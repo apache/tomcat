@@ -19,9 +19,11 @@ package javax.el;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -29,7 +31,242 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class ImportHandler {
 
-    private List<String> packageNames = new ArrayList<>();
+    private static final Map<String,Set<String>> standardPackages = new HashMap<>();
+
+    static {
+        // Servlet 4.0
+        Set<String> servletClassNames = new HashSet<>();
+        // Interfaces
+        servletClassNames.add("AsyncContext");
+        servletClassNames.add("AsyncListener");
+        servletClassNames.add("Filter");
+        servletClassNames.add("FilterChain");
+        servletClassNames.add("FilterConfig");
+        servletClassNames.add("FilterRegistration");
+        servletClassNames.add("FilterRegistration.Dynamic");
+        servletClassNames.add("ReadListener");
+        servletClassNames.add("Registration");
+        servletClassNames.add("Registration.Dynamic");
+        servletClassNames.add("RequestDispatcher");
+        servletClassNames.add("Servlet");
+        servletClassNames.add("ServletConfig");
+        servletClassNames.add("ServletContainerInitializer");
+        servletClassNames.add("ServletContext");
+        servletClassNames.add("ServletContextAttributeListener");
+        servletClassNames.add("ServletContextListener");
+        servletClassNames.add("ServletRegistration");
+        servletClassNames.add("ServletRegistration.Dynamic");
+        servletClassNames.add("ServletRequest");
+        servletClassNames.add("ServletRequestAttributeListener");
+        servletClassNames.add("ServletRequestListener");
+        servletClassNames.add("ServletResponse");
+        servletClassNames.add("SessionCookieConfig");
+        servletClassNames.add("SingleThreadModel");
+        servletClassNames.add("WriteListener");
+        // Classes
+        servletClassNames.add("AsyncEvent");
+        servletClassNames.add("GenericFilter");
+        servletClassNames.add("GenericServlet");
+        servletClassNames.add("HttpConstraintElement");
+        servletClassNames.add("HttpMethodConstraintElement");
+        servletClassNames.add("MultipartConfigElement");
+        servletClassNames.add("ServletContextAttributeEvent");
+        servletClassNames.add("ServletContextEvent");
+        servletClassNames.add("ServletInputStream");
+        servletClassNames.add("ServletOutputStream");
+        servletClassNames.add("ServletRequestAttributeEvent");
+        servletClassNames.add("ServletRequestEvent");
+        servletClassNames.add("ServletRequestWrapper");
+        servletClassNames.add("ServletResponseWrapper");
+        servletClassNames.add("ServletSecurityElement");
+        // Enums
+        servletClassNames.add("DispatcherType");
+        servletClassNames.add("SessionTrackingMode");
+        // Exceptions
+        servletClassNames.add("ServletException");
+        servletClassNames.add("UnavailableException");
+        standardPackages.put("javax.servlet", servletClassNames);
+
+        // Servlet 4.0
+        Set<String> servletHttpClassNames = new HashSet<>();
+        // Interfaces
+        servletHttpClassNames.add("HttpServletMapping");
+        servletHttpClassNames.add("HttpServletRequest");
+        servletHttpClassNames.add("HttpServletResponse");
+        servletHttpClassNames.add("HttpSession");
+        servletHttpClassNames.add("HttpSessionActivationListener");
+        servletHttpClassNames.add("HttpSessionAttributeListener");
+        servletHttpClassNames.add("HttpSessionBindingListener");
+        servletHttpClassNames.add("HttpSessionContext");
+        servletHttpClassNames.add("HttpSessionIdListener");
+        servletHttpClassNames.add("HttpSessionListener");
+        servletHttpClassNames.add("HttpUpgradeHandler");
+        servletHttpClassNames.add("Part");
+        servletHttpClassNames.add("PushBuilder");
+        servletHttpClassNames.add("WebConnection");
+        // Classes
+        servletHttpClassNames.add("Cookie");
+        servletHttpClassNames.add("HttpFilter");
+        servletHttpClassNames.add("HttpServlet");
+        servletHttpClassNames.add("HttpServletRequestWrapper");
+        servletHttpClassNames.add("HttpServletResponseWrapper");
+        servletHttpClassNames.add("HttpSessionBindingEvent");
+        servletHttpClassNames.add("HttpSessionEvent");
+        servletHttpClassNames.add("HttpUtils");
+        // Enums
+        servletHttpClassNames.add("MappingMatch");
+        standardPackages.put("javax.servlet.http", servletHttpClassNames);
+
+        // JSP 2.3
+        Set<String> servletJspClassNames = new HashSet<>();
+        //Interfaces
+        servletJspClassNames.add("HttpJspPage");
+        servletJspClassNames.add("JspApplicationContext");
+        servletJspClassNames.add("JspPage");
+        // Classes
+        servletJspClassNames.add("ErrorData");
+        servletJspClassNames.add("JspContext");
+        servletJspClassNames.add("JspEngineInfo");
+        servletJspClassNames.add("JspFactory");
+        servletJspClassNames.add("JspWriter");
+        servletJspClassNames.add("PageContext");
+        servletJspClassNames.add("Exceptions");
+        servletJspClassNames.add("JspException");
+        servletJspClassNames.add("JspTagException");
+        servletJspClassNames.add("SkipPageException");
+        standardPackages.put("javax.servlet.jsp", servletJspClassNames);
+
+        Set<String> javaLangClassNames = new HashSet<>();
+        // Taken from Java 11 EA18 Javadoc
+        // Interfaces
+        javaLangClassNames.add("Appendable");
+        javaLangClassNames.add("AutoCloseable");
+        javaLangClassNames.add("CharSequence");
+        javaLangClassNames.add("Cloneable");
+        javaLangClassNames.add("Comparable");
+        javaLangClassNames.add("Iterable");
+        javaLangClassNames.add("ProcessHandle");
+        javaLangClassNames.add("ProcessHandle.Info");
+        javaLangClassNames.add("Readable");
+        javaLangClassNames.add("Runnable");
+        javaLangClassNames.add("StackWalker.StackFrame");
+        javaLangClassNames.add("System.Logger");
+        javaLangClassNames.add("Thread.UncaughtExceptionHandler");
+        //Classes
+        javaLangClassNames.add("Boolean");
+        javaLangClassNames.add("Byte");
+        javaLangClassNames.add("Character");
+        javaLangClassNames.add("Character.Subset");
+        javaLangClassNames.add("Character.UnicodeBlock");
+        javaLangClassNames.add("Class");
+        javaLangClassNames.add("ClassLoader");
+        javaLangClassNames.add("ClassValue");
+        javaLangClassNames.add("Compiler");
+        javaLangClassNames.add("Double");
+        javaLangClassNames.add("Enum");
+        javaLangClassNames.add("Float");
+        javaLangClassNames.add("InheritableThreadLocal");
+        javaLangClassNames.add("Integer");
+        javaLangClassNames.add("Long");
+        javaLangClassNames.add("Math");
+        javaLangClassNames.add("Module");
+        javaLangClassNames.add("ModuleLayer");
+        javaLangClassNames.add("ModuleLayer.Controller");
+        javaLangClassNames.add("Number");
+        javaLangClassNames.add("Object");
+        javaLangClassNames.add("Package");
+        javaLangClassNames.add("Process");
+        javaLangClassNames.add("ProcessBuilder");
+        javaLangClassNames.add("ProcessBuilder.Redirect");
+        javaLangClassNames.add("Runtime");
+        javaLangClassNames.add("Runtime.Version");
+        javaLangClassNames.add("RuntimePermission");
+        javaLangClassNames.add("SecurityManager");
+        javaLangClassNames.add("Short");
+        javaLangClassNames.add("StackTraceElement");
+        javaLangClassNames.add("StackWalker");
+        javaLangClassNames.add("StrictMath");
+        javaLangClassNames.add("String");
+        javaLangClassNames.add("StringBuffer");
+        javaLangClassNames.add("StringBuilder");
+        javaLangClassNames.add("System");
+        javaLangClassNames.add("System.LoggerFinder");
+        javaLangClassNames.add("Thread");
+        javaLangClassNames.add("ThreadGroup");
+        javaLangClassNames.add("ThreadLocal");
+        javaLangClassNames.add("Throwable");
+        javaLangClassNames.add("Void");
+        //Enums
+        javaLangClassNames.add("Character.UnicodeScript");
+        javaLangClassNames.add("ProcessBuilder.Redirect.Type");
+        javaLangClassNames.add("StackWalker.Option");
+        javaLangClassNames.add("System.Logger.Level");
+        javaLangClassNames.add("Thread.State");
+        //Exceptions
+        javaLangClassNames.add("ArithmeticException");
+        javaLangClassNames.add("ArrayIndexOutOfBoundsException");
+        javaLangClassNames.add("ArrayStoreException");
+        javaLangClassNames.add("ClassCastException");
+        javaLangClassNames.add("ClassNotFoundException");
+        javaLangClassNames.add("CloneNotSupportedException");
+        javaLangClassNames.add("EnumConstantNotPresentException");
+        javaLangClassNames.add("Exception");
+        javaLangClassNames.add("IllegalAccessException");
+        javaLangClassNames.add("IllegalArgumentException");
+        javaLangClassNames.add("IllegalCallerException");
+        javaLangClassNames.add("IllegalMonitorStateException");
+        javaLangClassNames.add("IllegalStateException");
+        javaLangClassNames.add("IllegalThreadStateException");
+        javaLangClassNames.add("IndexOutOfBoundsException");
+        javaLangClassNames.add("InstantiationException");
+        javaLangClassNames.add("InterruptedException");
+        javaLangClassNames.add("LayerInstantiationException");
+        javaLangClassNames.add("NegativeArraySizeException");
+        javaLangClassNames.add("NoSuchFieldException");
+        javaLangClassNames.add("NoSuchMethodException");
+        javaLangClassNames.add("NullPointerException");
+        javaLangClassNames.add("NumberFormatException");
+        javaLangClassNames.add("ReflectiveOperationException");
+        javaLangClassNames.add("RuntimeException");
+        javaLangClassNames.add("SecurityException");
+        javaLangClassNames.add("StringIndexOutOfBoundsException");
+        javaLangClassNames.add("TypeNotPresentException");
+        javaLangClassNames.add("UnsupportedOperationException");
+        //Errors
+        javaLangClassNames.add("AbstractMethodError");
+        javaLangClassNames.add("AssertionError");
+        javaLangClassNames.add("BootstrapMethodError");
+        javaLangClassNames.add("ClassCircularityError");
+        javaLangClassNames.add("ClassFormatError");
+        javaLangClassNames.add("Error");
+        javaLangClassNames.add("ExceptionInInitializerError");
+        javaLangClassNames.add("IllegalAccessError");
+        javaLangClassNames.add("IncompatibleClassChangeError");
+        javaLangClassNames.add("InstantiationError");
+        javaLangClassNames.add("InternalError");
+        javaLangClassNames.add("LinkageError");
+        javaLangClassNames.add("NoClassDefFoundError");
+        javaLangClassNames.add("NoSuchFieldError");
+        javaLangClassNames.add("NoSuchMethodError");
+        javaLangClassNames.add("OutOfMemoryError");
+        javaLangClassNames.add("StackOverflowError");
+        javaLangClassNames.add("ThreadDeath");
+        javaLangClassNames.add("UnknownError");
+        javaLangClassNames.add("UnsatisfiedLinkError");
+        javaLangClassNames.add("UnsupportedClassVersionError");
+        javaLangClassNames.add("VerifyError");
+        javaLangClassNames.add("VirtualMachineError");
+        //Annotation Types
+        javaLangClassNames.add("Deprecated");
+        javaLangClassNames.add("FunctionalInterface");
+        javaLangClassNames.add("Override");
+        javaLangClassNames.add("SafeVarargs");
+        javaLangClassNames.add("SuppressWarnings");
+        standardPackages.put("java.lang", javaLangClassNames);
+
+    }
+
+    private Map<String,Set<String>> packageNames = new ConcurrentHashMap<>();
     private ConcurrentHashMap<String,String> classNames = new ConcurrentHashMap<>();
     private Map<String,Class<?>> clazzes = new ConcurrentHashMap<>();
     private Map<String,Class<?>> statics = new ConcurrentHashMap<>();
@@ -127,7 +364,11 @@ public class ImportHandler {
         // a) for sake of performance when used in JSPs (BZ 57142),
         // b) java.lang.Package.getPackage(name) is not reliable (BZ 57574),
         // c) such check is not required by specification.
-        packageNames.add(name);
+        Set<String> preloaded = standardPackages.get(name);
+        if (preloaded == null) {
+            preloaded = Collections.emptySet();
+        }
+        packageNames.put(name, preloaded);
     }
 
 
@@ -159,8 +400,17 @@ public class ImportHandler {
 
         // Search the package imports - note there may be multiple matches
         // (which correctly triggers an error)
-        for (String p : packageNames) {
-            className = p + '.' + name;
+        for (Map.Entry<String,Set<String>> entry : packageNames.entrySet()) {
+            if (!entry.getValue().isEmpty()) {
+                // Standard package where we know all the class names
+                if (!entry.getValue().contains(name)) {
+                    // Requested name isn't in the list so it isn't in this
+                    // package so move on to next package. This allows the
+                    // class loader look-up to be skipped.
+                    continue;
+                }
+            }
+            className = entry.getKey() + '.' + name;
             Class<?> clazz = findClass(className, false);
             if (clazz != null) {
                 if (result != null) {

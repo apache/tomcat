@@ -103,6 +103,12 @@
         By default, one thread will be used per core. Based on a patch by Dan
         Fabulich. (markt)
       </add>
+      <add>
+        <bug>62453</bug>: Add a performance optimisation for using expressions
+        in tags that depend on uninitialised tag attributes with implied scope.
+        Generally, using an explicit scope with tag attributes in EL is the best
+        way to avoid various potential performance issues. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Web applications">
