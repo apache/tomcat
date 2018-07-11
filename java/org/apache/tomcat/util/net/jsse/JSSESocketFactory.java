@@ -191,7 +191,7 @@ public class JSSESocketFactory implements ServerSocketFactory, SSLUtil {
                     log.debug(sm.getString("jsse.excludeDefaultCipher", cipher));
                     continue;
                 }
-                // Remove DHE ciphers unless running on Java 8 or above 
+                // Remove DHE ciphers unless running on Java 8 or above
                 if (!JreCompat.isJre8Available() &&
                         cipher.toUpperCase(Locale.ENGLISH).contains("_DHE_")) {
                     log.debug(sm.getString("jsse.excludeDefaultCipher", cipher));
@@ -208,7 +208,7 @@ public class JSSESocketFactory implements ServerSocketFactory, SSLUtil {
                 }
                 filteredCiphers.add(cipher);
             }
-    
+
             defaultServerCipherSuites = filteredCiphers.toArray(new String[filteredCiphers.size()]);
             if (defaultServerCipherSuites.length == 0) {
                 log.warn(sm.getString("jsse.noDefaultCiphers", endpoint.getName()));
@@ -819,7 +819,7 @@ public class JSSESocketFactory implements ServerSocketFactory, SSLUtil {
      * Configures SSLEngine to honor cipher suites ordering based upon
      * endpoint configuration.
      *
-     * @throws InvalidAlgorithmParameterException If the runtime JVM doesn't
+     * @throws UnsupportedOperationException If the runtime JVM doesn't
      *         support this setting.
      */
     protected void configureUseServerCipherSuitesOrder(SSLServerSocket socket) {
@@ -846,7 +846,7 @@ public class JSSESocketFactory implements ServerSocketFactory, SSLUtil {
 
         socket.setEnabledCipherSuites(enabledCiphers);
         socket.setEnabledProtocols(enabledProtocols);
-        
+
         // we don't know if client auth is needed -
         // after parsing the request we may re-handshake
         configureClientAuth(socket);
