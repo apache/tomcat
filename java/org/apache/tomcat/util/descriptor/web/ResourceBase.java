@@ -22,8 +22,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.tomcat.util.res.StringManager;
-
 
 /**
  * Representation of an Context element
@@ -33,8 +31,6 @@ import org.apache.tomcat.util.res.StringManager;
 public class ResourceBase implements Serializable, Injectable {
 
     private static final long serialVersionUID = 1L;
-
-    private static final StringManager sm = StringManager.getManager(ResourceBase.class);
 
 
     // ------------------------------------------------------------- Properties
