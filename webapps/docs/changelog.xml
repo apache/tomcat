@@ -78,6 +78,12 @@
         <code>Vary</code> HTTP response header to use a common utility method
         that addresses several additional edge cases. (markt)
       </fix>
+      <fix>
+        <bug>62526</bug>: Correctly handle PKCS12 format key stores when the key
+        store password is configured to be the empty string. Note that Java 6
+        does not support PKCS12 key stores configured to use a store password of
+        the empty string. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">

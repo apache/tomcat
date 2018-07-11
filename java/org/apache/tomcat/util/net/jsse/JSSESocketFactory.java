@@ -465,13 +465,33 @@ public class JSSESocketFactory implements ServerSocketFactory, SSLUtil {
             } else {
                 ks = KeyStore.getInstance(type, provider);
             }
+            // Some key store types (e.g. hardware) expect the InputStream
+            // to be null
             if(!("PKCS11".equalsIgnoreCase(type) ||
                     "".equalsIgnoreCase(path))) {
                 istream = ConfigFileLoader.getInputStream(path);
             }
 
+            // The digester cannot differentiate between null and "".
+            // Unfortunately, some key stores behave differently with null
+            // and "".
+            // JKS key stores treat null and "" interchangeably.
+            // PKCS12 key stores (Java 7 onwards) don't return the cert if
+            // null is used.
+            // Key stores that do not use passwords expect null
+            // Therefore:
+            // - log an error of PKCS12 is used with an empty password
+            //   (an exception will follow)
+            // - generally use null if pass is null or ""
+            // - for JKS or PKCS12 only use null if pass is null
+            //   (because JKS will auto-switch to PKCS12)
+            if ("PKCS12".equalsIgnoreCase(type) && pass != null && pass.length() == 0 &&
+                    !JreCompat.isJre7Available()) {
+                log.error(sm.getString("jsse.java6.emptyPass"));
+            }
             char[] storePass = null;
-            if (pass != null && !"".equals(pass)) {
+            if (pass != null && (!"".equals(pass) ||
+                    "JKS".equalsIgnoreCase(type) || "PKCS12".equalsIgnoreCase(type))) {
                 storePass = pass.toCharArray();
             }
             ks.load(istream, storePass);
