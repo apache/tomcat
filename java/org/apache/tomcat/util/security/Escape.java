@@ -82,7 +82,7 @@ public class Escape {
      * @return The escaped content or <code>&quot;?&quot;</code> if obj is
      *         {@code null}
      */
-    public static String htmlElementContext(Object obj) {
+    public static String htmlElementContent(Object obj) {
         if (obj == null) {
             return "?";
         }

@@ -500,23 +500,23 @@ public class StatusTransformer {
                 }
                 writer.write("</td>");
                 writer.write("<td>");
-                writer.print(Escape.htmlElementContext(mBeanServer.getAttribute
+                writer.print(Escape.htmlElementContent(mBeanServer.getAttribute
                                     (pName, "remoteAddrForwarded")));
                 writer.write("</td>");
                 writer.write("<td>");
-                writer.print(Escape.htmlElementContext(mBeanServer.getAttribute
+                writer.print(Escape.htmlElementContent(mBeanServer.getAttribute
                                     (pName, "remoteAddr")));
                 writer.write("</td>");
                 writer.write("<td nowrap>");
-                writer.write(Escape.htmlElementContext(mBeanServer.getAttribute
+                writer.write(Escape.htmlElementContent(mBeanServer.getAttribute
                                     (pName, "virtualHost")));
                 writer.write("</td>");
                 writer.write("<td nowrap class=\"row-left\">");
                 if (showRequest) {
-                    writer.write(Escape.htmlElementContext(mBeanServer.getAttribute
+                    writer.write(Escape.htmlElementContent(mBeanServer.getAttribute
                                         (pName, "method")));
                     writer.write(" ");
-                    writer.write(Escape.htmlElementContext(mBeanServer.getAttribute
+                    writer.write(Escape.htmlElementContent(mBeanServer.getAttribute
                                         (pName, "currentUri")));
                     String queryString = (String) mBeanServer.getAttribute
                         (pName, "currentQueryString");
@@ -525,7 +525,7 @@ public class StatusTransformer {
                         writer.print(Escape.htmlElementContent(queryString));
                     }
                     writer.write(" ");
-                    writer.write(Escape.htmlElementContext(mBeanServer.getAttribute
+                    writer.write(Escape.htmlElementContent(mBeanServer.getAttribute
                                         (pName, "protocol")));
                 } else {
                     writer.write("?");
@@ -559,18 +559,18 @@ public class StatusTransformer {
                 }
                 writer.write("\"");
                 writer.write(" remoteAddr=\""
-                             + Escape.htmlElementContext(mBeanServer.getAttribute
+                             + Escape.htmlElementContent(mBeanServer.getAttribute
                                       (pName, "remoteAddr")) + "\"");
                 writer.write(" virtualHost=\""
-                             + Escape.htmlElementContext(mBeanServer.getAttribute
+                             + Escape.htmlElementContent(mBeanServer.getAttribute
                                       (pName, "virtualHost")) + "\"");
 
                 if (showRequest) {
                     writer.write(" method=\""
-                                 + Escape.htmlElementContext(mBeanServer.getAttribute
+                                 + Escape.htmlElementContent(mBeanServer.getAttribute
                                           (pName, "method")) + "\"");
                     writer.write(" currentUri=\""
-                                 + Escape.htmlElementContext(mBeanServer.getAttribute
+                                 + Escape.htmlElementContent(mBeanServer.getAttribute
                                           (pName, "currentUri")) + "\"");
 
                     String queryString = (String) mBeanServer.getAttribute
@@ -582,7 +582,7 @@ public class StatusTransformer {
                         writer.write(" currentQueryString=\"&#63;\"");
                     }
                     writer.write(" protocol=\""
-                                 + Escape.htmlElementContext(mBeanServer.getAttribute
+                                 + Escape.htmlElementContent(mBeanServer.getAttribute
                                           (pName, "protocol")) + "\"");
                 } else {
                     writer.write(" method=\"&#63;\"");
@@ -644,7 +644,7 @@ public class StatusTransformer {
                 }
 
                 writer.print("<a href=\"#" + (count++) + ".0\">");
-                writer.print(Escape.htmlElementContext(webModuleName));
+                writer.print(Escape.htmlElementContent(webModuleName));
                 writer.print("</a>");
                 if (iterator.hasNext()) {
                     writer.print("<br>");
@@ -726,7 +726,7 @@ public class StatusTransformer {
             }
 
             writer.print("<h1>");
-            writer.print(Escape.htmlElementContext(name));
+            writer.print(Escape.htmlElementContent(name));
             writer.print("</h1>");
             writer.print("</a>");
 
@@ -869,11 +869,11 @@ public class StatusTransformer {
                 mBeanServer.invoke(objectName, "findMappings", null, null);
 
             writer.print("<h2>");
-            writer.print(Escape.htmlElementContext(servletName));
+            writer.print(Escape.htmlElementContent(servletName));
             if ((mappings != null) && (mappings.length > 0)) {
                 writer.print(" [ ");
                 for (int i = 0; i < mappings.length; i++) {
-                    writer.print(Escape.htmlElementContext(mappings[i]));
+                    writer.print(Escape.htmlElementContent(mappings[i]));
                     if (i < mappings.length - 1) {
                         writer.print(" , ");
                     }
