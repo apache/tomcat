@@ -23,6 +23,11 @@ package org.apache.tomcat.util.security;
  */
 public class Escape {
 
+    private Escape() {
+        // Hide default constructor for this utility class
+    }
+
+
     /**
      * Escape content for use in HTML. This escaping is suitable for the
      * following uses:
