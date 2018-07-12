@@ -93,6 +93,8 @@ public class TestImportHandlerStandardPackages {
             Enumeration<URL> resources = cl.getResources(path);
             while (resources.hasMoreElements()) {
                 URL resource = resources.nextElement();
+                // Debugging for Gump failure
+                System.out.println("Scanning: [" + resource + "]");
                 File dir = new File(resource.toURI());
                 String[] files = dir.list();
                 for (String file : files) {
