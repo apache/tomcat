@@ -19,6 +19,7 @@ package javax.el;
 import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.net.URI;
 import java.net.URL;
 import java.util.Enumeration;
 import java.util.Map;
@@ -95,7 +96,13 @@ public class TestImportHandlerStandardPackages {
                 URL resource = resources.nextElement();
                 // Debugging for Gump failure
                 System.out.println("Scanning: [" + resource + "]");
-                File dir = new File(resource.toURI());
+                URI uri = resource.toURI();
+                // Gump includes some JARs on classpath - skip them
+                if (!"file".equals(uri.getScheme())) {
+                    continue;
+                }
+                File dir = new File(uri);
+
                 String[] files = dir.list();
                 for (String file : files) {
                     if (!file.endsWith(".class")) {
