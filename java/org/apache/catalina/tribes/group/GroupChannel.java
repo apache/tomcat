@@ -186,6 +186,11 @@ public class GroupChannel extends ChannelInterceptorBase
     @Override
     public void heartbeat() {
         super.heartbeat();
+
+        if (coordinator.getMembershipService() instanceof Heartbeat) {
+            ((Heartbeat) coordinator.getMembershipService()).heartbeat();
+        }
+
         for (MembershipListener listener : membershipListeners) {
             if ( listener instanceof Heartbeat ) ((Heartbeat)listener).heartbeat();
         }
