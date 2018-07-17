@@ -56,9 +56,6 @@
         <bug>62527</bug>: Revert restriction of JNDI to the <code>java:</code>
         namespace. (remm)
       </fix>
-      <fix>
-        Propagate heartbeat from channel down to membership service. (remm)
-      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
