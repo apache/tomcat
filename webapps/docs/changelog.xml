@@ -102,6 +102,14 @@
       </add>
     </changelog>
   </subsection>
+  <subsection name="Tribes">
+    <changelog>
+      <fix>
+        Ensures that the specified <code>rxBufSize</code> is correctly set to
+        receiver buffer size. (kfujino)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 7.0.90 (violetagg)" rtext="released 2018-07-06">
   <subsection name="Catalina">
