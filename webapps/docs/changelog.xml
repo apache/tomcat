@@ -132,6 +132,10 @@
         Ensures that the specified <code>rxBufSize</code> is correctly set to
         receiver buffer size. (kfujino)
       </fix>
+      <fix>
+        Correct the stop order of the Channel components. It stops in the
+        reverse order to that at startup. (kfujino)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">

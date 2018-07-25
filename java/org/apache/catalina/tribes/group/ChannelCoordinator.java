@@ -221,25 +221,24 @@ public class ChannelCoordinator extends ChannelInterceptorBase implements Messag
             if (svc == 0 ) return;//nothing to stop
 
             boolean valid = false;
-            if ( Channel.SND_RX_SEQ==(svc & Channel.SND_RX_SEQ) ) {
-                clusterReceiver.stop();
-                clusterReceiver.setMessageListener(null);
+            if ( Channel.MBR_TX_SEQ==(svc & Channel.MBR_TX_SEQ) ) {
+                membershipService.stop(MembershipService.MBR_TX);
                 valid = true;
             }
-            if ( Channel.SND_TX_SEQ==(svc & Channel.SND_TX_SEQ) ) {
-                clusterSender.stop();
-                valid = true;
-            }
-
             if ( Channel.MBR_RX_SEQ==(svc & Channel.MBR_RX_SEQ) ) {
                 membershipService.stop(MembershipService.MBR_RX);
                 membershipService.setMembershipListener(null);
                 valid = true;
 
             }
-            if ( Channel.MBR_TX_SEQ==(svc & Channel.MBR_TX_SEQ) ) {
+            if ( Channel.SND_TX_SEQ==(svc & Channel.SND_TX_SEQ) ) {
+                clusterSender.stop();
                 valid = true;
-                membershipService.stop(MembershipService.MBR_TX);
+            }
+            if ( Channel.SND_RX_SEQ==(svc & Channel.SND_RX_SEQ) ) {
+                clusterReceiver.stop();
+                clusterReceiver.setMessageListener(null);
+                valid = true;
             }
             if ( !valid) {
                 throw new IllegalArgumentException(sm.getString("channelCoordinator.invalid.startLevel"));
