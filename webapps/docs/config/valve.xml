@@ -1830,9 +1830,10 @@
       </attribute>
 
       <attribute name="showReport" required="false">
-        <p>Flag to determine if the error report is presented when an error
-           occurs. If set to <code>false</code>, then the error report is not in
-           the HTML response.
+        <p>Flag to determine if the error report (custom error message and/or
+           stack trace) is presented when an error occurs. If set to
+           <code>false</code>, then the error report is not returned in the HTML
+           response.
            Default value: <code>true</code>
         </p>
       </attribute>
