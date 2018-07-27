@@ -208,9 +208,9 @@ public class StaticMembershipProvider extends MembershipProviderBase implements 
         if (!(msg instanceof MemberMessage)) return;
         MemberMessage memMsg = (MemberMessage) msg;
         if (memMsg.getMsgtype() == MemberMessage.MSG_START) {
-            //TODO
+            messageReceived(memMsg, sender);
         } else if (memMsg.getMsgtype() == MemberMessage.MSG_PING) {
-            //TODO
+            messageReceived(memMsg, sender);
         } else {
             // other messages are ignored.
             if (log.isInfoEnabled())
