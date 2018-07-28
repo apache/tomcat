@@ -45,7 +45,7 @@ public class StaticMembershipProvider extends MembershipProviderBase implements 
 
     protected static final StringManager sm = StringManager.getManager(StaticMembershipProvider.class);
     private static final Log log = LogFactory.getLog(StaticMembershipProvider.class);
- 
+
     protected Channel channel;
     protected RpcChannel rpcChannel;
     protected MembershipService service;
@@ -66,7 +66,7 @@ public class StaticMembershipProvider extends MembershipProviderBase implements 
         this.connectTimeout = Integer.parseInt(connectTimeoutStr);
         String rpcTimeouStr = properties.getProperty("rpcTimeout");
         this.rpcTimeout = Long.parseLong(rpcTimeouStr);
-        this.membershipName = properties.getProperty("membershipName");;
+        this.membershipName = properties.getProperty("membershipName");
         this.membershipId = membershipName.getBytes(StandardCharsets.ISO_8859_1);
         membership = new Membership(service.getLocalMember(true));
         this.rpcChannel = new RpcChannel(this.membershipId, channel, this);

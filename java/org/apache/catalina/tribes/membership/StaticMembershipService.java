@@ -73,7 +73,7 @@ public class StaticMembershipService extends MembershipServiceBase {
             if (provider != null && provider.stop(level)) {
                 // TODO JMX unregister
                 provider = null;
-                channel = null;;
+                channel = null;
             }
         } catch (Exception e) {
             log.error(sm.getString("staticMembershipService.stopFail", Integer.valueOf(level)), e);
@@ -89,7 +89,7 @@ public class StaticMembershipService extends MembershipServiceBase {
     }
 
     @Override
-    public void setLocalMemberProperties(String listenHost, int listenPort, 
+    public void setLocalMemberProperties(String listenHost, int listenPort,
             int securePort, int udpPort) {
         try {
             localMember.setHostname(listenHost);
