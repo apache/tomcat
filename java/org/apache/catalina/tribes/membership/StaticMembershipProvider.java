@@ -219,7 +219,8 @@ public class StaticMembershipProvider extends MembershipProviderBase implements 
         } else {
             // other messages are ignored.
             if (log.isInfoEnabled())
-                log.info("never happen");
+                log.info(sm.getString("staticMembershipProvider.replyRequest.ignored",
+                        memMsg.getTypeDesc()));
             return null;
         }
     }
@@ -235,7 +236,8 @@ public class StaticMembershipProvider extends MembershipProviderBase implements 
         } else {
             // other messages are ignored.
             if (log.isInfoEnabled())
-                log.info("never happen");
+                log.info(sm.getString("staticMembershipProvider.leftOver.ignored",
+                        memMsg.getTypeDesc()));
         }
     }
 
@@ -341,6 +343,19 @@ public class StaticMembershipProvider extends MembershipProviderBase implements 
         @Override
         public String toString() {
             return super.toString();
+        }
+
+        protected String getTypeDesc() {
+            switch (msgtype) {
+            case MSG_START:
+                return "MSG_START";
+            case MSG_STOP:
+                return "MSG_STOP";
+            case MSG_PING:
+                return "MSG_PING";
+            default:
+                return "UNKNOWN";
+            }
         }
     }
 
