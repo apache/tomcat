@@ -40,7 +40,7 @@ public class Client {
     private final Async async;
 
     /**
-     * Contains the messages wich are buffered until the previous
+     * Contains the messages which are buffered until the previous
      * send operation has finished.
      */
     private final LinkedList<AbstractWebsocketMessage> messagesToSend =
@@ -201,7 +201,7 @@ public class Client {
                 // set isSendingMessage to false because we must assume the connection
                 // broke (and onClose will be called), so we don't try to send
                 // other messages.
-                // As a precaution, we close the session (e.g. if a send timeout occured).
+                // As a precaution, we close the session (e.g. if a send timeout occurred).
                 // TODO: session.close() blocks, while this handler shouldn't block.
                 // Ideally, there should be some abort() method that cancels the
                 // connection immediately...
