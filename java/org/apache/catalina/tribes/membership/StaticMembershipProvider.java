@@ -57,6 +57,11 @@ public class StaticMembershipProvider extends MembershipProviderBase implements 
     protected int connectTimeout = 500;
     protected long rpcTimeout = 3000;
     protected int startLevel = 0;
+    // for ping thread
+    protected boolean useThread = false;
+    protected long pingInterval = 1000;
+    protected volatile boolean running = true;
+    protected PingThread thread = null;
 
     @Override
     public void init(Properties properties) throws Exception {
@@ -71,6 +76,10 @@ public class StaticMembershipProvider extends MembershipProviderBase implements 
         membership = new Membership(service.getLocalMember(true));
         this.rpcChannel = new RpcChannel(this.membershipId, channel, this);
         this.channel.addChannelListener(this);
+        String useThreadStr = properties.getProperty("useThread");
+        this.useThread = Boolean.parseBoolean(useThreadStr);
+        String pingIntervalStr = properties.getProperty("pingInterval");
+        this.pingInterval = Long.parseLong(pingIntervalStr);
     }
 
     @Override
@@ -84,6 +93,13 @@ public class StaticMembershipProvider extends MembershipProviderBase implements 
         startLevel = (startLevel | level);
         if (startLevel == (Channel.MBR_RX_SEQ | Channel.MBR_TX_SEQ)) {
             startMembership(getAliveMembers(staticMembers.toArray(new Member[0])));
+            running = true;
+            if ( thread == null && useThread) {
+                thread = new PingThread();
+                thread.setDaemon(true);
+                thread.setName("StaticMembership.PingThread[" + this.channel.getName() +"]");
+                thread.start();
+            }
         }
     }
 
@@ -97,6 +113,11 @@ public class StaticMembershipProvider extends MembershipProviderBase implements 
         }
         startLevel = (startLevel & (~level));
         if ( startLevel == 0 ) {
+            running = false;
+            if (thread != null) {
+                thread.interrupt();
+                thread = null;
+            }
             if (this.rpcChannel != null) {
                 this.rpcChannel.breakdown();
             }
@@ -221,7 +242,7 @@ public class StaticMembershipProvider extends MembershipProviderBase implements 
     @Override
     public void heartbeat() {
         try {
-            ping();
+            if (!useThread) ping();
         } catch (ChannelException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -323,4 +344,18 @@ public class StaticMembershipProvider extends MembershipProviderBase implements 
         }
     }
 
+    protected class PingThread extends Thread {
+        @Override
+        public void run() {
+            while (running) {
+                try {
+                    sleep(pingInterval);
+                    ping();
+                }catch (InterruptedException ix) {
+                }catch (Exception x) {
+                    log.warn(sm.getString("staticMembershipProvider.pingThread.failed"),x);
+                }
+            }
+        }
+    }
 }

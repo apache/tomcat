@@ -161,6 +161,24 @@ public class StaticMembershipService extends MembershipServiceBase {
         properties.setProperty("rpcTimeout", String.valueOf(rpcTimeout));
     }
 
+    public boolean getUseThread() {
+        String useThread = properties.getProperty("useThread");
+        return Boolean.parseBoolean(useThread);
+    }
+
+    public void setUseThread(boolean useThread) {
+        properties.setProperty("useThread", String.valueOf(useThread));
+    }
+
+    public long getPingInterval() {
+        String pingInterval = properties.getProperty("pingInterval");
+        return Long.parseLong(pingInterval);
+    }
+
+    public void setPingInterval(long pingInterval) {
+        properties.setProperty("pingInterval", String.valueOf(pingInterval));
+    }
+
     @Override
     public void setProperties(Properties properties) {
         setDefaults(properties);
@@ -175,6 +193,10 @@ public class StaticMembershipService extends MembershipServiceBase {
             properties.setProperty("connectTimeout","500");
         if (properties.getProperty("rpcTimeout") == null)
             properties.setProperty("rpcTimeout","3000");
+        if (properties.getProperty("useThread") == null)
+            properties.setProperty("useThread","false");
+        if (properties.getProperty("pingInterval") == null)
+            properties.setProperty("pingInterval","1000");
     }
 
     private String getMembershipName() {
