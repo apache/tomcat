@@ -866,6 +866,16 @@
       <zipfileset file="${tomcat.manifests}/default.license"
         fullpath="META-INF/LICENSE" />
     </jar>
+    <jar jarfile="${tomcat.build}/lib/tomcat-i18n-ru.jar"
+      manifest="${tomcat.manifests}/default.manifest">
+      <fileset dir="${tomcat.classes}">
+        <include name="**/LocalStrings_ru.properties" />
+      </fileset>
+      <zipfileset file="${tomcat.manifests}/default.notice"
+        fullpath="META-INF/NOTICE" />
+      <zipfileset file="${tomcat.manifests}/default.license"
+        fullpath="META-INF/LICENSE" />
+    </jar>
 
   </target>
 
