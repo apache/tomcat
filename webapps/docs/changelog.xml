@@ -144,6 +144,12 @@
         Correct the stop order of the Channel components. It stops in the
         reverse order to that at startup. (kfujino)
       </fix>
+      <add>
+        Added new StaticMembership implementation. This implementation does not
+        require any additional configuration of other
+        <code>ChannelInterceptors</code>. It works only with membership service.
+        (kfujino)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Other">
