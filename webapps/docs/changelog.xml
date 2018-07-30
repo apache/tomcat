@@ -173,6 +173,9 @@
         Implement checksum checks when downloading dependencies that are used
         to build Tomcat. (kkolinko)
       </add>
+      <fix>
+        Fixed spelling. Patch provided by Jimmy Casey via GitHub. (violetagg)
+      </fix>
     </changelog>
   </subsection>
 </section>
