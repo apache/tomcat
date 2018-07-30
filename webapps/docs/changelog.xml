@@ -118,6 +118,13 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Other">
+    <changelog>
+      <fix>
+        Fixed spelling. Patch provided by Jimmy Casey via GitHub. (violetagg)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 7.0.90 (violetagg)" rtext="released 2018-07-06">
   <subsection name="Catalina">
