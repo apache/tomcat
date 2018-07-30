@@ -102,6 +102,14 @@
       </add>
     </changelog>
   </subsection>
+  <subsection name="Web applications">
+    <changelog>
+      <add>
+        <bug>62558</bug>: Add Russian translations for the Manager and Host
+        Manager web applications. Based on a patch by Ivan Krasnov. (markt)
+      </add>
+    </changelog>
+  </subsection>
   <subsection name="Tribes">
     <changelog>
       <fix>

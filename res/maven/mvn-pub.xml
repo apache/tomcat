@@ -317,6 +317,7 @@
     <doMavenDeployNoSrc artifactId="tomcat-i18n-es"/>
     <doMavenDeployNoSrc artifactId="tomcat-i18n-fr"/>
     <doMavenDeployNoSrc artifactId="tomcat-i18n-ja"/>
+    <doMavenDeployNoSrc artifactId="tomcat-i18n-ru"/>
 
     <!-- Extras jars -->
     <doMavenDeploy artifactId="tomcat-extras-juli"
