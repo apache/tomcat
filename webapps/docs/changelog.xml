@@ -56,6 +56,13 @@
         <bug>62527</bug>: Revert restriction of JNDI to the <code>java:</code>
         namespace. (remm)
       </fix>
+      <add>
+        Introduce a new class - <code>MultiThrowable</code> - to report
+        exceptions when multiple actions are taken where each action may throw
+        an exception but all actions are taken before any errors are reported.
+        Use this new class when reporting multiple container (e.g. web
+        application) failures during start. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
