@@ -451,7 +451,7 @@ public class JAASRealm extends RealmBase {
             return null;
         }
         if (log.isDebugEnabled()) {
-            log.debug(sm.getString("jaasRealm.authenticateSuccess", username));
+            log.debug(sm.getString("jaasRealm.authenticateSuccess", username, principal));
         }
 
         return principal;
