@@ -182,7 +182,7 @@
     <attributes>
       <attribute name="className" required="true">
         <p>
-        The value is <code>org.apache.catalina.tribes.membership.StaticMembershipService</code>. 
+        The value is <code>org.apache.catalina.tribes.membership.StaticMembershipService</code>.
         </p>
       </attribute>
       <attribute name="connectTimeout" required="false">
