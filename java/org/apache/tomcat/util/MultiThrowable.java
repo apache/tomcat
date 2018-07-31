@@ -24,6 +24,8 @@ import java.util.List;
  * Wraps a list of throwables as a single throwable. This is intended to be used
  * when multiple actions are taken where each may throw an exception but all
  * actions are taken before any errors are reported.
+ * <p>
+ * This class is <b>NOT</b> threadsafe.
  */
 public class MultiThrowable extends Throwable {
 
