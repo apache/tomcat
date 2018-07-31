@@ -75,7 +75,7 @@ public final class TesterSupport {
 
     public static final String ROLE = "testrole";
 
-    private static String clientAuthExpectedIssuer = null;
+    private static String clientAuthExpectedIssuer;
     private static String lastUsage = "NONE";
     private static Principal[] lastRequestedIssuers = new Principal[0];
 
@@ -275,6 +275,10 @@ public final class TesterSupport {
         lc.setAuthMethod("CLIENT-CERT");
         ctx.setLoginConfig(lc);
         ctx.getPipeline().addValve(new SSLAuthenticator());
+
+        // Clear the tracking data
+        lastUsage = "NONE";
+        lastRequestedIssuers = new Principal[0];
     }
 
     protected static String getClientAuthExpectedIssuer() {
