@@ -37,6 +37,12 @@
   <p>
     The membership component in the Apache Tribes <a href="cluster-channel.html">Channel</a> is responsible
     for dynamic discovery of other members(nodes) in the cluster.
+    There are currently two different membership service, the <code>org.apache.catalina.tribes.membership.McastService</code>
+    and the <code>org.apache.catalina.tribes.membership.StaticMembershipService</code>.
+    The <code>McastService</code> builds a multicast based membership service
+    that sends UDP packets to multicast IP addresses.
+    The <code>StaticMembershipService</code> builds  a unicast based membership
+    service that sends TCP packets to predefined member address.
   </p>
 </section>
 
@@ -55,15 +61,24 @@
 
 
 <section name="Attributes">
-
+  <subsection name="Common Attributes">
+    <attributes>
+      <attribute name="className" required="true">
+        <p>
+        The implementation of the membership component.
+        Two implementations available, <code>org.apache.catalina.tribes.membership.McastService</code>
+        and <code>org.apache.catalina.tribes.membership.StaticMembershipService</code>.
+        </p>
+      </attribute>
+    </attributes>
+  </subsection>
   <subsection name="Multicast Attributes">
 
   <attributes>
 
     <attribute name="className" required="true">
       <p>
-      The default value is <code>org.apache.catalina.tribes.membership.McastService</code>
-      and is currently the only implementation.
+      The value is <code>org.apache.catalina.tribes.membership.McastService</code>.
       This implementation uses multicast heartbeats for member discovery.
       </p>
     </attribute>
@@ -159,15 +174,129 @@
       </p>
     </attribute>
 
-
   </attributes>
-
 
   </subsection>
 
+  <subsection name="Static Membership Attributes">
+    <attributes>
+      <attribute name="className" required="true">
+        <p>
+        The value is <code>org.apache.catalina.tribes.membership.StaticMembershipService</code>. 
+        </p>
+      </attribute>
+      <attribute name="connectTimeout" required="false">
+        <p>
+        Timeout for attempting a TCP connection to address of predefined static member.
+        Default is <code>500</code> ms.
+        </p>
+      </attribute>
+      <attribute name="expirationTime" required="false">
+        <p>
+        If members have failed to update their alive time within the given time,
+        this membership will notify the memberDisappeared event to cluster.
+        Default is <code>5000</code> ms.
+        </p>
+      </attribute>
+      <attribute name="rpcTimeout" required="false">
+        <p>
+        Timeout for messages that used for member notification to/from othee nodes.
+        Default is <code>3000</code> ms.
+        </p>
+      </attribute>
+      <attribute name="useThread" required="false">
+        <p>
+        If set to true, this membership service will start a local thread for
+        sending a ping message. if set to <code>false</code>, channel heartbeat
+        will send a ping message. Default is <code>false</code>.
+        </p>
+      </attribute>
+      <attribute name="pingInterval" required="false">
+        <p>
+        If <code>useThread</code> == <code>true</code>, defines the interval of
+        sending a ping message. Default is <code>1000</code> ms.
+        </p>
+      </attribute>
+    </attributes>
+  </subsection>
 
 </section>
 
+<section name="Nested Components">
+  <p>
+  Static Membership Service allows nesting of a <strong>&lt;LocalMember&gt;</strong>
+  and <strong>&lt;Member&gt;</strong>element.
+  </p>
+  <subsection name="StaticMember Attributes">
+    <p><b>LocalMember:</b> <br/>
+    Static member that is the local member of the static cluster group.
+    </p>
+    <attributes>
+      <attribute name="className" required="true">
+        Only one implementation available:<code>org.apache.catalina.tribes.membership.StaticMember</code>
+      </attribute>
+      <attribute name="port" required="false">
+        There is no need to set.
+        The value of this attribute inherits from the cluster receiver setting.
+      </attribute>
+      <attribute name="securePort" required="false">
+        There is no need to set.
+        The value of this attribute inherits from the cluster receiver setting.
+      </attribute>
+      <attribute name="host" required="false">
+        There is no need to set.
+        The value of this attribute inherits from the cluster receiver setting.
+      </attribute>
+      <attribute name="domain" required="false">
+        The logical cluster domain for that this static member listens for cluster messages.
+        Two different type of values are possible:<br/>
+        1. Regular string values like &quot;staging-domain&quot; or &quot;tomcat-cluster&quot; will be converted into bytes
+        using ISO-8859-1 encoding.
+        2. byte array in string form, for example {216,123,12,3}<br/>
+      </attribute>
+      <attribute name="uniqueId" required="true">
+        A universally uniqueId for this static member.
+        The values must be 16 bytes in the following form:<br/>
+        1. byte array in string form, for example {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15}<br/>
+      </attribute>
+    </attributes>
+
+    <p><b>Member:</b> <br/>
+    Static member that add to the static cluster group.
+    </p>
+    <attributes>
+      <attribute name="className" required="true">
+        Only one implementation available:<code>org.apache.catalina.tribes.membership.StaticMember</code>
+      </attribute>
+      <attribute name="port" required="true">
+        The port that this static member listens to for cluster messages
+      </attribute>
+      <attribute name="securePort" required="false">
+        The secure port this static member listens to for encrypted cluster messages
+        default value is <code>-1</code>, this value means the member is not listening on a secure port
+      </attribute>
+      <attribute name="host" required="true">
+        The host (or network interface) that this static member listens for cluster messages.
+        Three different type of values are possible:<br/>
+        1. IP address in the form of &quot;216.123.1.23&quot;<br/>
+        2. Hostnames like &quot;tomcat01.mydomain.com&quot; or &quot;tomcat01&quot; as long as they resolve correctly<br/>
+        3. byte array in string form, for example {216,123,12,3}<br/>
+      </attribute>
+      <attribute name="domain" required="false">
+        The logical cluster domain for that this static member listens for cluster messages.
+        Two different type of values are possible:<br/>
+        1. Regular string values like &quot;staging-domain&quot; or &quot;tomcat-cluster&quot; will be converted into bytes
+        using ISO-8859-1 encoding.<br/>
+        2. byte array in string form, for example {216,123,12,3}<br/>
+      </attribute>
+      <attribute name="uniqueId" required="true">
+        A universally uniqueId for this static member.
+        The values must be 16 bytes in the following form:<br/>
+        1. byte array in string form, for example {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15}<br/>
+      </attribute>
+    </attributes>
+  </subsection>
+</section>
 
 </body>
 

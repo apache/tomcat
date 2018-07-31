@@ -132,6 +132,9 @@
         <bug>62558</bug>: Add Russian translations for the Manager and Host
         Manager web applications. Based on a patch by Ivan Krasnov. (markt)
       </add>
+      <add>
+        Add documents for Static Membership service. (kfujino)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Tribes">
