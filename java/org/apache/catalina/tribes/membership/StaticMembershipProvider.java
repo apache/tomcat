@@ -177,8 +177,7 @@ public class StaticMembershipProvider extends MembershipProviderBase implements 
         try {
             channel.send(members, msg, sendOptions);
         } catch (ChannelException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            log.error(sm.getString("staticMembershipProvider.stopMembership.sendFailed"), e);
         }
     }
 
@@ -246,8 +245,7 @@ public class StaticMembershipProvider extends MembershipProviderBase implements 
         try {
             if (!useThread) ping();
         } catch (ChannelException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            log.error(sm.getString("staticMembershipProvider.heartbeat.failed"), e);
         }
     }
 
