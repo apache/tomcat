@@ -64,6 +64,7 @@ import org.apache.catalina.util.LifecycleMBeanBase;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.ExceptionUtils;
+import org.apache.tomcat.util.MultiThrowable;
 import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.util.threads.InlineExecutorService;
 
@@ -943,31 +944,32 @@ public abstract class ContainerBase extends LifecycleMBeanBase
             results.add(startStopExecutor.submit(new StartChild(children[i])));
         }
 
-        boolean fail = false;
+        MultiThrowable multiThrowable = new MultiThrowable();
+
         for (Future<Void> result : results) {
             try {
                 result.get();
-            } catch (Exception e) {
+            } catch (Throwable e) {
                 log.error(sm.getString("containerBase.threadedStartFailed"), e);
-                fail = true;
+                multiThrowable.add(e);
             }
 
         }
-        if (fail) {
-            throw new LifecycleException(
-                    sm.getString("containerBase.threadedStartFailed"));
+        if (multiThrowable.size() > 0) {
+            throw new LifecycleException(sm.getString("containerBase.threadedStartFailed"),
+                    multiThrowable.getThrowable());
         }
 
         // Start the Valves in our pipeline (including the basic), if any
-        if (pipeline instanceof Lifecycle)
+        if (pipeline instanceof Lifecycle) {
             ((Lifecycle) pipeline).start();
+        }
 
 
         setState(LifecycleState.STARTING);
 
         // Start our thread
         threadStart();
-
     }
 
 
