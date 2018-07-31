@@ -44,14 +44,19 @@ import org.junit.Test;
 import org.apache.catalina.Context;
 import org.apache.catalina.Host;
 import org.apache.catalina.LifecycleEvent;
+import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleListener;
+import org.apache.catalina.authenticator.AuthenticatorBase;
+import org.apache.catalina.connector.Request;
 import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.core.StandardHost;
 import org.apache.catalina.deploy.ContextEnvironment;
 import org.apache.catalina.deploy.ContextResourceLink;
+import org.apache.catalina.deploy.LoginConfig;
 import org.apache.catalina.ha.context.ReplicatedContext;
 import org.apache.catalina.realm.GenericPrincipal;
 import org.apache.catalina.realm.RealmBase;
+import org.apache.tomcat.util.MultiThrowable;
 import org.apache.tomcat.util.buf.ByteChunk;
 
 public class TestTomcat extends TomcatBaseTest {
@@ -619,5 +624,68 @@ public class TestTomcat extends TomcatBaseTest {
             // Hack via a static since we can't pass an instance in the test.
             used = true;
         }
+    }
+
+
+    @Test
+    public void testBrokenWarOne() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        StandardContext ctx = (StandardContext) tomcat.addContext("/a", null);
+        ctx.addValve(new BrokenAuthenticator());
+
+        try {
+            tomcat.start();
+            Assert.fail();
+        } catch (Throwable t) {
+            Assert.assertTrue(getRootCause(t) instanceof LifecycleException);
+        }
+    }
+
+
+    @Test
+    public void testBrokenWarTwo() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        StandardContext ctxA = (StandardContext) tomcat.addContext("/a", null);
+        ctxA.addValve(new BrokenAuthenticator());
+        StandardContext ctxB = (StandardContext) tomcat.addContext("/b", null);
+        ctxB.addValve(new BrokenAuthenticator());
+
+        try {
+            tomcat.start();
+            Assert.fail();
+        } catch (Throwable t) {
+            Assert.assertTrue(getRootCause(t) instanceof MultiThrowable);
+        }
+    }
+
+
+    private static Throwable getRootCause(Throwable t) {
+        while (t.getCause() != null && t.getCause() != t) {
+            t = t.getCause();
+        }
+        return t;
+    }
+
+
+    private static class BrokenAuthenticator extends AuthenticatorBase {
+
+        @Override
+        public boolean authenticate(Request request, HttpServletResponse response, LoginConfig config)
+                throws IOException {
+            return false;
+        }
+
+        @Override
+        protected String getAuthMethod() {
+            return null;
+        }
+
+        @Override
+        protected synchronized void startInternal() throws LifecycleException {
+            throw new LifecycleException("Deliberately Broken");
+        }
+
     }
 }
