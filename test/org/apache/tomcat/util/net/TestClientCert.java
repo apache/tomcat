@@ -59,23 +59,24 @@ public class TestClientCert extends TomcatBaseTest {
         getTomcatInstance().start();
 
         // Unprotected resource
-        ByteChunk res =
-                getUrl("https://localhost:" + getPort() + "/unprotected");
+        ByteChunk res = getUrl("https://localhost:" + getPort() + "/unprotected");
 
+        int count = TesterSupport.getLastClientAuthRequestedIssuerCount();
         if (log.isDebugEnabled()) {
-            int count = TesterSupport.getLastClientAuthRequestedIssuerCount();
             log.debug("Last client KeyManager usage: " + TesterSupport.getLastClientAuthKeyManagerUsage() +
                       ", " + count + " requested Issuers, first one: " +
                       (count > 0 ? TesterSupport.getLastClientAuthRequestedIssuer(0).getName() : "NONE"));
-            log.debug("Expected requested Issuer: " + TesterSupport.getClientAuthExpectedIssuer());
+            log.debug("Expected requested Issuer: " +
+                      (preemptive ? TesterSupport.getClientAuthExpectedIssuer() : "NONE"));
         }
-        Assert.assertTrue("Checking requested client issuer against " +
-                TesterSupport.getClientAuthExpectedIssuer(),
-                TesterSupport.checkLastClientAuthRequestedIssuers());
 
         if (preemptive) {
+            Assert.assertTrue("Checking requested client issuer against " +
+                    TesterSupport.getClientAuthExpectedIssuer(),
+                    TesterSupport.checkLastClientAuthRequestedIssuers());
             Assert.assertEquals("OK-" + TesterSupport.ROLE, res.toString());
         } else {
+            Assert.assertEquals(0, count);
             Assert.assertEquals("OK", res.toString());
         }
 
@@ -83,7 +84,7 @@ public class TestClientCert extends TomcatBaseTest {
         res = getUrl("https://localhost:" + getPort() + "/protected");
 
         if (log.isDebugEnabled()) {
-            int count = TesterSupport.getLastClientAuthRequestedIssuerCount();
+            count = TesterSupport.getLastClientAuthRequestedIssuerCount();
             log.debug("Last client KeyManager usage: " + TesterSupport.getLastClientAuthKeyManagerUsage() +
                       ", " + count + " requested Issuers, first one: " +
                       (count > 0 ? TesterSupport.getLastClientAuthRequestedIssuer(0).getName() : "NONE"));
@@ -128,41 +129,42 @@ public class TestClientCert extends TomcatBaseTest {
         Arrays.fill(body, TesterSupport.DATA);
 
         // Unprotected resource
-        ByteChunk res = postUrl(body,
-                "https://localhost:" + getPort() + "/unprotected");
+        ByteChunk res = postUrl(body, "https://localhost:" + getPort() + "/unprotected");
 
+        int count = TesterSupport.getLastClientAuthRequestedIssuerCount();
         if (log.isDebugEnabled()) {
-            int count = TesterSupport.getLastClientAuthRequestedIssuerCount();
             log.debug("Last client KeyManager usage: " + TesterSupport.getLastClientAuthKeyManagerUsage() +
                       ", " + count + " requested Issuers, first one: " +
                       (count > 0 ? TesterSupport.getLastClientAuthRequestedIssuer(0).getName() : "NONE"));
-            log.debug("Expected requested Issuer: " + TesterSupport.getClientAuthExpectedIssuer());
+            log.debug("Expected requested Issuer: NONE");
         }
-        Assert.assertTrue("Checking requested client issuer against " +
-                TesterSupport.getClientAuthExpectedIssuer(),
-                TesterSupport.checkLastClientAuthRequestedIssuers());
 
+        // Unprotected resource with no preemptive authentication
+        Assert.assertEquals(0, count);
+        // No authentication no need to buffer POST body during TLS handshake so
+        // no possibility of hitting buffer limit
         Assert.assertEquals("OK-" + bodySize, res.toString());
 
         // Protected resource
         res.recycle();
-        int rc = postUrl(body, "https://localhost:" + getPort() + "/protected",
-                res, null);
+        int rc = postUrl(body, "https://localhost:" + getPort() + "/protected", res, null);
 
+        count = TesterSupport.getLastClientAuthRequestedIssuerCount();
         if (log.isDebugEnabled()) {
-            int count = TesterSupport.getLastClientAuthRequestedIssuerCount();
             log.debug("Last client KeyManager usage: " + TesterSupport.getLastClientAuthKeyManagerUsage() +
                       ", " + count + " requested Issuers, first one: " +
                       (count > 0 ? TesterSupport.getLastClientAuthRequestedIssuer(0).getName() : "NONE"));
             log.debug("Expected requested Issuer: " + TesterSupport.getClientAuthExpectedIssuer());
         }
-        Assert.assertTrue("Checking requested client issuer against " +
-                TesterSupport.getClientAuthExpectedIssuer(),
-                TesterSupport.checkLastClientAuthRequestedIssuers());
 
         if (expectProtectedFail) {
             Assert.assertEquals(401, rc);
+            // POST body buffer fails so TLS handshake never happens
+            Assert.assertEquals(0, count);
         } else {
+            Assert.assertTrue("Checking requested client issuer against " +
+                    TesterSupport.getClientAuthExpectedIssuer(),
+                    TesterSupport.checkLastClientAuthRequestedIssuers());
             Assert.assertEquals("OK-" + bodySize, res.toString());
         }
     }
