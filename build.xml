@@ -710,7 +710,7 @@
         <include name="**/*.xml"/>
       </fileset>
     </copy>
-    
+
     <!-- Convert the message files from UTF-8 to ASCII. This can be removed
     after upgrading to Java 9+ as the minimum JRE and specifying the encoding
     when loading the ResourceBundles -->
