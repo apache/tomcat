@@ -94,6 +94,10 @@
         <bug>62526</bug>: Correctly handle PKCS12 format key stores when the key
         store password is configured to be the empty string. (markt)
       </fix>
+      <fix>
+        Fix error in back-port of HTTP/2 compression that meant compression was
+        never enabled. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">

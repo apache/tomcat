@@ -106,7 +106,7 @@ public class Http2Protocol implements UpgradeProtocol {
     @Override
     public InternalHttpUpgradeHandler getInternalUpgradeHandler(Adapter adapter,
             Request coyoteRequest) {
-        Http2UpgradeHandler result = new Http2UpgradeHandler(adapter, coyoteRequest);
+        Http2UpgradeHandler result = new Http2UpgradeHandler(this, adapter, coyoteRequest);
 
         result.setReadTimeout(getReadTimeout());
         result.setKeepAliveTimeout(getKeepAliveTimeout());

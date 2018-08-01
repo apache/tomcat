@@ -152,6 +152,14 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
     private int maxTrailerSize = Constants.DEFAULT_MAX_TRAILER_SIZE;
 
 
+    /**
+     * @param adapter       The adapter to use to process the upgrade
+     * @param coyoteRequest The request to use to process the upgrade
+     *
+     * @deprecated This will be removed in Tomcat 9 onwards.
+     *             Use {@link #Http2UpgradeHandler(Http2Protocol, Adapter, Request)}
+     */
+    @Deprecated
     public Http2UpgradeHandler(Adapter adapter, Request coyoteRequest) {
         this(null, adapter, coyoteRequest);
     }
