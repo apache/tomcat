@@ -143,7 +143,7 @@ public class StaticMembershipProvider extends MembershipProviderBase implements 
                 messageReceived(resp[i].getMessage(), resp[i].getSource());
             }
         } else {
-            log.warn("no response");
+            log.warn(sm.getString("staticMembershipProvider.startMembership.noReplies"));
         }
     }
 
@@ -340,7 +340,15 @@ public class StaticMembershipProvider extends MembershipProviderBase implements 
 
         @Override
         public String toString() {
-            return super.toString();
+            StringBuilder buf = new StringBuilder("MemberMessage[");
+            buf.append("name=");
+            buf.append(new String(membershipId));
+            buf.append("; type=");
+            buf.append(getTypeDesc());
+            buf.append("; member=");
+            buf.append(member);
+            buf.append("]");
+            return buf.toString();
         }
 
         protected String getTypeDesc() {
