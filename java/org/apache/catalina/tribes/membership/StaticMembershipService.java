@@ -21,19 +21,29 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Properties;
 
+import javax.management.ObjectName;
+
 import org.apache.catalina.tribes.Member;
 import org.apache.catalina.tribes.MembershipProvider;
+import org.apache.catalina.tribes.jmx.JmxRegistry;
 import org.apache.catalina.tribes.util.StringManager;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
-public class StaticMembershipService extends MembershipServiceBase {
+public class StaticMembershipService extends MembershipServiceBase
+        implements StaticMembershipServiceMBean {
+
     private static final Log log = LogFactory.getLog(StaticMembershipService.class);
     protected static final StringManager sm = StringManager.getManager(Constants.Package);
 
     protected final ArrayList<StaticMember> staticMembers = new ArrayList<>();
     private StaticMember localMember;
     private StaticMembershipProvider provider;
+
+    /**
+     * the ObjectName of this McastService.
+     */
+    private ObjectName oname = null;
 
     public StaticMembershipService() {
         //default values
@@ -53,7 +63,10 @@ public class StaticMembershipService extends MembershipServiceBase {
             provider = buildMembershipProvider();
         }
         provider.start(level);
-        // TODO JMX register
+        JmxRegistry jmxRegistry = JmxRegistry.getRegistry(channel);
+        if (jmxRegistry != null) {
+            this.oname = jmxRegistry.registerJmx(",component=Membership", this);
+        }
     }
 
     protected StaticMembershipProvider buildMembershipProvider() throws Exception {
@@ -71,7 +84,10 @@ public class StaticMembershipService extends MembershipServiceBase {
     public void stop(int level) {
         try {
             if (provider != null && provider.stop(level)) {
-                // TODO JMX unregister
+                if (oname != null) {
+                    JmxRegistry.getRegistry(channel).unregisterJmx(oname);
+                    oname = null;
+                }
                 provider = null;
                 channel = null;
             }
@@ -134,24 +150,27 @@ public class StaticMembershipService extends MembershipServiceBase {
         localMember.setLocal(true);
     }
 
-     public long getExpirationTime() {
-         String expirationTime = properties.getProperty("expirationTime");
-         return Long.parseLong(expirationTime);
-     }
+    @Override
+    public long getExpirationTime() {
+        String expirationTime = properties.getProperty("expirationTime");
+        return Long.parseLong(expirationTime);
+    }
 
     public void setExpirationTime(long expirationTime) {
         properties.setProperty("expirationTime", String.valueOf(expirationTime));
     }
 
-     public int getConnectTimeout() {
-         String connectTimeout = properties.getProperty("connectTimeout");
-         return Integer.parseInt(connectTimeout);
-     }
+    @Override
+    public int getConnectTimeout() {
+        String connectTimeout = properties.getProperty("connectTimeout");
+        return Integer.parseInt(connectTimeout);
+    }
 
     public void setConnectTimeout(int connectTimeout) {
         properties.setProperty("connectTimeout", String.valueOf(connectTimeout));
     }
 
+    @Override
     public long getRpcTimeout() {
         String rpcTimeout = properties.getProperty("rpcTimeout");
         return Long.parseLong(rpcTimeout);
@@ -161,6 +180,7 @@ public class StaticMembershipService extends MembershipServiceBase {
         properties.setProperty("rpcTimeout", String.valueOf(rpcTimeout));
     }
 
+    @Override
     public boolean getUseThread() {
         String useThread = properties.getProperty("useThread");
         return Boolean.parseBoolean(useThread);
@@ -170,6 +190,7 @@ public class StaticMembershipService extends MembershipServiceBase {
         properties.setProperty("useThread", String.valueOf(useThread));
     }
 
+    @Override
     public long getPingInterval() {
         String pingInterval = properties.getProperty("pingInterval");
         return Long.parseLong(pingInterval);
