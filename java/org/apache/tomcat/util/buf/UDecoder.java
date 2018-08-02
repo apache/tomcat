@@ -71,7 +71,11 @@ public final class UDecoder {
         convert(mb, true);
     }
 
-    /** URLDecode, will modify the source.
+    /**
+     * URLDecode, will modify the source.
+     * @param mb The URL encoded bytes
+     * @param query <code>true</code> if this is a query string
+     * @throws IOException Invalid %xx URL encoding
      */
     public void convert( ByteChunk mb, boolean query )
         throws IOException
@@ -122,8 +126,6 @@ public final class UDecoder {
         }
 
         mb.setEnd( idx );
-
-        return;
     }
 
     // -------------------- Additional methods --------------------
@@ -140,7 +142,11 @@ public final class UDecoder {
         convert(mb, true);
     }
 
-    /** In-buffer processing - the buffer will be modified
+    /**
+     * In-buffer processing - the buffer will be modified.
+     * @param mb The URL encoded chars
+     * @param query <code>true</code> if this is a query string
+     * @throws IOException Invalid %xx URL encoding
      */
     public void convert( CharChunk mb, boolean query )
         throws IOException
@@ -205,7 +211,11 @@ public final class UDecoder {
         convert(mb, true);
     }
 
-    /** URLDecode, will modify the source
+    /**
+     * URLDecode, will modify the source
+     * @param mb The URL encoded String, bytes or chars
+     * @param query <code>true</code> if this is a query string
+     * @throws IOException Invalid %xx URL encoding
      */
     public void convert(MessageBytes mb, boolean query)
         throws IOException
@@ -245,6 +255,12 @@ public final class UDecoder {
         return convert(str, true);
     }
 
+    /**
+     * %xx decoding of a string. FIXME: this is inefficient.
+     * @param str The URL encoded string
+     * @param query <code>true</code> if this is a query string
+     * @return the decoded string
+     */
     public final String convert(String str, boolean query)
     {
         if (str == null) {
@@ -315,6 +331,7 @@ public final class UDecoder {
                  ( c>='A' && c<='F' ));
     }
 
+
     private static int x2c( byte b1, byte b2 ) {
         int digit= (b1>='A') ? ( (b1 & 0xDF)-'A') + 10 :
             (b1 -'0');
@@ -324,6 +341,7 @@ public final class UDecoder {
         return digit;
     }
 
+
     private static int x2c( char b1, char b2 ) {
         int digit= (b1>='A') ? ( (b1 & 0xDF)-'A') + 10 :
             (b1 -'0');
@@ -332,5 +350,4 @@ public final class UDecoder {
             (b2 -'0');
         return digit;
     }
-
 }
