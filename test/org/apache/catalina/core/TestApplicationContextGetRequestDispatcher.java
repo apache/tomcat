@@ -353,6 +353,20 @@ public class TestApplicationContextGetRequestDispatcher extends TomcatBaseTest {
     }
 
 
+    @Test
+    public void testGetRequestDispatcher47() throws Exception {
+        doTestGetRequestDispatcher(true, "/prefix/start", null, "aa+bb",
+                "/prefix/aa+bb", TargetServlet.OK);
+    }
+
+
+    @Test
+    public void testGetRequestDispatcher48() throws Exception {
+        doTestGetRequestDispatcher(false, "/prefix/start", null, "aa+bb",
+                "/prefix/aa+bb", TargetServlet.OK);
+    }
+
+
     private void doTestGetRequestDispatcher(boolean useEncodedDispatchPaths, String startPath,
             String startQueryString, String dispatchPath, String targetPath, String expectedBody)
             throws Exception {

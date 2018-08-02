@@ -20,10 +20,9 @@ package org.apache.jasper.compiler;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FilePermission;
-import java.io.UnsupportedEncodingException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.net.URLDecoder;
 import java.security.CodeSource;
 import java.security.PermissionCollection;
 import java.security.Policy;
@@ -412,10 +411,10 @@ public final class JspRuntimeContext {
                     try {
                         // Need to decode the URL, primarily to convert %20
                         // sequences back to spaces
-                        String decoded = URLDecoder.decode(urls[i].getPath(), "UTF-8");
+                        String decoded = urls[i].toURI().getPath();
                         cpath.append(decoded + File.pathSeparator);
-                    } catch (UnsupportedEncodingException e) {
-                        // All JREs are required to support UTF-8
+                    } catch (URISyntaxException e) {
+                        log.warn(Localizer.getMessage("jsp.warning.classpathUrl"), e);
                     }
                 }
             }
