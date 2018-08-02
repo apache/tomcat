@@ -17,11 +17,9 @@
 package org.apache.catalina.core;
 
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -75,6 +73,7 @@ import org.apache.catalina.util.URLEncoder;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.buf.CharChunk;
 import org.apache.tomcat.util.buf.MessageBytes;
+import org.apache.tomcat.util.buf.UDecoder;
 import org.apache.tomcat.util.descriptor.web.FilterDef;
 import org.apache.tomcat.util.http.RequestUtil;
 import org.apache.tomcat.util.res.StringManager;
@@ -425,13 +424,7 @@ public class ApplicationContext implements ServletContext {
 
         if (getContext().getDispatchersUseEncodedPaths()) {
             // Decode
-            String decodedPath;
-            try {
-                decodedPath = URLDecoder.decode(normalizedPath, "UTF-8");
-            } catch (UnsupportedEncodingException e) {
-                // Impossible
-                return null;
-            }
+            String decodedPath = UDecoder.URLDecode(normalizedPath);
 
             // Security check to catch attempts to encode /../ sequences
             normalizedPath = RequestUtil.normalize(decodedPath);

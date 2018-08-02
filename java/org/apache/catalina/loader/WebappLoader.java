@@ -22,11 +22,9 @@ import java.beans.PropertyChangeSupport;
 import java.io.File;
 import java.io.FilePermission;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Constructor;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.net.URLDecoder;
 
 import javax.management.ObjectName;
 import javax.servlet.ServletContext;
@@ -41,6 +39,7 @@ import org.apache.catalina.util.ToStringUtil;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.ExceptionUtils;
+import org.apache.tomcat.util.buf.UDecoder;
 import org.apache.tomcat.util.modeler.Registry;
 import org.apache.tomcat.util.res.StringManager;
 
@@ -602,9 +601,9 @@ public class WebappLoader extends LifecycleMBeanBase
                 for (int i = 0; i < repositories.length; i++) {
                     String repository = repositories[i].toString();
                     if (repository.startsWith("file://"))
-                        repository = utf8Decode(repository.substring(7));
+                        repository = UDecoder.URLDecode(repository.substring(7));
                     else if (repository.startsWith("file:"))
-                        repository = utf8Decode(repository.substring(5));
+                        repository = UDecoder.URLDecode(repository.substring(5));
                     else
                         continue;
                     if (repository == null)
@@ -629,16 +628,6 @@ public class WebappLoader extends LifecycleMBeanBase
             return false;
         }
         return true;
-    }
-
-    private String utf8Decode(String input) {
-        String result = null;
-        try {
-            result = URLDecoder.decode(input, "UTF-8");
-        } catch (UnsupportedEncodingException uee) {
-            // Impossible. All JVMs are required to support UTF-8.
-        }
-        return result;
     }
 
 
