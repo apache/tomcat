@@ -63,15 +63,6 @@ do let us know.</p>
 
 <section name="Directories and Files">
 
-<p>Throughout the docs, you'll notice there are numerous references to
-<strong>$CATALINA_HOME</strong>. This represents the root of your Tomcat
-installation. When we say, "This information can be found in your
-$CATALINA_HOME/README.txt file" we mean to look at the README.txt file at the
-root of your Tomcat install. Optionally, Tomcat may be configured for multiple
-instances by defining <strong>$CATALINA_BASE</strong> for each instance. If
-multiple instances are not configured, <strong>$CATALINA_BASE</strong> is the
-same as <strong>$CATALINA_HOME</strong>.</p>
-
 <p>These are some of the key tomcat directories:</p>
 
 <ul>
@@ -87,6 +78,122 @@ same as <strong>$CATALINA_HOME</strong>.</p>
 <li><strong>/webapps</strong> - This is where your webapps go.</li>
 </ul>
 
+</section>
+
+<section name="CATALINA_HOME and CATALINA_BASE">
+  <p>Throughout the documentation, there are references to the two following 
+    properties:
+    <ul>
+      <li>
+        <strong>CATALINA_HOME</strong>: Represents the root of your Tomcat
+        installation, for example <code>/home/tomcat/apache-tomcat-9.0.10</code>
+        or <code>C:\Program Files\apache-tomcat-9.0.10</code>.
+      </li>
+      <li>
+        <strong>CATALINA_BASE</strong>: Represents the root of a runtime
+        configuration of a specific Tomcat instance. If you want to have 
+        multiple Tomcat instances on one machine, use the <code>CATALINA_BASE</code>
+        property.
+      </li>
+    </ul>
+  </p>
+  <p>
+    If you set the properties to different locations, the CATALINA_HOME location
+    contains static sources, such as <code>.jar</code> files, or binary files. 
+    The CATALINA_BASE location contains configuration files, log files, deployed
+    applications, and other runtime requirements.
+  </p>
+  <subsection name="Why Use CATALINA_BASE">
+    <p>
+      By default, CATALINA_HOME and CATALINA_BASE point to the same directory.
+      Set CATALINA_BASE manually when you require running multiple Tomcat 
+      instances on one machine. Doing so provides the following benefits:
+    </p>
+    <ul>
+      <li>
+        Easier management of upgrading to a newer version of Tomcat. Because all
+        instances with single CATALINA_HOME location share one set of 
+        <code>.jar</code> files and binary files, you can easily upgrade the files
+        to newer version and have the change propagated to all Tomcat instances
+        using the same CATALIA_HOME directory.
+      </li>
+      <li>
+        Avoiding duplication of the same static <code>.jar</code> files.
+      </li>
+      <li>
+        The possibility to share certain settings, for example the <code>setenv</code> shell
+        or bat script file (depending on your operating system).
+      </li>
+    </ul>
+  </subsection>
+  <subsection name="Contents of CATALINA_BASE">
+    <p>
+      Before you start using CATALINA_BASE, create the directory you want to use
+      as CATALINA_BASE for the particular Tomcat instance. At minimum, it must
+      contain:
+      <ul>
+        <li>conf/server.xml</li>
+        <li>conf/web.xml</li>
+      </ul>
+      That includes the <code>conf</code> directory. Otherwise, Tomcat may
+      fail to start.
+    </p>
+    <p>
+      Additionally, it may also contain the following:
+      <ul>
+        <li>
+          The <code>bin</code> directory with the <code>setenv.sh</code>, 
+          <code>setenv.bat</code>, and <code>tomcat-juli.jar</code> files.
+        </li>
+        <li>
+          The <code>lib</code> directory with further resources to be added on
+          classpath.
+        </li>
+        <li>
+          The <code>logs</code> directory for instance-specific log files.
+        </li>
+        <li>
+          The <code>webapps</code> directory for automatically loaded web 
+          applications.
+        </li>
+        <li>
+          The <code>work</code> directory that contains temporary working 
+          directories for the deployed web applications.
+        </li>
+        <li>
+          The <code>temp</code> directory used by the JVM for temporary files.
+        </li>
+      </ul>
+    </p>
+    <p>
+      We recommend you not to change the <code>tomcat-juli.jar</code> file. 
+      However, in case you require your own logging implementation, you can 
+      replace the <code>tomcat-juli.jar</code> file in a CATALINA_BASE location
+      for the specific Tomcat instance.
+    </p>
+    <p>
+      We also recommend you not to copy over any configuration file that is identical
+      for multiple Tomcat instances, with the exception of the mandatory files.
+      For example, copy over the <code>conf/logging.properties</code> only if 
+      you require the particular Tomcat instance to have specific logging settings.
+    </p>
+    <p>
+      For advanced configuration information, see the 
+      <a href="https://tomcat.apache.org/tomcat-9.0-doc/RUNNING.txt">
+        RUNNING.txt
+      </a> file.
+    </p>
+  </subsection>
+  <subsection name="How to Use CATALINA_BASE">
+    <p>
+      The CATALINA_BASE property is an environment variable. You can set it
+      before you execute the Tomcat start script, for example:
+      <ul>
+        <li>On Unix: <code>CATALINA_BASE=/tmp/tomcat_base1 bin/catalina.sh start</code></li>
+        <li>On Windows: <code>CATALINA_BASE=C:\tomcat_base1 bin/catalina.bat start</code></li>
+      </ul> 
+    </p>
+  </subsection>
 </section>
 
 
