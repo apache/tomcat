@@ -76,6 +76,11 @@
         Use this new class when reporting multiple container (e.g. web
         application) failures during start. (markt)
       </add>
+      <fix>
+        Correctly decode URL paths (<code>+</code> should not be decoded to a
+        space in the path) in the <code>RequestDispatcher</code> and the web
+        application class loader. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

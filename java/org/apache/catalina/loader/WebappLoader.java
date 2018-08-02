@@ -14,8 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.catalina.loader;
 
 
@@ -28,12 +26,10 @@ import java.io.FilePermission;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Constructor;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.net.URLDecoder;
 import java.net.URLStreamHandlerFactory;
 import java.util.ArrayList;
 import java.util.jar.JarFile;
@@ -59,6 +55,7 @@ import org.apache.naming.resources.DirContextURLStreamHandler;
 import org.apache.naming.resources.DirContextURLStreamHandlerFactory;
 import org.apache.naming.resources.Resource;
 import org.apache.tomcat.util.ExceptionUtils;
+import org.apache.tomcat.util.buf.UDecoder;
 import org.apache.tomcat.util.compat.JreCompat;
 import org.apache.tomcat.util.modeler.Registry;
 import org.apache.tomcat.util.res.StringManager;
@@ -1101,9 +1098,9 @@ public class WebappLoader extends LifecycleMBeanBase
                 for (int i = 0; i < repositories.length; i++) {
                     String repository = repositories[i].toString();
                     if (repository.startsWith("file://"))
-                        repository = utf8Decode(repository.substring(7));
+                        repository = UDecoder.URLDecode(repository.substring(7));
                     else if (repository.startsWith("file:"))
-                        repository = utf8Decode(repository.substring(5));
+                        repository = UDecoder.URLDecode(repository.substring(5));
                     else if (repository.startsWith("jndi:"))
                         repository =
                             servletContext.getRealPath(repository.substring(5));
@@ -1131,16 +1128,6 @@ public class WebappLoader extends LifecycleMBeanBase
             return false;
         }
         return true;
-    }
-
-    private String utf8Decode(String input) {
-        String result = null;
-        try {
-            result = URLDecoder.decode(input, "UTF-8");
-        } catch (UnsupportedEncodingException uee) {
-            // Impossible. All JVMs are required to support UTF-8.
-        }
-        return result;
     }
 
 
