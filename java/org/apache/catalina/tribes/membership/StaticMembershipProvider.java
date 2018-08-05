@@ -162,6 +162,7 @@ public class StaticMembershipProvider extends MembershipProviderBase implements 
         Member mbr = setupMember(member);
         if(membership.memberAlive(mbr)) {
             Runnable r = new Runnable() {
+                @Override
                 public void run(){
                     String name = Thread.currentThread().getName();
                     try {
@@ -179,6 +180,7 @@ public class StaticMembershipProvider extends MembershipProviderBase implements 
     protected void memberDisappeared(Member member) {
         membership.removeMember(member);
         Runnable r = new Runnable() {
+            @Override
             public void run(){
                 String name = Thread.currentThread().getName();
                 try {
