@@ -81,6 +81,10 @@
         space in the path) in the <code>RequestDispatcher</code> and the web
         application class loader. (markt)
       </fix>
+      <add>
+        <bug>62559</bug>: Add <code>jaxb-*.jar</code> to the list of JARs
+        ignored by <code>StandardJarScanner</code>. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
