@@ -82,6 +82,10 @@
         space in the path) in the <code>RequestDispatcher</code> and the web
         application class loader. (markt)
       </fix>
+      <add>
+        Make logout more robust if JASPIC subject is unexpectedly unavailable.
+        (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
