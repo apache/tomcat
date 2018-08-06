@@ -201,7 +201,9 @@ public class StaticMembershipProvider extends MembershipProviderBase implements 
 
     protected void stopMembership(Member[] members) {
         if (members.length == 0 ) return;
-        MemberMessage msg = new MemberMessage(membershipId, MemberMessage.MSG_STOP, service.getLocalMember(true));
+        Member localmember = service.getLocalMember(false);
+        localmember.setCommand(Member.SHUTDOWN_PAYLOAD);
+        MemberMessage msg = new MemberMessage(membershipId, MemberMessage.MSG_STOP, localmember);
         try {
             channel.send(members, msg, sendOptions);
         } catch (ChannelException e) {
