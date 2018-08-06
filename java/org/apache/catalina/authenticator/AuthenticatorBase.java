@@ -810,7 +810,6 @@ public abstract class AuthenticatorBase extends ValveBase
                     !principal.getUserPrincipal().equals(request.getUserPrincipal())) {
                 // Skip registration if authentication credentials were
                 // cached and the Principal did not change.
-                request.setNote(Constants.REQ_JASPIC_SUBJECT_NOTE, client);
                 @SuppressWarnings("rawtypes")// JASPIC API uses raw types
                 Map map = state.messageInfo.getMap();
                 if (map != null && map.containsKey("javax.servlet.http.registerSession")) {
@@ -819,6 +818,7 @@ public abstract class AuthenticatorBase extends ValveBase
                     register(request, response, principal, "JASPIC", null, null);
                 }
             }
+            request.setNote(Constants.REQ_JASPIC_SUBJECT_NOTE, client);
             return true;
         }
         return false;

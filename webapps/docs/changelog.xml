@@ -86,6 +86,11 @@
         Make logout more robust if JASPIC subject is unexpectedly unavailable.
         (markt)
       </add>
+      <fix>
+        <bug>62547</bug>: JASPIC <code>cleanSubject()</code> was not called on
+        logout when the authenticator was configured to cache the authenticated
+        Principal. Patch provided by Guillermo González de Agüero. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
