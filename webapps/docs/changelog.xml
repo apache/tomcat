@@ -81,6 +81,10 @@
         <bug>62559</bug>: Add <code>jaxb-*.jar</code> to the list of JARs
         ignored by <code>StandardJarScanner</code>. (markt)
       </add>
+      <add>
+        <bug>62560</bug>: Add <code>oraclepki.jar</code> to the list of JARs
+        ignored by <code>StandardJarScanner</code>. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
