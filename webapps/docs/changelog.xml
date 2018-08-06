@@ -77,6 +77,10 @@
         logout when the authenticator was configured to cache the authenticated
         Principal. Patch provided by Guillermo González de Agüero. (markt)
       </fix>
+      <add>
+        <bug>62559</bug>: Add <code>jaxb-*.jar</code> to the list of JARs
+        ignored by <code>StandardJarScanner</code>. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
