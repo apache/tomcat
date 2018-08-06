@@ -51,6 +51,15 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
     protected final Adapter adapter;
     protected final AsyncStateMachine asyncStateMachine;
     private volatile long asyncTimeout = -1;
+    /*
+     * Tracks the current async generation when a timeout is dispatched. In the
+     * time it takes for a container thread to be allocated and the timeout
+     * processing to start, it is possible that the application completes this
+     * generation of async processing and starts a new one. If the timeout is
+     * then processed against the new generation, response mix-up can occur.
+     * This field is used to ensure that any timeout event processed is for the
+     * current async generation. This prevents the response mix-up.
+     */
     private volatile long asyncTimeoutGeneration = 0;
     protected final Request request;
     protected final Response response;
