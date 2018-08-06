@@ -1136,19 +1136,17 @@ public abstract class AuthenticatorBase extends ValveBase
         if (provider != null) {
             MessageInfo messageInfo = new MessageInfoImpl(request, request.getResponse(), true);
             Subject client = (Subject) request.getNote(Constants.REQ_JASPIC_SUBJECT_NOTE);
-            if (client == null) {
-                return;
-            }
-
-            ServerAuthContext serverAuthContext;
-            try {
-                ServerAuthConfig serverAuthConfig = provider.getServerAuthConfig("HttpServlet",
-                        jaspicAppContextID, CallbackHandlerImpl.getInstance());
-                String authContextID = serverAuthConfig.getAuthContextID(messageInfo);
-                serverAuthContext = serverAuthConfig.getAuthContext(authContextID, null, null);
-                serverAuthContext.cleanSubject(messageInfo, client);
-            } catch (AuthException e) {
-                log.debug(sm.getString("authenticator.jaspicCleanSubjectFail"), e);
+            if (client != null) {
+                ServerAuthContext serverAuthContext;
+                try {
+                    ServerAuthConfig serverAuthConfig = provider.getServerAuthConfig("HttpServlet",
+                            jaspicAppContextID, CallbackHandlerImpl.getInstance());
+                    String authContextID = serverAuthConfig.getAuthContextID(messageInfo);
+                    serverAuthContext = serverAuthConfig.getAuthContext(authContextID, null, null);
+                    serverAuthContext.cleanSubject(messageInfo, client);
+                } catch (AuthException e) {
+                    log.debug(sm.getString("authenticator.jaspicCleanSubjectFail"), e);
+                }
             }
         }
 
