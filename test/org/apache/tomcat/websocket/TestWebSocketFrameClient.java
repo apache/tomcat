@@ -17,11 +17,15 @@
 package org.apache.tomcat.websocket;
 
 import java.net.URI;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import javax.websocket.ClientEndpointConfig;
+import javax.websocket.ClientEndpointConfig.Configurator;
 import javax.websocket.ContainerProvider;
 import javax.websocket.Session;
 import javax.websocket.WebSocketContainer;
@@ -57,10 +61,19 @@ public class TestWebSocketFrameClient extends WebSocketBaseTest {
 
         tomcat.start();
 
-        WebSocketContainer wsContainer =
-                ContainerProvider.getWebSocketContainer();
+        WebSocketContainer wsContainer = ContainerProvider.getWebSocketContainer();
+
+        // BZ 62596
         ClientEndpointConfig clientEndpointConfig =
-                ClientEndpointConfig.Builder.create().build();
+                ClientEndpointConfig.Builder.create().configurator(new Configurator() {
+                    @Override
+                    public void beforeRequest(Map<String, List<String>> headers) {
+                        headers.put("Dummy", Collections.singletonList(
+                                String.join("", Collections.nCopies(4000, "A"))));
+                        super.beforeRequest(headers);
+                    }
+                }).build();
+
         Session wsSession = wsContainer.connectToServer(
                 TesterProgrammaticEndpoint.class,
                 clientEndpointConfig,
