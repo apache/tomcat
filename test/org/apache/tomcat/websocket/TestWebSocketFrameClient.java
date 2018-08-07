@@ -64,12 +64,15 @@ public class TestWebSocketFrameClient extends WebSocketBaseTest {
         WebSocketContainer wsContainer = ContainerProvider.getWebSocketContainer();
 
         // BZ 62596
+        final StringBuilder dummyValue = new StringBuilder(4000);
+        for (int i = 0; i < 4000; i++) {
+            dummyValue.append('A');
+        }
         ClientEndpointConfig clientEndpointConfig =
                 ClientEndpointConfig.Builder.create().configurator(new Configurator() {
                     @Override
                     public void beforeRequest(Map<String, List<String>> headers) {
-                        headers.put("Dummy", Collections.singletonList(
-                                String.join("", Collections.nCopies(4000, "A"))));
+                        headers.put("Dummy", Collections.singletonList(dummyValue.toString()));
                         super.beforeRequest(headers);
                     }
                 }).build();
