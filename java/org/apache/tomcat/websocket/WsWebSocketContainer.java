@@ -733,7 +733,7 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
 
         // Headers
         for (Entry<String, List<String>> entry : reqHeaders.entrySet()) {
-            addHeader(result, entry.getKey(), entry.getValue());
+            result = addHeader(result, entry.getKey(), entry.getValue());
         }
 
         // Terminating CRLF
@@ -745,15 +745,34 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
     }
 
 
-    private static void addHeader(ByteBuffer result, String key, List<String> values) {
+    private static ByteBuffer addHeader(ByteBuffer result, String key, List<String> values) {
         if (values.isEmpty()) {
-            return;
+            return result;
         }
 
-        result.put(key.getBytes(StandardCharsets.ISO_8859_1));
-        result.put(": ".getBytes(StandardCharsets.ISO_8859_1));
-        result.put(StringUtils.join(values).getBytes(StandardCharsets.ISO_8859_1));
-        result.put(CRLF);
+        result = putWithExpand(result, key.getBytes(StandardCharsets.ISO_8859_1));
+        result = putWithExpand(result, ": ".getBytes(StandardCharsets.ISO_8859_1));
+        result = putWithExpand(result, StringUtils.join(values).getBytes(StandardCharsets.ISO_8859_1));
+        result = putWithExpand(result, CRLF);
+
+        return result;
+    }
+
+
+    private static ByteBuffer putWithExpand(ByteBuffer input, byte[] bytes) {
+        if (bytes.length > input.remaining()) {
+            int newSize;
+            if (bytes.length > input.capacity()) {
+                newSize = 2 * bytes.length;
+            } else {
+                newSize = input.capacity() * 2;
+            }
+            ByteBuffer expanded = ByteBuffer.allocate(newSize);
+            input.flip();
+            expanded.put(input);
+            input = expanded;
+        }
+        return input.put(bytes);
     }
 
 

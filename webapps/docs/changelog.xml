@@ -159,6 +159,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subseciton name="WebSocket">
+    <changelog>
+      <fix>
+        <bug>62596</bug>: Remove the limit on the size of the initial HTTP
+        upgrade request used to establish the web socket connection. (markt)
+      </fix>
+    </changelog>
+  </subseciton>
   <subsection name="Web applications">
     <changelog>
       <add>
