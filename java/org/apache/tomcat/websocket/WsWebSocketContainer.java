@@ -789,7 +789,7 @@ public class WsWebSocketContainer
 
         // Headers
         for (Entry<String, List<String>> entry : reqHeaders.entrySet()) {
-            addHeader(result, entry.getKey(), entry.getValue());
+            result = addHeader(result, entry.getKey(), entry.getValue());
         }
 
         // Terminating CRLF
@@ -801,12 +801,12 @@ public class WsWebSocketContainer
     }
 
 
-    private static void addHeader(ByteBuffer result, String key, List<String> values) {
+    private static ByteBuffer addHeader(ByteBuffer result, String key, List<String> values) {
         StringBuilder sb = new StringBuilder();
 
         Iterator<String> iter = values.iterator();
         if (!iter.hasNext()) {
-            return;
+            return result;
         }
         sb.append(iter.next());
         while (iter.hasNext()) {
@@ -814,10 +814,29 @@ public class WsWebSocketContainer
             sb.append(iter.next());
         }
 
-        result.put(key.getBytes(StandardCharsets.ISO_8859_1));
-        result.put(": ".getBytes(StandardCharsets.ISO_8859_1));
-        result.put(sb.toString().getBytes(StandardCharsets.ISO_8859_1));
-        result.put(CRLF);
+        result = putWithExpand(result, key.getBytes(StandardCharsets.ISO_8859_1));
+        result = putWithExpand(result, ": ".getBytes(StandardCharsets.ISO_8859_1));
+        result = putWithExpand(result, sb.toString().getBytes(StandardCharsets.ISO_8859_1));
+        result = putWithExpand(result, CRLF);
+
+        return result;
+    }
+
+
+    private static ByteBuffer putWithExpand(ByteBuffer input, byte[] bytes) {
+        if (bytes.length > input.remaining()) {
+            int newSize;
+            if (bytes.length > input.capacity()) {
+                newSize = 2 * bytes.length;
+            } else {
+                newSize = input.capacity() * 2;
+            }
+            ByteBuffer expanded = ByteBuffer.allocate(newSize);
+            input.flip();
+            expanded.put(input);
+            input = expanded;
+        }
+        return input.put(bytes);
     }
 
 
