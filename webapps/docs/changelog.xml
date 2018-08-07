@@ -128,6 +128,11 @@
         <bug>62558</bug>: Add Russian translations for the Manager and Host
         Manager web applications. Based on a patch by Ivan Krasnov. (markt)
       </add>
+      <add>
+        <bug>62561</bug>: Add advanced class loader configuration information
+        regarding the use of the Server and Shared class loaders to the
+        documentation web application. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Tribes">

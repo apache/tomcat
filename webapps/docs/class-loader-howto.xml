@@ -254,6 +254,34 @@ for further information.</p>
 
 </section>
 
+<section name="Advanced configuration">
+
+<p>A more complex class loader hierarchy may also be configured. See the diagram
+below. By default, the <strong>Server</strong> and <strong>Shared</strong>
+class loaders are not defined and the simplifed hierarchy shown above is used.
+This more complex hierarchy may be use by defining values for the
+<code>server.loader</code> and/or <code>shared.loader</code> properties in
+<code>conf/catalina.properties</code>.</p>
+
+<source>
+  Bootstrap
+      |
+    System
+      |
+    Common
+     /  \
+Server  Shared
+         /  \
+   Webapp1  Webapp2 ...</source>
+
+<p>The <strong>Server</strong> class loader is only visible to Tomcat internals
+and is completely invisible to web applications.</p>
+
+<p>The <strong>Shared</strong> class loader is visible to all web applications
+and may be used to shared code across all web applications. However, any updates
+to this shared code will require a Tomcat restart.</p>
+
+</section>
 
 </body>
 
