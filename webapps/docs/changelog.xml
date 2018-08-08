@@ -120,6 +120,11 @@
         Fix error in back-port of HTTP/2 compression that meant compression was
         never enabled. (markt)
       </fix>
+      <fix>
+        <bug>62605</bug>: Ensure <code>ReadListener.onDataAvailable()</code> is
+        called when the initial request body data arrives after the request
+        headers when using asynchronous processing over HTTP/2. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
