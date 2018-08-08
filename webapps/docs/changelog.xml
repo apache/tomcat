@@ -138,6 +138,11 @@
         <bug>62526</bug>: Correctly handle PKCS12 format key stores when the key
         store password is configured to be the empty string. (markt)
       </fix>
+      <fix>
+        <bug>62605</bug>: Ensure <code>ReadListener.onDataAvailable()</code> is
+        called when the initial request body data arrives after the request
+        headers when using asynchronous processing over HTTP/2. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
