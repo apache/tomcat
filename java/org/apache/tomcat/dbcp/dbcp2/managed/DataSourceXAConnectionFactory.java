@@ -27,6 +27,7 @@ import javax.sql.PooledConnection;
 import javax.sql.XAConnection;
 import javax.sql.XADataSource;
 import javax.transaction.TransactionManager;
+import javax.transaction.TransactionSynchronizationRegistry;
 import javax.transaction.xa.XAResource;
 
 import org.apache.tomcat.dbcp.dbcp2.Utils;
@@ -50,9 +51,25 @@ public class DataSourceXAConnectionFactory implements XAConnectionFactory {
      *            the transaction manager in which connections will be enlisted
      * @param xaDataSource
      *            the data source from which connections will be retrieved
+     * @param transactionSynchronizationRegistry
+     *            register with this TransactionSynchronizationRegistry
+     */
+    public DataSourceXAConnectionFactory(final TransactionManager transactionManager, final XADataSource xaDataSource, final TransactionSynchronizationRegistry transactionSynchronizationRegistry) {
+        this(transactionManager, xaDataSource, null, (char[]) null, transactionSynchronizationRegistry);
+    }
+
+    /**
+     * Creates an DataSourceXAConnectionFactory which uses the specified XADataSource to create database connections.
+     * The connections are enlisted into transactions using the specified transaction manager.
+     *
+     * @param transactionManager
+     *            the transaction manager in which connections will be enlisted
+     * @param xaDataSource
+     *            the data source from which connections will be retrieved
+     * @since 2.6.0
      */
     public DataSourceXAConnectionFactory(final TransactionManager transactionManager, final XADataSource xaDataSource) {
-        this(transactionManager, xaDataSource, null, (char[]) null);
+        this(transactionManager, xaDataSource, null, (char[]) null, null);
     }
 
     /**
@@ -70,9 +87,33 @@ public class DataSourceXAConnectionFactory implements XAConnectionFactory {
      */
     public DataSourceXAConnectionFactory(final TransactionManager transactionManager, final XADataSource xaDataSource,
             final String userName, final char[] userPassword) {
+        this(transactionManager, xaDataSource, userName, userPassword, null);
+    }
+
+    /**
+     * Creates an DataSourceXAConnectionFactory which uses the specified XADataSource to create database connections.
+     * The connections are enlisted into transactions using the specified transaction manager.
+     *
+     * @param transactionManager
+     *            the transaction manager in which connections will be enlisted
+     * @param xaDataSource
+     *            the data source from which connections will be retrieved
+     * @param userName
+     *            the user name used for authenticating new connections or null for unauthenticated
+     * @param userPassword
+     *            the password used for authenticating new connections
+     * @param transactionSynchronizationRegistry
+     *            register with this TransactionSynchronizationRegistry
+     * @since 2.6.0
+     */
+    public DataSourceXAConnectionFactory(final TransactionManager transactionManager, final XADataSource xaDataSource,
+            final String userName, final char[] userPassword, final TransactionSynchronizationRegistry transactionSynchronizationRegistry) {
         Objects.requireNonNull(transactionManager, "transactionManager is null");
         Objects.requireNonNull(xaDataSource, "xaDataSource is null");
-        this.transactionRegistry = new TransactionRegistry(transactionManager);
+
+        // We do allow the transactionSynchronizationRegistry to be null for non-app server environments
+
+        this.transactionRegistry = new TransactionRegistry(transactionManager, transactionSynchronizationRegistry);
         this.xaDataSource = xaDataSource;
         this.userName = userName;
         this.userPassword = userPassword;
@@ -93,7 +134,7 @@ public class DataSourceXAConnectionFactory implements XAConnectionFactory {
      */
     public DataSourceXAConnectionFactory(final TransactionManager transactionManager, final XADataSource xaDataSource,
             final String userName, final String userPassword) {
-        this(transactionManager, xaDataSource, userName, Utils.toCharArray(userPassword));
+        this(transactionManager, xaDataSource, userName, Utils.toCharArray(userPassword), null);
     }
 
     /**

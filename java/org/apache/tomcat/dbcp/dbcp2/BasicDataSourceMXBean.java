@@ -59,6 +59,16 @@ public interface BasicDataSourceMXBean {
     String getDefaultCatalog();
 
     /**
+     * See {@link BasicDataSource#getDefaultSchema()}
+     *
+     * @return {@link BasicDataSource#getDefaultSchema()}
+     * @since 2.5.0
+     */
+    default String getDefaultSchema() {
+        return null;
+    }
+
+    /**
      * See {@link BasicDataSource#getCacheState()}
      *
      * @return {@link BasicDataSource#getCacheState()}

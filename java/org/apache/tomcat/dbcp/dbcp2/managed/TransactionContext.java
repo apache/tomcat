@@ -27,6 +27,7 @@ import javax.transaction.Status;
 import javax.transaction.Synchronization;
 import javax.transaction.SystemException;
 import javax.transaction.Transaction;
+import javax.transaction.TransactionSynchronizationRegistry;
 import javax.transaction.xa.XAResource;
 
 /**
@@ -39,6 +40,7 @@ import javax.transaction.xa.XAResource;
 public class TransactionContext {
     private final TransactionRegistry transactionRegistry;
     private final WeakReference<Transaction> transactionRef;
+    private final TransactionSynchronizationRegistry transactionSynchronizationRegistry;
     private Connection sharedConnection;
     private boolean transactionComplete;
 
@@ -50,13 +52,29 @@ public class TransactionContext {
      *            the TransactionRegistry used to obtain the XAResource for the shared connection
      * @param transaction
      *            the transaction
+     * @param transactionSynchronizationRegistry
+     *              The optional TSR to register synchronizations with
+     * @since 2.6.0
      */
-    public TransactionContext(final TransactionRegistry transactionRegistry, final Transaction transaction) {
+    public TransactionContext(final TransactionRegistry transactionRegistry, final Transaction transaction,
+                              final TransactionSynchronizationRegistry transactionSynchronizationRegistry) {
         Objects.requireNonNull(transactionRegistry, "transactionRegistry is null");
         Objects.requireNonNull(transaction, "transaction is null");
         this.transactionRegistry = transactionRegistry;
         this.transactionRef = new WeakReference<>(transaction);
         this.transactionComplete = false;
+        this.transactionSynchronizationRegistry = transactionSynchronizationRegistry;
+    }
+
+    /**
+     * Provided for backwards compatability
+     *
+     * @param transactionRegistry the TransactionRegistry used to obtain the XAResource for the
+     * shared connection
+     * @param transaction the transaction
+     */
+    public TransactionContext(final TransactionRegistry transactionRegistry, final Transaction transaction) {
+        this (transactionRegistry, transaction, null);
     }
 
     /**
@@ -113,7 +131,13 @@ public class TransactionContext {
      */
     public void addTransactionContextListener(final TransactionContextListener listener) throws SQLException {
         try {
-            getTransaction().registerSynchronization(new Synchronization() {
+            if (!isActive()) {
+                Transaction transaction = this.transactionRef.get();
+                listener.afterCompletion(TransactionContext.this,
+                        transaction == null ? false : transaction.getStatus() == Status.STATUS_COMMITTED);
+                return;
+            }
+            final Synchronization s = new Synchronization() {
                 @Override
                 public void beforeCompletion() {
                     // empty
@@ -123,7 +147,12 @@ public class TransactionContext {
                 public void afterCompletion(final int status) {
                     listener.afterCompletion(TransactionContext.this, status == Status.STATUS_COMMITTED);
                 }
-            });
+            };
+            if (transactionSynchronizationRegistry != null) {
+                transactionSynchronizationRegistry.registerInterposedSynchronization(s);
+            } else {
+                getTransaction().registerSynchronization(s);
+            }
         } catch (final RollbackException e) {
             // JTA spec doesn't let us register with a transaction marked rollback only
             // just ignore this and the tx state will be cleared another way.

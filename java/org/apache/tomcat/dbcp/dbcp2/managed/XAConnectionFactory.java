@@ -26,7 +26,7 @@ import org.apache.tomcat.dbcp.dbcp2.ConnectionFactory;
  * XAConnectionFactory is an extension of ConnectionFactory used to create connections in a transaction managed
  * environment. The XAConnectionFactory operates like a normal ConnectionFactory except a TransactionRegistry is
  * provided from which the XAResource for a connection can be obtained. This allows the existing DBCP pool code to work
- * with XAConnections and gives a the ManagedConnection a way to enlist a connection in the the transaction.
+ * with XAConnections and gives a the ManagedConnection a way to enlist a connection in the transaction.
  *
  * @since 2.0
  */

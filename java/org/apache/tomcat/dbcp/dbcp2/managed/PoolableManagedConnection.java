@@ -45,7 +45,7 @@ public class PoolableManagedConnection extends PoolableConnection {
      */
     public PoolableManagedConnection(final TransactionRegistry transactionRegistry, final Connection conn,
             final ObjectPool<PoolableConnection> pool) {
-        this(transactionRegistry, conn, pool, null, false);
+        this(transactionRegistry, conn, pool, null, true);
     }
 
     /**

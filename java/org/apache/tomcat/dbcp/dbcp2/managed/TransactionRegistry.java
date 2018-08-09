@@ -26,6 +26,7 @@ import java.util.WeakHashMap;
 import javax.transaction.SystemException;
 import javax.transaction.Transaction;
 import javax.transaction.TransactionManager;
+import javax.transaction.TransactionSynchronizationRegistry;
 import javax.transaction.xa.XAResource;
 
 import org.apache.tomcat.dbcp.dbcp2.DelegatingConnection;
@@ -43,15 +44,28 @@ public class TransactionRegistry {
     private final TransactionManager transactionManager;
     private final Map<Transaction, TransactionContext> caches = new WeakHashMap<>();
     private final Map<Connection, XAResource> xaResources = new WeakHashMap<>();
+    private final TransactionSynchronizationRegistry transactionSynchronizationRegistry;
 
     /**
      * Creates a TransactionRegistry for the specified transaction manager.
      *
      * @param transactionManager
      *            the transaction manager used to enlist connections.
+     * @param transactionSynchronizationRegistry
+     *              The optional TSR to register synchronizations with
+     * @since 2.6.0
+     */
+    public TransactionRegistry(final TransactionManager transactionManager, final TransactionSynchronizationRegistry transactionSynchronizationRegistry) {
+        this.transactionManager = transactionManager;
+        this.transactionSynchronizationRegistry = transactionSynchronizationRegistry;
+    }
+
+    /**
+     * Provided for backwards compatability
+     * @param transactionManager the transaction manager used to enlist connections
      */
     public TransactionRegistry(final TransactionManager transactionManager) {
-        this.transactionManager = transactionManager;
+        this (transactionManager, null);
     }
 
     /**
@@ -111,11 +125,11 @@ public class TransactionRegistry {
             throw new SQLException("Unable to determine current transaction ", e);
         }
 
-        // register the the context (or create a new one)
+        // register the context (or create a new one)
         synchronized (this) {
             TransactionContext cache = caches.get(transaction);
             if (cache == null) {
-                cache = new TransactionContext(this, transaction);
+                cache = new TransactionContext(this, transaction, transactionSynchronizationRegistry);
                 caches.put(transaction, cache);
             }
             return cache;

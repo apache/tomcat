@@ -224,6 +224,11 @@ public class BasicDataSource implements DataSource, BasicDataSourceMXBean, MBean
     private volatile String defaultCatalog;
 
     /**
+     * The default "schema" of connections created by this pool.
+     */
+    private volatile String defaultSchema;
+
+    /**
      * Returns the default catalog.
      *
      * @return the default catalog
@@ -231,6 +236,17 @@ public class BasicDataSource implements DataSource, BasicDataSourceMXBean, MBean
     @Override
     public String getDefaultCatalog() {
         return this.defaultCatalog;
+    }
+
+    /**
+     * Returns the default schema.
+     *
+     * @return the default schema.
+     * @since 2.5.0
+     */
+    @Override
+    public String getDefaultSchema() {
+        return this.defaultSchema;
     }
 
     /**
@@ -251,6 +267,28 @@ public class BasicDataSource implements DataSource, BasicDataSourceMXBean, MBean
             this.defaultCatalog = defaultCatalog;
         } else {
             this.defaultCatalog = null;
+        }
+    }
+
+    /**
+     * <p>
+     * Sets the default schema.
+     * </p>
+     * <p>
+     * Note: this method currently has no effect once the pool has been initialized. The pool is initialized the first
+     * time one of the following methods is invoked: <code>getConnection, setLogwriter,
+     * setLoginTimeout, getLoginTimeout, getLogWriter.</code>
+     * </p>
+     *
+     * @param defaultSchema
+     *            the default catalog
+     * @since 2.5.0
+     */
+    public void setDefaultSchema(final String defaultSchema) {
+        if (defaultSchema != null && defaultSchema.trim().length() > 0) {
+            this.defaultSchema = defaultSchema;
+        } else {
+            this.defaultSchema = null;
         }
     }
 
@@ -2271,11 +2309,11 @@ public class BasicDataSource implements DataSource, BasicDataSourceMXBean, MBean
      * Closes the connection pool, silently swallowing any exception that occurs.
      */
     private void closeConnectionPool() {
-        final GenericObjectPool<?> oldpool = connectionPool;
+        final GenericObjectPool<?> oldPool = connectionPool;
         connectionPool = null;
         try {
-            if (oldpool != null) {
-                oldpool.close();
+            if (oldPool != null) {
+                oldPool.close();
             }
         } catch (final Exception e) {
             /* Ignore */
@@ -2330,6 +2368,7 @@ public class BasicDataSource implements DataSource, BasicDataSourceMXBean, MBean
             connectionFactory.setDefaultAutoCommit(defaultAutoCommit);
             connectionFactory.setDefaultTransactionIsolation(defaultTransactionIsolation);
             connectionFactory.setDefaultCatalog(defaultCatalog);
+            connectionFactory.setDefaultSchema(defaultSchema);
             connectionFactory.setCacheState(cacheState);
             connectionFactory.setPoolStatements(poolPreparedStatements);
             connectionFactory.setMaxOpenPreparedStatements(maxOpenPreparedStatements);

@@ -244,6 +244,10 @@
         Update the internal fork of Apache Commons Pool 2 to 3e02523
         (2018-08-09) to pick up some bug fixes and enhancements. (markt)
       </update>
+      <update>
+        Update the internal fork of Apache Commons DBCP 2 to abc0484
+        (2018-08-09) to pick up some bug fixes and enhancements. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>

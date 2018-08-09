@@ -15,6 +15,7 @@
  * limitations under the License.
  */
 package org.apache.tomcat.dbcp.dbcp2;
+
 import java.sql.Connection;
 import java.sql.Driver;
 import java.sql.SQLException;
