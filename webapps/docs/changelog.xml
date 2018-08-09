@@ -89,6 +89,10 @@
         <bug>62560</bug>: Add <code>oraclepki.jar</code> to the list of JARs
         ignored by <code>StandardJarScanner</code>. (markt)
       </add>
+      <add>
+        <bug>62607</bug>: Return a non-zero exit code from
+        <code>catalina.[bat|sh] run</code> if Tomcat fails to start. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
