@@ -28,6 +28,7 @@ import org.apache.tomcat.dbcp.pool2.TrackedUse;
  * the pooled objects.
  * <p>
  * This class is intended to be thread-safe.
+ * </p>
  *
  * @param <T> the type of object in the pool
  *
@@ -81,10 +82,10 @@ public class DefaultPooledObject<T> implements PooledObject<T> {
     @Override
     public long getIdleTimeMillis() {
         final long elapsed = System.currentTimeMillis() - lastReturnTime;
-     // elapsed may be negative if:
-     // - another thread updates lastReturnTime during the calculation window
-     // - System.currentTimeMillis() is not monotonic (e.g. system time is set back)
-     return elapsed >= 0 ? elapsed : 0;
+        // elapsed may be negative if:
+        // - another thread updates lastReturnTime during the calculation window
+        // - System.currentTimeMillis() is not monotonic (e.g. system time is set back)
+        return elapsed >= 0 ? elapsed : 0;
     }
 
     @Override

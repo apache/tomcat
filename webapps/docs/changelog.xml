@@ -240,6 +240,10 @@
       <fix>
         Fixed spelling. Patch provided by Jimmy Casey via GitHub. (violetagg)
       </fix>
+      <update>
+        Update the internal fork of Apache Commons Pool 2 to 3e02523
+        (2018-08-09) to pick up some bug fixes and enhancements. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>

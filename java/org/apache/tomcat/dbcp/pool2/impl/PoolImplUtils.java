@@ -120,10 +120,8 @@ class PoolImplUtils {
             if (iface instanceof ParameterizedType) {
                 final ParameterizedType pi = (ParameterizedType) iface;
                 // Look for the generic interface
-                if (pi.getRawType() instanceof Class) {
-                    if (type.isAssignableFrom((Class<?>) pi.getRawType())) {
-                        return pi;
-                    }
+                if (pi.getRawType() instanceof Class && type.isAssignableFrom((Class<?>) pi.getRawType())) {
+                    return pi;
                 }
             }
         }

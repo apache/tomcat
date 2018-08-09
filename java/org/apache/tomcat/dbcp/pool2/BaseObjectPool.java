@@ -86,6 +86,7 @@ public abstract class BaseObjectPool<T> extends BaseObject implements ObjectPool
      * <p>
      * This affects the behavior of <code>isClosed</code> and
      * <code>assertOpen</code>.
+     * </p>
      */
     @Override
     public void close() {

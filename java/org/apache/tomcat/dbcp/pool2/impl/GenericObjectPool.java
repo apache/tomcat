@@ -296,29 +296,10 @@ public class GenericObjectPool<T> extends BaseGenericObjectPool<T>
      * @see GenericObjectPoolConfig
      */
     public void setConfig(final GenericObjectPoolConfig<T> conf) {
-        setLifo(conf.getLifo());
+        super.setConfig(conf);
         setMaxIdle(conf.getMaxIdle());
         setMinIdle(conf.getMinIdle());
         setMaxTotal(conf.getMaxTotal());
-        setMaxWaitMillis(conf.getMaxWaitMillis());
-        setBlockWhenExhausted(conf.getBlockWhenExhausted());
-        setTestOnCreate(conf.getTestOnCreate());
-        setTestOnBorrow(conf.getTestOnBorrow());
-        setTestOnReturn(conf.getTestOnReturn());
-        setTestWhileIdle(conf.getTestWhileIdle());
-        setNumTestsPerEvictionRun(conf.getNumTestsPerEvictionRun());
-        setMinEvictableIdleTimeMillis(conf.getMinEvictableIdleTimeMillis());
-        setTimeBetweenEvictionRunsMillis(conf.getTimeBetweenEvictionRunsMillis());
-        setSoftMinEvictableIdleTimeMillis(conf.getSoftMinEvictableIdleTimeMillis());
-        final EvictionPolicy<T> policy = conf.getEvictionPolicy();
-        if (policy == null) {
-            // Use the class name (pre-2.6.0 compatible)
-            setEvictionPolicyClassName(conf.getEvictionPolicyClassName());
-        } else {
-            // Otherwise, use the class (2.6.0 feature)
-            setEvictionPolicy(policy);
-        }
-        setEvictorShutdownTimeoutMillis(conf.getEvictorShutdownTimeoutMillis());
     }
 
     /**
@@ -540,21 +521,19 @@ public class GenericObjectPool<T> extends BaseGenericObjectPool<T>
 
         final long activeTime = p.getActiveTimeMillis();
 
-        if (getTestOnReturn()) {
-            if (!factory.validateObject(p)) {
-                try {
-                    destroy(p);
-                } catch (final Exception e) {
-                    swallowException(e);
-                }
-                try {
-                    ensureIdle(1, false);
-                } catch (final Exception e) {
-                    swallowException(e);
-                }
-                updateStatsReturn(activeTime);
-                return;
+        if (getTestOnReturn() && !factory.validateObject(p)) {
+            try {
+                destroy(p);
+            } catch (final Exception e) {
+                swallowException(e);
             }
+            try {
+                ensureIdle(1, false);
+            } catch (final Exception e) {
+                swallowException(e);
+            }
+            updateStatsReturn(activeTime);
+            return;
         }
 
         try {
@@ -844,6 +823,9 @@ public class GenericObjectPool<T> extends BaseGenericObjectPool<T>
             localMaxTotal = Integer.MAX_VALUE;
         }
 
+        long localStartTimeMillis = System.currentTimeMillis();
+        long localMaxWaitTimeMillis = Math.max(getMaxWaitMillis(), 0);
+
         // Flag that indicates if create should:
         // - TRUE:  call the factory to create an object
         // - FALSE: return null
@@ -867,13 +849,20 @@ public class GenericObjectPool<T> extends BaseGenericObjectPool<T>
                         // bring the pool to capacity. Those calls might also
                         // fail so wait until they complete and then re-test if
                         // the pool is at capacity or not.
-                        makeObjectCountLock.wait();
+                        makeObjectCountLock.wait(localMaxWaitTimeMillis);
                     }
                 } else {
                     // The pool is not at capacity. Create a new object.
                     makeObjectCount++;
                     create = Boolean.TRUE;
                 }
+            }
+
+            // Do not block more if maxWaitTimeMillis is set.
+            if (create == null &&
+                (localMaxWaitTimeMillis > 0 &&
+                 System.currentTimeMillis() - localStartTimeMillis >= localMaxWaitTimeMillis)) {
+                create = Boolean.FALSE;
             }
         }
 

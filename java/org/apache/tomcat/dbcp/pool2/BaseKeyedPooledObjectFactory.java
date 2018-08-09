@@ -30,8 +30,8 @@ package org.apache.tomcat.dbcp.pool2;
  *
  * @since 2.0
  */
-public abstract class BaseKeyedPooledObjectFactory<K,V> extends BaseObject
-        implements KeyedPooledObjectFactory<K,V> {
+public abstract class BaseKeyedPooledObjectFactory<K, V> extends BaseObject
+        implements KeyedPooledObjectFactory<K, V> {
 
     /**
      * Create an instance that can be served by the pool.
@@ -64,6 +64,7 @@ public abstract class BaseKeyedPooledObjectFactory<K,V> extends BaseObject
      * Destroy an instance no longer needed by the pool.
      * <p>
      * The default implementation is a no-op.
+     * </p>
      *
      * @param key the key used when selecting the instance
      * @param p a {@code PooledObject} wrapping the instance to be destroyed
@@ -78,6 +79,7 @@ public abstract class BaseKeyedPooledObjectFactory<K,V> extends BaseObject
      * Ensures that the instance is safe to be returned by the pool.
      * <p>
      * The default implementation always returns {@code true}.
+     * </p>
      *
      * @param key the key used when selecting the object
      * @param p a {@code PooledObject} wrapping the instance to be validated
@@ -92,6 +94,7 @@ public abstract class BaseKeyedPooledObjectFactory<K,V> extends BaseObject
      * Reinitialize an instance to be returned by the pool.
      * <p>
      * The default implementation is a no-op.
+     * </p>
      *
      * @param key the key used when selecting the object
      * @param p a {@code PooledObject} wrapping the instance to be activated
@@ -106,6 +109,7 @@ public abstract class BaseKeyedPooledObjectFactory<K,V> extends BaseObject
      * Uninitialize an instance to be returned to the idle object pool.
      * <p>
      * The default implementation is a no-op.
+     * </p>
      *
      * @param key the key used when selecting the object
      * @param p a {@code PooledObject} wrapping the instance to be passivated
