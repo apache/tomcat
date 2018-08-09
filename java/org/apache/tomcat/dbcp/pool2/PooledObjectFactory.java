@@ -22,6 +22,7 @@ package org.apache.tomcat.dbcp.pool2;
  * <p>
  * By contract, when an {@link ObjectPool} delegates to a
  * {@link PooledObjectFactory},
+ * </p>
  * <ol>
  *  <li>
  *   {@link #makeObject} is called whenever a new instance is needed.
@@ -61,6 +62,7 @@ package org.apache.tomcat.dbcp.pool2;
  * {@link PooledObject PooledObject&lt;V&gt;}.  These are the object wrappers that
  * pools use to track and maintain state information about the objects that
  * they manage.
+ * </p>
  *
  * @param <T> Type of element managed in this factory.
  *
@@ -87,6 +89,7 @@ public interface PooledObjectFactory<T> {
    * It is important for implementations of this method to be aware that there
    * is no guarantee about what state <code>obj</code> will be in and the
    * implementation should be prepared to handle unexpected errors.
+   * </p>
    * <p>
    * Also, an implementation must take in to consideration that instances lost
    * to the garbage collector may never be destroyed.

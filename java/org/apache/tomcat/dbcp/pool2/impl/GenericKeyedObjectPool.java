@@ -76,8 +76,8 @@ import org.apache.tomcat.dbcp.pool2.PooledObjectState;
  *
  * @since 2.0
  */
-public class GenericKeyedObjectPool<K,T> extends BaseGenericObjectPool<T>
-        implements KeyedObjectPool<K,T>, GenericKeyedObjectPoolMXBean<K> {
+public class GenericKeyedObjectPool<K, T> extends BaseGenericObjectPool<T>
+        implements KeyedObjectPool<K, T>, GenericKeyedObjectPoolMXBean<K> {
 
     /**
      * Create a new <code>GenericKeyedObjectPool</code> using defaults from
@@ -236,30 +236,11 @@ public class GenericKeyedObjectPool<K,T> extends BaseGenericObjectPool<T>
      * @see GenericKeyedObjectPoolConfig
      */
     public void setConfig(final GenericKeyedObjectPoolConfig<T> conf) {
-        setLifo(conf.getLifo());
+        super.setConfig(conf);
         setMaxIdlePerKey(conf.getMaxIdlePerKey());
         setMaxTotalPerKey(conf.getMaxTotalPerKey());
         setMaxTotal(conf.getMaxTotal());
         setMinIdlePerKey(conf.getMinIdlePerKey());
-        setMaxWaitMillis(conf.getMaxWaitMillis());
-        setBlockWhenExhausted(conf.getBlockWhenExhausted());
-        setTestOnCreate(conf.getTestOnCreate());
-        setTestOnBorrow(conf.getTestOnBorrow());
-        setTestOnReturn(conf.getTestOnReturn());
-        setTestWhileIdle(conf.getTestWhileIdle());
-        setNumTestsPerEvictionRun(conf.getNumTestsPerEvictionRun());
-        setMinEvictableIdleTimeMillis(conf.getMinEvictableIdleTimeMillis());
-        setSoftMinEvictableIdleTimeMillis(conf.getSoftMinEvictableIdleTimeMillis());
-        setTimeBetweenEvictionRunsMillis(conf.getTimeBetweenEvictionRunsMillis());
-        final EvictionPolicy<T> policy = conf.getEvictionPolicy();
-        if (policy == null) {
-            // Use the class name (pre-2.6.0 compatible)
-            setEvictionPolicyClassName(conf.getEvictionPolicyClassName());
-        } else {
-            // Otherwise, use the class (2.6.0 feature)
-            setEvictionPolicy(policy);
-        }
-        setEvictorShutdownTimeoutMillis(conf.getEvictorShutdownTimeoutMillis());
     }
 
     /**
@@ -478,16 +459,14 @@ public class GenericKeyedObjectPool<K,T> extends BaseGenericObjectPool<T>
         final long activeTime = p.getActiveTimeMillis();
 
         try {
-            if (getTestOnReturn()) {
-                if (!factory.validateObject(key, p)) {
-                    try {
-                        destroy(key, p, true);
-                    } catch (final Exception e) {
-                        swallowException(e);
-                    }
-                    whenWaitersAddObject(key, objectDeque.idleObjects);
-                    return;
+            if (getTestOnReturn() && !factory.validateObject(key, p)) {
+                try {
+                    destroy(key, p, true);
+                } catch (final Exception e) {
+                    swallowException(e);
                 }
+                whenWaitersAddObject(key, objectDeque.idleObjects);
+                return;
             }
 
             try {
@@ -544,7 +523,7 @@ public class GenericKeyedObjectPool<K,T> extends BaseGenericObjectPool<T>
      * @param key
      * @param idleObjects
      */
-    private void whenWaitersAddObject(final K key, LinkedBlockingDeque<PooledObject<T>> idleObjects) {
+    private void whenWaitersAddObject(final K key, final LinkedBlockingDeque<PooledObject<T>> idleObjects) {
         if (idleObjects.hasTakeWaiters()) {
             try {
                 addObject(key);

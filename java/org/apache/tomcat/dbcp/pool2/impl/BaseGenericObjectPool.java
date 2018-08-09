@@ -217,6 +217,29 @@ public abstract class BaseGenericObjectPool<T> extends BaseObject {
         this.blockWhenExhausted = blockWhenExhausted;
     }
 
+    protected void setConfig(BaseObjectPoolConfig<T> conf) {
+        setLifo(conf.getLifo());
+        setMaxWaitMillis(conf.getMaxWaitMillis());
+        setBlockWhenExhausted(conf.getBlockWhenExhausted());
+        setTestOnCreate(conf.getTestOnCreate());
+        setTestOnBorrow(conf.getTestOnBorrow());
+        setTestOnReturn(conf.getTestOnReturn());
+        setTestWhileIdle(conf.getTestWhileIdle());
+        setNumTestsPerEvictionRun(conf.getNumTestsPerEvictionRun());
+        setMinEvictableIdleTimeMillis(conf.getMinEvictableIdleTimeMillis());
+        setTimeBetweenEvictionRunsMillis(conf.getTimeBetweenEvictionRunsMillis());
+        setSoftMinEvictableIdleTimeMillis(conf.getSoftMinEvictableIdleTimeMillis());
+        final EvictionPolicy<T> policy = conf.getEvictionPolicy();
+        if (policy == null) {
+            // Use the class name (pre-2.6.0 compatible)
+            setEvictionPolicyClassName(conf.getEvictionPolicyClassName());
+        } else {
+            // Otherwise, use the class (2.6.0 feature)
+            setEvictionPolicy(policy);
+        }
+        setEvictorShutdownTimeoutMillis(conf.getEvictorShutdownTimeoutMillis());
+    }
+
     /**
      * Returns the maximum amount of time (in milliseconds) the
      * <code>borrowObject()</code> method should block before throwing an
@@ -971,7 +994,7 @@ public abstract class BaseGenericObjectPool<T> extends BaseObject {
      * Marks the object as returning to the pool.
      * @param pooledObject instance to return to the keyed pool
      */
-    protected void markReturningState(PooledObject<T> pooledObject) {
+    protected void markReturningState(final PooledObject<T> pooledObject) {
         synchronized(pooledObject) {
             final PooledObjectState state = pooledObject.getState();
             if (state != PooledObjectState.ALLOCATED) {
@@ -1011,7 +1034,7 @@ public abstract class BaseGenericObjectPool<T> extends BaseObject {
      */
     private ObjectName jmxRegister(final BaseObjectPoolConfig<T> config,
             final String jmxNameBase, String jmxNamePrefix) {
-        ObjectName objectName = null;
+        ObjectName newObjectName = null;
         final MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
         int i = 1;
         boolean registered = false;
@@ -1030,7 +1053,7 @@ public abstract class BaseGenericObjectPool<T> extends BaseObject {
                     objName = new ObjectName(base + jmxNamePrefix + i);
                 }
                 mbs.registerMBean(this, objName);
-                objectName = objName;
+                newObjectName = objName;
                 registered = true;
             } catch (final MalformedObjectNameException e) {
                 if (BaseObjectPoolConfig.DEFAULT_JMX_NAME_PREFIX.equals(
@@ -1051,7 +1074,7 @@ public abstract class BaseGenericObjectPool<T> extends BaseObject {
                 registered = true;
             }
         }
-        return objectName;
+        return newObjectName;
     }
 
     /**

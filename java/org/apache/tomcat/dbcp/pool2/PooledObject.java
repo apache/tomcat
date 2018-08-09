@@ -96,8 +96,10 @@ public interface PooledObject<T> extends Comparable<PooledObject<T>> {
      *<p>
      * Note: This class has a natural ordering that is inconsistent with
      *       equals if distinct objects have the same identity hash code.
+     * </p>
      * <p>
      * {@inheritDoc}
+     * </p>
      */
     @Override
     int compareTo(PooledObject<T> other);

@@ -23,6 +23,7 @@ import java.util.NoSuchElementException;
  * A pooling simple interface.
  * <p>
  * Example of use:
+ * </p>
  * <pre style="border:solid thin; padding: 1ex;"
  * > Object obj = <code style="color:#00C">null</code>;
  *
@@ -46,6 +47,7 @@ import java.util.NoSuchElementException;
  * }</pre>
  * <p>
  * See {@link BaseObjectPool} for a simple base implementation.
+ * </p>
  *
  * @param <T> Type of element pooled in this pool.
  *
@@ -65,14 +67,17 @@ public interface ObjectPool<T> extends Closeable {
      * idle object and have been activated with
      * {@link PooledObjectFactory#activateObject} and then validated with
      * {@link PooledObjectFactory#validateObject}.
+     * </p>
      * <p>
      * By contract, clients <strong>must</strong> return the borrowed instance
      * using {@link #returnObject}, {@link #invalidateObject}, or a related
      * method as defined in an implementation or sub-interface.
+     * </p>
      * <p>
      * The behaviour of this method when the pool has been exhausted
      * is not strictly specified (although it may be specified by
      * implementations).
+     * </p>
      *
      * @return an instance from this pool.
      *
@@ -112,9 +117,11 @@ public interface ObjectPool<T> extends Closeable {
      * By contract, <code>obj</code> <strong>must</strong> have been obtained
      * using {@link #borrowObject} or a related method as defined in an
      * implementation or sub-interface.
+     * </p>
      * <p>
      * This method should be used when an object that has been borrowed is
      * determined (due to an exception or other problem) to be invalid.
+     * </p>
      *
      * @param obj a {@link #borrowObject borrowed} instance to be disposed.
      *
@@ -171,8 +178,10 @@ public interface ObjectPool<T> extends Closeable {
      * <p>
      * Calling {@link #addObject} or {@link #borrowObject} after invoking this
      * method on a pool will cause them to throw an {@link IllegalStateException}.
+     * </p>
      * <p>
      * Implementations should silently fail if not all resources can be freed.
+     * </p>
      */
     @Override
     void close();
