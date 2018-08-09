@@ -229,7 +229,7 @@ public class MultipartStream {
     /**
      * The table for Knuth-Morris-Pratt search algorithm.
      */
-    private int[] boundaryTable;
+    private final int[] boundaryTable;
 
     /**
      * The length of the buffer used for processing the request.
