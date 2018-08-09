@@ -152,15 +152,29 @@ public class JspServletWrapper {
         this.reload = reload;
     }
 
+    public boolean getReload() {
+        return reload;
+    }
+
+    private boolean getReloadInternal() {
+        return firstTime || reload && !ctxt.getRuntimeContext().isCompileCheckInProgress();
+    }
+
     public Servlet getServlet() throws ServletException {
-        // DCL on 'reload' requires that 'reload' be volatile
-        // (this also forces a read memory barrier, ensuring the
-        // new servlet object is read consistently)
-        if (reload) {
+        /*
+         * DCL on 'reload' requires that 'reload' be volatile
+         * (this also forces a read memory barrier, ensuring the new servlet
+         * object is read consistently).
+         *
+         * When running in non development mode with a checkInterval it is
+         * possible (see BZ 62603) for a race condition to cause failures
+         * if a Servlet or tag is reloaded while a compile check is running
+         */
+        if (getReloadInternal()) {
             synchronized (this) {
                 // Synchronizing on jsw enables simultaneous loading
                 // of different pages, but not the same page.
-                if (reload) {
+                if (getReloadInternal()) {
                     // This is to maintain the original protocol.
                     destroy();
 
@@ -253,7 +267,7 @@ public class JspServletWrapper {
                 }
             }
 
-            if (reload) {
+            if (getReloadInternal()) {
                 tagHandlerClass = ctxt.load();
                 reload = false;
             }

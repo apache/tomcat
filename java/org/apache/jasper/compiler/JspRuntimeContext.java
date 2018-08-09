@@ -27,11 +27,14 @@ import java.security.CodeSource;
 import java.security.PermissionCollection;
 import java.security.Policy;
 import java.security.cert.Certificate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
 
 import org.apache.jasper.Constants;
 import org.apache.jasper.JspCompilationContext;
@@ -167,6 +170,12 @@ public final class JspRuntimeContext {
      * Keeps JSP pages ordered by last access.
      */
     private FastRemovalDequeue<JspServletWrapper> jspQueue = null;
+
+    /**
+     * Flag that indicates if a background compilation check is in progress.
+     */
+    private volatile boolean compileCheckInProgress = false;
+
 
     // ------------------------------------------------------ Public Methods
 
@@ -352,6 +361,11 @@ public final class JspRuntimeContext {
             return;
         }
 
+        List<JspServletWrapper> wrappersToReload = new ArrayList<>();
+        // Tell JspServletWrapper to ignore the reload attribute while this
+        // check is in progress. See BZ 62603.
+        compileCheckInProgress = true;
+
         Object [] wrappers = jsps.values().toArray();
         for (int i = 0; i < wrappers.length; i++ ) {
             JspServletWrapper jsw = (JspServletWrapper)wrappers[i];
@@ -361,6 +375,9 @@ public final class JspRuntimeContext {
             synchronized(jsw) {
                 try {
                     ctxt.compile();
+                    if (jsw.getReload()) {
+                        wrappersToReload.add(jsw);
+                    }
                 } catch (FileNotFoundException ex) {
                     ctxt.incrementRemoved();
                 } catch (Throwable t) {
@@ -371,6 +388,31 @@ public final class JspRuntimeContext {
             }
         }
 
+        // See BZ 62603.
+        // OK to process reload flag now.
+        compileCheckInProgress = false;
+        // Ensure all servlets and tags that need to be reloaded, are reloaded.
+        for (JspServletWrapper jsw : wrappersToReload) {
+            // Triggers reload
+            try {
+                if (jsw.isTagFile()) {
+                    // Although this is a public method, all other paths to this
+                    // method use this sync and it is required to prevent race
+                    // conditions during the reload.
+                    synchronized (this) {
+                        jsw.loadTagFile();
+                    }
+                } else {
+                    jsw.getServlet();
+                }
+            } catch (ServletException e) {
+                jsw.getServletContext().log("Servlet reload failed", e);
+            }
+        }
+    }
+
+    public boolean isCompileCheckInProgress() {
+        return compileCheckInProgress;
     }
 
     /**
