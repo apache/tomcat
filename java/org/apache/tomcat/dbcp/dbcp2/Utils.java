@@ -72,6 +72,17 @@ public final class Utils {
     }
 
     /**
+     * Clones the given char[] if not null.
+     *
+     * @param value
+     *            may be null.
+     * @return a cloned char[] or null.
+     */
+    public static char[] clone(final char[] value) {
+        return value == null ? null : value.clone();
+    }
+
+    /**
      * Closes the ResultSet (which may be null).
      *
      * @param resultSet
@@ -169,4 +180,5 @@ public final class Utils {
     public static String toString(final char[] value) {
         return value == null ? null : String.valueOf(value);
     }
+
 }

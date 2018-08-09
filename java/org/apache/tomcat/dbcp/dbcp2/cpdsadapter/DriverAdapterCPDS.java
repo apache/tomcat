@@ -423,8 +423,8 @@ public class DriverAdapterCPDS implements ConnectionPoolDataSource, Referenceabl
      */
     public void setPassword(final char[] userPassword) {
         assertInitializationAllowed();
-        this.userPassword = userPassword;
-        update(connectionProperties, KEY_PASSWORD, Utils.toString(userPassword));
+        this.userPassword = Utils.clone(userPassword);
+        update(connectionProperties, KEY_PASSWORD, Utils.toString(this.userPassword));
     }
 
     /**

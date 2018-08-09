@@ -224,8 +224,20 @@ public class DelegatingConnection<C extends Connection> extends AbandonedTrace i
             passivate();
         } finally {
             if (connection != null) {
+                boolean connectionIsClosed;
                 try {
-                    connection.close();
+                    connectionIsClosed = connection.isClosed();
+                } catch (final SQLException e) {
+                    // not sure what the state is, so assume the connection is open.
+                    connectionIsClosed = false;
+                }
+                try {
+                    // DBCP-512: Avoid exceptions when closing a connection in mutli-threaded use case.
+                    // Avoid closing again, which should be a no-op, but some drivers like H2 throw an exception when
+                    // closing from multiple threads.
+                    if (!connectionIsClosed) {
+                        connection.close();
+                    }
                 } finally {
                     closed = true;
                 }

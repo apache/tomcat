@@ -123,6 +123,15 @@ class CPDSConnectionFactory
     }
 
     /**
+     * (Testing API) Gets the value of password for the default user.
+     *
+     * @return value of password.
+     */
+    char[] getPasswordCharArray() {
+        return userPassword;
+    }
+
+    /**
      * Returns the object pool used to pool connections created by this factory.
      *
      * @return ObjectPool managing pooled connections
@@ -336,7 +345,7 @@ class CPDSConnectionFactory
      *            new password
      */
     public synchronized void setPassword(final char[] userPassword) {
-        this.userPassword = userPassword;
+        this.userPassword =  Utils.clone(userPassword);
     }
 
     /**

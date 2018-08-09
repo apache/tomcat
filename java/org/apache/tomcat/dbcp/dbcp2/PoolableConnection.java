@@ -117,7 +117,7 @@ public class PoolableConnection extends DelegatingConnection<Connection> impleme
      */
     public PoolableConnection(final Connection conn, final ObjectPool<PoolableConnection> pool,
             final ObjectName jmxName) {
-        this(conn, pool, jmxName, null, false);
+        this(conn, pool, jmxName, null, true);
     }
 
     @Override
