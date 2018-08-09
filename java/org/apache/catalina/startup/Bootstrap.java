@@ -491,11 +491,14 @@ public final class Bootstrap {
                 daemon.setAwait(true);
                 daemon.load(args);
                 daemon.start();
+                if (null == daemon.getServer()) {
+                    System.exit(1);
+                }
             } else if (command.equals("stop")) {
                 daemon.stopServer(args);
             } else if (command.equals("configtest")) {
                 daemon.load(args);
-                if (null==daemon.getServer()) {
+                if (null == daemon.getServer()) {
                     System.exit(1);
                 }
                 System.exit(0);
