@@ -71,7 +71,7 @@ public class SessionMessageImpl extends ClusterMessageBase implements SessionMes
      * <B>EVT_ALL_SESSION_DATA</B><BR>
      *    Send complete serializes session list<BR>
      * <B>EVT_ALL_SESSION_TRANSFERCOMPLETE</B><BR>
-     *    send that all session state information are transfered
+     *    send that all session state information are transferred
      *    after GET_ALL_SESSION received from this sender.<BR>
      * <B>EVT_CHANGE_SESSION_ID</B><BR>
      *    send original sessionID and new sessionID.<BR>
@@ -144,7 +144,7 @@ public class SessionMessageImpl extends ClusterMessageBase implements SessionMes
             case EVT_GET_ALL_SESSIONS : return "SESSION-GET-ALL";
             case EVT_SESSION_DELTA : return "SESSION-DELTA";
             case EVT_ALL_SESSION_DATA : return "ALL-SESSION-DATA";
-            case EVT_ALL_SESSION_TRANSFERCOMPLETE : return "SESSION-STATE-TRANSFERED";
+            case EVT_ALL_SESSION_TRANSFERCOMPLETE : return "SESSION-STATE-TRANSFERRED";
             case EVT_CHANGE_SESSION_ID : return "SESSION-ID-CHANGED";
             case EVT_ALL_SESSION_NOCONTEXTMANAGER : return "NO-CONTEXT-MANAGER";
             default : return "UNKNOWN-EVENT-TYPE";

@@ -292,7 +292,7 @@ public class StoreAppender {
      * Determine if the attribute value needs to be stored.
      *
      * @param bean
-     *            orginal bean
+     *            original bean
      * @param bean2
      *            default bean
      * @param attrName

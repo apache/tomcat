@@ -28,8 +28,8 @@ public interface TransactionContextListener {
      *
      * @param transactionContext
      *            the transaction context that completed
-     * @param commited
+     * @param committed
      *            true if the transaction committed; false otherwise
      */
-    void afterCompletion(TransactionContext transactionContext, boolean commited);
+    void afterCompletion(TransactionContext transactionContext, boolean committed);
 }

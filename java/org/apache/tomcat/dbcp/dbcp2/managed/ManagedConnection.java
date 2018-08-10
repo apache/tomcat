@@ -1,4 +1,4 @@
-/**
+vi /**
  *
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -204,7 +204,7 @@ public class ManagedConnection<C extends Connection> extends DelegatingConnectio
      */
     protected class CompletionListener implements TransactionContextListener {
         @Override
-        public void afterCompletion(final TransactionContext completedContext, final boolean commited) {
+        public void afterCompletion(final TransactionContext completedContext, final boolean committed) {
             if (completedContext == transactionContext) {
                 transactionComplete();
             }

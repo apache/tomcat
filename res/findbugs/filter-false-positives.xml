@@ -1007,7 +1007,7 @@
     <Bug pattern="NP_EQUALS_SHOULD_HANDLE_NULL_ARGUMENT" />
   </Match>
   <Match>
-    <!-- Natural ordering behavoiur is docuemented in Javadoc -->
+    <!-- Natural ordering behaviour is docuemented in Javadoc -->
     <Class name="org.apache.tomcat.dbcp.pool2.impl.DefaultPooledObject" />
     <Bug pattern="EQ_COMPARETO_USE_OBJECT_EQUALS" />
   </Match>

@@ -1004,7 +1004,7 @@ List of Attributes
 </table>
 
 <p>
-Wait for server connection and that cluster backup node is accessable
+Wait for server connection and that cluster backup node is accessible
 </p>
 <source><![CDATA[<target name="wait">
   <waitfor maxwait="${maxwait}" maxwaitunit="second" timeoutproperty="server.timeout" >

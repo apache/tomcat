@@ -29,7 +29,7 @@ import org.apache.tomcat.util.bcel.Const;
  * Wrapper class that parses a given Java .class file. The method <A
  * href ="#parse">parse</A> returns a <A href ="JavaClass.html">
  * JavaClass</A> object on success. When an I/O error or an
- * inconsistency occurs an appropiate exception is propagated back to
+ * inconsistency occurs an appropriate exception is propagated back to
  * the caller.
  *
  * The structure and the names comply, except for a few conveniences,
@@ -141,7 +141,7 @@ public final class ClassParser {
      */
     private void readClassInfo() throws IOException, ClassFormatException {
         access_flags = dataInputStream.readUnsignedShort();
-        /* Interfaces are implicitely abstract, the flag should be set
+        /* Interfaces are implicitly abstract, the flag should be set
          * according to the JVM specification.
          */
         if ((access_flags & Const.ACC_INTERFACE) != 0) {

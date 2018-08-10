@@ -661,7 +661,7 @@
         <code>1.9</code> is still supported. (markt)
       </update>
       <add>
-        Add support for specifing Java 10 (with the value <code>10</code>) as
+        Add support for specifying Java 10 (with the value <code>10</code>) as
         the compiler source and/or compiler target for JSP compilation. (markt)
       </add>
       <fix>
