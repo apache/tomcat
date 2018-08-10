@@ -103,6 +103,9 @@
         <bug>62607</bug>: Return a non-zero exit code from
         <code>catalina.[bat|sh] run</code> if Tomcat fails to start. (markt)
       </add>
+      <fix>
+        Use short circuit logic to prevent potential NPE in CorsFilter. (fschumacher)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
