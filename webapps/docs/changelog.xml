@@ -106,6 +106,9 @@
       <fix>
         Use short circuit logic to prevent potential NPE in CorsFilter. (fschumacher)
       </fix>
+      <scode>
+        Simplify construction of appName from container name in JAASRealm. (fschumacher)
+      </scode>
     </changelog>
   </subsection>
   <subsection name="Coyote">

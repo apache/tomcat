@@ -227,13 +227,7 @@ public class JAASRealm extends RealmBase {
         super.setContainer(container);
 
         if( appName==null  ) {
-            String name = container.getName();
-            if (!name.startsWith("/")) {
-                name = "/" + name;
-            }
-            name = makeLegalForJAAS(name);
-
-            appName=name;
+            appName = makeLegalForJAAS(container.getName());
 
             log.info("Set JAAS app name " + appName);
         }
