@@ -229,6 +229,10 @@
         Update the internal fork of Apache Commons DBCP 2 to abc0484
         (2018-08-09) to pick up some bug fixes and enhancements. (markt)
       </update>
+      <fix>
+        Correct various spelling errors throughout the source code and
+        documentation. Patch provided by Kazuhiro Sera. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
