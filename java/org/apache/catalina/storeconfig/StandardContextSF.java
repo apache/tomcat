@@ -161,7 +161,7 @@ public class StandardContextSF extends StoreFactoryBase {
                             !mover.getConfigOld().canWrite())) {
                 log.error("Cannot move orignal context output file at "
                         + mover.getConfigOld());
-                throw new IOException("Context orginal file at "
+                throw new IOException("Context original file at "
                         + mover.getConfigOld()
                         + " is null, not a file or not writable.");
             }

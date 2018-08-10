@@ -50,7 +50,7 @@ jsp-version     the version of JSP the tag library depends upon
 
 short-name      a simple default short name that could be used by
                 a JSP authoring tool to create names with a mnemonic
-                value; for example, the it may be used as the prefered
+                value; for example, the it may be used as the preferred
                 prefix value in taglib directives
 
 uri             a uri uniquely identifying this taglib

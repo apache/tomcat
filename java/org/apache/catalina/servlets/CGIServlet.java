@@ -1161,7 +1161,7 @@ public final class CGIServlet extends HttpServlet {
                 sb.append(System.lineSeparator());
                 sb.append("Check the HttpServletRequest pathInfo property to see if it is what ");
                 sb.append(System.lineSeparator());
-                sb.append("you meant it to be. You must specify an existant and executable file ");
+                sb.append("you meant it to be. You must specify an existent and executable file ");
                 sb.append(System.lineSeparator());
                 sb.append("as part of the path-info.");
                 sb.append(System.lineSeparator());
@@ -1425,7 +1425,7 @@ public final class CGIServlet extends HttpServlet {
          * directory, and input/output streams
          *
          * <p>
-         * This implements the following CGI specification recommedations:
+         * This implements the following CGI specification recommendations:
          * </p>
          * <UL>
          * <LI> Servers SHOULD provide the "<code>query</code>" component of

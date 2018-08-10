@@ -387,7 +387,7 @@ public class SecureNioChannel extends NioChannel  {
                             selector = Selector.open();
                             key = getIOChannel().register(selector, hsStatus);
                         } else {
-                            key.interestOps(hsStatus); // null warning supressed
+                            key.interestOps(hsStatus); // null warning suppressed
                         }
                         int keyCount = selector.select(timeout);
                         if (keyCount == 0 && ((System.currentTimeMillis()-now) >= timeout)) {

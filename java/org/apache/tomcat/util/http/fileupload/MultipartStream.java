@@ -605,7 +605,7 @@ public class MultipartStream {
      * @throws IOException if an i/o error occurs.
      */
     public boolean skipPreamble() throws IOException {
-        // First delimiter may be not preceeded with a CRLF.
+        // First delimiter may be not preceded with a CRLF.
         System.arraycopy(boundary, 2, boundary, 0, boundary.length - 2);
         boundaryLength = boundary.length - 2;
         computeBoundaryTable();

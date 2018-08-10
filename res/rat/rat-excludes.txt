@@ -51,7 +51,7 @@
     (*.gif, *.jpg are also binary, but are automatically detected by RAT as
     ones, so no explicit configuration is needed)
 
-  - Markdown files for display in ther GitHub UI
+  - Markdown files for display in their GitHub UI
 
   - Temporary cache files used by Checkstle
 

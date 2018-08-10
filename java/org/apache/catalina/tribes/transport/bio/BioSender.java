@@ -101,7 +101,7 @@ public class BioSender extends AbstractSender {
      * Send message.
      * @param data The data to send
      * @param waitForAck Wait for an ack
-     * @throws IOException An IO error occured sending the message
+     * @throws IOException An IO error occurred sending the message
      */
     public  void sendMessage(byte[] data, boolean waitForAck) throws IOException {
         IOException exception = null;
