@@ -351,7 +351,7 @@ public class InputBuffer extends Reader
      * Transfers bytes from the buffer to the specified ByteBuffer. After the
      * operation the position of the ByteBuffer will be returned to the one
      * before the operation, the limit will be the position incremented by
-     * the number of the transfered bytes.
+     * the number of the transferred bytes.
      *
      * @param to the ByteBuffer into which bytes are to be written.
      * @return an integer specifying the actual number of bytes read, or -1 if

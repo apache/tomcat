@@ -136,7 +136,7 @@ public class MapDemo implements ChannelListener, MembershipListener{
         long start = System.currentTimeMillis();
         //create a channel object
         ManagedChannel channel = (ManagedChannel) ChannelCreator.createChannel(args);
-        //define a map name, unless one is defined as a paramters
+        //define a map name, unless one is defined as a parameters
         String mapName = "MapDemo";
         if ( args.length > 0 && (!args[args.length-1].startsWith("-"))) {
             mapName = args[args.length-1];

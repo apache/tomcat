@@ -47,7 +47,7 @@ public class DriverManagerConnectionFactory implements ConnectionFactory {
      */
     public DriverManagerConnectionFactory(final String connectionUri) {
         this.connectionUri = connectionUri;
-        this.propeties = new Properties();
+        this.properties = new Properties();
     }
 
     /**
@@ -61,7 +61,7 @@ public class DriverManagerConnectionFactory implements ConnectionFactory {
      */
     public DriverManagerConnectionFactory(final String connectionUri, final Properties properties) {
         this.connectionUri = connectionUri;
-        this.propeties = properties;
+        this.properties = properties;
     }
 
     /**
@@ -83,17 +83,17 @@ public class DriverManagerConnectionFactory implements ConnectionFactory {
 
     @Override
     public Connection createConnection() throws SQLException {
-        if (null == propeties) {
+        if (null == properties) {
             if (userName == null && userPassword == null) {
                 return DriverManager.getConnection(connectionUri);
             }
             return DriverManager.getConnection(connectionUri, userName, userPassword);
         }
-        return DriverManager.getConnection(connectionUri, propeties);
+        return DriverManager.getConnection(connectionUri, properties);
     }
 
     private final String connectionUri;
     private String userName;
     private String userPassword;
-    private Properties propeties;
+    private Properties properties;
 }

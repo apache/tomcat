@@ -328,7 +328,7 @@ public class TestWebXmlOrdering {
 
     @Test
     public void testOrderWebFragmentsRelative11() {
-        // Test references to non-existant fragments
+        // Test references to non-existent fragments
         doRelativeOrderingTest(new RelativeTestRunner11());
     }
 

@@ -33,7 +33,7 @@
      are defined in XML Schema: Part 2: Datatypes -->
 <!ENTITY % xs-datatypes PUBLIC 'datatypes' 'datatypes.dtd' >
 
-<!ENTITY % p 'xs:'> <!-- can be overriden in the internal subset of a
+<!ENTITY % p 'xs:'> <!-- can be overridden in the internal subset of a
                          schema document to establish a different
                          namespace prefix -->
 <!ENTITY % s ':xs'> <!-- if %p is defined (e.g. as foo:) then you must
@@ -170,7 +170,7 @@
           %complexTypeAttrs;>
 
 <!-- particleAndAttrs is shorthand for a root type -->
-<!-- mixed is disallowed if simpleContent, overriden if complexContent
+<!-- mixed is disallowed if simpleContent, overridden if complexContent
      has one too. -->
 
 <!-- If anyAttribute appears in one or more referenced attributeGroups
