@@ -946,7 +946,7 @@ public class SimpleTcpCluster extends LifecycleMBeanBase
                 if (log.isDebugEnabled()) {
                     log.debug("Message " + message.toString() + " from type "
                             + message.getClass().getName()
-                            + " transfered but no listener registered");
+                            + " transferred but no listener registered");
                 }
             }
         }

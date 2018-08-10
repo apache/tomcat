@@ -166,6 +166,10 @@
       <fix>
         Fixed spelling. Patch provided by Jimmy Casey via GitHub. (violetagg)
       </fix>
+      <fix>
+        Correct various spelling errors throughout the source code and
+        documentation. Patch provided by Kazuhiro Sera. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>

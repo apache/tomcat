@@ -1020,7 +1020,7 @@ List of Attributes<br/>
 </table>
 </p>
 <p>
-Wait for server connection and that cluster backup node is accessable<br/>
+Wait for server connection and that cluster backup node is accessible<br/>
 <source>
 &lt;target name="wait"&gt;
   &lt;waitfor maxwait="${maxwait}" maxwaitunit="second" timeoutproperty="server.timeout" &gt;

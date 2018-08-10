@@ -34,7 +34,7 @@ import org.apache.catalina.tribes.util.StringManager;
 /**
  * Send cluster messages with only one socket. Ack and keep Alive Handling is
  * supported
- * 
+ *
  * @author Peter Rossbach
  * @author Filip Hanik
  * @since 5.5.16
@@ -55,19 +55,19 @@ public class BioSender extends AbstractSender {
      */
     private static final String info = "DataSender/3.0";
 
-    
+
     /**
      * current sender socket
      */
     private Socket socket = null;
     private OutputStream soOut = null;
     private InputStream soIn = null;
-    
+
     protected XByteBuffer ackbuf = new XByteBuffer(Constants.ACK_COMMAND.length,true);
 
 
     // ------------------------------------------------------------- Constructor
-    
+
     public BioSender()  {
         // NO-OP
     }
@@ -87,7 +87,7 @@ public class BioSender extends AbstractSender {
     // --------------------------------------------------------- Public Methods
 
     /**
-     * Connect other cluster member receiver 
+     * Connect other cluster member receiver
      * @see org.apache.catalina.tribes.transport.DataSender#connect()
      */
     @Override
@@ -95,10 +95,10 @@ public class BioSender extends AbstractSender {
         openSocket();
    }
 
- 
+
     /**
      * disconnect and close socket
-     * 
+     *
      * @see org.apache.catalina.tribes.transport.DataSender#disconnect()
      */
     @Override
@@ -109,11 +109,14 @@ public class BioSender extends AbstractSender {
             if (log.isDebugEnabled())
                 log.debug(sm.getString("IDataSender.disconnect", getAddress().getHostAddress(), Integer.valueOf(getPort()), Long.valueOf(0)));
         }
-        
+
     }
 
     /**
      * Send message.
+     * @param data The data to send
+     * @param waitForAck Wait for an ack
+     * @throws IOException An IO error occurred sending the message
      */
     public  void sendMessage(byte[] data, boolean waitForAck) throws IOException {
         IOException exception = null;
@@ -143,7 +146,7 @@ public class BioSender extends AbstractSender {
         }
     }
 
-    
+
     /**
      * Name of this SockerSender
      */
@@ -156,7 +159,7 @@ public class BioSender extends AbstractSender {
     }
 
     // --------------------------------------------------------- Protected Methods
- 
+
     /**
      * open real socket and set time out when waitForAck is enabled
      * is socket open return directly
@@ -189,12 +192,12 @@ public class BioSender extends AbstractSender {
               log.debug(sm.getString("IDataSender.openSocket.failure",getAddress().getHostAddress(), Integer.valueOf(getPort()), Long.valueOf(0)), ex1);
           throw (ex1);
         }
-        
+
      }
 
     /**
      * Close socket.
-     * 
+     *
      * @see #disconnect()
      */
     protected void closeSocket() {
@@ -221,20 +224,20 @@ public class BioSender extends AbstractSender {
      * Push messages with only one socket at a time
      * Wait for ack is needed and make auto retry when write message is failed.
      * After sending error close and reopen socket again.
-     * 
+     *
      * After successful sending update stats
-     * 
+     *
      * WARNING: Subclasses must be very careful that only one thread call this pushMessage at once!!!
-     * 
+     *
      * @see #closeSocket()
      * @see #openSocket()
      * @see #sendMessage(byte[], boolean)
-     * 
+     *
      * @param data
      *            data to send
      * @since 5.5.10
      */
-    
+
     protected void pushMessage(byte[] data, boolean reconnect, boolean waitForAck) throws IOException {
         keepalive();
         if ( reconnect ) closeSocket();
@@ -245,7 +248,7 @@ public class BioSender extends AbstractSender {
         SenderState.getSenderState(getDestination()).setReady();
 
     }
-    
+
     /**
      * Wait for Acknowledgement from other server.
      * FIXME Please, not wait only for three characters, better control that the wait ack message is correct.

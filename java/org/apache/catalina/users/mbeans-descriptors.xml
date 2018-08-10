@@ -43,7 +43,7 @@
             writeable="false"/>
 
     <attribute   name="readonly"
-          description="No persistant save of the user database"
+          description="No persistent save of the user database"
                  type="boolean"
             writeable="false"/>
 

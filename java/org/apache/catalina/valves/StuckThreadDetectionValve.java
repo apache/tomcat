@@ -367,7 +367,7 @@ public class StuckThreadDetectionValve extends ValveBase {
                 // no need to release the semaphore, it will be GCed
             }
             //else the request went through before being marked as stuck, no need
-            //to sync agains the semaphore
+            //to sync against the semaphore
             return threadState;
         }
 

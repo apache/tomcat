@@ -1141,7 +1141,7 @@ public class ExpiresFilter extends FilterBase {
 
     /**
      * Return the subset of the given {@code str} that is before the first
-     * occurence of the given {@code separator}. Return {@code null}
+     * occurrence of the given {@code separator}. Return {@code null}
      * if the given {@code str} or the given {@code separator} is
      * null. Return and empty string if the {@code separator} is empty.
      * 

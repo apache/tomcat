@@ -298,7 +298,7 @@
       writeable="false"/>
     <attribute
       name="stateTransfered"
-      description="Is session state transfered complete? "
+      description="Is session state transferred complete? "
       type="boolean"/>  
     <attribute
       name="stateTransferTimeout"

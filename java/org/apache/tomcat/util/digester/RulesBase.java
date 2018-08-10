@@ -150,7 +150,7 @@ public class RulesBase implements Rules {
      */
     @Override
     public void add(String pattern, Rule rule) {
-        // to help users who accidently add '/' to the end of their patterns
+        // to help users who accidentally add '/' to the end of their patterns
         int patternLength = pattern.length();
         if (patternLength>1 && pattern.endsWith("/")) {
             pattern = pattern.substring(0, patternLength-1);
