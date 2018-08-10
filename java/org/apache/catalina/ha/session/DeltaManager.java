@@ -297,7 +297,7 @@ public class DeltaManager extends ClusterManagerBase{
 
     /**
      * Set that state transferred is complete
-     * @param stateTransfered Fag value
+     * @param stateTransfered Flag value
      */
     public void setStateTransfered(boolean stateTransfered) {
         this.stateTransfered = stateTransfered;
