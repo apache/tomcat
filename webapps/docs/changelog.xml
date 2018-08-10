@@ -89,6 +89,11 @@
         <bug>62607</bug>: Return a non-zero exit code from
         <code>catalina.[bat|sh] run</code> if Tomcat fails to start. (markt)
       </add>
+      <scode>
+        Remove <code>ServletException</code> from declaration of
+        <code>Tomcat.addWebapp(String,String)</code> since it is never thrown.
+        Patch provided by Tzafrir. (markt)
+      </scode>
     </changelog>
   </subsection>
   <subsection name="Coyote">
