@@ -296,7 +296,7 @@ public class DeltaManager extends ClusterManagerBase{
     }
 
     /**
-     * Set that state transfered is complete
+     * Set that state transferred is complete
      * @param stateTransfered Fag value
      */
     public void setStateTransfered(boolean stateTransfered) {
@@ -802,8 +802,8 @@ public class DeltaManager extends ClusterManagerBase{
     }
 
     /**
-     * Wait that cluster session state is transfered or timeout after 60 Sec
-     * With stateTransferTimeout == -1 wait that backup is transfered (forever mode)
+     * Wait that cluster session state is transferred or timeout after 60 Sec
+     * With stateTransferTimeout == -1 wait that backup is transferred (forever mode)
      * @param beforeSendTime Start instant of the operation
      */
     protected void waitForSendAllSessions(long beforeSendTime) {
@@ -811,7 +811,7 @@ public class DeltaManager extends ClusterManagerBase{
         long reqNow = reqStart ;
         boolean isTimeout = false;
         if(getStateTransferTimeout() > 0) {
-            // wait that state is transfered with timeout check
+            // wait that state is transferred with timeout check
             do {
                 try {
                     Thread.sleep(100);
@@ -823,7 +823,7 @@ public class DeltaManager extends ClusterManagerBase{
             } while ((!getStateTransfered()) && (!isTimeout) && (!isNoContextManagerReceived()));
         } else {
             if(getStateTransferTimeout() == -1) {
-                // wait that state is transfered
+                // wait that state is transferred
                 do {
                     try {
                         Thread.sleep(100);
@@ -1197,7 +1197,7 @@ public class DeltaManager extends ClusterManagerBase{
 
 
     /**
-     * handle receive session state is complete transfered
+     * handle receive session state is complete transferred
      * @param msg Session message
      * @param sender Member which sent the message
      */
@@ -1331,7 +1331,7 @@ public class DeltaManager extends ClusterManagerBase{
      * handle receive that other node want all sessions ( restart )
      * a) send all sessions with one message
      * b) send session at blocks
-     * After sending send state is complete transfered
+     * After sending send state is complete transferred
      * @param msg Session message
      * @param sender Member which sent the message
      * @throws IOException IO error sending messages
@@ -1369,8 +1369,8 @@ public class DeltaManager extends ClusterManagerBase{
         }//end if
 
         SessionMessage newmsg = new SessionMessageImpl(name,
-                SessionMessage.EVT_ALL_SESSION_TRANSFERCOMPLETE, null, "SESSION-STATE-TRANSFERED",
-                "SESSION-STATE-TRANSFERED" + getName());
+                SessionMessage.EVT_ALL_SESSION_TRANSFERCOMPLETE, null, "SESSION-STATE-TRANSFERRED",
+                "SESSION-STATE-TRANSFERRED" + getName());
         newmsg.setTimestamp(findSessionTimestamp);
         if (log.isDebugEnabled()) {
             log.debug(sm.getString("deltaManager.createMessage.allSessionTransfered",getName()));

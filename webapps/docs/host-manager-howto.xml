@@ -111,7 +111,7 @@ OK - Listed hosts
 localhost:</source>
   </p>
   <p>
-    Note that in case you retreive your users using the
+    Note that in case you retrieve your users using the
     <code>DataSourceRealm</code>, <code>JDBCRealm</code>, or
     <code>JNDIRealm</code> mechanism, add the appropriate role in the database
     or the directory server respectively.

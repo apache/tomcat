@@ -61,7 +61,7 @@ public class TransactionRegistry {
     }
 
     /**
-     * Provided for backwards compatability
+     * Provided for backwards compatibility
      * @param transactionManager the transaction manager used to enlist connections
      */
     public TransactionRegistry(final TransactionManager transactionManager) {

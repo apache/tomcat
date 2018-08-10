@@ -67,7 +67,7 @@ public class TransactionContext {
     }
 
     /**
-     * Provided for backwards compatability
+     * Provided for backwards compatibility
      *
      * @param transactionRegistry the TransactionRegistry used to obtain the XAResource for the
      * shared connection

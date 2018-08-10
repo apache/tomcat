@@ -566,7 +566,7 @@
       browsers are not compliant with this specification and use these
       characters in unencoded form. To prevent Tomcat rejecting such requests,
       this attribute may be used to specify the additional characters to allow.
-      If not specified, no addtional characters will be allowed. The value may
+      If not specified, no additional characters will be allowed. The value may
       be any combination of the following characters:
       <code>&quot; &lt; &gt; [ \ ] ^ ` { | }</code> . Any other characters
       present in the value will be ignored.</p>
@@ -579,7 +579,7 @@
       the major browsers are not compliant with this specification and use these
       characters in unencoded form. To prevent Tomcat rejecting such requests,
       this attribute may be used to specify the additional characters to allow.
-      If not specified, no addtional characters will be allowed. The value may
+      If not specified, no additional characters will be allowed. The value may
       be any combination of the following characters:
       <code>&quot; &lt; &gt; [ \ ] ^ ` { | }</code> . Any other characters
       present in the value will be ignored.</p>
