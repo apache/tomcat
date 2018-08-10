@@ -218,9 +218,8 @@ public class Tomcat {
      * @param docBase Base directory for the context, for static files.
      *  Must exist, relative to the server home
      * @return the deployed context
-     * @throws ServletException if a deployment error occurs
      */
-    public Context addWebapp(String contextPath, String docBase) throws ServletException {
+    public Context addWebapp(String contextPath, String docBase) {
         return addWebapp(getHost(), contextPath, docBase);
     }
 

@@ -109,6 +109,11 @@
       <scode>
         Simplify construction of appName from container name in JAASRealm. (fschumacher)
       </scode>
+      <scode>
+        Remove <code>ServletException</code> from declaration of
+        <code>Tomcat.addWebapp(String,String)</code> since it is never thrown.
+        Patch provided by Tzafrir. (markt)
+      </scode>
     </changelog>
   </subsection>
   <subsection name="Coyote">
