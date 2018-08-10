@@ -224,10 +224,8 @@ public class Tomcat {
      * with the application will be processed normally. Normal web fragment and
      * {@link javax.servlet.ServletContainerInitializer} processing will be
      * applied.
-     *
-     * @throws ServletException
      */
-    public Context addWebapp(String contextPath, String docBase) throws ServletException {
+    public Context addWebapp(String contextPath, String docBase) {
         return addWebapp(getHost(), contextPath, docBase);
     }
 
