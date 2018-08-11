@@ -196,7 +196,17 @@ class Stream extends AbstractStream implements HeaderEmitter {
         boolean notify = getWindowSize() < 1;
         super.incrementWindowSize(windowSizeIncrement);
         if (notify && getWindowSize() > 0) {
-            notifyAll();
+            if (coyoteResponse.getWriteListener() == null) {
+                // Blocking, so use notify to release StreamOutputBuffer
+                notifyAll();
+            } else {
+                // Non-blocking so dispatch
+                coyoteResponse.action(ActionCode.DISPATCH_WRITE, null);
+                // Need to explicitly execute dispatches on the StreamProcessor
+                // as this thread is being processed by an UpgradeProcessor
+                // which won't see this dispatch
+                coyoteResponse.action(ActionCode.DISPATCH_EXECUTE, null);
+            }
         }
     }
 
