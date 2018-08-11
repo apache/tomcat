@@ -810,6 +810,12 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
                     log.debug(sm.getString("upgradeHandler.releaseBacklog",
                             connectionId, stream.getIdentifier()));
                 }
+                // There is never any O/P on stream zero but it is included in
+                // the backlog as it simplifies the code. Skip it if it appears
+                // here.
+                if (this == stream) {
+                    continue;
+                }
                 Response coyoteResponse = ((Stream) stream).getCoyoteResponse();
                 if (coyoteResponse.getWriteListener() == null) {
                     // Blocking, so use notify to release StreamOutputBuffer
