@@ -158,6 +158,13 @@
         called when the initial request body data arrives after the request
         headers when using asynchronous processing over HTTP/2. (markt)
       </fix>
+      <fix>
+        <bug>62614</bug>: Ensure that
+        <code>WriteListener.onWritePossible()</code> is called after
+        <code>isReady()</code> returns <code>false</code> and the window size is
+        subsequently incremented when using asynchronous processing over HTTP/2.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
