@@ -234,7 +234,7 @@ public class JAASRealm extends RealmBase {
     public void setContainer(Container container) {
         super.setContainer(container);
 
-        if( appName==null  ) {
+        if (appName == null) {
             appName = makeLegalForJAAS(container.getName());
 
             log.info("Set JAAS app name " + appName);
