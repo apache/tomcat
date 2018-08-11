@@ -465,7 +465,7 @@ public class CorsFilter implements Filter {
                         String.valueOf(preflightMaxAge));
             }
 
-            if  ((allowedHttpMethods != null & !allowedHttpMethods.isEmpty())) {
+            if  ((allowedHttpMethods != null) && (!allowedHttpMethods.isEmpty())) {
                 response.addHeader(
                         CorsFilter.RESPONSE_HEADER_ACCESS_CONTROL_ALLOW_METHODS,
                         join(allowedHttpMethods, ","));
