@@ -36,10 +36,12 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import javax.servlet.http.WebConnection;
 
+import org.apache.coyote.ActionCode;
 import org.apache.coyote.Adapter;
 import org.apache.coyote.CloseNowException;
 import org.apache.coyote.ProtocolException;
 import org.apache.coyote.Request;
+import org.apache.coyote.Response;
 import org.apache.coyote.http11.upgrade.InternalHttpUpgradeHandler;
 import org.apache.coyote.http2.HpackDecoder.HeaderEmitter;
 import org.apache.coyote.http2.HpackEncoder.State;
@@ -793,8 +795,23 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
 
         if (streamsToNotify != null) {
             for (AbstractStream stream : streamsToNotify) {
-                synchronized (stream) {
-                    stream.notifyAll();
+                if (log.isDebugEnabled()) {
+                    log.debug(sm.getString("upgradeHandler.releaseBacklog",
+                            connectionId, stream.getIdentifier()));
+                }
+                Response coyoteResponse = ((Stream) stream).getCoyoteResponse();
+                if (coyoteResponse.getWriteListener() == null) {
+                    // Blocking, so use notify to release StreamOutputBuffer
+                    synchronized (stream) {
+                        stream.notifyAll();
+                    }
+                } else {
+                    // Non-blocking so dispatch
+                    coyoteResponse.action(ActionCode.DISPATCH_WRITE, null);
+                    // Need to explicitly execute dispatches on the
+                    // StreamProcessor as this thread is being processed by an
+                    // UpgradeProcessor which won't see this dispatch
+                    coyoteResponse.action(ActionCode.DISPATCH_EXECUTE, null);
                 }
             }
         }
