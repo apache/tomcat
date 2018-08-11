@@ -98,6 +98,9 @@
         <code>Tomcat.addWebapp(String,String)</code> since it is never thrown.
         Patch provided by Tzafrir. (markt)
       </scode>
+      <fix>
+        Use short circuit logic to prevent potential NPE in CorsFilter. (fschumacher)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
