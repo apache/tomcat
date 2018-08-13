@@ -172,10 +172,11 @@ do let us know.</p>
       for the specific Tomcat instance.
     </p>
     <p>
-      We also recommend you not to copy over any configuration file that is identical
-      for multiple Tomcat instances, with the exception of the mandatory files.
-      For example, copy over the <code>conf/logging.properties</code> only if 
-      you require the particular Tomcat instance to have specific logging settings.
+      We also recommend you copy all configuration files from the
+      <code>CATALINA_HOME/conf</code> directory into the 
+      <code>CATALINA_BASE/conf/</code> directory. In case a configuration file 
+      is missing in CATALINA_BASE, there is no fallback to CATALINA_HOME. 
+      Consequently, this may cause failure.
     </p>
     <p>
       For advanced configuration information, see the 
