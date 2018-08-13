@@ -246,7 +246,7 @@ public class LockOutRealm extends CombinedRealm {
      * a login attempt, then the last access time will be recorded and any
      * attempt to authenticated a locked user will log a warning.
      */
-    private boolean isLocked(String username) {
+    public boolean isLocked(String username) {
         LockRecord lockRecord = null;
         synchronized (this) {
             lockRecord = failedUsers.get(username);
