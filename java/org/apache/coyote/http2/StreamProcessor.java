@@ -255,15 +255,25 @@ class StreamProcessor extends AbstractProcessor {
     @Override
     protected final void executeDispatches() {
         Iterator<DispatchType> dispatches = getIteratorAndClearDispatches();
-        synchronized (this) {
+        /*
+         * Compare with superclass that uses SocketWrapper
+         * A sync is not necessary here as the window sizes are updated with
+         * syncs before the dispatches are executed and it is the window size
+         * updates that need to be complete before the dispatch executes.
+         */
+        while (dispatches != null && dispatches.hasNext()) {
+            DispatchType dispatchType = dispatches.next();
             /*
-             * TODO Check if this sync is necessary.
-             *      Compare with superclass that uses SocketWrapper
+             * Dispatch on new thread.
+             * Firstly, this avoids a deadlock on the SocketWrapper as Streams
+             * being processed by container threads lock the SocketProcessor
+             * before they lock the SocketWrapper which is the opposite order to
+             * container threads processing via Http2UpgrageHandler.
+             * Secondly, this code executes after a Window update has released
+             * one or more Streams. By dispatching each Stream to a dedicated
+             * thread, those Streams may progress concurrently.
              */
-            while (dispatches != null && dispatches.hasNext()) {
-                DispatchType dispatchType = dispatches.next();
-                processSocketEvent(dispatchType.getSocketStatus(), false);
-            }
+            processSocketEvent(dispatchType.getSocketStatus(), true);
         }
     }
 
