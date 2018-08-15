@@ -47,8 +47,10 @@
 <section name="Tomcat 9.0.12 (markt)" rtext="in development">
   <subsection name="Coyote">
     <changelog>
-      Fix potential deadlocks when using asynchronous Servlet processing with
-      HTTP/2 connectors. (markt)
+      <fix>
+        Fix potential deadlocks when using asynchronous Servlet processing with
+        HTTP/2 connectors. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
