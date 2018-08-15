@@ -48,7 +48,6 @@ import javax.net.ssl.SSLSession;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.ExceptionUtils;
-import org.apache.tomcat.util.buf.ByteBufferHolder;
 import org.apache.tomcat.util.collections.SynchronizedStack;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.net.jsse.JSSESupport;
@@ -575,19 +574,14 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
                     synchronized (writeCompletionHandler) {
                         if (nBytes.intValue() < 0) {
                             failed(new EOFException(sm.getString("iob.failedwrite")), attachment);
-                        } else if (bufferedWrites.size() > 0) {
+                        } else if (!writeBuffer.isEmpty()) {
                             nestedWriteCompletionCount.get().incrementAndGet();
                             // Continue writing data using a gathering write
                             List<ByteBuffer> arrayList = new ArrayList<>();
                             if (attachment.hasRemaining()) {
                                 arrayList.add(attachment);
                             }
-                            for (ByteBufferHolder buffer : bufferedWrites) {
-                                buffer.flip();
-                                arrayList.add(buffer.getBuf());
-                            }
-                            bufferedWrites.clear();
-                            ByteBuffer[] array = arrayList.toArray(new ByteBuffer[arrayList.size()]);
+                            ByteBuffer[] array = writeBuffer.transferToListAsArray(arrayList);
                             getSocket().write(array, 0, array.length,
                                     toNio2Timeout(getWriteTimeout()), TimeUnit.MILLISECONDS,
                                     array, gatheringWriteCompletionHandler);
@@ -633,7 +627,7 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
                     synchronized (writeCompletionHandler) {
                         if (nBytes.longValue() < 0) {
                             failed(new EOFException(sm.getString("iob.failedwrite")), attachment);
-                        } else if (bufferedWrites.size() > 0 || arrayHasData(attachment)) {
+                        } else if (!writeBuffer.isEmpty() || arrayHasData(attachment)) {
                             // Continue writing data
                             nestedWriteCompletionCount.get().incrementAndGet();
                             List<ByteBuffer> arrayList = new ArrayList<>();
@@ -642,12 +636,7 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
                                     arrayList.add(buffer);
                                 }
                             }
-                            for (ByteBufferHolder buffer : bufferedWrites) {
-                                buffer.flip();
-                                arrayList.add(buffer.getBuf());
-                            }
-                            bufferedWrites.clear();
-                            ByteBuffer[] array = arrayList.toArray(new ByteBuffer[arrayList.size()]);
+                            ByteBuffer[] array = writeBuffer.transferToListAsArray(arrayList);
                             getSocket().write(array, 0, array.length,
                                     toNio2Timeout(getWriteTimeout()), TimeUnit.MILLISECONDS,
                                     array, gatheringWriteCompletionHandler);
@@ -1187,11 +1176,11 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
                     off = off + thisTime;
                     if (len > 0) {
                         // Remaining data must be buffered
-                        addToBuffers(buf, off, len);
+                        writeBuffer.add(buf, off, len);
                     }
                     flushNonBlocking(true);
                 } else {
-                    addToBuffers(buf, off, len);
+                    writeBuffer.add(buf, off, len);
                 }
             }
         }
@@ -1222,11 +1211,11 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
                     transfer(from, socketBufferHandler.getWriteBuffer());
                     if (from.remaining() > 0) {
                         // Remaining data must be buffered
-                        addToBuffers(from);
+                        writeBuffer.add(from);
                     }
                     flushNonBlocking(true);
                 } else {
-                    addToBuffers(from);
+                    writeBuffer.add(from);
                 }
             }
         }
@@ -1297,18 +1286,13 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
             synchronized (writeCompletionHandler) {
                 if (hasPermit || writePending.tryAcquire()) {
                     socketBufferHandler.configureWriteBufferForRead();
-                    if (bufferedWrites.size() > 0) {
+                    if (!writeBuffer.isEmpty()) {
                         // Gathering write of the main buffer plus all leftovers
                         List<ByteBuffer> arrayList = new ArrayList<>();
                         if (socketBufferHandler.getWriteBuffer().hasRemaining()) {
                             arrayList.add(socketBufferHandler.getWriteBuffer());
                         }
-                        for (ByteBufferHolder buffer : bufferedWrites) {
-                            buffer.flip();
-                            arrayList.add(buffer.getBuf());
-                        }
-                        bufferedWrites.clear();
-                        ByteBuffer[] array = arrayList.toArray(new ByteBuffer[arrayList.size()]);
+                        ByteBuffer[] array = writeBuffer.transferToListAsArray(arrayList);
                         Nio2Endpoint.startInline();
                         getSocket().write(array, 0, array.length, toNio2Timeout(getWriteTimeout()),
                                 TimeUnit.MILLISECONDS, array, gatheringWriteCompletionHandler);
@@ -1336,7 +1320,7 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
         public boolean hasDataToWrite() {
             synchronized (writeCompletionHandler) {
                 return !socketBufferHandler.isWriteBufferEmpty() ||
-                        bufferedWrites.size() > 0 || getError() != null;
+                        !writeBuffer.isEmpty() || getError() != null;
             }
         }
 

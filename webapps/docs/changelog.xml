@@ -51,6 +51,10 @@
         Fix potential deadlocks when using asynchronous Servlet processing with
         HTTP/2 connectors. (markt)
       </fix>
+      <fix>
+        <bug>62620</bug>: Fix corruption of response bodies when writing large
+        bodies using asynchronous processing over HTTP/2. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">

@@ -43,6 +43,7 @@ import org.apache.tomcat.util.buf.MessageBytes;
 import org.apache.tomcat.util.http.MimeHeaders;
 import org.apache.tomcat.util.http.parser.Host;
 import org.apache.tomcat.util.net.ApplicationBufferHandler;
+import org.apache.tomcat.util.net.WriteBuffer;
 import org.apache.tomcat.util.res.StringManager;
 
 class Stream extends AbstractStream implements HeaderEmitter {
@@ -712,9 +713,10 @@ class Stream extends AbstractStream implements HeaderEmitter {
     }
 
 
-    class StreamOutputBuffer implements HttpOutputBuffer {
+    class StreamOutputBuffer implements HttpOutputBuffer, WriteBuffer.Sink {
 
         private final ByteBuffer buffer = ByteBuffer.allocate(8 * 1024);
+        private final WriteBuffer writeBuffer = new WriteBuffer(32 * 1024);
         private volatile long written = 0;
         private volatile boolean closed = false;
         private volatile boolean endOfStreamSent = false;
@@ -742,6 +744,7 @@ class Stream extends AbstractStream implements HeaderEmitter {
                     // Only flush if we have more data to write and the buffer
                     // is full
                     if (flush(true, coyoteResponse.getWriteListener() == null)) {
+                        writeBuffer.add(chunk);
                         break;
                     }
                 }
@@ -751,7 +754,33 @@ class Stream extends AbstractStream implements HeaderEmitter {
         }
 
         final synchronized boolean flush(boolean block) throws IOException {
-            return flush(false, block);
+            /*
+             * Need to ensure that there is exactly one call to flush even when
+             * there is no data to write.
+             * Too few calls (i.e. zero) and the end of stream message is not
+             * sent for a completed asynchronous write.
+             * Too many calls and the end of stream message is sent too soon and
+             * trailer headers are not sent.
+             */
+            boolean dataLeft = buffer.position() > 0;
+            boolean flushed = false;
+
+            if (dataLeft) {
+                dataLeft = flush(false, block);
+                flushed = true;
+            }
+
+            if (!dataLeft) {
+                if (writeBuffer.isEmpty()) {
+                    if (!flushed) {
+                        dataLeft = flush(false, block);
+                    }
+                } else {
+                    dataLeft = writeBuffer.write(this, block);
+                }
+            }
+
+            return dataLeft;
         }
 
         private final synchronized boolean flush(boolean writeInProgress, boolean block)
@@ -826,6 +855,23 @@ class Stream extends AbstractStream implements HeaderEmitter {
         @Override
         public void flush() throws IOException {
             flush(true);
+        }
+
+        @Override
+        public boolean writeFromBuffer(ByteBuffer src, boolean blocking) throws IOException {
+            int chunkLimit = src.limit();
+            int offset = 0;
+            while (src.remaining() > 0) {
+                int thisTime = Math.min(buffer.remaining(), src.remaining());
+                src.limit(src.position() + thisTime);
+                buffer.put(src);
+                src.limit(chunkLimit);
+                written += offset;
+                if (flush(true, blocking)) {
+                    return true;
+                }
+            }
+            return false;
         }
     }
 
