@@ -85,7 +85,9 @@ public class WriteBuffer {
     ByteBuffer[] toArray(ByteBuffer... prefixes) {
         List<ByteBuffer> result = new ArrayList<>();
         for (ByteBuffer prefix : prefixes) {
-            result.add(prefix);
+            if (prefix.hasRemaining()) {
+                result.add(prefix);
+            }
         }
         for (ByteBufferHolder buffer : buffers) {
             buffer.flip();
