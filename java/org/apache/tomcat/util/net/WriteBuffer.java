@@ -18,6 +18,7 @@ package org.apache.tomcat.util.net;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.LinkedBlockingDeque;
@@ -71,13 +72,29 @@ public class WriteBuffer {
     }
 
 
-    ByteBuffer[] transferToListAsArray(List<ByteBuffer> target) {
+    /**
+     * Create an array of ByteBuffers from the current WriteBuffer, prefixing
+     * that array with the provided ByteBuffers.
+     *
+     * @param prefixes The additional ByteBuffers to add to the start of the
+     *                 array
+     *
+     * @return an array of ByteBuffers from the current WriteBuffer prefixed by
+     *         the provided ByteBuffers
+     */
+    ByteBuffer[] toArray(ByteBuffer... prefixes) {
+        List<ByteBuffer> result = new ArrayList<>();
+        for (ByteBuffer prefix : prefixes) {
+            if (prefix.hasRemaining()) {
+                result.add(prefix);
+            }
+        }
         for (ByteBufferHolder buffer : buffers) {
             buffer.flip();
-            target.add(buffer.getBuf());
+            result.add(buffer.getBuf());
         }
         buffers.clear();
-        return target.toArray(new ByteBuffer[target.size()]);
+        return result.toArray(new ByteBuffer[result.size()]);
     }
 
 
