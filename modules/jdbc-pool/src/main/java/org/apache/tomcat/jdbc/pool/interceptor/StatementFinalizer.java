@@ -55,7 +55,7 @@ public class StatementFinalizer extends AbstractCreateStatementInterceptor {
     @SuppressWarnings("null") // st is not null when used
     @Override
     public void closeInvoked() {
-        while (statements.size()>0) {
+        while (!statements.isEmpty()) {
             StatementEntry ws = statements.remove(0);
             Statement st = ws.getStatement();
             boolean shallClose = false;
