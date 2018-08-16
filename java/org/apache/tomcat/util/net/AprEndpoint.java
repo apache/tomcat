@@ -2576,9 +2576,9 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
 
 
         @Override
-        protected void writeByteBufferBlocking(ByteBuffer from) throws IOException {
+        protected void writeBlockingDirect(ByteBuffer from) throws IOException {
             if (from.isDirect()) {
-                super.writeByteBufferBlocking(from);
+                super.writeBlockingDirect(from);
             } else {
                 // The socket write buffer capacity is socket.appWriteBufSize
                 ByteBuffer writeBuffer = socketBufferHandler.getWriteBuffer();
@@ -2598,9 +2598,9 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
 
 
         @Override
-        protected boolean writeByteBufferNonBlocking(ByteBuffer from) throws IOException {
+        protected boolean writeNonBlockingDirect(ByteBuffer from) throws IOException {
             if (from.isDirect()) {
-                return super.writeByteBufferNonBlocking(from);
+                return super.writeNonBlockingDirect(from);
             } else {
                 // The socket write buffer capacity is socket.appWriteBufSize
                 ByteBuffer writeBuffer = socketBufferHandler.getWriteBuffer();
