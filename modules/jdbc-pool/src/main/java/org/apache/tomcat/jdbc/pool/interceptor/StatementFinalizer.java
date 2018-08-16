@@ -49,7 +49,7 @@ public class StatementFinalizer extends AbstractCreateStatementInterceptor {
 
     @Override
     public void closeInvoked() {
-        while (statements.size()>0) {
+        while (!statements.isEmpty()) {
             WeakReference<Statement> ws = statements.remove(0);
             Statement st = ws.get();
             if (st!=null) {

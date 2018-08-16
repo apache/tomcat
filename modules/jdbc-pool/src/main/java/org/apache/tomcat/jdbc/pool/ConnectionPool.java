@@ -386,8 +386,8 @@ public class ConnectionPool {
         }
 
         /* release all idle connections */
-        BlockingQueue<PooledConnection> pool = (idle.size()>0)?idle:(force?busy:idle);
-        while (pool.size()>0) {
+        BlockingQueue<PooledConnection> pool = (!idle.isEmpty())?idle:(force?busy:idle);
+        while (!pool.isEmpty()) {
             try {
                 //retrieve the next connection
                 PooledConnection con = pool.poll(1000, TimeUnit.MILLISECONDS);
@@ -398,7 +398,7 @@ public class ConnectionPool {
                         release(con);
                     else
                         abandon(con);
-                    if (pool.size()>0) {
+                    if (!pool.isEmpty()) {
                         con = pool.poll(1000, TimeUnit.MILLISECONDS);
                     } else {
                         break;
@@ -409,7 +409,7 @@ public class ConnectionPool {
                     Thread.currentThread().interrupt();
                 }
             }
-            if (pool.size()==0 && force && pool!=busy) pool = busy;
+            if (pool.isEmpty() && force && pool!=busy) pool = busy;
         }
         if (this.getPoolProperties().isJmxEnabled()) this.jmxPool = null;
         PoolProperties.InterceptorDefinition[] proxies = getPoolProperties().getJdbcInterceptorsAsArray();
@@ -970,7 +970,7 @@ public class ConnectionPool {
      */
     public void checkAbandoned() {
         try {
-            if (busy.size()==0) return;
+            if (busy.isEmpty()) return;
             Iterator<PooledConnection> locked = busy.iterator();
             int sto = getPoolProperties().getSuspectTimeout();
             while (locked.hasNext()) {
@@ -1017,7 +1017,7 @@ public class ConnectionPool {
     public void checkIdle(boolean ignoreMinSize) {
 
         try {
-            if (idle.size()==0) return;
+            if (idle.isEmpty()) return;
             long now = System.currentTimeMillis();
             Iterator<PooledConnection> unlocked = idle.iterator();
             while ( (ignoreMinSize || (idle.size()>=getPoolProperties().getMinIdle())) && unlocked.hasNext()) {
@@ -1062,7 +1062,7 @@ public class ConnectionPool {
      */
     public void testAllIdle() {
         try {
-            if (idle.size()==0) return;
+            if (idle.isEmpty()) return;
             Iterator<PooledConnection> unlocked = idle.iterator();
             while (unlocked.hasNext()) {
                 PooledConnection con = unlocked.next();
@@ -1402,7 +1402,7 @@ public class ConnectionPool {
             cleaner.cancel();
             if (poolCleanTimer != null) {
                 poolCleanTimer.purge();
-                if (cleaners.size() == 0) {
+                if (cleaners.isEmpty()) {
                     poolCleanTimer.cancel();
                     poolCleanTimer = null;
                 }
