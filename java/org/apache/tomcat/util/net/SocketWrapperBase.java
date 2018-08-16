@@ -80,12 +80,16 @@ public abstract class SocketWrapperBase<E> {
     protected int bufferedWriteSize = 64 * 1024; // 64k default write buffer
 
     /**
-     * For "non-blocking" writes use an external set of buffers. Although the
-     * API only allows one non-blocking write at a time, due to buffering and
-     * the possible need to write HTTP headers, there may be more than one write
-     * to the OutputBuffer.
+     * Additional buffer used for non-blocking writes. Non-blocking writes need
+     * to return immediately even if the data cannot be written immediately but
+     * the socket buffer may not be big enough to hold all of the unwritten
+     * data. This structure provides an additional buffer to hold the data until
+     * it can be written.
+     * Not that while the Servlet API only allows one non-blocking write at a
+     * time, due to buffering and the possible need to write HTTP headers, this
+     * layer may see multiple writes.
      */
-    protected final WriteBuffer writeBuffer = new WriteBuffer(bufferedWriteSize);
+    protected final WriteBuffer nonBlockingWriteBuffer = new WriteBuffer(bufferedWriteSize);
 
     public SocketWrapperBase(E socket, AbstractEndpoint<E> endpoint) {
         this.socket = socket;
@@ -228,7 +232,7 @@ public abstract class SocketWrapperBase<E> {
     public SocketBufferHandler getSocketBufferHandler() { return socketBufferHandler; }
 
     public boolean hasDataToWrite() {
-        return !socketBufferHandler.isWriteBufferEmpty() || !writeBuffer.isEmpty();
+        return !socketBufferHandler.isWriteBufferEmpty() || !nonBlockingWriteBuffer.isEmpty();
     }
 
     /**
@@ -258,7 +262,7 @@ public abstract class SocketWrapperBase<E> {
         if (socketBufferHandler == null) {
             throw new IllegalStateException(sm.getString("socket.closed"));
         }
-        return socketBufferHandler.isWriteBufferWritable() && writeBuffer.isEmpty();
+        return socketBufferHandler.isWriteBufferWritable() && nonBlockingWriteBuffer.isEmpty();
     }
 
 
@@ -481,7 +485,7 @@ public abstract class SocketWrapperBase<E> {
      * @throws IOException If an IO error occurs during the write
      */
     protected void writeNonBlocking(byte[] buf, int off, int len) throws IOException {
-        if (writeBuffer.isEmpty() && socketBufferHandler.isWriteBufferWritable()) {
+        if (nonBlockingWriteBuffer.isEmpty() && socketBufferHandler.isWriteBufferWritable()) {
             socketBufferHandler.configureWriteBufferForWrite();
             int thisTime = transfer(buf, off, len, socketBufferHandler.getWriteBuffer());
             len = len - thisTime;
@@ -503,7 +507,7 @@ public abstract class SocketWrapperBase<E> {
 
         if (len > 0) {
             // Remaining data must be buffered
-            writeBuffer.add(buf, off, len);
+            nonBlockingWriteBuffer.add(buf, off, len);
         }
     }
 
@@ -520,13 +524,13 @@ public abstract class SocketWrapperBase<E> {
      * @throws IOException If an IO error occurs during the write
      */
     protected void writeNonBlocking(ByteBuffer from) throws IOException {
-        if (writeBuffer.isEmpty() && socketBufferHandler.isWriteBufferWritable()) {
+        if (nonBlockingWriteBuffer.isEmpty() && socketBufferHandler.isWriteBufferWritable()) {
             writeNonBlockingInternal(from);
         }
 
         if (from.remaining() > 0) {
             // Remaining data must be buffered
-            writeBuffer.add(from);
+            nonBlockingWriteBuffer.add(from);
         }
     }
 
@@ -603,8 +607,8 @@ public abstract class SocketWrapperBase<E> {
     protected void flushBlocking() throws IOException {
         doWrite(true);
 
-        if (!writeBuffer.isEmpty()) {
-            writeBuffer.write(this, true);
+        if (!nonBlockingWriteBuffer.isEmpty()) {
+            nonBlockingWriteBuffer.write(this, true);
 
             if (!socketBufferHandler.isWriteBufferEmpty()) {
                 doWrite(true);
@@ -623,8 +627,8 @@ public abstract class SocketWrapperBase<E> {
             dataLeft = !socketBufferHandler.isWriteBufferEmpty();
         }
 
-        if (!dataLeft && !writeBuffer.isEmpty()) {
-            dataLeft = writeBuffer.write(this, false);
+        if (!dataLeft && !nonBlockingWriteBuffer.isEmpty()) {
+            dataLeft = nonBlockingWriteBuffer.write(this, false);
 
             if (!dataLeft && !socketBufferHandler.isWriteBufferEmpty()) {
                 doWrite(false);
