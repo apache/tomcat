@@ -107,7 +107,7 @@ public class MultiLockFairBlockingQueue<E> implements BlockingQueue<E> {
         ExchangeCountDownLatch<E> c = null;
         try {
             //check to see if threads are waiting for an object
-            if (waiters[idx].size() > 0) {
+            if (!waiters[idx].isEmpty()) {
                 //if threads are waiting grab the latch for that thread
                 c = waiters[idx].poll();
                 //give the object to the thread instead of adding it to the pool
