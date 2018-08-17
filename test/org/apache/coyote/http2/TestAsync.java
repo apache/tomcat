@@ -18,6 +18,9 @@ package org.apache.coyote.http2;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 import javax.servlet.AsyncContext;
 import javax.servlet.ServletOutputStream;
@@ -28,57 +31,57 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.Wrapper;
 import org.apache.catalina.startup.Tomcat;
 
+/*
+ * Based on
+ * https://bz.apache.org/bugzilla/show_bug.cgi?id=62614
+ * https://bz.apache.org/bugzilla/show_bug.cgi?id=62620
+ */
+@RunWith(Parameterized.class)
 public class TestAsync extends Http2TestBase {
 
     private static final int BLOCK_SIZE = 0x8000;
 
-    // https://bz.apache.org/bugzilla/show_bug.cgi?id=62614
-    @Test
-    public void testEmptyBothWindowsUpdateConnectionFirst() throws Exception {
-        doEmptyWindowTest(true, false, false);
+    @Parameterized.Parameters(name = "{index}: expandConnectionFirst[{0}], " +
+            "connectionUnlimited[{1}], streamUnlimited[{2}]")
+    public static Collection<Object[]> parameters() {
+        Boolean[] booleans = new Boolean[] { Boolean.FALSE, Boolean.TRUE };
+        List<Object[]> parameterSets = new ArrayList<>();
+
+        for (Boolean expandConnectionFirst : booleans) {
+            for (Boolean connectionUnlimited : booleans) {
+                for (Boolean streamUnlimited : booleans) {
+                    parameterSets.add(new Object[] {
+                            expandConnectionFirst, connectionUnlimited, streamUnlimited
+                    });
+                }
+            }
+        }
+        return parameterSets;
+    }
+
+
+    private final boolean expandConnectionFirst;
+    private final boolean connectionUnlimited;
+    private final boolean streamUnlimited;
+
+
+    public TestAsync(boolean expandConnectionFirst, boolean connectionUnlimited,
+            boolean streamUnlimited) {
+        this.expandConnectionFirst = expandConnectionFirst;
+        this.connectionUnlimited = connectionUnlimited;
+        this.streamUnlimited = streamUnlimited;
     }
 
 
     @Test
-    public void testEmptyBothWindowsUpdateStreamFirst() throws Exception {
-        doEmptyWindowTest(false, false, false);
-    }
-
-
-    @Test
-    public void testEmptyConnectionWindowUpdateConnectionFirst() throws Exception {
-        doEmptyWindowTest(true, false, true);
-    }
-
-
-    @Test
-    public void testEmptyConnectionWindowUpdateStreamFirst() throws Exception {
-        doEmptyWindowTest(false, false, true);
-    }
-
-
-    @Test
-    public void testEmptyStreamWindowUpdateConnectionFirst() throws Exception {
-        doEmptyWindowTest(true, true, false);
-    }
-
-
-    @Test
-    public void testEmptyStreamWindowUpdateStreamFirst() throws Exception {
-        doEmptyWindowTest(false, true, false);
-    }
-
-
-    // No point testing when both Stream and Connection are unlimited
-
-
-    private void doEmptyWindowTest(boolean expandConnectionFirst, boolean connectionUnlimited,
-            boolean streamUnlimited) throws Exception {
+    public void testEmptyWindow() throws Exception {
         int blockCount = 4;
 
         enableHttp2();
@@ -118,39 +121,42 @@ public class TestAsync extends Http2TestBase {
         // Headers
         parser.readFrame(true);
         // Body
-        int startingWindowSize = ConnectionSettingsBase.DEFAULT_INITIAL_WINDOW_SIZE;
 
-        while (output.getBytesRead() < startingWindowSize) {
-            parser.readFrame(true);
-        }
+        if (!connectionUnlimited || !streamUnlimited) {
+            int startingWindowSize = ConnectionSettingsBase.DEFAULT_INITIAL_WINDOW_SIZE;
 
-        // Check that the right number of bytes were received
-        Assert.assertEquals(startingWindowSize, output.getBytesRead());
+            while (output.getBytesRead() < startingWindowSize) {
+                parser.readFrame(true);
+            }
 
-        // Increase the Window size (50% of total body)
-        int windowSizeIncrease = blockCount * BLOCK_SIZE / 2;
-        if (expandConnectionFirst) {
-            sendWindowUpdate(0, windowSizeIncrease);
-            sendWindowUpdate(3, windowSizeIncrease);
-        } else {
-            sendWindowUpdate(3, windowSizeIncrease);
-            sendWindowUpdate(0, windowSizeIncrease);
-        }
+            // Check that the right number of bytes were received
+            Assert.assertEquals(startingWindowSize, output.getBytesRead());
 
-        while (output.getBytesRead() < startingWindowSize + windowSizeIncrease) {
-            parser.readFrame(true);
-        }
+            // Increase the Window size (50% of total body)
+            int windowSizeIncrease = blockCount * BLOCK_SIZE / 2;
+            if (expandConnectionFirst) {
+                sendWindowUpdate(0, windowSizeIncrease);
+                sendWindowUpdate(3, windowSizeIncrease);
+            } else {
+                sendWindowUpdate(3, windowSizeIncrease);
+                sendWindowUpdate(0, windowSizeIncrease);
+            }
 
-        // Check that the right number of bytes were received
-        Assert.assertEquals(startingWindowSize + windowSizeIncrease, output.getBytesRead());
+            while (output.getBytesRead() < startingWindowSize + windowSizeIncrease) {
+                parser.readFrame(true);
+            }
 
-        // Increase the Window size
-        if (expandConnectionFirst) {
-            sendWindowUpdate(0, windowSizeIncrease);
-            sendWindowUpdate(3, windowSizeIncrease);
-        } else {
-            sendWindowUpdate(3, windowSizeIncrease);
-            sendWindowUpdate(0, windowSizeIncrease);
+            // Check that the right number of bytes were received
+            Assert.assertEquals(startingWindowSize + windowSizeIncrease, output.getBytesRead());
+
+            // Increase the Window size
+            if (expandConnectionFirst) {
+                sendWindowUpdate(0, windowSizeIncrease);
+                sendWindowUpdate(3, windowSizeIncrease);
+            } else {
+                sendWindowUpdate(3, windowSizeIncrease);
+                sendWindowUpdate(0, windowSizeIncrease);
+            }
         }
 
         while (!output.getTrace().endsWith("3-EndOfStream\n")) {
@@ -193,7 +199,7 @@ public class TestAsync extends Http2TestBase {
                     while (output.isReady()) {
                         blockCount++;
                         output.write(bytes);
-                        if (blockCount > blockLimit) {
+                        if (blockCount == blockLimit) {
                             asyncContext.complete();
                             return;
                         }
