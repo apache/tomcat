@@ -70,14 +70,18 @@ public abstract class AbstractProcessorLight implements Processor {
                 state = SocketState.CLOSED;
             }
 
-            if (state != SocketState.CLOSED && isAsync()) {
-                state = asyncPostProcess();
-            }
-
             if (getLog().isDebugEnabled()) {
                 getLog().debug("Socket: [" + socketWrapper +
                         "], Status in: [" + status +
                         "], State out: [" + state + "]");
+            }
+
+            if (state != SocketState.CLOSED && isAsync()) {
+                state = asyncPostProcess();
+                if (getLog().isDebugEnabled()) {
+                    getLog().debug("Socket: [" + socketWrapper +
+                            "], State after async post processing: [" + state + "]");
+                }
             }
 
             if (dispatches == null || !dispatches.hasNext()) {

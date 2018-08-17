@@ -818,11 +818,19 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
                 }
                 Response coyoteResponse = ((Stream) stream).getCoyoteResponse();
                 if (coyoteResponse.getWriteListener() == null) {
+                    if (log.isDebugEnabled()) {
+                        log.debug(sm.getString("upgradeHandler.notifyAll",
+                            connectionId, stream.getIdentifier()));
+                    }
                     // Blocking, so use notify to release StreamOutputBuffer
                     synchronized (stream) {
                         stream.notifyAll();
                     }
                 } else {
+                    if (log.isDebugEnabled()) {
+                        log.debug(sm.getString("upgradeHandler.dispatchWrite",
+                            connectionId, stream.getIdentifier()));
+                    }
                     // Non-blocking so dispatch
                     coyoteResponse.action(ActionCode.DISPATCH_WRITE, null);
                     // Need to explicitly execute dispatches on the
