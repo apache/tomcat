@@ -890,6 +890,7 @@ public abstract class Http2TestBase extends TomcatBaseTest {
         private ConnectionSettingsRemote remoteSettings = new ConnectionSettingsRemote("-1");
         private boolean traceBody = false;
         private ByteBuffer bodyBuffer = null;
+        private long bytesRead;
 
         public void setTraceBody(boolean traceBody) {
             this.traceBody = traceBody;
@@ -905,6 +906,7 @@ public abstract class Http2TestBase extends TomcatBaseTest {
         @Override
         public ByteBuffer startRequestBodyFrame(int streamId, int payloadSize) {
             lastStreamId = Integer.toString(streamId);
+            bytesRead += payloadSize;
             if (traceBody) {
                 bodyBuffer = ByteBuffer.allocate(payloadSize);
                 return bodyBuffer;
@@ -1068,6 +1070,7 @@ public abstract class Http2TestBase extends TomcatBaseTest {
 
         public void clearTrace() {
             trace = new StringBuffer();
+            bytesRead = 0;
         }
 
 
@@ -1078,6 +1081,11 @@ public abstract class Http2TestBase extends TomcatBaseTest {
 
         public int getMaxFrameSize() {
             return remoteSettings.getMaxFrameSize();
+        }
+
+
+        public long getBytesRead() {
+            return bytesRead;
         }
     }
 
@@ -1100,6 +1108,8 @@ public abstract class Http2TestBase extends TomcatBaseTest {
     protected static class SimpleServlet extends HttpServlet {
 
         private static final long serialVersionUID = 1L;
+
+        public static final int CONTENT_LENGTH = 8192;
 
         @Override
         protected void doGet(HttpServletRequest req, HttpServletResponse resp)

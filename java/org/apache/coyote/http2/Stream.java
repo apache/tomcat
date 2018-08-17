@@ -718,6 +718,7 @@ class Stream extends AbstractStream implements HeaderEmitter {
         private final ByteBuffer buffer = ByteBuffer.allocate(8 * 1024);
         private final WriteBuffer writeBuffer = new WriteBuffer(32 * 1024);
         private volatile long written = 0;
+        private volatile int streamReservation = 0;
         private volatile boolean closed = false;
         private volatile boolean endOfStreamSent = false;
 
@@ -732,25 +733,31 @@ class Stream extends AbstractStream implements HeaderEmitter {
                 throw new IllegalStateException(
                         sm.getString("stream.closed", getConnectionId(), getIdentifier()));
             }
-            int chunkLimit = chunk.limit();
-            int offset = 0;
-            while (chunk.remaining() > 0) {
-                int thisTime = Math.min(buffer.remaining(), chunk.remaining());
-                chunk.limit(chunk.position() + thisTime);
-                buffer.put(chunk);
-                chunk.limit(chunkLimit);
-                offset += thisTime;
-                if (chunk.remaining() > 0 && !buffer.hasRemaining()) {
-                    // Only flush if we have more data to write and the buffer
-                    // is full
-                    if (flush(true, coyoteResponse.getWriteListener() == null)) {
-                        writeBuffer.add(chunk);
-                        break;
+            int totalThisTime = 0;
+            if (writeBuffer.isEmpty()) {
+                int chunkLimit = chunk.limit();
+                while (chunk.remaining() > 0) {
+                    int thisTime = Math.min(buffer.remaining(), chunk.remaining());
+                    chunk.limit(chunk.position() + thisTime);
+                    buffer.put(chunk);
+                    chunk.limit(chunkLimit);
+                    totalThisTime += thisTime;
+                    if (chunk.remaining() > 0 && !buffer.hasRemaining()) {
+                        // Only flush if we have more data to write and the buffer
+                        // is full
+                        if (flush(true, coyoteResponse.getWriteListener() == null)) {
+                            totalThisTime += chunk.remaining();
+                            writeBuffer.add(chunk);
+                            break;
+                        }
                     }
                 }
+            } else {
+                totalThisTime = chunk.remaining();
+                writeBuffer.add(chunk);
             }
-            written += offset;
-            return offset;
+            written += totalThisTime;
+            return totalThisTime;
         }
 
         final synchronized boolean flush(boolean block) throws IOException {
@@ -803,15 +810,22 @@ class Stream extends AbstractStream implements HeaderEmitter {
             buffer.flip();
             int left = buffer.remaining();
             while (left > 0) {
-                int streamReservation  = reserveWindowSize(left, block);
                 if (streamReservation == 0) {
-                    // Must be non-blocking
-                    buffer.compact();
-                    return true;
+                    streamReservation  = reserveWindowSize(left, block);
+                    if (streamReservation == 0) {
+                        // Must be non-blocking
+                        buffer.compact();
+                        return true;
+                    }
                 }
                 while (streamReservation > 0) {
                     int connectionReservation =
-                                handler.reserveWindowSize(Stream.this, streamReservation);
+                                handler.reserveWindowSize(Stream.this, streamReservation, block);
+                    if (connectionReservation == 0) {
+                        // Must be non-blocking
+                        buffer.compact();
+                        return true;
+                    }
                     // Do the write
                     handler.writeBody(Stream.this, buffer, connectionReservation,
                             !writeInProgress && closed && left == connectionReservation &&
@@ -858,16 +872,14 @@ class Stream extends AbstractStream implements HeaderEmitter {
         }
 
         @Override
-        public boolean writeFromBuffer(ByteBuffer src, boolean blocking) throws IOException {
+        public synchronized boolean writeFromBuffer(ByteBuffer src, boolean blocking) throws IOException {
             int chunkLimit = src.limit();
-            int offset = 0;
             while (src.remaining() > 0) {
                 int thisTime = Math.min(buffer.remaining(), src.remaining());
                 src.limit(src.position() + thisTime);
                 buffer.put(src);
                 src.limit(chunkLimit);
-                written += offset;
-                if (flush(true, blocking)) {
+                if (flush(false, blocking)) {
                     return true;
                 }
             }

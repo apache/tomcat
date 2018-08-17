@@ -280,7 +280,7 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
                 // Reserve as much as possible right away
                 int reservation = (sendfile.end - sendfile.pos > Integer.MAX_VALUE) ? Integer.MAX_VALUE : (int) (sendfile.end - sendfile.pos);
                 sendfile.streamReservation  = sendfile.stream.reserveWindowSize(reservation, true);
-                sendfile.connectionReservation = reserveWindowSize(sendfile.stream, sendfile.streamReservation);
+                sendfile.connectionReservation = reserveWindowSize(sendfile.stream, sendfile.streamReservation, true);
             } catch (IOException e) {
                 return SendfileState.ERROR;
             }
@@ -340,7 +340,7 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
                         int reservation = (sendfile.end - sendfile.pos > Integer.MAX_VALUE) ? Integer.MAX_VALUE : (int) (sendfile.end - sendfile.pos);
                         sendfile.streamReservation = sendfile.stream.reserveWindowSize(reservation, true);
                     }
-                    sendfile.connectionReservation = reserveWindowSize(sendfile.stream, sendfile.streamReservation);
+                    sendfile.connectionReservation = reserveWindowSize(sendfile.stream, sendfile.streamReservation, true);
                 }
             } catch (IOException e) {
                 failed (e, sendfile);
