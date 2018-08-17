@@ -46,6 +46,7 @@ import org.apache.catalina.startup.Tomcat;
  * Based on
  * https://bz.apache.org/bugzilla/show_bug.cgi?id=62614
  * https://bz.apache.org/bugzilla/show_bug.cgi?id=62620
+ * https://bz.apache.org/bugzilla/show_bug.cgi?id=62628
  */
 @RunWith(Parameterized.class)
 public class TestAsync extends Http2TestBase {
@@ -53,7 +54,8 @@ public class TestAsync extends Http2TestBase {
     private static final int BLOCK_SIZE = 0x8000;
 
     @Parameterized.Parameters(name = "{index}: expandConnectionFirst[{0}], " +
-            "connectionUnlimited[{1}], streamUnlimited[{2}], useNonContainerThreadForWrite[{3}]")
+            "connectionUnlimited[{1}], streamUnlimited[{2}], useNonContainerThreadForWrite[{3}]," +
+            "largeInitialWindow[{4}]")
     public static Collection<Object[]> parameters() {
         Boolean[] booleans = new Boolean[] { Boolean.FALSE, Boolean.TRUE };
         List<Object[]> parameterSets = new ArrayList<>();
@@ -62,10 +64,12 @@ public class TestAsync extends Http2TestBase {
             for (Boolean connectionUnlimited : booleans) {
                 for (Boolean streamUnlimited : booleans) {
                     for (Boolean useNonContainerThreadForWrite : booleans) {
-                        parameterSets.add(new Object[] {
-                                expandConnectionFirst, connectionUnlimited, streamUnlimited,
-                                useNonContainerThreadForWrite
-                        });
+                        for (Boolean largeInitialWindow : booleans) {
+                            parameterSets.add(new Object[] {
+                                    expandConnectionFirst, connectionUnlimited, streamUnlimited,
+                                    useNonContainerThreadForWrite, largeInitialWindow
+                            });
+                        }
                     }
                 }
             }
@@ -78,20 +82,23 @@ public class TestAsync extends Http2TestBase {
     private final boolean connectionUnlimited;
     private final boolean streamUnlimited;
     private final boolean useNonContainerThreadForWrite;
+    private final boolean largeInitialWindow;
 
 
     public TestAsync(boolean expandConnectionFirst, boolean connectionUnlimited,
-            boolean streamUnlimited, boolean useNonContainerThreadForWrite) {
+            boolean streamUnlimited, boolean useNonContainerThreadForWrite,
+            boolean largeInitialWindow) {
         this.expandConnectionFirst = expandConnectionFirst;
         this.connectionUnlimited = connectionUnlimited;
         this.streamUnlimited = streamUnlimited;
         this.useNonContainerThreadForWrite = useNonContainerThreadForWrite;
+        this.largeInitialWindow = largeInitialWindow;
     }
 
 
     @Test
     public void testEmptyWindow() throws Exception {
-        int blockCount = 4;
+        int blockCount = 8;
 
         enableHttp2();
 
@@ -106,18 +113,31 @@ public class TestAsync extends Http2TestBase {
         ctxt.addServletMappingDecoded("/async", "async");
         tomcat.start();
 
+        int startingWindowSize;
+
         openClientConnection();
         doHttpUpgrade();
         sendClientPreface();
         validateHttp2InitialResponse();
 
+        // Reset connection window size after intial response
+        sendWindowUpdate(0, SimpleServlet.CONTENT_LENGTH);
+
+        if (largeInitialWindow) {
+            startingWindowSize = ((1 << 17) - 1);
+            SettingValue sv =
+                    new SettingValue(Setting.INITIAL_WINDOW_SIZE.getId(), startingWindowSize);
+            sendSettings(0, false, sv);
+            // Test code assumes connection window and stream window size are the same at the start
+            sendWindowUpdate(0, startingWindowSize - ConnectionSettingsBase.DEFAULT_INITIAL_WINDOW_SIZE);
+        } else {
+            startingWindowSize = ConnectionSettingsBase.DEFAULT_INITIAL_WINDOW_SIZE;
+        }
+
         byte[] frameHeader = new byte[9];
         ByteBuffer headersPayload = ByteBuffer.allocate(128);
         buildGetRequest(frameHeader, headersPayload, null, 3, "/async");
         writeFrame(frameHeader, headersPayload);
-
-        // Reset connection window size after intial response
-        sendWindowUpdate(0, SimpleServlet.CONTENT_LENGTH);
 
         if (connectionUnlimited) {
             // Effectively unlimited for this test
@@ -133,7 +153,6 @@ public class TestAsync extends Http2TestBase {
         // Body
 
         if (!connectionUnlimited || !streamUnlimited) {
-            int startingWindowSize = ConnectionSettingsBase.DEFAULT_INITIAL_WINDOW_SIZE;
 
             while (output.getBytesRead() < startingWindowSize) {
                 parser.readFrame(true);
@@ -224,7 +243,7 @@ public class TestAsync extends Http2TestBase {
                                     throw new IllegalStateException(e);
                                 }
                             }
-                        }, 2, TimeUnit.SECONDS);
+                        }, 200, TimeUnit.MILLISECONDS);
                     } else {
                         write();
                     }

@@ -56,8 +56,9 @@
         bodies using asynchronous processing over HTTP/2. (markt)
       </fix>
       <fix>
-        Additional fixes for output corruption of response bodies when writing
-        large bodies using asynchronous processing over HTTP/2. (markt)
+        <bug>62628</bug>: Additional fixes for output corruption of response
+        bodies when writing large bodies using asynchronous processing over
+        HTTP/2. (markt)
       </fix>
     </changelog>
   </subsection>
