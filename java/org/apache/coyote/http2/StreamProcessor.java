@@ -83,9 +83,12 @@ class StreamProcessor extends AbstractProcessor {
                         }
                     }
                 } catch (Exception e) {
-                    ConnectionException ce = new ConnectionException(sm.getString(
-                            "streamProcessor.error.connection", stream.getConnectionId(),
-                            stream.getIdentifier()), Http2Error.INTERNAL_ERROR);
+                    String msg = sm.getString("streamProcessor.error.connection",
+                            stream.getConnectionId(), stream.getIdentifier());
+                    if (log.isDebugEnabled()) {
+                        log.debug(msg, e);
+                    }
+                    ConnectionException ce = new ConnectionException(msg, Http2Error.INTERNAL_ERROR);
                     ce.initCause(e);
                     stream.close(ce);
                 } finally {
@@ -318,6 +321,10 @@ class StreamProcessor extends AbstractProcessor {
 
     @Override
     protected boolean flushBufferedWrite() throws IOException {
+        if (log.isDebugEnabled()) {
+            log.debug(sm.getString("streamProcessor.flushBufferedWrite.entry",
+                    stream.getConnectionId(), stream.getIdentifier()));
+        }
         if (stream.flush(false)) {
             // The buffer wasn't fully flushed so re-register the
             // stream for write. Note this does not go via the
