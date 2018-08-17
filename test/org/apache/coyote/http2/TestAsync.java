@@ -21,6 +21,10 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import javax.servlet.AsyncContext;
 import javax.servlet.ServletOutputStream;
@@ -49,7 +53,7 @@ public class TestAsync extends Http2TestBase {
     private static final int BLOCK_SIZE = 0x8000;
 
     @Parameterized.Parameters(name = "{index}: expandConnectionFirst[{0}], " +
-            "connectionUnlimited[{1}], streamUnlimited[{2}]")
+            "connectionUnlimited[{1}], streamUnlimited[{2}], useNonContainerThreadForWrite[{3}]")
     public static Collection<Object[]> parameters() {
         Boolean[] booleans = new Boolean[] { Boolean.FALSE, Boolean.TRUE };
         List<Object[]> parameterSets = new ArrayList<>();
@@ -57,9 +61,12 @@ public class TestAsync extends Http2TestBase {
         for (Boolean expandConnectionFirst : booleans) {
             for (Boolean connectionUnlimited : booleans) {
                 for (Boolean streamUnlimited : booleans) {
-                    parameterSets.add(new Object[] {
-                            expandConnectionFirst, connectionUnlimited, streamUnlimited
-                    });
+                    for (Boolean useNonContainerThreadForWrite : booleans) {
+                        parameterSets.add(new Object[] {
+                                expandConnectionFirst, connectionUnlimited, streamUnlimited,
+                                useNonContainerThreadForWrite
+                        });
+                    }
                 }
             }
         }
@@ -70,13 +77,15 @@ public class TestAsync extends Http2TestBase {
     private final boolean expandConnectionFirst;
     private final boolean connectionUnlimited;
     private final boolean streamUnlimited;
+    private final boolean useNonContainerThreadForWrite;
 
 
     public TestAsync(boolean expandConnectionFirst, boolean connectionUnlimited,
-            boolean streamUnlimited) {
+            boolean streamUnlimited, boolean useNonContainerThreadForWrite) {
         this.expandConnectionFirst = expandConnectionFirst;
         this.connectionUnlimited = connectionUnlimited;
         this.streamUnlimited = streamUnlimited;
+        this.useNonContainerThreadForWrite = useNonContainerThreadForWrite;
     }
 
 
@@ -91,7 +100,8 @@ public class TestAsync extends Http2TestBase {
         Context ctxt = tomcat.addContext("", null);
         Tomcat.addServlet(ctxt, "simple", new SimpleServlet());
         ctxt.addServletMappingDecoded("/simple", "simple");
-        Wrapper w = Tomcat.addServlet(ctxt, "async", new AsyncServlet(blockCount));
+        Wrapper w = Tomcat.addServlet(ctxt, "async",
+                new AsyncServlet(blockCount, useNonContainerThreadForWrite));
         w.setAsyncSupported(true);
         ctxt.addServletMappingDecoded("/async", "async");
         tomcat.start();
@@ -173,11 +183,18 @@ public class TestAsync extends Http2TestBase {
         private static final long serialVersionUID = 1L;
 
         private final int blockLimit;
+        private final boolean useNonContainerThreadForWrite;
+        private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+        private volatile Future<?> future;
 
-        public AsyncServlet(int blockLimit) {
+        public AsyncServlet(int blockLimit, boolean useNonContainerThreadForWrite) {
             this.blockLimit = blockLimit;
+            this.useNonContainerThreadForWrite = useNonContainerThreadForWrite;
         }
 
+        /*
+         * Not thread-safe. OK for this test. NOt OK for use in the real world.
+         */
         @Override
         protected void doGet(HttpServletRequest request, HttpServletResponse response)
                 throws IOException {
@@ -196,19 +213,41 @@ public class TestAsync extends Http2TestBase {
 
                 @Override
                 public void onWritePossible() throws IOException {
+                    if (useNonContainerThreadForWrite) {
+                        future = scheduler.schedule(new Runnable() {
+
+                            @Override
+                            public void run() {
+                                try {
+                                    write();
+                                } catch (IOException e) {
+                                    throw new IllegalStateException(e);
+                                }
+                            }
+                        }, 2, TimeUnit.SECONDS);
+                    } else {
+                        write();
+                    }
+                }
+
+
+                private void write() throws IOException {
                     while (output.isReady()) {
                         blockCount++;
                         output.write(bytes);
                         if (blockCount == blockLimit) {
                             asyncContext.complete();
+                            scheduler.shutdown();
                             return;
                         }
                     }
                 }
 
-
                 @Override
                 public void onError(Throwable t) {
+                    if (future != null) {
+                        future.cancel(false);
+                    }
                     t.printStackTrace();
                 }
             });
