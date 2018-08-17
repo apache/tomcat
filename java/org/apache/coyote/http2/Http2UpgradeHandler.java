@@ -712,7 +712,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
     }
 
 
-    int reserveWindowSize(Stream stream, int reservation) throws IOException {
+    int reserveWindowSize(Stream stream, int reservation, boolean block) throws IOException {
         // Need to be holding the stream lock so releaseBacklog() can't notify
         // this thread until after this thread enters wait()
         int allocation = 0;
@@ -764,12 +764,16 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
                     }
                 }
                 if (allocation == 0) {
-                    try {
-                        stream.wait();
-                    } catch (InterruptedException e) {
-                        throw new IOException(sm.getString(
-                                "upgradeHandler.windowSizeReservationInterrupted", connectionId,
-                                stream.getIdentifier(), Integer.toString(reservation)), e);
+                    if (block) {
+                        try {
+                            stream.wait();
+                        } catch (InterruptedException e) {
+                            throw new IOException(sm.getString(
+                                    "upgradeHandler.windowSizeReservationInterrupted", connectionId,
+                                    stream.getIdentifier(), Integer.toString(reservation)), e);
+                        }
+                    } else {
+                        return 0;
                     }
                 }
             } while (allocation == 0);
