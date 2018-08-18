@@ -296,10 +296,11 @@ public class JDBCRealm
      * @param username Username of the Principal to look up
      * @param credentials Password or other credentials to use in
      *  authenticating this username
+     * @param remoteAddr the remote address if available or null
      * @return the associated principal, or <code>null</code> if there is none.
      */
     @Override
-    public synchronized Principal authenticate(String username, String credentials) {
+    public synchronized Principal authenticate(String username, String credentials, String remoteAddr) {
 
         // Number of tries is the number of attempts to connect to the database
         // during this login attempt (if we need to open the database)

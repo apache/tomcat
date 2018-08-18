@@ -136,7 +136,7 @@ public class LockOutRealm extends CombinedRealm {
 
         Principal authenticatedUser = super.authenticate(username, clientDigest, nonce, nc, cnonce,
                 qop, realmName, md5a2);
-        return filterLockedAccounts(username, authenticatedUser);
+        return filterLockedAccounts(username, authenticatedUser, null);
     }
 
 
@@ -147,11 +147,13 @@ public class LockOutRealm extends CombinedRealm {
      * @param username Username of the Principal to look up
      * @param credentials Password or other credentials to use in
      *  authenticating this username
+     * @param remoteAddr the remote address if available or null
+     * @return the authenticated principal or null 
      */
     @Override
-    public Principal authenticate(String username, String credentials) {
-        Principal authenticatedUser = super.authenticate(username, credentials);
-        return filterLockedAccounts(username, authenticatedUser);
+    public Principal authenticate(String username, String credentials, String remoteAddr) {
+        Principal authenticatedUser = super.authenticate(username, credentials, remoteAddr);
+        return filterLockedAccounts(username, authenticatedUser, remoteAddr);
     }
 
 
@@ -170,7 +172,7 @@ public class LockOutRealm extends CombinedRealm {
         }
 
         Principal authenticatedUser = super.authenticate(certs);
-        return filterLockedAccounts(username, authenticatedUser);
+        return filterLockedAccounts(username, authenticatedUser, null);
     }
 
 
@@ -193,7 +195,7 @@ public class LockOutRealm extends CombinedRealm {
 
             Principal authenticatedUser = super.authenticate(gssContext, storeCreds);
 
-            return filterLockedAccounts(username, authenticatedUser);
+            return filterLockedAccounts(username, authenticatedUser, null);
         }
 
         // Fail in all other cases
@@ -205,7 +207,7 @@ public class LockOutRealm extends CombinedRealm {
      * Filters authenticated principals to ensure that <code>null</code> is
      * returned for any user that is currently locked out.
      */
-    private Principal filterLockedAccounts(String username, Principal authenticatedUser) {
+    private Principal filterLockedAccounts(String username, Principal authenticatedUser, String remoteAddr) {
         // Register all failed authentications
         if (authenticatedUser == null && isAvailable()) {
             registerAuthFailure(username);
@@ -213,7 +215,7 @@ public class LockOutRealm extends CombinedRealm {
 
         if (isLocked(username)) {
             // If the user is currently locked, authentication will always fail
-            log.warn(sm.getString("lockOutRealm.authLockedUser", username));
+            log.warn(sm.getString("lockOutRealm.authLockedUser", username, remoteAddr));
             return null;
         }
 

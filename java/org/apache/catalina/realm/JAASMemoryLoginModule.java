@@ -328,7 +328,7 @@ public class JAASMemoryLoginModule extends MemoryRealm implements LoginModule {
         // Validate the username and password we have received
         if (authMethod == null) {
             // BASIC or FORM
-            principal = super.authenticate(username, password);
+            principal = super.authenticate(username, password, null);
         } else if (authMethod.equals(HttpServletRequest.DIGEST_AUTH)) {
             principal = super.authenticate(username, password, nonce, nc,
                     cnonce, qop, realmName, md5a2);

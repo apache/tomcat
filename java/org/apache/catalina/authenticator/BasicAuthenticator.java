@@ -91,7 +91,7 @@ public class BasicAuthenticator extends AuthenticatorBase {
                 String username = credentials.getUsername();
                 String password = credentials.getPassword();
 
-                Principal principal = context.getRealm().authenticate(username, password);
+                Principal principal = context.getRealm().authenticate(username, password, request.getRemoteAddr());
                 if (principal != null) {
                     register(request, response, principal,
                         HttpServletRequest.BASIC_AUTH, username, password);
