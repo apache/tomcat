@@ -1102,7 +1102,7 @@ public abstract class AuthenticatorBase extends ValveBase
 
     @Override
     public void login(String username, String password, Request request) throws ServletException {
-        Principal principal = doLogin(request, username, password);
+        Principal principal = doLogin(request, username, password, request.getRemoteAddr());
         register(request, request.getResponse(), principal, getAuthMethod(), username, password);
     }
 
@@ -1117,13 +1117,15 @@ public abstract class AuthenticatorBase extends ValveBase
      *            The user
      * @param password
      *            The password
+     * @param remoteAddr
+     *            The remote ip address or null if not available
      * @return The authenticated Principal
      * @throws ServletException
      *             No principal was authenticated with the specified credentials
      */
-    protected Principal doLogin(Request request, String username, String password)
+    protected Principal doLogin(Request request, String username, String password, String remoteAddr)
             throws ServletException {
-        Principal p = context.getRealm().authenticate(username, password);
+        Principal p = context.getRealm().authenticate(username, password, remoteAddr);
         if (p == null) {
             throw new ServletException(sm.getString("authenticator.loginFail"));
         }

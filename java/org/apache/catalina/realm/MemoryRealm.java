@@ -104,10 +104,11 @@ public class MemoryRealm  extends RealmBase {
      * @param username Username of the Principal to look up
      * @param credentials Password or other credentials to use in
      *  authenticating this username
+     * @param remoteAddr the remote address if available or null
      * @return the associated principal, or <code>null</code> if there is none.
      */
     @Override
-    public Principal authenticate(String username, String credentials) {
+    public Principal authenticate(String username, String credentials, String remoteAddr) {
 
         // No user or no credentials
         // Can't possibly authenticate, don't bother the database then

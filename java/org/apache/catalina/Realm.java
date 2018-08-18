@@ -76,9 +76,10 @@ public interface Realm extends Contained {
      * @param username Username of the Principal to look up
      * @param credentials Password or other credentials to use in
      * authenticating this username
+     * @param remoteAddr the remote ip address or null if it's not available or wasn't provided
      * @return the associated principal, or <code>null</code> if there is none
      */
-    public Principal authenticate(String username, String credentials);
+    public Principal authenticate(String username, String credentials, String remoteAddr);
 
 
     /**

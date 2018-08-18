@@ -156,7 +156,7 @@ public class FormAuthenticator
                     log.debug("Reauthenticating username '" + username + "'");
                 }
                 principal =
-                    context.getRealm().authenticate(username, password);
+                    context.getRealm().authenticate(username, password, request.getRemoteAddr());
                 if (principal != null) {
                     session.setNote(Constants.FORM_PRINCIPAL_NOTE, principal);
                     if (!matchRequest(request)) {
@@ -261,7 +261,7 @@ public class FormAuthenticator
         if (log.isDebugEnabled()) {
             log.debug("Authenticating username '" + username + "'");
         }
-        principal = realm.authenticate(username, password);
+        principal = realm.authenticate(username, password, request.getRemoteAddr());
         if (principal == null) {
             forwardToErrorPage(request, response, config);
             return false;

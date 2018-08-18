@@ -174,9 +174,11 @@ public class CombinedRealm extends RealmBase {
      * @param username Username of the Principal to look up
      * @param credentials Password or other credentials to use in
      *  authenticating this username
+     * @param remoteAddr the remote address if available or null
+     * @return the authenticated principal or null if authentication failed
      */
     @Override
-    public Principal authenticate(String username, String credentials) {
+    public Principal authenticate(String username, String credentials, String remoteAddr) {
         Principal authenticatedUser = null;
 
         for (Realm realm : realms) {
@@ -185,7 +187,7 @@ public class CombinedRealm extends RealmBase {
                         realm.getClass().getName()));
             }
 
-            authenticatedUser = realm.authenticate(username, credentials);
+            authenticatedUser = realm.authenticate(username, credentials, remoteAddr);
 
             if (authenticatedUser == null) {
                 if (log.isDebugEnabled()) {

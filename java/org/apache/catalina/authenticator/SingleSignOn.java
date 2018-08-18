@@ -482,7 +482,7 @@ public class SingleSignOn extends ValveBase {
             String username = entry.getUsername();
             if (username != null) {
                 Principal reauthPrincipal =
-                        realm.authenticate(username, entry.getPassword());
+                        realm.authenticate(username, entry.getPassword(), request.getRemoteAddr());
                 if (reauthPrincipal != null) {
                     reauthenticated = true;
                     // Bind the authorization credentials to the request
