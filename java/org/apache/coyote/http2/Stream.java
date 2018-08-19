@@ -825,7 +825,7 @@ public class Stream extends AbstractStream implements HeaderEmitter {
         }
 
         synchronized boolean isReady() {
-            if (getWindowSize() > 0 && handler.getWindowSize() > 0) {
+            if (getWindowSize() > 0 && handler.getWindowSize() > 0 && writeBuffer.isEmpty()) {
                 return true;
             } else {
                 writeInterest = true;
