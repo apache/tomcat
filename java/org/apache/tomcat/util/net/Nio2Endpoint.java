@@ -1183,6 +1183,19 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
          */
         @Override
         protected void writeNonBlocking(ByteBuffer from) throws IOException {
+            writeNonBlockingInternal(from);
+        }
+
+
+        /**
+         * {@inheritDoc}
+         * <p>
+         * Overridden for NIO2 to enable a gathering write to be used to write
+         * all of the remaining data in a single additional write should a
+         * non-blocking write leave data in the buffer.
+         */
+        @Override
+        protected void writeNonBlockingInternal(ByteBuffer from) throws IOException {
             // Note: Possible alternate behavior:
             // If there's non blocking abuse (like a test writing 1MB in a single
             // "non blocking" write), then block until the previous write is
