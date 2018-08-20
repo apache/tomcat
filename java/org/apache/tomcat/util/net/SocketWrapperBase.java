@@ -603,6 +603,10 @@ public abstract class SocketWrapperBase<E> {
     /**
      * Separate method so it can be re-used by the socket write buffer to write
      * data to the network
+     *
+     * @param from The ByteBuffer containing the data to be written
+     *
+     * @throws IOException If an IO error occurs during the write
      */
     protected void writeNonBlockingInternal(ByteBuffer from) throws IOException {
         if (socketBufferHandler.isWriteBufferEmpty()) {
