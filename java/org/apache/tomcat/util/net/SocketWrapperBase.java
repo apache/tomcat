@@ -600,12 +600,11 @@ public abstract class SocketWrapperBase<E> {
     }
 
 
-    /*
+    /**
      * Separate method so it can be re-used by the socket write buffer to write
      * data to the network
      */
-    void writeNonBlockingInternal(ByteBuffer from) throws IOException {
-        // TODO Explore refactoring this method back into writeNonBlocking
+    protected void writeNonBlockingInternal(ByteBuffer from) throws IOException {
         if (socketBufferHandler.isWriteBufferEmpty()) {
             writeNonBlockingDirect(from);
         } else {
