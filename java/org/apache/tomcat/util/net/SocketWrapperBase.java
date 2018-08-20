@@ -604,26 +604,24 @@ public abstract class SocketWrapperBase<E> {
      * Separate method so it can be re-used by the socket write buffer to write
      * data to the network
      */
-    boolean writeNonBlockingInternal(ByteBuffer from) throws IOException {
+    void writeNonBlockingInternal(ByteBuffer from) throws IOException {
         // TODO Explore refactoring this method back into writeNonBlocking
         if (socketBufferHandler.isWriteBufferEmpty()) {
-            return writeNonBlockingDirect(from);
+            writeNonBlockingDirect(from);
         } else {
             socketBufferHandler.configureWriteBufferForWrite();
             transfer(from, socketBufferHandler.getWriteBuffer());
             if (!socketBufferHandler.isWriteBufferWritable()) {
                 doWrite(false);
                 if (socketBufferHandler.isWriteBufferWritable()) {
-                    return writeNonBlockingDirect(from);
+                    writeNonBlockingDirect(from);
                 }
             }
         }
-
-        return !socketBufferHandler.isWriteBufferWritable();
     }
 
 
-    protected boolean writeNonBlockingDirect(ByteBuffer from) throws IOException {
+    protected void writeNonBlockingDirect(ByteBuffer from) throws IOException {
         // The socket write buffer capacity is socket.appWriteBufSize
         // TODO This only matters when using TLS. For non-TLS connections it
         //      should be possible to write the ByteBuffer in a single write
@@ -638,7 +636,7 @@ public abstract class SocketWrapperBase<E> {
                 // Didn't write the whole amount of data in the last
                 // non-blocking write.
                 // Exit the loop.
-                return true;
+                return;
             }
         }
 
@@ -646,8 +644,6 @@ public abstract class SocketWrapperBase<E> {
             socketBufferHandler.configureWriteBufferForWrite();
             transfer(from, socketBufferHandler.getWriteBuffer());
         }
-
-        return false;
     }
 
 

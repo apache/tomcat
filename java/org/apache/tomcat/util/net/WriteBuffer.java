@@ -107,10 +107,12 @@ public class WriteBuffer {
             if (blocking) {
                 socketWrapper.writeBlocking(buffer.getBuf());
             } else {
-                dataLeft = socketWrapper.writeNonBlockingInternal(buffer.getBuf());
+                socketWrapper.writeNonBlockingInternal(buffer.getBuf());
             }
             if (buffer.getBuf().remaining() == 0) {
                 bufIter.remove();
+            } else {
+                dataLeft = true;
             }
         }
         return dataLeft;

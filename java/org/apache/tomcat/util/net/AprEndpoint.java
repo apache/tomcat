@@ -2648,9 +2648,9 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
 
 
         @Override
-        protected boolean writeNonBlockingDirect(ByteBuffer from) throws IOException {
+        protected void writeNonBlockingDirect(ByteBuffer from) throws IOException {
             if (from.isDirect()) {
-                return super.writeNonBlockingDirect(from);
+                super.writeNonBlockingDirect(from);
             } else {
                 // The socket write buffer capacity is socket.appWriteBufSize
                 ByteBuffer writeBuffer = socketBufferHandler.getWriteBuffer();
@@ -2664,7 +2664,6 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
                         // Didn't write the whole amount of data in the last
                         // non-blocking write.
                         // Exit the loop.
-                        return true;
                     }
                 }
 
@@ -2672,8 +2671,6 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
                     socketBufferHandler.configureWriteBufferForWrite();
                     transfer(from, writeBuffer);
                 }
-
-                return false;
             }
         }
 
