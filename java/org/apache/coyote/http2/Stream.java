@@ -868,7 +868,16 @@ class Stream extends AbstractStream implements HeaderEmitter {
 
         @Override
         public void flush() throws IOException {
-            flush(true);
+            /*
+             * This method should only be called during blocking I/O. All the
+             * Servlet API calls that end up here are illegal during
+             * non-blocking I/O. Servlet 5.4.
+             * However, the wording Servlet specification states that the
+             * behaviour is undefined so we do the best we can which is to
+             * perform a flush using blocking I/O or non-blocking I/O based
+             * depending which is currently in use.
+             */
+            flush(getCoyoteResponse().getWriteListener() == null);
         }
 
         @Override
