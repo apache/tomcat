@@ -113,7 +113,7 @@ public class TestAsyncFlush extends Http2TestBase {
         }
 
         @Override
-        protected void doGet(HttpServletRequest request, HttpServletResponse response)
+        protected void doGet(final HttpServletRequest request, final HttpServletResponse response)
                 throws IOException {
 
             final AsyncContext asyncContext = request.startAsync();
