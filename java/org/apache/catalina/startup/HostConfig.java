@@ -528,7 +528,7 @@ public class HostConfig implements LifecycleListener {
 
         for (Future<?> result : results) {
             try {
-                result.get();
+                 result.get(60000, TimeUnit.SECONDS);
             } catch (Exception e) {
                 log.error(sm.getString(
                         "hostConfig.deployDescriptor.threaded.error"), e);
