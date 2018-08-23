@@ -128,40 +128,78 @@ do let us know.</p>
   </subsection>
   <subsection name="Contents of CATALINA_BASE">
     <p>
-      Before you start using CATALINA_BASE, create the directory you want to use
-      as CATALINA_BASE for the particular Tomcat instance. At minimum, it must
-      contain:
-      <ul>
-        <li>conf/server.xml</li>
-        <li>conf/web.xml</li>
-      </ul>
-      That includes the <code>conf</code> directory. Otherwise, Tomcat may
-      fail to start.
+      Before you start using CATALINA_BASE, first consider and create the 
+      directory tree used by CATALINA_BASE. Note that if you do not create
+      all the recommended directories, Tomcat creates the directories 
+      automatically. If it fails to create the necessary directory, for example
+      due to permission issues, Tomcat will either fail to start, or may not
+      function correctly. 
     </p>
     <p>
-      Additionally, it may also contain the following:
+      Consider the following list of directories:
       <ul>
         <li>
-          The <code>bin</code> directory with the <code>setenv.sh</code>, 
-          <code>setenv.bat</code>, and <code>tomcat-juli.jar</code> files.
+          <p>
+            The <code>bin</code> directory with the <code>setenv.sh</code>, 
+            <code>setenv.bat</code>, and <code>tomcat-juli.jar</code> files.
+          </p>
+          <p>
+            <i>Recommended:</i> No.
+          </p>
+          <p>
+            <i>Order of lookup:</i> CATALINA_BASE is checked first; fallback is provided
+            to CATALINA_HOME. 
+          </p>
         </li>
         <li>
-          The <code>lib</code> directory with further resources to be added on
-          classpath.
+          <p>
+            The <code>lib</code> directory with further resources to be added on
+            classpath.
+          </p>
+          <p>
+            <i>Recommended:</i> Yes, if your application depends on external libraries.
+          </p>
+          <p>
+            <i>Order of lookup:</i> CATALINA_BASE is checked first; CATALINA_HOME is
+            loaded second. 
+          </p>
         </li>
         <li>
-          The <code>logs</code> directory for instance-specific log files.
+          <p>
+            The <code>logs</code> directory for instance-specific log files.
+          </p>
+          <p>
+            <i>Recommended:</i> Yes.
+          </p>
         </li>
         <li>
-          The <code>webapps</code> directory for automatically loaded web 
-          applications.
+          <p>
+            The <code>webapps</code> directory for automatically loaded web 
+            applications.
+          </p>
+          <p>
+            <i>Recommended:</i> Yes, if you want to deploy applications.
+          </p>
+          <p>
+            <i>Order of lookup:</i> CATALINA_HOME only. 
+          </p>
         </li>
         <li>
-          The <code>work</code> directory that contains temporary working 
-          directories for the deployed web applications.
+          <p>
+            The <code>work</code> directory that contains temporary working 
+            directories for the deployed web applications.
+          </p>
+          <p>
+            <i>Recommended:</i> Yes.
+          </p>
         </li>
         <li>
-          The <code>temp</code> directory used by the JVM for temporary files.
+          <p>
+            The <code>temp</code> directory used by the JVM for temporary files.
+          </p>
+          <p>
+            <i>Recommended:</i> Yes.
+          </p>
         </li>
       </ul>
     </p>
@@ -177,6 +215,15 @@ do let us know.</p>
       <code>CATALINA_BASE/conf/</code> directory. In case a configuration file 
       is missing in CATALINA_BASE, there is no fallback to CATALINA_HOME. 
       Consequently, this may cause failure.
+    </p>
+    <p>
+      At minimum, CATALINA_BASE must contain:
+      <ul>
+        <li>conf/server.xml</li>
+        <li>conf/web.xml</li>
+      </ul>
+      That includes the <code>conf</code> directory. Otherwise, Tomcat fails
+      to start, or fails to function properly.
     </p>
     <p>
       For advanced configuration information, see the 
