@@ -830,7 +830,7 @@
       filesDir="${tomcat.classes}"
       filesId="files.jasper-el" />
 
-    <!-- Re-packaged Apache Commons DBCP-->
+    <!-- Re-packaged Apache Commons DBCP 2-->
     <jarIt jarfile="${tomcat-dbcp.jar}"
       filesDir="${tomcat.classes}"
       filesId="files.tomcat-dbcp" />
@@ -2576,7 +2576,7 @@ skip.installer property in build.properties" />
       filesDir="java"
       filesId="files.jasper-el" />
 
-    <!-- Repackaged DBCP -->
+    <!-- Repackaged DBCP 2 -->
     <jarIt jarfile="${tomcat-dbcp-src.jar}"
       filesDir="java"
       filesId="files.tomcat-dbcp" />

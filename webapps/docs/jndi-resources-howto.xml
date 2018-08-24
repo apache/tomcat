@@ -663,7 +663,7 @@ Transport.send(message);]]></source>
     </ul>
 
     <p><strong>NOTE</strong> - The default data source support in Tomcat
-    is based on the <strong>DBCP</strong> connection pool from the
+    is based on the <strong>DBCP 2</strong> connection pool from the
     <a href="https://commons.apache.org/">Commons</a>
     project.  However, it is possible to use any other connection pool
     that implements <code>javax.sql.DataSource</code>, by writing your
@@ -828,8 +828,12 @@ conn.close();]]></source>
     <p>The abandoning feature is disabled by default and can be configured
     using the following properties:</p>
     <ul>
-    <li><strong>removeAbandoned</strong> - true or false: whether to
-        remove abandoned connections from the pool. Default: false</li>
+    <li><strong>removeAbandonedOnBorrow</strong> - true or false: whether to
+        remove abandoned connections from the pool when a connection is
+        borrowed. Default: false</li>
+    <li><strong>removeAbandonedOnMaintenance</strong> - true or false: whether
+        to remove abandoned connections from the pool during pool maintenance.
+        Default: false</li>
     <li><strong>removeAbandonedTimeout</strong> - The number of
         seconds after which a borrowed connection is assumed to be abandoned.
         Default: 300</li>
@@ -868,7 +872,7 @@ conn.close();]]></source>
     <li><strong>accessToUnderlyingConnectionAllowed</strong> - true or false: whether
         accessing the underlying connections is allowed. Default: false</li>
     </ul>
-    <p>For more details, please refer to the commons-dbcp documentation.</p>
+    <p>For more details, please refer to the Commons DBCP 2 documentation.</p>
 
   </subsection>
 
