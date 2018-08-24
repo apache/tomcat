@@ -1203,7 +1203,7 @@
         This attribute is ignored if the <code>singleton</code> attribute is
         false. If not specified, no default is defined and no close method will
         be called.</p>
-        <p>For Apache Commons DBCP and Apache Tomcat JDBC connection pools
+        <p>For Apache Commons DBCP 2 and Apache Tomcat JDBC connection pools
         you can use <code>closeMethod="close"</code>.</p>
       </attribute>
 
@@ -1315,7 +1315,7 @@
     <p>Shared Data Source Example:</p>
     <p><strong>Warning:</strong> This feature works only if the global DataSource
 supports <code>getConnection(username, password)</code> method.
-<a href="https://commons.apache.org/dbcp/">Apache Commons DBCP</a> pool that
+<a href="https://commons.apache.org/dbcp/">Apache Commons DBCP 2</a> pool that
 Tomcat uses by default does not support it. See its Javadoc for
 <code>BasicDataSource</code> class.
 <a href="../jdbc-pool.html">Apache Tomcat JDBC pool</a> does support it,

@@ -69,6 +69,11 @@
         the use of <code>CATALINA_HOME</code> and <code>CATALINA_BASE</code>.
         Patch provided by Marek Czernek. (markt)
       </add>
+      <fix>
+        <bug>62652</bug>: Make it clearer that the version of DBCP that is
+        packaged in Tomcat 9.0.x is DBCP 2. Correct the names of some DBCP 2
+        configuration attributes that changed between 1.x and 2.x. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
@@ -882,8 +887,8 @@
         Always report the OS's umask when launching the JVM. (schultz)
       </add>
       <add>
-        Add managed connections package to the package renamed DBCP2 to provide
-        a complete DBCP2 in Tomcat. (remm)
+        Add managed connections package to the package renamed DBCP 2 to provide
+        a complete DBCP 2 in Tomcat. (remm)
       </add>
     </changelog>
   </subsection>
@@ -4454,7 +4459,7 @@
         BCEL 6 release. (markt)
       </update>
       <update>
-        Update the internal fork of Commons DBCP2 to r1757164 to pick up a
+        Update the internal fork of Commons DBCP 2 to r1757164 to pick up a
         couple of bug fixes. (markt)
       </update>
       <update>

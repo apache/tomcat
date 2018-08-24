@@ -118,8 +118,8 @@ The following libraries are used:
 </p>
 
 <ul>
-<li>Commons DBCP</li>
-<li>Commons Pool</li>
+<li>Commons DBCP 2</li>
+<li>Commons Pool 2</li>
 </ul>
 
 <p>
@@ -129,12 +129,12 @@ only the classes needed for connection pooling have been included, and the
 packages have been renamed to avoid interfering with applications.
 </p>
 
-<p>DBCP 2.0 provides support for JDBC 4.1.</p>
+<p>DBCP 2 provides support for JDBC 4.1.</p>
 
 <subsection name="Installation">
 
 <p>See the <a href="https://commons.apache.org/dbcp/configuration.html">
-DBCP documentation</a> for a complete list of configuration parameters.
+DBCP 2 documentation</a> for a complete list of configuration parameters.
 </p>
 
 </subsection>
@@ -156,15 +156,15 @@ This can eventually result in your web application database connections failing
 if there are no more available connections.</p>
 
 <p>
-There is a solution to this problem.  The Apache Commons DBCP can be
+There is a solution to this problem.  The Apache Commons DBCP 2 can be
 configured to track and recover these abandoned database connections.  Not
 only can it recover them, but also generate a stack trace for the code
 which opened these resources and never closed them.</p>
 
 <p>
-To configure a DBCP DataSource so that abandoned database connections are
+To configure a DBCP 2 DataSource so that abandoned database connections are
 removed and recycled, add one or both of the following attributes to the
-<code>Resource</code> configuration for your DBCP DataSource:
+<code>Resource</code> configuration for your DBCP 2 DataSource:
 </p>
 <source>removeAbandonedOnBorrow=true</source>
 <source>removeAbandonedOnMaintenance=true</source>
@@ -173,7 +173,7 @@ removed and recycled, add one or both of the following attributes to the
 maintenance is enabled by setting <code>timeBetweenEvictionRunsMillis</code>
 to a positive value.  See the
 <a href="https://commons.apache.org/dbcp/configuration.html">
-DBCP documentation</a> for full documentation on these attributes.
+DBCP 2 documentation</a> for full documentation on these attributes.
 </p>
 
 <p>
@@ -189,7 +189,7 @@ The default timeout for removing abandoned connections is 300 seconds.
 
 <p>
 The <code>logAbandoned</code> attribute can be set to <code>true</code>
-if you want DBCP to log a stack trace of the code which abandoned the
+if you want DBCP 2 to log a stack trace of the code which abandoned the
 database connection resources.
 </p>
 <source>logAbandoned="true"</source>
@@ -199,7 +199,7 @@ The default is <code>false</code>.
 
 </subsection>
 
-<subsection name="MySQL DBCP Example">
+<subsection name="MySQL DBCP 2 Example">
 
 <h5>0. Introduction</h5>
 <p>Versions of <a href="https://www.mysql.com/products/mysql/index.html">MySQL</a> and JDBC
@@ -262,7 +262,7 @@ resource to your <a href="config/context.html">Context</a>.</p>
          -->
 
     <!-- maxIdle: Maximum number of idle database connections to retain in pool.
-         Set to -1 for no limit.  See also the DBCP documentation on this
+         Set to -1 for no limit.  See also the DBCP 2 documentation on this
          and the minEvictableIdleTimeMillis configuration parameter.
          -->
 
@@ -410,7 +410,7 @@ Connection conn = ds.getConnection();
 <h5>1. Required files </h5>
 <p>
 Copy the Postgres JDBC jar to $CATALINA_HOME/lib. As with Oracle, the
-jars need to be in this directory in order for DBCP's Classloader to find
+jars need to be in this directory in order for DBCP 2's Classloader to find
 them. This has to be done regardless of which configuration step you take next.
 </p>
 
@@ -496,7 +496,7 @@ than testing!) or some other pooling technology.
 <section name="Oracle 8i with OCI client">
 <subsection name="Introduction">
 <p>Whilst not strictly addressing the creation of a JNDI DataSource using the OCI client, these notes can be combined with the
-Oracle and DBCP solution above.</p>
+Oracle and DBCP 2 solution above.</p>
 <p>
 In order to use OCI driver, you should have an Oracle client installed. You should have installed
 Oracle8i(8.1.7) client from cd,  and download the suitable JDBC/OCI
@@ -583,7 +583,7 @@ than one second.  The remainder will only take a few seconds.  Rarely,
 if ever should a GC take more than 10 seconds.</p>
 
 <p>Make sure that the db connection timeout is set to 10-15 seconds.
-For the DBCP you set this using the parameter <code>maxWaitMillis</code>.</p>
+For DBCP 2 you set this using the parameter <code>maxWaitMillis</code>.</p>
 
 </subsection>
 

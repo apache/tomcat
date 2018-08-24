@@ -147,8 +147,8 @@ loaders as it is initialized:</p>
     <li><em>tomcat-api.jar</em> &#8212; Several interfaces defined by Tomcat.</li>
     <li><em>tomcat-coyote.jar</em> &#8212; Tomcat connectors and utility classes.</li>
     <li><em>tomcat-dbcp.jar</em> &#8212; Database connection pool
-        implementation based on package-renamed copy of Apache Commons Pool
-        and Apache Commons DBCP.</li>
+        implementation based on package-renamed copy of Apache Commons Pool 2
+        and Apache Commons DBCP 2.</li>
     <li><em>tomcat-i18n-**.jar</em> &#8212; Optional JARs containing resource bundles
         for other languages. As default bundles are also included in each
         individual JAR, they can be safely removed if no internationalization
