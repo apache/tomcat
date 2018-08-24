@@ -162,6 +162,11 @@
         regarding the use of the Server and Shared class loaders to the
         documentation web application. (markt)
       </add>
+      <add>
+        Expand the information in the documentation web application regarding
+        the use of <code>CATALINA_HOME</code> and <code>CATALINA_BASE</code>.
+        Patch provided by Marek Czernek. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Tribes">
