@@ -663,7 +663,7 @@ Transport.send(message);]]></source>
     </ul>
 
     <p><strong>NOTE</strong> - The default data source support in Tomcat
-    is based on the <strong>DBCP</strong> connection pool from the
+    is based on the <strong>DBCP 1.x</strong> connection pool from the
     <a href="https://commons.apache.org/">Commons</a>
     project.  However, it is possible to use any other connection pool
     that implements <code>javax.sql.DataSource</code>, by writing your

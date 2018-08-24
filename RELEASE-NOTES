@@ -112,7 +112,7 @@ for use by web applications (by placing them in "lib"):
 * tomcat7-websocket.jar (WebSocket 1.1 implementation)
 * tomcat-api.jar (Interfaces shared by Catalina and Jasper)
 * tomcat-coyote.jar (Tomcat connectors and utility classes)
-* tomcat-dbcp.jar (package renamed database connection pool based on Commons DBCP)
+* tomcat-dbcp.jar (package renamed database connection pool based on Commons DBCP 1.x)
 * tomcat-jdbc.jar (Tomcat's database connection pooling solution)
 * tomcat-util.jar (Various utilities)
 * websocket-api.jar (WebSocket 1.1 API)

@@ -44,7 +44,7 @@ source distribution, do the following:
     Note regarding later versions of Java:
 
       As documented elsewhere, one of the components in Apache Tomcat includes
-      a private copy of the Apache Commons DBCP library. The source code
+      a private copy of the Apache Commons DBCP 1.x library. The source code
       for this library is downloaded, processed by the build script
       (renaming the packages) and compiled.
 
@@ -54,7 +54,7 @@ source distribution, do the following:
       implementing this version of specification. Therefore, the build Tomcat
       build process must be executed with a Java 6 JDK.
 
-      See Apache Commons DBCP project web site for more details on
+      See Apache Commons DBCP 1.x project web site for more details on
       available versions of the library and its requirements,
 
         https://commons.apache.org/dbcp/

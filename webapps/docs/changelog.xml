@@ -167,6 +167,10 @@
         the use of <code>CATALINA_HOME</code> and <code>CATALINA_BASE</code>.
         Patch provided by Marek Czernek. (markt)
       </add>
+      <fix>
+        <bug>62652</bug>: Make it clearer that the version of DBCP that is
+        packaged in Tomcat 7.0.x is DBCP 1. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Tribes">
@@ -9694,7 +9698,7 @@
         <bug>52853</bug>: Clarify how Jar Scanner handles directories. (markt)
       </fix>
       <fix>
-        <bug>53158</bug>: Fix documented defaults for DBCP.
+        <bug>53158</bug>: Fix documented defaults for DBCP 1.x.
         Patch provided by ph.dezanneau at gmail.com. (rjung)
       </fix>
       <fix>
@@ -12718,7 +12722,7 @@
         annotations. (markt)
       </fix>
       <add>
-        <bug>25060</bug>: Close Apache Commons DBCP datasources when the
+        <bug>25060</bug>: Close Apache Commons DBCP 1.x datasources when the
         associated JNDI naming context is stopped (e.g. for a non-global
         DataSource resource on web application reload) to close remaining
         database connections immediately rather than waiting for garbage 

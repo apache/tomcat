@@ -2583,7 +2583,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       filesDir="java"
       filesId="files.jasper-el" />
 
-    <!-- Repackaged DBCP -->
+    <!-- Repackaged DBCP 1.x -->
     <copy file="${tomcat-dbcp-src.jar}" todir="${tomcat.src.jars}" />
     <!-- jdbc-pool JAR File -->
     <copy file="${tomcat-jdbc-src.jar}" todir="${tomcat.src.jars}" />
@@ -2656,7 +2656,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       <param name="checksum.value" value="${commons-daemon.bin.checksum.value}"/>
     </antcall>
 
-    <!-- Download src and build Tomcat DBCP bundle -->
+    <!-- Download src and build Tomcat DBCP 1.x bundle -->
     <antcall target="downloadgz-2">
       <param name="sourcefile.1" value="${commons-pool-src.loc.1}"/>
       <param name="sourcefile.2" value="${commons-pool-src.loc.2}"/>
