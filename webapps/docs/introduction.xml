@@ -81,7 +81,7 @@ do let us know.</p>
 </section>
 
 <section name="CATALINA_HOME and CATALINA_BASE">
-  <p>Throughout the documentation, there are references to the two following 
+  <p>Throughout the documentation, there are references to the two following
     properties:
     <ul>
       <li>
@@ -91,7 +91,7 @@ do let us know.</p>
       </li>
       <li>
         <strong>CATALINA_BASE</strong>: Represents the root of a runtime
-        configuration of a specific Tomcat instance. If you want to have 
+        configuration of a specific Tomcat instance. If you want to have
         multiple Tomcat instances on one machine, use the <code>CATALINA_BASE</code>
         property.
       </li>
@@ -99,20 +99,20 @@ do let us know.</p>
   </p>
   <p>
     If you set the properties to different locations, the CATALINA_HOME location
-    contains static sources, such as <code>.jar</code> files, or binary files. 
+    contains static sources, such as <code>.jar</code> files, or binary files.
     The CATALINA_BASE location contains configuration files, log files, deployed
     applications, and other runtime requirements.
   </p>
   <subsection name="Why Use CATALINA_BASE">
     <p>
       By default, CATALINA_HOME and CATALINA_BASE point to the same directory.
-      Set CATALINA_BASE manually when you require running multiple Tomcat 
+      Set CATALINA_BASE manually when you require running multiple Tomcat
       instances on one machine. Doing so provides the following benefits:
     </p>
     <ul>
       <li>
         Easier management of upgrading to a newer version of Tomcat. Because all
-        instances with single CATALINA_HOME location share one set of 
+        instances with single CATALINA_HOME location share one set of
         <code>.jar</code> files and binary files, you can easily upgrade the files
         to newer version and have the change propagated to all Tomcat instances
         using the same CATALIA_HOME directory.
@@ -128,19 +128,19 @@ do let us know.</p>
   </subsection>
   <subsection name="Contents of CATALINA_BASE">
     <p>
-      Before you start using CATALINA_BASE, first consider and create the 
+      Before you start using CATALINA_BASE, first consider and create the
       directory tree used by CATALINA_BASE. Note that if you do not create
-      all the recommended directories, Tomcat creates the directories 
+      all the recommended directories, Tomcat creates the directories
       automatically. If it fails to create the necessary directory, for example
       due to permission issues, Tomcat will either fail to start, or may not
-      function correctly. 
+      function correctly.
     </p>
     <p>
       Consider the following list of directories:
       <ul>
         <li>
           <p>
-            The <code>bin</code> directory with the <code>setenv.sh</code>, 
+            The <code>bin</code> directory with the <code>setenv.sh</code>,
             <code>setenv.bat</code>, and <code>tomcat-juli.jar</code> files.
           </p>
           <p>
@@ -148,7 +148,7 @@ do let us know.</p>
           </p>
           <p>
             <i>Order of lookup:</i> CATALINA_BASE is checked first; fallback is provided
-            to CATALINA_HOME. 
+            to CATALINA_HOME.
           </p>
         </li>
         <li>
@@ -161,7 +161,7 @@ do let us know.</p>
           </p>
           <p>
             <i>Order of lookup:</i> CATALINA_BASE is checked first; CATALINA_HOME is
-            loaded second. 
+            loaded second.
           </p>
         </li>
         <li>
@@ -174,19 +174,19 @@ do let us know.</p>
         </li>
         <li>
           <p>
-            The <code>webapps</code> directory for automatically loaded web 
+            The <code>webapps</code> directory for automatically loaded web
             applications.
           </p>
           <p>
             <i>Recommended:</i> Yes, if you want to deploy applications.
           </p>
           <p>
-            <i>Order of lookup:</i> CATALINA_BASE only. 
+            <i>Order of lookup:</i> CATALINA_BASE only.
           </p>
         </li>
         <li>
           <p>
-            The <code>work</code> directory that contains temporary working 
+            The <code>work</code> directory that contains temporary working
             directories for the deployed web applications.
           </p>
           <p>
@@ -204,16 +204,16 @@ do let us know.</p>
       </ul>
     </p>
     <p>
-      We recommend you not to change the <code>tomcat-juli.jar</code> file. 
-      However, in case you require your own logging implementation, you can 
+      We recommend you not to change the <code>tomcat-juli.jar</code> file.
+      However, in case you require your own logging implementation, you can
       replace the <code>tomcat-juli.jar</code> file in a CATALINA_BASE location
       for the specific Tomcat instance.
     </p>
     <p>
       We also recommend you copy all configuration files from the
-      <code>CATALINA_HOME/conf</code> directory into the 
-      <code>CATALINA_BASE/conf/</code> directory. In case a configuration file 
-      is missing in CATALINA_BASE, there is no fallback to CATALINA_HOME. 
+      <code>CATALINA_HOME/conf</code> directory into the
+      <code>CATALINA_BASE/conf/</code> directory. In case a configuration file
+      is missing in CATALINA_BASE, there is no fallback to CATALINA_HOME.
       Consequently, this may cause failure.
     </p>
     <p>
@@ -226,7 +226,7 @@ do let us know.</p>
       to start, or fails to function properly.
     </p>
     <p>
-      For advanced configuration information, see the 
+      For advanced configuration information, see the
       <a href="https://tomcat.apache.org/tomcat-9.0-doc/RUNNING.txt">
         RUNNING.txt
       </a> file.
@@ -239,7 +239,7 @@ do let us know.</p>
       <ul>
         <li>On Unix: <code>CATALINA_BASE=/tmp/tomcat_base1 bin/catalina.sh start</code></li>
         <li>On Windows: <code>CATALINA_BASE=C:\tomcat_base1 bin/catalina.bat start</code></li>
-      </ul> 
+      </ul>
     </p>
   </subsection>
 </section>
