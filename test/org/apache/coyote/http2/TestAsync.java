@@ -193,7 +193,7 @@ public class TestAsync extends Http2TestBase {
         }
 
         // Check that the right number of bytes were received
-        Assert.assertEquals(blockCount * BLOCK_SIZE, output.getBytesRead());
+        Assert.assertEquals((long) blockCount * BLOCK_SIZE, output.getBytesRead());
     }
 
 
@@ -203,8 +203,8 @@ public class TestAsync extends Http2TestBase {
 
         private final int blockLimit;
         private final boolean useNonContainerThreadForWrite;
-        private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
-        private volatile Future<?> future;
+        private final transient ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+        private transient volatile Future<?> future;
 
         public AsyncServlet(int blockLimit, boolean useNonContainerThreadForWrite) {
             this.blockLimit = blockLimit;
