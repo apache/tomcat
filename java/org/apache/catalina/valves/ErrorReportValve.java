@@ -371,9 +371,8 @@ public class ErrorReportValve extends ValveBase {
         response.setContentType("text/html");
         response.setCharacterEncoding("UTF-8");
 
-        try {
-            OutputStream os = response.getOutputStream();
-            InputStream is = new FileInputStream(file);
+        try (OutputStream os = response.getOutputStream();
+                InputStream is = new FileInputStream(file);){
             IOTools.flow(is, os);
         } catch (IOException e) {
             getContainer().getLogger().warn(
