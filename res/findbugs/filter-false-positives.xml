@@ -583,11 +583,24 @@
     <Bug code="Dm" />
   </Match>
   <Match>
+    <!-- Yes this is a dead store. This is so the IDE warning can be suppressed.
+         The object creation has side-effects so the code is required. -->
+    <Class name="org.apache.jasper.compiler.JspDocumentParser" />
+    <Method name="comment"/>
+    <Bug pattern="DLS_DEAD_LOCAL_STORE"/>
+  </Match>
+  <Match>
     <!-- Node constructors add node to parent. Local variable is used to
          silence an Eclipse warning -->
     <Class name="org.apache.jasper.compiler.ELFunctionMapper"/>
     <Method name="map"/>
     <Bug code="DLS"/>
+  </Match>
+  <Match>
+    <!-- NPE is not possible -->
+    <Class name="org.apache.jasper.compiler.JspConfig"/>
+    <Method name="selectProperty"/>
+    <Bug code="NP"/>
   </Match>
   <Match>
     <!-- NPE is not possible -->
