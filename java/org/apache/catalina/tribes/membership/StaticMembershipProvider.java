@@ -39,6 +39,7 @@ import org.apache.catalina.tribes.group.Response;
 import org.apache.catalina.tribes.group.RpcCallback;
 import org.apache.catalina.tribes.group.RpcChannel;
 import org.apache.catalina.tribes.util.Arrays;
+import org.apache.catalina.tribes.util.ExceptionUtils;
 import org.apache.catalina.tribes.util.ExecutorFactory;
 import org.apache.catalina.tribes.util.StringManager;
 import org.apache.juli.logging.Log;
@@ -130,7 +131,10 @@ public class StaticMembershipProvider extends MembershipProviderBase implements 
             if (this.channel != null) {
                 try {
                     stopMembership(this.getMembers());
-                } catch ( Exception ignore){}
+                } catch (Throwable t) {
+                    ExceptionUtils.handleThrowable(t);
+                    // Otherwise ignore
+                }
                 this.channel.removeChannelListener(this);
                 this.channel = null;
             }
@@ -328,7 +332,9 @@ public class StaticMembershipProvider extends MembershipProviderBase implements 
                 InetSocketAddress addr = new InetSocketAddress(ia, member.getPort());
                 socket.connect(addr, connectTimeout);
                 aliveMembers.add(member);
-            } catch (Exception x) {//no-op
+            } catch (Throwable t) {
+                ExceptionUtils.handleThrowable(t);
+                // Otherwise ignore
             }
         }
         return aliveMembers.toArray(new Member[0]);
