@@ -2664,6 +2664,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
                         // Didn't write the whole amount of data in the last
                         // non-blocking write.
                         // Exit the loop.
+                        return;
                     }
                 }
 
