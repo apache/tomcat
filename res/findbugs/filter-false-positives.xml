@@ -1205,6 +1205,15 @@
     <Bug pattern="DLS_DEAD_LOCAL_STORE"/>
   </Match>
   <Match>
+    <!-- Field set via injection-->
+    <Class name="org.apache.naming.TesterInjectionServlet" />
+    <Or>
+      <Field name="property1" />
+      <Field name="property3" />
+    </Or>
+    <Bug pattern="UWF_NULL_FIELD" />
+  </Match>
+  <Match>
     <!-- Use of statics is unavoidable in all cases -->
     <!-- Better to use it consistently rather than only where necessary -->
     <Class name="org.apache.tomcat.jdbc.pool.interceptor.TestInterceptor" />
