@@ -104,6 +104,7 @@ public class TestImportHandlerStandardPackages {
                 File dir = new File(uri);
 
                 String[] files = dir.list();
+                Assert.assertNotNull(files);
                 for (String file : files) {
                     if (!file.endsWith(".class")) {
                         // Skip non-class resoucres
