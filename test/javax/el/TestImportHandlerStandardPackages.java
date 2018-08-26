@@ -102,6 +102,7 @@ public class TestImportHandlerStandardPackages {
                 URL resource = resources.nextElement();
                 File dir = new File(resource.toURI());
                 String[] files = dir.list();
+                Assert.assertNotNull(files);
                 for (String file : files) {
                     if (!file.endsWith(".class")) {
                         // Skip non-class resoucres
