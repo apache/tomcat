@@ -380,7 +380,7 @@ public class TestApplicationContextGetRequestDispatcher extends TomcatBaseTest {
 
         // Add a default servlet to return 404 for not found resources
         Tomcat.addServlet(ctx, "Default", new Default404Servlet());
-        ctx.addServletMappingDecoded("/*", "Default");
+        ctx.addServletMappingDecoded("/", "Default");
 
         // Add a target servlet to dispatch to
         Tomcat.addServlet(ctx, "target", new TargetServlet());
@@ -414,7 +414,7 @@ public class TestApplicationContextGetRequestDispatcher extends TomcatBaseTest {
     }
 
 
-    private static class Default404Servlet extends HttpServlet {
+    static class Default404Servlet extends HttpServlet {
 
         private static final long serialVersionUID = 1L;
         private static final String DEFAULT_404 = "DEFAULT-404";
