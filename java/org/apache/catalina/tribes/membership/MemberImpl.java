@@ -540,7 +540,7 @@ public class MemberImpl implements Member, java.io.Externalizable {
         buf.append("id=").append(bToS(this.uniqueId)).append(", ");
         buf.append("payload=").append(bToS(this.payload,8)).append(", ");
         buf.append("command=").append(bToS(this.command,8)).append(", ");
-        buf.append("domain=").append(bToS(this.domain,8)).append(", ");
+        buf.append("domain=").append(bToS(this.domain,8));
         buf.append("]");
         return buf.toString();
     }
