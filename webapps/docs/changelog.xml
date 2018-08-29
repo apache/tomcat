@@ -104,6 +104,10 @@
       <scode>
         Simplify construction of appName from container name in JAASRealm. (fschumacher)
       </scode>
+      <fix>
+        Improve the handling of path parameters when working with
+        RequestDispatcher objects. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
