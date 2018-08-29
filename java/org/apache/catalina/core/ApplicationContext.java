@@ -405,9 +405,8 @@ public class ApplicationContext implements org.apache.catalina.servlet4preview.S
                     sm.getString("applicationContext.requestDispatcher.iae", path));
         }
 
-        // Need to separate the query string and the uri. This is required for
-        // the ApplicationDispatcher constructor. Mapping also requires the uri
-        // without the query string.
+        // Same processing order as InputBuffer / CoyoteAdapter
+        // First remove query string
         String uri;
         String queryString;
         int pos = path.indexOf('?');
@@ -419,18 +418,24 @@ public class ApplicationContext implements org.apache.catalina.servlet4preview.S
             queryString = null;
         }
 
-        String normalizedPath = RequestUtil.normalize(uri);
-        if (normalizedPath == null) {
+        // Remove path parameters
+        String uriNoParams = stripPathParams(uri);
+
+        // Then normalize
+        String normalizedUri = RequestUtil.normalize(uriNoParams);
+        if (normalizedUri == null) {
             return (null);
         }
 
+        // Mapping is against the normalized uri
+
         if (getContext().getDispatchersUseEncodedPaths()) {
             // Decode
-            String decodedPath = UDecoder.URLDecode(normalizedPath);
+            String decodedUri = UDecoder.URLDecode(normalizedUri);
 
             // Security check to catch attempts to encode /../ sequences
-            normalizedPath = RequestUtil.normalize(decodedPath);
-            if (!decodedPath.equals(normalizedPath)) {
+            normalizedUri = RequestUtil.normalize(decodedUri);
+            if (!decodedUri.equals(normalizedUri)) {
                 getContext().getLogger().warn(
                         sm.getString("applicationContext.illegalDispatchPath", path),
                         new IllegalArgumentException());
@@ -447,7 +452,7 @@ public class ApplicationContext implements org.apache.catalina.servlet4preview.S
             uri = URLEncoder.DEFAULT.encode(getContextPath() + uri, StandardCharsets.UTF_8);
         }
 
-        pos = normalizedPath.length();
+        pos = normalizedUri.length();
 
         // Use the thread local URI and mapping data
         DispatchData dd = dispatchData.get();
@@ -462,47 +467,64 @@ public class ApplicationContext implements org.apache.catalina.servlet4preview.S
         // Use the thread local mapping data
         MappingData mappingData = dd.mappingData;
 
-        // Map the URI
-        CharChunk uriCC = uriMB.getCharChunk();
         try {
-            uriCC.append(context.getPath(), 0, context.getPath().length());
-            /*
-             * Ignore any trailing path params (separated by ';') for mapping
-             * purposes
-             */
-            int semicolon = normalizedPath.indexOf(';');
-            if (pos >= 0 && semicolon > pos) {
-                semicolon = -1;
+            // Map the URI
+            CharChunk uriCC = uriMB.getCharChunk();
+            try {
+                uriCC.append(context.getPath());
+                uriCC.append(normalizedUri);
+                service.getMapper().map(context, uriMB, mappingData);
+                if (mappingData.wrapper == null) {
+                    return null;
+                }
+            } catch (Exception e) {
+                // Should never happen
+                log(sm.getString("applicationContext.mapping.error"), e);
+                return null;
             }
-            uriCC.append(normalizedPath, 0, semicolon > 0 ? semicolon : pos);
-            service.getMapper().map(context, uriMB, mappingData);
-            if (mappingData.wrapper == null) {
-                return (null);
-            }
-            /*
-             * Append any trailing path params (separated by ';') that were
-             * ignored for mapping purposes, so that they're reflected in the
-             * RequestDispatcher's requestURI
-             */
-            if (semicolon > 0) {
-                uriCC.append(normalizedPath, semicolon, pos - semicolon);
-            }
-        } catch (Exception e) {
-            // Should never happen
-            log(sm.getString("applicationContext.mapping.error"), e);
-            return (null);
+
+            Wrapper wrapper = mappingData.wrapper;
+            String wrapperPath = mappingData.wrapperPath.toString();
+            String pathInfo = mappingData.pathInfo.toString();
+            ServletMapping mapping = new ApplicationMapping(mappingData).getServletMapping();
+
+            // Construct a RequestDispatcher to process this request
+            return new ApplicationDispatcher(wrapper, uri, wrapperPath, pathInfo,
+                    queryString, mapping, null);
+        } finally {
+            // Recycle thread local data at the end of the request so references
+            // are not held to a completed request as there is potential for
+            // that to trigger a memory leak if a context is unloaded.
+            mappingData.recycle();
+        }
+    }
+
+
+    // Package private to facilitate testing
+    static String stripPathParams(String input) {
+        // Shortcut
+        if (input.indexOf(';') < 0) {
+            return input;
         }
 
-        Wrapper wrapper = mappingData.wrapper;
-        String wrapperPath = mappingData.wrapperPath.toString();
-        String pathInfo = mappingData.pathInfo.toString();
-        ServletMapping mapping = (new ApplicationMapping(mappingData)).getServletMapping();
+        StringBuilder sb = new StringBuilder(input.length());
+        int pos = 0;
+        int limit = input.length();
+        while (pos < limit) {
+            int nextSemiColon = input.indexOf(';', pos);
+            if (nextSemiColon < 0) {
+                nextSemiColon = limit;
+            }
+            sb.append(input.substring(pos, nextSemiColon));
+            int followingSlash = input.indexOf('/', nextSemiColon);
+            if (followingSlash < 0) {
+                pos = limit;
+            } else {
+                pos = followingSlash;
+            }
+        }
 
-        mappingData.recycle();
-
-        // Construct a RequestDispatcher to process this request
-        return new ApplicationDispatcher(wrapper, uri, wrapperPath, pathInfo,
-                queryString, mapping, null);
+        return sb.toString();
     }
 
 

@@ -51,6 +51,10 @@
         Make the <code>isLocked()</code> method of the <code>LockOutRealm</code>
         public and expose the method via JMX. (markt)
       </add>
+      <fix>
+        Improve the handling of path parameters when working with
+        RequestDispatcher objects. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
