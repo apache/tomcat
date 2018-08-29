@@ -460,47 +460,52 @@ public class ApplicationContext implements ServletContext {
         // Use the thread local mapping data
         MappingData mappingData = dd.mappingData;
 
-        // Map the URI
-        CharChunk uriCC = uriMB.getCharChunk();
         try {
-            uriCC.append(context.getPath(), 0, context.getPath().length());
-            /*
-             * Ignore any trailing path params (separated by ';') for mapping
-             * purposes
-             */
-            int semicolon = normalizedPath.indexOf(';');
-            if (pos >= 0 && semicolon > pos) {
-                semicolon = -1;
-            }
-            uriCC.append(normalizedPath, 0, semicolon > 0 ? semicolon : pos);
-            service.getMapper().map(context, uriMB, mappingData);
-            if (mappingData.wrapper == null) {
+            // Map the URI
+            CharChunk uriCC = uriMB.getCharChunk();
+            try {
+                uriCC.append(context.getPath(), 0, context.getPath().length());
+                /*
+                 * Ignore any trailing path params (separated by ';') for mapping
+                 * purposes
+                 */
+                int semicolon = normalizedPath.indexOf(';');
+                if (pos >= 0 && semicolon > pos) {
+                    semicolon = -1;
+                }
+                uriCC.append(normalizedPath, 0, semicolon > 0 ? semicolon : pos);
+                service.getMapper().map(context, uriMB, mappingData);
+                if (mappingData.wrapper == null) {
+                    return null;
+                }
+                /*
+                 * Append any trailing path params (separated by ';') that were
+                 * ignored for mapping purposes, so that they're reflected in the
+                 * RequestDispatcher's requestURI
+                 */
+                if (semicolon > 0) {
+                    uriCC.append(normalizedPath, semicolon, pos - semicolon);
+                }
+            } catch (Exception e) {
+                // Should never happen
+                log(sm.getString("applicationContext.mapping.error"), e);
                 return null;
             }
-            /*
-             * Append any trailing path params (separated by ';') that were
-             * ignored for mapping purposes, so that they're reflected in the
-             * RequestDispatcher's requestURI
-             */
-            if (semicolon > 0) {
-                uriCC.append(normalizedPath, semicolon, pos - semicolon);
-            }
-        } catch (Exception e) {
-            // Should never happen
-            log(sm.getString("applicationContext.mapping.error"), e);
-            return null;
+
+            Wrapper wrapper = mappingData.wrapper;
+            String wrapperPath = mappingData.wrapperPath.toString();
+            String pathInfo = mappingData.pathInfo.toString();
+            HttpServletMapping mapping = new ApplicationMapping(mappingData).getHttpServletMapping();
+
+            // Construct a RequestDispatcher to process this request
+            return new ApplicationDispatcher(wrapper, uri, wrapperPath, pathInfo,
+                    queryString, mapping, null);
+        } finally {
+            // Recycle thread local data at the end of the request so references
+            // are not held to a completed request as there is potential for
+            // that to trigger a memory leak if a context is unloaded.
+            mappingData.recycle();
         }
-
-        Wrapper wrapper = mappingData.wrapper;
-        String wrapperPath = mappingData.wrapperPath.toString();
-        String pathInfo = mappingData.pathInfo.toString();
-        HttpServletMapping mapping = new ApplicationMapping(mappingData).getHttpServletMapping();
-
-        mappingData.recycle();
-
-        // Construct a RequestDispatcher to process this request
-        return new ApplicationDispatcher(wrapper, uri, wrapperPath, pathInfo,
-                queryString, mapping, null);
     }
 
 
