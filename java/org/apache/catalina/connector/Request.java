@@ -1360,6 +1360,25 @@ public class Request implements HttpServletRequest {
             return context.getServletContext().getRequestDispatcher(path);
         }
 
+        /*
+         * Relative to what, exactly?
+         *
+         * From the Servlet 4.0 Javadoc:
+         * - The pathname specified may be relative, although it cannot extend
+         *   outside the current servlet context.
+         * - If it is relative, it must be relative against the current servlet
+         *
+         * From Section 9.1 of the spec:
+         * - The servlet container uses information in the request object to
+         *   transform the given relative path against the current servlet to a
+         *   complete path.
+         *
+         * It is undefined whether the requestURI is used or whether servletPath
+         * and pathInfo are used. Given that the RequestURI includes the
+         * contextPath (and extracting that is messy) , using the servletPath and
+         * pathInfo looks to be the more reasonable choice.
+         */
+
         // Convert a request-relative path to a context-relative one
         String servletPath = (String) getAttribute(
                 RequestDispatcher.INCLUDE_SERVLET_PATH);
