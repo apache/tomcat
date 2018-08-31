@@ -80,6 +80,11 @@
         Correct the JSP version in the X-PoweredBy HTTP header generated when
         the xpoweredBy option is enabled. (markt)
       </fix>
+      <fix>
+        <bug>62662</bug>: Fix the corruption of web.xml output during JSP
+        compilation caused by the fix for <bug>53492</bug>. Patch provided by
+        Bernhard Frauendienst. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
