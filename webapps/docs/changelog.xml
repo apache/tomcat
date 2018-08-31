@@ -101,6 +101,12 @@
         packaged in Tomcat 9.0.x is DBCP 2. Correct the names of some DBCP 2
         configuration attributes that changed between 1.x and 2.x. (markt)
       </fix>
+      <add>
+        <bug>62666</bug>: Expand internationalisation support in the Manager
+        application to include the server status page and provide Russian
+        translations in addition to English. Patch provided by Artem Chebykin.
+        (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Other">
