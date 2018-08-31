@@ -3283,11 +3283,6 @@ implements HttpServletRequest {
                 return;
             }
 
-            if( !getConnector().isParseBodyMethod(getMethod()) ) {
-                success = true;
-                return;
-            }
-
             String contentType = getContentType();
             if (contentType == null) {
                 contentType = "";
@@ -3301,6 +3296,11 @@ implements HttpServletRequest {
 
             if ("multipart/form-data".equals(contentType)) {
                 parseParts();
+                success = true;
+                return;
+            }
+
+            if( !getConnector().isParseBodyMethod(getMethod()) ) {
                 success = true;
                 return;
             }
