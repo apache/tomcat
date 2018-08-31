@@ -145,6 +145,10 @@
         possible that some updates would not take effect and/or
         <code>ClassNotFoundException</code>s would occur. (markt)
       </fix>
+      <fix>
+        Correct the JSP version in the X-PoweredBy HTTP header generated when
+        the xpoweredBy option is enabled. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="WebSocket">
