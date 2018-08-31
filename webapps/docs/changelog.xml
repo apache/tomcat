@@ -190,6 +190,12 @@
         <bug>62652</bug>: Make it clearer that the version of DBCP that is
         packaged in Tomcat 7.0.x is DBCP 1. (markt)
       </fix>
+      <add>
+        <bug>62666</bug>: Expand internationalisation support in the Manager
+        application to include the server status page and provide Russian
+        translations in addition to English. Patch provided by Artem Chebykin.
+        (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Tribes">

@@ -283,20 +283,59 @@ public class StatusManagerServlet
         try {
 
             // Display operating system statistics using APR if available
-            StatusTransformer.writeOSState(writer,mode);
+            args = new Object[7];
+            args[0] = sm.getString("htmlManagerServlet.osPhysicalMemory");
+            args[1] = sm.getString("htmlManagerServlet.osAvailableMemory");
+            args[2] = sm.getString("htmlManagerServlet.osTotalPageFile");
+            args[3] = sm.getString("htmlManagerServlet.osFreePageFile");
+            args[4] = sm.getString("htmlManagerServlet.osMemoryLoad");
+            args[5] = sm.getString("htmlManagerServlet.osKernelTime");
+            args[6] = sm.getString("htmlManagerServlet.osUserTime");
+            StatusTransformer.writeOSState(writer, mode, args);
 
             // Display virtual machine statistics
-            StatusTransformer.writeVMState(writer,mode);
+            args = new Object[9];
+            args[0] = sm.getString("htmlManagerServlet.jvmFreeMemory");
+            args[1] = sm.getString("htmlManagerServlet.jvmTotalMemory");
+            args[2] = sm.getString("htmlManagerServlet.jvmMaxMemory");
+            args[3] = sm.getString("htmlManagerServlet.jvmTableTitleMemoryPool");
+            args[4] = sm.getString("htmlManagerServlet.jvmTableTitleType");
+            args[5] = sm.getString("htmlManagerServlet.jvmTableTitleInitial");
+            args[6] = sm.getString("htmlManagerServlet.jvmTableTitleTotal");
+            args[7] = sm.getString("htmlManagerServlet.jvmTableTitleMaximum");
+            args[8] = sm.getString("htmlManagerServlet.jvmTableTitleUsed");
+            // use StatusTransformer to output status
+            StatusTransformer.writeVMState(writer,mode, args);
 
             Enumeration<ObjectName> enumeration = threadPools.elements();
             while (enumeration.hasMoreElements()) {
                 ObjectName objectName = enumeration.nextElement();
                 String name = objectName.getKeyProperty("name");
+                args = new Object[19];
+                args[0] = sm.getString("htmlManagerServlet.connectorStateMaxThreads");
+                args[1] = sm.getString("htmlManagerServlet.connectorStateThreadCount");
+                args[2] = sm.getString("htmlManagerServlet.connectorStateThreadBusy");
+                args[3] = sm.getString("htmlManagerServlet.connectorStateAliveSocketCount");
+                args[4] = sm.getString("htmlManagerServlet.connectorStateMaxProcessingTime");
+                args[5] = sm.getString("htmlManagerServlet.connectorStateProcessingTime");
+                args[6] = sm.getString("htmlManagerServlet.connectorStateRequestCount");
+                args[7] = sm.getString("htmlManagerServlet.connectorStateErrorCount");
+                args[8] = sm.getString("htmlManagerServlet.connectorStateBytesRecieved");
+                args[9] = sm.getString("htmlManagerServlet.connectorStateBytesSent");
+                args[10] = sm.getString("htmlManagerServlet.connectorStateTableTitleStage");
+                args[11] = sm.getString("htmlManagerServlet.connectorStateTableTitleTime");
+                args[12] = sm.getString("htmlManagerServlet.connectorStateTableTitleBSent");
+                args[13] = sm.getString("htmlManagerServlet.connectorStateTableTitleBRecv");
+                args[14] = sm.getString("htmlManagerServlet.connectorStateTableTitleClientForw");
+                args[15] = sm.getString("htmlManagerServlet.connectorStateTableTitleClientAct");
+                args[16] = sm.getString("htmlManagerServlet.connectorStateTableTitleVHost");
+                args[17] = sm.getString("htmlManagerServlet.connectorStateTableTitleRequest");
+                args[18] = sm.getString("htmlManagerServlet.connectorStateHint");
                 // use StatusTransformer to output status
                 StatusTransformer.writeConnectorState
                     (writer, objectName,
                      name, mBeanServer, globalRequestProcessors,
-                     requestProcessors, mode);
+                     requestProcessors, mode, args);
             }
 
             if ((request.getPathInfo() != null) 
