@@ -51,6 +51,12 @@
         Improve the handling of path parameters when working with
         RequestDispatcher objects. (markt)
       </fix>
+      <fix>
+        <bug>62664</bug>: Process requests with content type
+        <code>multipart/form-data</code> to servlets with a
+        <code>@MultipartConfig</code> annotation regardless of HTTP method.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
