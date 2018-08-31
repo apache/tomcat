@@ -3227,11 +3227,6 @@ public class Request implements org.apache.catalina.servlet4preview.http.HttpSer
                 return;
             }
 
-            if( !getConnector().isParseBodyMethod(getMethod()) ) {
-                success = true;
-                return;
-            }
-
             String contentType = getContentType();
             if (contentType == null) {
                 contentType = "";
@@ -3245,6 +3240,11 @@ public class Request implements org.apache.catalina.servlet4preview.http.HttpSer
 
             if ("multipart/form-data".equals(contentType)) {
                 parseParts(false);
+                success = true;
+                return;
+            }
+
+            if( !getConnector().isParseBodyMethod(getMethod()) ) {
                 success = true;
                 return;
             }
