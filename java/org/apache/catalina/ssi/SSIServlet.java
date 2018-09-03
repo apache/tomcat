@@ -32,8 +32,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import org.apache.catalina.Globals;
 /**
  * Servlet to process SSI requests within a webpage. Mapped to a path from
  * within web.xml.
@@ -177,7 +175,6 @@ public class SSIServlet extends HttpServlet {
             res.setDateHeader("Expires", (new java.util.Date()).getTime()
                     + expires.longValue() * 1000);
         }
-        req.setAttribute(Globals.SSI_FLAG_ATTR, "true");
         processSSI(req, res, resource);
     }
 
