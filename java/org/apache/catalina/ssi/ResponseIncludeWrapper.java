@@ -25,9 +25,7 @@ import java.text.SimpleDateFormat;
 import java.util.Locale;
 import java.util.TimeZone;
 
-import javax.servlet.ServletContext;
 import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletResponseWrapper;
 
@@ -44,13 +42,11 @@ public class ResponseIncludeWrapper extends HttpServletResponseWrapper {
     /**
      * The names of some headers we want to capture.
      */
-    private static final String CONTENT_TYPE = "content-type";
     private static final String LAST_MODIFIED = "last-modified";
     private static final DateFormat RFC1123_FORMAT;
     private static final String RFC1123_PATTERN = "EEE, dd MMM yyyy HH:mm:ss z";
 
     protected long lastModified = -1;
-    private String contentType = null;
 
     /**
      * Our ServletOutputStream
@@ -58,9 +54,6 @@ public class ResponseIncludeWrapper extends HttpServletResponseWrapper {
     protected final ServletOutputStream captureServletOutputStream;
     protected ServletOutputStream servletOutputStream;
     protected PrintWriter printWriter;
-
-    private final ServletContext context;
-    private final HttpServletRequest request;
 
     static {
         RFC1123_FORMAT = new SimpleDateFormat(RFC1123_PATTERN, Locale.US);
@@ -71,17 +64,12 @@ public class ResponseIncludeWrapper extends HttpServletResponseWrapper {
      * Initialize our wrapper with the current HttpServletResponse and
      * ServletOutputStream.
      *
-     * @param context The servlet context
-     * @param request The HttpServletResponse to use
      * @param response The response to use
      * @param captureServletOutputStream The ServletOutputStream to use
      */
-    public ResponseIncludeWrapper(ServletContext context,
-            HttpServletRequest request, HttpServletResponse response,
+    public ResponseIncludeWrapper(HttpServletResponse response,
             ServletOutputStream captureServletOutputStream) {
         super(response);
-        this.context = context;
-        this.request = request;
         this.captureServletOutputStream = captureServletOutputStream;
     }
 
@@ -162,41 +150,6 @@ public class ResponseIncludeWrapper extends HttpServletResponseWrapper {
         return lastModified;
     }
 
-    /**
-     * Returns the value of the <code>content-type</code> header field.
-     *
-     * @return the content type of the resource referenced by this
-     *   <code>ResponseIncludeWrapper</code>, or <code>null</code> if not known.
-     */
-    @Override
-    public String getContentType() {
-        if (contentType == null) {
-            String url = request.getRequestURI();
-            String mime = context.getMimeType(url);
-            if (mime != null) {
-                setContentType(mime);
-            } else {
-                // return a safe value
-                setContentType("application/x-octet-stream");
-            }
-        }
-        return contentType;
-    }
-
-    /**
-     * Sets the value of the <code>content-type</code> header field.
-     *
-     * @param mime a mime type
-     */
-    @Override
-    public void setContentType(String mime) {
-        contentType = mime;
-        if (contentType != null) {
-            getResponse().setContentType(contentType);
-        }
-    }
-
-
     @Override
     public void addDateHeader(String name, long value) {
         super.addDateHeader(name, value);
@@ -218,8 +171,6 @@ public class ResponseIncludeWrapper extends HttpServletResponseWrapper {
             } catch (Throwable ignore) {
                 ExceptionUtils.handleThrowable(ignore);
             }
-        } else if (lname.equals(CONTENT_TYPE)) {
-            contentType = value;
         }
     }
 
@@ -244,10 +195,6 @@ public class ResponseIncludeWrapper extends HttpServletResponseWrapper {
             } catch (Throwable ignore) {
                 ExceptionUtils.handleThrowable(ignore);
             }
-        }
-        else if (lname.equals(CONTENT_TYPE))
-        {
-            contentType = value;
         }
     }
 }

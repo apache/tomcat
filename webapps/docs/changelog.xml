@@ -62,6 +62,11 @@
         (markt)
       </fix>
       <fix>
+        <bug>62669</bug>: When using the SSIFilter and a resource does not
+        specify a content type, do not force the content type to
+        <code>application/x-octet-stream</code>. (markt)
+      </fix>
+      <fix>
         <bug>62670</bug>: Adjust the memory leak protection for the
         <code>DriverManager</code> so that JDBC drivers located in
         <code>$CATALINA_HOME/lib</code> and <code>$CATALINA_BASE/lib</code> are
