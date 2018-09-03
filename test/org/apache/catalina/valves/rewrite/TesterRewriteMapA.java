@@ -25,6 +25,7 @@ public class TesterRewriteMapA implements RewriteMap {
 
     static {
         map.put("a", "aa");
+        map.put("aa", "aaaa");
         map.put("b", "bb");
     }
 
