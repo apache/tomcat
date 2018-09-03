@@ -142,11 +142,6 @@ public class ResponseIncludeWrapper extends HttpServletResponseWrapper {
      *   known.
      */
     public long getLastModified() {
-        if (lastModified == -1) {
-            // javadocs say to return -1 if date not known, if you want another
-            // default, put it here
-            return -1;
-        }
         return lastModified;
     }
 
