@@ -89,6 +89,12 @@ public class TestRewriteValve extends TomcatBaseTest {
     }
 
     @Test
+    public void testRewriteMap04() throws Exception {
+        doTestRewrite("RewriteMap mapa org.apache.catalina.valves.rewrite.TesterRewriteMapA\n" +
+                "RewriteRule /b/(.*).html$ /c/${mapa:a$1|dd}", "/b/a.html", "/c/aaaa");
+    }
+
+    @Test
     public void testRewriteServerVar() throws Exception {
         doTestRewrite("RewriteRule /b/(.*).html$ /c%{SERVLET_PATH}", "/b/x.html", "/c/b/x.html");
     }
