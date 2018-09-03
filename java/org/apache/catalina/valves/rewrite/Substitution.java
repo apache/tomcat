@@ -101,14 +101,13 @@ public class Substitution {
 
     public class MapElement extends SubstitutionElement {
         public RewriteMap map = null;
-        public String key;
-        public String defaultValue = "";
-        public int n;
+        public SubstitutionElement[] defaultValue = null;
+        public SubstitutionElement[] key = null;
         @Override
         public String evaluate(Matcher rule, Matcher cond, Resolver resolver) {
-            String result = map.lookup(rule.group(n));
-            if (result == null) {
-                result = defaultValue;
+            String result = map.lookup(evaluateSubstitution(key, rule, cond, resolver));
+            if (result == null && defaultValue != null) {
+                result = evaluateSubstitution(defaultValue, rule, cond, resolver);
             }
             return result;
         }
@@ -126,6 +125,10 @@ public class Substitution {
     }
 
     public void parse(Map<String, RewriteMap> maps) {
+        this.elements = parseSubtitution(sub, maps);
+    }
+
+    private SubstitutionElement[] parseSubtitution(String sub, Map<String, RewriteMap> maps) {
 
         List<SubstitutionElement> elements = new ArrayList<>();
         int pos = 0;
@@ -183,17 +186,20 @@ public class Substitution {
                     if (newElement.map == null) {
                         throw new IllegalArgumentException(sub + ": No map: " + sub.substring(open + 1, colon));
                     }
+                    String key = null;
+                    String defaultValue = null;
                     if (def > -1) {
                         if (!(colon < def && def < close)) {
                             throw new IllegalArgumentException(sub);
                         }
-                        newElement.key = sub.substring(colon + 1, def);
-                        newElement.defaultValue = sub.substring(def + 1, close);
+                        key = sub.substring(colon + 1, def);
+                        defaultValue = sub.substring(def + 1, close);
                     } else {
-                        newElement.key = sub.substring(colon + 1, close);
+                        key = sub.substring(colon + 1, close);
                     }
-                    if (newElement.key.startsWith("$")) {
-                        newElement.n = Integer.parseInt(newElement.key.substring(1));
+                    newElement.key = parseSubtitution(key, maps);
+                    if (defaultValue != null) {
+                        newElement.defaultValue = parseSubtitution(defaultValue, maps);
                     }
                     pos = close + 1;
                     elements.add(newElement);
@@ -253,7 +259,7 @@ public class Substitution {
             }
         }
 
-        this.elements = elements.toArray(new SubstitutionElement[0]);
+        return elements.toArray(new SubstitutionElement[0]);
 
     }
 
@@ -265,6 +271,10 @@ public class Substitution {
      * @return The substitution result
      */
     public String evaluate(Matcher rule, Matcher cond, Resolver resolver) {
+        return evaluateSubstitution(elements, rule, cond, resolver);
+    }
+
+    private String evaluateSubstitution(SubstitutionElement[] elements, Matcher rule, Matcher cond, Resolver resolver) {
         StringBuffer buf = new StringBuffer();
         for (int i = 0; i < elements.length; i++) {
             buf.append(elements[i].evaluate(rule, cond, resolver));

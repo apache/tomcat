@@ -64,6 +64,9 @@
         loaded via the service loader mechanism when the protection is enabled.
         (markt)
       </fix>
+      <fix>
+        <bug>62667</bug>: Add recursion to rewrite substitution parsing. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
