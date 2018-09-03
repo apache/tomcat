@@ -92,8 +92,7 @@ public class SSIFilter extends GenericFilter {
 
         // setup to capture output
         ByteArrayServletOutputStream basos = new ByteArrayServletOutputStream();
-        ResponseIncludeWrapper responseIncludeWrapper =
-                new ResponseIncludeWrapper(getServletContext(),req, res, basos);
+        ResponseIncludeWrapper responseIncludeWrapper = new ResponseIncludeWrapper(res, basos);
 
         // process remainder of filter chain
         chain.doFilter(req, responseIncludeWrapper);
@@ -106,7 +105,7 @@ public class SSIFilter extends GenericFilter {
         String contentType = responseIncludeWrapper.getContentType();
 
         // is this an allowed type for SSI processing?
-        if (contentTypeRegEx.matcher(contentType).matches()) {
+        if (contentType != null && contentTypeRegEx.matcher(contentType).matches()) {
             String encoding = res.getCharacterEncoding();
 
             // set up SSI processing
