@@ -57,6 +57,13 @@
         <code>@MultipartConfig</code> annotation regardless of HTTP method.
         (markt)
       </fix>
+      <fix>
+        <bug>62670</bug>: Adjust the memory leak protection for the
+        <code>DriverManager</code> so that JDBC drivers located in
+        <code>$CATALINA_HOME/lib</code> and <code>$CATALINA_BASE/lib</code> are
+        loaded via the service loader mechanism when the protection is enabled.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
