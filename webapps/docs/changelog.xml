@@ -81,6 +81,11 @@
         bodies when writing large bodies using asynchronous processing over
         HTTP/2. (markt)
       </fix>
+      <scode>
+        Support for Netware in the <code>org.apache.tomcat.jni</code> package
+        has been removed as there has not been a supported Netware platform for
+        a number of years. (markt)
+      </scode>
     </changelog>
   </subsection>
   <subsection name="Jasper">

@@ -139,8 +139,8 @@ public class Procattr {
      * Determine if the child should start in its own address space or using the
      * current one from its parent
      * @param attr The procattr we care about.
-     * @param addrspace Should the child start in its own address space?  Default
-     * is no on NetWare and yes on other platforms.
+     * @param addrspace Should the child start in its own address space?
+     *                  Default is yes.
      * @return the operation status
      */
     public static native int addrspaceSet(long attr, int addrspace);

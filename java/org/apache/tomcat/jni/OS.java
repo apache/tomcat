@@ -25,7 +25,6 @@ public class OS {
 
     /* OS Enums */
     private static final int UNIX      = 1;
-    private static final int NETWARE   = 2;
     private static final int WIN32     = 3;
     private static final int WIN64     = 4;
     private static final int LINUX     = 5;
@@ -47,7 +46,13 @@ public class OS {
     private static native boolean is(int type);
 
     public static final boolean IS_UNIX    = is(UNIX);
-    public static final boolean IS_NETWARE = is(NETWARE);
+    /**
+     * @deprecated Hard-coded to false since there has not been a supported
+     *             Netware platform for many years.
+     *             This will be removed in Tomcat 10 onwards
+     */
+    @Deprecated
+    public static final boolean IS_NETWARE = false;
     public static final boolean IS_WIN32   = is(WIN32);
     public static final boolean IS_WIN64   = is(WIN64);
     public static final boolean IS_LINUX   = is(LINUX);
