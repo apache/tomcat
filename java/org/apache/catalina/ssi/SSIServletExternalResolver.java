@@ -526,10 +526,8 @@ public class SSIServletExternalResolver implements SSIExternalResolver {
                 throw new IOException(
                         "Couldn't get request dispatcher for path: " + path);
             }
-            ByteArrayServletOutputStream basos =
-                new ByteArrayServletOutputStream();
-            ResponseIncludeWrapper responseIncludeWrapper =
-                new ResponseIncludeWrapper(context, req, res, basos);
+            ByteArrayServletOutputStream basos = new ByteArrayServletOutputStream();
+            ResponseIncludeWrapper responseIncludeWrapper = new ResponseIncludeWrapper(res, basos);
             rd.include(req, responseIncludeWrapper);
             //We can't assume the included servlet flushed its output
             responseIncludeWrapper.flushOutputStreamOrWriter();
