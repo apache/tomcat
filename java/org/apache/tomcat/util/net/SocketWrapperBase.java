@@ -399,8 +399,6 @@ public abstract class SocketWrapperBase<E> {
          * - To enable a marginally more efficient implemented for blocking
          *   writes which do not require the additional checks related to the
          *   use of the non-blocking write buffer
-         *   TODO: Explore re-factoring options to remove the split into
-         *         separate methods
          */
         if (block) {
             writeBlocking(buf, off, len);
@@ -448,8 +446,6 @@ public abstract class SocketWrapperBase<E> {
          * - To enable a marginally more efficient implemented for blocking
          *   writes which do not require the additional checks related to the
          *   use of the non-blocking write buffer
-         *   TODO: Explore re-factoring options to remove the split into
-         *         separate methods
          */
         if (block) {
             writeBlocking(from);
