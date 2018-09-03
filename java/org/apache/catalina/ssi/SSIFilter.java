@@ -35,8 +35,6 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import org.apache.catalina.Globals;
 /**
  * Filter to process SSI requests within a webpage. Mapped to a content types
  * from within web.xml.
@@ -91,9 +89,6 @@ public class SSIFilter extends GenericFilter {
         // cast once
         HttpServletRequest req = (HttpServletRequest)request;
         HttpServletResponse res = (HttpServletResponse)response;
-
-        // indicate that we're in SSI processing
-        req.setAttribute(Globals.SSI_FLAG_ATTR, "true");
 
         // setup to capture output
         ByteArrayServletOutputStream basos = new ByteArrayServletOutputStream();
