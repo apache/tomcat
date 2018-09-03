@@ -129,6 +129,13 @@
         does not support PKCS12 key stores configured to use a store password of
         the empty string. (markt)
       </fix>
+      <fix>
+        <bug>62670</bug>: Adjust the memory leak protection for the
+        <code>DriverManager</code> so that JDBC drivers located in
+        <code>$CATALINA_HOME/lib</code> and <code>$CATALINA_BASE/lib</code> are
+        loaded via the service loader mechanism when the protection is enabled.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
