@@ -813,8 +813,10 @@ class Stream extends AbstractStream implements HeaderEmitter {
                 if (streamReservation == 0) {
                     streamReservation  = reserveWindowSize(left, block);
                     if (streamReservation == 0) {
-                        // Must be non-blocking
-                        buffer.compact();
+                        // Must be non-blocking. Unwritten non-blocking data
+                        // must put in writeBuffer else isReady() logic breaks
+                        writeBuffer.add(buffer);
+                        buffer.clear();
                         return true;
                     }
                 }
@@ -822,8 +824,10 @@ class Stream extends AbstractStream implements HeaderEmitter {
                     int connectionReservation =
                                 handler.reserveWindowSize(Stream.this, streamReservation, block);
                     if (connectionReservation == 0) {
-                        // Must be non-blocking
-                        buffer.compact();
+                        // Must be non-blocking. Unwritten non-blocking data
+                        // must put in writeBuffer else isReady() logic breaks
+                        writeBuffer.add(buffer);
+                        buffer.clear();
                         return true;
                     }
                     // Do the write
