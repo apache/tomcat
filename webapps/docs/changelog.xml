@@ -119,6 +119,10 @@
         specify a content type, do not force the content type to
         <code>application/x-octet-stream</code>. (markt)
       </fix>
+      <fix>
+        When generating a redirect to a directory in the Default Servlet, avoid
+        generating a protocol relative redirect. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
