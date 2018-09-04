@@ -72,6 +72,10 @@
       <fix>
         <bug>62667</bug>: Add recursion to rewrite substitution parsing. (remm)
       </fix>
+      <fix>
+        When generating a redirect to a directory in the Default Servlet, avoid
+        generating a protocol relative redirect. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
