@@ -45,6 +45,14 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 8.5.35 (markt)" rtext="in development">
+  <subsection name="Jasper">
+    <changelog>
+      <fix>
+        Correct parsing of XML whitespace in TLD function signatures that
+        incorrectly only looked for the space character. (markt)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 8.5.34 (markt)" rtext="release in progress">
   <subsection name="Catalina">

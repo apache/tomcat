@@ -23,6 +23,8 @@ import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Locale;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.el.ELException;
 import javax.el.ExpressionFactory;
@@ -417,6 +419,9 @@ class Validator {
      * A visitor for validating nodes other than page directives
      */
     private static class ValidateVisitor extends Node.Visitor {
+
+        // Pattern to extract a method name from a full method signature
+        private static final Pattern METHOD_NAME_PATTERN = Pattern.compile(".*[ \t\n\r]+(.+)[ \t\n\r]*\\(.*");
 
         private final PageInfo pageInfo;
 
@@ -1638,18 +1643,13 @@ class Validator {
             FunctionInfo funcInfo = func.getFunctionInfo();
             String signature = funcInfo.getFunctionSignature();
 
-            int start = signature.indexOf(' ');
-            if (start < 0) {
+            Matcher m = METHOD_NAME_PATTERN.matcher(signature);
+            if (!m.matches()) {
                 err.jspError("jsp.error.tld.fn.invalid.signature", func
                         .getPrefix(), func.getName());
             }
-            int end = signature.indexOf('(');
-            if (end < 0) {
-                err.jspError(
-                        "jsp.error.tld.fn.invalid.signature.parenexpected",
-                        func.getPrefix(), func.getName());
-            }
-            return signature.substring(start + 1, end).trim();
+
+            return m.group(1);
         }
 
         /**
