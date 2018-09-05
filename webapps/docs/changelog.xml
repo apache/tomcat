@@ -176,6 +176,10 @@
         compilation caused by the fix for <bug>53492</bug>. Patch provided by
         Bernhard Frauendienst. (markt)
       </fix>
+      <fix>
+        Correct parsing of XML whitespace in TLD function signatures that
+        incorrectly only looked for the space character. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="WebSocket">
