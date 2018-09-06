@@ -17,6 +17,7 @@
 -->
 <!DOCTYPE document [
   <!ENTITY project SYSTEM "project.xml">
+  <!ENTITY le              "&#x02264;" >
 ]>
 <document url="logging.html">
 
@@ -241,11 +242,12 @@
     The default <code>logging.properties</code> in the JRE specifies a
     <code>ConsoleHandler</code> that routes logging to System.err.
     The default <code>conf/logging.properties</code> in Apache Tomcat also
-    adds several <code>FileHandler</code>s that write to files.
+    adds several <code>AsyncFileHandler</code>s that write to files.
   </p>
   <p>
-    A handler's log level threshold is INFO by default and can be set using
-    SEVERE, WARNING, INFO, CONFIG, FINE, FINER, FINEST or ALL.
+    A handler's log level threshold is <code>INFO</code> by default and can be set using
+    <code>SEVERE</code>, <code>WARNING</code>, <code>INFO</code>, <code>CONFIG</code>,
+    <code>FINE</code>, <code>FINER</code>, <code>FINEST</code> or <code>ALL</code>.
     You can also target specific packages to collect logging from and specify
     a level.
   </p>
@@ -272,7 +274,7 @@ java.util.logging.ConsoleHandler.level=ALL</source>
       digit, and ends with '.'. For example, <code>22foobar.</code> is a valid
       prefix.</li>
       <li>System property replacement is performed for property values which
-      contain ${systemPropertyName}.</li>
+      contain <code>${systemPropertyName}</code>.</li>
       <li>If using a class loader that implements the
       <code>org.apache.juli.WebappProperties</code> interface (Tomcat&apos;s
       web application class loader does) then property replacement is also
@@ -290,14 +292,14 @@ java.util.logging.ConsoleHandler.level=ALL</source>
       <li> By default the log files will be kept on the file system
       <code>90</code> days. This may be changed per handler using the
       <code>handlerName.maxDays</code> property. If the specified value for the
-      property is <code>&lt;=0</code> then the log files will be kept on the
+      property is <code>&le;0</code> then the log files will be kept on the
       file system forever, otherwise they will be kept the specified maximum
       days.</li>
   </ul>
   <p>
     There are several additional implementation classes, that can be used
-    together with the ones provided by Java. The notable one is
-    <code>org.apache.juli.FileHandler</code>.
+    together with the ones provided by Java. The notable ones are
+    <code>org.apache.juli.FileHandler</code> and <code>org.apache.juli.AsyncFileHandler</code>.
   </p>
   <p>
     <code>org.apache.juli.FileHandler</code> supports buffering of the
@@ -308,6 +310,12 @@ java.util.logging.ConsoleHandler.level=ALL</source>
       value <code>&gt;0</code> uses a BufferedOutputStream with the defined
       value but note that the system default buffering will also be
       applied.
+  </p>
+  <p>
+    <code>org.apache.juli.AsyncFileHandler</code> is a subclass of <code>FileHandler</code>
+      that queues the log messages and writes them asynchronously to the log files.
+      Its additional behaviour can be configured by setting some
+      <a href="config/systemprops.html#Logging">system properties</a>.
   </p>
   <p>
     Example logging.properties file to be placed in $CATALINA_BASE/conf:
@@ -338,7 +346,7 @@ java.util.logging.ConsoleHandler.level=ALL</source>
 3manager.org.apache.juli.FileHandler.bufferSize = 16384
 
 java.util.logging.ConsoleHandler.level = FINE
-java.util.logging.ConsoleHandler.formatter = java.util.logging.SimpleFormatter
+java.util.logging.ConsoleHandler.formatter = java.util.logging.OneLineFormatter
 
 
 ############################################################
@@ -374,7 +382,7 @@ org.apache.juli.FileHandler.directory = ${catalina.base}/logs
 org.apache.juli.FileHandler.prefix = ${classloader.webappName}.
 
 java.util.logging.ConsoleHandler.level = FINE
-java.util.logging.ConsoleHandler.formatter = java.util.logging.SimpleFormatter]]></source>
+java.util.logging.ConsoleHandler.formatter = java.util.logging.OneLineFormatter]]></source>
 
 
     <subsection name="Documentation references">
