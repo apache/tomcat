@@ -36,6 +36,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameter;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.Wrapper;
@@ -45,12 +46,19 @@ import org.apache.tomcat.util.buf.B2CConverter;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.http.parser.MediaType;
 
+/*
+ * Note: This test is split using two base classes. This is because, as a single
+ *       test, it takes so long to run it dominates the time taken to run the
+ *       tests when running tests using multiple threads. For example, on a
+ *       system with 12 cores, the tests take ~5 minutes per connector with this
+ *       test as a single test and ~3.5 minutes per connector with this test
+ *       split in two.
+ */
 @RunWith(Parameterized.class)
-public class TestDefaultServletEncoding extends TomcatBaseTest {
+public abstract class DefaultServletEncodingBaseTest extends TomcatBaseTest {
 
-    @Parameterized.Parameters(name = "{index}: contextEnc[{0}], fileEnc[{1}], useBom[{2}],"
-            + " target[{3}], useInclude[{4}], outputEnc[{5}], callSetCharacterEnc[{6}],"
-            + " useWriter[{7}], expectedPass[{8}]")
+    @Parameterized.Parameters(name = "{index}: contextEnc[{0}], fileEnc[{1}], target[{4}]," +
+            " useInclude[{5}], outputEnc[{6}], callSetCharacterEnc[{8}], useWriter[{7}]")
     public static Collection<Object[]> parameters() {
 
         String[] encodings = new String[] {
@@ -65,41 +73,34 @@ public class TestDefaultServletEncoding extends TomcatBaseTest {
 
         for (String contextResponseEncoding : encodings) {
             for (String fileEncoding : encodings) {
-                for (Boolean useBom : booleans) {
-                    for (String targetFile : targetFiles) {
-                        for (Boolean useInclude : booleans) {
-                            if (useInclude.booleanValue()) {
-                                for (String outputEncoding : encodings) {
-                                    for (Boolean callSetCharacterEncoding : booleans) {
-                                        for (Boolean useWriter : booleans) {
-                                            Boolean expected = getExpected(fileEncoding, useBom,
-                                                    targetFile, outputEncoding,
-                                                    callSetCharacterEncoding, useWriter);
-
-                                            parameterSets.add(new Object[] {
-                                                    contextResponseEncoding, fileEncoding, useBom,
-                                                    targetFile, useInclude, outputEncoding,
-                                                    callSetCharacterEncoding, useWriter, expected
-                                            });
-                                        }
+                for (String targetFile : targetFiles) {
+                    for (Boolean useInclude : booleans) {
+                        if (useInclude.booleanValue()) {
+                            for (String outputEncoding : encodings) {
+                                for (Boolean callSetCharacterEncoding : booleans) {
+                                    for (Boolean useWriter : booleans) {
+                                        parameterSets.add(new Object[] { contextResponseEncoding,
+                                                fileEncoding, targetFile,
+                                                useInclude, outputEncoding,
+                                                callSetCharacterEncoding, useWriter });
                                     }
                                 }
-                            } else {
-                                /*
-                                 * Not using include so ignore outputEncoding,
-                                 * callSetCharacterEncoding and useWriter
-                                 *
-                                 * Tests that do not use include are always expected to
-                                 * pass.
-                                 */
-                                String encoding = targetFile;
-                                if (encoding.endsWith("-bom")) {
-                                    encoding = encoding.substring(0, encoding.length() - 4);
-                                }
-                                parameterSets.add(new Object[] { contextResponseEncoding,
-                                        fileEncoding, useBom, targetFile, useInclude, encoding,
-                                        Boolean.FALSE, Boolean.FALSE, Boolean.TRUE });
                             }
+                        } else {
+                            /*
+                             * Not using include so ignore outputEncoding,
+                             * callSetCharacterEncoding and useWriter
+                             *
+                             * Tests that do not use include are always expected to
+                             * pass.
+                             */
+                            String encoding = targetFile;
+                            if (encoding.endsWith("-bom")) {
+                                encoding = encoding.substring(0, encoding.length() - 4);
+                            }
+                            parameterSets.add(new Object[] { contextResponseEncoding, fileEncoding,
+                                    targetFile, useInclude, encoding, Boolean.FALSE,
+                                    Boolean.FALSE });
                         }
                     }
                 }
@@ -110,22 +111,22 @@ public class TestDefaultServletEncoding extends TomcatBaseTest {
     }
 
 
-    private static Boolean getExpected(String fileEncoding, Boolean useBom, String targetFile,
-            String outputEncoding, Boolean callSetCharacterEncoding, Boolean useWriter) {
-        if (useWriter.booleanValue() || callSetCharacterEncoding.booleanValue()) {
+    private static boolean getExpected(String fileEncoding, boolean useBom, String targetFile,
+            String outputEncoding, boolean callSetCharacterEncoding, boolean useWriter) {
+        if (useWriter || callSetCharacterEncoding) {
             /*
              * Using a writer or setting the output character encoding means the
              * response will specify a character set. These cases therefore
              * reduce to can the file be read with the correct encoding.
              * (Assuming any BOM is always skipped in the included output.)
              */
-            if (targetFile.endsWith("-bom") && useBom.booleanValue() ||
+            if (targetFile.endsWith("-bom") && useBom ||
                     targetFile.startsWith(fileEncoding) ||
                     targetFile.equals("cp1252") && fileEncoding.equals("iso-8859-1") ||
                     targetFile.equals("iso-8859-1") && fileEncoding.equals("cp1252")) {
-                return Boolean.TRUE;
+                return true;
             } else {
-                return Boolean.FALSE;
+                return false;
             }
         } else if (!(targetFile.startsWith(outputEncoding) ||
                 targetFile.equals("cp1252") && outputEncoding.equals("iso-8859-1") ||
@@ -138,39 +139,38 @@ public class TestDefaultServletEncoding extends TomcatBaseTest {
              * cp1252, the bytes vary by character set.
              * (Assuming any BOM is always skipped in the included output.)
              */
-            return Boolean.FALSE;
+            return false;
         } else {
-            return Boolean.TRUE;
+            return true;
         }
     }
 
 
-    private final String contextResponseEncoding;
-    private final String fileEncoding;
-    private final boolean useBom;
-    private final String targetFile;
-    private final boolean useInclude;
-    private final String outputEncoding;
-    private final boolean callSetCharacterEncoding;
-    private final boolean useWriter;
-    private final boolean expectedPass;
+    @Parameter(0)
+    public String contextResponseEncoding;
+    @Parameter(1)
+    public String fileEncoding;
+    @Parameter(2)
+    public String targetFile;
+    @Parameter(3)
+    public boolean useInclude;
+    @Parameter(4)
+    public String outputEncoding;
+    @Parameter(5)
+    public boolean callSetCharacterEncoding;
+    @Parameter(6)
+    public boolean useWriter;
 
-    public TestDefaultServletEncoding(String contextResponseEncoding, String fileEncoding,
-            boolean useBom, String targetFile, boolean useInclude, String outputEncoding,
-            boolean callSetCharacterEncoding, boolean useWriter, boolean expectedPass) {
-        this.contextResponseEncoding = contextResponseEncoding;
-        this.fileEncoding = fileEncoding;
-        this.useBom = useBom;
-        this.targetFile = targetFile;
-        this.useInclude = useInclude;
-        this.outputEncoding = outputEncoding;
-        this.callSetCharacterEncoding = callSetCharacterEncoding;
-        this.useWriter = useWriter;
-        this.expectedPass = expectedPass;
-    }
+
+    protected abstract boolean getUseBom();
+
 
     @Test
     public void testEncoding() throws Exception {
+
+        boolean expectedPass = getExpected(fileEncoding, getUseBom(), targetFile, outputEncoding,
+                callSetCharacterEncoding, useWriter);
+
         Tomcat tomcat = getTomcatInstance();
 
         File appDir = new File("test/webapp");
@@ -178,7 +178,7 @@ public class TestDefaultServletEncoding extends TomcatBaseTest {
         ctxt.setResponseCharacterEncoding(contextResponseEncoding);
         Wrapper defaultServlet = Tomcat.addServlet(ctxt, "default", DefaultServlet.class.getName());
         defaultServlet.addInitParameter("fileEncoding", fileEncoding);
-        defaultServlet.addInitParameter("useBomIfPresent", Boolean.toString(useBom));
+        defaultServlet.addInitParameter("useBomIfPresent", Boolean.toString(getUseBom()));
 
         ctxt.addServletMappingDecoded("/", "default");
 
