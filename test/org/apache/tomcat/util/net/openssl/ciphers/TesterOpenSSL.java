@@ -109,12 +109,10 @@ public class TesterOpenSSL {
         unimplemented.add(Cipher.SSL2_IDEA_128_CBC_WITH_MD5);
         unimplemented.add(Cipher.SSL2_DES_192_EDE3_CBC_WITH_MD5);
 
-        // These are TLS v1.3 ciphers that the test suite doesn't yet handle
+        // These are TLS v1.3 ciphers that are not supported by any current
+        // version
         unimplemented.add(Cipher.TLS_AES_128_CCM_8_SHA256);
         unimplemented.add(Cipher.TLS_AES_128_CCM_SHA256);
-        unimplemented.add(Cipher.TLS_AES_128_GCM_SHA256);
-        unimplemented.add(Cipher.TLS_AES_256_GCM_SHA384);
-        unimplemented.add(Cipher.TLS_CHACHA20_POLY1305_SHA256);
 
         if (VERSION < 10002) {
             // These were implemented in 1.0.2 so won't be available in any
@@ -329,6 +327,19 @@ public class TesterOpenSSL {
             unimplemented.add(Cipher.TLS_ECDHE_ECDSA_WITH_3DES_EDE_CBC_SHA);
             unimplemented.add(Cipher.TLS_SRP_SHA_RSA_WITH_3DES_EDE_CBC_SHA);
         }
+
+        if (VERSION < 10102) {
+            // These were implemented in 1.1.2 so won't be available in any
+            // earlier version
+            unimplemented.add(Cipher.TLS_AES_128_GCM_SHA256);
+            unimplemented.add(Cipher.TLS_AES_256_GCM_SHA384);
+            unimplemented.add(Cipher.TLS_CHACHA20_POLY1305_SHA256);
+        } else {
+            // These were removed in 1.1.2 so won't be available from that
+            // version onwards
+            /* Currently none */
+        }
+
         OPENSSL_UNIMPLEMENTED_CIPHERS = Collections.unmodifiableSet(unimplemented);
 
         Map<String,String> renamed = new HashMap<>();
