@@ -57,16 +57,14 @@ public class TesterOpenSSL {
             // Supported until at least 2023-09-11
             VERSION = 10101;
         } else if (versionString.startsWith("OpenSSL 1.1.0")) {
-            // Support ends 2018-04-30
+            // Support ends 2019-09-11
             VERSION = 10100;
         } else if (versionString.startsWith("OpenSSL 1.0.2")) {
-            // Support ends 2019-12-31 (LTS)
-            // Note: Gump current tests 8.0.x with OpenSSL 1.0.2
+            // LTS
+            // Support ends 2019-12-31
+            // Note: Gump current tests 8.5.x with OpenSSL 1.0.2
             VERSION = 10002;
-        } else if (versionString.startsWith("OpenSSL 1.0.1")) {
-            // Support ends 2016-12-31
-            VERSION = 10001;
-        // Note: Release branches 1.0.0 and earlier are no longer supported by
+        // Note: Release branches 1.0.1 and earlier are no longer supported by
         //       the OpenSSL team so these tests don't support them either.
         } else {
             VERSION = -1;
@@ -120,37 +118,6 @@ public class TesterOpenSSL {
         unimplemented.add(Cipher.TLS_AES_128_GCM_SHA256);
         unimplemented.add(Cipher.TLS_AES_256_GCM_SHA384);
         unimplemented.add(Cipher.TLS_CHACHA20_POLY1305_SHA256);
-
-        if (VERSION < 10002) {
-            // These were implemented in 1.0.2 so won't be available in any
-            // earlier version
-            unimplemented.add(Cipher.TLS_DH_DSS_WITH_AES_128_CBC_SHA);
-            unimplemented.add(Cipher.TLS_DH_DSS_WITH_AES_256_CBC_SHA);
-            unimplemented.add(Cipher.TLS_DH_DSS_WITH_AES_128_CBC_SHA256);
-            unimplemented.add(Cipher.TLS_DH_DSS_WITH_AES_256_CBC_SHA256);
-            unimplemented.add(Cipher.TLS_DH_DSS_WITH_AES_128_GCM_SHA256);
-            unimplemented.add(Cipher.TLS_DH_DSS_WITH_AES_256_GCM_SHA384);
-            unimplemented.add(Cipher.TLS_DH_DSS_WITH_CAMELLIA_128_CBC_SHA);
-            unimplemented.add(Cipher.TLS_DH_DSS_WITH_CAMELLIA_256_CBC_SHA);
-            unimplemented.add(Cipher.TLS_DH_DSS_WITH_DES_CBC_SHA);
-            unimplemented.add(Cipher.TLS_DH_DSS_WITH_3DES_EDE_CBC_SHA);
-            unimplemented.add(Cipher.TLS_DH_DSS_WITH_SEED_CBC_SHA);
-            unimplemented.add(Cipher.TLS_DH_RSA_WITH_AES_128_CBC_SHA);
-            unimplemented.add(Cipher.TLS_DH_RSA_WITH_AES_256_CBC_SHA);
-            unimplemented.add(Cipher.TLS_DH_RSA_WITH_AES_128_CBC_SHA256);
-            unimplemented.add(Cipher.TLS_DH_RSA_WITH_AES_256_CBC_SHA256);
-            unimplemented.add(Cipher.TLS_DH_RSA_WITH_AES_128_GCM_SHA256);
-            unimplemented.add(Cipher.TLS_DH_RSA_WITH_AES_256_GCM_SHA384);
-            unimplemented.add(Cipher.TLS_DH_RSA_WITH_CAMELLIA_128_CBC_SHA);
-            unimplemented.add(Cipher.TLS_DH_RSA_WITH_CAMELLIA_256_CBC_SHA);
-            unimplemented.add(Cipher.TLS_DH_RSA_WITH_DES_CBC_SHA);
-            unimplemented.add(Cipher.TLS_DH_RSA_WITH_3DES_EDE_CBC_SHA);
-            unimplemented.add(Cipher.TLS_DH_RSA_WITH_SEED_CBC_SHA);
-        } else {
-            // These were removed in 1.0.2 so won't be available from that
-            // version onwards.
-            // None at present.
-        }
 
         if (VERSION < 10100) {
             // These were implemented in 1.1.0 so won't be available in any
