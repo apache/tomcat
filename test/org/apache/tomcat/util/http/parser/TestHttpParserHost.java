@@ -56,7 +56,6 @@ public class TestHttpParserHost {
         result.add(new Object[] { TestType.IPv4, "0.0.0.0:8080", Integer.valueOf(7), null} );
         // IPv4 - invalid
         result.add(new Object[] { TestType.IPv4, ".0.0.0", Integer.valueOf(-1), IAE} );
-        result.add(new Object[] { TestType.IPv4, "0.0.0.", Integer.valueOf(-1), IAE} );
         result.add(new Object[] { TestType.IPv4, "0..0.0", Integer.valueOf(-1), IAE} );
         result.add(new Object[] { TestType.IPv4, "0]", Integer.valueOf(-1), IAE} );
         // Domain Name - valid
@@ -126,14 +125,18 @@ public class TestHttpParserHost {
         result.add(new Object[] { TestType.IPv4, "myapp-t.my-domain.c-om", Integer.valueOf(-1), null} );
         result.add(new Object[] { TestType.IPv4, "myapp-t.my-domain.c-om:8080", Integer.valueOf(22), null} );
         result.add(new Object[] { TestType.IPv4, "gateway.demo-ilt-latest-demo:9000", Integer.valueOf(28), null} );
+        // Domain Name with trailing dot - valid
+        result.add(new Object[] { TestType.IPv4, "0.0.0.", Integer.valueOf(-1), null} );
+        result.add(new Object[] { TestType.IPv4, "myapp-t.mydomain.com.", Integer.valueOf(-1), null} );
+        result.add(new Object[] { TestType.IPv4, "myapp-t.mydomain.com.:8080", Integer.valueOf(21), null} );
+        result.add(new Object[] { TestType.IPv4, "foo.bar.", Integer.valueOf(-1), null} );
+        result.add(new Object[] { TestType.IPv4, "foo.bar.:8080", Integer.valueOf(8), null} );
         // Domain Name - invalid
         result.add(new Object[] { TestType.IPv4, ".", Integer.valueOf(-1), IAE} );
         result.add(new Object[] { TestType.IPv4, ".:8080", Integer.valueOf(-1), IAE} );
         result.add(new Object[] { TestType.IPv4, ".foo.bar", Integer.valueOf(-1), IAE} );
         result.add(new Object[] { TestType.IPv4, "-foo.bar", Integer.valueOf(-1), IAE} );
-        result.add(new Object[] { TestType.IPv4, "foo.bar.", Integer.valueOf(-1), IAE} );
         result.add(new Object[] { TestType.IPv4, "foo.bar-", Integer.valueOf(-1), IAE} );
-        result.add(new Object[] { TestType.IPv4, "foo.bar.:8080", Integer.valueOf(-1), IAE} );
         result.add(new Object[] { TestType.IPv4, "foo.bar-:8080", Integer.valueOf(-1), IAE} );
         result.add(new Object[] { TestType.IPv4, "^foo.bar", Integer.valueOf(-1), IAE} );
         result.add(new Object[] { TestType.IPv4, "foo-.bar", Integer.valueOf(-1), IAE} );

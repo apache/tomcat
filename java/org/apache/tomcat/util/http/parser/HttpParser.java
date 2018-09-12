@@ -865,7 +865,7 @@ public class HttpParser {
         NEW(     true, false, false, false, " at the start of"),
         ALPHA(   true,  true,  true,  true, " after a letter in"),
         NUMERIC( true,  true,  true,  true, " after a number in"),
-        PERIOD(  true, false, false, false, " after a period in"),
+        PERIOD(  true, false, false,  true, " after a period in"),
         HYPHEN(  true,  true, false, false, " after a hypen in"),
         COLON(  false, false, false, false, " after a colon in"),
         END(    false, false, false, false, " at the end of");
