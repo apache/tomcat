@@ -217,7 +217,7 @@ public abstract class BaseGenericObjectPool<T> extends BaseObject {
         this.blockWhenExhausted = blockWhenExhausted;
     }
 
-    protected void setConfig(BaseObjectPoolConfig<T> conf) {
+    protected void setConfig(final BaseObjectPoolConfig<T> conf) {
         setLifo(conf.getLifo());
         setMaxWaitMillis(conf.getMaxWaitMillis());
         setBlockWhenExhausted(conf.getBlockWhenExhausted());
@@ -784,6 +784,12 @@ public abstract class BaseGenericObjectPool<T> extends BaseObject {
         }
     }
 
+    /**
+     * Stops the evictor.
+     */
+    void stopEvitor() {
+        startEvictor(-1L);
+    }
     /**
      * Tries to ensure that the configured minimum number of idle instances are
      * available in the pool.

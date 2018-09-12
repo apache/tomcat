@@ -76,6 +76,10 @@
         Port DBCP transaction synchronization registry fix
         (commit d49d45e). (remm)
       </fix>
+      <update>
+        Update the internal fork of Apache Commons Pool 2 to d4e0e88
+        (2018-09-12) to pick up some bug fixes and enhancements. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>

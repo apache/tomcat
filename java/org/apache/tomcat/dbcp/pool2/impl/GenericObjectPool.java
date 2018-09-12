@@ -673,7 +673,7 @@ public class GenericObjectPool<T> extends BaseGenericObjectPool<T>
 
             // Stop the evictor before the pool is closed since evict() calls
             // assertOpen()
-            startEvictor(-1L);
+            stopEvitor();
 
             closed = true;
             // This clear removes any idle objects
@@ -823,8 +823,8 @@ public class GenericObjectPool<T> extends BaseGenericObjectPool<T>
             localMaxTotal = Integer.MAX_VALUE;
         }
 
-        long localStartTimeMillis = System.currentTimeMillis();
-        long localMaxWaitTimeMillis = Math.max(getMaxWaitMillis(), 0);
+        final long localStartTimeMillis = System.currentTimeMillis();
+        final long localMaxWaitTimeMillis = Math.max(getMaxWaitMillis(), 0);
 
         // Flag that indicates if create should:
         // - TRUE:  call the factory to create an object
