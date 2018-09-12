@@ -221,6 +221,11 @@
         translations in addition to English. Patch provided by Artem Chebykin.
         (markt)
       </add>
+      <fix>
+        <bug>62676</bug>: Expand the CORS filter documentation to make it clear
+        that explicit configuration is required to enable support for
+        cross-origin requests. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Tribes">

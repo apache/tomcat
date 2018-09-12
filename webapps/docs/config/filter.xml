@@ -116,6 +116,15 @@
   <filter-name>CorsFilter</filter-name>
   <url-pattern>/*</url-pattern>
 </filter-mapping>]]></source>
+    <p>The above configuration enables the filter but does not relax the
+    cross-origin policy. As a minimum, you will need to add a
+    <strong>cors.allowed.origins</strong> initialisation parameter as described
+    below to enable cross-origin requests. Depending on your requirements, you
+    may need to provide additional configuration.</p>
+    <p>An instance of this filter can only implement one policy. If you want to
+    apply different policies (e.g. different allowed origins) to different URLs
+    or sets of URLs within your web application you will need to configure a
+    separate instance of this filter for each policy you wish to configure.</p>
   </subsection>
   <subsection name="Filter Class Name">
     <p>The filter class name for the CORS Filter is
