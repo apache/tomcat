@@ -145,6 +145,11 @@
         loaded via the service loader mechanism when the protection is enabled.
         (markt)
       </fix>
+      <fix>
+        <bug>62685</bug>: Correct an error in host name validation parsing that
+        did not allow a fully qualified domain name to terminate with a period.
+        Patch provided by AG. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
