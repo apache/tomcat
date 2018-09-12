@@ -70,6 +70,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Other">
+    <changelog>
+      <update>
+        Update the internal fork of Apache Commons Pool 2 to d4e0e88
+        (2018-09-12) to pick up some bug fixes and enhancements. (markt)
+      </update>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 8.5.34 (markt)" rtext="2018-09-10">
   <subsection name="Catalina">

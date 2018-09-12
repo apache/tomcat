@@ -107,23 +107,23 @@ class EvictionTimer {
     }
 
     /**
-     * Thread factory that creates a thread, with the context classloader from this class.
+     * Thread factory that creates a thread, with the context class loader from this class.
      */
     private static class EvictorThreadFactory implements ThreadFactory {
 
         @Override
-        public Thread newThread(final Runnable r) {
-            final Thread t = new Thread(null, r, "commons-pool-evictor-thread");
+        public Thread newThread(final Runnable runnable) {
+            final Thread thread = new Thread(null, runnable, "commons-pool-evictor-thread");
 
             AccessController.doPrivileged(new PrivilegedAction<Void>() {
                 @Override
                 public Void run() {
-                    t.setContextClassLoader(EvictorThreadFactory.class.getClassLoader());
+                    thread.setContextClassLoader(EvictorThreadFactory.class.getClassLoader());
                     return null;
                 }
             });
 
-            return t;
+            return thread;
         }
     }
 }

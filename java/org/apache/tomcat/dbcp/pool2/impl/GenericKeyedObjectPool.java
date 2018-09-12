@@ -689,7 +689,7 @@ public class GenericKeyedObjectPool<K, T> extends BaseGenericObjectPool<T>
 
             // Stop the evictor before the pool is closed since evict() calls
             // assertOpen()
-            startEvictor(-1L);
+            stopEvitor();
 
             closed = true;
             // This clear removes any idle objects
