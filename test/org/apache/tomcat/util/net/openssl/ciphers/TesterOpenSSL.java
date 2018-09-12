@@ -48,9 +48,13 @@ public class TesterOpenSSL {
         } catch (IOException e) {
             versionString = "";
         }
-        if (versionString.startsWith("OpenSSL 1.1.1")) {
+        if (versionString.startsWith("OpenSSL 1.1.2")) {
             // Note: Gump currently tests 9.0.x with OpenSSL master
-            //       (a.k.a 1.1.1-dev)
+            //       (a.k.a 1.1.2-dev)
+            VERSION = 10102;
+        } else if (versionString.startsWith("OpenSSL 1.1.1")) {
+            // LTS
+            // Supported until at least 2023-09-11
             VERSION = 10101;
         } else if (versionString.startsWith("OpenSSL 1.1.0")) {
             // Support ends 2018-04-30
