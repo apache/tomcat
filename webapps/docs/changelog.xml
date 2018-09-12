@@ -76,6 +76,11 @@
         <bug>62712</bug>: Correct NPE in Manager application when attempting to
         view configured certificates for an APR/native TLS connector. (markt)
       </fix>
+      <fix>
+        <bug>62676</bug>: Expand the CORS filter documentation to make it clear
+        that explicit configuration is required to enable support for
+        cross-origin requests. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
