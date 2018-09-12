@@ -636,8 +636,8 @@ public abstract class AbstractEndpoint<S> {
             for (Acceptor acceptor : acceptors) {
                 while (waitLeft > 0 &&
                         acceptor.getState() == AcceptorState.RUNNING) {
-                    Thread.sleep(50);
-                    waitLeft -= 50;
+                    Thread.sleep(5);
+                    waitLeft -= 5;
                 }
             }
         } catch(Exception e) {
