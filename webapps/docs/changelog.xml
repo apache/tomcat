@@ -61,6 +61,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Other">
+    <changelog>
+      <fix>
+        Port DBCP transaction synchronization registry fix
+        (commit d49d45e). (remm)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 9.0.12 (markt)" rtext="2018-09-10">
   <subsection name="Catalina">
