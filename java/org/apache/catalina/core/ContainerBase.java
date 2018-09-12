@@ -1236,18 +1236,21 @@ public abstract class ContainerBase extends LifecycleMBeanBase
             results.add(startStopExecutor.submit(new StartChild(children[i])));
         }
 
-        MultiThrowable multiThrowable = new MultiThrowable();
+        MultiThrowable multiThrowable = null;
 
         for (Future<Void> result : results) {
             try {
                 result.get();
             } catch (Throwable e) {
                 log.error(sm.getString("containerBase.threadedStartFailed"), e);
+                if (multiThrowable == null) {
+                    multiThrowable = new MultiThrowable();
+                }
                 multiThrowable.add(e);
             }
 
         }
-        if (multiThrowable.size() > 0) {
+        if (multiThrowable != null) {
             throw new LifecycleException(sm.getString("containerBase.threadedStartFailed"),
                     multiThrowable.getThrowable());
         }
