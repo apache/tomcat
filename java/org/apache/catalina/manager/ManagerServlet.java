@@ -1851,17 +1851,22 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
                 for (SSLHostConfig sslHostConfig : sslHostConfigs) {
                     String name = connector.toString() + "-" + sslHostConfig.getHostName();
                     List<String> certList = new ArrayList<>();
-                    SSLContext sslContext =
-                            sslHostConfig.getCertificates().iterator().next().getSslContext();
-                    X509Certificate[] certs = sslContext.getAcceptedIssuers();
-                    if (certs == null) {
-                        certList.add(sm.getString("managerServlet.certsNotAvailable"));
-                    } else if (certs.length == 0) {
-                        certList.add(sm.getString("managerServlet.trustedCertsNotConfigured"));
-                    } else {
-                        for (Certificate cert : certs) {
-                            certList.add(cert.toString());
+                    if (sslHostConfig.getOpenSslContext().longValue() == 0) {
+                        // Not set. Must be JSSE based.
+                        SSLContext sslContext =
+                                sslHostConfig.getCertificates().iterator().next().getSslContext();
+                        X509Certificate[] certs = sslContext.getAcceptedIssuers();
+                        if (certs == null) {
+                            certList.add(sm.getString("managerServlet.certsNotAvailable"));
+                        } else if (certs.length == 0) {
+                            certList.add(sm.getString("managerServlet.trustedCertsNotConfigured"));
+                        } else {
+                            for (Certificate cert : certs) {
+                                certList.add(cert.toString());
+                            }
                         }
+                    } else {
+                        certList.add(sm.getString("managerServlet.certsNotAvailable"));
                     }
                     result.put(name, certList);
                 }
