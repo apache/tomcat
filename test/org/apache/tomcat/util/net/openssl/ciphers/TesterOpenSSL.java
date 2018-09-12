@@ -109,10 +109,17 @@ public class TesterOpenSSL {
         unimplemented.add(Cipher.SSL2_IDEA_128_CBC_WITH_MD5);
         unimplemented.add(Cipher.SSL2_DES_192_EDE3_CBC_WITH_MD5);
 
-        // These are TLS v1.3 ciphers that are not supported by any current
-        // version
+        // These are TLS v1.3 cipher suites
+        // Java does not currently support these so they are excluded from the
+        // testing.
+        // Note: If OpenSSL is used then some of these may be available
+        //       depending on the OpenSSL version used and the defaults for that
+        //       version
         unimplemented.add(Cipher.TLS_AES_128_CCM_8_SHA256);
         unimplemented.add(Cipher.TLS_AES_128_CCM_SHA256);
+        unimplemented.add(Cipher.TLS_AES_128_GCM_SHA256);
+        unimplemented.add(Cipher.TLS_AES_256_GCM_SHA384);
+        unimplemented.add(Cipher.TLS_CHACHA20_POLY1305_SHA256);
 
         if (VERSION < 10002) {
             // These were implemented in 1.0.2 so won't be available in any
@@ -328,18 +335,6 @@ public class TesterOpenSSL {
             unimplemented.add(Cipher.TLS_SRP_SHA_RSA_WITH_3DES_EDE_CBC_SHA);
         }
 
-        if (VERSION < 10102) {
-            // These were implemented in 1.1.2 so won't be available in any
-            // earlier version
-            unimplemented.add(Cipher.TLS_AES_128_GCM_SHA256);
-            unimplemented.add(Cipher.TLS_AES_256_GCM_SHA384);
-            unimplemented.add(Cipher.TLS_CHACHA20_POLY1305_SHA256);
-        } else {
-            // These were removed in 1.1.2 so won't be available from that
-            // version onwards
-            /* Currently none */
-        }
-
         OPENSSL_UNIMPLEMENTED_CIPHERS = Collections.unmodifiableSet(unimplemented);
 
         Map<String,String> renamed = new HashMap<>();
@@ -389,7 +384,7 @@ public class TesterOpenSSL {
         // Standard command to list the ciphers
         args.add("ciphers");
         args.add("-v");
-        if (VERSION == 10101) {
+        if (VERSION >= 10101) {
             // Need to exclude the TLSv1.3 ciphers
             args.add("-ciphersuites");
             args.add("");
