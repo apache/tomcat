@@ -1806,25 +1806,33 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
             if (Boolean.TRUE.equals(connector.getProperty("SSLEnabled"))) {
                 SSLHostConfig[] sslHostConfigs = connector.getProtocolHandler().findSslHostConfigs();
                 for (SSLHostConfig sslHostConfig : sslHostConfigs) {
-                    Set<SSLHostConfigCertificate> sslHostConfigCerts =
-                            sslHostConfig.getCertificates();
-                    for (SSLHostConfigCertificate sslHostConfigCert : sslHostConfigCerts) {
-                        String name = connector.toString() + "-" + sslHostConfig.getHostName() +
-                                "-" + sslHostConfigCert.getType();
-                        List<String> certList = new ArrayList<>();
-                        SSLContext sslContext = sslHostConfigCert.getSslContext();
-                        String alias = sslHostConfigCert.getCertificateKeyAlias();
-                        if (alias == null) {
-                            alias = "tomcat";
-                        }
-                        X509Certificate[] certs = sslContext.getCertificateChain(alias);
-                        if (certs == null) {
-                            certList.add(sm.getString("managerServlet.certsNotAvailable"));
-                        } else {
-                            for (Certificate cert : certs) {
-                                certList.add(cert.toString());
+                    if (sslHostConfig.getOpenSslContext().longValue() == 0) {
+                        // Not set. Must be JSSE based.
+                        Set<SSLHostConfigCertificate> sslHostConfigCerts =
+                                sslHostConfig.getCertificates();
+                        for (SSLHostConfigCertificate sslHostConfigCert : sslHostConfigCerts) {
+                            String name = connector.toString() + "-" + sslHostConfig.getHostName() +
+                                    "-" + sslHostConfigCert.getType();
+                            List<String> certList = new ArrayList<>();
+                            SSLContext sslContext = sslHostConfigCert.getSslContext();
+                            String alias = sslHostConfigCert.getCertificateKeyAlias();
+                            if (alias == null) {
+                                alias = "tomcat";
                             }
+                            X509Certificate[] certs = sslContext.getCertificateChain(alias);
+                            if (certs == null) {
+                                certList.add(sm.getString("managerServlet.certsNotAvailable"));
+                            } else {
+                                for (Certificate cert : certs) {
+                                    certList.add(cert.toString());
+                                }
+                            }
+                            result.put(name, certList);
                         }
+                    } else {
+                        List<String> certList = new ArrayList<>();
+                        certList.add(sm.getString("managerServlet.certsNotAvailable"));
+                        String name = connector.toString() + "-" + sslHostConfig.getHostName();
                         result.put(name, certList);
                     }
                 }

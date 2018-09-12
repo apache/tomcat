@@ -70,6 +70,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Web applications">
+    <changelog>
+      <fix>
+        <bug>62712</bug>: Correct NPE in Manager application when attempting to
+        view configured certificates for an APR/native TLS connector. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <fix>
