@@ -618,7 +618,7 @@ public final class CGIServlet extends HttpServlet {
             throws ServletException, IOException {
         // Note: This method will never be called if cgiMethods is "*" so that
         //       case does nto need to be handled here.
-        Set<String> allowedMethods = new HashSet<>();
+        Set<String> allowedMethods = new HashSet<String>();
         allowedMethods.addAll(cgiMethods);
         allowedMethods.addAll(CGIServlet.DEFAULT_SUPER_METHODS);
 
