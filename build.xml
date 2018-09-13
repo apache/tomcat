@@ -41,18 +41,20 @@
   <property name="version.number"        value="${version.major}.${version.minor}.${version.build}.${version.patch}" />
   <property name="version.major.minor"   value="${version.major}.${version.minor}" />
 
+  <property name="ant.min.version"       value="1.9.8" />
+
   <!-- constant to declare a file binary for md5sum -->
-  <property name="md5sum.binary-prefix" value=" *" />
+  <property name="md5sum.binary-prefix"  value=" *" />
 
   <!-- Exact spec versions (for the manifests) -->
-  <property name="servlet.revision" value="FR" />
-  <property name="jsp.revision" value="FR" />
-  <property name="el.revision" value="FR" />
-  <property name="websocket.revision" value="FR" />
+  <property name="servlet.revision"      value="FR" />
+  <property name="jsp.revision"          value="FR" />
+  <property name="el.revision"           value="FR" />
+  <property name="websocket.revision"    value="FR" />
   <!-- MR B but this was first 1.1 release so use FR -->
-  <property name="jaspic.revision" value="FR" />
+  <property name="jaspic.revision"       value="FR" />
   <!-- MR 3 but this was first 1.3 release so use FR -->
-  <property name="annotation.revision" value="FR" />
+  <property name="annotation.revision"   value="FR" />
 
   <!-- Release artifact base names -->
   <property name="final.name"            value="${project}-${version}" />
@@ -508,6 +510,17 @@
 
   <!-- =========================== Build targets =========================== -->
 
+  <target name="check-ant-version">
+    <antversion property="version.running" />
+    <fail message="Ant version ${ant.min.version} or newer is required. Current version is ${version.running}.">
+      <condition>
+          <not>
+              <antversion atleast="${ant.min.version}" />
+          </not>
+      </condition>
+    </fail>
+  </target>
+
   <target name="build-prepare">
 
     <!-- Required so we can compile -->
@@ -680,7 +693,7 @@
     </copy>
   </target>
 
-  <target name="compile" depends="download-compile,validate">
+  <target name="compile" depends="check-ant-version,download-compile,validate">
     <!-- Compile internal server components -->
     <javac srcdir="java" destdir="${tomcat.classes}"
            debug="${compile.debug}"
