@@ -41,7 +41,7 @@
   There is no ordering by add/update/fix/scode.
 
   Other fixed issues are added to the end of the list, chronologically.
-  They eventually become mixed with the numbered issues. (I.e., numbered
+  They eventually become mixed with the numbered issues (i.e., numbered
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 9.0.13 (markt)" rtext="in development">
@@ -98,6 +98,12 @@
         Update the internal fork of Apache Commons Pool 2 to d4e0e88
         (2018-09-12) to pick up some bug fixes and enhancements. (markt)
       </update>
+    </changelog>
+    <changelog>
+      <add>
+        <bug>62705</bug>: Added a fail fast check for minimum required Apache
+        Ant version 1.9.8 when building Tomcat. (isapir)
+      </add>
     </changelog>
   </subsection>
 </section>

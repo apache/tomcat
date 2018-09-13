@@ -34,8 +34,7 @@
   <property file="build.properties.default"/>
 
   <!-- Check Ant Version -->
-  <antversion property="ant.version.running" />
-  <fail message="Ant version ${ant.version.required} or newer is required (version ${ant.version.running} is installed)">
+  <fail message="Ant version ${ant.version.required} or newer is required (${ant.version} is installed)">
     <condition>
       <not><antversion atleast="${ant.version.required}" /></not>
     </condition>
