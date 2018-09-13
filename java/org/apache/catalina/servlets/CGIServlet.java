@@ -613,6 +613,29 @@ public final class CGIServlet extends HttpServlet {
         }
 
 
+    @Override
+    protected void doOptions(HttpServletRequest req, HttpServletResponse res)
+            throws ServletException, IOException {
+        // Note: This method will never be called if cgiMethods is "*" so that
+        //       case does nto need to be handled here.
+        Set<String> allowedMethods = new HashSet<>();
+        allowedMethods.addAll(cgiMethods);
+        allowedMethods.addAll(CGIServlet.DEFAULT_SUPER_METHODS);
+
+        StringBuilder headerValue = new StringBuilder();
+
+        for (String method : allowedMethods) {
+            headerValue.append(method);
+            headerValue.append(',');
+        }
+
+        // Remove trailing comma
+        headerValue.deleteCharAt(headerValue.length() - 1);
+
+        res.setHeader("allow", headerValue.toString());
+    }
+
+
     /**
      * Behaviour depends on the status code.
      *
