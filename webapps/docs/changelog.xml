@@ -60,6 +60,11 @@
 <section name="Tomcat 7.0.91 (violetagg)">
   <subsection name="Catalina">
     <changelog>
+      <add>
+        <bug>61692</bug>: Add the ability to control which HTTP methods are
+        handled by the CGI Servlet via a new initialization parameter
+        <code>cgiMethods</code>. (markt)
+      </add>
       <fix>
         Ensure that the HTTP Vary header is set correctly when using the CORS
         filter and improve the cacheability of requests that pass through the
