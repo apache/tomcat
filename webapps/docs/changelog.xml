@@ -47,6 +47,11 @@
 <section name="Tomcat 9.0.13 (markt)" rtext="in development">
   <subsection name="Catalina">
     <changelog>
+      <add>
+        <bug>61692</bug>: Add the ability to control which HTTP methods are
+        handled by the CGI Servlet via a new initialization parameter
+        <code>cgiMethods</code>. (markt)
+      </add>
       <fix>
         <bug>62687</bug>: Expose content length information for resources
         when using a compressed war. (remm)

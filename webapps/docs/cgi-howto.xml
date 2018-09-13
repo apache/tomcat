@@ -91,6 +91,12 @@ file affects all web applications. See
 <p>There are several servlet init parameters which can be used to
 configure the behaviour of the CGI servlet.</p>
 <ul>
+<li><strong>cgiMethods</strong> - Comma separated list of HTTP methods. Requests
+using one of these methods will be passed to the CGI script for the script to
+generate the response. The default value is <code>GET,POST</code>. Use
+<code>*</code> for the script to handle all requests regardless of method.
+Unless over-ridden by the configuration of this parameter, requests using HEAD,
+OPTIONS or TRACE will have handled by the superclass.</li>
 <li><strong>cgiPathPrefix</strong> - The CGI search path will start at
 the web application root directory + File.separator + this prefix.
 By default there is no value, which results in the web application root
