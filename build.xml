@@ -33,6 +33,14 @@
   <property file="build.properties"/>
   <property file="build.properties.default"/>
 
+  <!-- Check Ant Version -->
+  <antversion property="ant.version.running" />
+  <fail message="Ant version ${ant.version.required} or newer is required (version ${ant.version.running} is installed)">
+    <condition>
+      <not><antversion atleast="${ant.version.required}" /></not>
+    </condition>
+  </fail>
+
   <!-- Project Name -->
   <property name="project"               value="apache-tomcat" />
 
@@ -40,8 +48,6 @@
   <property name="version"               value="${version.major}.${version.minor}.${version.build}${version.suffix}" />
   <property name="version.number"        value="${version.major}.${version.minor}.${version.build}.${version.patch}" />
   <property name="version.major.minor"   value="${version.major}.${version.minor}" />
-
-  <property name="ant.min.version"       value="1.9.8" />
 
   <!-- constant to declare a file binary for md5sum -->
   <property name="md5sum.binary-prefix"  value=" *" />
@@ -510,17 +516,6 @@
 
   <!-- =========================== Build targets =========================== -->
 
-  <target name="check-ant-version">
-    <antversion property="version.running" />
-    <fail message="Ant version ${ant.min.version} or newer is required. Current version is ${version.running}.">
-      <condition>
-          <not>
-              <antversion atleast="${ant.min.version}" />
-          </not>
-      </condition>
-    </fail>
-  </target>
-
   <target name="build-prepare">
 
     <!-- Required so we can compile -->
@@ -693,7 +688,7 @@
     </copy>
   </target>
 
-  <target name="compile" depends="check-ant-version,download-compile,validate">
+  <target name="compile" depends="download-compile,validate">
     <!-- Compile internal server components -->
     <javac srcdir="java" destdir="${tomcat.classes}"
            debug="${compile.debug}"

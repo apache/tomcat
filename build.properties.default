@@ -31,6 +31,7 @@ version.suffix=-dev
 
 # ----- Build control flags -----
 # Note enabling validation uses Checkstyle which is LGPL licensed
+ant.version.required=1.9.8
 execute.validate=false
 execute.test.nio=true
 execute.test.nio2=true
