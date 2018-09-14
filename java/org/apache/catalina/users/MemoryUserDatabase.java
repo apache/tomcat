@@ -351,13 +351,17 @@ public class MemoryUserDatabase implements UserDatabase {
                     // Construct a digester to read the XML input file
                     Digester digester = new Digester();
                     try {
-                        digester.setFeature("http://apache.org/xml/features/allow-java-encodings", true);
+                        digester.setFeature(
+                                "http://apache.org/xml/features/allow-java-encodings", true);
                     } catch (Exception e) {
                         log.warn(sm.getString("memoryUserDatabase.xmlFeatureEncoding"), e);
                     }
-                    digester.addFactoryCreate("tomcat-users/group", new MemoryGroupCreationFactory(this), true);
-                    digester.addFactoryCreate("tomcat-users/role", new MemoryRoleCreationFactory(this), true);
-                    digester.addFactoryCreate("tomcat-users/user", new MemoryUserCreationFactory(this), true);
+                    digester.addFactoryCreate("tomcat-users/group",
+                            new MemoryGroupCreationFactory(this), true);
+                    digester.addFactoryCreate("tomcat-users/role",
+                            new MemoryRoleCreationFactory(this), true);
+                    digester.addFactoryCreate("tomcat-users/user",
+                            new MemoryUserCreationFactory(this), true);
 
                     // Parse the XML input to load this database
                     digester.parse(is);
@@ -474,8 +478,10 @@ public class MemoryUserDatabase implements UserDatabase {
             // Print the file prolog
             writer.println("<?xml version='1.0' encoding='utf-8'?>");
             writer.println("<tomcat-users xmlns=\"http://tomcat.apache.org/xml\"");
-            writer.println("              xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"");
-            writer.println("              xsi:schemaLocation=\"http://tomcat.apache.org/xml tomcat-users.xsd\"");
+            writer.print("              ");
+            writer.println("xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"");
+            writer.print("              ");
+            writer.println("xsi:schemaLocation=\"http://tomcat.apache.org/xml tomcat-users.xsd\"");
             writer.println("              version=\"1.0\">");
 
             // Print entries for each defined role, group, and user
@@ -501,7 +507,8 @@ public class MemoryUserDatabase implements UserDatabase {
 
             // Check for errors that occurred while printing
             if (writer.checkError()) {
-                throw new IOException(sm.getString("memoryUserDatabase.writeException", fileNew.getAbsolutePath()));
+                throw new IOException(sm.getString("memoryUserDatabase.writeException",
+                        fileNew.getAbsolutePath()));
             }
         } catch (IOException e) {
             if (fileNew.exists() && !fileNew.delete()) {
@@ -524,7 +531,8 @@ public class MemoryUserDatabase implements UserDatabase {
         }
         if (fileOrig.exists()) {
             if (!fileOrig.renameTo(fileOld)) {
-                throw new IOException(sm.getString("memoryUserDatabase.renameOld", fileOld.getAbsolutePath()));
+                throw new IOException(sm.getString("memoryUserDatabase.renameOld",
+                        fileOld.getAbsolutePath()));
             }
         }
         if (!fileNew.renameTo(fileOrig)) {
@@ -533,7 +541,8 @@ public class MemoryUserDatabase implements UserDatabase {
                     log.warn(sm.getString("memoryUserDatabase.restoreOrig", fileOld));
                 }
             }
-            throw new IOException(sm.getString("memoryUserDatabase.renameNew", fileOrig.getAbsolutePath()));
+            throw new IOException(sm.getString("memoryUserDatabase.renameNew",
+                    fileOrig.getAbsolutePath()));
         }
         if (fileOld.exists() && !fileOld.delete()) {
             throw new IOException(sm.getString("memoryUserDatabase.fileDelete", fileOld));
