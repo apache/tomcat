@@ -136,6 +136,12 @@ public class UserDatabaseRealm extends RealmBase {
 
     // ------------------------------------------------------ Protected Methods
 
+    @Override
+    public void backgroundProcess() {
+        database.backgroundProcess();
+    }
+
+
     /**
      * Return the password associated with the given principal's user name.
      */

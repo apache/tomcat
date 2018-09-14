@@ -162,4 +162,13 @@ public interface UserDatabase {
      * @exception Exception if any exception is thrown during saving
      */
     public void save() throws Exception;
+
+
+    /**
+     * Perform any background processing (e.g. checking for changes in persisted
+     * storage) required for the user database.
+     */
+    public default void backgroundProcess() {
+        // NO-OP by default
+    }
 }
