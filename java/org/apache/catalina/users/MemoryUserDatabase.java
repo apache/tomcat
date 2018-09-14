@@ -329,7 +329,7 @@ public class MemoryUserDatabase implements UserDatabase {
         }
 
         MemoryUser user = new MemoryUser(this, username, password, fullName);
-        readLock.unlock();
+        readLock.lock();
         try {
             users.put(user.getUsername(), user);
         } finally {
