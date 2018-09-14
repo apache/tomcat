@@ -73,6 +73,10 @@
         Correct parsing of XML whitespace in TLD function signatures that
         incorrectly only looked for the space character. (markt)
       </fix>
+      <fix>
+        <bug>62721</bug>: Correct generation of web.xml header when using JspC.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
