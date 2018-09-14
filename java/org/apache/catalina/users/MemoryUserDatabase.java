@@ -22,8 +22,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.apache.catalina.Globals;
 import org.apache.catalina.Group;
@@ -42,9 +46,33 @@ import org.xml.sax.Attributes;
  * Concrete implementation of {@link UserDatabase} that loads all defined users,
  * groups, and roles into an in-memory data structure, and uses a specified XML
  * file for its persistent storage.
+ * <p>
+ * This class is thread-safe.
+ * <p>
+ * This class does not enforce what, in an RDBMS, would be called referential
+ * integrity. Concurrent modifications may result in inconsistent data such as
+ * a User retaining a reference to a Role that has been removed from the
+ * database.
  *
  * @author Craig R. McClanahan
  * @since 4.1
+ */
+/*
+ * Implementation notes:
+ *
+ * Any operation that acts on a single element of the database (e.g. operations
+ * that create, read, update or delete a user, role or group) must first obtain
+ * the read lock. Operations that return iterators for users, roles or groups
+ * also fall into this category.
+ *
+ * Iterators must always be created from copies of the data to prevent possible
+ * corruption of the iterator due to the remove of all elements from the
+ * underlying Map that would occur during a subsequent re-loading of the
+ * database.
+ *
+ * Any operation that acts on multiple elements and expects the database to
+ * remain consistent during the operation (e.g. saving or loading the database)
+ * must first obtain the write lock.
  */
 public class MemoryUserDatabase implements UserDatabase {
 
@@ -76,7 +104,7 @@ public class MemoryUserDatabase implements UserDatabase {
     /**
      * The set of {@link Group}s defined in this database, keyed by group name.
      */
-    protected final HashMap<String, Group> groups = new HashMap<>();
+    protected final Map<String, Group> groups = new ConcurrentHashMap<>();
 
     /**
      * The unique global identifier of this user database.
@@ -109,12 +137,16 @@ public class MemoryUserDatabase implements UserDatabase {
     /**
      * The set of {@link Role}s defined in this database, keyed by role name.
      */
-    protected final HashMap<String, Role> roles = new HashMap<>();
+    protected final Map<String, Role> roles = new ConcurrentHashMap<>();
 
     /**
      * The set of {@link User}s defined in this database, keyed by user name.
      */
-    protected final HashMap<String, User> users = new HashMap<>();
+    protected final Map<String, User> users = new ConcurrentHashMap<>();
+
+    private final ReentrantReadWriteLock dbLock = new ReentrantReadWriteLock();
+    private final Lock readLock = dbLock.readLock();
+    private final Lock writeLock = dbLock.writeLock();
 
 
     // ------------------------------------------------------------- Properties
@@ -124,8 +156,11 @@ public class MemoryUserDatabase implements UserDatabase {
      */
     @Override
     public Iterator<Group> getGroups() {
-        synchronized (groups) {
-            return groups.values().iterator();
+        readLock.lock();
+        try {
+            return new ArrayList<>(groups.values()).iterator();
+        } finally {
+            readLock.unlock();
         }
     }
 
@@ -182,8 +217,11 @@ public class MemoryUserDatabase implements UserDatabase {
      */
     @Override
     public Iterator<Role> getRoles() {
-        synchronized (roles) {
-            return roles.values().iterator();
+        readLock.lock();
+        try {
+            return new ArrayList<>(roles.values()).iterator();
+        } finally {
+            readLock.unlock();
         }
     }
 
@@ -193,8 +231,11 @@ public class MemoryUserDatabase implements UserDatabase {
      */
     @Override
     public Iterator<User> getUsers() {
-        synchronized (users) {
-            return users.values().iterator();
+        readLock.lock();
+        try {
+            return new ArrayList<>(users.values()).iterator();
+        } finally {
+            readLock.unlock();
         }
     }
 
@@ -209,13 +250,14 @@ public class MemoryUserDatabase implements UserDatabase {
     @Override
     public void close() throws Exception {
 
-        save();
-
-        synchronized (groups) {
-            synchronized (users) {
-                users.clear();
-                groups.clear();
-            }
+        writeLock.lock();
+        try {
+            save();
+            users.clear();
+            groups.clear();
+            roles.clear();
+        } finally {
+            writeLock.unlock();
         }
     }
 
@@ -235,8 +277,11 @@ public class MemoryUserDatabase implements UserDatabase {
         }
 
         MemoryGroup group = new MemoryGroup(this, groupname, description);
-        synchronized (groups) {
+        readLock.lock();
+        try {
             groups.put(group.getGroupname(), group);
+        } finally {
+            readLock.unlock();
         }
         return group;
     }
@@ -257,8 +302,11 @@ public class MemoryUserDatabase implements UserDatabase {
         }
 
         MemoryRole role = new MemoryRole(this, rolename, description);
-        synchronized (roles) {
+        readLock.lock();
+        try {
             roles.put(role.getRolename(), role);
+        } finally {
+            readLock.unlock();
         }
         return role;
     }
@@ -281,8 +329,11 @@ public class MemoryUserDatabase implements UserDatabase {
         }
 
         MemoryUser user = new MemoryUser(this, username, password, fullName);
-        synchronized (users) {
+        readLock.unlock();
+        try {
             users.put(user.getUsername(), user);
+        } finally {
+            readLock.unlock();
         }
         return user;
     }
@@ -296,8 +347,11 @@ public class MemoryUserDatabase implements UserDatabase {
      */
     @Override
     public Group findGroup(String groupname) {
-        synchronized (groups) {
+        readLock.lock();
+        try {
             return groups.get(groupname);
+        } finally {
+            readLock.unlock();
         }
     }
 
@@ -310,8 +364,11 @@ public class MemoryUserDatabase implements UserDatabase {
      */
     @Override
     public Role findRole(String rolename) {
-        synchronized (roles) {
+        readLock.lock();
+        try {
             return roles.get(rolename);
+        } finally {
+            readLock.unlock();
         }
     }
 
@@ -324,8 +381,11 @@ public class MemoryUserDatabase implements UserDatabase {
      */
     @Override
     public User findUser(String username) {
-        synchronized (users) {
+        readLock.lock();
+        try {
             return users.get(username);
+        } finally {
+            readLock.unlock();
         }
     }
 
@@ -338,37 +398,37 @@ public class MemoryUserDatabase implements UserDatabase {
     @Override
     public void open() throws Exception {
 
-        synchronized (groups) {
-            synchronized (users) {
+        writeLock.lock();
+        try {
+            // Erase any previous groups and users
+            users.clear();
+            groups.clear();
+            roles.clear();
 
-                // Erase any previous groups and users
-                users.clear();
-                groups.clear();
-                roles.clear();
-
-                String pathName = getPathname();
-                try (InputStream is = ConfigFileLoader.getInputStream(getPathname())) {
-                    // Construct a digester to read the XML input file
-                    Digester digester = new Digester();
-                    try {
-                        digester.setFeature(
-                                "http://apache.org/xml/features/allow-java-encodings", true);
-                    } catch (Exception e) {
-                        log.warn(sm.getString("memoryUserDatabase.xmlFeatureEncoding"), e);
-                    }
-                    digester.addFactoryCreate("tomcat-users/group",
-                            new MemoryGroupCreationFactory(this), true);
-                    digester.addFactoryCreate("tomcat-users/role",
-                            new MemoryRoleCreationFactory(this), true);
-                    digester.addFactoryCreate("tomcat-users/user",
-                            new MemoryUserCreationFactory(this), true);
-
-                    // Parse the XML input to load this database
-                    digester.parse(is);
-                } catch (IOException ioe) {
-                    log.error(sm.getString("memoryUserDatabase.fileNotFound", pathName));
+            String pathName = getPathname();
+            try (InputStream is = ConfigFileLoader.getInputStream(getPathname())) {
+                // Construct a digester to read the XML input file
+                Digester digester = new Digester();
+                try {
+                    digester.setFeature(
+                            "http://apache.org/xml/features/allow-java-encodings", true);
+                } catch (Exception e) {
+                    log.warn(sm.getString("memoryUserDatabase.xmlFeatureEncoding"), e);
                 }
+                digester.addFactoryCreate("tomcat-users/group",
+                        new MemoryGroupCreationFactory(this), true);
+                digester.addFactoryCreate("tomcat-users/role",
+                        new MemoryRoleCreationFactory(this), true);
+                digester.addFactoryCreate("tomcat-users/user",
+                        new MemoryUserCreationFactory(this), true);
+
+                // Parse the XML input to load this database
+                digester.parse(is);
+            } catch (IOException ioe) {
+                log.error(sm.getString("memoryUserDatabase.fileNotFound", pathName));
             }
+        } finally {
+            writeLock.unlock();
         }
     }
 
@@ -380,14 +440,16 @@ public class MemoryUserDatabase implements UserDatabase {
      */
     @Override
     public void removeGroup(Group group) {
-
-        synchronized (groups) {
+        readLock.lock();
+        try {
             Iterator<User> users = getUsers();
             while (users.hasNext()) {
                 User user = users.next();
                 user.removeGroup(group);
             }
             groups.remove(group.getGroupname());
+        } finally {
+            readLock.unlock();
         }
     }
 
@@ -399,8 +461,8 @@ public class MemoryUserDatabase implements UserDatabase {
      */
     @Override
     public void removeRole(Role role) {
-
-        synchronized (roles) {
+        readLock.lock();
+        try {
             Iterator<Group> groups = getGroups();
             while (groups.hasNext()) {
                 Group group = groups.next();
@@ -412,6 +474,8 @@ public class MemoryUserDatabase implements UserDatabase {
                 user.removeRole(role);
             }
             roles.remove(role.getRolename());
+        } finally {
+            readLock.unlock();
         }
     }
 
@@ -423,8 +487,11 @@ public class MemoryUserDatabase implements UserDatabase {
      */
     @Override
     public void removeUser(User user) {
-        synchronized (users) {
+        readLock.lock();
+        try {
             users.remove(user.getUsername());
+        } finally {
+            readLock.unlock();
         }
     }
 
@@ -484,22 +551,27 @@ public class MemoryUserDatabase implements UserDatabase {
             writer.println("xsi:schemaLocation=\"http://tomcat.apache.org/xml tomcat-users.xsd\"");
             writer.println("              version=\"1.0\">");
 
-            // Print entries for each defined role, group, and user
-            Iterator<?> values = null;
-            values = getRoles();
-            while (values.hasNext()) {
-                writer.print("  ");
-                writer.println(values.next());
-            }
-            values = getGroups();
-            while (values.hasNext()) {
-                writer.print("  ");
-                writer.println(values.next());
-            }
-            values = getUsers();
-            while (values.hasNext()) {
-                writer.print("  ");
-                writer.println(((MemoryUser) values.next()).toXml());
+            writeLock.lock();
+            try {
+                // Print entries for each defined role, group, and user
+                Iterator<?> values = null;
+                values = getRoles();
+                while (values.hasNext()) {
+                    writer.print("  ");
+                    writer.println(values.next());
+                }
+                values = getGroups();
+                while (values.hasNext()) {
+                    writer.print("  ");
+                    writer.println(values.next());
+                }
+                values = getUsers();
+                while (values.hasNext()) {
+                    writer.print("  ");
+                    writer.println(((MemoryUser) values.next()).toXml());
+                }
+            } finally {
+                writeLock.unlock();
             }
 
             // Print the file epilog
