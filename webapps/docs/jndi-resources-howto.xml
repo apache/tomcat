@@ -482,6 +482,12 @@ public class MyBean2 {
     is running as. Ensure that these are appropriate to maintain the security
     of your installation.</p>
 
+    <p>If referenced in a Realm, the UserDatabse will, by default, monitor
+    <code>pathname</code> for changes and reload the file if a change in the
+    last modified time is observed. This can be disabled by setting the
+    <code>watchSource</code> attribute to <code>false</code>.
+    </p>
+
     <h5>3.  Configure the Realm</h5>
 
     <p>Configure a UserDatabase Realm to use this resource as described in the

@@ -22,6 +22,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.net.URI;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Map;
@@ -148,6 +151,9 @@ public class MemoryUserDatabase implements UserDatabase {
     private final Lock readLock = dbLock.readLock();
     private final Lock writeLock = dbLock.writeLock();
 
+    private volatile long lastModified = 0;
+    private boolean watchSource = true;
+
 
     // ------------------------------------------------------------- Properties
 
@@ -163,6 +169,7 @@ public class MemoryUserDatabase implements UserDatabase {
             readLock.unlock();
         }
     }
+
 
 
     /**
@@ -209,6 +216,17 @@ public class MemoryUserDatabase implements UserDatabase {
      */
     public void setReadonly(boolean readonly) {
         this.readonly = readonly;
+    }
+
+
+    public boolean getWatchSource() {
+        return watchSource;
+    }
+
+
+
+    public void setWatchSource(boolean watchSource) {
+        this.watchSource = watchSource;
     }
 
 
@@ -406,7 +424,13 @@ public class MemoryUserDatabase implements UserDatabase {
             roles.clear();
 
             String pathName = getPathname();
-            try (InputStream is = ConfigFileLoader.getInputStream(getPathname())) {
+            URI uri = ConfigFileLoader.getURI(pathName);
+            URL url = uri.toURL();
+            URLConnection uConn = url.openConnection();
+
+            try (InputStream is = uConn.getInputStream()) {
+                this.lastModified = uConn.getLastModified();
+
                 // Construct a digester to read the XML input file
                 Digester digester = new Digester();
                 try {
@@ -538,21 +562,21 @@ public class MemoryUserDatabase implements UserDatabase {
             fileNew = new File(System.getProperty(Globals.CATALINA_BASE_PROP), pathnameNew);
         }
 
-        try (FileOutputStream fos = new FileOutputStream(fileNew);
-                OutputStreamWriter osw = new OutputStreamWriter(fos, "UTF8");
-                PrintWriter writer = new PrintWriter(osw)) {
+        writeLock.lock();
+        try {
+            try (FileOutputStream fos = new FileOutputStream(fileNew);
+                    OutputStreamWriter osw = new OutputStreamWriter(fos, "UTF8");
+                    PrintWriter writer = new PrintWriter(osw)) {
 
-            // Print the file prolog
-            writer.println("<?xml version='1.0' encoding='utf-8'?>");
-            writer.println("<tomcat-users xmlns=\"http://tomcat.apache.org/xml\"");
-            writer.print("              ");
-            writer.println("xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"");
-            writer.print("              ");
-            writer.println("xsi:schemaLocation=\"http://tomcat.apache.org/xml tomcat-users.xsd\"");
-            writer.println("              version=\"1.0\">");
+                // Print the file prolog
+                writer.println("<?xml version='1.0' encoding='utf-8'?>");
+                writer.println("<tomcat-users xmlns=\"http://tomcat.apache.org/xml\"");
+                writer.print("              ");
+                writer.println("xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"");
+                writer.print("              ");
+                writer.println("xsi:schemaLocation=\"http://tomcat.apache.org/xml tomcat-users.xsd\"");
+                writer.println("              version=\"1.0\">");
 
-            writeLock.lock();
-            try {
                 // Print entries for each defined role, group, and user
                 Iterator<?> values = null;
                 values = getRoles();
@@ -570,23 +594,24 @@ public class MemoryUserDatabase implements UserDatabase {
                     writer.print("  ");
                     writer.println(((MemoryUser) values.next()).toXml());
                 }
-            } finally {
-                writeLock.unlock();
-            }
 
-            // Print the file epilog
-            writer.println("</tomcat-users>");
+                // Print the file epilog
+                writer.println("</tomcat-users>");
 
-            // Check for errors that occurred while printing
-            if (writer.checkError()) {
-                throw new IOException(sm.getString("memoryUserDatabase.writeException",
-                        fileNew.getAbsolutePath()));
+                // Check for errors that occurred while printing
+                if (writer.checkError()) {
+                    throw new IOException(sm.getString("memoryUserDatabase.writeException",
+                            fileNew.getAbsolutePath()));
+                }
+            } catch (IOException e) {
+                if (fileNew.exists() && !fileNew.delete()) {
+                    log.warn(sm.getString("memoryUserDatabase.fileDelete", fileNew));
+                }
+                throw e;
             }
-        } catch (IOException e) {
-            if (fileNew.exists() && !fileNew.delete()) {
-                log.warn(sm.getString("memoryUserDatabase.fileDelete", fileNew));
-            }
-            throw e;
+            this.lastModified = fileNew.lastModified();
+        } finally {
+            writeLock.unlock();
         }
 
         // Perform the required renames to permanently save this file
@@ -618,6 +643,34 @@ public class MemoryUserDatabase implements UserDatabase {
         }
         if (fileOld.exists() && !fileOld.delete()) {
             throw new IOException(sm.getString("memoryUserDatabase.fileDelete", fileOld));
+        }
+    }
+
+
+    @Override
+    public void backgroundProcess() {
+        if (!watchSource) {
+            return;
+        }
+
+        URI uri = ConfigFileLoader.getURI(getPathname());
+        try {
+            URL url = uri.toURL();
+            URLConnection uConn = url.openConnection();
+
+            if (this.lastModified != uConn.getLastModified()) {
+                writeLock.lock();
+                try {
+                    if (this.lastModified != uConn.getLastModified()) {
+                        log.info(sm.getString("memoryUserDatabase.reload", id, uri));
+                        open();
+                    }
+                } finally {
+                    writeLock.unlock();
+                }
+            }
+        } catch (Exception ioe) {
+            log.error(sm.getString("memoryUserDatabase.reloadError", id, uri), ioe);
         }
     }
 

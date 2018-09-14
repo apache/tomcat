@@ -48,6 +48,13 @@
   <subsection name="Catalina">
     <changelog>
       <add>
+        <bug>58590</bug>: Add the ability for a UserDatabase to monitor the
+        backing XML file for changes and reload the source file if a change in
+        the last modified time is detected. This is enabled by default meaning
+        that changes to <code>$CATALINA_BASE/conf/tomcat-users.xml</code> will
+        now take effect a short time after the file is saved. (markt)
+      </add>
+      <add>
         <bug>61692</bug>: Add the ability to control which HTTP methods are
         handled by the CGI Servlet via a new initialization parameter
         <code>cgiMethods</code>. (markt)

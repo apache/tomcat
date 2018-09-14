@@ -98,6 +98,11 @@ public class MemoryUserDatabaseFactory implements ObjectFactory {
             database.setReadonly(Boolean.parseBoolean(ra.getContent().toString()));
         }
 
+        ra = ref.get("watchSource");
+        if (ra != null) {
+            database.setWatchSource(Boolean.parseBoolean(ra.getContent().toString()));
+        }
+
         // Return the configured database instance
         database.open();
         // Don't try something we know won't work
