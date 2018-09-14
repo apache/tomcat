@@ -111,11 +111,10 @@ public class MemoryUserDatabase implements UserDatabase {
      */
     protected final HashMap<String, Role> roles = new HashMap<>();
 
-
     /**
      * The set of {@link User}s defined in this database, keyed by user name.
      */
-    protected final HashMap<String,User> users = new HashMap<>();
+    protected final HashMap<String, User> users = new HashMap<>();
 
 
     // ------------------------------------------------------------- Properties
@@ -304,8 +303,8 @@ public class MemoryUserDatabase implements UserDatabase {
 
 
     /**
-     * Return the {@link Role} with the specified role name, if any;
-     * otherwise return <code>null</code>.
+     * Return the {@link Role} with the specified role name, if any; otherwise
+     * return <code>null</code>.
      *
      * @param rolename Name of the role to return
      */
@@ -318,8 +317,8 @@ public class MemoryUserDatabase implements UserDatabase {
 
 
     /**
-     * Return the {@link User} with the specified user name, if any;
-     * otherwise return <code>null</code>.
+     * Return the {@link User} with the specified user name, if any; otherwise
+     * return <code>null</code>.
      *
      * @param username Name of the user to return
      */
@@ -480,8 +479,10 @@ public class MemoryUserDatabase implements UserDatabase {
             // Print the file prolog
             writer.println("<?xml version='1.0' encoding='utf-8'?>");
             writer.println("<tomcat-users xmlns=\"http://tomcat.apache.org/xml\"");
-            writer.println("              xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"");
-            writer.println("              xsi:schemaLocation=\"http://tomcat.apache.org/xml tomcat-users.xsd\"");
+            writer.print("              ");
+            writer.println("xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"");
+            writer.print("              ");
+            writer.println("xsi:schemaLocation=\"http://tomcat.apache.org/xml tomcat-users.xsd\"");
             writer.println("              version=\"1.0\">");
 
             // Print entries for each defined role, group, and user
@@ -509,9 +510,8 @@ public class MemoryUserDatabase implements UserDatabase {
             if (writer.checkError()) {
                 writer.close();
                 fileNew.delete();
-                throw new IOException
-                    (sm.getString("memoryUserDatabase.writeException",
-                                  fileNew.getAbsolutePath()));
+                throw new IOException(sm.getString("memoryUserDatabase.writeException",
+                        fileNew.getAbsolutePath()));
             }
             writer.close();
         } catch (IOException e) {
@@ -536,18 +536,16 @@ public class MemoryUserDatabase implements UserDatabase {
         if (fileOrig.exists()) {
             fileOld.delete();
             if (!fileOrig.renameTo(fileOld)) {
-                throw new IOException
-                    (sm.getString("memoryUserDatabase.renameOld",
-                                  fileOld.getAbsolutePath()));
+                throw new IOException(sm.getString("memoryUserDatabase.renameOld",
+                        fileOld.getAbsolutePath()));
             }
         }
         if (!fileNew.renameTo(fileOrig)) {
             if (fileOld.exists()) {
                 fileOld.renameTo(fileOrig);
             }
-            throw new IOException
-                (sm.getString("memoryUserDatabase.renameNew",
-                              fileOrig.getAbsolutePath()));
+            throw new IOException(sm.getString("memoryUserDatabase.renameNew",
+                    fileOrig.getAbsolutePath()));
         }
         fileOld.delete();
 
