@@ -38,7 +38,7 @@ public class ApplicationSessionCookieConfig implements SessionCookieConfig {
     private int maxAge = -1;
     private String comment;
     private String domain;
-    private String name;
+    private String name = "JSESSIONID";
     private String path;
     private StandardContext context;
 
