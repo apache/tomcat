@@ -64,6 +64,11 @@
         <bug>62721</bug>: Correct generation of web.xml header when using JspC.
         (markt)
       </fix>
+      <fix>
+        <bug>62674</bug>: Correct a regression in the stand-alone JSP compiler
+        utility, <code>JspC</code>, caused by the fix for <bug>53492</bug>, that
+        caused the JCP compiler to hang. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>

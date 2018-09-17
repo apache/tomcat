@@ -1463,55 +1463,59 @@ public class JspC extends Task implements Options {
             ExecutorService threadPool = Executors.newFixedThreadPool(threadCount);
             ExecutorCompletionService<Void> service =
                     new ExecutorCompletionService<Void>(threadPool);
-            int pageCount = pages.size();
+            try {
+                int pageCount = pages.size();
 
-            for (String nextjsp : pages) {
-                File fjsp = new File(nextjsp);
-                if (!fjsp.isAbsolute()) {
-                    fjsp = new File(uriRootF, nextjsp);
-                }
-                if (!fjsp.exists()) {
-                    if (log.isWarnEnabled()) {
-                        log.warn(Localizer.getMessage(
-                                "jspc.error.fileDoesNotExist", fjsp.toString()));
+                for (String nextjsp : pages) {
+                    File fjsp = new File(nextjsp);
+                    if (!fjsp.isAbsolute()) {
+                        fjsp = new File(uriRootF, nextjsp);
                     }
-                    continue;
-                }
-                String s = fjsp.getAbsolutePath();
-                if (s.startsWith(uriRoot)) {
-                    nextjsp = s.substring(uriRoot.length());
-                }
-                if (nextjsp.startsWith("." + File.separatorChar)) {
-                    nextjsp = nextjsp.substring(2);
-                }
-                service.submit(new ProcessFile(nextjsp));
-            }
-            JasperException reportableError = null;
-            for (int i = 0; i < pageCount; i++) {
-                try {
-                    service.take().get();
-                } catch (ExecutionException e) {
-                    if (failFast) {
-                        // Generation is not interruptible so any tasks that
-                        // have started will complete.
-                        List<Runnable> notExecuted = threadPool.shutdownNow();
-                        i += notExecuted.size();
-                        Throwable t = e.getCause();
-                        if (t instanceof JasperException) {
-                            reportableError = (JasperException) t;
-                        } else {
-                            reportableError = new JasperException(t);
+                    if (!fjsp.exists()) {
+                        if (log.isWarnEnabled()) {
+                            log.warn(Localizer.getMessage(
+                                    "jspc.error.fileDoesNotExist", fjsp.toString()));
                         }
-                    } else {
-                        errorCount++;
-                        log.error(e.getMessage());
+                        continue;
                     }
-                } catch (InterruptedException e) {
-                    // Ignore
+                    String s = fjsp.getAbsolutePath();
+                    if (s.startsWith(uriRoot)) {
+                        nextjsp = s.substring(uriRoot.length());
+                    }
+                    if (nextjsp.startsWith("." + File.separatorChar)) {
+                        nextjsp = nextjsp.substring(2);
+                    }
+                    service.submit(new ProcessFile(nextjsp));
                 }
-            }
-            if (reportableError != null) {
-                throw reportableError;
+                JasperException reportableError = null;
+                for (int i = 0; i < pageCount; i++) {
+                    try {
+                        service.take().get();
+                    } catch (ExecutionException e) {
+                        if (failFast) {
+                            // Generation is not interruptible so any tasks that
+                            // have started will complete.
+                            List<Runnable> notExecuted = threadPool.shutdownNow();
+                            i += notExecuted.size();
+                            Throwable t = e.getCause();
+                            if (t instanceof JasperException) {
+                                reportableError = (JasperException) t;
+                            } else {
+                                reportableError = new JasperException(t);
+                            }
+                        } else {
+                            errorCount++;
+                            log.error(e.getMessage());
+                        }
+                    } catch (InterruptedException e) {
+                        // Ignore
+                    }
+                }
+                if (reportableError != null) {
+                    throw reportableError;
+                }
+            } finally {
+                threadPool.shutdown();
             }
 
             long time = System.currentTimeMillis() - start;
