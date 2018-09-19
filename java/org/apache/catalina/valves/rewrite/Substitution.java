@@ -175,9 +175,9 @@ public class Substitution {
                     // $: map lookup as ${mapname:key|default}
                     MapElement newElement = new MapElement();
                     int open = sub.indexOf('{', dollarPos);
-                    int colon = sub.indexOf(':', dollarPos);
-                    int def = sub.indexOf('|', dollarPos);
-                    int close = sub.indexOf('}', dollarPos);
+                    int colon = findMatchingColonOrBar(true, sub, open);
+                    int def = findMatchingColonOrBar(false, sub, open);
+                    int close = findMatchingBrace(sub, open);
                     if (!(-1 < open && open < colon && colon < close)) {
                         throw new IllegalArgumentException(sub);
                     }
@@ -227,8 +227,8 @@ public class Substitution {
                     // %: server variable as %{variable}
                     SubstitutionElement newElement = null;
                     int open = sub.indexOf('{', percentPos);
-                    int colon = sub.indexOf(':', percentPos);
-                    int close = sub.indexOf('}', percentPos);
+                    int colon = findMatchingColonOrBar(true, sub, open);
+                    int close = findMatchingBrace(sub, open);
                     if (!(-1 < open && open < close)) {
                         throw new IllegalArgumentException(sub);
                     }
@@ -260,6 +260,45 @@ public class Substitution {
 
         return elements.toArray(new SubstitutionElement[0]);
 
+    }
+
+    private static int findMatchingBrace(String sub, int start) {
+        int nesting = 1;
+        for (int i = start + 1; i < sub.length(); i++) {
+            char c = sub.charAt(i);
+            if (c == '{') {
+                char previousChar = sub.charAt(i-1);
+                if (previousChar == '$' || previousChar == '%') {
+                    nesting++;
+                }
+            } else if (c == '}') {
+                nesting--;
+                if (nesting == 0) {
+                    return i;
+                }
+            }
+        }
+        return -1;
+    }
+
+    private static int findMatchingColonOrBar(boolean colon, String sub, int start) {
+        int nesting = 0;
+        for (int i = start + 1; i < sub.length(); i++) {
+            char c = sub.charAt(i);
+            if (c == '{') {
+                char previousChar = sub.charAt(i-1);
+                if (previousChar == '$' || previousChar == '%') {
+                    nesting++;
+                }
+            } else if (c == '}') {
+                nesting--;
+            } else if (colon ? c == ':' : c =='|') {
+                if (nesting == 0) {
+                    return i;
+                }
+            }
+        }
+        return -1;
     }
 
     /**
