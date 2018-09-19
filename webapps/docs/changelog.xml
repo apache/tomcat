@@ -63,6 +63,10 @@
         <bug>62687</bug>: Expose content length information for resources
         when using a compressed war. (remm)
       </fix>
+      <fix>
+        <bug>62737</bug>: Fix rewrite substitutions parsing of {} nesting.
+        (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
