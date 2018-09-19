@@ -86,7 +86,7 @@ public class TestFlushableGZIPOutputStream {
         Assert.assertEquals(originalLength, decompressedBytes.length);
     }
 
-    /**
+    /*
      * Test for {@code write(int)}.
      */
     @Test
