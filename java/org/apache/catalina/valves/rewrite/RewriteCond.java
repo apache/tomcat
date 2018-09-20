@@ -88,6 +88,7 @@ public class RewriteCond {
 
     protected String testString = null;
     protected String condPattern = null;
+    protected String flagsString = null;
 
     public String getCondPattern() {
         return condPattern;
@@ -103,6 +104,14 @@ public class RewriteCond {
 
     public void setTestString(String testString) {
         this.testString = testString;
+    }
+
+    public final String getFlagsString() {
+        return flagsString;
+    }
+
+    public final void setFlagsString(String flagsString) {
+        this.flagsString = flagsString;
     }
 
     public void parse(Map<String, RewriteMap> maps) {
@@ -163,8 +172,8 @@ public class RewriteCond {
      */
     @Override
     public String toString() {
-        // FIXME: Add flags if possible
-        return "RewriteCond " + testString + " " + condPattern;
+        return "RewriteCond " + testString + " " + condPattern
+                + ((flagsString != null) ? (" " + flagsString) : "");
     }
 
 

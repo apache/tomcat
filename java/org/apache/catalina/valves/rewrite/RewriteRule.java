@@ -31,6 +31,7 @@ public class RewriteRule {
 
     protected String patternString = null;
     protected String substitutionString = null;
+    protected String flagsString = null;
 
     public void parse(Map<String, RewriteMap> maps) {
         // Parse the substitution
@@ -145,8 +146,8 @@ public class RewriteRule {
      */
     @Override
     public String toString() {
-        // FIXME: Add flags if possible
-        return "RewriteRule " + patternString + " " + substitutionString;
+        return "RewriteRule " + patternString + " " + substitutionString
+                + ((flagsString != null) ? (" " + flagsString) : "");
     }
 
 
@@ -280,6 +281,15 @@ public class RewriteRule {
      *  a rewrite rule.
      */
     protected boolean qsappend = false;
+
+    /**
+     *  When the requested URI contains a query string, and the target URI does
+     *  not, the default behavior of RewriteRule is to copy that query string
+     *  to the target URI. Using the [QSD] flag causes the query string
+     *  to be discarded.
+     *  Using [QSD] and [QSA] together will result in [QSD] taking precedence.
+     */
+    protected boolean qsdiscard = false;
 
     /**
      *  Prefix Substitution with http://thishost[:thisport]/ (which makes the
@@ -430,6 +440,12 @@ public class RewriteRule {
     public void setQsappend(boolean qsappend) {
         this.qsappend = qsappend;
     }
+    public final boolean isQsdiscard() {
+        return qsdiscard;
+    }
+    public final void setQsdiscard(boolean qsdiscard) {
+        this.qsdiscard = qsdiscard;
+    }
     public boolean isRedirect() {
         return redirect;
     }
@@ -481,6 +497,14 @@ public class RewriteRule {
 
     public void setSubstitutionString(String substitutionString) {
         this.substitutionString = substitutionString;
+    }
+
+    public final String getFlagsString() {
+        return flagsString;
+    }
+
+    public final void setFlagsString(String flagsString) {
+        this.flagsString = flagsString;
     }
 
     public boolean isHost() {
