@@ -92,6 +92,12 @@ public class RewriteValve extends ValveBase {
     protected Map<String, RewriteMap> maps = new Hashtable<>();
 
 
+    /**
+     * Maps configuration.
+     */
+    protected ArrayList<String> mapsConfiguration = new ArrayList<>();
+
+
     public RewriteValve() {
         super(true);
     }
@@ -189,7 +195,12 @@ public class RewriteValve extends ValveBase {
 
     public String getConfiguration() {
         StringBuffer buffer = new StringBuffer();
-        // FIXME: Output maps if possible
+        for (String mapConfiguration : mapsConfiguration) {
+            buffer.append(mapConfiguration).append("\r\n");
+        }
+        if (mapsConfiguration.size() > 0) {
+            buffer.append("\r\n");
+        }
         for (int i = 0; i < rules.length; i++) {
             for (int j = 0; j < rules[i].getConditions().length; j++) {
                 buffer.append(rules[i].getConditions()[j].toString()).append("\r\n");
@@ -239,6 +250,9 @@ public class RewriteValve extends ValveBase {
                     String mapName = (String) ((Object[]) result)[0];
                     RewriteMap map = (RewriteMap) ((Object[]) result)[1];
                     maps.put(mapName, map);
+                    // Keep the original configuration line as it is not possible to get
+                    // the parameters back without an API change
+                    mapsConfiguration.add(line);
                     if (map instanceof Lifecycle) {
                         ((Lifecycle) map).start();
                     }
@@ -304,6 +318,7 @@ public class RewriteValve extends ValveBase {
             boolean rewritten = false;
             boolean done = false;
             boolean qsa = false;
+            boolean qsd = false;
             for (int i = 0; i < rules.length; i++) {
                 RewriteRule rule = rules[i];
                 CharSequence test = (rule.isHost()) ? host : urlDecoded;
@@ -323,9 +338,11 @@ public class RewriteValve extends ValveBase {
 
                 // Check QSA before the final reply
                 if (!qsa && newtest != null && rule.isQsappend()) {
-                    // TODO: This logic will need some tweaks if we add QSD
-                    //       support
                     qsa = true;
+                }
+
+                if (!qsa && newtest != null && rule.isQsdiscard()) {
+                    qsd = true;
                 }
 
                 // Final reply
@@ -359,8 +376,8 @@ public class RewriteValve extends ValveBase {
 
                     StringBuffer urlStringEncoded =
                             new StringBuffer(URLEncoder.DEFAULT.encode(urlStringDecoded, uriCharset));
-                    if (originalQueryStringEncoded != null &&
-                            originalQueryStringEncoded.length() > 0) {
+                    if (!qsd && originalQueryStringEncoded != null
+                            && originalQueryStringEncoded.length() > 0) {
                         if (rewrittenQueryStringDecoded == null) {
                             urlStringEncoded.append('?');
                             urlStringEncoded.append(originalQueryStringEncoded);
@@ -612,6 +629,7 @@ public class RewriteValve extends ValveBase {
                 condition.setCondPattern(tokenizer.nextToken());
                 if (tokenizer.hasMoreTokens()) {
                     String flags = tokenizer.nextToken();
+                    condition.setFlagsString(flags);
                     if (flags.startsWith("[") && flags.endsWith("]")) {
                         flags = flags.substring(1, flags.length() - 1);
                     }
@@ -631,6 +649,7 @@ public class RewriteValve extends ValveBase {
                 rule.setSubstitutionString(tokenizer.nextToken());
                 if (tokenizer.hasMoreTokens()) {
                     String flags = tokenizer.nextToken();
+                    rule.setFlagsString(flags);
                     if (flags.startsWith("[") && flags.endsWith("]")) {
                         flags = flags.substring(1, flags.length() - 1);
                     }
@@ -761,6 +780,8 @@ public class RewriteValve extends ValveBase {
         // Note: Proxy is not supported as Tomcat does not have proxy
         //       capabilities
         } else if (flag.startsWith("qsappend") || flag.startsWith("QSA")) {
+            rule.setQsappend(true);
+        } else if (flag.startsWith("qsdiscard") || flag.startsWith("QSD")) {
             rule.setQsappend(true);
         } else if (flag.startsWith("redirect") || flag.startsWith("R")) {
             rule.setRedirect(true);

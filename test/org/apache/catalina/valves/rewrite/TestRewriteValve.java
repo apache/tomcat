@@ -175,6 +175,11 @@ public class TestRewriteValve extends TomcatBaseTest {
     }
 
     @Test
+    public void testQueryStringRemove02() throws Exception {
+        doTestRewrite("RewriteRule ^/b/(.*) /c/$1 [QSD]", "/b/d?=1", "/c/d", null);
+    }
+
+    @Test
     public void testNonAsciiQueryString() throws Exception {
         doTestRewrite("RewriteRule ^/b/(.*) /c?$1",
                 "/b/id=%E5%9C%A8%E7%BA%BF%E6%B5%8B%E8%AF%95",

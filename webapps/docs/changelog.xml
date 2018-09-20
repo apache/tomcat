@@ -60,6 +60,14 @@
         <bug>62737</bug>: Fix rewrite substitutions parsing of {} nesting.
         (remm)
       </fix>
+      <fix>
+        Add rewrite flags output when getting the rewrite configuration back.
+        (remm)
+      </fix>
+      <fix>
+        Add missing qsdiscard flag to the rewrite flags as a cleaner way to
+        discard the query string. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
