@@ -668,7 +668,12 @@ public class MemoryUserDatabase implements UserDatabase {
             if (this.lastModified != uConn.getLastModified()) {
                 writeLock.lock();
                 try {
-                    if (this.lastModified != uConn.getLastModified()) {
+                    long detectedLastModified = uConn.getLastModified();
+                    // Last modified as a resolution of 1s. Ensure that a write
+                    // to the file is not in progress by ensuring that the last
+                    // modified time is at least 2 seconds ago.
+                    if (this.lastModified != detectedLastModified &&
+                            detectedLastModified + 2000 < System.currentTimeMillis()) {
                         log.info(sm.getString("memoryUserDatabase.reload", id, uri));
                         open();
                     }
