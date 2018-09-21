@@ -451,6 +451,13 @@ public class MemoryUserDatabase implements UserDatabase {
             } catch (IOException ioe) {
                 log.error(sm.getString("memoryUserDatabase.fileNotFound", pathName));
             }
+        } catch (Exception e) {
+            // Fail safe on error
+            users.clear();
+            groups.clear();
+            roles.clear();
+
+            throw e;
         } finally {
             writeLock.unlock();
         }
