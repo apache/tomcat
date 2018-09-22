@@ -158,6 +158,8 @@ public class Tomcat {
     private final Map<String, List<String>> userRoles = new HashMap<>();
     private final Map<String, Principal> userPrincipals = new HashMap<>();
 
+    private boolean addDefaultWebXmlToWebapp = true;
+
     public Tomcat() {
         ExceptionUtils.preload();
     }
@@ -623,12 +625,15 @@ public class Tomcat {
         Context ctx = createContext(host, contextPath);
         ctx.setPath(contextPath);
         ctx.setDocBase(docBase);
-        ctx.addLifecycleListener(getDefaultWebXmlListener());
+
+        if (addDefaultWebXmlToWebapp)
+            ctx.addLifecycleListener(getDefaultWebXmlListener());
+
         ctx.setConfigFile(getWebappConfigFile(docBase, contextPath));
 
         ctx.addLifecycleListener(config);
 
-        if (config instanceof ContextConfig) {
+        if (addDefaultWebXmlToWebapp && (config instanceof ContextConfig)) {
             // prevent it from looking ( if it finds one - it'll have dup error )
             ((ContextConfig) config).setDefaultWebXml(noDefaultWebXmlPath());
         }
@@ -800,6 +805,24 @@ public class Tomcat {
         } else {
             logger.setLevel(Level.INFO);
         }
+    }
+
+
+    /**
+     * By default, when calling addWebapp() to create a Context, the settings from
+     * from the default web.xml are added to the context.  Calling this method with
+     * a <code>false</code> value prior to calling addWebapp() allows to opt out of
+     * the default settings. In that event you will need to add the configurations
+     * yourself,  either programmatically or by using web.xml deployment descriptors.
+     * @param addDefaultWebXmlToWebapp <code>false</code> will prevent the class from
+     *                                 automatically adding the default settings when
+     *                                 calling addWebapp().
+     *                                 <code>true</code> will add the default settings
+     *                                 and is the default behavior.
+     * @see #addWebapp(Host, String, String, LifecycleListener)
+     */
+    public void setAddDefaultWebXmlToWebapp(boolean addDefaultWebXmlToWebapp){
+        this.addDefaultWebXmlToWebapp = addDefaultWebXmlToWebapp;
     }
 
 
