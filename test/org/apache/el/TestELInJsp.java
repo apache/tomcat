@@ -555,6 +555,7 @@ public class TestELInJsp extends TomcatBaseTest {
         String result = res.toString();
         assertEcho(result, "01-OK");
         assertEcho(result, "02-OK");
+        assertEcho(result, "03-OK");
     }
 
 

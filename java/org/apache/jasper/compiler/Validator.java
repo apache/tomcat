@@ -420,7 +420,7 @@ class Validator {
     static class ValidateVisitor extends Node.Visitor {
 
         // Pattern to extract a method name from a full method signature
-        private static final Pattern METHOD_NAME_PATTERN = Pattern.compile(".*[ \t\n\r]+(.+)[ \t\n\r]*\\(.*");
+        private static final Pattern METHOD_NAME_PATTERN = Pattern.compile(".*[ \t\n\r]+(.+?)[ \t\n\r]*\\(.*");
 
         private final PageInfo pageInfo;
 
