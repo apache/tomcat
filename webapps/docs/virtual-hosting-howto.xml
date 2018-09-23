@@ -122,6 +122,18 @@ $CATALINA_HOME/conf/Catalina/stimpy/ROOT.xml</source>
 cp localhost/manager.xml ren/
 cp localhost/manager.xml stimpy/</source>
     </subsection>
+    <subsection name="Defaults per host">
+      <p>
+        You can override the default values found in <code>conf/context.xml</code>
+        and <code>conf/web.xml</code> by specifying the new values in files
+        named <code>context.xml.default</code> and <code>web.xml.default</code>
+        from the host specific xml directory.</p>
+      <p>Following our previous example, you could use
+        <code>$CATALINA_HOME/conf/Catalina/ren/web.xml.default</code>
+        to customize the defaults for all webapps that are deployed in the virtual
+        host named <code>ren</code>.
+      </p>
+    </subsection>
     <subsection name="Further Information">
       <p>
         Consult the configuration documentation for other attributes of the

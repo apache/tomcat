@@ -81,6 +81,11 @@
         Call <code>setAddDefaultWebXmlToWebapp(false)</code> to prevent the 
         automatic config. (isapir)
       </add>
+      <fix>
+        Add documentation about the files <code>context.xml.default</code> and
+        <code>web.xml.default</code> that can be used to customize <code>conf/context.xml</code>
+        and <code>conf/web.xml</code> on a per host basis. (fschumacher)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
