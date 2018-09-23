@@ -76,10 +76,11 @@
         discard the query string. (remm)
       </fix>
       <add>
-        <bug>62755</bug>: Add ability to opt out of adding the default web.xml 
-        config when embedding Tomcat and adding a context via <code>addWebapp()</code>. 
-        Call <code>setAddDefaultWebXmlToWebapp(false)</code> to prevent the 
-        automatic config. (isapir)
+        <bug>62755</bug>: Add ability to opt out of adding the default web.xml
+        config when embedding Tomcat and adding a context via
+        <code>addWebapp()</code>. Call
+        <code>setAddDefaultWebXmlToWebapp(false)</code> to prevent the automatic
+        config. (isapir)
       </add>
       <fix>
         Add documentation about the files <code>context.xml.default</code> and
