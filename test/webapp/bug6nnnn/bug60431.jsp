@@ -21,5 +21,6 @@
   <body>
     <tags:echo echo="${'01-' += fn:concat('O', 'K')}"/>
     <tags:echo echo="${'02-' += fn:concat(fn:toArray('O', 'K'))}"/>
+    <tags:echo echo="${'03-' += fn:concat(fn:toArrayB('O', 'K'))}"/>
   </body>
 </html>
