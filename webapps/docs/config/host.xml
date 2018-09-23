@@ -633,6 +633,13 @@
 
   </subsection>
 
+  <subsection name="Custom context.xml and web.xml">
+    <p>You can override the default values found in <code>conf/context.xml</code> and
+    <code>conf/web.xml</code> files from <code>$CATALINA_BASE</code> for each virtual host.
+    Tomcat will look for files named <code>context.xml.default</code> and <code>web.xml.default</code>
+    in the directory specified by <code>xmlBase</code> and merge the files into
+    those found in the default ones.</p>
+  </subsection>
 
 </section>
 

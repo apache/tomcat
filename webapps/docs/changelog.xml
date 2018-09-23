@@ -58,6 +58,15 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 7.0.92 (violetagg)">
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        Add documentation about the files <code>context.xml.default</code> and
+        <code>web.xml.default</code> that can be used to customize <code>conf/context.xml</code>
+        and <code>conf/web.xml</code> on a per host basis. (fschumacher)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Jasper">
     <changelog>
       <fix>
