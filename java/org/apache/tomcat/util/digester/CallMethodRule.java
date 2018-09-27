@@ -317,10 +317,12 @@ public class CallMethodRule extends Rule {
         for (int i = 0; i < paramTypes.length; i++) {
             // convert nulls and convert stringy parameters
             // for non-stringy param types
-            if(
-                parameters[i] == null ||
-                 (parameters[i] instanceof String &&
-                   !String.class.isAssignableFrom(paramTypes[i]))) {
+            Object param = parameters[i];
+            // Tolerate null non-primitive values
+            if(null == param && !paramTypes[i].isPrimitive())
+                paramValues[i] = null;
+            else if(param instanceof String &&
+                    !String.class.isAssignableFrom(paramTypes[i])) {
 
                 paramValues[i] =
                         IntrospectionUtils.convert((String) parameters[i], paramTypes[i]);
