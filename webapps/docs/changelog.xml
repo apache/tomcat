@@ -101,6 +101,16 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="WebSocket">
+    <changelog>
+      <fix>
+        <bug>62731</bug>: Make the URI returned by
+        <code>HandshakeRequest.getRequestURI()</code> and
+        <code>Session.getRequestURI()</code> absolute so that the scheme, host
+        and port are accessible. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Web applications">
     <changelog>
       <fix>
