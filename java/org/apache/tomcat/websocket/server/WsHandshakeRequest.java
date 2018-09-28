@@ -31,11 +31,14 @@ import javax.servlet.http.HttpServletRequest;
 import javax.websocket.server.HandshakeRequest;
 
 import org.apache.tomcat.websocket.CaseInsensitiveKeyMap;
+import org.apache.tomcat.util.res.StringManager;
 
 /**
  * Represents the request that this session was opened under.
  */
 public class WsHandshakeRequest implements HandshakeRequest {
+
+    private static final StringManager sm = StringManager.getManager(WsHandshakeRequest.class);
 
     private final URI requestUri;
     private final Map<String,List<String>> parameterMap;
@@ -54,18 +57,7 @@ public class WsHandshakeRequest implements HandshakeRequest {
         queryString = request.getQueryString();
         userPrincipal = request.getUserPrincipal();
         httpSession = request.getSession(false);
-
-        // URI
-        StringBuilder sb = new StringBuilder(request.getRequestURI());
-        if (queryString != null) {
-            sb.append("?");
-            sb.append(queryString);
-        }
-        try {
-            requestUri = new URI(sb.toString());
-        } catch (URISyntaxException e) {
-            throw new IllegalArgumentException(e);
-        }
+        requestUri = buildRequestUri(request);
 
         // ParameterMap
         Map<String,String[]> originalParameters = request.getParameterMap();
@@ -146,5 +138,54 @@ public class WsHandshakeRequest implements HandshakeRequest {
      */
     void finished() {
         request = null;
+    }
+
+
+    /*
+     * See RequestUtil.getRequestURL()
+     */
+    private static URI buildRequestUri(HttpServletRequest req) {
+
+        StringBuffer uri = new StringBuffer();
+        String scheme = req.getScheme();
+        int port = req.getServerPort();
+        if (port < 0) {
+            // Work around java.net.URL bug
+            port = 80;
+        }
+
+        if ("http".equals(scheme)) {
+            uri.append("ws");
+        } else if ("https".equals(scheme)) {
+            uri.append("wss");
+        } else {
+            // Should never happen
+            throw new IllegalArgumentException(
+                    sm.getString("wsHandshakeRequest.unknownScheme", scheme));
+        }
+
+        uri.append("://");
+        uri.append(req.getServerName());
+
+        if ((scheme.equals("http") && (port != 80))
+            || (scheme.equals("https") && (port != 443))) {
+            uri.append(':');
+            uri.append(port);
+        }
+
+        uri.append(req.getRequestURI());
+
+        if (req.getQueryString() != null) {
+            uri.append("?");
+            uri.append(req.getQueryString());
+        }
+
+        try {
+            return new URI(uri.toString());
+        } catch (URISyntaxException e) {
+            // Should never happen
+            throw new IllegalArgumentException(
+                    sm.getString("wsHandshakeRequest.invalidUri", uri.toString()), e);
+        }
     }
 }
