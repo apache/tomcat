@@ -22,11 +22,13 @@ import java.util.Properties;
 import org.apache.catalina.tribes.Member;
 import org.apache.catalina.tribes.MembershipListener;
 import org.apache.catalina.tribes.MembershipProvider;
+import org.apache.catalina.tribes.MembershipService;
 
 public abstract class MembershipProviderBase implements MembershipProvider {
 
     protected Membership membership;
     protected MembershipListener membershipListener;
+    protected MembershipService service;
 
     @Override
     public void init(Properties properties) throws Exception {
@@ -53,5 +55,10 @@ public abstract class MembershipProviderBase implements MembershipProvider {
     @Override
     public void setMembershipListener(MembershipListener listener) {
         this.membershipListener = listener;
+    }
+
+    @Override
+    public void setMembershipService(MembershipService service) {
+        this.service = service;
     }
 }

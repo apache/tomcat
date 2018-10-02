@@ -138,6 +138,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Tribes">
+    <changelog>
+      <add>
+        Add <code>setMembershipService</code> method to the
+        <code>MembershipProvider</code>. (kfujino)
+      </add>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <fix>

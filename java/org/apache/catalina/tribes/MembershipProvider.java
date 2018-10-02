@@ -29,6 +29,8 @@ public interface MembershipProvider {
 
     public void setMembershipListener(MembershipListener listener);
 
+    public void setMembershipService(MembershipService service);
+
     public boolean hasMembers();
 
     public Member getMember(Member mbr);

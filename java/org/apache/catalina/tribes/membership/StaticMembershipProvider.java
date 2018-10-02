@@ -34,7 +34,6 @@ import org.apache.catalina.tribes.ChannelException.FaultyMember;
 import org.apache.catalina.tribes.ChannelListener;
 import org.apache.catalina.tribes.Heartbeat;
 import org.apache.catalina.tribes.Member;
-import org.apache.catalina.tribes.MembershipService;
 import org.apache.catalina.tribes.group.Response;
 import org.apache.catalina.tribes.group.RpcCallback;
 import org.apache.catalina.tribes.group.RpcChannel;
@@ -52,7 +51,6 @@ public class StaticMembershipProvider extends MembershipProviderBase implements 
 
     protected Channel channel;
     protected RpcChannel rpcChannel;
-    protected MembershipService service;
     private String membershipName = null;
     private byte[] membershipId = null;
     protected ArrayList<StaticMember> staticMembers;
@@ -314,10 +312,6 @@ public class StaticMembershipProvider extends MembershipProviderBase implements 
 
     public void setChannel(Channel channel) {
         this.channel = channel;
-    }
-
-    public void setMembershipService(MembershipService service) {
-        this.service = service;
     }
 
     public void setStaticMembers(ArrayList<StaticMember> staticMembers) {
