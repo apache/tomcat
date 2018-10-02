@@ -49,7 +49,7 @@ import org.apache.tomcat.util.res.StringManager;
  * i.e. with boundaries containing "BEGIN PRIVATE KEY" or "BEGIN ENCRYPTED PRIVATE KEY",
  * not "BEGIN RSA PRIVATE KEY" or other variations).
  */
-class PEMFile {
+public class PEMFile {
 
     private static final StringManager sm = StringManager.getManager(PEMFile.class);
 

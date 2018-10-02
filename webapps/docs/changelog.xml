@@ -96,6 +96,9 @@
         did not allow a fully qualified domain name to terminate with a period.
         Patch provided by AG. (markt)
       </fix>
+      <fix>
+        Make PEM file parser a public utility class. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
