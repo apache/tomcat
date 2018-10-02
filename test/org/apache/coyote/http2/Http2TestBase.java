@@ -838,7 +838,7 @@ public abstract class Http2TestBase extends TomcatBaseTest {
                     connector.getProtocolHandlerClassName().contains("Nio2"));
 
             Assume.assumeTrue("This test is only expected to trigger an exception on Windo9ws",
-                    System.getProperty("os.name").startsWith("Windows"));
+                    isWindows());
         }
     }
 

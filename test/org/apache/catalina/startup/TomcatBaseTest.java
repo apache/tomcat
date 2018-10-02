@@ -88,6 +88,7 @@ public abstract class TomcatBaseTest extends LoggingBaseTest {
     protected static final int DEFAULT_CLIENT_TIMEOUT_MS = 300_000;
 
     public static final String TEMP_DIR = System.getProperty("java.io.tmpdir");
+    public static final String OS_NAME = System.getProperty("os.name");
 
     /**
      * Make the Tomcat instance available to sub-classes.
@@ -146,6 +147,13 @@ public abstract class TomcatBaseTest extends LoggingBaseTest {
      */
     public boolean isAccessLogEnabled() {
         return accessLogEnabled;
+    }
+
+    /*
+     * Sub-classes may need to test differently on Windows, e.g. case-insensitive file paths
+     */
+    public boolean isWindows() {
+        return OS_NAME.startsWith("Windows");
     }
 
     @Before

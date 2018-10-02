@@ -48,7 +48,15 @@ public class TestAbstractArchiveResource extends TomcatBaseTest {
         expectedURL.append(docBase.getAbsoluteFile().toURI().toURL().toString());
         expectedURL.append("*/WEB-INF/lib/test.jar!/META-INF/resources/index.html");
 
-        Assert.assertEquals(expectedURL.toString(), webResource.getURL().toString());
+        String expected = expectedURL.toString();
+        String actual = webResource.getURL().toString();
+
+        if (isWindows()){
+            expected = expected.toLowerCase();
+            actual = actual.toLowerCase();
+        }
+
+        Assert.assertEquals(expected, actual);
     }
 
 
@@ -71,7 +79,15 @@ public class TestAbstractArchiveResource extends TomcatBaseTest {
         expectedURL.append(docBase.getAbsoluteFile().toURI().toURL().toString());
         expectedURL.append("WEB-INF/lib/test-lib.jar!/META-INF/tags/echo.tag");
 
-        Assert.assertEquals(expectedURL.toString(), webResource.getURL().toString());
+        String expected = expectedURL.toString();
+        String actual = webResource.getURL().toString();
+
+        if (isWindows()){
+            expected = expected.toLowerCase();
+            actual = actual.toLowerCase();
+        }
+
+        Assert.assertEquals(expected, actual);
     }
 
 }

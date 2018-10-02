@@ -40,6 +40,15 @@ public class TestFileResource extends TomcatBaseTest {
 
         // Build the expected location the same way the webapp base dir is built
         File f = new File("test/webapp/WEB-INF/classes");
-        Assert.assertEquals(f.toURI().toURL().toString(), out.toString().trim());
+
+        String expected = f.toURI().toURL().toString();
+        String actual = out.toString().trim();
+
+        if (isWindows()){
+            expected = expected.toLowerCase();
+            actual = actual.toLowerCase();
+        }
+
+        Assert.assertEquals(expected, actual);
     }
 }
