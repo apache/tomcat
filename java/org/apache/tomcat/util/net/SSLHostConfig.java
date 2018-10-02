@@ -35,6 +35,7 @@ import javax.net.ssl.TrustManagerFactory;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.compat.TLS;
 import org.apache.tomcat.util.net.openssl.OpenSSLConf;
 import org.apache.tomcat.util.net.openssl.ciphers.Cipher;
 import org.apache.tomcat.util.net.openssl.ciphers.OpenSSLCipherConfigurationParser;
@@ -61,6 +62,9 @@ public class SSLHostConfig implements Serializable {
         SSL_PROTO_ALL_SET.add(Constants.SSL_PROTO_TLSv1);
         SSL_PROTO_ALL_SET.add(Constants.SSL_PROTO_TLSv1_1);
         SSL_PROTO_ALL_SET.add(Constants.SSL_PROTO_TLSv1_2);
+        if (TLS.isTlsv13Available()) {
+            SSL_PROTO_ALL_SET.add(Constants.SSL_PROTO_TLSv1_3);
+        }
     }
 
     private Type configType = null;

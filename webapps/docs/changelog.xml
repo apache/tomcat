@@ -91,6 +91,11 @@
   </subsection>
   <subsection name="Coyote">
     <changelog>
+      <add>
+        Add TLSv1.3 to the default protocols and to the <code>all</code>
+        alias for JSSE based TLS connectors when running on a JVM that
+        supports TLS version 1.3. One such JVM is OpenJDK version 11. (rjung)
+      </add>
       <fix>
         <bug>62685</bug>: Correct an error in host name validation parsing that
         did not allow a fully qualified domain name to terminate with a period.
