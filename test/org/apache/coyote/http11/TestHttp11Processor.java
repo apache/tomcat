@@ -1204,6 +1204,118 @@ public class TestHttp11Processor extends TomcatBaseTest {
     }
 
     /*
+     * Hostname (no port) is included in the request line, but Host header
+     * is empty.
+     * Added for bug 62739.
+     */
+    @Test
+    public void testInconsistentHostHeader04() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        // This setting means the connection will be closed at the end of the
+        // request
+        tomcat.getConnector().setAttribute("maxKeepAliveRequests", "1");
+
+        // No file system docBase required
+        Context ctx = tomcat.addContext("", null);
+
+        // Add servlet
+        Tomcat.addServlet(ctx, "TesterServlet", new TesterServlet());
+        ctx.addServletMappingDecoded("/foo", "TesterServlet");
+
+        tomcat.start();
+
+        String request =
+                "GET http://a/foo HTTP/1.1" + SimpleHttpClient.CRLF +
+                "Host: " + SimpleHttpClient.CRLF +
+                 SimpleHttpClient.CRLF;
+
+        Client client = new Client(tomcat.getConnector().getLocalPort());
+        client.setRequest(new String[] {request});
+
+        client.connect();
+        client.processRequest();
+
+        // Expected response is a 400 response.
+        Assert.assertTrue(client.isResponse400());
+    }
+
+    /*
+     * Hostname (with port) is included in the request line, but Host header
+     * is empty.
+     * Added for bug 62739.
+     */
+    @Test
+    public void testInconsistentHostHeader05() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        // This setting means the connection will be closed at the end of the
+        // request
+        tomcat.getConnector().setAttribute("maxKeepAliveRequests", "1");
+
+        // No file system docBase required
+        Context ctx = tomcat.addContext("", null);
+
+        // Add servlet
+        Tomcat.addServlet(ctx, "TesterServlet", new TesterServlet());
+        ctx.addServletMappingDecoded("/foo", "TesterServlet");
+
+        tomcat.start();
+
+        String request =
+                "GET http://a:8080/foo HTTP/1.1" + SimpleHttpClient.CRLF +
+                "Host: " + SimpleHttpClient.CRLF +
+                 SimpleHttpClient.CRLF;
+
+        Client client = new Client(tomcat.getConnector().getLocalPort());
+        client.setRequest(new String[] {request});
+
+        client.connect();
+        client.processRequest();
+
+        // Expected response is a 400 response.
+        Assert.assertTrue(client.isResponse400());
+    }
+
+    /*
+     * Hostname (with port and user) is included in the request line, but Host
+     * header is empty.
+     * Added for bug 62739.
+     */
+    @Test
+    public void testInconsistentHostHeader06() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        // This setting means the connection will be closed at the end of the
+        // request
+        tomcat.getConnector().setAttribute("maxKeepAliveRequests", "1");
+
+        // No file system docBase required
+        Context ctx = tomcat.addContext("", null);
+
+        // Add servlet
+        Tomcat.addServlet(ctx, "TesterServlet", new TesterServlet());
+        ctx.addServletMappingDecoded("/foo", "TesterServlet");
+
+        tomcat.start();
+
+        String request =
+                "GET http://user:pwd@a/foo HTTP/1.1" + SimpleHttpClient.CRLF +
+                "Host: " + SimpleHttpClient.CRLF +
+                 SimpleHttpClient.CRLF;
+
+        Client client = new Client(tomcat.getConnector().getLocalPort());
+        client.setRequest(new String[] {request});
+
+        client.connect();
+        client.processRequest();
+
+        // Expected response is a 400 response.
+        Assert.assertTrue(client.isResponse400());
+    }
+
+
+    /*
      * Request line host is an exact match for Host header (no port)
      */
     @Test
@@ -1297,6 +1409,81 @@ public class TestHttp11Processor extends TomcatBaseTest {
         String request =
                 "GET http://user:pwd@a/foo HTTP/1.1" + SimpleHttpClient.CRLF +
                 "Host: a" + SimpleHttpClient.CRLF +
+                 SimpleHttpClient.CRLF;
+
+        Client client = new Client(tomcat.getConnector().getLocalPort());
+        client.setRequest(new String[] {request});
+
+        client.connect();
+        client.processRequest();
+
+        // Expected response is a 200 response.
+        Assert.assertTrue(client.isResponse200());
+    }
+
+    /*
+     * Host header exists but its value is an empty string.  This is valid if
+     * the request line does not include a hostname/port.
+     * Added for bug 62739.
+     */
+    @Test
+    public void testBlankHostHeader01() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        // This setting means the connection will be closed at the end of the
+        // request
+        tomcat.getConnector().setAttribute("maxKeepAliveRequests", "1");
+
+        // No file system docBase required
+        Context ctx = tomcat.addContext("", null);
+
+        // Add servlet
+        Tomcat.addServlet(ctx, "TesterServlet", new TesterServlet());
+        ctx.addServletMappingDecoded("/foo", "TesterServlet");
+
+        tomcat.start();
+
+        String request =
+                "GET /foo HTTP/1.1" + SimpleHttpClient.CRLF +
+                "Host: " + SimpleHttpClient.CRLF +
+                 SimpleHttpClient.CRLF;
+
+        Client client = new Client(tomcat.getConnector().getLocalPort());
+        client.setRequest(new String[] {request});
+
+        client.connect();
+        client.processRequest();
+
+        // Expected response is a 200 response.
+        Assert.assertTrue(client.isResponse200());
+    }
+
+    /*
+     * Host header exists but has its value is empty (and there are multiple
+     * spaces after the ':'.  This is valid if the request line does not
+     * include a hostname/port.
+     * Added for bug 62739.
+     */
+    @Test
+    public void testBlankHostHeader02() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        // This setting means the connection will be closed at the end of the
+        // request
+        tomcat.getConnector().setAttribute("maxKeepAliveRequests", "1");
+
+        // No file system docBase required
+        Context ctx = tomcat.addContext("", null);
+
+        // Add servlet
+        Tomcat.addServlet(ctx, "TesterServlet", new TesterServlet());
+        ctx.addServletMappingDecoded("/foo", "TesterServlet");
+
+        tomcat.start();
+
+        String request =
+                "GET /foo HTTP/1.1" + SimpleHttpClient.CRLF +
+                "Host:      " + SimpleHttpClient.CRLF +
                  SimpleHttpClient.CRLF;
 
         Client client = new Client(tomcat.getConnector().getLocalPort());
