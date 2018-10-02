@@ -397,7 +397,9 @@ public class SignCode extends Task {
             byte[] buf = new byte[32 * 1024];
             for (int i = 0; i < files.size(); i ++) {
                 try (FileOutputStream fos = new FileOutputStream(files.get(i))) {
-                    zis.getNextEntry();
+                    if (zis.getNextEntry() == null) {
+                        throw new BuildException("Signing failed. Malformed service reply.");
+                    }
                     int numRead;
                     while ( (numRead = zis.read(buf)) >= 0) {
                         fos.write(buf, 0 , numRead);
