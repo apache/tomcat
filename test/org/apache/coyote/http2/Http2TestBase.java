@@ -49,6 +49,7 @@ import org.apache.coyote.http2.HpackDecoder.HeaderEmitter;
 import org.apache.coyote.http2.Http2Parser.Input;
 import org.apache.coyote.http2.Http2Parser.Output;
 import org.apache.tomcat.util.codec.binary.Base64;
+import org.apache.tomcat.util.compat.JrePlatform;
 import org.apache.tomcat.util.http.MimeHeaders;
 
 /**
@@ -838,7 +839,7 @@ public abstract class Http2TestBase extends TomcatBaseTest {
                     connector.getProtocolHandlerClassName().contains("Nio2"));
 
             Assume.assumeTrue("This test is only expected to trigger an exception on Windows",
-                    isWindows());
+                    JrePlatform.IS_WINDOWS);
         }
     }
 

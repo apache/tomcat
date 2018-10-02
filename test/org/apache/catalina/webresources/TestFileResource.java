@@ -20,6 +20,7 @@ import java.io.File;
 
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.tomcat.util.compat.JrePlatform;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -44,7 +45,7 @@ public class TestFileResource extends TomcatBaseTest {
         String expected = f.toURI().toURL().toString();
         String actual = out.toString().trim();
 
-        if (isWindows()){
+        if (JrePlatform.IS_WINDOWS){
             expected = expected.toLowerCase();
             actual = actual.toLowerCase();
         }

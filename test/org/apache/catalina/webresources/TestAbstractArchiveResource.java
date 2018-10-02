@@ -18,6 +18,7 @@ package org.apache.catalina.webresources;
 
 import java.io.File;
 
+import org.apache.tomcat.util.compat.JrePlatform;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -51,7 +52,7 @@ public class TestAbstractArchiveResource extends TomcatBaseTest {
         String expected = expectedURL.toString();
         String actual = webResource.getURL().toString();
 
-        if (isWindows()){
+        if (JrePlatform.IS_WINDOWS){
             expected = expected.toLowerCase();
             actual = actual.toLowerCase();
         }
@@ -82,7 +83,7 @@ public class TestAbstractArchiveResource extends TomcatBaseTest {
         String expected = expectedURL.toString();
         String actual = webResource.getURL().toString();
 
-        if (isWindows()){
+        if (JrePlatform.IS_WINDOWS){
             expected = expected.toLowerCase();
             actual = actual.toLowerCase();
         }
