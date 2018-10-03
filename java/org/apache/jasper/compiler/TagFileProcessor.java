@@ -543,12 +543,11 @@ class TagFileProcessor {
                         wrapper = new JspServletWrapper(ctxt.getServletContext(), ctxt
                                 .getOptions(), tagFilePath, tagInfo, ctxt
                                 .getRuntimeContext(), tagJar);
-                        rctxt.addWrapper(wrapperUri, wrapper);
-
                         // Use same classloader and classpath for compiling tag files
                         wrapper.getJspEngineContext().setClassLoader(
                                 ctxt.getClassLoader());
                         wrapper.getJspEngineContext().setClassPath(ctxt.getClassPath());
+                        rctxt.addWrapper(wrapperUri, wrapper);
                     } else {
                         // Make sure that JspCompilationContext gets the latest TagInfo
                         // for the tag file. TagInfo instance was created the last

@@ -126,6 +126,12 @@
         utility, <code>JspC</code>, caused by the fix for <bug>53492</bug>, that
         caused the JSP compiler to hang. (markt)
       </fix>
+      <fix>
+        <bug>62757</bug>: Correct a regression in the fix for <bug>62603</bug>
+        that caused <code>NullPointerException</code>s when compiling tag files
+        on first access when development mode was disabled and background
+        compilation was enabled. Based on a patch by Jordi Llach. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="WebSocket">

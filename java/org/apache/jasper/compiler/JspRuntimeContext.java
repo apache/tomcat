@@ -378,8 +378,7 @@ public final class JspRuntimeContext {
         for (int i = 0; i < wrappers.length; i++ ) {
             JspServletWrapper jsw = (JspServletWrapper)wrappers[i];
             JspCompilationContext ctxt = jsw.getJspEngineContext();
-            // JspServletWrapper also synchronizes on this when
-            // it detects it has to do a reload
+            // Sync on JspServletWrapper when calling ctxt.compile()
             synchronized(jsw) {
                 try {
                     ctxt.compile();
