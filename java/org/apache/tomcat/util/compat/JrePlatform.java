@@ -23,8 +23,6 @@ import java.util.Locale;
 public class JrePlatform {
 
     private static final String OS_NAME_PROPERTY = "os.name";
-    private static final String OS_NAME_WINDOWS_PREFIX = "Windows";
-    private static final String OS_NAME_MAC_OS_LC_PREFIX = "mac os x";
 
     static {
         /*
@@ -53,9 +51,9 @@ public class JrePlatform {
                 });
         }
 
-        IS_MAC_OS = osName.toLowerCase(Locale.ENGLISH).startsWith(OS_NAME_MAC_OS_LC_PREFIX);
+        IS_MAC_OS = osName.toLowerCase(Locale.ENGLISH).startsWith("mac os x");
 
-        IS_WINDOWS = osName.startsWith(OS_NAME_WINDOWS_PREFIX);
+        IS_WINDOWS = osName.startsWith("Windows");
     }
 
 
