@@ -32,7 +32,7 @@ public class TLS {
     static {
         boolean ok = false;
         try {
-            SSLContext sc = SSLContext.getInstance(Constants.SSL_PROTO_TLSv1_3);
+            SSLContext.getInstance(Constants.SSL_PROTO_TLSv1_3);
             ok = true;
         } catch (NoSuchAlgorithmException ex) {
         }
