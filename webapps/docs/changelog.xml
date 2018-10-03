@@ -65,6 +65,10 @@
         <code>web.xml.default</code> that can be used to customize <code>conf/context.xml</code>
         and <code>conf/web.xml</code> on a per host basis. (fschumacher)
       </fix>
+      <fix>
+        Ensure that a canonical path is always used for the docBase of a Context
+        to ensure consistent behaviour. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
