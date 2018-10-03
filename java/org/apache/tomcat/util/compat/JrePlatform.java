@@ -18,11 +18,13 @@ package org.apache.tomcat.util.compat;
 
 import java.security.AccessController;
 import java.security.PrivilegedAction;
+import java.util.Locale;
 
 public class JrePlatform {
 
     private static final String OS_NAME_PROPERTY = "os.name";
     private static final String OS_NAME_WINDOWS_PREFIX = "Windows";
+    private static final String OS_NAME_MAC_OS_LC_PREFIX = "mac os x";
 
     static {
         /*
@@ -51,9 +53,13 @@ public class JrePlatform {
                 });
         }
 
+        IS_MAC_OS = osName.toLowerCase(Locale.ENGLISH).startsWith(OS_NAME_MAC_OS_LC_PREFIX);
+
         IS_WINDOWS = osName.startsWith(OS_NAME_WINDOWS_PREFIX);
     }
 
+
+    public static final boolean IS_MAC_OS;
 
     public static final boolean IS_WINDOWS;
 }
