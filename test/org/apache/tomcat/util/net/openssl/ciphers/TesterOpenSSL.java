@@ -422,8 +422,14 @@ public class TesterOpenSSL {
 
     private static String executeOpenSSLCommand(String... args) throws IOException {
         String openSSLPath = System.getProperty("tomcat.test.openssl.path");
+        String openSSLLibPath = null;
         if (openSSLPath == null || openSSLPath.length() == 0) {
             openSSLPath = "openssl";
+        } else {
+            // Explicit OpenSSL path may also need explicit lib path
+            // (e.g. Gump needs this)
+            openSSLLibPath = openSSLPath.substring(0, openSSLPath.lastIndexOf('/'));
+            openSSLLibPath = openSSLLibPath + "/../lib";
         }
         List<String> cmd = new ArrayList<>();
         cmd.add(openSSLPath);
@@ -432,6 +438,18 @@ public class TesterOpenSSL {
         }
 
         ProcessBuilder pb = new ProcessBuilder(cmd.toArray(new String[cmd.size()]));
+
+        if (openSSLLibPath != null) {
+            Map<String,String> env = pb.environment();
+            String libraryPath = env.get("LD_LIBRARY_PATH");
+            if (libraryPath == null) {
+                libraryPath = openSSLLibPath;
+            } else {
+                libraryPath = libraryPath + ":" + openSSLLibPath;
+            }
+            env.put("LD_LIBRARY_PATH", libraryPath);
+        }
+
         Process p = pb.start();
 
         InputStreamToText stdout = new InputStreamToText(p.getInputStream());
