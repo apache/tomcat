@@ -20,7 +20,6 @@ import java.io.File;
 
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.tomcat.util.compat.JrePlatform;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -41,15 +40,6 @@ public class TestFileResource extends TomcatBaseTest {
 
         // Build the expected location the same way the webapp base dir is built
         File f = new File("test/webapp/WEB-INF/classes");
-
-        String expected = f.toURI().toURL().toString();
-        String actual = out.toString().trim();
-
-        if (JrePlatform.IS_WINDOWS){
-            expected = expected.toLowerCase();
-            actual = actual.toLowerCase();
-        }
-
-        Assert.assertEquals(expected, actual);
+        Assert.assertEquals(f.getCanonicalFile().toURI().toURL().toString(), out.toString().trim());
     }
 }

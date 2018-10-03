@@ -18,7 +18,6 @@ package org.apache.catalina.webresources;
 
 import java.io.File;
 
-import org.apache.tomcat.util.compat.JrePlatform;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -46,18 +45,10 @@ public class TestAbstractArchiveResource extends TomcatBaseTest {
                 ctx.getResources().getClassLoaderResource("/META-INF/resources/index.html");
 
         StringBuilder expectedURL = new StringBuilder("jar:war:");
-        expectedURL.append(docBase.getAbsoluteFile().toURI().toURL().toString());
+        expectedURL.append(docBase.getCanonicalFile().toURI().toURL().toString());
         expectedURL.append("*/WEB-INF/lib/test.jar!/META-INF/resources/index.html");
 
-        String expected = expectedURL.toString();
-        String actual = webResource.getURL().toString();
-
-        if (JrePlatform.IS_WINDOWS){
-            expected = expected.toLowerCase();
-            actual = actual.toLowerCase();
-        }
-
-        Assert.assertEquals(expected, actual);
+        Assert.assertEquals(expectedURL.toString(), webResource.getURL().toString());
     }
 
 
@@ -77,18 +68,10 @@ public class TestAbstractArchiveResource extends TomcatBaseTest {
                 ctx.getResources().getClassLoaderResource("/META-INF/tags/echo.tag");
 
         StringBuilder expectedURL = new StringBuilder("jar:");
-        expectedURL.append(docBase.getAbsoluteFile().toURI().toURL().toString());
+        expectedURL.append(docBase.getCanonicalFile().toURI().toURL().toString());
         expectedURL.append("WEB-INF/lib/test-lib.jar!/META-INF/tags/echo.tag");
 
-        String expected = expectedURL.toString();
-        String actual = webResource.getURL().toString();
-
-        if (JrePlatform.IS_WINDOWS){
-            expected = expected.toLowerCase();
-            actual = actual.toLowerCase();
-        }
-
-        Assert.assertEquals(expected, actual);
+        Assert.assertEquals(expectedURL.toString(), webResource.getURL().toString());
     }
 
 }
