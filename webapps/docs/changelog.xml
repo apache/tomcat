@@ -182,6 +182,11 @@
         Ant version 1.9.8 when building Tomcat. (isapir)
       </add>
     </changelog>
+    <changelog>
+      <add>
+        Added ant target ide-intellij to create an IntelliJ IDEA project. (isapir)
+      </add>
+    </changelog>
   </subsection>
 </section>
 <section name="Tomcat 9.0.12 (markt)" rtext="2018-09-10">
