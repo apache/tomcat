@@ -155,6 +155,10 @@
         <bug>62712</bug>: Correct NPE in Manager application when attempting to
         view configured certificates for an APR/native TLS connector. (markt)
       </fix>
+      <fix>
+        <bug>62761</bug>: Correct the advanced CORS example in the Filter
+        documentation to use a valid configuration. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Tribes">
