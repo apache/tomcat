@@ -1330,7 +1330,7 @@ public class TestHttp11Processor extends TomcatBaseTest {
         Context ctx = tomcat.addContext("", null);
 
         // Add servlet
-        Tomcat.addServlet(ctx, "TesterServlet", new TesterServlet());
+        Tomcat.addServlet(ctx, "TesterServlet", new ServerNameTesterServlet());
         ctx.addServletMappingDecoded("/foo", "TesterServlet");
 
         tomcat.start();
@@ -1348,6 +1348,7 @@ public class TestHttp11Processor extends TomcatBaseTest {
 
         // Expected response is a 200 response.
         Assert.assertTrue(client.isResponse200());
+        Assert.assertEquals("request.getServerName() is [a] and request.getServerPort() is 80", client.getResponseBody());
     }
 
     /*
@@ -1365,7 +1366,7 @@ public class TestHttp11Processor extends TomcatBaseTest {
         Context ctx = tomcat.addContext("", null);
 
         // Add servlet
-        Tomcat.addServlet(ctx, "TesterServlet", new TesterServlet());
+        Tomcat.addServlet(ctx, "TesterServlet", new ServerNameTesterServlet());
         ctx.addServletMappingDecoded("/foo", "TesterServlet");
 
         tomcat.start();
@@ -1383,6 +1384,8 @@ public class TestHttp11Processor extends TomcatBaseTest {
 
         // Expected response is a 200 response.
         Assert.assertTrue(client.isResponse200());
+        Assert.assertEquals("request.getServerName() is [a] and request.getServerPort() is 8080", client.getResponseBody());
+
     }
 
     /*
@@ -1401,7 +1404,7 @@ public class TestHttp11Processor extends TomcatBaseTest {
         Context ctx = tomcat.addContext("", null);
 
         // Add servlet
-        Tomcat.addServlet(ctx, "TesterServlet", new TesterServlet());
+        Tomcat.addServlet(ctx, "TesterServlet", new ServerNameTesterServlet());
         ctx.addServletMappingDecoded("/foo", "TesterServlet");
 
         tomcat.start();
@@ -1419,6 +1422,7 @@ public class TestHttp11Processor extends TomcatBaseTest {
 
         // Expected response is a 200 response.
         Assert.assertTrue(client.isResponse200());
+        Assert.assertEquals("request.getServerName() is [a] and request.getServerPort() is 80", client.getResponseBody());
     }
 
     /*
@@ -1438,7 +1442,7 @@ public class TestHttp11Processor extends TomcatBaseTest {
         Context ctx = tomcat.addContext("", null);
 
         // Add servlet
-        Tomcat.addServlet(ctx, "TesterServlet", new TesterServlet());
+        Tomcat.addServlet(ctx, "TesterServlet", new ServerNameTesterServlet());
         ctx.addServletMappingDecoded("/foo", "TesterServlet");
 
         tomcat.start();
@@ -1456,6 +1460,7 @@ public class TestHttp11Processor extends TomcatBaseTest {
 
         // Expected response is a 200 response.
         Assert.assertTrue(client.isResponse200());
+        Assert.assertEquals("request.getServerName() is [] and request.getServerPort() is " + getPort(), client.getResponseBody());
     }
 
     /*
@@ -1476,7 +1481,7 @@ public class TestHttp11Processor extends TomcatBaseTest {
         Context ctx = tomcat.addContext("", null);
 
         // Add servlet
-        Tomcat.addServlet(ctx, "TesterServlet", new TesterServlet());
+        Tomcat.addServlet(ctx, "TesterServlet", new ServerNameTesterServlet());
         ctx.addServletMappingDecoded("/foo", "TesterServlet");
 
         tomcat.start();
@@ -1494,5 +1499,42 @@ public class TestHttp11Processor extends TomcatBaseTest {
 
         // Expected response is a 200 response.
         Assert.assertTrue(client.isResponse200());
+        Assert.assertEquals("request.getServerName() is [] and request.getServerPort() is " + getPort(), client.getResponseBody());
+    }
+
+
+    /**
+     * Test servlet that prints out the values of
+     * HttpServletRequest.getServerName() and
+     * HttpServletRequest.getServerPort() in the response body, e.g.:
+     *
+     * "request.getServerName() is [foo] and request.getServerPort() is 8080"
+     *
+     * or:
+     *
+     * "request.getServerName() is null and request.getServerPort() is 8080"
+     */
+    private static class ServerNameTesterServlet extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+                throws ServletException, IOException {
+
+            resp.setContentType("text/plain");
+            PrintWriter out = resp.getWriter();
+
+            if (null == req.getServerName())
+            {
+                out.print("request.getServerName() is null");
+            }
+            else
+            {
+                out.print("request.getServerName() is [" + req.getServerName() + "]");
+            }
+
+            out.print(" and request.getServerPort() is " + req.getServerPort());
+        }
     }
 }

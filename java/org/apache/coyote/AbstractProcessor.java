@@ -264,8 +264,14 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
 
 
     protected void parseHost(MessageBytes valueMB) {
-        if (valueMB == null || valueMB.isNull() || valueMB.getLength() == 0) {
+        if (valueMB == null || valueMB.isNull()) {
             populateHost();
+            return;
+        }
+        else if (valueMB.getLength() == 0)
+        {
+            populateHost();
+            request.serverName().setString("");
             return;
         }
 
