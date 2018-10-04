@@ -268,6 +268,12 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
             populateHost();
             return;
         }
+        else if (valueMB.getLength() == 0)
+        {
+            populateHost();
+            request.serverName().setString("");
+            return;
+        }
 
         ByteChunk valueBC = valueMB.getByteChunk();
         byte[] valueB = valueBC.getBytes();
