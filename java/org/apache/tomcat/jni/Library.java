@@ -39,7 +39,7 @@ public final class Library {
         for (int i = 0; i < NAMES.length; i++) {
             File library = new File(binLib, System.mapLibraryName(NAMES[i]));
             try {
-                System.load(library.getPath());
+                System.load(library.getAbsolutePath());
                 loaded = true;
             } catch (ThreadDeath t) {
                 throw t;
@@ -83,7 +83,7 @@ public final class Library {
                             throw t;
                         }
                     }
-                    if (i > 0) {
+                    if (err.length() > 0) {
                         err.append(", ");
                     }
                     err.append(t.getMessage());

@@ -72,6 +72,7 @@ public final class TesterSupport {
     public static final String LOCALHOST_KEY_PEM = SSL_DIR + "localhost-key.pem";
     public static final boolean OPENSSL_AVAILABLE;
     public static final int OPENSSL_VERSION;
+    public static final String OPENSSL_ERROR;
 
     public static final String ROLE = "testrole";
 
@@ -82,16 +83,18 @@ public final class TesterSupport {
     static {
         boolean available = false;
         int version = 0;
+        String err = "";
         try {
             Library.initialize(null);
             available = true;
             version = SSL.version();
             Library.terminate();
         } catch (Exception | LibraryNotFoundError ex) {
-            // Ignore
+            err = ex.getMessage();
         }
         OPENSSL_AVAILABLE = available;
         OPENSSL_VERSION = version;
+        OPENSSL_ERROR = err;
     }
 
     public static boolean isOpensslAvailable() {
