@@ -195,7 +195,7 @@
   <filter-class>org.apache.catalina.filters.CorsFilter</filter-class>
   <init-param>
     <param-name>cors.allowed.origins</param-name>
-    <param-value>*</param-value>
+    <param-value>https://www.apache.org</param-value>
   </init-param>
   <init-param>
     <param-name>cors.allowed.methods</param-name>
