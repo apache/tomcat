@@ -86,6 +86,11 @@
         did not allow a fully qualified domain name to terminate with a period.
         Patch provided by AG. (markt)
       </fix>
+      <fix>
+        <bug>62739</bug>: Do not reject requests with an empty HTTP Host header.
+        Such requests are unusual but not invalid. Patch provided by Michael
+        Orr. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">

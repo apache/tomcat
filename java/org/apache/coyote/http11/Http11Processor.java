@@ -1425,21 +1425,23 @@ public class Http11Processor extends AbstractProcessor {
     }
 
 
+    /*
+     * Note: populateHost() is not over-ridden.
+     *       request.serverName() will be set to return the default host name by
+     *       the Mapper.
+     */
+
+
     /**
      * {@inheritDoc}
      * <p>
-     * This implementation provides the server name from the default host and
-     * the server port from the local port.
+     * This implementation provides the server port from the local port.
      */
     @Override
-    protected void populateHost() {
-        // No host information (HTTP/1.0)
+    protected void populatePort() {
         // Ensure the local port field is populated before using it.
         request.action(ActionCode.REQ_LOCALPORT_ATTRIBUTE, request);
         request.setServerPort(request.getLocalPort());
-
-        // request.serverName() will be set to the default host name by the
-        // mapper
     }
 
 
