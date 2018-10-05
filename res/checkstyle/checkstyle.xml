@@ -88,7 +88,7 @@
     <module name="GenericWhitespace"/>
     <module name="EmptyForInitializerPad"/>
     <module name="EmptyForIteratorPad"/>
-    <!--  ~ 1200 errors
+    <!--  ~ 1100 errors
     <module name="OperatorWrap">
       <property name="option" value="eol"/>
     </module>
