@@ -266,6 +266,12 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
     protected void parseHost(MessageBytes valueMB) {
         if (valueMB == null || valueMB.isNull()) {
             populateHost();
+            populatePort();
+            return;
+        } else if (valueMB.getLength() == 0) {
+            // Empty Host header so set sever name to empty string
+            request.serverName().setString("");
+            populatePort();
             return;
         }
 
@@ -329,13 +335,25 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
 
 
     /**
-     * Called when a host name is not present in the request (e.g. HTTP/1.0).
-     * It populates the server name and port with appropriate information. The
-     * source is expected to vary by protocol.
+     * Called when a host header is not present in the request (e.g. HTTP/1.0).
+     * It populates the server name with appropriate information. The source is
+     * expected to vary by protocol.
      * <p>
      * The default implementation is a NO-OP.
      */
     protected void populateHost() {
+        // NO-OP
+    }
+
+
+    /**
+     * Called when a host header is not present or is empty in the request (e.g.
+     * HTTP/1.0). It populates the server port with appropriate information. The
+     * source is expected to vary by protocol.
+     * <p>
+     * The default implementation is a NO-OP.
+     */
+    protected void populatePort() {
         // NO-OP
     }
 
