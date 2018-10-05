@@ -102,6 +102,42 @@
         <TransientAttribute>URIEncoding</TransientAttribute>
         <TransientAttribute>maxProcessor</TransientAttribute>
         <TransientAttribute>minProcessor</TransientAttribute>
+        <!-- All attribute duplicated from the SSLHostConfig, may be removed in Tomcat 10 -->
+        <TransientAttribute>SSLProtocol</TransientAttribute>
+        <TransientAttribute>sslEnabledProtocols</TransientAttribute>
+        <TransientAttribute>SSLCipherSuite</TransientAttribute>
+        <TransientAttribute>ciphers</TransientAttribute>
+        <TransientAttribute>SSLCertificateChainFile</TransientAttribute>
+        <TransientAttribute>SSLCertificateFile</TransientAttribute>
+        <TransientAttribute>keyAlias</TransientAttribute>
+        <TransientAttribute>SSLCertificateKeyFile</TransientAttribute>
+        <TransientAttribute>keyPass</TransientAttribute>
+        <TransientAttribute>SSLPassword</TransientAttribute>
+        <TransientAttribute>keystoreFile</TransientAttribute>
+        <TransientAttribute>keystorePass</TransientAttribute>
+        <TransientAttribute>keystoreProvider</TransientAttribute>
+        <TransientAttribute>keystoreType</TransientAttribute>
+        <TransientAttribute>SSLCACertificateFile</TransientAttribute>
+        <TransientAttribute>SSLCACertificatePath</TransientAttribute>
+        <TransientAttribute>crlFile</TransientAttribute>
+        <TransientAttribute>SSLCARevocationFile</TransientAttribute>
+        <TransientAttribute>SSLCARevocationPath</TransientAttribute>
+        <TransientAttribute>SSLDisableCompression</TransientAttribute>
+        <TransientAttribute>SSLDisableSessionTickets</TransientAttribute>
+        <TransientAttribute>SSLDisableCompression</TransientAttribute>
+        <TransientAttribute>SSLHonorCipherOrder</TransientAttribute>
+        <TransientAttribute>useServerCipherSuitesOrder</TransientAttribute>
+        <TransientAttribute>algorithm</TransientAttribute>
+        <TransientAttribute>sslContext</TransientAttribute>
+        <TransientAttribute>sessionCacheSize</TransientAttribute>
+        <TransientAttribute>sessionTimeout</TransientAttribute>
+        <TransientAttribute>sslProtocol</TransientAttribute>
+        <TransientAttribute>trustManagerClassName</TransientAttribute>
+        <TransientAttribute>truststoreAlgorithm</TransientAttribute>
+        <TransientAttribute>truststoreFile</TransientAttribute>
+        <TransientAttribute>truststorePass</TransientAttribute>
+        <TransientAttribute>truststoreProvider</TransientAttribute>
+        <TransientAttribute>truststoreType</TransientAttribute>
      </Description>
      <Description
         tag="UpgradeProtocol"
@@ -120,6 +156,16 @@
         storeFactoryClass="org.apache.catalina.storeconfig.SSLHostConfigSF">
         <TransientAttribute>openSslContext</TransientAttribute>
         <TransientAttribute>openSslConfContext</TransientAttribute>
+        <!-- All attribute duplicated from the Certificate, may be removed in Tomcat 10 -->
+        <TransientAttribute>certificateChainFile</TransientAttribute>
+        <TransientAttribute>certificateFile</TransientAttribute>
+        <TransientAttribute>certificateKeyAlias</TransientAttribute>
+        <TransientAttribute>certificateKeyFile</TransientAttribute>
+        <TransientAttribute>certificateKeyPassword</TransientAttribute>
+        <TransientAttribute>certificateKeystoreFile</TransientAttribute>
+        <TransientAttribute>certificateKeystorePassword</TransientAttribute>
+        <TransientAttribute>certificateKeystoreProvider</TransientAttribute>
+        <TransientAttribute>certificateKeystoreType</TransientAttribute>
      </Description>
      <Description
         tag="Certificate"
@@ -127,7 +173,8 @@
         default="true"
         tagClass="org.apache.tomcat.util.net.SSLHostConfigCertificate"
         children="false"
-        storeFactoryClass="org.apache.catalina.storeconfig.StoreFactoryBase">
+        storeFactoryClass="org.apache.catalina.storeconfig.StoreFactoryBase"
+        storeAppenderClass="org.apache.catalina.storeconfig.CertificateStoreAppender">
      </Description>
      <Description
         tag="OpenSSLConf"

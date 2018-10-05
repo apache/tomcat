@@ -92,6 +92,10 @@
         Ensure that a canonical path is always used for the docBase of a Context
         to ensure consistent behaviour. (markt)
       </fix>
+      <fix>
+        <bug>62803</bug>: Fix SSL connector configuration processing
+        in storeconfig. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

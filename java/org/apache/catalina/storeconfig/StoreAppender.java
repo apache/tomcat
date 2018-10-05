@@ -230,29 +230,10 @@ public class StoreAppender {
         // Create blank instance
         Object bean2 = defaultInstance(bean);
         for (int i = 0; i < descriptors.length; i++) {
-            if (descriptors[i] instanceof IndexedPropertyDescriptor) {
-                continue; // Indexed properties are not persisted
+            Object value = checkAttribute(desc, descriptors[i], descriptors[i].getName(), bean, bean2);
+            if (value != null) {
+                printAttribute(writer, indent, bean, desc, descriptors[i].getName(), bean2, value);
             }
-            if (!isPersistable(descriptors[i].getPropertyType())
-                    || (descriptors[i].getReadMethod() == null)
-                    || (descriptors[i].getWriteMethod() == null)) {
-                continue; // Must be a read-write primitive or String
-            }
-            if (desc.isTransientAttribute(descriptors[i].getName())) {
-                continue; // Skip the specified exceptions
-            }
-            Object value = IntrospectionUtils.getProperty(bean, descriptors[i]
-                    .getName());
-            if (value == null) {
-                continue; // Null values are not persisted
-            }
-            Object value2 = IntrospectionUtils.getProperty(bean2,
-                    descriptors[i].getName());
-            if (value.equals(value2)) {
-                // The property has its default value
-                continue;
-            }
-            printAttribute(writer, indent, bean, desc, descriptors[i].getName(), bean2, value);
         }
 
         if (bean instanceof ResourceBase) {
@@ -270,6 +251,39 @@ public class StoreAppender {
 
             }
         }
+    }
+
+    /**
+     * Check if the attribute should be printed.
+     * @param desc RegistryDescriptor from this bean
+     * @param descriptor PropertyDescriptor from this bean property
+     * @param attributeName The attribute name to store
+     * @param bean The current bean
+     * @param bean2 A default instance of the bean for comparison
+     * @return null if the value should be skipped, the value to print otherwise
+     */
+    protected Object checkAttribute(StoreDescription desc, PropertyDescriptor descriptor, String attributeName, Object bean, Object bean2) {
+        if (descriptor instanceof IndexedPropertyDescriptor) {
+            return null; // Indexed properties are not persisted
+        }
+        if (!isPersistable(descriptor.getPropertyType())
+                || (descriptor.getReadMethod() == null)
+                || (descriptor.getWriteMethod() == null)) {
+            return null; // Must be a read-write primitive or String
+        }
+        if (desc.isTransientAttribute(descriptor.getName())) {
+            return null; // Skip the specified exceptions
+        }
+        Object value = IntrospectionUtils.getProperty(bean, descriptor.getName());
+        if (value == null) {
+            return null; // Null values are not persisted
+        }
+        Object value2 = IntrospectionUtils.getProperty(bean2, descriptor.getName());
+        if (value.equals(value2)) {
+            // The property has its default value
+            return null;
+        }
+        return value;
     }
 
     /**
@@ -303,15 +317,7 @@ public class StoreAppender {
      */
     public boolean isPrintValue(Object bean, Object bean2, String attrName,
             StoreDescription desc) {
-        boolean printValue = false;
-
-        Object value = IntrospectionUtils.getProperty(bean, attrName);
-        if (value != null) {
-            Object value2 = IntrospectionUtils.getProperty(bean2, attrName);
-            printValue = !value.equals(value2);
-
-        }
-        return printValue;
+        return true;
     }
 
     /**

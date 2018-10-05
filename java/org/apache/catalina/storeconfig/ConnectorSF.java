@@ -41,9 +41,11 @@ public class ConnectorSF extends StoreFactoryBase {
             // Store nested <UpgradeProtocol> elements
             UpgradeProtocol[] upgradeProtocols = connector.findUpgradeProtocols();
             storeElementArray(aWriter, indent, upgradeProtocols);
-            // Store nested <SSLHostConfig> elements
-            SSLHostConfig[] hostConfigs = connector.findSslHostConfigs();
-            storeElementArray(aWriter, indent, hostConfigs);
+            if (Boolean.TRUE.equals(connector.getProperty("SSLEnabled"))) {
+                // Store nested <SSLHostConfig> elements
+                SSLHostConfig[] hostConfigs = connector.findSslHostConfigs();
+                storeElementArray(aWriter, indent, hostConfigs);
+            }
         }
     }
 
