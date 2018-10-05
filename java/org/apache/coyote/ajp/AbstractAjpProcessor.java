@@ -985,19 +985,30 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
     /**
      * {@inheritDoc}
      * <p>
-     * This implementation populates the server name and port from the local
-     * name and port provided by the AJP message.
+     * This implementation populates the server name from the local name
+     * provided by the AJP message.
      */
     @Override
     protected void populateHost() {
-        // No host information (HTTP/1.0)
-        request.setServerPort(request.getLocalPort());
         try {
             request.serverName().duplicate(request.localName());
         } catch (IOException e) {
             response.setStatus(400);
             setErrorState(ErrorState.CLOSE_CLEAN, e);
         }
+    }
+
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * This implementation populates the server port from the local port
+     * provided by the AJP message.
+     */
+    @Override
+    protected void populatePort() {
+        // No host information (HTTP/1.0)
+        request.setServerPort(request.getLocalPort());
     }
 
 

@@ -71,6 +71,15 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+        <bug>62739</bug>: Do not reject requests with an empty HTTP Host header.
+        Such requests are unusual but not invalid. Patch provided by Michael
+        Orr. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Jasper">
     <changelog>
       <fix>
