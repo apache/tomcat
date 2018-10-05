@@ -18,9 +18,11 @@
 package org.apache.catalina.storeconfig;
 
 import java.io.PrintWriter;
+import java.util.ArrayList;
 
 import org.apache.tomcat.util.net.SSLHostConfig;
 import org.apache.tomcat.util.net.SSLHostConfigCertificate;
+import org.apache.tomcat.util.net.SSLHostConfigCertificate.Type;
 import org.apache.tomcat.util.net.openssl.OpenSSLConf;
 
 /**
@@ -39,6 +41,16 @@ public class SSLHostConfigSF extends StoreFactoryBase {
             SSLHostConfig sslHostConfig = (SSLHostConfig) aSSLHostConfig;
             // Store nested <SSLHostConfigCertificate> elements
             SSLHostConfigCertificate[] hostConfigsCertificates = sslHostConfig.getCertificates().toArray(new SSLHostConfigCertificate[0]);
+            // Remove a possible default UNDEFINED certificate
+            if (hostConfigsCertificates.length > 1) {
+                ArrayList<SSLHostConfigCertificate> certificates = new ArrayList<>();
+                for (SSLHostConfigCertificate certificate : hostConfigsCertificates) {
+                    if (Type.UNDEFINED != certificate.getType()) {
+                        certificates.add(certificate);
+                    }
+                }
+                hostConfigsCertificates = certificates.toArray(new SSLHostConfigCertificate[0]);
+            }
             storeElementArray(aWriter, indent, hostConfigsCertificates);
             // Store nested <OpenSSLConf> element
             OpenSSLConf openSslConf = sslHostConfig.getOpenSslConf();
