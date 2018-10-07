@@ -127,13 +127,13 @@
         incorrectly only looked for the space character. (markt)
       </fix>
       <fix>
-        <bug>62721</bug>: Correct generation of web.xml header when using JspC.
-        (markt)
-      </fix>
-      <fix>
         <bug>62674</bug>: Correct a regression in the stand-alone JSP compiler
         utility, <code>JspC</code>, caused by the fix for <bug>53492</bug>, that
         caused the JSP compiler to hang. (markt)
+      </fix>
+      <fix>
+        <bug>62721</bug>: Correct generation of web.xml header when using JspC.
+        (markt)
       </fix>
       <fix>
         <bug>62757</bug>: Correct a regression in the fix for <bug>62603</bug>
@@ -188,14 +188,10 @@
         Update the internal fork of Apache Commons Pool 2 to d4e0e88
         (2018-09-12) to pick up some bug fixes and enhancements. (markt)
       </update>
-    </changelog>
-    <changelog>
       <add>
         <bug>62705</bug>: Added a fail fast check for minimum required Apache
         Ant version 1.9.8 when building Tomcat. (isapir)
       </add>
-    </changelog>
-    <changelog>
       <add>
         Added ant target ide-intellij to create an IntelliJ IDEA project. (isapir)
       </add>
@@ -216,6 +212,9 @@
         (markt)
       </fix>
       <fix>
+        <bug>62667</bug>: Add recursion to rewrite substitution parsing. (remm)
+      </fix>
+      <fix>
         <bug>62669</bug>: When using the SSIFilter and a resource does not
         specify a content type, do not force the content type to
         <code>application/x-octet-stream</code>. (markt)
@@ -226,9 +225,6 @@
         <code>$CATALINA_HOME/lib</code> and <code>$CATALINA_BASE/lib</code> are
         loaded via the service loader mechanism when the protection is enabled.
         (markt)
-      </fix>
-      <fix>
-        <bug>62667</bug>: Add recursion to rewrite substitution parsing. (remm)
       </fix>
       <fix>
         When generating a redirect to a directory in the Default Servlet, avoid
