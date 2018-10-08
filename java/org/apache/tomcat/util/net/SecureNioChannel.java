@@ -431,8 +431,6 @@ public class SecureNioChannel extends NioChannel  {
      */
     @Override
     public int read(ByteBuffer dst) throws IOException {
-        //if we want to take advantage of the expand function, make sure we only use the ApplicationBufferHandler's buffers
-        if ( dst != bufHandler.getReadBuffer() ) throw new IllegalArgumentException("You can only read using the application read buffer provided by the handler.");
         //are we in the middle of closing or closed?
         if ( closing || closed) return -1;
         //did we finish our handshake?
