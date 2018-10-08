@@ -10,6 +10,9 @@ developed by the Netty project
 and from finagle-native developed at Twitter
 (https://github.com/twitter/finagle).
 
+This software contains code derived from jgroups-kubernetes
+developed by the JGroups project (http://www.jgroups.org/).
+
 The Windows Installer is built with the Nullsoft
 Scriptable Install System (NSIS), which is
 open source software.  The original software and
@@ -32,7 +35,7 @@ For portions of the Tomcat cloud support
 The org.apache.catalina.tribes.membership.cloud package contains derivative
 work originating from the jgroups project.
 https://github.com/jgroups-extras/jgroups-kubernetes
-Copyright 2018 Red Hat Inc.
+Copyright 2002-2018 Red Hat Inc.
 
 The original XML Schemas for Java EE Deployment Descriptors:
  - javaee_5.xsd
