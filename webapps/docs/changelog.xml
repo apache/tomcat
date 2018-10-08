@@ -118,6 +118,11 @@
         Such requests are unusual but not invalid. Patch provided by Michael
         Orr. (markt)
       </fix>
+      <fix>
+        <bug>62791</bug>: Remove an unnecessary check in the NIO TLS
+        implementation that prevented from secure WebSocket connections from
+        being established. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
