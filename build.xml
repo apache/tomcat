@@ -213,6 +213,7 @@
   <path id="compile.classpath">
     <pathelement location="${jdt.jar}"/>
     <pathelement location="${saaj-api.jar}"/>
+    <pathelement location="${openjson.jar}"/>
   </path>
 
   <path id="tomcat.classpath">
@@ -2717,7 +2718,17 @@ skip.installer property in build.properties" />
       <param name="checksum.value" value="${saaj-api.checksum.value}"/>
     </antcall>
 
-  </target>
+    <!-- Download openjson -->
+    <antcall target="downloadfile">
+      <param name="sourcefile" value="${openjson.loc}"/>
+      <param name="destfile" value="${openjson.jar}"/>
+      <param name="destdir" value="${openjson.home}"/>
+      <param name="checksum.enabled" value="${openjson.checksum.enabled}"/>
+      <param name="checksum.algorithm" value="${openjson.checksum.algorithm}"/>
+      <param name="checksum.value" value="${openjson.checksum.value}"/>
+    </antcall>
+
+ </target>
 
   <target name="download-test-compile"
           description="Download additional components for the tests" >

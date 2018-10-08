@@ -283,6 +283,15 @@ saaj-api.home=${base.path}/saaj-api-${saaj-api.version}
 saaj-api.jar=${saaj-api.home}/saaj-api-${saaj-api.version}.jar
 saaj-api.loc=${base-maven.loc}/javax/xml/soap/saaj-api/${saaj-api.version}/saaj-api-${saaj-api.version}.jar
 
+# ----- OpenJSON, version 1.0.10 or later -----
+openjson.version=1.0.10
+openjson.checksum.enabled=true
+openjson.checksum.algorithm=MD5|SHA-1
+openjson.checksum.value=c7c4cb9266cacc0aab5dcbb59456720c|8dcccbcc8bbfa15162cd7ca77bcf2b9daa90e70a
+openjson.home=${base.path}/openjson-${openjson.version}
+openjson.jar=${easymock.home}/openjson-${openjson.version}.jar
+openjson.loc=${base-maven.loc}/com/github/openjson/openjson/${openjson.version}/openjson-${openjson.version}.jar
+
 # ----- bnd & bndlib, version 4.0.0 or later  -----
 # ----- provides OSGI metadata for JARs       -----
 bnd.version=4.0.0

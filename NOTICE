@@ -28,6 +28,12 @@ project developed at Twitter
 * Copyright 2014 The Netty Project
 * Copyright 2014 Twitter
 
+For portions of the Tomcat cloud support
+The org.apache.catalina.tribes.membership.cloud package contains derivative
+work originating from the jgroups project.
+https://github.com/jgroups-extras/jgroups-kubernetes
+Copyright 2018 Red Hat Inc.
+
 The original XML Schemas for Java EE Deployment Descriptors:
  - javaee_5.xsd
  - javaee_web_services_1_2.xsd

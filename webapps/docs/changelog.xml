@@ -181,6 +181,10 @@
         Add <code>setMembershipService</code> method to the
         <code>MembershipProvider</code>. (kfujino)
       </add>
+      <add>
+        Experimental Kubernetes aware cloud membership provider, based on code
+        by Maxime Beck. Contains code derived from jgroups. (remm/kfujino)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Other">
