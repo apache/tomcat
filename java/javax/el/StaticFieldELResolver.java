@@ -47,8 +47,8 @@ public class StaticFieldELResolver extends ELResolver {
                         Modifier.isPublic(modifiers)) {
                     return field.get(null);
                 }
-            } catch (IllegalArgumentException | IllegalAccessException
-                    | NoSuchFieldException | SecurityException e) {
+            } catch (IllegalArgumentException | IllegalAccessException |
+                    NoSuchFieldException | SecurityException e) {
                 exception = e;
             }
             String msg = Util.message(context, "staticFieldELResolver.notFound",
