@@ -565,11 +565,6 @@ public class SecureNioChannel extends NioChannel  {
      */
     @Override
     public int read(ByteBuffer dst) throws IOException {
-        // Make sure we only use the ApplicationBufferHandler's buffers
-        if (dst != getBufHandler().getReadBuffer() && (getAppReadBufHandler() == null
-                || dst != getAppReadBufHandler().getByteBuffer())) {
-            throw new IllegalArgumentException(sm.getString("channel.nio.ssl.invalidBuffer"));
-        }
         //are we in the middle of closing or closed?
         if ( closing || closed) return -1;
         //did we finish our handshake?
