@@ -289,7 +289,7 @@ openjson.checksum.enabled=true
 openjson.checksum.algorithm=MD5|SHA-1
 openjson.checksum.value=c7c4cb9266cacc0aab5dcbb59456720c|8dcccbcc8bbfa15162cd7ca77bcf2b9daa90e70a
 openjson.home=${base.path}/openjson-${openjson.version}
-openjson.jar=${easymock.home}/openjson-${openjson.version}.jar
+openjson.jar=${openjson.home}/openjson-${openjson.version}.jar
 openjson.loc=${base-maven.loc}/com/github/openjson/openjson/${openjson.version}/openjson-${openjson.version}.jar
 
 # ----- bnd & bndlib, version 4.0.0 or later  -----

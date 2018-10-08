@@ -32,7 +32,6 @@ import java.util.Properties;
 import org.apache.catalina.tribes.ChannelListener;
 import org.apache.catalina.tribes.Heartbeat;
 import org.apache.catalina.tribes.Member;
-import org.apache.catalina.tribes.membership.Constants;
 import org.apache.catalina.tribes.membership.Membership;
 import org.apache.catalina.tribes.membership.MembershipProviderBase;
 import org.apache.catalina.tribes.util.StringManager;

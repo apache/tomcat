@@ -41,7 +41,7 @@ public class CloudMembershipService extends MembershipServiceBase {
 
     public static final String MEMBERSHIP_PROVIDER_CLASS_NAME = "membershipProviderClassName";
     private static final String KUBE = "kubernetes";
-    private static final String KUBE_PROVIDER_CLASS = "org.apache.catalina.cloud.membership.KubernetesMembershipProvider";
+    private static final String KUBE_PROVIDER_CLASS = "org.apache.catalina.tribes.membership.cloud.KubernetesMembershipProvider";
 
     private MembershipProvider membershipProvider;
     private MemberImpl localMember;
