@@ -1226,6 +1226,8 @@ public class TestHttp11Processor extends TomcatBaseTest {
         // request
         tomcat.getConnector().setAttribute("maxKeepAliveRequests", "1");
 
+        tomcat.getConnector().setAttribute("allowHostHeaderMismatch", "false");
+
         // No file system docBase required
         Context ctx = tomcat.addContext("", null);
 
@@ -1263,6 +1265,8 @@ public class TestHttp11Processor extends TomcatBaseTest {
         // request
         tomcat.getConnector().setAttribute("maxKeepAliveRequests", "1");
 
+        tomcat.getConnector().setAttribute("allowHostHeaderMismatch", "false");
+
         // No file system docBase required
         Context ctx = tomcat.addContext("", null);
 
@@ -1299,6 +1303,8 @@ public class TestHttp11Processor extends TomcatBaseTest {
         // This setting means the connection will be closed at the end of the
         // request
         tomcat.getConnector().setAttribute("maxKeepAliveRequests", "1");
+
+        tomcat.getConnector().setAttribute("allowHostHeaderMismatch", "false");
 
         // No file system docBase required
         Context ctx = tomcat.addContext("", null);
