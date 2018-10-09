@@ -18,11 +18,9 @@
  */
 
 package org.apache.tomcat.util.json;
-import java.io.*;
-import java.util.*;
-import java.math.*;
 
 /** Token Manager. */
+@SuppressWarnings("all") // Ignore warnings in generated code
 public class JSONParserTokenManager implements JSONParserConstants {
 
   /** Debug output. */
@@ -593,8 +591,8 @@ private int jjMoveNfa_0(int startState, int curPos)
 
 /** Token literal values. */
 public static final String[] jjstrLiteralImages = {
-"", null, null, null, null, null, "\54", "\173", "\175", "\72", "\133", 
-"\135", null, null, null, null, null, null, null, null, null, null, "\47\47", 
+"", null, null, null, null, null, "\54", "\173", "\175", "\72", "\133",
+"\135", null, null, null, null, null, null, null, null, null, null, "\47\47",
 "\42\42", null, null, null, null, null, null, };
 protected Token jjFillToken()
 {
@@ -622,8 +620,8 @@ protected Token jjFillToken()
    return t;
 }
 static final int[] jjnextStates = {
-   6, 7, 9, 27, 28, 30, 36, 19, 22, 29, 37, 31, 27, 30, 31, 11, 
-   12, 14, 1, 2, 20, 21, 23, 25, 34, 35, 
+   6, 7, 9, 27, 28, 30, 36, 19, 22, 29, 37, 31, 27, 30, 31, 11,
+   12, 14, 1, 2, 20, 21, 23, 25, 34, 35,
 };
 private static final boolean jjCanMove_0(int hiByte, int i1, int i2, long l1, long l2)
 {
@@ -646,7 +644,7 @@ int jjmatchedPos;
 int jjmatchedKind;
 
 /** Get the next Token. */
-public Token getNextToken() 
+public Token getNextToken()
 {
   Token matchedToken;
   int curPos = 0;
@@ -774,7 +772,7 @@ private void jjCheckNAddStates(int start, int end)
   }
 
   /** Reinitialise parser. */
-  
+
   public void ReInit(JavaCharStream stream)
   {
 
@@ -797,7 +795,7 @@ private void jjCheckNAddStates(int start, int end)
 
   /** Reinitialise parser. */
   public void ReInit(JavaCharStream stream, int lexState)
-  
+
   {
     ReInit(stream);
     SwitchTo(lexState);
@@ -820,20 +818,20 @@ public static final String[] lexStateNames = {
 
 /** Lex State array. */
 public static final int[] jjnewLexState = {
-   -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 
-   -1, -1, -1, -1, -1, 
+   -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+   -1, -1, -1, -1, -1,
 };
 static final long[] jjtoToken = {
-   0x3ccf8fc1L, 
+   0x3ccf8fc1L,
 };
 static final long[] jjtoSkip = {
-   0x3eL, 
+   0x3eL,
 };
 static final long[] jjtoSpecial = {
-   0x0L, 
+   0x0L,
 };
 static final long[] jjtoMore = {
-   0x0L, 
+   0x0L,
 };
     protected JavaCharStream  input_stream;
 

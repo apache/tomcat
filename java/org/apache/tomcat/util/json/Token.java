@@ -22,7 +22,7 @@ package org.apache.tomcat.util.json;
 /**
  * Describes the input token stream.
  */
-
+@SuppressWarnings("all") // Ignore warnings in generated code
 public class Token implements java.io.Serializable {
 
   /**

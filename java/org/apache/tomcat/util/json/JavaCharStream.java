@@ -23,7 +23,7 @@ package org.apache.tomcat.util.json;
  * An implementation of interface CharStream, where the stream is assumed to
  * contain only ASCII characters (with java-like unicode escape processing).
  */
-
+@SuppressWarnings("all") // Ignore warnings in generated code
 public
 class JavaCharStream
 {

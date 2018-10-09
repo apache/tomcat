@@ -20,6 +20,7 @@
 package org.apache.tomcat.util.json;
 
 /** Token Manager Error. */
+@SuppressWarnings("all") // Ignore warnings in generated code
 public class TokenMgrError extends Error
 {
 

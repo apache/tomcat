@@ -28,6 +28,7 @@ package org.apache.tomcat.util.json;
  * You can modify this class to customize your error reporting
  * mechanisms so long as you retain the public fields.
  */
+@SuppressWarnings("all") // Ignore warnings in generated code
 public class ParseException extends Exception {
 
   /**
@@ -141,8 +142,8 @@ public class ParseException extends Exception {
     }
     retval += "\" at line " + currentToken.next.beginLine + ", column " + currentToken.next.beginColumn;
     retval += "." + EOL;
-    
-    
+
+
     if (expectedTokenSequences.length == 0) {
         // Nothing to add here
     } else {
@@ -153,7 +154,7 @@ public class ParseException extends Exception {
 	    }
 	    retval += expected.toString();
     }
-    
+
     return retval;
   }
 
