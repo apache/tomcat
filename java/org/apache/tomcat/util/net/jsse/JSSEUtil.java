@@ -58,6 +58,7 @@ import javax.net.ssl.X509KeyManager;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.compat.JreVendor;
+import org.apache.tomcat.util.compat.TLS;
 import org.apache.tomcat.util.file.ConfigFileLoader;
 import org.apache.tomcat.util.net.Constants;
 import org.apache.tomcat.util.net.SSLContext;
@@ -141,7 +142,12 @@ public class JSSEUtil extends SSLUtilBase {
 
 
     public JSSEUtil (SSLHostConfigCertificate certificate) {
-        super(certificate);
+        this(certificate, true);
+    }
+
+
+    public JSSEUtil (SSLHostConfigCertificate certificate, boolean warnOnSkip) {
+        super(certificate, warnOnSkip);
         this.sslHostConfig = certificate.getSSLHostConfig();
     }
 
@@ -161,6 +167,12 @@ public class JSSEUtil extends SSLUtilBase {
     @Override
     protected Set<String> getImplementedCiphers() {
         return implementedCiphers;
+    }
+
+
+    @Override
+    protected boolean isTls13Available() {
+        return TLS.isTlsv13Available();
     }
 
 

@@ -21,7 +21,6 @@ import java.nio.ReadOnlyBufferException;
 import java.security.Principal;
 import java.security.cert.Certificate;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -65,6 +64,8 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
 
     public static final Set<String> AVAILABLE_CIPHER_SUITES;
 
+    public static final Set<String> IMPLEMENTED_PROTOCOLS_SET;
+
     static {
         final Set<String> availableCipherSuites = new LinkedHashSet<>(128);
         final long aprPool = Pool.create(0);
@@ -94,6 +95,19 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
             Pool.destroy(aprPool);
         }
         AVAILABLE_CIPHER_SUITES = Collections.unmodifiableSet(availableCipherSuites);
+
+        HashSet<String> protocols = new HashSet<>();
+        protocols.add(Constants.SSL_PROTO_SSLv2Hello);
+        protocols.add(Constants.SSL_PROTO_SSLv2);
+        protocols.add(Constants.SSL_PROTO_SSLv3);
+        protocols.add(Constants.SSL_PROTO_TLSv1);
+        protocols.add(Constants.SSL_PROTO_TLSv1_1);
+        protocols.add(Constants.SSL_PROTO_TLSv1_2);
+        if (SSL.version() >= 0x1010100f) {
+            protocols.add(Constants.SSL_PROTO_TLSv1_3);
+        }
+
+        IMPLEMENTED_PROTOCOLS_SET = Collections.unmodifiableSet(protocols);
     }
 
     private static final int MAX_PLAINTEXT_LENGTH = 16 * 1024; // 2^14
@@ -102,17 +116,6 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
 
     // Protocols
     static final int VERIFY_DEPTH = 10;
-
-    private static final String[] IMPLEMENTED_PROTOCOLS = {
-        Constants.SSL_PROTO_SSLv2Hello,
-        Constants.SSL_PROTO_SSLv2,
-        Constants.SSL_PROTO_SSLv3,
-        Constants.SSL_PROTO_TLSv1,
-        Constants.SSL_PROTO_TLSv1_1,
-        Constants.SSL_PROTO_TLSv1_2
-    };
-    public static final Set<String> IMPLEMENTED_PROTOCOLS_SET =
-            Collections.unmodifiableSet(new HashSet<>(Arrays.asList(IMPLEMENTED_PROTOCOLS)));
 
     // Header (5) + Data (2^14) + Compression (1024) + Encryption (1024) + MAC (20) + Padding (256)
     static final int MAX_ENCRYPTED_PACKET_LENGTH = MAX_CIPHERTEXT_LENGTH + 5 + 20 + 256;
@@ -760,7 +763,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
 
     @Override
     public String[] getSupportedProtocols() {
-        return IMPLEMENTED_PROTOCOLS.clone();
+        return IMPLEMENTED_PROTOCOLS_SET.toArray(new String[IMPLEMENTED_PROTOCOLS_SET.size()]);
     }
 
     @Override

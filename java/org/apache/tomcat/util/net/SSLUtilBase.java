@@ -48,14 +48,25 @@ public abstract class SSLUtilBase implements SSLUtil {
 
 
     protected SSLUtilBase(SSLHostConfigCertificate certificate) {
+        this(certificate, true);
+    }
+
+
+    protected SSLUtilBase(SSLHostConfigCertificate certificate, boolean warnOnSkip) {
         this.certificate = certificate;
         SSLHostConfig sslHostConfig = certificate.getSSLHostConfig();
 
         // Calculate the enabled protocols
         Set<String> configuredProtocols = sslHostConfig.getProtocols();
+        if (!isTls13Available() &&
+                !sslHostConfig.isExplicitlyRequestedProtocol(Constants.SSL_PROTO_TLSv1_3)) {
+            // TLS 1.3 not implemented and not explicitly requested so ignore it
+            // if present
+            configuredProtocols.remove(Constants.SSL_PROTO_TLSv1_3);
+        }
         Set<String> implementedProtocols = getImplementedProtocols();
         List<String> enabledProtocols =
-                getEnabled("protocols", getLog(), true, configuredProtocols, implementedProtocols);
+                getEnabled("protocols", getLog(), warnOnSkip, configuredProtocols, implementedProtocols);
         if (enabledProtocols.contains("SSLv3")) {
             log.warn(sm.getString("jsse.ssl3"));
         }
@@ -197,4 +208,5 @@ public abstract class SSLUtilBase implements SSLUtil {
     protected abstract Set<String> getImplementedProtocols();
     protected abstract Set<String> getImplementedCiphers();
     protected abstract Log getLog();
+    protected abstract boolean isTls13Available();
 }

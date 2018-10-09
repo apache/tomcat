@@ -439,6 +439,8 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
                     value |= SSL.SSL_PROTOCOL_TLSV1_1;
                 } else if (Constants.SSL_PROTO_TLSv1_2.equalsIgnoreCase(protocol)) {
                     value |= SSL.SSL_PROTOCOL_TLSV1_2;
+                } else if (Constants.SSL_PROTO_TLSv1_3.equalsIgnoreCase(protocol)) {
+                    value |= SSL.SSL_PROTOCOL_TLSV1_3;
                 } else {
                     // Should not happen since filtering to build
                     // enabled protocols removes invalid values.

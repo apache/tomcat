@@ -25,6 +25,7 @@ import javax.net.ssl.TrustManager;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.jni.SSL;
 import org.apache.tomcat.util.net.SSLContext;
 import org.apache.tomcat.util.net.SSLHostConfig;
 import org.apache.tomcat.util.net.SSLHostConfigCertificate;
@@ -42,7 +43,8 @@ public class OpenSSLUtil extends SSLUtilBase {
 
         if (certificate.getCertificateFile() == null) {
             // Using JSSE configuration for keystore and truststore
-            jsseUtil = new JSSEUtil(certificate);
+            // Missing protocols not a concern so don't warn on skip
+            jsseUtil = new JSSEUtil(certificate, false);
         } else {
             // Use OpenSSL configuration for certificates
             jsseUtil = null;
@@ -65,6 +67,12 @@ public class OpenSSLUtil extends SSLUtilBase {
     @Override
     protected Set<String> getImplementedCiphers() {
         return OpenSSLEngine.AVAILABLE_CIPHER_SUITES;
+    }
+
+
+    @Override
+    protected boolean isTls13Available() {
+        return SSL.version() >= 0x1010100f;
     }
 
 

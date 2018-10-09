@@ -1294,8 +1294,8 @@
       an empty list.</p>
       <p>The token <code>all</code> is an alias for
       <code>SSLv2Hello,TLSv1,TLSv1.1,TLSv1.2,TLSv1.3</code>.</p>
-      <p>Note that <code>TLSv1.3</code> is only supported for JSSE and JVMs
-      that implement <code>TLSv1.3</code>.</p>
+      <p>Note that <code>TLSv1.3</code> is only supported for JSSE when using a
+      JVM that implements <code>TLSv1.3</code>.</p>
       <p>Note that <code>SSLv2Hello</code> will be ignored for OpenSSL based
       secure connectors. If more than one protocol is specified for an OpenSSL
       based secure connector it will always support <code>SSLv2Hello</code>. If a
