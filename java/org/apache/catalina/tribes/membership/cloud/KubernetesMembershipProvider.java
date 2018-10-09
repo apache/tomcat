@@ -35,11 +35,7 @@ import org.apache.catalina.tribes.membership.MemberImpl;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.codec.binary.StringUtils;
-
-import com.github.openjson.JSONArray;
-import com.github.openjson.JSONException;
-import com.github.openjson.JSONObject;
-import com.github.openjson.JSONTokener;
+import org.noggit.JSONParser;
 
 
 public class KubernetesMembershipProvider extends CloudMembershipProvider {
@@ -145,58 +141,170 @@ public class KubernetesMembershipProvider extends CloudMembershipProvider {
 
     protected void parsePods(Reader reader, List<MemberImpl> members)
             throws IOException{
-        JSONObject json = new JSONObject(new JSONTokener(reader));
 
-        JSONArray items = json.getJSONArray("items");
-
-        for (int i = 0; i < items.length(); i++) {
-            String phase;
-            String ip;
-            String name;
-            Instant creationTime;
-
-            try {
-                JSONObject item = items.getJSONObject(i);
-                JSONObject status = item.getJSONObject("status");
-                phase = status.getString("phase");
-
-                // Ignore shutdown pods
-                if (!phase.equals("Running"))
-                    continue;
-
-                ip = status.getString("podIP");
-
-                // Get name & start time
-                JSONObject metadata = item.getJSONObject("metadata");
-                name = metadata.getString("name");
-                String timestamp = metadata.getString("creationTimestamp");
-                creationTime = Instant.parse(timestamp);
-            } catch (JSONException e) {
-                log.error(sm.getString("kubernetesMembershipProvider.jsonError"), e);
-                continue;
+        int event = 0;
+        JSONParser parser = new JSONParser(reader);
+        boolean parseItems = false;
+        for (;;) {
+            event = parser.nextEvent();
+            switch (event) {
+            case JSONParser.STRING:
+                String value = parser.getString();
+                if (parser.wasKey()) {
+                    if ("items".equals(value) && parser.nextEvent() == JSONParser.ARRAY_START) {
+                        parseItems = true;
+                    }
+                }
+                break;
+            case JSONParser.ARRAY_END:
+                parseItems = false;
+                break;
+            case JSONParser.OBJECT_START:
+                if (parseItems) {
+                    parseItem(parser, members);
+                }
+                break;
+            default:
+                break;
             }
 
-            // We found ourselves, ignore
-            if (name.equals(hostName))
-                continue;
-
-            // id = md5(hostname)
-            byte[] id = md5.digest(name.getBytes());
-            long aliveTime = Duration.between(creationTime, startTime).getSeconds() * 1000; // aliveTime is in ms
-
-            MemberImpl member = null;
-            try {
-                member = new MemberImpl(ip, port, aliveTime);
-            } catch (IOException e) {
-                // Shouldn't happen:
-                // an exception is thrown if hostname can't be resolved to IP, but we already provide an IP
-                log.error(sm.getString("kubernetesMembershipProvider.memberError"), e);
-                continue;
-            }
-
-            member.setUniqueId(id);
-            members.add(member);
+            if (event == JSONParser.EOF)
+                break;
         }
+
+    }
+
+    private void parseItem(JSONParser parser, List<MemberImpl> members)
+            throws IOException {
+        int event = 0;
+        String podIP = null;
+        // Name in first position, creation in second
+        String[] nameAndCreationTimestamp = null;
+        for (;;) {
+            event = parser.nextEvent();
+            switch (event) {
+            case JSONParser.STRING:
+                String value = parser.getString();
+                if (parser.wasKey()) {
+                    if ("kind".equals(value)) {
+                        // Verify the item is a pod
+                        if (parser.nextEvent() != JSONParser.STRING && (!"Pod".equals(parser.getString()))) {
+                            throw new IllegalStateException();
+                        }
+                    } else if ("status".equals(value)) {
+                        // Verify the status is Running and return the podIP
+                        podIP = parseStatus(parser);
+                    } else if ("metadata".equals(value)) {
+                        nameAndCreationTimestamp = parseMetadata(parser);
+                    }
+                }
+                break;
+            case JSONParser.OBJECT_END:
+                // Done
+                if (podIP == null || nameAndCreationTimestamp == null
+                    || nameAndCreationTimestamp[0] == null
+                    || nameAndCreationTimestamp[1] == null) {
+                    throw new IOException(sm.getString("kubernetesMembershipProvider.jsonError"));
+                } else {
+                    // We found ourselves, ignore
+                    if (nameAndCreationTimestamp[0].equals(hostName))
+                        return;
+
+                    // id = md5(hostname)
+                    byte[] id = md5.digest(nameAndCreationTimestamp[0].getBytes());
+                    long aliveTime = Duration.between(Instant.parse(nameAndCreationTimestamp[1]), startTime).getSeconds() * 1000; // aliveTime is in ms
+
+                    MemberImpl member = null;
+                    try {
+                        member = new MemberImpl(podIP, port, aliveTime);
+                    } catch (IOException e) {
+                        // Shouldn't happen:
+                        // an exception is thrown if hostname can't be resolved to IP, but we already provide an IP
+                        log.error(sm.getString("kubernetesMembershipProvider.memberError"), e);
+                        continue;
+                    }
+
+                    member.setUniqueId(id);
+                    members.add(member);
+                }
+                return;
+            default:
+                break;
+            }
+
+            if (event == JSONParser.EOF)
+                break;
+        }
+
+    }
+
+    private String parseStatus(JSONParser parser)
+            throws IOException {
+        String result = null;
+        int event = 0;
+        for (;;) {
+            event = parser.nextEvent();
+            switch (event) {
+            case JSONParser.STRING:
+                String value = parser.getString();
+                if (parser.wasKey()) {
+                    if ("phase".equals(value)) {
+                        // Verify the item is a pod
+                        if (parser.nextEvent() != JSONParser.STRING && (!"Running".equals(parser.getString()))) {
+                            return null;
+                        }
+                    } else if ("podIP".equals(value)) {
+                        if (parser.nextEvent() == JSONParser.STRING) {
+                            result = parser.getString();
+                        }
+                    }
+                }
+                break;
+            case JSONParser.OBJECT_END:
+                // Done
+                return result;
+            default:
+                break;
+            }
+
+            if (event == JSONParser.EOF)
+                break;
+        }
+        return result;
+    }
+
+    private String[] parseMetadata(JSONParser parser)
+            throws IOException {
+        String[] result = new String[2];
+        int event = 0;
+        for (;;) {
+            event = parser.nextEvent();
+            switch (event) {
+            case JSONParser.STRING:
+                String value = parser.getString();
+                if (parser.wasKey()) {
+                    if ("name".equals(value)) {
+                        if (parser.nextEvent() == JSONParser.STRING) {
+                            result[0] = parser.getString();
+                        }
+                    } else if ("creationTimestamp".equals(value)) {
+                        if (parser.nextEvent() == JSONParser.STRING) {
+                            result[1] = parser.getString();
+                        }
+                    }
+                }
+                break;
+            case JSONParser.OBJECT_END:
+                // Done
+                return result;
+            default:
+                break;
+            }
+
+            if (event == JSONParser.EOF)
+                break;
+        }
+        return result;
     }
 
 }

@@ -38,6 +38,4 @@ New items for 10.0.x onwards:
 3.  Remove the ExtensionValidator and associated classes (assuming that the
     minimum Java version is Java 9 or later).
 
-4.  New builder style alternate embedded API (likely also for 9.x).
-
-5.  Cloud aware cluster membership provider(s) (likely also for 9.x).
+4.  New embedded APIs (likely also for 9.x).
