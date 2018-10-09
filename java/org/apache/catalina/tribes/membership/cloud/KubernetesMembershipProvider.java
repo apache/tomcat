@@ -20,6 +20,7 @@ package org.apache.catalina.tribes.membership.cloud;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.Reader;
 import java.net.URLEncoder;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
@@ -56,8 +57,9 @@ public class KubernetesMembershipProvider extends CloudMembershipProvider {
 
         // Set up Kubernetes API parameters
         String namespace = getEnv("KUBERNETES_NAMESPACE", CUSTOM_ENV_PREFIX + "NAMESPACE");
-        if (namespace == null || namespace.length() == 0)
-            throw new RuntimeException(sm.getString("kubernetesMembershipProvider.noNamespace"));
+        if (namespace == null || namespace.length() == 0) {
+            throw new IllegalArgumentException(sm.getString("kubernetesMembershipProvider.noNamespace"));
+        }
 
         if (log.isDebugEnabled()) {
             log.debug(String.format("Namespace [%s] set; clustering enabled", namespace));
@@ -131,64 +133,70 @@ public class KubernetesMembershipProvider extends CloudMembershipProvider {
 
         List<MemberImpl> members = new ArrayList<>();
 
-        try (InputStream stream = streamProvider.openStream(url, headers, connectionTimeout, readTimeout)) {
-            JSONObject json = new JSONObject(new JSONTokener(new InputStreamReader(stream, "UTF-8")));
-
-            JSONArray items = json.getJSONArray("items");
-
-            for (int i = 0; i < items.length(); i++) {
-                String phase;
-                String ip;
-                String name;
-                Instant creationTime;
-
-                try {
-                    JSONObject item = items.getJSONObject(i);
-                    JSONObject status = item.getJSONObject("status");
-                    phase = status.getString("phase");
-
-                    // Ignore shutdown pods
-                    if (!phase.equals("Running"))
-                        continue;
-
-                    ip = status.getString("podIP");
-
-                    // Get name & start time
-                    JSONObject metadata = item.getJSONObject("metadata");
-                    name = metadata.getString("name");
-                    String timestamp = metadata.getString("creationTimestamp");
-                    creationTime = Instant.parse(timestamp);
-                } catch (JSONException e) {
-                    log.warn(sm.getString("kubernetesMembershipProvider.jsonError"), e);
-                    continue;
-                }
-
-                // We found ourselves, ignore
-                if (name.equals(hostName))
-                    continue;
-
-                // id = md5(hostname)
-                byte[] id = md5.digest(name.getBytes());
-                long aliveTime = Duration.between(creationTime, startTime).getSeconds() * 1000; // aliveTime is in ms
-
-                MemberImpl member = null;
-                try {
-                    member = new MemberImpl(ip, port, aliveTime);
-                } catch (IOException e) {
-                    // Shouldn't happen:
-                    // an exception is thrown if hostname can't be resolved to IP, but we already provide an IP
-                    log.warn(sm.getString("kubernetesMembershipProvider.memberError"), e);
-                    continue;
-                }
-
-                member.setUniqueId(id);
-                members.add(member);
-            }
+        try (InputStream stream = streamProvider.openStream(url, headers, connectionTimeout, readTimeout);
+                InputStreamReader reader = new InputStreamReader(stream, "UTF-8")) {
+            parsePods(reader, members);
         } catch (IOException e) {
-            log.warn(sm.getString("kubernetesMembershipProvider.streamError"), e);
+            log.error(sm.getString("kubernetesMembershipProvider.streamError"), e);
         }
 
         return members.toArray(new Member[0]);
+    }
+
+    protected void parsePods(Reader reader, List<MemberImpl> members)
+            throws IOException{
+        JSONObject json = new JSONObject(new JSONTokener(reader));
+
+        JSONArray items = json.getJSONArray("items");
+
+        for (int i = 0; i < items.length(); i++) {
+            String phase;
+            String ip;
+            String name;
+            Instant creationTime;
+
+            try {
+                JSONObject item = items.getJSONObject(i);
+                JSONObject status = item.getJSONObject("status");
+                phase = status.getString("phase");
+
+                // Ignore shutdown pods
+                if (!phase.equals("Running"))
+                    continue;
+
+                ip = status.getString("podIP");
+
+                // Get name & start time
+                JSONObject metadata = item.getJSONObject("metadata");
+                name = metadata.getString("name");
+                String timestamp = metadata.getString("creationTimestamp");
+                creationTime = Instant.parse(timestamp);
+            } catch (JSONException e) {
+                log.error(sm.getString("kubernetesMembershipProvider.jsonError"), e);
+                continue;
+            }
+
+            // We found ourselves, ignore
+            if (name.equals(hostName))
+                continue;
+
+            // id = md5(hostname)
+            byte[] id = md5.digest(name.getBytes());
+            long aliveTime = Duration.between(creationTime, startTime).getSeconds() * 1000; // aliveTime is in ms
+
+            MemberImpl member = null;
+            try {
+                member = new MemberImpl(ip, port, aliveTime);
+            } catch (IOException e) {
+                // Shouldn't happen:
+                // an exception is thrown if hostname can't be resolved to IP, but we already provide an IP
+                log.error(sm.getString("kubernetesMembershipProvider.memberError"), e);
+                continue;
+            }
+
+            member.setUniqueId(id);
+            members.add(member);
+        }
     }
 
 }
