@@ -190,7 +190,7 @@ public class BasicManagedDataSource extends BasicDataSource {
             }
 
             try {
-                xaDataSourceInstance = (XADataSource) xaDataSourceClass.newInstance();
+                xaDataSourceInstance = (XADataSource) xaDataSourceClass.getConstructor().newInstance();
             } catch (final Exception t) {
                 final String message = "Cannot create XA data source of class '" + xaDataSource + "'";
                 throw new SQLException(message, t);

@@ -106,7 +106,8 @@ public class CloudMembershipService extends MembershipServiceBase {
             if (log.isDebugEnabled()) {
                 log.debug("Using membershipProvider: " + provider);
             }
-            membershipProvider = (MembershipProvider) Class.forName(provider).newInstance();
+            membershipProvider =
+                    (MembershipProvider) Class.forName(provider).getConstructor().newInstance();
             membershipProvider.setMembershipListener(this);
             membershipProvider.setMembershipService(this);
             membershipProvider.init(properties);
