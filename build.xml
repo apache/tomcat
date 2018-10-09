@@ -1972,6 +1972,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       <packageset dir="${tomcat.dist}/src/java/">
         <include name="org/**"/>
         <exclude name="org/apache/el/parser/**"/>
+        <exclude name="org/apache/tomcat/util/json/**"/>
       </packageset>
       <!--jdbc-pool src files for javadoc-->
       <packageset dir="${tomcat.dist}/src/modules/jdbc-pool/src/main/java"/>
