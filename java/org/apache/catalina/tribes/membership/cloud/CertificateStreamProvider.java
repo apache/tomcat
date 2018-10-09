@@ -90,7 +90,7 @@ public class CertificateStreamProvider extends AbstractStreamProvider {
             String alias = cert.getSubjectX500Principal().getName();
             keyStore.setKeyEntry(alias, privKey, clientKeyPassword, new Certificate[]{cert});
 
-            KeyManagerFactory keyManagerFactory = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
+            KeyManagerFactory keyManagerFactory = KeyManagerFactory.getInstance(clientKeyAlgo);
             keyManagerFactory.init(keyStore, clientKeyPassword);
 
             return keyManagerFactory.getKeyManagers();
