@@ -79,7 +79,7 @@
       <disallow pkg="org\.apache\.catalina(?!\.tribes).*" regex="true"/>
       <disallow pkg="org.apache.coyote"/>
       <disallow pkg="org.apache.naming"/>
-      <disallow pkg="org.apache.tomcat"/>
+      <disallow pkg="org\.apache\.tomcat(?!\.util\.json).*" regex="true"/>
       <allow pkg="org.apache.catalina.tribes"/>
       <subpackage name="membership">
         <subpackage name="cloud">
