@@ -35,6 +35,7 @@ public class InsecureStreamProvider extends AbstractStreamProvider {
     private static final Log log = LogFactory.getLog(InsecureStreamProvider.class);
 
     private static final HostnameVerifier INSECURE_HOSTNAME_VERIFIER = new HostnameVerifier() {
+        @Override
         public boolean verify(String arg0, SSLSession arg1) {
             return true;
         }
