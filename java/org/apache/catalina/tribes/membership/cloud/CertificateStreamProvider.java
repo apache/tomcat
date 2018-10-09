@@ -47,11 +47,8 @@ public class CertificateStreamProvider extends AbstractStreamProvider {
     private final SSLSocketFactory factory;
 
     CertificateStreamProvider(String clientCertFile, String clientKeyFile, String clientKeyPassword, String clientKeyAlgo, String caCertFile) throws Exception {
-        // defaults - RSA and empty password
         char[] password = (clientKeyPassword != null) ? clientKeyPassword.toCharArray() : new char[0];
-        String algorithm = (clientKeyAlgo != null) ? clientKeyAlgo : "RSA";
-
-        KeyManager[] keyManagers = configureClientCert(clientCertFile, clientKeyFile, password, algorithm);
+        KeyManager[] keyManagers = configureClientCert(clientCertFile, clientKeyFile, password, clientKeyAlgo);
         TrustManager[] trustManagers = configureCaCert(caCertFile);
         SSLContext context = SSLContext.getInstance("TLS");
         context.init(keyManagers, trustManagers, null);
@@ -77,12 +74,11 @@ public class CertificateStreamProvider extends AbstractStreamProvider {
     }
 
     private static KeyManager[] configureClientCert(String clientCertFile, String clientKeyFile, char[] clientKeyPassword, String clientKeyAlgo) throws Exception {
-        // TODO What is intended usage of clientKeyAlgo?
         try (InputStream certInputStream = new FileInputStream(clientCertFile)) {
             CertificateFactory certFactory = CertificateFactory.getInstance("X509");
             X509Certificate cert = (X509Certificate)certFactory.generateCertificate(certInputStream);
 
-            PEMFile pemFile = new PEMFile(clientKeyFile, new String(clientKeyPassword));
+            PEMFile pemFile = new PEMFile(clientKeyFile, new String(clientKeyPassword), clientKeyAlgo);
             PrivateKey privKey = pemFile.getPrivateKey();
 
             KeyStore keyStore = KeyStore.getInstance("JKS");
