@@ -213,7 +213,6 @@
   <path id="compile.classpath">
     <pathelement location="${jdt.jar}"/>
     <pathelement location="${saaj-api.jar}"/>
-    <pathelement location="${noggit.jar}"/>
   </path>
 
   <path id="tomcat.classpath">
@@ -390,6 +389,7 @@
     <include name="org/apache/tomcat/util/res/**" />
     <include name="org/apache/tomcat/util/security/**" />
     <include name="org/apache/tomcat/util/threads/**" />
+    <include name="org/apache/tomcat/util/json/**" />
     <include name="org/apache/tomcat/util/*" />
     <exclude name="org/apache/tomcat/util/bcel" />
     <exclude name="org/apache/tomcat/util/descriptor" />
@@ -596,6 +596,7 @@
         <exclude name="java/org/apache/**/parser/ParseException.java" />
         <exclude name="java/org/apache/**/parser/SimpleCharStream.java" />
         <exclude name="java/org/apache/**/parser/Token*.java" />
+        <exclude name="java/org/apache/tomcat/util/json/*.java" />
         <!-- Exclude simple test files -->
         <exclude name="test/webapp/bug53257/**/*.txt"/>
         <exclude name="test/webapp/bug49nnn/bug49464*"/>
@@ -2716,16 +2717,6 @@ skip.installer property in build.properties" />
       <param name="checksum.enabled" value="${saaj-api.checksum.enabled}"/>
       <param name="checksum.algorithm" value="${saaj-api.checksum.algorithm}"/>
       <param name="checksum.value" value="${saaj-api.checksum.value}"/>
-    </antcall>
-
-    <!-- Download noggit -->
-    <antcall target="downloadfile">
-      <param name="sourcefile" value="${noggit.loc}"/>
-      <param name="destfile" value="${noggit.jar}"/>
-      <param name="destdir" value="${noggit.home}"/>
-      <param name="checksum.enabled" value="${noggit.checksum.enabled}"/>
-      <param name="checksum.algorithm" value="${noggit.checksum.algorithm}"/>
-      <param name="checksum.value" value="${noggit.checksum.value}"/>
     </antcall>
 
  </target>

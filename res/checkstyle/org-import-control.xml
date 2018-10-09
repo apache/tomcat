@@ -85,7 +85,7 @@
         <subpackage name="cloud">
           <allow class="org.apache.tomcat.util.codec.binary.StringUtils"/>
           <allow class="org.apache.tomcat.util.net.jsse.PEMFile"/>
-          <allow pkg="org.noggit"/>
+          <allow class="org.apache.tomcat.util.json.JSONParser"/>
         </subpackage>
       </subpackage>
     </subpackage>

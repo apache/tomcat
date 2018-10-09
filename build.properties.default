@@ -283,15 +283,6 @@ saaj-api.home=${base.path}/saaj-api-${saaj-api.version}
 saaj-api.jar=${saaj-api.home}/saaj-api-${saaj-api.version}.jar
 saaj-api.loc=${base-maven.loc}/javax/xml/soap/saaj-api/${saaj-api.version}/saaj-api-${saaj-api.version}.jar
 
-# ----- Noggit, version 0.8 or later -----
-noggit.version=0.8
-noggit.checksum.enabled=true
-noggit.checksum.algorithm=MD5|SHA-1
-noggit.checksum.value=6856f2ceab2dd7128595e4659d22d581|ba4ad65a62d7dfcf97a8d42c82ae7d8824f9087f
-noggit.home=${base.path}/noggit-${noggit.version}
-noggit.jar=${noggit.home}/noggit-${noggit.version}.jar
-noggit.loc=${base-maven.loc}/org/noggit/noggit/${noggit.version}/noggit-${noggit.version}.jar
-
 # ----- bnd & bndlib, version 4.0.0 or later  -----
 # ----- provides OSGI metadata for JARs       -----
 bnd.version=4.0.0

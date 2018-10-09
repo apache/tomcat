@@ -204,6 +204,10 @@
       <add>
         Added ant target ide-intellij to create an IntelliJ IDEA project. (isapir)
       </add>
+      <add>
+        Utility JSON parser generated from a public domain javacc grammar
+        written by Robert Fischer. (remm)
+      </add>
     </changelog>
   </subsection>
 </section>

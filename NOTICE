@@ -24,6 +24,10 @@ JDT Core Batch Compiler component, which is open source software.
 The original software and related information is available at
 https://www.eclipse.org/jdt/core/.
 
+org.apache.tomcat.util.json.JSONParser.jj is a public domain javacc grammar
+for JSON written by Robert Fischer.
+https://github.com/RobertFischer/json-parser
+
 For portions of the Tomcat JNI OpenSSL API and the OpenSSL JSSE integration
 The org.apache.tomcat.jni and the org.apache.tomcat.net.openssl packages
 are derivative work originating from the Netty project and the finagle-native
