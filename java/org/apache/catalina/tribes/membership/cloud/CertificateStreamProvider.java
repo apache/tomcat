@@ -77,6 +77,7 @@ public class CertificateStreamProvider extends AbstractStreamProvider {
     }
 
     private static KeyManager[] configureClientCert(String clientCertFile, String clientKeyFile, char[] clientKeyPassword, String clientKeyAlgo) throws Exception {
+        // TODO What is intended usage of clientKeyAlgo?
         try (InputStream certInputStream = new FileInputStream(clientCertFile)) {
             CertificateFactory certFactory = CertificateFactory.getInstance("X509");
             X509Certificate cert = (X509Certificate)certFactory.generateCertificate(certInputStream);
@@ -90,7 +91,7 @@ public class CertificateStreamProvider extends AbstractStreamProvider {
             String alias = cert.getSubjectX500Principal().getName();
             keyStore.setKeyEntry(alias, privKey, clientKeyPassword, new Certificate[]{cert});
 
-            KeyManagerFactory keyManagerFactory = KeyManagerFactory.getInstance(clientKeyAlgo);
+            KeyManagerFactory keyManagerFactory = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
             keyManagerFactory.init(keyStore, clientKeyPassword);
 
             return keyManagerFactory.getKeyManagers();
