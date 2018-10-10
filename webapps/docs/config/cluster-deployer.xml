@@ -36,7 +36,7 @@
 <section name="Introduction">
   <p>The Farm War Deployer can deploy and undeploy web applications on the other
   nodes in the cluster.</p>
-  <p><strong>Note: </strong>FarmWarDeployer can be configured at host level
+  <p><strong>Note:</strong> FarmWarDeployer can be configured at host level
   cluster only.
   </p>
 </section>
