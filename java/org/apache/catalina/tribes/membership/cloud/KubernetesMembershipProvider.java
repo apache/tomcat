@@ -159,10 +159,6 @@ public class KubernetesMembershipProvider extends CloudMembershipProvider {
                 }
                 @SuppressWarnings("unchecked")
                 LinkedHashMap<String, Object> pod = (LinkedHashMap<String, Object>) podObject;
-                if (!"Pod".equals(pod.get("kind"))) {
-                    log.warn(sm.getString("kubernetesMembershipProvider.invalidPod"));
-                    continue;
-                }
                 Object metadataObject = pod.get("metadata");
                 if (!(metadataObject instanceof LinkedHashMap<?, ?>)) {
                     log.warn(sm.getString("kubernetesMembershipProvider.invalidPod"));
