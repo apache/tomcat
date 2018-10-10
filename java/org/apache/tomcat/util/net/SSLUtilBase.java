@@ -53,7 +53,7 @@ public abstract class SSLUtilBase implements SSLUtil {
     }
 
 
-    protected SSLUtilBase(SSLHostConfigCertificate certificate, boolean warnOnSkip) {
+    protected SSLUtilBase(SSLHostConfigCertificate certificate, boolean warnTls13) {
         this.certificate = certificate;
         SSLHostConfig sslHostConfig = certificate.getSSLHostConfig();
 
@@ -67,7 +67,7 @@ public abstract class SSLUtilBase implements SSLUtil {
         }
         Set<String> implementedProtocols = getImplementedProtocols();
         List<String> enabledProtocols =
-                getEnabled("protocols", getLog(), warnOnSkip, configuredProtocols, implementedProtocols);
+                getEnabled("protocols", getLog(), warnTls13, configuredProtocols, implementedProtocols);
         if (enabledProtocols.contains("SSLv3")) {
             log.warn(sm.getString("jsse.ssl3"));
         }
@@ -76,7 +76,7 @@ public abstract class SSLUtilBase implements SSLUtil {
         if (enabledProtocols.contains(Constants.SSL_PROTO_TLSv1_3) &&
                 (sslHostConfig.getCertificateVerification() == CertificateVerification.OPTIONAL ||
                         sslHostConfig.getCertificateVerification() == CertificateVerification.OPTIONAL) &&
-                !isTls13RenegAuthAvailable() && warnOnSkip) {
+                !isTls13RenegAuthAvailable() && warnTls13) {
             log.warn(sm.getString("jsse.tls13.auth"));
         }
 
