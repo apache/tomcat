@@ -141,31 +141,65 @@ public class KubernetesMembershipProvider extends CloudMembershipProvider {
         return members.toArray(new Member[0]);
     }
 
-    protected void parsePods(Reader reader, List<MemberImpl> members)
-            throws IOException{
+    protected void parsePods(Reader reader, List<MemberImpl> members) {
         JSONParser parser = new JSONParser(reader);
         try {
             LinkedHashMap<String, Object> json = parser.object();
+            Object itemsObject = json.get("items");
+            if (!(itemsObject instanceof List<?>)) {
+                log.error(sm.getString("kubernetesMembershipProvider.invalidPodsList", "no items"));
+                return;
+            }
             @SuppressWarnings("unchecked")
-            List<Object> items = (List<Object>) json.get("items");
+            List<Object> items = (List<Object>) itemsObject;
             for (Object podObject : items) {
+                if (!(podObject instanceof LinkedHashMap<?, ?>)) {
+                    log.warn(sm.getString("kubernetesMembershipProvider.invalidPod"));
+                    continue;
+                }
                 @SuppressWarnings("unchecked")
                 LinkedHashMap<String, Object> pod = (LinkedHashMap<String, Object>) podObject;
                 if (!"Pod".equals(pod.get("kind"))) {
+                    log.warn(sm.getString("kubernetesMembershipProvider.invalidPod"));
+                    continue;
+                }
+                Object metadataObject = pod.get("metadata");
+                if (!(metadataObject instanceof LinkedHashMap<?, ?>)) {
+                    log.warn(sm.getString("kubernetesMembershipProvider.invalidPod"));
                     continue;
                 }
                 @SuppressWarnings("unchecked")
-                LinkedHashMap<String, Object> metadata = (LinkedHashMap<String, Object>) pod.get("metadata");
-                String name = metadata.get("name").toString();
+                LinkedHashMap<String, Object> metadata = (LinkedHashMap<String, Object>) metadataObject;
+                Object nameObject = metadata.get("name");
+                if (nameObject == null) {
+                    log.warn(sm.getString("kubernetesMembershipProvider.invalidPod"));
+                    continue;
+                }
+                String name = nameObject.toString();
                 Object objectUid = metadata.get("uid");
                 String uid = (objectUid == null) ? name : objectUid.toString();
-                String creationTimestamp = metadata.get("creationTimestamp").toString();
+                Object creationTimestampObject = metadata.get("creationTimestamp");
+                if (creationTimestampObject == null) {
+                    log.warn(sm.getString("kubernetesMembershipProvider.invalidPod"));
+                    continue;
+                }
+                String creationTimestamp = creationTimestampObject.toString();
+                Object statusObject = pod.get("status");
+                if (!(statusObject instanceof LinkedHashMap<?, ?>)) {
+                    log.warn(sm.getString("kubernetesMembershipProvider.invalidPod"));
+                    continue;
+                }
                 @SuppressWarnings("unchecked")
-                LinkedHashMap<String, Object> status = (LinkedHashMap<String, Object>) pod.get("status");
+                LinkedHashMap<String, Object> status = (LinkedHashMap<String, Object>) statusObject;
                 if (!"Running".equals(status.get("phase"))) {
                     continue;
                 }
-                String podIP = status.get("podIP").toString();
+                Object podIPObject = status.get("podIP");
+                if (podIPObject == null) {
+                    log.warn(sm.getString("kubernetesMembershipProvider.invalidPod"));
+                    continue;
+                }
+                String podIP = podIPObject.toString();
 
                 // We found ourselves, ignore
                 if (name.equals(hostName)) {
@@ -188,7 +222,7 @@ public class KubernetesMembershipProvider extends CloudMembershipProvider {
                 members.add(member);
             }
         } catch (Exception e) {
-            throw new IOException(sm.getString("kubernetesMembershipProvider.jsonError"), e);
+            log.error(sm.getString("kubernetesMembershipProvider.jsonError"), e);
         }
     }
 
