@@ -77,6 +77,13 @@ public class OpenSSLUtil extends SSLUtilBase {
 
 
     @Override
+    protected boolean isTls13RenegAuthAvailable() {
+        // OpenSSL does support authentication after the initial handshake
+        return true;
+    }
+
+
+    @Override
     public SSLContext createSSLContext(List<String> negotiableProtocols) throws Exception {
         return new OpenSSLContext(certificate, negotiableProtocols);
     }

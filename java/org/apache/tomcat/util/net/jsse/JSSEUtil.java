@@ -177,6 +177,13 @@ public class JSSEUtil extends SSLUtilBase {
 
 
     @Override
+    protected boolean isTls13RenegAuthAvailable() {
+        // TLS 1.3 does not support authentication after the initial handshake
+        return false;
+    }
+
+
+    @Override
     public SSLContext createSSLContext(List<String> negotiableProtocols) throws NoSuchAlgorithmException {
         return new JSSESSLContext(sslHostConfig.getSslProtocol());
     }

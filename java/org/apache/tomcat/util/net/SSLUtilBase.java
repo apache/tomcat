@@ -31,6 +31,7 @@ import java.util.Set;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.file.ConfigFileLoader;
+import org.apache.tomcat.util.net.SSLHostConfig.CertificateVerification;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -71,6 +72,13 @@ public abstract class SSLUtilBase implements SSLUtil {
             log.warn(sm.getString("jsse.ssl3"));
         }
         this.enabledProtocols = enabledProtocols.toArray(new String[enabledProtocols.size()]);
+
+        if (enabledProtocols.contains(Constants.SSL_PROTO_TLSv1_3) &&
+                (sslHostConfig.getCertificateVerification() == CertificateVerification.OPTIONAL ||
+                        sslHostConfig.getCertificateVerification() == CertificateVerification.OPTIONAL) &&
+                !isTls13RenegAuthAvailable() && warnOnSkip) {
+            log.warn(sm.getString("jsse.tls13.auth"));
+        }
 
         // Calculate the enabled ciphers
         List<String> configuredCiphers = sslHostConfig.getJsseCipherNames();
@@ -209,4 +217,5 @@ public abstract class SSLUtilBase implements SSLUtil {
     protected abstract Set<String> getImplementedCiphers();
     protected abstract Log getLog();
     protected abstract boolean isTls13Available();
+    protected abstract boolean isTls13RenegAuthAvailable();
 }
