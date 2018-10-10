@@ -173,7 +173,7 @@
      </attribute>
      <attribute name="performReadTest" required="false">
        If true is set, read the response of the test message that sent. Default is false.
-       <strong>Note: </strong>if <code>performSendTest</code> is false, this attribute will have no effect.
+       <strong>Note:</strong> if <code>performSendTest</code> is false, this attribute will have no effect.
      </attribute>
      <attribute name="readTestTimeout" required="false">
        Specifies the timeout, in milliseconds, to use when performing a read test

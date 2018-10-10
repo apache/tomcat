@@ -248,7 +248,7 @@ p.notice {
             <tr><td>
             <blockquote>
             <p class="notice">
-              <strong>Notice: </strong>This comments section collects your suggestions
+              <strong>Notice:</strong> This comments section collects your suggestions
               on improving documentation for Apache Tomcat.<br/><br/>
               If you have trouble and need help, read
               <a href="http://tomcat.apache.org/findhelp.html">Find Help</a> page

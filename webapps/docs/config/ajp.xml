@@ -148,7 +148,7 @@
 
     <attribute name="parseBodyMethods" required="false">
       <p>A comma-separated list of HTTP methods for which request
-      bodies using <code>application/x-www-form-urlencoded</code>will be parsed
+      bodies using <code>application/x-www-form-urlencoded</code> will be parsed
       for request parameters identically to POST. This is useful in RESTful
       applications that want to support POST-style semantics for PUT requests.
       Note that any setting other than <code>POST</code> causes Tomcat

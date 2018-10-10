@@ -439,7 +439,7 @@
         resource that is not protected by a security constraint, if the
         authenticator supports preemptive authentication (the standard
         authenticators provided with Tomcat do) then the user&apos; credentials
-        will be processed. If not specified, the default of <code>false</code>is
+        will be processed. If not specified, the default of <code>false</code> is
         used.
         </p>
       </attribute>

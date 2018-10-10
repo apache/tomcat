@@ -278,7 +278,7 @@ com.sun.security.jgss.krb5.accept {
 
   <subsection name="Jespa">
   <p>Full details of this solution can be found through the
-  <a href="http://www.ioplex.com/" rel="nofollow">project web site</a>The key
+  <a href="http://www.ioplex.com/" rel="nofollow">project web site.</a> The key
   features are:</p>
   <ul>
   <li>Pure Java solution</li>

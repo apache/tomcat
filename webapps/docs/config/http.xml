@@ -135,7 +135,7 @@
 
     <attribute name="parseBodyMethods" required="false">
       <p>A comma-separated list of HTTP methods for which request
-      bodies using <code>application/x-www-form-urlencoded</code>will be parsed
+      bodies using <code>application/x-www-form-urlencoded</code> will be parsed
       for request parameters identically to POST. This is useful in RESTful
       applications that want to support POST-style semantics for PUT requests.
       Note that any setting other than <code>POST</code> causes Tomcat
@@ -1224,7 +1224,7 @@
       <code>javax.net.ssl.trustStoreProvider</code> system property. If
       that property is null, the value of <code>keystoreProvider</code> is used
       as the default. If neither this attribute, the default system property nor
-      <code>keystoreProvider</code>is set, the list of registered providers is
+      <code>keystoreProvider</code> is set, the list of registered providers is
       traversed in preference order and the first provider that supports the
       <code>truststoreType</code> is used.
       </p>
