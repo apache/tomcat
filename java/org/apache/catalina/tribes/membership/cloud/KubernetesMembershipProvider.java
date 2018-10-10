@@ -22,6 +22,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.time.Duration;
@@ -156,6 +157,8 @@ public class KubernetesMembershipProvider extends CloudMembershipProvider {
                 @SuppressWarnings("unchecked")
                 LinkedHashMap<String, Object> metadata = (LinkedHashMap<String, Object>) pod.get("metadata");
                 String name = metadata.get("name").toString();
+                Object objectUid = metadata.get("uid");
+                String uid = (objectUid == null) ? name : objectUid.toString();
                 String creationTimestamp = metadata.get("creationTimestamp").toString();
                 @SuppressWarnings("unchecked")
                 LinkedHashMap<String, Object> status = (LinkedHashMap<String, Object>) pod.get("status");
@@ -164,8 +167,12 @@ public class KubernetesMembershipProvider extends CloudMembershipProvider {
                 }
                 String podIP = status.get("podIP").toString();
 
-                // id = md5(hostname)
-                byte[] id = md5.digest(name.getBytes());
+                // We found ourselves, ignore
+                if (name.equals(hostName)) {
+                    continue;
+                }
+
+                byte[] id = md5.digest(uid.getBytes(StandardCharsets.US_ASCII));
                 long aliveTime = Duration.between(Instant.parse(creationTimestamp), startTime).getSeconds() * 1000; // aliveTime is in ms
 
                 MemberImpl member = null;
@@ -177,7 +184,6 @@ public class KubernetesMembershipProvider extends CloudMembershipProvider {
                     log.error(sm.getString("kubernetesMembershipProvider.memberError"), e);
                     continue;
                 }
-
                 member.setUniqueId(id);
                 members.add(member);
             }
