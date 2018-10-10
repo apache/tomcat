@@ -374,7 +374,7 @@ applications you can also disable debug info with <code>debug=&quot;off&quot;</c
 
 <p>
 When you don't want to stop the JSP generation at first JSP syntax error, use
-<code>failOnError=&quot;false&quot;</code>and with
+<code>failOnError=&quot;false&quot;</code> and with
 <code>showSuccess=&quot;true&quot;</code> all successful <i>JSP to Java</i>
 generation are printed out. Sometimes it is very helpful, when you cleanup the
 generate java source files at <code>${webapp.path}/WEB-INF/src</code>

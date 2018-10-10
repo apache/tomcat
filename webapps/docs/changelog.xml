@@ -1625,7 +1625,7 @@
   <subsection name="jdbc-pool">
     <changelog>
       <fix>
-        <bug>61312</bug>: Prevent <code>NullPointerException</code>n when using
+        <bug>61312</bug>: Prevent <code>NullPointerException</code> when using
         the statement cache of connection that has been closed. (kfujino)
       </fix>
     </changelog>
@@ -2533,7 +2533,7 @@
         Christian Stöber. (markt)
       </add>
       <add>
-        <bug>61127</bug>Allow human-readable names for channelSendOptions and
+        <bug>61127</bug>: Allow human-readable names for channelSendOptions and
         mapSendOptions. Patch provided by Igal Sapir. (schultz)
       </add>
     </changelog>

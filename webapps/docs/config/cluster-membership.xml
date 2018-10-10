@@ -225,7 +225,7 @@
 <section name="Nested Components">
   <p>
   Static Membership Service allows nesting of a <strong>&lt;LocalMember&gt;</strong>
-  and <strong>&lt;Member&gt;</strong>element.
+  and <strong>&lt;Member&gt;</strong> element.
   </p>
   <subsection name="StaticMember Attributes">
     <p><b>LocalMember:</b> <br/>

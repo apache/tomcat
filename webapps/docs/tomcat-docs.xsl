@@ -195,7 +195,7 @@
 
                 <div class="text">
                   <p class="notice">
-                    <strong>Notice: </strong>This comments section collects your suggestions
+                    <strong>Notice:</strong> This comments section collects your suggestions
                     on improving documentation for Apache Tomcat.<br/><br/>
                     If you have trouble and need help, read
                     <a href="https://tomcat.apache.org/findhelp.html">Find Help</a> page

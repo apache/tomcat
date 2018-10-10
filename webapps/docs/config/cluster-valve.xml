@@ -113,7 +113,7 @@
   <p>See the <a href="host.html#Single_Sign_On">Single Sign On</a> special
     feature on the <strong>Host</strong> element for more information.</p>
 
-  <p><strong>Note: </strong>ClusterSingleSignOn can be configured at host level cluster only.
+  <p><strong>Note:</strong> ClusterSingleSignOn can be configured at host level cluster only.
   </p>
 
   <subsection name="Attributes">
