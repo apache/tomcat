@@ -197,7 +197,6 @@ TOKEN:{
     )+>
 | <STRING_SINGLE_NONEMPTY: <QUOTE_SINGLE> <STRING_SINGLE_BODY> <QUOTE_SINGLE>>
 | <STRING_DOUBLE_NONEMPTY: <QUOTE_DOUBLE> <STRING_DOUBLE_BODY> <QUOTE_DOUBLE>>
-| <RUBY_SYMBOL:  ":" (["a"-"z"] | ["A"-"Z"] | ["0"-"9"] | "_")+>
 }
 
 // Raw symbol tokens
@@ -348,15 +347,8 @@ String string() : {
 }{
     ( s = doubleQuoteString() 
     | s = singleQuoteString()
-    | s = rubySymbol()
     )
     { return s; }
-}
-
-String rubySymbol(): {
-}{
-    <RUBY_SYMBOL>
-    { return token.image.substring(1); }
 }
 
 String doubleQuoteString() : {

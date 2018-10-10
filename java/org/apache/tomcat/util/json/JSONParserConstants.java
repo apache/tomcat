@@ -82,9 +82,7 @@ public interface JSONParserConstants {
   /** RegularExpression Id. */
   int STRING_DOUBLE_NONEMPTY = 27;
   /** RegularExpression Id. */
-  int RUBY_SYMBOL = 28;
-  /** RegularExpression Id. */
-  int SYMBOL = 29;
+  int SYMBOL = 28;
 
   /** Lexical state. */
   int DEFAULT = 0;
@@ -119,7 +117,6 @@ public interface JSONParserConstants {
     "<STRING_DOUBLE_BODY>",
     "<STRING_SINGLE_NONEMPTY>",
     "<STRING_DOUBLE_NONEMPTY>",
-    "<RUBY_SYMBOL>",
     "<SYMBOL>",
   };
 
