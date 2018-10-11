@@ -33,7 +33,8 @@ import org.apache.tomcat.util.compat.TLS;
  * repository since not all of them are AL2 licensed.
  *
  * The JSSE implementation of TLSv1.3 only supports authentication during the
- * initial handshake.
+ * initial handshake. This test requires TLSv1.3 on client and server so it is
+ * skipped unless running on a Java version that supports TLSv1.3.
  */
 public class TestClientCertTls13 extends TomcatBaseTest {
 
@@ -47,6 +48,7 @@ public class TestClientCertTls13 extends TomcatBaseTest {
 
     @Test
     public void testClientCertPost() throws Exception {
+        Assume.assumeTrue(TLS.isTlsv13Available());
         getTomcatInstance().start();
 
         int size = 32 * 1024;
