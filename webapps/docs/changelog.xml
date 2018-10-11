@@ -127,6 +127,11 @@
         implementation that prevented from secure WebSocket connections from
         being established. (markt)
       </fix>
+      <fix>
+        Fix server initiated TLS renegotiation to obtain a client certificate
+        when using NIO/NIO2 and the OpenSSL backed JSSE TLS implementation.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">

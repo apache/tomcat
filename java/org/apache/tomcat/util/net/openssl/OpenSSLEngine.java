@@ -982,7 +982,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
             // No pending data to be sent to the peer
             // Check to see if we have finished handshaking
             int handshakeCount = SSL.getHandshakeCount(ssl);
-            if (handshakeCount != currentHandshake) {
+            if (handshakeCount != currentHandshake && SSL.renegotiatePending(ssl) == 0) {
                 if (alpn) {
                     selectedProtocol = SSL.getAlpnSelected(ssl);
                     if (selectedProtocol == null) {
@@ -994,7 +994,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
                 return SSLEngineResult.HandshakeStatus.FINISHED;
             }
 
-            // No pending data and still handshaking
+            // No pending data and still handshaking / renegotiation pending
             // Must be waiting on the peer to send more data
             return SSLEngineResult.HandshakeStatus.NEED_UNWRAP;
         }

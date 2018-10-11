@@ -557,6 +557,13 @@ public final class SSL {
     public static native int renegotiate(long ssl);
 
     /**
+     * SSL_renegotiate_pending
+     * @param ssl the SSL instance (SSL *)
+     * @return the operation status
+     */
+    public static native int renegotiatePending(long ssl);
+
+    /**
      * SSL_in_init.
      * @param ssl the SSL instance (SSL *)
      * @return the status
