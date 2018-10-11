@@ -564,6 +564,20 @@ public final class SSL {
     public static native int renegotiatePending(long ssl);
 
     /**
+     * SSL_verify_client_post_handshake
+     * @param ssl the SSL instance (SSL *)
+     * @return the operation status
+     */
+    public static native int verifyClientPostHandshake(long ssl);
+
+    /**
+     * Is post handshake authentication in progress on this connection?
+     * @param ssl the SSL instance (SSL *)
+     * @return the operation status
+     */
+    public static native int getPostHandshakeAuthInProgress(long ssl);
+
+    /**
      * SSL_in_init.
      * @param ssl the SSL instance (SSL *)
      * @return the status

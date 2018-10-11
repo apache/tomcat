@@ -908,7 +908,12 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
 
     private synchronized void renegotiate() throws SSLException {
         clearLastError();
-        int code = SSL.renegotiate(ssl);
+        int code;
+        if (SSL.getVersion(ssl).equals(Constants.SSL_PROTO_TLSv1_3)) {
+            code = SSL.verifyClientPostHandshake(ssl);
+        } else {
+            code = SSL.renegotiate(ssl);
+        }
         if (code <= 0) {
             checkLastError();
         }
@@ -979,10 +984,42 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
                 return SSLEngineResult.HandshakeStatus.NEED_WRAP;
             }
 
+            /*
+             * Tomcat Native stores a count of the completed handshakes in the
+             * SSL instance and increments it every time a handshake is
+             * completed. Comparing the handshake count when the handshake
+             * started to the current handshake count enables this code to
+             * detect when the handshake has completed.
+             *
+             * Obtaining client certificates after the connection has been
+             * established requires additional checks. We need to trigger
+             * additional reads until the certificates have been read but we
+             * don't know how many reads we will need as it depends on both
+             * client and network behaviour.
+             *
+             * The additional reads are triggered by returning NEED_UNWRAP
+             * rather than FINISHED. This allows the standard I/O code to be
+             * used.
+             *
+             * For TLSv1.2 and below, the handshake completes before the
+             * renegotiation. We therefore use SSL.renegotiatePending() to
+             * check on the current status of the renegotiation and return
+             * NEED_UNWRAP until it completes which means the client
+             * certificates will have been read from the client.
+             *
+             * For TLSv1.3, Tomcat Native sets a flag when post handshake
+             * authentication is started and updates it once the client
+             * certificate has been received. We therefore use
+             * SSL.getPostHandshakeAuthInProgress() to check the current status
+             * and return NEED_UNWRAP until that methods indicates that PHA is
+             * no longer in progress.
+             */
+
             // No pending data to be sent to the peer
             // Check to see if we have finished handshaking
             int handshakeCount = SSL.getHandshakeCount(ssl);
-            if (handshakeCount != currentHandshake && SSL.renegotiatePending(ssl) == 0) {
+            if (handshakeCount != currentHandshake && SSL.renegotiatePending(ssl) == 0 &&
+                    (SSL.getPostHandshakeAuthInProgress(ssl) == 0)) {
                 if (alpn) {
                     selectedProtocol = SSL.getAlpnSelected(ssl);
                     if (selectedProtocol == null) {
@@ -994,7 +1031,8 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
                 return SSLEngineResult.HandshakeStatus.FINISHED;
             }
 
-            // No pending data and still handshaking / renegotiation pending
+            // No pending data
+            // Still handshaking / renegotiation / post-handshake auth pending
             // Must be waiting on the peer to send more data
             return SSLEngineResult.HandshakeStatus.NEED_UNWRAP;
         }
