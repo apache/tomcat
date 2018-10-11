@@ -104,11 +104,13 @@ public abstract class CloudMembershipProvider extends MembershipProviderBase imp
 
     @Override
     public void heartbeat() {
-        log.debug("Fetching announced members");
         Member[] announcedMembers = fetchMembers();
         // Add new members or refresh the members in the membership
         for (Member member : announcedMembers) {
             if (membership.memberAlive(member)) {
+                if (log.isDebugEnabled()) {
+                    log.debug("Member added: " + member);
+                }
                 membershipListener.memberAdded(member);
             }
         }
@@ -116,7 +118,7 @@ public abstract class CloudMembershipProvider extends MembershipProviderBase imp
         Member[] expired = membership.expire(100); // TODO: is 100ms a good value?
         for (Member member : expired) {
             if (log.isDebugEnabled()) {
-                log.debug("Member is dead: " + member);
+                log.debug("Member disappeared: " + member);
             }
             membershipListener.memberDisappeared(member);
         }
