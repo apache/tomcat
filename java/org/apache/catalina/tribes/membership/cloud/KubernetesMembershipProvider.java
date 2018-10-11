@@ -146,12 +146,6 @@ public class KubernetesMembershipProvider extends CloudMembershipProvider {
         JSONParser parser = new JSONParser(reader);
         try {
             LinkedHashMap<String, Object> json = parser.object();
-            // If there is a "kind", check it is "PodList"
-            Object kindObject = json.get("kind");
-            if (kindObject != null && !"PodList".equals(kindObject)) {
-                log.error(sm.getString("kubernetesMembershipProvider.invalidPodsList", "not podList"));
-                return;
-            }
             Object itemsObject = json.get("items");
             if (!(itemsObject instanceof List<?>)) {
                 log.error(sm.getString("kubernetesMembershipProvider.invalidPodsList", "no items"));
