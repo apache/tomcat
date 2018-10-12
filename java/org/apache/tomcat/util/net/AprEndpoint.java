@@ -1921,8 +1921,8 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
         // Socket and socket pool
         protected long socket;
 
-        public SendfileData(String filename, long pos, long length) {
-            super(filename, pos, length);
+        public SendfileData(String filename, long pos, long length, double rate) {
+            super(filename, pos, length, rate);
         }
     }
 
@@ -2039,9 +2039,15 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
                      0, data.fdpool);
                 // Set the socket to nonblocking mode
                 Socket.timeoutSet(data.socket, 0);
+                long transRate;
                 while (sendfileRunning) {
-                    long nw = Socket.sendfilen(data.socket, data.fd,
-                                               data.pos, data.length, 0);
+                    //use limited rate or data length
+                    if (data.rateLimiter != null) {
+                        transRate = data.rateLimiter.getMinPauseCheckBytes();
+                    } else {
+                        transRate = data.length;
+                    }
+                    long nw = Socket.sendfilen(data.socket, data.fd, data.pos, transRate, 0);
                     if (nw < 0) {
                         if (!(-nw == Status.EAGAIN)) {
                             Pool.destroy(data.fdpool);
@@ -2060,6 +2066,10 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
                             // Set back socket to blocking mode
                             Socket.timeoutSet(data.socket, getConnectionTimeout() * 1000);
                             return SendfileState.DONE;
+                        }
+                        // transfer not complete, do rate limit
+                        if (data.length > 0 && data.rateLimiter != null) {
+                            data.rateLimiter.pause(nw);
                         }
                     }
                 }
@@ -2153,6 +2163,7 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
                     // Pool for the specified interval
                     int rv = Poll.poll(sendfilePollset, pollTime, desc, false);
                     if (rv > 0) {
+                        long transRate;
                         for (int n = 0; n < rv; n++) {
                             // Get the sendfile state
                             SendfileData state =
@@ -2167,10 +2178,15 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
                                 closeSocket(state.socket);
                                 continue;
                             }
+                            // use limited rate or data length
+                            if (state.rateLimiter != null) {
+                                transRate = state.rateLimiter.getMinPauseCheckBytes();
+                            } else {
+                                transRate = state.length;
+                            }
                             // Write some data using sendfile
                             long nw = Socket.sendfilen(state.socket, state.fd,
-                                                       state.pos,
-                                                       state.length, 0);
+                                                       state.pos, transRate, 0);
                             if (nw < 0) {
                                 // Close socket and clear pool
                                 remove(state);
@@ -2212,6 +2228,10 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
                                     break;
                                 }
                                 }
+                            }
+                            // transfer not complete, do rate limit
+                            if (state.length > 0 && state.rateLimiter != null) {
+                                state.rateLimiter.pause(nw);
                             }
                         }
                     } else if (rv < 0) {
@@ -2756,8 +2776,8 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
 
 
         @Override
-        public SendfileDataBase createSendfileData(String filename, long pos, long length) {
-            return new SendfileData(filename, pos, length);
+        public SendfileDataBase createSendfileData(String filename, long pos, long length, double rate) {
+            return new SendfileData(filename, pos, length, rate);
         }
 
 

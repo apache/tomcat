@@ -77,6 +77,9 @@
   <!--                       which sendfile will be used. Use a negative    -->
   <!--                       value to always disable sendfile.  [48]        -->
   <!--                                                                      -->
+  <!--   sendfileRate        For transfer rate control,                     -->
+  <!--                       using double value in MB per second.           -->
+  <!--                                                                      -->
   <!--   useAcceptRanges     Should the Accept-Ranges header be included    -->
   <!--                       in responses where appropriate? [true]         -->
   <!--                                                                      -->

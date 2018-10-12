@@ -854,11 +854,22 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                         socketWrapper.updateLastWrite();
                     }
                 } else {
-                    long written = sd.fchannel.transferTo(sd.pos,sd.length,wc);
+                    // use limited rate or data length
+                    long transRate;
+                    if (sd.rateLimiter != null) {
+                        transRate = sd.rateLimiter.getMinPauseCheckBytes();
+                    } else {
+                        transRate = sd.length;
+                    }
+                    long written = sd.fchannel.transferTo(sd.pos, transRate, wc);
                     if (written > 0) {
                         sd.pos += written;
                         sd.length -= written;
                         socketWrapper.updateLastWrite();
+                        // transfer not complete, do rate limit
+                        if (sd.length > 0 && sd.rateLimiter != null) {
+                            sd.rateLimiter.pause(written);
+                        }
                     } else {
                         // Unusual not to be able to transfer any bytes
                         // Check the length was set correctly
@@ -1255,8 +1266,8 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
 
 
         @Override
-        public SendfileDataBase createSendfileData(String filename, long pos, long length) {
-            return new SendfileData(filename, pos, length);
+        public SendfileDataBase createSendfileData(String filename, long pos, long length, double rate) {
+            return new SendfileData(filename, pos, length, rate);
         }
 
 
@@ -1448,8 +1459,8 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
      */
     public static class SendfileData extends SendfileDataBase {
 
-        public SendfileData(String filename, long pos, long length) {
-            super(filename, pos, length);
+        public SendfileData(String filename, long pos, long length, double rate) {
+            super(filename, pos, length, rate);
         }
 
         protected volatile FileChannel fchannel;

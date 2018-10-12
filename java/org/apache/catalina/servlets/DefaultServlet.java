@@ -246,6 +246,11 @@ public class DefaultServlet extends HttpServlet {
     protected int sendfileSize = 48 * 1024;
 
     /**
+     * Rate limit for sendfile usage in MB per second.
+     */
+    protected double sendfileRate = 0D;
+
+    /**
      * Should the Accept-Ranges: bytes header be send with static resources?
      */
     protected boolean useAcceptRanges = true;
@@ -294,6 +299,9 @@ public class DefaultServlet extends HttpServlet {
         if (getServletConfig().getInitParameter("sendfileSize") != null)
             sendfileSize =
                 Integer.parseInt(getServletConfig().getInitParameter("sendfileSize")) * 1024;
+
+        if (getServletConfig().getInitParameter("sendfileRate") != null)
+            sendfileRate = Double.parseDouble(getServletConfig().getInitParameter("sendfileRate"));
 
         fileEncoding = getServletConfig().getInitParameter("fileEncoding");
         if (fileEncoding == null) {
@@ -2056,6 +2064,9 @@ public class DefaultServlet extends HttpServlet {
             } else {
                 request.setAttribute(Globals.SENDFILE_FILE_START_ATTR, Long.valueOf(range.start));
                 request.setAttribute(Globals.SENDFILE_FILE_END_ATTR, Long.valueOf(range.end + 1));
+            }
+            if (sendfileRate > 0) {
+                request.setAttribute(Globals.SENDFILE_RATE_ATTR, sendfileRate);
             }
             return true;
         }

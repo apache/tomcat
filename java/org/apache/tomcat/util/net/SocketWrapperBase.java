@@ -767,7 +767,7 @@ public abstract class SocketWrapperBase<E> {
 
     public abstract void registerWriteInterest();
 
-    public abstract SendfileDataBase createSendfileData(String filename, long pos, long length);
+    public abstract SendfileDataBase createSendfileData(String filename, long pos, long length, double rate);
 
     /**
      * Starts the sendfile process. It is expected that if the sendfile process

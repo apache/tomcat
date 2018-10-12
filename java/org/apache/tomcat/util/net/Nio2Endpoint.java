@@ -480,6 +480,11 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
                         getSocket().getBufHandler().configureWriteBufferForWrite();
                         int nRead = -1;
                         try {
+                            // use limited rate or default length
+                            if (attachment.rateLimiter != null) {
+                                // rate is for bandwidth, so cast to int is safe
+                                buffer.limit((int) attachment.rateLimiter.getMinPauseCheckBytes());
+                            }
                             nRead = attachment.fchannel.read(buffer);
                         } catch (IOException e) {
                             failed(e, attachment);
@@ -494,6 +499,11 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
                         } else {
                             failed(new EOFException(), attachment);
                             return;
+                        }
+
+                        // transfer not complete, do rate limit
+                        if (attachment.length > 0 && attachment.rateLimiter != null) {
+                            attachment.rateLimiter.pause(nRead);
                         }
                     }
                 }
@@ -1411,8 +1421,8 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
 
 
         @Override
-        public SendfileDataBase createSendfileData(String filename, long pos, long length) {
-            return new SendfileData(filename, pos, length);
+        public SendfileDataBase createSendfileData(String filename, long pos, long length, double rate) {
+            return new SendfileData(filename, pos, length, rate);
         }
 
 
@@ -1720,8 +1730,8 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
         private boolean doneInline = false;
         private boolean error = false;
 
-        public SendfileData(String filename, long pos, long length) {
-            super(filename, pos, length);
+        public SendfileData(String filename, long pos, long length, double rate) {
+            super(filename, pos, length, rate);
         }
     }
 }
