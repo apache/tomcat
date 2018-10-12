@@ -81,6 +81,10 @@
         <bug>62803</bug>: Fix SSL connector configuration processing
         in storeconfig. (remm)
       </fix>
+      <fix>
+        <bug>62797</bug>: Pass throwable to keep client aborts with status 200
+        rather than 500. Patch submitted by zikfat. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
