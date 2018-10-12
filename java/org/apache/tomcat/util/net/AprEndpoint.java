@@ -83,6 +83,9 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
         SSL_PROTO_ALL.add(Constants.SSL_PROTO_TLSv1);
         SSL_PROTO_ALL.add(Constants.SSL_PROTO_TLSv1_1);
         SSL_PROTO_ALL.add(Constants.SSL_PROTO_TLSv1_2);
+        if (SSL.version() >= 0x1010100f) {
+            SSL_PROTO_ALL.add(Constants.SSL_PROTO_TLSv1_3);
+        }
     }
 
     // ----------------------------------------------------------------- Fields
@@ -116,8 +119,8 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
     public void removeWaitingRequest(SocketWrapper<Long> socketWrapper) {
         waitingRequests.remove(socketWrapper);
     }
-    
-    
+
+
     private final Map<Long,AprSocketWrapper> connections =
             new ConcurrentHashMap<Long, AprSocketWrapper>();
 
@@ -572,6 +575,9 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
                         value |= SSL.SSL_PROTOCOL_TLSV1_1;
                     } else if (Constants.SSL_PROTO_TLSv1_2.equalsIgnoreCase(protocol)) {
                         value |= SSL.SSL_PROTOCOL_TLSV1_2;
+                    } else if (Constants.SSL_PROTO_TLSv1_3.equalsIgnoreCase(protocol)
+                            && (SSL.version() >= 0x1010100f)) {
+                        value |= SSL.SSL_PROTOCOL_TLSV1_3;
                     } else {
                         // Protocol not recognized, fail to start as it is safer than
                         // continuing with the default which might enable more than the
@@ -1037,7 +1043,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
         }
     }
 
-    
+
     @Override
     protected Log getLog() {
         return log;
@@ -1418,7 +1424,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
          */
         protected SocketList addList = null;
 
-        
+
         /**
          * List of sockets to be closed.
          */
@@ -2297,7 +2303,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
                 if (!sendfileRunning) {
                     break;
                 }
-                
+
                 try {
                     // Add socket to the poller
                     if (addS.size() > 0) {

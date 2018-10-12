@@ -74,7 +74,9 @@ public final class SSL {
     public static final int SSL_PROTOCOL_TLSV1 = (1<<2);
     public static final int SSL_PROTOCOL_TLSV1_1 = (1<<3);
     public static final int SSL_PROTOCOL_TLSV1_2 = (1<<4);
-    public static final int SSL_PROTOCOL_ALL   = (SSL_PROTOCOL_TLSV1 | SSL_PROTOCOL_TLSV1_1 | SSL_PROTOCOL_TLSV1_2);
+    public static final int SSL_PROTOCOL_TLSV1_3 = (1<<5);
+    public static final int SSL_PROTOCOL_ALL   = (SSL_PROTOCOL_TLSV1 | SSL_PROTOCOL_TLSV1_1 |
+                                                  SSL_PROTOCOL_TLSV1_2 | SSL_PROTOCOL_TLSV1_3);
 
     /*
      * Define the SSL verify levels
@@ -377,14 +379,14 @@ public final class SSL {
 
     /**
      * Return true if all the requested SSL_OP_* are supported by OpenSSL.
-     * 
+     *
      * <i>Note that for versions of tcnative &lt; 1.1.25, this method will
      * return <code>true</code> if and only if <code>op</code>=
      * {@link #SSL_OP_ALLOW_UNSAFE_LEGACY_RENEGOTIATION} and tcnative
      * supports that flag.</i>
      *
      * @param op Bitwise-OR of all SSL_OP_* to test.
-     * 
+     *
      * @return true if all SSL_OP_* are supported by OpenSSL library.
      */
     public static native boolean hasOp(int op);
