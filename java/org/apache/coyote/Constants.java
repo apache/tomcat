@@ -89,6 +89,12 @@ public final class Constants {
 
 
     /**
+     * The request attribute for transfer rate control,
+     * using double values in megabytes per second.
+     */
+    public static final String SENDFILE_RATE_ATTR = "org.apache.tomcat.sendfile.rate";
+
+    /**
      * The request attribute set by the RemoteIpFilter, RemoteIpValve (and may
      * be set by other similar components) that identifies for the connector the
      * remote IP address claimed to be associated with this request when a

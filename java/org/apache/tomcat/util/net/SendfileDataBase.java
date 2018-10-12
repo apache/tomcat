@@ -46,9 +46,15 @@ public abstract class SendfileDataBase {
      */
     public long length;
 
-    public SendfileDataBase(String filename, long pos, long length) {
+    /**
+     * For transfer rate control.
+     */
+    public RateLimiter rateLimiter;
+
+    public SendfileDataBase(String filename, long pos, long length, double rate) {
         this.fileName = filename;
         this.pos = pos;
         this.length = length;
+        this.rateLimiter = rate > 0 ? new RateLimiter.SimpleRateLimiter(rate) : null;
     }
 }

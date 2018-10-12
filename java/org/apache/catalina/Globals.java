@@ -187,6 +187,16 @@ public final class Globals {
 
 
     /**
+     * The request attribute for transfer rate control,
+     * using double values in megabytes per second.
+     *
+     * Duplicated here for neater code in the catalina packages.
+     */
+    public static final String SENDFILE_RATE_ATTR =
+            org.apache.coyote.Constants.SENDFILE_RATE_ATTR;
+
+
+    /**
      * The request attribute set by the RemoteIpFilter, RemoteIpValve (and may
      * be set by other similar components) that identifies for the connector the
      * remote IP address claimed to be associated with this request when a

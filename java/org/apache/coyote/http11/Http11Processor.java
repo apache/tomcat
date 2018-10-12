@@ -1006,7 +1006,10 @@ public class Http11Processor extends AbstractProcessor {
                     org.apache.coyote.Constants.SENDFILE_FILE_START_ATTR)).longValue();
             long end = ((Long) request.getAttribute(
                     org.apache.coyote.Constants.SENDFILE_FILE_END_ATTR)).longValue();
-            sendfileData = socketWrapper.createSendfileData(fileName, pos, end - pos);
+            Double rate = (Double)request.getAttribute(
+                    org.apache.coyote.Constants.SENDFILE_RATE_ATTR);
+            sendfileData = socketWrapper.createSendfileData(fileName, pos, end - pos,
+                    null == rate ? 0D : rate.doubleValue());
         }
     }
 
