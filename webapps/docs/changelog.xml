@@ -69,6 +69,10 @@
         Ensure that a canonical path is always used for the docBase of a Context
         to ensure consistent behaviour. (markt)
       </fix>
+      <fix>
+        <bug>62797</bug>: Pass throwable to keep client aborts with status 200
+        rather than 500. Patch submitted by zikfat. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
