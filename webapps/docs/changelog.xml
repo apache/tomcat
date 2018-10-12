@@ -138,6 +138,12 @@
         <bug>62761</bug>: Correct the advanced CORS example in the Filter
         documentation to use a valid configuration. (markt)
       </fix>
+      <fix>
+        <bug>62786</bug>: Add a note to the Context documentation to explain
+        that, by default, settings for a Context element defined in server.xml
+        will be overwritten by settings specified in a default context file such
+        as <code>conf/context.xml</code>. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>

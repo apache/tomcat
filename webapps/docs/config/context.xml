@@ -193,7 +193,11 @@
   server.xml file.</b> This is because it makes modifying the
   <strong>Context</strong> configuration more invasive since the main
   <code>conf/server.xml</code> file cannot be reloaded without restarting
-  Tomcat.</p>
+  Tomcat. Default <strong>Context</strong> elements (see below) will also
+  <strong>overwrite</strong> the configuration of any &lt;Context&gt; elements
+  placed directly in server.xml. To prevent this, the <code>override</code>
+  attribute of the &lt;Context&gt; element defined in server.xml should be set
+  to <code>true</code>.</p>
 
   <p>Individual <strong>Context</strong> elements may be explicitly defined:
   </p>
