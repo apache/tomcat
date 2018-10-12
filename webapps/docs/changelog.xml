@@ -85,6 +85,11 @@
   </subsection>
   <subsection name="Coyote">
     <changelog>
+      <add>
+        Add TLSv1.3 to the default protocols and to the <code>all</code>
+        alias for JSSE based TLS connectors when running on a JVM that
+        supports TLS version 1.3. One such JVM is OpenJDK version 11. (rjung)
+      </add>
       <fix>
         <bug>62685</bug>: Correct an error in host name validation parsing that
         did not allow a fully qualified domain name to terminate with a period.
@@ -95,10 +100,20 @@
         Such requests are unusual but not invalid. Patch provided by Michael
         Orr. (markt)
       </fix>
+      <add>
+        <bug>62748</bug>: Add TLS 1.3 support for the APR/Native connector and
+        the NIO/NIO2 connector when using the OpenSSL backed JSSE
+        implementation. (schultz/markt)
+      </add>
       <fix>
         <bug>62791</bug>: Remove an unnecessary check in the NIO TLS
         implementation that prevented from secure WebSocket connections from
         being established. (markt)
+      </fix>
+      <fix>
+        Fix server initiated TLS renegotiation to obtain a client certificate
+        when using NIO/NIO2 and the OpenSSL backed JSSE TLS implementation.
+        (markt)
       </fix>
     </changelog>
   </subsection>

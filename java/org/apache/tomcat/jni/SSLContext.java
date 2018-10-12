@@ -41,6 +41,7 @@ public final class SSLContext {
      * {@link SSL#SSL_PROTOCOL_TLSV1}
      * {@link SSL#SSL_PROTOCOL_TLSV1_1}
      * {@link SSL#SSL_PROTOCOL_TLSV1_2}
+     * {@link SSL#SSL_PROTOCOL_TLSV1_3}
      * {@link SSL#SSL_PROTOCOL_ALL} ( == all TLS versions, no SSL)
      * </PRE>
      * @param mode SSL mode to use

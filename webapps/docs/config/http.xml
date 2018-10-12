@@ -1288,13 +1288,15 @@
       This should be a list of any combination of the following:
       </p>
       <ul><li>SSLv2Hello</li><li>SSLv3</li><li>TLSv1</li><li>TLSv1.1</li>
-      <li>TLSv1.2</li><li>all</li></ul>
+      <li>TLSv1.2</li><li>TLSv1.3</li><li>all</li></ul>
       <p>Each token in the list can be prefixed with a plus sign ("+")
       or a minus sign ("-"). A plus sign adds the protocol, a minus sign
       removes it form the current list. The list is built starting from
       an empty list.</p>
       <p>The token <code>all</code> is an alias for
-      <code>SSLv2Hello,TLSv1,TLSv1.1,TLSv1.2</code>.</p>
+      <code>SSLv2Hello,TLSv1,TLSv1.1,TLSv1.2,TLSv1.3</code>.</p>
+      <p>Note that <code>TLSv1.3</code> is only supported for JSSE when using a
+      JVM that implements <code>TLSv1.3</code>.</p>
       <p>Note that <code>SSLv2Hello</code> will be ignored for OpenSSL based
       secure connectors. If more than one protocol is specified for an OpenSSL
       based secure connector it will always support <code>SSLv2Hello</code>. If a

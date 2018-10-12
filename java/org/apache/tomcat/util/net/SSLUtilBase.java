@@ -30,6 +30,7 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.compat.JreCompat;
 import org.apache.tomcat.util.file.ConfigFileLoader;
+import org.apache.tomcat.util.net.SSLHostConfig.CertificateVerification;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -47,18 +48,36 @@ public abstract class SSLUtilBase implements SSLUtil {
 
 
     protected SSLUtilBase(SSLHostConfigCertificate certificate) {
+        this(certificate, true);
+    }
+
+
+    protected SSLUtilBase(SSLHostConfigCertificate certificate, boolean warnTls13) {
         this.certificate = certificate;
         SSLHostConfig sslHostConfig = certificate.getSSLHostConfig();
 
         // Calculate the enabled protocols
         Set<String> configuredProtocols = sslHostConfig.getProtocols();
+        if (!isTls13Available() &&
+                !sslHostConfig.isExplicitlyRequestedProtocol(Constants.SSL_PROTO_TLSv1_3)) {
+            // TLS 1.3 not implemented and not explicitly requested so ignore it
+            // if present
+            configuredProtocols.remove(Constants.SSL_PROTO_TLSv1_3);
+        }
         Set<String> implementedProtocols = getImplementedProtocols();
         List<String> enabledProtocols =
-                getEnabled("protocols", getLog(), true, configuredProtocols, implementedProtocols);
+                getEnabled("protocols", getLog(), warnTls13, configuredProtocols, implementedProtocols);
         if (enabledProtocols.contains("SSLv3")) {
             log.warn(sm.getString("jsse.ssl3"));
         }
         this.enabledProtocols = enabledProtocols.toArray(new String[enabledProtocols.size()]);
+
+        if (enabledProtocols.contains(Constants.SSL_PROTO_TLSv1_3) &&
+                (sslHostConfig.getCertificateVerification() == CertificateVerification.OPTIONAL ||
+                        sslHostConfig.getCertificateVerification() == CertificateVerification.OPTIONAL) &&
+                !isTls13RenegAuthAvailable() && warnTls13) {
+            log.warn(sm.getString("jsse.tls13.auth"));
+        }
 
         // Calculate the enabled ciphers
         List<String> configuredCiphers = sslHostConfig.getJsseCipherNames();
@@ -196,4 +215,6 @@ public abstract class SSLUtilBase implements SSLUtil {
     protected abstract Set<String> getImplementedProtocols();
     protected abstract Set<String> getImplementedCiphers();
     protected abstract Log getLog();
+    protected abstract boolean isTls13Available();
+    protected abstract boolean isTls13RenegAuthAvailable();
 }

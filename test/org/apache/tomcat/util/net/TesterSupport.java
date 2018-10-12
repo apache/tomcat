@@ -229,6 +229,14 @@ public final class TesterSupport {
     protected static void configureClientCertContext(Tomcat tomcat) {
         TesterSupport.initSsl(tomcat);
 
+        /* When running on Java 11, TLSv1.3 is enabled by default. The JSSE
+         * implementation of TLSv1.3 does not support
+         * certificateVerification="optional", a setting on which these tests
+         * depend. Therefore, force these tests to use TLSv1.2 so that they pass
+         * when running on TLSv1.3.
+         */
+        tomcat.getConnector().setProperty("sslEnabledProtocols", "TLSv1.2");
+
         // Need a web application with a protected and unprotected URL
         // No file system docBase required
         Context ctx = tomcat.addContext("", null);

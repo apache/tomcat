@@ -21,7 +21,6 @@ import java.nio.ReadOnlyBufferException;
 import java.security.Principal;
 import java.security.cert.Certificate;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -65,6 +64,8 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
 
     public static final Set<String> AVAILABLE_CIPHER_SUITES;
 
+    public static final Set<String> IMPLEMENTED_PROTOCOLS_SET;
+
     static {
         final Set<String> availableCipherSuites = new LinkedHashSet<>(128);
         final long aprPool = Pool.create(0);
@@ -94,6 +95,19 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
             Pool.destroy(aprPool);
         }
         AVAILABLE_CIPHER_SUITES = Collections.unmodifiableSet(availableCipherSuites);
+
+        HashSet<String> protocols = new HashSet<>();
+        protocols.add(Constants.SSL_PROTO_SSLv2Hello);
+        protocols.add(Constants.SSL_PROTO_SSLv2);
+        protocols.add(Constants.SSL_PROTO_SSLv3);
+        protocols.add(Constants.SSL_PROTO_TLSv1);
+        protocols.add(Constants.SSL_PROTO_TLSv1_1);
+        protocols.add(Constants.SSL_PROTO_TLSv1_2);
+        if (SSL.version() >= 0x1010100f) {
+            protocols.add(Constants.SSL_PROTO_TLSv1_3);
+        }
+
+        IMPLEMENTED_PROTOCOLS_SET = Collections.unmodifiableSet(protocols);
     }
 
     private static final int MAX_PLAINTEXT_LENGTH = 16 * 1024; // 2^14
@@ -102,17 +116,6 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
 
     // Protocols
     static final int VERIFY_DEPTH = 10;
-
-    private static final String[] IMPLEMENTED_PROTOCOLS = {
-        Constants.SSL_PROTO_SSLv2Hello,
-        Constants.SSL_PROTO_SSLv2,
-        Constants.SSL_PROTO_SSLv3,
-        Constants.SSL_PROTO_TLSv1,
-        Constants.SSL_PROTO_TLSv1_1,
-        Constants.SSL_PROTO_TLSv1_2
-    };
-    public static final Set<String> IMPLEMENTED_PROTOCOLS_SET =
-            Collections.unmodifiableSet(new HashSet<>(Arrays.asList(IMPLEMENTED_PROTOCOLS)));
 
     // Header (5) + Data (2^14) + Compression (1024) + Encryption (1024) + MAC (20) + Padding (256)
     static final int MAX_ENCRYPTED_PACKET_LENGTH = MAX_CIPHERTEXT_LENGTH + 5 + 20 + 256;
@@ -760,7 +763,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
 
     @Override
     public String[] getSupportedProtocols() {
-        return IMPLEMENTED_PROTOCOLS.clone();
+        return IMPLEMENTED_PROTOCOLS_SET.toArray(new String[IMPLEMENTED_PROTOCOLS_SET.size()]);
     }
 
     @Override
@@ -905,7 +908,12 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
 
     private synchronized void renegotiate() throws SSLException {
         clearLastError();
-        int code = SSL.renegotiate(ssl);
+        int code;
+        if (SSL.getVersion(ssl).equals(Constants.SSL_PROTO_TLSv1_3)) {
+            code = SSL.verifyClientPostHandshake(ssl);
+        } else {
+            code = SSL.renegotiate(ssl);
+        }
         if (code <= 0) {
             checkLastError();
         }
@@ -976,10 +984,42 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
                 return SSLEngineResult.HandshakeStatus.NEED_WRAP;
             }
 
+            /*
+             * Tomcat Native stores a count of the completed handshakes in the
+             * SSL instance and increments it every time a handshake is
+             * completed. Comparing the handshake count when the handshake
+             * started to the current handshake count enables this code to
+             * detect when the handshake has completed.
+             *
+             * Obtaining client certificates after the connection has been
+             * established requires additional checks. We need to trigger
+             * additional reads until the certificates have been read but we
+             * don't know how many reads we will need as it depends on both
+             * client and network behaviour.
+             *
+             * The additional reads are triggered by returning NEED_UNWRAP
+             * rather than FINISHED. This allows the standard I/O code to be
+             * used.
+             *
+             * For TLSv1.2 and below, the handshake completes before the
+             * renegotiation. We therefore use SSL.renegotiatePending() to
+             * check on the current status of the renegotiation and return
+             * NEED_UNWRAP until it completes which means the client
+             * certificates will have been read from the client.
+             *
+             * For TLSv1.3, Tomcat Native sets a flag when post handshake
+             * authentication is started and updates it once the client
+             * certificate has been received. We therefore use
+             * SSL.getPostHandshakeAuthInProgress() to check the current status
+             * and return NEED_UNWRAP until that methods indicates that PHA is
+             * no longer in progress.
+             */
+
             // No pending data to be sent to the peer
             // Check to see if we have finished handshaking
             int handshakeCount = SSL.getHandshakeCount(ssl);
-            if (handshakeCount != currentHandshake) {
+            if (handshakeCount != currentHandshake && SSL.renegotiatePending(ssl) == 0 &&
+                    (SSL.getPostHandshakeAuthInProgress(ssl) == 0)) {
                 if (alpn) {
                     selectedProtocol = SSL.getAlpnSelected(ssl);
                     if (selectedProtocol == null) {
@@ -991,7 +1031,8 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
                 return SSLEngineResult.HandshakeStatus.FINISHED;
             }
 
-            // No pending data and still handshaking
+            // No pending data
+            // Still handshaking / renegotiation / post-handshake auth pending
             // Must be waiting on the peer to send more data
             return SSLEngineResult.HandshakeStatus.NEED_UNWRAP;
         }
