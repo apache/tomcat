@@ -88,19 +88,13 @@
         Orr. (markt)
       </fix>
       <add>
-        <bug>62748</bug>: Add TLS 1.3 support for the APR/Native connector and
-        the NIO/NIO2 connector when using the OpenSSL backed JSSE
-        implementation. (schultz/markt)
+        <bug>62748</bug>: Add TLS 1.3 support for the APR/Native connector.
+        (schultz/markt)
       </add>
       <fix>
         <bug>62791</bug>: Remove an unnecessary check in the NIO TLS
         implementation that prevented from secure WebSocket connections from
         being established. (markt)
-      </fix>
-      <fix>
-        Fix server initiated TLS renegotiation to obtain a client certificate
-        when using NIO/NIO2 and the OpenSSL backed JSSE TLS implementation.
-        (markt)
       </fix>
     </changelog>
   </subsection>
