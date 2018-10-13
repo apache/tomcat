@@ -119,7 +119,7 @@ public final class TesterSupport {
             File truststoreFile = toFile(truststoreUrl);
             connector.setAttribute("truststoreFile",
                     truststoreFile.getAbsolutePath());
-            
+
             if (keystorePass != null) {
                 connector.setAttribute("keystorePass", keystorePass);
             }
@@ -131,7 +131,7 @@ public final class TesterSupport {
             File keystoreFile = toFile(keyStoreUrl);
             tomcat.getConnector().setAttribute("SSLCertificateFile",
                     keystoreFile.getAbsolutePath());
-            
+
             java.net.URL sslCertificateKeyUrl = cl.getResource(LOCALHOST_KEY_PEM);
             File sslCertificateKeyFile = toFile(sslCertificateKeyUrl);
             tomcat.getConnector().setAttribute("SSLCertificateKeyFile",
@@ -158,7 +158,7 @@ public final class TesterSupport {
             throw new IllegalArgumentException(e);
         }
     }
-    
+
     protected static KeyManager[] getUser1KeyManagers() throws Exception {
         KeyManagerFactory kmf = KeyManagerFactory.getInstance(
                 KeyManagerFactory.getDefaultAlgorithm());
@@ -224,10 +224,10 @@ public final class TesterSupport {
         /* When running on Java 11, TLSv1.3 is enabled by default. The JSSE
          * implementation of TLSv1.3 does not support
          * certificateVerification="optional", a setting on which these tests
-         * depend. Therefore, force these tests to use TLSv1.2 so that they pass
-         * when running on TLSv1.3.
+         * depend. Therefore, force these tests to use TLSv1 (the latest
+         * available on Java 6) so that they pass when running on Java 11).
          */
-        tomcat.getConnector().setProperty("sslEnabledProtocols", "TLSv1.2");
+        tomcat.getConnector().setProperty("sslEnabledProtocols", "TLSv1");
 
         // Need a web application with a protected and unprotected URL
         // No file system docBase required
@@ -331,15 +331,15 @@ public final class TesterSupport {
             // NOOP - Trust everything
         }
     }
-    
+
     public static class NoSSLv2SocketFactory extends SSLSocketFactory {
 
         SSLSocketFactory factory;
-        
+
         public NoSSLv2SocketFactory(SSLSocketFactory factory) {
             this.factory = factory;
         }
-        
+
         @Override
         public String[] getDefaultCipherSuites() {
             return factory.getDefaultCipherSuites();
