@@ -100,6 +100,11 @@
         <bug>62797</bug>: Pass throwable to keep client aborts with status 200
         rather than 500. Patch submitted by zikfat. (remm)
       </fix>
+      <fix>
+        <bug>62802</bug>: Restore the <code>appContextProtection</code>
+        attribute to the <code>JreMemoryLeakPreventionListener</code> as
+        application code may still trigger this memory leak. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

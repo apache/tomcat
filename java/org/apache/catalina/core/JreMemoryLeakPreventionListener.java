@@ -25,6 +25,7 @@ import java.sql.DriverManager;
 import java.util.StringTokenizer;
 import java.util.concurrent.ForkJoinPool;
 
+import javax.imageio.ImageIO;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -65,6 +66,18 @@ public class JreMemoryLeakPreventionListener implements LifecycleListener {
 
     private static final String FORK_JOIN_POOL_THREAD_FACTORY_PROPERTY =
             "java.util.concurrent.ForkJoinPool.common.threadFactory";
+    /**
+     * Protect against the memory leak caused when the first call to
+     * <code>sun.awt.AppContext.getAppContext()</code> is triggered by a web
+     * application. Defaults to <code>false</code> since Tomcat code no longer
+     * triggers this althoguh application code may.
+     */
+    private boolean appContextProtection = false;
+    public boolean isAppContextProtection() { return appContextProtection; }
+    public void setAppContextProtection(boolean appContextProtection) {
+        this.appContextProtection = appContextProtection;
+    }
+
     /**
      * Protect against the memory leak caused when the first call to
      * <code>java.awt.Toolkit.getDefaultToolkit()</code> is triggered
@@ -220,6 +233,28 @@ public class JreMemoryLeakPreventionListener implements LifecycleListener {
                 // ClassLoader pinning we're about to do.
                 Thread.currentThread().setContextClassLoader(
                         ClassLoader.getSystemClassLoader());
+
+                /*
+                 * Several components end up calling:
+                 * sun.awt.AppContext.getAppContext()
+                 *
+                 * Those libraries / components known to trigger memory leaks
+                 * due to eventual calls to getAppContext() are:
+                 * - Google Web Toolkit via its use of javax.imageio
+                 * - Batik
+                 * - others TBD
+                 *
+                 * Note tha a call to sun.awt.AppContext.getAppContext() results
+                 * in a thread being started named AWT-AppKit that requires a
+                 * graphical environment to be available.
+                 */
+
+                // Trigger a call to sun.awt.AppContext.getAppContext(). This
+                // will pin the system class loader in memory but that shouldn't
+                // be an issue.
+                if (appContextProtection) {
+                    ImageIO.getCacheDirectory();
+                }
 
                 // Trigger the creation of the AWT (AWT-Windows, AWT-XAWT,
                 // etc.) thread.
