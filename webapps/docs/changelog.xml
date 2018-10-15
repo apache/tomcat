@@ -120,6 +120,11 @@
         on first access when development mode was disabled and background
         compilation was enabled. Based on a patch by Jordi Llach. (markt)
       </fix>
+      <fix>
+        <bug>62808</bug>: Fix a regression in the TLD whitespace parsing fix
+        that broke parsing when new lines were present in the method signature.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="WebSocket">
