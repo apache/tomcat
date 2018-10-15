@@ -928,7 +928,7 @@ public abstract class AbstractEndpoint<S,U> {
             ExceptionUtils.handleThrowable(t);
             if (getLog().isDebugEnabled()) {
                 getLog().debug(sm.getString("endpoint.debug.unlock.fail", "" + getPort()+"-offset-" +
-                  getPortWithOffset()), t);
+                  getPortOffset()), t);
             }
         }
     }

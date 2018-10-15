@@ -111,7 +111,6 @@ public interface Server extends Lifecycle {
      */
     public int getPortWithOffset();
 
-
     /**
      * @return the address on which we listen to for shutdown commands.
      */
