@@ -43,8 +43,11 @@
   <function>
     <name>toArray</name>
     <function-class>org.apache.el.TesterFunctions</function-class>
+    <!-- Do not change whitespace in signature below.
+         It used to test for correctness in o.a.jasper.compiler.Validator. -->
     <function-signature>
-      java.lang.String toArray(java.lang.String,java.lang.String)
+      java.lang.String toArray(java.lang.String,
+                               java.lang.String)
     </function-signature>
   </function>
 
