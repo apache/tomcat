@@ -282,6 +282,7 @@ public class Catalina {
         Map<Class<?>, List<String>> fakeAttributes = new HashMap<>();
         List<String> attrs = new ArrayList<>();
         attrs.add("className");
+        attrs.add("source");
         fakeAttributes.put(Object.class, attrs);
         digester.setFakeAttributes(fakeAttributes);
         digester.setUseContextClassLoader(true);
