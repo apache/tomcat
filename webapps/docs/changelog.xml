@@ -210,6 +210,10 @@
         Experimental Kubernetes aware cloud membership provider, based on code
         by Maxime Beck. Contains code derived from jgroups. (remm/kfujino)
       </add>
+      <fix>
+        Move the event notification <code>ThreadPoolExecutor</code> to
+        <code>MembershipProviderBase</code>. (kfujino)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
