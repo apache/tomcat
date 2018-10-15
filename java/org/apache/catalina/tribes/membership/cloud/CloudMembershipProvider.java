@@ -111,7 +111,19 @@ public abstract class CloudMembershipProvider extends MembershipProviderBase imp
                 if (log.isDebugEnabled()) {
                     log.debug("Member added: " + member);
                 }
-                membershipListener.memberAdded(member);
+                Runnable r = new Runnable() {
+                    @Override
+                    public void run(){
+                        String name = Thread.currentThread().getName();
+                        try {
+                            Thread.currentThread().setName("CloudMembership-memberAdded");
+                            membershipListener.memberAdded(member);
+                        } finally {
+                            Thread.currentThread().setName(name);
+                        }
+                    }
+                };
+                executor.execute(r);
             }
         }
         // Remove non refreshed members from the membership
@@ -120,7 +132,19 @@ public abstract class CloudMembershipProvider extends MembershipProviderBase imp
             if (log.isDebugEnabled()) {
                 log.debug("Member disappeared: " + member);
             }
-            membershipListener.memberDisappeared(member);
+            Runnable r = new Runnable() {
+                @Override
+                public void run(){
+                    String name = Thread.currentThread().getName();
+                    try {
+                        Thread.currentThread().setName("CloudMembership-memberDisappeared");
+                        membershipListener.memberDisappeared(member);
+                    } finally {
+                        Thread.currentThread().setName(name);
+                    }
+                }
+            };
+            executor.execute(r);
         }
     }
 
