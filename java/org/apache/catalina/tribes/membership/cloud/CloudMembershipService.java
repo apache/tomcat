@@ -18,9 +18,6 @@
 package org.apache.catalina.tribes.membership.cloud;
 
 import java.io.IOException;
-import java.net.InetAddress;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 
 import javax.management.ObjectName;
 
@@ -42,6 +39,7 @@ public class CloudMembershipService extends MembershipServiceBase {
     public static final String MEMBERSHIP_PROVIDER_CLASS_NAME = "membershipProviderClassName";
     private static final String KUBE = "kubernetes";
     private static final String KUBE_PROVIDER_CLASS = "org.apache.catalina.tribes.membership.cloud.KubernetesMembershipProvider";
+    static final byte[] INITIAL_ID = new byte[16];
 
     private MembershipProvider membershipProvider;
     private MemberImpl localMember;
@@ -173,13 +171,7 @@ public class CloudMembershipService extends MembershipServiceBase {
 
         if (localMember == null) {
             localMember = new MemberImpl();
-            try {
-                // Set localMember unique ID to md5 hash of hostname
-                localMember.setUniqueId(MessageDigest.getInstance("md5")
-                        .digest(InetAddress.getLocalHost().getHostName().getBytes()));
-            } catch (NoSuchAlgorithmException e) {
-                throw new IOException(e);
-            }
+            localMember.setUniqueId(INITIAL_ID);
             localMember.setLocal(true);
         }
         localMember.setHostname(host);

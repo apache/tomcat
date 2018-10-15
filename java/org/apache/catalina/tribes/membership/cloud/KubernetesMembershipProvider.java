@@ -203,10 +203,15 @@ public class KubernetesMembershipProvider extends CloudMembershipProvider {
 
                 // We found ourselves, ignore
                 if (name.equals(hostName)) {
+                    // Update the UID on initial lookup
+                    Member localMember = service.getLocalMember(false);
+                    if (localMember.getUniqueId() == CloudMembershipService.INITIAL_ID && localMember instanceof MemberImpl) {
+                        byte[] id = md5.digest(uid.getBytes(StandardCharsets.US_ASCII));
+                        ((MemberImpl) localMember).setUniqueId(id);
+                    }
                     continue;
                 }
 
-                byte[] id = md5.digest(uid.getBytes(StandardCharsets.US_ASCII));
                 long aliveTime = Duration.between(Instant.parse(creationTimestamp), startTime).getSeconds() * 1000; // aliveTime is in ms
 
                 MemberImpl member = null;
@@ -218,6 +223,7 @@ public class KubernetesMembershipProvider extends CloudMembershipProvider {
                     log.error(sm.getString("kubernetesMembershipProvider.memberError"), e);
                     continue;
                 }
+                byte[] id = md5.digest(uid.getBytes(StandardCharsets.US_ASCII));
                 member.setUniqueId(id);
                 members.add(member);
             }
