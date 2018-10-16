@@ -226,5 +226,5 @@ public class CloudMembershipService extends MembershipServiceBase
 
     public void setReadTimeout(int readTimeout) {
         properties.setProperty("readTimeout", String.valueOf(readTimeout));
-    }   
+    }
 }
