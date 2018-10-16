@@ -26,6 +26,7 @@ import java.net.PasswordAuthentication;
 import java.net.URL;
 import java.net.URLConnection;
 
+import org.apache.catalina.util.IOTools;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
 
@@ -145,6 +146,9 @@ public abstract class AbstractCatalinaTask extends BaseRedirectorHelperTask {
         URLConnection conn = null;
         InputStreamReader reader = null;
         try {
+            // Set up authorization with our credentials
+            Authenticator.setDefault(new TaskAuthenticator(username, password));
+
             // Create a connection for this command
             conn = (new URL(url + command)).openConnection();
             HttpURLConnection hconn = (HttpURLConnection) conn;
@@ -153,6 +157,8 @@ public abstract class AbstractCatalinaTask extends BaseRedirectorHelperTask {
             hconn.setDoInput(true);
             hconn.setUseCaches(false);
             if (istream != null) {
+                preAuthenticate();
+
                 hconn.setDoOutput(true);
                 hconn.setRequestMethod("PUT");
                 if (contentType != null) {
@@ -167,9 +173,6 @@ public abstract class AbstractCatalinaTask extends BaseRedirectorHelperTask {
                 hconn.setRequestMethod("GET");
             }
             hconn.setRequestProperty("User-Agent", "Catalina-Ant-Task/1.0");
-
-            // Set up authorization with our credentials
-            Authenticator.setDefault(new TaskAuthenticator(username, password));
 
             // Establish the connection with the server
             hconn.connect();
@@ -262,6 +265,44 @@ public abstract class AbstractCatalinaTask extends BaseRedirectorHelperTask {
                 }
             }
         }
+    }
+
+
+    /*
+     * This is a hack.
+     * We need to use streaming to avoid OOME on large uploads.
+     * We'd like to use Authenticator.setDefault() for authentication as the JRE
+     * then provides the DIGEST client implementation.
+     * However, the above two are not compatible. When the request is made, the
+     * resulting 401 triggers an exception because, when using streams, the
+     * InputStream is no longer available to send with the repeated request that
+     * now includes the appropriate Authorization header.
+     * The hack is to make a simple OPTIONS request- i.e. without a request
+     * body.
+     * This triggers authentication and the requirement to authenticate for this
+     * host is cached and used to provide an appropriate Authorization when the
+     * next request is made (that includes a request body).
+     */
+    private void preAuthenticate() throws IOException {
+        URLConnection conn = null;
+
+        // Create a connection for this command
+        conn = (new URL(url)).openConnection();
+        HttpURLConnection hconn = (HttpURLConnection) conn;
+
+        // Set up standard connection characteristics
+        hconn.setAllowUserInteraction(false);
+        hconn.setDoInput(true);
+        hconn.setUseCaches(false);
+        hconn.setDoOutput(false);
+        hconn.setRequestMethod("OPTIONS");
+        hconn.setRequestProperty("User-Agent", "Catalina-Ant-Task/1.0");
+
+        // Establish the connection with the server
+        hconn.connect();
+
+        // Swallow response message
+        IOTools.flow(hconn.getInputStream(), null);
     }
 
 

@@ -72,7 +72,9 @@ public class IOTools {
         throws IOException {
         int numRead;
         while ( (numRead = is.read(buf) ) >= 0) {
-            os.write(buf, 0, numRead);
+            if (os != null) {
+                os.write(buf, 0, numRead);
+            }
         }
     }  
 
