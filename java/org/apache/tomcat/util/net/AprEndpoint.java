@@ -75,18 +75,31 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
 
     private static final Log log = LogFactory.getLog(AprEndpoint.class);
 
-    protected static final Set<String> SSL_PROTO_ALL = new HashSet<String>();
+    // Lazy init as we need the AprLifecycleListener to have loaded the
+    // APR/native library to populate this correctly.
+    private static volatile Set<String> SSL_PROTO_ALL;
+    private static final Object SSL_PROTO_ALL_LOCK = new Object();
 
-    static {
-        /* Default used if SSLProtocol is not configured, also
-           used if SSLProtocol="All" */
-        SSL_PROTO_ALL.add(Constants.SSL_PROTO_TLSv1);
-        SSL_PROTO_ALL.add(Constants.SSL_PROTO_TLSv1_1);
-        SSL_PROTO_ALL.add(Constants.SSL_PROTO_TLSv1_2);
-        if (SSL.version() >= 0x1010100f) {
-            SSL_PROTO_ALL.add(Constants.SSL_PROTO_TLSv1_3);
+    protected static Set<String> getSslProtocolAll() {
+        if (SSL_PROTO_ALL == null) {
+            synchronized (SSL_PROTO_ALL_LOCK) {
+                if (SSL_PROTO_ALL == null) {
+                    Set<String> temp = new HashSet<String>();
+                    /* Default used if SSLProtocol is not configured, also
+                    used if SSLProtocol="All" */
+                    temp.add(Constants.SSL_PROTO_TLSv1);
+                    temp.add(Constants.SSL_PROTO_TLSv1_1);
+                    temp.add(Constants.SSL_PROTO_TLSv1_2);
+                    if (SSL.version() >= 0x1010100f) {
+                        temp.add(Constants.SSL_PROTO_TLSv1_3);
+                    }
+                    SSL_PROTO_ALL = temp;
+                }
+            }
         }
+        return SSL_PROTO_ALL;
     }
+
 
     // ----------------------------------------------------------------- Fields
     /**
@@ -547,7 +560,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
                         if (trimmed.charAt(0) == '-') {
                             trimmed = trimmed.substring(1).trim();
                             if (trimmed.equalsIgnoreCase(Constants.SSL_PROTO_ALL)) {
-                                protocols.removeAll(SSL_PROTO_ALL);
+                                protocols.removeAll(getSslProtocolAll());
                             } else {
                                 protocols.remove(trimmed);
                             }
@@ -556,7 +569,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
                                 trimmed = trimmed.substring(1).trim();
                             }
                             if (trimmed.equalsIgnoreCase(Constants.SSL_PROTO_ALL)) {
-                                protocols.addAll(SSL_PROTO_ALL);
+                                protocols.addAll(getSslProtocolAll());
                             } else {
                                 protocols.add(trimmed);
                             }
