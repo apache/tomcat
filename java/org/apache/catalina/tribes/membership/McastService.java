@@ -341,6 +341,7 @@ public class McastService
                                     this,
                                     this,
                                     Boolean.parseBoolean(properties.getProperty("localLoopbackDisabled")));
+        impl.setMembershipService(this);
         String value = properties.getProperty("recoveryEnabled");
         boolean recEnabled = Boolean.parseBoolean(value);
         impl.setRecoveryEnabled(recEnabled);
