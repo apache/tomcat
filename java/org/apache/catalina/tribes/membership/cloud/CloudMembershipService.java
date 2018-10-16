@@ -32,7 +32,9 @@ import org.apache.catalina.tribes.util.StringManager;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
-public class CloudMembershipService extends MembershipServiceBase {
+public class CloudMembershipService extends MembershipServiceBase
+        implements CloudMembershipServiceMBean {
+
     private static final Log log = LogFactory.getLog(CloudMembershipService.class);
     protected static final StringManager sm = StringManager.getManager(Constants.Package);
 
@@ -206,4 +208,23 @@ public class CloudMembershipService extends MembershipServiceBase {
         this.membershipProvider = memberProvider;
     }
 
+    @Override
+    public int getConnectTimeout() {
+        String connectTimeout = properties.getProperty("connectTimeout");
+        return Integer.parseInt(connectTimeout);
+    }
+
+    public void setConnectTimeout(int connectTimeout) {
+        properties.setProperty("connectTimeout", String.valueOf(connectTimeout));
+    }
+
+    @Override
+    public int getReadTimeout() {
+        String readTimeout = properties.getProperty("readTimeout");
+        return Integer.parseInt(readTimeout);
+    }
+
+    public void setReadTimeout(int readTimeout) {
+        properties.setProperty("readTimeout", String.valueOf(readTimeout));
+    }   
 }
