@@ -105,6 +105,12 @@
         attribute to the <code>JreMemoryLeakPreventionListener</code> as
         application code may still trigger this memory leak. (markt)
       </fix>
+      <fix>
+        <bug>62809</bug>: Correct a regression in the implementation of DIGEST
+        authentication support for the Deployer Ant tasks (bug <bug>45832</bug>)
+        that prevented the <code>DeployTask</code> from working when
+        authentication was required. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
