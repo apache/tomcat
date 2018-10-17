@@ -254,4 +254,25 @@ public final class Library {
         }
         return initialize();
     }
+
+    /**
+     * Calls System.load(filename). Using this method will load the
+     * native library via the Common ClassLoader so that it can
+     * be used by all of the Webapps
+     * @param filename - absolute path of the native library
+     */
+    public static void load(String filename){
+        System.load(filename);
+    }
+
+    /**
+     * Calls System.loadLibrary(libname). Using this method will the
+     * native library via the Common ClassLoader so that it can
+     * be used by all of the Webapps
+     * @param libname - the name of the native library
+     */
+    public static void loadLibrary(String libname){
+        System.loadLibrary(libname);
+    }
+
 }
