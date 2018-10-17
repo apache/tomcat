@@ -279,20 +279,21 @@ public class StaticMembershipProvider extends MembershipProviderBase implements 
     protected void ping() throws ChannelException {
         // send ping
         Member[] members = getAliveMembers(staticMembers.toArray(new Member[0]));
-        if (members.length == 0) return;
-        try {
-            MemberMessage msg = new MemberMessage(membershipId, MemberMessage.MSG_PING, service.getLocalMember(true));
-            Response[] resp = rpcChannel.send(members, msg, RpcChannel.ALL_REPLY, sendOptions, rpcTimeout);
-            for (int i = 0; i < resp.length; i++) {
-                messageReceived(resp[i].getMessage(), resp[i].getSource());
+        if (members.length > 0) {
+            try {
+                MemberMessage msg = new MemberMessage(membershipId, MemberMessage.MSG_PING, service.getLocalMember(true));
+                Response[] resp = rpcChannel.send(members, msg, RpcChannel.ALL_REPLY, sendOptions, rpcTimeout);
+                for (int i = 0; i < resp.length; i++) {
+                    messageReceived(resp[i].getMessage(), resp[i].getSource());
+                }
+            } catch (ChannelException ce) {
+                // Handle known failed members
+                FaultyMember[] faultyMembers = ce.getFaultyMembers();
+                for (FaultyMember faultyMember : faultyMembers) {
+                    memberDisappeared(faultyMember.getMember());
+                }
+                throw ce;
             }
-        } catch (ChannelException ce) {
-            // Handle known failed members
-            FaultyMember[] faultyMembers = ce.getFaultyMembers();
-            for (FaultyMember faultyMember : faultyMembers) {
-                memberDisappeared(faultyMember.getMember());
-            }
-            throw ce;
         }
         // expire
         checkExpired();

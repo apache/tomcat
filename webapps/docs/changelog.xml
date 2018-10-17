@@ -220,6 +220,10 @@
         Move the event notification <code>ThreadPoolExecutor</code> to
         <code>MembershipProviderBase</code>. (kfujino)
       </fix>
+      <fix>
+        Even if all members have already disappeared and PING can not be sent,
+        ensure that members will be expired. (kfujino)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
