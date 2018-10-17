@@ -3066,6 +3066,23 @@ skip.installer property in build.properties" />
 Read the Building page on the Apache Tomcat documentation site for details on how to configure your Eclipse workspace.</echo>
   </target>
 
+  <!-- ============================ IntelliJ IDEA=========================== -->
+
+  <target name="ide-intellij"
+          depends="download-compile, extras-webservices-prepare, download-test-compile"
+          description="Creates project directory .idea for IntelliJ IDEA">
+
+    <copy todir="${tomcat.home}/.idea">
+      <fileset dir="${tomcat.home}/res/ide-support/idea"/>
+    </copy>
+
+    <echo>IntelliJ IDEA project directory created. Please create PATH VARIABLES for
+
+      ANT_HOME          = ${ant.home}
+      TOMCAT_BUILD_LIBS = ${base.path}
+    </echo>
+  </target>
+
   <!-- ============================ NetBeans =============================== -->
 
   <target name="ide-netbeans"

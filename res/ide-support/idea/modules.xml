@@ -15,11 +15,10 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 -->
-<inspections version="1.0" is_locked="false">
-  <option name="myName" value="Tomcat" />
-  <option name="myLocal" value="true" />
-  <inspection_tool class="StaticImport" enabled="true" level="WARNING" enabled_by_default="true" />
-  <inspection_tool class="UnnecessaryBoxing" enabled="false" level="WARNING" enabled_by_default="false" />
-  <inspection_tool class="UnnecessaryUnboxing" enabled="false" level="WARNING" enabled_by_default="false" />
-</inspections>
-
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/tomcat.iml" filepath="$PROJECT_DIR$/.idea/tomcat.iml" />
+    </modules>
+  </component>
+</project>
