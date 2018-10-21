@@ -111,6 +111,9 @@
         that prevented the <code>DeployTask</code> from working when
         authentication was required. (markt)
       </fix>
+      <update>
+        Update the recommended minimum Tomcat Native version to 1.2.18. (markt)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Coyote">
