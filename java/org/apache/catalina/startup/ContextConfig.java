@@ -423,10 +423,14 @@ public class ContextConfig implements LifecycleListener {
         Digester digester = new Digester();
         digester.setValidating(false);
         digester.setRulesValidation(true);
-        HashMap<Class<?>, List<String>> fakeAttributes = new HashMap<>();
-        ArrayList<String> attrs = new ArrayList<>();
-        attrs.add("className");
-        fakeAttributes.put(Object.class, attrs);
+        Map<Class<?>, List<String>> fakeAttributes = new HashMap<>();
+        List<String> objectAttrs = new ArrayList<>();
+        objectAttrs.add("className");
+        fakeAttributes.put(Object.class, objectAttrs);
+        // Ignore attribute added by Eclipse for its internal tracking
+        List<String> contextAttrs = new ArrayList<>();
+        contextAttrs.add("source");
+        fakeAttributes.put(StandardContext.class, contextAttrs);
         digester.setFakeAttributes(fakeAttributes);
         RuleSet contextRuleSet = new ContextRuleSet("", false);
         digester.addRuleSet(contextRuleSet);
