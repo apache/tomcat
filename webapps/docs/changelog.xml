@@ -79,6 +79,9 @@
         that prevented the <code>DeployTask</code> from working when
         authentication was required. (markt)
       </fix>
+      <update>
+        Update the recommended minimum Tomcat Native version to 1.2.18. (markt)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Coyote">
@@ -155,6 +158,15 @@
         will be overwritten by settings specified in a default context file such
         as <code>conf/context.xml</code>. (markt)
       </fix>
+    </changelog>
+  </subsection>
+  <subsection name="Other">
+    <changelog>
+      <update>
+        Update the packaged version of the Tomcat Native Library to 1.2.18 to
+        pick up the latest Windows binaries built with APR 1.6.5 and OpenSSL
+        1.1.1. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
