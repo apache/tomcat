@@ -159,6 +159,29 @@
 
   </subsection>
 
+  <subsection name="JNI Library Loading Listener - org.apache.catalina.core.JniLifecycleListener">
+
+    <p>The <strong>JNI Library Loading Listener</strong> makes it possible
+    for multiple Webapps to use a native library, by loading the native
+    library using a shared class loader (typically the Common class loader but
+    may vary in some configurations)</p>
+
+    <p>The listener supports two mutually exclusive attributes, so one of them must be used, but you can not use both together:</p>
+
+    <attributes>
+      <attribute name="libraryName" required="false">
+        <p>The name of the native library, as defined in
+        <code>java.lang.System.loadLibrary()</code>
+        </p>
+      </attribute>
+      <attribute name="libraryPath" required="false">
+        <p>The absolute path of the native library, as defined in
+        <code>java.lang.System.load()</code>
+        </p>
+      </attribute>
+    </attributes>
+  </subsection>
+
   <subsection name="JRE Memory Leak Prevention Listener - org.apache.catalina.core.JreMemoryLeakPreventionListener">
 
     <p>The <strong>JRE Memory Leak Prevention Listener</strong> provides
@@ -261,7 +284,7 @@
         class the PoolCleaner thread will be configured with the thread's
         context class loader set to the web application class loader which in
         turn will trigger a memory leak on reload. Defaults to
-        <code>true</code>. This protection is disabled if running on Java 9 
+        <code>true</code>. This protection is disabled if running on Java 9
         onwards since the leak has been fixed for Java 9 onwards.</p>
       </attribute>
 
@@ -399,13 +422,13 @@
 
     <p>The <strong>UserConfig</strong> provides feature of User Web Applications.
     User Web Applications map a request URI starting with a tilde character ("~")
-    and a username to a directory (commonly named public_html) in that user's 
+    and a username to a directory (commonly named public_html) in that user's
     home directory on the server.</p>
 
     <p>See the <a href="host.html#User_Web_Applications">User Web Applications</a>
     special feature on the <strong>Host</strong> element for more information.</p>
 
-    <p>The following additional attributes are supported by the 
+    <p>The following additional attributes are supported by the
     <strong>UserConfig</strong>:</p>
 
     <attributes>
@@ -417,11 +440,11 @@
 
       <attribute name="userClass" required="false">
         <p>The class name of the user database class.
-        There are currently two user database, the 
+        There are currently two user database, the
         <code>org.apache.catalina.startup.PasswdUserDatabase</code> is used on a
         Unix system that uses the /etc/passwd file to identify valid users.
-        The <code>org.apache.catalina.startup.HomesUserDatabase</code> is used on 
-        a server where /etc/passwd is not in use. HomesUserDatabase deploy all 
+        The <code>org.apache.catalina.startup.HomesUserDatabase</code> is used on
+        a server where /etc/passwd is not in use. HomesUserDatabase deploy all
         directories found in a specified base directory.</p>
       </attribute>
 
@@ -432,7 +455,7 @@
       </attribute>
 
       <attribute name="allow" required="false">
-        <p>A regular expression defining user who deployment is allowed. If this 
+        <p>A regular expression defining user who deployment is allowed. If this
         attribute is specified, the user to deploy must match for this pattern.
         If this attribute is not specified, all users will be deployed unless the
         user matches a deny pattern.</p>
@@ -448,7 +471,7 @@
     </attributes>
 
   </subsection>
-  
+
   <subsection name="Version Logging Lifecycle Listener - org.apache.catalina.startup.VersionLoggerListener">
 
     <p>The <strong>Version Logging Lifecycle Listener</strong> logs Tomcat, Java
