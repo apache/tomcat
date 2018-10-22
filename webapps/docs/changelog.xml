@@ -121,11 +121,10 @@
         Eclipse. Based on a patch by mdfst13. (markt)
       </add>
       <add>
-        <bug>62830</bug>: Add static methods
-        <code>Library.loadLibrary(libname)</code> and
-        <code>Library.load(filename)</code> to load a native library by the
-        common class loader so that more than one application can load it.
-        (isapir)
+        <bug>62830</bug>: Added <code>JniLifeCycleListener</code> and static
+        methods <code>Library.loadLibrary(libraryName)</code> and
+        <code>Library.load(filename)</code> to load a native library by a
+        shared class loader so that more than one Webapp can use it. (isapir)
       </add>
     </changelog>
   </subsection>
