@@ -159,6 +159,29 @@
 
   </subsection>
 
+  <subsection name="JNI Library Loading Listener - org.apache.catalina.core.JniLifecycleListener">
+
+    <p>The <strong>JNI Library Loading Listener</strong> makes it possible
+    for multiple Webapps to use a native library, by loading the native
+    library using a shared class loader (typically the Common class loader but
+    may vary in some configurations)</p>
+
+    <p>The listener supports two mutually exclusive attributes, so one of them must be used, but you can not use both together:</p>
+
+    <attributes>
+      <attribute name="libraryName" required="false">
+        <p>The name of the native library, as defined in
+        <code>java.lang.System.loadLibrary()</code>
+        </p>
+      </attribute>
+      <attribute name="libraryPath" required="false">
+        <p>The absolute path of the native library, as defined in
+        <code>java.lang.System.load()</code>
+        </p>
+      </attribute>
+    </attributes>
+  </subsection>
+
   <subsection name="JRE Memory Leak Prevention Listener - org.apache.catalina.core.JreMemoryLeakPreventionListener">
 
     <p>The <strong>JRE Memory Leak Prevention Listener</strong> provides
