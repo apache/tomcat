@@ -131,6 +131,7 @@ public class TcpFailureDetector extends ChannelInterceptorBase implements TcpFai
                 //check to see if it is alive
                 if (memberAlive(member)) {
                     membership.memberAlive(member);
+                    addSuspects.remove(member);
                     notify = true;
                 } else {
                     addSuspects.put(member, Long.valueOf(System.currentTimeMillis()));

@@ -239,6 +239,10 @@
         Even if all members have already disappeared and PING can not be sent,
         ensure that members will be expired. (kfujino)
       </fix>
+      <fix>
+        Ensure that remove the member from suspect list when member added.
+        (kfujino)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
