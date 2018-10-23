@@ -239,8 +239,9 @@
       <p>The APR Lifecycle Listener is not stable if compiled on Solaris using
       gcc. If using the APR/native connector on Solaris, compile it with the
       Sun Studio compiler.</p>
-
-      <p>The Security Listener should be enabled and configured as appropriate.
+      <p>The JNI Library Loading Listener may be used to load native code. It should
+      only be used to load trusted libraries.</p>
+      <p>The Security Lifecycle Listener should be enabled and configured as appropriate.
       </p>
     </subsection>
 
@@ -375,7 +376,7 @@
       context as required.</p>
 
       <p>Any administrative application should be protected by a
-      RemoteAddrValve. (Note that this Valve is also available as a Filter.)
+      RemoteAddrValve (this Valve is also available as a Filter).
       The <strong>allow</strong> attribute should be used to limit access to a
       set of known trusted hosts.</p>
 
@@ -391,7 +392,7 @@
       <p>Modify the values as required. Note that this will also change the version
       number reported in some of the management tools and may make it harder to
       determine the real version installed. The CATALINA_HOME/bin/version.bat|sh
-      script will still report the version number.</p>
+      script will still report the correct version number.</p>
 
       <p>The default ErrorReportValve can display stack traces and/or JSP
       source code to clients when an error occurs. To avoid this, custom error
@@ -490,7 +491,7 @@
     <p>Modify the values as required. Note that this will also change the version
     number reported in some of the management tools and may make it harder to
     determine the real version installed. The CATALINA_HOME/bin/version.bat|sh
-    script will still report the version number.
+    script will still report the correct version number.
     </p>
 
     <p>The CGI Servlet is disabled by default. If enabled, the debug
