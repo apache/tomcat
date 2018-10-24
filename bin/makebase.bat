@@ -90,6 +90,8 @@ if "%COPY_WEBAPPS%" == "true" (
 ) else (
     rem copy conf directory without subdirectories and suppress warning
     robocopy %CATALINA_HOME%\conf %BASE_TGT%\conf > nul
+    rem create empty ROOT directory
+    mkdir %BASE_TGT%\webapps\ROOT
 )
 
 rem copy setenv.bat if exists
@@ -97,8 +99,16 @@ robocopy %CATALINA_HOME%\bin %BASE_TGT%\bin setenv.bat > nul
 
 echo Created CATALINA_BASE directory at %BASE_TGT%
 
+echo
+echo You can launch the new instance by running:
+echo     set CATALINA_HOME=%CATALINA_HOME%
+echo     set CATALINA_BASE=%BASE_TGT%
+echo     %%CATALINA_HOME%%/bin/catalina.bat run
+
+echo
 echo Attention: The ports in conf\server.xml might be bound by a
-echo            different instance. Please review your config files
-echo            and update them where necessary.
+echo     different instance. Please review your config files
+echo     and update them where necessary.
+echo
 
 :EOF

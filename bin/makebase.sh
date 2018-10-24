@@ -92,6 +92,8 @@ if [ "$COPY_WEBAPPS" = true ]; then
 else
     # copy conf directory without subdirectories and suppress warning
     cp "${CATALINA_HOME}/conf"/* "$BASE_TGT/conf" 2> /dev/null
+    # create empty ROOT directory
+    mkdir "$BASE_TGT/webapps/ROOT"
 fi
 
 # copy setenv.sh if exists
@@ -100,6 +102,14 @@ fi
 
 echo "Created CATALINA_BASE directory at $BASE_TGT"
 
+echo
+echo "You can launch the new instance by running:"
+echo "    export CATALINA_HOME=$CATALINA_HOME"
+echo "    export CATALINA_BASE=$BASE_TGT"
+echo "    \$CATALINA_HOME/bin/catalina.sh run"
+
+echo
 echo "Attention: The ports in conf/server.xml might be bound by a "
-echo "           different instance. Please review your config files "
-echo "           and update them as necessary."
+echo "    different instance. Please review your config files "
+echo "    and update them as necessary."
+echo
