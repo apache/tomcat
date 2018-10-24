@@ -239,8 +239,9 @@
       <p>The APR Lifecycle Listener is not stable if compiled on Solaris using
       gcc. If using the APR/native connector on Solaris, compile it with the
       Sun Studio compiler.</p>
-
-      <p>The Security Listener should be enabled and configured as appropriate.
+      <p>The JNI Library Loading Listener may be used to load native code. It should
+      only be used to load trusted libraries.</p>
+      <p>The Security Lifecycle Listener should be enabled and configured as appropriate.
       </p>
     </subsection>
 
