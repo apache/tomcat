@@ -68,16 +68,16 @@ public interface Host extends Container {
 
     /**
      * @return the XML root for this Host.  This can be an absolute
-     * pathname, a relative pathname, or a URL.
-     * If null, defaults to
+     * pathname or a relative pathname.
+     * If null, the base path defaults to
      * ${catalina.base}/conf/&lt;engine name&gt;/&lt;host name&gt; directory
      */
     public String getXmlBase();
 
     /**
      * Set the Xml root for this Host.  This can be an absolute
-     * pathname, a relative pathname, or a URL.
-     * If null, defaults to
+     * pathname or a relative pathname.
+     * If null, the base path defaults to
      * ${catalina.base}/conf/&lt;engine name&gt;/&lt;host name&gt; directory
      * @param xmlBase The new XML root
      */

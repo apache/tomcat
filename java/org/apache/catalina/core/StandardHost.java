@@ -266,10 +266,7 @@ public class StandardHost extends ContainerBase implements Host {
 
 
     /**
-     * Return the XML root for this Host.  This can be an absolute
-     * pathname, a relative pathname, or a URL.
-     * If null, defaults to
-     * ${catalina.base}/conf/&lt;engine name&gt;/&lt;host name&gt; directory
+     * ({@inheritDoc}
      */
     @Override
     public String getXmlBase() {
@@ -278,12 +275,7 @@ public class StandardHost extends ContainerBase implements Host {
 
 
     /**
-     * Set the Xml root for this Host.  This can be an absolute
-     * pathname, a relative pathname, or a URL.
-     * If null, defaults to
-     * ${catalina.base}/conf/&lt;engine name&gt;/&lt;host name&gt; directory
-     *
-     * @param xmlBase The new XML root
+     * ({@inheritDoc}
      */
     @Override
     public void setXmlBase(String xmlBase) {
