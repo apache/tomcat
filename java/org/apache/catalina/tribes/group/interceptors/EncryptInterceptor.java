@@ -191,7 +191,7 @@ public class EncryptInterceptor extends ChannelInterceptorBase implements Encryp
      * will be shown as "ab". The length of the string in characters will
      * be twice the length of the key in bytes.
      *
-     * @return The encryption key.
+     * @param keyBytes The encryption key.
      */
     public void setEncryptionKey(String keyBytes) {
         if(null == keyBytes)
