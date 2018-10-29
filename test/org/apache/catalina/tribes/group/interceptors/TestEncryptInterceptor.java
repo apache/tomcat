@@ -16,9 +16,12 @@
  */
 package org.apache.catalina.tribes.group.interceptors;
 
-import static org.junit.Assert.*;
-
 import java.nio.charset.StandardCharsets;
+
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+
 import org.apache.catalina.tribes.Channel;
 import org.apache.catalina.tribes.ChannelException;
 import org.apache.catalina.tribes.ChannelInterceptor;
@@ -29,8 +32,6 @@ import org.apache.catalina.tribes.group.InterceptorPayload;
 import org.apache.catalina.tribes.io.ChannelData;
 import org.apache.catalina.tribes.io.XByteBuffer;
 import org.apache.tomcat.util.buf.HexUtils;
-import org.junit.Before;
-import org.junit.Test;
 
 /**
  * Tests the EncryptInterceptor.
@@ -66,7 +67,7 @@ public class TestEncryptInterceptor {
 
         String testInput = "The quick brown fox jumps over the lazy dog.";
 
-        assertEquals("Basic roundtrip failed",
+        Assert.assertEquals("Basic roundtrip failed",
                      testInput,
                      roundTrip(testInput, src, dest));
     }
@@ -78,7 +79,7 @@ public class TestEncryptInterceptor {
 
         String testInput = "x";
 
-        assertEquals("Tiny payload roundtrip failed",
+        Assert.assertEquals("Tiny payload roundtrip failed",
                      testInput,
                      roundTrip(testInput, src, dest));
     }
@@ -90,7 +91,7 @@ public class TestEncryptInterceptor {
 
         byte[] bytes = new byte[1073741824]; // 1MiB, all zeros
 
-        assertArrayEquals("Tiny payload roundtrip failed",
+        Assert.assertArrayEquals("Tiny payload roundtrip failed",
                           bytes,
                           roundTrip(bytes, src, dest));
     }
@@ -104,7 +105,7 @@ public class TestEncryptInterceptor {
 
         String testInput = "The quick brown fox jumps over the lazy dog.";
 
-        assertEquals("Failed to set custom provider name",
+        Assert.assertEquals("Failed to set custom provider name",
                      testInput,
                      roundTrip(testInput, src, dest));
     }
@@ -118,7 +119,7 @@ public class TestEncryptInterceptor {
 
         String testInput = "The quick brown fox jumps over the lazy dog.";
 
-        assertEquals("Failed to set custom provider name",
+        Assert.assertEquals("Failed to set custom provider name",
                      testInput,
                      roundTrip(testInput, src, dest));
     }
@@ -132,7 +133,7 @@ public class TestEncryptInterceptor {
 
         String testInput = "The quick brown fox jumps over the lazy dog.";
 
-        assertEquals("Failed to set custom provider name",
+        Assert.assertEquals("Failed to set custom provider name",
                      testInput,
                      roundTrip(testInput, src, dest));
     }
