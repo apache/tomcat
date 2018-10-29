@@ -28,54 +28,259 @@ import org.apache.catalina.tribes.membership.MemberImpl;
 
 public class TestKubernetesJson extends KubernetesMembershipProvider {
 
-    private static final String JSON_POD_LIST = "{\n" +
-            "  \"kind\": \"List\",\n" +
-            "  \"apiVersion\": \"v1\",\n" +
-            "  \"items\": [\n" +
-            "    {\n" +
-            "      \"kind\": \"Pod\",\n" +
-            "      \"apiVersion\": \"v1\",\n" +
-            "      \"metadata\": {\n" +
-            "        \"name\": \"test_pod\",\n" +
-            "        \"namespace\": \"default\",\n" +
-            "        \"selfLink\": \"/api/v1/pods/foo\",\n" +
-            "        \"uid\": \"748932794874923\",\n" +
-            "        \"resourceVersion\": \"23\",\n" +
-            "        \"creationTimestamp\": \"2018-10-02T09:14:01Z\"\n" +
-            "      },\n" +
-            "      \"status\": {\n" +
-            "        \"phase\": \"Running\",\n" +
-            "        \"podIP\": \"192.168.0.2\"\n" +
-            "      }\n" +
-            "    },\n" +
-            "    {\n" +
-            "      \"kind\": \"Pod\",\n" +
-            "      \"apiVersion\": \"v1\",\n" +
-            "      \"metadata\": {\n" +
-            "        \"name\": \"test_pod_2\",\n" +
-            "        \"namespace\": \"default\",\n" +
-            "        \"selfLink\": \"/api/v1/pods/foo2\",\n" +
-            "        \"uid\": \"7489327944322341414923\",\n" +
-            "        \"resourceVersion\": \"18\",\n" +
-            "        \"creationTimestamp\": \"2018-10-01T09:14:01Z\"\n" +
-            "      },\n" +
-            "      \"status\": {\n" +
-            "        \"phase\": \"Running\",\n" +
-            "        \"podIP\": \"192.168.0.3\"\n" +
-            "      }\n" +
-            "    }\n" +
-            "  ]\n" +
-            "}";
+    private static final String OPENSHIFT_JSON_POD_LIST = "{\n"
+            + "  \"kind\": \"PodList\",\n" + "  \"apiVersion\": \"v1\",\n"
+            + "  \"metadata\": {\n"
+            + "    \"selfLink\": \"/api/v1/namespaces/tomcat-in-the-cloud/pods\",\n"
+            + "    \"resourceVersion\": \"1120453180\"\n" + "  },\n"
+            + "  \"items\": [\n" + "    {\n" + "      \"metadata\": {\n"
+            + "        \"name\": \"tomcat-in-the-cloud-5bc6dc7cf8-ndpdm\",\n"
+            + "        \"generateName\": \"tomcat-in-the-cloud-5bc6dc7cf8-\",\n"
+            + "        \"namespace\": \"tomcat-in-the-cloud\",\n"
+            + "        \"selfLink\": \"/api/v1/namespaces/tomcat-in-the-cloud/pods/tomcat-in-the-cloud-5bc6dc7cf8-ndpdm\",\n"
+            + "        \"uid\": \"29cc7dec-cc8d-11e8-943e-02ec8e61afcf\",\n"
+            + "        \"resourceVersion\": \"1120373053\",\n"
+            + "        \"creationTimestamp\": \"2018-10-10T13:05:29Z\",\n"
+            + "        \"labels\": {\n"
+            + "          \"pod-template-hash\": \"1672873794\",\n"
+            + "          \"run\": \"tomcat-in-the-cloud\"\n" + "        },\n"
+            + "        \"annotations\": {\n"
+            + "          \"kubernetes.io/limit-ranger\": \"LimitRanger plugin set: cpu, memory request for container tomcat-in-the-cloud; cpu, memory limit for container tomcat-in-the-cloud\",\n"
+            + "          \"openshift.io/scc\": \"restricted\"\n"
+            + "        },\n" + "        \"ownerReferences\": [\n"
+            + "          {\n" + "            \"apiVersion\": \"apps/v1\",\n"
+            + "            \"kind\": \"ReplicaSet\",\n"
+            + "            \"name\": \"tomcat-in-the-cloud-5bc6dc7cf8\",\n"
+            + "            \"uid\": \"12c4fa68-cc8d-11e8-943e-02ec8e61afcf\",\n"
+            + "            \"controller\": true,\n"
+            + "            \"blockOwnerDeletion\": true\n" + "          }\n"
+            + "        ]\n" + "      },\n" + "      \"spec\": {\n"
+            + "        \"volumes\": [\n" + "          {\n"
+            + "            \"name\": \"default-token-n87wf\",\n"
+            + "            \"secret\": {\n"
+            + "              \"secretName\": \"default-token-n87wf\",\n"
+            + "              \"defaultMode\": 420\n" + "            }\n"
+            + "          }\n" + "        ],\n" + "        \"containers\": [\n"
+            + "          {\n"
+            + "            \"name\": \"tomcat-in-the-cloud\",\n"
+            + "            \"image\": \"docker.io/jfclere/test\",\n"
+            + "            \"ports\": [\n" + "              {\n"
+            + "                \"containerPort\": 8080,\n"
+            + "                \"protocol\": \"TCP\"\n" + "              }\n"
+            + "            ],\n" + "            \"resources\": {\n"
+            + "              \"limits\": {\n"
+            + "                \"cpu\": \"1\",\n"
+            + "                \"memory\": \"512Mi\"\n" + "              },\n"
+            + "              \"requests\": {\n"
+            + "                \"cpu\": \"20m\",\n"
+            + "                \"memory\": \"256Mi\"\n" + "              }\n"
+            + "            },\n" + "            \"volumeMounts\": [\n"
+            + "              {\n"
+            + "                \"name\": \"default-token-n87wf\",\n"
+            + "                \"readOnly\": true,\n"
+            + "                \"mountPath\": \"/var/run/secrets/kubernetes.io/serviceaccount\"\n"
+            + "              }\n" + "            ],\n"
+            + "            \"terminationMessagePath\": \"/dev/termination-log\",\n"
+            + "            \"terminationMessagePolicy\": \"File\",\n"
+            + "            \"imagePullPolicy\": \"Always\",\n"
+            + "            \"securityContext\": {\n"
+            + "              \"capabilities\": {\n"
+            + "                \"drop\": [\n" + "                  \"KILL\",\n"
+            + "                  \"MKNOD\",\n"
+            + "                  \"NET_RAW\",\n"
+            + "                  \"SETGID\",\n"
+            + "                  \"SETUID\"\n" + "                ]\n"
+            + "              },\n" + "              \"runAsUser\": 1119270000\n"
+            + "            }\n" + "          }\n" + "        ],\n"
+            + "        \"restartPolicy\": \"Always\",\n"
+            + "        \"terminationGracePeriodSeconds\": 30,\n"
+            + "        \"dnsPolicy\": \"ClusterFirst\",\n"
+            + "        \"nodeSelector\": {\n"
+            + "          \"type\": \"compute\"\n" + "        },\n"
+            + "        \"serviceAccountName\": \"default\",\n"
+            + "        \"serviceAccount\": \"default\",\n"
+            + "        \"nodeName\": \"ip-172-31-18-231.ca-central-1.compute.internal\",\n"
+            + "        \"securityContext\": {\n"
+            + "          \"seLinuxOptions\": {\n"
+            + "            \"level\": \"s0:c345,c295\"\n" + "          },\n"
+            + "          \"fsGroup\": 1119270000\n" + "        },\n"
+            + "        \"imagePullSecrets\": [\n" + "          {\n"
+            + "            \"name\": \"default-dockercfg-lx7wg\"\n"
+            + "          }\n" + "        ],\n"
+            + "        \"schedulerName\": \"default-scheduler\",\n"
+            + "        \"tolerations\": [\n" + "          {\n"
+            + "            \"key\": \"node.kubernetes.io/memory-pressure\",\n"
+            + "            \"operator\": \"Exists\",\n"
+            + "            \"effect\": \"NoSchedule\"\n" + "          }\n"
+            + "        ],\n" + "        \"priority\": 0\n" + "      },\n"
+            + "      \"status\": {\n" + "        \"phase\": \"Running\",\n"
+            + "        \"conditions\": [\n" + "          {\n"
+            + "            \"type\": \"Initialized\",\n"
+            + "            \"status\": \"True\",\n"
+            + "            \"lastProbeTime\": null,\n"
+            + "            \"lastTransitionTime\": \"2018-10-10T13:05:30Z\"\n"
+            + "          },\n" + "          {\n"
+            + "            \"type\": \"Ready\",\n"
+            + "            \"status\": \"True\",\n"
+            + "            \"lastProbeTime\": null,\n"
+            + "            \"lastTransitionTime\": \"2018-10-10T13:06:30Z\"\n"
+            + "          },\n" + "          {\n"
+            + "            \"type\": \"ContainersReady\",\n"
+            + "            \"status\": \"True\",\n"
+            + "            \"lastProbeTime\": null,\n"
+            + "            \"lastTransitionTime\": null\n" + "          },\n"
+            + "          {\n" + "            \"type\": \"PodScheduled\",\n"
+            + "            \"status\": \"True\",\n"
+            + "            \"lastProbeTime\": null,\n"
+            + "            \"lastTransitionTime\": \"2018-10-10T13:05:30Z\"\n"
+            + "          }\n" + "        ],\n"
+            + "        \"hostIP\": \"172.31.18.231\",\n"
+            + "        \"podIP\": \"10.130.140.153\",\n"
+            + "        \"startTime\": \"2018-10-10T13:05:30Z\",\n"
+            + "        \"containerStatuses\": [\n" + "          {\n"
+            + "            \"name\": \"tomcat-in-the-cloud\",\n"
+            + "            \"state\": {\n" + "              \"running\": {\n"
+            + "                \"startedAt\": \"2018-10-10T13:06:29Z\"\n"
+            + "              }\n" + "            },\n"
+            + "            \"lastState\": {\n" + "              \n"
+            + "            },\n" + "            \"ready\": true,\n"
+            + "            \"restartCount\": 0,\n"
+            + "            \"image\": \"docker.io/jfclere/test:latest\",\n"
+            + "            \"imageID\": \"docker.io/jfclere/test@sha256:d36155492516915ecf448fe62769f61b5f9ab795bc8ae1e72a199ee6485cbea2\",\n"
+            + "            \"containerID\": \"cri-o://a173e05e66730efd5e5df6e9b2681b5c37de44b81cc22f2455077b3008a5284c\"\n"
+            + "          }\n" + "        ],\n"
+            + "        \"qosClass\": \"Burstable\"\n" + "      }\n" + "    },\n"
+            + "    {\n" + "      \"metadata\": {\n"
+            + "        \"name\": \"tomcat-in-the-cloud-5bc6dc7cf8-w454k\",\n"
+            + "        \"generateName\": \"tomcat-in-the-cloud-5bc6dc7cf8-\",\n"
+            + "        \"namespace\": \"tomcat-in-the-cloud\",\n"
+            + "        \"selfLink\": \"/api/v1/namespaces/tomcat-in-the-cloud/pods/tomcat-in-the-cloud-5bc6dc7cf8-w454k\",\n"
+            + "        \"uid\": \"12cd7ae2-cc8d-11e8-943e-02ec8e61afcf\",\n"
+            + "        \"resourceVersion\": \"1120369623\",\n"
+            + "        \"creationTimestamp\": \"2018-10-10T13:04:51Z\",\n"
+            + "        \"labels\": {\n"
+            + "          \"pod-template-hash\": \"1672873794\",\n"
+            + "          \"run\": \"tomcat-in-the-cloud\"\n" + "        },\n"
+            + "        \"annotations\": {\n"
+            + "          \"kubernetes.io/limit-ranger\": \"LimitRanger plugin set: cpu, memory request for container tomcat-in-the-cloud; cpu, memory limit for container tomcat-in-the-cloud\",\n"
+            + "          \"openshift.io/scc\": \"restricted\"\n"
+            + "        },\n" + "        \"ownerReferences\": [\n"
+            + "          {\n" + "            \"apiVersion\": \"apps/v1\",\n"
+            + "            \"kind\": \"ReplicaSet\",\n"
+            + "            \"name\": \"tomcat-in-the-cloud-5bc6dc7cf8\",\n"
+            + "            \"uid\": \"12c4fa68-cc8d-11e8-943e-02ec8e61afcf\",\n"
+            + "            \"controller\": true,\n"
+            + "            \"blockOwnerDeletion\": true\n" + "          }\n"
+            + "        ]\n" + "      },\n" + "      \"spec\": {\n"
+            + "        \"volumes\": [\n" + "          {\n"
+            + "            \"name\": \"default-token-n87wf\",\n"
+            + "            \"secret\": {\n"
+            + "              \"secretName\": \"default-token-n87wf\",\n"
+            + "              \"defaultMode\": 420\n" + "            }\n"
+            + "          }\n" + "        ],\n" + "        \"containers\": [\n"
+            + "          {\n"
+            + "            \"name\": \"tomcat-in-the-cloud\",\n"
+            + "            \"image\": \"docker.io/jfclere/test\",\n"
+            + "            \"ports\": [\n" + "              {\n"
+            + "                \"containerPort\": 8080,\n"
+            + "                \"protocol\": \"TCP\"\n" + "              }\n"
+            + "            ],\n" + "            \"resources\": {\n"
+            + "              \"limits\": {\n"
+            + "                \"cpu\": \"1\",\n"
+            + "                \"memory\": \"512Mi\"\n" + "              },\n"
+            + "              \"requests\": {\n"
+            + "                \"cpu\": \"20m\",\n"
+            + "                \"memory\": \"256Mi\"\n" + "              }\n"
+            + "            },\n" + "            \"volumeMounts\": [\n"
+            + "              {\n"
+            + "                \"name\": \"default-token-n87wf\",\n"
+            + "                \"readOnly\": true,\n"
+            + "                \"mountPath\": \"/var/run/secrets/kubernetes.io/serviceaccount\"\n"
+            + "              }\n" + "            ],\n"
+            + "            \"terminationMessagePath\": \"/dev/termination-log\",\n"
+            + "            \"terminationMessagePolicy\": \"File\",\n"
+            + "            \"imagePullPolicy\": \"Always\",\n"
+            + "            \"securityContext\": {\n"
+            + "              \"capabilities\": {\n"
+            + "                \"drop\": [\n" + "                  \"KILL\",\n"
+            + "                  \"MKNOD\",\n"
+            + "                  \"NET_RAW\",\n"
+            + "                  \"SETGID\",\n"
+            + "                  \"SETUID\"\n" + "                ]\n"
+            + "              },\n" + "              \"runAsUser\": 1119270000\n"
+            + "            }\n" + "          }\n" + "        ],\n"
+            + "        \"restartPolicy\": \"Always\",\n"
+            + "        \"terminationGracePeriodSeconds\": 30,\n"
+            + "        \"dnsPolicy\": \"ClusterFirst\",\n"
+            + "        \"nodeSelector\": {\n"
+            + "          \"type\": \"compute\"\n" + "        },\n"
+            + "        \"serviceAccountName\": \"default\",\n"
+            + "        \"serviceAccount\": \"default\",\n"
+            + "        \"nodeName\": \"ip-172-31-23-191.ca-central-1.compute.internal\",\n"
+            + "        \"securityContext\": {\n"
+            + "          \"seLinuxOptions\": {\n"
+            + "            \"level\": \"s0:c345,c295\"\n" + "          },\n"
+            + "          \"fsGroup\": 1119270000\n" + "        },\n"
+            + "        \"imagePullSecrets\": [\n" + "          {\n"
+            + "            \"name\": \"default-dockercfg-lx7wg\"\n"
+            + "          }\n" + "        ],\n"
+            + "        \"schedulerName\": \"default-scheduler\",\n"
+            + "        \"tolerations\": [\n" + "          {\n"
+            + "            \"key\": \"node.kubernetes.io/memory-pressure\",\n"
+            + "            \"operator\": \"Exists\",\n"
+            + "            \"effect\": \"NoSchedule\"\n" + "          }\n"
+            + "        ],\n" + "        \"priority\": 0\n" + "      },\n"
+            + "      \"status\": {\n" + "        \"phase\": \"Running\",\n"
+            + "        \"conditions\": [\n" + "          {\n"
+            + "            \"type\": \"Initialized\",\n"
+            + "            \"status\": \"True\",\n"
+            + "            \"lastProbeTime\": null,\n"
+            + "            \"lastTransitionTime\": \"2018-10-10T13:04:51Z\"\n"
+            + "          },\n" + "          {\n"
+            + "            \"type\": \"Ready\",\n"
+            + "            \"status\": \"True\",\n"
+            + "            \"lastProbeTime\": null,\n"
+            + "            \"lastTransitionTime\": \"2018-10-10T13:05:15Z\"\n"
+            + "          },\n" + "          {\n"
+            + "            \"type\": \"ContainersReady\",\n"
+            + "            \"status\": \"True\",\n"
+            + "            \"lastProbeTime\": null,\n"
+            + "            \"lastTransitionTime\": null\n" + "          },\n"
+            + "          {\n" + "            \"type\": \"PodScheduled\",\n"
+            + "            \"status\": \"True\",\n"
+            + "            \"lastProbeTime\": null,\n"
+            + "            \"lastTransitionTime\": \"2018-10-10T13:04:51Z\"\n"
+            + "          }\n" + "        ],\n"
+            + "        \"hostIP\": \"172.31.23.191\",\n"
+            + "        \"podIP\": \"10.129.123.39\",\n"
+            + "        \"startTime\": \"2018-10-10T13:04:51Z\",\n"
+            + "        \"containerStatuses\": [\n" + "          {\n"
+            + "            \"name\": \"tomcat-in-the-cloud\",\n"
+            + "            \"state\": {\n" + "              \"running\": {\n"
+            + "                \"startedAt\": \"2018-10-10T13:05:14Z\"\n"
+            + "              }\n" + "            },\n"
+            + "            \"lastState\": {\n" + "              \n"
+            + "            },\n" + "            \"ready\": true,\n"
+            + "            \"restartCount\": 0,\n"
+            + "            \"image\": \"docker.io/jfclere/test:latest\",\n"
+            + "            \"imageID\": \"docker.io/jfclere/test@sha256:d36155492516915ecf448fe62769f61b5f9ab795bc8ae1e72a199ee6485cbea2\",\n"
+            + "            \"containerID\": \"cri-o://401533326c8224ef5a3f40234dd26c1030925d659757e0b26c09ff1e728c78f1\"\n"
+            + "          }\n" + "        ],\n"
+            + "        \"qosClass\": \"Burstable\"\n" + "      }\n" + "    }\n"
+            + "  ]\n" + "}";
 
     @Test
     public void testJson() throws Exception {
         startTime = Instant.now();
 
         List<MemberImpl> members = new ArrayList<>();
-        parsePods(new StringReader(JSON_POD_LIST), members);
+        parsePods(new StringReader(OPENSHIFT_JSON_POD_LIST), members);
 
         Assert.assertTrue(members.size() == 2);
-        Assert.assertTrue("192.168.0.2".equals(members.get(0).getHostname()));
-        Assert.assertTrue("tcp://192.168.0.2:0".equals(members.get(0).getName()));
+        Assert.assertTrue("10.130.140.153".equals(members.get(0).getHostname()));
+        Assert.assertTrue(
+                "tcp://10.130.140.153:0".equals(members.get(0).getName()));
+
+        members.clear();
     }
 }
