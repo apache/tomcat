@@ -146,12 +146,6 @@ public class Connector extends LifecycleMBeanBase  {
 
 
     /**
-     * The port number on which we listen for requests.
-     */
-    protected int port = -1;
-
-
-    /**
      * The server name to which we should pretend requests to this Connector
      * were directed.  This is useful when operating Tomcat behind a proxy
      * server, so that redirects get constructed accurately.  If not specified,
@@ -516,7 +510,12 @@ public class Connector extends LifecycleMBeanBase  {
      * when the socket is bound.
      */
     public int getPort() {
-        return this.port;
+        Object port = getProperty("port");
+        if (port == null) {
+            return -1;
+        } else {
+            return ((Integer) port).intValue();
+        }
     }
 
 
@@ -526,7 +525,6 @@ public class Connector extends LifecycleMBeanBase  {
      * @param port The new port number
      */
     public void setPort(int port) {
-        this.port = port;
         setProperty("port", String.valueOf(port));
     }
 

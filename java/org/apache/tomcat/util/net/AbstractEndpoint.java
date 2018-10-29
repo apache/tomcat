@@ -451,7 +451,7 @@ public abstract class AbstractEndpoint<S,U> {
     /**
      * Server socket port.
      */
-    private int port;
+    private int port = -1;
     public int getPort() { return port; }
     public void setPort(int port ) { this.port=port; }
 

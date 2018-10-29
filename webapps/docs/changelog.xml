@@ -126,6 +126,11 @@
         <code>Library.load(filename)</code> to load a native library by a
         shared class loader so that more than one Webapp can use it. (isapir)
       </add>
+      <scode>
+        Refactor the <code>Connector</code> so that the port is obtained from
+        the <code>Endpoint</code> rather than a local field that could end up
+        out of sync. (markt)
+      </scode>
     </changelog>
   </subsection>
   <subsection name="Coyote">
