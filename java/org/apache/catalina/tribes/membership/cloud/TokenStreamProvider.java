@@ -83,25 +83,20 @@ public class TokenStreamProvider extends AbstractStreamProvider {
 
     private TrustManager[] configureCaCert(String caCertFile) throws Exception {
         if (caCertFile != null) {
-            try {
-                InputStream pemInputStream = new BufferedInputStream(new FileInputStream(caCertFile));
-                try {
-                    CertificateFactory certFactory = CertificateFactory.getInstance("X509");
-                    X509Certificate cert = (X509Certificate)certFactory.generateCertificate(pemInputStream);
+            try (InputStream pemInputStream = new BufferedInputStream(new FileInputStream(caCertFile))) {
+                CertificateFactory certFactory = CertificateFactory.getInstance("X509");
+                X509Certificate cert = (X509Certificate)certFactory.generateCertificate(pemInputStream);
 
-                    KeyStore trustStore = KeyStore.getInstance("JKS");
-                    trustStore.load(null);
+                KeyStore trustStore = KeyStore.getInstance("JKS");
+                trustStore.load(null);
 
-                    String alias = cert.getSubjectX500Principal().getName();
-                    trustStore.setCertificateEntry(alias, cert);
+                String alias = cert.getSubjectX500Principal().getName();
+                trustStore.setCertificateEntry(alias, cert);
 
-                    TrustManagerFactory trustManagerFactory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
-                    trustManagerFactory.init(trustStore);
+                TrustManagerFactory trustManagerFactory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+                trustManagerFactory.init(trustStore);
 
-                    return trustManagerFactory.getTrustManagers();
-                } finally {
-                    pemInputStream.close();
-                }
+                return trustManagerFactory.getTrustManagers();
             } catch (FileNotFoundException fnfe) {
                 log.error(sm.getString("tokenStream.fileNotFound", caCertFile));
                 throw fnfe;
