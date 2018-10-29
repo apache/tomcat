@@ -145,6 +145,7 @@ public class EncryptInterceptor extends ChannelInterceptorBase implements Encryp
      *
      * @param algorithm The algorithm to use.
      */
+    @Override
     public void setEncryptionAlgorithm(String algorithm) {
         if(null == getEncryptionAlgorithm())
             throw new IllegalStateException(sm.getString("encryptInterceptor.algorithm.required"));
@@ -165,6 +166,7 @@ public class EncryptInterceptor extends ChannelInterceptorBase implements Encryp
      *
      * @return The algorithm being used, including the algorithm mode and padding.
      */
+    @Override
     public String getEncryptionAlgorithm() {
         return encryptionAlgorithm;
     }
@@ -175,6 +177,7 @@ public class EncryptInterceptor extends ChannelInterceptorBase implements Encryp
      *
      * @param key The encryption key.
      */
+    @Override
     public void setEncryptionKey(byte[] key) {
         if(null == key)
             key = null;
@@ -202,6 +205,7 @@ public class EncryptInterceptor extends ChannelInterceptorBase implements Encryp
      *
      * @return The encryption key.
      */
+    @Override
     public byte[] getEncryptionKey() {
         byte[] key = getEncryptionKeyInternal();
 
@@ -222,6 +226,7 @@ public class EncryptInterceptor extends ChannelInterceptorBase implements Encryp
      *
      * @param provider The name of the JCA provider.
      */
+    @Override
     public void setProviderName(String provider) {
         providerName = provider;
     }
@@ -233,6 +238,7 @@ public class EncryptInterceptor extends ChannelInterceptorBase implements Encryp
      *
      * @return The name of the JCA provider.
      */
+    @Override
     public String getProviderName() {
         return providerName;
     }
