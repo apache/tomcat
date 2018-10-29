@@ -179,10 +179,11 @@ public class EncryptInterceptor extends ChannelInterceptorBase implements Encryp
      */
     @Override
     public void setEncryptionKey(byte[] key) {
-        if(null == key)
-            key = null;
-        else
+        if (null == key) {
+            encryptionKeyBytes = null;
+        } else {
             encryptionKeyBytes = key.clone();
+        }
     }
 
     /**
