@@ -174,6 +174,10 @@
         when using NIO/NIO2 and the OpenSSL backed JSSE TLS implementation.
         (markt)
       </fix>
+      <fix>
+        Ensure open sockets etc. are cleaned up if the socket binding process
+        fails. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">

@@ -1039,9 +1039,23 @@ public abstract class AbstractEndpoint<S,U> {
     public abstract void startInternal() throws Exception;
     public abstract void stopInternal() throws Exception;
 
+
+    private void bindWithCleanup() throws Exception {
+        try {
+            bind();
+        } catch (Throwable t) {
+            // Ensure open sockets etc. are cleaned up if something goes
+            // wrong during bind
+            ExceptionUtils.handleThrowable(t);
+            unbind();
+            throw t;
+        }
+    }
+
+
     public final void init() throws Exception {
         if (bindOnInit) {
-            bind();
+            bindWithCleanup();
             bindState = BindState.BOUND_ON_INIT;
         }
         if (this.domain != null) {
@@ -1105,7 +1119,7 @@ public abstract class AbstractEndpoint<S,U> {
 
     public final void start() throws Exception {
         if (bindState == BindState.UNBOUND) {
-            bind();
+            bindWithCleanup();
             bindState = BindState.BOUND_ON_START;
         }
         startInternal();
