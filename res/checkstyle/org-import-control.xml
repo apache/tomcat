@@ -83,7 +83,6 @@
       <allow pkg="org.apache.catalina.tribes"/>
       <subpackage name="membership">
         <subpackage name="cloud">
-          <allow class="org.apache.tomcat.util.codec.binary.StringUtils"/>
           <allow class="org.apache.tomcat.util.net.jsse.PEMFile"/>
           <allow class="org.apache.tomcat.util.json.JSONParser"/>
         </subpackage>

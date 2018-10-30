@@ -36,7 +36,6 @@ import org.apache.catalina.tribes.MembershipService;
 import org.apache.catalina.tribes.membership.MemberImpl;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
-import org.apache.tomcat.util.codec.binary.StringUtils;
 import org.apache.tomcat.util.json.JSONParser;
 
 
@@ -82,7 +81,7 @@ public class KubernetesMembershipProvider extends CloudMembershipProvider {
                 saTokenFile = "/var/run/secrets/kubernetes.io/serviceaccount/token";
             }
             byte[] bytes = Files.readAllBytes(FileSystems.getDefault().getPath(saTokenFile));
-            streamProvider = new TokenStreamProvider(StringUtils.newStringUsAscii(bytes), caCertFile);
+            streamProvider = new TokenStreamProvider(new String(bytes, StandardCharsets.US_ASCII), caCertFile);
         } else {
             if (protocol == null) {
                 protocol = "http";
