@@ -335,7 +335,10 @@ public class EncryptInterceptor extends ChannelInterceptorBase implements Encryp
      *
      * @return The encrypted IV block in [0] and the encrypted data in [1].
      *
-     * @throws GeneralSecurityException If there is a problem performing the encryption.
+     * @throws IllegalBlockSizeException If the input data is not a multiple of
+     *             the block size and no padding has been requested (for block
+     *             ciphers) or if the input data cannot be encrypted
+     * @throws BadPaddingException Declared but should not occur during encryption
      */
     private byte[][] encrypt(byte[] bytes) throws IllegalBlockSizeException, BadPaddingException {
         Cipher cipher = getEncryptionCipher();
@@ -357,7 +360,10 @@ public class EncryptInterceptor extends ChannelInterceptorBase implements Encryp
      *
      * @return The decrypted data.
      *
-     * @throws GeneralSecurityException If there is a problem performing the decryption.
+     * @throws IllegalBlockSizeException If the input data cannot be encrypted
+     * @throws BadPaddingException If the decrypted data does not include the
+     *             expected number of padding bytes
+     *
      */
     private byte[] decrypt(byte[] bytes) throws IllegalBlockSizeException, BadPaddingException {
         return getDecryptionCipher().doFinal(bytes);
