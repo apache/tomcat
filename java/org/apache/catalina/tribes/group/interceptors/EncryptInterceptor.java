@@ -35,7 +35,7 @@ import org.apache.catalina.tribes.io.XByteBuffer;
 import org.apache.catalina.tribes.util.StringManager;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
-import org.apache.tomcat.util.buf.HexUtils;
+
 
 /**
  * Adds encryption using a pre-shared key.
@@ -196,10 +196,11 @@ public class EncryptInterceptor extends ChannelInterceptorBase implements Encryp
      * @param keyBytes The encryption key.
      */
     public void setEncryptionKey(String keyBytes) {
-        if(null == keyBytes)
+        if (null == keyBytes) {
             setEncryptionKey((byte[])null);
-        else
-            setEncryptionKey(HexUtils.fromHexString(keyBytes.trim()));
+        } else {
+            setEncryptionKey(fromHexString(keyBytes.trim()));
+        }
     }
 
     /**
@@ -360,5 +361,50 @@ public class EncryptInterceptor extends ChannelInterceptorBase implements Encryp
      */
     private byte[] decrypt(byte[] bytes) throws IllegalBlockSizeException, BadPaddingException {
         return getDecryptionCipher().doFinal(bytes);
+    }
+
+
+    // Copied from org.apache.tomcat.util.buf.HexUtils
+
+    private static final int[] DEC = {
+        00, 01, 02, 03, 04, 05, 06, 07,  8,  9, -1, -1, -1, -1, -1, -1,
+        -1, 10, 11, 12, 13, 14, 15, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+        -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+        -1, 10, 11, 12, 13, 14, 15,
+    };
+
+
+    private static int getDec(int index) {
+        // Fast for correct values, slower for incorrect ones
+        try {
+            return DEC[index - '0'];
+        } catch (ArrayIndexOutOfBoundsException ex) {
+            return -1;
+        }
+    }
+
+
+    private static byte[] fromHexString(String input) {
+        if (input == null) {
+            return null;
+        }
+
+        if ((input.length() & 1) == 1) {
+            // Odd number of characters
+            throw new IllegalArgumentException(sm.getString("hexUtils.fromHex.oddDigits"));
+        }
+
+        char[] inputChars = input.toCharArray();
+        byte[] result = new byte[input.length() >> 1];
+        for (int i = 0; i < result.length; i++) {
+            int upperNibble = getDec(inputChars[2*i]);
+            int lowerNibble =  getDec(inputChars[2*i + 1]);
+            if (upperNibble < 0 || lowerNibble < 0) {
+                // Non hex character
+                throw new IllegalArgumentException(sm.getString("hexUtils.fromHex.nonHex"));
+            }
+            result[i] = (byte) ((upperNibble << 4) + lowerNibble);
+        }
+        return result;
     }
 }
