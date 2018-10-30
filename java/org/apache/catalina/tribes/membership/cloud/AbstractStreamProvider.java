@@ -18,12 +18,15 @@
 package org.apache.catalina.tribes.membership.cloud;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.Map;
 
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
@@ -48,6 +51,11 @@ public abstract class AbstractStreamProvider implements StreamProvider {
                 }
             }
         };
+
+    /**
+     * @return the socket factory, or null if not needed
+     */
+    protected abstract SSLSocketFactory getSocketFactory();
 
     /**
      * Open URL connection to the specified URL.
@@ -77,6 +85,23 @@ public abstract class AbstractStreamProvider implements StreamProvider {
         connection.setConnectTimeout(connectTimeout);
         connection.setReadTimeout(readTimeout);
         return connection;
+    }
+
+    @Override
+    public InputStream openStream(String url, Map<String, String> headers,
+            int connectTimeout, int readTimeout) throws IOException {
+        URLConnection connection = openConnection(url, headers, connectTimeout, readTimeout);
+        if (connection instanceof HttpsURLConnection) {
+            ((HttpsURLConnection) connection).setSSLSocketFactory(getSocketFactory());
+            if (log.isDebugEnabled()) {
+                log.debug(String.format("Using HttpsURLConnection with SSLSocketFactory [%s] for url [%s].", getSocketFactory(), url));
+            }
+        } else {
+            if (log.isDebugEnabled()) {
+                log.debug(String.format("Using URLConnection for url [%s].", url));
+            }
+        }
+        return connection.getInputStream();
     }
 
 }

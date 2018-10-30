@@ -20,15 +20,12 @@ package org.apache.catalina.tribes.membership.cloud;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URLConnection;
 import java.security.KeyStore;
 import java.security.PrivateKey;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
-import java.util.Map;
 
-import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
@@ -56,21 +53,8 @@ public class CertificateStreamProvider extends AbstractStreamProvider {
     }
 
     @Override
-    public InputStream openStream(String url, Map<String, String> headers, int connectTimeout, int readTimeout) throws IOException {
-        URLConnection connection = openConnection(url, headers, connectTimeout, readTimeout);
-        if (connection instanceof HttpsURLConnection) {
-            HttpsURLConnection httpsConnection = HttpsURLConnection.class.cast(connection);
-            //httpsConnection.setHostnameVerifier(InsecureStreamProvider.INSECURE_HOSTNAME_VERIFIER);
-            httpsConnection.setSSLSocketFactory(factory);
-            if (log.isDebugEnabled()) {
-                log.debug(String.format("Using HttpsURLConnection with SSLSocketFactory [%s] for url [%s].", factory, url));
-            }
-        } else {
-            if (log.isDebugEnabled()) {
-                log.debug(String.format("Using URLConnection for url [%s].", url));
-            }
-        }
-        return connection.getInputStream();
+    protected SSLSocketFactory getSocketFactory() {
+        return factory;
     }
 
     private static KeyManager[] configureClientCert(String clientCertFile, String clientKeyFile, char[] clientKeyPassword, String clientKeyAlgo) throws Exception {

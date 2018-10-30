@@ -22,13 +22,11 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URLConnection;
 import java.security.KeyStore;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.Map;
 
-import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
@@ -45,9 +43,18 @@ public class TokenStreamProvider extends AbstractStreamProvider {
     private String caCertFile;
     private SSLSocketFactory factory;
 
-    TokenStreamProvider(String token, String caCertFile) {
+    TokenStreamProvider(String token, String caCertFile) throws Exception {
         this.token = token;
         this.caCertFile = caCertFile;
+        TrustManager[] trustManagers = configureCaCert(this.caCertFile);
+        SSLContext context = SSLContext.getInstance("TLS");
+        context.init(null, trustManagers, null);
+        this.factory = context.getSocketFactory();
+    }
+
+    @Override
+    protected SSLSocketFactory getSocketFactory() {
+        return factory;
     }
 
     @Override
@@ -57,26 +64,10 @@ public class TokenStreamProvider extends AbstractStreamProvider {
         if (token != null) {
             headers.put("Authorization", "Bearer " + token);
         }
-
-        // Open HTTP connection
-        URLConnection connection = openConnection(url, headers, connectTimeout, readTimeout);
-
-        if (connection instanceof HttpsURLConnection) {
-            HttpsURLConnection httpsConnection = HttpsURLConnection.class.cast(connection);
-            //httpsConnection.setHostnameVerifier(InsecureStreamProvider.INSECURE_HOSTNAME_VERIFIER);
-            httpsConnection.setSSLSocketFactory(getSSLSocketFactory());
-            if (log.isDebugEnabled()) {
-                log.debug(String.format("Using HttpsURLConnection with SSLSocketFactory [%s] for url [%s].", factory, url));
-            }
-        } else {
-            if (log.isDebugEnabled()) {
-                log.debug(String.format("Using URLConnection for url [%s].", url));
-            }
-        }
-
         try {
-            return connection.getInputStream();
+            return super.openStream(url, headers, connectTimeout, readTimeout);
         } catch (IOException e) {
+            // Add debug information
             throw new IOException(sm.getString("tokenStream.failedConnection", url, token, caCertFile), e);
         }
     }
@@ -108,24 +99,6 @@ public class TokenStreamProvider extends AbstractStreamProvider {
             log.warn(sm.getString("tokenStream.CACertUndefined"));
             return InsecureStreamProvider.INSECURE_TRUST_MANAGERS;
         }
-    }
-
-    private SSLSocketFactory getSSLSocketFactory() throws IOException {
-        if(this.factory == null) {
-            synchronized(this) {
-                if(this.factory == null) {
-                    try {
-                        TrustManager[] trustManagers = configureCaCert(this.caCertFile);
-                        SSLContext context = SSLContext.getInstance("TLS");
-                        context.init(null, trustManagers, null);
-                        this.factory = context.getSocketFactory();
-                    } catch(Exception e) {
-                        throw new IOException(e);
-                    }
-                }
-            }
-        }
-        return this.factory;
     }
 
 }
