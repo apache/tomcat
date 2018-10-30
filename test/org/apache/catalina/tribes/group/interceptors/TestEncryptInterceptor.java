@@ -20,6 +20,7 @@ import java.nio.charset.StandardCharsets;
 
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import org.apache.catalina.tribes.Channel;
@@ -85,13 +86,26 @@ public class TestEncryptInterceptor {
     }
 
     @Test
+    public void testLargePayload() throws Exception {
+        src.start(Channel.SND_TX_SEQ);
+        dest.start(Channel.SND_TX_SEQ);
+
+        byte[] bytes = new byte[1024*1024];
+
+        Assert.assertArrayEquals("Huge payload roundtrip failed",
+                          bytes,
+                          roundTrip(bytes, src, dest));
+    }
+
+    @Test
+    @Ignore // Too big for default settings. Breaks Gump, Eclipse, ...
     public void testHugePayload() throws Exception {
         src.start(Channel.SND_TX_SEQ);
         dest.start(Channel.SND_TX_SEQ);
 
-        byte[] bytes = new byte[1073741824]; // 1MiB, all zeros
+        byte[] bytes = new byte[1024*1024*1024];
 
-        Assert.assertArrayEquals("Tiny payload roundtrip failed",
+        Assert.assertArrayEquals("Huge payload roundtrip failed",
                           bytes,
                           roundTrip(bytes, src, dest));
     }
