@@ -22,8 +22,10 @@ import org.junit.Assert;
 import org.junit.Assume;
 import org.junit.Test;
 
+import org.apache.catalina.connector.Connector;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.tomcat.jni.SSL;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.compat.TLS;
 
@@ -41,7 +43,13 @@ public class TestClientCertTls13 extends TomcatBaseTest {
     @Test
     public void testClientCertGet() throws Exception {
         Assume.assumeTrue(TLS.isTlsv13Available());
-        getTomcatInstance().start();
+        Tomcat tomcat = getTomcatInstance();
+        Connector connector = tomcat.getConnector();
+        if (connector.getProtocolHandlerClassName().contains("Apr")) {
+            Assume.assumeTrue(SSL.version() >= 0x1010100f);
+        }
+
+        tomcat.start();
         ByteChunk res = getUrl("https://localhost:" + getPort() + "/protected");
         Assert.assertEquals("OK-" + TesterSupport.ROLE, res.toString());
     }
@@ -49,7 +57,13 @@ public class TestClientCertTls13 extends TomcatBaseTest {
     @Test
     public void testClientCertPost() throws Exception {
         Assume.assumeTrue(TLS.isTlsv13Available());
-        getTomcatInstance().start();
+        Tomcat tomcat = getTomcatInstance();
+        Connector connector = tomcat.getConnector();
+        if (connector.getProtocolHandlerClassName().contains("Apr")) {
+            Assume.assumeTrue(SSL.version() >= 0x1010100f);
+        }
+
+        tomcat.start();
 
         int size = 32 * 1024;
 
