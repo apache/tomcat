@@ -137,6 +137,10 @@
         to Tomcat clustering regardless of the type of cluster manager
         or membership being used. (schultz)
       </add>
+      <fix>
+        Correct a typo in the Spanish resource files. Patch provided by Diego
+        Agulló. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
