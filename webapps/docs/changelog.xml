@@ -94,6 +94,10 @@
         <code>Library.load(filename)</code> to load a native library by a
         shared class loader so that more than one Webapp can use it. (isapir)
       </add>
+      <fix>
+        Correct a typo in the Spanish resource files. Patch provided by Diego
+        Agulló. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
