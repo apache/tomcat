@@ -55,6 +55,12 @@
         now take effect a short time after the file is saved. (markt)
       </add>
       <add>
+        <bug>61171</bug>: Add the <code>portOffset</code> attribute to the
+        <code>Server</code> element which is added to the configured shutdown
+        and <code>Connector</code> ports. Based on a patch by Marek Czernek.
+        (markt)
+      </add>
+      <add>
         <bug>61692</bug>: Add the ability to control which HTTP methods are
         handled by the CGI Servlet via a new initialization parameter
         <code>cgiMethods</code>. (markt)

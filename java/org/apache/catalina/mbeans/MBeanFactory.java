@@ -699,7 +699,7 @@ public class MBeanFactory {
             if (objConnAddress != null) {
                 connAddress = ((InetAddress) objConnAddress).getHostAddress();
             }
-            String connPort = ""+conns[i].getPort();
+            String connPort = ""+conns[i].getPortWithOffset();
 
             if (address == null) {
                 // Don't combine this with outer if or we could get an NPE in

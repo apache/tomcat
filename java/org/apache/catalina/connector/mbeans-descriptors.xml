@@ -130,8 +130,18 @@
                  type="int"/>
 
     <attribute   name="port"
-          description="The port number on which this connector is configured to listen for requests. The special value of 0 means select a random free port when the socket is bound."
-                type="int"/>
+          description="The port number (excluding any offset) on which this connector is configured to listen for requests. The special value of 0 means select a random free port when the socket is bound."
+                 type="int"/>
+
+    <attribute   name="portOffset"
+          description="The offset that will be applied to port to determine the actual port number used."
+                 type="int"
+            writeable="false"/>
+
+    <attribute   name="portWithOffset"
+          description="The actual port number (including any offset) on which this connector is configured to listen for requests."
+                 type="int"
+            writeable="false"/>
 
     <!-- Common -->
     <attribute   name="processorCache"
@@ -157,8 +167,13 @@
                  type="int"/>
 
     <attribute   name="redirectPort"
-          description="The redirect port for non-SSL to SSL redirects"
+          description="The redirect port (excluding any offset) for non-SSL to SSL redirects"
                  type="int"/>
+
+    <attribute   name="redirectPortWithOffset"
+          description="The actual redirect port (including any offset) for non-SSL to SSL redirects."
+                 type="int"
+            writeable="false"/>
 
     <attribute   name="scheme"
           description="Protocol name for this Connector (http, https)"

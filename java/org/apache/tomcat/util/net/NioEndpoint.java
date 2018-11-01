@@ -232,7 +232,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
         if (!getUseInheritedChannel()) {
             serverSock = ServerSocketChannel.open();
             socketProperties.setProperties(serverSock.socket());
-            InetSocketAddress addr = (getAddress()!=null?new InetSocketAddress(getAddress(),getPort()):new InetSocketAddress(getPort()));
+            InetSocketAddress addr = new InetSocketAddress(getAddress(), getPortWithOffset());
             serverSock.socket().bind(addr,getAcceptCount());
         } else {
             // Retrieve the channel provided by the OS
@@ -323,7 +323,8 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
     @Override
     public void unbind() throws Exception {
         if (log.isDebugEnabled()) {
-            log.debug("Destroy initiated for "+new InetSocketAddress(getAddress(),getPort()));
+            log.debug("Destroy initiated for " +
+                    new InetSocketAddress(getAddress(),getPortWithOffset()));
         }
         if (running) {
             stop();
@@ -336,7 +337,8 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
         }
         selectorPool.close();
         if (log.isDebugEnabled()) {
-            log.debug("Destroy completed for "+new InetSocketAddress(getAddress(),getPort()));
+            log.debug("Destroy completed for " +
+                    new InetSocketAddress(getAddress(), getPortWithOffset()));
         }
     }
 

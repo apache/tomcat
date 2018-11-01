@@ -456,6 +456,27 @@ public abstract class AbstractEndpoint<S,U> {
     public void setPort(int port ) { this.port=port; }
 
 
+    private int portOffset = 0;
+    public int getPortOffset() { return portOffset; }
+    public void setPortOffset(int portOffset ) {
+        if (portOffset < 0) {
+            throw new IllegalArgumentException(
+                    sm.getString("endpoint.portOffset.invalid", Integer.valueOf(portOffset)));
+        }
+        this.portOffset = portOffset;
+    }
+
+
+    public int getPortWithOffset() {
+        // Zero is a special case and negative values are invalid
+        int port = getPort();
+        if (port > 0) {
+            return port + getPortOffset();
+        }
+        return port;
+    }
+
+
     public final int getLocalPort() {
         try {
             InetSocketAddress localAddress = getLocalAddress();
@@ -922,7 +943,8 @@ public abstract class AbstractEndpoint<S,U> {
         } catch(Throwable t) {
             ExceptionUtils.handleThrowable(t);
             if (getLog().isDebugEnabled()) {
-                getLog().debug(sm.getString("endpoint.debug.unlock.fail", "" + getPort()), t);
+                getLog().debug(sm.getString(
+                        "endpoint.debug.unlock.fail", String.valueOf(getPortWithOffset())), t);
             }
         }
     }

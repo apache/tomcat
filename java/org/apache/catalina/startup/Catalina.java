@@ -35,6 +35,7 @@ import org.apache.catalina.Container;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleState;
 import org.apache.catalina.Server;
+import org.apache.catalina.connector.Connector;
 import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.security.SecurityConfig;
 import org.apache.juli.ClassLoaderLogManager;
@@ -281,6 +282,7 @@ public class Catalina {
         digester.setValidating(false);
         digester.setRulesValidation(true);
         Map<Class<?>, List<String>> fakeAttributes = new HashMap<>();
+        // Ignore className on all elements
         List<String> objectAttrs = new ArrayList<>();
         objectAttrs.add("className");
         fakeAttributes.put(Object.class, objectAttrs);
@@ -288,6 +290,10 @@ public class Catalina {
         List<String> contextAttrs = new ArrayList<>();
         contextAttrs.add("source");
         fakeAttributes.put(StandardContext.class, contextAttrs);
+        // Ignore Connector attribute used internally but set on Server
+        List<String> connectorAttrs = new ArrayList<>();
+        connectorAttrs.add("portOffset");
+        fakeAttributes.put(Connector.class, connectorAttrs);
         digester.setFakeAttributes(fakeAttributes);
         digester.setUseContextClassLoader(true);
 
@@ -349,6 +355,8 @@ public class Catalina {
         digester.addSetNext("Server/Service/Connector",
                             "addConnector",
                             "org.apache.catalina.connector.Connector");
+
+        digester.addRule("Server/Service/Connector", new AddPortOffsetRule());
 
         digester.addObjectCreate("Server/Service/Connector/SSLHostConfig",
                                  "org.apache.tomcat.util.net.SSLHostConfig");
@@ -499,8 +507,8 @@ public class Catalina {
 
         // Stop the existing server
         s = getServer();
-        if (s.getPort()>0) {
-            try (Socket socket = new Socket(s.getAddress(), s.getPort());
+        if (s.getPortWithOffset() > 0) {
+            try (Socket socket = new Socket(s.getAddress(), s.getPortWithOffset());
                     OutputStream stream = socket.getOutputStream()) {
                 String shutdown = s.getShutdown();
                 for (int i = 0; i < shutdown.length(); i++) {
@@ -508,9 +516,9 @@ public class Catalina {
                 }
                 stream.flush();
             } catch (ConnectException ce) {
-                log.error(sm.getString("catalina.stopServer.connectException",
-                                       s.getAddress(),
-                                       String.valueOf(s.getPort())));
+                log.error(sm.getString("catalina.stopServer.connectException", s.getAddress(),
+                        String.valueOf(s.getPortWithOffset()), String.valueOf(s.getPort()),
+                        String.valueOf(s.getPortOffset())));
                 log.error("Catalina.stop: ", ce);
                 System.exit(1);
             } catch (IOException e) {

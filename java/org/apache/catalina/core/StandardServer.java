@@ -113,6 +113,8 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
      */
     private int port = 8005;
 
+    private int portOffset = 0;
+
     /**
      * The address on which we wait for shutdown commands.
      */
@@ -277,6 +279,35 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
     }
 
 
+    @Override
+    public int getPortOffset() {
+        return portOffset;
+    }
+
+
+    @Override
+    public void setPortOffset(int portOffset) {
+        if (portOffset < 0) {
+            throw new IllegalArgumentException(
+                    sm.getString("standardServer.portOffset.invalid", Integer.valueOf(portOffset)));
+        }
+        this.portOffset = portOffset;
+    }
+
+
+    @Override
+    public int getPortWithOffset() {
+        // Non-positive port values have special meanings and the offset should
+        // not apply.
+        int port = getPort();
+        if (port > 0) {
+            return port + getPortOffset();
+        } else {
+            return port;
+        }
+    }
+
+
     /**
      * Return the address on which we listen to for shutdown commands.
      */
@@ -396,11 +427,11 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
     @Override
     public void await() {
         // Negative values - don't wait on port - tomcat is embedded or we just don't like ports
-        if( port == -2 ) {
+        if (getPortWithOffset() == -2) {
             // undocumented yet - for embedding apps that are around, alive.
             return;
         }
-        if( port==-1 ) {
+        if (getPortWithOffset() == -1) {
             try {
                 awaitThread = Thread.currentThread();
                 while(!stopAwait) {
@@ -418,12 +449,12 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
 
         // Set up a server socket to wait on
         try {
-            awaitSocket = new ServerSocket(port, 1,
+            awaitSocket = new ServerSocket(getPortWithOffset(), 1,
                     InetAddress.getByName(address));
         } catch (IOException e) {
-            log.error("StandardServer.await: create[" + address
-                               + ":" + port
-                               + "]: ", e);
+            log.error(sm.getString("standardServer.awaitSocket.fail", address,
+                    String.valueOf(getPortWithOffset()), String.valueOf(getPort()),
+                    String.valueOf(getPortOffset())), e);
             return;
         }
 
@@ -927,5 +958,4 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
     protected final String getObjectNameKeyProperties() {
         return "type=Server";
     }
-
 }

@@ -1305,8 +1305,17 @@
                type="java.lang.Object"/>
 
     <attribute name="port"
-               description="TCP port for shutdown messages"
+               description="TCP port (excluding any offset) for shutdown messages"
                type="int"/>
+
+    <attribute name="portOffset"
+               description="The offset applied to port and to the port attributes of any nested connectors"
+               type="int"/>
+
+    <attribute name="portWithOffset"
+               description="Actual TCP port (including any offset) for shutdown messages"
+               type="int"
+               writeable="false"/>
 
     <attribute name="serverInfo"
                description="Tomcat server release identifier"
