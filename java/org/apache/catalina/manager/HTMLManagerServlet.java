@@ -1205,7 +1205,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
         "  <small><input type=\"submit\" value=\"{5}\"></small>" +
         "  </form>\n" +
         "  <form class=\"inline\" method=\"POST\" action=\"{6}\">" +
-        "  <small><input type=\"submit\" value=\"{7}\"></small>" +
+        "  &nbsp;&nbsp;<small><input type=\"submit\" value=\"{7}\"></small>" +
         "  </form>\n" +
         " </td>\n" +
         " </tr><tr>\n" +
