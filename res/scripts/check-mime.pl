@@ -77,7 +77,6 @@ my %TOMCAT_ONLY = qw(
     body text/html
     dib image/bmp
     dv video/x-dv
-    flac audio/flac
     gz application/x-gzip
     htc text/x-component
     jsf text/plain
@@ -106,6 +105,7 @@ my %TOMCAT_KEEP = qw(
     cdf application/x-cdf
     class application/java
     exe application/octet-stream
+    flac audio/flac
     m4v video/mp4
     mif application/x-mif
     pct image/pict
