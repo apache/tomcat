@@ -333,6 +333,54 @@ while (<$webxml_fh>) {
 close($webxml_fh);
 
 
+# Look for extensions in TOMCAT_ONLY.
+# Abort if it already exists in mime.types.
+# Warn if they are no longer existing in web.xml.
+for $extension (sort keys %TOMCAT_ONLY) {
+    if (exists($httpd{$extension})) {
+        if ($httpd{$extension} eq $TOMCAT_ONLY{$extension}) {
+            print STDERR "FATAL Consistent definition for '$extension' -> '$TOMCAT_ONLY{$extension}' exists in mime.types.\n";
+            print STDERR "FATAL You must remove '$extension' from the TOMCAT_ONLY list - Aborting!\n";
+            exit 7;
+        } else {
+            print STDERR "FATAL Definition '$extension' -> '$httpd{$extension}' exists in mime.types but\n";
+            print STDERR "FATAL differs from '$extension' -> '$TOMCAT_ONLY{$extension}' in TOMCAT_ONLY.\n";
+            print STDERR "FATAL You must either remove '$extension' from the TOMCAT_ONLY list to keep the mime.types variant,\n";
+            print STDERR "FATAL or move it to TOMCAT_KEEP to overwrite the mime.types variant - Aborting!\n";
+            exit 8;
+        }
+    }
+    if (!exists($tomcat{$extension})) {
+        print STDERR "WARN Additional extension '$extension' allowed by TOMCAT_ONLY list, but not found in web.xml\n";
+        print STDERR "WARN Definition '$extension' -> '$TOMCAT_ONLY{$extension}' will be added again to generated web.xml.\n";
+        print STDERR "WARN Consider removing it from TOMCAT_ONLY if you do not want to add back this extension.\n";
+    }
+}
+
+
+# Look for extensions in TOMCAT_KEEP.
+# Abort if they do not exist in mime.types or have the same definition there..
+# Warn if they are no longer existing in web.xml.
+for $extension (sort keys %TOMCAT_KEEP) {
+    if (exists($httpd{$extension})) {
+        if ($httpd{$extension} eq $TOMCAT_KEEP{$extension}) {
+            print STDERR "FATAL Consistent definition for '$extension' -> '$TOMCAT_KEEP{$extension}' exists in mime.types.\n";
+            print STDERR "FATAL You must remove '$extension' from the TOMCAT_KEEP list - Aborting!\n";
+            exit 9;
+        }
+    } else {
+        print STDERR "WARN Definition '$extension' -> '$TOMCAT_KEEP{$extension}' does not exist in mime.types,\n";
+        print STDERR "FATAL so you must move it from TOMCAT_KEEP to TOMCAT_ONLY - Aborting!\n";
+        exit 10;
+    }
+    if (!exists($tomcat{$extension})) {
+        print STDERR "WARN Additional extension '$extension' allowed by TOMCAT_KEEP list, but not found in web.xml\n";
+        print STDERR "WARN Definition '$extension' -> '$TOMCAT_KEEP{$extension}' will be added again to generated web.xml.\n";
+        print STDERR "WARN Consider removing it from TOMCAT_KEEP if you do not want to add back this extension.\n";
+    }
+}
+
+
 # Look for extensions existing for Tomcat but not for httpd.
 # Log them if they are not in TOMCAT_ONLY
 for $extension (@tomcat_extensions) {
