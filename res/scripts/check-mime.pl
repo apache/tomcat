@@ -23,31 +23,31 @@
 # The script uses two mime type lists to describe
 # the merging between httpd and Tomcat mime types.
 #
-# 1) %TOMCAT_ONLY: Additional extensions for Tomcat that do not exist in httpd
-# 2) %TOMCAT_KEEP: Mime type differences for common extensions where we stick to
+# - %TOMCAT_ONLY: Additional extensions for Tomcat that do not exist in httpd
+# - %TOMCAT_KEEP: Mime type differences for common extensions where we stick to
 #    the Tomcat definition
 
 # The script checks consistency between Tomcat and httpd according
-# to the lists 1) and 2) and generates a new web.xml:
+# to the lists TOMCAT_ONLY and TOMCAT_KEEP and generates a new web.xml:
 #
-# A) Additional extensions in Tomcat which are not part of 1)
+# A) Additional extensions in Tomcat which are not part of TOMCAT_ONLY
 #    are logged. They will be removed in the generated new web.xml.
-#    If you want to keep them, add them to the list 1) and run the
+#    If you want to keep them, add them to TOMCAT_ONLY and run the
 #    script again. If you want to remove them, commit the generated
 #    new web.xml.
 # B) Mime type differences for the same extension between httpd
-#    and Tomcat that are not part of the list 2) are logged.
+#    and Tomcat that are not part of TOMCAT_KEEP are logged.
 #    They will be overwritten wit the httpd definition in the generated
 #    new web.xml. If you want to keep their Tomcat definition, add them
-#    to the list 1) and run the script again. If you want to use the
+#    to TOMCAT_KEEP and run the script again. If you want to use the
 #    definitions from httpd, commit the generated new web.xml.
 # C) Additional extensions in httpd are logged. The script outputs a
 #    merged web.xml, which already includes all those additional
-#    extensions. If you want to keep them, update web.xml with the
-#    generated new web.xml.
+#    extensions. If you want to keep them, commit the generated
+#    new web.xml.
 # D) If the extensions are not sorted alphabetically, a message is logged.
-#    The generated web.xml will be always be sorted alphabetically.
-#    If you want to fix the sort order, update web.xml with the generated
+#    The generated web.xml will always be sorted alphabetically.
+#    If you want to keep the alphabetical sort order, commit the generated
 #    new web.xml.
 
 use strict;
@@ -412,4 +412,3 @@ for $extension (sort keys %httpd) {
 print $output_fh $tomcat_post;
 close($output_fh);
 print "New file '$opt_o' has been written.\n";
-
