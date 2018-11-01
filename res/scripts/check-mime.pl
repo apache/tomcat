@@ -181,6 +181,18 @@ if ($opt_m eq '' || $opt_i eq '' || $opt_o eq '') {
 # Switch locale for alphabetical ordering
 setlocale(LC_COLLATE, $LOCALE);
 
+# Check whether TOMCAT_ONLY and TOMCAT_KEEP are disjoint
+for $extension (sort keys %TOMCAT_ONLY) {
+    if (exists($TOMCAT_KEEP{$extension})) {
+        push(@extensions, ($extension));
+    }
+}
+if (@extensions > 0) {
+    print STDERR "FATAL Lists TOMCAT_ONLY and TOMCAT_KEEP must be disjoint.\n";
+    print STDERR "FATAL Common entries are: " . join(', ', @extensions) . " - Aborting!\n";
+    exit 6;
+}
+
 # Read and parse httpd mime.types, build up hash extension->mime-type
 open($mimetypes_fh, '<', $opt_m) or die "Could not open file '$opt_m' for read - Aborting!";
 while (<$mimetypes_fh>) {
