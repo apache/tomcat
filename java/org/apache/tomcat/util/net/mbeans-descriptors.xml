@@ -1,0 +1,675 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one or more
+  contributor license agreements.  See the NOTICE file distributed with
+  this work for additional information regarding copyright ownership.
+  The ASF licenses this file to You under the Apache License, Version 2.0
+  (the "License"); you may not use this file except in compliance with
+  the License.  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+<mbeans-descriptors>
+
+  <mbean         name="NioEndpoint"
+            className="org.apache.catalina.mbeans.ClassNameMBean"
+               domain="Catalina"
+                group="ThreadPool"
+                 type="org.apache.tomcat.util.net.NioEndpoint">
+
+    <attribute   name="acceptCount"
+                 type="int"/>
+
+    <attribute   name="acceptorThreadCount"
+                 type="int"/>
+
+    <attribute   name="acceptorThreadPriority"
+                 type="int"/>
+
+    <attribute   name="alpnSupported"
+                 type="boolean"
+            writeable="false"
+                   is="true"/>
+
+    <attribute   name="bindOnInit"
+                 type="boolean"/>
+
+    <attribute   name="connectionCount"
+                 type="long"
+            writeable="false"/>
+
+    <attribute   name="connectionLinger"
+                 type="int"/>
+
+    <attribute   name="connectionTimeout"
+                 type="int"/>
+
+    <attribute   name="currentThreadCount"
+                 type="int"
+            writeable="false"/>
+
+    <attribute   name="currentThreadsBusy"
+                 type="int"
+            writeable="false"/>
+
+    <attribute   name="daemon"
+                 type="boolean"/>
+
+    <attribute   name="defaultSSLHostConfigName"
+                 type="java.lang.String"/>
+
+    <attribute   name="deferAccept"
+                 type="boolean"
+            writeable="false"/>
+
+    <attribute   name="domain"
+                 type="java.lang.String"/>
+
+    <attribute   name="executorTerminationTimeoutMillis"
+                 type="long"/>
+
+    <attribute   name="keepAliveCount"
+                 type="int"
+            writeable="false"/>
+
+    <attribute   name="keepAliveTimeout"
+                 type="int"/>
+
+    <attribute   name="localPort"
+                 type="int"
+            writeable="false"/>
+
+    <attribute   name="maxConnections"
+                 type="int"/>
+
+    <attribute   name="maxKeepAliveRequests"
+                 type="int"/>
+
+    <attribute   name="maxThreads"
+                 type="int"/>
+
+    <attribute   name="minSpareThreads"
+                 type="int"/>
+
+    <attribute   name="modelerType"
+                 type="java.lang.String"
+            writeable="false"/>
+
+    <attribute   name="name"
+                 type="java.lang.String"/>
+
+    <attribute   name="paused"
+                 type="boolean"
+            writeable="false"
+                   is="true"/>
+
+    <attribute   name="pollerThreadCount"
+                 type="int"/>
+
+    <attribute   name="pollerThreadPriority"
+                 type="int"/>
+
+    <attribute   name="port"
+                 type="int"/>
+
+    <attribute   name="running"
+                 type="boolean"
+            writeable="false"
+                   is="true"/>
+
+    <attribute   name="sSLEnabled"
+                 type="boolean"
+                   is="true"/>
+
+    <attribute   name="selectorTimeout"
+                 type="long"/>
+
+    <attribute   name="sniParseLimit"
+                 type="int"/>
+
+    <attribute   name="sslImplementation"
+                 type="org.apache.tomcat.util.net.SSLImplementation"
+            writeable="false"/>
+
+    <attribute   name="sslImplementationName"
+                 type="java.lang.String"/>
+
+    <attribute   name="tcpNoDelay"
+                 type="boolean"/>
+
+    <attribute   name="threadPriority"
+                 type="int"/>
+
+    <attribute   name="useInheritedChannel"
+                 type="boolean"/>
+
+    <attribute   name="useSendfile"
+                 type="boolean"/>
+
+    <operation       name="addNegotiatedProtocol"
+               returnType="void">
+      <parameter name="param0"
+                 type="java.lang.String"/>
+    </operation>
+
+    <operation       name="bind"
+               returnType="void"/>
+
+    <operation       name="closeServerSocketGraceful"
+               returnType="void"/>
+
+    <operation       name="createExecutor"
+               returnType="void"/>
+
+    <operation       name="destroy"
+               returnType="void"/>
+
+    <operation       name="findSslHostConfigs"
+               returnType="[Lorg.apache.tomcat.util.net.SSLHostConfig;"/>
+
+    <operation       name="getAttribute"
+               returnType="java.lang.Object">
+      <parameter name="param0"
+                 type="java.lang.String"/>
+    </operation>
+
+    <operation       name="getProperty"
+               returnType="java.lang.String">
+      <parameter name="param0"
+                 type="java.lang.String"/>
+    </operation>
+
+    <operation       name="hasNegotiableProtocols"
+               returnType="boolean"/>
+
+    <operation       name="init"
+               returnType="void"/>
+
+    <operation       name="pause"
+               returnType="void"/>
+
+    <operation       name="reloadSslHostConfig"
+               returnType="void">
+      <parameter name="param0"
+                 type="java.lang.String"/>
+    </operation>
+
+    <operation       name="reloadSslHostConfigs"
+               returnType="void"/>
+
+    <operation       name="removeSslHostConfig"
+               returnType="org.apache.tomcat.util.net.SSLHostConfig">
+      <parameter name="param0"
+                 type="java.lang.String"/>
+    </operation>
+
+    <operation       name="resume"
+               returnType="void"/>
+
+    <operation       name="setProperty"
+               returnType="boolean">
+      <parameter name="param0"
+                 type="java.lang.String"/>
+      <parameter name="param1"
+                 type="java.lang.String"/>
+    </operation>
+
+    <operation       name="shutdownExecutor"
+               returnType="void"/>
+
+    <operation       name="start"
+               returnType="void"/>
+
+    <operation       name="startInternal"
+               returnType="void"/>
+
+    <operation       name="stop"
+               returnType="void"/>
+
+    <operation       name="stopInternal"
+               returnType="void"/>
+
+    <operation       name="unbind"
+               returnType="void"/>
+
+  </mbean>
+
+  <mbean         name="Nio2Endpoint"
+            className="org.apache.catalina.mbeans.ClassNameMBean"
+               domain="Catalina"
+                group="ThreadPool"
+                 type="org.apache.tomcat.util.net.Nio2Endpoint">
+
+    <attribute   name="acceptCount"
+                 type="int"/>
+
+    <attribute   name="acceptorThreadCount"
+                 type="int"/>
+
+    <attribute   name="acceptorThreadPriority"
+                 type="int"/>
+
+    <attribute   name="alpnSupported"
+                 type="boolean"
+            writeable="false"
+                   is="true"/>
+
+    <attribute   name="bindOnInit"
+                 type="boolean"/>
+
+    <attribute   name="connectionCount"
+                 type="long"
+            writeable="false"/>
+
+    <attribute   name="connectionLinger"
+                 type="int"/>
+
+    <attribute   name="connectionTimeout"
+                 type="int"/>
+
+    <attribute   name="currentThreadCount"
+                 type="int"
+            writeable="false"/>
+
+    <attribute   name="currentThreadsBusy"
+                 type="int"
+            writeable="false"/>
+
+    <attribute   name="daemon"
+                 type="boolean"/>
+
+    <attribute   name="defaultSSLHostConfigName"
+                 type="java.lang.String"/>
+
+    <attribute   name="deferAccept"
+                 type="boolean"
+            writeable="false"/>
+
+    <attribute   name="domain"
+                 type="java.lang.String"/>
+
+    <attribute   name="executorTerminationTimeoutMillis"
+                 type="long"/>
+
+    <attribute   name="keepAliveCount"
+                 type="int"
+            writeable="false"/>
+
+    <attribute   name="keepAliveTimeout"
+                 type="int"/>
+
+    <attribute   name="localPort"
+                 type="int"
+            writeable="false"/>
+
+    <attribute   name="maxConnections"
+                 type="int"/>
+
+    <attribute   name="maxKeepAliveRequests"
+                 type="int"/>
+
+    <attribute   name="maxThreads"
+                 type="int"/>
+
+    <attribute   name="minSpareThreads"
+                 type="int"/>
+
+    <attribute   name="modelerType"
+                 type="java.lang.String"
+            writeable="false"/>
+
+    <attribute   name="name"
+                 type="java.lang.String"/>
+
+    <attribute   name="paused"
+                 type="boolean"
+            writeable="false"
+                   is="true"/>
+
+    <attribute   name="port"
+                 type="int"/>
+
+    <attribute   name="running"
+                 type="boolean"
+            writeable="false"
+                   is="true"/>
+
+    <attribute   name="sSLEnabled"
+                 type="boolean"
+                   is="true"/>
+
+    <attribute   name="sniParseLimit"
+                 type="int"/>
+
+    <attribute   name="sslImplementation"
+                 type="org.apache.tomcat.util.net.SSLImplementation"
+            writeable="false"/>
+
+    <attribute   name="sslImplementationName"
+                 type="java.lang.String"/>
+
+    <attribute   name="tcpNoDelay"
+                 type="boolean"/>
+
+    <attribute   name="threadPriority"
+                 type="int"/>
+
+    <attribute   name="useSendfile"
+                 type="boolean"/>
+
+    <operation       name="addNegotiatedProtocol"
+               returnType="void">
+      <parameter name="param0"
+                 type="java.lang.String"/>
+    </operation>
+
+    <operation       name="bind"
+               returnType="void"/>
+
+    <operation       name="closeServerSocketGraceful"
+               returnType="void"/>
+
+    <operation       name="createExecutor"
+               returnType="void"/>
+
+    <operation       name="destroy"
+               returnType="void"/>
+
+    <operation       name="findSslHostConfigs"
+               returnType="[Lorg.apache.tomcat.util.net.SSLHostConfig;"/>
+
+    <operation       name="getAttribute"
+               returnType="java.lang.Object">
+      <parameter name="param0"
+                 type="java.lang.String"/>
+    </operation>
+
+    <operation       name="getProperty"
+               returnType="java.lang.String">
+      <parameter name="param0"
+                 type="java.lang.String"/>
+    </operation>
+
+    <operation       name="hasNegotiableProtocols"
+               returnType="boolean"/>
+
+    <operation       name="init"
+               returnType="void"/>
+
+    <operation       name="pause"
+               returnType="void"/>
+
+    <operation       name="reloadSslHostConfig"
+               returnType="void">
+      <parameter name="param0"
+                 type="java.lang.String"/>
+    </operation>
+
+    <operation       name="reloadSslHostConfigs"
+               returnType="void"/>
+
+    <operation       name="removeSslHostConfig"
+               returnType="org.apache.tomcat.util.net.SSLHostConfig">
+      <parameter name="param0"
+                 type="java.lang.String"/>
+    </operation>
+
+    <operation       name="resume"
+               returnType="void"/>
+
+    <operation       name="setProperty"
+               returnType="boolean">
+      <parameter name="param0"
+                 type="java.lang.String"/>
+      <parameter name="param1"
+                 type="java.lang.String"/>
+    </operation>
+
+    <operation       name="shutdownExecutor"
+               returnType="void"/>
+
+    <operation       name="start"
+               returnType="void"/>
+
+    <operation       name="startInternal"
+               returnType="void"/>
+
+    <operation       name="stop"
+               returnType="void"/>
+
+    <operation       name="stopInternal"
+               returnType="void"/>
+
+    <operation       name="unbind"
+               returnType="void"/>
+
+  </mbean>
+
+  <mbean         name="AprEndpoint"
+            className="org.apache.catalina.mbeans.ClassNameMBean"
+               domain="Catalina"
+                group="ThreadPool"
+                 type="org.apache.tomcat.util.net.AprEndpoint">
+
+    <attribute   name="acceptCount"
+                 type="int"/>
+
+    <attribute   name="acceptorThreadCount"
+                 type="int"/>
+
+    <attribute   name="acceptorThreadPriority"
+                 type="int"/>
+
+    <attribute   name="alpnSupported"
+                 type="boolean"
+            writeable="false"
+                   is="true"/>
+
+    <attribute   name="bindOnInit"
+                 type="boolean"/>
+
+    <attribute   name="connectionCount"
+                 type="long"
+            writeable="false"/>
+
+    <attribute   name="connectionLinger"
+                 type="int"/>
+
+    <attribute   name="connectionTimeout"
+                 type="int"/>
+
+    <attribute   name="currentThreadCount"
+                 type="int"
+            writeable="false"/>
+
+    <attribute   name="currentThreadsBusy"
+                 type="int"
+            writeable="false"/>
+
+    <attribute   name="daemon"
+                 type="boolean"/>
+
+    <attribute   name="defaultSSLHostConfigName"
+                 type="java.lang.String"/>
+
+    <attribute   name="deferAccept"
+                 type="boolean"/>
+
+    <attribute   name="domain"
+                 type="java.lang.String"/>
+
+    <attribute   name="executorTerminationTimeoutMillis"
+                 type="long"/>
+
+    <attribute   name="ipv6v6only"
+                 type="boolean"/>
+
+    <attribute   name="keepAliveCount"
+                 type="int"
+            writeable="false"/>
+
+    <attribute   name="keepAliveTimeout"
+                 type="int"/>
+
+    <attribute   name="localPort"
+                 type="int"
+            writeable="false"/>
+
+    <attribute   name="maxConnections"
+                 type="int"/>
+
+    <attribute   name="maxKeepAliveRequests"
+                 type="int"/>
+
+    <attribute   name="maxThreads"
+                 type="int"/>
+
+    <attribute   name="minSpareThreads"
+                 type="int"/>
+
+    <attribute   name="modelerType"
+                 type="java.lang.String"
+            writeable="false"/>
+
+    <attribute   name="name"
+                 type="java.lang.String"/>
+
+    <attribute   name="paused"
+                 type="boolean"
+            writeable="false"
+                   is="true"/>
+
+    <attribute   name="pollTime"
+                 type="int"/>
+
+    <attribute   name="port"
+                 type="int"/>
+
+    <attribute   name="running"
+                 type="boolean"
+            writeable="false"
+                   is="true"/>
+
+    <attribute   name="sSLEnabled"
+                 type="boolean"
+                   is="true"/>
+
+    <attribute   name="sendfileCount"
+                 type="int"
+            writeable="false"/>
+
+    <attribute   name="sendfileSize"
+                 type="int"/>
+
+    <attribute   name="tcpNoDelay"
+                 type="boolean"/>
+
+    <attribute   name="threadPriority"
+                 type="int"/>
+
+    <attribute   name="useSendfile"
+                 type="boolean"/>
+
+    <operation       name="addNegotiatedProtocol"
+               returnType="void">
+      <parameter name="param0"
+                 type="java.lang.String"/>
+    </operation>
+
+    <operation       name="bind"
+               returnType="void"/>
+
+    <operation       name="closeServerSocketGraceful"
+               returnType="void"/>
+
+    <operation       name="createExecutor"
+               returnType="void"/>
+
+    <operation       name="destroy"
+               returnType="void"/>
+
+    <operation       name="findSslHostConfigs"
+               returnType="[Lorg.apache.tomcat.util.net.SSLHostConfig;"/>
+
+    <operation       name="getAttribute"
+               returnType="java.lang.Object">
+      <parameter name="param0"
+                 type="java.lang.String"/>
+    </operation>
+
+    <operation       name="getProperty"
+               returnType="java.lang.String">
+      <parameter name="param0"
+                 type="java.lang.String"/>
+    </operation>
+
+    <operation       name="getSslContext"
+               returnType="long">
+      <parameter name="param0"
+                 type="java.lang.String"/>
+    </operation>
+
+    <operation       name="hasNegotiableProtocols"
+               returnType="boolean"/>
+
+    <operation       name="init"
+               returnType="void"/>
+
+    <operation       name="pause"
+               returnType="void"/>
+
+    <operation       name="reloadSslHostConfig"
+               returnType="void">
+      <parameter name="param0"
+                 type="java.lang.String"/>
+    </operation>
+
+    <operation       name="reloadSslHostConfigs"
+               returnType="void"/>
+
+    <operation       name="removeSslHostConfig"
+               returnType="org.apache.tomcat.util.net.SSLHostConfig">
+      <parameter name="param0"
+                 type="java.lang.String"/>
+    </operation>
+
+    <operation       name="resume"
+               returnType="void"/>
+
+    <operation       name="setProperty"
+               returnType="boolean">
+      <parameter name="param0"
+                 type="java.lang.String"/>
+      <parameter name="param1"
+                 type="java.lang.String"/>
+    </operation>
+
+    <operation       name="shutdownExecutor"
+               returnType="void"/>
+
+    <operation       name="start"
+               returnType="void"/>
+
+    <operation       name="startInternal"
+               returnType="void"/>
+
+    <operation       name="stop"
+               returnType="void"/>
+
+    <operation       name="stopInternal"
+               returnType="void"/>
+
+    <operation       name="unbind"
+               returnType="void"/>
+
+  </mbean>
+
+</mbeans-descriptors>
+
+

@@ -144,6 +144,12 @@
         when using NIO/NIO2 and the OpenSSL backed JSSE TLS implementation.
         (markt)
       </fix>
+      <fix>
+        <bug>62871</bug>: Improve MBeans for Endpoint instances (type
+        <code>ThreadPool</code> in JMX) by using explicit declaration of
+        attributes and operations rather than relying on introspection. Add a
+        new MBean to expose the <code>Socketproperties</code> values. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
