@@ -1085,6 +1085,11 @@ public abstract class AbstractEndpoint<S,U> {
             oname = new ObjectName(domain + ":type=ThreadPool,name=\"" + getName() + "\"");
             Registry.getRegistry(null, null).registerComponent(this, oname, null);
 
+            ObjectName socketPropertiesOname = new ObjectName(domain +
+                    ":type=ThreadPool,name=\"" + getName() + "\",subType=SocketProperties");
+            socketProperties.setObjectName(socketPropertiesOname);
+            Registry.getRegistry(null, null).registerComponent(socketProperties, socketPropertiesOname, null);
+
             for (SSLHostConfig sslHostConfig : findSslHostConfigs()) {
                 registerJmx(sslHostConfig);
             }
@@ -1203,6 +1208,7 @@ public abstract class AbstractEndpoint<S,U> {
         }
         Registry registry = Registry.getRegistry(null, null);
         registry.unregisterComponent(oname);
+        registry.unregisterComponent(socketProperties.getObjectName());
         for (SSLHostConfig sslHostConfig : findSslHostConfigs()) {
             unregisterJmx(sslHostConfig);
         }

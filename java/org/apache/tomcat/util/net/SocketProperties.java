@@ -24,6 +24,8 @@ import java.net.StandardSocketOptions;
 import java.nio.channels.AsynchronousServerSocketChannel;
 import java.nio.channels.AsynchronousSocketChannel;
 
+import javax.management.ObjectName;
+
 /**
  * Properties that can be set in the &lt;Connector&gt; element
  * in server.xml. All properties are prefixed with &quot;socket.&quot;
@@ -172,6 +174,9 @@ public class SocketProperties {
      * Timeout in milliseconds for an unlock to take place.
      */
     protected int unlockTimeout = 250;
+
+    private ObjectName oname = null;
+
 
     public void setProperties(Socket socket) throws SocketException{
         if (rxBufSize != null)
@@ -421,5 +426,11 @@ public class SocketProperties {
         this.unlockTimeout = unlockTimeout;
     }
 
+    void setObjectName(ObjectName oname) {
+        this.oname = oname;
+    }
 
+    ObjectName getObjectName() {
+        return oname;
+    }
 }

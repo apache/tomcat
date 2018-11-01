@@ -188,6 +188,12 @@
         Ensure open sockets etc. are cleaned up if the socket binding process
         fails. (markt)
       </fix>
+      <fix>
+        <bug>62871</bug>: Improve MBeans for Endpoint instances (type
+        <code>ThreadPool</code> in JMX) by using explicit declaration of
+        attributes and operations rather than relying on introspection. Add a
+        new MBean to expose the <code>Socketproperties</code> values. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
