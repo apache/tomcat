@@ -79,11 +79,9 @@ my %TOMCAT_ONLY = qw(
     dv video/x-dv
     flac audio/flac
     gz application/x-gzip
-    hqx application/mac-binhex40
     htc text/x-component
     jsf text/plain
     jspf text/plain
-    m4a audio/mp4
     m4b audio/mp4
     m4r audio/mp4
     mp1 audio/mpeg
