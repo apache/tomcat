@@ -39,6 +39,7 @@ import org.apache.catalina.startup.TesterServlet;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.buf.ByteChunk;
+import org.apache.tomcat.util.compat.TLS;
 import org.apache.tomcat.websocket.server.WsContextListener;
 
 /**
@@ -109,7 +110,15 @@ public class TestSsl extends TomcatBaseTest {
 
         tomcat.start();
 
-        SSLContext sslCtx = SSLContext.getInstance("TLS");
+        SSLContext sslCtx;
+        if (TLS.isTlsv13Available()) {
+            // Force TLS 1.2 if TLS 1.3 is available as JSSE's TLS 1.3
+            // implementation doesn't support Post Handshake Authentication
+            // which is required for this test to pass.
+            sslCtx = SSLContext.getInstance("TLSv1.2");
+        } else {
+            sslCtx = SSLContext.getInstance("TLS");
+        }
         sslCtx.init(null, TesterSupport.getTrustManagers(), null);
         SSLSocketFactory socketFactory = sslCtx.getSocketFactory();
         SSLSocket socket = (SSLSocket) socketFactory.createSocket("localhost",
