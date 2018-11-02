@@ -179,7 +179,7 @@ public final class TesterSupport {
 
     protected static void configureClientSsl() {
         try {
-            SSLContext sc = SSLContext.getInstance("TLS");
+            SSLContext sc = SSLContext.getInstance("TLSv1.2");
             sc.init(TesterSupport.getUser1KeyManagers(),
                     TesterSupport.getTrustManagers(),
                     null);
