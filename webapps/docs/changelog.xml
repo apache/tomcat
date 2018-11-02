@@ -137,12 +137,6 @@
         the <code>Endpoint</code> rather than a local field that could end up
         out of sync. (markt)
       </scode>
-      <add>
-        Add EncryptInterceptor to the portfolio of available clustering
-        interceptors. This adds symmetric encryption of session data
-        to Tomcat clustering regardless of the type of cluster manager
-        or membership being used. (schultz)
-      </add>
       <fix>
         Correct a typo in the Spanish resource files. Patch provided by Diego
         Agulló. (markt)
@@ -284,6 +278,12 @@
         Ensure that remove the member from suspect list when member added.
         (kfujino)
       </fix>
+      <add>
+        Add EncryptInterceptor to the portfolio of available clustering
+        interceptors. This adds symmetric encryption of session data
+        to Tomcat clustering regardless of the type of cluster manager
+        or membership being used. (schultz)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Other">
