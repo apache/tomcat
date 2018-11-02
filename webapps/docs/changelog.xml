@@ -110,6 +110,11 @@
         Correct a typo in the Spanish resource files. Patch provided by Diego
         Agulló. (markt)
       </fix>
+      <fix>
+        <bug>62868</bug>: Order the <code>Enumeration&lt;URL&gt;</code> provided
+        by <code>WebappClassLoaderBase.getResources(String)</code> according to
+        the setting of the delegate flag. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

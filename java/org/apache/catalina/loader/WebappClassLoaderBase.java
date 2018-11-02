@@ -51,6 +51,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.NoSuchElementException;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -1042,6 +1043,24 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
             log.debug("  --> Resource not found, returning null");
         return (null);
 
+    }
+
+
+    @Override
+    public Enumeration<URL> getResources(String name) throws IOException {
+
+        Enumeration<URL> parentResources = getParent().getResources(name);
+        Enumeration<URL> localResources = findResources(name);
+
+        // Need to combine these enumerations. The order in which the
+        // Enumerations are combined depends on how delegation is configured
+        boolean delegateFirst = delegate || filter(name, false);
+
+        if (delegateFirst) {
+            return new CombinedEnumeration(parentResources, localResources);
+        } else {
+            return new CombinedEnumeration(localResources, parentResources);
+        }
     }
 
 
@@ -2597,6 +2616,45 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
         @Override
         public Boolean run() {
             return Boolean.valueOf(findResource("logging.properties") != null);
+        }
+    }
+
+
+    private static class CombinedEnumeration implements Enumeration<URL> {
+
+        private final Enumeration<URL>[] sources;
+        private int index = 0;
+
+        public CombinedEnumeration(Enumeration<URL> enum1, Enumeration<URL> enum2) {
+            @SuppressWarnings("unchecked")
+            Enumeration<URL>[] sources = new Enumeration[] { enum1, enum2 };
+            this.sources = sources;
+        }
+
+
+        @Override
+        public boolean hasMoreElements() {
+            return inc();
+        }
+
+
+        @Override
+        public URL nextElement() {
+            if (inc()) {
+                return sources[index].nextElement();
+            }
+            throw new NoSuchElementException();
+        }
+
+
+        private boolean inc() {
+            while (index < sources.length) {
+                if (sources[index].hasMoreElements()) {
+                    return true;
+                }
+                index++;
+            }
+            return false;
         }
     }
 }
