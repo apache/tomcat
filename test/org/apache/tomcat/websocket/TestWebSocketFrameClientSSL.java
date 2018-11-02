@@ -16,11 +16,17 @@
  */
 package org.apache.tomcat.websocket;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
 import java.net.URI;
+import java.security.KeyStore;
 import java.util.Queue;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManagerFactory;
 import javax.websocket.ClientEndpointConfig;
 import javax.websocket.ContainerProvider;
 import javax.websocket.MessageHandler;
@@ -57,9 +63,10 @@ public class TestWebSocketFrameClientSSL extends WebSocketBaseTest {
                 ContainerProvider.getWebSocketContainer();
         ClientEndpointConfig clientEndpointConfig =
                 ClientEndpointConfig.Builder.create().build();
+
         clientEndpointConfig.getUserProperties().put(
-                Constants.SSL_TRUSTSTORE_PROPERTY,
-                TesterSupport.CA_JKS);
+                Constants.SSL_CONTEXT_PROPERTY, createSSLContext());
+
         Session wsSession = wsContainer.connectToServer(
                 TesterProgrammaticEndpoint.class,
                 clientEndpointConfig,
@@ -104,9 +111,10 @@ public class TestWebSocketFrameClientSSL extends WebSocketBaseTest {
                 ContainerProvider.getWebSocketContainer();
         ClientEndpointConfig clientEndpointConfig =
                 ClientEndpointConfig.Builder.create().build();
+
         clientEndpointConfig.getUserProperties().put(
-                Constants.SSL_TRUSTSTORE_PROPERTY,
-                TesterSupport.CA_JKS);
+                Constants.SSL_CONTEXT_PROPERTY, createSSLContext());
+
         Session wsSession = wsContainer.connectToServer(
                 TesterProgrammaticEndpoint.class,
                 clientEndpointConfig,
@@ -149,5 +157,27 @@ public class TestWebSocketFrameClientSSL extends WebSocketBaseTest {
 
         // Close the client session.
         wsSession.close();
+    }
+
+
+    private SSLContext createSSLContext() throws Exception {
+        // Create the SSL Context
+        // Java 7 doesn't default to TLSv1.2 but the tests do
+        SSLContext sslContext = SSLContext.getInstance("TLSv1.2");
+
+        // Trust store
+        File keyStoreFile = new File(TesterSupport.CA_JKS);
+        KeyStore ks = KeyStore.getInstance("JKS");
+        try (InputStream is = new FileInputStream(keyStoreFile)) {
+            ks.load(is, Constants.SSL_TRUSTSTORE_PWD_DEFAULT.toCharArray());
+        }
+
+        TrustManagerFactory tmf = TrustManagerFactory.getInstance(
+                TrustManagerFactory.getDefaultAlgorithm());
+        tmf.init(ks);
+
+        sslContext.init(null, tmf.getTrustManagers(), null);
+
+        return sslContext;
     }
 }
