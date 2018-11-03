@@ -16,10 +16,14 @@
  */
 package org.apache.tomcat.websocket;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.SocketTimeoutException;
 import java.net.URI;
 import java.nio.ByteBuffer;
+import java.security.KeyStore;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
@@ -29,6 +33,8 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManagerFactory;
 import javax.servlet.ServletContextEvent;
 import javax.websocket.ClientEndpointConfig;
 import javax.websocket.ContainerProvider;
@@ -833,9 +839,28 @@ public class TestWsWebSocketContainer extends WebSocketBaseTest {
                 ContainerProvider.getWebSocketContainer();
         ClientEndpointConfig clientEndpointConfig =
                 ClientEndpointConfig.Builder.create().build();
+
+        // Create the SSL Context
+        // Java 7 doesn't default to TLSv1.2 but the tests do
+        SSLContext sslContext = SSLContext.getInstance("TLSv1.2");
+
+        // Trust store
+        File keyStoreFile = new File(TesterSupport.CA_JKS);
+        KeyStore ks = KeyStore.getInstance("JKS");
+        try (InputStream is = new FileInputStream(keyStoreFile)) {
+            ks.load(is, org.apache.tomcat.websocket.Constants.SSL_TRUSTSTORE_PWD_DEFAULT.toCharArray());
+        }
+
+        TrustManagerFactory tmf = TrustManagerFactory.getInstance(
+                TrustManagerFactory.getDefaultAlgorithm());
+        tmf.init(ks);
+
+        sslContext.init(null, tmf.getTrustManagers(), null);
+
         clientEndpointConfig.getUserProperties().put(
-                org.apache.tomcat.websocket.Constants.SSL_TRUSTSTORE_PROPERTY,
-                TesterSupport.CA_JKS);
+                org.apache.tomcat.websocket.Constants.SSL_CONTEXT_PROPERTY,
+                sslContext);
+
         Session wsSession = wsContainer.connectToServer(
                 TesterProgrammaticEndpoint.class,
                 clientEndpointConfig,
