@@ -1696,6 +1696,7 @@ FINE: Request "/docs/config/manager.html" with response status "200"
 1request-dumper.org.apache.juli.FileHandler.level = INFO
 1request-dumper.org.apache.juli.FileHandler.directory = ${catalina.base}/logs
 1request-dumper.org.apache.juli.FileHandler.prefix = request-dumper.
+1request-dumper.org.apache.juli.FileHandler.encoding = UTF-8
 1request-dumper.org.apache.juli.FileHandler.formatter = org.apache.juli.VerbatimFormatter
 org.apache.catalina.filters.RequestDumperFilter.level = INFO
 org.apache.catalina.filters.RequestDumperFilter.handlers = \

@@ -70,6 +70,11 @@
         to ensure consistent behaviour. (markt)
       </fix>
       <fix>
+        <bug>62788</bug>: Add explicit logging configuration to write log files
+        using UTF-8 to align with Tomcat&apos;s use of UTF-8 by default
+        elsewhere. (markt)
+      </fix>
+      <fix>
         <bug>62797</bug>: Pass throwable to keep client aborts with status 200
         rather than 500. Patch submitted by zikfat. (remm)
       </fix>
