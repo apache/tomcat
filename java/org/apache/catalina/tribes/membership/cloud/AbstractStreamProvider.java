@@ -17,17 +17,23 @@
 
 package org.apache.catalina.tribes.membership.cloud;
 
+import java.io.BufferedInputStream;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
+import java.security.KeyStore;
 import java.security.cert.CertificateException;
+import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.Map;
 
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
+import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.X509TrustManager;
 
 import org.apache.catalina.tribes.membership.Constants;
@@ -104,4 +110,32 @@ public abstract class AbstractStreamProvider implements StreamProvider {
         return connection.getInputStream();
     }
 
+    protected static TrustManager[] configureCaCert(String caCertFile) throws Exception {
+        if (caCertFile != null) {
+            try (InputStream pemInputStream = new BufferedInputStream(new FileInputStream(caCertFile))) {
+                CertificateFactory certFactory = CertificateFactory.getInstance("X509");
+                X509Certificate cert = (X509Certificate)certFactory.generateCertificate(pemInputStream);
+
+                KeyStore trustStore = KeyStore.getInstance("JKS");
+                trustStore.load(null);
+
+                String alias = cert.getSubjectX500Principal().getName();
+                trustStore.setCertificateEntry(alias, cert);
+
+                TrustManagerFactory trustManagerFactory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+                trustManagerFactory.init(trustStore);
+
+                return trustManagerFactory.getTrustManagers();
+            } catch (FileNotFoundException fnfe) {
+                log.error(sm.getString("abstractStream.fileNotFound", caCertFile));
+                throw fnfe;
+            } catch (Exception e) {
+                log.error(sm.getString("abstractStream.trustManagerError", caCertFile));
+                throw e;
+            }
+        } else {
+            log.warn(sm.getString("abstractStream.CACertUndefined"));
+            return InsecureStreamProvider.INSECURE_TRUST_MANAGERS;
+        }
+    }
 }

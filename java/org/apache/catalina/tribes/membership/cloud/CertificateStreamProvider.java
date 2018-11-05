@@ -31,7 +31,6 @@ import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
-import javax.net.ssl.TrustManagerFactory;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -76,34 +75,8 @@ public class CertificateStreamProvider extends AbstractStreamProvider {
 
             return keyManagerFactory.getKeyManagers();
         } catch (IOException e) {
-            log.error(sm.getString("certificateStream.clientCertError", clientCertFile, clientKeyFile), e);
+            log.error(sm.getString("certificateStream.clientCertError", clientCertFile, clientKeyFile));
             throw e;
-        }
-    }
-
-    private static TrustManager[] configureCaCert(String caCertFile) throws Exception {
-        if (caCertFile != null) {
-            try (InputStream pemInputStream = new FileInputStream(caCertFile)) {
-                CertificateFactory certFactory = CertificateFactory.getInstance("X509");
-                X509Certificate cert = (X509Certificate) certFactory.generateCertificate(pemInputStream);
-
-                KeyStore trustStore = KeyStore.getInstance("JKS");
-                trustStore.load(null);
-
-                String alias = cert.getSubjectX500Principal().getName();
-                trustStore.setCertificateEntry(alias, cert);
-
-                TrustManagerFactory trustManagerFactory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
-                trustManagerFactory.init(trustStore);
-
-                return trustManagerFactory.getTrustManagers();
-            } catch (Exception e) {
-                log.error(sm.getString("certificateStream.CACertError", caCertFile), e);
-                throw e;
-            }
-        } else {
-            log.warn(sm.getString("certificateStream.CACertUndefined"));
-            return InsecureStreamProvider.INSECURE_TRUST_MANAGERS;
         }
     }
 
