@@ -45,6 +45,15 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 8.5.36 (markt)" rtext="in development">
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        <bug>62788</bug>: Add explicit logging configuration to write log files
+        using UTF-8 to align with Tomcat&apos;s use of UTF-8 by default
+        elsewhere. (markt)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 8.5.35 (markt)" rtext="release in progress">
   <subsection name="Catalina">
