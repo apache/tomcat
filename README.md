@@ -14,7 +14,8 @@ environment and released under the
 project is intended to be a collaboration of the best-of-breed developers from
 around the world. We invite you to participate in this open development
 project. To learn more about getting involved,
-[click here](https://tomcat.apache.org/getinvolved.html) or keep reading.
+[click here](https://tomcat.apache.org/getinvolved.html) or keep reading.ddd
+
 
 Apache Tomcat software powers numerous large-scale, mission-critical web
 applications across a diverse range of industries and organizations. Some of
