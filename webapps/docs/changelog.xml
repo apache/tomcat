@@ -52,6 +52,10 @@
         using UTF-8 to align with Tomcat&apos;s use of UTF-8 by default
         elsewhere. (markt)
       </fix>
+      <fix>
+        The default Servlet should not override a previously set content-type.
+        (remm)
+      </fix>
     </changelog>
   </subsection>
 </section>

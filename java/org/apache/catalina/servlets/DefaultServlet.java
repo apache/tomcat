@@ -946,7 +946,10 @@ public class DefaultServlet extends HttpServlet {
                 if (debug > 0)
                     log("DefaultServlet.serveFile:  contentType='" +
                         contentType + "'");
-                response.setContentType(contentType);
+                // Don't override a previously set content type
+                if (response.getContentType() == null) {
+                    response.setContentType(contentType);
+                }
             }
             if (resource.isFile() && contentLength >= 0 &&
                     (!serveContent || ostream != null)) {
