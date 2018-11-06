@@ -103,7 +103,7 @@ public class TestSsl extends TomcatBaseTest {
         // Default - MITM attack prevented
 
         tomcat.start();
-        SSLContext sslCtx = SSLContext.getInstance("TLS");
+        SSLContext sslCtx = SSLContext.getInstance(Constants.SSL_PROTO_TLS);
         sslCtx.init(null, TesterSupport.getTrustManagers(), null);
         SSLSocketFactory socketFactory = sslCtx.getSocketFactory();
         SSLSocket socket = (SSLSocket) socketFactory.createSocket("localhost", getPort());

@@ -22,10 +22,10 @@ import org.junit.Assert;
 import org.junit.Assume;
 import org.junit.Test;
 
+import org.apache.catalina.connector.Connector;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.buf.ByteChunk;
-import org.apache.tomcat.util.compat.TLS;
 
 /**
  * The keys and certificates used in this file are all available in svn and were
@@ -40,7 +40,6 @@ public class TestClientCertTls13 extends TomcatBaseTest {
 
     @Test
     public void testClientCertGet() throws Exception {
-        Assume.assumeTrue(TLS.isTlsv13Available());
         getTomcatInstance().start();
         ByteChunk res = getUrl("https://localhost:" + getPort() + "/protected");
         Assert.assertEquals("OK-" + TesterSupport.ROLE, res.toString());
@@ -48,7 +47,6 @@ public class TestClientCertTls13 extends TomcatBaseTest {
 
     @Test
     public void testClientCertPost() throws Exception {
-        Assume.assumeTrue(TLS.isTlsv13Available());
         getTomcatInstance().start();
 
         int size = 32 * 1024;
@@ -70,9 +68,12 @@ public class TestClientCertTls13 extends TomcatBaseTest {
 
         Tomcat tomcat = getTomcatInstance();
 
+        Connector connector = tomcat.getConnector();
+        Assume.assumeTrue(TesterSupport.isDefaultTLSProtocolForTesting13(connector));
+
         TesterSupport.configureClientCertContext(tomcat);
         // Need to override some of the previous settings
-        tomcat.getConnector().setProperty("sslEnabledProtocols", "TLSv1.3");
+        tomcat.getConnector().setProperty("sslEnabledProtocols", Constants.SSL_PROTO_TLSv1_3);
         // And add force authentication to occur on the initial handshake
         tomcat.getConnector().setProperty("clientAuth", "required");
 
