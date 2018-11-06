@@ -591,7 +591,7 @@ public class TestRequest extends TomcatBaseTest {
                      method + " http://localhost:" + getPort() + "/echo"
                      + (null == queryString ? "" : ("?" + queryString))
                      + " HTTP/1.1" + CRLF
-                     + "Host: localhost" + CRLF
+                     + "Host: localhost:" + getPort() + CRLF
                      + (null == contentType ? ""
                         : ("Content-Type: " + contentType + CRLF))
                      + "Connection: close" + CRLF
