@@ -51,6 +51,8 @@ import org.apache.juli.logging.LogFactory;
  */
 public abstract class LoggingBaseTest {
 
+    private static List<File> deleteOnClassTearDown = new ArrayList<>();
+
     protected Log log;
 
     private static File tempDir;
@@ -134,7 +136,8 @@ public abstract class LoggingBaseTest {
         }
         deleteOnTearDown.clear();
 
-        ExpandWar.deleteDir(tempDir);
+        // tempDir contains log files which will be open until JULI shuts down
+        deleteOnClassTearDown.add(tempDir);
     }
 
     @AfterClass
@@ -145,5 +148,9 @@ public abstract class LoggingBaseTest {
         } else {
             logManager.reset();
         }
+        for (File file : deleteOnClassTearDown) {
+            ExpandWar.delete(file);
+        }
+        deleteOnClassTearDown.clear();
     }
 }
