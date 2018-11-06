@@ -53,6 +53,7 @@ import org.apache.catalina.startup.Tomcat;
 import org.apache.tomcat.jni.Library;
 import org.apache.tomcat.jni.LibraryNotFoundError;
 import org.apache.tomcat.jni.SSL;
+import org.apache.tomcat.util.compat.TLS;
 import org.apache.tomcat.util.descriptor.web.LoginConfig;
 import org.apache.tomcat.util.descriptor.web.SecurityCollection;
 import org.apache.tomcat.util.descriptor.web.SecurityConstraint;
@@ -179,7 +180,7 @@ public final class TesterSupport {
 
     protected static void configureClientSsl() {
         try {
-            SSLContext sc = SSLContext.getInstance("TLSv1.2");
+            SSLContext sc = SSLContext.getInstance(Constants.SSL_PROTO_TLSv1_2);
             sc.init(TesterSupport.getUser1KeyManagers(),
                     TesterSupport.getTrustManagers(),
                     null);
@@ -240,7 +241,7 @@ public final class TesterSupport {
          * depend. Therefore, force these tests to use TLSv1.2 so that they pass
          * when running on TLSv1.3.
          */
-        tomcat.getConnector().setProperty("sslEnabledProtocols", "TLSv1.2");
+        tomcat.getConnector().setProperty("sslEnabledProtocols", Constants.SSL_PROTO_TLSv1_2);
 
         // Need a web application with a protected and unprotected URL
         // No file system docBase required
@@ -560,5 +561,37 @@ public final class TesterSupport {
                 throw new CertificateException();
             }
         }
+    }
+
+
+    /*
+     * We want to use TLS 1.3 where we can but this requires TLS 1.3 to be
+     * supported on the client and the server.
+     */
+    public static String getDefaultTLSProtocolForTesting(Connector connector) {
+        // Clients always use JSSE
+        if (!TLS.isTlsv13Available()) {
+            // Client doesn't support TLS 1.3 so we have to use TLS 1.2
+            return Constants.SSL_PROTO_TLSv1_2;
+        }
+
+        if (connector.getProtocolHandlerClassName().contains("Apr")) {
+            // APR connector so OpenSSL is used for TLS.
+            if (SSL.version() >= 0x1010100f) {
+                return Constants.SSL_PROTO_TLSv1_3;
+            } else {
+                return Constants.SSL_PROTO_TLSv1_2;
+            }
+        } else {
+            // NIO or NIO2. Tests do not use JSSE+OpenSSL so JSSE will be used.
+            // Due to check above, it is known that TLS 1.3 is available
+            return Constants.SSL_PROTO_TLSv1_3;
+        }
+    }
+
+
+    public static boolean isDefaultTLSProtocolForTesting13(Connector connector) {
+        return Constants.SSL_PROTO_TLSv1_3.equals(
+                TesterSupport.getDefaultTLSProtocolForTesting(connector));
     }
 }
