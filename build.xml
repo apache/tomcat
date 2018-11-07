@@ -902,6 +902,16 @@
       addOSGi="true" />
 
     <!-- i18n JARs -->
+    <jar jarfile="${tomcat.build}/lib/tomcat-i18n-de.jar"
+      manifest="${tomcat.manifests}/default.manifest">
+      <fileset dir="${tomcat.classes}">
+        <include name="**/LocalStrings_de.properties" />
+      </fileset>
+      <zipfileset file="${tomcat.manifests}/default.notice"
+        fullpath="META-INF/NOTICE" />
+      <zipfileset file="${tomcat.manifests}/default.license"
+        fullpath="META-INF/LICENSE" />
+    </jar>
     <jar jarfile="${tomcat.build}/lib/tomcat-i18n-es.jar"
       manifest="${tomcat.manifests}/default.manifest">
       <fileset dir="${tomcat.classes}">

@@ -60,6 +60,10 @@
         Fix storeconfig for the cluster encryption interceptor key attribute.
         (remm)
       </fix>
+      <fix>
+        Include German translations for the Manager application in the standard
+        Tomcat distribution. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
