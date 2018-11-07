@@ -58,6 +58,7 @@ public class EncryptInterceptor extends ChannelInterceptorBase implements Encryp
     private String providerName;
     private String encryptionAlgorithm = DEFAULT_ENCRYPTION_ALGORITHM;
     private byte[] encryptionKeyBytes;
+    private String encryptionKeyString;
 
     private Cipher encryptionCipher;
     private Cipher decryptionCipher;
@@ -196,6 +197,7 @@ public class EncryptInterceptor extends ChannelInterceptorBase implements Encryp
      * @param keyBytes The encryption key.
      */
     public void setEncryptionKey(String keyBytes) {
+        this.encryptionKeyString = keyBytes;
         if (null == keyBytes) {
             setEncryptionKey((byte[])null);
         } else {
@@ -220,6 +222,14 @@ public class EncryptInterceptor extends ChannelInterceptorBase implements Encryp
 
     private byte[] getEncryptionKeyInternal() {
         return encryptionKeyBytes;
+    }
+
+    public String getEncryptionKeyString() {
+        return encryptionKeyString;
+    }
+
+    public void setEncryptionKeyString(String encryptionKeyString) {
+        setEncryptionKey(encryptionKeyString);
     }
 
     /**

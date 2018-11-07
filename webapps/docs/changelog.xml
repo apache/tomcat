@@ -56,6 +56,10 @@
         The default Servlet should not override a previously set content-type.
         (remm)
       </fix>
+      <fix>
+        Fix storeconfig for the cluster encryption interceptor key attribute.
+        (remm)
+      </fix>
     </changelog>
   </subsection>
 </section>
