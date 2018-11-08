@@ -360,6 +360,7 @@ public class Tomcat {
      * SSL certificates, etc).
      * If no configuration source is specified, it will use the default
      * locations for these files.
+     * @param source The configuration source
      */
     public void init(ConfigurationSource source) {
         ConfigFileLoader.setSource(source);
