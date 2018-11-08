@@ -151,7 +151,7 @@ public class Acceptor<U> implements Runnable {
      * @param currentErrorDelay The current delay being applied on failure
      * @return  The delay to apply on the next failure
      */
-    private int handleExceptionWithDelay(int currentErrorDelay) {
+    protected int handleExceptionWithDelay(int currentErrorDelay) {
         // Don't delay on first exception
         if (currentErrorDelay > 0) {
             try {

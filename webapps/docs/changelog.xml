@@ -83,6 +83,10 @@
         Refactor connector async timeout threads using a scheduled executor.
         (remm)
       </update>
+      <update>
+        Avoid using a dedicated thread for accept on the NIO2 connector, it is
+        always less efficient. (remm)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Tribes">
