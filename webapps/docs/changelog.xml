@@ -77,6 +77,14 @@
       </update>
     </changelog>
   </subsection>
+  <subsection name="Coyote">
+    <changelog>
+      <update>
+        Refactor connector async timeout threads using a scheduled executor.
+        (remm)
+      </update>
+    </changelog>
+  </subsection>
   <subsection name="Tribes">
     <changelog>
       <update>

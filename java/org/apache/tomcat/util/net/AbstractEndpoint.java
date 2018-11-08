@@ -31,6 +31,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.Executor;
 import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import javax.management.MalformedObjectNameException;
@@ -446,6 +448,22 @@ public abstract class AbstractEndpoint<S,U> {
         this.internalExecutor = (executor == null);
     }
     public Executor getExecutor() { return executor; }
+
+
+    /**
+     * External Executor based thread pool for utility tasks.
+     */
+    private ScheduledExecutorService utilityExecutor = null;
+    public void setUtilityExecutor(ScheduledExecutorService utilityExecutor) {
+        this.utilityExecutor = utilityExecutor;
+    }
+    public ScheduledExecutorService getUtilityExecutor() {
+        if (utilityExecutor == null) {
+            getLog().warn(sm.getString("endpoint.warn.noUtilityExecutor"));
+            utilityExecutor = new ScheduledThreadPoolExecutor(1);
+        }
+        return utilityExecutor;
+    }
 
 
     /**
@@ -1153,7 +1171,7 @@ public abstract class AbstractEndpoint<S,U> {
     }
 
 
-    protected final void startAcceptorThreads() {
+    protected void startAcceptorThreads() {
         int count = getAcceptorThreadCount();
         acceptors = new ArrayList<>(count);
 
