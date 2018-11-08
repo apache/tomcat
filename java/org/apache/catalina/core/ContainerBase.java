@@ -1267,7 +1267,8 @@ public abstract class ContainerBase extends LifecycleMBeanBase
      * session timeouts.
      */
     protected void threadStart() {
-        if (backgroundProcessorDelay > 0 && getState().isAvailable()
+        if (backgroundProcessorDelay > 0
+                && (getState().isAvailable() || LifecycleState.STARTING_PREP.equals(getState()))
                 && (backgroundProcessorFuture == null || backgroundProcessorFuture.isDone())) {
             if (backgroundProcessorFuture != null && backgroundProcessorFuture.isDone()) {
                 // There was an error executing the scheduled task, get it and log it
