@@ -22,6 +22,7 @@ import java.io.Serializable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -79,14 +80,15 @@ public class GroupChannel extends ChannelInterceptorBase
 
     /**
      * If <code>heartbeat == true</code> then how often do we want this
-     * heartbeat to run. default is one minute
+     * heartbeat to run. The default value is 5000 milliseconds.
      */
-    protected long heartbeatSleeptime = 5*1000;//every 5 seconds
+    protected long heartbeatSleeptime = 5*1000;
 
     /**
      * Internal heartbeat future
      */
     protected ScheduledFuture<?> heartbeatFuture = null;
+    protected ScheduledFuture<?> monitorFuture;
 
     /**
      * The  <code>ChannelCoordinator</code> coordinates the bottom layer components:<br>
@@ -477,9 +479,30 @@ public class GroupChannel extends ChannelInterceptorBase
             ownExecutor = true;
         }
         super.start(svc);
-        if (heartbeatFuture == null && heartbeat) {
-            heartbeatFuture = utilityExecutor.scheduleWithFixedDelay
-                    (new HeartbeatRunnable(), heartbeatSleeptime, heartbeatSleeptime, TimeUnit.MILLISECONDS);
+        startHeartbeat();
+        monitorFuture = utilityExecutor.scheduleWithFixedDelay(
+                new Runnable() {
+                    @Override
+                    public void run() {
+                        startHeartbeat();
+                    }
+                }, 60, 60, TimeUnit.SECONDS);
+    }
+
+    protected void startHeartbeat() {
+        if (heartbeat && (heartbeatFuture == null || (heartbeatFuture != null && heartbeatFuture.isDone()))) {
+            if (heartbeatFuture != null && heartbeatFuture.isDone()) {
+                if (heartbeatFuture != null && heartbeatFuture.isDone()) {
+                    // There was an error executing the scheduled task, get it and log it
+                    try {
+                        heartbeatFuture.get();
+                    } catch (InterruptedException | ExecutionException e) {
+                        log.error(sm.getString("groupChannel.unable.sendHeartbeat"), e);
+                    }
+                }
+            }
+            heartbeatFuture = utilityExecutor.scheduleWithFixedDelay(new HeartbeatRunnable(),
+                    heartbeatSleeptime, heartbeatSleeptime, TimeUnit.MILLISECONDS);
         }
     }
 
@@ -491,6 +514,10 @@ public class GroupChannel extends ChannelInterceptorBase
      */
     @Override
     public synchronized void stop(int svc) throws ChannelException {
+        if (monitorFuture != null) {
+            monitorFuture.cancel(true);
+            monitorFuture = null;
+        }
         if (heartbeatFuture != null) {
             heartbeatFuture.cancel(true);
             heartbeatFuture = null;
@@ -804,11 +831,7 @@ public class GroupChannel extends ChannelInterceptorBase
     public class HeartbeatRunnable implements Runnable {
         @Override
         public void run() {
-            try {
-                heartbeat();
-            } catch (Exception x) {
-                log.error(sm.getString("groupChannel.unable.sendHeartbeat"), x);
-            }
+            heartbeat();
         }
     }
 

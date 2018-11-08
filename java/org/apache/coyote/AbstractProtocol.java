@@ -22,6 +22,7 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -97,6 +98,7 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
      * Controller for the async timeout scheduling.
      */
     private ScheduledFuture<?> asyncTimeoutFuture = null;
+    private ScheduledFuture<?> monitorFuture;
 
     public AbstractProtocol(AbstractEndpoint<S,?> endpoint) {
         this.endpoint = endpoint;
@@ -565,34 +567,46 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
 
         endpoint.start();
         startAsyncTimeout();
+        monitorFuture = getUtilityExecutor().scheduleWithFixedDelay(
+                new Runnable() {
+                    @Override
+                    public void run() {
+                        if (!isPaused()) {
+                            startAsyncTimeout();
+                        }
+                    }
+                }, 60, 60, TimeUnit.SECONDS);
     }
 
 
     protected void startAsyncTimeout() {
-        if (asyncTimeoutFuture != null) {
-            return;
-        }
-        asyncTimeoutFuture = getUtilityExecutor().scheduleWithFixedDelay(
-                new Runnable() {
-                    @Override
-                    public void run() {
-                        if (!endpoint.isPaused()) {
+        if (asyncTimeoutFuture == null || (asyncTimeoutFuture != null && asyncTimeoutFuture.isDone())) {
+            if (asyncTimeoutFuture != null && asyncTimeoutFuture.isDone()) {
+                // There was an error executing the scheduled task, get it and log it
+                try {
+                    asyncTimeoutFuture.get();
+                } catch (InterruptedException | ExecutionException e) {
+                    getLog().error(sm.getString("abstractProtocolHandler.asyncTimeoutError"), e);
+                }
+            }
+            asyncTimeoutFuture = getUtilityExecutor().scheduleAtFixedRate(
+                    new Runnable() {
+                        @Override
+                        public void run() {
                             long now = System.currentTimeMillis();
                             for (Processor processor : waitingProcessors) {
                                 processor.timeoutAsync(now);
                             }
                         }
-                    }
-
-                }, 1, 1, TimeUnit.SECONDS);
+                    }, 1, 1, TimeUnit.SECONDS);
+        }
     }
 
     protected void stopAsyncTimeout() {
-        if (asyncTimeoutFuture == null) {
-            return;
+        if (asyncTimeoutFuture != null) {
+            asyncTimeoutFuture.cancel(false);
+            asyncTimeoutFuture = null;
         }
-        asyncTimeoutFuture.cancel(false);
-        asyncTimeoutFuture = null;
     }
 
     @Override
@@ -629,6 +643,10 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
             logPortOffset();
         }
 
+        if (monitorFuture != null) {
+            monitorFuture.cancel(true);
+            monitorFuture = null;
+        }
         stopAsyncTimeout();
         // Timeout any pending async request
         for (Processor processor : waitingProcessors) {

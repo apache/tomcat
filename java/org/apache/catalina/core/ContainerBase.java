@@ -958,6 +958,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
         // Stop our thread
         if (monitorFuture != null) {
             monitorFuture.cancel(true);
+            monitorFuture = null;
         }
         threadStop();
 
