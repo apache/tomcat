@@ -72,6 +72,7 @@ public class TestRegistration extends TomcatBaseTest {
             "Tomcat:type=Server",
             "Tomcat:type=Service",
             "Tomcat:type=StringCache",
+            "Tomcat:type=UtilityExecutor",
             "Tomcat:type=Valve,name=StandardEngineValve",
         };
     }

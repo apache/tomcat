@@ -64,6 +64,10 @@
         Include German translations for the Manager application in the standard
         Tomcat distribution. (markt)
       </fix>
+      <add>
+        Add a scheduled executor to the Service, which can be used to
+        process periodic utility tasks. (remm)
+      </add>
     </changelog>
   </subsection>
 </section>

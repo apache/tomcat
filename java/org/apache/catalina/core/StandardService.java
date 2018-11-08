@@ -20,6 +20,11 @@ package org.apache.catalina.core;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.management.ObjectName;
 
@@ -85,9 +90,24 @@ public class StandardService extends LifecycleMBeanBase implements Service {
     private final Object connectorsLock = new Object();
 
     /**
-     *
+     * The list of executors held by the service.
      */
     protected final ArrayList<Executor> executors = new ArrayList<>();
+
+    /**
+     * The number of threads available to process utility tasks in this service.
+     */
+    protected int utilityThreads = 0;
+
+    /**
+     * Utility executor with scheduling capabilities.
+     */
+    private ScheduledThreadPoolExecutor utilityExecutor = null;
+
+    /**
+     * Utility executor wrapper.
+     */
+    private ScheduledExecutorService utilityExecutorWrapper = null;
 
     private Engine engine = null;
 
@@ -202,7 +222,64 @@ public class StandardService extends LifecycleMBeanBase implements Service {
     }
 
 
+    @Override
+    public int getUtilityThreads() {
+        return utilityThreads;
+    }
+
+
+    /**
+     * Handles the special values.
+     */
+    private int getUtilityThreadsInternal() {
+        int result = getUtilityThreads();
+        if (result > 0) {
+            return result;
+        }
+
+        // Zero == Runtime.getRuntime().availableProcessors()
+        // -ve  == Runtime.getRuntime().availableProcessors() + value
+        // These two are the same
+        result = (Runtime.getRuntime().availableProcessors() / 2) + result;
+        if (result < 1) {
+            result = 1;
+        }
+        return result;
+    }
+
+    @Override
+    public void setUtilityThreads(int utilityThreads) {
+        if (utilityThreads < getUtilityThreadsInternal()) {
+            return;
+        }
+        int oldUtilityThreads = this.utilityThreads;
+        this.utilityThreads = utilityThreads;
+
+        // Use local copies to ensure thread safety
+        if (oldUtilityThreads != utilityThreads && utilityExecutor != null) {
+            reconfigureUtilityExecutor(getUtilityThreadsInternal());
+        }
+    }
+
+
+    private synchronized void reconfigureUtilityExecutor(int threads) {
+        if (utilityExecutor != null) {
+            utilityExecutor.setMaximumPoolSize(threads);
+        } else {
+            ScheduledThreadPoolExecutor scheduledThreadPoolExecutor =
+                    new ScheduledThreadPoolExecutor(1, new UtilityThreadFactory(getName() + "-utility-"));
+            scheduledThreadPoolExecutor.setMaximumPoolSize(threads);
+            scheduledThreadPoolExecutor.setKeepAliveTime(10, TimeUnit.SECONDS);
+            scheduledThreadPoolExecutor.setRemoveOnCancelPolicy(true);
+            scheduledThreadPoolExecutor.setExecuteExistingDelayedTasksAfterShutdownPolicy(false);
+            utilityExecutor = scheduledThreadPoolExecutor;
+            utilityExecutorWrapper = new org.apache.tomcat.util.threads.ScheduledThreadPoolExecutor(utilityExecutor);
+        }
+    }
+
+
     // --------------------------------------------------------- Public Methods
+
 
     /**
      * Add a new Connector to the set of defined Connectors, and associate it
@@ -500,6 +577,7 @@ public class StandardService extends LifecycleMBeanBase implements Service {
                 executor.stop();
             }
         }
+
     }
 
 
@@ -511,6 +589,9 @@ public class StandardService extends LifecycleMBeanBase implements Service {
     protected void initInternal() throws LifecycleException {
 
         super.initInternal();
+
+        reconfigureUtilityExecutor(getUtilityThreadsInternal());
+        register(utilityExecutor, "type=UtilityExecutor");
 
         if (engine != null) {
             engine.init();
@@ -554,6 +635,12 @@ public class StandardService extends LifecycleMBeanBase implements Service {
 
         if (engine != null) {
             engine.destroy();
+        }
+
+        if (utilityExecutor != null) {
+            utilityExecutor.shutdownNow();
+            unregister("type=UtilityExecutor");
+            utilityExecutor = null;
         }
 
         super.destroyInternal();
@@ -613,4 +700,29 @@ public class StandardService extends LifecycleMBeanBase implements Service {
     public final String getObjectNameKeyProperties() {
         return "type=Service";
     }
+
+    private static class UtilityThreadFactory implements ThreadFactory {
+        private final ThreadGroup group;
+        private final AtomicInteger threadNumber = new AtomicInteger(1);
+        private final String namePrefix;
+
+        public UtilityThreadFactory(String namePrefix) {
+            SecurityManager s = System.getSecurityManager();
+            group = (s != null) ? s.getThreadGroup() : Thread.currentThread().getThreadGroup();
+            this.namePrefix = namePrefix;
+        }
+
+        @Override
+        public Thread newThread(Runnable r) {
+            Thread thread = new Thread(group, r, namePrefix + threadNumber.getAndIncrement());
+            thread.setDaemon(true);
+            return thread;
+        }
+    }
+
+    @Override
+    public ScheduledExecutorService getUtilityExecutor() {
+        return utilityExecutorWrapper;
+    }
+
 }
