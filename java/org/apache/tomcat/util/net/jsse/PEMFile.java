@@ -18,8 +18,8 @@ package org.apache.tomcat.util.net.jsse;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
-import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
@@ -42,6 +42,7 @@ import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
 
 import org.apache.tomcat.util.codec.binary.Base64;
+import org.apache.tomcat.util.file.ConfigFileLoader;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -73,15 +74,17 @@ public class PEMFile {
         this(filename, password, null);
     }
 
-    public PEMFile(String filename, String password, String keyAlgorithm) throws IOException, GeneralSecurityException {
+    public PEMFile(String filename, String password, String keyAlgorithm)
+            throws IOException, GeneralSecurityException {
         this.filename = filename;
 
         List<Part> parts = new ArrayList<>();
-        try (BufferedReader in = new BufferedReader(new InputStreamReader(
-                new FileInputStream(filename), StandardCharsets.US_ASCII))) {
+        try (InputStream inputStream = ConfigFileLoader.getSource().getResource(filename).getInputStream()) {
+            BufferedReader reader =
+                    new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.US_ASCII));
             Part part = null;
             String line;
-            while ((line = in.readLine()) != null) {
+            while ((line = reader.readLine()) != null) {
                 if (line.startsWith(Part.BEGIN_BOUNDARY)) {
                     part = new Part();
                     part.type = line.substring(Part.BEGIN_BOUNDARY.length(), line.length() - 5).trim();

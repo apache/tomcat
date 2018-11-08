@@ -17,8 +17,6 @@
 package org.apache.catalina.valves.rewrite;
 
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -37,8 +35,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.catalina.Container;
 import org.apache.catalina.Context;
-import org.apache.catalina.Engine;
-import org.apache.catalina.Host;
 import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.Pipeline;
@@ -52,6 +48,8 @@ import org.apache.tomcat.util.buf.CharChunk;
 import org.apache.tomcat.util.buf.MessageBytes;
 import org.apache.tomcat.util.buf.UDecoder;
 import org.apache.tomcat.util.buf.UriUtil;
+import org.apache.tomcat.util.file.ConfigFileLoader;
+import org.apache.tomcat.util.file.ConfigurationSource;
 import org.apache.tomcat.util.http.RequestUtil;
 
 public class RewriteValve extends ValveBase {
@@ -139,29 +137,15 @@ public class RewriteValve extends ValveBase {
                     containerLog.debug("Read configuration from: /WEB-INF/" + resourcePath);
                 }
             }
-        } else if (getContainer() instanceof Host) {
-            String resourceName = getHostConfigPath(resourcePath);
-            File file = new File(getConfigBase(), resourceName);
+        } else {
+            String resourceName = Container.getConfigPath(getContainer(), resourcePath);
             try {
-                if (!file.exists()) {
-                    // Use getResource and getResourceAsStream
-                    is = getClass().getClassLoader()
-                        .getResourceAsStream(resourceName);
-                    if (is != null && containerLog.isDebugEnabled()) {
-                        containerLog.debug("Read configuration from CL at " + resourceName);
-                    }
-                } else {
-                    if (containerLog.isDebugEnabled()) {
-                        containerLog.debug("Read configuration from " + file.getAbsolutePath());
-                    }
-                    is = new FileInputStream(file);
-                }
+                ConfigurationSource.Resource resource = ConfigFileLoader.getSource().getConfResource(resourceName);
+                is = resource.getInputStream();
+            } catch (IOException e) {
                 if ((is == null) && (containerLog.isDebugEnabled())) {
-                    containerLog.debug("No configuration resource found: " + resourceName +
-                            " in " + getConfigBase() + " or in the classloader");
+                    containerLog.debug("No configuration resource found: " + resourceName, e);
                 }
-            } catch (Exception e) {
-                containerLog.error("Error opening configuration", e);
             }
         }
 
@@ -561,49 +545,6 @@ public class RewriteValve extends ValveBase {
             invoked.set(null);
         }
 
-    }
-
-
-    /**
-     * @return config base.
-     */
-    protected File getConfigBase() {
-        File configBase =
-            new File(System.getProperty("catalina.base"), "conf");
-        if (!configBase.exists()) {
-            return null;
-        } else {
-            return configBase;
-        }
-    }
-
-
-    /**
-     * Find the configuration path where the rewrite configuration file
-     * will be stored.
-     * @param resourceName The rewrite configuration file name
-     * @return the full rewrite configuration path
-     */
-    protected String getHostConfigPath(String resourceName) {
-        StringBuffer result = new StringBuffer();
-        Container container = getContainer();
-        Container host = null;
-        Container engine = null;
-        while (container != null) {
-            if (container instanceof Host)
-                host = container;
-            if (container instanceof Engine)
-                engine = container;
-            container = container.getParent();
-        }
-        if (engine != null) {
-            result.append(engine.getName()).append('/');
-        }
-        if (host != null) {
-            result.append(host.getName()).append('/');
-        }
-        result.append(resourceName);
-        return result.toString();
     }
 
 

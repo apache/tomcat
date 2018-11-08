@@ -222,15 +222,15 @@ public class JSSEUtil extends SSLUtilBase {
                 throw new IOException(sm.getString("jsse.noCertFile"));
             }
 
-            PEMFile privateKeyFile = new PEMFile(SSLHostConfig.adjustRelativePath
-                    (certificate.getCertificateKeyFile() != null ? certificate.getCertificateKeyFile() : certificate.getCertificateFile()),
+            PEMFile privateKeyFile = new PEMFile(
+                    certificate.getCertificateKeyFile() != null ? certificate.getCertificateKeyFile() : certificate.getCertificateFile(),
                     keyPass);
-            PEMFile certificateFile = new PEMFile(SSLHostConfig.adjustRelativePath(certificate.getCertificateFile()));
+            PEMFile certificateFile = new PEMFile(certificate.getCertificateFile());
 
             Collection<Certificate> chain = new ArrayList<>();
             chain.addAll(certificateFile.getCertificates());
             if (certificate.getCertificateChainFile() != null) {
-                PEMFile certificateChainFile = new PEMFile(SSLHostConfig.adjustRelativePath(certificate.getCertificateChainFile()));
+                PEMFile certificateChainFile = new PEMFile(certificate.getCertificateChainFile());
                 chain.addAll(certificateChainFile.getCertificates());
             }
 
@@ -436,7 +436,7 @@ public class JSSEUtil extends SSLUtilBase {
         Collection<? extends CRL> crls = null;
         try {
             CertificateFactory cf = CertificateFactory.getInstance("X.509");
-            try (InputStream is = ConfigFileLoader.getInputStream(crlf)) {
+            try (InputStream is = ConfigFileLoader.getSource().getResource(crlf).getInputStream()) {
                 crls = cf.generateCRLs(is);
             }
         } catch(IOException iex) {

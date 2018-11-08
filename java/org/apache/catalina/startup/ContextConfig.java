@@ -104,6 +104,8 @@ import org.apache.tomcat.util.descriptor.web.WebXml;
 import org.apache.tomcat.util.descriptor.web.WebXmlParser;
 import org.apache.tomcat.util.digester.Digester;
 import org.apache.tomcat.util.digester.RuleSet;
+import org.apache.tomcat.util.file.ConfigFileLoader;
+import org.apache.tomcat.util.file.ConfigurationSource;
 import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.util.scan.JarFactory;
 import org.xml.sax.InputSource;
@@ -458,34 +460,29 @@ public class ContextConfig implements LifecycleListener {
         }
 
         if (!context.getOverride()) {
-            File defaultContextFile = new File(defaultContextXml);
-            if (!defaultContextFile.isAbsolute()) {
-                defaultContextFile =
-                        new File(context.getCatalinaBase(), defaultContextXml);
-            }
-            if (defaultContextFile.exists()) {
-                try {
-                    URL defaultContextUrl = defaultContextFile.toURI().toURL();
-                    processContextConfig(digester, defaultContextUrl);
-                } catch (MalformedURLException e) {
-                    log.error(sm.getString(
-                            "contextConfig.badUrl", defaultContextFile), e);
-                }
+            try (ConfigurationSource.Resource contextXmlResource =
+                    ConfigFileLoader.getSource().getResource(defaultContextXml)) {
+                URL defaultContextUrl = contextXmlResource.getURI().toURL();
+                processContextConfig(digester, defaultContextUrl, contextXmlResource.getInputStream());
+            } catch (MalformedURLException e) {
+                log.error(sm.getString("contextConfig.badUrl", defaultContextXml), e);
+            } catch (IOException e) {
+                // Not found
             }
 
-            File hostContextFile = new File(getHostConfigBase(), Constants.HostContextXml);
-            if (hostContextFile.exists()) {
-                try {
-                    URL hostContextUrl = hostContextFile.toURI().toURL();
-                    processContextConfig(digester, hostContextUrl);
-                } catch (MalformedURLException e) {
-                    log.error(sm.getString(
-                            "contextConfig.badUrl", hostContextFile), e);
-                }
+            String hostContextFile = Container.getConfigPath(context, Constants.HostContextXml);
+            try (ConfigurationSource.Resource contextXmlResource =
+                    ConfigFileLoader.getSource().getConfResource(hostContextFile)) {
+                URL defaultContextUrl = contextXmlResource.getURI().toURL();
+                processContextConfig(digester, defaultContextUrl, contextXmlResource.getInputStream());
+            } catch (MalformedURLException e) {
+                log.error(sm.getString("contextConfig.badUrl", hostContextFile), e);
+            } catch (IOException e) {
+                // Not found
             }
         }
         if (context.getConfigFile() != null) {
-            processContextConfig(digester, context.getConfigFile());
+            processContextConfig(digester, context.getConfigFile(), null);
         }
 
     }
@@ -495,8 +492,9 @@ public class ContextConfig implements LifecycleListener {
      * Process a context.xml.
      * @param digester The digester that will be used for XML parsing
      * @param contextXml The URL to the context.xml configuration
+     * @param stream The XML resource stream
      */
-    protected void processContextConfig(Digester digester, URL contextXml) {
+    protected void processContextConfig(Digester digester, URL contextXml, InputStream stream) {
 
         if (log.isDebugEnabled()) {
             log.debug("Processing context [" + context.getName()
@@ -504,13 +502,14 @@ public class ContextConfig implements LifecycleListener {
         }
 
         InputSource source = null;
-        InputStream stream = null;
 
         try {
             source = new InputSource(contextXml.toString());
-            URLConnection xmlConn = contextXml.openConnection();
-            xmlConn.setUseCaches(false);
-            stream = xmlConn.getInputStream();
+            if (stream == null) {
+                URLConnection xmlConn = contextXml.openConnection();
+                xmlConn.setUseCaches(false);
+                stream = xmlConn.getInputStream();
+            }
         } catch (Exception e) {
             log.error(sm.getString("contextConfig.contextMissing",
                       contextXml) , e);
@@ -1770,8 +1769,7 @@ public class ContextConfig implements LifecycleListener {
         if (Constants.NoDefaultWebXml.equals(defaultWebXml)) {
             return null;
         }
-        return getWebXmlSource(defaultWebXml,
-                context.getCatalinaBase().getPath());
+        return getWebXmlSource(defaultWebXml, true);
     }
 
     /**
@@ -1784,7 +1782,7 @@ public class ContextConfig implements LifecycleListener {
         if (hostConfigBase == null)
             return null;
 
-        return getWebXmlSource(Constants.HostWebXml, hostConfigBase.getPath());
+        return getWebXmlSource(hostConfigBase.getPath(), false);
     }
 
     /**
@@ -1847,43 +1845,64 @@ public class ContextConfig implements LifecycleListener {
         return source;
     }
 
+    public String getConfigBasePath() {
+        String path = null;
+        if (context.getParent() instanceof Host) {
+            Host host = (Host) context.getParent();
+            if (host.getXmlBase() != null) {
+                path = host.getXmlBase();
+            } else {
+                StringBuilder xmlDir = new StringBuilder("conf");
+                Container parent = host.getParent();
+                if (parent instanceof Engine) {
+                    xmlDir.append('/');
+                    xmlDir.append(parent.getName());
+                }
+                xmlDir.append('/');
+                xmlDir.append(host.getName());
+                path = xmlDir.toString();
+            }
+        }
+        return path;
+    }
+
     /**
      * Utility method to create an input source from the specified XML file.
      * @param filename  Name of the file (possibly with one or more leading path
      *                  segments) to read
-     * @param path      Location that filename is relative to
+     * @param global true if processing a shared resource, false if processing
+     *        a host based resource
      * @return the input source
      */
-    protected InputSource getWebXmlSource(String filename, String path) {
-        File file = new File(filename);
-        if (!file.isAbsolute()) {
-            file = new File(path, filename);
+    protected InputSource getWebXmlSource(String filename, boolean global) {
+        ConfigurationSource.Resource webXmlResource = null;
+        try {
+            if (global) {
+                if (Constants.DefaultWebXml.equals(filename)) {
+                    webXmlResource = ConfigFileLoader.getSource().getSharedWebXml();
+                } else {
+                    webXmlResource = ConfigFileLoader.getSource().getResource(filename);
+                }
+            } else {
+                String hostWebXml = Container.getConfigPath(context, Constants.HostWebXml);
+                webXmlResource = ConfigFileLoader.getSource().getConfResource(hostWebXml);
+            }
+        } catch (IOException e) {
+            // Ignore if not found
+            return null;
         }
 
         InputStream stream = null;
         InputSource source = null;
 
         try {
-            if (!file.exists()) {
-                // Use getResource and getResourceAsStream
-                stream =
-                    getClass().getClassLoader().getResourceAsStream(filename);
-                if(stream != null) {
-                    source =
-                        new InputSource(getClass().getClassLoader().getResource(
-                                filename).toURI().toString());
-                }
-            } else {
-                source = new InputSource(file.getAbsoluteFile().toURI().toString());
-                stream = new FileInputStream(file);
-            }
-
+            stream = webXmlResource.getInputStream();
+            source = new InputSource(webXmlResource.getURI().toString());
             if (stream != null && source != null) {
                 source.setByteStream(stream);
             }
         } catch (Exception e) {
-            log.error(sm.getString(
-                    "contextConfig.defaultError", filename, file), e);
+            log.error(sm.getString("contextConfig.defaultError", filename, webXmlResource.getURI()), e);
         } finally {
             if (source == null && stream != null) {
                 try {

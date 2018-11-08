@@ -17,12 +17,9 @@
  */
 package org.apache.tomcat.util.file;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
-import java.net.URL;
 
 import org.apache.tomcat.util.res.StringManager;
 
@@ -36,17 +33,18 @@ public class ConfigFileLoader {
     private static final StringManager sm = StringManager.getManager(ConfigFileLoader.class
             .getPackage().getName());
 
-    private static final File CATALINA_BASE_FILE;
-    private static final URI CATALINA_BASE_URI;
+    private static ConfigurationSource source;
 
-    static {
-        String catalinaBase = System.getProperty("catalina.base");
-        if (catalinaBase != null) {
-            CATALINA_BASE_FILE = new File(catalinaBase);
-            CATALINA_BASE_URI = CATALINA_BASE_FILE.toURI();
-        } else {
-            CATALINA_BASE_FILE = null;
-            CATALINA_BASE_URI = null;
+    public static final ConfigurationSource getSource() {
+        if (ConfigFileLoader.source == null) {
+            throw new IllegalStateException(sm.getString("configFileLoader.noConfigurationSource"));
+        }
+        return source;
+    }
+
+    public static final void setSource(ConfigurationSource source) {
+        if (ConfigFileLoader.source == null) {
+            ConfigFileLoader.source = source;
         }
     }
 
@@ -68,40 +66,15 @@ public class ConfigFileLoader {
      * @throws IOException If an InputStream cannot be created using the
      *                     provided location
      */
+    @Deprecated
     public static InputStream getInputStream(String location) throws IOException {
-        // Location was originally always a file before URI support was added so
-        // try file first.
-
-        File f = new File(location);
-        if (!f.isAbsolute()) {
-            f = new File(CATALINA_BASE_FILE, location);
-        }
-        if (f.isFile()) {
-            return new FileInputStream(f);
-        }
-
-        // File didn't work so try URI.
-        URI uri = getURI(location);
-
-        // Obtain the input stream we need
-        try {
-            URL url = uri.toURL();
-            return url.openConnection().getInputStream();
-        } catch (IllegalArgumentException e) {
-            throw new IOException(sm.getString("configFileLoader.cannotObtainURL", location), e);
-        }
+        return getSource().getResource(location).getInputStream();
     }
 
 
+    @Deprecated
     public static URI getURI(String location) {
-        // Using resolve() enables the code to handle relative paths that did
-        // not point to a file
-        URI uri;
-        if (CATALINA_BASE_URI != null) {
-            uri = CATALINA_BASE_URI.resolve(location);
-        } else {
-            uri = URI.create(location);
-        }
-        return uri;
+        return getSource().getURI(location);
     }
+
 }

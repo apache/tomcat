@@ -63,6 +63,8 @@ import org.apache.catalina.realm.RealmBase;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.buf.UriUtil;
 import org.apache.tomcat.util.descriptor.web.LoginConfig;
+import org.apache.tomcat.util.file.ConfigFileLoader;
+import org.apache.tomcat.util.file.ConfigurationSource;
 import org.apache.tomcat.util.res.StringManager;
 
 // TODO: lazy init for the temp dir - only when a JSP is compiled or
@@ -352,6 +354,25 @@ public class Tomcat {
 
 
     /**
+     * Initialize the server given the specified configuration source.
+     * The server will be loaded according to the Tomcat configuration
+     * files contained in the source (server.xml, web.xml, context.xml,
+     * SSL certificates, etc).
+     * If no configuration source is specified, it will use the default
+     * locations for these files.
+     */
+    public void init(ConfigurationSource source) {
+        ConfigFileLoader.setSource(source);
+        Catalina catalina = new Catalina();
+        // Load the Catalina instance with the regular configuration files
+        // from specified source
+        catalina.load();
+        // Retrieve and set the server
+        server = catalina.getServer();
+    }
+
+
+    /**
      * Initialize the server.
      *
      * @throws LifecycleException Init error
@@ -540,6 +561,9 @@ public class Tomcat {
 
         initBaseDir();
 
+        // Set configuration source
+        ConfigFileLoader.setSource(new CatalinaBaseConfigurationSource(new File(basedir), null));
+
         server.setPort( -1 );
 
         Service service = new StandardService();
@@ -605,7 +629,7 @@ public class Tomcat {
             throw new IllegalArgumentException(e);
         }
 
-        return addWebapp(host,  contextPath, docBase, listener);
+        return addWebapp(host, contextPath, docBase, listener);
     }
 
     /**

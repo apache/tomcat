@@ -149,7 +149,7 @@ public abstract class SSLUtilBase implements SSLUtil {
                 ks = KeyStore.getInstance(type, provider);
             }
             if ("DKS".equalsIgnoreCase(type)) {
-                URI uri = ConfigFileLoader.getURI(path);
+                URI uri = ConfigFileLoader.getSource().getURI(path);
                 ks.load(new DomainLoadStoreParameter(uri, Collections.emptyMap()));
             } else {
                 // Some key store types (e.g. hardware) expect the InputStream
@@ -157,7 +157,7 @@ public abstract class SSLUtilBase implements SSLUtil {
                 if(!("PKCS11".equalsIgnoreCase(type) ||
                         "".equalsIgnoreCase(path)) ||
                         "NONE".equalsIgnoreCase(path)) {
-                    istream = ConfigFileLoader.getInputStream(path);
+                    istream = ConfigFileLoader.getSource().getResource(path).getInputStream();
                 }
 
                 // The digester cannot differentiate between null and "".

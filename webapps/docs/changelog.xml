@@ -75,6 +75,19 @@
       <update>
         Refactor parallel deployment threads using the Service executor. (remm)
       </update>
+      <add>
+        Introduce a ConfigurationSource API to standardize access to the core
+        configuration resources of Tomcat. (remm)
+      </add>
+      <update>
+        Update the Tomcat embedded API by allowing to set a configuration
+        source, which will allow processing of core configuration. (remm)
+      </update>
+      <update>
+        Refactor processing of server.xml, web.xml, context.xml and context
+        configuration files using the ConfigurationSource API. JASPIC and
+        storeconfig remain file based. (remm)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Coyote">
@@ -86,6 +99,10 @@
       <update>
         Avoid using a dedicated thread for accept on the NIO2 connector, it is
         always less efficient. (remm)
+      </update>
+      <update>
+        Load SSL configuration resources for JSSE using the ConfigurationSource
+        API. OpenSSL use requires actual files. (remm)
       </update>
     </changelog>
   </subsection>

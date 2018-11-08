@@ -239,7 +239,7 @@ public class MemoryRealm  extends RealmBase {
     @Override
     protected void startInternal() throws LifecycleException {
         String pathName = getPathname();
-        try (InputStream is = ConfigFileLoader.getInputStream(pathName)) {
+        try (InputStream is = ConfigFileLoader.getSource().getResource(pathName).getInputStream()) {
             // Load the contents of the database file
             if (log.isDebugEnabled()) {
                 log.debug(sm.getString("memoryRealm.loadPath", pathName));

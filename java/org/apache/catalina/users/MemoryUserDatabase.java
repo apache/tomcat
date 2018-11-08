@@ -19,7 +19,6 @@ package org.apache.catalina.users;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.URI;
@@ -42,6 +41,7 @@ import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.digester.AbstractObjectCreationFactory;
 import org.apache.tomcat.util.digester.Digester;
 import org.apache.tomcat.util.file.ConfigFileLoader;
+import org.apache.tomcat.util.file.ConfigurationSource;
 import org.apache.tomcat.util.res.StringManager;
 import org.xml.sax.Attributes;
 
@@ -415,48 +415,40 @@ public class MemoryUserDatabase implements UserDatabase {
      */
     @Override
     public void open() throws Exception {
-
         writeLock.lock();
-        try {
-            // Erase any previous groups and users
-            users.clear();
-            groups.clear();
-            roles.clear();
+        // Erase any previous groups and users
+        users.clear();
+        groups.clear();
+        roles.clear();
 
-            String pathName = getPathname();
-            URI uri = ConfigFileLoader.getURI(pathName);
-            URL url = uri.toURL();
-            URLConnection uConn = url.openConnection();
+        String pathName = getPathname();
+        try (ConfigurationSource.Resource resource = ConfigFileLoader.getSource().getResource(pathName)) {
+            this.lastModified = resource.getURI().toURL().openConnection().getLastModified();
 
-            try (InputStream is = uConn.getInputStream()) {
-                this.lastModified = uConn.getLastModified();
-
-                // Construct a digester to read the XML input file
-                Digester digester = new Digester();
-                try {
-                    digester.setFeature(
-                            "http://apache.org/xml/features/allow-java-encodings", true);
-                } catch (Exception e) {
-                    log.warn(sm.getString("memoryUserDatabase.xmlFeatureEncoding"), e);
-                }
-                digester.addFactoryCreate("tomcat-users/group",
-                        new MemoryGroupCreationFactory(this), true);
-                digester.addFactoryCreate("tomcat-users/role",
-                        new MemoryRoleCreationFactory(this), true);
-                digester.addFactoryCreate("tomcat-users/user",
-                        new MemoryUserCreationFactory(this), true);
-
-                // Parse the XML input to load this database
-                digester.parse(is);
-            } catch (IOException ioe) {
-                log.error(sm.getString("memoryUserDatabase.fileNotFound", pathName));
+            // Construct a digester to read the XML input file
+            Digester digester = new Digester();
+            try {
+                digester.setFeature(
+                        "http://apache.org/xml/features/allow-java-encodings", true);
+            } catch (Exception e) {
+                log.warn(sm.getString("memoryUserDatabase.xmlFeatureEncoding"), e);
             }
+            digester.addFactoryCreate("tomcat-users/group",
+                    new MemoryGroupCreationFactory(this), true);
+            digester.addFactoryCreate("tomcat-users/role",
+                    new MemoryRoleCreationFactory(this), true);
+            digester.addFactoryCreate("tomcat-users/user",
+                    new MemoryUserCreationFactory(this), true);
+
+            // Parse the XML input to load this database
+            digester.parse(resource.getInputStream());
+        } catch (IOException ioe) {
+            log.error(sm.getString("memoryUserDatabase.fileNotFound", pathName));
         } catch (Exception e) {
             // Fail safe on error
             users.clear();
             groups.clear();
             roles.clear();
-
             throw e;
         } finally {
             writeLock.unlock();
@@ -660,7 +652,7 @@ public class MemoryUserDatabase implements UserDatabase {
             return;
         }
 
-        URI uri = ConfigFileLoader.getURI(getPathname());
+        URI uri = ConfigFileLoader.getSource().getURI(getPathname());
         try {
             URL url = uri.toURL();
             URLConnection uConn = url.openConnection();
