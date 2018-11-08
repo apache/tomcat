@@ -22,6 +22,10 @@ import java.io.Serializable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
@@ -72,6 +76,7 @@ public class GroupChannel extends ChannelInterceptorBase
      * If set to true, the channel will start a local thread for the heart beat.
      */
     protected boolean heartbeat = true;
+
     /**
      * If <code>heartbeat == true</code> then how often do we want this
      * heartbeat to run. default is one minute
@@ -79,9 +84,9 @@ public class GroupChannel extends ChannelInterceptorBase
     protected long heartbeatSleeptime = 5*1000;//every 5 seconds
 
     /**
-     * Internal heartbeat thread
+     * Internal heartbeat future
      */
-    protected HeartbeatThread hbthread = null;
+    protected ScheduledFuture<?> heartbeatFuture = null;
 
     /**
      * The  <code>ChannelCoordinator</code> coordinates the bottom layer components:<br>
@@ -132,6 +137,11 @@ public class GroupChannel extends ChannelInterceptorBase
      * If set to true, this channel is registered with jmx.
      */
     private boolean jmxEnabled = true;
+
+    /**
+     * Executor service.
+     */
+    protected ScheduledExecutorService utilityExecutor = null;
 
     /**
      * the ObjectName of this channel.
@@ -446,6 +456,8 @@ public class GroupChannel extends ChannelInterceptorBase
 
     }
 
+    protected boolean ownExecutor = false;
+
     /**
      * Starts the channel.
      * @param svc int - what service to start
@@ -459,10 +471,15 @@ public class GroupChannel extends ChannelInterceptorBase
         // register jmx
         JmxRegistry jmxRegistry = JmxRegistry.getRegistry(this);
         if (jmxRegistry != null) this.oname = jmxRegistry.registerJmx(",component=Channel", this);
+        if (utilityExecutor == null) {
+            log.warn(sm.getString("groupChannel.warn.noUtilityExecutor"));
+            utilityExecutor = new ScheduledThreadPoolExecutor(1);
+            ownExecutor = true;
+        }
         super.start(svc);
-        if ( hbthread == null && heartbeat ) {
-            hbthread = new HeartbeatThread(this,heartbeatSleeptime);
-            hbthread.start();
+        if (heartbeatFuture == null && heartbeat) {
+            heartbeatFuture = utilityExecutor.scheduleWithFixedDelay
+                    (new HeartbeatRunnable(), heartbeatSleeptime, heartbeatSleeptime, TimeUnit.MILLISECONDS);
         }
     }
 
@@ -474,11 +491,16 @@ public class GroupChannel extends ChannelInterceptorBase
      */
     @Override
     public synchronized void stop(int svc) throws ChannelException {
-        if (hbthread != null) {
-            hbthread.stopHeartbeat();
-            hbthread = null;
+        if (heartbeatFuture != null) {
+            heartbeatFuture.cancel(true);
+            heartbeatFuture = null;
         }
         super.stop(svc);
+        if (ownExecutor) {
+            utilityExecutor.shutdown();
+            utilityExecutor = null;
+            ownExecutor = false;
+        }
         if (oname != null) {
             JmxRegistry.getRegistry(this).unregisterJmx(oname);
             oname = null;
@@ -492,6 +514,16 @@ public class GroupChannel extends ChannelInterceptorBase
     public ChannelInterceptor getFirstInterceptor() {
         if (interceptors != null) return interceptors;
         else return coordinator;
+    }
+
+    @Override
+    public ScheduledExecutorService getUtilityExecutor() {
+        return utilityExecutor;
+    }
+
+    @Override
+    public void setUtilityExecutor(ScheduledExecutorService utilityExecutor) {
+        this.utilityExecutor = utilityExecutor;
     }
 
     /**
@@ -764,56 +796,20 @@ public class GroupChannel extends ChannelInterceptorBase
     }
 
     /**
-     *
-     * <p>Title: Internal heartbeat thread</p>
+     * <p>Title: Internal heartbeat runnable</p>
      *
      * <p>Description: if <code>Channel.getHeartbeat()==true</code> then a thread of this class
      * is created</p>
-     *
-     * @version 1.0
      */
-    public static class HeartbeatThread extends Thread {
-        private static final Log log = LogFactory.getLog(HeartbeatThread.class);
-        protected static int counter = 1;
-        protected static synchronized int inc() {
-            return counter++;
-        }
-
-        protected volatile boolean doRun = true;
-        protected final GroupChannel channel;
-        protected final long sleepTime;
-        public HeartbeatThread(GroupChannel channel, long sleepTime) {
-            super();
-            this.setPriority(MIN_PRIORITY);
-            String channelName = "";
-            if (channel.getName() != null) channelName = "[" + channel.getName() + "]";
-            setName("GroupChannel-Heartbeat" + channelName + "-" +inc());
-            setDaemon(true);
-            this.channel = channel;
-            this.sleepTime = sleepTime;
-        }
-        public void stopHeartbeat() {
-            doRun = false;
-            interrupt();
-        }
-
+    public class HeartbeatRunnable implements Runnable {
         @Override
         public void run() {
-            while (doRun) {
-                try {
-                    Thread.sleep(sleepTime);
-                    channel.heartbeat();
-                } catch ( InterruptedException x ) {
-                    // Ignore. Probably triggered by a call to stopHeartbeat().
-                    // In the highly unlikely event it was a different trigger,
-                    // simply ignore it and continue.
-                } catch ( Exception x ) {
-                    log.error(sm.getString("groupChannel.unable.sendHeartbeat"),x);
-                }//catch
-            }//while
-        }//run
-    }//HeartbeatThread
-
-
+            try {
+                heartbeat();
+            } catch (Exception x) {
+                log.error(sm.getString("groupChannel.unable.sendHeartbeat"), x);
+            }
+        }
+    }
 
 }

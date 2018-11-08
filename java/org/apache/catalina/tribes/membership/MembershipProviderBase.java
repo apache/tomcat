@@ -18,14 +18,12 @@
 package org.apache.catalina.tribes.membership;
 
 import java.util.Properties;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.ScheduledExecutorService;
 
 import org.apache.catalina.tribes.Member;
 import org.apache.catalina.tribes.MembershipListener;
 import org.apache.catalina.tribes.MembershipProvider;
 import org.apache.catalina.tribes.MembershipService;
-import org.apache.catalina.tribes.util.ExecutorFactory;
 
 public abstract class MembershipProviderBase implements MembershipProvider {
 
@@ -33,7 +31,7 @@ public abstract class MembershipProviderBase implements MembershipProvider {
     protected MembershipListener membershipListener;
     protected MembershipService service;
     // The event notification executor
-    protected final ExecutorService executor = ExecutorFactory.newThreadPool(0, 10, 10, TimeUnit.SECONDS);
+    protected ScheduledExecutorService executor;
 
     @Override
     public void init(Properties properties) throws Exception {
@@ -65,5 +63,6 @@ public abstract class MembershipProviderBase implements MembershipProvider {
     @Override
     public void setMembershipService(MembershipService service) {
         this.service = service;
+        executor = service.getChannel().getUtilityExecutor();
     }
 }

@@ -77,6 +77,16 @@
       </update>
     </changelog>
   </subsection>
+  <subsection name="Tribes">
+    <changelog>
+      <update>
+        Refactor various operations performed in tribes using a scheduled
+        executor. When tribes is not running standalone, it will use the
+        executor from the Catalina Service. If running independently, the
+        Channel will provide the executor. (remm)
+      </update>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 9.0.13 (markt)" rtext="2018-11-07">
   <subsection name="Catalina">

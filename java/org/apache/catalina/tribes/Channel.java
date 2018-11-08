@@ -18,6 +18,7 @@ package org.apache.catalina.tribes;
 
 import java.io.Serializable;
 import java.util.StringJoiner;
+import java.util.concurrent.ScheduledExecutorService;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -372,6 +373,18 @@ public interface Channel {
      * @param name The new channel name
      */
     public void setName(String name);
+
+    /**
+     * Return executor that can be used for utility tasks.
+     * @return the executor
+     */
+    public ScheduledExecutorService getUtilityExecutor();
+
+    /**
+     * Set the executor that can be used for utility tasks.
+     * @param utilityExecutor the executor
+     */
+    public void setUtilityExecutor(ScheduledExecutorService utilityExecutor);
 
     /**
      * Translates the name of an option to its integer value.  Valid option names are "asynchronous" (alias "async"),
