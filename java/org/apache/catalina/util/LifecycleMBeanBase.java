@@ -178,6 +178,36 @@ public abstract class LifecycleMBeanBase extends LifecycleBase
      * Note: This method should only be used once {@link #initInternal()} has
      * been called and before {@link #destroyInternal()} has been called.
      *
+     * @param objectNameKeyProperties   The key properties component of the
+     *                                  object name to use to unregister the
+     *                                  object
+     */
+    protected final void unregister(String objectNameKeyProperties) {
+        // Construct an object name with the right domain
+        StringBuilder name = new StringBuilder(getDomain());
+        name.append(':');
+        name.append(objectNameKeyProperties);
+
+        ObjectName on = null;
+
+        try {
+            on = new ObjectName(name.toString());
+            Registry.getRegistry(null, null).unregisterComponent(on);
+        } catch (MalformedObjectNameException e) {
+            log.warn(sm.getString("lifecycleMBeanBase.unregisterFail", name), e);
+        } catch (Exception e) {
+            log.warn(sm.getString("lifecycleMBeanBase.unregisterFail", name), e);
+        }
+    }
+
+
+    /**
+     * Utility method to enable sub-classes to easily unregister additional
+     * components that don't implement {@link JmxEnabled} with an MBean server.
+     * <br>
+     * Note: This method should only be used once {@link #initInternal()} has
+     * been called and before {@link #destroyInternal()} has been called.
+     *
      * @param on    The name of the component to unregister
      */
     protected final void unregister(ObjectName on) {
