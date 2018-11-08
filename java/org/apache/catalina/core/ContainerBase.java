@@ -936,11 +936,10 @@ public abstract class ContainerBase extends LifecycleMBeanBase
         setState(LifecycleState.STARTING);
 
         // Start our thread
-        threadStart();
         if (backgroundProcessorDelay > 0) {
             monitorFuture = Container.getService(ContainerBase.this)
                     .getUtilityExecutor().scheduleWithFixedDelay(
-                            new ContainerBackgroundProcessorMonitor(), 60, 60, TimeUnit.SECONDS);
+                            new ContainerBackgroundProcessorMonitor(), 0, 60, TimeUnit.SECONDS);
         }
     }
 

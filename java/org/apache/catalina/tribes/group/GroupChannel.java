@@ -479,26 +479,23 @@ public class GroupChannel extends ChannelInterceptorBase
             ownExecutor = true;
         }
         super.start(svc);
-        startHeartbeat();
         monitorFuture = utilityExecutor.scheduleWithFixedDelay(
                 new Runnable() {
                     @Override
                     public void run() {
                         startHeartbeat();
                     }
-                }, 60, 60, TimeUnit.SECONDS);
+                }, 0, 60, TimeUnit.SECONDS);
     }
 
     protected void startHeartbeat() {
         if (heartbeat && (heartbeatFuture == null || (heartbeatFuture != null && heartbeatFuture.isDone()))) {
             if (heartbeatFuture != null && heartbeatFuture.isDone()) {
-                if (heartbeatFuture != null && heartbeatFuture.isDone()) {
-                    // There was an error executing the scheduled task, get it and log it
-                    try {
-                        heartbeatFuture.get();
-                    } catch (InterruptedException | ExecutionException e) {
-                        log.error(sm.getString("groupChannel.unable.sendHeartbeat"), e);
-                    }
+                // There was an error executing the scheduled task, get it and log it
+                try {
+                    heartbeatFuture.get();
+                } catch (InterruptedException | ExecutionException e) {
+                    log.error(sm.getString("groupChannel.unable.sendHeartbeat"), e);
                 }
             }
             heartbeatFuture = utilityExecutor.scheduleWithFixedDelay(new HeartbeatRunnable(),
