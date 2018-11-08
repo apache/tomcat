@@ -68,6 +68,13 @@
         Add a scheduled executor to the Service, which can be used to
         process periodic utility tasks. (remm)
       </add>
+      <update>
+        Refactor container background processor using the Service executor, and
+        add monitoring to reschedule it in case of an unexpected error. (remm)
+      </update>
+      <update>
+        Refactor parallel deployment threads using the Service executor. (remm)
+      </update>
     </changelog>
   </subsection>
 </section>
