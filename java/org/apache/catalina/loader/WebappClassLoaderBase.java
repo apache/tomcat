@@ -1720,7 +1720,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
                                 getContextName(), threadName, getStackTrace(thread)));
                     }
 
-                    // Don't try an stop the threads unless explicitly
+                    // Don't try and stop the threads unless explicitly
                     // configured to do so
                     if (!clearReferencesStopThreads) {
                         continue;
