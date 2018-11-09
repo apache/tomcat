@@ -125,15 +125,15 @@ wsdl4j-lib.loc=${base-maven.loc}/wsdl4j/wsdl4j/${wsdl4j-lib.version}/wsdl4j-${ws
 # ----- Eclipse JDT, version 4.7 or later -----#
 # See https://wiki.apache.org/tomcat/JDTCoreBatchCompiler before updating
 #
-# Checksum is from "SHA512 Checksums for 4.7.3a" link at
-# http://download.eclipse.org/eclipse/downloads/drops4/R-4.7.3a-201803300640/
-# http://download.eclipse.org/eclipse/downloads/drops4/R-4.7.3a-201803300640/checksum/eclipse-4.7.3a-SUMSSHA512
+# Checksum is from "SHA512 Checksums for 4.9" link at
+# http://download.eclipse.org/eclipse/downloads/drops4/R-4.9-201809060745/
+# http://download.eclipse.org/eclipse/downloads/drops4/R-4.9-201809060745/checksum/eclipse-4.9-SUMSSHA512
 #
-jdt.version=4.7.3a
-jdt.release=R-4.7.3a-201803300640
+jdt.version=4.9
+jdt.release=R-4.9-201809060745
 jdt.checksum.enabled=true
 jdt.checksum.algorithm=SHA-512
-jdt.checksum.value=7287b1ea3e18423d027a99ce40ae72e46e1700a65b474d2ec09af6a17b10653b7c2e69e9bb87efe14f4c593dc66b6370ea566fce90edb4b4190a903046817e6f
+jdt.checksum.value=c4ddf476e161758a0ba5d336052cb5eb7109686b97dd0b62df6e33b417f7c18f210b81edba009bc765bb9122bd5831520a10291a0ff76ee223624bbcfd12ee2f
 jdt.home=${base.path}/ecj-${jdt.version}
 jdt.jar=${jdt.home}/ecj-${jdt.version}.jar
 # The download will be moved to the archive area eventually. We are taking care of that in advance.
