@@ -743,6 +743,12 @@ public class StandardContext extends ContainerBase
     private boolean clearReferencesObjectStreamClassCaches = true;
 
     /**
+     * Should Tomcat attempt to clear references to classes loaded by this class
+     * loader from ThreadLocals?
+     */
+    private boolean clearReferencesThreadLocals = true;
+
+    /**
      * Should Tomcat skip the memory leak checks when the web application is
      * stopped as part of the process of shutting down the JVM?
      */
@@ -2694,6 +2700,20 @@ public class StandardContext extends ContainerBase
         support.firePropertyChange("clearReferencesObjectStreamClassCaches",
                 oldClearReferencesObjectStreamClassCaches,
                 this.clearReferencesObjectStreamClassCaches);
+    }
+
+
+    public boolean getClearReferencesThreadLocals() {
+        return clearReferencesThreadLocals;
+    }
+
+
+    public void setClearReferencesThreadLocals(boolean clearReferencesThreadLocals) {
+        boolean oldClearReferencesThreadLocals = this.clearReferencesThreadLocals;
+        this.clearReferencesThreadLocals = clearReferencesThreadLocals;
+        support.firePropertyChange("clearReferencesThreadLocals",
+                oldClearReferencesThreadLocals,
+                this.clearReferencesThreadLocals);
     }
 
 
@@ -4967,8 +4987,10 @@ public class StandardContext extends ContainerBase
                         getClearReferencesHttpClientKeepAliveThread());
                 setClassLoaderProperty("clearReferencesObjectStreamClassCaches",
                         getClearReferencesObjectStreamClassCaches());
-                setClassLoaderProperty("skipMemoryLeakChecksOnJvmShutdown",
-                        getSkipMemoryLeakChecksOnJvmShutdown());
+                setClassLoaderProperty("clearReferencesObjectStreamClassCaches",
+                        getClearReferencesObjectStreamClassCaches());
+                setClassLoaderProperty("clearReferencesThreadLocals",
+                        getClearReferencesThreadLocals());
 
                 // By calling unbindThread and bindThread in a row, we setup the
                 // current Thread CCL to be the webapp classloader

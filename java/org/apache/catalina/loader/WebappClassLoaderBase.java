@@ -370,6 +370,12 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
     private boolean clearReferencesObjectStreamClassCaches = true;
 
     /**
+     * Should Tomcat attempt to clear references to classes loaded by this class
+     * loader from ThreadLocals?
+     */
+    private boolean clearReferencesThreadLocals = true;
+
+    /**
      * Should Tomcat skip the memory leak checks when the web application is
      * stopped as part of the process of shutting down the JVM?
      */
@@ -618,6 +624,16 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
     public void setClearReferencesObjectStreamClassCaches(
             boolean clearReferencesObjectStreamClassCaches) {
         this.clearReferencesObjectStreamClassCaches = clearReferencesObjectStreamClassCaches;
+    }
+
+
+    public boolean getClearReferencesThreadLocals() {
+        return clearReferencesThreadLocals;
+    }
+
+
+    public void setClearReferencesThreadLocals(boolean clearReferencesThreadLocals) {
+        this.clearReferencesThreadLocals = clearReferencesThreadLocals;
     }
 
 
@@ -1587,7 +1603,9 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
         }
 
         // Check for leaks triggered by ThreadLocals loaded by this class loader
-        checkThreadLocalsForLeaks();
+        if (clearReferencesThreadLocals) {
+            checkThreadLocalsForLeaks();
+        }
 
         // Clear RMI Targets loaded by this class loader
         if (clearReferencesRmiTargets) {

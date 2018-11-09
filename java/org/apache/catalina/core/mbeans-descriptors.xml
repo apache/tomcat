@@ -94,6 +94,10 @@
                description="Should Tomcat attempt to terminate TimerThreads that have been started by the web application? Advisable to be used only in a development environment."
                type="boolean"/>
 
+    <attribute name="clearReferencesThreadLocals"
+               description="Should Tomcat attempt to clear ThreadLocal variables that have been populated with classes loaded by the web application?"
+               type="boolean"/>
+
     <attribute name="configFile"
                description="Location of the context.xml resource or file"
                type="java.net.URL"/>
