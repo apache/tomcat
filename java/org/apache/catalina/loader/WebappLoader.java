@@ -615,6 +615,8 @@ public class WebappLoader extends LifecycleMBeanBase
                         ((StandardContext) container).getClearReferencesHttpClientKeepAliveThread());
                 classLoader.setClearReferencesObjectStreamClassCaches(
                         ((StandardContext) container).getClearReferencesObjectStreamClassCaches());
+                classLoader.setClearReferencesThreadLocals(
+                        ((StandardContext) container).getClearReferencesThreadLocals());
             }
 
             for (int i = 0; i < repositories.length; i++) {

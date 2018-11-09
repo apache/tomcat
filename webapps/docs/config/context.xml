@@ -869,6 +869,13 @@
         not specified, the default value of <code>false</code> will be used.</p>
       </attribute>
 
+      <attribute name="clearReferencesThreadLocals" required="false">
+        <p>If <code>true</code>, Tomcat attempts to clear
+        <code>java.lang.ThreadLocal</code> variables that have been populated
+        with classes loaded by the web application. If not specified, the
+        default value of <code>true</code> will be used.</p>
+      </attribute>
+
       <attribute name="copyXML" required="false">
         <p>Set to <code>true</code> if you want a context XML descriptor
         embedded inside the application (located at

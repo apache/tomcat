@@ -58,6 +58,18 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 7.0.93 (violetagg)">
+  <subsection name="Catalina">
+    <changelog>
+      <add>
+        <bug>62897</bug>: Provide a property
+        (<code>clearReferencesThreadLocals</code>) on the standard
+        <code>Context</code> implementation that enables the check for memory
+        leaks via <code>ThreadLocal</code>s to be disabled because this check
+        depends on the use of an API that has been deprecated in later versions
+        of Java. (markt)
+      </add>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 7.0.92 (violetagg)">
   <subsection name="Catalina">
