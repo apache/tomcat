@@ -143,7 +143,7 @@ public class RewriteValve extends ValveBase {
                 ConfigurationSource.Resource resource = ConfigFileLoader.getSource().getConfResource(resourceName);
                 is = resource.getInputStream();
             } catch (IOException e) {
-                if ((is == null) && (containerLog.isDebugEnabled())) {
+                if (containerLog.isDebugEnabled()) {
                     containerLog.debug("No configuration resource found: " + resourceName, e);
                 }
             }

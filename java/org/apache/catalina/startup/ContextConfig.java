@@ -1898,7 +1898,7 @@ public class ContextConfig implements LifecycleListener {
         try {
             stream = webXmlResource.getInputStream();
             source = new InputSource(webXmlResource.getURI().toString());
-            if (stream != null && source != null) {
+            if (stream != null) {
                 source.setByteStream(stream);
             }
         } catch (Exception e) {

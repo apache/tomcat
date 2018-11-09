@@ -64,7 +64,8 @@ public class CatalinaBaseConfigurationSource implements ConfigurationSource {
                 }
             }
         }
-        if (result == null) {
+
+        if (result == null && ioe != null) {
             throw ioe;
         } else {
             return result;
