@@ -68,7 +68,7 @@
       must be unique.</p>
     </attribute>
 
-    <attribute name="startStopThreads" required="false">
+    <attribute name="utilityThreads" required="false">
       <p>The number of threads this <strong>Service</strong> will use for
       various utility tasks, including recurring ones. The special value
       of 0 will result in the value of
@@ -91,6 +91,12 @@
   common attributes listed above):</p>
 
   <attributes>
+
+    <attribute name="utilityThreadsAsDaemon" required="false">
+      <p>Set the daemon flag value for the utility threads. The default value
+      is <code>true</code>.
+      </p>
+    </attribute>
 
   </attributes>
 

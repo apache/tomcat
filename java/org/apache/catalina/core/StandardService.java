@@ -100,6 +100,11 @@ public class StandardService extends LifecycleMBeanBase implements Service {
     protected int utilityThreads = 0;
 
     /**
+     * The utility threads daemon flag.
+     */
+    protected boolean utilityThreadsAsDaemon = true;
+
+    /**
      * Utility executor with scheduling capabilities.
      */
     private ScheduledThreadPoolExecutor utilityExecutor = null;
@@ -267,7 +272,8 @@ public class StandardService extends LifecycleMBeanBase implements Service {
             utilityExecutor.setMaximumPoolSize(threads);
         } else {
             ScheduledThreadPoolExecutor scheduledThreadPoolExecutor =
-                    new ScheduledThreadPoolExecutor(1, new UtilityThreadFactory(getName() + "-utility-"));
+                    new ScheduledThreadPoolExecutor(1,
+                            new UtilityThreadFactory(getName() + "-utility-", utilityThreadsAsDaemon));
             scheduledThreadPoolExecutor.setMaximumPoolSize(threads);
             scheduledThreadPoolExecutor.setKeepAliveTime(10, TimeUnit.SECONDS);
             scheduledThreadPoolExecutor.setRemoveOnCancelPolicy(true);
@@ -275,6 +281,24 @@ public class StandardService extends LifecycleMBeanBase implements Service {
             utilityExecutor = scheduledThreadPoolExecutor;
             utilityExecutorWrapper = new org.apache.tomcat.util.threads.ScheduledThreadPoolExecutor(utilityExecutor);
         }
+    }
+
+
+    /**
+     * Get if the utility threads are daemon threads.
+     * @return the threads daemon flag
+     */
+    public boolean getUtilityThreadsAsDaemon() {
+        return utilityThreadsAsDaemon;
+    }
+
+
+    /**
+     * Set the utility threads daemon flag. The default value is true.
+     * @param utilityThreadsAsDaemon the new thread daemon flag
+     */
+    public void setUtilityThreadsAsDaemon(boolean utilityThreadsAsDaemon) {
+        this.utilityThreadsAsDaemon = utilityThreadsAsDaemon;
     }
 
 
@@ -705,17 +729,19 @@ public class StandardService extends LifecycleMBeanBase implements Service {
         private final ThreadGroup group;
         private final AtomicInteger threadNumber = new AtomicInteger(1);
         private final String namePrefix;
+        private final boolean daemon;
 
-        public UtilityThreadFactory(String namePrefix) {
+        public UtilityThreadFactory(String namePrefix, boolean daemon) {
             SecurityManager s = System.getSecurityManager();
             group = (s != null) ? s.getThreadGroup() : Thread.currentThread().getThreadGroup();
             this.namePrefix = namePrefix;
+            this.daemon = daemon;
         }
 
         @Override
         public Thread newThread(Runnable r) {
             Thread thread = new Thread(group, r, namePrefix + threadNumber.getAndIncrement());
-            thread.setDaemon(true);
+            thread.setDaemon(daemon);
             return thread;
         }
     }
