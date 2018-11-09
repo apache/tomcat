@@ -17,18 +17,14 @@
 package org.apache.tomcat.buildutil.translate;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.io.Reader;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
-import java.util.regex.Pattern;
 
 /**
  * Generates a single properties file per language for import into a translation
@@ -37,8 +33,6 @@ import java.util.regex.Pattern;
 public class Export {
 
     private static final Map<String,Properties> translations = new HashMap<>();
-    private static final Pattern ADD_CONTINUATION = Pattern.compile("\\n", Pattern.MULTILINE);
-    private static final Pattern ESCAPE_LEADING_SPACE = Pattern.compile("^(\\s)", Pattern.MULTILINE);
 
     public static void main(String... args) {
         for (String dir : Constants.SEARCH_DIRS) {
@@ -82,23 +76,10 @@ public class Export {
         }
 
         // Determine language
-        String language = name.substring(Constants.L10N_PREFIX.length(), name.length() - Constants.L10N_SUFFIX.length());
-        if (language.length() == 0) {
-            // Default
-        } else if (language.length() == 3) {
-            language = language.substring(1);
-        }
+        String language = Utils.getLanguage(name);
 
         String keyPrefix = getKeyPrefix(f);
-
-        Properties props = new Properties();
-
-        try (FileInputStream fis = new FileInputStream(f);
-                Reader r = new InputStreamReader(fis, StandardCharsets.UTF_8)) {
-            props.load(r);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        Properties props = Utils.load(f);
 
         // Create a Map for the language if one does not exist.
         Properties translation = translations.get(language);
@@ -141,22 +122,12 @@ public class Export {
             try (FileOutputStream fos = new FileOutputStream(out);
                     Writer w = new OutputStreamWriter(fos, StandardCharsets.UTF_8)) {
                 for (Object key : translation.keySet()) {
-                    w.write(key + "=" + formatValue(translation.getProperty((String) key)) + "\n");
+                    w.write(key + "=" + Utils.formatValue(translation.getProperty((String) key)) + "\n");
                 }
             } catch (IOException ioe) {
                 ioe.printStackTrace();
             }
         }
-    }
-
-
-    private static String formatValue(String in) {
-        String result = ADD_CONTINUATION.matcher(in).replaceAll("\\\\n\\\\\n");
-        if (result.endsWith("\\\n")) {
-            result = result.substring(0, result.length() - 2);
-        }
-        result = ESCAPE_LEADING_SPACE.matcher(result).replaceAll("\\\\$1");
-        return result;
     }
 }
 
