@@ -575,7 +575,6 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
     private boolean clearReferencesHttpClientKeepAliveThread = true;
 
     /**
-<<<<<<< .working
      * Name of associated context used with logging and JMX to associate with
      * the right web application. Particularly useful for the clear references
      * messages. Defaults to unknown but if standard Tomcat components are used
@@ -584,15 +583,12 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
     private String contextName = "unknown";
 
     /**
-||||||| .merge-left.r1826689
-=======
      * Should Tomcat attempt to clear references to classes loaded by this class
      * loader from the ObjectStreamClass caches?
      */
     private boolean clearReferencesObjectStreamClassCaches = true;
 
     /**
->>>>>>> .merge-right.r1826690
      * Holds the class file transformers decorating this class loader. The
      * CopyOnWriteArrayList is thread safe. It is expensive on writes, but
      * those should be rare. It is very fast on reads, since synchronization
