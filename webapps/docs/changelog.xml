@@ -131,6 +131,15 @@
       </update>
     </changelog>
   </subsection>
+  <subsection name="Other">
+    <changelog>
+      <fix>
+        Prevent an error when running in a Cygwin shell and the
+        <code>JAVA_ENDORSED_DIRS</code> system property is empty. Patch provided
+        by Zemian Deng. (markt)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 9.0.13 (markt)" rtext="2018-11-07">
   <subsection name="Catalina">
