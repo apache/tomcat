@@ -1101,7 +1101,7 @@ public class Digester extends DefaultHandler2 {
                     try {
                         ((DocumentProperties.Charset) root).setCharset(B2CConverter.getCharset(enc));
                     } catch (UnsupportedEncodingException e) {
-                        log.warn(sm.getString("disgester.encodingInvalid", enc), e);
+                        log.warn(sm.getString("digester.encodingInvalid", enc), e);
                     }
                 }
             }
