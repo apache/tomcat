@@ -45,7 +45,10 @@ public class Import {
 
         // Skip the original
         if (language.length() == 0) {
+            // Comment this line out if the originals needs to be exported.
             return;
+        } else {
+            language = "_" + language;
         }
 
         Properties props = Utils.load(f);
@@ -65,7 +68,7 @@ public class Import {
                 if (w != null) {
                     w.close();
                 }
-                File outFile = new File(currentPkg.replace('.', File.separatorChar), Constants.L10N_PREFIX + "_" + language + Constants.L10N_SUFFIX);
+                File outFile = new File(currentPkg.replace('.', File.separatorChar), Constants.L10N_PREFIX + language + Constants.L10N_SUFFIX);
                 FileOutputStream fos = new FileOutputStream(outFile);
                 w = new OutputStreamWriter(fos, StandardCharsets.UTF_8);
                 insertLicense(w);
