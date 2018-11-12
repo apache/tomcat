@@ -110,6 +110,12 @@ public class Export {
 
 
     private static void outputTranslations() {
+
+        File storageDir = new File(Constants.STORAGE_DIR);
+        if (!storageDir.exists()) {
+            storageDir.mkdirs();
+        }
+
         for (Map.Entry<String,Properties> translationEntry : translations.entrySet()) {
             Properties translation = translationEntry.getValue();
 
@@ -118,7 +124,7 @@ public class Export {
                 language = "_" + language;
             }
 
-            File out = new File(Constants.L10N_PREFIX + language + Constants.L10N_SUFFIX);
+            File out = new File(storageDir, Constants.L10N_PREFIX + language + Constants.L10N_SUFFIX);
             try (FileOutputStream fos = new FileOutputStream(out);
                     Writer w = new OutputStreamWriter(fos, StandardCharsets.UTF_8)) {
                 for (Object key : translation.keySet()) {

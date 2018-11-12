@@ -28,7 +28,7 @@ import java.util.Properties;
 public class Import {
 
     public static void main(String... args) throws IOException {
-        File root = new File(".");
+        File root = new File(Constants.STORAGE_DIR);
 
         for (File f : root.listFiles()) {
             // Not robust but good enough
