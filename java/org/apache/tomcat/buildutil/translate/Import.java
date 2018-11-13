@@ -47,8 +47,6 @@ public class Import {
         if (language.length() == 0) {
             // Comment this line out if the originals needs to be exported.
             return;
-        } else {
-            language = "_" + language;
         }
 
         Properties props = Utils.load(f);

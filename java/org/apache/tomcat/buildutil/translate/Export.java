@@ -120,9 +120,6 @@ public class Export {
             Properties translation = translationEntry.getValue();
 
             String language = translationEntry.getKey();
-            if (language.length() > 0) {
-                language = "_" + language;
-            }
 
             File out = new File(storageDir, Constants.L10N_PREFIX + language + Constants.L10N_SUFFIX);
             try (FileOutputStream fos = new FileOutputStream(out);

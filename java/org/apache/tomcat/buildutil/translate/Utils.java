@@ -36,13 +36,7 @@ public class Utils {
 
 
     static String getLanguage(String name) {
-        String language = name.substring(Constants.L10N_PREFIX.length(), name.length() - Constants.L10N_SUFFIX.length());
-        if (language.length() == 0) {
-            // Default
-        } else if (language.length() == 3) {
-            language = language.substring(1);
-        }
-        return language;
+        return name.substring(Constants.L10N_PREFIX.length(), name.length() - Constants.L10N_SUFFIX.length());
     }
 
 
@@ -65,6 +59,14 @@ public class Utils {
             result = result.substring(0, result.length() - 2);
         }
         result = ESCAPE_LEADING_SPACE.matcher(result).replaceAll("\\\\$1");
+
+        if (result.contains("{")) {
+            result = result.replace("'","''");
+        }
+
+        if (result.contains("\n\\\t")) {
+            result = result.replace("\n\\\t", "\n\\t");
+        }
         return result;
     }
 }
