@@ -66,6 +66,14 @@
       </add>
     </changelog>
   </subsection>
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+        Avoid an exception when using Tomcat Native built with a version of
+        OpenSSL that does not support TLSv1.3. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <fix>
