@@ -138,6 +138,12 @@
         <code>JAVA_ENDORSED_DIRS</code> system property is empty. Patch provided
         by Zemian Deng. (markt)
       </fix>
+      <add>
+        Expand the coverage and quality of the localisation translations
+        provided with Apache Tomcat. Includes contributions from soliplaya,
+        remm, David, NicolasG, Israel, Ulises Gonzalez Horta, burghard and
+        Geraldo Netto. (markt)
+      </add>
     </changelog>
   </subsection>
 </section>
