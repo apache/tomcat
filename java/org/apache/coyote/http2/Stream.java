@@ -988,14 +988,21 @@ class Stream extends AbstractStream implements HeaderEmitter {
         }
 
 
-        final void registerReadInterest() {
+        final boolean isReadyForRead() {
             ensureBuffersExist();
 
-            synchronized (inBuffer) {
-                readInterest = true;
+            synchronized (this) {
+                if (available() > 0) {
+                    return true;
+                }
+
+                if (!isRequestBodyFullyRead()) {
+                    readInterest = true;
+                }
+
+                return false;
             }
         }
-
 
         final synchronized boolean isRequestBodyFullyRead() {
             return (inBuffer == null || inBuffer.position() == 0) && isInputFinished();

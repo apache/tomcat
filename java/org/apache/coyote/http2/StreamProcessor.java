@@ -238,6 +238,12 @@ class StreamProcessor extends AbstractProcessor {
 
 
     @Override
+    protected final boolean isReadyForRead() {
+        return stream.getInputBuffer().isReadyForRead();
+    }
+
+
+    @Override
     protected final boolean isRequestBodyFullyRead() {
         return stream.getInputBuffer().isRequestBodyFullyRead();
     }
@@ -245,7 +251,9 @@ class StreamProcessor extends AbstractProcessor {
 
     @Override
     protected final void registerReadInterest() {
-        stream.getInputBuffer().registerReadInterest();
+        // Should never be called for StreamProcessor as isReadyForRead() is
+        // overridden
+        throw new UnsupportedOperationException();
     }
 
 

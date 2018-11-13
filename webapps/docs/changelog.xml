@@ -112,6 +112,11 @@
         Load SSL configuration resources for JSSE using the ConfigurationSource
         API. OpenSSL use requires actual files. (remm)
       </update>
+      <fix>
+        <bug>62899</bug>: Prevent the incorrect timing out of connections when
+        Servlet non-blocking I/O is used to read a request body over an HTTP/2
+        stream. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
