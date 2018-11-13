@@ -144,6 +144,10 @@
         remm, David, NicolasG, Israel, Ulises Gonzalez Horta, burghard and
         Geraldo Netto. (markt)
       </add>
+      <fix>
+        Include Brazilian Portuguese translations in the standard Tomcat
+        distribution. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
