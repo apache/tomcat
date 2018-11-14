@@ -60,10 +60,6 @@ public class Utils {
         }
         result = ESCAPE_LEADING_SPACE.matcher(result).replaceAll("\\\\$1");
 
-        if (result.contains("{")) {
-            result = result.replace("'","''");
-        }
-
         if (result.contains("\n\\\t")) {
             result = result.replace("\n\\\t", "\n\\t");
         }
