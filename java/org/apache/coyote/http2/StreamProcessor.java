@@ -223,8 +223,8 @@ class StreamProcessor extends AbstractProcessor {
 
 
     @Override
-    protected final boolean isReady() {
-        return stream.isReady();
+    protected final boolean isReadyForWrite() {
+        return stream.isReadyForWrite();
     }
 
 
@@ -333,7 +333,7 @@ class StreamProcessor extends AbstractProcessor {
             // has been emptied then the code below will call
             // dispatch() which will enable the
             // Response to respond to this event.
-            if (stream.isReady()) {
+            if (stream.isReadyForWrite()) {
                 // Unexpected
                 throw new IllegalStateException();
             }

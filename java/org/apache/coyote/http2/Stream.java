@@ -520,7 +520,7 @@ public class Stream extends AbstractStream implements HeaderEmitter {
     }
 
 
-    final boolean isReady() {
+    final boolean isReadyForWrite() {
         return streamOutputBuffer.isReady();
     }
 

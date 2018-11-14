@@ -1242,7 +1242,7 @@ public class AjpProcessor extends AbstractProcessor {
 
 
     @Override
-    protected final boolean isReady() {
+    protected final boolean isReadyForWrite() {
         return responseMsgPos == -1 && socketWrapper.isReadyForWrite();
     }
 

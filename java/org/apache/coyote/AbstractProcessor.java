@@ -576,7 +576,7 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
         }
         case NB_WRITE_INTEREST: {
             AtomicBoolean isReady = (AtomicBoolean)param;
-            isReady.set(isReady());
+            isReady.set(isReadyForWrite());
             break;
         }
         case DISPATCH_READ: {
@@ -779,7 +779,7 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
     protected abstract void registerReadInterest();
 
 
-    protected abstract boolean isReady();
+    protected abstract boolean isReadyForWrite();
 
 
     protected void executeDispatches() {

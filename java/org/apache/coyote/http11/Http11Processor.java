@@ -1635,7 +1635,7 @@ public class Http11Processor extends AbstractProcessor {
 
 
     @Override
-    protected final boolean isReady() {
+    protected final boolean isReadyForWrite() {
         return outputBuffer.isReady();
     }
 
