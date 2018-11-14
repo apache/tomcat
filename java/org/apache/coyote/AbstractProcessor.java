@@ -569,9 +569,8 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
             break;
         }
         case NB_READ_INTEREST: {
-            if (!isRequestBodyFullyRead()) {
-                registerReadInterest();
-            }
+            AtomicBoolean isReady = (AtomicBoolean)param;
+            isReady.set(isReadyForRead());
             break;
         }
         case NB_WRITE_INTEREST: {
@@ -770,6 +769,19 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
         if (socketWrapper != null) {
             socketWrapper.processSocket(event, dispatch);
         }
+    }
+
+
+    protected boolean isReadyForRead() {
+        if (available(true) > 0) {
+            return true;
+        }
+
+        if (!isRequestBodyFullyRead()) {
+            registerReadInterest();
+        }
+
+        return false;
     }
 
 

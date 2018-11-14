@@ -72,6 +72,11 @@
         Avoid an exception when using Tomcat Native built with a version of
         OpenSSL that does not support TLSv1.3. (markt)
       </fix>
+      <fix>
+        <bug>62899</bug>: Prevent the incorrect timing out of connections when
+        Servlet non-blocking I/O is used to read a request body over an HTTP/2
+        stream. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
