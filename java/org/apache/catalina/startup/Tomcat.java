@@ -364,6 +364,7 @@ public class Tomcat {
      */
     public void init(ConfigurationSource source) {
         ConfigFileLoader.setSource(source);
+        addDefaultWebXmlToWebapp = false;
         Catalina catalina = new Catalina();
         // Load the Catalina instance with the regular configuration files
         // from specified source
