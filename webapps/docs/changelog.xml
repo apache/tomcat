@@ -147,7 +147,7 @@
         Expand the coverage and quality of the localisation translations
         provided with Apache Tomcat. Includes contributions from soliplaya,
         remm, David, NicolasG, Israel, Ulises Gonzalez Horta, burghard,
-        Geraldo Netto and Eduardo Quintanilla. (markt)
+        Geraldo Netto, Eduardo Quintanilla and Ludovic Pénet. (markt)
       </add>
       <fix>
         Include Brazilian Portuguese translations in the standard Tomcat
