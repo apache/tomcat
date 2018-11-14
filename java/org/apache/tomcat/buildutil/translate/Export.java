@@ -125,9 +125,6 @@ public class Export {
             try (FileOutputStream fos = new FileOutputStream(out);
                     Writer w = new OutputStreamWriter(fos, StandardCharsets.UTF_8)) {
                 for (Object key : translation.keySet()) {
-                    if (translation.get(key).toString().contains("''")) {
-                        System.out.println("");
-                    }
                     w.write(key + "=" + Utils.formatValue(translation.getProperty((String) key)) + "\n");
                 }
             } catch (IOException ioe) {
