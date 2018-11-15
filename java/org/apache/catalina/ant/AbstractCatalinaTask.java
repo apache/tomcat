@@ -16,10 +16,10 @@
  */
 package org.apache.catalina.ant;
 
-import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.net.Authenticator;
 import java.net.HttpURLConnection;
 import java.net.PasswordAuthentication;
@@ -210,17 +210,8 @@ public abstract class AbstractCatalinaTask extends BaseRedirectorHelperTask {
 
             // Send the request data (if any)
             if (istream != null) {
-                try (BufferedOutputStream ostream = new BufferedOutputStream(
-                                hconn.getOutputStream(), 1024)) {
-                    byte buffer[] = new byte[1024];
-                    while (true) {
-                        int n = istream.read(buffer);
-                        if (n < 0) {
-                            break;
-                        }
-                        ostream.write(buffer, 0, n);
-                    }
-                    ostream.flush();
+                try (OutputStream ostream = hconn.getOutputStream()) {
+                    IOTools.flow(istream, ostream);
                 } finally {
                     try {
                         istream.close();

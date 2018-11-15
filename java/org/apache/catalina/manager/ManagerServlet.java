@@ -16,11 +16,11 @@
  */
 package org.apache.catalina.manager;
 
-import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
@@ -61,6 +61,7 @@ import org.apache.catalina.connector.Connector;
 import org.apache.catalina.core.StandardHost;
 import org.apache.catalina.startup.ExpandWar;
 import org.apache.catalina.util.ContextName;
+import org.apache.catalina.util.IOTools;
 import org.apache.catalina.util.ServerInfo;
 import org.apache.coyote.ProtocolHandler;
 import org.apache.coyote.http11.AbstractHttp11Protocol;
@@ -1665,16 +1666,8 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
         }
 
         try (ServletInputStream istream = request.getInputStream();
-                BufferedOutputStream ostream =
-                        new BufferedOutputStream(new FileOutputStream(war), 1024)) {
-            byte buffer[] = new byte[1024];
-            while (true) {
-                int n = istream.read(buffer);
-                if (n < 0) {
-                    break;
-                }
-                ostream.write(buffer, 0, n);
-            }
+                OutputStream ostream = new FileOutputStream(war)) {
+            IOTools.flow(istream, ostream);
         } catch (IOException e) {
             if (war.exists() && !war.delete()) {
                 writer.println(
@@ -1682,7 +1675,6 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
             }
             throw e;
         }
-
     }
 
 
