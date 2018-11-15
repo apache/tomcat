@@ -126,6 +126,15 @@
       </update>
     </changelog>
   </subsection>
+  <subsection name="Web applications">
+    <changelog>
+      <add>
+        <bug>53553</bug>: Add the ability to specify a context.xml from the
+        server to use when uploading a web application for deployment with the
+        Manager web application. Patch provided by Anton Lindström. (markt)
+      </add>
+    </changelog>
+  </subsection>
   <subsection name="Tribes">
     <changelog>
       <update>

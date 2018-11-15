@@ -430,6 +430,7 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
         if (path != null) {
             cn = new ContextName(path, request.getParameter("version"));
         }
+        String config = request.getParameter("config");
         String tag = request.getParameter("tag");
         boolean update = false;
         if ((request.getParameter("update") != null)
@@ -449,7 +450,7 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
         if (command == null) {
             writer.println(smClient.getString("managerServlet.noCommand"));
         } else if (command.equals("/deploy")) {
-            deploy(writer, cn, tag, update, request, smClient);
+            deploy(writer, config, cn, tag, update, request, smClient);
         } else {
             writer.println(smClient.getString("managerServlet.unknownCommand",
                     command));
@@ -727,6 +728,7 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
      * at the specified context path.
      *
      * @param writer   Writer to render results to
+     * @param config   URL of the context configuration file to be installed
      * @param cn       Name of the application to be installed
      * @param tag      Tag to be associated with the webapp
      * @param update   Flag that indicates that any existing app should be
@@ -735,12 +737,21 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
      * @param smClient i18n messages using the locale of the client
      */
     protected synchronized void deploy
-        (PrintWriter writer, ContextName cn,
+        (PrintWriter writer, String config, ContextName cn,
          String tag, boolean update, HttpServletRequest request,
          StringManager smClient) {
 
+        if (config != null && config.length() == 0) {
+            config = null;
+        }
+
         if (debug >= 1) {
-            log("deploy: Deploying web application '" + cn + "'");
+            if (config == null) {
+                log("deploy: Deploying web application '" + cn + "'");
+            } else {
+                log("deploy: Deploying web application '" + cn + "' " +
+                        "with context configuration at '" + config + "'");
+            }
         }
 
         // Validate the requested context path
@@ -758,6 +769,10 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
             writer.println(smClient.getString("managerServlet.alreadyContext",
                     displayPath));
             return;
+        }
+
+        if (config != null && (config.startsWith("file:"))) {
+            config = config.substring("file:".length());
         }
 
         File deployedWar = new File(host.getAppBaseFile(), baseName + ".war");
@@ -796,6 +811,18 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
             } else {
                 addServiced(name);
                 try {
+                    if (config != null) {
+                        if (!configBase.mkdirs() && !configBase.isDirectory()) {
+                            writer.println(smClient.getString(
+                                    "managerServlet.mkdirFail",configBase));
+                            return;
+                        }
+                        if (copy(new File(config),
+                                new File(configBase, baseName + ".xml")) == false) {
+                            throw new Exception("Could not copy config file from path '" +
+                                    config + "'");
+                        }
+                    }
                     // Upload WAR
                     uploadWar(writer, request, uploadedWar, smClient);
                     if (update && tag == null) {

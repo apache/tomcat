@@ -337,6 +337,10 @@ including a Context configuration XML file in
 <li><code>tag</code>: Specifying a tag name, this allows associating the
     deployed webapp with a tag or label. If the web application is undeployed,
     it can be later redeployed when needed using only the tag.</li>
+<li><code>config </code>: URL of a Context configuration ".xml" file in the
+    format <strong>file:/absolute/path/to/a/context.xml</strong>. This must be
+    the absolute path of a web application Context configuration ".xml" file
+    which contains the Context configuration element.</li>
 </ul>
 
 <p><strong>NOTE</strong> - This command is the logical
