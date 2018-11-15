@@ -862,27 +862,27 @@ public class HttpParser {
 
 
     private enum DomainParseState {
-        NEW(     true, false, false, false, " at the start of"),
-        ALPHA(   true,  true,  true,  true, " after a letter in"),
-        NUMERIC( true,  true,  true,  true, " after a number in"),
-        PERIOD(  true, false, false,  true, " after a period in"),
-        HYPHEN(  true,  true, false, false, " after a hypen in"),
-        COLON(  false, false, false, false, " after a colon in"),
-        END(    false, false, false, false, " at the end of");
+        NEW(     true, false, false, false, "http.invalidCharacterDomain.atStart"),
+        ALPHA(   true,  true,  true,  true, "http.invalidCharacterDomain.afterLetter"),
+        NUMERIC( true,  true,  true,  true, "http.invalidCharacterDomain.afterNumber"),
+        PERIOD(  true, false, false,  true, "http.invalidCharacterDomain.afterPeriod"),
+        HYPHEN(  true,  true, false, false, "http.invalidCharacterDomain.afterHyphen"),
+        COLON(  false, false, false, false, "http.invalidCharacterDomain.afterColon"),
+        END(    false, false, false, false, "http.invalidCharacterDomain.atEnd");
 
         private final boolean mayContinue;
         private final boolean allowsHyphen;
         private final boolean allowsPeriod;
         private final boolean allowsEnd;
-        private final String errorLocation;
+        private final String errorMsg;
 
         private DomainParseState(boolean mayContinue, boolean allowsHyphen, boolean allowsPeriod,
-                boolean allowsEnd, String errorLocation) {
+                boolean allowsEnd, String errorMsg) {
             this.mayContinue = mayContinue;
             this.allowsHyphen = allowsHyphen;
             this.allowsPeriod = allowsPeriod;
             this.allowsEnd = allowsEnd;
-            this.errorLocation = errorLocation;
+            this.errorMsg = errorMsg;
         }
 
         public boolean mayContinue() {
@@ -898,15 +898,15 @@ public class HttpParser {
                 if (allowsPeriod) {
                     return PERIOD;
                 } else {
-                    throw new IllegalArgumentException(sm.getString("http.invalidCharacterDomain",
-                            Character.toString((char) c), errorLocation));
+                    throw new IllegalArgumentException(sm.getString(errorMsg,
+                            Character.toString((char) c)));
                 }
             } else if (c == ':') {
                 if (allowsEnd) {
                     return COLON;
                 } else {
-                    throw new IllegalArgumentException(sm.getString("http.invalidCharacterDomain",
-                            Character.toString((char) c), errorLocation));
+                    throw new IllegalArgumentException(sm.getString(errorMsg,
+                            Character.toString((char) c)));
                 }
             } else if (c == -1) {
                 if (allowsEnd) {
@@ -919,8 +919,8 @@ public class HttpParser {
                 if (allowsHyphen) {
                     return HYPHEN;
                 } else {
-                    throw new IllegalArgumentException(sm.getString("http.invalidCharacterDomain",
-                            Character.toString((char) c), errorLocation));
+                    throw new IllegalArgumentException(sm.getString(errorMsg,
+                            Character.toString((char) c)));
                 }
             } else {
                 throw new IllegalArgumentException(sm.getString(
