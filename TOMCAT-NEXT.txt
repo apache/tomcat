@@ -34,6 +34,12 @@ New items for 10.0.x onwards:
 
 2.  Remove org.apache.tomcat.jni and replace with the minimum necessary to
     interface with OpenSSL and clones.
+    We might want to park this one until we see what is available direct from
+    the JRE with project Panama.
 
 3.  Remove the ExtensionValidator and associated classes (assuming that the
     minimum Java version is Java 9 or later).
+
+4.  Clean-up content-type header processing. Remove the optional space after the
+    ';' character (if any). Don't mutate the header if there is no charset
+    parameter. See BZ 62912 for some discussion and additional references.
