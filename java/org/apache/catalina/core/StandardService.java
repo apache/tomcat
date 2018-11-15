@@ -22,9 +22,7 @@ import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.management.ObjectName;
 
@@ -43,6 +41,7 @@ import org.apache.catalina.util.LifecycleMBeanBase;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.res.StringManager;
+import org.apache.tomcat.util.threads.TaskThreadFactory;
 
 
 /**
@@ -273,7 +272,7 @@ public class StandardService extends LifecycleMBeanBase implements Service {
         } else {
             ScheduledThreadPoolExecutor scheduledThreadPoolExecutor =
                     new ScheduledThreadPoolExecutor(1,
-                            new UtilityThreadFactory(getName() + "-utility-", utilityThreadsAsDaemon));
+                            new TaskThreadFactory(getName() + "-utility-", utilityThreadsAsDaemon, Thread.NORM_PRIORITY));
             scheduledThreadPoolExecutor.setMaximumPoolSize(threads);
             scheduledThreadPoolExecutor.setKeepAliveTime(10, TimeUnit.SECONDS);
             scheduledThreadPoolExecutor.setRemoveOnCancelPolicy(true);
@@ -723,27 +722,6 @@ public class StandardService extends LifecycleMBeanBase implements Service {
     @Override
     public final String getObjectNameKeyProperties() {
         return "type=Service";
-    }
-
-    private static class UtilityThreadFactory implements ThreadFactory {
-        private final ThreadGroup group;
-        private final AtomicInteger threadNumber = new AtomicInteger(1);
-        private final String namePrefix;
-        private final boolean daemon;
-
-        public UtilityThreadFactory(String namePrefix, boolean daemon) {
-            SecurityManager s = System.getSecurityManager();
-            group = (s != null) ? s.getThreadGroup() : Thread.currentThread().getThreadGroup();
-            this.namePrefix = namePrefix;
-            this.daemon = daemon;
-        }
-
-        @Override
-        public Thread newThread(Runnable r) {
-            Thread thread = new Thread(group, r, namePrefix + threadNumber.getAndIncrement());
-            thread.setDaemon(daemon);
-            return thread;
-        }
     }
 
     @Override
