@@ -940,7 +940,7 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
         }
 
         if (debug >= 1) {
-            if (config != null && config.length() > 0) {
+            if (config != null) {
                 if (war != null) {
                     log("install: Installing context configuration at '" +
                             config + "' from '" + war + "'");
