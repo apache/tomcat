@@ -1538,7 +1538,7 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
                         writer.println(smClient.getString(
                                 "managerServlet.deleteFail", war));
                         return;
-                    } else if (dir.exists() && !undeployDir(dir)) {
+                    } else if (dir.exists() && !ExpandWar.delete(dir, false)) {
                         writer.println(smClient.getString(
                                 "managerServlet.deleteFail", dir));
                         return;
@@ -1641,35 +1641,6 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
         String[] params = { name };
         String[] signature = { "java.lang.String" };
         mBeanServer.invoke(oname, "removeServiced", params, signature);
-    }
-
-
-    /**
-     * Delete the specified directory, including all of its contents and
-     * subdirectories recursively. The code assumes that the directory exists.
-     *
-     * @param dir File object representing the directory to be deleted.
-     * @return <code>true</code> if the deletion was successful
-     */
-    protected boolean undeployDir(File dir) {
-
-        String files[] = dir.list();
-        if (files == null) {
-            files = new String[0];
-        }
-        for (int i = 0; i < files.length; i++) {
-            File file = new File(dir, files[i]);
-            if (file.isDirectory()) {
-                if (!undeployDir(file)) {
-                    return false;
-                }
-            } else {
-                if (!file.delete()) {
-                    return false;
-                }
-            }
-        }
-        return dir.delete();
     }
 
 
