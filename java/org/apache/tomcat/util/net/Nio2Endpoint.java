@@ -132,13 +132,13 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
     public void bind() throws Exception {
 
         // Create worker collection
-        if ( getExecutor() == null ) {
+        if (getExecutor() == null) {
             createExecutor();
         }
         if (getExecutor() instanceof ExecutorService) {
             threadGroup = AsynchronousChannelGroup.withThreadPool((ExecutorService) getExecutor());
         }
-        // AsynchronousChannelGroup currently needs exclusive access to its executor service
+        // AsynchronousChannelGroup needs exclusive access to its executor service
         if (!internalExecutor) {
             log.warn(sm.getString("endpoint.nio2.exclusiveExecutor"));
         }
@@ -146,11 +146,10 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
         serverSock = AsynchronousServerSocketChannel.open(threadGroup);
         socketProperties.setProperties(serverSock);
         InetSocketAddress addr = new InetSocketAddress(getAddress(), getPortWithOffset());
-        serverSock.bind(addr,getAcceptCount());
+        serverSock.bind(addr, getAcceptCount());
 
-        // Initialize thread count defaults for acceptor, poller
+        // NIO 2 does not use a dedicated accept thread
         if (acceptorThreadCount != 1) {
-            // NIO2 does not allow any form of IO concurrency
             acceptorThreadCount = 1;
         }
 
