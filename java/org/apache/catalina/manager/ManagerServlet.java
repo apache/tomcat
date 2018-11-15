@@ -17,7 +17,6 @@
 package org.apache.catalina.manager;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -818,7 +817,7 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
                                     "managerServlet.mkdirFail",configBase));
                             return;
                         }
-                        if (copy(new File(config),
+                        if (ExpandWar.copy(new File(config),
                                 new File(configBase, baseName + ".xml")) == false) {
                             throw new Exception("Could not copy config file from path '" +
                                     config + "'");
@@ -841,7 +840,7 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
                     }
                     if (tag != null) {
                         // Copy WAR to the host's appBase
-                        copy(uploadedWar, deployedWar);
+                        ExpandWar.copy(uploadedWar, deployedWar);
                     }
                     // Perform new deployment
                     check(name);
@@ -900,7 +899,7 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
                                 deployedWar));
                         return;
                     }
-                    copy(localWar, deployedWar);
+                    ExpandWar.copy(localWar, deployedWar);
                     // Perform new deployment
                     check(name);
                 } finally {
@@ -1000,7 +999,7 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
                                     "managerServlet.deleteFail", localConfig));
                             return;
                         }
-                        copy(new File(config), localConfig);
+                        ExpandWar.copy(new File(config), localConfig);
                     }
                     if (war != null) {
                         File localWar;
@@ -1014,7 +1013,7 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
                                     "managerServlet.deleteFail", localWar));
                             return;
                         }
-                        copy(new File(war), localWar);
+                        ExpandWar.copy(new File(war), localWar);
                     }
                     // Perform new deployment
                     check(name);
@@ -1695,75 +1694,6 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
         writer.println(sm.getString("managerServlet.invalidPath", path));
         return false;
     }
-
-    /**
-     * Copy the specified file or directory to the destination.
-     *
-     * @param src File object representing the source
-     * @param dest File object representing the destination
-     * @return <code>true</code> if the copy was successful
-     */
-    public static boolean copy(File src, File dest) {
-        boolean result = false;
-        try {
-            if( src != null &&
-                    !src.getCanonicalPath().equals(dest.getCanonicalPath()) ) {
-                result = copyInternal(src, dest, new byte[4096]);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return result;
-    }
-
-
-    /**
-     * Copy the specified file or directory to the destination.
-     *
-     * @param src File object representing the source
-     * @param dest File object representing the destination
-     * @param buf Temp byte buffer
-     * @return <code>true</code> if the copy was successful
-     */
-    public static boolean copyInternal(File src, File dest, byte[] buf) {
-
-        boolean result = true;
-
-        String files[] = null;
-        if (src.isDirectory()) {
-            files = src.list();
-            result = dest.mkdir();
-        } else {
-            files = new String[1];
-            files[0] = "";
-        }
-        if (files == null) {
-            files = new String[0];
-        }
-        for (int i = 0; (i < files.length) && result; i++) {
-            File fileSrc = new File(src, files[i]);
-            File fileDest = new File(dest, files[i]);
-            if (fileSrc.isDirectory()) {
-                result = copyInternal(fileSrc, fileDest, buf);
-            } else {
-                try (FileInputStream is = new FileInputStream(fileSrc);
-                        FileOutputStream os = new FileOutputStream(fileDest)){
-                    int len = 0;
-                    while (true) {
-                        len = is.read(buf);
-                        if (len == -1)
-                            break;
-                        os.write(buf, 0, len);
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    result = false;
-                }
-            }
-        }
-        return result;
-    }
-
 
     protected Map<String,List<String>> getConnectorCiphers() {
         Map<String,List<String>> result = new HashMap<>();
