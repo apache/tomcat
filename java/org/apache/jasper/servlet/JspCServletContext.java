@@ -257,7 +257,7 @@ public class JspCServletContext implements ServletContext {
      */
     @Override
     public int getMajorVersion() {
-        return 3;
+        return 4;
     }
 
 
@@ -277,7 +277,7 @@ public class JspCServletContext implements ServletContext {
      */
     @Override
     public int getMinorVersion() {
-        return 1;
+        return 0;
     }
 
 
@@ -406,7 +406,7 @@ public class JspCServletContext implements ServletContext {
      */
     @Override
     public String getServerInfo() {
-        return "JspC/ApacheTomcat8";
+        return "JspC/ApacheTomcat9";
     }
 
 
