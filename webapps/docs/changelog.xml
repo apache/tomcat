@@ -64,6 +64,9 @@
         depends on the use of an API that has been deprecated in later versions
         of Java. (markt)
       </add>
+      <fix>
+        Fix more storeconfig issues with duplicated SSL attributes. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

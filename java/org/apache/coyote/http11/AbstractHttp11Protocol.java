@@ -582,7 +582,7 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
 
     public String getClientAuth() {
         registerDefaultSSLHostConfig();
-        return defaultSSLHostConfig.getCertificateVerification().toString();
+        return defaultSSLHostConfig.getCertificateVerificationAsString();
     }
     public void setClientAuth(String certificateVerification) {
         registerDefaultSSLHostConfig();
@@ -592,7 +592,7 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
 
     public String getSSLVerifyClient() {
         registerDefaultSSLHostConfig();
-        return defaultSSLHostConfig.getCertificateVerification().toString();
+        return defaultSSLHostConfig.getCertificateVerificationAsString();
     }
     public void setSSLVerifyClient(String certificateVerification) {
         registerDefaultSSLHostConfig();

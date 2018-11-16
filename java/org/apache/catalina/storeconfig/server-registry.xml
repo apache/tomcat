@@ -102,7 +102,7 @@
         <TransientAttribute>URIEncoding</TransientAttribute>
         <TransientAttribute>maxProcessor</TransientAttribute>
         <TransientAttribute>minProcessor</TransientAttribute>
-        <!-- All attribute duplicated from the SSLHostConfig, may be removed in Tomcat 10 -->
+        <!-- All attribute duplicated from the SSLHostConfig, removed in Tomcat 10 -->
         <TransientAttribute>SSLProtocol</TransientAttribute>
         <TransientAttribute>sslEnabledProtocols</TransientAttribute>
         <TransientAttribute>SSLCipherSuite</TransientAttribute>
@@ -138,6 +138,13 @@
         <TransientAttribute>truststorePass</TransientAttribute>
         <TransientAttribute>truststoreProvider</TransientAttribute>
         <TransientAttribute>truststoreType</TransientAttribute>
+        <!-- All attribute duplicated from the AbstractHttp11Protocol, removed in Tomcat 10 -->
+        <TransientAttribute>clientAuth</TransientAttribute>
+        <TransientAttribute>SSLVerifyClient</TransientAttribute>
+        <TransientAttribute>trustMaxCertLength</TransientAttribute>
+        <TransientAttribute>SSLVerifyDepth</TransientAttribute>
+        <TransientAttribute>useServerCipherSuitesOrder</TransientAttribute>
+        <TransientAttribute>SSLHonorCipherOrder</TransientAttribute>
      </Description>
      <Description
         tag="UpgradeProtocol"

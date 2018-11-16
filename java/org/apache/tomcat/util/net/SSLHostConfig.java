@@ -341,6 +341,16 @@ public class SSLHostConfig implements Serializable {
     }
 
 
+    public void setCertificateVerificationAsString(String certificateVerification) {
+        setCertificateVerification(certificateVerification);
+    }
+
+
+    public String getCertificateVerificationAsString() {
+        return certificateVerification.toString();
+    }
+
+
     public void setCertificateVerificationDepth(int certificateVerificationDepth) {
         this.certificateVerificationDepth = certificateVerificationDepth;
         certificateVerificationDepthConfigured = true;
