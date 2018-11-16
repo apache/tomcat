@@ -71,14 +71,14 @@ public class AsyncFileHandler extends FileHandler {
     protected volatile boolean closed = false;
 
     public AsyncFileHandler() {
-        this(null, null, null, DEFAULT_MAX_DAYS);
+        this(null, null, null);
     }
 
     public AsyncFileHandler(String directory, String prefix, String suffix) {
-        this(directory, prefix, suffix, DEFAULT_MAX_DAYS);
+        this(directory, prefix, suffix, null);
     }
 
-    public AsyncFileHandler(String directory, String prefix, String suffix, int maxDays) {
+    public AsyncFileHandler(String directory, String prefix, String suffix, Integer maxDays) {
         super(directory, prefix, suffix, maxDays);
         open();
     }
