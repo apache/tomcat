@@ -136,6 +136,10 @@
         server to use when uploading a web application for deployment with the
         Manager web application. Patch provided by Anton Lindström. (markt)
       </add>
+      <fix>
+        <bug>62918</bug>: Filter out subtype mbeans to avoid breaking the
+        connector status page. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Tribes">
