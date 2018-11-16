@@ -43,3 +43,7 @@ New items for 10.0.x onwards:
 4.  Clean-up content-type header processing. Remove the optional space after the
     ';' character (if any). Don't mutate the header if there is no charset
     parameter. See BZ 62912 for some discussion and additional references.
+
+5.  Consider applying the delayed log file opening (until there is something to
+    log). See BZ 53620.
+
