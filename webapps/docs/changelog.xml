@@ -120,6 +120,9 @@
         Servlet non-blocking I/O is used to read a request body over an HTTP/2
         stream. (markt)
       </fix>
+      <fix>
+        Avoid bad SSLHostConfig JMX registrations before init. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
