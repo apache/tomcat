@@ -94,7 +94,7 @@
 
     <attribute name="utilityThreadsAsDaemon" required="false">
       <p>Set the daemon flag value for the utility threads. The default value
-      is <code>true</code>.
+      is <code>false</code>.
       </p>
     </attribute>
 

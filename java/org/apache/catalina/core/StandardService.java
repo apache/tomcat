@@ -101,7 +101,7 @@ public class StandardService extends LifecycleMBeanBase implements Service {
     /**
      * The utility threads daemon flag.
      */
-    protected boolean utilityThreadsAsDaemon = true;
+    protected boolean utilityThreadsAsDaemon = false;
 
     /**
      * Utility executor with scheduling capabilities.

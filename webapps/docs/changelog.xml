@@ -66,7 +66,8 @@
       </fix>
       <add>
         Add a scheduled executor to the Service, which can be used to
-        process periodic utility tasks. (remm)
+        process periodic utility tasks. The utility threads are non daemon
+        by default. (remm)
       </add>
       <update>
         Refactor container background processor using the Service executor, and
