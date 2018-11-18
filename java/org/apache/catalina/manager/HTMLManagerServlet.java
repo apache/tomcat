@@ -26,6 +26,9 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 import java.text.MessageFormat;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -366,6 +369,11 @@ public final class HTMLManagerServlet extends ManagerServlet {
         } else {
             args[1] = Escape.htmlElementContent(message);
         }
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime nowUtc = LocalDateTime.now(ZoneId.of("UTC"));
+        args[2] = String.format("Generated at: %s UTC (%s VM time)",
+                formatter.format(nowUtc), formatter.format(now));
         writer.print(MessageFormat.format(Constants.MESSAGE_SECTION, args));
 
         // Manager Section

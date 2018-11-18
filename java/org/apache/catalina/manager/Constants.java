@@ -146,7 +146,8 @@ public class Constants {
             " <tr>\n" +
             "  <td class=\"row-left\" width=\"10%\">" +
             "<small><strong>{0}</strong></small>&nbsp;</td>\n" +
-            "  <td class=\"row-left\"><pre>{1}</pre></td>\n" +
+            "  <td class=\"row-left\"><pre>{1}</pre><br/>" +
+            "   <i style=\"font-size: small;\">{2}</i></td>\n" +
             " </tr>\n" +
             "</table>\n" +
             "<br>\n" +
