@@ -100,6 +100,10 @@
       <fix>
         Fix more storeconfig issues with duplicated SSL attributes. (remm)
       </fix>
+      <fix>
+        <bug>62924</bug>: Fix file descriptor leak introduced in the code that
+        monitors <code>tomcat-users.xml</code> for modifications. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

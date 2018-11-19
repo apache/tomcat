@@ -653,9 +653,10 @@ public class MemoryUserDatabase implements UserDatabase {
         }
 
         URI uri = ConfigFileLoader.getSource().getURI(getPathname());
+        URLConnection uConn = null;
         try {
             URL url = uri.toURL();
-            URLConnection uConn = url.openConnection();
+            uConn = url.openConnection();
 
             if (this.lastModified != uConn.getLastModified()) {
                 writeLock.lock();
@@ -675,6 +676,15 @@ public class MemoryUserDatabase implements UserDatabase {
             }
         } catch (Exception ioe) {
             log.error(sm.getString("memoryUserDatabase.reloadError", id, uri), ioe);
+        } finally {
+            if (uConn != null) {
+                try {
+                    // Can't close a uConn directly. Have to do it like this.
+                    uConn.getInputStream().close();
+                } catch (IOException ioe) {
+                    log.warn(sm.getString("memoryUserDatabase.fileClose", pathname), ioe);
+                }
+            }
         }
     }
 
