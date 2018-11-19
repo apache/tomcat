@@ -129,7 +129,8 @@
   <subsection name="Jasper">
     <changelog>
       <update>
-        Update the Eclipse Compiler for Java to 4.9. (markt)
+        Update the Eclipse Compiler for Java to 4.9. Additional patch by Lukasz
+        Jader. (markt)
       </update>
     </changelog>
   </subsection>
