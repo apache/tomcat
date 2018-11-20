@@ -16,8 +16,6 @@
  */
 package org.apache.catalina.tribes.group.interceptors;
 
-import java.nio.charset.StandardCharsets;
-
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -32,7 +30,6 @@ import org.apache.catalina.tribes.group.ChannelInterceptorBase;
 import org.apache.catalina.tribes.group.InterceptorPayload;
 import org.apache.catalina.tribes.io.ChannelData;
 import org.apache.catalina.tribes.io.XByteBuffer;
-import org.apache.tomcat.util.buf.HexUtils;
 
 /**
  * Tests the EncryptInterceptor.
@@ -42,9 +39,9 @@ import org.apache.tomcat.util.buf.HexUtils;
  * for readability for the tests and their outputs.
  */
 public class TestEncryptInterceptor {
-    private static final String encryptionKey128 = HexUtils.toHexString("cafebabedeadbeef".getBytes(StandardCharsets.UTF_8));
-    private static final String encryptionKey192 = HexUtils.toHexString("cafebabedeadbeefbeefcafe".getBytes(StandardCharsets.UTF_8));
-    private static final String encryptionKey256 = HexUtils.toHexString("cafebabedeadbeefcafebabedeadbeef".getBytes(StandardCharsets.UTF_8));
+    private static final String encryptionKey128 = "cafebabedeadbeefcafebabedeadbeef";
+    private static final String encryptionKey192 = "cafebabedeadbeefbeefcafecafebabedeadbeefbeefcafe";
+    private static final String encryptionKey256 = "cafebabedeadbeefcafebabedeadbeefcafebabedeadbeefcafebabedeadbeef";
 
     EncryptInterceptor src;
     EncryptInterceptor dest;
