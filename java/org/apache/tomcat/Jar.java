@@ -65,6 +65,18 @@ public interface Jar extends AutoCloseable {
     long getLastModified(String name) throws IOException;
 
     /**
+     * Determine if the given resource in present in the JAR.
+     *
+     * @param name  Entry to look for
+     *
+     * @return {@code true} if the entry is present in the JAR, otherwise
+     *         {@code false}
+     *
+     * @throws IOException if an I/O error occurs while processing the JAR file
+     */
+    boolean exists(String name) throws IOException;
+
+    /**
      * Close any resources associated with this JAR.
      */
     @Override
