@@ -37,7 +37,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.Stack;
 import java.util.StringTokenizer;
 import java.util.Vector;
 import java.util.concurrent.Callable;
@@ -1380,40 +1379,47 @@ public class JspC extends Task implements Options {
      * Locate all jsp files in the webapp. Used if no explicit
      * jsps are specified.
      * @param base Base path
+     *
+     * @deprecated This will be removed in Tomcat 10. Use {@link #scanFiles()}
      */
-    public void scanFiles( File base ) {
-        Stack<String> dirs = new Stack<>();
-        dirs.push(base.toString());
+    @Deprecated
+    public void scanFiles(File base) {
+        scanFiles();
+    }
 
+
+    /**
+     * Locate all jsp files in the webapp. Used if no explicit jsps are
+     * specified. Scan is performed via the ServletContext and will include any
+     * JSPs located in resource JARs.
+     */
+    public void scanFiles() {
         // Make sure default extensions are always included
         if ((getExtensions() == null) || (getExtensions().size() < 2)) {
             addExtension("jsp");
             addExtension("jspx");
         }
 
-        while (!dirs.isEmpty()) {
-            String s = dirs.pop();
-            File f = new File(s);
-            if (f.exists() && f.isDirectory()) {
-                String[] files = f.list();
-                String ext;
-                for (int i = 0; (files != null) && i < files.length; i++) {
-                    File f2 = new File(s, files[i]);
-                    if (f2.isDirectory()) {
-                        dirs.push(f2.getPath());
-                    } else {
-                        String path = f2.getPath();
-                        String uri = path.substring(uriRoot.length());
-                        ext = files[i].substring(files[i].lastIndexOf('.') +1);
-                        if (getExtensions().contains(ext) ||
-                            jspConfig.isJspPage(uri)) {
-                            pages.add(path);
-                        }
-                    }
+        scanFilesInternal("/");
+    }
+
+
+    private void scanFilesInternal(String input) {
+        Set<String> paths = context.getResourcePaths(input);
+        for (String path : paths) {
+            if (path.endsWith("/")) {
+                scanFilesInternal(input.substring(0, input.length() -1) + path);
+            } else if (jspConfig.isJspPage(input + path)) {
+                pages.add(path);
+            } else {
+                String ext = path.substring(path.lastIndexOf('.') + 1);
+                if (extensions.contains(ext)) {
+                    pages.add(input + path.substring(1));
                 }
             }
         }
     }
+
 
     /**
      * Executes the compilation.
@@ -1456,20 +1462,15 @@ public class JspC extends Task implements Options {
 
             // No explicit pages, we'll process all .jsp in the webapp
             if (pages.size() == 0) {
-                scanFiles(uriRootF);
-            }
+                scanFiles();
+            } else {
+                // Ensure pages are all relative to the uriRoot.
+                // Those that are not will trigger an error later. The error
+                // could be detected earlier but isn't to support the use case
+                // when failFast is not used.
+                for (int i = 0; i < pages.size(); i++) {
+                    String nextjsp = pages.get(i);
 
-            initWebXml();
-
-            int errorCount = 0;
-            long start = System.currentTimeMillis();
-
-            ExecutorService threadPool = Executors.newFixedThreadPool(threadCount);
-            ExecutorCompletionService<Void> service = new ExecutorCompletionService<>(threadPool);
-            try {
-                int pageCount = pages.size();
-
-                for (String nextjsp : pages) {
                     File fjsp = new File(nextjsp);
                     if (!fjsp.isAbsolute()) {
                         fjsp = new File(uriRootF, nextjsp);
@@ -1488,6 +1489,20 @@ public class JspC extends Task implements Options {
                     if (nextjsp.startsWith("." + File.separatorChar)) {
                         nextjsp = nextjsp.substring(2);
                     }
+                    pages.set(i, nextjsp);
+                }
+            }
+
+            initWebXml();
+
+            int errorCount = 0;
+            long start = System.currentTimeMillis();
+
+            ExecutorService threadPool = Executors.newFixedThreadPool(threadCount);
+            ExecutorCompletionService<Void> service = new ExecutorCompletionService<>(threadPool);
+            try {
+                int pageCount = pages.size();
+                for (String nextjsp : pages) {
                     service.submit(new ProcessFile(nextjsp));
                 }
                 JasperException reportableError = null;
