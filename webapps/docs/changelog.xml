@@ -136,6 +136,10 @@
         Update the Eclipse Compiler for Java to 4.9. Additional patch by Lukasz
         Jader. (markt)
       </update>
+      <add>
+        <bug>53737</bug>: Extend JspC, the precompilation tool, to include
+        support for resource JARs. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Web applications">

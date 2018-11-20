@@ -19,6 +19,7 @@ package org.apache.jasper.servlet;
 import java.io.File;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.Set;
 
 import javax.servlet.descriptor.JspConfigDescriptor;
 import javax.servlet.descriptor.JspPropertyGroupDescriptor;
@@ -130,5 +131,26 @@ public class TestJspCServletContext {
                 null, appDir.toURI().toURL(), null, false, false);
         Assert.assertEquals(4, context.getEffectiveMajorVersion());
         Assert.assertEquals(0, context.getEffectiveMinorVersion());
+    }
+
+
+    @Test
+    public void testResourceJARs() throws Exception {
+        File appDir = new File("test/webapp-fragments");
+        JspCServletContext context = new JspCServletContext(
+                null, appDir.toURI().toURL(), null, false, false);
+
+        Set<String> paths = context.getResourcePaths("/");
+        Assert.assertEquals(paths.size(), 10);
+        Assert.assertTrue(paths.contains("/WEB-INF/"));
+        Assert.assertTrue(paths.contains("/folder/"));
+        Assert.assertTrue(paths.contains("/'singlequote.jsp"));
+        Assert.assertTrue(paths.contains("/'singlequote2.jsp"));
+        Assert.assertTrue(paths.contains("/bug51396.jsp"));
+        Assert.assertTrue(paths.contains("/jndi.jsp"));
+        Assert.assertTrue(paths.contains("/resourceA.jsp"));
+        Assert.assertTrue(paths.contains("/resourceB.jsp"));
+        Assert.assertTrue(paths.contains("/resourceF.jsp"));
+        Assert.assertTrue(paths.contains("/warDirContext.jsp"));
     }
 }
