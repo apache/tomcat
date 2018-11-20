@@ -1750,7 +1750,7 @@ public class JspC extends Task implements Options {
     /**
      * Find the WEB-INF dir by looking up in the directory tree.
      * This is used if no explicit docbase is set, but only files.
-     * XXX Maybe we should require the docbase.
+     *
      * @param f The path from which it will start looking
      */
     protected void locateUriRoot( File f ) {
@@ -1785,8 +1785,7 @@ public class JspC extends Task implements Options {
                     }
 
                     // If there is no acceptable candidate, uriRoot will
-                    // remain null to indicate to the CompilerContext to
-                    // use the current working/user dir.
+                    // remain null.
                 }
 
                 if (uriRoot != null) {
@@ -1795,9 +1794,7 @@ public class JspC extends Task implements Options {
                 }
             }
         } catch (IOException ioe) {
-            // since this is an optional default and a null value
-            // for uriRoot has a non-error meaning, we can just
-            // pass straight through
+            // Missing uriRoot will be handled in the caller.
         }
     }
 
