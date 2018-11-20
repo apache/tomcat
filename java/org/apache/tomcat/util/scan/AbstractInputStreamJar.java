@@ -137,6 +137,13 @@ public abstract class AbstractInputStreamJar implements Jar {
 
 
     @Override
+    public boolean exists(String name) throws IOException {
+        gotoEntry(name);
+        return entry != null;
+    }
+
+
+    @Override
     public String getURL(String entry) {
         StringBuilder result = new StringBuilder("jar:");
         result.append(getJarFileURL().toExternalForm());

@@ -104,6 +104,13 @@ public class JarFileUrlJar implements Jar {
     }
 
     @Override
+    public boolean exists(String name) throws IOException {
+        // JarFile#getEntry() is multi-release aware
+        ZipEntry entry = jarFile.getEntry(name);
+        return entry != null;
+    }
+
+    @Override
     public String getURL(String entry) {
         StringBuilder result = new StringBuilder("jar:");
         result.append(getJarFileURL().toExternalForm());
