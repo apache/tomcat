@@ -29,6 +29,7 @@ public class Utils {
 
     private static final Pattern ADD_CONTINUATION = Pattern.compile("\\n", Pattern.MULTILINE);
     private static final Pattern ESCAPE_LEADING_SPACE = Pattern.compile("^(\\s)", Pattern.MULTILINE);
+    private static final Pattern FIX_SINGLE_QUOTE = Pattern.compile("([^'])'([^'])", Pattern.MULTILINE);
 
     private Utils() {
         // Utility class. Hide default constructor.
@@ -62,6 +63,10 @@ public class Utils {
 
         if (result.contains("\n\\\t")) {
             result = result.replace("\n\\\t", "\n\\t");
+        }
+
+        if (result.contains("[{0}]")) {
+            result = FIX_SINGLE_QUOTE.matcher(result).replaceAll("$1''$2");
         }
         return result;
     }
