@@ -60,10 +60,6 @@
         Fix storeconfig for the cluster encryption interceptor key attribute.
         (remm)
       </fix>
-      <fix>
-        Include German translations for the Manager application in the standard
-        Tomcat distribution. (markt)
-      </fix>
       <add>
         Add a scheduled executor to the Service, which can be used to
         process periodic utility tasks. The utility threads are non daemon
@@ -173,15 +169,46 @@
         by Zemian Deng. (markt)
       </fix>
       <add>
-        Expand the coverage and quality of the localisation translations
-        provided with Apache Tomcat. Includes contributions from soliplaya,
-        remm, David, NicolasG, Israel, Ulises Gonzalez Horta, burghard, Geraldo
-        Netto, Eduardo Quintanilla, Ludovic Pénet, Matk80, Daniel Wehringer and
-        Miguel Suarez. (markt)
+        Expand the coverage and quality of the French translations provided with
+        Apache Tomcat. Includes contributions from remm, soliplaya, Ludovic
+        Pénet, David, NicolasG  and bdelacretaz. (markt)
+      </add>
+      <add>
+        Add Simplified Chinese translations to the translations to Apache
+        Tomcat. Includes contributions from Darren Luo, syseal, Winsonzhao,
+        袁宇杰, Lanranzi, ZhangJieWen, Jerry, yinzhili001, 安柏诚, shawn, lavender,
+        Zheng Feng, zengwc, RichardHo, mm, gingshi huang, Bob, geekwang, zheng,
+        Deanzhg, Tianfengjingjing, Panblack, oking, Dave Newman, Cnfnss, Jim Ma
+        and 852394875. (markt)
+      </add>
+      <add>
+        Add Korean translations to Apache Tomcat. Includes contributions from
+        woonsan, JunSang Park and song choe. (markt)
+      </add>
+      <add>
+        Expand the coverage and quality of the Spanish translations provided
+        with Apache Tomcat. Includes contributions from Ulises Gonzalez Horta,
+        Israel, Eduardo Quintanilla and Miguel suarez. (markt)
+      </add>
+      <add>
+        Expand the coverage and quality of the Russian translations provided
+        with Apache Tomcat. Includes contributions from Rafael Sachakov. (markt)
+      </add>
+      <add>
+        Expand the coverage and quality of the German translations provided
+        with Apache Tomcat. Includes contributions from Matk80, burghard and
+        Daniel Wehringer. (markt)
+      </add>
+      <add>
+        Add Brazilian Portuguese translations to Apache Tomcat. Includes
+        contributions from geraldo netto. (markt)
       </add>
       <fix>
         Include Brazilian Portuguese translations in the standard Tomcat
         distribution. (markt)
+      </fix>
+      <fix>
+        Include German translations in the standard Tomcat distribution. (markt)
       </fix>
     </changelog>
   </subsection>
