@@ -385,7 +385,7 @@ public final class CGIServlet extends HttpServlet {
 
         if (getServletConfig().getInitParameter("cgiMethods") != null) {
             String paramValue = getServletConfig().getInitParameter("cgiMethods");
-            paramValue.trim();
+            paramValue = paramValue.trim();
             if ("*".equals(paramValue)) {
                 cgiMethodsAll = true;
             } else {
