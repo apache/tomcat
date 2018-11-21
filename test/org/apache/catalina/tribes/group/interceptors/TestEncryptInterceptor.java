@@ -16,16 +16,16 @@
  */
 package org.apache.catalina.tribes.group.interceptors;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.FixMethodOrder;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 
 import org.apache.catalina.tribes.Channel;
 import org.apache.catalina.tribes.ChannelException;
