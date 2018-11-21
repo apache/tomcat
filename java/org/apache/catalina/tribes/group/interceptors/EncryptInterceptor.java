@@ -326,7 +326,7 @@ public class EncryptInterceptor extends ChannelInterceptorBase implements Encryp
         if(start < 0)
             throw new IllegalArgumentException(sm.getString("encryptInterceptor.algorithm.required"));
         int end = algorithm.indexOf('/', start + 1);
-        if(start < 0)
+        if(end < 0)
             throw new IllegalArgumentException(sm.getString("encryptInterceptor.algorithm.required"));
 
         return algorithm.substring(start + 1, end);
