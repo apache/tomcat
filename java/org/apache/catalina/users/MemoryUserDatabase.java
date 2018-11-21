@@ -416,40 +416,42 @@ public class MemoryUserDatabase implements UserDatabase {
     @Override
     public void open() throws Exception {
         writeLock.lock();
-        // Erase any previous groups and users
-        users.clear();
-        groups.clear();
-        roles.clear();
-
-        String pathName = getPathname();
-        try (ConfigurationSource.Resource resource = ConfigFileLoader.getSource().getResource(pathName)) {
-            this.lastModified = resource.getURI().toURL().openConnection().getLastModified();
-
-            // Construct a digester to read the XML input file
-            Digester digester = new Digester();
-            try {
-                digester.setFeature(
-                        "http://apache.org/xml/features/allow-java-encodings", true);
-            } catch (Exception e) {
-                log.warn(sm.getString("memoryUserDatabase.xmlFeatureEncoding"), e);
-            }
-            digester.addFactoryCreate("tomcat-users/group",
-                    new MemoryGroupCreationFactory(this), true);
-            digester.addFactoryCreate("tomcat-users/role",
-                    new MemoryRoleCreationFactory(this), true);
-            digester.addFactoryCreate("tomcat-users/user",
-                    new MemoryUserCreationFactory(this), true);
-
-            // Parse the XML input to load this database
-            digester.parse(resource.getInputStream());
-        } catch (IOException ioe) {
-            log.error(sm.getString("memoryUserDatabase.fileNotFound", pathName));
-        } catch (Exception e) {
-            // Fail safe on error
+        try {
+            // Erase any previous groups and users
             users.clear();
             groups.clear();
             roles.clear();
-            throw e;
+
+            String pathName = getPathname();
+            try (ConfigurationSource.Resource resource = ConfigFileLoader.getSource().getResource(pathName)) {
+                this.lastModified = resource.getURI().toURL().openConnection().getLastModified();
+
+                // Construct a digester to read the XML input file
+                Digester digester = new Digester();
+                try {
+                    digester.setFeature(
+                            "http://apache.org/xml/features/allow-java-encodings", true);
+                } catch (Exception e) {
+                    log.warn(sm.getString("memoryUserDatabase.xmlFeatureEncoding"), e);
+                }
+                digester.addFactoryCreate("tomcat-users/group",
+                        new MemoryGroupCreationFactory(this), true);
+                digester.addFactoryCreate("tomcat-users/role",
+                        new MemoryRoleCreationFactory(this), true);
+                digester.addFactoryCreate("tomcat-users/user",
+                        new MemoryUserCreationFactory(this), true);
+
+                // Parse the XML input to load this database
+                digester.parse(resource.getInputStream());
+            } catch (IOException ioe) {
+                log.error(sm.getString("memoryUserDatabase.fileNotFound", pathName));
+            } catch (Exception e) {
+                // Fail safe on error
+                users.clear();
+                groups.clear();
+                roles.clear();
+                throw e;
+            }
         } finally {
             writeLock.unlock();
         }
