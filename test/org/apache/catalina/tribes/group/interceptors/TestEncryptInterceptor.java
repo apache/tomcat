@@ -36,6 +36,8 @@ import org.apache.catalina.tribes.group.ChannelInterceptorBase;
 import org.apache.catalina.tribes.group.InterceptorPayload;
 import org.apache.catalina.tribes.io.ChannelData;
 import org.apache.catalina.tribes.io.XByteBuffer;
+import org.hamcrest.core.IsEqual;
+import org.hamcrest.core.IsNot;
 
 /**
  * Tests the EncryptInterceptor.
@@ -75,6 +77,34 @@ public class TestEncryptInterceptor {
         Assert.assertEquals("Basic roundtrip failed",
                      testInput,
                      roundTrip(testInput, src, dest));
+    }
+
+    @Test
+    public void testMultipleMessages() throws Exception {
+        src.start(Channel.SND_TX_SEQ);
+        dest.start(Channel.SND_TX_SEQ);
+
+        String testInput = "The quick brown fox jumps over the lazy dog.";
+
+        Assert.assertEquals("Basic roundtrip failed",
+                     testInput,
+                     roundTrip(testInput, src, dest));
+
+        Assert.assertEquals("Second roundtrip failed",
+                testInput,
+                roundTrip(testInput, src, dest));
+
+        Assert.assertEquals("Third roundtrip failed",
+                testInput,
+                roundTrip(testInput, src, dest));
+
+        Assert.assertEquals("Fourth roundtrip failed",
+                testInput,
+                roundTrip(testInput, src, dest));
+
+        Assert.assertEquals("Fifth roundtrip failed",
+                testInput,
+                roundTrip(testInput, src, dest));
     }
 
     @Test
@@ -268,6 +298,28 @@ public class TestEncryptInterceptor {
         msg.setMessage(xbb);
 
         dest.messageReceived(msg);
+    }
+
+    @Test
+    public void testMessageUniqueness() throws Exception {
+        src.start(Channel.SND_TX_SEQ);
+        src.setNext(new ValueCaptureInterceptor());
+
+        String testInput = "The quick brown fox jumps over the lazy dog.";
+
+        ChannelData msg = new ChannelData(false);
+        msg.setMessage(new XByteBuffer(testInput.getBytes("UTF-8"), false));
+        src.sendMessage(null, msg, null);
+
+        byte[] cipherText1 = ((ValueCaptureInterceptor)src.getNext()).getValue();
+
+        msg.setMessage(new XByteBuffer(testInput.getBytes("UTF-8"), false));
+        src.sendMessage(null, msg, null);
+
+        byte[] cipherText2 = ((ValueCaptureInterceptor)src.getNext()).getValue();
+
+        Assert.assertThat("Two identical cleartexts encrypt to the same ciphertext",
+                cipherText1, IsNot.not(IsEqual.equalTo(cipherText2)));
     }
 
     @Test
