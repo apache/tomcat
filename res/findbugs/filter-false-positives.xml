@@ -542,6 +542,13 @@
     <Bug pattern="IS2_INCONSISTENT_SYNC"/>
   </Match>
   <Match>
+    <!-- This could be optimised but a) the code would be less clear and -->
+    <!-- b) SpotBugs still reports an error with the optimised code.     -->
+    <Class name="org.apache.catalina.tribes.group.GroupChannel"/>
+    <Method name="startHeartbeat"/>
+    <Bug pattern="RpC_REPEATED_CONDITIONAL_TEST "/>
+  </Match>
+  <Match>
     <Class name="org.apache.catalina.tribes.group.RpcChannel"/>
     <Method name="send"/>
     <Bug pattern="WA_NOT_IN_LOOP"/>
@@ -707,6 +714,13 @@
       <Method name="clearDispatches"/>
     </Or>
     <Bug pattern="JLM_JSR166_UTILCONCURRENT_MONITORENTER" />
+  </Match>
+  <Match>
+    <!-- This could be optimised but a) the code would be less clear and -->
+    <!-- b) SpotBugs still reports an error with the optimised code.     -->
+    <Class name="org.apache.coyote.AbstractProtocol"/>
+    <Method name="startAsyncTimeout"/>
+    <Bug pattern="RpC_REPEATED_CONDITIONAL_TEST "/>
   </Match>
   <Match>
     <!-- Correct behaviour does not assume sequential operations on concurrent
