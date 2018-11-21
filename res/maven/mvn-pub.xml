@@ -442,8 +442,10 @@
     <doMavenDeployNoSrc artifactId="tomcat-i18n-es"/>
     <doMavenDeployNoSrc artifactId="tomcat-i18n-fr"/>
     <doMavenDeployNoSrc artifactId="tomcat-i18n-ja"/>
+    <doMavenDeployNoSrc artifactId="tomcat-i18n-ko"/>
     <doMavenDeployNoSrc artifactId="tomcat-i18n-pt-BR"/>
     <doMavenDeployNoSrc artifactId="tomcat-i18n-ru"/>
+    <doMavenDeployNoSrc artifactId="tomcat-i18n-zh-CN"/>
 
     <!-- Extras jars -->
     <doMavenDeploy artifactId="tomcat-catalina-jmx-remote"

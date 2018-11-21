@@ -208,7 +208,11 @@
         distribution. (markt)
       </fix>
       <fix>
-        Include German translations in the standard Tomcat distribution. (markt)
+        Include Simplified Chinese translations in the standard Tomcat
+        distribution. (markt)
+      </fix>
+      <fix>
+        Include Korean translations in the standard Tomcat distribution. (markt)
       </fix>
     </changelog>
   </subsection>
