@@ -1397,6 +1397,12 @@
     <Bug code="SF" />
   </Match>
   <Match>
+    <!-- Stream will be closed -->
+    <Class name="org.apache.tomcat.util.net.jsse.PEMFile" />
+    <Method name="&lt;init&gt;" />
+    <Pattern name="OS_OPEN_STREAM" />
+  </Match>
+  <Match>
     <!-- Array elements are not modified after assignment -->
     <Class name="org.apache.tomcat.util.net.openssl.OpenSSLEngine" />
     <Or>
