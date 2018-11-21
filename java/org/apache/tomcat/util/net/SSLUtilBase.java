@@ -74,8 +74,7 @@ public abstract class SSLUtilBase implements SSLUtil {
         this.enabledProtocols = enabledProtocols.toArray(new String[enabledProtocols.size()]);
 
         if (enabledProtocols.contains(Constants.SSL_PROTO_TLSv1_3) &&
-                (sslHostConfig.getCertificateVerification() == CertificateVerification.OPTIONAL ||
-                        sslHostConfig.getCertificateVerification() == CertificateVerification.OPTIONAL) &&
+                sslHostConfig.getCertificateVerification() == CertificateVerification.OPTIONAL &&
                 !isTls13RenegAuthAvailable() && warnTls13) {
             log.warn(sm.getString("jsse.tls13.auth"));
         }
