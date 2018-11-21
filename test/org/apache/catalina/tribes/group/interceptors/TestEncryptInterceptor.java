@@ -18,8 +18,14 @@ package org.apache.catalina.tribes.group.interceptors;
 
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.FixMethodOrder;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.junit.runners.MethodSorters;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 
 import org.apache.catalina.tribes.Channel;
 import org.apache.catalina.tribes.ChannelException;
@@ -38,8 +44,9 @@ import org.apache.catalina.tribes.io.XByteBuffer;
  * though the interceptor actually operates on byte arrays. This is done
  * for readability for the tests and their outputs.
  */
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TestEncryptInterceptor {
-    private static final String encryptionKey128 = "cafebabedeadbeefcafebabedeadbeef";
+    private static final String encryptionKey128 = "cafebabedeadbeefbeefcafecafebabe";
     private static final String encryptionKey192 = "cafebabedeadbeefbeefcafecafebabedeadbeefbeefcafe";
     private static final String encryptionKey256 = "cafebabedeadbeefcafebabedeadbeefcafebabedeadbeefcafebabedeadbeef";
 
@@ -95,7 +102,7 @@ public class TestEncryptInterceptor {
     }
 
     @Test
-    @Ignore // Too big for default settings. Breaks Gump, Eclipse, ...
+    @Ignore("Too big for default settings. Breaks Gump, Eclipse, ...")
     public void testHugePayload() throws Exception {
         src.start(Channel.SND_TX_SEQ);
         dest.start(Channel.SND_TX_SEQ);
@@ -157,7 +164,7 @@ public class TestEncryptInterceptor {
 
         bytes = roundTrip(bytes, src, dest);
 
-        return new String(((ValueCaptureInterceptor)dest.getPrevious()).getValue(), "UTF-8");
+        return new String(bytes, "UTF-8");
     }
 
     /**
@@ -169,6 +176,123 @@ public class TestEncryptInterceptor {
         src.sendMessage(null, msg, null);
 
         return ((ValueCaptureInterceptor)dest.getPrevious()).getValue();
+    }
+
+    @Test
+    @Ignore("ECB mode isn't because it's insecure")
+    public void testECB() throws Exception {
+        src.setEncryptionAlgorithm("AES/ECB/PKCS5Padding");
+        src.start(Channel.SND_TX_SEQ);
+        dest.setEncryptionAlgorithm("AES/ECB/PKCS5Padding");
+        dest.start(Channel.SND_TX_SEQ);
+
+        String testInput = "The quick brown fox jumps over the lazy dog.";
+
+        Assert.assertEquals("Failed in ECB mode",
+                     testInput,
+                     roundTrip(testInput, src, dest));
+    }
+
+    @Test
+    public void testOFB() throws Exception {
+        src.setEncryptionAlgorithm("AES/OFB/PKCS5Padding");
+        src.start(Channel.SND_TX_SEQ);
+        dest.setEncryptionAlgorithm("AES/OFB/PKCS5Padding");
+        dest.start(Channel.SND_TX_SEQ);
+
+        String testInput = "The quick brown fox jumps over the lazy dog.";
+
+        Assert.assertEquals("Failed in OFB mode",
+                     testInput,
+                     roundTrip(testInput, src, dest));
+    }
+
+    @Test
+    public void testCFB() throws Exception {
+        src.setEncryptionAlgorithm("AES/CFB/PKCS5Padding");
+        src.start(Channel.SND_TX_SEQ);
+        dest.setEncryptionAlgorithm("AES/CFB/PKCS5Padding");
+        dest.start(Channel.SND_TX_SEQ);
+
+        String testInput = "The quick brown fox jumps over the lazy dog.";
+
+        Assert.assertEquals("Failed in CFB mode",
+                     testInput,
+                     roundTrip(testInput, src, dest));
+    }
+
+    @Test
+    @Ignore("GCM mode is unsupported because it requires a custom initialization vector")
+    public void testGCM() throws Exception {
+        src.setEncryptionAlgorithm("AES/GCM/PKCS5Padding");
+        src.start(Channel.SND_TX_SEQ);
+        dest.setEncryptionAlgorithm("AES/GCM/PKCS5Padding");
+        dest.start(Channel.SND_TX_SEQ);
+
+        String testInput = "The quick brown fox jumps over the lazy dog.";
+
+        Assert.assertEquals("Failed in GCM mode",
+                     testInput,
+                     roundTrip(testInput, src, dest));
+    }
+
+    @Test
+    public void testViaFile() throws Exception {
+        src.start(Channel.SND_TX_SEQ);
+        src.setNext(new ValueCaptureInterceptor());
+
+        String testInput = "The quick brown fox jumps over the lazy dog.";
+
+        ChannelData msg = new ChannelData(false);
+        msg.setMessage(new XByteBuffer(testInput.getBytes("UTF-8"), false));
+        src.sendMessage(null, msg, null);
+
+        byte[] bytes = ((ValueCaptureInterceptor)src.getNext()).getValue();
+
+        try (FileOutputStream out = new FileOutputStream("message.bin")) {
+            out.write(bytes);
+        }
+
+        dest.start(Channel.SND_TX_SEQ);
+
+        bytes = new byte[8192];
+        int read;
+
+        try (FileInputStream in = new FileInputStream("message.bin")) {
+            read = in.read(bytes);
+        }
+
+        msg = new ChannelData(false);
+        XByteBuffer xbb = new XByteBuffer(read, false);
+        xbb.append(bytes, 0, read);
+        msg.setMessage(xbb);
+
+        dest.messageReceived(msg);
+    }
+
+    @Test
+    public void testPickup() throws Exception {
+        File file = new File("message.bin");
+        if(!file.exists()) {
+            System.err.println("File message.bin does not exist. Skipping test.");
+            return;
+        }
+
+        dest.start(Channel.SND_TX_SEQ);
+
+        byte[] bytes = new byte[8192];
+        int read;
+
+        try (FileInputStream in = new FileInputStream("message.bin")) {
+            read = in.read(bytes);
+        }
+
+        ChannelData msg = new ChannelData(false);
+        XByteBuffer xbb = new XByteBuffer(read, false);
+        xbb.append(bytes, 0, read);
+        msg.setMessage(xbb);
+
+        dest.messageReceived(msg);
     }
 
     /**
