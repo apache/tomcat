@@ -452,8 +452,6 @@ public class ApplicationContext implements org.apache.catalina.servlet4preview.S
             uri = URLEncoder.DEFAULT.encode(getContextPath() + uri, StandardCharsets.UTF_8);
         }
 
-        pos = normalizedUri.length();
-
         // Use the thread local URI and mapping data
         DispatchData dd = dispatchData.get();
         if (dd == null) {
