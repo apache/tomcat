@@ -450,8 +450,6 @@ public class ApplicationContext implements ServletContext {
             uri = URLEncoder.DEFAULT.encode(getContextPath() + uri, StandardCharsets.UTF_8);
         }
 
-        pos = normalizedUri.length();
-
         // Use the thread local URI and mapping data
         DispatchData dd = dispatchData.get();
         if (dd == null) {
