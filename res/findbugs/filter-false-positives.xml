@@ -952,6 +952,14 @@
     <Bug code="Nm" />
   </Match>
   <Match>
+    <!-- Utility classes used to import/export l10n strings -->
+    <!-- This code does not need to be robust -->
+    <Or>
+      <Class name="org.apache.tomcat.buildutil.translate.Export"/>
+      <Class name="org.apache.tomcat.buildutil.translate.Import"/>
+    </Or>
+  </Match>
+  <Match>
     <!-- Return value is never used -->
     <Class name="org.apache.tomcat.dbcp.dbcp2.DelegatingConnection" />
     <Method name="prepareStatement" />
@@ -1245,6 +1253,15 @@
       <Method name="readLhex" />
     </Or>
     <Bug pattern="SR_NOT_CHECKED" />
+  </Match>
+  <Match>
+    <!--  Generated code -->
+    <Or>
+      <Class name="org.apache.tomcat.util.json.JSONParser"/>
+      <Class name="org.apache.tomcat.util.json.JSONParserTokenManager"/>
+      <Class name="org.apache.tomcat.util.json.ParseException"/>
+      <Class name="org.apache.tomcat.util.json.TokenMgrError"/>
+    </Or>
   </Match>
   <Match>
     <!-- Hiding of field in superclass is deliberate -->
