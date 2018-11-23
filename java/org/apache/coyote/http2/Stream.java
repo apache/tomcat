@@ -733,7 +733,8 @@ class Stream extends AbstractStream implements HeaderEmitter {
                 throw new IllegalStateException(
                         sm.getString("stream.closed", getConnectionId(), getIdentifier()));
             }
-            int totalThisTime = 0;
+            // chunk is always fully written
+            int result = chunk.remaining();
             if (writeBuffer.isEmpty()) {
                 int chunkLimit = chunk.limit();
                 while (chunk.remaining() > 0) {
@@ -741,23 +742,20 @@ class Stream extends AbstractStream implements HeaderEmitter {
                     chunk.limit(chunk.position() + thisTime);
                     buffer.put(chunk);
                     chunk.limit(chunkLimit);
-                    totalThisTime += thisTime;
                     if (chunk.remaining() > 0 && !buffer.hasRemaining()) {
                         // Only flush if we have more data to write and the buffer
                         // is full
                         if (flush(true, coyoteResponse.getWriteListener() == null)) {
-                            totalThisTime += chunk.remaining();
                             writeBuffer.add(chunk);
                             break;
                         }
                     }
                 }
             } else {
-                totalThisTime = chunk.remaining();
                 writeBuffer.add(chunk);
             }
-            written += totalThisTime;
-            return totalThisTime;
+            written += result;
+            return result;
         }
 
         final synchronized boolean flush(boolean block) throws IOException {
