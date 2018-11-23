@@ -549,6 +549,12 @@
     <Bug pattern="RpC_REPEATED_CONDITIONAL_TEST "/>
   </Match>
   <Match>
+    <!-- False positive. It is lifecycle state that is being protected -->
+    <Class name="org.apache.catalina.tribes.group.GroupChannel" />
+    <Field name="utilityExecutor" />
+    <Bug pattern="IS2_INCONSISTENT_SYNC" />
+  </Match>
+  <Match>
     <Class name="org.apache.catalina.tribes.group.RpcChannel"/>
     <Method name="send"/>
     <Bug pattern="WA_NOT_IN_LOOP"/>
