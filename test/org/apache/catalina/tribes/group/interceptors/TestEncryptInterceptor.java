@@ -350,7 +350,7 @@ public class TestEncryptInterceptor {
         dest.messageReceived(msg);
     }
 
-    /**
+    /*
      * This test isn't guaranteed to catch any multithreaded issues, but it
      * gives a good exercise.
      */
@@ -367,6 +367,7 @@ public class TestEncryptInterceptor {
         dest.start(Channel.SND_TX_SEQ);
 
         Runnable job = new Runnable() {
+            @Override
             public void run() {
                 try {
                     ChannelData msg = new ChannelData(false);
@@ -456,7 +457,7 @@ public class TestEncryptInterceptor {
     private static class ValuesCaptureInterceptor
         extends ChannelInterceptorBase
     {
-        private ArrayList<byte[]> messages = new ArrayList<byte[]>();
+        private ArrayList<byte[]> messages = new ArrayList<>();
 
         @Override
         public void sendMessage(Member[] destination, ChannelMessage msg, InterceptorPayload payload)
