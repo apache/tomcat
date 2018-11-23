@@ -19,6 +19,8 @@ package org.apache.catalina.tribes.group.interceptors;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.util.ArrayList;
+import java.util.Collection;
 
 import org.hamcrest.core.IsEqual;
 import org.hamcrest.core.IsNot;
@@ -349,6 +351,60 @@ public class TestEncryptInterceptor {
     }
 
     /**
+     * This test isn't guaranteed to catch any multithreaded issues, but it
+     * gives a good exercise.
+     */
+    @Test
+    public void testMultithreaded() throws Exception {
+        String inputValue = "A test string to fight over.";
+        final byte[] bytes = inputValue.getBytes("UTF-8");
+        int numThreads = 100;
+        final int messagesPerThread = 10;
+
+        dest.setPrevious(new ValuesCaptureInterceptor());
+
+        src.start(Channel.SND_TX_SEQ);
+        dest.start(Channel.SND_TX_SEQ);
+
+        Runnable job = new Runnable() {
+            public void run() {
+                try {
+                    ChannelData msg = new ChannelData(false);
+                    XByteBuffer xbb = new XByteBuffer(1024, false);
+                    xbb.append(bytes, 0, bytes.length);
+                    msg.setMessage(xbb);
+
+                    for(int i=0; i<messagesPerThread; ++i)
+                        src.sendMessage(null, msg, null);
+                } catch (ChannelException e) {
+                    Assert.fail("Encountered exception sending messages: " + e.getMessage());
+                }
+            }
+        };
+
+        Thread[] threads = new Thread[numThreads];
+        for(int i=0; i<numThreads; ++i) {
+            threads[i] = new Thread(job);
+            threads[i].setName("Message-Thread-" + i);
+        }
+
+        for(int i=0; i<numThreads; ++i)
+            threads[i].start();
+
+        for(int i=0; i<numThreads; ++i)
+            threads[i].join();
+
+        // Check all received messages to make sure they are not corrupted
+        Collection<byte[]> messages = ((ValuesCaptureInterceptor)dest.getPrevious()).getValues();
+
+        Assert.assertEquals("Did not receive all expected messages",
+                numThreads * messagesPerThread, messages.size());
+
+        for(byte[] message : messages)
+            Assert.assertArrayEquals("Message is corrupted", message, bytes);
+    }
+
+    /**
      * Interceptor that delivers directly to a destination.
      */
     private static class PipedInterceptor
@@ -391,6 +447,35 @@ public class TestEncryptInterceptor {
 
         public byte[] getValue() {
             return value;
+        }
+    }
+
+    /**
+     * Interceptor that simply captures all messages sent to or received by it.
+     */
+    private static class ValuesCaptureInterceptor
+        extends ChannelInterceptorBase
+    {
+        private ArrayList<byte[]> messages = new ArrayList<byte[]>();
+
+        @Override
+        public void sendMessage(Member[] destination, ChannelMessage msg, InterceptorPayload payload)
+                throws ChannelException {
+            synchronized(messages) {
+                messages.add(msg.getMessage().getBytes());
+            }
+        }
+
+        @Override
+        public void messageReceived(ChannelMessage msg) {
+            synchronized(messages) {
+                messages.add(msg.getMessage().getBytes());
+            }
+        }
+
+        @SuppressWarnings("unchecked")
+        public Collection<byte[]> getValues() {
+            return (Collection<byte[]>)messages.clone();
         }
     }
 }

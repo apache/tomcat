@@ -159,6 +159,10 @@
         executor from the Catalina Service. If running independently, the
         Channel will provide the executor. (remm)
       </update>
+      <fix>
+        Make EncryptInterceptor thread-safe. This makes this interceptor
+        actually usable. (schultz/markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
