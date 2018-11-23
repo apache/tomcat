@@ -82,9 +82,9 @@ public class JspServletWrapper {
     // Logger
     private final Log log = LogFactory.getLog(JspServletWrapper.class); // must not be static
 
-    private Servlet theServlet;
+    private volatile Servlet theServlet;
     private final String jspUri;
-    private Class<?> tagHandlerClass;
+    private volatile Class<?> tagHandlerClass;
     private final JspCompilationContext ctxt;
     private long available = 0L;
     private final ServletConfig config;
@@ -281,7 +281,6 @@ public class JspServletWrapper {
                 synchronized (this) {
                     if (getReloadInternal() || tagHandlerClass == null) {
                         tagHandlerClass = ctxt.load();
-                        // Volatile 'reload' forces in order write of 'tagHandlerClass'
                         reload = false;
                     }
                 }
