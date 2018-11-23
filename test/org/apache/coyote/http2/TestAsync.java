@@ -153,9 +153,11 @@ public class TestAsync extends Http2TestBase {
         // Body
 
         if (!connectionUnlimited || !streamUnlimited) {
-
+            // TODO Remove debug code
+            System.out.println("Read loop 1");
             while (output.getBytesRead() < startingWindowSize) {
                 parser.readFrame(true);
+                System.out.println(output.getBytesRead());
             }
 
             // Check that the right number of bytes were received
@@ -171,8 +173,11 @@ public class TestAsync extends Http2TestBase {
                 sendWindowUpdate(0, windowSizeIncrease);
             }
 
+            // TODO Remove debug code
+            System.out.println("Read loop 2");
             while (output.getBytesRead() < startingWindowSize + windowSizeIncrease) {
                 parser.readFrame(true);
+                System.out.println(output.getBytesRead());
             }
 
             // Check that the right number of bytes were received
@@ -188,8 +193,11 @@ public class TestAsync extends Http2TestBase {
             }
         }
 
+        // TODO Remove debug code
+        System.out.println("Read loop 3");
         while (!output.getTrace().endsWith("3-EndOfStream\n")) {
             parser.readFrame(true);
+            System.out.println(output.getBytesRead());
         }
 
         // Check that the right number of bytes were received
