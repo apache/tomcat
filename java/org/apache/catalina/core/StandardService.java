@@ -96,7 +96,7 @@ public class StandardService extends LifecycleMBeanBase implements Service {
     /**
      * The number of threads available to process utility tasks in this service.
      */
-    protected int utilityThreads = 0;
+    protected int utilityThreads = 1;
 
     /**
      * The utility threads daemon flag.
@@ -235,14 +235,14 @@ public class StandardService extends LifecycleMBeanBase implements Service {
     /**
      * Handles the special values.
      */
-    private int getUtilityThreadsInternal() {
-        int result = getUtilityThreads();
+    private static int getUtilityThreadsInternal(int utilityThreads) {
+        int result = utilityThreads;
         if (result > 0) {
             return result;
         }
 
-        // Zero == Runtime.getRuntime().availableProcessors()
-        // -ve  == Runtime.getRuntime().availableProcessors() + value
+        // Zero == Runtime.getRuntime().availableProcessors() / 2
+        // -ve  == Runtime.getRuntime().availableProcessors() / 2 + value
         // These two are the same
         result = (Runtime.getRuntime().availableProcessors() / 2) + result;
         if (result < 1) {
@@ -253,7 +253,7 @@ public class StandardService extends LifecycleMBeanBase implements Service {
 
     @Override
     public void setUtilityThreads(int utilityThreads) {
-        if (utilityThreads < getUtilityThreadsInternal()) {
+        if (getUtilityThreadsInternal(utilityThreads) < getUtilityThreadsInternal(this.utilityThreads)) {
             return;
         }
         int oldUtilityThreads = this.utilityThreads;
@@ -261,19 +261,19 @@ public class StandardService extends LifecycleMBeanBase implements Service {
 
         // Use local copies to ensure thread safety
         if (oldUtilityThreads != utilityThreads && utilityExecutor != null) {
-            reconfigureUtilityExecutor(getUtilityThreadsInternal());
+            reconfigureUtilityExecutor(getUtilityThreadsInternal(utilityThreads));
         }
     }
 
 
     private synchronized void reconfigureUtilityExecutor(int threads) {
+        // The ScheduledThreadPoolExecutor doesn't use MaximumPoolSize, only CorePoolSize is available
         if (utilityExecutor != null) {
-            utilityExecutor.setMaximumPoolSize(threads);
+            utilityExecutor.setCorePoolSize(threads);
         } else {
             ScheduledThreadPoolExecutor scheduledThreadPoolExecutor =
-                    new ScheduledThreadPoolExecutor(1,
+                    new ScheduledThreadPoolExecutor(threads,
                             new TaskThreadFactory(getName() + "-utility-", utilityThreadsAsDaemon, Thread.NORM_PRIORITY));
-            scheduledThreadPoolExecutor.setMaximumPoolSize(threads);
             scheduledThreadPoolExecutor.setKeepAliveTime(10, TimeUnit.SECONDS);
             scheduledThreadPoolExecutor.setRemoveOnCancelPolicy(true);
             scheduledThreadPoolExecutor.setExecuteExistingDelayedTasksAfterShutdownPolicy(false);
@@ -613,7 +613,7 @@ public class StandardService extends LifecycleMBeanBase implements Service {
 
         super.initInternal();
 
-        reconfigureUtilityExecutor(getUtilityThreadsInternal());
+        reconfigureUtilityExecutor(getUtilityThreadsInternal(utilityThreads));
         register(utilityExecutor, "type=UtilityExecutor");
 
         if (engine != null) {
