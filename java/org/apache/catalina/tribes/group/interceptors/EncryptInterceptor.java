@@ -73,12 +73,7 @@ public class EncryptInterceptor extends ChannelInterceptorBase implements Encryp
     @Override
     public void start(int svc) throws ChannelException {
         if(Channel.SND_TX_SEQ == (svc & Channel.SND_TX_SEQ)) {
-            try {
-                initCiphers();
-            } catch (GeneralSecurityException gse) {
-                log.fatal(sm.getString("encryptInterceptor.init.failed"));
-                throw new ChannelException(sm.getString("encryptInterceptor.init.failed"), gse);
-            }
+            initInternal();
         }
 
         super.start(svc);
@@ -274,7 +269,7 @@ public class EncryptInterceptor extends ChannelInterceptorBase implements Encryp
         return algorithmName;
     }
 
-    private void initCiphers() throws GeneralSecurityException {
+    private void initInternal() {
         if(null == getEncryptionKey())
             throw new IllegalStateException(sm.getString("encryptInterceptor.key.required"));
 
