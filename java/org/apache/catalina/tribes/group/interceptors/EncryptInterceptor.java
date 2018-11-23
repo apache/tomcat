@@ -329,7 +329,7 @@ public class EncryptInterceptor extends ChannelInterceptorBase implements Encryp
         cipherPool.offer(cipher);
     }
 
-    private SecureRandom getRandom() throws GeneralSecurityException {
+    private SecureRandom getRandom() {
         SecureRandom random = randomPool.poll();
 
         if(null == random) {
