@@ -20,6 +20,7 @@ import java.security.GeneralSecurityException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.SecureRandom;
+import java.security.spec.AlgorithmParameterSpec;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import javax.crypto.Cipher;
@@ -481,21 +482,15 @@ public class EncryptInterceptor extends ChannelInterceptorBase implements Encryp
          */
         private byte[][] encrypt(byte[] bytes) throws GeneralSecurityException {
             Cipher cipher = null;
-            SecureRandom random = null;
-            byte[] iv = new byte[getIVSize()];
+
+            // Always use a random IV For cipher setup.
+            // The recipient doesn't need the (matching) IV because we will always
+            // pre-pad messages with the IV as a nonce.
+            byte[] iv = generateIVBytes();
 
             try {
-                random = getRandom();
-
-                // Always use a random IV For cipher setup.
-                // The recipient doesn't need the (matching) IV because we will always
-                // pre-pad messages with the IV as a nonce.
-                random.nextBytes(iv);
-
-                IvParameterSpec IV = new IvParameterSpec(iv);
-
                 cipher = getCipher();
-                cipher.init(Cipher.ENCRYPT_MODE, getSecretKey(), IV);
+                cipher.init(Cipher.ENCRYPT_MODE, getSecretKey(), generateIV(iv, 0, ivSize));
 
                 // Prepend the IV to the beginning of the encrypted data
                 byte[][] data = new byte[2][];
@@ -506,8 +501,6 @@ public class EncryptInterceptor extends ChannelInterceptorBase implements Encryp
             } finally {
                 if(null != cipher)
                     returnCipher(cipher);
-                if(null != random)
-                    returnRandom(random);
             }
         }
 
@@ -523,9 +516,7 @@ public class EncryptInterceptor extends ChannelInterceptorBase implements Encryp
         private byte[] decrypt(byte[] bytes) throws GeneralSecurityException {
             Cipher cipher = null;
 
-            int ivSize = getIVSize();
-            // Use first part of incoming data as IV
-            IvParameterSpec IV = new IvParameterSpec(bytes, 0, ivSize);
+            AlgorithmParameterSpec IV = generateIV(bytes, 0, ivSize);
 
             try {
                 cipher = getCipher();
@@ -538,6 +529,30 @@ public class EncryptInterceptor extends ChannelInterceptorBase implements Encryp
                 if(null != cipher)
                     returnCipher(cipher);
             }
+        }
+
+        protected byte[] generateIVBytes() {
+            byte[] ivBytes = new byte[getIVSize()];
+
+            SecureRandom random = null;
+
+            try {
+                random = getRandom();
+
+                // Always use a random IV For cipher setup.
+                // The recipient doesn't need the (matching) IV because we will always
+                // pre-pad messages with the IV as a nonce.
+                random.nextBytes(ivBytes);
+
+                return ivBytes;
+            } finally {
+                if(null != random)
+                    returnRandom(random);
+            }
+        }
+
+        protected AlgorithmParameterSpec generateIV(byte[] ivBytes, int offset, int length) {
+            return new IvParameterSpec(ivBytes, offset, length);
         }
     }
 }
