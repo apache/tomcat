@@ -344,46 +344,46 @@ public class EncryptInterceptor extends ChannelInterceptorBase implements Encryp
         /**
          * The fully-specified algorithm e.g. AES/CBC/PKCS5Padding.
          */
-        private String algorithm;
+        private final String algorithm;
 
         /**
          * The size of the initialization vector to use for encryption. This is
          * often, but not always, the same as the block size.
          */
-        private int ivSize;
+        private final int ivSize;
 
         /**
          * The cryptographic provider name.
          */
-        private String providerName;
+        private final String providerName;
 
         /**
          * The secret key to use for encryption and decryption operations.
          */
-        private SecretKeySpec secretKey;
+        private final SecretKeySpec secretKey;
 
         /**
          * A pool of Cipher objects. Ciphers are expensive to create, but not
          * to re-initialize, so we use a pool of them which grows as necessary.
          */
-        private ConcurrentLinkedQueue<Cipher> cipherPool;
+        private final ConcurrentLinkedQueue<Cipher> cipherPool;
 
         /**
          * A pool of SecureRandom objects. Each encrypt operation requires access
          * to a source of randomness. SecureRandom is thread-safe, but sharing a
          * single instance will likely be a bottleneck.
          */
-        private ConcurrentLinkedQueue<SecureRandom> randomPool;
+        private final ConcurrentLinkedQueue<SecureRandom> randomPool;
 
         public EncryptionManager(String algorithm, SecretKeySpec secretKey, String providerName)
             throws NoSuchAlgorithmException, NoSuchPaddingException, NoSuchProviderException {
-            setAlgorithm(algorithm);
-            setProviderName(providerName);
-            setSecretKey(secretKey);
+            this.algorithm = algorithm;
+            this.providerName = providerName;
+            this.secretKey = secretKey;
 
             cipherPool = new ConcurrentLinkedQueue<>();
             Cipher cipher = createCipher();
-            setIVSize(cipher.getBlockSize());
+            ivSize = cipher.getBlockSize();
             cipherPool.offer(cipher);
             randomPool = new ConcurrentLinkedQueue<>();
         }
@@ -394,32 +394,16 @@ public class EncryptInterceptor extends ChannelInterceptorBase implements Encryp
             randomPool.clear();
         }
 
-        private void setAlgorithm(String algorithm) {
-            this.algorithm = algorithm;
-        }
-
         private String getAlgorithm() {
             return algorithm;
-        }
-
-        private void setSecretKey(SecretKeySpec secretKey) {
-            this.secretKey = secretKey;
         }
 
         private SecretKeySpec getSecretKey() {
             return secretKey;
         }
 
-        private void setIVSize(int size) {
-            ivSize = size;
-        }
-
         private int getIVSize() {
             return ivSize;
-        }
-
-        private void setProviderName(String provider) {
-            providerName = provider;
         }
 
         private String getProviderName() {
