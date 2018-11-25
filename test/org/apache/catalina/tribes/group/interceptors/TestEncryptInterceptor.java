@@ -255,7 +255,6 @@ public class TestEncryptInterceptor {
     }
 
     @Test
-    @Ignore("GCM mode is unsupported because it requires a custom initialization vector")
     public void testGCM() throws Exception {
         src.setEncryptionAlgorithm("AES/GCM/PKCS5Padding");
         src.start(Channel.SND_TX_SEQ);

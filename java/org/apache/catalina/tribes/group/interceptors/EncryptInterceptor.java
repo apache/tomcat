@@ -25,6 +25,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 import javax.crypto.Cipher;
 import javax.crypto.NoSuchPaddingException;
+import javax.crypto.spec.GCMParameterSpec;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
@@ -64,7 +65,7 @@ public class EncryptInterceptor extends ChannelInterceptorBase implements Encryp
     private String encryptionKeyString;
 
 
-    private EncryptionManager encryptionManager;
+    private BaseEncryptionManager encryptionManager;
 
     public EncryptInterceptor() {
     }
@@ -300,7 +301,7 @@ public class EncryptInterceptor extends ChannelInterceptorBase implements Encryp
         return result;
     }
 
-    private static EncryptionManager createEncryptionManager(String algorithm,
+    private static BaseEncryptionManager createEncryptionManager(String algorithm,
             byte[] encryptionKey, String providerName)
         throws NoSuchAlgorithmException, NoSuchPaddingException, NoSuchProviderException {
         if(null == encryptionKey)
@@ -328,29 +329,31 @@ public class EncryptInterceptor extends ChannelInterceptorBase implements Encryp
         }
 
         // Note: ECB is not an appropriate mode for secure communications.
+        if("GCM".equalsIgnoreCase(algorithmMode))
+            return new GCMEncryptionManager(algorithm, new SecretKeySpec(encryptionKey, algorithmName), providerName);
+
         if(!("CBC".equalsIgnoreCase(algorithmMode)
                 || "OFB".equalsIgnoreCase(algorithmMode)
                 || "CFB".equalsIgnoreCase(algorithmMode)))
             throw new IllegalArgumentException(sm.getString("encryptInterceptor.algorithm.unsupported-mode", algorithmMode));
 
-        EncryptionManager mgr = new EncryptionManager(algorithm,
+        BaseEncryptionManager mgr = new BaseEncryptionManager(algorithm,
                 new SecretKeySpec(encryptionKey, algorithmName),
                 providerName);
 
         return mgr;
     }
 
-    private static class EncryptionManager {
+    private static class BaseEncryptionManager {
         /**
          * The fully-specified algorithm e.g. AES/CBC/PKCS5Padding.
          */
         private final String algorithm;
 
         /**
-         * The size of the initialization vector to use for encryption. This is
-         * often, but not always, the same as the block size.
+         * The block size of the cipher.
          */
-        private final int ivSize;
+        private final int blockSize;
 
         /**
          * The cryptographic provider name.
@@ -375,7 +378,7 @@ public class EncryptInterceptor extends ChannelInterceptorBase implements Encryp
          */
         private final ConcurrentLinkedQueue<SecureRandom> randomPool;
 
-        public EncryptionManager(String algorithm, SecretKeySpec secretKey, String providerName)
+        public BaseEncryptionManager(String algorithm, SecretKeySpec secretKey, String providerName)
             throws NoSuchAlgorithmException, NoSuchPaddingException, NoSuchProviderException {
             this.algorithm = algorithm;
             this.providerName = providerName;
@@ -383,7 +386,7 @@ public class EncryptInterceptor extends ChannelInterceptorBase implements Encryp
 
             cipherPool = new ConcurrentLinkedQueue<>();
             Cipher cipher = createCipher();
-            ivSize = cipher.getBlockSize();
+            blockSize = cipher.getBlockSize();
             cipherPool.offer(cipher);
             randomPool = new ConcurrentLinkedQueue<>();
         }
@@ -402,8 +405,14 @@ public class EncryptInterceptor extends ChannelInterceptorBase implements Encryp
             return secretKey;
         }
 
-        private int getIVSize() {
-            return ivSize;
+        /**
+         * Gets the size of the initialization vector for the cipher being used.
+         * The IV size is often, but not always, the block size for the cipher.
+         *
+         * @return The size of the initialization vector for this algorithm.
+         */
+        protected int getIVSize() {
+            return blockSize;
         }
 
         private String getProviderName() {
@@ -474,7 +483,7 @@ public class EncryptInterceptor extends ChannelInterceptorBase implements Encryp
 
             try {
                 cipher = getCipher();
-                cipher.init(Cipher.ENCRYPT_MODE, getSecretKey(), generateIV(iv, 0, ivSize));
+                cipher.init(Cipher.ENCRYPT_MODE, getSecretKey(), generateIV(iv, 0, getIVSize()));
 
                 // Prepend the IV to the beginning of the encrypted data
                 byte[][] data = new byte[2][];
@@ -500,6 +509,7 @@ public class EncryptInterceptor extends ChannelInterceptorBase implements Encryp
         private byte[] decrypt(byte[] bytes) throws GeneralSecurityException {
             Cipher cipher = null;
 
+            int ivSize = getIVSize();
             AlgorithmParameterSpec IV = generateIV(bytes, 0, ivSize);
 
             try {
@@ -537,6 +547,24 @@ public class EncryptInterceptor extends ChannelInterceptorBase implements Encryp
 
         protected AlgorithmParameterSpec generateIV(byte[] ivBytes, int offset, int length) {
             return new IvParameterSpec(ivBytes, offset, length);
+        }
+    }
+
+    private static class GCMEncryptionManager extends BaseEncryptionManager
+    {
+        public GCMEncryptionManager(String algorithm, SecretKeySpec secretKey, String providerName)
+                throws NoSuchAlgorithmException, NoSuchPaddingException, NoSuchProviderException {
+            super(algorithm, secretKey, providerName);
+        }
+
+        @Override
+        protected int getIVSize() {
+            return 12;
+        }
+
+        @Override
+        protected AlgorithmParameterSpec generateIV(byte[] bytes, int offset, int length) {
+            return new GCMParameterSpec(128, bytes, offset, length);
         }
     }
 }

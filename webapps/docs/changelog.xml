@@ -163,6 +163,9 @@
         Make EncryptInterceptor thread-safe. This makes this interceptor
         actually usable. (schultz/markt)
       </fix>
+      <add>
+        Add support for GCM mode to EncryptInterceptor. (schultz)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Other">
