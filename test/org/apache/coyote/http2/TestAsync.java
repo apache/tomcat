@@ -120,7 +120,7 @@ public class TestAsync extends Http2TestBase {
         sendClientPreface();
         validateHttp2InitialResponse();
 
-        // Reset connection window size after intial response
+        // Reset connection window size after initial response
         sendWindowUpdate(0, SimpleServlet.CONTENT_LENGTH);
 
         if (largeInitialWindow) {
