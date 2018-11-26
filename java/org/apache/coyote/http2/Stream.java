@@ -718,7 +718,7 @@ class Stream extends AbstractStream implements HeaderEmitter {
         private final ByteBuffer buffer = ByteBuffer.allocate(8 * 1024);
         private final WriteBuffer writeBuffer = new WriteBuffer(32 * 1024);
         private volatile long written = 0;
-        private volatile int streamReservation = 0;
+        private int streamReservation = 0;
         private volatile boolean closed = false;
         private volatile boolean endOfStreamSent = false;
 
