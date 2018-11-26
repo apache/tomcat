@@ -717,6 +717,10 @@ class Stream extends AbstractStream implements HeaderEmitter {
 
         private final ByteBuffer buffer = ByteBuffer.allocate(8 * 1024);
         private final WriteBuffer writeBuffer = new WriteBuffer(32 * 1024);
+        // Flag that indicates that data was left over on a previous
+        // non-blocking write. Once set, this flag stays set until all the data
+        // has been written.
+        private boolean dataLeft;
         private volatile long written = 0;
         private int streamReservation = 0;
         private volatile boolean closed = false;
@@ -747,6 +751,7 @@ class Stream extends AbstractStream implements HeaderEmitter {
                         // is full
                         if (flush(true, coyoteResponse.getWriteListener() == null)) {
                             writeBuffer.add(chunk);
+                            dataLeft = true;
                             break;
                         }
                     }
@@ -767,17 +772,20 @@ class Stream extends AbstractStream implements HeaderEmitter {
              * Too many calls and the end of stream message is sent too soon and
              * trailer headers are not sent.
              */
-            boolean dataLeft = buffer.position() > 0;
+            boolean dataInBuffer = buffer.position() > 0;
             boolean flushed = false;
 
-            if (dataLeft) {
-                dataLeft = flush(false, block);
+            if (dataInBuffer) {
+                dataInBuffer = flush(false, block);
                 flushed = true;
             }
 
-            if (!dataLeft) {
+            if (!dataInBuffer) {
                 if (writeBuffer.isEmpty()) {
-                    if (!flushed) {
+                    // Both buffer and writeBuffer are empty.
+                    if (flushed) {
+                        dataLeft = false;
+                    } else {
                         dataLeft = flush(false, block);
                     }
                 } else {
@@ -811,10 +819,10 @@ class Stream extends AbstractStream implements HeaderEmitter {
                 if (streamReservation == 0) {
                     streamReservation  = reserveWindowSize(left, block);
                     if (streamReservation == 0) {
-                        // Must be non-blocking. Unwritten non-blocking data
-                        // must put in writeBuffer else isReady() logic breaks
-                        writeBuffer.add(buffer);
-                        buffer.clear();
+                        // Must be non-blocking.
+                        // Note: Can't add to the writeBuffer here as the write
+                        // may originate from the writeBuffer.
+                        buffer.compact();
                         return true;
                     }
                 }
@@ -822,10 +830,10 @@ class Stream extends AbstractStream implements HeaderEmitter {
                     int connectionReservation =
                                 handler.reserveWindowSize(Stream.this, streamReservation, block);
                     if (connectionReservation == 0) {
-                        // Must be non-blocking. Unwritten non-blocking data
-                        // must put in writeBuffer else isReady() logic breaks
-                        writeBuffer.add(buffer);
-                        buffer.clear();
+                        // Must be non-blocking.
+                        // Note: Can't add to the writeBuffer here as the write
+                        // may originate from the writeBuffer.
+                        buffer.compact();
                         return true;
                     }
                     // Do the write
@@ -841,7 +849,7 @@ class Stream extends AbstractStream implements HeaderEmitter {
         }
 
         final synchronized boolean isReady() {
-            if (getWindowSize() > 0 && handler.getWindowSize() > 0 && writeBuffer.isEmpty()) {
+            if (getWindowSize() > 0 && handler.getWindowSize() > 0 && !dataLeft) {
                 return true;
             } else {
                 return false;
