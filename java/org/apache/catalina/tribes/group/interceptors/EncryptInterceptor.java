@@ -328,20 +328,19 @@ public class EncryptInterceptor extends ChannelInterceptorBase implements Encryp
             algorithmMode = "CBC";
         }
 
-        // Note: ECB is not an appropriate mode for secure communications.
         if("GCM".equalsIgnoreCase(algorithmMode))
             return new GCMEncryptionManager(algorithm, new SecretKeySpec(encryptionKey, algorithmName), providerName);
-
-        if(!("CBC".equalsIgnoreCase(algorithmMode)
+        else if("CBC".equalsIgnoreCase(algorithmMode)
                 || "OFB".equalsIgnoreCase(algorithmMode)
-                || "CFB".equalsIgnoreCase(algorithmMode)))
+                || "CFB".equalsIgnoreCase(algorithmMode))
+            return new BaseEncryptionManager(algorithm,
+                    new SecretKeySpec(encryptionKey, algorithmName),
+                    providerName);
+//        else if("ECB".equalsIgnoreCase(algorithmMode)) {
+            // Note: ECB is not an appropriate mode for secure communications.
+//            return new ECBEncryptionManager(algorithm, new SecretKeySpec(encryptionKey, algorithmName), providerName);
+        else
             throw new IllegalArgumentException(sm.getString("encryptInterceptor.algorithm.unsupported-mode", algorithmMode));
-
-        BaseEncryptionManager mgr = new BaseEncryptionManager(algorithm,
-                new SecretKeySpec(encryptionKey, algorithmName),
-                providerName);
-
-        return mgr;
     }
 
     private static class BaseEncryptionManager {
@@ -406,8 +405,9 @@ public class EncryptInterceptor extends ChannelInterceptorBase implements Encryp
         }
 
         /**
-         * Gets the size of the initialization vector for the cipher being used.
-         * The IV size is often, but not always, the block size for the cipher.
+         * Gets the size, in bytes, of the initialization vector for the
+         * cipher being used. The IV size is often, but not always, the block
+         * size for the cipher.
          *
          * @return The size of the initialization vector for this algorithm.
          */
@@ -550,6 +550,25 @@ public class EncryptInterceptor extends ChannelInterceptorBase implements Encryp
         }
     }
 
+    /**
+     * Implements an EncryptionManager for using GCM block cipher modes.
+     *
+     * GCM works a little differently than some of the other block cipher modes
+     * supported by EncryptInterceptor. First of all, it requires a different
+     * kind of AlgorithmParameterSpec object to be used, and second, it
+     * requires a slightly different initialization vector and something called
+     * an "authentication tag".
+     *
+     * The choice of IV length can be somewhat arbitrary, but there is consensus
+     * that 96-bit (12-byte) IVs for GCM are the best trade-off between security
+     * and performance. For other block cipher modes, IV length is the same as
+     * the block size.
+     *
+     * The "authentication tag" is a computed authentication value based upon
+     * the message and the encryption process. GCM defines these tags as the
+     * number of bits to use for the authentication tag, and it's clear that
+     * the highest number of bits supported 128-bit provide the best security.
+     */
     private static class GCMEncryptionManager extends BaseEncryptionManager
     {
         public GCMEncryptionManager(String algorithm, SecretKeySpec secretKey, String providerName)
@@ -559,12 +578,39 @@ public class EncryptInterceptor extends ChannelInterceptorBase implements Encryp
 
         @Override
         protected int getIVSize() {
-            return 12;
+            return 12; // See class javadoc for explanation of this magic number (12)
         }
 
         @Override
         protected AlgorithmParameterSpec generateIV(byte[] bytes, int offset, int length) {
+            // See class javadoc for explanation of this magic number (128)
             return new GCMParameterSpec(128, bytes, offset, length);
+        }
+    }
+
+    @SuppressWarnings("unused")
+    private static class ECBEncryptionManager extends BaseEncryptionManager
+    {
+        public ECBEncryptionManager(String algorithm, SecretKeySpec secretKey, String providerName)
+                throws NoSuchAlgorithmException, NoSuchPaddingException, NoSuchProviderException {
+            super(algorithm, secretKey, providerName);
+        }
+
+        private static final byte[] EMPTY_IV = new byte[0];
+
+        @Override
+        protected int getIVSize() {
+            return 0;
+        }
+
+        @Override
+        protected byte[] generateIVBytes() {
+            return EMPTY_IV;
+        }
+
+        @Override
+        protected AlgorithmParameterSpec generateIV(byte[] bytes, int offset, int length) {
+            return null;
         }
     }
 }

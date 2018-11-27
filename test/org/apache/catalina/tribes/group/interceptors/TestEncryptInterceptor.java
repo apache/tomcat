@@ -269,6 +269,19 @@ public class TestEncryptInterceptor {
     }
 
     @Test
+    public void testIllegalECB() throws Exception {
+        try {
+            src.setEncryptionAlgorithm("AES/ECB/PKCS5Padding");
+            src.start(Channel.SND_TX_SEQ);
+
+            // start() should trigger IllegalArgumentException
+            Assert.fail("ECB mode is not being refused");
+        } catch (IllegalArgumentException iae) {
+            // Expected
+        }
+    }
+
+    @Test
     public void testViaFile() throws Exception {
         src.start(Channel.SND_TX_SEQ);
         src.setNext(new ValueCaptureInterceptor());
