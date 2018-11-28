@@ -55,6 +55,8 @@ public abstract class CloudMembershipProvider extends MembershipProviderBase imp
     protected int port;
     protected String hostName;
 
+    protected long expirationTime = 5000;
+
     public CloudMembershipProvider() {
         try {
             md5 = MessageDigest.getInstance("md5");
@@ -87,6 +89,8 @@ public abstract class CloudMembershipProvider extends MembershipProviderBase imp
 
         hostName = InetAddress.getLocalHost().getHostName();
         port = Integer.parseInt(properties.getProperty("tcpListenPort"));
+
+        expirationTime = Long.parseLong(properties.getProperty("expirationTime", "5000"));
     }
 
     @Override
@@ -127,7 +131,7 @@ public abstract class CloudMembershipProvider extends MembershipProviderBase imp
             }
         }
         // Remove non refreshed members from the membership
-        Member[] expired = membership.expire(100); // TODO: is 100ms a good value?
+        Member[] expired = membership.expire(expirationTime);
         for (Member member : expired) {
             if (log.isDebugEnabled()) {
                 log.debug("Member disappeared: " + member);
