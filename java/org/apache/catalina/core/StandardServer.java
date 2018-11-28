@@ -490,7 +490,7 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
 
     /**
      * Set the new period between two lifecycle events in seconds.
-     * @param eventPeriod The period in seconds, negative or zero will
+     * @param periodicEventDelay The period in seconds, negative or zero will
      *  disable events
      */
     public final void setPeriodicEventDelay(int periodicEventDelay) {
