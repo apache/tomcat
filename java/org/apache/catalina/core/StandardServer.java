@@ -452,7 +452,7 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
         } else {
             ScheduledThreadPoolExecutor scheduledThreadPoolExecutor =
                     new ScheduledThreadPoolExecutor(threads,
-                            new TaskThreadFactory("Catalina-utility-", utilityThreadsAsDaemon, Thread.NORM_PRIORITY));
+                            new TaskThreadFactory("Catalina-utility-", utilityThreadsAsDaemon, Thread.MIN_PRIORITY));
             scheduledThreadPoolExecutor.setKeepAliveTime(10, TimeUnit.SECONDS);
             scheduledThreadPoolExecutor.setRemoveOnCancelPolicy(true);
             scheduledThreadPoolExecutor.setExecuteExistingDelayedTasksAfterShutdownPolicy(false);
