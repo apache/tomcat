@@ -1424,7 +1424,9 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
         public boolean hasDataToWrite() {
             synchronized (writeCompletionHandler) {
                 return !socketBufferHandler.isWriteBufferEmpty() ||
-                        !nonBlockingWriteBuffer.isEmpty() || getError() != null;
+                        !nonBlockingWriteBuffer.isEmpty() ||
+                        writePending.availablePermits() == 0 ||
+                        getError() != null;
             }
         }
 
