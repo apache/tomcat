@@ -211,7 +211,7 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
 
 
     /**
-     * The event period.
+     * The lifecycle event period.
      */
     protected int eventPeriod = 10;
 
@@ -481,7 +481,7 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
 
 
     /**
-     * @return The period between two events, in seconds
+     * @return The period between two lifecycle events, in seconds
      */
     public int getEventPeriod() {
         return eventPeriod;
@@ -489,8 +489,9 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
 
 
     /**
-     * Set the new period between two events.
-     * @param eventPeriod The period in seconds, <= 0 disables events
+     * Set the new period between two lifecycle events.
+     * @param eventPeriod The period in seconds, negative or zero will
+     *  disable events
      */
     public final void setEventPeriod(int eventPeriod) {
         this.eventPeriod = eventPeriod;
