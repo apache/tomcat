@@ -18,8 +18,6 @@
 
 package org.apache.catalina;
 
-import java.util.concurrent.ScheduledExecutorService;
-
 import org.apache.catalina.connector.Connector;
 import org.apache.catalina.mapper.Mapper;
 
@@ -98,20 +96,6 @@ public interface Service extends Lifecycle {
     public String getDomain();
 
 
-    /**
-     * Get the utility thread count.
-     * @return the thread count
-     */
-    public int getUtilityThreads();
-
-
-    /**
-     * Set the utility thread count.
-     * @param utilityThreads the new thread count
-     */
-    public void setUtilityThreads(int utilityThreads);
-
-
     // --------------------------------------------------------- Public Methods
 
     /**
@@ -167,10 +151,5 @@ public interface Service extends Lifecycle {
      * @return the mapper associated with this Service.
      */
     Mapper getMapper();
-
-    /**
-     * @return the utility executor managed by the Service.
-     */
-    ScheduledExecutorService getUtilityExecutor();
 
 }

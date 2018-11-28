@@ -19,6 +19,7 @@
 package org.apache.catalina;
 
 import java.io.File;
+import java.util.concurrent.ScheduledExecutorService;
 
 import org.apache.catalina.deploy.NamingResourcesImpl;
 import org.apache.catalina.startup.Catalina;
@@ -204,6 +205,20 @@ public interface Server extends Lifecycle {
     public void setCatalinaHome(File catalinaHome);
 
 
+    /**
+     * Get the utility thread count.
+     * @return the thread count
+     */
+    public int getUtilityThreads();
+
+
+    /**
+     * Set the utility thread count.
+     * @param utilityThreads the new thread count
+     */
+    public void setUtilityThreads(int utilityThreads);
+
+
     // --------------------------------------------------------- Public Methods
 
 
@@ -250,4 +265,10 @@ public interface Server extends Lifecycle {
      * context.
      */
     public Object getNamingToken();
+
+    /**
+     * @return the utility executor managed by the Service.
+     */
+    public ScheduledExecutorService getUtilityExecutor();
+
 }

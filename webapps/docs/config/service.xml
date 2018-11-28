@@ -68,17 +68,6 @@
       must be unique.</p>
     </attribute>
 
-    <attribute name="utilityThreads" required="false">
-      <p>The number of threads this <strong>Service</strong> will use for
-      various utility tasks, including recurring ones. The special value
-      of 0 will result in the value of
-      <code>Runtime.getRuntime().availableProcessors()/2</code> being
-      used. Negative values will result in
-      <code>Runtime.getRuntime().availableProcessors()/2 + value</code> being
-      used unless this is less than 1 in which case 1 thread will be used.
-      </p>
-    </attribute>
-
   </attributes>
 
   </subsection>
@@ -91,13 +80,6 @@
   common attributes listed above):</p>
 
   <attributes>
-
-    <attribute name="utilityThreadsAsDaemon" required="false">
-      <p>Set the daemon flag value for the utility threads. The default value
-      is <code>false</code>.
-      </p>
-    </attribute>
-
   </attributes>
 
   </subsection>

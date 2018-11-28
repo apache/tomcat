@@ -20,9 +20,6 @@ package org.apache.catalina.core;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 
 import javax.management.ObjectName;
 
@@ -41,7 +38,6 @@ import org.apache.catalina.util.LifecycleMBeanBase;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.res.StringManager;
-import org.apache.tomcat.util.threads.TaskThreadFactory;
 
 
 /**
@@ -92,26 +88,6 @@ public class StandardService extends LifecycleMBeanBase implements Service {
      * The list of executors held by the service.
      */
     protected final ArrayList<Executor> executors = new ArrayList<>();
-
-    /**
-     * The number of threads available to process utility tasks in this service.
-     */
-    protected int utilityThreads = 1;
-
-    /**
-     * The utility threads daemon flag.
-     */
-    protected boolean utilityThreadsAsDaemon = false;
-
-    /**
-     * Utility executor with scheduling capabilities.
-     */
-    private ScheduledThreadPoolExecutor utilityExecutor = null;
-
-    /**
-     * Utility executor wrapper.
-     */
-    private ScheduledExecutorService utilityExecutorWrapper = null;
 
     private Engine engine = null;
 
@@ -223,81 +199,6 @@ public class StandardService extends LifecycleMBeanBase implements Service {
     @Override
     public void setServer(Server server) {
         this.server = server;
-    }
-
-
-    @Override
-    public int getUtilityThreads() {
-        return utilityThreads;
-    }
-
-
-    /**
-     * Handles the special values.
-     */
-    private static int getUtilityThreadsInternal(int utilityThreads) {
-        int result = utilityThreads;
-        if (result > 0) {
-            return result;
-        }
-
-        // Zero == Runtime.getRuntime().availableProcessors() / 2
-        // -ve  == Runtime.getRuntime().availableProcessors() / 2 + value
-        // These two are the same
-        result = (Runtime.getRuntime().availableProcessors() / 2) + result;
-        if (result < 1) {
-            result = 1;
-        }
-        return result;
-    }
-
-    @Override
-    public void setUtilityThreads(int utilityThreads) {
-        if (getUtilityThreadsInternal(utilityThreads) < getUtilityThreadsInternal(this.utilityThreads)) {
-            return;
-        }
-        int oldUtilityThreads = this.utilityThreads;
-        this.utilityThreads = utilityThreads;
-
-        // Use local copies to ensure thread safety
-        if (oldUtilityThreads != utilityThreads && utilityExecutor != null) {
-            reconfigureUtilityExecutor(getUtilityThreadsInternal(utilityThreads));
-        }
-    }
-
-
-    private synchronized void reconfigureUtilityExecutor(int threads) {
-        // The ScheduledThreadPoolExecutor doesn't use MaximumPoolSize, only CorePoolSize is available
-        if (utilityExecutor != null) {
-            utilityExecutor.setCorePoolSize(threads);
-        } else {
-            ScheduledThreadPoolExecutor scheduledThreadPoolExecutor =
-                    new ScheduledThreadPoolExecutor(threads,
-                            new TaskThreadFactory(getName() + "-utility-", utilityThreadsAsDaemon, Thread.NORM_PRIORITY));
-            scheduledThreadPoolExecutor.setKeepAliveTime(10, TimeUnit.SECONDS);
-            scheduledThreadPoolExecutor.setRemoveOnCancelPolicy(true);
-            scheduledThreadPoolExecutor.setExecuteExistingDelayedTasksAfterShutdownPolicy(false);
-            utilityExecutor = scheduledThreadPoolExecutor;
-            utilityExecutorWrapper = new org.apache.tomcat.util.threads.ScheduledThreadPoolExecutor(utilityExecutor);
-        }
-    }
-
-
-    /**
-     * Get if the utility threads are daemon threads.
-     * @return the threads daemon flag
-     */
-    public boolean getUtilityThreadsAsDaemon() {
-        return utilityThreadsAsDaemon;
-    }
-
-
-    /**
-     * Set the utility threads daemon flag. The default value is true.
-     * @param utilityThreadsAsDaemon the new thread daemon flag
-     */
-    public void setUtilityThreadsAsDaemon(boolean utilityThreadsAsDaemon) {
-        this.utilityThreadsAsDaemon = utilityThreadsAsDaemon;
     }
 
 
@@ -613,9 +514,6 @@ public class StandardService extends LifecycleMBeanBase implements Service {
 
         super.initInternal();
 
-        reconfigureUtilityExecutor(getUtilityThreadsInternal(utilityThreads));
-        register(utilityExecutor, "type=UtilityExecutor");
-
         if (engine != null) {
             engine.init();
         }
@@ -658,12 +556,6 @@ public class StandardService extends LifecycleMBeanBase implements Service {
 
         if (engine != null) {
             engine.destroy();
-        }
-
-        if (utilityExecutor != null) {
-            utilityExecutor.shutdownNow();
-            unregister("type=UtilityExecutor");
-            utilityExecutor = null;
         }
 
         super.destroyInternal();
@@ -722,11 +614,6 @@ public class StandardService extends LifecycleMBeanBase implements Service {
     @Override
     public final String getObjectNameKeyProperties() {
         return "type=Service";
-    }
-
-    @Override
-    public ScheduledExecutorService getUtilityExecutor() {
-        return utilityExecutorWrapper;
     }
 
 }

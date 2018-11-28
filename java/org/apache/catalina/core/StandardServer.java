@@ -30,12 +30,18 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.security.AccessControlException;
 import java.util.Random;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import javax.management.InstanceNotFoundException;
 import javax.management.MBeanException;
 import javax.management.ObjectName;
 
 import org.apache.catalina.Context;
+import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleState;
 import org.apache.catalina.Server;
@@ -51,6 +57,7 @@ import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.buf.StringCache;
 import org.apache.tomcat.util.res.StringManager;
+import org.apache.tomcat.util.threads.TaskThreadFactory;
 
 
 /**
@@ -174,6 +181,39 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
     private File catalinaBase = null;
 
     private final Object namingToken = new Object();
+
+    /**
+     * The number of threads available to process utility tasks in this service.
+     */
+    protected int utilityThreads = 1;
+
+    /**
+     * The utility threads daemon flag.
+     */
+    protected boolean utilityThreadsAsDaemon = false;
+
+    /**
+     * Utility executor with scheduling capabilities.
+     */
+    private ScheduledThreadPoolExecutor utilityExecutor = null;
+
+    /**
+     * Utility executor wrapper.
+     */
+    private ScheduledExecutorService utilityExecutorWrapper = null;
+
+
+    /**
+     * Controller for the periodic lifecycle event.
+     */
+    private ScheduledFuture<?> periodicLifecycleEventFuture = null;
+    private ScheduledFuture<?> monitorFuture;
+
+
+    /**
+     * The event period.
+     */
+    protected int eventPeriod = 10;
 
 
     // ------------------------------------------------------------- Properties
@@ -363,6 +403,99 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
     public void setCatalina(Catalina catalina) {
         this.catalina = catalina;
     }
+
+
+    @Override
+    public int getUtilityThreads() {
+        return utilityThreads;
+    }
+
+
+    /**
+     * Handles the special values.
+     */
+    private static int getUtilityThreadsInternal(int utilityThreads) {
+        int result = utilityThreads;
+        if (result > 0) {
+            return result;
+        }
+
+        // Zero == Runtime.getRuntime().availableProcessors() / 2
+        // -ve  == Runtime.getRuntime().availableProcessors() / 2 + value
+        // These two are the same
+        result = (Runtime.getRuntime().availableProcessors() / 2) + result;
+        if (result < 1) {
+            result = 1;
+        }
+        return result;
+    }
+
+    @Override
+    public void setUtilityThreads(int utilityThreads) {
+        if (getUtilityThreadsInternal(utilityThreads) < getUtilityThreadsInternal(this.utilityThreads)) {
+            return;
+        }
+        int oldUtilityThreads = this.utilityThreads;
+        this.utilityThreads = utilityThreads;
+
+        // Use local copies to ensure thread safety
+        if (oldUtilityThreads != utilityThreads && utilityExecutor != null) {
+            reconfigureUtilityExecutor(getUtilityThreadsInternal(utilityThreads));
+        }
+    }
+
+
+    private synchronized void reconfigureUtilityExecutor(int threads) {
+        // The ScheduledThreadPoolExecutor doesn't use MaximumPoolSize, only CorePoolSize is available
+        if (utilityExecutor != null) {
+            utilityExecutor.setCorePoolSize(threads);
+        } else {
+            ScheduledThreadPoolExecutor scheduledThreadPoolExecutor =
+                    new ScheduledThreadPoolExecutor(threads,
+                            new TaskThreadFactory("Catalina-utility-", utilityThreadsAsDaemon, Thread.NORM_PRIORITY));
+            scheduledThreadPoolExecutor.setKeepAliveTime(10, TimeUnit.SECONDS);
+            scheduledThreadPoolExecutor.setRemoveOnCancelPolicy(true);
+            scheduledThreadPoolExecutor.setExecuteExistingDelayedTasksAfterShutdownPolicy(false);
+            utilityExecutor = scheduledThreadPoolExecutor;
+            utilityExecutorWrapper = new org.apache.tomcat.util.threads.ScheduledThreadPoolExecutor(utilityExecutor);
+        }
+    }
+
+
+    /**
+     * Get if the utility threads are daemon threads.
+     * @return the threads daemon flag
+     */
+    public boolean getUtilityThreadsAsDaemon() {
+        return utilityThreadsAsDaemon;
+    }
+
+
+    /**
+     * Set the utility threads daemon flag. The default value is true.
+     * @param utilityThreadsAsDaemon the new thread daemon flag
+     */
+    public void setUtilityThreadsAsDaemon(boolean utilityThreadsAsDaemon) {
+        this.utilityThreadsAsDaemon = utilityThreadsAsDaemon;
+    }
+
+
+    /**
+     * @return The period between two events, in seconds
+     */
+    public int getEventPeriod() {
+        return eventPeriod;
+    }
+
+
+    /**
+     * Set the new period between two events.
+     * @param eventPeriod The period in seconds, <= 0 disables events
+     */
+    public final void setEventPeriod(int eventPeriod) {
+        this.eventPeriod = eventPeriod;
+    }
+
 
     // --------------------------------------------------------- Server Methods
 
@@ -801,6 +934,37 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
                 services[i].start();
             }
         }
+
+        if (eventPeriod > 0) {
+            monitorFuture = getUtilityExecutor().scheduleWithFixedDelay(
+                    new Runnable() {
+                        @Override
+                        public void run() {
+                            startPeriodicLifecycleEvent();
+                        }
+                    }, 0, 60, TimeUnit.SECONDS);
+        }
+    }
+
+
+    protected void startPeriodicLifecycleEvent() {
+        if (periodicLifecycleEventFuture == null || (periodicLifecycleEventFuture != null && periodicLifecycleEventFuture.isDone())) {
+            if (periodicLifecycleEventFuture != null && periodicLifecycleEventFuture.isDone()) {
+                // There was an error executing the scheduled task, get it and log it
+                try {
+                    periodicLifecycleEventFuture.get();
+                } catch (InterruptedException | ExecutionException e) {
+                    log.error(sm.getString("standardServer.periodicEventError"), e);
+                }
+            }
+            periodicLifecycleEventFuture = getUtilityExecutor().scheduleAtFixedRate(
+                    new Runnable() {
+                        @Override
+                        public void run() {
+                            fireLifecycleEvent(Lifecycle.PERIODIC_EVENT, null);
+                        }
+                    }, eventPeriod, eventPeriod, TimeUnit.SECONDS);
+        }
     }
 
 
@@ -815,6 +979,16 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
     protected void stopInternal() throws LifecycleException {
 
         setState(LifecycleState.STOPPING);
+
+        if (monitorFuture != null) {
+            monitorFuture.cancel(true);
+            monitorFuture = null;
+        }
+        if (periodicLifecycleEventFuture != null) {
+            periodicLifecycleEventFuture.cancel(false);
+            periodicLifecycleEventFuture = null;
+        }
+
         fireLifecycleEvent(CONFIGURE_STOP_EVENT, null);
 
         // Stop our defined Services
@@ -835,6 +1009,10 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
     protected void initInternal() throws LifecycleException {
 
         super.initInternal();
+
+        // Initialize utility executor
+        reconfigureUtilityExecutor(getUtilityThreadsInternal(utilityThreads));
+        register(utilityExecutor, "type=UtilityExecutor");
 
         // Register global String cache
         // Note although the cache is global, if there are multiple Servers
@@ -897,6 +1075,12 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
 
         unregister(onameStringCache);
 
+        if (utilityExecutor != null) {
+            utilityExecutor.shutdownNow();
+            unregister("type=UtilityExecutor");
+            utilityExecutor = null;
+        }
+
         super.destroyInternal();
     }
 
@@ -958,4 +1142,10 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
     protected final String getObjectNameKeyProperties() {
         return "type=Server";
     }
+
+    @Override
+    public ScheduledExecutorService getUtilityExecutor() {
+        return utilityExecutorWrapper;
+    }
+
 }

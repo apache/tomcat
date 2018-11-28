@@ -141,7 +141,7 @@
         and all its child containers. A host will use background processing to
         perform live web application deployment related tasks. If not
         specified, the default value for this attribute is -1, which means
-        the host will rely on the background processing thread of its parent
+        the host will rely on the background processing setting of its parent
         engine.</p>
       </attribute>
 
@@ -204,8 +204,8 @@
         thread pool will be used to deploy new
         <a href="context.html">Context</a>s if automatic deployment is being
         used.
-        As the thread pool is shared at the service level, if more than one
-        host specifies this setting, only the maximum value will apply and will
+        As the thread pool is shared at the Server level, if more than one
+        Host specifies this setting, only the maximum value will apply and will
         be used for all except for the special value 1. If
         not specified, the default value of 1 will be used. If 1 thread is
         used then rather than using an <code>ExecutorService</code> the current

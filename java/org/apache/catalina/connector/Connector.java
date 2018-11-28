@@ -949,7 +949,7 @@ public class Connector extends LifecycleMBeanBase  {
         adapter = new CoyoteAdapter(this);
         protocolHandler.setAdapter(adapter);
         if (service != null) {
-            protocolHandler.setUtilityExecutor(service.getUtilityExecutor());
+            protocolHandler.setUtilityExecutor(service.getServer().getUtilityExecutor());
         }
 
         // Make sure parseBodyMethodsSet has a default

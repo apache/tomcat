@@ -52,7 +52,7 @@ import org.apache.catalina.LifecycleState;
 import org.apache.catalina.Loader;
 import org.apache.catalina.Pipeline;
 import org.apache.catalina.Realm;
-import org.apache.catalina.Service;
+import org.apache.catalina.Server;
 import org.apache.catalina.Valve;
 import org.apache.catalina.Wrapper;
 import org.apache.catalina.connector.Request;
@@ -873,9 +873,9 @@ public abstract class ContainerBase extends LifecycleMBeanBase
             }
         } else {
             // Delegate utility execution to the Service
-            Service service = Container.getService(this);
-            service.setUtilityThreads(threads);
-            startStopExecutor = Container.getService(this).getUtilityExecutor();
+            Server server = Container.getService(this).getServer();
+            server.setUtilityThreads(threads);
+            startStopExecutor = server.getUtilityExecutor();
         }
     }
 
@@ -937,7 +937,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
 
         // Start our thread
         if (backgroundProcessorDelay > 0) {
-            monitorFuture = Container.getService(ContainerBase.this)
+            monitorFuture = Container.getService(ContainerBase.this).getServer()
                     .getUtilityExecutor().scheduleWithFixedDelay(
                             new ContainerBackgroundProcessorMonitor(), 0, 60, TimeUnit.SECONDS);
         }
@@ -1278,7 +1278,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
                     log.error(sm.getString("containerBase.backgroundProcess.error"), e);
                 }
             }
-            backgroundProcessorFuture = Container.getService(this).getUtilityExecutor()
+            backgroundProcessorFuture = Container.getService(this).getServer().getUtilityExecutor()
                     .scheduleWithFixedDelay(new ContainerBackgroundProcessor(),
                             backgroundProcessorDelay, backgroundProcessorDelay,
                             TimeUnit.SECONDS);
