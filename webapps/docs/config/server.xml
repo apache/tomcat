@@ -117,6 +117,14 @@
       </p>
     </attribute>
 
+    <attribute name="periodicEventDelay" required="false">
+      <p>This value represents the delay in seconds between periodic
+      lifecycle event invocation of the lifecycle listeners configured on this
+      Server. The value is in seconds, and a negative or zero value will
+      disable the invocations. If not specified, the default value for this
+      attribute is 10 seconds.</p>
+    </attribute>
+
   </attributes>
 
   </subsection>

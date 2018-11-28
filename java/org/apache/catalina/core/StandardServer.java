@@ -211,9 +211,9 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
 
 
     /**
-     * The lifecycle event period.
+     * The lifecycle event period in seconds.
      */
-    protected int eventPeriod = 10;
+    protected int periodicEventDelay = 10;
 
 
     // ------------------------------------------------------------- Properties
@@ -483,18 +483,18 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
     /**
      * @return The period between two lifecycle events, in seconds
      */
-    public int getEventPeriod() {
-        return eventPeriod;
+    public final int getPeriodicEventDelay() {
+        return periodicEventDelay;
     }
 
 
     /**
-     * Set the new period between two lifecycle events.
+     * Set the new period between two lifecycle events in seconds.
      * @param eventPeriod The period in seconds, negative or zero will
      *  disable events
      */
-    public final void setEventPeriod(int eventPeriod) {
-        this.eventPeriod = eventPeriod;
+    public final void setPeriodicEventDelay(int periodicEventDelay) {
+        this.periodicEventDelay = periodicEventDelay;
     }
 
 
@@ -936,7 +936,7 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
             }
         }
 
-        if (eventPeriod > 0) {
+        if (periodicEventDelay > 0) {
             monitorFuture = getUtilityExecutor().scheduleWithFixedDelay(
                     new Runnable() {
                         @Override
@@ -964,7 +964,7 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
                         public void run() {
                             fireLifecycleEvent(Lifecycle.PERIODIC_EVENT, null);
                         }
-                    }, eventPeriod, eventPeriod, TimeUnit.SECONDS);
+                    }, periodicEventDelay, periodicEventDelay, TimeUnit.SECONDS);
         }
     }
 
