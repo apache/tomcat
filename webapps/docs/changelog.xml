@@ -230,6 +230,10 @@
         Add a packaging method for Tomcat using Maven, as well as a container
         build file for it. (remm)
       </add>
+      <fix>
+        Add XML Namespace to the project element of all POM files so that the
+        XML files are Well Formed and Valid. (csutherl)
+      </fix>
     </changelog>
   </subsection>
 </section>
