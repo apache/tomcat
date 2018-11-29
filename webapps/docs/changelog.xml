@@ -160,7 +160,7 @@
       <update>
         Refactor various operations performed in tribes using a scheduled
         executor. When tribes is not running standalone, it will use the
-        executor from the Catalina Service. If running independently, the
+        executor from the Catalina Server. If running independently, the
         Channel will provide the executor. (remm)
       </update>
       <fix>
