@@ -606,6 +606,50 @@
 
   </subsection>
 
+  <subsection name="HTTPD mod_heartmonitor Listener - org.apache.catalina.ha.backend.HeartbeatListener">
+
+    <p>The <strong>HTTPD mod_heartmonitor Listener</strong> allows tomcat to send heart beat message to
+    the Apache HTTPD mod_heartmonitor module.</p>
+
+    <p>The following additional attributes are supported by the <strong>HTTPD mod_heartmonitor
+    Listener</strong>:</p>
+
+    <attributes>
+      <attribute name="Port" required="false">
+        <p>Port the connector that will received proxied traffic from HTTPD, default the first connector will be used</p>
+      </attribute>
+
+      <attribute name="Host" required="false">
+        <p>Host it is the IP corresponding the <strong>address</strong> of the connector that will received proxied traffic,
+        default empty the <strong>Port</strong> will be used</p>
+      </attribute>
+
+      <attribute name="proxyURL" required="false">
+        <p>proxyURL is the URL corresponding to the <strong>Location</strong> in httpd configuration of the heartbeat Handler,
+        default /HeartbeatListener</p>
+      </attribute>
+
+      <attribute name="ProxyList" required="false">
+        <p>ProxyList is the list of proxies from which tomcat is going to receive requests,
+        formatted like "address:port,address:port" once filled the multicast logic is disable and the multi parameters are
+        ignored</p>
+      </attribute>
+
+      <attribute name="Group" required="false">
+        <p>Group is the Multicast IP to boardcast messages to HTTPD, default 224.0.1.105</p>
+      </attribute>
+
+      <attribute name="Multiport" required="false">
+        <p>Multiport is the Multicast port to boardcast messages to HTTPD, default 23364</p>
+      </attribute>
+
+      <attribute name="Ttl" required="false">
+        <p>Ttl is the TTL for the boardcast messages, default 16</p>
+      </attribute>
+
+    </attributes>
+  </subsection>
+
 </section>
 
 </body>
