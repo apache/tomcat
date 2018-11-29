@@ -18,8 +18,6 @@
 
 package org.apache.catalina.ha.backend;
 
-import org.apache.catalina.ContainerEvent;
-import org.apache.catalina.ContainerListener;
 import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleEvent;
 import org.apache.catalina.LifecycleListener;
@@ -33,43 +31,133 @@ import org.apache.juli.logging.LogFactory;
  * what about the bind(IP. port) only IP makes sense (for the moment).
  * BTW:v  = version :-)
  */
-public class HeartbeatListener implements LifecycleListener, ContainerListener {
+public class HeartbeatListener implements LifecycleListener {
 
     private static final Log log = LogFactory.getLog(HeartbeatListener.class);
 
     /* To allow to select the connector */
-    private int port = 0;
-    private String host = null;
+    protected int port = 8009;
+    protected String host = null;
+
+    /**
+     * @return the host corresponding to the connector
+     * we want to proxy.
+     */
+    public String getHost() {
+        return this.host;
+    }
+
+    /**
+     * Set the host corresponding to the connector.
+     *
+     * @param host the hostname or ip string.
+     */
+    public void setHost(String host) {
+        this.host = host;
+    }
+
+    /**
+     * @return the port of the connector we want to proxy.
+     */
+    public int getPort() {
+        return this.port;
+    }
+
+    /**
+     * Set the port corresponding to the connector.
+     *
+     * @param port default 8009 the ajp one.
+     */
+    public void setPort(int port) {
+        this.port = port;
+    }
 
     /* for multicasting stuff */
-    private final String ip = "224.0.1.105"; /* Multicast IP */
-    private final int multiport = 23364;     /* Multicast Port */
-    private final int ttl = 16;
+    protected String ip = "224.0.1.105"; /* Multicast IP */
+    protected int multiport = 23364;     /* Multicast Port */
+    protected int ttl = 16;
 
-    public String getHost() { return host; }
+    /* corresponding setters and getters */
+
+    /**
+     * @return the Multicast IP we are using for Multicast
+     */
     public String getGroup() { return ip; }
+
+    /**
+     * Set the Multicast IP to use for Multicast
+     *
+     * @param group the multi address to use.
+     */
+    public void setGroup(String group) { this.ip = group; }
+
+    /**
+     * @return the Multicast Port we are using for Multicast.
+     */
     public int getMultiport() { return multiport; }
+
+    /**
+     * Set the Port to use for Multicast
+     *
+     * @param port the port to use.
+     */
+    public void setMultiport(int port) { this.multiport=port; }
+
+    /**
+     * @return the TTL for Multicast packets.
+     */
     public int getTtl() { return ttl; }
+
+    /**
+     * Set the TTL for Multicast packets.
+     *
+     * @param ttl value for TTL.
+     */
+    public void setTtl(int ttl) { this.ttl=ttl; }
 
     /**
      * Proxy list, format "address:port,address:port".
      */
-    private final String proxyList = null;
+    protected String proxyList = null;
+
+    /**
+     * @return the list of proxies that send us requests.
+     */
     public String getProxyList() { return proxyList; }
+
+    /**
+     * Set the list of Proxies that send is requests, when not empty it toogles
+     * the multi to off. A SetHandler heartbeat must be existing in httpd.conf.
+     * 
+     *
+     * @param proxyList the list of proxy, format "address:port,address:port".
+     */
+    public void setProxyList(String proxyList) { this.proxyList = proxyList; }
 
     /**
      * URL prefix.
      */
-    private final String proxyURL = "/HeartbeatListener";
+    protected String proxyURL = "/HeartbeatListener";
+
+    /**
+     * @return the URL specified in <Location/> for the SetHandler heartbeat.
+     */
     public String getProxyURL() { return proxyURL; }
+
+    /**
+     * Set the URL of receiver in httpd. That is the location used in
+     * <Location "/HeartbeatListener">
+     *    SetHandler heartbeat
+     * </Location>
+     * All proxies MUST use the same location.
+     *
+     * @param proxyURL a String with the URL starting with /
+     */
+    public void setProxyURLString(String proxyURL) { this.proxyURL = proxyURL; }
 
     private CollectedInfo coll = null;
 
     private Sender sender = null;
-
-    @Override
-    public void containerEvent(ContainerEvent event) {
-    }
 
     @Override
     public void lifecycleEvent(LifecycleEvent event) {

@@ -59,25 +59,36 @@ public class CollectedInfo {
         Set<ObjectInstance> set = mBeanServer.queryMBeans(objectName, null);
         for (ObjectInstance oi : set) {
             objName = oi.getObjectName();
+            String subtype = objName.getKeyProperty("subType");
+            if (subtype != null && subtype.equals("SocketProperties")) {
+                objName = null;
+                continue;
+            }
             String name = objName.getKeyProperty("name");
+            name = name.replace("\"", "");
 
             /* Name are:
-             * http-8080
-             * jk-10.33.144.3-8009
-             * jk-jfcpc%2F10.33.144.3-8009
+             * ajp-nio-8009
+             * ajp-nio-127.0.0.1-8009
+             * ajp-nio-0:0:0:0:0:0:0:1-8009
+             * ajp-nio-10.36.116.209-8009
              */
             String [] elenames = name.split("-");
             String sport = elenames[elenames.length-1];
             iport = Integer.parseInt(sport);
-            String [] shosts = elenames[1].split("%2F");
-            shost = shosts[0];
+            if (elenames.length == 4)
+                shost = elenames[2];
 
             if (port==0 && host==null)
-                  break; /* Take the first one */
-            if (host==null && iport==port)
-                break; /* Only port done */
-            if (shost.compareTo(host) == 0)
-                break; /* Done port and host are the expected ones */
+                break; /* Done: take the first one */
+            if (iport==port) {
+                if (host == null)
+                    break; /* Done: return the first with the right port */
+                else if (shost != null && shost.compareTo(host) == 0)
+                    break; /* Done port and host are the expected ones */
+            }
+            objName = null;
+            shost = null;
         }
         if (objName == null)
             throw new Exception("Can't find connector for " + host + ":" + port);
