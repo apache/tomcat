@@ -203,13 +203,18 @@
       </add>
       <add>
         Expand the coverage and quality of the Russian translations provided
-        with Apache Tomcat. Includes contributions from solomax and Rafael
-        Sachakov. (markt)
+        with Apache Tomcat. Includes contributions from solomax, Rafael Sachakov
+        and Andrei Maiseyenka. (markt)
       </add>
       <add>
         Expand the coverage and quality of the German translations provided
         with Apache Tomcat. Includes contributions from Matk80, burghard,
         Daniel Wehringer and Felix Schumacher. (markt)
+      </add>
+      <add>
+        Expand the coverage and quality of the Japanese translations provided
+        with Apache Tomcat. Includes contributions from Yujiorama,
+        motohashi.yuki and kfujino. (markt)
       </add>
       <add>
         Add Brazilian Portuguese translations to Apache Tomcat. Includes
