@@ -128,7 +128,6 @@ public class HeartbeatListener implements LifecycleListener {
     /**
      * Set the list of Proxies that send is requests, when not empty it toogles
      * the multi to off. A SetHandler heartbeat must be existing in httpd.conf.
-     * 
      *
      * @param proxyList the list of proxy, format "address:port,address:port".
      */
@@ -140,15 +139,17 @@ public class HeartbeatListener implements LifecycleListener {
     protected String proxyURL = "/HeartbeatListener";
 
     /**
-     * @return the URL specified in <Location/> for the SetHandler heartbeat.
+     * @return the URL specified in &lt;Location/&gt; for the SetHandler heartbeat.
      */
     public String getProxyURL() { return proxyURL; }
 
     /**
      * Set the URL of receiver in httpd. That is the location used in
-     * <Location "/HeartbeatListener">
+     * <pre>
+     * &lt;Location "/HeartbeatListener"&gt;
      *    SetHandler heartbeat
-     * </Location>
+     * &lt;/Location&gt;
+     * </pre>
      * All proxies MUST use the same location.
      *
      * @param proxyURL a String with the URL starting with /
