@@ -226,6 +226,10 @@
       <fix>
         Include Korean translations in the standard Tomcat distribution. (markt)
       </fix>
+      <add>
+        Add a packaging method for Tomcat using Maven, as well as a container
+        build file for it. (remm)
+      </add>
     </changelog>
   </subsection>
 </section>
