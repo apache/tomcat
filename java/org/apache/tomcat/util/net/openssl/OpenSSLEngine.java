@@ -145,6 +145,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
 
     // Use an invalid cipherSuite until the handshake is completed
     // See http://docs.oracle.com/javase/7/docs/api/javax/net/ssl/SSLEngine.html#getSession()
+    private volatile String version;
     private volatile String cipher;
     private volatile String applicationProtocol;
 
@@ -632,7 +633,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
             throws SSLException {
         // NOTE: Calling a fake read is necessary before calling pendingReadableBytesInSSL because
         // SSL_pending will return 0 if OpenSSL has not started the current TLS record
-        // See https://www.openssl.org/docs/manmaster/ssl/SSL_pending.html
+        // See https://www.openssl.org/docs/manmaster/man3/SSL_pending.html
         clearLastError();
         int lastPrimingReadResult = SSL.readFromSSL(ssl, EMPTY_ADDR, 0); // priming read
         // check if SSL_read returned <= 0. In this case we need to check the error and see if it was something
@@ -640,7 +641,22 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         if (lastPrimingReadResult <= 0) {
             checkLastError();
         }
-        return SSL.pendingReadableBytesInSSL(ssl);
+        int pendingReadableBytesInSSL = SSL.pendingReadableBytesInSSL(ssl);
+
+        // TLS 1.0 needs additional handling
+        // TODO Figure out why this is necessary and if a simpler / better
+        // solution is available
+        if (Constants.SSL_PROTO_TLSv1.equals(version) && lastPrimingReadResult == 0 &&
+                pendingReadableBytesInSSL == 0) {
+            // Perform another priming read
+            lastPrimingReadResult = SSL.readFromSSL(ssl, EMPTY_ADDR, 0);
+            if (lastPrimingReadResult <= 0) {
+                checkLastError();
+            }
+            pendingReadableBytesInSSL = SSL.pendingReadableBytesInSSL(ssl);
+        }
+
+        return pendingReadableBytesInSSL;
     }
 
     @Override
@@ -1027,6 +1043,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
                     }
                 }
                 session.lastAccessedTime = System.currentTimeMillis();
+                version = SSL.getVersion(ssl);
                 handshakeFinished = true;
                 return SSLEngineResult.HandshakeStatus.FINISHED;
             }
