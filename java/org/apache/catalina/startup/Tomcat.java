@@ -907,10 +907,7 @@ public class Tomcat {
             return (Context) Class.forName(contextClass).getConstructor()
                     .newInstance();
         } catch (ReflectiveOperationException  | IllegalArgumentException | SecurityException e) {
-            throw new IllegalArgumentException(
-                    "Can't instantiate context-class " + contextClass
-                            + " for host " + host + " and url "
-                            + url, e);
+            throw new IllegalArgumentException(sm.getString("tomcat.noContextClass", contextClass, host, url), e);
         }
     }
 
