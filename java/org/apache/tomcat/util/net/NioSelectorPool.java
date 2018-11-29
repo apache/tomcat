@@ -26,22 +26,10 @@ import java.util.NoSuchElementException;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.apache.juli.logging.Log;
-import org.apache.juli.logging.LogFactory;
-
 /**
- *
  * Thread safe non blocking selector pool
- * @version 1.0
- * @since 6.0
  */
-
 public class NioSelectorPool {
-
-    public NioSelectorPool() {
-    }
-
-    private static final Log log = LogFactory.getLog(NioSelectorPool.class);
 
     protected static final boolean SHARED =
         Boolean.parseBoolean(System.getProperty("org.apache.tomcat.util.net.NioSelectorShared", "true"));
@@ -64,7 +52,6 @@ public class NioSelectorPool {
             synchronized ( NioSelectorPool.class ) {
                 if ( SHARED_SELECTOR == null )  {
                     SHARED_SELECTOR = Selector.open();
-                    log.info("Using a shared selector for servlet write/read");
                 }
             }
         }

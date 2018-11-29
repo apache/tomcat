@@ -626,7 +626,7 @@ public class Catalina {
         }
 
         if (getServer() == null) {
-            log.fatal("Cannot start server. Server instance is not configured.");
+            log.fatal(sm.getString("catalina.noServer"));
             return;
         }
 
@@ -647,7 +647,7 @@ public class Catalina {
 
         long t2 = System.nanoTime();
         if(log.isInfoEnabled()) {
-            log.info("Server startup in " + ((t2 - t1) / 1000000) + " ms");
+            log.info(sm.getString("catalina.startup", ((t2 - t1) / 1000000)));
         }
 
         // Register shutdown hook
