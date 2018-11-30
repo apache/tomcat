@@ -20,6 +20,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -55,12 +56,13 @@ public class CatalinaBaseConfigurationSource implements ConfigurationSource {
             ioe = e;
         }
         if (result == null) {
-            InputStream inputStream = getClass().getClassLoader().getResourceAsStream("server-embed.xml");
-            if (inputStream != null) {
+            // Compatibility with legacy server-embed.xml location
+            InputStream stream = getClass().getClassLoader().getResourceAsStream("server-embed.xml");
+            if (stream != null) {
                 try {
-                    result = new Resource(inputStream, getClass().getClassLoader().getResource("server-embed.xml").toURI());
+                    result = new Resource(stream, getClass().getClassLoader().getResource("server-embed.xml").toURI());
                 } catch (URISyntaxException e) {
-                    // Ignore
+                    stream.close();
                 }
             }
         }
@@ -87,12 +89,13 @@ public class CatalinaBaseConfigurationSource implements ConfigurationSource {
 
         // Try classloader
         InputStream stream = getClass().getClassLoader().getResourceAsStream(name);
-        try {
-            if (stream != null) {
+        if (stream != null) {
+            try {
                 return new Resource(stream, getClass().getClassLoader().getResource(name).toURI());
+            } catch (URISyntaxException e) {
+                stream.close();
+                throw new IOException(sm.getString("catalinaConfigurationSource.cannotObtainURL", name), e);
             }
-        } catch (URISyntaxException e) {
-            throw new IOException(sm.getString("catalinaConfigurationSource.cannotObtainURL", name), e);
         }
 
         // Then try URI.
@@ -102,7 +105,7 @@ public class CatalinaBaseConfigurationSource implements ConfigurationSource {
         try {
             URL url = uri.toURL();
             return new Resource(url.openConnection().getInputStream(), uri);
-        } catch (IllegalArgumentException e) {
+        } catch (MalformedURLException e) {
             throw new IOException(sm.getString("catalinaConfigurationSource.cannotObtainURL", name), e);
         }
     }
