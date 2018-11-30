@@ -81,9 +81,11 @@
         source, which will allow processing of core configuration. (remm)
       </update>
       <update>
-        Refactor processing of server.xml, web.xml, context.xml and context
-        configuration files using the ConfigurationSource API. JASPIC and
-        storeconfig remain file based. (remm)
+        Refactor processing of server.xml, web.xml, context.xml, other
+        configuration files and resources using the ConfigurationSource API.
+        JASPIC persistent providers load and store remains file based.
+        StoreConfig Tomcat configuration files storing remains file based
+        at their previous default locations. (remm)
       </update>
       <add>
         <bug>62897</bug>: Provide a property

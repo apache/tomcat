@@ -135,6 +135,7 @@ public class StoreLoader {
      *
      * @param path Path to the configuration file, may be null to use the default
      *  name server-registry.xml
+     * @throws Exception when the configuration file isn't found or a parse error occurs
      */
     public void load(String path) throws Exception {
         try (Resource resource = (path == null) ?
