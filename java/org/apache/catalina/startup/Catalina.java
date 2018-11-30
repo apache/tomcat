@@ -596,7 +596,7 @@ public class Catalina {
 
         long t2 = System.nanoTime();
         if(log.isInfoEnabled()) {
-            log.info(sm.getString("catalina.init", ((t2 - t1) / 1000000)));
+            log.info(sm.getString("catalina.init", Long.valueOf((t2 - t1) / 1000000)));
         }
     }
 
@@ -647,7 +647,7 @@ public class Catalina {
 
         long t2 = System.nanoTime();
         if(log.isInfoEnabled()) {
-            log.info(sm.getString("catalina.startup", ((t2 - t1) / 1000000)));
+            log.info(sm.getString("catalina.startup", Long.valueOf((t2 - t1) / 1000000)));
         }
 
         // Register shutdown hook
