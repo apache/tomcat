@@ -67,6 +67,11 @@
       <fix>
         Fix more storeconfig issues with duplicated SSL attributes. (remm)
       </fix>
+      <fix>
+        <bug>62968</bug>: Avoid unnecessary (and relatively expensive)
+        <code>getResources()</code> call in the Mapper when processing rule 7.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
