@@ -25,6 +25,7 @@ import java.util.Collection;
 import org.hamcrest.core.IsEqual;
 import org.hamcrest.core.IsNot;
 
+import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.FixMethodOrder;
@@ -51,12 +52,23 @@ import org.apache.catalina.tribes.io.XByteBuffer;
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TestEncryptInterceptor {
+    private static final String MESSAGE_FILE = "message.bin";
+
     private static final String encryptionKey128 = "cafebabedeadbeefbeefcafecafebabe";
     private static final String encryptionKey192 = "cafebabedeadbeefbeefcafecafebabedeadbeefbeefcafe";
     private static final String encryptionKey256 = "cafebabedeadbeefcafebabedeadbeefcafebabedeadbeefcafebabedeadbeef";
 
     EncryptInterceptor src;
     EncryptInterceptor dest;
+
+
+    @AfterClass
+    public static void cleanup() {
+        File f = new File(MESSAGE_FILE);
+        if (f.isFile()) {
+            Assert.assertTrue(f.delete());
+        }
+    }
 
     @Before
     public void setup() {
@@ -294,7 +306,7 @@ public class TestEncryptInterceptor {
 
         byte[] bytes = ((ValueCaptureInterceptor)src.getNext()).getValue();
 
-        try (FileOutputStream out = new FileOutputStream("message.bin")) {
+        try (FileOutputStream out = new FileOutputStream(MESSAGE_FILE)) {
             out.write(bytes);
         }
 
@@ -303,7 +315,7 @@ public class TestEncryptInterceptor {
         bytes = new byte[8192];
         int read;
 
-        try (FileInputStream in = new FileInputStream("message.bin")) {
+        try (FileInputStream in = new FileInputStream(MESSAGE_FILE)) {
             read = in.read(bytes);
         }
 
@@ -339,7 +351,7 @@ public class TestEncryptInterceptor {
 
     @Test
     public void testPickup() throws Exception {
-        File file = new File("message.bin");
+        File file = new File(MESSAGE_FILE);
         if(!file.exists()) {
             System.err.println("File message.bin does not exist. Skipping test.");
             return;
@@ -350,7 +362,7 @@ public class TestEncryptInterceptor {
         byte[] bytes = new byte[8192];
         int read;
 
-        try (FileInputStream in = new FileInputStream("message.bin")) {
+        try (FileInputStream in = new FileInputStream(file)) {
             read = in.read(bytes);
         }
 
