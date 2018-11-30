@@ -29,6 +29,7 @@ import org.apache.catalina.Server;
 import org.apache.catalina.Service;
 import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.mbeans.MBeanUtils;
+import org.apache.catalina.startup.Bootstrap;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.res.StringManager;
@@ -119,8 +120,7 @@ public class StoreConfig implements IStoreConfig {
     public synchronized void storeServer(String aServerName, boolean backup,
             boolean externalAllowed) throws MalformedObjectNameException {
         if (aServerName == null || aServerName.length() == 0) {
-            if (log.isErrorEnabled())
-                log.error("Please, call with a correct server ObjectName!");
+            log.error(sm.getString("config.emptyObjectName"));
             return;
         }
         MBeanServer mserver = MBeanUtils.createServer();
@@ -149,12 +149,11 @@ public class StoreConfig implements IStoreConfig {
                     store(aServer);
                 }
             } catch (Exception e) {
-                if (log.isInfoEnabled())
-                    log.info("Object " + aServerName
-                            + " is no a Server instance or store exception", e);
+                log.error(sm.getString("config.storeServerError"), e);
             }
-        } else if (log.isInfoEnabled())
-            log.info("Server " + aServerName + " not found!");
+        } else {
+            log.info(sm.getString("config.objectNameNotFound", aServerName));
+        }
     }
 
     /**
@@ -171,8 +170,7 @@ public class StoreConfig implements IStoreConfig {
     public synchronized void storeContext(String aContextName, boolean backup,
             boolean externalAllowed) throws MalformedObjectNameException {
         if (aContextName == null || aContextName.length() == 0) {
-            if (log.isErrorEnabled())
-                log.error("Please, call with a correct context ObjectName!");
+            log.error(sm.getString("config.emptyObjectName"));
             return;
         }
         MBeanServer mserver = MBeanUtils.createServer();
@@ -183,44 +181,35 @@ public class StoreConfig implements IStoreConfig {
                         "managedResource");
                 URL configFile = aContext.getConfigFile();
                 if (configFile != null) {
-                    try {
-                        StoreDescription desc = null;
-                        desc = getRegistry().findDescription(
-                                aContext.getClass());
-                        if (desc != null) {
-                            boolean oldSeparate = desc.isStoreSeparate();
-                            boolean oldBackup = desc.isBackup();
-                            boolean oldExternalAllowed = desc
-                                    .isExternalAllowed();
-                            try {
-                                desc.setStoreSeparate(true);
-                                desc.setBackup(backup);
-                                desc.setExternalAllowed(externalAllowed);
-                                desc.getStoreFactory()
-                                        .store(null, -2, aContext);
-                            } finally {
-                                desc.setStoreSeparate(oldSeparate);
-                                desc.setBackup(oldBackup);
-                                desc.setBackup(oldExternalAllowed);
-                            }
+                    StoreDescription desc = null;
+                    desc = getRegistry().findDescription(
+                            aContext.getClass());
+                    if (desc != null) {
+                        boolean oldSeparate = desc.isStoreSeparate();
+                        boolean oldBackup = desc.isBackup();
+                        boolean oldExternalAllowed = desc
+                                .isExternalAllowed();
+                        try {
+                            desc.setStoreSeparate(true);
+                            desc.setBackup(backup);
+                            desc.setExternalAllowed(externalAllowed);
+                            desc.getStoreFactory()
+                            .store(null, -2, aContext);
+                        } finally {
+                            desc.setStoreSeparate(oldSeparate);
+                            desc.setBackup(oldBackup);
+                            desc.setBackup(oldExternalAllowed);
                         }
-                    } catch (Exception e) {
-                        log.error(e);
                     }
-                } else
-                    log.error("Missing configFile at Context "
-                            + aContext.getPath() + " to store!");
+                } else {
+                    log.error(sm.getString("config.missingContextFile", aContext.getPath()));
+                }
             } catch (Exception e) {
-                if (log.isInfoEnabled())
-                    log
-                            .info(
-                                    "Object "
-                                            + aContextName
-                                            + " is no a context instance or store exception",
-                                    e);
+                log.error(sm.getString("config.storeContextError", aContextName), e);
             }
-        } else if (log.isInfoEnabled())
-            log.info("Context " + aContextName + " not found!");
+        } else {
+            log.info(sm.getString("config.objectNameNotFound", aContextName));
+        }
     }
 
     /**
@@ -232,9 +221,8 @@ public class StoreConfig implements IStoreConfig {
      */
     @Override
     public synchronized boolean store(Server aServer) {
-        StoreFileMover mover = new StoreFileMover(System
-                .getProperty("catalina.base"), getServerFilename(),
-                getRegistry().getEncoding());
+        StoreFileMover mover = new StoreFileMover(Bootstrap.getCatalinaBase(),
+                getServerFilename(), getRegistry().getEncoding());
         // Open an output writer for the new configuration file
         try {
             try (PrintWriter writer = mover.getWriter()) {
@@ -272,7 +260,7 @@ public class StoreConfig implements IStoreConfig {
                 log.error(sm.getString("config.storeContextError", aContext.getName()), e);
             }
         } else {
-            log.error("Missing configFile at Context " + aContext.getPath());
+            log.error(sm.getString("config.missingContextFile", aContext.getPath()));
         }
         return false;
     }
