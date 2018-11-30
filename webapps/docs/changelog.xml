@@ -137,7 +137,7 @@
       </fix>
       <fix>
         Avoid a potential hang when a client connects using TLS 1.0 to a Tomcat
-        HTTPS connector configured to use NIO or NIO with OpenSSL 1.1.1 or
+        HTTPS connector configured to use NIO or NIO2 with OpenSSL 1.1.1 or
         later. (markt)
       </fix>
     </changelog>
