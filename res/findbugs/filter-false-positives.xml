@@ -191,6 +191,13 @@
     <Bug code="Dm" />
   </Match>
   <Match>
+    <!-- This could be optimised but a) the code would be less clear and -->
+    <!-- b) SpotBugs still reports an error with the optimised code.     -->
+    <Class name="org.apache.catalina.core.StandardServer"/>
+    <Method name="startPeriodicLifecycleEvent"/>
+    <Bug pattern="RpC_REPEATED_CONDITIONAL_TEST "/>
+  </Match>
+  <Match>
     <!-- Sync not targeting these fields -->
     <Class name="org.apache.catalina.core.StandardWrapper" />
     <Or>
