@@ -251,6 +251,11 @@
         Add XML Namespace to the project element of all POM files so that the
         XML files are Well Formed and Valid. (csutherl)
       </fix>
+      <add>
+        <bug>53930</bug>: Add support for the <code>CATALINA_OUT_CMD</code>
+        environment variable that defines a command to which captured stdout and
+        stderr will be redirected. Patch provided by Casey Lucas. (markt)
+      </add>
     </changelog>
   </subsection>
 </section>
