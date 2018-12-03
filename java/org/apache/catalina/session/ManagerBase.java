@@ -1115,9 +1115,10 @@ public abstract class ManagerBase extends LifecycleMBeanBase implements Manager 
      */
     public String getSessionAttribute( String sessionId, String key ) {
         Session s = sessions.get(sessionId);
-        if( s==null ) {
-            if(log.isInfoEnabled())
-                log.info("Session not found " + sessionId);
+        if (s == null) {
+            if (log.isInfoEnabled()) {
+                log.info(sm.getString("managerBase.sessionNotFound", sessionId));
+            }
             return null;
         }
         Object o=s.getSession().getAttribute(key);
@@ -1142,7 +1143,7 @@ public abstract class ManagerBase extends LifecycleMBeanBase implements Manager 
         Session s = sessions.get(sessionId);
         if (s == null) {
             if (log.isInfoEnabled()) {
-                log.info("Session not found " + sessionId);
+                log.info(sm.getString("managerBase.sessionNotFound", sessionId));
             }
             return null;
         }
@@ -1163,63 +1164,79 @@ public abstract class ManagerBase extends LifecycleMBeanBase implements Manager 
 
 
     public void expireSession( String sessionId ) {
-        Session s=sessions.get(sessionId);
-        if( s==null ) {
-            if(log.isInfoEnabled())
-                log.info("Session not found " + sessionId);
+        Session s = sessions.get(sessionId);
+        if (s == null) {
+            if (log.isInfoEnabled()) {
+                log.info(sm.getString("managerBase.sessionNotFound", sessionId));
+            }
             return;
         }
         s.expire();
     }
 
     public long getThisAccessedTimestamp( String sessionId ) {
-        Session s=sessions.get(sessionId);
-        if(s== null)
-            return -1 ;
+        Session s = sessions.get(sessionId);
+        if (s == null) {
+            if (log.isInfoEnabled()) {
+                log.info(sm.getString("managerBase.sessionNotFound", sessionId));
+            }
+            return -1;
+        }
         return s.getThisAccessedTime();
     }
 
     public String getThisAccessedTime( String sessionId ) {
-        Session s=sessions.get(sessionId);
-        if( s==null ) {
-            if(log.isInfoEnabled())
-                log.info("Session not found " + sessionId);
+        Session s = sessions.get(sessionId);
+        if (s == null) {
+            if (log.isInfoEnabled()) {
+                log.info(sm.getString("managerBase.sessionNotFound", sessionId));
+            }
             return "";
         }
         return new Date(s.getThisAccessedTime()).toString();
     }
 
     public long getLastAccessedTimestamp( String sessionId ) {
-        Session s=sessions.get(sessionId);
-        if(s== null)
-            return -1 ;
+        Session s = sessions.get(sessionId);
+        if (s == null) {
+            if (log.isInfoEnabled()) {
+                log.info(sm.getString("managerBase.sessionNotFound", sessionId));
+            }
+            return -1;
+        }
         return s.getLastAccessedTime();
     }
 
     public String getLastAccessedTime( String sessionId ) {
-        Session s=sessions.get(sessionId);
-        if( s==null ) {
-            if(log.isInfoEnabled())
-                log.info("Session not found " + sessionId);
+        Session s = sessions.get(sessionId);
+        if (s == null) {
+            if (log.isInfoEnabled()) {
+                log.info(sm.getString("managerBase.sessionNotFound", sessionId));
+            }
             return "";
         }
         return new Date(s.getLastAccessedTime()).toString();
     }
 
     public String getCreationTime( String sessionId ) {
-        Session s=sessions.get(sessionId);
-        if( s==null ) {
-            if(log.isInfoEnabled())
-                log.info("Session not found " + sessionId);
+        Session s = sessions.get(sessionId);
+        if (s == null) {
+            if (log.isInfoEnabled()) {
+                log.info(sm.getString("managerBase.sessionNotFound", sessionId));
+            }
             return "";
         }
         return new Date(s.getCreationTime()).toString();
     }
 
     public long getCreationTimestamp( String sessionId ) {
-        Session s=sessions.get(sessionId);
-        if(s== null)
-            return -1 ;
+        Session s = sessions.get(sessionId);
+        if (s == null) {
+            if (log.isInfoEnabled()) {
+                log.info(sm.getString("managerBase.sessionNotFound", sessionId));
+            }
+            return -1;
+        }
         return s.getCreationTime();
     }
 
