@@ -1295,7 +1295,7 @@ public class Tomcat {
         if (docBase.isDirectory()) {
             return getWebappConfigFileFromDirectory(docBase, contextName);
         } else {
-            return getWebappConfigFileFromJar(docBase, contextName);
+            return getWebappConfigFileFromWar(docBase, contextName);
         }
     }
 
@@ -1313,7 +1313,7 @@ public class Tomcat {
         return result;
     }
 
-    private URL getWebappConfigFileFromJar(File docBase, String contextName) {
+    private URL getWebappConfigFileFromWar(File docBase, String contextName) {
         URL result = null;
         try (JarFile jar = new JarFile(docBase)) {
             JarEntry entry = jar.getJarEntry(Constants.ApplicationContextXml);
