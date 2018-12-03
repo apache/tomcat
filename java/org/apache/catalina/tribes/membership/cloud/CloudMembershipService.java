@@ -25,7 +25,6 @@ import org.apache.catalina.tribes.Member;
 import org.apache.catalina.tribes.MembershipProvider;
 import org.apache.catalina.tribes.MembershipService;
 import org.apache.catalina.tribes.jmx.JmxRegistry;
-import org.apache.catalina.tribes.membership.Constants;
 import org.apache.catalina.tribes.membership.MemberImpl;
 import org.apache.catalina.tribes.membership.MembershipServiceBase;
 import org.apache.catalina.tribes.util.StringManager;
