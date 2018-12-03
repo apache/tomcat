@@ -226,4 +226,14 @@ public class CloudMembershipService extends MembershipServiceBase
     public void setReadTimeout(int readTimeout) {
         properties.setProperty("readTimeout", String.valueOf(readTimeout));
     }
+
+    @Override
+    public long getExpirationTime() {
+        String expirationTime = properties.getProperty("expirationTime");
+        return Long.parseLong(expirationTime);
+    }
+
+    public void setExpirationTime(long expirationTime) {
+        properties.setProperty("expirationTime", String.valueOf(expirationTime));
+    }
 }
