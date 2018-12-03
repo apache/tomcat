@@ -77,6 +77,11 @@
         <code>JAVA_ENDORSED_DIRS</code> system property is empty. Patch provided
         by Zemian Deng. (markt)
       </fix>
+      <add>
+        <bug>53930</bug>: Add support for the <code>CATALINA_OUT_CMD</code>
+        environment variable that defines a command to which captured stdout and
+        stderr will be redirected. Patch provided by Casey Lucas. (markt)
+      </add>
     </changelog>
   </subsection>
 </section>
