@@ -33,6 +33,14 @@
 #                   will be redirected.
 #                   Default is $CATALINA_BASE/logs/catalina.out
 #
+#   CATALINA_OUT_CMD (Optional) Command which will be executed and receive
+#                   as its stdin the stdout and stderr from the Tomcat java
+#                   process. If CATALINA_OUT_CMD is set, the value of
+#                   CATALINA_OUT will be ignored.
+#                   No default.
+#                   Example (all one line)
+#                   CATALINA_OUT_CMD="cronolog $CATALINA_BASE/logs/catalina.%Y-%m-%d.out >/dev/null 2>&1"
+#
 #   CATALINA_OPTS   (Optional) Java runtime options used when the "start",
 #                   "run" or "debug" command is executed.
 #                   Include here and not in JAVA_OPTS all options, that should
@@ -443,13 +451,23 @@ elif [ "$1" = "start" ] ; then
   fi
 
   shift
-  touch "$CATALINA_OUT"
+  if [ -z "$CATALINA_OUT_CMD" ] ; then
+    touch "$CATALINA_OUT"
+    catalina_out_command=">> \"$CATALINA_OUT\" 2>&1"
+  else
+    catalina_out_command="| $CATALINA_OUT_CMD"
+  fi
+  if [ ! -z "$CATALINA_PID" ]; then
+    catalina_pid_file="$CATALINA_PID"
+  else
+    catalina_pid_file=/dev/null
+  fi
   if [ "$1" = "-security" ] ; then
     if [ $have_tty -eq 1 ]; then
       echo "Using Security Manager"
     fi
     shift
-    eval $_NOHUP "\"$_RUNJAVA\"" "\"$LOGGING_CONFIG\"" $LOGGING_MANAGER $JAVA_OPTS $CATALINA_OPTS \
+    eval \{ $_NOHUP "\"$_RUNJAVA\"" "\"$LOGGING_CONFIG\"" $LOGGING_MANAGER $JAVA_OPTS $CATALINA_OPTS \
       -D$ENDORSED_PROP="\"$JAVA_ENDORSED_DIRS\"" \
       -classpath "\"$CLASSPATH\"" \
       -Djava.security.manager \
@@ -458,22 +476,18 @@ elif [ "$1" = "start" ] ; then
       -Dcatalina.home="\"$CATALINA_HOME\"" \
       -Djava.io.tmpdir="\"$CATALINA_TMPDIR\"" \
       org.apache.catalina.startup.Bootstrap "$@" start \
-      >> "$CATALINA_OUT" 2>&1 "&"
+      2\>\&1 \& echo \$! \>\"$catalina_pid_file\" \; \} $catalina_out_command "&"
 
   else
-    eval $_NOHUP "\"$_RUNJAVA\"" "\"$LOGGING_CONFIG\"" $LOGGING_MANAGER $JAVA_OPTS $CATALINA_OPTS \
+    eval \{ $_NOHUP "\"$_RUNJAVA\"" "\"$LOGGING_CONFIG\"" $LOGGING_MANAGER $JAVA_OPTS $CATALINA_OPTS \
       -D$ENDORSED_PROP="\"$JAVA_ENDORSED_DIRS\"" \
       -classpath "\"$CLASSPATH\"" \
       -Dcatalina.base="\"$CATALINA_BASE\"" \
       -Dcatalina.home="\"$CATALINA_HOME\"" \
       -Djava.io.tmpdir="\"$CATALINA_TMPDIR\"" \
       org.apache.catalina.startup.Bootstrap "$@" start \
-      >> "$CATALINA_OUT" 2>&1 "&"
+      2\>\&1 \& echo \$! \>\"$catalina_pid_file\" \; \} $catalina_out_command "&"
 
-  fi
-
-  if [ ! -z "$CATALINA_PID" ]; then
-    echo $! > "$CATALINA_PID"
   fi
 
   echo "Tomcat started."
