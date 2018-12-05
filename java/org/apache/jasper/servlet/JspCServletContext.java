@@ -206,7 +206,6 @@ public class JspCServletContext implements ServletContext {
                     // This is a resource JAR
                     resourceJars.add(resourceFragment.getURL());
                 }
-                jar.close();
             } catch (IOException ioe) {
                 throw new JasperException(ioe);
             }
