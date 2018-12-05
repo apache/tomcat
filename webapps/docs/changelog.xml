@@ -96,6 +96,10 @@
         <bug>53737</bug>: Extend JspC, the precompilation tool, to include
         support for resource JARs. (markt)
       </add>
+      <fix>
+        <bug>62976</bug>: Avoid an <code>IllegalStateException</code> when using
+        background compilation when tag files are packaged in JAR files. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
