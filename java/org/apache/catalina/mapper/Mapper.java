@@ -270,12 +270,12 @@ public final class Mapper {
             addHost(hostName, new String[0], host);
             mappedHost = exactFind(hosts, hostName);
             if (mappedHost == null) {
-                log.error("No host found: " + hostName);
+                log.error(sm.getString("mapper.addContext.noHost", hostName));
                 return;
             }
         }
         if (mappedHost.isAlias()) {
-            log.error("No host found: " + hostName);
+            log.error(sm.getString("mapper.addContext.hostIsAlias", hostName));
             return;
         }
         int slashCount = slashCount(path);
@@ -388,7 +388,7 @@ public final class Mapper {
         MappedHost host = exactFind(hosts, hostName);
         if (host == null || host.isAlias()) {
             if (!silent) {
-                log.error("No host found: " + hostName);
+                log.error(sm.getString("mapper.findContext.noHostOrAlias", hostName));
             }
             return null;
         }
@@ -396,15 +396,14 @@ public final class Mapper {
                 contextPath);
         if (context == null) {
             if (!silent) {
-                log.error("No context found: " + contextPath);
+                log.error(sm.getString("mapper.findContext.noContext", contextPath));
             }
             return null;
         }
         ContextVersion contextVersion = exactFind(context.versions, version);
         if (contextVersion == null) {
             if (!silent) {
-                log.error("No context version found: " + contextPath + " "
-                        + version);
+                log.error(sm.getString("mapper.findContext.noContextVersion", contextPath, version));
             }
             return null;
         }
