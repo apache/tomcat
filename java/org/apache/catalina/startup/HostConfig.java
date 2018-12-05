@@ -228,7 +228,7 @@ public class HostConfig implements LifecycleListener {
                     }
                 } catch (MalformedURLException e) {
                     // Should never happen
-                    log.warn("hostConfig.docBaseUrlInvalid", e);
+                    log.warn(sm.getString("hostConfig.docBaseUrlInvalid"), e);
                 }
             }
         }

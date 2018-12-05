@@ -1197,7 +1197,7 @@ public class ContextConfig implements LifecycleListener {
         }
 
         if (context.getLogEffectiveWebXml()) {
-            log.info("web.xml:\n" + webXml.toXml());
+            log.info(sm.getString("contextConfig.effectiveWebXml", webXml.toXml()));
         }
 
         // Always need to look for static resources
