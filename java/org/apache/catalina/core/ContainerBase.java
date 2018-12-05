@@ -421,7 +421,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
                 try {
                     ((Lifecycle) oldCluster).stop();
                 } catch (LifecycleException e) {
-                    log.error("ContainerBase.setCluster: stop: ", e);
+                    log.error(sm.getString("containerbase.cluster.stop"), e);
                 }
             }
 
@@ -434,7 +434,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
                 try {
                     ((Lifecycle) cluster).start();
                 } catch (LifecycleException e) {
-                    log.error("ContainerBase.setCluster: start: ", e);
+                    log.error(sm.getString("containerbase.cluster.start"), e);
                 }
             }
         } finally {
@@ -635,7 +635,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
                 try {
                     ((Lifecycle) oldRealm).stop();
                 } catch (LifecycleException e) {
-                    log.error("ContainerBase.setRealm: stop: ", e);
+                    log.error(sm.getString("containerbase.realm.stop"), e);
                 }
             }
 
@@ -647,7 +647,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
                 try {
                     ((Lifecycle) realm).start();
                 } catch (LifecycleException e) {
-                    log.error("ContainerBase.setRealm: start: ", e);
+                    log.error(sm.getString("containerbase.realm.start"), e);
                 }
             }
 
@@ -697,9 +697,8 @@ public abstract class ContainerBase extends LifecycleMBeanBase
             log.debug("Add child " + child + " " + this);
         synchronized(children) {
             if (children.get(child.getName()) != null)
-                throw new IllegalArgumentException("addChild:  Child name '" +
-                                                   child.getName() +
-                                                   "' is not unique");
+                throw new IllegalArgumentException(
+                        sm.getString("containerbase.child.notUnique", child.getName()));
             child.setParent(this);  // May throw IAE
             children.put(child.getName(), child);
         }
@@ -714,8 +713,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
                 child.start();
             }
         } catch (LifecycleException e) {
-            log.error("ContainerBase.addChild: start: ", e);
-            throw new IllegalStateException("ContainerBase.addChild: start: " + e);
+            throw new IllegalStateException(sm.getString("containerbase.child.start"), e);
         } finally {
             fireContainerEvent(ADD_CHILD_EVENT, child);
         }
@@ -805,7 +803,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
                 child.stop();
             }
         } catch (LifecycleException e) {
-            log.error("ContainerBase.removeChild: stop: ", e);
+            log.error(sm.getString("containerbase.child.stop"), e);
         }
 
         try {
@@ -816,7 +814,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
                 child.destroy();
             }
         } catch (LifecycleException e) {
-            log.error("ContainerBase.removeChild: destroy: ", e);
+            log.error(sm.getString("containerbase.child.destroy"), e);
         }
 
         synchronized(children) {

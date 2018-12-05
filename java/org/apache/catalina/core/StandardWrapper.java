@@ -990,9 +990,8 @@ public class StandardWrapper extends ContainerBase
                 jspMonitorON = new ObjectName(oname.toString());
                 Registry.getRegistry(null, null)
                     .registerComponent(instance, jspMonitorON, null);
-            } catch( Exception ex ) {
-                log.info("Error registering JSP monitoring with jmx " +
-                         instance);
+            } catch (Exception ex) {
+                log.info(sm.getString("standardWrapper.jspMonitorError", instance));
             }
         }
     }

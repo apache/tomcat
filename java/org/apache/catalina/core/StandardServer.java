@@ -619,15 +619,14 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
                                 Long.valueOf(System.currentTimeMillis() - acceptStartTime)), ste);
                         continue;
                     } catch (AccessControlException ace) {
-                        log.warn("StandardServer.accept security exception: "
-                                + ace.getMessage(), ace);
+                        log.warn(sm.getString("standardServer.accept.security"), ace);
                         continue;
                     } catch (IOException e) {
                         if (stopAwait) {
                             // Wait was aborted with socket.close()
                             break;
                         }
-                        log.error("StandardServer.await: accept: ", e);
+                        log.error(sm.getString("standardServer.accept.error"), e);
                         break;
                     }
 
@@ -643,7 +642,7 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
                         try {
                             ch = stream.read();
                         } catch (IOException e) {
-                            log.warn("StandardServer.await: read: ", e);
+                            log.warn(sm.getString("standardServer.accept.readError"), e);
                             ch = -1;
                         }
                         // Control character or EOF (-1) terminates loop
@@ -670,8 +669,7 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
                     log.info(sm.getString("standardServer.shutdownViaPort"));
                     break;
                 } else
-                    log.warn("StandardServer.await: Invalid command '"
-                            + command.toString() + "' received");
+                    log.warn(sm.getString("standardServer.invalidShutdownCommand", command.toString()));
             }
         } finally {
             ServerSocket serverSocket = awaitSocket;
@@ -863,7 +861,7 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
             }
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
-            log.error(t);
+            log.error(sm.getString("standardServer.storeConfig.error"), t);
         }
     }
 
@@ -894,7 +892,7 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
             }
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
-            log.error(t);
+            log.error(sm.getString("standardServer.storeConfig.contextError", context.getName()), t);
         }
     }
 

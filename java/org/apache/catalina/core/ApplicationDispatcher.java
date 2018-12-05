@@ -1043,6 +1043,7 @@ final class ApplicationDispatcher implements AsyncDispatcher, RequestDispatcher 
 
     private void recycleRequestWrapper(State state) {
         if (state.wrapRequest instanceof ApplicationHttpRequest) {
-            ((ApplicationHttpRequest) state.wrapRequest).recycle();        }
+            ((ApplicationHttpRequest) state.wrapRequest).recycle();
+        }
     }
 }

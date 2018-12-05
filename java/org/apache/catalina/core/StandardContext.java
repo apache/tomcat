@@ -1822,7 +1822,7 @@ public class StandardContext extends ContainerBase
                 try {
                     ((Lifecycle) oldLoader).stop();
                 } catch (LifecycleException e) {
-                    log.error("StandardContext.setLoader: stop: ", e);
+                    log.error(sm.getString("standardContext.setLoader.stop"), e);
                 }
             }
 
@@ -1834,7 +1834,7 @@ public class StandardContext extends ContainerBase
                 try {
                     ((Lifecycle) loader).start();
                 } catch (LifecycleException e) {
-                    log.error("StandardContext.setLoader: start: ", e);
+                    log.error(sm.getString("standardContext.setLoader.start"), e);
                 }
             }
         } finally {
@@ -1877,7 +1877,7 @@ public class StandardContext extends ContainerBase
                     ((Lifecycle) oldManager).stop();
                     ((Lifecycle) oldManager).destroy();
                 } catch (LifecycleException e) {
-                    log.error("StandardContext.setManager: stop-destroy: ", e);
+                    log.error(sm.getString("standardContext.setManager.stop"), e);
                 }
             }
 
@@ -1889,7 +1889,7 @@ public class StandardContext extends ContainerBase
                 try {
                     ((Lifecycle) manager).start();
                 } catch (LifecycleException e) {
-                    log.error("StandardContext.setManager: start: ", e);
+                    log.error(sm.getString("standardContext.setManager.start"), e);
                 }
             }
         } finally {
@@ -3267,7 +3267,7 @@ public class StandardContext extends ContainerBase
                 wrapper = (Wrapper) wrapperClass.getConstructor().newInstance();
             } catch (Throwable t) {
                 ExceptionUtils.handleThrowable(t);
-                log.error("createWrapper", t);
+                log.error(sm.getString("standardContext.createWrapper.error"), t);
                 return null;
             }
         } else {
@@ -3283,7 +3283,7 @@ public class StandardContext extends ContainerBase
                     wrapper.addLifecycleListener(listener);
                 } catch (Throwable t) {
                     ExceptionUtils.handleThrowable(t);
-                    log.error("createWrapper", t);
+                    log.error(sm.getString("standardContext.createWrapper.listenerError"), t);
                     return null;
                 }
             }
@@ -3298,7 +3298,7 @@ public class StandardContext extends ContainerBase
                     wrapper.addContainerListener(listener);
                 } catch (Throwable t) {
                     ExceptionUtils.handleThrowable(t);
-                    log.error("createWrapper", t);
+                    log.error(sm.getString("standardContext.createWrapper.containerListenerError"), t);
                     return null;
                 }
             }
@@ -5050,11 +5050,11 @@ public class StandardContext extends ContainerBase
                                 Boolean.valueOf((getCluster() != null)),
                                 Boolean.valueOf(distributable)));
                     }
-                    if ( (getCluster() != null) && distributable) {
+                    if ((getCluster() != null) && distributable) {
                         try {
                             contextManager = getCluster().createManager(getName());
                         } catch (Exception ex) {
-                            log.error("standardContext.clusterFail", ex);
+                            log.error(sm.getString("standardContext.cluster.managerError"), ex);
                             ok = false;
                         }
                     } else {
@@ -6100,9 +6100,7 @@ public class StandardContext extends ContainerBase
                         urlPattern.charAt(urlPattern.length()-2) != '/')) ||
                     urlPattern.startsWith("*.") && urlPattern.length() > 2 &&
                         urlPattern.lastIndexOf('.') > 1) {
-                log.info("Suspicious url pattern: \"" + urlPattern + "\"" +
-                        " in context [" + getName() + "] - see" +
-                        " sections 12.1 and 12.2 of the Servlet specification");
+                log.info(sm.getString("standardContext.suspiciousUrl", urlPattern, getName()));
             }
         }
     }
