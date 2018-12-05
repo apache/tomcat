@@ -285,8 +285,9 @@ public class JAASMemoryLoginModule extends MemoryRealm implements LoginModule {
     @Override
     public boolean login() throws LoginException {
         // Set up our CallbackHandler requests
-        if (callbackHandler == null)
-            throw new LoginException("No CallbackHandler specified");
+        if (callbackHandler == null) {
+            throw new LoginException(sm.getString("jaasMemoryLoginModule.noCallbackHandler"));
+        }
         Callback callbacks[] = new Callback[9];
         callbacks[0] = new NameCallback("Username: ");
         callbacks[1] = new PasswordCallback("Password: ", false);
@@ -322,7 +323,7 @@ public class JAASMemoryLoginModule extends MemoryRealm implements LoginModule {
             md5a2 = ((TextInputCallback) callbacks[7]).getText();
             authMethod = ((TextInputCallback) callbacks[8]).getText();
         } catch (IOException | UnsupportedCallbackException e) {
-            throw new LoginException(e.toString());
+            throw new LoginException(sm.getString("jaasMemoryLoginModule.callbackHandlerError", e.toString()));
         }
 
         // Validate the username and password we have received
@@ -335,7 +336,7 @@ public class JAASMemoryLoginModule extends MemoryRealm implements LoginModule {
         } else if (authMethod.equals(HttpServletRequest.CLIENT_CERT_AUTH)) {
             principal = super.getPrincipal(username);
         } else {
-            throw new LoginException("Unknown authentication method");
+            throw new LoginException(sm.getString("jaasMemoryLoginModule.unknownAuthenticationMethod"));
         }
 
         if (log.isDebugEnabled()) {
@@ -346,7 +347,7 @@ public class JAASMemoryLoginModule extends MemoryRealm implements LoginModule {
         if (principal != null) {
             return true;
         } else {
-            throw new FailedLoginException("Username or password is incorrect");
+            throw new FailedLoginException(sm.getString("jaasMemoryLoginModule.invalidCredentials"));
         }
     }
 
@@ -380,14 +381,14 @@ public class JAASMemoryLoginModule extends MemoryRealm implements LoginModule {
         if (!file.isAbsolute()) {
             String catalinaBase = getCatalinaBase();
             if (catalinaBase == null) {
-                log.warn("Unable to determine Catalina base to load file " + pathname);
+                log.warn(sm.getString("jaasMemoryLoginModule.noCatalinaBase", pathname));
                 return;
             } else {
                 file = new File(catalinaBase, pathname);
             }
         }
         if (!file.canRead()) {
-            log.warn("Cannot load configuration file " + file.getAbsolutePath());
+            log.warn(sm.getString("jaasMemoryLoginModule.noConfig", file.getAbsolutePath()));
             return;
         }
 
@@ -399,7 +400,7 @@ public class JAASMemoryLoginModule extends MemoryRealm implements LoginModule {
             digester.push(this);
             digester.parse(file);
         } catch (Exception e) {
-            log.warn("Error processing configuration file " + file.getAbsolutePath(), e);
+            log.warn(sm.getString("jaasMemoryLoginModule.parseError", file.getAbsolutePath()), e);
         } finally {
             digester.reset();
         }

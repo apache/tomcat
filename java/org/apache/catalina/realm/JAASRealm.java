@@ -208,8 +208,7 @@ public class JAASRealm extends RealmBase {
      * @param useContext True means use context ClassLoader
      */
     public void setUseContextClassLoader(boolean useContext) {
-      useContextClassLoader = useContext;
-      log.info("Setting useContextClassLoader = " + useContext);
+        useContextClassLoader = useContext;
     }
 
     /**
@@ -228,8 +227,7 @@ public class JAASRealm extends RealmBase {
 
         if (appName == null) {
             appName = makeLegalForJAAS(container.getName());
-
-            log.info("Set JAAS app name " + appName);
+            log.info(sm.getString("jaasRealm.appName", appName));
         }
     }
 
@@ -280,11 +278,10 @@ public class JAASRealm extends RealmBase {
                  if (Principal.class.isAssignableFrom(principalClass)) {
                      classNamesList.add(classNames[i]);
                  } else {
-                     log.error("Class "+classNames[i]+" is not implementing "+
-                               "java.security.Principal! Class not added.");
+                     log.error(sm.getString("jaasRealm.notPrincipal", classNames[i]));
                  }
              } catch (ClassNotFoundException e) {
-                 log.error("Class "+classNames[i]+" not found! Class not added.");
+                 log.error(sm.getString("jassRealm.classNotFound", classNames[i]));
              }
          }
      }

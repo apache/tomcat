@@ -46,6 +46,7 @@ import org.apache.catalina.Service;
 import org.apache.catalina.Wrapper;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
+import org.apache.catalina.realm.RealmBase.AllRolesMode;
 import org.apache.catalina.util.LifecycleMBeanBase;
 import org.apache.catalina.util.SessionConfig;
 import org.apache.catalina.util.ToStringUtil;
@@ -409,8 +410,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
         try {
             valueBytes = serverDigestValue.getBytes(getDigestCharset());
         } catch (UnsupportedEncodingException uee) {
-            log.error("Illegal digestEncoding: " + getDigestEncoding(), uee);
-            throw new IllegalArgumentException(uee.getMessage());
+            throw new IllegalArgumentException(sm.getString("realmBase.invalidDigestEncoding", getDigestEncoding()), uee);
         }
 
         String serverDigest = MD5Encoder.encode(ConcurrentMessageDigest.digestMD5(valueBytes));
@@ -1159,8 +1159,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
         try {
             valueBytes = digestValue.getBytes(getDigestCharset());
         } catch (UnsupportedEncodingException uee) {
-            log.error("Illegal digestEncoding: " + getDigestEncoding(), uee);
-            throw new IllegalArgumentException(uee.getMessage());
+            throw new IllegalArgumentException(sm.getString("realmBase.invalidDigestEncoding", getDigestEncoding()), uee);
         }
 
         return MD5Encoder.encode(ConcurrentMessageDigest.digestMD5(valueBytes));
@@ -1458,44 +1457,42 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
          */
         public static final AllRolesMode STRICT_AUTH_ONLY_MODE = new AllRolesMode("strictAuthOnly");
 
-        static AllRolesMode toMode(String name)
-        {
+        static AllRolesMode toMode(String name) {
             AllRolesMode mode;
-            if( name.equalsIgnoreCase(STRICT_MODE.name) )
+            if (name.equalsIgnoreCase(STRICT_MODE.name)) {
                 mode = STRICT_MODE;
-            else if( name.equalsIgnoreCase(AUTH_ONLY_MODE.name) )
+            } else if (name.equalsIgnoreCase(AUTH_ONLY_MODE.name)) {
                 mode = AUTH_ONLY_MODE;
-            else if( name.equalsIgnoreCase(STRICT_AUTH_ONLY_MODE.name) )
+            } else if (name.equalsIgnoreCase(STRICT_AUTH_ONLY_MODE.name)) {
                 mode = STRICT_AUTH_ONLY_MODE;
-            else
-                throw new IllegalStateException("Unknown mode, must be one of: strict, authOnly, strictAuthOnly");
+            } else {
+                throw new IllegalStateException(
+                        sm.getString("realmBase.unknownAllRolesMode", name));
+            }
             return mode;
         }
 
-        private AllRolesMode(String name)
-        {
+        private AllRolesMode(String name) {
             this.name = name;
         }
 
         @Override
-        public boolean equals(Object o)
-        {
+        public boolean equals(Object o) {
             boolean equals = false;
-            if( o instanceof AllRolesMode )
-            {
+            if (o instanceof AllRolesMode) {
                 AllRolesMode mode = (AllRolesMode) o;
                 equals = name.equals(mode.name);
             }
             return equals;
         }
+
         @Override
-        public int hashCode()
-        {
+        public int hashCode() {
             return name.hashCode();
         }
+
         @Override
-        public String toString()
-        {
+        public String toString() {
             return name;
         }
     }
