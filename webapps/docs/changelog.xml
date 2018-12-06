@@ -87,6 +87,11 @@
         web application start to make integration simpler for downstream users.
         Patch provided by rmannibucau. (markt)
       </scode>
+      <fix>
+        <bug>62988</bug>: Fix the <code>LoadBalancerDrainingValve</code> so it
+        works when the session cookie configuration is not explicitly declared.
+        Based on a patch provided by Andreas Kurth. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
