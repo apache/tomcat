@@ -621,8 +621,6 @@ public class RemoteIpValve extends ValveBase {
                 request.setRemoteAddr(remoteIp);
                 request.setRemoteHost(remoteIp);
 
-                // use request.coyoteRequest.mimeHeaders.setValue(str).setString(str) because request.addHeader(str, str) is no-op in Tomcat
-                // 6.0
                 if (proxiesHeaderValue.size() == 0) {
                     request.getCoyoteRequest().getMimeHeaders().removeHeader(proxiesHeader);
                 } else {
@@ -644,15 +642,11 @@ public class RemoteIpValve extends ValveBase {
                     // of the request
                 } else if (isForwardedProtoHeaderValueSecure(protocolHeaderValue)) {
                     request.setSecure(true);
-                    // use request.coyoteRequest.scheme instead of request.setScheme() because request.setScheme() is no-op in Tomcat 6.0
                     request.getCoyoteRequest().scheme().setString("https");
-
                     setPorts(request, httpsServerPort);
                 } else {
                     request.setSecure(false);
-                    // use request.coyoteRequest.scheme instead of request.setScheme() because request.setScheme() is no-op in Tomcat 6.0
                     request.getCoyoteRequest().scheme().setString("http");
-
                     setPorts(request, httpServerPort);
                 }
             }
@@ -686,15 +680,11 @@ public class RemoteIpValve extends ValveBase {
         } finally {
             request.setRemoteAddr(originalRemoteAddr);
             request.setRemoteHost(originalRemoteHost);
-
             request.setSecure(originalSecure);
-
-            MimeHeaders headers = request.getCoyoteRequest().getMimeHeaders();
-            // use request.coyoteRequest.scheme instead of request.setScheme() because request.setScheme() is no-op in Tomcat 6.0
             request.getCoyoteRequest().scheme().setString(originalScheme);
-
             request.setServerPort(originalServerPort);
 
+            MimeHeaders headers = request.getCoyoteRequest().getMimeHeaders();
             if (originalProxiesHeader == null || originalProxiesHeader.length() == 0) {
                 headers.removeHeader(proxiesHeader);
             } else {
