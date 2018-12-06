@@ -72,6 +72,11 @@
         <code>getResources()</code> call in the Mapper when processing rule 7.
         (markt)
       </fix>
+      <fix>
+        <bug>62978</bug>: Update the RemoteIpValve to handle multiple values in
+        the <code>x-forwarded-proto</code> header. Patch provided by Tom Groot.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

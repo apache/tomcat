@@ -679,6 +679,107 @@ public class TestRemoteIpValve {
     }
 
     @Test
+    public void testInvokeXforwardedProtoSaysMultipleHttpsForwardsForIncomingHttpsRequest() throws Exception {
+        performXForwardedProtoWithMultipleForwardsTest("https,https", true, true);
+    }
+
+    @Test
+    public void testInvokeXforwardedProtoSaysMultipleForwardsWithFirstBeingHttpForIncomingHttpsRequest() throws Exception {
+        performXForwardedProtoWithMultipleForwardsTest("http,https", true, false);
+    }
+
+    @Test
+    public void testInvokeXforwardedProtoSaysMultipleForwardsWithLastBeingHttpForIncomingHttpsRequest() throws Exception {
+        performXForwardedProtoWithMultipleForwardsTest("https,http", false, false);
+    }
+
+    @Test
+    public void testInvokeXforwardedProtoSaysMultipleForwardsWithMiddleBeingHttpForIncomingHttpsRequest() throws Exception {
+        performXForwardedProtoWithMultipleForwardsTest("https,http,https", true, false);
+    }
+
+    @Test
+    public void testInvokeXforwardedProtoSaysMultipleHttpForwardsForIncomingHttpsRequest() throws Exception {
+        performXForwardedProtoWithMultipleForwardsTest("http,http", false, false);
+    }
+
+    @Test
+    public void testInvokeXforwardedProtoSaysInvalidValueForIncomingHttpsRequest() throws Exception {
+        performXForwardedProtoWithMultipleForwardsTest(",", false, false);
+    }
+
+    private void performXForwardedProtoWithMultipleForwardsTest(String incomingHeaderValue,
+            boolean arrivesAsSecure, boolean shouldBeSecure) throws Exception {
+
+        // PREPARE
+        String incomingScheme = arrivesAsSecure ? "https" : "http";
+        String expectedScheme = shouldBeSecure ? "https" : "http";
+        int incommingServerPort = arrivesAsSecure ? 8443 : 8080;
+        int expectedServerPort = shouldBeSecure ? 443 : 80;
+        RemoteIpValve remoteIpValve = new RemoteIpValve();
+        remoteIpValve.setRemoteIpHeader("x-forwarded-for");
+        remoteIpValve.setProtocolHeader("x-forwarded-proto");
+        RemoteAddrAndHostTrackerValve remoteAddrAndHostTrackerValve = new RemoteAddrAndHostTrackerValve();
+        remoteIpValve.setNext(remoteAddrAndHostTrackerValve);
+
+        Request request = new MockRequest();
+        request.setCoyoteRequest(new org.apache.coyote.Request());
+        // client ip
+        request.setRemoteAddr("192.168.0.10");
+        request.setRemoteHost("192.168.0.10");
+        request.getCoyoteRequest().getMimeHeaders().addValue("x-forwarded-for").setString("140.211.11.130");
+        // protocol
+        request.getCoyoteRequest().getMimeHeaders().addValue("x-forwarded-proto").setString(incomingHeaderValue);
+        request.setSecure(arrivesAsSecure);
+        request.setServerPort(incommingServerPort);
+        request.getCoyoteRequest().scheme().setString(incomingScheme);
+
+        // TEST
+        remoteIpValve.invoke(request, null);
+
+        // VERIFY
+        // client ip
+        String actualXForwardedFor = remoteAddrAndHostTrackerValve.getForwardedFor();
+        Assert.assertNull("no intermediate non-trusted proxy, x-forwarded-for must be null", actualXForwardedFor);
+
+        String actualXForwardedBy = remoteAddrAndHostTrackerValve.getForwardedBy();
+        Assert.assertNull("no intermediate trusted proxy", actualXForwardedBy);
+
+        String actualRemoteAddr = remoteAddrAndHostTrackerValve.getRemoteAddr();
+        Assert.assertEquals("remoteAddr", "140.211.11.130", actualRemoteAddr);
+
+        String actualRemoteHost = remoteAddrAndHostTrackerValve.getRemoteHost();
+        Assert.assertEquals("remoteHost", "140.211.11.130", actualRemoteHost);
+
+        String actualPostInvokeRemoteAddr = request.getRemoteAddr();
+        Assert.assertEquals("postInvoke remoteAddr", "192.168.0.10", actualPostInvokeRemoteAddr);
+
+        String actualPostInvokeRemoteHost = request.getRemoteHost();
+        Assert.assertEquals("postInvoke remoteAddr", "192.168.0.10", actualPostInvokeRemoteHost);
+
+        // protocol
+        String actualScheme = remoteAddrAndHostTrackerValve.getScheme();
+        Assert.assertEquals("x-forwarded-proto says " + expectedScheme, expectedScheme, actualScheme);
+
+        int actualServerPort = remoteAddrAndHostTrackerValve.getServerPort();
+        Assert.assertEquals("x-forwarded-proto says " + expectedScheme, expectedServerPort, actualServerPort);
+
+        boolean actualSecure = remoteAddrAndHostTrackerValve.isSecure();
+        Assert.assertEquals("x-forwarded-proto says " + expectedScheme,
+                Boolean.valueOf(shouldBeSecure), Boolean.valueOf(actualSecure));
+
+        boolean actualPostInvokeSecure = request.isSecure();
+        Assert.assertEquals("postInvoke secure",
+                Boolean.valueOf(arrivesAsSecure), Boolean.valueOf(actualPostInvokeSecure));
+
+        int actualPostInvokeServerPort = request.getServerPort();
+        Assert.assertEquals("postInvoke serverPort", incommingServerPort, actualPostInvokeServerPort);
+
+        String actualPostInvokeScheme = request.getScheme();
+        Assert.assertEquals("postInvoke scheme", incomingScheme, actualPostInvokeScheme);
+    }
+
+    @Test
     public void testInvokeXforwardedProtoIsNullForIncomingHttpsRequest() throws Exception {
 
         // PREPARE
