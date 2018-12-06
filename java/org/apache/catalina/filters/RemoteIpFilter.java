@@ -77,7 +77,7 @@ import org.apache.juli.logging.LogFactory;
  * <li>otherwise, the ip/host is declared to be the remote ip and looping is stopped.</li>
  * </ul>
  * </li>
- * <li>If the request http header named <code>$protocolHeader</code> (e.g. <code>x-forwarded-for</code>) equals to the value of
+ * <li>If the request http header named <code>$protocolHeader</code> (e.g. <code>x-forwarded-proto</code>) consists only of forwards that match
  * <code>protocolHeaderHttpsValue</code> configuration parameter (default <code>https</code>) then <code>request.isSecure = true</code>,
  * <code>request.scheme = https</code> and <code>request.serverPort = 443</code>. Note that 443 can be overwritten with the
  * <code>$httpsServerPort</code> configuration parameter.</li>
@@ -829,8 +829,9 @@ public class RemoteIpFilter implements Filter {
             if (protocolHeader != null) {
                 String protocolHeaderValue = request.getHeader(protocolHeader);
                 if (protocolHeaderValue == null) {
-                    // don't modify the secure,scheme and serverPort attributes of the request
-                } else if (protocolHeaderHttpsValue.equalsIgnoreCase(protocolHeaderValue)) {
+                    // Don't modify the secure, scheme and serverPort attributes
+                    // of the request
+                } else if (isForwardedProtoHeaderValueSecure(protocolHeaderValue)) {
                     xRequest.setSecure(true);
                     xRequest.setScheme("https");
                     setPorts(xRequest, httpsServerPort);
@@ -872,6 +873,26 @@ public class RemoteIpFilter implements Filter {
             chain.doFilter(request, response);
         }
 
+    }
+
+    /*
+     * Considers the value to be secure if it exclusively holds forwards for
+     * {@link #protocolHeaderHttpsValue}.
+     */
+    private boolean isForwardedProtoHeaderValueSecure(String protocolHeaderValue) {
+        if (!protocolHeaderValue.contains(",")) {
+            return protocolHeaderHttpsValue.equalsIgnoreCase(protocolHeaderValue);
+        }
+        String[] forwardedProtocols = commaDelimitedListToStringArray(protocolHeaderValue);
+        if (forwardedProtocols.length == 0) {
+            return false;
+        }
+        for (int i = 0; i < forwardedProtocols.length; i++) {
+            if (!protocolHeaderHttpsValue.equalsIgnoreCase(forwardedProtocols[i])) {
+                return false;
+            }
+        }
+        return true;
     }
 
     private void setPorts(XForwardedRequest xrequest, int defaultPort) {
