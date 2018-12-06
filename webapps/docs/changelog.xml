@@ -114,6 +114,11 @@
       <update>
         Update the recommended minimum Tomcat Native version to 1.2.19. (markt)
       </update>
+      <fix>
+        <bug>62978</bug>: Update the RemoteIpValve to handle multiple values in
+        the <code>x-forwarded-proto</code> header. Patch provided by Tom Groot.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
