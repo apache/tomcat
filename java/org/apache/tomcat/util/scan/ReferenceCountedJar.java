@@ -143,4 +143,13 @@ public class ReferenceCountedJar implements Jar {
             jar.wrappedJar.reset();
         }
     }
+
+
+    @Override
+    @Deprecated
+    public boolean entryExists(String name) throws IOException {
+        try (ReferenceCountedJar jar = open()) {
+            return jar.wrappedJar.entryExists(name);
+        }
+    }
 }
