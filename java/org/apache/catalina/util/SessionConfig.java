@@ -84,6 +84,44 @@ public class SessionConfig {
     }
 
 
+    /**
+     * Determine the value to use for the session cookie path for the provided
+     * context.
+     *
+     * @param context The context
+     * @return the parameter name for the session
+     */
+    public static String getSessionCookiePath(Context context) {
+
+        SessionCookieConfig scc = context.getServletContext().getSessionCookieConfig();
+
+        String contextPath = context.getSessionCookiePath();
+        if (contextPath == null || contextPath.length() == 0) {
+            contextPath = scc.getPath();
+        }
+        if (contextPath == null || contextPath.length() == 0) {
+            contextPath = context.getEncodedPath();
+        }
+        if (context.getSessionCookiePathUsesTrailingSlash()) {
+            // Handle special case of ROOT context where cookies require a path of
+            // '/' but the servlet spec uses an empty string
+            // Also ensure the cookies for a context with a path of /foo don't get
+            // sent for requests with a path of /foobar
+            if (!contextPath.endsWith("/")) {
+                contextPath = contextPath + "/";
+            }
+        } else {
+            // Only handle special case of ROOT context where cookies require a
+            // path of '/' but the servlet spec uses an empty string
+            if (contextPath.length() == 0) {
+                contextPath = "/";
+            }
+        }
+
+        return contextPath;
+    }
+
+
     private SessionConfig() {
         // Utility class. Hide default constructor.
     }
