@@ -129,6 +129,10 @@
         web application start to make integration simpler for downstream users.
         Patch provided by rmannibucau. (markt)
       </scode>
+      <fix>
+        Filter out tomcat-web.xml from the watched resources list in
+        storeconfig. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
@@ -282,6 +286,9 @@
         Update the packaged version of the Tomcat Native Library to 1.2.19 to
         pick up the latest Windows binaries built with APR 1.6.5 and OpenSSL
         1.1.1a. (markt)
+      </update>
+      <update>
+        Add i18n to many strings that lacked it. (remm)
       </update>
     </changelog>
   </subsection>
