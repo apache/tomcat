@@ -638,7 +638,7 @@ public class RemoteIpValve extends ValveBase {
             if (protocolHeader != null) {
                 String protocolHeaderValue = request.getHeader(protocolHeader);
                 if (protocolHeaderValue == null) {
-                    // don't modify the secure,scheme and serverPort attributes
+                    // Don't modify the secure, scheme and serverPort attributes
                     // of the request
                 } else if (isForwardedProtoHeaderValueSecure(protocolHeaderValue)) {
                     request.setSecure(true);
@@ -699,7 +699,7 @@ public class RemoteIpValve extends ValveBase {
         }
     }
 
-    /**
+    /*
      * Considers the value to be secure if it exclusively holds forwards for
      * {@link #protocolHeaderHttpsValue}.
      */

@@ -119,6 +119,11 @@
         the <code>x-forwarded-proto</code> header. Patch provided by Tom Groot.
         (markt)
       </fix>
+      <fix>
+        Update the RemoteIpFilter to handle multiple values in the
+        <code>x-forwarded-proto</code> header. Based on a patch provided by Tom
+        Groot. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
