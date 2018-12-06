@@ -354,7 +354,7 @@ public class GroupChannel extends ChannelInterceptorBase
             //this could be the channel listener throwing an exception, we should log it
             //as a warning.
             if ( log.isWarnEnabled() ) log.warn(sm.getString("groupChannel.receiving.error"),x);
-            throw new RemoteProcessException("Exception:"+x.getMessage(),x);
+            throw new RemoteProcessException(sm.getString("groupChannel.receiving.error"),x);
         }
     }
 

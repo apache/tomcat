@@ -169,7 +169,7 @@ public class NioReceiver extends ReceiverBase implements Runnable, NioReceiverMB
                 }
                 r.run();
             } catch (Exception x) {
-                log.error("", x);
+                log.error(sm.getString("nioReceiver.eventsError"), x);
             }
         }
     }

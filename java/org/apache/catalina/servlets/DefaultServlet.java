@@ -335,7 +335,7 @@ public class DefaultServlet extends HttpServlet {
                 Globals.RESOURCES_ATTR);
 
         if (resources == null) {
-            throw new UnavailableException("No resources");
+            throw new UnavailableException(sm.getString("defaultServlet.noResources"));
         }
 
         if (getServletConfig().getInitParameter("showServerInfo") != null) {
@@ -1670,7 +1670,7 @@ public class DefaultServlet extends HttpServlet {
             osWriter.flush();
             return new ByteArrayInputStream(stream.toByteArray());
         } catch (TransformerException e) {
-            throw new ServletException("XSL transformer error", e);
+            throw new ServletException(sm.getString("defaultServlet.xslError"), e);
         } finally {
             if (Globals.IS_SECURITY_ENABLED) {
                 PrivilegedSetTccl pa = new PrivilegedSetTccl(original);
@@ -1874,7 +1874,7 @@ public class DefaultServlet extends HttpServlet {
                     }
                     copyRange(reader, new PrintWriter(buffer));
                 } catch (IOException e) {
-                    log("Failure to close reader", e);
+                    log(sm.getString("defaultServlet.readerCloseFailed"), e);
                 } finally {
                     if (reader != null) {
                         try {

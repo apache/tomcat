@@ -819,8 +819,7 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
                         }
                         if (ExpandWar.copy(new File(config),
                                 new File(configBase, baseName + ".xml")) == false) {
-                            throw new Exception("Could not copy config file from path '" +
-                                    config + "'");
+                            throw new Exception(sm.getString("managerServlet.copyError", config));
                         }
                     }
                     // Upload WAR

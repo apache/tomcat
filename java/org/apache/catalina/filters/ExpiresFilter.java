@@ -1021,7 +1021,6 @@ public class ExpiresFilter extends FilterBase {
          */
         @Override
         public boolean isReady() {
-            // TODO Auto-generated method stub
             return false;
         }
 
@@ -1030,11 +1029,7 @@ public class ExpiresFilter extends FilterBase {
          */
         @Override
         public void setWriteListener(WriteListener listener) {
-            // TODO Auto-generated method stub
-
         }
-
-
 
     }
 
@@ -1076,9 +1071,7 @@ public class ExpiresFilter extends FilterBase {
             try {
                 ints[i] = Integer.parseInt(intAsString);
             } catch (NumberFormatException e) {
-                throw new RuntimeException("Exception parsing number '" + i +
-                        "' (zero based) of comma delimited list '" +
-                        commaDelimitedInts + "'");
+                throw new RuntimeException(sm.getString("expiresFilter.numberError", i, commaDelimitedInts));
             }
         }
         return ints;

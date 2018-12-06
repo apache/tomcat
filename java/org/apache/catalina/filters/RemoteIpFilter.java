@@ -45,6 +45,7 @@ import org.apache.catalina.util.RequestUtil;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.http.FastHttpDateFormat;
+import org.apache.tomcat.util.res.StringManager;
 
 /**
  * <p>
@@ -633,6 +634,7 @@ public class RemoteIpFilter extends GenericFilter {
     // Log must be non-static as loggers are created per class-loader and this
     // Filter may be used in multiple class loaders
     private transient Log log = LogFactory.getLog(RemoteIpFilter.class);
+    protected static final StringManager sm = StringManager.getManager(RemoteIpFilter.class);
 
     protected static final String PROTOCOL_HEADER_PARAMETER = "protocolHeader";
 
@@ -986,7 +988,7 @@ public class RemoteIpFilter extends GenericFilter {
             try {
                 setHttpServerPort(Integer.parseInt(getInitParameter(HTTP_SERVER_PORT_PARAMETER)));
             } catch (NumberFormatException e) {
-                throw new NumberFormatException("Illegal " + HTTP_SERVER_PORT_PARAMETER + " : " + e.getMessage());
+                throw new NumberFormatException(sm.getString("remoteIpFilter.invalidNumber", HTTP_SERVER_PORT_PARAMETER, e.getLocalizedMessage()));
             }
         }
 
@@ -994,7 +996,7 @@ public class RemoteIpFilter extends GenericFilter {
             try {
                 setHttpsServerPort(Integer.parseInt(getInitParameter(HTTPS_SERVER_PORT_PARAMETER)));
             } catch (NumberFormatException e) {
-                throw new NumberFormatException("Illegal " + HTTPS_SERVER_PORT_PARAMETER + " : " + e.getMessage());
+                throw new NumberFormatException(sm.getString("remoteIpFilter.invalidNumber", HTTPS_SERVER_PORT_PARAMETER, e.getLocalizedMessage()));
             }
         }
     }
