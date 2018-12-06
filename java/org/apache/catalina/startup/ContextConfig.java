@@ -1274,60 +1274,8 @@ public class ContextConfig implements LifecycleListener {
         }
 
         if  (!webXml.isMetadataComplete() || typeInitializerMap.size() > 0) {
-            // Step 4. Process /WEB-INF/classes for annotations
-            if (ok) {
-                // Hack required by Eclipse's "serve modules without
-                // publishing" feature since this backs WEB-INF/classes by
-                // multiple locations rather than one.
-                NamingEnumeration<Binding> listBindings = null;
-                try {
-                    try {
-                        listBindings = context.getResources().listBindings(
-                                "/WEB-INF/classes");
-                    } catch (NameNotFoundException ignore) {
-                        // Safe to ignore
-                    }
-                    while (listBindings != null &&
-                            listBindings.hasMoreElements()) {
-                        Binding binding = listBindings.nextElement();
-                        if (binding.getObject() instanceof FileDirContext) {
-                            File webInfClassDir = new File(
-                                    ((FileDirContext) binding.getObject()).getDocBase());
-                            processAnnotationsFile(webInfClassDir, webXml,
-                                    webXml.isMetadataComplete());
-                        } else if ("META-INF".equals(binding.getName())) {
-                            // Skip the META-INF directory from any JARs that have been
-                            // expanded in to WEB-INF/classes (sometimes IDEs do this).
-                        } else {
-                            String resource =
-                                    "/WEB-INF/classes/" + binding.getName();
-                            try {
-                                URL url = sContext.getResource(resource);
-                                processAnnotationsUrl(url, webXml,
-                                        webXml.isMetadataComplete());
-                            } catch (MalformedURLException e) {
-                                log.error(sm.getString(
-                                        "contextConfig.webinfClassesUrl",
-                                        resource), e);
-                            }
-                        }
-                    }
-                } catch (NamingException e) {
-                    log.error(sm.getString(
-                            "contextConfig.webinfClassesUrl",
-                            "/WEB-INF/classes"), e);
-                }
-            }
-
-            // Step 5. Process JARs for annotations - only need to process
-            // those fragments we are going to use
-            if (ok) {
-                processAnnotations(
-                        orderedFragments, webXml.isMetadataComplete());
-            }
-
-            // Cache, if used, is no longer required so clear it
-            javaClassCache.clear();
+            // Steps 4 & 5.
+            processClasses(webXml, orderedFragments);
         }
 
         if (!webXml.isMetadataComplete()) {
@@ -1404,6 +1352,65 @@ public class ContextConfig implements LifecycleListener {
             }
         }
     }
+
+
+    protected void processClasses(WebXml webXml, Set<WebXml> orderedFragments) {
+        // Step 4. Process /WEB-INF/classes for annotations
+        if (ok) {
+            // Hack required by Eclipse's "serve modules without
+            // publishing" feature since this backs WEB-INF/classes by
+            // multiple locations rather than one.
+            NamingEnumeration<Binding> listBindings = null;
+            try {
+                try {
+                    listBindings = context.getResources().listBindings(
+                            "/WEB-INF/classes");
+                } catch (NameNotFoundException ignore) {
+                    // Safe to ignore
+                }
+                while (listBindings != null &&
+                        listBindings.hasMoreElements()) {
+                    Binding binding = listBindings.nextElement();
+                    if (binding.getObject() instanceof FileDirContext) {
+                        File webInfClassDir = new File(
+                                ((FileDirContext) binding.getObject()).getDocBase());
+                        processAnnotationsFile(webInfClassDir, webXml,
+                                webXml.isMetadataComplete());
+                    } else if ("META-INF".equals(binding.getName())) {
+                        // Skip the META-INF directory from any JARs that have been
+                        // expanded in to WEB-INF/classes (sometimes IDEs do this).
+                    } else {
+                        String resource =
+                                "/WEB-INF/classes/" + binding.getName();
+                        try {
+                            URL url = context.getServletContext().getResource(resource);
+                            processAnnotationsUrl(url, webXml,
+                                    webXml.isMetadataComplete());
+                        } catch (MalformedURLException e) {
+                            log.error(sm.getString(
+                                    "contextConfig.webinfClassesUrl",
+                                    resource), e);
+                        }
+                    }
+                }
+            } catch (NamingException e) {
+                log.error(sm.getString(
+                        "contextConfig.webinfClassesUrl",
+                        "/WEB-INF/classes"), e);
+            }
+        }
+
+        // Step 5. Process JARs for annotations - only need to process
+        // those fragments we are going to use
+        if (ok) {
+            processAnnotations(
+                    orderedFragments, webXml.isMetadataComplete());
+        }
+
+        // Cache, if used, is no longer required so clear it
+        javaClassCache.clear();
+    }
+
 
     private WebXml getDefaultWebXmlFragment() {
 
@@ -2116,10 +2123,14 @@ public class ContextConfig implements LifecycleListener {
             return;
         }
 
-        String className = clazz.getClassName();
+        processClass(fragment, clazz);
+    }
 
+
+    protected void processClass(WebXml fragment, JavaClass clazz) {
         AnnotationEntry[] annotationsEntries = clazz.getAnnotationEntries();
         if (annotationsEntries != null) {
+            String className = clazz.getClassName();
             for (AnnotationEntry ae : annotationsEntries) {
                 String type = ae.getAnnotationType();
                 if ("Ljavax/servlet/annotation/WebServlet;".equals(type)) {
@@ -2134,6 +2145,7 @@ public class ContextConfig implements LifecycleListener {
             }
         }
     }
+
 
     /**
      * For classes packaged with the web application, the class and each
