@@ -1132,36 +1132,8 @@ public class ContextConfig implements LifecycleListener {
         }
 
         if  (!webXml.isMetadataComplete() || typeInitializerMap.size() > 0) {
-            // Step 4. Process /WEB-INF/classes for annotations and
-            // @HandlesTypes matches
-            Map<String,JavaClassCacheEntry> javaClassCache = new HashMap<>();
-
-            if (ok) {
-                WebResource[] webResources =
-                        context.getResources().listResources("/WEB-INF/classes");
-
-                for (WebResource webResource : webResources) {
-                    // Skip the META-INF directory from any JARs that have been
-                    // expanded in to WEB-INF/classes (sometimes IDEs do this).
-                    if ("META-INF".equals(webResource.getName())) {
-                        continue;
-                    }
-                    processAnnotationsWebResource(webResource, webXml,
-                            webXml.isMetadataComplete(), javaClassCache);
-                }
-            }
-
-            // Step 5. Process JARs for annotations and
-            // @HandlesTypes matches - only need to process those fragments we
-            // are going to use (remember orderedFragments includes any
-            // container fragments)
-            if (ok) {
-                processAnnotations(
-                        orderedFragments, webXml.isMetadataComplete(), javaClassCache);
-            }
-
-            // Cache, if used, is no longer required so clear it
-            javaClassCache.clear();
+            // Steps 4 & 5.
+            processClasses(webXml, orderedFragments);
         }
 
         if (!webXml.isMetadataComplete()) {
@@ -1234,6 +1206,40 @@ public class ContextConfig implements LifecycleListener {
                 }
             }
         }
+    }
+
+
+    protected void processClasses(WebXml webXml, Set<WebXml> orderedFragments) {
+        // Step 4. Process /WEB-INF/classes for annotations and
+        // @HandlesTypes matches
+        Map<String, JavaClassCacheEntry> javaClassCache = new HashMap<>();
+
+        if (ok) {
+            WebResource[] webResources =
+                    context.getResources().listResources("/WEB-INF/classes");
+
+            for (WebResource webResource : webResources) {
+                // Skip the META-INF directory from any JARs that have been
+                // expanded in to WEB-INF/classes (sometimes IDEs do this).
+                if ("META-INF".equals(webResource.getName())) {
+                    continue;
+                }
+                processAnnotationsWebResource(webResource, webXml,
+                        webXml.isMetadataComplete(), javaClassCache);
+            }
+        }
+
+        // Step 5. Process JARs for annotations and
+        // @HandlesTypes matches - only need to process those fragments we
+        // are going to use (remember orderedFragments includes any
+        // container fragments)
+        if (ok) {
+            processAnnotations(
+                    orderedFragments, webXml.isMetadataComplete(), javaClassCache);
+        }
+
+        // Cache, if used, is no longer required so clear it
+        javaClassCache.clear();
     }
 
 
@@ -2109,6 +2115,11 @@ public class ContextConfig implements LifecycleListener {
             return;
         }
 
+        processClass(fragment, clazz);
+    }
+
+
+    protected void processClass(WebXml fragment, JavaClass clazz) {
         AnnotationEntry[] annotationsEntries = clazz.getAnnotationEntries();
         if (annotationsEntries != null) {
             String className = clazz.getClassName();
@@ -2126,6 +2137,7 @@ public class ContextConfig implements LifecycleListener {
             }
         }
     }
+
 
     /**
      * For classes packaged with the web application, the class and each
