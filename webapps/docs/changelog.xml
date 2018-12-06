@@ -82,6 +82,11 @@
         <code>x-forwarded-proto</code> header. Based on a patch provided by Tom
         Groot. (markt)
       </fix>
+      <scode>
+        <bug>62986</bug>: Refactor the code that performs class scanning during
+        web application start to make integration simpler for downstream users.
+        Patch provided by rmannibucau. (markt)
+      </scode>
     </changelog>
   </subsection>
   <subsection name="Coyote">
