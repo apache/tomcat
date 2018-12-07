@@ -250,7 +250,7 @@ public class FarmWarDeployer extends ClusterListener
                                     "farmWarDeployer.servicingDeploy",
                                     contextName, name));
                     } catch (Exception ex) {
-                        log.error(ex);
+                        log.error(sm.getString("farmWarDeployer.fileMessageError"), ex);
                     } finally {
                         removeFactory(fmsg);
                     }
@@ -278,7 +278,7 @@ public class FarmWarDeployer extends ClusterListener
                                 "farmWarDeployer.servicingUndeploy",
                                 contextName));
                 } catch (Exception ex) {
-                    log.error(ex);
+                    log.error(sm.getString("farmWarDeployer.undeployMessageError"), ex);
                 }
             }
         } catch (java.io.IOException x) {
