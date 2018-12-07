@@ -155,7 +155,7 @@ public class HpackDecoder {
                     return;
                 }
             } else {
-                throw new RuntimeException("Not yet implemented");
+                throw new RuntimeException(sm.getString("hpackdecoder.notImplemented"));
             }
         }
     }
