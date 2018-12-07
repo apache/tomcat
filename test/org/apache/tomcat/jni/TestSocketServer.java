@@ -195,8 +195,8 @@ public class TestSocketServer extends AbstractJniTest {
         }
         long wait = System.nanoTime() - start;
         Assert.assertTrue("Timeout failed", ok);
-        Assert.assertFalse("non_blocking accept Socket.APR_SO_NONBLOCK failed (>1ms) [" + wait +
-                "] +-[" + ERROR_MARGIN + "]", wait > 1000000 + ERROR_MARGIN);
+        Assert.assertFalse("non_blocking accept Socket.APR_SO_NONBLOCK failed (>10ms) [" + wait +
+                "] +-[" + ERROR_MARGIN + "]", wait > 10000000 + ERROR_MARGIN);
     }
 
 
