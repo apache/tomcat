@@ -245,7 +245,7 @@ public class FileMessageFactory {
         if (msg.getMessageNumber() <= lastMessageProcessed.get()) {
             // Duplicate of message already processed
             log.warn(sm.getString("fileMessageFactory.duplicateMessage", msg.getContextName(), msg.getFileName(),
-                    HexUtils.toHexString(msg.getData()), msg.getDataLength()));
+                    HexUtils.toHexString(msg.getData()), Integer.valueOf(msg.getDataLength())));
             return false;
         }
 
@@ -254,7 +254,7 @@ public class FileMessageFactory {
         if (previous != null) {
             // Duplicate of message not yet processed
             log.warn(sm.getString("fileMessageFactory.duplicateMessage", msg.getContextName(), msg.getFileName(),
-                    HexUtils.toHexString(msg.getData()), msg.getDataLength()));
+                    HexUtils.toHexString(msg.getData()), Integer.valueOf(msg.getDataLength())));
             return false;
         }
 
@@ -351,6 +351,7 @@ public class FileMessageFactory {
      * @throws Exception An error occurred
      * @deprecated
      */
+    @Deprecated
     public static void main(String[] args) throws Exception {
         System.out.println("Usage: FileMessageFactory fileToBeRead fileToBeWritten");
         System.out.println("Usage: This will make a copy of the file on the local file system");

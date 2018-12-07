@@ -94,7 +94,8 @@ public class CollectedInfo {
             shost = null;
         }
         if (objName == null) {
-            throw new Exception(sm.getString("collectedInfo.noConnector", host, port));
+            throw new Exception(sm.getString("collectedInfo.noConnector",
+                    host, Integer.valueOf(port)));
         }
         this.port = iport;
         this.host = shost;

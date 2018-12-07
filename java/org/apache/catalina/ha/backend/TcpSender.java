@@ -143,7 +143,7 @@ public class TcpSender
                 responseStatus = responseStatus.substring(responseStatus.indexOf(' ') + 1, responseStatus.indexOf(' ', responseStatus.indexOf(' ') + 1));
                 int status = Integer.parseInt(responseStatus);
                 if (status != 200) {
-                    log.error(sm.getString("tcpSender.responseErrorCode", status));
+                    log.error(sm.getString("tcpSender.responseErrorCode", Integer.valueOf(status)));
                     close(i);
                     continue;
                 }
