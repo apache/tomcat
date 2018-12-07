@@ -31,6 +31,7 @@ import javax.management.openmbean.TabularData;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.ExceptionUtils;
+import org.apache.tomcat.util.res.StringManager;
 
 /**
  * General helper to dump MBean contents to the log.
@@ -38,6 +39,7 @@ import org.apache.tomcat.util.ExceptionUtils;
 public class MBeanDumper {
 
     private static final Log log = LogFactory.getLog(MBeanDumper.class);
+    protected static final StringManager sm = StringManager.getManager(MBeanDumper.class);
 
     private static final String CRLF = "\r\n";
 
@@ -87,19 +89,19 @@ public class MBeanDumper {
                         Throwable cause = rme.getCause();
                         if (cause instanceof UnsupportedOperationException) {
                             if (log.isDebugEnabled()) {
-                                log.debug("Error getting attribute " + oname + " " + attName, rme);
+                                log.debug(sm.getString("mBeanDumper.getAttributeError", attName, oname), rme);
                             }
                         } else if (cause instanceof NullPointerException) {
                             if (log.isDebugEnabled()) {
-                                log.debug("Error getting attribute " + oname + " " + attName, rme);
+                                log.debug(sm.getString("mBeanDumper.getAttributeError", attName, oname), rme);
                             }
                         } else {
-                            log.error("Error getting attribute " + oname + " " + attName, rme);
+                            log.error(sm.getString("mBeanDumper.getAttributeError", attName, oname), rme);
                         }
                         continue;
                     } catch (Throwable t) {
                         ExceptionUtils.handleThrowable(t);
-                        log.error("Error getting attribute " + oname + " " + attName, t);
+                        log.error(sm.getString("mBeanDumper.getAttributeError", attName, oname), t);
                         continue;
                     }
                     if (value == null) {

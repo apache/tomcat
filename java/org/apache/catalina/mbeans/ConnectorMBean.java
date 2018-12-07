@@ -52,8 +52,8 @@ public class ConnectorMBean extends ClassNameMBean<Connector> {
         // Validate the input parameters
         if (name == null) {
             throw new RuntimeOperationsException(
-                    new IllegalArgumentException("Attribute name is null"),
-                    "Attribute name is null");
+                    new IllegalArgumentException(sm.getString("mBean.nullName")),
+                    sm.getString("mBean.nullName"));
         }
 
         Connector connector = doGetManagedResource();
@@ -81,14 +81,14 @@ public class ConnectorMBean extends ClassNameMBean<Connector> {
         // Validate the input parameters
         if (attribute == null) {
             throw new RuntimeOperationsException(new IllegalArgumentException(
-                    "Attribute is null"), "Attribute is null");
+                    sm.getString("mBean.nullAttribute")), sm.getString("mBean.nullAttribute"));
         }
         String name = attribute.getName();
         Object value = attribute.getValue();
         if (name == null) {
             throw new RuntimeOperationsException(
-                    new IllegalArgumentException("Attribute name is null"),
-                    "Attribute name is null");
+                    new IllegalArgumentException(sm.getString("mBean.nullName")),
+                    sm.getString("mBean.nullName"));
         }
 
         Connector connector = doGetManagedResource();

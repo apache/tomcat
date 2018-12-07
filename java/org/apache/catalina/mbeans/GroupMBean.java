@@ -65,8 +65,7 @@ public class GroupMBean extends BaseModelMBean {
                 ObjectName oname = MBeanUtils.createObjectName(managed.getDomain(), role);
                 results.add(oname.toString());
             } catch (MalformedObjectNameException e) {
-                IllegalArgumentException iae = new IllegalArgumentException(
-                        "Cannot create object name for role " + role);
+                IllegalArgumentException iae = new IllegalArgumentException(sm.getString("userMBean.createError.role", role));
                 iae.initCause(e);
                 throw iae;
             }
@@ -90,8 +89,7 @@ public class GroupMBean extends BaseModelMBean {
                 ObjectName oname = MBeanUtils.createObjectName(managed.getDomain(), user);
                 results.add(oname.toString());
             } catch (MalformedObjectNameException e) {
-                IllegalArgumentException iae = new IllegalArgumentException(
-                        "Cannot create object name for user " + user);
+                IllegalArgumentException iae = new IllegalArgumentException(sm.getString("userMBean.createError.user", user));
                 iae.initCause(e);
                 throw iae;
             }
@@ -113,7 +111,7 @@ public class GroupMBean extends BaseModelMBean {
         }
         Role role = group.getUserDatabase().findRole(rolename);
         if (role == null) {
-            throw new IllegalArgumentException("Invalid role name '" + rolename + "'");
+            throw new IllegalArgumentException(sm.getString("userMBean.invalidRole", rolename));
         }
         group.addRole(role);
     }
@@ -132,7 +130,7 @@ public class GroupMBean extends BaseModelMBean {
         }
         Role role = group.getUserDatabase().findRole(rolename);
         if (role == null) {
-            throw new IllegalArgumentException("Invalid role name [" + rolename + "]");
+            throw new IllegalArgumentException(sm.getString("userMBean.invalidRole", rolename));
         }
         group.removeRole(role);
     }

@@ -182,7 +182,7 @@ public class MBeanFactory {
         }
         if (service == null ||
                 !service.getObjectName().getDomain().equals(domain)) {
-            throw new Exception("Service with the domain is not found");
+            throw new Exception(sm.getString("mBeanFactory.noService", domain));
         }
         return service;
 
@@ -461,7 +461,7 @@ public class MBeanFactory {
                            new Object [] {contextName},
                            new String [] {"java.lang.String"});
         } else {
-            log.warn("Deployer not found for "+pname.getKeyProperty("host"));
+            log.warn(sm.getString("mBeanFactory.noDeployer", pname.getKeyProperty("host")));
             Service service = getService(pname);
             Engine engine = service.getContainer();
             Host host = (Host) engine.findChild(pname.getKeyProperty("host"));
@@ -535,7 +535,7 @@ public class MBeanFactory {
             String defaultHost, String baseDir) throws Exception{
 
         if (!(container instanceof Server)) {
-            throw new Exception("Container not Server");
+            throw new Exception(sm.getString("mBeanFactory.notServer"));
         }
 
         StandardEngine engine = new StandardEngine();
@@ -752,7 +752,7 @@ public class MBeanFactory {
                            new Object[] {pathStr},
                            new String[] {"java.lang.String"});
         } else {
-            log.warn("Deployer not found for "+hostName);
+            log.warn(sm.getString("mBeanFactory.noDeployer", hostName));
             Host host = (Host) engine.findChild(hostName);
             Context context = (Context) host.findChild(pathStr);
             // Remove this component from its parent component
@@ -761,7 +761,7 @@ public class MBeanFactory {
             try {
                 context.destroy();
             } catch (Exception e) {
-                log.warn("Error during context [" + context.getName() + "] destroy ", e);
+                log.warn(sm.getString("mBeanFactory.contextDestroyError"), e);
            }
 
         }

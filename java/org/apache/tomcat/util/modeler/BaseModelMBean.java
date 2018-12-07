@@ -48,6 +48,7 @@ import javax.management.modelmbean.ModelMBeanNotificationBroadcaster;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.res.StringManager;
 
 /*
  * Changes from commons.modeler:
@@ -104,6 +105,7 @@ public class BaseModelMBean implements DynamicMBean, MBeanRegistration,
         ModelMBeanNotificationBroadcaster {
 
     private static final Log log = LogFactory.getLog(BaseModelMBean.class);
+    protected static final StringManager sm = StringManager.getManager(BaseModelMBean.class);
 
     // ----------------------------------------------------- Instance Variables
 
