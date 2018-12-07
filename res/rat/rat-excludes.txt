@@ -23,7 +23,7 @@
 
   - *.html files in documentation are generated from XML sources
 
-  - *.md5, *.sha/*.sha1 files are generated and cannot contain license
+  - *.sha512 files are generated and cannot contain license
 
   - *.manifest, MANIFEST.MF JAR manifest files cannot contain license
 
@@ -63,8 +63,7 @@ output/build/webapps/docs/**/*.html
 output/dist/webapps/docs/**/*.html
 output/deployer/deployer-howto.html
 
-**/*.md5
-**/*.sha1
+**/*.sha512
 
 **/MANIFEST.MF
 **/*.manifest
