@@ -188,7 +188,14 @@ public class TestAsync extends Http2TestBase {
         }
 
         while (!output.getTrace().endsWith("3-EndOfStream\n")) {
-            parser.readFrame(true);
+            try {
+                parser.readFrame(true);
+            } catch (IOException ioe) {
+                // Attempt to debug intermittent test failures
+                System.out.println(output.getTrace());
+                System.out.println(output.getBytesRead());
+                throw ioe;
+            }
         }
 
         // Check that the right number of bytes were received
