@@ -222,7 +222,7 @@ public class JarWarResourceSet extends AbstractArchiveResourceSet {
      */
     @Override
     protected JarEntry getArchiveEntry(String pathInArchive) {
-        throw new IllegalStateException(sm.getString("JarWarResourceSet.codingError"));
+        throw new IllegalStateException(sm.getString("jarWarResourceSet.codingError"));
     }
 
 
