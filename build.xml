@@ -1458,6 +1458,9 @@
       <include name="org/apache/**" />
       <include name="javax/**" />
       <include name="util/**" />
+      <!-- Exclude these by default as Gump can't run them because the -->
+      <!-- classes on which they depend are not in any output JAR.     -->
+      <exclude name="org/apache/tomcat/buildutil/**"/>
     </javac>
     <copy todir="${test.classes}">
         <fileset dir="test">
