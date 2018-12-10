@@ -26,6 +26,8 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.tomcat.util.res.StringManager;
+
 /**
  * Filter that attempts to force MS WebDAV clients connecting on port 80 to use
  * a WebDAV client that actually works. Other workarounds that might help
@@ -59,9 +61,7 @@ import javax.servlet.http.HttpServletResponse;
 public class WebdavFixFilter extends GenericFilter {
 
     private static final long serialVersionUID = 1L;
-
-    private static final String LOG_MESSAGE_PREAMBLE =
-        "WebdavFixFilter: Detected client problem: ";
+    protected static final StringManager sm = StringManager.getManager(WebdavFixFilter.class);
 
     /* Start string for all versions */
     private static final String UA_MINIDIR_START =
@@ -101,11 +101,11 @@ public class WebdavFixFilter extends GenericFilter {
         } else if (ua.startsWith(UA_MINIDIR_5_2_3790)) {
             // XP 64-bit SP2
             if (!"".equals(httpRequest.getContextPath())) {
-                log("XP-x64-SP2 clients only work with the root context");
+                getServletContext().log(sm.getString("webDavFilter.xpRootContext"));
             }
             // Namespace issue maybe
             // see http://greenbytes.de/tech/webdav/webdav-redirector-list.html
-            log("XP-x64-SP2 is known not to work with WebDAV Servlet");
+            getServletContext().log(sm.getString("webDavFilter.xpProblem"));
 
             chain.doFilter(request, response);
         } else {
@@ -131,9 +131,4 @@ public class WebdavFixFilter extends GenericFilter {
         return location.toString();
     }
 
-    private void log(String msg) {
-        StringBuilder builder = new StringBuilder(LOG_MESSAGE_PREAMBLE);
-        builder.append(msg);
-        getServletContext().log(builder.toString());
-    }
 }

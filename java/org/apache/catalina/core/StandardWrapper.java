@@ -1133,7 +1133,7 @@ public class StandardWrapper extends ContainerBase
             throw f;
         } catch (Throwable f) {
             ExceptionUtils.handleThrowable(f);
-            getServletContext().log("StandardWrapper.Throwable", f );
+            getServletContext().log(sm.getString("standardWrapper.initException", getName()), f);
             // If the servlet wanted to be unavailable it would have
             // said so, so do not call unavailable(null).
             throw new ServletException

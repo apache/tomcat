@@ -134,7 +134,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
                 doSessions(cn, request, response, smClient);
                 return;
             } catch (Exception e) {
-                log("HTMLManagerServlet.sessions[" + cn + "]", e);
+                log(sm.getString("htmlManagerServlet.error.sessions", cn), e);
                 message = smClient.getString("managerServlet.exception",
                         e.toString());
             }
@@ -827,7 +827,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
             try {
                 idle = Integer.parseInt(idleParam);
             } catch (NumberFormatException e) {
-                log("Could not parse idle parameter to an int: " + idleParam);
+                log(sm.getString("managerServlet.error.idleParam", idleParam));
             }
         }
         return sessions(cn, idle, smClient);
@@ -958,7 +958,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
                     req.setAttribute(APPLICATION_ERROR, "Can't sort session list: one session is invalidated");
                 }
             } else {
-                log("WARNING: unknown sort order: " + sortBy);
+                log(sm.getString("htmlManagerServlet.error.sortOrder", sortBy));
             }
         }
         // keep sort order
@@ -1021,7 +1021,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
             if (null == session) {
                 // Shouldn't happen, but let's play nice...
                 if (debug >= 1) {
-                    log("WARNING: can't invalidate null session " + sessionId);
+                    log("Cannot invalidate null session " + sessionId);
                 }
                 continue;
             }
@@ -1033,7 +1033,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
                 }
             } catch (IllegalStateException ise) {
                 if (debug >= 1) {
-                    log("Can't invalidate already invalidated session id " + sessionId);
+                    log("Cannot invalidate already invalidated session id " + sessionId);
                 }
             }
         }
@@ -1056,7 +1056,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
         if (null == session) {
             // Shouldn't happen, but let's play nice...
             if (debug >= 1) {
-                log("WARNING: can't remove attribute '" + attributeName + "' for null session " + sessionId);
+                log("Cannot remove attribute '" + attributeName + "' for null session " + sessionId);
             }
             return false;
         }
@@ -1065,7 +1065,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
             session.removeAttribute(attributeName);
         } catch (IllegalStateException ise) {
             if (debug >= 1) {
-                log("Can't remote attribute '" + attributeName + "' for invalidated session id " + sessionId);
+                log("Cannot remote attribute '" + attributeName + "' for invalidated session id " + sessionId);
             }
         }
         return wasPresent;
