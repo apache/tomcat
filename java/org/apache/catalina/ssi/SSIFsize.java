@@ -20,6 +20,8 @@ package org.apache.catalina.ssi;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.DecimalFormat;
+
+import org.apache.tomcat.util.res.StringManager;
 /**
  * Implements the Server-side #fsize command
  *
@@ -29,6 +31,7 @@ import java.text.DecimalFormat;
  * @author David Becker
  */
 public final class SSIFsize implements SSICommand {
+    private static final StringManager sm = StringManager.getManager(SSIFsize.class);
     static final int ONE_KILOBYTE = 1024;
     static final int ONE_MEGABYTE = 1024 * 1024;
 
@@ -57,12 +60,11 @@ public final class SSIFsize implements SSICommand {
                     String configSizeFmt = ssiMediator.getConfigSizeFmt();
                     writer.write(formatSize(size, configSizeFmt));
                 } else {
-                    ssiMediator.log("#fsize--Invalid attribute: " + paramName);
+                    ssiMediator.log(sm.getString("ssiCommand.invalidAttribute", paramName));
                     writer.write(configErrMsg);
                 }
             } catch (IOException e) {
-                ssiMediator.log("#fsize--Couldn't get size for file: "
-                        + substitutedValue, e);
+                ssiMediator.log(sm.getString("ssiFsize.noSize", substitutedValue), e);
                 writer.write(configErrMsg);
             }
         }
@@ -72,7 +74,7 @@ public final class SSIFsize implements SSICommand {
 
     public String repeat(char aChar, int numChars) {
         if (numChars < 0) {
-            throw new IllegalArgumentException("Num chars can't be negative");
+            throw new IllegalArgumentException(sm.getString("ssiFsize.invalidNumChars"));
         }
         StringBuilder buf = new StringBuilder();
         for (int i = 0; i < numChars; i++) {

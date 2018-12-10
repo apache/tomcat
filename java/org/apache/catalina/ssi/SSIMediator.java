@@ -29,6 +29,7 @@ import java.util.regex.Matcher;
 
 import org.apache.catalina.util.Strftime;
 import org.apache.catalina.util.URLEncoder;
+import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.util.security.Escape;
 
 /**
@@ -42,6 +43,7 @@ import org.apache.tomcat.util.security.Escape;
  * @author David Becker
  */
 public class SSIMediator {
+    private static final StringManager sm = StringManager.getManager(SSIMediator.class);
     protected static final String DEFAULT_CONFIG_ERR_MSG = "[an error occurred while processing this directive]";
     protected static final String DEFAULT_CONFIG_TIME_FMT = "%A, %d-%b-%Y %T %Z";
     protected static final String DEFAULT_CONFIG_SIZE_FMT = "abbrev";
@@ -289,7 +291,7 @@ public class SSIMediator {
             retVal = Escape.htmlElementContent(value);
         } else {
             //This shouldn't be possible
-            throw new IllegalArgumentException("Unknown encoding: " + encoding);
+            throw new IllegalArgumentException(sm.getString("ssiMediator.unknownEncoding", encoding));
         }
         return retVal;
     }
