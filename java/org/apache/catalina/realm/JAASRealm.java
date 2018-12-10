@@ -281,7 +281,7 @@ public class JAASRealm extends RealmBase {
                      log.error(sm.getString("jaasRealm.notPrincipal", classNames[i]));
                  }
              } catch (ClassNotFoundException e) {
-                 log.error(sm.getString("jassRealm.classNotFound", classNames[i]));
+                 log.error(sm.getString("jaasRealm.classNotFound", classNames[i]));
              }
          }
      }
