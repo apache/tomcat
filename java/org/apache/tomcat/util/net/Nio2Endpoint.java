@@ -333,7 +333,7 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
             return processSocket(socketWrapper, SocketEvent.OPEN_READ, false);
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
-            log.error("",t);
+            log.error(sm.getString("endpoint.socketOptionsError"),t);
         }
         // Tell to close the socket
         return false;

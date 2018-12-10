@@ -789,7 +789,7 @@ public abstract class AbstractEndpoint<S,U> {
                 return IntrospectionUtils.setProperty(this,name,value,false);
             }
         }catch ( Exception x ) {
-            getLog().error("Unable to set attribute \""+name+"\" to \""+value+"\"",x);
+            getLog().error(sm.getString("endpoint.setAttributeError", name, value), x);
             return false;
         }
     }

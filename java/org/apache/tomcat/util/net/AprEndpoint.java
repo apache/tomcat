@@ -914,7 +914,7 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
                 getExecutor().execute(new SocketWithOptionsProcessor(wrapper));
             }
         } catch (RejectedExecutionException x) {
-            log.warn("Socket processing request was rejected for:"+socket,x);
+            log.warn(sm.getString("endpoint.rejectedExecution", socket), x);
             return false;
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);

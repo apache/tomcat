@@ -36,10 +36,12 @@ import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.collections.SynchronizedQueue;
 import org.apache.tomcat.util.collections.SynchronizedStack;
 import org.apache.tomcat.util.net.NioEndpoint.NioSocketWrapper;
+import org.apache.tomcat.util.res.StringManager;
 
 public class NioBlockingSelector {
 
     private static final Log log = LogFactory.getLog(NioBlockingSelector.class);
+    protected static final StringManager sm = StringManager.getManager(NioBlockingSelector.class);
 
     private static final AtomicInteger threadCounter = new AtomicInteger();
 
@@ -85,7 +87,9 @@ public class NioBlockingSelector {
     public int write(ByteBuffer buf, NioChannel socket, long writeTimeout)
             throws IOException {
         SelectionKey key = socket.getIOChannel().keyFor(socket.getPoller().getSelector());
-        if ( key == null ) throw new IOException("Key no longer registered");
+        if (key == null) {
+            throw new IOException(sm.getString("nioBlockingSelector.keyNotRegistered"));
+        }
         KeyReference reference = keyReferenceStack.pop();
         if (reference == null) {
             reference = new KeyReference();
@@ -157,7 +161,9 @@ public class NioBlockingSelector {
      */
     public int read(ByteBuffer buf, NioChannel socket, long readTimeout) throws IOException {
         SelectionKey key = socket.getIOChannel().keyFor(socket.getPoller().getSelector());
-        if ( key == null ) throw new IOException("Key no longer registered");
+        if (key == null) {
+            throw new IOException(sm.getString("nioBlockingSelector.keyNotRegistered"));
+        }
         KeyReference reference = keyReferenceStack.pop();
         if (reference == null) {
             reference = new KeyReference();
@@ -310,7 +316,7 @@ public class NioBlockingSelector {
                         continue;
                     } catch (Throwable x) {
                         ExceptionUtils.handleThrowable(x);
-                        log.error("",x);
+                        log.error(sm.getString("nioBlockingSelector.selectError"), x);
                         continue;
                     }
 
@@ -337,7 +343,7 @@ public class NioBlockingSelector {
                         }
                     }//while
                 }catch ( Throwable t ) {
-                    log.error("",t);
+                    log.error(sm.getString("nioBlockingSelector.processingError"), t);
                 }
             }
             events.clear();
@@ -467,7 +473,7 @@ public class NioBlockingSelector {
         @Override
         public void finalize() {
             if (key!=null && key.isValid()) {
-                log.warn("Possible key leak, cancelling key in the finalizer.");
+                log.warn(sm.getString("nioBlockingSelector.possibleLeak"));
                 try {key.cancel();}catch (Exception ignore){}
             }
         }
