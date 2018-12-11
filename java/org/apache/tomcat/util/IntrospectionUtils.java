@@ -25,14 +25,15 @@ import java.util.Hashtable;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.res.StringManager;
 
 /**
  * Utils for introspection and reflection
  */
 public final class IntrospectionUtils {
 
-
     private static final Log log = LogFactory.getLog(IntrospectionUtils.class);
+    private static final StringManager sm = StringManager.getManager(IntrospectionUtils.class);
 
     /**
      * Find a method with the right name If found, call the method ( if param is
@@ -165,18 +166,11 @@ public final class IntrospectionUtils {
                 }
             }
 
-        } catch (IllegalArgumentException ex2) {
-            log.warn("IAE " + o + " " + name + " " + value, ex2);
-        } catch (SecurityException ex1) {
-            log.warn("IntrospectionUtils: SecurityException for " +
-                    o.getClass() + " " + name + "=" + value + ")", ex1);
-        } catch (IllegalAccessException iae) {
-            log.warn("IntrospectionUtils: IllegalAccessException for " +
-                    o.getClass() + " " + name + "=" + value + ")", iae);
-        } catch (InvocationTargetException ie) {
-            ExceptionUtils.handleThrowable(ie.getCause());
-            log.warn("IntrospectionUtils: InvocationTargetException for " +
-                    o.getClass() + " " + name + "=" + value + ")", ie);
+        } catch (IllegalArgumentException | SecurityException | IllegalAccessException e) {
+            log.warn(sm.getString("introspectionUtils.setPropertyError", name, value, o.getClass()), e);
+        } catch (InvocationTargetException e) {
+            ExceptionUtils.handleThrowable(e.getCause());
+            log.warn(sm.getString("introspectionUtils.setPropertyError", name, value, o.getClass()), e);
         }
         return false;
     }
@@ -211,22 +205,15 @@ public final class IntrospectionUtils {
                 return getPropertyMethod.invoke(o, params);
             }
 
-        } catch (IllegalArgumentException ex2) {
-            log.warn("IAE " + o + " " + name, ex2);
-        } catch (SecurityException ex1) {
-            log.warn("IntrospectionUtils: SecurityException for " +
-                    o.getClass() + " " + name + ")", ex1);
-        } catch (IllegalAccessException iae) {
-            log.warn("IntrospectionUtils: IllegalAccessException for " +
-                    o.getClass() + " " + name + ")", iae);
-        } catch (InvocationTargetException ie) {
-            if (ie.getCause() instanceof NullPointerException) {
+        } catch (IllegalArgumentException | SecurityException | IllegalAccessException e) {
+            log.warn(sm.getString("introspectionUtils.getPropertyError", name, o.getClass()), e);
+        } catch (InvocationTargetException e) {
+            if (e.getCause() instanceof NullPointerException) {
                 // Assume the underlying object uses a storage to represent an unset property
                 return null;
             }
-            ExceptionUtils.handleThrowable(ie.getCause());
-            log.warn("IntrospectionUtils: InvocationTargetException for " +
-                    o.getClass() + " " + name + ")", ie);
+            ExceptionUtils.handleThrowable(e.getCause());
+            log.warn(sm.getString("introspectionUtils.getPropertyError", name, o.getClass()), e);
         }
         return null;
     }
@@ -350,10 +337,8 @@ public final class IntrospectionUtils {
 
     public static Object callMethod1(Object target, String methodN,
             Object param1, String typeParam1, ClassLoader cl) throws Exception {
-        if (target == null || param1 == null) {
-            throw new IllegalArgumentException(
-                    "IntrospectionUtils: Assert: Illegal params " +
-                    target + " " + param1);
+        if (target == null || methodN == null || param1 == null) {
+            throw new IllegalArgumentException(sm.getString("introspectionUtils.nullParameter"));
         }
         if (log.isDebugEnabled())
             log.debug("IntrospectionUtils: callMethod1 " +
@@ -443,7 +428,7 @@ public final class IntrospectionUtils {
                         paramType.getName());
         }
         if (result == null) {
-            throw new IllegalArgumentException("Can't convert argument: " + object);
+            throw new IllegalArgumentException(sm.getString("introspectionUtils.conversionError", object, paramType.getName()));
         }
         return result;
     }
