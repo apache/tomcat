@@ -83,7 +83,7 @@ public class MbeansDescriptorsIntrospectionSource extends ModelerSource
             registry.addManagedBean(managed);
 
         } catch( Exception ex ) {
-            log.error( "Error reading descriptors ", ex);
+            log.error(sm.getString("modules.readDescriptorsError"), ex);
         }
     }
 
@@ -351,7 +351,7 @@ public class MbeansDescriptorsIntrospectionSource extends ModelerSource
                     }
                     mbean.addOperation(op);
                 } else {
-                    log.error("Null arg method for [" + name + "]");
+                    log.error(sm.getString("modules.nullMethod", name));
                 }
             }
 

@@ -30,6 +30,7 @@ import org.apache.catalina.UserDatabase;
 import org.apache.tomcat.util.modeler.BaseModelMBean;
 import org.apache.tomcat.util.modeler.ManagedBean;
 import org.apache.tomcat.util.modeler.Registry;
+import org.apache.tomcat.util.res.StringManager;
 
 /**
  * <p>A <strong>ModelMBean</strong> implementation for the
@@ -38,6 +39,8 @@ import org.apache.tomcat.util.modeler.Registry;
  * @author Craig R. McClanahan
  */
 public class MemoryUserDatabaseMBean extends BaseModelMBean {
+
+    private static final StringManager sm = StringManager.getManager(MemoryUserDatabaseMBean.class);
 
     // ----------------------------------------------------- Instance Variables
 

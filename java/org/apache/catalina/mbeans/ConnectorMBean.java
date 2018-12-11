@@ -24,6 +24,7 @@ import javax.management.RuntimeOperationsException;
 
 import org.apache.catalina.connector.Connector;
 import org.apache.tomcat.util.IntrospectionUtils;
+import org.apache.tomcat.util.res.StringManager;
 
 /**
  * <p>A <strong>ModelMBean</strong> implementation for the
@@ -32,6 +33,8 @@ import org.apache.tomcat.util.IntrospectionUtils;
  * @author Amy Roh
  */
 public class ConnectorMBean extends ClassNameMBean<Connector> {
+
+    private static final StringManager sm = StringManager.getManager(ConnectorMBean.class);
 
     /**
      * Obtain and return the value of a specific attribute of this MBean.

@@ -39,6 +39,7 @@ import javax.management.ObjectName;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.modeler.modules.ModelerSource;
+import org.apache.tomcat.util.res.StringManager;
 
 /*
    Issues:
@@ -70,6 +71,7 @@ public class Registry implements RegistryMBean, MBeanRegistration {
      * The Log instance to which we will write our log messages.
      */
     private static final Log log = LogFactory.getLog(Registry.class);
+    private static final StringManager sm = StringManager.getManager(Registry.class);
 
     // Support for the factory methods
 
@@ -237,7 +239,7 @@ public class Registry implements RegistryMBean, MBeanRegistration {
         try {
             unregisterComponent(new ObjectName(oname));
         } catch (MalformedObjectNameException e) {
-            log.info("Error creating object name " + e);
+            log.info(sm.getString("registry.objectNameCreateError"), e);
         }
     }
 
@@ -272,7 +274,7 @@ public class Registry implements RegistryMBean, MBeanRegistration {
             } catch (Exception t) {
                 if (failFirst)
                     throw t;
-                log.info("Error initializing " + current + " " + t.toString());
+                log.info(sm.getString("registry.initError"), t);
             }
         }
     }
@@ -372,7 +374,7 @@ public class Registry implements RegistryMBean, MBeanRegistration {
         try {
             info = getMBeanServer().getMBeanInfo(oname);
         } catch (Exception e) {
-            log.info("Can't find metadata for object" + oname);
+            log.info(sm.getString("registry.noMetadata", oname));
             return null;
         }
 
@@ -399,7 +401,7 @@ public class Registry implements RegistryMBean, MBeanRegistration {
         try {
             info = getMBeanServer().getMBeanInfo(oname);
         } catch (Exception e) {
-            log.info("Can't find metadata " + oname);
+            log.info(sm.getString("registry.noMetadata", oname));
             return null;
         }
         MBeanOperationInfo attInfo[] = info.getOperations();
@@ -424,7 +426,7 @@ public class Registry implements RegistryMBean, MBeanRegistration {
                 getMBeanServer().unregisterMBean(oname);
             }
         } catch (Throwable t) {
-            log.error("Error unregistering mbean", t);
+            log.error(sm.getString("registry.unregisterError"), t);
         }
     }
 
@@ -503,7 +505,7 @@ public class Registry implements RegistryMBean, MBeanRegistration {
 
             managed = findManagedBean(type);
             if (managed == null) {
-                log.warn("No metadata found for " + type);
+                log.warn(sm.getString("registry.noTypeMetadata", type));
                 return null;
             }
             managed.setName(type);
@@ -613,7 +615,7 @@ public class Registry implements RegistryMBean, MBeanRegistration {
         }
 
         if (bean == null) {
-            log.error("Null component " + oname);
+            log.error(sm.getString("registry.nullBean", oname));
             return;
         }
 
@@ -636,7 +638,7 @@ public class Registry implements RegistryMBean, MBeanRegistration {
 
             getMBeanServer().registerMBean(mbean, oname);
         } catch (Exception ex) {
-            log.error("Error registering " + oname, ex);
+            log.error(sm.getString("registry.registerError", oname), ex);
             throw ex;
         }
     }
@@ -672,7 +674,7 @@ public class Registry implements RegistryMBean, MBeanRegistration {
         try {
             load("MbeansDescriptorsDigesterSource", dURL, null);
         } catch (Exception ex) {
-            log.error("Error loading " + dURL);
+            log.error(sm.getString("registry.loadError", dURL));
         }
     }
 

@@ -24,6 +24,7 @@ import javax.management.RuntimeOperationsException;
 
 import org.apache.tomcat.util.descriptor.web.ContextResourceLink;
 import org.apache.tomcat.util.descriptor.web.NamingResources;
+import org.apache.tomcat.util.res.StringManager;
 
 /**
  * <p>A <strong>ModelMBean</strong> implementation for the
@@ -32,6 +33,8 @@ import org.apache.tomcat.util.descriptor.web.NamingResources;
  * @author Amy Roh
  */
 public class ContextResourceLinkMBean extends BaseCatalinaMBean<ContextResourceLink> {
+
+    private static final StringManager sm = StringManager.getManager(ContextResourceLinkMBean.class);
 
     /**
      * Obtain and return the value of a specific attribute of this MBean.

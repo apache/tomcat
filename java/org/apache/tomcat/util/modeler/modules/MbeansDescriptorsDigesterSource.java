@@ -168,7 +168,7 @@ public class MbeansDescriptorsDigesterSource extends ModelerSource
                 digester.push(loadedMbeans);
                 digester.parse(stream);
             } catch (Exception e) {
-                log.error("Error digesting Registry data", e);
+                log.error(sm.getString("modules.digesterParseError"), e);
                 throw e;
             } finally {
                 digester.reset();
