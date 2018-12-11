@@ -92,6 +92,9 @@
         works when the session cookie configuration is not explicitly declared.
         Based on a patch provided by Andreas Kurth. (markt)
       </fix>
+      <fix>
+        <bug>63002</bug>: Fix setting rewrite qsdiscard flag. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

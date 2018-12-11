@@ -782,7 +782,7 @@ public class RewriteValve extends ValveBase {
         } else if (flag.startsWith("qsappend") || flag.startsWith("QSA")) {
             rule.setQsappend(true);
         } else if (flag.startsWith("qsdiscard") || flag.startsWith("QSD")) {
-            rule.setQsappend(true);
+            rule.setQsdiscard(true);
         } else if (flag.startsWith("redirect") || flag.startsWith("R")) {
             rule.setRedirect(true);
             int redirectCode = HttpServletResponse.SC_FOUND;
