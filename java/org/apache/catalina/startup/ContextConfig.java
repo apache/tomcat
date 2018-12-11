@@ -2699,12 +2699,7 @@ public class ContextConfig implements LifecycleListener {
                 if (jar != null) {
                     jar.close();
                 }
-                fragment.setURL(url);
-                if (fragment.getName() == null) {
-                    fragment.setName(fragment.getURL().toString());
-                }
-                fragment.setJarName(extractJarFileName(url));
-                fragments.put(fragment.getName(), fragment);
+                addFragment(fragment, url);
             }
         }
 
@@ -2745,13 +2740,26 @@ public class ContextConfig implements LifecycleListener {
                     } catch (IOException e) {
                     }
                 }
-                fragment.setURL(file.toURI().toURL());
-                if (fragment.getName() == null) {
-                    fragment.setName(fragment.getURL().toString());
-                }
-                fragment.setJarName(file.getName());
-                fragments.put(fragment.getName(), fragment);
+                addFragment(fragment, file.toURI().toURL());
             }
+        }
+
+        private void addFragment(WebXml fragment, URL url) {
+            fragment.setURL(url);
+            if (fragment.getName() == null) {
+                fragment.setName(url.toString());
+            }
+            fragment.setJarName(extractJarFileName(url));
+            if (fragments.containsKey(fragment.getName())) {
+                // Duplicate. Mark the fragment that has already been found with
+                // this name as having a duplicate so Tomcat can handle it
+                // correctly when the fragments are being ordered.
+                String duplicateName = fragment.getName();
+                fragments.get(duplicateName).setDuplicated(true);
+                // Rename the current fragment so it doesn't clash
+                fragment.setName(url.toString());
+             }
+            fragments.put(fragment.getName(), fragment);
         }
 
         public Map<String,WebXml> getFragments() {

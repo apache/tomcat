@@ -76,6 +76,19 @@ public class WebXml {
         this.overridable = overridable;
     }
 
+    /*
+     * Ideally, fragment names will be unique. If they are not, Tomcat needs
+     * to know as the action that the specification requires (see 8.2.2 1.e and
+     * 2.c) varies depending on the ordering method used.
+     */
+    private boolean duplicated = false;
+    public boolean isDuplicated() {
+        return duplicated;
+    }
+    public void setDuplicated(boolean duplicated) {
+        this.duplicated = duplicated;
+    }
+
     // web.xml only elements
     // Absolute Ordering
     private Set<String> absoluteOrdering = null;
@@ -2319,6 +2332,13 @@ public class WebXml {
                 }
             }
         } else {
+            // Stage 0. Check there were no fragments with duplicate names
+            for (WebXml fragment : fragments.values()) {
+                if (fragment.isDuplicated()) {
+                    throw new IllegalArgumentException(
+                            sm.getString("webXml.duplicateFragment", fragment.getName()));
+                }
+            }
             // Stage 1. Make all dependencies bi-directional - this makes the
             //          next stage simpler.
             for (WebXml fragment : fragments.values()) {

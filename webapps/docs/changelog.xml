@@ -83,6 +83,12 @@
         web application start to make integration simpler for downstream users.
         Based on a patch provided by rmannibucau. (markt)
       </scode>
+      <fix>
+        Implement the requirements of section 8.2.2 2c of the Servlet
+        specification and prevent a web application from deploying if it has
+        fragments with duplicate names and is configured to use relative
+        ordering of fragments. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
