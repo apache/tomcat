@@ -694,7 +694,7 @@ public class TestRemoteIpValve {
     }
 
     @Test
-    public void testInvokeXforwardedProtoSaysMultipleForwardsWithLastBeingHttpForIncomingHttpsRequest() throws Exception {
+    public void testInvokeXforwardedProtoSaysMultipleForwardsWithLastBeingHttpForIncomingHttpRequest() throws Exception {
         performXForwardedProtoWithMultipleForwardsTest("https,http", false, false);
     }
 
@@ -704,12 +704,12 @@ public class TestRemoteIpValve {
     }
 
     @Test
-    public void testInvokeXforwardedProtoSaysMultipleHttpForwardsForIncomingHttpsRequest() throws Exception {
+    public void testInvokeXforwardedProtoSaysMultipleHttpForwardsForIncomingHttpRequest() throws Exception {
         performXForwardedProtoWithMultipleForwardsTest("http,http", false, false);
     }
 
     @Test
-    public void testInvokeXforwardedProtoSaysInvalidValueForIncomingHttpsRequest() throws Exception {
+    public void testInvokeXforwardedProtoSaysInvalidValueForIncomingHttpRequest() throws Exception {
         performXForwardedProtoWithMultipleForwardsTest(",", false, false);
     }
 
