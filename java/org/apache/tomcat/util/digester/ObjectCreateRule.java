@@ -108,8 +108,7 @@ public class ObjectCreateRule extends Rule {
         }
 
         if (realClassName == null) {
-            throw new NullPointerException("No class name specified for " +
-                    namespace + " " + name);
+            throw new NullPointerException(sm.getString("rule.noClassName", namespace, name));
         }
 
         // Instantiate the new object and push it on the context stack

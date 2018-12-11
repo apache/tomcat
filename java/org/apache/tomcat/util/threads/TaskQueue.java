@@ -21,6 +21,8 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.tomcat.util.res.StringManager;
+
 /**
  * As task queue specifically designed to run with a thread pool executor. The
  * task queue is optimised to properly utilize threads within a thread pool
@@ -31,6 +33,8 @@ import java.util.concurrent.TimeUnit;
 public class TaskQueue extends LinkedBlockingQueue<Runnable> {
 
     private static final long serialVersionUID = 1L;
+    protected static final StringManager sm = StringManager
+            .getManager("org.apache.tomcat.util.threads.res");
 
     private transient volatile ThreadPoolExecutor parent = null;
 
@@ -55,12 +59,12 @@ public class TaskQueue extends LinkedBlockingQueue<Runnable> {
     }
 
     public boolean force(Runnable o) {
-        if ( parent==null || parent.isShutdown() ) throw new RejectedExecutionException("Executor not running, can't force a command into the queue");
+        if ( parent==null || parent.isShutdown() ) throw new RejectedExecutionException(sm.getString("taskQueue.notRunning"));
         return super.offer(o); //forces the item onto the queue, to be used if the task is rejected
     }
 
     public boolean force(Runnable o, long timeout, TimeUnit unit) throws InterruptedException {
-        if ( parent==null || parent.isShutdown() ) throw new RejectedExecutionException("Executor not running, can't force a command into the queue");
+        if ( parent==null || parent.isShutdown() ) throw new RejectedExecutionException(sm.getString("taskQueue.notRunning"));
         return super.offer(o,timeout,unit); //forces the item onto the queue, to be used if the task is rejected
     }
 

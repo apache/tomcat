@@ -171,7 +171,7 @@ public class ThreadPoolExecutor extends java.util.concurrent.ThreadPoolExecutor 
                 try {
                     if (!queue.force(command, timeout, unit)) {
                         submittedCount.decrementAndGet();
-                        throw new RejectedExecutionException("Queue capacity is full.");
+                        throw new RejectedExecutionException(sm.getString("threadPoolExecutor.queueFull"));
                     }
                 } catch (InterruptedException x) {
                     submittedCount.decrementAndGet();

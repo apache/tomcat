@@ -17,6 +17,7 @@
 package org.apache.tomcat.util.codec.binary;
 
 import org.apache.tomcat.util.buf.HexUtils;
+import org.apache.tomcat.util.res.StringManager;
 
 /**
  * Abstract superclass for Base-N encoders and decoders.
@@ -26,6 +27,8 @@ import org.apache.tomcat.util.buf.HexUtils;
  * </p>
  */
 public abstract class BaseNCodec {
+
+    protected static final StringManager sm = StringManager.getManager(BaseNCodec.class);
 
     /**
      * Holds thread context so classes can be thread-safe.
