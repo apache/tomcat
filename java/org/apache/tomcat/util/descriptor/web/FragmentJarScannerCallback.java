@@ -84,7 +84,17 @@ public class FragmentJarScannerCallback implements JarScannerCallback {
                 fragment.setName(fragment.getURL().toString());
             }
             fragment.setJarName(extractJarFileName(jar.getJarFileURL()));
-            fragments.put(fragment.getName(), fragment);
+            if (fragments.containsKey(fragment.getName())) {
+                // Duplicate. Mark the fragment that has already been found with
+                // this name as having a duplicate so Tomcat can handle it
+                // correctly when the fragments are being ordered.
+                String duplicateName = fragment.getName();
+                fragments.get(duplicateName).setDuplicated(true);
+                // Rename the current fragment so it doesn't clash
+                fragment.setName(fragment.getURL().toString());
+            } else {
+                fragments.put(fragment.getName(), fragment);
+            }
         }
     }
 
