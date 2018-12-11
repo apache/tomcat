@@ -1610,6 +1610,8 @@
             <exclude name="org/apache/tomcat/util/net/openssl/ciphers/**" unless="${test.openssl.exists}" />
             <!-- Exclude performance tests. E.g. on systems with slow/inconsistent timing -->
             <exclude name="**/*Performance.java" if="${test.excludePerformance}" />
+            <!-- Exclude tests that Gump can't compile -->
+            <exclude name="org/apache/tomcat/buildutil/**" />
             <!-- Exclude a configurable list of tests -->
             <exclude name="${test.exclude}" />
           </fileset>
