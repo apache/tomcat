@@ -1370,8 +1370,8 @@ public class Digester extends DefaultHandler2 {
      */
     @Override
     public void fatalError(SAXParseException exception) throws SAXException {
-        log.error(sm.getString("digester.parseErrorFatal", exception.getLineNumber(),
-                exception.getColumnNumber()), exception);
+        log.error(sm.getString("digester.parseErrorFatal", Integer.valueOf(exception.getLineNumber()),
+                Integer.valueOf(exception.getColumnNumber())), exception);
         if (errorHandler != null) {
             errorHandler.fatalError(exception);
         }
