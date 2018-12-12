@@ -654,7 +654,8 @@ public class Base64 extends BaseNCodec {
         final Base64 b64 = isChunked ? new Base64(urlSafe) : new Base64(0, CHUNK_SEPARATOR, urlSafe);
         final long len = b64.getEncodedLength(binaryData);
         if (len > maxResultSize) {
-            throw new IllegalArgumentException(sm.getString("base64.inputTooLarge", len, maxResultSize));
+            throw new IllegalArgumentException(sm.getString(
+                    "base64.inputTooLarge", Long.valueOf(len), Integer.valueOf(maxResultSize)));
         }
 
         return b64.encode(binaryData);
