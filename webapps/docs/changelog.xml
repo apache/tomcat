@@ -45,6 +45,22 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 8.5.37 (markt)" rtext="development in progress">
+  <subsection name="Catalina">
+    <changelog>
+      <update>
+        Update the recommended minimum Tomcat Native version to 1.2.19. (markt)
+      </update>
+    </changelog>
+  </subsection>
+  <subsection name="Other">
+    <changelog>
+      <update>
+        Update the packaged version of the Tomcat Native Library to 1.2.19 to
+        pick up the latest Windows binaries built with APR 1.6.5 and OpenSSL
+        1.1.1a. (markt)
+      </update>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 8.5.36 (markt)" rtext="not released">
   <subsection name="Catalina">
