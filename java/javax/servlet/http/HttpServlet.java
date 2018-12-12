@@ -758,7 +758,7 @@ class NoBodyResponse extends HttpServletResponseWrapper {
     // file private
     NoBodyResponse(HttpServletResponse r) {
         super(r);
-        noBody = new NoBodyOutputStream();
+        noBody = new NoBodyOutputStream(this);
     }
 
     // file private
@@ -847,11 +847,13 @@ class NoBodyOutputStream extends ServletOutputStream {
     private static final ResourceBundle lStrings =
         ResourceBundle.getBundle(LSTRING_FILE);
 
+    private final HttpServletResponse response;
+    private boolean flushed = false;
     private int contentLength = 0;
 
     // file private
-    NoBodyOutputStream() {
-        // NOOP
+    NoBodyOutputStream(HttpServletResponse response) {
+        this.response = response;
     }
 
     // file private
@@ -860,8 +862,9 @@ class NoBodyOutputStream extends ServletOutputStream {
     }
 
     @Override
-    public void write(int b) {
+    public void write(int b) throws IOException {
         contentLength++;
+        checkCommit();
     }
 
     @Override
@@ -882,6 +885,7 @@ class NoBodyOutputStream extends ServletOutputStream {
         }
 
         contentLength += len;
+        checkCommit();
     }
 
     @Override
@@ -893,5 +897,12 @@ class NoBodyOutputStream extends ServletOutputStream {
     @Override
     public void setWriteListener(javax.servlet.WriteListener listener) {
         // TODO SERVLET 3.1
+    }
+
+    private void checkCommit() throws IOException {
+        if (!flushed && contentLength > response.getBufferSize()) {
+            response.flushBuffer();
+            flushed = true;
+        }
     }
 }

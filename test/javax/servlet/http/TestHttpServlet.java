@@ -143,7 +143,7 @@ public class TestHttpServlet extends TomcatBaseTest {
             if ("date".equalsIgnoreCase(headerName)) {
                 continue;
             }
-            Assert.assertTrue(headHeaders.containsKey(headerName));
+            Assert.assertTrue(headerName, headHeaders.containsKey(headerName));
             List<String> getValues = getHeader.getValue();
             List<String> headValues = headHeaders.get(headerName);
             Assert.assertEquals(getValues.size(), headValues.size());
@@ -198,8 +198,8 @@ public class TestHttpServlet extends TomcatBaseTest {
             resp.setContentType("text/plain");
             resp.setCharacterEncoding("UTF-8");
             PrintWriter pw = resp.getWriter();
-            // Force chunking
-            resp.flushBuffer();
+            // Trigger chunking
+            pw.write(new char[8192 * 16]);
             pw.println("Data");
         }
     }

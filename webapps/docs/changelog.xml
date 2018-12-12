@@ -56,6 +56,11 @@
         fragments with duplicate names and is configured to use relative
         ordering of fragments. (markt)
       </fix>
+      <fix>
+        Ensure that the HEAD response is consistent with the GET response when
+        <code>HttpServlet</code> is relied upon to generate the HEAD response
+        and the GET response uses chunking. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
