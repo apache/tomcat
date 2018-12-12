@@ -478,7 +478,8 @@ public class Base64 extends BaseNCodec {
                     buffer[context.pos++] = (byte) ((context.ibitWorkArea) & MASK_8BITS);
                     break;
                 default:
-                    throw new IllegalStateException(sm.getString("base64.impossibleModulus", context.modulus));
+                    throw new IllegalStateException(sm.getString(
+                            "base64.impossibleModulus", Integer.valueOf(context.modulus)));
             }
         }
     }
