@@ -954,8 +954,7 @@ public class JspUtil {
 
         if (t == null) {
             // Should never happen
-            throw new IllegalArgumentException("Unable to extract type from [" +
-                    type + "]");
+            throw new IllegalArgumentException(Localizer.getMessage("jsp.error.unable.getType", type));
         }
 
         StringBuilder resultType = new StringBuilder(t);

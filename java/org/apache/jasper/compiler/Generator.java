@@ -1366,7 +1366,8 @@ class Generator {
                     if (!Modifier.isPublic(modifiers)
                             || Modifier.isInterface(modifiers)
                             || Modifier.isAbstract(modifiers)) {
-                        throw new Exception("Invalid bean class modifier");
+                        throw new Exception(Localizer.getMessage("jsp.error.invalid.bean",
+                                Integer.valueOf(modifiers)));
                     }
                     // Check that there is a 0 arg constructor
                     bean.getConstructor(new Class[] {});
@@ -3485,11 +3486,7 @@ class Generator {
         } else if (n instanceof Node.NamedAttribute) {
             ci = ((Node.NamedAttribute) n).getChildInfo();
         } else {
-            // Cannot access err since this method is static, but at
-            // least flag an error.
-            throw new JasperException("Unexpected Node Type");
-            // err.getString(
-            // "jsp.error.internal.unexpected_node_type" ) );
+            throw new JasperException(Localizer.getMessage("jsp.error.internal.unexpectedNodeType"));
         }
 
         if (ci.hasUseBean()) {

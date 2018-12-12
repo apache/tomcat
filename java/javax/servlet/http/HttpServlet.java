@@ -736,7 +736,7 @@ public abstract class HttpServlet extends GenericServlet {
             request = (HttpServletRequest) req;
             response = (HttpServletResponse) res;
         } catch (ClassCastException e) {
-            throw new ServletException("non-HTTP request or response");
+            throw new ServletException(lStrings.getString("http.non_http"));
         }
         service(request, response);
     }

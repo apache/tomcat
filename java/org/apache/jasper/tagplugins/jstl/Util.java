@@ -35,6 +35,7 @@ import javax.servlet.jsp.JspTagException;
 import javax.servlet.jsp.PageContext;
 
 import org.apache.jasper.Constants;
+import org.apache.jasper.compiler.Localizer;
 
 /**
  * Util contains some often used consts, static methods and embedded class
@@ -259,8 +260,7 @@ public class Util {
                 return url;
         } else {
             if (!context.startsWith("/") || !url.startsWith("/")) {
-                throw new JspTagException(
-                "In URL tags, when the \"context\" attribute is specified, values of both \"context\" and \"url\" must start with \"/\".");
+                throw new JspTagException(Localizer.getMessage("jstl.urlMustStartWithSlash"));
             }
             if (context.equals("/")) {
                 // Don't produce string starting with '//', many
@@ -313,8 +313,7 @@ public class Util {
         @Override
         public PrintWriter getWriter() {
             if (isStreamUsed)
-                throw new IllegalStateException("Unexpected internal error during &lt;import&gt: " +
-                "Target servlet called getWriter(), then getOutputStream()");
+                throw new IllegalStateException(Localizer.getMessage("jstl.writerAfterOS"));
             isWriterUsed = true;
             return new PrintWriter(sw);
         }
@@ -322,8 +321,7 @@ public class Util {
         @Override
         public ServletOutputStream getOutputStream() {
             if (isWriterUsed)
-                throw new IllegalStateException("Unexpected internal error during &lt;import&gt: " +
-                "Target servlet called getOutputStream(), then getWriter()");
+                throw new IllegalStateException(Localizer.getMessage("jstl.OSAfterWriter"));
             isStreamUsed = true;
             return sos;
         }

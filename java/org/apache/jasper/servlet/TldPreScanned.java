@@ -21,6 +21,7 @@ import java.util.Collection;
 
 import javax.servlet.ServletContext;
 
+import org.apache.jasper.compiler.Localizer;
 import org.apache.tomcat.util.descriptor.tld.TldResourcePath;
 
 public class TldPreScanned extends TldScanner {
@@ -48,7 +49,7 @@ public class TldPreScanned extends TldScanner {
                     throw new IllegalStateException(e);
                 }
             } else {
-                throw new IllegalStateException("Bad tld url: "+str);
+                throw new IllegalStateException(Localizer.getMessage("jsp.error.tld.url", str));
             }
         }
     }

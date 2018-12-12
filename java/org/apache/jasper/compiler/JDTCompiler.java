@@ -120,7 +120,7 @@ public class JDTCompiler extends org.apache.jasper.compiler.Compiler {
                     result = new char[buf.length()];
                     buf.getChars(0, result.length, result, 0);
                 } catch (IOException e) {
-                    log.error("Compilation error", e);
+                    log.error(Localizer.getMessage("jsp.error.compilation.source", sourceFile), e);
                 }
                 return result;
             }
@@ -215,9 +215,9 @@ public class JDTCompiler extends org.apache.jasper.compiler.Compiler {
                                 new NameEnvironmentAnswer(classFileReader, null);
                         }
                     } catch (IOException exc) {
-                        log.error("Compilation error", exc);
+                        log.error(Localizer.getMessage("jsp.error.compilation.dependent", className), exc);
                     } catch (org.eclipse.jdt.internal.compiler.classfmt.ClassFormatException exc) {
-                        log.error("Compilation error", exc);
+                        log.error(Localizer.getMessage("jsp.error.compilation.dependent", className), exc);
                     }
                     return null;
                 }
@@ -322,7 +322,7 @@ public class JDTCompiler extends org.apache.jasper.compiler.Compiler {
                 settings.put(CompilerOptions.OPTION_Source,
                              CompilerOptions.VERSION_10);
             } else {
-                log.warn("Unknown source VM " + opt + " ignored.");
+                log.warn(Localizer.getMessage("jsp.warning.unknown.sourceVM", opt));
                 settings.put(CompilerOptions.OPTION_Source,
                         CompilerOptions.VERSION_1_8);
             }
@@ -380,7 +380,7 @@ public class JDTCompiler extends org.apache.jasper.compiler.Compiler {
                 settings.put(CompilerOptions.OPTION_Compliance,
                         CompilerOptions.VERSION_10);
             } else {
-                log.warn("Unknown target VM " + opt + " ignored.");
+                log.warn(Localizer.getMessage("jsp.warning.unknown.targetVM", opt));
                 settings.put(CompilerOptions.OPTION_TargetPlatform,
                         CompilerOptions.VERSION_1_8);
             }
@@ -411,7 +411,7 @@ public class JDTCompiler extends org.apache.jasper.compiler.Compiler {
                                                 (name, pageNodes, new StringBuilder(problem.getMessage()),
                                                         problem.getSourceLineNumber(), ctxt));
                                     } catch (JasperException e) {
-                                        log.error("Error visiting node", e);
+                                        log.error(Localizer.getMessage("jsp.error.compilation.jdtProblemError"), e);
                                     }
                                 }
                             }
@@ -439,7 +439,7 @@ public class JDTCompiler extends org.apache.jasper.compiler.Compiler {
                             }
                         }
                     } catch (IOException exc) {
-                        log.error("Compilation error", exc);
+                        log.error(Localizer.getMessage("jsp.error.compilation.jdt"), exc);
                     }
                 }
             };

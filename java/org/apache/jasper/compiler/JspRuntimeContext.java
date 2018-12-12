@@ -389,8 +389,7 @@ public final class JspRuntimeContext {
                     ctxt.incrementRemoved();
                 } catch (Throwable t) {
                     ExceptionUtils.handleThrowable(t);
-                    jsw.getServletContext().log("Background compile failed",
-                                                t);
+                    jsw.getServletContext().log(Localizer.getMessage("jsp.error.backgroundCompilationFailed"), t);
                 }
             }
         }
@@ -413,7 +412,7 @@ public final class JspRuntimeContext {
                     jsw.getServlet();
                 }
             } catch (ServletException e) {
-                jsw.getServletContext().log("Servlet reload failed", e);
+                jsw.getServletContext().log(Localizer.getMessage("jsp.error.reload"), e);
             }
         }
     }
@@ -557,8 +556,8 @@ public final class JspRuntimeContext {
                 // Allow the JSP to access org.apache.jasper.runtime.HttpJspBase
                 permissions.add( new RuntimePermission(
                     "accessClassInPackage.org.apache.jasper.runtime") );
-            } catch(RuntimeException | IOException e) {
-                context.log("Security Init for context failed",e);
+            } catch (RuntimeException | IOException e) {
+                context.log(Localizer.getMessage("jsp.error.security"), e);
             }
         }
         return new SecurityHolder(source, permissions);

@@ -177,17 +177,17 @@ public class SmapUtil {
             SDEInstaller installer = new SDEInstaller(classFile, smap);
             installer.install(tmpFile);
             if (!classFile.delete()) {
-                throw new IOException("classFile.delete() failed");
+                throw new IOException(Localizer.getMessage("jsp.error.unable.deleteClassFile"));
             }
             if (!tmpFile.renameTo(classFile)) {
-                throw new IOException("tmpFile.renameTo(classFile) failed");
+                throw new IOException(Localizer.getMessage("jsp.error.unable.renameClassFile"));
             }
         }
 
         SDEInstaller(File inClassFile, byte[] sdeAttr)
             throws IOException {
             if (!inClassFile.exists()) {
-                throw new FileNotFoundException("no such file: " + inClassFile);
+                throw new FileNotFoundException(Localizer.getMessage("jsp.error.noFile", inClassFile));
             }
 
             this.sdeAttr = sdeAttr;
@@ -211,7 +211,7 @@ public class SmapUtil {
             byte[] bytes = new byte[len];
             try (FileInputStream inStream = new FileInputStream(input)) {
                 if (inStream.read(bytes, 0, len) != len) {
-                    throw new IOException("expected size: " + len);
+                    throw new IOException(Localizer.getMessage("jsp.error.readContent", len));
                 }
             }
             return bytes;
@@ -416,7 +416,7 @@ public class SmapUtil {
                         writeBytes(utf8);
                         break;
                     default :
-                        throw new IOException("unexpected tag: " + tag);
+                        throw new IOException(Localizer.getMessage("jsp.error.unexpectedTag", tag));
                 }
             }
             return sdeIndex;

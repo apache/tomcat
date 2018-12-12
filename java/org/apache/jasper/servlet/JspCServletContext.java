@@ -381,7 +381,7 @@ public class JspCServletContext implements ServletContext {
     public URL getResource(String path) throws MalformedURLException {
 
         if (!path.startsWith("/")) {
-            throw new MalformedURLException("Path '" + path + "' does not start with '/'");
+            throw new MalformedURLException(Localizer.getMessage("jsp.error.URLMustStartWithSlash", path));
         }
 
         // Strip leading '/'

@@ -968,8 +968,7 @@ public class JspRuntimeLibrary {
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
             Log log = LogFactory.getLog(JspRuntimeLibrary.class);
-            log.warn("Error processing release on tag instance of "
-                    + tag.getClass().getName(), t);
+            log.warn(Localizer.getMessage("jsp.warning.tagRelease", tag.getClass().getName()), t);
         }
         try {
             instanceManager.destroyInstance(tag);
@@ -977,8 +976,7 @@ public class JspRuntimeLibrary {
             Throwable t = ExceptionUtils.unwrapInvocationTargetException(e);
             ExceptionUtils.handleThrowable(t);
             Log log = LogFactory.getLog(JspRuntimeLibrary.class);
-            log.warn("Error processing preDestroy on tag instance of "
-                    + tag.getClass().getName(), t);
+            log.warn(Localizer.getMessage("jsp.warning.tagPreDestroy", tag.getClass().getName()), t);
         }
 
     }

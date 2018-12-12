@@ -426,8 +426,7 @@ public class JspC extends Task implements Options {
                 setThreadCount(nextArg());
             } else {
                 if (tok.startsWith("-")) {
-                    throw new JasperException("Unrecognized option: " + tok +
-                        ".  Use -help for help.");
+                    throw new JasperException(Localizer.getMessage("jspc.error.unknownOption", tok));
                 }
                 if (!fullstop) {
                     argPos--;
@@ -997,10 +996,10 @@ public class JspC extends Task implements Options {
                 newThreadCount = Integer.parseInt(threadCount);
             }
         } catch (NumberFormatException e) {
-            throw new BuildException("Couldn't parse thread count: " + threadCount);
+            throw new BuildException(Localizer.getMessage("jspc.error.parseThreadCount", threadCount));
         }
         if (newThreadCount < 1) {
-            throw new BuildException("There must be at least one thread: " + newThreadCount);
+            throw new BuildException(Localizer.getMessage("jspc.error.minThreadCount", newThreadCount));
         }
         this.threadCount = newThreadCount;
     }
@@ -1541,7 +1540,7 @@ public class JspC extends Task implements Options {
                             }
                         } else {
                             errorCount++;
-                            log.error(e.getMessage());
+                            log.error(Localizer.getMessage("jspc.error.compilation"), e);
                         }
                     } catch (InterruptedException e) {
                         // Ignore
@@ -1558,7 +1557,7 @@ public class JspC extends Task implements Options {
             String msg = Localizer.getMessage("jspc.generation.result",
                     Integer.toString(errorCount), Long.toString(time));
             if (failOnError && errorCount > 0) {
-                System.out.println("Error Count: " + errorCount);
+                System.out.println(Localizer.getMessage("jspc.errorCount", errorCount));
                 throw new BuildException(msg);
             } else {
                 log.info(msg);
@@ -1754,8 +1753,7 @@ public class JspC extends Task implements Options {
                         String ext=libs[i].substring( libs[i].length() - 4 );
                         if (! ".jar".equalsIgnoreCase(ext)) {
                             if (".tld".equalsIgnoreCase(ext)) {
-                                log.warn("TLD files should not be placed in "
-                                         + "/WEB-INF/lib");
+                                log.warn(Localizer.getMessage("jspc.warning.tldInWebInfLib"));
                             }
                             continue;
                         }

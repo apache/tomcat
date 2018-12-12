@@ -32,6 +32,7 @@ import javax.servlet.jsp.JspApplicationContext;
 import javax.servlet.jsp.JspContext;
 
 import org.apache.jasper.Constants;
+import org.apache.jasper.compiler.Localizer;
 import org.apache.jasper.el.ELContextImpl;
 import org.apache.jasper.el.JasperELResolver;
 
@@ -62,14 +63,14 @@ public class JspApplicationContextImpl implements JspApplicationContext {
     @Override
     public void addELContextListener(ELContextListener listener) {
         if (listener == null) {
-            throw new IllegalArgumentException("ELContextListener was null");
+            throw new IllegalArgumentException(Localizer.getMessage("jsp.error.nullArgument"));
         }
         this.contextListeners.add(listener);
     }
 
     public static JspApplicationContextImpl getInstance(ServletContext context) {
         if (context == null) {
-            throw new IllegalArgumentException("ServletContext was null");
+            throw new IllegalArgumentException(Localizer.getMessage("jsp.error.nullArgument"));
         }
         JspApplicationContextImpl impl = (JspApplicationContextImpl) context
                 .getAttribute(KEY);
@@ -82,7 +83,7 @@ public class JspApplicationContextImpl implements JspApplicationContext {
 
     public ELContextImpl createELContext(JspContext context) {
         if (context == null) {
-            throw new IllegalArgumentException("JspContext was null");
+            throw new IllegalArgumentException(Localizer.getMessage("jsp.error.nullArgument"));
         }
 
         // create ELContext for JspContext
@@ -127,11 +128,10 @@ public class JspApplicationContextImpl implements JspApplicationContext {
     @Override
     public void addELResolver(ELResolver resolver) throws IllegalStateException {
         if (resolver == null) {
-            throw new IllegalArgumentException("ELResolver was null");
+            throw new IllegalArgumentException(Localizer.getMessage("jsp.error.nullArgument"));
         }
         if (this.instantiated) {
-            throw new IllegalStateException(
-                    "cannot call addELResolver after the first request has been made");
+            throw new IllegalStateException(Localizer.getMessage("jsp.error.cannotAddResolver"));
         }
         this.resolvers.add(resolver);
     }

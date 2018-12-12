@@ -66,7 +66,7 @@ public class JspWriterImpl extends JspWriter {
             boolean autoFlush) {
         super(sz, autoFlush);
         if (sz < 0)
-            throw new IllegalArgumentException("Buffer size <= 0");
+            throw new IllegalArgumentException(Localizer.getMessage("jsp.error.negativeBufferSize"));
         this.response = response;
         cb = sz == 0 ? null : new char[sz];
         nextChar = 0;
@@ -184,7 +184,7 @@ public class JspWriterImpl extends JspWriter {
     /** check to make sure that the stream has not been closed */
     private void ensureOpen() throws IOException {
         if (response == null || closed)
-            throw new IOException("Stream closed");
+            throw new IOException(Localizer.getMessage("jsp.error.stream.closed"));
     }
 
 
