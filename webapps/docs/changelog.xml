@@ -89,6 +89,9 @@
         fragments with duplicate names and is configured to use relative
         ordering of fragments. (markt)
       </fix>
+      <update>
+        Update the recommended minimum Tomcat Native version to 1.2.19. (markt)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Other">
@@ -103,6 +106,11 @@
         environment variable that defines a command to which captured stdout and
         stderr will be redirected. Patch provided by Casey Lucas. (markt)
       </add>
+      <update>
+        Update the packaged version of the Tomcat Native Library to 1.2.19 to
+        pick up the latest Windows binaries built with APR 1.6.5 and OpenSSL
+        1.1.1a. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
