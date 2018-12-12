@@ -58,6 +58,8 @@ package org.apache.tomcat.util.json;
 @SuppressWarnings("all") // Ignore warnings in generated code
 public class JSONParser {
 
+    protected static final org.apache.tomcat.util.res.StringManager sm = org.apache.tomcat.util.res.StringManager.getManager(JSONParser.class);
+
     private boolean nativeNumbers = false;
 
     public JSONParser(String input) {
@@ -70,7 +72,7 @@ public class JSONParser {
     public java.util.LinkedHashMap<String, Object> parseObject() throws ParseException {
         java.util.LinkedHashMap<String, Object> toReturn = object(); 
         if (!ensureEOF()) {
-            throw new IllegalStateException("Expected EOF, but still had content to parse");
+            throw new IllegalStateException(sm.getString("parser.unexpectedEOF"));
         }
         return toReturn;
     }
@@ -81,7 +83,7 @@ public class JSONParser {
     public java.util.ArrayList<Object> parseArray() throws ParseException {   
         java.util.ArrayList<Object> toReturn = list(); 
         if (!ensureEOF()) {
-            throw new IllegalStateException("Expected EOF, but still had content to parse");
+            throw new IllegalStateException(sm.getString("parser.unexpectedEOF"));
         }
         return toReturn;
     }
@@ -92,7 +94,7 @@ public class JSONParser {
     public Object parse() throws ParseException { 
         Object toReturn = anything(); 
         if (!ensureEOF()) {
-            throw new IllegalStateException("Expected EOF, but still had content to parse");
+            throw new IllegalStateException(sm.getString("parser.unexpectedEOF"));
         }
         return toReturn;
     }

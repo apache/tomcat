@@ -50,7 +50,7 @@ import org.apache.tomcat.util.res.StringManager;
 
 public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
 
-    private static final StringManager sm =
+    protected static final StringManager sm =
             StringManager.getManager(WsRemoteEndpointImplBase.class);
 
     protected static final SendResult SENDRESULT_OK = new SendResult();

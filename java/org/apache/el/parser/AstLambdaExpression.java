@@ -120,7 +120,7 @@ public class AstLambdaExpression extends SimpleNode {
     private void setNestedState(NestedState nestedState) {
         if (this.nestedState != null) {
             // Should never happen
-            throw new IllegalStateException("nestedState may only be set once");
+            throw new IllegalStateException(MessageFactory.get("error.lambda.wrongNestedState"));
         }
         this.nestedState = nestedState;
 

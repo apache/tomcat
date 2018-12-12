@@ -137,7 +137,7 @@ public class DataSourceLinkFactory extends ResourceLinkFactory {
             if (iface == DataSource.class) {
                 return ds;
             } else {
-                throw new SQLException("Not a wrapper of "+iface.getName());
+                throw new SQLException(sm.getString("dataSourceLinkFactory.badWrapper", iface.getName()));
             }
         }
 

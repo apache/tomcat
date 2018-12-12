@@ -27,12 +27,16 @@ import javax.xml.namespace.QName;
 import javax.xml.rpc.Service;
 import javax.xml.rpc.ServiceException;
 
+import org.apache.naming.StringManager;
+
 /**
  * Object proxy for Web Services.
  *
  * @author Fabien Carrion
  */
 public class ServiceProxy implements InvocationHandler {
+
+    private static final StringManager sm = StringManager.getManager(ServiceProxy.class);
 
     /**
      * Service object.

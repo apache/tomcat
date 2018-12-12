@@ -225,14 +225,9 @@ public final class AstIdentifier extends SimpleNode {
         if (obj instanceof MethodExpression) {
             return (MethodExpression) obj;
         } else if (obj == null) {
-            throw new MethodNotFoundException("Identity '" + this.image
-                    + "' was null and was unable to invoke");
+            throw new MethodNotFoundException(MessageFactory.get("error.identifier.noMethod", this.image));
         } else {
-            throw new ELException(
-                    "Identity '"
-                            + this.image
-                            + "' does not reference a MethodExpression instance, returned type: "
-                            + obj.getClass().getName());
+            throw new ELException(MessageFactory.get("error.identifier.notMethodExpression", this.image, obj.getClass().getName()));
         }
     }
 }
