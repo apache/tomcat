@@ -353,7 +353,8 @@ public final class CharChunk extends AbstractChunk implements CharSequence {
     public void flushBuffer() throws IOException {
         // assert out!=null
         if (out == null) {
-            throw new IOException(sm.getString("chunk.overflow", getLimit(), buff.length));
+            throw new IOException(sm.getString("chunk.overflow",
+                    Integer.valueOf(getLimit()), Integer.valueOf(buff.length)));
         }
         out.realWriteChars(buff, start, end - start);
         end = start;
