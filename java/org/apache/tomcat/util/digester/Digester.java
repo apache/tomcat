@@ -1352,8 +1352,8 @@ public class Digester extends DefaultHandler2 {
      */
     @Override
     public void error(SAXParseException exception) throws SAXException {
-        log.error(sm.getString("digester.parseError", exception.getLineNumber(),
-                exception.getColumnNumber()), exception);
+        log.error(sm.getString("digester.parseError", Integer.valueOf(exception.getLineNumber()),
+                Integer.valueOf(exception.getColumnNumber())), exception);
         if (errorHandler != null) {
             errorHandler.error(exception);
         }
