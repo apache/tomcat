@@ -111,6 +111,51 @@ public class TestHttpServlet extends TomcatBaseTest {
     }
 
 
+    @Test
+    public void testChunkingWithHead() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        // No file system docBase required
+        StandardContext ctx = (StandardContext) tomcat.addContext("", null);
+
+        ChunkingServlet s = new ChunkingServlet();
+        Tomcat.addServlet(ctx, "ChunkingServlet", s);
+        ctx.addServletMappingDecoded("/chunking", "ChunkingServlet");
+
+        tomcat.start();
+
+        Map<String,List<String>> getHeaders = new HashMap<>();
+        String path = "http://localhost:" + getPort() + "/chunking";
+        ByteChunk out = new ByteChunk();
+
+        int rc = getUrl(path, out, getHeaders);
+        Assert.assertEquals(HttpServletResponse.SC_OK, rc);
+        out.recycle();
+
+        Map<String,List<String>> headHeaders = new HashMap<>();
+        rc = headUrl(path, out, headHeaders);
+        Assert.assertEquals(HttpServletResponse.SC_OK, rc);
+
+        // Headers should be the same (apart from Date)
+        Assert.assertEquals(getHeaders.size(), headHeaders.size());
+        for (Map.Entry<String, List<String>> getHeader : getHeaders.entrySet()) {
+            String headerName = getHeader.getKey();
+            if ("date".equalsIgnoreCase(headerName)) {
+                continue;
+            }
+            Assert.assertTrue(headHeaders.containsKey(headerName));
+            List<String> getValues = getHeader.getValue();
+            List<String> headValues = headHeaders.get(headerName);
+            Assert.assertEquals(getValues.size(), headValues.size());
+            for (String value : getValues) {
+                Assert.assertTrue(headValues.contains(value));
+            }
+        }
+
+        tomcat.stop();
+    }
+
+
     private static class Bug57602ServletOuter extends HttpServlet {
 
         private static final long serialVersionUID = 1L;
@@ -139,6 +184,23 @@ public class TestHttpServlet extends TomcatBaseTest {
             resp.setCharacterEncoding("UTF-8");
             PrintWriter pw = resp.getWriter();
             pw.println("Included");
+        }
+    }
+
+
+    private static class ChunkingServlet extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+                throws ServletException, IOException {
+            resp.setContentType("text/plain");
+            resp.setCharacterEncoding("UTF-8");
+            PrintWriter pw = resp.getWriter();
+            // Force chunking
+            resp.flushBuffer();
+            pw.println("Data");
         }
     }
 }
