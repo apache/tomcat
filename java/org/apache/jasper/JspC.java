@@ -999,7 +999,8 @@ public class JspC extends Task implements Options {
             throw new BuildException(Localizer.getMessage("jspc.error.parseThreadCount", threadCount));
         }
         if (newThreadCount < 1) {
-            throw new BuildException(Localizer.getMessage("jspc.error.minThreadCount", newThreadCount));
+            throw new BuildException(Localizer.getMessage(
+                    "jspc.error.minThreadCount", Integer.valueOf(newThreadCount)));
         }
         this.threadCount = newThreadCount;
     }
