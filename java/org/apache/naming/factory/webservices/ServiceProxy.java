@@ -117,7 +117,7 @@ public class ServiceProxy implements InvocationHandler {
         }
 
         // no ports have been found
-        throw new ServiceException("Port-component-ref : " + name + " not found");
+        throw new ServiceException(sm.getString("serviceProxy.portNotFound", name));
     }
 
     /**
