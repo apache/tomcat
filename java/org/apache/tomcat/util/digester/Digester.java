@@ -1849,7 +1849,8 @@ public class Digester extends DefaultHandler2 {
         }
         if (locator != null) {
             String error = sm.getString("digester.errorLocation",
-                    locator.getLineNumber(), locator.getColumnNumber(), message);
+                    Integer.valueOf(locator.getLineNumber()),
+                    Integer.valueOf(locator.getColumnNumber()), message);
             if (e != null) {
                 return new SAXParseException(error, locator, e);
             } else {
