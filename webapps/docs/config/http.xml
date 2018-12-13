@@ -1114,7 +1114,7 @@
   directed the original request.</p>
 
   <p>For more information, see the
-  <a href="../proxy-howto.html">Proxy Support HOW-TO</a>.</p>
+  <a href="../proxy-howto.html">Proxy Support How-To</a>.</p>
 
   </subsection>
 
@@ -1159,7 +1159,7 @@
   configuration attributes in the <strong>Connector</strong>.</p>
 
   <p>For more information, see the
-  <a href="../ssl-howto.html">SSL Configuration HOW-TO</a>.</p>
+  <a href="../ssl-howto.html">SSL Configuration How-To</a>.</p>
 
   </subsection>
 

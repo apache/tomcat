@@ -73,7 +73,7 @@
    </ul>
    <p>
     For more information - please see the
-    <a href="/docs/manager-howto.html">Manager App HOW-TO</a>.
+    <a href="/docs/manager-howto.html">Manager App How-To</a>.
    </p>
  </body>
 

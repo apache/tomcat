@@ -66,7 +66,7 @@ once (no matter how many web applications you plan to develop).</p>
     logged in, and have the security role <code>manager-script</code> assigned
     to him or her.  How such users are defined depends on which Realm you have
     configured in Tomcat's <code>conf/server.xml</code> file -- see the
-    <a href="../realm-howto.html">Realm Configuration HOW-TO</a> for more
+    <a href="../realm-howto.html">Realm Configuration How-To</a> for more
     information.  You may define any number of users (with any username
     and password that you like) with the <code>manager-script</code> role.
     </p></li>

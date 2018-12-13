@@ -216,6 +216,9 @@
         <bug>62918</bug>: Filter out subtype mbeans to avoid breaking the
         connector status page. (remm)
       </fix>
+      <fix>
+        Unify letter case of the word 'How-To' in the webapps (csutherl)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Tribes">
@@ -5379,7 +5382,7 @@
   <subsection name="Web applications">
     <changelog>
       <fix>
-        <bug>58891</bug>: Update the SSL how-to. Based on a suggestion by
+        <bug>58891</bug>: Update the SSL How-To. Based on a suggestion by
         Alexander Kjäll. (markt)
       </fix>
     </changelog>

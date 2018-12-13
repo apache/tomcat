@@ -97,7 +97,7 @@
             unattended installs of Apache Tomcat.
         </li>
         <li>Refer to the
-            <a href="windows-service-howto.html">Windows Service HOW-TO</a>
+            <a href="windows-service-howto.html">Windows Service How-To</a>
             for information on how to manage Tomcat as a Windows service.
             </li>
       </ul>

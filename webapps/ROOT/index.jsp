@@ -55,9 +55,9 @@ request.setAttribute("tomcatExamplesUrl", "/examples/");
                     <img src="tomcat.png" alt="[tomcat logo]" />
                     <div id="tasks">
                         <h3>Recommended Reading:</h3>
-                        <h4><a href="${tomcatDocUrl}security-howto.html">Security Considerations HOW-TO</a></h4>
-                        <h4><a href="${tomcatDocUrl}manager-howto.html">Manager Application HOW-TO</a></h4>
-                        <h4><a href="${tomcatDocUrl}cluster-howto.html">Clustering/Session Replication HOW-TO</a></h4>
+                        <h4><a href="${tomcatDocUrl}security-howto.html">Security Considerations How-To</a></h4>
+                        <h4><a href="${tomcatDocUrl}manager-howto.html">Manager Application How-To</a></h4>
+                        <h4><a href="${tomcatDocUrl}cluster-howto.html">Clustering/Session Replication How-To</a></h4>
                     </div>
                 </div>
                 <div id="actions">

@@ -26,7 +26,7 @@
         <author email="craigmcc@apache.org">Craig R. McClanahan</author>
         <author email="yoavs@apache.org">Yoav Shapira</author>
         <author email="arjaquith@mindspring.com">Andrew R. Jaquith</author>
-        <title>Realm Configuration HOW-TO</title>
+        <title>Realm Configuration How-To</title>
     </properties>
 
 <body>
@@ -454,7 +454,7 @@ as your database structure conforms to the following requirements:</p>
     never attempt to write to these tables.)</li>
 <li>Configure a JNDI named JDBC DataSource for your database.  Refer to the
     <a href="jndi-datasource-examples-howto.html">JNDI DataSource Example
-    HOW-TO</a> for information on how to configure a JNDI named JDBC DataSource.
+    How-To</a> for information on how to configure a JNDI named JDBC DataSource.
     Be sure to set the <code>Realm</code>&apos;s <code>localDataSource</code>
     attribute appropriately, depending on where the JNDI DataSource is
     defined.</li>
