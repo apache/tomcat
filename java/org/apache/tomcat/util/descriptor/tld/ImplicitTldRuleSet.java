@@ -73,7 +73,7 @@ public class ImplicitTldRuleSet implements RuleSet {
         @Override
         public void begin(String namespace, String name, Attributes attributes) throws Exception {
             throw new IllegalArgumentException(
-                    sm.getString("implicitTldRule.elementNotAllowed", name));
+                    ImplicitTldRuleSet.sm.getString("implicitTldRule.elementNotAllowed", name));
         }
     }
 }
