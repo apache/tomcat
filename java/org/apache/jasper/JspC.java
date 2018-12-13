@@ -1558,7 +1558,8 @@ public class JspC extends Task implements Options {
             String msg = Localizer.getMessage("jspc.generation.result",
                     Integer.toString(errorCount), Long.toString(time));
             if (failOnError && errorCount > 0) {
-                System.out.println(Localizer.getMessage("jspc.errorCount", errorCount));
+                System.out.println(Localizer.getMessage(
+                        "jspc.errorCount", Integer.valueOf(errorCount)));
                 throw new BuildException(msg);
             } else {
                 log.info(msg);
