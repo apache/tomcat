@@ -1388,8 +1388,8 @@ public class Digester extends DefaultHandler2 {
      */
     @Override
     public void warning(SAXParseException exception) throws SAXException {
-        log.error(sm.getString("digester.parseWarning", exception.getLineNumber(),
-                exception.getColumnNumber()), exception);
+        log.error(sm.getString("digester.parseWarning", Integer.valueOf(exception.getLineNumber()),
+                Integer.valueOf(exception.getColumnNumber()), exception));
         if (errorHandler != null) {
             errorHandler.warning(exception);
         }
