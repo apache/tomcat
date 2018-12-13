@@ -417,7 +417,8 @@ public class SmapUtil {
                         writeBytes(utf8);
                         break;
                     default :
-                        throw new IOException(Localizer.getMessage("jsp.error.unexpectedTag", tag));
+                        throw new IOException(Localizer.getMessage(
+                                "jsp.error.unexpectedTag", Integer.valueOf(tag)));
                 }
             }
             return sdeIndex;
