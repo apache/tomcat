@@ -76,7 +76,8 @@ public class SmapStratum {
 
         public void setInputLineCount(int inputLineCount) {
             if (inputLineCount < 0)
-                throw new IllegalArgumentException(Localizer.getMessage("jsp.error.negativeParameter", inputLineCount));
+                throw new IllegalArgumentException(Localizer.getMessage(
+                        "jsp.error.negativeParameter", Integer.valueOf(inputLineCount)));
             this.inputLineCount = inputLineCount;
         }
 
