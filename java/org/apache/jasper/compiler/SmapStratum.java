@@ -83,7 +83,8 @@ public class SmapStratum {
 
         public void setOutputLineIncrement(int outputLineIncrement) {
             if (outputLineIncrement < 0)
-                throw new IllegalArgumentException(Localizer.getMessage("jsp.error.negativeParameter", outputLineIncrement));
+                throw new IllegalArgumentException(Localizer.getMessage(
+                        "jsp.error.negativeParameter", Integer.valueOf(outputLineIncrement)));
             this.outputLineIncrement = outputLineIncrement;
         }
 
