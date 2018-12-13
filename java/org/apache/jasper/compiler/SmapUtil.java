@@ -211,7 +211,8 @@ public class SmapUtil {
             byte[] bytes = new byte[len];
             try (FileInputStream inStream = new FileInputStream(input)) {
                 if (inStream.read(bytes, 0, len) != len) {
-                    throw new IOException(Localizer.getMessage("jsp.error.readContent", len));
+                    throw new IOException(Localizer.getMessage(
+                            "jsp.error.readContent", Integer.valueOf(len)));
                 }
             }
             return bytes;
