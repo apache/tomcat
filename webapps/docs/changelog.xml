@@ -45,6 +45,15 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 8.5.38 (markt)" rtext="in development">
+  <subsection name="Coyote">
+    <changelog>
+      <add>
+        <bug>63009</bug>: Include the optional <code>content-length</code>
+        header in HTTP/2 responses where an appropriate value is available.
+        (markt)
+      </add>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 8.5.37 (markt)" rtext="release in progress">
   <subsection name="Catalina">
