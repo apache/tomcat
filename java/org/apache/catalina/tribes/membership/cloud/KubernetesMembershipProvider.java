@@ -176,7 +176,6 @@ public class KubernetesMembershipProvider extends CloudMembershipProvider {
                 }
                 String name = nameObject.toString();
                 Object objectUid = metadata.get("uid");
-                String uid = (objectUid == null) ? name : objectUid.toString();
                 Object creationTimestampObject = metadata.get("creationTimestamp");
                 if (creationTimestampObject == null) {
                     log.warn(sm.getString("kubernetesMembershipProvider.invalidPod"));
@@ -199,6 +198,7 @@ public class KubernetesMembershipProvider extends CloudMembershipProvider {
                     continue;
                 }
                 String podIP = podIPObject.toString();
+                String uid = (objectUid == null) ? podIP : objectUid.toString();
 
                 // We found ourselves, ignore
                 if (name.equals(hostName)) {
@@ -211,7 +211,7 @@ public class KubernetesMembershipProvider extends CloudMembershipProvider {
                     continue;
                 }
 
-                long aliveTime = Duration.between(Instant.parse(creationTimestamp), startTime).getSeconds() * 1000; // aliveTime is in ms
+                long aliveTime = Duration.between(Instant.parse(creationTimestamp), startTime).toMillis();
 
                 MemberImpl member = null;
                 try {

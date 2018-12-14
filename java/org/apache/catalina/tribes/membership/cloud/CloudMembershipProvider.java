@@ -39,8 +39,8 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
 public abstract class CloudMembershipProvider extends MembershipProviderBase implements Heartbeat, ChannelListener {
-    private static final Log log = LogFactory.getLog(KubernetesMembershipProvider.class);
-    protected static final StringManager sm = StringManager.getManager(Constants.Package);
+    private static final Log log = LogFactory.getLog(CloudMembershipProvider.class);
+    protected static final StringManager sm = StringManager.getManager(CloudMembershipProvider.class);
 
     protected String url;
     protected StreamProvider streamProvider;

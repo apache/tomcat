@@ -35,12 +35,12 @@ public class CloudMembershipService extends MembershipServiceBase
         implements CloudMembershipServiceMBean {
 
     private static final Log log = LogFactory.getLog(CloudMembershipService.class);
-    protected static final StringManager sm = StringManager.getManager(Constants.Package);
+    protected static final StringManager sm = StringManager.getManager(CloudMembershipService.class);
 
     public static final String MEMBERSHIP_PROVIDER_CLASS_NAME = "membershipProviderClassName";
     private static final String KUBE = "kubernetes";
     private static final String KUBE_PROVIDER_CLASS = "org.apache.catalina.tribes.membership.cloud.KubernetesMembershipProvider";
-    static final byte[] INITIAL_ID = new byte[16];
+    protected static final byte[] INITIAL_ID = new byte[16];
 
     private MembershipProvider membershipProvider;
     private MemberImpl localMember;

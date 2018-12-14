@@ -63,6 +63,15 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Tribes">
+    <changelog>
+      <update>
+        Add dns-ping support to enumerate cluster members. This is much simpler
+        than getting the pod list but it does not indicate pod status.
+        Submitted by by Maxime Beck. (remm)
+      </update>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 9.0.14 (markt)" rtext="2018-12-12">
   <subsection name="Catalina">

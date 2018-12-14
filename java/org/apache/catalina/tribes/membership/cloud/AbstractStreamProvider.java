@@ -42,7 +42,7 @@ import org.apache.juli.logging.LogFactory;
 
 public abstract class AbstractStreamProvider implements StreamProvider {
     private static final Log log = LogFactory.getLog(AbstractStreamProvider.class);
-    protected static final StringManager sm = StringManager.getManager(Constants.Package);
+    protected static final StringManager sm = StringManager.getManager(AbstractStreamProvider.class);
 
     protected static final TrustManager[] INSECURE_TRUST_MANAGERS = new TrustManager[] {
             new X509TrustManager() {
