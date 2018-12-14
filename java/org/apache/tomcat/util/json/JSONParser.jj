@@ -72,7 +72,7 @@ public class JSONParser {
     public java.util.LinkedHashMap<String, Object> parseObject() throws ParseException {
         java.util.LinkedHashMap<String, Object> toReturn = object(); 
         if (!ensureEOF()) {
-            throw new IllegalStateException(sm.getString("parser.unexpectedEOF"));
+            throw new IllegalStateException(sm.getString("parser.expectedEOF"));
         }
         return toReturn;
     }
@@ -83,7 +83,7 @@ public class JSONParser {
     public java.util.ArrayList<Object> parseArray() throws ParseException {   
         java.util.ArrayList<Object> toReturn = list(); 
         if (!ensureEOF()) {
-            throw new IllegalStateException(sm.getString("parser.unexpectedEOF"));
+            throw new IllegalStateException(sm.getString("parser.expectedEOF"));
         }
         return toReturn;
     }
@@ -94,7 +94,7 @@ public class JSONParser {
     public Object parse() throws ParseException { 
         Object toReturn = anything(); 
         if (!ensureEOF()) {
-            throw new IllegalStateException(sm.getString("parser.unexpectedEOF"));
+            throw new IllegalStateException(sm.getString("parser.expectedEOF"));
         }
         return toReturn;
     }
