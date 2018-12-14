@@ -156,6 +156,13 @@ class StreamProcessor extends AbstractProcessor {
             }
         }
 
+        // Add a content-length header if a content length has been set unless
+        // the application has already added one
+        long contentLength = coyoteResponse.getContentLengthLong();
+        if (contentLength != -1 && headers.getValue("content-length") == null) {
+            headers.addValue("content-length").setLong(contentLength);
+        }
+
         // Add date header unless it is an informational response or the
         // application has already set one
         if (statusCode >= 200 && headers.getValue("date") == null) {

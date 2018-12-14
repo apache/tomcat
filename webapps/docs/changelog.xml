@@ -63,6 +63,15 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Coyote">
+    <changelog>
+      <add>
+        <bug>63009</bug>: Include the optional <code>content-length</code>
+        header in HTTP/2 responses where an appropriate value is available.
+        (markt)
+      </add>
+    </changelog>
+  </subsection>
   <subsection name="Tribes">
     <changelog>
       <update>
