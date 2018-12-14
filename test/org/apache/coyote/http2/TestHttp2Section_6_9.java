@@ -227,6 +227,7 @@ public class TestHttp2Section_6_9 extends Http2TestBase {
         Assert.assertEquals(
                 "5-HeadersStart\n" +
                 "5-Header-[:status]-[200]\n" +
+                "5-Header-[content-length]-[128]\n" +
                 "5-Header-[date]-[Wed, 11 Nov 2015 19:18:42 GMT]\n" +
                 "5-HeadersEnd\n" +
                 "5-Body-128\n" +

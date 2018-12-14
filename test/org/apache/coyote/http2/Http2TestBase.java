@@ -443,15 +443,15 @@ public abstract class Http2TestBase extends TomcatBaseTest {
 
     protected String getCookieResponseTrace(int streamId, int cookieCount) {
         return getResponseBodyFrameTrace(streamId, "text/plain;charset=UTF-8",
-                "Cookie count: " + cookieCount);
+                "Cookie count: " + cookieCount, null);
     }
 
 
     private String getResponseBodyFrameTrace(int streamId, String body) {
-        return getResponseBodyFrameTrace(streamId, "application/octet-stream", body);
+        return getResponseBodyFrameTrace(streamId, "application/octet-stream", body, body);
     }
 
-    private String getResponseBodyFrameTrace(int streamId, String contentType, String body) {
+    private String getResponseBodyFrameTrace(int streamId, String contentType, String body, String cl) {
         StringBuilder result = new StringBuilder();
         result.append(streamId);
         result.append("-HeadersStart\n");
@@ -461,6 +461,12 @@ public abstract class Http2TestBase extends TomcatBaseTest {
         result.append("-Header-[content-type]-[");
         result.append(contentType);
         result.append("]\n");
+        if (cl != null) {
+            result.append(streamId);
+            result.append("-Header-[content-length]-[");
+            result.append(cl);
+            result.append("]\n");
+        }
         result.append(streamId);
         result.append("-Header-[date]-[");
         result.append(DEFAULT_DATE);

@@ -62,6 +62,7 @@ public class TestHttp2UpgradeHandler extends Http2TestBase {
                 "3-Header-[:status]-[200]\n" +
                 "3-Header-[x-ignore]-[...]\n" +
                 "3-Header-[content-type]-[text/plain;charset=UTF-8]\n" +
+                "3-Header-[content-length]-[2]\n" +
                 "3-Header-[date]-[Wed, 11 Nov 2015 19:18:42 GMT]\n" +
                 "3-HeadersEnd\n" +
                 "3-Body-2\n" +
