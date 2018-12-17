@@ -79,6 +79,15 @@ public class DNSMembershipProvider extends CloudMembershipProvider {
             for (InetAddress inetAddress : inetAddresses) {
                 String ip = inetAddress.getHostAddress();
                 byte[] id = md5.digest(ip.getBytes());
+                // We found ourselves, ignore
+                if (inetAddress.getHostName().equals(hostName)) {
+                    // Update the UID on initial lookup
+                    Member localMember = service.getLocalMember(false);
+                    if (localMember.getUniqueId() == CloudMembershipService.INITIAL_ID && localMember instanceof MemberImpl) {
+                        ((MemberImpl) localMember).setUniqueId(id);
+                    }
+                    continue;
+                }
                 long aliveTime = -1;
                 MemberImpl member = null;
                 try {
