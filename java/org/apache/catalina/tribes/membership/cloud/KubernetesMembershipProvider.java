@@ -200,7 +200,7 @@ public class KubernetesMembershipProvider extends CloudMembershipProvider {
                 String uid = (objectUid == null) ? podIP : objectUid.toString();
 
                 // We found ourselves, ignore
-                if (localIp.equals(podIP)) {
+                if (podIP.equals(localIp)) {
                     // Update the UID on initial lookup
                     Member localMember = service.getLocalMember(false);
                     if (localMember.getUniqueId() == CloudMembershipService.INITIAL_ID && localMember instanceof MemberImpl) {
