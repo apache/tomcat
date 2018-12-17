@@ -79,6 +79,9 @@
         than getting the pod list but it does not indicate pod status.
         Submitted by by Maxime Beck. (remm)
       </update>
+      <fix>
+        Never expire the local member from a Membership. (remm)
+      </fix>
     </changelog>
   </subsection>
 </section>
