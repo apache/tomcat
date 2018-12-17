@@ -52,8 +52,8 @@ public abstract class CloudMembershipProvider extends MembershipProviderBase imp
 
     protected Map<String, String> headers = new HashMap<>();
 
+    protected String localIp;
     protected int port;
-    protected String hostName;
 
     protected long expirationTime = 5000;
 
@@ -87,7 +87,7 @@ public abstract class CloudMembershipProvider extends MembershipProviderBase imp
         connectionTimeout = Integer.parseInt(properties.getProperty("connectionTimeout", "1000"));
         readTimeout = Integer.parseInt(properties.getProperty("readTimeout", "1000"));
 
-        hostName = InetAddress.getLocalHost().getHostName();
+        localIp = InetAddress.getLocalHost().getHostAddress();
         port = Integer.parseInt(properties.getProperty("tcpListenPort"));
 
         expirationTime = Long.parseLong(properties.getProperty("expirationTime", "5000"));

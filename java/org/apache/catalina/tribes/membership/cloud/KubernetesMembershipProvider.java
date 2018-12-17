@@ -174,7 +174,6 @@ public class KubernetesMembershipProvider extends CloudMembershipProvider {
                     log.warn(sm.getString("kubernetesMembershipProvider.invalidPod"));
                     continue;
                 }
-                String name = nameObject.toString();
                 Object objectUid = metadata.get("uid");
                 Object creationTimestampObject = metadata.get("creationTimestamp");
                 if (creationTimestampObject == null) {
@@ -201,7 +200,7 @@ public class KubernetesMembershipProvider extends CloudMembershipProvider {
                 String uid = (objectUid == null) ? podIP : objectUid.toString();
 
                 // We found ourselves, ignore
-                if (name.equals(hostName)) {
+                if (localIp.equals(podIP)) {
                     // Update the UID on initial lookup
                     Member localMember = service.getLocalMember(false);
                     if (localMember.getUniqueId() == CloudMembershipService.INITIAL_ID && localMember instanceof MemberImpl) {
