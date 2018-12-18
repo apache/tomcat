@@ -53,6 +53,7 @@ import org.apache.catalina.startup.Tomcat;
 import org.apache.tomcat.jni.Library;
 import org.apache.tomcat.jni.LibraryNotFoundError;
 import org.apache.tomcat.jni.SSL;
+import org.apache.tomcat.util.compat.JreCompat;
 import org.apache.tomcat.util.compat.TLS;
 import org.apache.tomcat.util.descriptor.web.LoginConfig;
 import org.apache.tomcat.util.descriptor.web.SecurityCollection;
@@ -238,10 +239,16 @@ public final class TesterSupport {
         /* When running on Java 11, TLSv1.3 is enabled by default. The JSSE
          * implementation of TLSv1.3 does not support
          * certificateVerification="optional", a setting on which these tests
-         * depend. Therefore, force these tests to use TLSv1.2 so that they pass
-         * when running on TLSv1.3.
+         * depend.
+         * Java 7 does not enable TLSv1.1 or TLS1.2 by default
+         *
+         * Ensure these tests pass with all JREs from Java 7 onwards.
          */
-        tomcat.getConnector().setProperty("sslEnabledProtocols", Constants.SSL_PROTO_TLSv1_2);
+        if (JreCompat.isJre8Available()) {
+            tomcat.getConnector().setProperty("sslEnabledProtocols", Constants.SSL_PROTO_TLSv1_2);
+        } else {
+            tomcat.getConnector().setProperty("sslEnabledProtocols", Constants.SSL_PROTO_TLSv1);
+        }
 
         // Need a web application with a protected and unprotected URL
         // No file system docBase required
