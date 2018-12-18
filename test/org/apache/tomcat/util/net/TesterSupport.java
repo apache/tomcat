@@ -112,7 +112,7 @@ public final class TesterSupport {
             String keystorePass, String keyPass) {
 
         String protocol = tomcat.getConnector().getProtocolHandlerClassName();
-        if (protocol.indexOf("Apr") == -1) {
+        if (!protocol.contains("Apr")) {
             Connector connector = tomcat.getConnector();
             String sslImplementation = System.getProperty("tomcat.test.sslImplementation");
             if (sslImplementation != null && !"${test.sslImplementation}".equals(sslImplementation)) {
@@ -180,7 +180,7 @@ public final class TesterSupport {
 
     protected static void configureClientSsl() {
         try {
-            SSLContext sc = SSLContext.getInstance(Constants.SSL_PROTO_TLSv1_2);
+            SSLContext sc = SSLContext.getInstance(Constants.SSL_PROTO_TLS);
             sc.init(TesterSupport.getUser1KeyManagers(),
                     TesterSupport.getTrustManagers(),
                     null);
@@ -268,7 +268,7 @@ public final class TesterSupport {
             X509Certificate cert = (X509Certificate)ks.getCertificate(CA_ALIAS);
             clientAuthExpectedIssuer = cert.getSubjectDN().getName();
         } catch (Exception ex) {
-            // Ignore
+            throw new RuntimeException(ex);
         }
 
         String cn = "NOTFOUND";
@@ -277,7 +277,7 @@ public final class TesterSupport {
             X509Certificate cert = (X509Certificate)ks.getCertificate(CLIENT_ALIAS);
             cn = cert.getSubjectDN().getName();
         } catch (Exception ex) {
-            // Ignore
+            throw new RuntimeException(ex);
         }
 
         realm.addUser(cn, "not used");
