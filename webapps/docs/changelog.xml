@@ -60,6 +60,11 @@
 <section name="Tomcat 7.0.93 (violetagg)">
   <subsection name="Catalina">
     <changelog>
+      <fix>
+        <bug>54741</bug>: Add a new method,
+        <code>Tomcat.addWebapp(String,URL)</code>, that allows a web application
+        to be deployed from a URL when using Tomcat in embedded mode. (markt)
+      </fix>
       <add>
         <bug>62897</bug>: Provide a property
         (<code>clearReferencesThreadLocals</code>) on the standard

@@ -17,10 +17,14 @@
 package org.apache.catalina.startup;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLConnection;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -61,8 +65,11 @@ import org.apache.catalina.core.StandardWrapper;
 import org.apache.catalina.deploy.LoginConfig;
 import org.apache.catalina.realm.GenericPrincipal;
 import org.apache.catalina.realm.RealmBase;
+import org.apache.catalina.util.ContextName;
+import org.apache.catalina.util.IOTools;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.buf.UriUtil;
+import org.apache.tomcat.util.res.StringManager;
 
 // TODO: lazy init for the temp dir - only when a JSP is compiled or
 // get temp dir is called we need to create it. This will avoid the
@@ -140,6 +147,9 @@ import org.apache.tomcat.util.buf.UriUtil;
  * @author Costin Manolache
  */
 public class Tomcat {
+
+    private static final StringManager sm = StringManager.getManager(Tomcat.class);
+
     // Some logging implementations use weak references for loggers so there is
     // the possibility that logging configuration could be lost if GC runs just
     // after Loggers are configured but before they are used. The purpose of
@@ -231,7 +241,76 @@ public class Tomcat {
 
 
     /**
-     * Add a context - programmatic mode, no web.xml used.
+     * Copy the specified WAR file to the Host's appBase and then call
+     * {@link #addWebapp(String, String)} with the newly copied WAR. The WAR
+     * will <b>NOT</b> be removed from the Host's appBase when the Tomcat
+     * instance stops. Note that {@link ExpandWar} provides utility methods that
+     * may be used to delete the WAR and/or expanded directory if required.
+     *
+     * @param contextPath   The context mapping to use, "" for root context.
+     * @param source        The location from which the WAR should be copied
+     *
+     * @return The deployed Context
+     *
+     * @throws IOException If an I/O error occurs while copying the WAR file
+     *                     from the specified URL to the appBase
+     */
+    public Context addWebapp(String contextPath, URL source) throws IOException {
+
+        ContextName cn = new ContextName(contextPath, null);
+
+        // Make sure a conflicting web application has not already been deployed
+        Host h = getHost();
+        if (h.findChild(cn.getName()) != null) {
+            throw new IllegalArgumentException(sm.getString("tomcat.addWebapp.conflictChild",
+                    source, contextPath, cn.getName()));
+        }
+
+        // Make sure appBase does not contain a conflicting web application
+        File targetWar = new File(h.getAppBase(), cn.getBaseName() + ".war");
+        File targetDir = new File(h.getAppBase(), cn.getBaseName());
+
+        if (targetWar.exists()) {
+            throw new IllegalArgumentException(sm.getString("tomcat.addWebapp.conflictFile",
+                    source, contextPath, targetWar.getAbsolutePath()));
+        }
+        if (targetDir.exists()) {
+            throw new IllegalArgumentException(sm.getString("tomcat.addWebapp.conflictFile",
+                    source, contextPath, targetDir.getAbsolutePath()));
+        }
+
+        // Should be good to copy the WAR now
+        URLConnection uConn = source.openConnection();
+
+        InputStream is = null;
+        OutputStream os = null;
+        try {
+            is = uConn.getInputStream();
+            os = new FileOutputStream(targetWar);
+            IOTools.flow(is, os);
+        } finally {
+            if (is != null) {
+                try {
+                    is.close();
+                } catch (IOException e) {
+                    // Ignore
+                }
+            }
+            if (os != null) {
+                try {
+                    os.close();
+                } catch (IOException e) {
+                    // Ignore
+                }
+            }
+        }
+
+        return addWebapp(contextPath, targetWar.getAbsolutePath());
+    }
+
+
+    /**
+     * Add a context - programmatic mode, no default web.xml used.
      *
      * <p>
      * API calls equivalent with web.xml:
