@@ -48,6 +48,11 @@
   <subsection name="Catalina">
     <changelog>
       <fix>
+        <bug>54741</bug>: Add a new method,
+        <code>Tomcat.addWebapp(String,URL)</code>, that allows a web application
+        to be deployed from a URL when using Tomcat in embedded mode. (markt)
+      </fix>
+      <fix>
         <bug>63002</bug>: Fix setting rewrite qsdiscard flag. (remm)
       </fix>
       <fix>
