@@ -45,6 +45,15 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 8.5.38 (markt)" rtext="in development">
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        Ensure that the <code>ServletOutputStream</code> implementation is
+        consistent with the requirements of asynchronous I/O and that all of the
+        write methods use a single write rather than multiple writes. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Coyote">
     <changelog>
       <add>
