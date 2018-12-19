@@ -400,15 +400,18 @@ public interface Context extends Container {
 
 
     /**
-     * Return the document root for this Context.  This can be an absolute
-     * pathname, a relative pathname, or a URL.
+     * Obtain the document root for this Context.
+     *
+     * @return An absolute pathname or a relative (to the Host's appBase)
+     *         pathname.
      */
     public String getDocBase();
 
 
     /**
-     * Set the document root for this Context.  This can be an absolute
-     * pathname, a relative pathname, or a URL.
+     * Set the document root for this Context. This can be either an absolute
+     * pathname or a relative pathname. Relative pathnames are relative to the
+     * containing Host's appBase.
      *
      * @param docBase The new document root
      */
@@ -623,7 +626,7 @@ public interface Context extends Container {
      */
     public boolean getXmlNamespaceAware();
 
-    
+
     /**
      * Controls whether the parsing of web.xml and web-fragment.xml files for
      * this Context will be performed by a namespace aware parser.
@@ -632,7 +635,7 @@ public interface Context extends Container {
      */
     public void setXmlNamespaceAware(boolean xmlNamespaceAware);
 
-    
+
     /**
      * Will the parsing of web.xml and web-fragment.xml files for this Context
      * be performed by a validating parser?
@@ -655,7 +658,7 @@ public interface Context extends Container {
      * *.tld files are always parsed using a namespace aware parser.
      *
      * @return Always <code>true</code>
-     * 
+     *
      * @deprecated This option will be removed in 8.0.x.
      */
     @Deprecated
@@ -666,7 +669,7 @@ public interface Context extends Container {
      * *.tld files are always parsed using a namespace aware parser.
      *
      * @param tldNamespaceAware ignored
-     * 
+     *
      * @deprecated This option will be removed in 8.0.x.
      */
     @Deprecated

@@ -97,6 +97,12 @@
         consistent with the requirements of asynchronous I/O and that all of the
         write methods use a single write rather than multiple writes. (markt)
       </fix>
+      <fix>
+        Correct the Javadoc for <code>Context.getDocBase()</code> and
+        <code>Context.setDocBase()</code> and remove text that indicates that a
+        URL may be used for the <code>docBase</code> as this has not been the
+        case for quite some time. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">

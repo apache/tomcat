@@ -2064,10 +2064,6 @@ public class StandardContext extends ContainerBase
     }
 
 
-    /**
-     * Return the document root for this Context.  This can be an absolute
-     * pathname, a relative pathname, or a URL.
-     */
     @Override
     public String getDocBase() {
 
@@ -2076,12 +2072,6 @@ public class StandardContext extends ContainerBase
     }
 
 
-    /**
-     * Set the document root for this Context.  This can be an absolute
-     * pathname, a relative pathname, or a URL.
-     *
-     * @param docBase The new document root
-     */
     @Override
     public void setDocBase(String docBase) {
 
