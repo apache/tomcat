@@ -61,6 +61,11 @@
         <code>HttpServlet</code> is relied upon to generate the HEAD response
         and the GET response uses chunking. (markt)
       </fix>
+      <fix>
+        Ensure that the <code>ServletOutputStream</code> implementation is
+        consistent with the requirements of asynchronous I/O and that all of the
+        write methods use a single write rather than multiple writes. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
