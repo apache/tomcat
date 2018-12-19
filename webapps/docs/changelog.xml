@@ -89,6 +89,13 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Other">
+    <changelog>
+      <update>
+        Update container image with monitoring contraptions. (remm)
+      </update>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 9.0.14 (markt)" rtext="2018-12-12">
   <subsection name="Catalina">

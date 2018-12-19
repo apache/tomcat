@@ -26,12 +26,30 @@ ADD webapps /deployments/webapps
 
 WORKDIR /deployments
 
-ARG namespace=myproject
+ARG namespace=tomcat
 ENV KUBERNETES_NAMESPACE=$namespace
 ARG port=8080
 EXPOSE $port
 
-RUN sh -c 'touch app.jar'
-ENV JAVA_OPTS="-Dcatalina.base=. -Djava.util.logging.manager=org.apache.juli.ClassLoaderLogManager -Djava.util.logging.config.file=conf/logging.properties -Djava.security.egd=file:/dev/urandom"
-ENTRYPOINT [ "sh", "-c", "java $JAVA_OPTS -jar app.jar" ]
+ENV JAVA_OPTS="-Dcatalina.base=. -Djava.security.egd=file:/dev/urandom"
 
+# Add JULI logging configuration
+ENV JAVA_OPTS="${JAVA_OPTS} -Djava.util.logging.manager=org.apache.juli.ClassLoaderLogManager -Djava.util.logging.config.file=conf/logging.properties"
+
+RUN sh -c 'touch app.jar'
+
+RUN mkdir /opt
+
+# Optional: Add Jolokia agent for JMX monitoring and management
+# RUN mkdir /opt/jolokia && wget http://central.maven.org/maven2/org/jolokia/jolokia-jvm/1.6.0/jolokia-jvm-1.6.0-agent.jar -O /opt/jolokia/jolokia.jar
+# ARG jolokiaport=8778
+# ENV JAVA_OPTS="-javaagent:/opt/jolokia/jolokia.jar=host=*,port=$jolokiaport,protocol=https,authIgnoreCerts=true ${JAVA_OPTS}"
+# EXPOSE $jolokiaport
+
+# Optional: Add Prometheus agent for JMX monitoring
+# RUN mkdir /opt/prometheus && wget http://central.maven.org/maven2/io/prometheus/jmx/jmx_prometheus_javaagent/0.10/jmx_prometheus_javaagent-0.10.jar -O /opt/prometheus/prometheus.jar && wget https://raw.githubusercontent.com/prometheus/jmx_exporter/master/example_configs/tomcat.yml -O conf/prometheus.yaml
+# ARG prometheusport=9404
+# ENV JAVA_OPTS="-javaagent:/opt/prometheus/prometheus.jar=$prometheusport:conf/prometheus.yaml ${JAVA_OPTS}"
+# EXPOSE $prometheusport
+
+ENTRYPOINT [ "sh", "-c", "java $JAVA_OPTS -jar app.jar" ]
