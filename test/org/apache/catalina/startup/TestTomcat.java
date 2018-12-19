@@ -621,4 +621,21 @@ public class TestTomcat extends TomcatBaseTest {
             throw new LifecycleException("Deliberately Broken");
         }
     }
+
+
+    @Test
+    public void testAddWebappUrl() throws Exception {
+        URL docBase = new URL("jar:" + new File("test/deployment/context.jar").toURI().toString() + "!/context.war");
+
+        Tomcat tomcat = getTomcatInstance();
+        tomcat.addWebapp("", docBase);
+        tomcat.start();
+
+        ByteChunk bc = new ByteChunk();
+        int rc = getUrl("http://localhost:" + getPort() + "/", bc, null, null);
+
+        Assert.assertEquals(200, rc);
+        // Index page in sample is 100 bytes
+        Assert.assertEquals(100, bc.getLength());
+    }
 }
