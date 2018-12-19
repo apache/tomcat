@@ -159,7 +159,10 @@ public class TestHttp2Section_5_3 extends Http2TestBase {
                 // Unexpected stream
                 Assert.fail("Unexpected stream: [" + output.getTrace() + "]");
             }
-            if (data[1] > 10) {
+            // A value of more than 1 here is unlikely but possible depending on
+            // how threads are scheduled. This has been observed as high as 12
+            // on ci.apache.org so allow a margin and use 20.
+            if (data[1] > 20) {
                 // Larger than expected body size
                 Assert.fail("Larger than expected body: [" + output.getTrace() + "]");
             }
@@ -173,7 +176,7 @@ public class TestHttp2Section_5_3 extends Http2TestBase {
         // possible that the timing of the server threads is such that there are
         // still small body frames to read.
         int[] data = parseBodyFrame(output.getTrace());
-        while (data[1] < 10) {
+        while (data[1] < 20) {
             // Debugging Gump failure
             log.info(output.getTrace());
             output.clearTrace();
@@ -191,14 +194,14 @@ public class TestHttp2Section_5_3 extends Http2TestBase {
                 seen19 = true;
                 // If everything works instantly this should be 256 but allow a
                 // fairly large margin for timing differences
-                if (data[1] < 236 || data[1] > 276) {
+                if (data[1] < 216 || data[1] > 296) {
                     Assert.fail("Unexpected body size: [" + output.getTrace() + "]");
                 }
             } else if (data[0] == 21) {
                 seen21 = true;
                 // If everything works instantly this should be 768 but allow a
                 // fairly large margin for timing differences
-                if (data[1] < 748 || data[1] > 788) {
+                if (data[1] < 728 || data[1] > 808) {
                     Assert.fail("Unexpected body size: [" + output.getTrace() + "]");
                 }
             } else {
