@@ -56,9 +56,12 @@ public abstract class ServletOutputStream extends OutputStream {
      *                if an input or output exception occurred
      */
     public void print(String s) throws IOException {
-        if (s == null)
+        if (s == null) {
             s = "null";
+        }
         int len = s.length();
+        byte[] buffer = new byte[len];
+
         for (int i = 0; i < len; i++) {
             char c = s.charAt(i);
 
@@ -75,8 +78,9 @@ public abstract class ServletOutputStream extends OutputStream {
                 errMsg = MessageFormat.format(errMsg, errArgs);
                 throw new CharConversionException(errMsg);
             }
-            write(c);
+            buffer[i] = (byte) (c & 0xFF);
         }
+        write(buffer);
     }
 
     /**
@@ -183,8 +187,10 @@ public abstract class ServletOutputStream extends OutputStream {
      *                if an input or output exception occurred
      */
     public void println(String s) throws IOException {
-        print(s);
-        println();
+        StringBuilder sb = new StringBuilder();
+        sb.append(s);
+        sb.append("\r\n");
+        print(sb.toString());
     }
 
     /**
@@ -197,8 +203,14 @@ public abstract class ServletOutputStream extends OutputStream {
      *                if an input or output exception occurred
      */
     public void println(boolean b) throws IOException {
-        print(b);
-        println();
+        StringBuilder sb = new StringBuilder();
+        if (b) {
+            sb.append(lStrings.getString("value.true"));
+        } else {
+            sb.append(lStrings.getString("value.false"));
+        }
+        sb.append("\r\n");
+        print(sb.toString());
     }
 
     /**
@@ -211,8 +223,7 @@ public abstract class ServletOutputStream extends OutputStream {
      *                if an input or output exception occurred
      */
     public void println(char c) throws IOException {
-        print(c);
-        println();
+        println(String.valueOf(c));
     }
 
     /**
@@ -225,8 +236,7 @@ public abstract class ServletOutputStream extends OutputStream {
      *                if an input or output exception occurred
      */
     public void println(int i) throws IOException {
-        print(i);
-        println();
+        println(String.valueOf(i));
     }
 
     /**
@@ -239,8 +249,7 @@ public abstract class ServletOutputStream extends OutputStream {
      *                if an input or output exception occurred
      */
     public void println(long l) throws IOException {
-        print(l);
-        println();
+        println(String.valueOf(l));
     }
 
     /**
@@ -253,8 +262,7 @@ public abstract class ServletOutputStream extends OutputStream {
      *                if an input or output exception occurred
      */
     public void println(float f) throws IOException {
-        print(f);
-        println();
+        println(String.valueOf(f));
     }
 
     /**
@@ -267,7 +275,6 @@ public abstract class ServletOutputStream extends OutputStream {
      *                if an input or output exception occurred
      */
     public void println(double d) throws IOException {
-        print(d);
-        println();
+        println(String.valueOf(d));
     }
 }
