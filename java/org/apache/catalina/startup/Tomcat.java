@@ -238,9 +238,9 @@ public class Tomcat {
 
 
     /**
-     * Copy the specified WAR file to the Host&apos;s appBase and then call
+     * Copy the specified WAR file to the Host's appBase and then call
      * {@link #addWebapp(String, String)} with the newly copied WAR. The WAR
-     * will <b>NOT</b> be removed from the Host&apos;s appBase when the Tomcat
+     * will <b>NOT</b> be removed from the Host's appBase when the Tomcat
      * instance stops. Note that {@link ExpandWar} provides utility methods that
      * may be used to delete the WAR and/or expanded directory if required.
      *

@@ -398,7 +398,7 @@ public interface Context extends Container, ContextBind {
     /**
      * Obtain the document root for this Context.
      *
-     * @return An absolute pathname or a relative (to the Host&apos;s appBase)
+     * @return An absolute pathname or a relative (to the Host's appBase)
      *         pathname.
      */
     public String getDocBase();
@@ -407,7 +407,7 @@ public interface Context extends Container, ContextBind {
     /**
      * Set the document root for this Context. This can be either an absolute
      * pathname or a relative pathname. Relative pathnames are relative to the
-     * containing Host&apos;s appBase.
+     * containing Host's appBase.
      *
      * @param docBase The new document root
      */
