@@ -583,16 +583,20 @@ public class SecureNio2Channel extends Nio2Channel  {
         try {
             if (timeout > 0) {
                 if (!flush().get(timeout, TimeUnit.MILLISECONDS).booleanValue()) {
+                    closeSilently();
                     throw new IOException(sm.getString("channel.nio.ssl.remainingDataDuringClose"));
                 }
             } else {
                 if (!flush().get().booleanValue()) {
+                    closeSilently();
                     throw new IOException(sm.getString("channel.nio.ssl.remainingDataDuringClose"));
                 }
             }
         } catch (InterruptedException | ExecutionException | TimeoutException e) {
+            closeSilently();
             throw new IOException(sm.getString("channel.nio.ssl.remainingDataDuringClose"), e);
         } catch (WritePendingException e) {
+            closeSilently();
             throw new IOException(sm.getString("channel.nio.ssl.pendingWriteDuringClose"), e);
         }
         //prep the buffer for the close message
@@ -609,16 +613,20 @@ public class SecureNio2Channel extends Nio2Channel  {
         try {
             if (timeout > 0) {
                 if (!flush().get(timeout, TimeUnit.MILLISECONDS).booleanValue()) {
+                    closeSilently();
                     throw new IOException(sm.getString("channel.nio.ssl.remainingDataDuringClose"));
                 }
             } else {
                 if (!flush().get().booleanValue()) {
+                    closeSilently();
                     throw new IOException(sm.getString("channel.nio.ssl.remainingDataDuringClose"));
                 }
             }
         } catch (InterruptedException | ExecutionException | TimeoutException e) {
+            closeSilently();
             throw new IOException(sm.getString("channel.nio.ssl.remainingDataDuringClose"), e);
         } catch (WritePendingException e) {
+            closeSilently();
             throw new IOException(sm.getString("channel.nio.ssl.pendingWriteDuringClose"), e);
         }
 
