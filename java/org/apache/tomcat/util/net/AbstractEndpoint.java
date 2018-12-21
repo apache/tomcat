@@ -1320,5 +1320,6 @@ public abstract class AbstractEndpoint<S> {
      * @throws IOException If an error occurs closing the socket
      */
     protected abstract void doCloseServerSocket() throws IOException;
+
 }
 

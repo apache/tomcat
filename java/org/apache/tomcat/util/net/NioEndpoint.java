@@ -1251,7 +1251,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
 
         @Override
         public boolean isClosed() {
-            return closed || !getSocket().isOpen();
+            return closed;
         }
 
 
