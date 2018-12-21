@@ -86,6 +86,15 @@
         header in HTTP/2 responses where an appropriate value is available.
         (markt)
       </add>
+      <fix>
+        <bug>63022</bug>: Do not use the socket open state when using the
+        wrapper isClosed method for NIO and NIO2, as it will disable all
+        further processing. (remm)
+      </fix>
+      <fix>
+        Fix socket close discrepancies for NIO2, now the wrapper close
+        is used everywhere except for socket accept problems. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Tribes">

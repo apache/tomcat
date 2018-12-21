@@ -1302,6 +1302,12 @@ public abstract class AbstractEndpoint<S,U> {
 
     protected abstract boolean setSocketOptions(U socket);
 
+    /**
+     * Close the socket when the connection has to be immediately closed when
+     * an error occurs while configuring the accepted socket, allocating
+     * a wrapper for the socket, or trying to dispatch it for processing.
+     * @param socket The newly accepted socket
+     */
     protected abstract void closeSocket(U socket);
 
     protected void destroySocket(U socket) {

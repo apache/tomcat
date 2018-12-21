@@ -226,7 +226,7 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
                     // Then close all active connections if any remain
                     try {
                         for (Nio2Channel channel : getHandler().getOpenSockets()) {
-                            closeSocket(channel.getSocket());
+                            channel.getSocket().close();
                         }
                     } catch (Throwable t) {
                         ExceptionUtils.handleThrowable(t);
@@ -377,47 +377,6 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
         return new SocketProcessor(socketWrapper, event);
     }
 
-
-    private void closeSocket(SocketWrapperBase<Nio2Channel> socket) {
-        if (log.isDebugEnabled()) {
-            log.debug("Calling [" + this + "].closeSocket([" + socket + "],[" + socket.getSocket() + "])",
-                    new Exception());
-        }
-        if (socket == null) {
-            return;
-        }
-        try {
-            getHandler().release(socket);
-        } catch (Throwable e) {
-            ExceptionUtils.handleThrowable(e);
-            if (log.isDebugEnabled()) log.error("",e);
-        }
-        Nio2SocketWrapper nio2Socket = (Nio2SocketWrapper) socket;
-        try {
-            synchronized (socket.getSocket()) {
-                if (!nio2Socket.closed) {
-                    nio2Socket.closed = true;
-                    countDownConnection();
-                }
-                if (socket.getSocket().isOpen()) {
-                    socket.getSocket().close(true);
-                }
-            }
-        } catch (Throwable e) {
-            ExceptionUtils.handleThrowable(e);
-            if (log.isDebugEnabled()) log.error("",e);
-        }
-        try {
-            if (nio2Socket.getSendfileData() != null
-                    && nio2Socket.getSendfileData().fchannel != null
-                    && nio2Socket.getSendfileData().fchannel.isOpen()) {
-                nio2Socket.getSendfileData().fchannel.close();
-            }
-        } catch (Throwable e) {
-            ExceptionUtils.handleThrowable(e);
-            if (log.isDebugEnabled()) log.error("",e);
-        }
-    }
 
     protected class Nio2Acceptor extends Acceptor<AsynchronousSocketChannel>
         implements CompletionHandler<AsynchronousSocketChannel, Void> {
@@ -928,14 +887,50 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
 
 
         @Override
-        public void close() throws IOException {
-            getSocket().close();
+        public void close() {
+            if (log.isDebugEnabled()) {
+                log.debug("Calling [" + getEndpoint() + "].closeSocket([" + this + "])", new Exception());
+            }
+            try {
+                getEndpoint().getHandler().release(this);
+            } catch (Throwable e) {
+                ExceptionUtils.handleThrowable(e);
+                if (log.isDebugEnabled()) {
+                    log.error("Channel close error", e);
+                }
+            }
+            try {
+                synchronized (getSocket()) {
+                    if (!closed) {
+                        closed = true;
+                        getEndpoint().countDownConnection();
+                    }
+                    if (getSocket().isOpen()) {
+                        getSocket().close(true);
+                    }
+                }
+            } catch (Throwable e) {
+                ExceptionUtils.handleThrowable(e);
+                if (log.isDebugEnabled()) {
+                    log.error("Channel close error", e);
+                }
+            }
+            try {
+                SendfileData data = getSendfileData();
+                if (data != null && data.fchannel != null && data.fchannel.isOpen()) {
+                    data.fchannel.close();
+                }
+            } catch (Throwable e) {
+                ExceptionUtils.handleThrowable(e);
+                if (log.isDebugEnabled()) {
+                    log.error("Channel close error", e);
+                }
+            }
         }
-
 
         @Override
         public boolean isClosed() {
-            return closed || !getSocket().isOpen();
+            return closed;
         }
 
 
@@ -1775,7 +1770,7 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
                     }
                     if (state == SocketState.CLOSED) {
                         // Close socket and pool
-                        closeSocket(socketWrapper);
+                        socketWrapper.close();
                         if (running && !paused) {
                             if (!nioChannels.push(socketWrapper.getSocket())) {
                                 socketWrapper.getSocket().free();
@@ -1785,7 +1780,7 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
                         launch = true;
                     }
                 } else if (handshake == -1 ) {
-                    closeSocket(socketWrapper);
+                    socketWrapper.close();
                     if (running && !paused) {
                         if (!nioChannels.push(socketWrapper.getSocket())) {
                             socketWrapper.getSocket().free();
@@ -1797,7 +1792,7 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
             } catch (Throwable t) {
                 log.error(sm.getString("endpoint.processing.fail"), t);
                 if (socketWrapper != null) {
-                    closeSocket(socketWrapper);
+                    ((Nio2SocketWrapper) socketWrapper).close();
                 }
             } finally {
                 if (launch) {
