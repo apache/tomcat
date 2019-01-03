@@ -77,6 +77,9 @@
         URL may be used for the <code>docBase</code> as this has not been the
         case for quite some time. (markt)
       </fix>
+      <update>
+        Add basic health check valve. (remm)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Coyote">
