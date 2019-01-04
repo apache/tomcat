@@ -744,12 +744,12 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
         }
 
         // Next write the mask && length length
-        if (payload.limit() < 126) {
-            headerBuffer.put((byte) (payload.limit() | b));
-        } else if (payload.limit() < 65536) {
+        if (payload.remaining() < 126) {
+            headerBuffer.put((byte) (payload.remaining() | b));
+        } else if (payload.remaining() < 65536) {
             headerBuffer.put((byte) (126 | b));
-            headerBuffer.put((byte) (payload.limit() >>> 8));
-            headerBuffer.put((byte) (payload.limit() & 0xFF));
+            headerBuffer.put((byte) (payload.remaining() >>> 8));
+            headerBuffer.put((byte) (payload.remaining() & 0xFF));
         } else {
             // Will never be more than 2^31-1
             headerBuffer.put((byte) (127 | b));
@@ -757,10 +757,10 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
             headerBuffer.put((byte) 0);
             headerBuffer.put((byte) 0);
             headerBuffer.put((byte) 0);
-            headerBuffer.put((byte) (payload.limit() >>> 24));
-            headerBuffer.put((byte) (payload.limit() >>> 16));
-            headerBuffer.put((byte) (payload.limit() >>> 8));
-            headerBuffer.put((byte) (payload.limit() & 0xFF));
+            headerBuffer.put((byte) (payload.remaining() >>> 24));
+            headerBuffer.put((byte) (payload.remaining() >>> 16));
+            headerBuffer.put((byte) (payload.remaining() >>> 8));
+            headerBuffer.put((byte) (payload.remaining() & 0xFF));
         }
         if (masked) {
             headerBuffer.put(mask[0]);
