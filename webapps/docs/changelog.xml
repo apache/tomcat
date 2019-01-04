@@ -128,6 +128,11 @@
         motohashi.yuki. (markt)
       </add>
       <add>
+        Expand the coverage and quality of the French translations provided with
+        Apache Tomcat. Includes contributions from remm, Ludovic Pénet and
+        evernat. (markt)
+      </add>
+      <add>
         Expand the coverage and quality of the German translations provided
         with Apache Tomcat. Includes contributions from fschumacher, Stefan and
         burghard. (markt)
@@ -136,7 +141,7 @@
         Expand the coverage and quality of the Chinese (simplified) translations
         provided with Apache Tomcat. Includes contributions from winsonzhao,
         Lanranzi, shawn, Winsonzhoa, JinXiqian, RichardHo, qingshi huang,
-        Greenman0007, Jim Ma, huxing and 袁宇杰. (markt)
+        Greenman0007, Jim Ma, huxing, 袁宇杰 and evernat. (markt)
       </add>
       <add>
         Expand the coverage and quality of the Spanish translations provided
