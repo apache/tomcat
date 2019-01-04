@@ -83,6 +83,15 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Jasper">
+    <changelog>
+      <fix>
+        <bug>63056</bug>: Correct a regression in the fix for <bug>53737</bug>
+        that did not correctly scan the web application directory structure for
+        JSPs. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="WebSocket">
     <changelog>
       <fix>

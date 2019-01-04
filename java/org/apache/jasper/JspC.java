@@ -1408,13 +1408,13 @@ public class JspC extends Task implements Options {
         Set<String> paths = context.getResourcePaths(input);
         for (String path : paths) {
             if (path.endsWith("/")) {
-                scanFilesInternal(input.substring(0, input.length() -1) + path);
-            } else if (jspConfig.isJspPage(input + path)) {
+                scanFilesInternal(path);
+            } else if (jspConfig.isJspPage(path)) {
                 pages.add(path);
             } else {
                 String ext = path.substring(path.lastIndexOf('.') + 1);
                 if (extensions.contains(ext)) {
-                    pages.add(input + path.substring(1));
+                    pages.add(path);
                 }
             }
         }
