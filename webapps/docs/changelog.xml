@@ -117,6 +117,42 @@
       <update>
         Update container image with monitoring contraptions. (remm)
       </update>
+      <add>
+        Expand the coverage and quality of the Korean translations provided with
+        Apache Tomcat. Includes contributions from woonsan and Chris Cho.
+        (markt)
+      </add>
+      <add>
+        Expand the coverage and quality of the Japanese translations provided
+        with Apache Tomcat. Includes contributions from kfujino, Yujiorama and
+        motohashi.yuki. (markt)
+      </add>
+      <add>
+        Expand the coverage and quality of the German translations provided
+        with Apache Tomcat. Includes contributions from fschumacher, Stefan and
+        burghard. (markt)
+      </add>
+      <add>
+        Expand the coverage and quality of the Chinese (simplified) translations
+        provided with Apache Tomcat. Includes contributions from winsonzhao,
+        Lanranzi, shawn, Winsonzhoa, JinXiqian, RichardHo, qingshi huang,
+        Greenman0007, Jim Ma, huxing and 袁宇杰. (markt)
+      </add>
+      <add>
+        Expand the coverage and quality of the Spanish translations provided
+        with Apache Tomcat. Includes contributions from Ulises Gonzalez Horta,
+        Israel, Eduardo Quintanilla and Miguel Ortega. (markt)
+      </add>
+      <add>
+        Expand the coverage and quality of the Russian translations provided
+        with Apache Tomcat. Includes contributions from Andrei Maiseyenka and
+        solomax. (markt)
+      </add>
+      <add>
+        Expand the coverage and quality of the Brazilian Portuguese translations
+        provided with Apache Tomcat. Includes contributions from Victor Caetano
+        and Dabilo. (markt)
+      </add>
     </changelog>
   </subsection>
 </section>
