@@ -111,6 +111,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="WebSocket">
+    <changelog>
+      <fix>
+        <bug>63019</bug>: Use payload remaining bytes rather than limit when
+        writing. Submitted by Benoit Courtilly. (remm)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <fix>
