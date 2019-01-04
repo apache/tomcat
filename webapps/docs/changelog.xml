@@ -98,6 +98,10 @@
         Fix socket close discrepancies for NIO2, now the wrapper close
         is used everywhere except for socket accept problems. (remm)
       </fix>
+      <fix>
+        Fix use of write timeout instead of read timeout for HTTP/2 NIO2
+        frame read. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Tribes">

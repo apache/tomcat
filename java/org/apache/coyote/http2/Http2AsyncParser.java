@@ -58,7 +58,7 @@ class Http2AsyncParser extends Http2Parser {
         framePaylod.clear();
         FrameCompletionHandler handler = new FrameCompletionHandler(expected, header, framePaylod);
         CompletionState state =
-                socketWrapper.read(BlockingMode.NON_BLOCK, socketWrapper.getWriteTimeout(), TimeUnit.MILLISECONDS, null, handler, handler, header, framePaylod);
+                socketWrapper.read(BlockingMode.NON_BLOCK, socketWrapper.getReadTimeout(), TimeUnit.MILLISECONDS, null, handler, handler, header, framePaylod);
         if (state == CompletionState.ERROR || state == CompletionState.INLINE) {
             handleAsyncException();
             return true;
