@@ -141,7 +141,7 @@ public class TestJspCServletContext {
                 null, appDir.toURI().toURL(), null, false, false);
 
         Set<String> paths = context.getResourcePaths("/");
-        Assert.assertEquals(paths.size(), 10);
+        Assert.assertEquals(10, paths.size());
         Assert.assertTrue(paths.contains("/WEB-INF/"));
         Assert.assertTrue(paths.contains("/folder/"));
         Assert.assertTrue(paths.contains("/'singlequote.jsp"));
@@ -152,5 +152,11 @@ public class TestJspCServletContext {
         Assert.assertTrue(paths.contains("/resourceB.jsp"));
         Assert.assertTrue(paths.contains("/resourceF.jsp"));
         Assert.assertTrue(paths.contains("/warDirContext.jsp"));
+
+        paths = context.getResourcePaths("/folder/");
+        Assert.assertEquals(3, paths.size());
+        Assert.assertTrue(paths.contains("/folder/resourceC.jsp"));
+        Assert.assertTrue(paths.contains("/folder/resourceD.jsp"));
+        Assert.assertTrue(paths.contains("/folder/resourceE.jsp"));
     }
 }
