@@ -36,7 +36,7 @@
 <section name="Introduction">
   <p>
   Apache Tribes supports an interceptor architecture to intercept both messages and membership notifications.
-  This architecture allows decoupling of logic and opens the way for some very kewl feature add ons.
+  This architecture allows decoupling of logic and opens the way for some very useful feature add ons.
   </p>
 </section>
 
@@ -55,6 +55,7 @@
     <li><code>org.apache.catalina.tribes.group.interceptors.FragmentationInterceptor</code></li>
     <li><code>org.apache.catalina.tribes.group.interceptors.GzipInterceptor</code></li>
     <li><code>org.apache.catalina.tribes.group.interceptors.TcpPingInterceptor</code></li>
+    <li><code>org.apache.catalina.tribes.group.interceptors.EncryptInterceptor</code></li>
    </ul>
 </section>
 
@@ -209,6 +210,44 @@
        The report is logged to the <code>org.apache.juli.logging.LogFactory.getLog(ThroughputInterceptor.class)</code>
        logger under the <code>INFO</code> level.
        Default value is to report every <code>10000</code> messages.
+     </attribute>
+   </attributes>
+  </subsection>
+  <subsection name="org.apache.catalina.tribes.group.interceptors.EncryptInterceptor Attributes">
+   <p>
+     The EncryptInterceptor adds encryption to the channel messages carrying
+     session data between nodes. Added in Tomcat 7.0.100.
+   </p>
+   <p>
+     If using the <code>TcpFailureDetector</code>, the <code>EncryptInterceptor</code>
+     <i>must</i> be inserted into the interceptor chain <i>before</i> the
+     <code>TcpFailureDetector</code>. This is because when validating cluster
+     members, <code>TcpFailureDetector</code> writes channel data directly
+     to the other members without using the remainder of the interceptor chain,
+     but on the receiving side, the message still goes through the chain (in reverse).
+     Because of this asymmetry, the <code>EncryptInterceptor</code> must execute
+     <i>before</i> the <code>TcpFailureDetector</code> on the sender and <i>after</i>
+     it on the receiver, otherwise message corruption will occur.
+   </p>
+   <attributes>
+     <attribute name="encryptionAlgorithm" required="false">
+       The encryption algorithm to be used, including the mode and padding. Please see
+       <a href="https://docs.oracle.com/javase/8/docs/technotes/guides/security/StandardNames.html">https://docs.oracle.com/javase/8/docs/technotes/guides/security/StandardNames.html</a>
+       for the standard JCA names that can be used.
+
+       The <i>mode</i> is currently required to be <code>CBC</code>.
+
+       The length of the key will specify the flavor of the encryption algorithm
+       to be used, if applicable (e.g. AES-128 versus AES-256).
+
+       The default algorithm is <code>AES/CBC/PKCS5Padding</code>.
+     </attribute>
+     <attribute name="encryptionKey" required="true">
+       The key to be used with the encryption algorithm.
+
+       The key should be specified as hex-encoded bytes of the appropriate
+       length for the algorithm (e.g. 16 bytes / 32 characters / 128 bits for
+       AES-128, 32 bytes / 64 characters / 256 bits for AES-256, etc.).
      </attribute>
    </attributes>
   </subsection>
