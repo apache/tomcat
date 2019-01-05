@@ -100,6 +100,16 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Tribes">
+    <changelog>
+      <add>
+        Add EncryptInterceptor to the portfolio of available clustering
+        interceptors. This adds symmetric encryption of session data
+        to Tomcat clustering regardless of the type of cluster manager
+        or membership being used. (schultz)
+      </add>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 8.5.37 (markt)" rtext="2018-12-18">
   <subsection name="Catalina">
@@ -212,16 +222,6 @@
         <bug>62918</bug>: Filter out subtype mbeans to avoid breaking the
         connector status page. (remm)
       </fix>
-    </changelog>
-  </subsection>
-  <subsection name="Tribes">
-    <changelog>
-      <add>
-        Add EncryptInterceptor to the portfolio of available clustering
-        interceptors. This adds symmetric encryption of session data
-        to Tomcat clustering regardless of the type of cluster manager
-        or membership being used. (schultz)
-      </add>
     </changelog>
   </subsection>
   <subsection name="Other">
