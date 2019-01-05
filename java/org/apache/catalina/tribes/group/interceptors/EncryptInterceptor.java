@@ -31,6 +31,7 @@ import javax.crypto.spec.SecretKeySpec;
 
 import org.apache.catalina.tribes.Channel;
 import org.apache.catalina.tribes.ChannelException;
+import org.apache.catalina.tribes.ChannelInterceptor;
 import org.apache.catalina.tribes.ChannelMessage;
 import org.apache.catalina.tribes.Member;
 import org.apache.catalina.tribes.group.ChannelInterceptorBase;
@@ -72,6 +73,8 @@ public class EncryptInterceptor extends ChannelInterceptorBase implements Encryp
 
     @Override
     public void start(int svc) throws ChannelException {
+        validateChannelChain();
+
         if(Channel.SND_TX_SEQ == (svc & Channel.SND_TX_SEQ)) {
             try {
                 encryptionManager = createEncryptionManager(getEncryptionAlgorithm(),
@@ -83,6 +86,16 @@ public class EncryptInterceptor extends ChannelInterceptorBase implements Encryp
         }
 
         super.start(svc);
+    }
+
+    private void validateChannelChain() throws ChannelException {
+        ChannelInterceptor interceptor = getPrevious();
+        while(null != interceptor) {
+            if(interceptor instanceof TcpFailureDetector)
+                throw new ChannelConfigException(sm.getString("encryptInterceptor.tcpFailureDetector.ordering"));
+
+            interceptor = interceptor.getPrevious();
+        }
     }
 
     @Override
@@ -611,6 +624,16 @@ public class EncryptInterceptor extends ChannelInterceptorBase implements Encryp
         @Override
         protected AlgorithmParameterSpec generateIV(byte[] bytes, int offset, int length) {
             return null;
+        }
+    }
+
+    static class ChannelConfigException
+        extends ChannelException
+    {
+        private static final long serialVersionUID = 1L;
+
+        public ChannelConfigException(String message) {
+            super(message);
         }
     }
 }

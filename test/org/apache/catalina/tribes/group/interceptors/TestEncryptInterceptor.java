@@ -224,7 +224,7 @@ public class TestEncryptInterceptor {
     }
 
     @Test
-    @Ignore("ECB mode isn't because it's insecure")
+    @Ignore("ECB mode isn't implemented because it's insecure")
     public void testECB() throws Exception {
         src.setEncryptionAlgorithm("AES/ECB/PKCS5Padding");
         src.start(Channel.SND_TX_SEQ);
@@ -427,6 +427,23 @@ public class TestEncryptInterceptor {
 
         for(byte[] message : messages)
             Assert.assertArrayEquals("Message is corrupted", message, bytes);
+    }
+
+    @Test
+    public void testTcpFailureDetectorDetection() {
+        src.setPrevious(new TcpFailureDetector());
+
+        try {
+            src.start(Channel.SND_TX_SEQ);
+            Assert.fail("EncryptInterceptor should detect TcpFailureDetector and throw an error");
+        } catch (EncryptInterceptor.ChannelConfigException cce) {
+            // Expected behavior
+        } catch (AssertionError ae) {
+            // This is the junit assertion being thrown
+            throw ae;
+        } catch (Throwable t) {
+            Assert.fail("EncryptionInterceptor should throw ChannelConfigException, not " + t.getClass().getName());
+        }
     }
 
     /**
