@@ -214,6 +214,16 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Tribes">
+    <changelog>
+      <add>
+        Add EncryptInterceptor to the portfolio of available clustering
+        interceptors. This adds symmetric encryption of session data
+        to Tomcat clustering regardless of the type of cluster manager
+        or membership being used. (schultz)
+      </add>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <fix>
