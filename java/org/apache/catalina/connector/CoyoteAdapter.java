@@ -870,9 +870,9 @@ public class CoyoteAdapter implements Adapter {
         }
 
         // Set the authorization type
-        String authtype = req.getAuthType().toString();
-        if (authtype != null) {
-            request.setAuthType(authtype);
+        String authType = req.getAuthType().toString();
+        if (authType != null) {
+            request.setAuthType(authType);
         }
     }
 
