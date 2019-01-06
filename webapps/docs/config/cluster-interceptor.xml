@@ -224,11 +224,11 @@
        The length of the key will specify the flavor of the encryption algorithm
        to be used, if applicable (e.g. AES-128 versus AES-256).
 
-       The default algorithm is <code>AES/CBC/PKCS5Padding</code>. 
+       The default algorithm is <code>AES/CBC/PKCS5Padding</code>.
      </attribute>
      <attribute name="encryptionKey" required="true">
        The key to be used with the encryption algorithm.
-       
+
        The key should be specified as hex-encoded bytes of the appropriate
        length for the algorithm (e.g. 16 bytes / 32 characters / 128 bits for
        AES-128, 32 bytes / 64 characters / 256 bits for AES-256, etc.).
