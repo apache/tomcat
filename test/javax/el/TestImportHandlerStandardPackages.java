@@ -59,8 +59,10 @@ public class TestImportHandlerStandardPackages {
             // 9 (and later) so it is not necessary that this is executed on
             // every test run. The intention is that it will catch new classes
             // when the tests are run on a newer JRE.
-            // The latest version of the JRE where this test is known to pass is
-            // Java 11, Early Access 21
+            // The latest versions of the JRE where this test is known to pass are
+            // - OpenJDK 11.0.1
+            // - OpenJDK 12 EA 26
+            // - OpenJDK 13 EA 02
             if (!JreCompat.isJre9Available()) {
                 return;
             }

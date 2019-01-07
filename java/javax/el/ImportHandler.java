@@ -164,6 +164,7 @@ public class ImportHandler {
         javaLangClassNames.add("Compiler");
         javaLangClassNames.add("Double");
         javaLangClassNames.add("Enum");
+        javaLangClassNames.add("Enum.EnumDesc");
         javaLangClassNames.add("Float");
         javaLangClassNames.add("InheritableThreadLocal");
         javaLangClassNames.add("Integer");
