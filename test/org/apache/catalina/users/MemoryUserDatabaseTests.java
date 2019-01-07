@@ -157,6 +157,7 @@ public class MemoryUserDatabaseTests {
         throws Exception {
         // Generate lots of concurrent load on the user database
         Runnable job = new Runnable() {
+            @Override
             public void run() {
                 for(int i=0; i<10; ++i)
                     db.createUser("newUser-" + Thread.currentThread().getName() + "-" + i, "x", null);
@@ -170,6 +171,7 @@ public class MemoryUserDatabaseTests {
 
         // Let's
         threads[numThreads] = new Thread(new Runnable() {
+            @Override
             public void run() {
                 try { db.open(); }
                 catch (Exception e) {
@@ -210,7 +212,7 @@ public class MemoryUserDatabaseTests {
 
     private void assertPrincipalNames(String[] expectedNames, Iterator<? extends Principal> i)
     {
-        HashSet<String> names = new HashSet<String>(expectedNames.length);
+        HashSet<String> names = new HashSet<>(expectedNames.length);
         for(String name : expectedNames)
             names.add(name);
 
