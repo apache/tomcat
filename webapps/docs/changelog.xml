@@ -5285,6 +5285,10 @@
         <code>InstanceManager.destroy()</code> to ensure that the method is
         executed. (markt)
       </fix>
+      <fix>
+        Document the default for the HTTP/2 configuration parameter
+        <code>maxConcurrentStreamExecution</code> as 20. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
