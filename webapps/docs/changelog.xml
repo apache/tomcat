@@ -111,6 +111,12 @@
         that did not correctly scan the web application directory structure for
         JSPs. (markt)
       </fix>
+      <fix>
+        Update the performance optimisation for using expressions in tags that
+        depend on uninitialised tag attributes with implied scope to make the
+        performance optimisation aware of the new public class
+        (<code>java.lang.Enum$EnumDesc</code>) added in Java 12. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="WebSocket">
