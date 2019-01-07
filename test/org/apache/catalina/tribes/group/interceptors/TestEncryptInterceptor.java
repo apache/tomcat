@@ -292,7 +292,7 @@ public class TestEncryptInterceptor {
             dest.setEncryptionAlgorithm("AES/GCM/PKCS5Padding");
             dest.start(Channel.SND_TX_SEQ);
         } catch (ChannelException ce) {
-            Assume.assumeTrue("Skipping testGCM due to lack of JVM support",
+            Assume.assumeFalse("Skipping testGCM due to lack of JVM support",
                     ce.getCause() instanceof NoSuchAlgorithmException
                     && ce.getCause().getMessage().contains("GCM"));
 
