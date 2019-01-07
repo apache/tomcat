@@ -135,7 +135,7 @@
       can be allocated threads from the container thread pool. If more streams
       are active than threads are available, those streams will have to wait
       for a stream to become available. If not specified, the default value of
-      <code>200</code> will be used.</p>
+      <code>20</code> will be used.</p>
     </attribute>
 
     <attribute name="maxConcurrentStreams" required="false">
