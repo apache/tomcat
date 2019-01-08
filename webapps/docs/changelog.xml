@@ -63,6 +63,10 @@
         URL may be used for the <code>docBase</code> as this has not been the
         case for quite some time. (markt)
       </fix>
+      <add>
+        Ensure that Tomcat is fully terminated when running as a service.
+        (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
