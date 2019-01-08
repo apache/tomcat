@@ -47,3 +47,10 @@ New items for 10.0.x onwards:
 5.  Consider applying the delayed log file opening (until there is something to
     log). See BZ 53620.
 
+6. Consider including
+   <request-character-encoding>UTF-8</request-character-encoding>
+   in conf/web.xml
+
+7. Consider including
+   <response-character-encoding>UTF-8</response-character-encoding>
+   in conf/web.xml
