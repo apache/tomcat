@@ -80,6 +80,10 @@
       <update>
         Add basic health check valve. (remm)
       </update>
+      <fix>
+        Correct a bug exposed in 9.0.14 and ensure that the Tomcat terminates in
+        a timely manner when running as a service. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

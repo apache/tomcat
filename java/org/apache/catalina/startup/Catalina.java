@@ -501,6 +501,7 @@ public class Catalina {
             // Server object already present. Must be running as a service
             try {
                 s.stop();
+                s.destroy();
             } catch (LifecycleException e) {
                 log.error(sm.getString("catalina.stopError"), e);
             }
