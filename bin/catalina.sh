@@ -476,7 +476,7 @@ elif [ "$1" = "start" ] ; then
       -Dcatalina.home="\"$CATALINA_HOME\"" \
       -Djava.io.tmpdir="\"$CATALINA_TMPDIR\"" \
       org.apache.catalina.startup.Bootstrap "$@" start \
-      2\>\&1 \& echo \$! \>\"$catalina_pid_file\" \; \} $catalina_out_command "&"
+      2\>\&1 \&\& echo \$! \>\"$catalina_pid_file\" \; \} $catalina_out_command "&"
 
   else
     eval \{ $_NOHUP "\"$_RUNJAVA\"" "\"$LOGGING_CONFIG\"" $LOGGING_MANAGER $JAVA_OPTS $CATALINA_OPTS \
@@ -486,7 +486,7 @@ elif [ "$1" = "start" ] ; then
       -Dcatalina.home="\"$CATALINA_HOME\"" \
       -Djava.io.tmpdir="\"$CATALINA_TMPDIR\"" \
       org.apache.catalina.startup.Bootstrap "$@" start \
-      2\>\&1 \& echo \$! \>\"$catalina_pid_file\" \; \} $catalina_out_command "&"
+      2\>\&1 \&\& echo \$! \>\"$catalina_pid_file\" \; \} $catalina_out_command "&"
 
   fi
 
