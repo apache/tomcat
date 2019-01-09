@@ -189,6 +189,11 @@
         provided with Apache Tomcat. Includes contributions from Victor Caetano
         and Dabilo. (markt)
       </add>
+      <fix>
+        <bug>63041</bug>: Correct a regression in the fix for <bug>53930</bug>
+        that prevented Tomcat from working correctly with systemd. Patch
+        provided by Patrik S. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
