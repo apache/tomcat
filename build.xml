@@ -76,8 +76,6 @@
   <property name="tomcat.dist"           value="${tomcat.output}/dist"/>
   <property name="tomcat.embed"          value="${tomcat.output}/embed"/>
   <property name="tomcat.embed.sources"  value="${tomcat.output}/embed-src-jars"/>
-  <property name="tomcat.extras"         value="${tomcat.output}/extras"/>
-  <property name="tomcat.extras.sources" value="${tomcat.output}/extras-src-jars"/>
   <property name="tomcat.manifests"      value="${tomcat.output}/manifests"/>
   <property name="tomcat.release"        value="${tomcat.output}/release"/>
   <property name="tomcat.src.jars"       value="${tomcat.output}/src-jars"/>
@@ -161,13 +159,6 @@
   <property name="tomcat-embed-el-sources.jar" value="${tomcat.embed.sources}/tomcat-embed-el-src.jar"/>
   <property name="tomcat-embed-websocket-sources.jar" value="${tomcat.embed.sources}/tomcat-embed-websocket-src.jar"/>
 
-  <!-- Extras JARs & source JARs -->
-  <property name="catalina-ws.jar" value="${tomcat.extras}/catalina-ws.jar"/>
-  <property name="catalina-jmx-remote.jar" value="${tomcat.extras}/catalina-jmx-remote.jar"/>
-
-  <property name="catalina-ws-src.jar" value="${tomcat.extras.sources}/catalina-ws-src.jar"/>
-  <property name="catalina-jmx-remote-src.jar" value="${tomcat.extras.sources}/catalina-jmx-remote-src.jar"/>
-
   <!-- jdbc-pool JARs & source JARs -->
   <property name="tomcat-jdbc.jar" value="${tomcat.pool}/tomcat-jdbc.jar"/>
   <property name="tomcat-jdbc-src.jar" value="${tomcat.pool}/tomcat-jdbc-src.jar"/>
@@ -213,6 +204,8 @@
   <path id="compile.classpath">
     <pathelement location="${jdt.jar}"/>
     <pathelement location="${saaj-api.jar}"/>
+    <pathelement location="${jaxrpc-lib.jar}"/>
+    <pathelement location="${wsdl4j-lib.jar}"/>
   </path>
 
   <path id="tomcat.classpath">
@@ -229,14 +222,6 @@
     <pathelement location="${objenesis.jar}"/>
     <path refid="compile.classpath" />
     <path refid="tomcat.classpath" />
-  </path>
-
-  <path id="tomcat.webservices.classpath">
-    <path refid="tomcat.classpath" />
-    <fileset dir="${tomcat.extras}/webservices">
-      <include name="jaxrpc.jar"/>
-      <include name="wsdl4j.jar"/>
-    </fileset>
   </path>
 
   <!-- Version info filter set -->
@@ -413,10 +398,8 @@
     <!-- Modules -->
     <exclude name="org/apache/catalina/ant/**" />
     <exclude name="org/apache/catalina/ha/**" />
-    <exclude name="org/apache/catalina/mbeans/JmxRemote*" />
     <exclude name="org/apache/catalina/tribes/**" />
     <exclude name="org/apache/catalina/storeconfig/**" />
-    <exclude name="org/apache/naming/factory/webservices/**" />
   </patternset>
 
   <patternset id="files.catalina-tribes">
@@ -504,15 +487,6 @@
     <!-- Annotations API is a separate dependency to avoid JRE 9 issues -->
     <!-- See BZ 61439 -->
     <!--<patternset refid="files.annotations-api" />-->
-
-  <!-- Pattern sets for extras JARs -->
-  <patternset id="files.tomcat-extras-ws">
-    <include name="org/apache/naming/factory/webservices/**" />
-  </patternset>
-
-  <patternset id="files.tomcat-extras-jmxremote">
-    <include name="org/apache/catalina/mbeans/JmxRemote*" />
-  </patternset>
 
   <!-- =========================== Build targets =========================== -->
 
@@ -704,7 +678,6 @@
       <compilerarg value="-Xlint:unchecked"/>
       -->
       <classpath refid="compile.classpath" />
-      <exclude name="org/apache/naming/factory/webservices/**" />
     </javac>
     <!-- Copy static resource files -->
     <copy todir="${tomcat.classes}" encoding="ISO-8859-1">
@@ -1729,92 +1702,6 @@
     </findbugs>
   </target>
 
-  <target name="extras-prepare" >
-    <mkdir dir="${tomcat.extras}"/>
-    <mkdir dir="${tomcat.extras.sources}"/>
-    <mkdir dir="${tomcat.embed}"/>
-    <mkdir dir="${tomcat.embed.sources}"/>
-    <mkdir dir="${tomcat.extras}/webservices"/>
-  </target>
-
-  <target name="extras-webservices-prepare"
-          depends="extras-prepare"
-          description="Prepare to build web services extras package">
-
-    <antcall target="downloadfile">
-      <param name="sourcefile" value="${jaxrpc-lib.loc}"/>
-      <param name="destfile" value="${jaxrpc-lib.jar}"/>
-      <param name="destdir" value="${jaxrpc-lib.home}"/>
-      <param name="checksum.enabled" value="${jaxrpc-lib.checksum.enabled}"/>
-      <param name="checksum.algorithm" value="${jaxrpc-lib.checksum.algorithm}"/>
-      <param name="checksum.value" value="${jaxrpc-lib.checksum.value}"/>
-    </antcall>
-
-    <antcall target="downloadfile">
-      <param name="sourcefile" value="${wsdl4j-lib.loc}"/>
-      <param name="destfile" value="${wsdl4j-lib.jar}"/>
-      <param name="destdir" value="${wsdl4j-lib.home}"/>
-      <param name="checksum.enabled" value="${wsdl4j-lib.checksum.enabled}"/>
-      <param name="checksum.algorithm" value="${wsdl4j-lib.checksum.algorithm}"/>
-      <param name="checksum.value" value="${wsdl4j-lib.checksum.value}"/>
-    </antcall>
-
-    <copy file="${jaxrpc-lib.jar}"
-          tofile="${tomcat.extras}/webservices/jaxrpc.jar" />
-    <copy file="${wsdl4j-lib.jar}"
-          tofile="${tomcat.extras}/webservices/wsdl4j.jar" />
-  </target>
-
-  <target name="extras-webservices"
-          depends="extras-webservices-prepare,compile,build-manifests"
-          description="Build web services extras package">
-
-    <!-- Compile web services classes components -->
-    <javac srcdir="java" destdir="${tomcat.classes}"
-           debug="${compile.debug}"
-           deprecation="${compile.deprecation}"
-           source="${compile.source}"
-           target="${compile.target}"
-           release="${compile.release}"
-           encoding="ISO-8859-1"
-           includeantruntime="false">
-      <classpath refid="tomcat.webservices.classpath" />
-      <include name="org/apache/naming/factory/webservices/**" />
-    </javac>
-
-    <jarIt jarfile="${catalina-ws.jar}"
-      filesDir="${tomcat.classes}"
-      filesId="files.tomcat-extras-ws" />
-
-    <hashAndSign file="${catalina-ws.jar}" />
-
-    <jarIt jarfile="${catalina-ws-src.jar}"
-      filesDir="java"
-      filesId="files.tomcat-extras-ws" />
-
-  </target>
-
-  <target name="extras-jmx-remote"
-          depends="extras-prepare,compile,build-manifests"
-          description="Build JMX remote extras package">
-
-    <jarIt jarfile="${catalina-jmx-remote.jar}"
-      filesDir="${tomcat.classes}"
-      filesId="files.tomcat-extras-jmxremote" />
-
-    <hashAndSign file="${catalina-jmx-remote.jar}" />
-
-    <jarIt jarfile="${catalina-jmx-remote-src.jar}"
-      filesDir="java"
-      filesId="files.tomcat-extras-jmxremote" />
-
-  </target>
-
-  <target name="extras"
-          depends="extras-webservices,extras-jmx-remote"
-          description="Build all extras packages">
-  </target>
-
   <target name="dist-prepare" depends="download-dist">
     <mkdir dir="${tomcat.dist}"/>
     <mkdir dir="${tomcat.dist}/bin"/>
@@ -1828,7 +1715,7 @@
     <mkdir dir="${tomcat.release}/v${version}/src" />
   </target>
 
-  <target name="dist-static" depends="dist-prepare, deploy, extras, embed">
+  <target name="dist-static" depends="dist-prepare, deploy, embed">
 
     <!-- Copy the top-level documentation files -->
     <copy todir="${tomcat.dist}" encoding="ISO-8859-1">
@@ -1901,7 +1788,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
 
   </target>
 
-  <target name="javadoc" depends="dist-source,extras-webservices-prepare"
+  <target name="javadoc" depends="dist-source"
     description="Create the Tomcat javadoc" >
     <javadoc packagenames="javax.servlet.*"
       excludepackagenames="javax.servlet.jsp.*"
@@ -1921,7 +1808,6 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       failonwarning="true">
       <classpath>
         <path refid="compile.classpath"/>
-        <path refid="tomcat.webservices.classpath"/>
         <path location="${ant.core.lib}"/>
       </classpath>
     </javadoc>
@@ -1942,7 +1828,6 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       failonwarning="true">
       <classpath>
         <path refid="compile.classpath"/>
-        <path refid="tomcat.webservices.classpath"/>
         <path location="${ant.core.lib}"/>
       </classpath>
     </javadoc>
@@ -1963,7 +1848,6 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       failonwarning="true">
       <classpath>
         <path refid="compile.classpath"/>
-        <path refid="tomcat.webservices.classpath"/>
         <path location="${ant.core.lib}"/>
       </classpath>
     </javadoc>
@@ -1984,7 +1868,6 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       failonwarning="true">
       <classpath>
         <path refid="compile.classpath"/>
-        <path refid="tomcat.webservices.classpath"/>
         <path location="${ant.core.lib}"/>
       </classpath>
     </javadoc>
@@ -2004,7 +1887,6 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       failonwarning="true">
       <classpath>
         <path refid="compile.classpath"/>
-        <path refid="tomcat.webservices.classpath"/>
         <path location="${ant.core.lib}"/>
       </classpath>
       <link href="../servletapi"/>
@@ -2293,13 +2175,6 @@ skip.installer property in build.properties" />
         tofile="${tomcat.release}/v${version}/bin/README.html"
         encoding="UTF-8">
       <filterset refid="version.filters"/>
-    </copy>
-
-    <mkdir dir="${tomcat.release}/v${version}/bin/extras" />
-    <copy todir="${tomcat.release}/v${version}/bin/extras">
-      <fileset dir="${tomcat.extras}">
-        <include name="*.*"/>
-      </fileset>
     </copy>
 
     <mkdir dir="${tomcat.release}/v${version}/bin/embed" />
@@ -2765,7 +2640,26 @@ skip.installer property in build.properties" />
       <param name="checksum.value" value="${saaj-api.checksum.value}"/>
     </antcall>
 
- </target>
+
+    <!-- Download WS API -->
+    <antcall target="downloadfile">
+      <param name="sourcefile" value="${jaxrpc-lib.loc}"/>
+      <param name="destfile" value="${jaxrpc-lib.jar}"/>
+      <param name="destdir" value="${jaxrpc-lib.home}"/>
+      <param name="checksum.enabled" value="${jaxrpc-lib.checksum.enabled}"/>
+      <param name="checksum.algorithm" value="${jaxrpc-lib.checksum.algorithm}"/>
+      <param name="checksum.value" value="${jaxrpc-lib.checksum.value}"/>
+    </antcall>
+    <antcall target="downloadfile">
+      <param name="sourcefile" value="${wsdl4j-lib.loc}"/>
+      <param name="destfile" value="${wsdl4j-lib.jar}"/>
+      <param name="destdir" value="${wsdl4j-lib.home}"/>
+      <param name="checksum.enabled" value="${wsdl4j-lib.checksum.enabled}"/>
+      <param name="checksum.algorithm" value="${wsdl4j-lib.checksum.algorithm}"/>
+      <param name="checksum.value" value="${wsdl4j-lib.checksum.value}"/>
+    </antcall>
+
+  </target>
 
   <target name="download-test-compile"
           description="Download additional components for the tests" >
@@ -3175,7 +3069,7 @@ skip.installer property in build.properties" />
   <!-- ============================ Eclipse ================================ -->
 
   <target name="ide-eclipse"
-          depends="download-compile, extras-webservices-prepare, download-test-compile"
+          depends="download-compile, download-test-compile"
           description="Prepares the source tree to be built in Eclipse">
 
     <!-- Copy the sample project files into the root directory -->
@@ -3193,7 +3087,7 @@ Read the Building page on the Apache Tomcat documentation site for details on ho
   <!-- ============================ IntelliJ IDEA=========================== -->
 
   <target name="ide-intellij"
-          depends="download-compile, extras-webservices-prepare, download-test-compile"
+          depends="download-compile, download-test-compile"
           description="Creates project directory .idea for IntelliJ IDEA">
 
     <copy todir="${tomcat.home}/.idea">

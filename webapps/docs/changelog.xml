@@ -194,6 +194,10 @@
         that prevented Tomcat from working correctly with systemd. Patch
         provided by Patrik S. (markt)
       </fix>
+      <update>
+        Remove extras (JMX remote listener and webservices object factories
+        remained) and merge them back into the core build. (remm)
+      </update>
     </changelog>
   </subsection>
 </section>
