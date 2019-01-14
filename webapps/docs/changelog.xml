@@ -195,8 +195,9 @@
         provided by Patrik S. (markt)
       </fix>
       <update>
-        Remove extras (JMX remote listener and webservices object factories
-        remained) and merge them back into the core build. (remm)
+        <fix>63072</fix>: Remove extras (JMX remote listener and webservices
+        object factories) and merge them back into the core build.
+        (remm)
       </update>
     </changelog>
   </subsection>

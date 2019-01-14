@@ -504,15 +504,7 @@
 
   </subsection>
 
-</section>
-
-<section name="Additional Implementations">
-
   <subsection name="JMX Remote Lifecycle Listener - org.apache.catalina.mbeans.JmxRemoteLifecycleListener">
-
-    <p>This listener requires <code>catalina-jmx-remote.jar</code> to be placed
-    in <code>$CATALINA_HOME/lib</code>. This jar may be found in the extras
-    directory of the binary download area.</p>
 
     <p>The <strong>JMX Remote Lifecycle Listener</strong> fixes the ports used by
     the JMX/RMI Server making things much simpler if you need to connect
