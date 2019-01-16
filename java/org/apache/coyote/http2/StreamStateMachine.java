@@ -131,7 +131,7 @@ public class StreamStateMachine {
             } else {
                 throw new StreamException(sm.getString("streamStateMachine.invalidFrame",
                         stream.getConnectionId(), stream.getIdentifier(), state, frameType),
-                        state.errorCodeForInvalidFrame, stream.getIdentifier().intValue());
+                        state.errorCodeForInvalidFrame, stream.getIdAsInt());
             }
         }
     }

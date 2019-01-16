@@ -284,7 +284,7 @@ public class Stream extends AbstractStream implements HeaderEmitter {
         if (pseudoHeader && headerState != HEADER_STATE_PSEUDO) {
             headerException = new StreamException(sm.getString(
                     "stream.header.unexpectedPseudoHeader", getConnectionId(), getIdentifier(),
-                    name), Http2Error.PROTOCOL_ERROR, getIdentifier().intValue());
+                    name), Http2Error.PROTOCOL_ERROR, getIdAsInt());
             // No need for further processing. The stream will be reset.
             return;
         }
@@ -381,7 +381,7 @@ public class Stream extends AbstractStream implements HeaderEmitter {
             if (pseudoHeader) {
                 headerException = new StreamException(sm.getString(
                         "stream.header.unknownPseudoHeader", getConnectionId(), getIdentifier(),
-                        name), Http2Error.PROTOCOL_ERROR, getIdentifier().intValue());
+                        name), Http2Error.PROTOCOL_ERROR, getIdAsInt());
             }
             // Assume other HTTP header
             coyoteRequest.getMimeHeaders().addValue(name).setString(value);
@@ -599,7 +599,7 @@ public class Stream extends AbstractStream implements HeaderEmitter {
 
     final void push(Request request) throws IOException {
         // Can only push when supported and from a peer initiated stream
-        if (!isPushSupported() || getIdentifier().intValue() % 2 == 0) {
+        if (!isPushSupported() || getIdAsInt() % 2 == 0) {
             return;
         }
         // Set the special HTTP/2 headers

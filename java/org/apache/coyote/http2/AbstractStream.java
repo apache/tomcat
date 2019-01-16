@@ -39,13 +39,19 @@ abstract class AbstractStream {
             Collections.newSetFromMap(new ConcurrentHashMap<Stream,Boolean>());
     private long windowSize = ConnectionSettingsBase.DEFAULT_INITIAL_WINDOW_SIZE;
 
+
+    public AbstractStream(Integer identifier) {
+        this.identifier = identifier;
+    }
+
+
     public Integer getIdentifier() {
         return identifier;
     }
 
 
-    public AbstractStream(Integer identifier) {
-        this.identifier = identifier;
+    public int getIdAsInt() {
+        return identifier.intValue();
     }
 
 

@@ -78,7 +78,7 @@ class StreamProcessor extends AbstractProcessor {
                             StreamException se = new StreamException(sm.getString(
                                     "streamProcessor.error.stream", stream.getConnectionId(),
                                     stream.getIdentifier()), Http2Error.INTERNAL_ERROR,
-                                    stream.getIdentifier().intValue());
+                                    stream.getIdAsInt());
                             stream.close(se);
                         }
                     }
