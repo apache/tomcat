@@ -601,7 +601,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
                 if (log.isDebugEnabled()) {
                     log.debug(headerFrameBuffers.getPayload().limit() + " bytes");
                 }
-                ByteUtil.set31Bits(headerFrameBuffers.getHeader(), 5, stream.getIdentifier().intValue());
+                ByteUtil.set31Bits(headerFrameBuffers.getHeader(), 5, stream.getIdAsInt());
                 headerFrameBuffers.endFrame();
             } else if (state == State.UNDERFLOW) {
                 headerFrameBuffers.expandPayload();
@@ -644,7 +644,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
             }
         }
         if (writeable) {
-            ByteUtil.set31Bits(header, 5, stream.getIdentifier().intValue());
+            ByteUtil.set31Bits(header, 5, stream.getIdAsInt());
             synchronized (socketWrapper) {
                 try {
                     socketWrapper.write(true, header, 0, header.length);
@@ -694,7 +694,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
             ByteUtil.set31Bits(frame, 9, increment);
             socketWrapper.write(true, frame, 0, frame.length);
             // Change stream Id and re-use
-            ByteUtil.set31Bits(frame, 5, stream.getIdentifier().intValue());
+            ByteUtil.set31Bits(frame, 5, stream.getIdAsInt());
             try {
                 socketWrapper.write(true, frame, 0, frame.length);
                 socketWrapper.flush(true);
@@ -1164,8 +1164,8 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
         // is sent before the next stream is created for a PUSH_PROMISE.
         synchronized (socketWrapper) {
             pushStream = createLocalStream(request);
-            writeHeaders(associatedStream, pushStream.getIdentifier().intValue(),
-                    request.getMimeHeaders(), false, Constants.DEFAULT_HEADERS_FRAME_SIZE);
+            writeHeaders(associatedStream, pushStream.getIdAsInt(), request.getMimeHeaders(),
+                    false, Constants.DEFAULT_HEADERS_FRAME_SIZE);
         }
 
         pushStream.sentPushPromise();
@@ -1390,7 +1390,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
                     stream.close(new StreamException(sm.getString(
                             "upgradeHandler.windowSizeTooBig", connectionId,
                             stream.getIdentifier()),
-                            h2e.getError(), stream.getIdentifier().intValue()));
+                            h2e.getError(), stream.getIdAsInt()));
                }
             }
         } else {

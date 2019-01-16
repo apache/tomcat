@@ -195,7 +195,7 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
             }
         }
         if (writeable) {
-            ByteUtil.set31Bits(header, 5, stream.getIdentifier().intValue());
+            ByteUtil.set31Bits(header, 5, stream.getIdAsInt());
             int orgLimit = data.limit();
             data.limit(data.position() + len);
             socketWrapper.write(BlockingMode.BLOCK, protocol.getWriteTimeout(),
@@ -223,7 +223,7 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
         ByteUtil.setThreeBytes(frame2, 0,  4);
         frame2[3] = FrameType.WINDOW_UPDATE.getIdByte();
         ByteUtil.set31Bits(frame2, 9, increment);
-        ByteUtil.set31Bits(frame2, 5, stream.getIdentifier().intValue());
+        ByteUtil.set31Bits(frame2, 5, stream.getIdAsInt());
         socketWrapper.write(BlockingMode.SEMI_BLOCK, protocol.getWriteTimeout(),
                 TimeUnit.MILLISECONDS, null, SocketWrapperBase.COMPLETE_WRITE, errorCompletion,
                 ByteBuffer.wrap(frame), ByteBuffer.wrap(frame2));
@@ -301,7 +301,7 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
                 }
             }
             if (writeable) {
-                ByteUtil.set31Bits(header, 5, sendfile.stream.getIdentifier().intValue());
+                ByteUtil.set31Bits(header, 5, sendfile.stream.getIdAsInt());
                 sendfile.mappedBuffer.limit(sendfile.mappedBuffer.position() + frameSize);
                 socketWrapper.write(BlockingMode.SEMI_BLOCK, protocol.getWriteTimeout(),
                         TimeUnit.MILLISECONDS, sendfile, SocketWrapperBase.COMPLETE_WRITE_WITH_COMPLETION,
@@ -362,7 +362,7 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
                 }
             }
             if (writeable) {
-                ByteUtil.set31Bits(header, 5, sendfile.stream.getIdentifier().intValue());
+                ByteUtil.set31Bits(header, 5, sendfile.stream.getIdAsInt());
                 sendfile.mappedBuffer.limit(sendfile.mappedBuffer.position() + frameSize);
                 socketWrapper.write(BlockingMode.SEMI_BLOCK, protocol.getWriteTimeout(),
                         TimeUnit.MILLISECONDS, sendfile, SocketWrapperBase.COMPLETE_WRITE_WITH_COMPLETION,
