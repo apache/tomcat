@@ -67,6 +67,12 @@
         Ensure that Tomcat is fully terminated when running as a service.
         (markt)
       </add>
+      <scode>
+        Treat I/O errors during request body reads the same way as I/O errors
+        during response body writes. The errors are treated as client side
+        errors rather than server side errors and only logged at debug level.
+        (markt)
+      </scode>
     </changelog>
   </subsection>
   <subsection name="Coyote">
