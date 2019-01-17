@@ -935,7 +935,7 @@ public class Stream extends AbstractStream implements HeaderEmitter {
         // 'write mode'.
         private volatile ByteBuffer inBuffer;
         private volatile boolean readInterest;
-        private boolean reset = false;
+        private boolean resetReceived = false;
 
         /**
          * @deprecated Unused. Will be removed in Tomcat 9. Use
@@ -959,7 +959,7 @@ public class Stream extends AbstractStream implements HeaderEmitter {
                             log.debug(sm.getString("stream.inputBuffer.empty"));
                         }
                         inBuffer.wait();
-                        if (reset) {
+                        if (resetReceived) {
                             // TODO: i18n
                             throw new IOException("HTTP/2 Stream reset");
                         }
@@ -1143,7 +1143,7 @@ public class Stream extends AbstractStream implements HeaderEmitter {
         protected void receiveReset() {
             if (inBuffer != null) {
                 synchronized (inBuffer) {
-                    reset = true;
+                    resetReceived = true;
                     inBuffer.notifyAll();
                 }
             }
