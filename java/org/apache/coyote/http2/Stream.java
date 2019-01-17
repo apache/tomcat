@@ -934,7 +934,7 @@ class Stream extends AbstractStream implements HeaderEmitter {
         // 'write mode'.
         private volatile ByteBuffer inBuffer;
         private volatile boolean readInterest;
-        private boolean reset = false;
+        private boolean resetReceived = false;
 
         @Override
         public final int doRead(ApplicationBufferHandler applicationBufferHandler)
@@ -954,7 +954,7 @@ class Stream extends AbstractStream implements HeaderEmitter {
                             log.debug(sm.getString("stream.inputBuffer.empty"));
                         }
                         inBuffer.wait();
-                        if (reset) {
+                        if (resetReceived) {
                             throw new IOException(sm.getString("stream.inputBuffer.reset"));
                         }
                     } catch (InterruptedException e) {
@@ -1080,7 +1080,7 @@ class Stream extends AbstractStream implements HeaderEmitter {
         private final void receiveReset() {
             if (inBuffer != null) {
                 synchronized (inBuffer) {
-                    reset = true;
+                    resetReceived = true;
                     inBuffer.notifyAll();
                 }
             }
