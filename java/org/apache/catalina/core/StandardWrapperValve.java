@@ -202,6 +202,11 @@ final class StandardWrapperValve
 
             }
         } catch (ClientAbortException e) {
+            if (container.getLogger().isDebugEnabled()) {
+                container.getLogger().debug(sm.getString(
+                        "standardWrapper.serviceException", wrapper.getName(),
+                        context.getName()), e);
+            }
             throwable = e;
             exception(request, response, e);
         } catch (IOException e) {
