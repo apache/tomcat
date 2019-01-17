@@ -957,8 +957,12 @@ public class Connector extends LifecycleMBeanBase  {
             setParseBodyMethods(getParseBodyMethods());
         }
 
+        if (protocolHandler.isAprRequired() && !AprLifecycleListener.isInstanceCreated()) {
+            throw new LifecycleException(sm.getString("coyoteConnector.protocolHandlerNoAprListener",
+                    getProtocolHandlerClassName()));
+        }
         if (protocolHandler.isAprRequired() && !AprLifecycleListener.isAprAvailable()) {
-            throw new LifecycleException(sm.getString("coyoteConnector.protocolHandlerNoApr",
+            throw new LifecycleException(sm.getString("coyoteConnector.protocolHandlerNoAprLibrary",
                     getProtocolHandlerClassName()));
         }
         if (AprLifecycleListener.isAprAvailable() && AprLifecycleListener.getUseOpenSSL() &&

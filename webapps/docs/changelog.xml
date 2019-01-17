@@ -84,6 +84,10 @@
         Correct a bug exposed in 9.0.14 and ensure that the Tomcat terminates in
         a timely manner when running as a service. (markt)
       </fix>
+      <fix>
+        Log a message when using a Connector that requires Apr without enabling
+        the AprLifecycleListener first. (csutherl)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

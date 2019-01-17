@@ -421,4 +421,8 @@ public class AprLifecycleListener
         return useOpenSSL;
     }
 
+    public static boolean isInstanceCreated() {
+        return instanceCreated;
+    }
+
 }
