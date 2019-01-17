@@ -1016,7 +1016,7 @@ public class Stream extends AbstractStream implements HeaderEmitter {
                             log.debug(sm.getString("stream.inputBuffer.empty"));
                         }
                         inBuffer.wait();
-                        if (reset) {
+                        if (resetReceived) {
                             // TODO: i18n
                             throw new IOException("HTTP/2 Stream reset");
                         }
