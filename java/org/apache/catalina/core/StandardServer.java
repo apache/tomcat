@@ -416,29 +416,24 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
      */
     private static int getUtilityThreadsInternal(int utilityThreads) {
         int result = utilityThreads;
-        if (result > 0) {
-            return result;
-        }
-
-        // Zero == Runtime.getRuntime().availableProcessors() / 2
-        // -ve  == Runtime.getRuntime().availableProcessors() / 2 + value
-        // These two are the same
-        result = (Runtime.getRuntime().availableProcessors() / 2) + result;
-        if (result < 1) {
-            result = 1;
+        if (result <= 0) {
+            result = Runtime.getRuntime().availableProcessors() + result;
+            if (result < 1) {
+                result = 1;
+            }
         }
         return result;
     }
 
+
     @Override
     public void setUtilityThreads(int utilityThreads) {
-        if (getUtilityThreadsInternal(utilityThreads) < getUtilityThreadsInternal(this.utilityThreads)) {
+        // Use local copies to ensure thread safety
+        int oldUtilityThreads = this.utilityThreads;
+        if (getUtilityThreadsInternal(utilityThreads) < getUtilityThreadsInternal(oldUtilityThreads)) {
             return;
         }
-        int oldUtilityThreads = this.utilityThreads;
         this.utilityThreads = utilityThreads;
-
-        // Use local copies to ensure thread safety
         if (oldUtilityThreads != utilityThreads && utilityExecutor != null) {
             reconfigureUtilityExecutor(getUtilityThreadsInternal(utilityThreads));
         }

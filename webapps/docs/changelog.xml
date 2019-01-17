@@ -88,6 +88,10 @@
         Log a message when using a Connector that requires Apr without enabling
         the AprLifecycleListener first. (csutherl)
       </fix>
+      <fix>
+        Utility thread count for special negative or zero values will again be
+        based on Runtime.getRuntime().availableProcessors(). (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
