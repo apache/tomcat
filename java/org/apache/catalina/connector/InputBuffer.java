@@ -332,9 +332,13 @@ public class InputBuffer extends Reader
             state = BYTE_STATE;
         }
 
-        int result = coyoteRequest.doRead(this);
-
-        return result;
+        try {
+            return coyoteRequest.doRead(this);
+        } catch (IOException ioe) {
+            // An IOException on a read is almost always due to
+            // the remote client aborting the request.
+            throw new ClientAbortException(ioe);
+        }
     }
 
 
