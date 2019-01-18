@@ -15,7 +15,7 @@
   limitations under the License.
 --%>
 <%@ taglib prefix="tags" tagdir="/WEB-INF/tags" %>
-<html>
+<html lang="en">
   <head><title>Bug 49297 duplicate attribute test case</title></head>
   <body>
     <tags:echo echo="Hello World" echo="error"/>

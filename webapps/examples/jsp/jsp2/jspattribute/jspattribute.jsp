@@ -16,7 +16,7 @@
 --%>
 <%@ taglib prefix="my" uri="http://tomcat.apache.org/jsp2-example-taglib"%>
 
-<html>
+<html lang="en">
   <head>
     <title>JSP 2.0 Examples - jsp:attribute and jsp:body</title>
   </head>

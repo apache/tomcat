@@ -15,7 +15,7 @@
   limitations under the License.
 --%>
 <%@page session="false" isErrorPage="true" %>
-<html>
+<html lang="en">
   <body>
     <p>ERROR</p>
   </body>

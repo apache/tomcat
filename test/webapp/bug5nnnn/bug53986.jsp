@@ -15,7 +15,7 @@
   limitations under the License.
 --%>
 <%--- Test comment ---%>
-<html>
+<html lang="en">
   <body>
     <p>OK</p>
   </body>

@@ -14,7 +14,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 --%>
-<html><body>
+<html lang="en"><body>
 <%@ taglib prefix="A" uri="http://tomcat.apache.org/A" %>
 <%@ taglib prefix="B" uri="http://tomcat.apache.org/B" %>
 <%@ taglib prefix="C" uri="http://tomcat.apache.org/C" %>

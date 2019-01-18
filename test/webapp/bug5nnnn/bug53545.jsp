@@ -17,7 +17,7 @@
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
          pageEncoding="ISO-8859-1"%>
 <%@ taglib prefix="bug53545" uri="/WEB-INF/bug53545.tld" %>
-<html>
+<html lang="en">
   <body>
     <p>FAIL</p>
     <bug53545:test>

@@ -15,7 +15,7 @@
   limitations under the License.
 --%>
 <%@ taglib prefix="tags" tagdir="/WEB-INF/tags" %>
-<html>
+<html lang="en">
   <head>
     <title>JSP 2.0 Examples - Display Products Tag File</title>
   </head>

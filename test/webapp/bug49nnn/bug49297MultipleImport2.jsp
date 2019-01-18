@@ -16,7 +16,7 @@
 --%>
 <%@page import="java.util.List" %>
 <%@page import="java.util.ArrayList" %>
-<html>
+<html lang="en">
   <head><title>Bug 49297 multiple import test case</title></head>
   <body>
     <%

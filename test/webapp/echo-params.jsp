@@ -15,7 +15,7 @@
   limitations under the License.
 --%>
 <%@page import="java.util.Enumeration" %>
-<html>
+<html lang="en">
 <body>
 <%
 Enumeration<String> params = request.getParameterNames();

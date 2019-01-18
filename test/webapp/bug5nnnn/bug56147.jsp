@@ -18,7 +18,7 @@
          pageEncoding="ISO-8859-1"
          import="java.util.List,java.util.ArrayList,org.apache.el.TesterBeanD"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-<html>
+<html lang="en">
   <%
   List<Object> list = new ArrayList<>();
   list.add(new TesterBeanD());

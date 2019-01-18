@@ -24,7 +24,7 @@
 <jsp:useBean id="numguess" class="num.NumberGuessBean" scope="session"/>
 <jsp:setProperty name="numguess" property="*"/>
 
-<html>
+<html lang="en">
 <head><title>Number Guess</title></head>
 <body bgcolor="white">
 <font size=4>

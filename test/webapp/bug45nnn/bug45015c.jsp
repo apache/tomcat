@@ -15,7 +15,7 @@
   limitations under the License.
 --%>
 <%@ taglib prefix="tags" tagdir="/WEB-INF/tags" %>
-<html>
+<html lang="en">
   <head><title>Bug 45015 test case C</title></head>
   <body>
     <tags:echo echo="<%= "hello world" %>" />

@@ -15,7 +15,7 @@
   limitations under the License.
 --%>
 <%@ taglib prefix="tags" tagdir="/WEB-INF/tags" %>
-<html>
+<html lang="en">
 <body>
 <tags:bug58178b />
 </html>

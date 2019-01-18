@@ -15,7 +15,7 @@
   limitations under the License.
 --%>
 <%@page import="java.math.*, java.util.Collections" %>
-<html>
+<html lang="en">
   <body>
     <p>00-${incr = x->x+1; incr(10)}</p>
   </body>

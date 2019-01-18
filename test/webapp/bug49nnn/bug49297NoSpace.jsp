@@ -15,7 +15,7 @@
   limitations under the License.
 --%>
 <%@ taglib prefix="tags" tagdir="/WEB-INF/tags" %>
-<html>
+<html lang="en">
   <head><title>Bug 49297 whitespace test case</title></head>
   <body>
     <tags:echo echo="Hello World"dummy="ignored"/>

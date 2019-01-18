@@ -21,7 +21,7 @@
     }
   }
 %>
-<html>
+<html lang="en">
   <body>
     <%
       Bug54241 bug54241 = new Bug54241();

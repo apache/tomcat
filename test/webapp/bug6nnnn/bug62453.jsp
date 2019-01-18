@@ -16,7 +16,7 @@
 --%>
 <%@ taglib prefix="tags" tagdir="/WEB-INF/tags" %>
 
-<html>
+<html lang="en">
   <body>
     <h2>Example of Uninitialized Tag Attributes</h2>
     <tags:bug62453 foo="OK"/>

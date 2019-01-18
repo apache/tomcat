@@ -15,7 +15,7 @@
   limitations under the License.
 --%>
 <%@ taglib prefix="tags" tagdir="/WEB-INF/tags" %>
-<html>
+<html lang="en">
   <head><title>Bug 44994 test case</title></head>
   <body>
     <tags:echo echo="00-${0 lt 0 ? 1 lt 0 ? 'many': 'one': 'none'}" />

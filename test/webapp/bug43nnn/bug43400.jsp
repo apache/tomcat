@@ -16,7 +16,7 @@
 --%>
 <%@ taglib uri="http://tomcat.apache.org/testerFunctions" prefix="fn" %>
 <%@ taglib prefix="tags" tagdir="/WEB-INF/tags" %>
-<html>
+<html lang="en">
   <head><title>Bug 46596 test case</title></head>
   <body>
     <tags:bug43400 type="ASYNC"/>

@@ -16,7 +16,7 @@
 --%>
 <%@ taglib uri="http://tomcat.apache.org/testerFunctions" prefix="fn" %>
 <%@ taglib prefix="tags" tagdir="/WEB-INF/tags" %>
-<html>
+<html lang="en">
   <head><title>Bug 48112 test case</title></head>
   <body>
     <tags:echo echo="${fn:trim('{OK}')}"/>

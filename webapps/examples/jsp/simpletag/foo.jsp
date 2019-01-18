@@ -14,7 +14,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 --%>
-<html>
+<html lang="en">
 <body>
 <%@ taglib uri="http://tomcat.apache.org/example-taglib" prefix="eg"%>
 

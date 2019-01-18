@@ -15,7 +15,7 @@
   limitations under the License.
 --%>
 <%@ page isELIgnored="true" %>
-<html>
+<html lang="en">
   <head><title>Bug 36923 test case</title></head>
   <body>
     <p>00-${<%= "hello world" %>}</p>

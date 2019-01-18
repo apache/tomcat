@@ -18,7 +18,7 @@
          pageEncoding="ISO-8859-1" session="true"
          import="java.io.Reader,java.io.StringReader" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-<html>
+<html lang="en">
   <body>
     <!-- Use of body as default value -->
     <p><c:out value="${sessionScope.doesNotExist}">OK - 1</c:out></p>

@@ -15,7 +15,7 @@
   limitations under the License.
 --%>
 <%@ page contentType="text/html"%>
-<html>
+<html lang="en">
   <head><title>Bug 49726 test case</title></head>
   <body>
     <p>OK</p>

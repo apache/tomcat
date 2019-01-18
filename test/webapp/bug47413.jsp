@@ -16,7 +16,7 @@
 --%>
 <%@ taglib prefix="tags" tagdir="/WEB-INF/tags" %>
 <jsp:useBean id="values" class="jsp2.examples.ValuesBean" />
-<html>
+<html lang="en">
   <head><title>Bug 47413 test case</title></head>
   <body>
     <jsp:setProperty name="values" property="stringValue" value="${'hello'} wo${'rld'}"/>

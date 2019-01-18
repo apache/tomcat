@@ -28,7 +28,7 @@
   }
 </jsp:declaration>
 
-<html>
+<html lang="en">
 <head>
   <title>Example JSP in XML format</title>
 </head>

@@ -18,7 +18,7 @@
 // As nonsensical as this is, it shouldn't throw an NPE
 pageContext.getErrorData();
 %>
-<html>
+<html lang="en">
   <head><title>Bug 49196 test case</title></head>
   <body>
     <p>OK</p>

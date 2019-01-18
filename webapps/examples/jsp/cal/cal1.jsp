@@ -15,7 +15,7 @@
   limitations under the License.
 --%>
 <%@page contentType="text/html; charset=UTF-8" %>
-<HTML>
+<HTML lang="en">
 <HEAD><TITLE>
     Calendar: A JSP APPLICATION
 </TITLE></HEAD>

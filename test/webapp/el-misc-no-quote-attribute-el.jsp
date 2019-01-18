@@ -15,7 +15,7 @@
   limitations under the License.
 --%>
 <%@ taglib prefix="tags" tagdir="/WEB-INF/tags" %>
-<html>
+<html lang="en">
   <head><title>Misc EL test cases</title></head>
   <body>
     <p>00-\\\"\${'hello world'}</p>

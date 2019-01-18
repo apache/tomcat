@@ -18,7 +18,7 @@
 <%
 request.setAttribute("text", "a&amp;b");
 %>
-<html>
+<html lang="en">
   <head><title>Bug 55198 test case</title></head>
   <body>
     <p><tags:bug55198 /></p>

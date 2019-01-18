@@ -15,7 +15,7 @@
   limitations under the License.
 --%>
 <%@ page import="java.util.Collections" %>
-<html>
+<html lang="en">
   <head><title>Bug 51544 test case</title></head>
   <%
   pageContext.setAttribute("list",Collections.emptyList());

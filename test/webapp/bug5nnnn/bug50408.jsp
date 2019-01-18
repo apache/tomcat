@@ -15,7 +15,7 @@
   limitations under the License.
 --%>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-<html>
+<html lang="en">
   <body>
     <c:forEach items="${pageContext.response.headerNames}" var="name">
       <c:forEach items="${pageContext.response.getHeaders(name)}" var="value">

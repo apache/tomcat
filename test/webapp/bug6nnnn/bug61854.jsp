@@ -16,7 +16,7 @@
 --%>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%@ taglib prefix="tags" tagdir="/WEB-INF/tags" %>
-<html>
+<html lang="en">
   <head><title>Bug 60431 test case</title></head>
   <body>
     <<tags:echo echo="0${ map = {'1':'2', 'a':'b'}; fn:length(map['a']) }-OK"/>

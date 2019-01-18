@@ -14,7 +14,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 --%>
-<html>
+<html lang="en">
 
 <jsp:useBean id="cb" scope="session" class="colors.ColorGameBean" />
 <jsp:setProperty name="cb" property="*" />

@@ -18,7 +18,7 @@
          pageEncoding="ISO-8859-1" session="true"
          import="java.io.Reader,java.io.StringReader" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-<html>
+<html lang="en">
   <body>
     <c:forEach items="1,2,3" var="foo">
       <p>OK - ${foo}</p>

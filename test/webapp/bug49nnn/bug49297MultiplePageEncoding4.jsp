@@ -15,7 +15,7 @@
   limitations under the License.
 --%>
 <%@page pageEncoding="ISO-8859-1" pageEncoding="UTF-8"%>
-<html>
+<html lang="en">
   <head><title>Bug 49297 multiple pageEncoding test case</title></head>
   <body>
     <p>Should fail</p>

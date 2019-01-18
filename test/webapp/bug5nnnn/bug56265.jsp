@@ -19,7 +19,7 @@
 request.setAttribute("text", "World <&>");
 request.setAttribute("textQuote", "'World <&>'");
 %>
-<html>
+<html lang="en">
   <head><title>Bug 56265 test case</title></head>
   <body>
     <p>[1: <tags:bug56265 data-test="window.alert('Hello World <&>!')"/>]</p>

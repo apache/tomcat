@@ -55,7 +55,7 @@ synchronized(this) {
     }
 }
 %>
-<html>
+<html lang="en">
 <body>
 <p>JSP count: <%= listener.getJspCount() %></p>
 <p>Tag count: <%= listener.getTagCount() %></p>

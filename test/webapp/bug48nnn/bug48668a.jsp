@@ -16,7 +16,7 @@
 --%>
 <%@ page isELIgnored="true" %>
 <%@ taglib prefix="tags" tagdir="/WEB-INF/tags" %>
-<html>
+<html lang="en">
   <head><title>Bug 48668a test case</title></head>
   <body>
     <p><tags:echo echo="00-Hello world" />#{foo.bar}</p>

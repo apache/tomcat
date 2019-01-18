@@ -16,7 +16,7 @@
 --%>
 <%@ taglib prefix="my" uri="http://tomcat.apache.org/example-taglib" %>
 
-<html>
+<html lang="en">
   <head>
     <title>JSP 2.0 Expression Language - Composite Expressions</title>
   </head>

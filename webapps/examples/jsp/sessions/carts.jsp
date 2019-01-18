@@ -14,7 +14,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 --%>
-<html>
+<html lang="en">
 <jsp:useBean id="cart" scope="session" class="sessions.DummyCart" />
 
 <jsp:setProperty name="cart" property="*" />

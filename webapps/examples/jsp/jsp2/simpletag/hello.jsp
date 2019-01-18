@@ -15,7 +15,7 @@
   limitations under the License.
 --%>
 <%@ taglib prefix="mytag" uri="/WEB-INF/jsp2/jsp2-example-taglib.tld" %>
-<html>
+<html lang="en">
   <head>
     <title>JSP 2.0 Examples - Hello World SimpleTag Handler</title>
   </head>

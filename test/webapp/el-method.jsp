@@ -17,7 +17,7 @@
 <%@ taglib prefix="tags" tagdir="/WEB-INF/tags" %>
 <%@ page import="org.apache.el.TesterBeanA" %>
 <%@ page import="org.apache.el.TesterBeanB" %>
-<html>
+<html lang="en">
   <head><title>EL method test cases</title></head>
   <body>
     <%

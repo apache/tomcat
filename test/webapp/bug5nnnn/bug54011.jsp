@@ -17,7 +17,7 @@
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
          pageEncoding="ISO-8859-1" session="false"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-<html>
+<html lang="en">
   <body>
     <p><c:out escapeXml="false" value="OK - 1"/></p>
     <p><c:out default="OK - 2" value="${request.session}"/></p>

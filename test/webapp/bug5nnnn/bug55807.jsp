@@ -17,7 +17,7 @@
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
          pageEncoding="ISO-8859-1" import="java.util.Map"%>
 <%@ taglib prefix="bug55807" uri="http://tomcat.apache.org/bug55807" %>
-<html>
+<html lang="en">
   <body>
     <bug55807:Echo echo="OK"/>
     <p>DependenciesCount: <%=_jspx_dependants.size() %></p>

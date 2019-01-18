@@ -14,7 +14,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 --%>
-<html>
+<html lang="en">
 <head>
 <title>Login Page for Examples</title>
 <body bgcolor="white">

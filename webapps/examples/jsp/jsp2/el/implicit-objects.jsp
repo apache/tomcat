@@ -17,7 +17,7 @@
 <%@page contentType="text/html; charset=UTF-8" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 
-<html>
+<html lang="en">
   <head>
     <title>JSP 2.0 Expression Language - Implicit Objects</title>
   </head>

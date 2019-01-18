@@ -16,7 +16,7 @@
 --%>
 <%@ page extends="org.apache.jasper.runtime.TesterHttpJspBase" %>
 <%@ taglib prefix="tags" tagdir="/WEB-INF/tags" %>
-<html>
+<html lang="en">
 <body>
 <tags:echo echo="00-PASS" />
 </body>

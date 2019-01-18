@@ -14,7 +14,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 --%>
-<html>
+<html lang="en">
   <body>
     <p>00-${Boolean.TRUE}</p>
     <p>01-${Boolean.FALSE}</p>

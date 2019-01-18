@@ -21,7 +21,7 @@
     return;
   }
 %>
-<html>
+<html lang="en">
 <head>
 <title>Protected Page for Examples</title>
 </head>

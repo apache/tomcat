@@ -15,7 +15,7 @@
   limitations under the License.
 --%>
 <%@page import="javax.annotation.PostConstruct"%>
-<html>
+<html lang="en">
   <head><title>Annotations test case</title></head>
   <body>
     <p>Hello world</p>

@@ -15,7 +15,7 @@
   limitations under the License.
 --%>
 <%@page import="java.math.*, java.util.Collections" %>
-<html>
+<html lang="en">
   <body>
     <p>00-${DispatcherType.ASYNC}</p>
     <p>01-${RoundingMode.HALF_UP}</p>
