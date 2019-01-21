@@ -2301,6 +2301,11 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
             }
 
             byte[] binaryContent = resource.getContent();
+            if (binaryContent == null) {
+                // Something went wrong reading the class bytes (and will have
+                // been logged at debug level).
+                return null;
+            }
             Manifest manifest = resource.getManifest();
             URL codeBase = resource.getCodeBase();
             Certificate[] certificates = resource.getCertificates();
