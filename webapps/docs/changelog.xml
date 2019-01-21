@@ -98,6 +98,11 @@
         errors rather than server side errors and only logged at debug level.
         (markt)
       </scode>
+      <fix>
+        <bug>63038</bug>: Ensure that a <code>ClassNotFoundException</code> is
+        thrown when attempting to load a class from a corrupted JAR file.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
