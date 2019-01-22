@@ -185,7 +185,7 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
     /**
      * The number of threads available to process utility tasks in this service.
      */
-    protected int utilityThreads = 1;
+    protected int utilityThreads = 2;
 
     /**
      * The utility threads daemon flag.
@@ -418,8 +418,8 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
         int result = utilityThreads;
         if (result <= 0) {
             result = Runtime.getRuntime().availableProcessors() + result;
-            if (result < 1) {
-                result = 1;
+            if (result < 2) {
+                result = 2;
             }
         }
         return result;

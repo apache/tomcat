@@ -103,6 +103,10 @@
         thrown when attempting to load a class from a corrupted JAR file.
         (markt)
       </fix>
+      <fix>
+        <bug>63078</bug>: Ensure the utility thread pool is at least two, as the
+        deployer uses a blocking pattern. (remm, markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
