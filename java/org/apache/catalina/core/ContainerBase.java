@@ -858,11 +858,6 @@ public abstract class ContainerBase extends LifecycleMBeanBase
     }
 
 
-    /*
-     * Implementation note: If there is a demand for more control than this then
-     * it is likely that the best solution will be to reference an external
-     * executor.
-     */
     private void reconfigureStartStopExecutor(int threads) {
         if (threads == 1) {
             // Use a fake executor
