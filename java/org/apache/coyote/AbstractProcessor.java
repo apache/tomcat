@@ -631,6 +631,10 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
                 if ((now - asyncStart) > asyncTimeout) {
                     doTimeoutAsync();
                 }
+            } else if (!asyncStateMachine.isAvailable()) {
+                // Timeout the async process if the associated web application
+                // is no longer running.
+                doTimeoutAsync();
             }
         }
     }

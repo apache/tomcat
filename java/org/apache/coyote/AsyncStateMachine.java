@@ -483,6 +483,16 @@ public class AsyncStateMachine {
     }
 
 
+    synchronized boolean isAvailable() {
+        if (asyncCtxt == null) {
+            // Async processing has probably been completed in another thread.
+            // Trigger a timeout to make sure the Processor is cleaned up.
+            return false;
+        }
+        return asyncCtxt.isAvailable();
+    }
+
+
     public synchronized void recycle() {
         // Use lastAsyncStart to determine if this instance has been used since
         // it was last recycled. If it hasn't there is no need to recycle again

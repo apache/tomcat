@@ -84,6 +84,10 @@
         <code>trimCredentials</code> on the <code>BasicAuthenticator</code>.
         (markt)
       </add>
+      <fix>
+        <bug>63003</bug>: Extend the <code>unloadDelay</code> attribute on a
+        <code>Context</code> to include in-flight asynchronous requests. (markt)
+      </fix>
       <add>
         <bug>63026</bug>: Add a new attribute, <code>forceDnHexEscape</code>, to
         the <code>JNDIRealm</code> that forces escaping in the String
