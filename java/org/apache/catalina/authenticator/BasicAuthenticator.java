@@ -170,9 +170,7 @@ public class BasicAuthenticator extends AuthenticatorBase {
          *
          * @throws IllegalArgumentException If the header does not conform
          *                                  to RFC 2617
-         * @deprecated Unused. Will be removed in Tomcat 10. Use {@link
-         *             BasicCredentials#BasicCredentials(ByteChunk, Charset,
-         *             boolean)}
+         * @deprecated Unused. Will be removed in Tomcat 10. Use 3-arg constructor
          */
         @Deprecated
         public BasicCredentials(ByteChunk input, Charset charset) throws IllegalArgumentException {
