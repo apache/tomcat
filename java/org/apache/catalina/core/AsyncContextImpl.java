@@ -137,6 +137,7 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
         } finally {
             context.fireRequestDestroyEvent(request.getRequest());
             clearServletRequestResponse();
+            this.context.decrementInProgressAsyncCount();
             if (Globals.IS_SECURITY_ENABLED) {
                 PrivilegedAction<Void> pa = new PrivilegedSetTccl(oldCL);
                 AccessController.doPrivileged(pa);
@@ -251,6 +252,7 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
             this.dispatch = run;
             this.request.getCoyoteRequest().action(ActionCode.ASYNC_DISPATCH, null);
             clearServletRequestResponse();
+            this.context.decrementInProgressAsyncCount();
         }
     }
 
@@ -371,6 +373,7 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
                     ActionCode.ASYNC_START, this);
 
             this.context = context;
+            context.incrementInProgressAsyncCount();
             this.servletRequest = request;
             this.servletResponse = response;
             this.hasOriginalRequestAndResponse = originalRequestResponse;
@@ -435,6 +438,17 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
         this.timeout = timeout;
         request.getCoyoteRequest().action(ActionCode.ASYNC_SETTIMEOUT,
                 Long.valueOf(timeout));
+    }
+
+
+
+    @Override
+    public boolean isAvailable() {
+        Context context = this.context;
+        if (context == null) {
+            return false;
+        }
+        return context.getState().isAvailable();
     }
 
 

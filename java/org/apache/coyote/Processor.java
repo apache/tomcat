@@ -53,7 +53,7 @@ public interface Processor<S> {
 
     HttpUpgradeHandler getHttpUpgradeHandler();
     SocketState upgradeDispatch(SocketStatus status) throws IOException;
-    
+
     void errorDispatch();
 
     boolean isComet();
@@ -65,4 +65,6 @@ public interface Processor<S> {
     void recycle(boolean socketClosing);
 
     void setSslSupport(SSLSupport sslSupport);
+
+    AsyncStateMachine<S> getAsyncStateMachine();
 }

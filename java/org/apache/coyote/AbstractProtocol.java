@@ -752,6 +752,20 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
             return SocketState.CLOSED;
         }
 
+        public boolean isAvailable(SocketWrapper<S> wrapper) {
+            S socket = wrapper.getSocket();
+            if (socket != null) {
+                Processor<S> processor = connections.get(socket);
+                if (processor != null) {
+                    AsyncStateMachine<S> asyncStateMachine = processor.getAsyncStateMachine();
+                    if (asyncStateMachine != null) {
+                        return processor.getAsyncStateMachine().isAvailable();
+                    }
+                }
+            }
+            return false;
+        }
+
         protected abstract P createProcessor();
         protected abstract void initSsl(SocketWrapper<S> socket,
                 Processor<S> processor);

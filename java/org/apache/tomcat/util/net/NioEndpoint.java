@@ -1512,6 +1512,10 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
                                     ka.access(Long.MAX_VALUE);
                                     processSocket(ka.getChannel(), SocketStatus.TIMEOUT, true);
                                 }
+                            } else if (ka.isAsync() && !handler.isAvailable(ka)) {
+                                // Prevent subsequent timeouts if the timeout event takes a while to process
+                                ka.access(Long.MAX_VALUE);
+                                processSocket(ka.getChannel(), SocketStatus.TIMEOUT, true);
                             }
                         }//end if
                     }catch ( CancelledKeyException ckx ) {
@@ -1689,6 +1693,7 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
         public void release(SocketWrapper<NioChannel> socket);
         public void release(SocketChannel socket);
         public SSLImplementation getSslImplementation();
+        public boolean isAvailable(SocketWrapper<NioChannel> socket);
     }
 
 

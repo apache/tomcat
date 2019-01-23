@@ -948,8 +948,22 @@ public class StandardContext extends ContainerBase
 
     private boolean allowMultipleLeadingForwardSlashInPath = false;
 
+    private final AtomicLong inProgressAsyncCount = new AtomicLong(0);
+
 
     // ----------------------------------------------------- Context Properties
+
+    @Override
+    public void incrementInProgressAsyncCount() {
+        inProgressAsyncCount.incrementAndGet();
+    }
+
+
+    @Override
+    public void decrementInProgressAsyncCount() {
+        inProgressAsyncCount.decrementAndGet();
+    }
+
 
     @Override
     public void setAllowMultipleLeadingForwardSlashInPath(
@@ -5855,6 +5869,22 @@ public class StandardContext extends ContainerBase
             broadcaster.sendNotification(notification);
         }
 
+        // Context has been removed from Mapper at this point (so no new
+        // requests will be mapped) but is still available.
+
+        // Give the in progress async requests a chance to complete
+        long limit = System.currentTimeMillis() + unloadDelay;
+        while (inProgressAsyncCount.get() > 0 && System.currentTimeMillis() < limit) {
+            try {
+                Thread.sleep(50);
+            } catch (InterruptedException e) {
+                log.info(sm.getString("standardContext.stop.asyncWaitInterrupted"), e);
+                break;
+            }
+        }
+
+        // Once the state is set to STOPPING, the Context will report itself as
+        // not available and any in progress async requests will timeout
         setState(LifecycleState.STOPPING);
 
         // Binding thread

@@ -1187,8 +1187,8 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
                     SocketWrapper<Long> socket = sockets.next();
                     if (socket.async) {
                         long access = socket.getLastAccess();
-                        if (socket.getTimeout() > 0 &&
-                                (now-access)>socket.getTimeout()) {
+                        if (socket.getTimeout() > 0 && (now-access)>socket.getTimeout() ||
+                                !handler.isAvailable(socket)) {
                             // Prevent multiple timeouts
                             socket.setTimeout(-1);
                             processSocketAsync(socket,SocketStatus.TIMEOUT);
@@ -2465,6 +2465,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
     public interface Handler extends AbstractEndpoint.Handler {
         public SocketState process(SocketWrapper<Long> socket,
                 SocketStatus status);
+        public boolean isAvailable(SocketWrapper<Long> socket);
     }
 
 

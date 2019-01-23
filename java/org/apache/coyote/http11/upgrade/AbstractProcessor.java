@@ -19,6 +19,7 @@ package org.apache.coyote.http11.upgrade;
 import java.io.IOException;
 import java.util.concurrent.Executor;
 
+import org.apache.coyote.AsyncStateMachine;
 import org.apache.coyote.Processor;
 import org.apache.coyote.Request;
 import org.apache.coyote.http11.upgrade.servlet31.HttpUpgradeHandler;
@@ -136,9 +137,15 @@ public abstract class AbstractProcessor<S>
         // Currently a NO-OP as upgrade processors are not recycled.
     }
 
-    
+
+    @Override
+    public final AsyncStateMachine<S> getAsyncStateMachine() {
+        return null;
+    }
+
+
     // ------------------ Processor methods for Inbound/Outbound based mechanism
-    
+
     @Override
     @Deprecated
     public UpgradeInbound getUpgradeInbound() {

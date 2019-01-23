@@ -432,6 +432,16 @@ public class AsyncStateMachine<S> {
     }
 
 
+    synchronized boolean isAvailable() {
+        if (asyncCtxt == null) {
+            // Async processing has probably been completed in another thread.
+            // Trigger a timeout to make sure the Processor is cleaned up.
+            return false;
+        }
+        return asyncCtxt.isAvailable();
+    }
+
+
     public synchronized void recycle() {
         // Ensure in case of error that any non-container threads that have been
         // paused are unpaused.

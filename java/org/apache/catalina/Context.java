@@ -1759,4 +1759,10 @@ public interface Context extends Container {
      *         otherwise <code>false</code>
      */
     public boolean getAllowMultipleLeadingForwardSlashInPath();
+
+
+    public void incrementInProgressAsyncCount();
+
+
+    public void decrementInProgressAsyncCount();
 }

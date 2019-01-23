@@ -132,6 +132,7 @@ public class JIoEndpoint extends AbstractEndpoint<Socket> {
         public SocketState process(SocketWrapper<Socket> socket,
                 SocketStatus status);
         public SSLImplementation getSslImplementation();
+        public boolean isAvailable(SocketWrapper<Socket> socket);
     }
 
 
@@ -159,8 +160,8 @@ public class JIoEndpoint extends AbstractEndpoint<Socket> {
                 while (sockets.hasNext()) {
                     SocketWrapper<Socket> socket = sockets.next();
                     long access = socket.getLastAccess();
-                    if (socket.getTimeout() > 0 &&
-                            (now-access)>socket.getTimeout()) {
+                    if (socket.getTimeout() > 0 && (now-access)>socket.getTimeout() ||
+                            !handler.isAvailable(socket)) {
                         // Prevent multiple timeouts
                         socket.setTimeout(-1);
                         processSocketAsync(socket,SocketStatus.TIMEOUT);

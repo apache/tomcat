@@ -344,4 +344,11 @@ public abstract class AbstractProcessor<S> implements ActionHook, Processor<S> {
     public abstract org.apache.coyote.http11.upgrade.UpgradeInbound getUpgradeInbound();
 
     protected abstract Log getLog();
+
+
+    @Override
+    public final AsyncStateMachine<S> getAsyncStateMachine() {
+        return asyncStateMachine;
+    }
+
 }

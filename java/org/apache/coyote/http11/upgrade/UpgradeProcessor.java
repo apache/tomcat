@@ -19,6 +19,7 @@ package org.apache.coyote.http11.upgrade;
 import java.io.IOException;
 import java.util.concurrent.Executor;
 
+import org.apache.coyote.AsyncStateMachine;
 import org.apache.coyote.Processor;
 import org.apache.coyote.Request;
 import org.apache.coyote.http11.upgrade.servlet31.HttpUpgradeHandler;
@@ -93,7 +94,7 @@ public abstract class UpgradeProcessor<S> implements Processor<S> {
         // Currently a NO-OP as upgrade processors are not recycled.
     }
 
-    
+
     // Servlet 3.1 based HTTP upgrade mechanism. NO-OPs for the proprietary
     // Tomcat upgrade mechanism.
     @Override
@@ -110,8 +111,8 @@ public abstract class UpgradeProcessor<S> implements Processor<S> {
     public boolean isUpgrade() {
         return false;
     }
-    
-    
+
+
     // NO-OP methods for upgrade
     @Override
     public final Executor getExecutor() {
@@ -162,5 +163,10 @@ public abstract class UpgradeProcessor<S> implements Processor<S> {
     @Override
     public final void setSslSupport(SSLSupport sslSupport) {
         // NOOP
+    }
+
+    @Override
+    public final AsyncStateMachine<S> getAsyncStateMachine() {
+        return null;
     }
 }
