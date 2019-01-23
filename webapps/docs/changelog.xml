@@ -78,6 +78,12 @@
         thrown when attempting to load a class from a corrupted JAR file.
         (markt)
       </fix>
+      <add>
+        Make the removal of leading and trailing whitespace from credentials
+        passed to BASIC authentication configurable via a new attribute,
+        <code>trimCredentials</code> on the <code>BasicAuthenticator</code>.
+        (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
