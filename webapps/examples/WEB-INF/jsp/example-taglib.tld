@@ -29,17 +29,6 @@
     A simple tab library for the examples
   </description>
 
-  <tag>
-    <name>ShowSource</name>
-    <tag-class>examples.ShowSource</tag-class>
-    <description> Display JSP sources </description>
-    <attribute>
-       <name>jspFile</name>
-       <required>true</required>
-       <rtexprvalue>true</rtexprvalue>
-    </attribute>
-  </tag>
-
   <!-- A simple Tag -->
   <!-- foo tag -->
   <tag>

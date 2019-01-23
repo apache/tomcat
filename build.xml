@@ -1310,7 +1310,6 @@
         <exclude name="security/protected/error.jsp"/>
         <exclude name="security/protected/index.jsp"/>
         <exclude name="security/protected/login.jsp"/>
-        <exclude name="source.jsp"/>
       </fileset>
     </txt2html>
   </target>
