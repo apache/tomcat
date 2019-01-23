@@ -107,6 +107,12 @@
         <bug>63078</bug>: Ensure the utility thread pool is at least two, as the
         deployer uses a blocking pattern. (remm, markt)
       </fix>
+      <add>
+        Make the removal of leading and trailing whitespace from credentials
+        passed to BASIC authentication configurable via a new attribute,
+        <code>trimCredentials</code> on the <code>BasicAuthenticator</code>.
+        (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">

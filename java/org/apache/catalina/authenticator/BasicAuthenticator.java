@@ -49,6 +49,7 @@ public class BasicAuthenticator extends AuthenticatorBase {
 
     private Charset charset = StandardCharsets.ISO_8859_1;
     private String charsetString = null;
+    private boolean trimCredentials = true;
 
 
     public String getCharset() {
@@ -66,6 +67,17 @@ public class BasicAuthenticator extends AuthenticatorBase {
             throw new IllegalArgumentException(sm.getString("basicAuthenticator.invalidCharset"));
         }
         this.charsetString = charsetString;
+    }
+
+
+
+    public boolean getTrimCredentials() {
+        return trimCredentials;
+    }
+
+
+    public void setTrimCredentials(boolean trimCredentials) {
+        this.trimCredentials = trimCredentials;
     }
 
 
@@ -87,7 +99,7 @@ public class BasicAuthenticator extends AuthenticatorBase {
             ByteChunk authorizationBC = authorization.getByteChunk();
             BasicCredentials credentials = null;
             try {
-                credentials = new BasicCredentials(authorizationBC, charset);
+                credentials = new BasicCredentials(authorizationBC, charset, trimCredentials);
                 String username = credentials.getUsername();
                 String password = credentials.getPassword();
 
@@ -138,6 +150,7 @@ public class BasicAuthenticator extends AuthenticatorBase {
         private static final String METHOD = "basic ";
 
         private final Charset charset;
+        private final boolean trimCredentials;
         private final ByteChunk authorization;
         private final int initialOffset;
         private int base64blobOffset;
@@ -145,6 +158,7 @@ public class BasicAuthenticator extends AuthenticatorBase {
 
         private String username = null;
         private String password = null;
+
         /**
          * Parse the HTTP Authorization header for BASIC authentication
          * as per RFC 2617 section 2, and the Base64 encoded credentials
@@ -156,11 +170,35 @@ public class BasicAuthenticator extends AuthenticatorBase {
          *
          * @throws IllegalArgumentException If the header does not conform
          *                                  to RFC 2617
+         * @deprecated Unused. Will be removed in Tomcat 10. Use {@link
+         *             BasicCredentials#BasicCredentials(ByteChunk, Charset,
+         *             boolean)}
          */
+        @Deprecated
         public BasicCredentials(ByteChunk input, Charset charset) throws IllegalArgumentException {
+            this(input, charset, true);
+        }
+
+        /**
+         * Parse the HTTP Authorization header for BASIC authentication
+         * as per RFC 2617 section 2, and the Base64 encoded credentials
+         * as per RFC 2045 section 6.8.
+         *
+         * @param input           The header value to parse in-place
+         * @param charset         The character set to use to convert the bytes
+         *                        to a string
+         * @param trimCredentials Should leading and trailing whitespace be
+         *                        removed from the parsed credentials
+         *
+         * @throws IllegalArgumentException If the header does not conform
+         *                                  to RFC 2617
+         */
+        public BasicCredentials(ByteChunk input, Charset charset, boolean trimCredentials)
+                throws IllegalArgumentException {
             authorization = input;
             initialOffset = input.getOffset();
             this.charset = charset;
+            this.trimCredentials = trimCredentials;
 
             parseMethod();
             byte[] decoded = parseBase64();
@@ -245,12 +283,12 @@ public class BasicAuthenticator extends AuthenticatorBase {
                 username = new String(decoded, 0, colon, charset);
                 password = new String(decoded, colon + 1, decoded.length - colon - 1, charset);
                 // tolerate surplus white space around credentials
-                if (password.length() > 1) {
+                if (password.length() > 1 && trimCredentials) {
                     password = password.trim();
                 }
             }
             // tolerate surplus white space around credentials
-            if (username.length() > 1) {
+            if (username.length() > 1 && trimCredentials) {
                 username = username.trim();
             }
         }
