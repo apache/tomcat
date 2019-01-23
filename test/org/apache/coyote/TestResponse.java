@@ -27,6 +27,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import org.apache.catalina.Context;
@@ -74,6 +75,74 @@ public class TestResponse extends TomcatBaseTest {
                 throws ServletException, IOException {
             resp.setContentType("text/plain");
             resp.setCharacterEncoding(req.getParameter("charset"));
+
+            resp.getWriter().print("OK");
+        }
+    }
+
+
+    @Test
+    public void testContentTypeWithSpace() throws Exception {
+        doTestContentTypeSpacing(true);
+    }
+
+
+    @Ignore // Disabled until Bug 62912 is addressed
+    @Test
+    public void testContentTypeWithoutSpace() throws Exception {
+        doTestContentTypeSpacing(false);
+    }
+
+
+    private void doTestContentTypeSpacing(boolean withSpace) throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        // No file system docBase required
+        Context ctx = tomcat.addContext("", null);
+
+        // Add  servlet
+        Tomcat.addServlet(ctx, "ContentTypeServlet", new ContentTypeServlet());
+        ctx.addServletMappingDecoded("/*", "ContentTypeServlet");
+
+        tomcat.start();
+
+        ByteChunk responseBody = new ByteChunk();
+        Map<String,List<String>> responseHeaders = new HashMap<>();
+        StringBuilder uri = new StringBuilder("http://localhost:");
+        uri.append(getPort());
+        uri.append("/test");
+        if (withSpace) {
+            uri.append("?withSpace=true");
+        }
+        int rc = getUrl(uri.toString(), responseBody, responseHeaders);
+
+        Assert.assertEquals(HttpServletResponse.SC_OK, rc);
+        Assert.assertTrue(responseHeaders.containsKey("Content-Type"));
+        List<String> contentType = responseHeaders.get("Content-Type");
+        Assert.assertEquals(1, contentType.size());
+        StringBuilder expected = new StringBuilder("text/plain;");
+        if (withSpace) {
+            expected.append(" ");
+        }
+        expected.append("v=1;charset=UTF-8");
+        Assert.assertEquals(expected.toString() , contentType.get(0));
+    }
+
+
+    private static class ContentTypeServlet extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+                throws ServletException, IOException {
+
+            if (req.getParameter("withSpace") == null) {
+                resp.setContentType("text/plain;v=1");
+            } else {
+                resp.setContentType("text/plain; v=1");
+            }
+            resp.setCharacterEncoding("UTF-8");
 
             resp.getWriter().print("OK");
         }
