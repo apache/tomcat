@@ -129,7 +129,7 @@ public class TestJNDIRealm {
             throws NamingException {
         @SuppressWarnings("unchecked")
         NamingEnumeration<SearchResult> searchResults =
-        EasyMock.createNiceMock(NamingEnumeration.class);
+                EasyMock.createNiceMock(NamingEnumeration.class);
         EasyMock.expect(Boolean.valueOf(searchResults.hasMore()))
                 .andReturn(Boolean.TRUE)
                 .andReturn(Boolean.FALSE)
