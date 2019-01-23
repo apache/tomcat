@@ -1865,4 +1865,10 @@ public interface Context extends Container, ContextBind {
      *         otherwise <code>false</code>
      */
     public boolean getAllowMultipleLeadingForwardSlashInPath();
+
+
+    public void incrementInProgressAsyncCount();
+
+
+    public void decrementInProgressAsyncCount();
 }

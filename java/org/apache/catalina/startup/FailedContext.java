@@ -809,4 +809,9 @@ public class FailedContext extends LifecycleMBeanBase implements Context {
     }
     @Override
     public boolean getAllowMultipleLeadingForwardSlashInPath() { return false; }
+
+    @Override
+    public void incrementInProgressAsyncCount() { /* NO-OP */ }
+    @Override
+    public void decrementInProgressAsyncCount() { /* NO-OP */ }
 }

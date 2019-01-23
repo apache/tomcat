@@ -111,6 +111,7 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
         } finally {
             context.fireRequestDestroyEvent(request.getRequest());
             clearServletRequestResponse();
+            this.context.decrementInProgressAsyncCount();
             context.unbind(Globals.IS_SECURITY_ENABLED, oldCL);
         }
     }
@@ -205,6 +206,7 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
                     request, applicationDispatcher, servletRequest, servletResponse);
             this.request.getCoyoteRequest().action(ActionCode.ASYNC_DISPATCH, null);
             clearServletRequestResponse();
+            this.context.decrementInProgressAsyncCount();
         }
     }
 
@@ -311,6 +313,7 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
                     ActionCode.ASYNC_START, this);
 
             this.context = context;
+            context.incrementInProgressAsyncCount();
             this.servletRequest = request;
             this.servletResponse = response;
             this.hasOriginalRequestAndResponse = originalRequestResponse;
@@ -374,6 +377,17 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
         this.timeout = timeout;
         request.getCoyoteRequest().action(ActionCode.ASYNC_SETTIMEOUT,
                 Long.valueOf(timeout));
+    }
+
+
+
+    @Override
+    public boolean isAvailable() {
+        Context context = this.context;
+        if (context == null) {
+            return false;
+        }
+        return context.getState().isAvailable();
     }
 
 
