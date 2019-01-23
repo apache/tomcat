@@ -99,7 +99,7 @@ public class BasicAuthenticator extends AuthenticatorBase {
             ByteChunk authorizationBC = authorization.getByteChunk();
             BasicCredentials credentials = null;
             try {
-                credentials = new BasicCredentials(authorizationBC, charset, trimCredentials);
+                credentials = new BasicCredentials(authorizationBC, charset, getTrimCredentials());
                 String username = credentials.getUsername();
                 String password = credentials.getPassword();
 
