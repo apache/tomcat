@@ -482,6 +482,15 @@
         required unless <code>userPassword</code> is specified</p>
       </attribute>
 
+      <attribute name="forceDnHexEscape" required="false">
+        <p>A setting of <code>true</code> forces escaping in the String
+        representation of a distinguished name to use the <code>\nn</code> form.
+        This may avoid issues with realms using Active Directory which appears
+        to be more tolerant of optional escaping when the <code>\nn</code> form
+        is used. If not specified, the default of <code>false</code> will be
+        used.</p>
+      </attribute>
+
       <attribute name="hostnameVerifierClassName" required="false">
         <p>The name of the class to use for hostname verification when
         using StartTLS for securing the connection to the ldap server.
