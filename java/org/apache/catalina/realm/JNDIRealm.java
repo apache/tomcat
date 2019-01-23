@@ -505,7 +505,18 @@ public class JNDIRealm extends RealmBase {
      */
     private String sslProtocol;
 
+    private boolean forceDnHexEscape = false;
+
+
     // ------------------------------------------------------------- Properties
+
+    public boolean getForceDnHexEscape() {
+        return forceDnHexEscape;
+    }
+
+    public void setForceDnHexEscape(boolean forceDnHexEscape) {
+        this.forceDnHexEscape = forceDnHexEscape;
+    }
 
     /**
      * @return the type of authentication to use.
@@ -2769,7 +2780,89 @@ public class JNDIRealm extends RealmBase {
                        resultName );
            }
         }
-        return name.toString();
+
+        if (getForceDnHexEscape()) {
+            // Bug 63026
+            return convertToHexEscape(name.toString());
+        } else {
+            return name.toString();
+        }
+    }
+
+
+    protected static String convertToHexEscape(String input) {
+        if (input.indexOf('\\') == -1) {
+            // No escaping present. Return original.
+            return input;
+        }
+
+        // +6 allows for 3 escaped characters by default
+        StringBuilder result = new StringBuilder(input.length() + 6);
+        boolean previousSlash = false;
+        for (int i = 0; i < input.length(); i++) {
+            char c = input.charAt(i);
+
+            if (previousSlash) {
+                switch (c) {
+                    case ' ': {
+                        result.append("\\20");
+                        break;
+                    }
+                    case '\"': {
+                        result.append("\\22");
+                        break;
+                    }
+                    case '#': {
+                        result.append("\\23");
+                        break;
+                    }
+                    case '+': {
+                        result.append("\\2B");
+                        break;
+                    }
+                    case ',': {
+                        result.append("\\2C");
+                        break;
+                    }
+                    case ';': {
+                        result.append("\\3B");
+                        break;
+                    }
+                    case '<': {
+                        result.append("\\3C");
+                        break;
+                    }
+                    case '=': {
+                        result.append("\\3D");
+                        break;
+                    }
+                    case '>': {
+                        result.append("\\3E");
+                        break;
+                    }
+                    case '\\': {
+                        result.append("\\5C");
+                        break;
+                    }
+                    default:
+                        result.append('\\');
+                        result.append(c);
+                }
+                previousSlash = false;
+            } else {
+                if (c == '\\') {
+                    previousSlash = true;
+                } else {
+                    result.append(c);
+                }
+            }
+        }
+
+        if (previousSlash) {
+            result.append('\\');
+        }
+
+        return result.toString();
     }
 
 

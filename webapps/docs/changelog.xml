@@ -84,6 +84,14 @@
         <code>trimCredentials</code> on the <code>BasicAuthenticator</code>.
         (markt)
       </add>
+      <add>
+        <bug>63026</bug>: Add a new attribute, <code>forceDnHexEscape</code>, to
+        the <code>JNDIRealm</code> that forces escaping in the String
+        representation of a distinguished name to use the <code>\nn</code> form.
+        This may avoid issues with realms using Active Directory which appears
+        to be more tolerant of optional escaping when the <code>\nn</code> form
+        is used. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
