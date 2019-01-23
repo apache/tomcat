@@ -2799,6 +2799,7 @@ public class JNDIRealm extends RealmBase {
         // Get the entry's distinguished name.  For relative results, this means
         // we need to composite a name with the base name, the context name, and
         // the result name.  For non-relative names, use the returned name.
+        Name name;
         if (result.isRelative()) {
            if (containerLog.isTraceEnabled()) {
                containerLog.trace("  search returned relative name: " +
@@ -2812,9 +2813,8 @@ public class JNDIRealm extends RealmBase {
            Name entryName =
                parser.parse(new CompositeName(result.getName()).get(0));
 
-           Name name = contextName.addAll(baseName);
+           name = contextName.addAll(baseName);
            name = name.addAll(entryName);
-           return name.toString();
         } else {
            String absoluteName = result.getName();
            if (containerLog.isTraceEnabled())
@@ -2831,14 +2831,14 @@ public class JNDIRealm extends RealmBase {
                            "Search returned unparseable absolute name: " +
                            absoluteName );
                }
-               Name name = parser.parse(pathComponent.substring(1));
-               return name.toString();
+               name = parser.parse(pathComponent.substring(1));
            } catch ( URISyntaxException e ) {
                throw new InvalidNameException(
                        "Search returned unparseable absolute name: " +
                        absoluteName );
            }
         }
+        return name.toString();
     }
 
 
