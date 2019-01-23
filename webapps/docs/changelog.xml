@@ -123,6 +123,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Web applications">
+    <changelog>
+      <fix>
+        <bug>63103</bug>: Remove the unused source.jsp file and associated tag
+        from the examples web application as it is no longer used. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <fix>
