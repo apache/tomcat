@@ -39,7 +39,7 @@ mvn clean; mvn package
 ```
 docker build -t apache/tomcat-maven:1.0 -f ./Dockerfile .
 ```
-Docker build arguments include `namepsace` (default is `myproject`) and `port` which should match the Tomcat port in `server.xml` (default is `8080`). Other ports that need to be exposed can be added in the `Dockerfile` as needed. Webapps should be added to the `webapps` folder where they will be auto deployed by the host if using the defaults. Otherwise, the `Dockerfile` command line can be edited like below to include the necesary resources and command line arguments to run a single or multiple hardcoded web applications.
+Docker build arguments include `namepsace` (default is `tomcat`) and `port` which should match the Tomcat port in `server.xml` (default is `8080`). Other ports that need to be exposed can be added in the `Dockerfile` as needed. Webapps should be added to the `webapps` folder where they will be auto deployed by the host if using the defaults. Otherwise, the `Dockerfile` command line can be edited like below to include the necesary resources and command line arguments to run a single or multiple hardcoded web applications.
 
 ## Running
 
@@ -65,10 +65,15 @@ java -Dcatalina.base=. -Djava.util.logging.manager=org.apache.juli.ClassLoaderLo
 java -Dcatalina.base=. -Djava.util.logging.manager=org.apache.juli.ClassLoaderLogManager -Djava.util.logging.config.file=conf/logging.properties -jar target/tomcat-maven-1.0.jar --war myrootwebapp --path /path1 --war mywebapp1 --path /path2 --war mywebapp2
 ```
 
-## Deployment
+## Cloud
+
+### Deployment
+
+An example `tomcat.yaml` is included which uses the Docker image. It uses the health check valve which can be added in `conf/server.xml`, or a similar service responding to requests on `/health`. It also declares the optional Jolokia and Prometheus ports for monitoring.
+
+### Cluster
 
 If using the Kubernetes cloud clustering membership provider, the pod needs to have the persmission to view other pods. For exemple with Openshift, this is done with:
 ```
 oc policy add-role-to-user view system:serviceaccount:$(oc project -q):default -n $(oc project -q)
 ```
-
