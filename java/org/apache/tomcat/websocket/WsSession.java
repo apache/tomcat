@@ -45,6 +45,7 @@ import javax.websocket.RemoteEndpoint;
 import javax.websocket.SendResult;
 import javax.websocket.Session;
 import javax.websocket.WebSocketContainer;
+import javax.websocket.server.ServerEndpointConfig;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -416,7 +417,7 @@ public class WsSession implements Session {
     @Override
     public Set<Session> getOpenSessions() {
         checkState();
-        return webSocketContainer.getOpenSessions(localEndpoint);
+        return webSocketContainer.getOpenSessions(getSessionMapKey());
     }
 
 
@@ -605,10 +606,20 @@ public class WsSession implements Session {
                 localEndpoint.onError(this, e);
             }
         } finally {
-            webSocketContainer.unregisterSession(localEndpoint, this);
+            webSocketContainer.unregisterSession(getSessionMapKey(), this);
         }
     }
 
+
+    private Object getSessionMapKey() {
+        if (endpointConfig instanceof ServerEndpointConfig) {
+            // Server
+            return ((ServerEndpointConfig) endpointConfig).getPath();
+        } else {
+            // Client
+            return localEndpoint;
+        }
+    }
 
     /**
      * Use protected so unit tests can access this method directly.

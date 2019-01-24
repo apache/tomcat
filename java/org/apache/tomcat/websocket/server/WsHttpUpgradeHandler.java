@@ -26,8 +26,8 @@ import javax.websocket.CloseReason;
 import javax.websocket.CloseReason.CloseCodes;
 import javax.websocket.DeploymentException;
 import javax.websocket.Endpoint;
-import javax.websocket.EndpointConfig;
 import javax.websocket.Extension;
+import javax.websocket.server.ServerEndpointConfig;
 
 import org.apache.coyote.http11.upgrade.InternalHttpUpgradeHandler;
 import org.apache.juli.logging.Log;
@@ -54,7 +54,7 @@ public class WsHttpUpgradeHandler implements InternalHttpUpgradeHandler {
     private SocketWrapperBase<?> socketWrapper;
 
     private Endpoint ep;
-    private EndpointConfig endpointConfig;
+    private ServerEndpointConfig serverEndpointConfig;
     private WsServerContainer webSocketContainer;
     private WsHandshakeRequest handshakeRequest;
     private List<Extension> negotiatedExtensions;
@@ -80,13 +80,13 @@ public class WsHttpUpgradeHandler implements InternalHttpUpgradeHandler {
     }
 
 
-    public void preInit(Endpoint ep, EndpointConfig endpointConfig,
+    public void preInit(Endpoint ep, ServerEndpointConfig serverEndpointConfig,
             WsServerContainer wsc, WsHandshakeRequest handshakeRequest,
             List<Extension> negotiatedExtensionsPhase2, String subProtocol,
             Transformation transformation, Map<String,String> pathParameters,
             boolean secure) {
         this.ep = ep;
-        this.endpointConfig = endpointConfig;
+        this.serverEndpointConfig = serverEndpointConfig;
         this.webSocketContainer = wsc;
         this.handshakeRequest = handshakeRequest;
         this.negotiatedExtensions = negotiatedExtensionsPhase2;
@@ -124,14 +124,14 @@ public class WsHttpUpgradeHandler implements InternalHttpUpgradeHandler {
                     handshakeRequest.getQueryString(),
                     handshakeRequest.getUserPrincipal(), httpSessionId,
                     negotiatedExtensions, subProtocol, pathParameters, secure,
-                    endpointConfig);
+                    serverEndpointConfig);
             wsFrame = new WsFrameServer(socketWrapper, wsSession, transformation,
                     applicationClassLoader);
             // WsFrame adds the necessary final transformations. Copy the
             // completed transformation chain to the remote end point.
             wsRemoteEndpointServer.setTransformation(wsFrame.getTransformation());
-            ep.onOpen(wsSession, endpointConfig);
-            webSocketContainer.registerSession(ep, wsSession);
+            ep.onOpen(wsSession, serverEndpointConfig);
+            webSocketContainer.registerSession(serverEndpointConfig.getPath(), wsSession);
         } catch (DeploymentException e) {
             throw new IllegalArgumentException(e);
         } finally {
