@@ -2379,11 +2379,13 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         request.setCoyoteRequest(new org.apache.coyote.Request());
         request.setContext(context);
         final AsyncContextImpl ac = new AsyncContextImpl(request);
+        context.incrementInProgressAsyncCount();
         EasyMock.expect(context.getApplicationEventListeners()).andReturn(null);
         EasyMock.expect(context.getLoader()).andReturn(loader);
         EasyMock.expect(loader.getClassLoader()).andReturn(null);
         EasyMock.expect(Boolean.valueOf(
                 context.fireRequestDestroyEvent(request.getRequest()))).andReturn(Boolean.TRUE);
+        context.decrementInProgressAsyncCount();
 
         EasyMock.replay(context, loader);
 
