@@ -44,7 +44,6 @@ import javax.websocket.CloseReason;
 import javax.websocket.CloseReason.CloseCodes;
 import javax.websocket.DeploymentException;
 import javax.websocket.Encoder;
-import javax.websocket.Endpoint;
 import javax.websocket.server.ServerContainer;
 import javax.websocket.server.ServerEndpoint;
 import javax.websocket.server.ServerEndpointConfig;
@@ -434,8 +433,8 @@ public class WsServerContainer extends WsWebSocketContainer
      * Overridden to make it visible to other classes in this package.
      */
     @Override
-    protected void registerSession(Endpoint endpoint, WsSession wsSession) {
-        super.registerSession(endpoint, wsSession);
+    protected void registerSession(Object key, WsSession wsSession) {
+        super.registerSession(key, wsSession);
         if (wsSession.isOpen() &&
                 wsSession.getUserPrincipal() != null &&
                 wsSession.getHttpSessionId() != null) {
@@ -451,13 +450,13 @@ public class WsServerContainer extends WsWebSocketContainer
      * Overridden to make it visible to other classes in this package.
      */
     @Override
-    protected void unregisterSession(Endpoint endpoint, WsSession wsSession) {
+    protected void unregisterSession(Object key, WsSession wsSession) {
         if (wsSession.getUserPrincipal() != null &&
                 wsSession.getHttpSessionId() != null) {
             unregisterAuthenticatedSession(wsSession,
                     wsSession.getHttpSessionId());
         }
-        super.unregisterSession(endpoint, wsSession);
+        super.unregisterSession(key, wsSession);
     }
 
 

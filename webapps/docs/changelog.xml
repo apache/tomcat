@@ -130,6 +130,11 @@
   <subsection name="WebSocket">
     <changelog>
       <fix>
+        <bug>57974</bug>: Ensure implementation of
+        <code>Session.getOpenSessions()</code> returns correct value for both
+        client-side and server-side calls. (markt)
+      </fix>
+      <fix>
         <bug>63019</bug>: Use payload remaining bytes rather than limit when
         writing. Submitted by Benoit Courtilly. (remm)
       </fix>
