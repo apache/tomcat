@@ -142,10 +142,9 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
         JVM_THREAD_GROUP_NAMES.add("RMI Runtime");
     }
 
-    protected class PrivilegedFindClassByName
-        implements PrivilegedAction<Class<?>> {
+    protected class PrivilegedFindClassByName implements PrivilegedAction<Class<?>> {
 
-        protected final String name;
+        private final String name;
 
         PrivilegedFindClassByName(String name) {
             this.name = name;
@@ -158,10 +157,9 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
     }
 
 
-    protected static final class PrivilegedGetClassLoader
-        implements PrivilegedAction<ClassLoader> {
+    protected static final class PrivilegedGetClassLoader implements PrivilegedAction<ClassLoader> {
 
-        public final Class<?> clazz;
+        private final Class<?> clazz;
 
         public PrivilegedGetClassLoader(Class<?> clazz){
             this.clazz = clazz;
