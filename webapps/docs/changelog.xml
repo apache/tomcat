@@ -175,6 +175,13 @@
         <bug>63019</bug>: Use payload remaining bytes rather than limit when
         writing. Submitted by Benoit Courtilly. (remm)
       </fix>
+      <fix>
+        When running under a <code>SecurityManager</code>, ensure that the
+        <code>ServiceLoader</code> look-up for the default
+        <code>javax.websocket.server.ServerEndpointConfig.Configurator</code>
+        implementation completes correctly rather than silently using the
+        hard-coded fall-back. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
