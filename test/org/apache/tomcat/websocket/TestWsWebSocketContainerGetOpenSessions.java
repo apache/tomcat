@@ -355,7 +355,7 @@ public class TestWsWebSocketContainerGetOpenSessions extends WebSocketBaseTest {
 
     public static class Tracker {
 
-        private static final Map<String, Integer> records = new ConcurrentHashMap<>();
+        private static final Map<String, Integer> records = new ConcurrentHashMap<String, Integer>();
         private static final AtomicInteger updateCount = new AtomicInteger(0);
 
         public static void addRecord(String key, int count) {
