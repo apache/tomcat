@@ -17,6 +17,8 @@
 package javax.websocket.server;
 
 import java.lang.reflect.InvocationTargetException;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -150,7 +152,12 @@ public interface ServerEndpointConfig extends EndpointConfig {
             if (defaultImpl == null) {
                 synchronized (defaultImplLock) {
                     if (defaultImpl == null) {
-                        defaultImpl = loadDefault();
+                        if (System.getSecurityManager() == null) {
+                            defaultImpl = loadDefault();
+                        } else {
+                            defaultImpl =
+                                    AccessController.doPrivileged(new PrivilegedLoadDefault());
+                        }
                     }
                 }
             }
@@ -185,6 +192,16 @@ public interface ServerEndpointConfig extends EndpointConfig {
             }
             return result;
         }
+
+
+        private static class PrivilegedLoadDefault implements PrivilegedAction<Configurator> {
+
+            @Override
+            public Configurator run() {
+                return Configurator.loadDefault();
+            }
+        }
+
 
         public String getNegotiatedSubprotocol(List<String> supported,
                 List<String> requested) {
