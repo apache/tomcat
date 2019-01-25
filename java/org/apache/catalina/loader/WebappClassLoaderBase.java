@@ -172,6 +172,21 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
     }
 
 
+    protected final class PrivilegedJavaseGetResource implements PrivilegedAction<URL> {
+
+        private final String name;
+
+        public PrivilegedJavaseGetResource(String name) {
+            this.name = name;
+        }
+
+        @Override
+        public URL run() {
+            return javaseClassLoader.getResource(name);
+        }
+    }
+
+
     // ------------------------------------------------------- Static Variables
 
     /**
@@ -1246,7 +1261,14 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
                 // details of how this may trigger a StackOverflowError
                 // Given these reported errors, catch Throwable to ensure any
                 // other edge cases are also caught
-                tryLoadingFromJavaseLoader = (javaseLoader.getResource(resourceName) != null);
+                URL url;
+                if (securityManager != null) {
+                    PrivilegedAction<URL> dp = new PrivilegedJavaseGetResource(resourceName);
+                    url = AccessController.doPrivileged(dp);
+                } else {
+                    url = javaseLoader.getResource(resourceName);
+                }
+                tryLoadingFromJavaseLoader = (url != null);
             } catch (Throwable t) {
                 // Swallow all exceptions apart from those that must be re-thrown
                 ExceptionUtils.handleThrowable(t);

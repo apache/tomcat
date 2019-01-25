@@ -96,6 +96,11 @@
         to be more tolerant of optional escaping when the <code>\nn</code> form
         is used. (markt)
       </add>
+      <fix>
+        Avoid a swallowed (and therefore ignored) access failure during web
+        application class loading when running under a
+        <code>SecurityManager</code>. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
