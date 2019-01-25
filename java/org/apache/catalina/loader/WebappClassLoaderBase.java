@@ -185,12 +185,11 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
     }
 
 
-    protected class PrivilegedFindResourceByName
-        implements PrivilegedAction<ResourceEntry> {
+    protected class PrivilegedFindResourceByName implements PrivilegedAction<ResourceEntry> {
 
-        protected String name;
-        protected String path;
-        protected boolean manifestRequired;
+        private final String name;
+        private final String path;
+        private final boolean manifestRequired;
 
         PrivilegedFindResourceByName(String name, String path, boolean manifestRequired) {
             this.name = name;
@@ -206,10 +205,9 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
     }
 
 
-    protected static final class PrivilegedGetClassLoader
-        implements PrivilegedAction<ClassLoader> {
+    protected static final class PrivilegedGetClassLoader implements PrivilegedAction<ClassLoader> {
 
-        public Class<?> clazz;
+        private final Class<?> clazz;
 
         public PrivilegedGetClassLoader(Class<?> clazz){
             this.clazz = clazz;
