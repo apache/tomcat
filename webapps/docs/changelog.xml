@@ -145,6 +145,10 @@
         implementation completes correctly rather than silently using the
         hard-coded fall-back. (markt)
       </fix>
+      <fix>
+        Ensure that the network connection is closed if the client receives an
+        I/O error trying to communicate with the server. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">

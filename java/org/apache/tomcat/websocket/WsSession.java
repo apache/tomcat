@@ -442,6 +442,22 @@ public class WsSession implements Session {
      */
     public void doClose(CloseReason closeReasonMessage,
             CloseReason closeReasonLocal) {
+        doClose(closeReasonMessage, closeReasonLocal, false);
+    }
+
+
+    /**
+     * WebSocket 1.0. Section 2.1.5.
+     * Need internal close method as spec requires that the local endpoint
+     * receives a 1006 on timeout.
+     *
+     * @param closeReasonMessage The close reason to pass to the remote endpoint
+     * @param closeReasonLocal   The close reason to pass to the local endpoint
+     * @param closeSocket        Should the socket be closed immediately rather than waiting
+     *                           for the server to respond
+     */
+    public void doClose(CloseReason closeReasonMessage, CloseReason closeReasonLocal,
+            boolean closeSocket) {
         // Double-checked locking. OK because state is volatile
         if (state != State.OPEN) {
             return;
@@ -465,6 +481,9 @@ public class WsSession implements Session {
             state = State.OUTPUT_CLOSED;
 
             sendCloseMessage(closeReasonMessage);
+            if (closeSocket) {
+                wsRemoteEndpoint.close();
+            }
             fireEndpointOnClose(closeReasonLocal);
         }
 
