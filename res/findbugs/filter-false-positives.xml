@@ -185,6 +185,12 @@
     <Bug pattern="DM_STRING_CTOR" />
   </Match>
   <Match>
+    <!-- Calling sleep while holding a lock is deliberate -->
+    <Class name="org.apache.catalina.core.StandardContext" />
+    <Method name="stopInternal" />
+    <Bug pattern="SWL_SLEEP_WITH_LOCK_HELD" />
+  </Match>
+  <Match>
     <!-- Have to trigger GC for leak detection to work. Clearly documented -->
     <Class name="org.apache.catalina.core.StandardHost" />
     <Method name="findReloadedContextMemoryLeaks" />
