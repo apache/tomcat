@@ -152,6 +152,9 @@
         Fix use of write timeout instead of read timeout for HTTP/2 NIO2
         frame read. (remm)
       </fix>
+      <fix>
+        Fix incorrect APR sendfile thread stop. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">

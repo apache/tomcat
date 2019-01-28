@@ -1975,7 +1975,7 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
             sendfileThread.start();
         }
 
-        protected void stop() {
+        protected synchronized void stop() {
             sendfileRunning = false;
 
             // Wait for the sendfile thread to exit, otherwise parallel
