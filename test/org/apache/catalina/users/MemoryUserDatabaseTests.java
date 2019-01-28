@@ -94,7 +94,7 @@ public class MemoryUserDatabaseTests {
 
     @AfterClass
     public static void cleanup() {
-        TEST_FILE.delete();
+        Assert.assertTrue(TEST_FILE.delete());
     }
 
     @Test
