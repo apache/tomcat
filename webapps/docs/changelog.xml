@@ -272,6 +272,10 @@
         object factories) and merge them back into the core build.
         (remm)
       </update>
+      <add>
+        Update the internal fork of Apache Commons FileUpload to pick up the
+        changes in the Apache Commons FileUpload 1.4 release. (markt)
+      </add>
     </changelog>
   </subsection>
 </section>

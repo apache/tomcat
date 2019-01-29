@@ -606,20 +606,23 @@ public abstract class FileUploadBase {
                 fieldName = pFieldName;
                 contentType = pContentType;
                 formField = pFormField;
-                final ItemInputStream itemStream = multi.newInputStream();
-                InputStream istream = itemStream;
-                if (fileSizeMax != -1) {
+                if (fileSizeMax != -1) { // Check if limit is already exceeded
                     if (pContentLength != -1
-                            &&  pContentLength > fileSizeMax) {
+                            && pContentLength > fileSizeMax) {
                         FileSizeLimitExceededException e =
-                            new FileSizeLimitExceededException(
-                                String.format("The field %s exceeds its maximum permitted size of %s bytes.",
-                                        fieldName, Long.valueOf(fileSizeMax)),
-                                pContentLength, fileSizeMax);
+                                new FileSizeLimitExceededException(
+                                        String.format("The field %s exceeds its maximum permitted size of %s bytes.",
+                                                       fieldName, Long.valueOf(fileSizeMax)),
+                                        pContentLength, fileSizeMax);
                         e.setFileName(pName);
                         e.setFieldName(pFieldName);
                         throw new FileUploadIOException(e);
                     }
+                }
+                // OK to construct stream now
+                final ItemInputStream itemStream = multi.newInputStream();
+                InputStream istream = itemStream;
+                if (fileSizeMax != -1) {
                     istream = new LimitedInputStream(istream, fileSizeMax) {
                         @Override
                         protected void raiseError(long pSizeMax, long pCount)

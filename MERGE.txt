@@ -55,9 +55,9 @@ the patch file has been applied and committed
 FileUpload
 ----------
 Sub-tree:
-src/main/java/org/apache/commons/fileupload
+src/main/java/org/apache/commons/fileupload2
 The SHA1 ID for the most recent commit to be merged to Tomcat is:
-b1498c9877d751f8bc4635a6f252ebdfcba28518
+2cf7d09fefb17c59e5a776fd6850aebdf41046b2
 
 Note: Tomcat's copy of fileupload also includes classes copied manually (rather
       than svn copied) from Commons IO.

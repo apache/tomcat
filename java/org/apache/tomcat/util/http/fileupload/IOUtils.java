@@ -58,20 +58,18 @@ public class IOUtils {
     // Writer. Each method should take at least one of these as a parameter,
     // or return one of them.
 
-    private static final int EOF = -1;
+    /**
+     * Represents the end-of-file (or stream).
+     * @since 2.5 (made public)
+     */
+    public static final int EOF = -1;
+
 
     /**
      * The default buffer size ({@value}) to use for
      * {@link #copyLarge(InputStream, OutputStream)}.
      */
     private static final int DEFAULT_BUFFER_SIZE = 1024 * 4;
-
-    /**
-     * Instances should NOT be constructed in standard programming.
-     */
-    public IOUtils() {
-        super();
-    }
 
     /**
      * Closes a <code>Closeable</code> unconditionally.
