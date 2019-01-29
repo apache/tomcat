@@ -509,8 +509,16 @@
     <p>The <strong>JMX Remote Lifecycle Listener</strong> fixes the ports used by
     the JMX/RMI Server making things much simpler if you need to connect
     jconsole or a similar tool to a remote Tomcat instance that is running
-    behind a firewall. Only these ports are configured via the listener. The
-    remainder of the configuration is via the standard system properties for
+    behind a firewall.</p>
+
+    <p>Note: The SSL configuration can be done with attributes identical to those
+    of <a href="http.html#SSL_Support_-_SSLHostConfig">SSLHostConfig</a> and the
+    properties of the default certificate as defined for
+    <a href="http.html#SSL_Support_-_Certificate">SSLHostConfigCertificate</a>.
+    This will create a JSSE SSLContext which will be given to the JMX/RMI registry
+    when creating the server socket.</p>
+
+    <p>The remainder of the configuration is via the standard system properties for
     configuring JMX. For further information on configuring JMX see
     <a href="http://docs.oracle.com/javase/6/docs/technotes/guides/management/agent.html">
     Monitoring and Management Using JMX</a> included with the Java SDK
@@ -520,7 +528,7 @@
     element.</p>
 
     <p>The following additional attributes are supported by the <strong>JMX Remote
-    Lifecycle Listener</strong>:</p>
+    Lifecycle Listener</strong>, in addition to the SSL related attributes:</p>
 
     <attributes>
 
@@ -568,6 +576,13 @@
     with a user name of <code>admin</code> and a password of
     <code>letmein</code>.
     </p>
+
+    <h3>SSL configurations</h3>
+
+    <p>A certificate can be defined for the server using a keystore:</p>
+  <source><![CDATA[  <Listener className="org.apache.catalina.mbeans.JmxRemoteLifecycleListener"
+               rmiRegistryPortPlatform="10001" rmiServerPortPlatform="10002"
+               certificateKeystoreFile="${catalina.home}/conf/mykeystore.jks" />]]></source>
 
     <h3>Using JAAS</h3>
 

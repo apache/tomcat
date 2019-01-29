@@ -130,6 +130,10 @@
         application class loading when running under a
         <code>SecurityManager</code>. (markt)
       </fix>
+      <update>
+        Add SSL configuration options to the JMX remote listener using the
+        <code>SSLHostConfig</code> framework. (remm)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Coyote">
