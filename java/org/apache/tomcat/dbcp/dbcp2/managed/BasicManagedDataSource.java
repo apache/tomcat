@@ -52,7 +52,7 @@ import org.apache.tomcat.dbcp.dbcp2.Utils;
  */
 public class BasicManagedDataSource extends BasicDataSource {
 
-    /** Transaction Registry */
+    /** Transaction Synchronization Registry */
     private TransactionRegistry transactionRegistry;
 
     /** Transaction Manager */
@@ -240,7 +240,7 @@ public class BasicManagedDataSource extends BasicDataSource {
             connectionFactory.setMaxOpenPreparedStatements(getMaxOpenPreparedStatements());
             connectionFactory.setMaxConnLifetimeMillis(getMaxConnLifetimeMillis());
             connectionFactory.setRollbackOnReturn(getRollbackOnReturn());
-            connectionFactory.setEnableAutoCommitOnReturn(getEnableAutoCommitOnReturn());
+            connectionFactory.setAutoCommitOnReturn(getAutoCommitOnReturn());
             connectionFactory.setDefaultQueryTimeout(getDefaultQueryTimeout());
             connectionFactory.setFastFailValidation(getFastFailValidation());
             connectionFactory.setDisconnectionSqlCodes(getDisconnectionSqlCodes());

@@ -329,4 +329,20 @@ public class PoolableConnection extends DelegatingConnection<Connection> impleme
         fatalSqlExceptionThrown |= isDisconnectionSqlException(e);
         super.handleException(e);
     }
+
+    /**
+     * @return The disconnection SQL codes.
+     * @since 2.6.0
+     */
+    public Collection<String> getDisconnectionSqlCodes() {
+        return disconnectionSqlCodes;
+    }
+
+    /**
+     * @return Whether to fail-fast.
+     * @since 2.6.0
+     */
+    public boolean isFastFailValidation() {
+        return fastFailValidation;
+    }
 }

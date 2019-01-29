@@ -36,45 +36,6 @@ import org.apache.tomcat.dbcp.dbcp2.ConnectionFactory;
  * @since 2.0
  */
 public class LocalXAConnectionFactory implements XAConnectionFactory {
-    private final TransactionRegistry transactionRegistry;
-    private final ConnectionFactory connectionFactory;
-
-    /**
-     * Creates an LocalXAConnectionFactory which uses the specified connection factory to create database connections.
-     * The connections are enlisted into transactions using the specified transaction manager.
-     *
-     * @param transactionManager
-     *            the transaction manager in which connections will be enlisted
-     * @param connectionFactory
-     *            the connection factory from which connections will be retrieved
-     */
-    public LocalXAConnectionFactory(final TransactionManager transactionManager,
-            final ConnectionFactory connectionFactory) {
-        Objects.requireNonNull(transactionManager, "transactionManager is null");
-        Objects.requireNonNull(connectionFactory, "connectionFactory is null");
-        this.transactionRegistry = new TransactionRegistry(transactionManager);
-        this.connectionFactory = connectionFactory;
-    }
-
-    @Override
-    public TransactionRegistry getTransactionRegistry() {
-        return transactionRegistry;
-    }
-
-    @Override
-    public Connection createConnection() throws SQLException {
-        // create a new connection
-        final Connection connection = connectionFactory.createConnection();
-
-        // create a XAResource to manage the connection during XA transactions
-        final XAResource xaResource = new LocalXAResource(connection);
-
-        // register the xa resource for the connection
-        transactionRegistry.registerConnection(connection, xaResource);
-
-        return connection;
-    }
-
     /**
      * LocalXAResource is a fake XAResource for non-XA connections. When a transaction is started the connection
      * auto-commit is turned off. When the connection is committed or rolled back, the commit or rollback method is
@@ -98,12 +59,196 @@ public class LocalXAConnectionFactory implements XAConnectionFactory {
         }
 
         /**
+         * Commits the transaction and restores the original auto commit setting.
+         *
+         * @param xid
+         *            the id of the transaction branch for this connection
+         * @param flag
+         *            ignored
+         * @throws XAException
+         *             if connection.commit() throws a SQLException
+         */
+        @Override
+        public synchronized void commit(final Xid xid, final boolean flag) throws XAException {
+            Objects.requireNonNull(xid, "xid is null");
+            if (this.currentXid == null) {
+                throw new XAException("There is no current transaction");
+            }
+            if (!this.currentXid.equals(xid)) {
+                throw new XAException("Invalid Xid: expected " + this.currentXid + ", but was " + xid);
+            }
+
+            try {
+                // make sure the connection isn't already closed
+                if (connection.isClosed()) {
+                    throw new XAException("Connection is closed");
+                }
+
+                // A read only connection should not be committed
+                if (!connection.isReadOnly()) {
+                    connection.commit();
+                }
+            } catch (final SQLException e) {
+                throw (XAException) new XAException().initCause(e);
+            } finally {
+                try {
+                    connection.setAutoCommit(originalAutoCommit);
+                } catch (final SQLException e) {
+                    // ignore
+                }
+                this.currentXid = null;
+            }
+        }
+
+        /**
+         * This method does nothing.
+         *
+         * @param xid
+         *            the id of the transaction branch for this connection
+         * @param flag
+         *            ignored
+         * @throws XAException
+         *             if the connection is already enlisted in another transaction
+         */
+        @Override
+        public synchronized void end(final Xid xid, final int flag) throws XAException {
+            Objects.requireNonNull(xid, "xid is null");
+            if (!this.currentXid.equals(xid)) {
+                throw new XAException("Invalid Xid: expected " + this.currentXid + ", but was " + xid);
+            }
+
+            // This notification tells us that the application server is done using this
+            // connection for the time being. The connection is still associated with an
+            // open transaction, so we must still wait for the commit or rollback method
+        }
+
+        /**
+         * Clears the currently associated transaction if it is the specified xid.
+         *
+         * @param xid
+         *            the id of the transaction to forget
+         */
+        @Override
+        public synchronized void forget(final Xid xid) {
+            if (xid != null && xid.equals(currentXid)) {
+                currentXid = null;
+            }
+        }
+
+        /**
+         * Always returns 0 since we have no way to set a transaction timeout on a JDBC connection.
+         *
+         * @return always 0
+         */
+        @Override
+        public int getTransactionTimeout() {
+            return 0;
+        }
+
+        /**
          * Gets the current xid of the transaction branch associated with this XAResource.
          *
          * @return the current xid of the transaction branch associated with this XAResource.
          */
         public synchronized Xid getXid() {
             return currentXid;
+        }
+
+        /**
+         * Returns true if the specified XAResource == this XAResource.
+         *
+         * @param xaResource
+         *            the XAResource to test
+         * @return true if the specified XAResource == this XAResource; false otherwise
+         */
+        @Override
+        public boolean isSameRM(final XAResource xaResource) {
+            return this == xaResource;
+        }
+
+        /**
+         * This method does nothing since the LocalXAConnection does not support two-phase-commit. This method will
+         * return XAResource.XA_RDONLY if the connection isReadOnly(). This assumes that the physical connection is
+         * wrapped with a proxy that prevents an application from changing the read-only flag while enrolled in a
+         * transaction.
+         *
+         * @param xid
+         *            the id of the transaction branch for this connection
+         * @return XAResource.XA_RDONLY if the connection.isReadOnly(); XAResource.XA_OK otherwise
+         */
+        @Override
+        public synchronized int prepare(final Xid xid) {
+            // if the connection is read-only, then the resource is read-only
+            // NOTE: this assumes that the outer proxy throws an exception when application code
+            // attempts to set this in a transaction
+            try {
+                if (connection.isReadOnly()) {
+                    // update the auto commit flag
+                    connection.setAutoCommit(originalAutoCommit);
+
+                    // tell the transaction manager we are read only
+                    return XAResource.XA_RDONLY;
+                }
+            } catch (final SQLException ignored) {
+                // no big deal
+            }
+
+            // this is a local (one phase) only connection, so we can't prepare
+            return XAResource.XA_OK;
+        }
+
+        /**
+         * Always returns a zero length Xid array. The LocalXAConnectionFactory can not support recovery, so no xids
+         * will ever be found.
+         *
+         * @param flag
+         *            ignored since recovery is not supported
+         * @return always a zero length Xid array.
+         */
+        @Override
+        public Xid[] recover(final int flag) {
+            return new Xid[0];
+        }
+
+        /**
+         * Rolls back the transaction and restores the original auto commit setting.
+         *
+         * @param xid
+         *            the id of the transaction branch for this connection
+         * @throws XAException
+         *             if connection.rollback() throws a SQLException
+         */
+        @Override
+        public synchronized void rollback(final Xid xid) throws XAException {
+            Objects.requireNonNull(xid, "xid is null");
+            if (!this.currentXid.equals(xid)) {
+                throw new XAException("Invalid Xid: expected " + this.currentXid + ", but was " + xid);
+            }
+
+            try {
+                connection.rollback();
+            } catch (final SQLException e) {
+                throw (XAException) new XAException().initCause(e);
+            } finally {
+                try {
+                    connection.setAutoCommit(originalAutoCommit);
+                } catch (final SQLException e) {
+                    // Ignore.
+                }
+                this.currentXid = null;
+            }
+        }
+
+        /**
+         * Always returns false since we have no way to set a transaction timeout on a JDBC connection.
+         *
+         * @param transactionTimeout
+         *            ignored since we have no way to set a transaction timeout on a JDBC connection
+         * @return always false
+         */
+        @Override
+        public boolean setTransactionTimeout(final int transactionTimeout) {
+            return false;
         }
 
         /**
@@ -155,190 +300,53 @@ public class LocalXAConnectionFactory implements XAConnectionFactory {
                 throw new XAException("Unknown start flag " + flag);
             }
         }
+    }
+    private final TransactionRegistry transactionRegistry;
 
-        /**
-         * This method does nothing.
-         *
-         * @param xid
-         *            the id of the transaction branch for this connection
-         * @param flag
-         *            ignored
-         * @throws XAException
-         *             if the connection is already enlisted in another transaction
-         */
-        @Override
-        public synchronized void end(final Xid xid, final int flag) throws XAException {
-            Objects.requireNonNull(xid, "xid is null");
-            if (!this.currentXid.equals(xid)) {
-                throw new XAException("Invalid Xid: expected " + this.currentXid + ", but was " + xid);
-            }
+    private final ConnectionFactory connectionFactory;
 
-            // This notification tells us that the application server is done using this
-            // connection for the time being. The connection is still associated with an
-            // open transaction, so we must still wait for the commit or rollback method
-        }
+    /**
+     * Creates an LocalXAConnectionFactory which uses the specified connection factory to create database connections.
+     * The connections are enlisted into transactions using the specified transaction manager.
+     *
+     * @param transactionManager
+     *            the transaction manager in which connections will be enlisted
+     * @param connectionFactory
+     *            the connection factory from which connections will be retrieved
+     */
+    public LocalXAConnectionFactory(final TransactionManager transactionManager,
+            final ConnectionFactory connectionFactory) {
+        Objects.requireNonNull(transactionManager, "transactionManager is null");
+        Objects.requireNonNull(connectionFactory, "connectionFactory is null");
+        this.transactionRegistry = new TransactionRegistry(transactionManager);
+        this.connectionFactory = connectionFactory;
+    }
 
-        /**
-         * This method does nothing since the LocalXAConnection does not support two-phase-commit. This method will
-         * return XAResource.XA_RDONLY if the connection isReadOnly(). This assumes that the physical connection is
-         * wrapped with a proxy that prevents an application from changing the read-only flag while enrolled in a
-         * transaction.
-         *
-         * @param xid
-         *            the id of the transaction branch for this connection
-         * @return XAResource.XA_RDONLY if the connection.isReadOnly(); XAResource.XA_OK otherwise
-         */
-        @Override
-        public synchronized int prepare(final Xid xid) {
-            // if the connection is read-only, then the resource is read-only
-            // NOTE: this assumes that the outer proxy throws an exception when application code
-            // attempts to set this in a transaction
-            try {
-                if (connection.isReadOnly()) {
-                    // update the auto commit flag
-                    connection.setAutoCommit(originalAutoCommit);
+    @Override
+    public Connection createConnection() throws SQLException {
+        // create a new connection
+        final Connection connection = connectionFactory.createConnection();
 
-                    // tell the transaction manager we are read only
-                    return XAResource.XA_RDONLY;
-                }
-            } catch (final SQLException ignored) {
-                // no big deal
-            }
+        // create a XAResource to manage the connection during XA transactions
+        final XAResource xaResource = new LocalXAResource(connection);
 
-            // this is a local (one phase) only connection, so we can't prepare
-            return XAResource.XA_OK;
-        }
+        // register the xa resource for the connection
+        transactionRegistry.registerConnection(connection, xaResource);
 
-        /**
-         * Commits the transaction and restores the original auto commit setting.
-         *
-         * @param xid
-         *            the id of the transaction branch for this connection
-         * @param flag
-         *            ignored
-         * @throws XAException
-         *             if connection.commit() throws a SQLException
-         */
-        @Override
-        public synchronized void commit(final Xid xid, final boolean flag) throws XAException {
-            Objects.requireNonNull(xid, "xid is null");
-            if (this.currentXid == null) {
-                throw new XAException("There is no current transaction");
-            }
-            if (!this.currentXid.equals(xid)) {
-                throw new XAException("Invalid Xid: expected " + this.currentXid + ", but was " + xid);
-            }
+        return connection;
+    }
 
-            try {
-                // make sure the connection isn't already closed
-                if (connection.isClosed()) {
-                    throw new XAException("Connection is closed");
-                }
+    /**
+     * @return The connection factory.
+     * @since 2.6.0
+     */
+    public ConnectionFactory getConnectionFactory() {
+        return connectionFactory;
+    }
 
-                // A read only connection should not be committed
-                if (!connection.isReadOnly()) {
-                    connection.commit();
-                }
-            } catch (final SQLException e) {
-                throw (XAException) new XAException().initCause(e);
-            } finally {
-                try {
-                    connection.setAutoCommit(originalAutoCommit);
-                } catch (final SQLException e) {
-                    // ignore
-                }
-                this.currentXid = null;
-            }
-        }
-
-        /**
-         * Rolls back the transaction and restores the original auto commit setting.
-         *
-         * @param xid
-         *            the id of the transaction branch for this connection
-         * @throws XAException
-         *             if connection.rollback() throws a SQLException
-         */
-        @Override
-        public synchronized void rollback(final Xid xid) throws XAException {
-            Objects.requireNonNull(xid, "xid is null");
-            if (!this.currentXid.equals(xid)) {
-                throw new XAException("Invalid Xid: expected " + this.currentXid + ", but was " + xid);
-            }
-
-            try {
-                connection.rollback();
-            } catch (final SQLException e) {
-                throw (XAException) new XAException().initCause(e);
-            } finally {
-                try {
-                    connection.setAutoCommit(originalAutoCommit);
-                } catch (final SQLException e) {
-                    // Ignore.
-                }
-                this.currentXid = null;
-            }
-        }
-
-        /**
-         * Returns true if the specified XAResource == this XAResource.
-         *
-         * @param xaResource
-         *            the XAResource to test
-         * @return true if the specified XAResource == this XAResource; false otherwise
-         */
-        @Override
-        public boolean isSameRM(final XAResource xaResource) {
-            return this == xaResource;
-        }
-
-        /**
-         * Clears the currently associated transaction if it is the specified xid.
-         *
-         * @param xid
-         *            the id of the transaction to forget
-         */
-        @Override
-        public synchronized void forget(final Xid xid) {
-            if (xid != null && xid.equals(currentXid)) {
-                currentXid = null;
-            }
-        }
-
-        /**
-         * Always returns a zero length Xid array. The LocalXAConnectionFactory can not support recovery, so no xids
-         * will ever be found.
-         *
-         * @param flag
-         *            ignored since recovery is not supported
-         * @return always a zero length Xid array.
-         */
-        @Override
-        public Xid[] recover(final int flag) {
-            return new Xid[0];
-        }
-
-        /**
-         * Always returns 0 since we have no way to set a transaction timeout on a JDBC connection.
-         *
-         * @return always 0
-         */
-        @Override
-        public int getTransactionTimeout() {
-            return 0;
-        }
-
-        /**
-         * Always returns false since we have no way to set a transaction timeout on a JDBC connection.
-         *
-         * @param transactionTimeout
-         *            ignored since we have no way to set a transaction timeout on a JDBC connection
-         * @return always false
-         */
-        @Override
-        public boolean setTransactionTimeout(final int transactionTimeout) {
-            return false;
-        }
+    @Override
+    public TransactionRegistry getTransactionRegistry() {
+        return transactionRegistry;
     }
 
 }

@@ -1053,4 +1053,79 @@ public abstract class InstanceKeyDataSource implements DataSource, Referenceable
         }
         return cpds;
     }
+
+    /**
+     * @since 2.6.0
+     */
+    @Override
+    public synchronized String toString() {
+        final StringBuilder builder = new StringBuilder(super.toString());
+        builder.append("[");
+        toStringFields(builder);
+        builder.append("]");
+        return builder.toString();
+    }
+
+    protected void toStringFields(final StringBuilder builder) {
+        builder.append("getConnectionCalled=");
+        builder.append(getConnectionCalled);
+        builder.append(", dataSource=");
+        builder.append(dataSource);
+        builder.append(", dataSourceName=");
+        builder.append(dataSourceName);
+        builder.append(", description=");
+        builder.append(description);
+        builder.append(", jndiEnvironment=");
+        builder.append(jndiEnvironment);
+        builder.append(", loginTimeout=");
+        builder.append(loginTimeout);
+        builder.append(", logWriter=");
+        builder.append(logWriter);
+        builder.append(", instanceKey=");
+        builder.append(instanceKey);
+        builder.append(", defaultBlockWhenExhausted=");
+        builder.append(defaultBlockWhenExhausted);
+        builder.append(", defaultEvictionPolicyClassName=");
+        builder.append(defaultEvictionPolicyClassName);
+        builder.append(", defaultLifo=");
+        builder.append(defaultLifo);
+        builder.append(", defaultMaxIdle=");
+        builder.append(defaultMaxIdle);
+        builder.append(", defaultMaxTotal=");
+        builder.append(defaultMaxTotal);
+        builder.append(", defaultMaxWaitMillis=");
+        builder.append(defaultMaxWaitMillis);
+        builder.append(", defaultMinEvictableIdleTimeMillis=");
+        builder.append(defaultMinEvictableIdleTimeMillis);
+        builder.append(", defaultMinIdle=");
+        builder.append(defaultMinIdle);
+        builder.append(", defaultNumTestsPerEvictionRun=");
+        builder.append(defaultNumTestsPerEvictionRun);
+        builder.append(", defaultSoftMinEvictableIdleTimeMillis=");
+        builder.append(defaultSoftMinEvictableIdleTimeMillis);
+        builder.append(", defaultTestOnCreate=");
+        builder.append(defaultTestOnCreate);
+        builder.append(", defaultTestOnBorrow=");
+        builder.append(defaultTestOnBorrow);
+        builder.append(", defaultTestOnReturn=");
+        builder.append(defaultTestOnReturn);
+        builder.append(", defaultTestWhileIdle=");
+        builder.append(defaultTestWhileIdle);
+        builder.append(", defaultTimeBetweenEvictionRunsMillis=");
+        builder.append(defaultTimeBetweenEvictionRunsMillis);
+        builder.append(", validationQuery=");
+        builder.append(validationQuery);
+        builder.append(", validationQueryTimeoutSeconds=");
+        builder.append(validationQueryTimeoutSeconds);
+        builder.append(", rollbackAfterValidation=");
+        builder.append(rollbackAfterValidation);
+        builder.append(", maxConnLifetimeMillis=");
+        builder.append(maxConnLifetimeMillis);
+        builder.append(", defaultAutoCommit=");
+        builder.append(defaultAutoCommit);
+        builder.append(", defaultTransactionIsolation=");
+        builder.append(defaultTransactionIsolation);
+        builder.append(", defaultReadOnly=");
+        builder.append(defaultReadOnly);
+    }
 }

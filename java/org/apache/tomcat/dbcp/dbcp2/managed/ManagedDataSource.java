@@ -52,6 +52,27 @@ public class ManagedDataSource<C extends Connection> extends PoolingDataSource<C
         this.transactionRegistry = transactionRegistry;
     }
 
+    @Override
+    public Connection getConnection() throws SQLException {
+        if (getPool() == null) {
+            throw new IllegalStateException("Pool has not been set");
+        }
+        if (transactionRegistry == null) {
+            throw new IllegalStateException("TransactionRegistry has not been set");
+        }
+
+        return new ManagedConnection<>(getPool(), transactionRegistry, isAccessToUnderlyingConnectionAllowed());
+    }
+
+    /**
+     * @return The transaction registry
+     *
+     * @since 2.6.0
+     */
+    public TransactionRegistry getTransactionRegistry() {
+        return transactionRegistry;
+    }
+
     /**
      * Sets the transaction registry from the XAConnectionFactory used to create the pool. The transaction registry can
      * only be set once using either a connector or this setter method.
@@ -66,17 +87,5 @@ public class ManagedDataSource<C extends Connection> extends PoolingDataSource<C
         Objects.requireNonNull(transactionRegistry, "transactionRegistry is null");
 
         this.transactionRegistry = transactionRegistry;
-    }
-
-    @Override
-    public Connection getConnection() throws SQLException {
-        if (getPool() == null) {
-            throw new IllegalStateException("Pool has not been set");
-        }
-        if (transactionRegistry == null) {
-            throw new IllegalStateException("TransactionRegistry has not been set");
-        }
-
-        return new ManagedConnection<>(getPool(), transactionRegistry, isAccessToUnderlyingConnectionAllowed());
     }
 }

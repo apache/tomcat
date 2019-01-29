@@ -46,11 +46,25 @@ import org.apache.tomcat.dbcp.pool2.ObjectPool;
  */
 public class ManagedConnection<C extends Connection> extends DelegatingConnection<C> {
 
+    /**
+     * Delegates to {@link ManagedConnection#transactionComplete()} for transaction completion events.
+     *
+     * @since 2.0
+     */
+    protected class CompletionListener implements TransactionContextListener {
+        @Override
+        public void afterCompletion(final TransactionContext completedContext, final boolean committed) {
+            if (completedContext == transactionContext) {
+                transactionComplete();
+            }
+        }
+    }
     private final ObjectPool<C> pool;
     private final TransactionRegistry transactionRegistry;
     private final boolean accessToUnderlyingConnectionAllowed;
     private TransactionContext transactionContext;
     private boolean isSharedConnection;
+
     private final Lock lock;
 
     /**
@@ -79,6 +93,145 @@ public class ManagedConnection<C extends Connection> extends DelegatingConnectio
     protected void checkOpen() throws SQLException {
         super.checkOpen();
         updateTransactionStatus();
+    }
+
+    @Override
+    public void close() throws SQLException {
+        if (!isClosedInternal()) {
+            // Don't actually close the connection if in a transaction. The
+            // connection will be closed by the transactionComplete method.
+            //
+            // DBCP-484 we need to make sure setClosedInternal(true) being
+            // invoked if transactionContext is not null as this value will
+            // be modified by the transactionComplete method which could run
+            // in the different thread with the transaction calling back.
+            lock.lock();
+            try {
+                if (transactionContext == null || transactionContext.isTransactionComplete()) {
+                    super.close();
+                }
+            } finally {
+                try {
+                    setClosedInternal(true);
+                } finally {
+                    lock.unlock();
+                }
+            }
+        }
+    }
+
+    @Override
+    public void commit() throws SQLException {
+        if (transactionContext != null) {
+            throw new SQLException("Commit can not be set while enrolled in a transaction");
+        }
+        super.commit();
+    }
+
+    @Override
+    public C getDelegate() {
+        if (isAccessToUnderlyingConnectionAllowed()) {
+            return getDelegateInternal();
+        }
+        return null;
+    }
+
+    //
+    // The following methods can't be used while enlisted in a transaction
+    //
+
+    @Override
+    public Connection getInnermostDelegate() {
+        if (isAccessToUnderlyingConnectionAllowed()) {
+            return super.getInnermostDelegateInternal();
+        }
+        return null;
+    }
+
+    /**
+     * @return The transaction context.
+     * @since 2.6.0
+     */
+    public TransactionContext getTransactionContext() {
+        return transactionContext;
+    }
+
+    /**
+     * @return The transaction registry.
+     * @since 2.6.0
+     */
+    public TransactionRegistry getTransactionRegistry() {
+        return transactionRegistry;
+    }
+
+    /**
+     * If false, getDelegate() and getInnermostDelegate() will return null.
+     *
+     * @return if false, getDelegate() and getInnermostDelegate() will return null
+     */
+    public boolean isAccessToUnderlyingConnectionAllowed() {
+        return accessToUnderlyingConnectionAllowed;
+    }
+
+    //
+    // Methods for accessing the delegate connection
+    //
+
+    @Override
+    public void rollback() throws SQLException {
+        if (transactionContext != null) {
+            throw new SQLException("Commit can not be set while enrolled in a transaction");
+        }
+        super.rollback();
+    }
+
+    @Override
+    public void setAutoCommit(final boolean autoCommit) throws SQLException {
+        if (transactionContext != null) {
+            throw new SQLException("Auto-commit can not be set while enrolled in a transaction");
+        }
+        super.setAutoCommit(autoCommit);
+    }
+
+    @Override
+    public void setReadOnly(final boolean readOnly) throws SQLException {
+        if (transactionContext != null) {
+            throw new SQLException("Read-only can not be set while enrolled in a transaction");
+        }
+        super.setReadOnly(readOnly);
+    }
+
+    protected void transactionComplete() {
+        lock.lock();
+        try {
+            transactionContext.completeTransaction();
+        } finally {
+            lock.unlock();
+        }
+
+        // If we were using a shared connection, clear the reference now that
+        // the transaction has completed
+        if (isSharedConnection) {
+            setDelegate(null);
+            isSharedConnection = false;
+        }
+
+        // If this connection was closed during the transaction and there is
+        // still a delegate present close it
+        final Connection delegate = getDelegateInternal();
+        if (isClosedInternal() && delegate != null) {
+            try {
+                setDelegate(null);
+
+                if (!delegate.isClosed()) {
+                    delegate.close();
+                }
+            } catch (final SQLException ignored) {
+                // Not a whole lot we can do here as connection is closed
+                // and this is a transaction callback so there is no
+                // way to report the error.
+            }
+        }
     }
 
     private void updateTransactionStatus() throws SQLException {
@@ -170,142 +323,5 @@ public class ManagedConnection<C extends Connection> extends DelegatingConnectio
         // autoCommit may have been changed directly on the underlying
         // connection
         clearCachedState();
-    }
-
-    @Override
-    public void close() throws SQLException {
-        if (!isClosedInternal()) {
-            // Don't actually close the connection if in a transaction. The
-            // connection will be closed by the transactionComplete method.
-            //
-            // DBCP-484 we need to make sure setClosedInternal(true) being
-            // invoked if transactionContext is not null as this value will
-            // be modified by the transactionComplete method which could run
-            // in the different thread with the transaction calling back.
-            lock.lock();
-            try {
-                if (transactionContext == null || transactionContext.isTransactionComplete()) {
-                    super.close();
-                }
-            } finally {
-                try {
-                    setClosedInternal(true);
-                } finally {
-                    lock.unlock();
-                }
-            }
-        }
-    }
-
-    /**
-     * Delegates to {@link ManagedConnection#transactionComplete()} for transaction completion events.
-     *
-     * @since 2.0
-     */
-    protected class CompletionListener implements TransactionContextListener {
-        @Override
-        public void afterCompletion(final TransactionContext completedContext, final boolean committed) {
-            if (completedContext == transactionContext) {
-                transactionComplete();
-            }
-        }
-    }
-
-    protected void transactionComplete() {
-        lock.lock();
-        try {
-            transactionContext.completeTransaction();
-        } finally {
-            lock.unlock();
-        }
-
-        // If we were using a shared connection, clear the reference now that
-        // the transaction has completed
-        if (isSharedConnection) {
-            setDelegate(null);
-            isSharedConnection = false;
-        }
-
-        // If this connection was closed during the transaction and there is
-        // still a delegate present close it
-        final Connection delegate = getDelegateInternal();
-        if (isClosedInternal() && delegate != null) {
-            try {
-                setDelegate(null);
-
-                if (!delegate.isClosed()) {
-                    delegate.close();
-                }
-            } catch (final SQLException ignored) {
-                // Not a whole lot we can do here as connection is closed
-                // and this is a transaction callback so there is no
-                // way to report the error.
-            }
-        }
-    }
-
-    //
-    // The following methods can't be used while enlisted in a transaction
-    //
-
-    @Override
-    public void setAutoCommit(final boolean autoCommit) throws SQLException {
-        if (transactionContext != null) {
-            throw new SQLException("Auto-commit can not be set while enrolled in a transaction");
-        }
-        super.setAutoCommit(autoCommit);
-    }
-
-    @Override
-    public void commit() throws SQLException {
-        if (transactionContext != null) {
-            throw new SQLException("Commit can not be set while enrolled in a transaction");
-        }
-        super.commit();
-    }
-
-    @Override
-    public void rollback() throws SQLException {
-        if (transactionContext != null) {
-            throw new SQLException("Commit can not be set while enrolled in a transaction");
-        }
-        super.rollback();
-    }
-
-    @Override
-    public void setReadOnly(final boolean readOnly) throws SQLException {
-        if (transactionContext != null) {
-            throw new SQLException("Read-only can not be set while enrolled in a transaction");
-        }
-        super.setReadOnly(readOnly);
-    }
-
-    //
-    // Methods for accessing the delegate connection
-    //
-
-    /**
-     * If false, getDelegate() and getInnermostDelegate() will return null.
-     *
-     * @return if false, getDelegate() and getInnermostDelegate() will return null
-     */
-    public boolean isAccessToUnderlyingConnectionAllowed() {
-        return accessToUnderlyingConnectionAllowed;
-    }
-
-    @Override
-    public C getDelegate() {
-        if (isAccessToUnderlyingConnectionAllowed()) {
-            return getDelegateInternal();
-        }
-        return null;
-    }
-
-    @Override
-    public Connection getInnermostDelegate() {
-        if (isAccessToUnderlyingConnectionAllowed()) {
-            return super.getInnermostDelegateInternal();
-        }
-        return null;
     }
 }

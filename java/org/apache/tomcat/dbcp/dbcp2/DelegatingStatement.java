@@ -161,7 +161,7 @@ public class DelegatingStatement extends AbandonedTrace implements Statement {
     public void closeOnCompletion() throws SQLException {
         checkOpen();
         try {
-            statement.closeOnCompletion();
+            Jdbc41Bridge.closeOnCompletion(statement);
         } catch (final SQLException e) {
             handleException(e);
         }
@@ -630,7 +630,7 @@ public class DelegatingStatement extends AbandonedTrace implements Statement {
     public boolean isCloseOnCompletion() throws SQLException {
         checkOpen();
         try {
-            return statement.isCloseOnCompletion();
+            return Jdbc41Bridge.isCloseOnCompletion(statement);
         } catch (final SQLException e) {
             handleException(e);
             return false;
@@ -790,7 +790,7 @@ public class DelegatingStatement extends AbandonedTrace implements Statement {
      * @return String
      */
     @Override
-    public String toString() {
+    public synchronized String toString() {
         return statement == null ? "NULL" : statement.toString();
     }
 

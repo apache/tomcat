@@ -130,7 +130,7 @@ public class DelegatingDatabaseMetaData implements DatabaseMetaData {
     public boolean generatedKeyAlwaysReturned() throws SQLException {
         connection.checkOpen();
         try {
-            return databaseMetaData.generatedKeyAlwaysReturned();
+            return Jdbc41Bridge.generatedKeyAlwaysReturned(databaseMetaData);
         } catch (final SQLException e) {
             handleException(e);
             return false;
@@ -744,8 +744,8 @@ public class DelegatingDatabaseMetaData implements DatabaseMetaData {
             final String columnNamePattern) throws SQLException {
         connection.checkOpen();
         try {
-            return DelegatingResultSet.wrapResultSet(connection,
-                    databaseMetaData.getPseudoColumns(catalog, schemaPattern, tableNamePattern, columnNamePattern));
+            return DelegatingResultSet.wrapResultSet(connection, Jdbc41Bridge.getPseudoColumns(databaseMetaData,
+                    catalog, schemaPattern, tableNamePattern, columnNamePattern));
         } catch (final SQLException e) {
             handleException(e);
             throw new AssertionError();

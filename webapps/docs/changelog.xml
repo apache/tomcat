@@ -280,6 +280,10 @@
         Update the internal fork of Apache Commons FileUpload to pick up the
         changes in the Apache Commons FileUpload 1.4 release. (markt)
       </add>
+      <update>
+        Update the internal fork of Apache Commons DBCP 2 to de20b77
+        (2019-01-29) to pick up some bug fixes and enhancements. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>

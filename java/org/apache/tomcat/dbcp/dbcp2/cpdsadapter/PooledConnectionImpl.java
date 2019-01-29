@@ -30,6 +30,7 @@ import javax.sql.StatementEventListener;
 
 import org.apache.tomcat.dbcp.dbcp2.DelegatingConnection;
 import org.apache.tomcat.dbcp.dbcp2.DelegatingPreparedStatement;
+import org.apache.tomcat.dbcp.dbcp2.Jdbc41Bridge;
 import org.apache.tomcat.dbcp.dbcp2.PStmtKey;
 import org.apache.tomcat.dbcp.dbcp2.PoolableCallableStatement;
 import org.apache.tomcat.dbcp.dbcp2.PoolablePreparedStatement;
@@ -295,7 +296,7 @@ class PooledConnectionImpl
 
     private String getSchemaOrNull() {
         try {
-            return connection == null ? null : connection.getSchema();
+            return connection == null ? null : Jdbc41Bridge.getSchema(connection);
         } catch (final SQLException e) {
             return null;
         }
@@ -645,5 +646,31 @@ class PooledConnectionImpl
     @Override
     public boolean validateObject(final PStmtKey key, final PooledObject<DelegatingPreparedStatement> pooledObject) {
         return true;
+    }
+
+    /**
+     * @since 2.6.0
+     */
+    @Override
+    public synchronized String toString() {
+        final StringBuilder builder = new StringBuilder(super.toString());
+        builder.append("[connection=");
+        builder.append(connection);
+        builder.append(", delegatingConnection=");
+        builder.append(delegatingConnection);
+        builder.append(", logicalConnection=");
+        builder.append(logicalConnection);
+        builder.append(", eventListeners=");
+        builder.append(eventListeners);
+        builder.append(", statementEventListeners=");
+        builder.append(statementEventListeners);
+        builder.append(", closed=");
+        builder.append(closed);
+        builder.append(", pStmtPool=");
+        builder.append(pStmtPool);
+        builder.append(", accessToUnderlyingConnectionAllowed=");
+        builder.append(accessToUnderlyingConnectionAllowed);
+        builder.append("]");
+        return builder.toString();
     }
 }
