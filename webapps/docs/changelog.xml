@@ -149,6 +149,9 @@
         Ensure that the network connection is closed if the client receives an
         I/O error trying to communicate with the server. (markt)
       </fix>
+      <fix>
+        Ignore synthetic methods when scanning POJO methods. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
