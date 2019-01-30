@@ -49,11 +49,15 @@
   </p>
   <p>
     Using the above configuration will enable all-to-all session replication
-    using the <code>DeltaManager</code> to replicate session deltas. By all-to-all we mean that the session gets replicated to all the other
-    nodes in the cluster. This works great for smaller cluster but we don't recommend it for larger clusters(a lot of Tomcat nodes).
-    Also when using the delta manager it will replicate to all nodes, even nodes that don't have the application deployed.<br/>
-    To get around this problem, you'll want to use the BackupManager. This manager only replicates the session data to one backup
-    node, and only to nodes that have the application deployed. Downside of the BackupManager: not quite as battle tested as the delta manager.
+    using the <code>DeltaManager</code> to replicate session deltas. By all-to-all, we mean that <i>every</i>
+    session gets replicated to <i>all the other nodes</i> in the cluster.
+    This works great for smaller clusters, but we don't recommend it for larger clusters &#8212; more than 4 nodes or so.
+    Also, when using the DeltaManager, Tomcat will replicate sessions to <i>all</i> nodes,
+    <i>even nodes that don't have the application deployed</i>.<br/>
+    To get around these problem, you'll want to use the <code>BackupManager</code>. The <code>BackupManager</code>
+    only replicates the session data to <i>one</i> backup node, and only to nodes that have the application deployed.
+    Once you have a simple cluster running with the <code>DeltaManager</code>, you will probably want to
+    migrate to the <code>BackupManager</code> as you increase the number of nodes in your cluster.
   </p>
   <p>
     Here are some of the important default values:
@@ -108,7 +112,7 @@
 
           <ClusterListener className="org.apache.catalina.ha.session.ClusterSessionListener"/>
         </Cluster>]]></source>
-  <p>Will cover this section in more detail later in this document.</p>
+  <p>We will cover this section in more detail later in this document.</p>
 </section>
 
 <section name="Security">
@@ -163,12 +167,15 @@ should be completed:</p>
   <li>Using in-memory-replication, using the SimpleTcpCluster that ships with Tomcat (lib/catalina-tribes.jar + lib/catalina-ha.jar)</li>
 </ol>
 
-<p>In this release of session replication, Tomcat can perform an all-to-all replication of session state using the <code>DeltaManager</code> or
+<p>Tomcat can perform an all-to-all replication of session state using the <code>DeltaManager</code> or
    perform backup replication to only one node using the <code>BackupManager</code>.
-   The all-to-all replication is an algorithm that is only efficient when the clusters are small. For larger clusters,  to use
-   a primary-secondary session replication where the session will only be stored at one backup server simply setup the BackupManager. <br/>
+   The all-to-all replication is an algorithm that is only efficient when the clusters are small. For larger clusters, you
+   should use the BackupManager to use a primary-secondary session replication strategy where the session will only be
+   stored at one backup node.<br/>
+
    Currently you can use the domain worker attribute (mod_jk &gt; 1.2.8) to build cluster partitions
-   with the potential of having a more scalable cluster solution with the DeltaManager(you'll need to configure the domain interceptor for this).
+   with the potential of having a more scalable cluster solution with the DeltaManager
+   (you'll need to configure the domain interceptor for this).
    In order to keep the network traffic down in an all-to-all environment, you can split your cluster
    into smaller groups. This can be easily achieved by using different multicast addresses for the different groups.
    A very simple setup would look like this:
