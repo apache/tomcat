@@ -123,6 +123,7 @@ Tomcat cluster. These include:</p>
   <li>private LAN</li>
   <li>a Virtual Private Network (VPN)</li>
   <li>IPSEC</li>
+  <li>Encrypt cluster traffic using the <a href="config/cluster-interceptor.html#org.apache.catalina.tribes.group.interceptors.EncryptInterceptor_Attributes">EncryptInterceptor</a></li>
 </ul>
 
 </section>
