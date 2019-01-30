@@ -435,6 +435,11 @@
       <p>The cluster implementation is written on the basis that a secure,
       trusted network is used for all of the cluster related network traffic. It
       is not safe to run a cluster on a insecure, untrusted network.</p>
+
+      <p>If you are operating on an untrusted network or would prefer to
+      execrise an over-abundance of caution, you can use the
+      <a href="config/cluster-interceptor.html#org.apache.catalina.tribes.group.interceptors.EncryptInterceptor_Attributes">EncryptInterceptor</a>
+      to encrypt traffic between nodes.</p>
     </subsection>
   </section>
 
