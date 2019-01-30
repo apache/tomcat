@@ -88,6 +88,13 @@ public class PojoMethodMapping {
                 clazzPojoMethods = currentClazzMethods;
             }
             for (Method method : currentClazzMethods) {
+                if (method.isSynthetic()) {
+                    // Skip all synthetic methods.
+                    // They may have copies of annotations from methods we are
+                    // interested in and they will use the wrong parameter type
+                    // (they always use Object) so we can't used them here.
+                    continue;
+                }
                 if (method.getAnnotation(OnOpen.class) != null) {
                     checkPublic(method);
                     if (open == null) {
