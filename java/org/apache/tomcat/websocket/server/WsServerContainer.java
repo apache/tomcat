@@ -82,6 +82,7 @@ public class WsServerContainer extends WsWebSocketContainer
     private final ConcurrentMap<String,Set<WsSession>> authenticatedSessions =
             new ConcurrentHashMap<>();
     private volatile boolean endpointsRegistered = false;
+    private volatile boolean deploymentFailed = false;
 
     WsServerContainer(ServletContext servletContext) {
 
@@ -128,8 +129,7 @@ public class WsServerContainer extends WsWebSocketContainer
      *         requested
      */
     @Override
-    public void addEndpoint(ServerEndpointConfig sec)
-            throws DeploymentException {
+    public void addEndpoint(ServerEndpointConfig sec) throws DeploymentException {
 
         if (enforceNoAddAfterHandshake && !addAllowed) {
             throw new DeploymentException(
@@ -140,50 +140,61 @@ public class WsServerContainer extends WsWebSocketContainer
             throw new DeploymentException(
                     sm.getString("serverContainer.servletContextMissing"));
         }
-        String path = sec.getPath();
 
-        // Add method mapping to user properties
-        PojoMethodMapping methodMapping = new PojoMethodMapping(sec.getEndpointClass(),
-                sec.getDecoders(), path);
-        if (methodMapping.getOnClose() != null || methodMapping.getOnOpen() != null
-                || methodMapping.getOnError() != null || methodMapping.hasMessageHandlers()) {
-            sec.getUserProperties().put(org.apache.tomcat.websocket.pojo.Constants.POJO_METHOD_MAPPING_KEY,
-                    methodMapping);
+        if (deploymentFailed) {
+            throw new DeploymentException(sm.getString("serverContainer.failedDeployment",
+                    servletContext.getContextPath(), servletContext.getVirtualServerName()));
         }
 
-        UriTemplate uriTemplate = new UriTemplate(path);
-        if (uriTemplate.hasParameters()) {
-            Integer key = Integer.valueOf(uriTemplate.getSegmentCount());
-            SortedSet<TemplatePathMatch> templateMatches =
-                    configTemplateMatchMap.get(key);
-            if (templateMatches == null) {
-                // Ensure that if concurrent threads execute this block they
-                // both end up using the same TreeSet instance
-                templateMatches = new TreeSet<>(
-                        TemplatePathMatchComparator.getInstance());
-                configTemplateMatchMap.putIfAbsent(key, templateMatches);
-                templateMatches = configTemplateMatchMap.get(key);
-            }
-            if (!templateMatches.add(new TemplatePathMatch(sec, uriTemplate))) {
-                // Duplicate uriTemplate;
-                throw new DeploymentException(
-                        sm.getString("serverContainer.duplicatePaths", path,
-                                     sec.getEndpointClass(),
-                                     sec.getEndpointClass()));
-            }
-        } else {
-            // Exact match
-            ServerEndpointConfig old = configExactMatchMap.put(path, sec);
-            if (old != null) {
-                // Duplicate path mappings
-                throw new DeploymentException(
-                        sm.getString("serverContainer.duplicatePaths", path,
-                                     old.getEndpointClass(),
-                                     sec.getEndpointClass()));
-            }
-        }
+        try {
+            String path = sec.getPath();
 
-        endpointsRegistered = true;
+            // Add method mapping to user properties
+            PojoMethodMapping methodMapping = new PojoMethodMapping(sec.getEndpointClass(),
+                    sec.getDecoders(), path);
+            if (methodMapping.getOnClose() != null || methodMapping.getOnOpen() != null
+                    || methodMapping.getOnError() != null || methodMapping.hasMessageHandlers()) {
+                sec.getUserProperties().put(org.apache.tomcat.websocket.pojo.Constants.POJO_METHOD_MAPPING_KEY,
+                        methodMapping);
+            }
+
+            UriTemplate uriTemplate = new UriTemplate(path);
+            if (uriTemplate.hasParameters()) {
+                Integer key = Integer.valueOf(uriTemplate.getSegmentCount());
+                SortedSet<TemplatePathMatch> templateMatches =
+                        configTemplateMatchMap.get(key);
+                if (templateMatches == null) {
+                    // Ensure that if concurrent threads execute this block they
+                    // both end up using the same TreeSet instance
+                    templateMatches = new TreeSet<>(
+                            TemplatePathMatchComparator.getInstance());
+                    configTemplateMatchMap.putIfAbsent(key, templateMatches);
+                    templateMatches = configTemplateMatchMap.get(key);
+                }
+                if (!templateMatches.add(new TemplatePathMatch(sec, uriTemplate))) {
+                    // Duplicate uriTemplate;
+                    throw new DeploymentException(
+                            sm.getString("serverContainer.duplicatePaths", path,
+                                         sec.getEndpointClass(),
+                                         sec.getEndpointClass()));
+                }
+            } else {
+                // Exact match
+                ServerEndpointConfig old = configExactMatchMap.put(path, sec);
+                if (old != null) {
+                    // Duplicate path mappings
+                    throw new DeploymentException(
+                            sm.getString("serverContainer.duplicatePaths", path,
+                                         old.getEndpointClass(),
+                                         sec.getEndpointClass()));
+                }
+            }
+
+            endpointsRegistered = true;
+        } catch (DeploymentException de) {
+            failDeployment();
+            throw de;
+        }
     }
 
 
@@ -197,40 +208,56 @@ public class WsServerContainer extends WsWebSocketContainer
     @Override
     public void addEndpoint(Class<?> pojo) throws DeploymentException {
 
-        ServerEndpoint annotation = pojo.getAnnotation(ServerEndpoint.class);
-        if (annotation == null) {
-            throw new DeploymentException(
-                    sm.getString("serverContainer.missingAnnotation",
-                            pojo.getName()));
-        }
-        String path = annotation.value();
-
-        // Validate encoders
-        validateEncoders(annotation.encoders());
-
-        // ServerEndpointConfig
         ServerEndpointConfig sec;
-        Class<? extends Configurator> configuratorClazz =
-                annotation.configurator();
-        Configurator configurator = null;
-        if (!configuratorClazz.equals(Configurator.class)) {
-            try {
-                configurator = annotation.configurator().getConstructor().newInstance();
-            } catch (ReflectiveOperationException e) {
-                throw new DeploymentException(sm.getString(
-                        "serverContainer.configuratorFail",
-                        annotation.configurator().getName(),
-                        pojo.getClass().getName()), e);
+
+        try {
+            ServerEndpoint annotation = pojo.getAnnotation(ServerEndpoint.class);
+            if (annotation == null) {
+                throw new DeploymentException(
+                        sm.getString("serverContainer.missingAnnotation",
+                                pojo.getName()));
             }
+            String path = annotation.value();
+
+            // Validate encoders
+            validateEncoders(annotation.encoders());
+
+            // ServerEndpointConfig
+            Class<? extends Configurator> configuratorClazz =
+                    annotation.configurator();
+            Configurator configurator = null;
+            if (!configuratorClazz.equals(Configurator.class)) {
+                try {
+                    configurator = annotation.configurator().getConstructor().newInstance();
+                } catch (ReflectiveOperationException e) {
+                    throw new DeploymentException(sm.getString(
+                            "serverContainer.configuratorFail",
+                            annotation.configurator().getName(),
+                            pojo.getClass().getName()), e);
+                }
+            }
+            sec = ServerEndpointConfig.Builder.create(pojo, path).
+                    decoders(Arrays.asList(annotation.decoders())).
+                    encoders(Arrays.asList(annotation.encoders())).
+                    subprotocols(Arrays.asList(annotation.subprotocols())).
+                    configurator(configurator).
+                    build();
+        } catch (DeploymentException de) {
+            failDeployment();
+            throw de;
         }
-        sec = ServerEndpointConfig.Builder.create(pojo, path).
-                decoders(Arrays.asList(annotation.decoders())).
-                encoders(Arrays.asList(annotation.encoders())).
-                subprotocols(Arrays.asList(annotation.subprotocols())).
-                configurator(configurator).
-                build();
 
         addEndpoint(sec);
+    }
+
+
+    void failDeployment() {
+        deploymentFailed = true;
+
+        // Clear all existing deployments
+        endpointsRegistered = false;
+        configExactMatchMap.clear();
+        configTemplateMatchMap.clear();
     }
 
 
