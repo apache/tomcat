@@ -177,6 +177,11 @@
         with <code>@OnMessage</code> does not conform to the requirements set
         out in the Javadoc. (mark)
       </fix>
+      <fix>
+        Improve algorithm that determines if two <code>@OnMessage</code>
+        annotations have been added for the same message type. Prior to this
+        change some matches were missed. (markt) 
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
