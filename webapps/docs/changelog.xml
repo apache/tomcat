@@ -152,6 +152,11 @@
       <fix>
         Ignore synthetic methods when scanning POJO methods. (markt)
       </fix>
+      <fix>
+        Implement the requirements of section 5.2.1 of the WebSocket 1.1
+        specification and ensure that if the deployment of one Endpoint fails,
+        no Endpoints are deployed for that web application. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
