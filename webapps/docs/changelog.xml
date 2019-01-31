@@ -166,6 +166,11 @@
         specification and ensure that if the deployment of one Endpoint fails,
         no Endpoints are deployed for that web application. (markt)
       </fix>
+      <fix>
+        Implement the requirements of section 4.3 of the WebSocket 1.1
+        specification and ensure that the deployment of an Endpoint fails if
+        <code>@PathParam</code> is used with an invalid parameter type. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
