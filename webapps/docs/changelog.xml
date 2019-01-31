@@ -175,12 +175,12 @@
         Ensure a <code>DeploymentException</code> rather than an
         <code>IllegalArgumentException</code> is thrown if a method annotated
         with <code>@OnMessage</code> does not conform to the requirements set
-        out in the Javadoc. (mark)
+        out in the Javadoc. (markt)
       </fix>
       <fix>
         Improve algorithm that determines if two <code>@OnMessage</code>
         annotations have been added for the same message type. Prior to this
-        change some matches were missed. (markt) 
+        change some matches were missed. (markt)
       </fix>
     </changelog>
   </subsection>
