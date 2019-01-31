@@ -208,6 +208,11 @@ public class WsServerContainer extends WsWebSocketContainer
     @Override
     public void addEndpoint(Class<?> pojo) throws DeploymentException {
 
+        if (deploymentFailed) {
+            throw new DeploymentException(sm.getString("serverContainer.failedDeployment",
+                    servletContext.getContextPath(), servletContext.getVirtualServerName()));
+        }
+
         ServerEndpointConfig sec;
 
         try {
