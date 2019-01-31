@@ -308,15 +308,6 @@ public class PojoMethodMapping {
                 for (Annotation paramAnnotation : paramAnnotations) {
                     if (paramAnnotation.annotationType().equals(
                             PathParam.class)) {
-                        // Check that the type is valid. "0" coerces to every
-                        // valid type
-                        try {
-                            Util.coerceToType(type, "0");
-                        } catch (IllegalArgumentException iae) {
-                            throw new DeploymentException(sm.getString(
-                                    "pojoMethodMapping.invalidPathParamType"),
-                                    iae);
-                        }
                         result[i] = new PojoPathParam(type,
                                 ((PathParam) paramAnnotation).value());
                         break;
