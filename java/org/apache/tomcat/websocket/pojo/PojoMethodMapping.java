@@ -388,7 +388,9 @@ public class PojoMethodMapping {
         private DecoderMatch decoderMatch = null;
         private long maxMessageSize = -1;
 
-        public MessageHandlerInfo(Method m, List<DecoderEntry> decoderEntries) {
+        public MessageHandlerInfo(Method m, List<DecoderEntry> decoderEntries)
+                throws DeploymentException {
+
             this.m = m;
 
             Class<?>[] types = m.getParameterTypes();
