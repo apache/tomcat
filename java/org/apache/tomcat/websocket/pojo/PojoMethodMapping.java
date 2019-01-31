@@ -407,7 +407,7 @@ public class PojoMethodMapping {
                     if (indexString == -1) {
                         indexString = i;
                     } else {
-                        throw new IllegalArgumentException(sm.getString(
+                        throw new DeploymentException(sm.getString(
                                 "pojoMethodMapping.duplicateMessageParam",
                                 m.getName(), m.getDeclaringClass().getName()));
                     }
@@ -415,7 +415,7 @@ public class PojoMethodMapping {
                     if (indexReader == -1) {
                         indexReader = i;
                     } else {
-                        throw new IllegalArgumentException(sm.getString(
+                        throw new DeploymentException(sm.getString(
                                 "pojoMethodMapping.duplicateMessageParam",
                                 m.getName(), m.getDeclaringClass().getName()));
                     }
@@ -423,7 +423,7 @@ public class PojoMethodMapping {
                     if (indexBoolean == -1) {
                         indexBoolean = i;
                     } else {
-                        throw new IllegalArgumentException(sm.getString(
+                        throw new DeploymentException(sm.getString(
                                 "pojoMethodMapping.duplicateLastParam",
                                 m.getName(), m.getDeclaringClass().getName()));
                     }
@@ -431,7 +431,7 @@ public class PojoMethodMapping {
                     if (indexByteBuffer == -1) {
                         indexByteBuffer = i;
                     } else {
-                        throw new IllegalArgumentException(sm.getString(
+                        throw new DeploymentException(sm.getString(
                                 "pojoMethodMapping.duplicateMessageParam",
                                 m.getName(), m.getDeclaringClass().getName()));
                     }
@@ -439,7 +439,7 @@ public class PojoMethodMapping {
                     if (indexByteArray == -1) {
                         indexByteArray = i;
                     } else {
-                        throw new IllegalArgumentException(sm.getString(
+                        throw new DeploymentException(sm.getString(
                                 "pojoMethodMapping.duplicateMessageParam",
                                 m.getName(), m.getDeclaringClass().getName()));
                     }
@@ -447,7 +447,7 @@ public class PojoMethodMapping {
                     if (indexInputStream == -1) {
                         indexInputStream = i;
                     } else {
-                        throw new IllegalArgumentException(sm.getString(
+                        throw new DeploymentException(sm.getString(
                                 "pojoMethodMapping.duplicateMessageParam",
                                 m.getName(), m.getDeclaringClass().getName()));
                     }
@@ -456,7 +456,7 @@ public class PojoMethodMapping {
                         indexPrimitive = i;
                         primitiveType = types[i];
                     } else {
-                        throw new IllegalArgumentException(sm.getString(
+                        throw new DeploymentException(sm.getString(
                                 "pojoMethodMapping.duplicateMessageParam",
                                 m.getName(), m.getDeclaringClass().getName()));
                     }
@@ -464,7 +464,7 @@ public class PojoMethodMapping {
                     if (indexSession == -1) {
                         indexSession = i;
                     } else {
-                        throw new IllegalArgumentException(sm.getString(
+                        throw new DeploymentException(sm.getString(
                                 "pojoMethodMapping.duplicateSessionParam",
                                 m.getName(), m.getDeclaringClass().getName()));
                     }
@@ -472,13 +472,13 @@ public class PojoMethodMapping {
                     if (indexPong == -1) {
                         indexPong = i;
                     } else {
-                        throw new IllegalArgumentException(sm.getString(
+                        throw new DeploymentException(sm.getString(
                                 "pojoMethodMapping.duplicatePongMessageParam",
                                 m.getName(), m.getDeclaringClass().getName()));
                     }
                 } else {
                     if (decoderMatch != null && decoderMatch.hasMatches()) {
-                        throw new IllegalArgumentException(sm.getString(
+                        throw new DeploymentException(sm.getString(
                                 "pojoMethodMapping.duplicateMessageParam",
                                 m.getName(), m.getDeclaringClass().getName()));
                     }
@@ -486,6 +486,8 @@ public class PojoMethodMapping {
 
                     if (decoderMatch.hasMatches()) {
                         indexPayload = i;
+                    } else {
+                        throw new DeploymentException("Boo!");
                     }
                 }
             }
@@ -493,7 +495,7 @@ public class PojoMethodMapping {
             // Additional checks required
             if (indexString != -1) {
                 if (indexPayload != -1) {
-                    throw new IllegalArgumentException(sm.getString(
+                    throw new DeploymentException(sm.getString(
                             "pojoMethodMapping.duplicateMessageParam",
                             m.getName(), m.getDeclaringClass().getName()));
                 } else {
@@ -502,7 +504,7 @@ public class PojoMethodMapping {
             }
             if (indexReader != -1) {
                 if (indexPayload != -1) {
-                    throw new IllegalArgumentException(sm.getString(
+                    throw new DeploymentException(sm.getString(
                             "pojoMethodMapping.duplicateMessageParam",
                             m.getName(), m.getDeclaringClass().getName()));
                 } else {
@@ -511,7 +513,7 @@ public class PojoMethodMapping {
             }
             if (indexByteArray != -1) {
                 if (indexPayload != -1) {
-                    throw new IllegalArgumentException(sm.getString(
+                    throw new DeploymentException(sm.getString(
                             "pojoMethodMapping.duplicateMessageParam",
                             m.getName(), m.getDeclaringClass().getName()));
                 } else {
@@ -520,7 +522,7 @@ public class PojoMethodMapping {
             }
             if (indexByteBuffer != -1) {
                 if (indexPayload != -1) {
-                    throw new IllegalArgumentException(sm.getString(
+                    throw new DeploymentException(sm.getString(
                             "pojoMethodMapping.duplicateMessageParam",
                             m.getName(), m.getDeclaringClass().getName()));
                 } else {
@@ -529,7 +531,7 @@ public class PojoMethodMapping {
             }
             if (indexInputStream != -1) {
                 if (indexPayload != -1) {
-                    throw new IllegalArgumentException(sm.getString(
+                    throw new DeploymentException(sm.getString(
                             "pojoMethodMapping.duplicateMessageParam",
                             m.getName(), m.getDeclaringClass().getName()));
                 } else {
@@ -538,7 +540,7 @@ public class PojoMethodMapping {
             }
             if (indexPrimitive != -1) {
                 if (indexPayload != -1) {
-                    throw new IllegalArgumentException(sm.getString(
+                    throw new DeploymentException(sm.getString(
                             "pojoMethodMapping.duplicateMessageParam",
                             m.getName(), m.getDeclaringClass().getName()));
                 } else {
@@ -547,7 +549,7 @@ public class PojoMethodMapping {
             }
             if (indexPong != -1) {
                 if (indexPayload != -1) {
-                    throw new IllegalArgumentException(sm.getString(
+                    throw new DeploymentException(sm.getString(
                             "pojoMethodMapping.pongWithPayload",
                             m.getName(), m.getDeclaringClass().getName()));
                 } else {
@@ -563,28 +565,28 @@ public class PojoMethodMapping {
                 indexBoolean = -1;
             }
             if (indexPayload == -1) {
-                throw new IllegalArgumentException(sm.getString(
+                throw new DeploymentException(sm.getString(
                         "pojoMethodMapping.noPayload",
                         m.getName(), m.getDeclaringClass().getName()));
             }
             if (indexPong != -1 && indexBoolean != -1) {
-                throw new IllegalArgumentException(sm.getString(
+                throw new DeploymentException(sm.getString(
                         "pojoMethodMapping.partialPong",
                         m.getName(), m.getDeclaringClass().getName()));
             }
             if(indexReader != -1 && indexBoolean != -1) {
-                throw new IllegalArgumentException(sm.getString(
+                throw new DeploymentException(sm.getString(
                         "pojoMethodMapping.partialReader",
                         m.getName(), m.getDeclaringClass().getName()));
             }
             if(indexInputStream != -1 && indexBoolean != -1) {
-                throw new IllegalArgumentException(sm.getString(
+                throw new DeploymentException(sm.getString(
                         "pojoMethodMapping.partialInputStream",
                         m.getName(), m.getDeclaringClass().getName()));
             }
             if (decoderMatch != null && decoderMatch.hasMatches() &&
                     indexBoolean != -1) {
-                throw new IllegalArgumentException(sm.getString(
+                throw new DeploymentException(sm.getString(
                         "pojoMethodMapping.partialObject",
                         m.getName(), m.getDeclaringClass().getName()));
             }
