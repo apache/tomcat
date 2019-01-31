@@ -211,6 +211,12 @@
         specification and ensure that the deployment of an Endpoint fails if
         <code>@PathParam</code> is used with an invalid parameter type. (markt)
       </fix>
+      <fix>
+        Ensure a <code>DeploymentException</code> rather than an
+        <code>IllegalArgumentException</code> is thrown if a method annotated
+        with <code>@OnMessage</code> does not conform to the requirements set
+        out in the Javadoc. (mark)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
