@@ -602,6 +602,10 @@ public class Stream extends AbstractStream implements HeaderEmitter {
         } else {
             handler.closeConnection(http2Exception);
         }
+        // Reads wait internally so need to call a method to break the wait()
+        if (inputBuffer != null) {
+            inputBuffer.receiveReset();
+        }
     }
 
 
@@ -986,8 +990,7 @@ public class Stream extends AbstractStream implements HeaderEmitter {
                         inBuffer.wait(handler.getProtocol().getStreamReadTimeout());
 
                         if (resetReceived) {
-                            // TODO: i18n
-                            throw new IOException("HTTP/2 Stream reset");
+                            throw new IOException(sm.getString("stream.inputBuffer.reset"));
                         }
 
                         if (inBuffer.position() == 0) {
