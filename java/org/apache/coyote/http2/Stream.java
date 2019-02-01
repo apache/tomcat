@@ -982,10 +982,22 @@ public class Stream extends AbstractStream implements HeaderEmitter {
                         if (log.isDebugEnabled()) {
                             log.debug(sm.getString("stream.inputBuffer.empty"));
                         }
-                        inBuffer.wait();
+
+                        inBuffer.wait(handler.getProtocol().getStreamReadTimeout());
+
                         if (resetReceived) {
                             // TODO: i18n
                             throw new IOException("HTTP/2 Stream reset");
+                        }
+
+                        if (inBuffer.position() == 0) {
+                            String msg = sm.getString("stream.inputBuffer.readTimeout");
+                            StreamException se = new StreamException(
+                                    msg, Http2Error.ENHANCE_YOUR_CALM, getIdAsInt());
+                            // Trigger a reset once control returns to Tomcat
+                            coyoteResponse.setError();
+                            streamOutputBuffer.reset = se;
+                            throw new CloseNowException(msg, se);
                         }
                     } catch (InterruptedException e) {
                         // Possible shutdown / rst or similar. Use an
