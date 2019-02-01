@@ -101,6 +101,9 @@
         application class loading when running under a
         <code>SecurityManager</code>. (markt)
       </fix>
+      <update>
+        Update the recommended minimum Tomcat Native version to 1.2.21. (markt)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Coyote">
