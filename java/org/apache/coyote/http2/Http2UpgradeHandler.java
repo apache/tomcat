@@ -356,7 +356,9 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
                     }
 
                     if (overheadCount.get() > 0) {
-                        throw new ConnectionException("Too much overhead", Http2Error.ENHANCE_YOUR_CALM);
+                        throw new ConnectionException(
+                                sm.getString("upgradeHandler.tooMuchOverhead", connectionId),
+                                Http2Error.ENHANCE_YOUR_CALM);
                     }
 
                     if (activeRemoteStreamCount.get() == 0) {
