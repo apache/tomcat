@@ -80,10 +80,13 @@ class StreamProcessor extends AbstractProcessor {
                             log.info(ce.getMessage(), ce);
                             stream.close(ce);
                         } else if (!getErrorState().isIoAllowed()) {
-                            StreamException se = new StreamException(sm.getString(
-                                    "streamProcessor.error.stream", stream.getConnectionId(),
-                                    stream.getIdentifier()), Http2Error.INTERNAL_ERROR,
-                                    stream.getIdentifier().intValue());
+                            StreamException se = stream.getResetException();
+                            if (se == null) {
+                                se = new StreamException(sm.getString(
+                                        "streamProcessor.error.stream", stream.getConnectionId(),
+                                        stream.getIdentifier()), Http2Error.INTERNAL_ERROR,
+                                        stream.getIdentifier().intValue());
+                            }
                             stream.close(se);
                         }
                     }
