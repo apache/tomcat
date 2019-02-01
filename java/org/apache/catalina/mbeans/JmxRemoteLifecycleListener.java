@@ -31,8 +31,11 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.RMIClientSocketFactory;
 import java.rmi.server.RMIServerSocketFactory;
+import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
+import java.util.Locale;
 
 import javax.management.remote.JMXConnectorServer;
 import javax.management.remote.JMXServiceURL;
@@ -41,7 +44,6 @@ import javax.management.remote.rmi.RMIJRMPServerImpl;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLServerSocket;
 import javax.net.ssl.SSLServerSocketFactory;
-import javax.net.ssl.SSLSessionContext;
 import javax.rmi.ssl.SslRMIClientSocketFactory;
 import javax.rmi.ssl.SslRMIServerSocketFactory;
 
@@ -50,9 +52,6 @@ import org.apache.catalina.LifecycleEvent;
 import org.apache.catalina.LifecycleListener;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
-import org.apache.tomcat.util.net.SSLHostConfig;
-import org.apache.tomcat.util.net.SSLHostConfigCertificate;
-import org.apache.tomcat.util.net.jsse.JSSEUtil;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -62,9 +61,7 @@ import org.apache.tomcat.util.res.StringManager;
  * the listener. The remainder of the configuration is via the standard system
  * properties for configuring JMX.
  */
-public class JmxRemoteLifecycleListener extends SSLHostConfig implements LifecycleListener {
-
-    private static final long serialVersionUID = 1L;
+public class JmxRemoteLifecycleListener implements LifecycleListener {
 
     private static final Log log = LogFactory.getLog(JmxRemoteLifecycleListener.class);
 
@@ -76,6 +73,9 @@ public class JmxRemoteLifecycleListener extends SSLHostConfig implements Lifecyc
     protected int rmiServerPortPlatform = -1;
     protected boolean rmiRegistrySSL = true;
     protected boolean rmiServerSSL = true;
+    protected String ciphers[] = null;
+    protected String protocols[] = null;
+    protected boolean clientAuth = true;
     protected boolean authenticate = true;
     protected String passwordFile = null;
     protected String loginModuleName = null;
@@ -155,138 +155,48 @@ public class JmxRemoteLifecycleListener extends SSLHostConfig implements Lifecyc
         this.useLocalPorts = useLocalPorts;
     }
 
-    /**
-     * @return the rmiRegistrySSL
-     */
-    public boolean isRmiRegistrySSL() {
-        return rmiRegistrySSL;
-    }
-
-    /**
-     * @param rmiRegistrySSL the rmiRegistrySSL to set
-     */
-    public void setRmiRegistrySSL(boolean rmiRegistrySSL) {
-        this.rmiRegistrySSL = rmiRegistrySSL;
-    }
-
-    /**
-     * @return the rmiServerSSL
-     */
-    public boolean isRmiServerSSL() {
-        return rmiServerSSL;
-    }
-
-    /**
-     * @param rmiServerSSL the rmiServerSSL to set
-     */
-    public void setRmiServerSSL(boolean rmiServerSSL) {
-        this.rmiServerSSL = rmiServerSSL;
-    }
-
-    /**
-     * @return the authenticate
-     */
-    public boolean isAuthenticate() {
-        return authenticate;
-    }
-
-    /**
-     * @param authenticate the authenticate to set
-     */
-    public void setAuthenticate(boolean authenticate) {
-        this.authenticate = authenticate;
-    }
-
-    /**
-     * @return the passwordFile
-     */
-    public String getPasswordFile() {
-        return passwordFile;
-    }
-
-    /**
-     * @param passwordFile the passwordFile to set
-     */
-    public void setPasswordFile(String passwordFile) {
-        this.passwordFile = passwordFile;
-    }
-
-    /**
-     * @return the loginModuleName
-     */
-    public String getLoginModuleName() {
-        return loginModuleName;
-    }
-
-    /**
-     * @param loginModuleName the loginModuleName to set
-     */
-    public void setLoginModuleName(String loginModuleName) {
-        this.loginModuleName = loginModuleName;
-    }
-
-    /**
-     * @return the accessFile
-     */
-    public String getAccessFile() {
-        return accessFile;
-    }
-
-    /**
-     * @param accessFile the accessFile to set
-     */
-    public void setAccessFile(String accessFile) {
-        this.accessFile = accessFile;
-    }
-
-    protected void init() {
+    private void init() {
         // Get all the other parameters required from the standard system
         // properties. Only need to get the parameters that affect the creation
         // of the server port.
-        String rmiRegistrySSLValue = System.getProperty("com.sun.management.jmxremote.registry.ssl");
-        if (rmiRegistrySSLValue != null) {
-            setRmiRegistrySSL(Boolean.parseBoolean(rmiRegistrySSLValue));
-        }
+        String rmiRegistrySSLValue = System.getProperty(
+                "com.sun.management.jmxremote.registry.ssl", "false");
+        rmiRegistrySSL = Boolean.parseBoolean(rmiRegistrySSLValue);
 
-        String rmiServerSSLValue = System.getProperty("com.sun.management.jmxremote.ssl");
-        if (rmiServerSSLValue != null) {
-            setRmiServerSSL(Boolean.parseBoolean(rmiServerSSLValue));
-        }
+        String rmiServerSSLValue = System.getProperty(
+                "com.sun.management.jmxremote.ssl", "true");
+        rmiServerSSL = Boolean.parseBoolean(rmiServerSSLValue);
 
-        String protocolsValue = System.getProperty("com.sun.management.jmxremote.ssl.enabled.protocols");
+        String protocolsValue = System.getProperty(
+                "com.sun.management.jmxremote.ssl.enabled.protocols");
         if (protocolsValue != null) {
-            setEnabledProtocols(protocolsValue.split(","));
+            protocols = protocolsValue.split(",");
         }
 
-        String ciphersValue = System.getProperty("com.sun.management.jmxremote.ssl.enabled.cipher.suites");
+        String ciphersValue = System.getProperty(
+                "com.sun.management.jmxremote.ssl.enabled.cipher.suites");
         if (ciphersValue != null) {
-            setCiphers(ciphersValue);
+            ciphers = ciphersValue.split(",");
         }
 
-        String clientAuthValue = System.getProperty("com.sun.management.jmxremote.ssl.need.client.auth");
-        if (clientAuthValue != null) {
-            setCertificateVerification(clientAuthValue);
-        }
+        String clientAuthValue = System.getProperty(
+                "com.sun.management.jmxremote.ssl.need.client.auth", "true");
+        clientAuth = Boolean.parseBoolean(clientAuthValue);
 
-        String authenticateValue = System.getProperty("com.sun.management.jmxremote.authenticate");
-        if (authenticateValue != null) {
-            setAuthenticate(Boolean.parseBoolean(authenticateValue));
-        }
+        String authenticateValue = System.getProperty(
+                "com.sun.management.jmxremote.authenticate", "true");
+        authenticate = Boolean.parseBoolean(authenticateValue);
 
-        String passwordFileValue = System.getProperty("com.sun.management.jmxremote.password.file");
-        if (passwordFileValue != null) {
-            setPasswordFile(passwordFileValue);
-        }
+        passwordFile = System.getProperty(
+                "com.sun.management.jmxremote.password.file",
+                "jmxremote.password");
 
-        String accessFileValue = System.getProperty("com.sun.management.jmxremote.access.file");
-        if (accessFileValue != null) {
-            setAccessFile(accessFileValue);
-        }
+        accessFile = System.getProperty(
+                "com.sun.management.jmxremote.access.file",
+                "jmxremote.access");
 
-        String loginModuleNameValue = System.getProperty("com.sun.management.jmxremote.login.config");
-        if (loginModuleNameValue != null) {
-            setLoginModuleName(loginModuleNameValue);
-        }
+        loginModuleName = System.getProperty(
+                "com.sun.management.jmxremote.login.config");
     }
 
 
@@ -294,35 +204,14 @@ public class JmxRemoteLifecycleListener extends SSLHostConfig implements Lifecyc
     public void lifecycleEvent(LifecycleEvent event) {
         // When the server starts, configure JMX/RMI
         if (Lifecycle.START_EVENT.equals(event.getType())) {
-
-            // Configure using standard JMX system properties
+            // Configure using standard jmx system properties
             init();
-
-            SSLContext sslContext = null;
-            // Create SSL context if properties were set to define a certificate
-            if (getCertificates().size() > 0) {
-                SSLHostConfigCertificate certificate = getCertificates().iterator().next();
-                // This can only support JSSE
-                JSSEUtil sslUtil = new JSSEUtil(certificate);
-                try {
-                    sslContext = javax.net.ssl.SSLContext.getInstance(getSslProtocol());
-                    setEnabledProtocols(sslUtil.getEnabledProtocols());
-                    setEnabledCiphers(sslUtil.getEnabledCiphers());
-                    sslContext.init(sslUtil.getKeyManagers(), sslUtil.getTrustManagers(), null);
-                    SSLSessionContext sessionContext = sslContext.getServerSessionContext();
-                    if (sessionContext != null) {
-                        sslUtil.configureSessionContext(sessionContext);
-                    }
-                } catch (Exception e) {
-                    log.error(sm.getString("jmxRemoteLifecycleListener.invalidSSLConfiguration"), e);
-                }
-            }
 
             // Prevent an attacker guessing the RMI object ID
             System.setProperty("java.rmi.server.randomIDs", "true");
 
             // Create the environment
-            Map<String,Object> env = new HashMap<>();
+            HashMap<String,Object> env = new HashMap<>();
 
             RMIClientSocketFactory registryCsf = null;
             RMIServerSocketFactory registrySsf = null;
@@ -334,14 +223,11 @@ public class JmxRemoteLifecycleListener extends SSLHostConfig implements Lifecyc
             if (rmiRegistrySSL) {
                 registryCsf = new SslRMIClientSocketFactory();
                 if (rmiBindAddress == null) {
-                    registrySsf = new SslRMIServerSocketFactory(sslContext,
-                            getEnabledCiphers(), getEnabledProtocols(),
-                            getCertificateVerification() == CertificateVerification.REQUIRED);
+                    registrySsf = new SslRMIServerSocketFactory(
+                            ciphers, protocols, clientAuth);
                 } else {
-                    registrySsf = new SslRmiServerBindSocketFactory(sslContext,
-                            getEnabledCiphers(), getEnabledProtocols(),
-                            getCertificateVerification() == CertificateVerification.REQUIRED,
-                            rmiBindAddress);
+                    registrySsf = new SslRmiServerBindSocketFactory(
+                            ciphers, protocols, clientAuth, rmiBindAddress);
                 }
             } else {
                 if (rmiBindAddress != null) {
@@ -353,14 +239,11 @@ public class JmxRemoteLifecycleListener extends SSLHostConfig implements Lifecyc
             if (rmiServerSSL) {
                 serverCsf = new SslRMIClientSocketFactory();
                 if (rmiBindAddress == null) {
-                    serverSsf = new SslRMIServerSocketFactory(sslContext,
-                            getEnabledCiphers(), getEnabledProtocols(),
-                            getCertificateVerification() == CertificateVerification.REQUIRED);
+                    serverSsf = new SslRMIServerSocketFactory(
+                            ciphers, protocols, clientAuth);
                 } else {
-                    serverSsf = new SslRmiServerBindSocketFactory(sslContext,
-                            getEnabledCiphers(), getEnabledProtocols(),
-                            getCertificateVerification() == CertificateVerification.REQUIRED,
-                            rmiBindAddress);
+                    serverSsf = new SslRmiServerBindSocketFactory(
+                            ciphers, protocols, clientAuth, rmiBindAddress);
                 }
             } else {
                 if (rmiBindAddress != null) {
@@ -413,7 +296,7 @@ public class JmxRemoteLifecycleListener extends SSLHostConfig implements Lifecyc
 
     private JMXConnectorServer createServer(String serverName,
             String bindAddress, int theRmiRegistryPort, int theRmiServerPort,
-            Map<String,Object> theEnv,
+            HashMap<String,Object> theEnv,
             RMIClientSocketFactory registryCsf, RMIServerSocketFactory registrySsf,
             RMIClientSocketFactory serverCsf, RMIServerSocketFactory serverSsf) {
 
@@ -526,13 +409,34 @@ public class JmxRemoteLifecycleListener extends SSLHostConfig implements Lifecyc
 
     public static class SslRmiServerBindSocketFactory extends SslRMIServerSocketFactory {
 
-        private final InetAddress bindAddress;
-        private final SSLContext sslContext;
+        private static final SSLServerSocketFactory sslServerSocketFactory;
+        private static final String[] defaultProtocols;
 
-        public SslRmiServerBindSocketFactory(SSLContext sslContext, String[] enabledCipherSuites,
+        static {
+            SSLContext sslContext;
+            try {
+                sslContext = SSLContext.getDefault();
+            } catch (NoSuchAlgorithmException e) {
+                // Can't continue. Force a failure.
+                throw new IllegalStateException(e);
+            }
+            sslServerSocketFactory = sslContext.getServerSocketFactory();
+            String[] protocols = sslContext.getDefaultSSLParameters().getProtocols();
+            List<String> filteredProtocols = new ArrayList<>(protocols.length);
+            for (String protocol : protocols) {
+                if (protocol.toUpperCase(Locale.ENGLISH).contains("SSL")) {
+                    continue;
+                }
+                filteredProtocols.add(protocol);
+            }
+            defaultProtocols = filteredProtocols.toArray(new String[filteredProtocols.size()]);
+        }
+
+        private final InetAddress bindAddress;
+
+        public SslRmiServerBindSocketFactory(String[] enabledCipherSuites,
                 String[] enabledProtocols, boolean needClientAuth, String address) {
-            super(sslContext, enabledCipherSuites, enabledProtocols, needClientAuth);
-            this.sslContext = sslContext;
+            super(enabledCipherSuites, enabledProtocols, needClientAuth);
             InetAddress bindAddress = null;
             try {
                 bindAddress = InetAddress.getByName(address);
@@ -546,47 +450,19 @@ public class JmxRemoteLifecycleListener extends SSLHostConfig implements Lifecyc
         }
 
         @Override
-        public ServerSocket createServerSocket(int port) throws IOException {
-            SSLServerSocketFactory sslServerSocketFactory = (sslContext == null)
-                    ? (SSLServerSocketFactory) SSLServerSocketFactory.getDefault()
-                    : sslContext.getServerSocketFactory();
+        public ServerSocket createServerSocket(int port) throws IOException  {
             SSLServerSocket sslServerSocket =
                     (SSLServerSocket) sslServerSocketFactory.createServerSocket(port, 0, bindAddress);
             if (getEnabledCipherSuites() != null) {
                 sslServerSocket.setEnabledCipherSuites(getEnabledCipherSuites());
             }
-            if (getEnabledProtocols() != null) {
+            if (getEnabledProtocols() == null) {
+                sslServerSocket.setEnabledProtocols(defaultProtocols);
+            } else {
                 sslServerSocket.setEnabledProtocols(getEnabledProtocols());
             }
             sslServerSocket.setNeedClientAuth(getNeedClientAuth());
             return sslServerSocket;
-        }
-
-        // Super class defines hashCode() and equals(). Probably not used in
-        // Tomcat but for safety, override them here.
-        @Override
-        public int hashCode() {
-            final int prime = 31;
-            int result = super.hashCode();
-            result = prime * result + ((bindAddress == null) ? 0 : bindAddress.hashCode());
-            return result;
-        }
-
-        @Override
-        public boolean equals(Object obj) {
-            if (this == obj)
-                return true;
-            if (!super.equals(obj))
-                return false;
-            if (getClass() != obj.getClass())
-                return false;
-            SslRmiServerBindSocketFactory other = (SslRmiServerBindSocketFactory) obj;
-            if (bindAddress == null) {
-                if (other.bindAddress != null)
-                    return false;
-            } else if (!bindAddress.equals(other.bindAddress))
-                return false;
-            return true;
         }
     }
 }
