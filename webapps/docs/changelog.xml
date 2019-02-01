@@ -200,6 +200,10 @@
         to Tomcat clustering regardless of the type of cluster manager
         or membership being used. (schultz)
       </add>
+      <update>
+        Update the packaged version of the Tomcat Native Library to 1.2.21 to
+        pick up the memory leak fixes when using NIO/NIO2 with OpenSSL. (markt)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Other">
@@ -226,10 +230,6 @@
         Update the packaged version of the Tomcat Native Library to 1.2.19 to
         pick up the latest Windows binaries built with APR 1.6.5 and OpenSSL
         1.1.1a. (markt)
-      </update>
-      <update>
-        Update the packaged version of the Tomcat Native Library to 1.2.21 to
-        pick up the memory leak fixes when using NIO/NIO2 with OpenSSL. (markt)
       </update>
     </changelog>
   </subsection>
