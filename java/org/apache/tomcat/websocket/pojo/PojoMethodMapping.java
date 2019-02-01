@@ -485,7 +485,9 @@ public class PojoMethodMapping {
                     if (decoderMatch.hasMatches()) {
                         indexPayload = i;
                     } else {
-                        throw new DeploymentException("Boo!");
+                        throw new DeploymentException(sm.getString(
+                                "pojoMethodMapping.noDecoder",
+                                m.getName(), m.getDeclaringClass().getName()));
                     }
                 }
             }
