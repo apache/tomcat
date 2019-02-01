@@ -26,7 +26,6 @@ public class TestHttp2Timeouts extends Http2TestBase {
     @Before
     public void http2Connect() throws Exception {
         super.http2Connect();
-        sendSettings(0, false, new SettingValue(Setting.INITIAL_WINDOW_SIZE.getId(), 0));
     }
 
 
@@ -36,6 +35,7 @@ public class TestHttp2Timeouts extends Http2TestBase {
      */
     @Test
     public void testClientWithEmptyWindow() throws Exception {
+        sendSettings(0, false, new SettingValue(Setting.INITIAL_WINDOW_SIZE.getId(), 0));
         sendSimpleGetRequest(3);
 
         // Settings
@@ -57,6 +57,7 @@ public class TestHttp2Timeouts extends Http2TestBase {
      */
     @Test
     public void testClientWithEmptyWindowLargeResponse() throws Exception {
+        sendSettings(0, false, new SettingValue(Setting.INITIAL_WINDOW_SIZE.getId(), 0));
         sendLargeGetRequest(3);
 
         // Settings
@@ -70,4 +71,37 @@ public class TestHttp2Timeouts extends Http2TestBase {
         Assert.assertEquals("3-RST-[11]\n", output.getTrace());
     }
 
+
+    /*
+     * Timeout with app reading request body directly.
+     */
+    @Test
+    public void testClientPostsNoBody() throws Exception {
+        sendSimplePostRequest(3,  null,  false);
+
+        // Headers
+        parser.readFrame(false);
+        output.clearTrace();
+
+        parser.readFrame(false);
+
+        Assert.assertEquals("3-RST-[11]\n", output.getTrace());
+    }
+
+
+    /*
+     * Timeout with app processing parameters.
+     */
+    @Test
+    public void testClientPostsNoParameters() throws Exception {
+        sendParameterPostRequest(3, null, null, 10, false);
+
+        // Headers
+        parser.readFrame(false);
+        output.clearTrace();
+
+        parser.readFrame(false);
+
+        Assert.assertEquals("3-RST-[11]\n", output.getTrace());
+    }
 }

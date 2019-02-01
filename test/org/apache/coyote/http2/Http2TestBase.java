@@ -28,6 +28,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Random;
 
 import javax.net.SocketFactory;
@@ -302,6 +303,24 @@ public abstract class Http2TestBase extends TomcatBaseTest {
     }
 
 
+    protected void sendParameterPostRequest(int streamId, byte[] padding, String body,
+            long contentLength, boolean useExpectation) throws IOException {
+        byte[] headersFrameHeader = new byte[9];
+        ByteBuffer headersPayload = ByteBuffer.allocate(128);
+        byte[] dataFrameHeader = new byte[9];
+        ByteBuffer dataPayload = ByteBuffer.allocate(128);
+
+        buildPostRequest(headersFrameHeader, headersPayload, useExpectation,
+                "application/x-www-form-urlencoded", contentLength, "/parameter", dataFrameHeader,
+                dataPayload, padding, null, null, streamId);
+        writeFrame(headersFrameHeader, headersPayload);
+        if (body != null) {
+            dataPayload.put(body.getBytes(StandardCharsets.ISO_8859_1));
+            writeFrame(dataFrameHeader, dataPayload);
+        }
+    }
+
+
     protected void buildPostRequest(byte[] headersFrameHeader, ByteBuffer headersPayload,
             boolean useExpectation, byte[] dataFrameHeader, ByteBuffer dataPayload, byte[] padding,
             int streamId) {
@@ -312,13 +331,28 @@ public abstract class Http2TestBase extends TomcatBaseTest {
     protected void buildPostRequest(byte[] headersFrameHeader, ByteBuffer headersPayload,
             boolean useExpectation, byte[] dataFrameHeader, ByteBuffer dataPayload, byte[] padding,
             byte[] trailersFrameHeader, ByteBuffer trailersPayload, int streamId) {
+        buildPostRequest(headersFrameHeader, headersPayload, useExpectation, null, -1, "/simple",
+                dataFrameHeader, dataPayload, padding, trailersFrameHeader, trailersPayload, streamId);
+    }
+
+    protected void buildPostRequest(byte[] headersFrameHeader, ByteBuffer headersPayload,
+            boolean useExpectation, String contentType, long contentLength, String path,
+            byte[] dataFrameHeader, ByteBuffer dataPayload, byte[] padding,
+            byte[] trailersFrameHeader, ByteBuffer trailersPayload, int streamId) {
+
         MimeHeaders headers = new MimeHeaders();
         headers.addValue(":method").setString("POST");
         headers.addValue(":scheme").setString("http");
-        headers.addValue(":path").setString("/simple");
+        headers.addValue(":path").setString(path);
         headers.addValue(":authority").setString("localhost:" + getPort());
         if (useExpectation) {
             headers.addValue("expect").setString("100-continue");
+        }
+        if (contentType != null) {
+            headers.addValue("content-type").setString(contentType);
+        }
+        if (contentLength > -1) {
+            headers.addValue("content-length").setLong(contentLength);
         }
         hpackEncoder.encode(headers, headersPayload);
 
@@ -514,6 +548,8 @@ public abstract class Http2TestBase extends TomcatBaseTest {
         ctxt.addServletMappingDecoded("/large", "large");
         Tomcat.addServlet(ctxt, "cookie", new CookieServlet());
         ctxt.addServletMappingDecoded("/cookie", "cookie");
+        Tomcat.addServlet(ctxt, "parameter", new ParameterServlet());
+        ctxt.addServletMappingDecoded("/parameter", "parameter");
 
         tomcat.start();
     }
@@ -1219,6 +1255,24 @@ public abstract class Http2TestBase extends TomcatBaseTest {
             }
             resp.setHeader(HEADER_IGNORED, headerValue.toString());
             resp.getWriter().print("OK");
+        }
+    }
+
+
+    static class ParameterServlet extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        protected void doPost(HttpServletRequest req, HttpServletResponse resp)
+                throws ServletException, IOException {
+
+            Map<String,String[]> params = req.getParameterMap();
+
+            resp.setContentType("text/plain");
+            resp.setCharacterEncoding("UTF-8");
+
+            resp.getWriter().print(params.size());
         }
     }
 
