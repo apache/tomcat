@@ -350,9 +350,16 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
                             }
                         }
                     }
-                    // No more frames to read so switch to the keep-alive
-                    // timeout.
-                    socketWrapper.setReadTimeout(getKeepAliveTimeout());
+
+                    if (activeRemoteStreamCount.get() == 0) {
+                        // No streams currently active. Use the keep-alive
+                        // timeout for the connection.
+                        socketWrapper.setReadTimeout(getKeepAliveTimeout());
+                    } else {
+                        // Streams currently active. Individual streams have
+                        // timeouts so keep the connection open.
+                        socketWrapper.setReadTimeout(-1);
+                    }
                 } catch (Http2Exception ce) {
                     // Really ConnectionException
                     if (log.isDebugEnabled()) {
