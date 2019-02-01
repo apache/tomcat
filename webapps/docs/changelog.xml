@@ -104,6 +104,13 @@
       <update>
         Update the recommended minimum Tomcat Native version to 1.2.21. (markt)
       </update>
+      <fix>
+        <bug>63137</bug>: If the resources for a web application have been
+        configured with multiple locations mapped to
+        <code>/WEB-INF/classes</code>, ensure that all of those locations are
+        used when building the web application class path. Patch provided by
+        Marcin Gołębski. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
