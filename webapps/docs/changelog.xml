@@ -125,6 +125,9 @@
         to be more tolerant of optional escaping when the <code>\nn</code> form
         is used. (markt)
       </add>
+      <update>
+        Update the recommended minimum Tomcat Native version to 1.2.21. (markt)
+      </update>
     </changelog>
   </subsection>
   <subsection name="WebSocket">
