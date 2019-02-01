@@ -54,6 +54,8 @@ public class Http2Protocol implements UpgradeProtocol {
     // This default is defined by the HTTP/2 specification
     static final int DEFAULT_INITIAL_WINDOW_SIZE = (1 << 16) - 1;
 
+    static final int DEFAULT_OVERHEAD_COUNT_FACTOR = 1;
+
     private static final String HTTP_UPGRADE_NAME = "h2c";
     private static final String ALPN_NAME = "h2";
     private static final byte[] ALPN_IDENTIFIER = ALPN_NAME.getBytes(StandardCharsets.UTF_8);
@@ -79,6 +81,8 @@ public class Http2Protocol implements UpgradeProtocol {
     private int maxHeaderSize = Constants.DEFAULT_MAX_HEADER_SIZE;
     private int maxTrailerCount = Constants.DEFAULT_MAX_TRAILER_COUNT;
     private int maxTrailerSize = Constants.DEFAULT_MAX_TRAILER_SIZE;
+    private int overheadCountFactor = DEFAULT_OVERHEAD_COUNT_FACTOR;
+
     private boolean initiatePingDisabled = false;
     // Compression
     private final CompressionConfig compressionConfig = new CompressionConfig();
@@ -299,6 +303,16 @@ public class Http2Protocol implements UpgradeProtocol {
 
     public int getMaxTrailerSize() {
         return maxTrailerSize;
+    }
+
+
+    public int getOverheadCountFactor() {
+        return overheadCountFactor;
+    }
+
+
+    public void setOverheadCountFactor(int overheadCountFactor) {
+        this.overheadCountFactor = overheadCountFactor;
     }
 
 
