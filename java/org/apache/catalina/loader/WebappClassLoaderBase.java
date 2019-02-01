@@ -1519,9 +1519,11 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
 
         state = LifecycleState.STARTING_PREP;
 
-        WebResource classes = resources.getResource("/WEB-INF/classes");
-        if (classes.isDirectory() && classes.canRead()) {
-            localRepositories.add(classes.getURL());
+        WebResource[] classesResources = resources.getResources("/WEB-INF/classes");
+        for (WebResource classes : classesResources) {
+            if (classes.isDirectory() && classes.canRead()) {
+                localRepositories.add(classes.getURL());
+            }
         }
         WebResource[] jars = resources.listResources("/WEB-INF/lib");
         for (WebResource jar : jars) {
