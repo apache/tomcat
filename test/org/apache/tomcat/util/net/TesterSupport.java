@@ -176,8 +176,13 @@ public final class TesterSupport {
 
 
     protected static void configureClientSsl() {
+        configureClientSsl("TLSv1");
+    }
+
+
+    protected static void configureClientSsl(String protocol) {
         try {
-            System.setProperty("https.protocols", "TLSv1");
+            System.setProperty("https.protocols", protocol);
             SSLContext sc = SSLContext.getInstance(Constants.SSL_PROTO_TLS);
             sc.init(TesterSupport.getUser1KeyManagers(),
                     TesterSupport.getTrustManagers(),
