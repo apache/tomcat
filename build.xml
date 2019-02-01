@@ -184,6 +184,9 @@
   <available file="/dev/urandom" property="test.jvmarg.egd" value="-Djava.security.egd=file:/dev/./urandom"/>
   <property name="test.jvmarg.egd" value="" />
 
+  <!-- Check for Java 11 -->
+  <available classname="java.net.http.HttpClient" property="java11.present"/>
+
   <!-- Include .gitignore in src distributions. -->
   <!-- .git, .gitattributes and .gitignore are in defaultexcludes since Ant 1.8.2 -->
   <defaultexcludes add="**/.git" />
@@ -661,6 +664,7 @@
       <exclude name="org/apache/naming/factory/webservices/**" />
       <!-- Exclude classes that require Java 7 to compile -->
       <exclude name="org/apache/catalina/startup/SafeForkJoinWorkerThreadFactory.java" />
+      <exclude name="org/apache/catalina/util/Base64.java" if="java11.present" />
       <exclude name="org/apache/tomcat/websocket/**" />
     </javac>
     <!-- Copy static resource files -->
@@ -700,12 +704,6 @@
       <!-- Only include classes that require Java 7 to compile -->
       <include name="org/apache/catalina/startup/SafeForkJoinWorkerThreadFactory.java" />
       <include name="org/apache/tomcat/websocket/**" />
-      <!-- Not required but prevents a warning being displayed -->
-      <bootclasspath>
-        <fileset dir="${java.7.home}/jre/lib">
-          <include name="*.jar"/>
-        </fileset>
-      </bootclasspath>
     </javac>
   </target>
 
@@ -1341,6 +1339,7 @@
       <include name="org/apache/**" />
       <include name="javax/**" />
       <include name="util/**" />
+      <exclude name="org/apache/catalina/util/TesterBase64Performance.java" if="java11.present" />
       <exclude unless="java.7.home" name="org/apache/catalina/websocket/**" />
       <exclude unless="java.7.home" name="org/apache/tomcat/websocket/**" />
     </javac>

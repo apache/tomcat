@@ -34,17 +34,17 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.catalina.connector.RequestFacade;
-import org.apache.catalina.util.Base64;
 import org.apache.tomcat.util.buf.B2CConverter;
+import org.apache.tomcat.util.codec.binary.Base64;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
  * Provides the base implementation of a Servlet for processing WebSocket
  * connections as per RFC6455. It is expected that applications will extend this
  * implementation and provide application specific functionality.
- * 
+ *
  * @deprecated  Replaced by the JSR356 WebSocket 1.1 implementation and will be
- *              removed in Tomcat 8.0.x.  
+ *              removed in Tomcat 8.0.x.
  */
 @Deprecated
 public abstract class WebSocketServlet extends HttpServlet {
@@ -193,7 +193,7 @@ public abstract class WebSocketServlet extends HttpServlet {
 
         sha1Helper.reset();
         sha1Helper.update(key.getBytes(B2CConverter.ISO_8859_1));
-        String result = Base64.encode(sha1Helper.digest(WS_ACCEPT));
+        String result = Base64.encodeBase64String(sha1Helper.digest(WS_ACCEPT));
 
         sha1Helpers.add(sha1Helper);
 

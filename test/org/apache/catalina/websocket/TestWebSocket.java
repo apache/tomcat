@@ -44,11 +44,11 @@ import org.apache.catalina.deploy.ContextEnvironment;
 import org.apache.catalina.servlets.DefaultServlet;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
-import org.apache.catalina.util.Base64;
 import org.apache.tomcat.util.buf.B2CConverter;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.C2BConverter;
 import org.apache.tomcat.util.buf.CharChunk;
+import org.apache.tomcat.util.codec.binary.Base64;
 import org.apache.tomcat.websocket.TesterEchoServer;
 
 /**
@@ -258,12 +258,12 @@ public class TestWebSocket extends TomcatBaseTest {
         MessageDigest sha1Helper = MessageDigest.getInstance("SHA1");
         sha1Helper.reset();
         sha1Helper.update("TODO".getBytes(B2CConverter.ISO_8859_1));
-        String source = Base64.encode(sha1Helper.digest(WS_ACCEPT));
+        String source = Base64.encodeBase64String(sha1Helper.digest(WS_ACCEPT));
         Assert.assertEquals(source,accept);
 
         sha1Helper.reset();
         sha1Helper.update("TOD".getBytes(B2CConverter.ISO_8859_1));
-        source = Base64.encode(sha1Helper.digest(WS_ACCEPT));
+        source = Base64.encodeBase64String(sha1Helper.digest(WS_ACCEPT));
         Assert.assertFalse(source.equals(accept));
         // Finished with the socket
         client.close();
