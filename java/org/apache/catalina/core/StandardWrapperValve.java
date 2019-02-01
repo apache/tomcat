@@ -36,6 +36,7 @@ import org.apache.catalina.connector.ClientAbortException;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
 import org.apache.catalina.valves.ValveBase;
+import org.apache.coyote.CloseNowException;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.buf.MessageBytes;
 import org.apache.tomcat.util.log.SystemLogHandler;
@@ -201,7 +202,7 @@ final class StandardWrapperValve
                 }
 
             }
-        } catch (ClientAbortException e) {
+        } catch (ClientAbortException | CloseNowException e) {
             if (container.getLogger().isDebugEnabled()) {
                 container.getLogger().debug(sm.getString(
                         "standardWrapper.serviceException", wrapper.getName(),

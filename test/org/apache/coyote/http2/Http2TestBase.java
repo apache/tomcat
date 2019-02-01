@@ -492,8 +492,10 @@ public abstract class Http2TestBase extends TomcatBaseTest {
         Http2Protocol http2Protocol = new Http2Protocol();
         // Short timeouts for now. May need to increase these for CI systems.
         http2Protocol.setReadTimeout(2000);
-        http2Protocol.setKeepAliveTimeout(5000);
         http2Protocol.setWriteTimeout(2000);
+        http2Protocol.setKeepAliveTimeout(5000);
+        http2Protocol.setStreamReadTimeout(1000);
+        http2Protocol.setStreamWriteTimeout(1000);
         http2Protocol.setMaxConcurrentStreams(maxConcurrentStreams);
         connector.addUpgradeProtocol(http2Protocol);
     }
