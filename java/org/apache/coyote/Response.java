@@ -19,6 +19,7 @@ package org.apache.coyote;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.Locale;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.http.MimeHeaders;
@@ -103,14 +104,45 @@ public final class Response {
     private long commitTime = -1;
 
     /**
+     * Has the charset been explicitly set.
+     */
+    boolean charsetSet = false;
+
+    /**
      * Holds request error exception.
      */
     Exception errorException = null;
 
     /**
-     * Has the charset been explicitly set.
+     * With the introduction of async processing and the possibility of
+     * non-container threads calling sendError() tracking the current error
+     * state and ensuring that the correct error page is called becomes more
+     * complicated. This state attribute helps by tracking the current error
+     * state and informing callers that attempt to change state if the change
+     * was successful or if another thread got there first.
+     *
+     * <pre>
+     * The state machine is very simple:
+     *
+     * 0 - NONE
+     * 1 - NOT_REPORTED
+     * 2 - REPORTED
+     *
+     *
+     *   -->---->-- >NONE
+     *   |   |        |
+     *   |   |        | setError()
+     *   ^   ^        |
+     *   |   |       \|/
+     *   |   |-<-NOT_REPORTED
+     *   |            |
+     *   ^            | report()
+     *   |            |
+     *   |           \|/
+     *   |----<----REPORTED
+     * </pre>
      */
-    boolean charsetSet = false;
+    private final AtomicInteger errorState = new AtomicInteger(0);
 
     Request req;
 
@@ -257,6 +289,36 @@ public final class Response {
 
     public boolean isExceptionPresent() {
         return ( errorException != null );
+    }
+
+
+    /**
+     * Set the error flag.
+     *
+     * @return <code>false</code> if the error flag was already set
+     */
+    public boolean setError() {
+        return errorState.compareAndSet(0, 1);
+    }
+
+
+    /**
+     * Error flag accessor.
+     *
+     * @return <code>true</code> if the response has encountered an error
+     */
+    public boolean isError() {
+        return errorState.get() > 0;
+    }
+
+
+    public boolean isErrorReportRequired() {
+        return errorState.get() == 1;
+    }
+
+
+    public boolean setErrorReported() {
+        return errorState.compareAndSet(1, 2);
     }
 
 
@@ -533,6 +595,7 @@ public final class Response {
         committed = false;
         commitTime = -1;
         errorException = null;
+        errorState.set(0);
         headers.clear();
 
         // update counters
