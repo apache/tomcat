@@ -125,9 +125,9 @@
 
     <attribute name="keepAliveTimeout" required="false">
       <p>The time, in milliseconds, that Tomcat will wait between HTTP/2 frames
-      before closing the connection. Negative values will be treated as an
-      infinite timeout. If not specified, a default value of <code>-1</code>
-      will be used.</p>
+      when there is no active Stream before closing the connection. Negative
+      values will be treated as an infinite timeout. If not specified, a default
+      value of <code>20000</code> will be used.</p>
     </attribute>
 
     <attribute name="maxConcurrentStreamExecution" required="false">
@@ -192,14 +192,31 @@
       <p>The time, in milliseconds, that Tomcat will wait for additional data
       when a partial HTTP/2 frame has been received. Negative values will be
       treated as an infinite timeout. If not specified, a default value of
-      <code>10000</code> will be used.</p>
+      <code>5000</code> will be used.</p>
+    </attribute>
+
+    <attribute name="streamReadTimeout" required="false">
+      <p>The time, in milliseconds, that Tomcat will wait for additional data
+      frames to arrive for the stream when an application is performing a
+      blocking I/O read and additional data is required. Negative values will be
+      treated as an infinite timeout. If not specified, a default value of
+      <code>20000</code> will be used.</p>
+    </attribute>
+
+    <attribute name="streamWriteTimeout" required="false">
+      <p>The time, in milliseconds, that Tomcat will wait for additional window
+      update frames to arrive for the stream and/or conenction when an
+      application is performing a blocking I/O write and the stream and/or
+      connection flow control window is too small for the write to complete.
+      Negative values will be treated as an infinite timeout. If not specified,
+      a default value of <code>20000</code> will be used.</p>
     </attribute>
 
     <attribute name="writeTimeout" required="false">
       <p>The time, in milliseconds, that Tomcat will wait to write additional
       data when an HTTP/2 frame has been partially written. Negative values will
       be treated as an infinite timeout. If not specified, a default value of
-      <code>10000</code> will be used.</p>
+      <code>5000</code> will be used.</p>
     </attribute>
 
   </attributes>
