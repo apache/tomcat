@@ -222,7 +222,12 @@ class Stream extends AbstractStream implements HeaderEmitter {
             }
             try {
                 if (block) {
-                    wait(handler.getProtocol().getStreamWriteTimeout());
+                    long writeTimeout = handler.getProtocol().getStreamWriteTimeout();
+                    if (writeTimeout < 0) {
+                        wait();
+                    } else {
+                        wait(writeTimeout);
+                    }
                     windowSize = getWindowSize();
                     if (windowSize == 0) {
                         String msg = sm.getString("stream.writeTimeout");
@@ -978,7 +983,12 @@ class Stream extends AbstractStream implements HeaderEmitter {
                             log.debug(sm.getString("stream.inputBuffer.empty"));
                         }
 
-                        inBuffer.wait(handler.getProtocol().getStreamReadTimeout());
+                        long readTimeout = handler.getProtocol().getStreamReadTimeout();
+                        if (readTimeout < 0) {
+                            inBuffer.wait();
+                        } else {
+                            inBuffer.wait(readTimeout);
+                        }
 
                         if (resetReceived) {
                             throw new IOException(sm.getString("stream.inputBuffer.reset"));
