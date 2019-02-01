@@ -109,7 +109,7 @@ abstract class AbstractStream {
 
     /**
      * Increment window size.
-     * @param increment The amount of the incrementation
+     * @param increment The amount by which the window size should be increased
      * @throws Http2Exception If the window size is now higher than
      *  the maximum allowed
      */
