@@ -134,6 +134,9 @@
         Add SSL configuration options to the JMX remote listener using the
         <code>SSLHostConfig</code> framework. (remm)
       </update>
+      <update>
+        Update the recommended minimum Tomcat Native version to 1.2.21. (markt)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Coyote">
