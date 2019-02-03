@@ -54,3 +54,6 @@ New items for 10.0.x onwards:
 7. Consider including
    <response-character-encoding>UTF-8</response-character-encoding>
    in conf/web.xml
+
+8. RFC 3986 states (section 2.2) that a %nn encoded delimiter is NOT equivalent
+   to the decoded form. Provide an option no to decode delimiters in %nn form.
