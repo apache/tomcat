@@ -213,7 +213,7 @@ public class HostManagerServlet
 
         // Process the requested command
         if (command == null) {
-            writer.println(sm.getString("hostManagerServlet.noCommand"));
+            writer.println(smClient.getString("hostManagerServlet.noCommand"));
         } else if (command.equals("/add")) {
             add(request, writer, name, false, smClient);
         } else if (command.equals("/remove")) {
@@ -227,7 +227,7 @@ public class HostManagerServlet
         } else if (command.equals("/persist")) {
             persist(writer, smClient);
         } else {
-            writer.println(sm.getString("hostManagerServlet.unknownCommand",
+            writer.println(smClient.getString("hostManagerServlet.unknownCommand",
                                         command));
         }
 

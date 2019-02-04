@@ -139,11 +139,11 @@ public final class HTMLManagerServlet extends ManagerServlet {
                         e.toString());
             }
         } else if (command.equals("/sslConnectorCiphers")) {
-            sslConnectorCiphers(request, response);
+            sslConnectorCiphers(request, response, smClient);
         } else if (command.equals("/sslConnectorCerts")) {
-            sslConnectorCerts(request, response);
+            sslConnectorCerts(request, response, smClient);
         } else if (command.equals("/sslConnectorTrustedCerts")) {
-            sslConnectorTrustedCerts(request, response);
+            sslConnectorTrustedCerts(request, response, smClient);
         } else if (command.equals("/upload") || command.equals("/deploy") ||
                 command.equals("/reload") || command.equals("/undeploy") ||
                 command.equals("/expire") || command.equals("/start") ||
@@ -764,24 +764,24 @@ public final class HTMLManagerServlet extends ManagerServlet {
 
 
     protected void sslConnectorCiphers(HttpServletRequest request,
-            HttpServletResponse response) throws ServletException, IOException {
-        request.setAttribute("cipherList", getConnectorCiphers());
+            HttpServletResponse response, StringManager smClient) throws ServletException, IOException {
+        request.setAttribute("cipherList", getConnectorCiphers(smClient));
         getServletContext().getRequestDispatcher(
                 connectorCiphersJspPath).forward(request, response);
     }
 
 
     protected void sslConnectorCerts(HttpServletRequest request,
-            HttpServletResponse response) throws ServletException, IOException {
-        request.setAttribute("certList", getConnectorCerts());
+            HttpServletResponse response, StringManager smClient) throws ServletException, IOException {
+        request.setAttribute("certList", getConnectorCerts(smClient));
         getServletContext().getRequestDispatcher(
                 connectorCertsJspPath).forward(request, response);
     }
 
 
     protected void sslConnectorTrustedCerts(HttpServletRequest request,
-            HttpServletResponse response) throws ServletException, IOException {
-        request.setAttribute("trustedCertList", getConnectorTrustedCerts());
+            HttpServletResponse response, StringManager smClient) throws ServletException, IOException {
+        request.setAttribute("trustedCertList", getConnectorTrustedCerts(smClient));
         getServletContext().getRequestDispatcher(
                 connectorTrustedCertsJspPath).forward(request, response);
     }

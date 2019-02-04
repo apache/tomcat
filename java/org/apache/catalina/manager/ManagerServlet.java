@@ -627,7 +627,7 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
 
     protected void sslConnectorCiphers(PrintWriter writer, StringManager smClient) {
         writer.println(smClient.getString("managerServlet.sslConnectorCiphers"));
-        Map<String,List<String>> connectorCiphers = getConnectorCiphers();
+        Map<String,List<String>> connectorCiphers = getConnectorCiphers(smClient);
         for (Map.Entry<String,List<String>> entry : connectorCiphers.entrySet()) {
             writer.println(entry.getKey());
             for (String cipher : entry.getValue()) {
@@ -640,7 +640,7 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
 
     private void sslConnectorCerts(PrintWriter writer, StringManager smClient) {
         writer.println(smClient.getString("managerServlet.sslConnectorCerts"));
-        Map<String,List<String>> connectorCerts = getConnectorCerts();
+        Map<String,List<String>> connectorCerts = getConnectorCerts(smClient);
         for (Map.Entry<String,List<String>> entry : connectorCerts.entrySet()) {
             writer.println(entry.getKey());
             for (String cert : entry.getValue()) {
@@ -652,7 +652,7 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
 
     private void sslConnectorTrustedCerts(PrintWriter writer, StringManager smClient) {
         writer.println(smClient.getString("managerServlet.sslConnectorTrustedCerts"));
-        Map<String,List<String>> connectorTrustedCerts = getConnectorTrustedCerts();
+        Map<String,List<String>> connectorTrustedCerts = getConnectorTrustedCerts(smClient);
         for (Map.Entry<String,List<String>> entry : connectorTrustedCerts.entrySet()) {
             writer.println(entry.getKey());
             for (String cert : entry.getValue()) {
@@ -1237,7 +1237,7 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
         if (debug >= 1)
             log("serverinfo");
         try {
-            writer.println(sm.getString("managerServlet.serverInfo", ServerInfo.getServerInfo(),
+            writer.println(smClient.getString("managerServlet.serverInfo", ServerInfo.getServerInfo(),
                     System.getProperty("os.name"), System.getProperty("os.version"), System.getProperty("os.arch"),
                     System.getProperty("java.runtime.version"), System.getProperty("java.vm.vendor")));
         } catch (Throwable t) {
@@ -1664,7 +1664,7 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
 
 
     protected static boolean validateContextName(ContextName cn,
-            PrintWriter writer, StringManager sm) {
+            PrintWriter writer, StringManager smClient) {
 
         // ContextName should be non-null with a path that is empty or starts
         // with /
@@ -1677,11 +1677,11 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
         if (cn != null) {
             path = Escape.htmlElementContent(cn.getPath());
         }
-        writer.println(sm.getString("managerServlet.invalidPath", path));
+        writer.println(smClient.getString("managerServlet.invalidPath", path));
         return false;
     }
 
-    protected Map<String,List<String>> getConnectorCiphers() {
+    protected Map<String,List<String>> getConnectorCiphers(StringManager smClient) {
         Map<String,List<String>> result = new HashMap<>();
 
         Connector connectors[] = getConnectors();
@@ -1696,7 +1696,7 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
                 }
             } else {
                 ArrayList<String> cipherList = new ArrayList<>(1);
-                cipherList.add(sm.getString("managerServlet.notSslConnector"));
+                cipherList.add(smClient.getString("managerServlet.notSslConnector"));
                 result.put(connector.toString(), cipherList);
             }
         }
@@ -1704,7 +1704,7 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
     }
 
 
-    protected Map<String,List<String>> getConnectorCerts() {
+    protected Map<String,List<String>> getConnectorCerts(StringManager smClient) {
         Map<String,List<String>> result = new HashMap<>();
 
         Connector connectors[] = getConnectors();
@@ -1727,7 +1727,7 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
                             }
                             X509Certificate[] certs = sslContext.getCertificateChain(alias);
                             if (certs == null) {
-                                certList.add(sm.getString("managerServlet.certsNotAvailable"));
+                                certList.add(smClient.getString("managerServlet.certsNotAvailable"));
                             } else {
                                 for (Certificate cert : certs) {
                                     certList.add(cert.toString());
@@ -1737,14 +1737,14 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
                         }
                     } else {
                         List<String> certList = new ArrayList<>();
-                        certList.add(sm.getString("managerServlet.certsNotAvailable"));
+                        certList.add(smClient.getString("managerServlet.certsNotAvailable"));
                         String name = connector.toString() + "-" + sslHostConfig.getHostName();
                         result.put(name, certList);
                     }
                 }
             } else {
                 List<String> certList = new ArrayList<>(1);
-                certList.add(sm.getString("managerServlet.notSslConnector"));
+                certList.add(smClient.getString("managerServlet.notSslConnector"));
                 result.put(connector.toString(), certList);
             }
         }
@@ -1753,7 +1753,7 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
     }
 
 
-    protected Map<String,List<String>> getConnectorTrustedCerts() {
+    protected Map<String,List<String>> getConnectorTrustedCerts(StringManager smClient) {
         Map<String,List<String>> result = new HashMap<>();
 
         Connector connectors[] = getConnectors();
@@ -1769,22 +1769,22 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
                                 sslHostConfig.getCertificates().iterator().next().getSslContext();
                         X509Certificate[] certs = sslContext.getAcceptedIssuers();
                         if (certs == null) {
-                            certList.add(sm.getString("managerServlet.certsNotAvailable"));
+                            certList.add(smClient.getString("managerServlet.certsNotAvailable"));
                         } else if (certs.length == 0) {
-                            certList.add(sm.getString("managerServlet.trustedCertsNotConfigured"));
+                            certList.add(smClient.getString("managerServlet.trustedCertsNotConfigured"));
                         } else {
                             for (Certificate cert : certs) {
                                 certList.add(cert.toString());
                             }
                         }
                     } else {
-                        certList.add(sm.getString("managerServlet.certsNotAvailable"));
+                        certList.add(smClient.getString("managerServlet.certsNotAvailable"));
                     }
                     result.put(name, certList);
                 }
             } else {
                 List<String> certList = new ArrayList<>(1);
-                certList.add(sm.getString("managerServlet.notSslConnector"));
+                certList.add(smClient.getString("managerServlet.notSslConnector"));
                 result.put(connector.toString(), certList);
             }
         }
