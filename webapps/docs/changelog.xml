@@ -216,6 +216,10 @@
         excluded from the build in this case as it depends on JRE classes that
         have been removed in Java 11 onwards. (markt)
       </fix>
+      <update>
+        Update the NSIS Installer used to build the Windows installer to version
+        3.04. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>

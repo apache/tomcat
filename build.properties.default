@@ -199,10 +199,10 @@ commons-pool-src.loc.1=${base-commons.loc.1}/pool/source/commons-pool-${commons-
 commons-pool-src.loc.2=${base-commons.loc.2}/pool/source/commons-pool-${commons-pool.version}-src.tar.gz
 
 # ----- NSIS, version 3.0 or later -----
-nsis.version=3.03
+nsis.version=3.04
 nsis.checksum.enabled=true
 nsis.checksum.algorithm=MD5|SHA-1
-nsis.checksum.value=d4919dc089ec256a7264e97ada299b64|ea69aa8d538916c9e8630dfd0106b063f7bb5d46
+nsis.checksum.value=434e89380742d415ca9b91676cb92540|ed241f7384f4e59d84b9a62c71d1f6955b6a719a
 nsis.home=${base.path}/nsis-${nsis.version}
 nsis.exe=${nsis.home}/makensis.exe
 nsis.arch.dir=x86-unicode/
