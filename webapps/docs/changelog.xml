@@ -103,6 +103,10 @@
         Expand the coverage and quality of the Chinese translations provided
         with Apache Tomcat. Includes contributions from zheng. (markt)
       </add>
+      <add>
+        Expand the coverage and quality of the Russian translations provided
+        with Apache Tomcat. (kkolinko)
+      </add>
     </changelog>
   </subsection>
 </section>
