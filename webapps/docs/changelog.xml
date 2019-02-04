@@ -45,6 +45,13 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 9.0.16 (markt)" rtext="in development">
+  <subsection name="Tribes">
+    <changelog>
+      <fix>
+        Remove unnecessary shutdown for executor. (kfujino)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 9.0.15 (markt)" rtext="release in progress">
   <subsection name="Catalina">
@@ -253,9 +260,6 @@
       </update>
       <fix>
         Never expire the local member from a Membership. (remm)
-      </fix>
-      <fix>
-        Remove unnecessary shutdown for executor. (kfujino)
       </fix>
     </changelog>
   </subsection>
