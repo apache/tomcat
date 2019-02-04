@@ -23,7 +23,7 @@
   <groupId>org.apache.tomcat</groupId>
   <artifactId>tomcat-i18n-de</artifactId>
   <version>@MAVEN.DEPLOY.VERSION@</version>
-  <description>Russian translations</description>
+  <description>German translations</description>
   <url>https://tomcat.apache.org/</url>
   <licenses>
     <license>
