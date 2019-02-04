@@ -320,7 +320,6 @@ public class McastServiceImpl extends MembershipProviderBase {
         startLevel = (startLevel & (~level));
         //we're shutting down, send a shutdown message and close the socket
         if ( startLevel == 0 ) {
-            executor.shutdownNow();
             //send a stop message
             member.setCommand(Member.SHUTDOWN_PAYLOAD);
             send(false);

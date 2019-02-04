@@ -112,7 +112,6 @@ public class StaticMembershipProvider extends MembershipProviderBase implements 
         }
         startLevel = (startLevel & (~level));
         if ( startLevel == 0 ) {
-            executor.shutdownNow();
             running = false;
             if (thread != null) {
                 thread.interrupt();

@@ -252,6 +252,9 @@
       <fix>
         Never expire the local member from a Membership. (remm)
       </fix>
+      <fix>
+        Remove unnecessary shutdown for executor. (kfujino)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
