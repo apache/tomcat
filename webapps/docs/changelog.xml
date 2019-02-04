@@ -58,6 +58,10 @@
         Update the NSIS Installer used to build the Windows installer to version
         3.04. (markt)
       </update>
+      <add>
+        Add Czech translations to Apache Tomcat. Includes contributions from
+        Arnošt Havelka and Alice. (markt)
+      </add>
     </changelog>
   </subsection>
 </section>
