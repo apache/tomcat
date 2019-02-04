@@ -58,6 +58,11 @@
         start with <code>OK -</code> where expected by the associated Ant tasks.
         (markt)
       </fix>
+      <fix>
+        <bug>63143</bug>: Ensure that the Manager web application respects the
+        language preferences of the user as configured in the browser when the
+        language of the default system locale is not English. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Tribes">
