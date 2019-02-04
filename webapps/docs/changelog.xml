@@ -223,6 +223,10 @@
         that prevented Tomcat from working correctly with systemd. Patch
         provided by Patrik S. (markt)
       </fix>
+      <update>
+        Update the NSIS Installer used to build the Windows installer to version
+        3.04. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
