@@ -45,13 +45,6 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 9.0.16 (markt)" rtext="in development">
-  <subsection name="Tribes">
-    <changelog>
-      <fix>
-        Remove unnecessary shutdown for executor. (kfujino)
-      </fix>
-    </changelog>
-  </subsection>
   <subsection name="Web applications">
     <changelog>
       <fix>
@@ -59,6 +52,18 @@
         Manager web application. Review and fix several cases when the
         client's language preference was not respected in Manager and
         Host Manager web applications. (kkolinko)
+      </fix>
+      <fix>
+        <bug>63141</bug>: Ensure that translated manager response strings still
+        start with <code>OK -</code> where expected by the associated Ant tasks.
+        (markt)
+      </fix>
+    </changelog>
+  </subsection>
+  <subsection name="Tribes">
+    <changelog>
+      <fix>
+        Remove unnecessary shutdown for executor. (kfujino)
       </fix>
     </changelog>
   </subsection>
