@@ -62,6 +62,27 @@
         Add Czech translations to Apache Tomcat. Includes contributions from
         Arnošt Havelka and Alice. (markt)
       </add>
+      <add>
+        Expand the coverage and quality of the Spanish translations provided
+        with Apache Tomcat. Includes contributions from Ulises Gonzalez Horta.
+        (markt)
+      </add>
+      <add>
+        Expand the coverage and quality of the French translations provided
+        with Apache Tomcat. (remm)
+      </add>
+      <add>
+        Expand the coverage and quality of the Korean translations provided
+        with Apache Tomcat. (woonsan)
+      </add>
+      <add>
+        Expand the coverage and quality of the Japanese translations provided
+        with Apache Tomcat. Includes contributions from Yujiorama. (markt)
+      </add>
+      <add>
+        Expand the coverage and quality of the Chinese translations provided
+        with Apache Tomcat. Includes contributions from zheng. (markt)
+      </add>
     </changelog>
   </subsection>
 </section>
