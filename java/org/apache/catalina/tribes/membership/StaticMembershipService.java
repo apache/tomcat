@@ -242,7 +242,7 @@ public class StaticMembershipService extends MembershipServiceBase
                 break;
             }
         }
-        if (this.localMember == null)  throw new IllegalStateException(sm.getString("staticMembershipService.noLocalMember"));
+        if (this.localMember == null) throw new IllegalStateException(sm.getString("staticMembershipService.noLocalMember"));
         staticMembers.remove(this.localMember);
     }
 }
