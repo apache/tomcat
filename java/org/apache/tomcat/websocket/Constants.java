@@ -133,10 +133,6 @@ public class Constants {
     static final boolean ALLOW_UNSUPPORTED_EXTENSIONS =
             Boolean.getBoolean("org.apache.tomcat.websocket.ALLOW_UNSUPPORTED_EXTENSIONS");
 
-    // Configuration for stream behavior
-    static final boolean STREAMS_DROP_EMPTY_MESSAGES =
-            Boolean.getBoolean("org.apache.tomcat.websocket.STREAMS_DROP_EMPTY_MESSAGES");
-
     public static final boolean STRICT_SPEC_COMPLIANCE =
             Boolean.getBoolean("org.apache.tomcat.websocket.STRICT_SPEC_COMPLIANCE");
 

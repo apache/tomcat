@@ -45,6 +45,21 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 9.0.17 (markt)" rtext="in development">
+  <subsection name="WebSocket">
+    <changelog>
+      <scode>
+        Remove the <code>STREAMS_DROP_EMPTY_MESSAGES</code> system property that
+        was introduced to work-around four failing TCK tests. An alternative
+        solution has been implemented. Sending messages via
+        <code>getSendStream()</code> and <code>getSendWriter()</code> will now
+        only result in messages on the wire if data is written to the
+        <code>OutputStream</code> or <code>Writer</code>. Writing zero length
+        data will result in an empty message. Note that sending a message via an
+        <code>Encoder</code> may result in the message being send via
+        <code>getSendStream()</code> or <code>getSendWriter()</code>. (markt)
+      </scode>
+    </changelog>
+  </subsection>
   <subsection name="Tribes">
     <changelog>
       <add>
