@@ -90,7 +90,7 @@ public class TestCipher {
         Set<String> unavailableCipherSuites = new HashSet<>();
         unavailableCipherSuites.addAll(expectedCipherSuites);
         unavailableCipherSuites.removeAll(availableCipherSuites);
-        StringBuilder unavailableList = new StringBuilder();
+        StringBuilder unavailableList = new StringBuilder("Unavailable cipher suites: ");
         for (String cipher : unavailableCipherSuites) {
             unavailableList.append(cipher);
             unavailableList.append(' ');
@@ -100,7 +100,7 @@ public class TestCipher {
         Set<String> unexpectedCipherSuites = new HashSet<>();
         unexpectedCipherSuites.addAll(availableCipherSuites);
         unexpectedCipherSuites.removeAll(expectedCipherSuites);
-        StringBuilder unexpectedList = new StringBuilder();
+        StringBuilder unexpectedList = new StringBuilder("Unexpected cipher suites: ");
         for (String cipher : unexpectedCipherSuites) {
             unexpectedList.append(cipher);
             unexpectedList.append(' ');
