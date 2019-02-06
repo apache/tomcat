@@ -237,7 +237,7 @@ public class StaticMembershipService extends MembershipServiceBase
         // find local member from static members
         for (StaticMember staticMember : this.staticMembers) {
             if (Arrays.equals(InetAddress.getByName(listenHost).getAddress(), staticMember.getHost())
-                    && Integer.valueOf(listenPort) == staticMember.getPort()) {
+                    && Integer.parseInt(listenPort) == staticMember.getPort()) {
                 this.localMember = staticMember;
                 break;
             }
