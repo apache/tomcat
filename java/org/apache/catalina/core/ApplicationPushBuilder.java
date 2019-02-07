@@ -32,6 +32,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.apache.catalina.Context;
+import org.apache.catalina.authenticator.AuthenticatorBase;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.servlet4preview.http.PushBuilder;
 import org.apache.catalina.util.SessionConfig;
@@ -159,7 +160,12 @@ public class ApplicationPushBuilder implements PushBuilder {
 
         // Authentication
         if (catalinaRequest.getPrincipal() != null) {
-            userName = catalinaRequest.getPrincipal().getName();
+            if ((session == null) || catalinaRequest.getSessionInternal(false).getPrincipal() == null
+                    || !(context.getAuthenticator() instanceof AuthenticatorBase)
+                    || !((AuthenticatorBase) context.getAuthenticator()).getCache()) {
+                // Set a username only if there is no session cache for the principal
+                userName = catalinaRequest.getPrincipal().getName();
+            }
             setHeader("authorization", "x-push");
         }
     }
