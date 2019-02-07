@@ -231,6 +231,9 @@
     <p><b>LocalMember:</b> <br/>
     Static member that is the local member of the static cluster group.
     </p>
+    <p><strong>Note:</strong> In Tomcat 9.0.17 and later, The setting of local member is not required.
+    It is possible to set up a list of all cluster members including local member instead of setting this components.
+    </p>
     <attributes>
       <attribute name="className" required="true">
         Only one implementation available:<code>org.apache.catalina.tribes.membership.StaticMember</code>
@@ -295,6 +298,31 @@
         1. byte array in string form, for example {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15}<br/>
       </attribute>
     </attributes>
+  </subsection>
+
+  <subsection name="Setting">
+    <p><b>Before Tomcat 9.0.16</b> <br/>
+    <source><![CDATA[     <Membership className="org.apache.catalina.tribes.membership.StaticMembershipService">
+       <LocalMember className="org.apache.catalina.tribes.membership.StaticMember"
+                  uniqueId="{0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15}"/>
+       <Member className="org.apache.catalina.tribes.membership.StaticMember"
+                  port="4004"
+                  host="tomcat02.mydomain.com"
+                  uniqueId="{1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,1}"/>
+     </Membership>]]></source>
+     </p>
+     <p><b>Tomcat9.0.17 and later</b> <br/>
+      <source><![CDATA[     <Membership className="org.apache.catalina.tribes.membership.StaticMembershipService">
+       <Member className="org.apache.catalina.tribes.membership.StaticMember"
+                  port="4004"
+                  host="tomcat01.mydomain.com"
+                  uniqueId="{0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15}"/>
+       <Member className="org.apache.catalina.tribes.membership.StaticMember"
+                  port="4004"
+                  host="tomcat02.mydomain.com"
+                  uniqueId="{1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,1}"/>
+     </Membership>]]></source>
+     </p>
   </subsection>
 </section>
 
