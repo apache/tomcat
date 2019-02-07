@@ -446,10 +446,9 @@ public class AjpProcessor extends AbstractProcessor {
                 // 400 - Bad Request
                 response.setStatus(400);
                 setErrorState(ErrorState.CLOSE_CLEAN, t);
-                getAdapter().log(request, response, 0);
             }
 
-            if (!getErrorState().isError()) {
+            if (getErrorState().isIoAllowed()) {
                 // Setting up filters, and parse some request headers
                 rp.setStage(org.apache.coyote.Constants.STAGE_PREPARE);
                 try {
@@ -460,20 +459,18 @@ public class AjpProcessor extends AbstractProcessor {
                     // 500 - Internal Server Error
                     response.setStatus(500);
                     setErrorState(ErrorState.CLOSE_CLEAN, t);
-                    getAdapter().log(request, response, 0);
                 }
             }
 
-            if (!getErrorState().isError() && !cping && endpoint.isPaused()) {
+            if (getErrorState().isIoAllowed() && !cping && endpoint.isPaused()) {
                 // 503 - Service unavailable
                 response.setStatus(503);
                 setErrorState(ErrorState.CLOSE_CLEAN, null);
-                getAdapter().log(request, response, 0);
             }
             cping = false;
 
             // Process the request in the adapter
-            if (!getErrorState().isError()) {
+            if (getErrorState().isIoAllowed()) {
                 try {
                     rp.setStage(org.apache.coyote.Constants.STAGE_SERVICE);
                     getAdapter().service(request, response);
@@ -933,7 +930,7 @@ public class AjpProcessor extends AbstractProcessor {
         MessageBytes valueMB = request.getMimeHeaders().getValue("host");
         parseHost(valueMB);
 
-        if (getErrorState().isError()) {
+        if (!getErrorState().isIoAllowed()) {
             getAdapter().log(request, response, 0);
         }
     }

@@ -733,7 +733,6 @@ public class Http11Processor extends AbstractProcessor {
                 // 400 - Bad Request
                 response.setStatus(400);
                 setErrorState(ErrorState.CLOSE_CLEAN, t);
-                getAdapter().log(request, response, 0);
             }
 
             // Has an upgrade been requested?
@@ -769,7 +768,7 @@ public class Http11Processor extends AbstractProcessor {
                 }
             }
 
-            if (!getErrorState().isError()) {
+            if (getErrorState().isIoAllowed()) {
                 // Setting up filters, and parse some request headers
                 rp.setStage(org.apache.coyote.Constants.STAGE_PREPARE);
                 try {
@@ -782,7 +781,6 @@ public class Http11Processor extends AbstractProcessor {
                     // 500 - Internal Server Error
                     response.setStatus(500);
                     setErrorState(ErrorState.CLOSE_CLEAN, t);
-                    getAdapter().log(request, response, 0);
                 }
             }
 
@@ -794,7 +792,7 @@ public class Http11Processor extends AbstractProcessor {
             }
 
             // Process the request in the adapter
-            if (!getErrorState().isError()) {
+            if (getErrorState().isIoAllowed()) {
                 try {
                     rp.setStage(org.apache.coyote.Constants.STAGE_SERVICE);
                     getAdapter().service(request, response);
@@ -920,7 +918,6 @@ public class Http11Processor extends AbstractProcessor {
                 // Partially processed the request so need to respond
                 response.setStatus(503);
                 setErrorState(ErrorState.CLOSE_CLEAN, null);
-                getAdapter().log(request, response, 0);
                 return false;
             } else {
                 // Need to keep processor associated with socket
@@ -1210,7 +1207,7 @@ public class Http11Processor extends AbstractProcessor {
             contentDelimitation = true;
         }
 
-        if (getErrorState().isError()) {
+        if (!getErrorState().isIoAllowed()) {
             getAdapter().log(request, response, 0);
         }
     }
