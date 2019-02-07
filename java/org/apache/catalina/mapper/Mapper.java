@@ -1217,7 +1217,7 @@ public final class Mapper {
 
         int i = 0;
         while (true) {
-            i = (b + a) / 2;
+            i = (b + a) >>> 1;
             int result = compare(name, start, end, map[i].name);
             if (result == 1) {
                 a = i;
@@ -1272,7 +1272,7 @@ public final class Mapper {
 
         int i = 0;
         while (true) {
-            i = (b + a) / 2;
+            i = (b + a) >>> 1;
             int result = compareIgnoreCase(name, start, end, map[i].name);
             if (result == 1) {
                 a = i;
@@ -1319,7 +1319,7 @@ public final class Mapper {
 
         int i = 0;
         while (true) {
-            i = (b + a) / 2;
+            i = (b + a) >>> 1;
             int result = name.compareTo(map[i].name);
             if (result > 0) {
                 a = i;
