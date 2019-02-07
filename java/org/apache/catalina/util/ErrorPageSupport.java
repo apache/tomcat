@@ -61,8 +61,41 @@ public class ErrorPageSupport {
     }
 
 
+    /**
+     * Find the ErrorPage, if any, for the named exception type.
+     *
+     * @param exceptionType The fully qualified class name of the exception type
+     *
+     * @return The ErrorPage for the named exception type, or {@code null} if
+     *         none is configured
+     *
+     * @deprecated Unused. Will be removed in Tomcat 10.
+     *             Use {@link #find(Throwable)} instead.
+     */
+    @Deprecated
     public ErrorPage find(String exceptionType) {
         return exceptionPages.get(exceptionType);
+    }
+
+
+    public ErrorPage find(Throwable exceptionType) {
+        if (exceptionType == null) {
+            return null;
+        }
+        Class<?> clazz = exceptionType.getClass();
+        String name = clazz.getName();
+        while (!Object.class.equals(clazz)) {
+            ErrorPage errorPage = exceptionPages.get(name);
+            if (errorPage != null) {
+                return errorPage;
+            }
+            clazz = clazz.getSuperclass();
+            if (clazz == null) {
+                break;
+            }
+            name = clazz.getName();
+        }
+        return null;
     }
 
 
