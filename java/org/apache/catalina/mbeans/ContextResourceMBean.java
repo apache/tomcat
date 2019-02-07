@@ -18,16 +18,12 @@ package org.apache.catalina.mbeans;
 
 import javax.management.Attribute;
 import javax.management.AttributeNotFoundException;
-import javax.management.InstanceNotFoundException;
 import javax.management.MBeanException;
 import javax.management.ReflectionException;
 import javax.management.RuntimeOperationsException;
-import javax.management.modelmbean.InvalidTargetObjectTypeException;
 
 import org.apache.tomcat.util.descriptor.web.ContextResource;
 import org.apache.tomcat.util.descriptor.web.NamingResources;
-import org.apache.tomcat.util.modeler.BaseModelMBean;
-
 
 /**
  * <p>A <strong>ModelMBean</strong> implementation for the
@@ -35,34 +31,7 @@ import org.apache.tomcat.util.modeler.BaseModelMBean;
  *
  * @author Amy Roh
  */
-public class ContextResourceMBean extends BaseModelMBean {
-
-
-    // ----------------------------------------------------------- Constructors
-
-
-    /**
-     * Construct a <code>ModelMBean</code> with default
-     * <code>ModelMBeanInfo</code> information.
-     *
-     * @exception MBeanException if the initializer of an object
-     *  throws an exception
-     * @exception RuntimeOperationsException if an IllegalArgumentException
-     *  occurs
-     */
-    public ContextResourceMBean()
-        throws MBeanException, RuntimeOperationsException {
-
-        super();
-
-    }
-
-
-    // ----------------------------------------------------- Instance Variables
-
-
-    // ------------------------------------------------------------- Attributes
-
+public class ContextResourceMBean extends BaseCatalinaMBean<ContextResource> {
 
     /**
      * Obtain and return the value of a specific attribute of this MBean.
@@ -77,24 +46,17 @@ public class ContextResourceMBean extends BaseModelMBean {
      *  occurs when invoking the getter
      */
     @Override
-    public Object getAttribute(String name)
-        throws AttributeNotFoundException, MBeanException,
-        ReflectionException {
+    public Object getAttribute(String name) throws AttributeNotFoundException, MBeanException,
+            ReflectionException {
 
         // Validate the input parameters
-        if (name == null)
-            throw new RuntimeOperationsException
-                (new IllegalArgumentException("Attribute name is null"),
-                 "Attribute name is null");
-
-        ContextResource cr = null;
-        try {
-            cr = (ContextResource) getManagedResource();
-        } catch (InstanceNotFoundException e) {
-            throw new MBeanException(e);
-        } catch (InvalidTargetObjectTypeException e) {
-             throw new MBeanException(e);
+        if (name == null) {
+            throw new RuntimeOperationsException(
+                    new IllegalArgumentException("Attribute name is null"),
+                    "Attribute name is null");
         }
+
+        ContextResource cr = doGetManagedResource();
 
         String value = null;
         if ("auth".equals(name)) {
@@ -111,12 +73,11 @@ public class ContextResourceMBean extends BaseModelMBean {
             value = (String) cr.getProperty(name);
             if (value == null) {
                 throw new AttributeNotFoundException
-                    ("Cannot find attribute "+name);
+                    ("Cannot find attribute [" + name + "]");
             }
         }
 
         return value;
-
     }
 
 
@@ -134,30 +95,24 @@ public class ContextResourceMBean extends BaseModelMBean {
      *  occurs when invoking the getter
      */
      @Override
-    public void setAttribute(Attribute attribute)
-        throws AttributeNotFoundException, MBeanException,
-        ReflectionException {
+    public void setAttribute(Attribute attribute) throws AttributeNotFoundException, MBeanException,
+            ReflectionException {
 
         // Validate the input parameters
-        if (attribute == null)
-            throw new RuntimeOperationsException
-                (new IllegalArgumentException("Attribute is null"),
-                 "Attribute is null");
+        if (attribute == null) {
+            throw new RuntimeOperationsException(
+                    new IllegalArgumentException("Attribute is null"),
+                    "Attribute is null");
+        }
         String name = attribute.getName();
         Object value = attribute.getValue();
-        if (name == null)
-            throw new RuntimeOperationsException
-                (new IllegalArgumentException("Attribute name is null"),
-                 "Attribute name is null");
-
-        ContextResource cr = null;
-        try {
-            cr = (ContextResource) getManagedResource();
-        } catch (InstanceNotFoundException e) {
-            throw new MBeanException(e);
-        } catch (InvalidTargetObjectTypeException e) {
-             throw new MBeanException(e);
+        if (name == null) {
+            throw new RuntimeOperationsException(
+                    new IllegalArgumentException("Attribute name is null"),
+                    "Attribute name is null");
         }
+
+        ContextResource cr = doGetManagedResource();
 
         if ("auth".equals(name)) {
             cr.setAuth((String)value);
@@ -170,7 +125,7 @@ public class ContextResourceMBean extends BaseModelMBean {
         } else if ("type".equals(name)) {
             cr.setType((String)value);
         } else {
-            cr.setProperty(name, ""+value);
+            cr.setProperty(name, "" + value);
         }
 
         // cannot use side-effects.  It's removed and added back each time

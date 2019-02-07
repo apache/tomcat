@@ -14,27 +14,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.catalina.mbeans;
 
-import javax.management.InstanceNotFoundException;
 import javax.management.MBeanException;
-import javax.management.RuntimeOperationsException;
-import javax.management.modelmbean.InvalidTargetObjectTypeException;
 
 import org.apache.catalina.Executor;
 import org.apache.catalina.Service;
 import org.apache.catalina.connector.Connector;
-import org.apache.tomcat.util.modeler.BaseModelMBean;
 
-public class ServiceMBean extends BaseModelMBean {
-
-    public ServiceMBean()
-        throws MBeanException, RuntimeOperationsException {
-
-        super();
-
-    }
+public class ServiceMBean extends BaseCatalinaMBean<Service> {
 
     /**
      * Add a new Connector to the set of defined Connectors, and associate it
@@ -49,16 +37,7 @@ public class ServiceMBean extends BaseModelMBean {
      */
     public void addConnector(String address, int port, boolean isAjp, boolean isSSL) throws MBeanException {
 
-        Service service;
-        try {
-            service = (Service)getManagedResource();
-        } catch (InstanceNotFoundException e) {
-            throw new MBeanException(e);
-        } catch (RuntimeOperationsException e) {
-            throw new MBeanException(e);
-        } catch (InvalidTargetObjectTypeException e) {
-            throw new MBeanException(e);
-        }
+        Service service = doGetManagedResource();
         String protocol = isAjp ? "AJP/1.3" : "HTTP/1.1";
         Connector connector = new Connector(protocol);
         if ((address!=null) && (address.length()>0)) {
@@ -69,8 +48,8 @@ public class ServiceMBean extends BaseModelMBean {
         connector.setScheme(isSSL ? "https" : "http");
 
         service.addConnector(connector);
-
     }
+
 
     /**
      * Adds a named executor to the service
@@ -78,28 +57,11 @@ public class ServiceMBean extends BaseModelMBean {
      * @throws MBeanException error creating the executor
      */
     public void addExecutor(String type) throws MBeanException {
-
-        Service service;
-        try {
-            service = (Service)getManagedResource();
-        } catch (InstanceNotFoundException e) {
-            throw new MBeanException(e);
-        } catch (RuntimeOperationsException e) {
-            throw new MBeanException(e);
-        } catch (InvalidTargetObjectTypeException e) {
-            throw new MBeanException(e);
-        }
-
-        Executor executor;
-        try {
-             executor = (Executor)Class.forName(type).getConstructor().newInstance();
-        } catch (ReflectiveOperationException e) {
-            throw new MBeanException(e);
-        }
-
+        Service service = doGetManagedResource();
+        Executor executor = (Executor) newInstance(type);
         service.addExecutor(executor);
-
     }
+
 
     /**
      * Find and return the set of Connectors associated with this Service.
@@ -108,27 +70,18 @@ public class ServiceMBean extends BaseModelMBean {
      */
     public String[] findConnectors() throws MBeanException {
 
-        Service service;
-        try {
-            service = (Service)getManagedResource();
-        } catch (InstanceNotFoundException e) {
-            throw new MBeanException(e);
-        } catch (RuntimeOperationsException e) {
-            throw new MBeanException(e);
-        } catch (InvalidTargetObjectTypeException e) {
-            throw new MBeanException(e);
-        }
+        Service service = doGetManagedResource();
 
         Connector[] connectors = service.findConnectors();
         String[] str = new String[connectors.length];
 
-        for(int i=0; i< connectors.length; i++){
+        for(int i = 0; i < connectors.length; i++) {
             str[i] = connectors[i].toString();
         }
 
         return str;
-
     }
+
 
     /**
      * Retrieves all executors.
@@ -137,26 +90,18 @@ public class ServiceMBean extends BaseModelMBean {
      */
     public String[] findExecutors() throws MBeanException {
 
-        Service service;
-        try {
-            service = (Service)getManagedResource();
-        } catch (InstanceNotFoundException e) {
-            throw new MBeanException(e);
-        } catch (RuntimeOperationsException e) {
-            throw new MBeanException(e);
-        } catch (InvalidTargetObjectTypeException e) {
-            throw new MBeanException(e);
-        }
+        Service service = doGetManagedResource();
 
         Executor[] executors = service.findExecutors();
         String[] str = new String[executors.length];
 
-        for(int i=0; i< executors.length; i++){
+        for(int i = 0; i < executors.length; i++){
             str[i] = executors[i].toString();
         }
 
         return str;
     }
+
 
     /**
      * Retrieves executor by name
@@ -165,21 +110,8 @@ public class ServiceMBean extends BaseModelMBean {
      * @throws MBeanException error accessing the associated service
      */
     public String getExecutor(String name) throws MBeanException{
-
-        Service service;
-        try {
-            service = (Service)getManagedResource();
-        } catch (InstanceNotFoundException e) {
-            throw new MBeanException(e);
-        } catch (RuntimeOperationsException e) {
-            throw new MBeanException(e);
-        } catch (InvalidTargetObjectTypeException e) {
-            throw new MBeanException(e);
-        }
-
+        Service service = doGetManagedResource();
         Executor executor = service.getExecutor(name);
         return executor.toString();
-
     }
-
 }

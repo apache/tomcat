@@ -14,17 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.catalina.mbeans;
-
 
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import javax.management.MBeanException;
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
-import javax.management.RuntimeOperationsException;
 
 import org.apache.catalina.Group;
 import org.apache.catalina.Role;
@@ -42,28 +38,7 @@ import org.apache.tomcat.util.modeler.Registry;
 public class UserMBean extends BaseModelMBean {
 
 
-    // ----------------------------------------------------------- Constructors
-
-
-    /**
-     * Construct a <code>ModelMBean</code> with default
-     * <code>ModelMBeanInfo</code> information.
-     *
-     * @exception MBeanException if the initializer of an object
-     *  throws an exception
-     * @exception RuntimeOperationsException if an IllegalArgumentException
-     *  occurs
-     */
-    public UserMBean()
-        throws MBeanException, RuntimeOperationsException {
-
-        super();
-
-    }
-
-
     // ----------------------------------------------------- Instance Variables
-
 
     /**
      * The configuration information registry for our managed beans.
@@ -74,8 +49,7 @@ public class UserMBean extends BaseModelMBean {
     /**
      * The <code>ManagedBean</code> information describing this MBean.
      */
-    protected final ManagedBean managed =
-        registry.findManagedBean("User");
+    protected final ManagedBean managed = registry.findManagedBean("User");
 
 
     // ------------------------------------------------------------- Attributes
@@ -104,7 +78,6 @@ public class UserMBean extends BaseModelMBean {
             }
         }
         return results.toArray(new String[results.size()]);
-
     }
 
 
@@ -131,12 +104,10 @@ public class UserMBean extends BaseModelMBean {
             }
         }
         return results.toArray(new String[results.size()]);
-
     }
 
 
     // ------------------------------------------------------------- Operations
-
 
     /**
      * Add a new {@link Group} to those this user belongs to.
@@ -151,11 +122,9 @@ public class UserMBean extends BaseModelMBean {
         }
         Group group = user.getUserDatabase().findGroup(groupname);
         if (group == null) {
-            throw new IllegalArgumentException
-                ("Invalid group name '" + groupname + "'");
+            throw new IllegalArgumentException("Invalid group name '" + groupname + "'");
         }
         user.addGroup(group);
-
     }
 
 
@@ -172,11 +141,9 @@ public class UserMBean extends BaseModelMBean {
         }
         Role role = user.getUserDatabase().findRole(rolename);
         if (role == null) {
-            throw new IllegalArgumentException
-                ("Invalid role name '" + rolename + "'");
+            throw new IllegalArgumentException("Invalid role name '" + rolename + "'");
         }
         user.addRole(role);
-
     }
 
 
@@ -193,11 +160,9 @@ public class UserMBean extends BaseModelMBean {
         }
         Group group = user.getUserDatabase().findGroup(groupname);
         if (group == null) {
-            throw new IllegalArgumentException
-                ("Invalid group name '" + groupname + "'");
+            throw new IllegalArgumentException("Invalid group name '" + groupname + "'");
         }
         user.removeGroup(group);
-
     }
 
 
@@ -214,12 +179,8 @@ public class UserMBean extends BaseModelMBean {
         }
         Role role = user.getUserDatabase().findRole(rolename);
         if (role == null) {
-            throw new IllegalArgumentException
-                ("Invalid role name '" + rolename + "'");
+            throw new IllegalArgumentException("Invalid role name '" + rolename + "'");
         }
         user.removeRole(role);
-
     }
-
-
 }

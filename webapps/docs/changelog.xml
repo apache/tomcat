@@ -75,6 +75,10 @@
         application provided error handling and/or the container provided error
         handling (<code>ErrorReportValve</code>) as appropriate. (markt)
       </add>
+      <scode>
+        Refactor the MBean implementations for the internal Tomcat components
+        to reduce code duplication. (markt)
+      </scode>
     </changelog>
   </subsection>
   <subsection name="WebSocket">
