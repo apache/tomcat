@@ -50,6 +50,12 @@
       <fix>
         Minor HTTP/2 push fixes. (remm)
       </fix>
+      <fix>
+        Refactor how cookies are transferred from the base request to a
+        <code>PushBuilder</code> so that they are accessible, and may be edited,
+        via the standard <code>PushBuilder</code> methods for working with HTTP
+        headers. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="WebSocket">
