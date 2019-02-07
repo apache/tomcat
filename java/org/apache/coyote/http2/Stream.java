@@ -36,6 +36,7 @@ import org.apache.coyote.http2.HpackDecoder.HeaderEmitter;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.buf.ByteChunk;
+import org.apache.tomcat.util.buf.MessageBytes;
 import org.apache.tomcat.util.http.MimeHeaders;
 import org.apache.tomcat.util.http.parser.Host;
 import org.apache.tomcat.util.net.ApplicationBufferHandler;
@@ -99,8 +100,19 @@ public class Stream extends AbstractStream implements HeaderEmitter {
             // HTTP/1.1 upgrade
             this.coyoteRequest = coyoteRequest;
             this.inputBuffer = null;
-            // Headers have been populated by this point
+            // Headers have been read by this point
             state.receivedStartOfHeaders();
+            // Populate coyoteRequest from headers
+            try {
+                prepareRequest();
+            } catch (IllegalArgumentException iae) {
+                // Something in the headers is invalid
+                // Set correct return status
+                coyoteResponse.setStatus(400);
+                // Set error flag. This triggers error processing rather than
+                // the normal mapping
+                coyoteResponse.setError();
+            }
             // TODO Assuming the body has been read at this point is not valid
             state.receivedEndOfStream();
         }
@@ -112,6 +124,44 @@ public class Stream extends AbstractStream implements HeaderEmitter {
         if (this.coyoteRequest.getStartTime() < 0) {
             this.coyoteRequest.setStartTime(System.currentTimeMillis());
         }
+    }
+
+
+    private void prepareRequest() {
+        MessageBytes hostValueMB = coyoteRequest.getMimeHeaders().getUniqueValue("host");
+        if (hostValueMB == null) {
+            throw new IllegalArgumentException();
+        }
+        // This processing expects bytes. Server push will have used a String
+        // to trigger a conversion if required.
+        hostValueMB.toBytes();
+        ByteChunk valueBC = hostValueMB.getByteChunk();
+        byte[] valueB = valueBC.getBytes();
+        int valueL = valueBC.getLength();
+        int valueS = valueBC.getStart();
+
+        int colonPos = Host.parse(hostValueMB);
+        if (colonPos != -1) {
+            int port = 0;
+            for (int i = colonPos + 1; i < valueL; i++) {
+                char c = (char) valueB[i + valueS];
+                if (c < '0' || c > '9') {
+                    throw new IllegalArgumentException();
+                }
+                port = port * 10 + c - '0';
+            }
+            coyoteRequest.setServerPort(port);
+
+            // Only need to copy the host name up to the :
+            valueL = colonPos;
+        }
+
+        // Extract the host name
+        char[] hostNameC = new char[valueL];
+        for (int i = 0; i < valueL; i++) {
+            hostNameC[i] = (char) valueB[i + valueS];
+        }
+        coyoteRequest.serverName().setChars(hostNameC, 0, valueL);
     }
 
 
