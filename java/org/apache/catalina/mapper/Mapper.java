@@ -740,8 +740,6 @@ public final class Mapper {
             throw new AssertionError();
         }
 
-        uri.setLimit(-1);
-
         // Virtual host mapping
         MappedHost[] hosts = this.hosts;
         MappedHost mappedHost = exactFindIgnoreCase(hosts, host);
@@ -767,6 +765,13 @@ public final class Mapper {
             }
         }
         mappingData.host = mappedHost.object;
+
+        if (uri.isNull()) {
+            // Can't map context or wrapper without a uri
+            return;
+        }
+
+        uri.setLimit(-1);
 
         // Context mapping
         ContextList contextList = mappedHost.contextList;
