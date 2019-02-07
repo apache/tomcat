@@ -24,6 +24,10 @@ import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
 
+import org.apache.catalina.util.ServerInfo;
+import org.apache.catalina.valves.ErrorReportValve;
+import org.apache.tomcat.util.res.StringManager;
+
 public class TestHttp2InitialConnection extends Http2TestBase {
 
     private TestData testData;
@@ -57,7 +61,6 @@ public class TestHttp2InitialConnection extends Http2TestBase {
         List<String> hostHeaders = new ArrayList<>(1);
 
         testData = new TestData(hostHeaders, 400);
-
         http2Connect();
     }
 
@@ -101,8 +104,26 @@ public class TestHttp2InitialConnection extends Http2TestBase {
         if (testData.getExpectedStatus() == 200) {
             return super.getResponseBodyFrameTrace(streamId, body);
         } else if (testData.getExpectedStatus() == 400) {
+            /*
+             * Need to be careful here. The test wants the exact content length
+             * in bytes.
+             * This will vary depending on where the test is run due to:
+             * - The length of the version string that appears once in the error
+             *   page
+             * - The status header uses a UTF-8 EM dash. When running in an IDE
+             *   the UTF-8 properties files will be used directly rather than
+             *   after native2ascii conversion.
+             *
+             * Note: The status header appears twice in the error page.
+             */
+            int serverInfoLength = ServerInfo.getServerInfo().getBytes().length;
+            StringManager sm = StringManager.getManager(ErrorReportValve.class);
+            int statusHeaderLength = sm.getString(
+                    "errorReportValve.statusHeader", "", "").getBytes().length;
+            int len = 1073 + serverInfoLength + statusHeaderLength * 2;
+            String contentLength = String.valueOf(len);
             return getResponseBodyFrameTrace(streamId, testData.getExpectedStatus(),
-                    "text/html;charset=utf-8", "en", "1136", "1136");
+                    "text/html;charset=utf-8", "en", contentLength, contentLength);
         } else {
             Assert.fail();
             // To keep the IDE happy
