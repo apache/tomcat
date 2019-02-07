@@ -56,6 +56,12 @@
         via the standard <code>PushBuilder</code> methods for working with HTTP
         headers. (markt)
       </fix>
+      <add>
+        Refactor error handling to enable errors that occur before processing is
+        passed to the application to be handled by the application provided
+        error handling and/or the container provided error handling
+        (<code>ErrorReportValve</code>) as appropriate. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="WebSocket">
