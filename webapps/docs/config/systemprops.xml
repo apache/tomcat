@@ -611,14 +611,6 @@
       <p>The default value is <code>false</code>.</p>
     </property>
 
-    <property name="org.apache.tomcat. websocket.STREAMS_DROP_EMPTY_MESSAGES">
-      <p>If <code>true</code>, streams provided to the user (writer and output
-      stream) will not send an empty message when flushing and there is no
-      data to flush, or when it is closed without having been used (for
-      example if an error occurs).</p>
-      <p>The default value is <code>false</code>.</p>
-    </property>
-
   </properties>
 
 </section>
