@@ -55,6 +55,17 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+        When performing an HTTP/1.1 upgrade to HTTP/2 (h2c) ensure that the hostname
+        and port from the HTTP/1.1 Host header of the upgraded request are made
+        available via the standard methods
+        <code>ServletRequest.getServerName()</code> and
+        <code>ServletRequest.getServerPort()</code>. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="WebSocket">
     <changelog>
       <scode>

@@ -476,25 +476,35 @@ public abstract class Http2TestBase extends TomcatBaseTest {
 
 
     protected String getCookieResponseTrace(int streamId, int cookieCount) {
-        return getResponseBodyFrameTrace(streamId, "text/plain;charset=UTF-8",
+        return getResponseBodyFrameTrace(streamId, 200, "text/plain;charset=UTF-8", null,
                 "Cookie count: " + cookieCount, null);
     }
 
 
-    private String getResponseBodyFrameTrace(int streamId, String body) {
-        return getResponseBodyFrameTrace(streamId, "application/octet-stream", body, body);
+    protected String getResponseBodyFrameTrace(int streamId, String body) {
+        return getResponseBodyFrameTrace(streamId, 200, "application/octet-stream", null, body, body);
     }
 
-    private String getResponseBodyFrameTrace(int streamId, String contentType, String body, String cl) {
+
+    protected String getResponseBodyFrameTrace(int streamId, int status, String contentType,
+            String contentLanguage, String body, String cl) {
         StringBuilder result = new StringBuilder();
         result.append(streamId);
         result.append("-HeadersStart\n");
         result.append(streamId);
-        result.append("-Header-[:status]-[200]\n");
+        result.append("-Header-[:status]-[");
+        result.append(status);
+        result.append("]\n");
         result.append(streamId);
         result.append("-Header-[content-type]-[");
         result.append(contentType);
         result.append("]\n");
+        if (contentLanguage != null) {
+            result.append(streamId);
+            result.append("-Header-[content-language]-[");
+            result.append(contentLanguage);
+            result.append("]\n");
+        }
         if (cl != null) {
             result.append(streamId);
             result.append("-Header-[content-length]-[");
