@@ -45,7 +45,6 @@ import javax.servlet.http.HttpServletResponseWrapper;
 import org.apache.catalina.Context;
 import org.apache.catalina.Globals;
 import org.apache.catalina.Session;
-import org.apache.catalina.Wrapper;
 import org.apache.catalina.security.SecurityUtil;
 import org.apache.catalina.util.SessionConfig;
 import org.apache.coyote.ActionCode;
@@ -409,14 +408,7 @@ public class Response implements HttpServletResponse {
      * @return <code>false</code> if the error flag was already set
      */
     public boolean setError() {
-        boolean result = getCoyoteResponse().setError();
-        if (result) {
-            Wrapper wrapper = getRequest().getWrapper();
-            if (wrapper != null) {
-                wrapper.incrementErrorCount();
-            }
-        }
-        return result;
+        return getCoyoteResponse().setError();
     }
 
 
