@@ -31,7 +31,6 @@ import java.util.Enumeration;
 import java.util.EventListener;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
@@ -105,6 +104,7 @@ import org.apache.catalina.loader.WebappLoader;
 import org.apache.catalina.session.StandardManager;
 import org.apache.catalina.util.CharsetMapper;
 import org.apache.catalina.util.ContextName;
+import org.apache.catalina.util.ErrorPageSupport;
 import org.apache.catalina.util.ExtensionValidator;
 import org.apache.catalina.util.URLEncoder;
 import org.apache.catalina.webresources.StandardRoot;
@@ -368,11 +368,7 @@ public class StandardContext extends ContainerBase
     private String docBase = null;
 
 
-    /**
-     * The exception pages for this web application, keyed by fully qualified
-     * class name of the Java exception.
-     */
-    private HashMap<String, ErrorPage> exceptionPages = new HashMap<>();
+    private final ErrorPageSupport errorPageSupport = new ErrorPageSupport();
 
 
     /**
@@ -548,13 +544,6 @@ public class StandardContext extends ContainerBase
      * The notification sequence number.
      */
     private AtomicLong sequenceNumber = new AtomicLong(0);
-
-    /**
-     * The status code error pages for this web application, keyed by
-     * HTTP status code (as an Integer). Note status code zero is used for the
-     * default error page.
-     */
-    private HashMap<Integer, ErrorPage> statusPages = new HashMap<>();
 
 
     /**
@@ -2958,20 +2947,8 @@ public class StandardContext extends ContainerBase
             }
         }
 
-        // Add the specified error page to our internal collections
-        String exceptionType = errorPage.getExceptionType();
-        if (exceptionType != null) {
-            synchronized (exceptionPages) {
-                exceptionPages.put(exceptionType, errorPage);
-            }
-        } else {
-            synchronized (statusPages) {
-                statusPages.put(Integer.valueOf(errorPage.getErrorCode()),
-                                errorPage);
-            }
-        }
+        errorPageSupport.add(errorPage);
         fireContainerEvent("addErrorPage", errorPage);
-
     }
 
 
@@ -3426,7 +3403,7 @@ public class StandardContext extends ContainerBase
      */
     @Override
     public ErrorPage findErrorPage(int errorCode) {
-        return statusPages.get(Integer.valueOf(errorCode));
+        return errorPageSupport.find(errorCode);
     }
 
 
@@ -3438,11 +3415,7 @@ public class StandardContext extends ContainerBase
      */
     @Override
     public ErrorPage findErrorPage(String exceptionType) {
-
-        synchronized (exceptionPages) {
-            return (exceptionPages.get(exceptionType));
-        }
-
+        return errorPageSupport.find(exceptionType);
     }
 
 
@@ -3452,23 +3425,7 @@ public class StandardContext extends ContainerBase
      */
     @Override
     public ErrorPage[] findErrorPages() {
-
-        synchronized(exceptionPages) {
-            synchronized(statusPages) {
-                ErrorPage results1[] = new ErrorPage[exceptionPages.size()];
-                results1 = exceptionPages.values().toArray(results1);
-                ErrorPage results2[] = new ErrorPage[statusPages.size()];
-                results2 = statusPages.values().toArray(results2);
-                ErrorPage results[] =
-                    new ErrorPage[results1.length + results2.length];
-                for (int i = 0; i < results1.length; i++)
-                    results[i] = results1[i];
-                for (int i = results1.length; i < results.length; i++)
-                    results[i] = results2[i - results1.length];
-                return (results);
-            }
-        }
-
+        return errorPageSupport.findAll();
     }
 
 
@@ -3711,41 +3668,33 @@ public class StandardContext extends ContainerBase
     }
 
 
-    /**
-     * @return the context-relative URI of the error page for the specified
-     * HTTP status code, if any; otherwise return <code>null</code>.
-     *
-     * @param status HTTP status code to look up
-     */
     @Override
+    @Deprecated
     public String findStatusPage(int status) {
 
-        ErrorPage errorPage = statusPages.get(Integer.valueOf(status));
-        if (errorPage!=null) {
+        ErrorPage errorPage = findErrorPage(status);
+        if (errorPage != null) {
             return errorPage.getLocation();
         }
         return null;
-
     }
 
 
-    /**
-     * @return the set of HTTP status codes for which error pages have
-     * been specified.  If none are specified, a zero-length array
-     * is returned.
-     */
     @Override
+    @Deprecated
     public int[] findStatusPages() {
-
-        synchronized (statusPages) {
-            int results[] = new int[statusPages.size()];
-            Iterator<Integer> elements = statusPages.keySet().iterator();
-            int i = 0;
-            while (elements.hasNext())
-                results[i++] = elements.next().intValue();
-            return (results);
+        ErrorPage[] errorPages = findErrorPages();
+        int size = errorPages.length;
+        int temp[] = new int[size];
+        int count = 0;
+        for (int i = 0; i < size; i++) {
+            if (errorPages[i].getExceptionType() == null) {
+                temp[count++] = errorPages[i].getErrorCode();
+            }
         }
-
+        int result[] = new int[count];
+        System.arraycopy(temp, 0, result, 0, count);
+        return result;
     }
 
 
@@ -4025,19 +3974,8 @@ public class StandardContext extends ContainerBase
      */
     @Override
     public void removeErrorPage(ErrorPage errorPage) {
-
-        String exceptionType = errorPage.getExceptionType();
-        if (exceptionType != null) {
-            synchronized (exceptionPages) {
-                exceptionPages.remove(exceptionType);
-            }
-        } else {
-            synchronized (statusPages) {
-                statusPages.remove(Integer.valueOf(errorPage.getErrorCode()));
-            }
-        }
+        errorPageSupport.remove(errorPage);
         fireContainerEvent("removeErrorPage", errorPage);
-
     }
 
 
