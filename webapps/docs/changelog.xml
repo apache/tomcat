@@ -128,6 +128,11 @@
       <update>
         Update the recommended minimum Tomcat Native version to 1.2.21. (markt)
       </update>
+      <update>
+        Simplify the value of <code>jarsToSkip</code> property in
+        <code>catalina.properties</code> file for tomcat-i18n jar files.
+        Use prefix pattern instead of listing each language. (kkolinko)
+      </update>
     </changelog>
   </subsection>
   <subsection name="WebSocket">
