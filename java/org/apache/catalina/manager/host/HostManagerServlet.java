@@ -435,7 +435,7 @@ public class HostManagerServlet
 
         host = (StandardHost) engine.findChild(name);
         if (host != null) {
-            writer.println(smClient.getString("hostManagerServlet.add", name));
+            writer.println(smClient.getString("hostManagerServlet.addSuccess", name));
         } else {
             // Something failed
             writer.println(smClient.getString(
@@ -495,7 +495,7 @@ public class HostManagerServlet
         Host host = (StandardHost) engine.findChild(name);
         if (host == null) {
             writer.println(smClient.getString(
-                    "hostManagerServlet.remove", name));
+                    "hostManagerServlet.removeSuccess", name));
         } else {
             // Something failed
             writer.println(smClient.getString(
