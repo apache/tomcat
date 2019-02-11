@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -124,7 +125,9 @@ public class Export {
             File out = new File(storageDir, Constants.L10N_PREFIX + language + Constants.L10N_SUFFIX);
             try (FileOutputStream fos = new FileOutputStream(out);
                     Writer w = new OutputStreamWriter(fos, StandardCharsets.UTF_8)) {
-                for (Object key : translation.keySet()) {
+                String[] keys = translation.keySet().toArray(new String[0]);
+                Arrays.sort(keys);
+                for (Object key : keys) {
                     w.write(key + "=" + Utils.formatValue(translation.getProperty((String) key)) + "\n");
                 }
             } catch (IOException ioe) {
