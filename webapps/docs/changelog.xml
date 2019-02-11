@@ -236,6 +236,10 @@
         Update the NSIS Installer used to build the Windows installer to version
         3.04. (markt)
       </update>
+      <add>
+        Expand the coverage and quality of the Russian translations provided
+        with Apache Tomcat. (kkolinko)
+      </add>
     </changelog>
   </subsection>
 </section>
