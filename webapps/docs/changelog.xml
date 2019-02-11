@@ -53,6 +53,11 @@
         via the standard <code>PushBuilder</code> methods for working with HTTP
         headers. (markt)
       </fix>
+      <update>
+        Simplify the value of <code>jarsToSkip</code> property in
+        <code>catalina.properties</code> file for tomcat-i18n jar files.
+        Use prefix pattern instead of listing each language. (kkolinko)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Coyote">
