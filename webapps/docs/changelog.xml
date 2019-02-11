@@ -116,6 +116,14 @@
       </scode>
     </changelog>
   </subsection>
+  <subsection name="Other">
+    <changelog>
+      <add>
+        Expand the coverage and quality of the Russian translations provided
+        with Apache Tomcat. (kkolinko)
+      </add>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 8.5.38 (markt)" rtext="2019-02-08">
   <subsection name="Catalina">
