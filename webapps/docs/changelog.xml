@@ -200,6 +200,10 @@
         language preferences of the user as configured in the browser when the
         language of the default system locale is not English. (markt)
       </fix>
+      <fix>
+        Fix messages used by Host Manager web application. Disambiguate
+        message keys used for different messages. (kkolinko)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
