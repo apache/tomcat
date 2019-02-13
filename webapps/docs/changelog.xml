@@ -108,6 +108,12 @@
         Expand the coverage and quality of the French translations provided
         with Apache Tomcat. (remm)
       </add>
+      <fix>
+        <bug>63041</bug>: Revert the changes for <bug>53930</bug> that added
+        support for the <code>CATALINA_OUT_CMD</code> environment variable as
+        they prevented correct operation with systemd configurations that did
+        not explicitly specify a PID file. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
