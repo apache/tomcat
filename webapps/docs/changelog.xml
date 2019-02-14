@@ -114,6 +114,10 @@
         they prevented correct operation with systemd configurations that did
         not explicitly specify a PID file. (markt)
       </fix>
+      <add>
+        Expand the coverage and quality of the Russian translations provided
+        with Apache Tomcat. (kkolinko)
+      </add>
     </changelog>
   </subsection>
 </section>
