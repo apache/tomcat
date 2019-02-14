@@ -127,6 +127,10 @@
         Fix messages used by Host Manager web application. Disambiguate
         message keys used for different messages. (kkolinko)
       </fix>
+      <fix>
+        Improve display of summary values on the status page of Manager web
+        application: separate terms and values with a whitespace. (kkolinko)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
