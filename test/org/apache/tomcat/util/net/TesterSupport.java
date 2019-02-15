@@ -70,8 +70,10 @@ public final class TesterSupport {
     public static final String JKS_PASS = "changeit";
     public static final String JKS_KEY_PASS = "tomcatpass";
     public static final String CA_CERT_PEM = SSL_DIR + CA_ALIAS + "-cert.pem";
-    public static final String LOCALHOST_CERT_PEM = SSL_DIR + "localhost-cert.pem";
-    public static final String LOCALHOST_KEY_PEM = SSL_DIR + "localhost-key.pem";
+    public static final String LOCALHOST_EC_CERT_PEM = SSL_DIR + "localhost-ec-cert.pem";
+    public static final String LOCALHOST_EC_KEY_PEM = SSL_DIR + "localhost-ec-key.pem";
+    public static final String LOCALHOST_RSA_CERT_PEM = SSL_DIR + "localhost-rsa-cert.pem";
+    public static final String LOCALHOST_RSA_KEY_PEM = SSL_DIR + "localhost-rsa-key.pem";
     public static final boolean OPENSSL_AVAILABLE;
     public static final int OPENSSL_VERSION;
     public static final String OPENSSL_ERROR;
@@ -141,11 +143,11 @@ public final class TesterSupport {
             }
         } else {
             File keystoreFile = new File(
-                    LOCALHOST_CERT_PEM);
+                    LOCALHOST_RSA_CERT_PEM);
             tomcat.getConnector().setAttribute("SSLCertificateFile",
                     keystoreFile.getAbsolutePath());
             keystoreFile = new File(
-                    LOCALHOST_KEY_PEM);
+                    LOCALHOST_RSA_KEY_PEM);
             tomcat.getConnector().setAttribute("SSLCertificateKeyFile",
                     keystoreFile.getAbsolutePath());
             keystoreFile = new File(
