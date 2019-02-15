@@ -491,8 +491,6 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
         // List the ciphers that the client is permitted to negotiate
         SSLContext.setCipherSuite(ctx, sslHostConfig.getCiphers());
         // Load Server key and certificate
-        // TODO: Confirm assumption that idx is not specific to
-        //       key/certificate type
         int idx = 0;
         for (SSLHostConfigCertificate certificate : sslHostConfig.getCertificates(true)) {
             SSLContext.setCertificate(ctx,
