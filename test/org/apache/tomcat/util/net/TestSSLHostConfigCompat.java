@@ -37,6 +37,7 @@ import org.apache.catalina.startup.TesterServlet;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.buf.ByteChunk;
+import org.apache.tomcat.util.net.SSLHostConfigCertificate.Type;
 
 /*
  * Tests compatibility of JSSE and OpenSSL settings.
@@ -84,6 +85,19 @@ public class TestSSLHostConfigCompat extends TomcatBaseTest {
     public void testHostRSAPEM() throws Exception {
         sslHostConfig.setCertificateFile(getPath(TesterSupport.LOCALHOST_RSA_CERT_PEM));
         sslHostConfig.setCertificateKeyFile(getPath(TesterSupport.LOCALHOST_RSA_KEY_PEM));
+        doTest();
+    }
+
+
+    @Test
+    public void testHostRSAandECPEM() throws Exception {
+        SSLHostConfigCertificate sslHostConfigCertificateRsa = new SSLHostConfigCertificate(sslHostConfig, Type.RSA);
+        sslHostConfigCertificateRsa.setCertificateFile(getPath(TesterSupport.LOCALHOST_RSA_CERT_PEM));
+        sslHostConfigCertificateRsa.setCertificateKeyFile(getPath(TesterSupport.LOCALHOST_RSA_KEY_PEM));
+        SSLHostConfigCertificate sslHostConfigCertificateEc = new SSLHostConfigCertificate(sslHostConfig, Type.EC);
+        sslHostConfigCertificateEc.setCertificateFile(getPath(TesterSupport.LOCALHOST_EC_CERT_PEM));
+        sslHostConfigCertificateEc.setCertificateKeyFile(getPath(TesterSupport.LOCALHOST_EC_KEY_PEM));
+        sslHostConfig.addCertificate(sslHostConfigCertificateEc);
         doTest();
     }
 
