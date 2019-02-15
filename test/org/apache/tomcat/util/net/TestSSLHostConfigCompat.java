@@ -75,6 +75,7 @@ public class TestSSLHostConfigCompat extends TomcatBaseTest {
     public void testHostPEM() throws Exception {
         sslHostConfig.setCertificateFile(getPath(TesterSupport.LOCALHOST_CERT_PEM));
         sslHostConfig.setCertificateKeyFile(getPath(TesterSupport.LOCALHOST_KEY_PEM));
+        doTest();
     }
 
 
@@ -82,6 +83,17 @@ public class TestSSLHostConfigCompat extends TomcatBaseTest {
     @Ignore // Currently the APR/native connector cannot be configured using a Keystore
     public void testHostKeystore() throws Exception {
         sslHostConfig.setCertificateKeystoreFile(getPath(TesterSupport.LOCALHOST_JKS));
+        doTest();
+    }
+
+
+    private void doTest() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+        tomcat.start();
+
+        // Check a request can be made
+        ByteChunk res = getUrl("https://localhost:" + getPort() + "/");
+        Assert.assertEquals("OK", res.toString());
     }
 
 
@@ -117,21 +129,6 @@ public class TestSSLHostConfigCompat extends TomcatBaseTest {
         Context ctxt = tomcat.addContext("", null);
         Tomcat.addServlet(ctxt, "TesterServlet", new TesterServlet());
         ctxt.addServletMappingDecoded("/*", "TesterServlet");
-    }
-
-
-    @Override
-    public void tearDown() throws Exception {
-        Tomcat tomcat = getTomcatInstance();
-        tomcat.start();
-
-        // Check a request can be made
-        ByteChunk res = getUrl("https://localhost:" + getPort() + "/");
-        try {
-            Assert.assertEquals("OK", res.toString());
-        } finally {
-            super.tearDown();
-        }
     }
 
 
