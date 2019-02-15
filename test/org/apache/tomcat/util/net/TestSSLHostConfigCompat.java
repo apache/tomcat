@@ -72,9 +72,17 @@ public class TestSSLHostConfigCompat extends TomcatBaseTest {
     private SSLHostConfig sslHostConfig = new SSLHostConfig();
 
     @Test
-    public void testHostPEM() throws Exception {
-        sslHostConfig.setCertificateFile(getPath(TesterSupport.LOCALHOST_CERT_PEM));
-        sslHostConfig.setCertificateKeyFile(getPath(TesterSupport.LOCALHOST_KEY_PEM));
+    public void testHostECPEM() throws Exception {
+        sslHostConfig.setCertificateFile(getPath(TesterSupport.LOCALHOST_EC_CERT_PEM));
+        sslHostConfig.setCertificateKeyFile(getPath(TesterSupport.LOCALHOST_EC_KEY_PEM));
+        doTest();
+    }
+
+
+    @Test
+    public void testHostRSAPEM() throws Exception {
+        sslHostConfig.setCertificateFile(getPath(TesterSupport.LOCALHOST_RSA_CERT_PEM));
+        sslHostConfig.setCertificateKeyFile(getPath(TesterSupport.LOCALHOST_RSA_KEY_PEM));
         doTest();
     }
 
