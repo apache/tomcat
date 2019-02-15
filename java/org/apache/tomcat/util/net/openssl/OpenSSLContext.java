@@ -52,7 +52,6 @@ import org.apache.tomcat.util.net.SSLHostConfig;
 import org.apache.tomcat.util.net.SSLHostConfigCertificate;
 import org.apache.tomcat.util.net.SSLHostConfigCertificate.Type;
 import org.apache.tomcat.util.net.jsse.JSSEKeyManager;
-import org.apache.tomcat.util.net.openssl.ciphers.OpenSSLCipherConfigurationParser;
 import org.apache.tomcat.util.res.StringManager;
 
 public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
@@ -72,12 +71,6 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
     private X509TrustManager x509TrustManager;
 
     private final List<String> negotiableProtocols;
-
-    private List<String> jsseCipherNames = new ArrayList<>();
-
-    public List<String> getJsseCipherNames() {
-        return jsseCipherNames;
-    }
 
     private String enabledProtocol;
 
@@ -270,9 +263,8 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
             }
 
             // List the ciphers that the client is permitted to negotiate
-            String opensslCipherConfig = sslHostConfig.getCiphers();
-            this.jsseCipherNames = OpenSSLCipherConfigurationParser.parseExpression(opensslCipherConfig);
-            SSLContext.setCipherSuite(ctx, opensslCipherConfig);
+            SSLContext.setCipherSuite(ctx, sslHostConfig.getCiphers());
+
             // Load Server key and certificate
             if (certificate.getCertificateFile() != null) {
                 // Set certificate
