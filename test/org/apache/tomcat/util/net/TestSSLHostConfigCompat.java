@@ -71,6 +71,7 @@ public class TestSSLHostConfigCompat extends TomcatBaseTest {
 
     private SSLHostConfig sslHostConfig = new SSLHostConfig();
 
+
     @Test
     public void testHostECPEM() throws Exception {
         sslHostConfig.setCertificateFile(getPath(TesterSupport.LOCALHOST_EC_CERT_PEM));
@@ -120,7 +121,6 @@ public class TestSSLHostConfigCompat extends TomcatBaseTest {
 
         TesterSupport.configureClientSsl();
 
-
         Tomcat tomcat = getTomcatInstance();
         Connector connector = tomcat.getConnector();
 
@@ -128,6 +128,7 @@ public class TestSSLHostConfigCompat extends TomcatBaseTest {
         connector.setScheme("https");
         connector.setSecure(true);
         connector.setProperty("SSLEnabled", "true");
+        connector.setProperty("sslImplementationName", sslImplementationName);
         connector.addSslHostConfig(sslHostConfig);
 
         StandardServer server = (StandardServer) tomcat.getServer();
