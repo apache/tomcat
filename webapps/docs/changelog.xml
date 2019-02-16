@@ -206,8 +206,21 @@
         language of the default system locale is not English. (markt)
       </fix>
       <fix>
-        Fix messages used by Host Manager web application. Disambiguate
-        message keys used for different messages. (kkolinko)
+        Use client's preferred language for the Server Status page of the
+        Manager web application. Review and fix several cases when the
+        client's language preference was not respected in Manager and
+        Host Manager web applications. (kkolinko)
+      </fix>
+      <fix>
+        Fix messages used by Manager and Host Manager web applications.
+        Disambiguate message keys used when adding or removing a host.
+        Improve display of summary values on the status page: separate
+        terms and values with a whitespace. Improve wording of messages
+        for expire sessions command. (kkolinko)
+      </fix>
+      <fix>
+        Do not add CSRF nonce parameter and suppress Referer header for external
+        links in Manager and Host Manager web applications. (kkolinko)
       </fix>
     </changelog>
   </subsection>
@@ -218,11 +231,6 @@
         <code>JAVA_ENDORSED_DIRS</code> system property is empty. Patch provided
         by Zemian Deng. (markt)
       </fix>
-      <add>
-        <bug>53930</bug>: Add support for the <code>CATALINA_OUT_CMD</code>
-        environment variable that defines a command to which captured stdout and
-        stderr will be redirected. Patch provided by Casey Lucas. (markt)
-      </add>
       <update>
         Update the packaged version of the Tomcat Native Library to 1.2.19 to
         pick up the latest Windows binaries built with APR 1.6.5 and OpenSSL

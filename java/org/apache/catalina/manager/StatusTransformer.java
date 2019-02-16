@@ -177,19 +177,31 @@ public class StatusTransformer {
 
                 writer.print("<p>");
                 writer.print( args[0] );
+                writer.print(' ');
                 writer.print(formatSize(Long.valueOf(result[0]), true));
-                writer.print(" " + args[1]);
+                writer.print(' ');
+                writer.print(args[1]);
+                writer.print(' ');
                 writer.print(formatSize(Long.valueOf(result[1]), true));
-                writer.print(" " + args[2]);
+                writer.print(' ');
+                writer.print(args[2]);
+                writer.print(' ');
                 writer.print(formatSize(Long.valueOf(result[2]), true));
-                writer.print(" " + args[3]);
+                writer.print(' ');
+                writer.print(args[3]);
+                writer.print(' ');
                 writer.print(formatSize(Long.valueOf(result[3]), true));
-                writer.print(" " + args[4]);
+                writer.print(' ');
+                writer.print(args[4]);
+                writer.print(' ');
                 writer.print(Long.valueOf(result[6]));
                 writer.print("<br>");
-                writer.print(" " + args[5]);
+                writer.print(args[5]);
+                writer.print(' ');
                 writer.print(formatTime(Long.valueOf(result[11] / 1000), true));
-                writer.print(" " + args[6]);
+                writer.print(' ');
+                writer.print(args[6]);
+                writer.print(' ');
                 writer.print(formatTime(Long.valueOf(result[12] / 1000), true));
                 writer.print("</p>");
             } else if (mode == 1){
@@ -223,12 +235,17 @@ public class StatusTransformer {
 
             writer.print("<p>");
             writer.print( args[0] );
+            writer.print(' ');
             writer.print(formatSize(
                     Long.valueOf(Runtime.getRuntime().freeMemory()), true));
-            writer.print(" " + args[1] );
+            writer.print(' ');
+            writer.print(args[1]);
+            writer.print(' ');
             writer.print(formatSize(
                     Long.valueOf(Runtime.getRuntime().totalMemory()), true));
-            writer.print(" " + args[2] );
+            writer.print(' ');
+            writer.print(args[2]);
+            writer.print(' ');
             writer.print(formatSize(
                     Long.valueOf(Runtime.getRuntime().maxMemory()), true));
             writer.print("</p>");
@@ -305,14 +322,21 @@ public class StatusTransformer {
 
             writer.print("<p>");
             writer.print( args[0] );
+            writer.print(' ');
             writer.print(mBeanServer.getAttribute(tpName, "maxThreads"));
-            writer.print(" " + args[1]);
+            writer.print(' ');
+            writer.print(args[1]);
+            writer.print(' ');
             writer.print(mBeanServer.getAttribute(tpName, "currentThreadCount"));
-            writer.print(" " + args[2]);
+            writer.print(' ');
+            writer.print(args[2]);
+            writer.print(' ');
             writer.print(mBeanServer.getAttribute(tpName, "currentThreadsBusy"));
             try {
                 Object value = mBeanServer.getAttribute(tpName, "keepAliveCount");
-                writer.print(" " + args[3]);
+                writer.print(' ');
+                writer.print(args[3]);
+                writer.print(' ');
                 writer.print(value);
             } catch (Exception e) {
                 // Ignore
@@ -336,19 +360,30 @@ public class StatusTransformer {
             }
 
             writer.print( args[4] );
+            writer.print(' ');
             writer.print(formatTime(mBeanServer.getAttribute
                                     (grpName, "maxTime"), false));
-            writer.print(" " + args[5]);
+            writer.print(' ');
+            writer.print(args[5]);
+            writer.print(' ');
             writer.print(formatTime(mBeanServer.getAttribute
                                     (grpName, "processingTime"), true));
-            writer.print(" " + args[6]);
+            writer.print(' ');
+            writer.print(args[6]);
+            writer.print(' ');
             writer.print(mBeanServer.getAttribute(grpName, "requestCount"));
-            writer.print(" " + args[7]);
+            writer.print(' ');
+            writer.print(args[7]);
+            writer.print(' ');
             writer.print(mBeanServer.getAttribute(grpName, "errorCount"));
-            writer.print(" " + args[8]);
+            writer.print(' ');
+            writer.print(args[8]);
+            writer.print(' ');
             writer.print(formatSize(mBeanServer.getAttribute
                                     (grpName, "bytesReceived"), true));
-            writer.print(" " + args[9]);
+            writer.print(' ');
+            writer.print(args[9]);
+            writer.print(' ');
             writer.print(formatSize(mBeanServer.getAttribute
                                     (grpName, "bytesSent"), true));
             writer.print("</p>");
@@ -516,20 +551,20 @@ public class StatusTransformer {
                 if (showRequest) {
                     writer.write(filter(mBeanServer.getAttribute
                                         (pName, "method")));
-                    writer.write(" ");
+                    writer.write(' ');
                     writer.write(filter(mBeanServer.getAttribute
                                         (pName, "currentUri")));
                     String queryString = (String) mBeanServer.getAttribute
                         (pName, "currentQueryString");
                     if ((queryString != null) && (!queryString.equals(""))) {
-                        writer.write("?");
+                        writer.write('?');
                         writer.print(RequestUtil.filter(queryString));
                     }
-                    writer.write(" ");
+                    writer.write(' ');
                     writer.write(filter(mBeanServer.getAttribute
                                         (pName, "protocol")));
                 } else {
-                    writer.write("?");
+                    writer.write('?');
                 }
                 writer.write("</td>");
             } else {

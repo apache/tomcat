@@ -1116,21 +1116,9 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
         if (debug >= 1)
             log("serverinfo");
         try {
-            StringBuilder props = new StringBuilder();
-            props.append("OK - Server info");
-            props.append("\nTomcat Version: ");
-            props.append(ServerInfo.getServerInfo());
-            props.append("\nOS Name: ");
-            props.append(System.getProperty("os.name"));
-            props.append("\nOS Version: ");
-            props.append(System.getProperty("os.version"));
-            props.append("\nOS Architecture: ");
-            props.append(System.getProperty("os.arch"));
-            props.append("\nJVM Version: ");
-            props.append(System.getProperty("java.runtime.version"));
-            props.append("\nJVM Vendor: ");
-            props.append(System.getProperty("java.vm.vendor"));
-            writer.println(props.toString());
+            writer.println(smClient.getString("managerServlet.serverInfo", ServerInfo.getServerInfo(),
+                    System.getProperty("os.name"), System.getProperty("os.version"), System.getProperty("os.arch"),
+                    System.getProperty("java.runtime.version"), System.getProperty("java.vm.vendor")));
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
             getServletContext().log("ManagerServlet.serverinfo",t);
@@ -1665,7 +1653,7 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
 
 
     protected static boolean validateContextName(ContextName cn,
-            PrintWriter writer, StringManager sm) {
+            PrintWriter writer, StringManager smClient) {
         
         // ContextName should be non-null with a path that is empty or starts
         // with /
@@ -1678,7 +1666,7 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
         if (cn != null) {
             path = RequestUtil.filter(cn.getPath());
         }
-        writer.println(sm.getString("managerServlet.invalidPath", path));
+        writer.println(smClient.getString("managerServlet.invalidPath", path));
         return false;
     }
 
