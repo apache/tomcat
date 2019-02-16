@@ -301,6 +301,8 @@ public final class HTMLHostManagerServlet extends HostManagerServlet {
             smClient.getString("htmlHostManagerServlet.hostsStop");
         String hostsRemove =
             smClient.getString("htmlHostManagerServlet.hostsRemove");
+        String hostThis =
+            smClient.getString("htmlHostManagerServlet.hostThis");
 
         Iterator<Map.Entry<String,String>> iterator =
             sortedHostNamesMap.entrySet().iterator();
@@ -332,7 +334,7 @@ public final class HTMLHostManagerServlet extends HostManagerServlet {
                 writer.print
                     (MessageFormat.format(HOSTS_ROW_DETAILS_SECTION, args));
 
-                args = new Object[4];
+                args = new Object[5];
                 if (host.getState().isAvailable()) {
                     args[0] = response.encodeURL
                     (request.getContextPath() +
@@ -351,6 +353,7 @@ public final class HTMLHostManagerServlet extends HostManagerServlet {
                      "/html/remove?name=" +
                      URLEncoder.encode(hostName, "UTF-8"));
                 args[3] = hostsRemove;
+                args[4] = hostThis;
                 if (host == this.installedHost) {
                     writer.print(MessageFormat.format(
                         MANAGER_HOST_ROW_BUTTON_SECTION, args));
@@ -461,9 +464,7 @@ public final class HTMLHostManagerServlet extends HostManagerServlet {
 
     private static final String MANAGER_HOST_ROW_BUTTON_SECTION =
         " <td class=\"row-left\">\n" +
-        "  <small>\n" +
-        sm.getString("htmlHostManagerServlet.hostThis") +
-        "  </small>\n" +
+        "  <small>{4}</small>\n" +
         " </td>\n" +
         "</tr>\n";
 

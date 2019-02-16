@@ -206,6 +206,12 @@
         language of the default system locale is not English. (markt)
       </fix>
       <fix>
+        Use client's preferred language for the Server Status page of the
+        Manager web application. Review and fix several cases when the
+        client's language preference was not respected in Manager and
+        Host Manager web applications. (kkolinko)
+      </fix>
+      <fix>
         Fix messages used by Manager and Host Manager web applications.
         Disambiguate message keys used when adding or removing a host.
         Improve display of summary values on the status page: separate
