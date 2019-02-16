@@ -124,12 +124,16 @@
   <subsection name="Web applications">
     <changelog>
       <fix>
-        Fix messages used by Host Manager web application. Disambiguate
-        message keys used for different messages. (kkolinko)
+        Use client's preferred language for the Server Status page of the
+        Manager web application. Review and fix several cases when the
+        client's language preference was not respected in Manager and
+        Host Manager web applications. (kkolinko)
       </fix>
       <fix>
-        Improve display of summary values on the status page of Manager web
-        application: separate terms and values with a whitespace. (kkolinko)
+        Fix messages used by Manager and Host Manager web applications.
+        Disambiguate message keys used when adding or removing a host.
+        Improve display of summary values on the status page: separate
+        terms and values with a whitespace. (kkolinko)
       </fix>
       <fix>
         Do not add CSRF nonce parameter and suppress Referer header for external
