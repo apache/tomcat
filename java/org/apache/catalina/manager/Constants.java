@@ -23,6 +23,8 @@ public class Constants {
 
     public static final String Package = "org.apache.catalina.manager";
 
+    public static final String REL_EXTERNAL = "rel=\"noopener noreferrer\"";
+
     public static final String HTML_HEADER_SECTION;
     public static final String BODY_HEADER_SECTION;
     public static final String MESSAGE_SECTION;
@@ -118,11 +120,11 @@ public class Constants {
             "<table cellspacing=\"4\" border=\"0\">\n" +
             " <tr>\n" +
             "  <td colspan=\"2\">\n" +
-            "   <a href=\"https://tomcat.apache.org/\">\n" +
+            "   <a href=\"https://tomcat.apache.org/\" " + REL_EXTERNAL + ">\n" +
             "    <img border=\"0\" alt=\"The Tomcat Servlet/JSP Container\"\n" +
             "         align=\"left\" src=\"{0}/images/tomcat.gif\">\n" +
             "   </a>\n" +
-            "   <a href=\"https://www.apache.org/\">\n" +
+            "   <a href=\"https://www.apache.org/\" " + REL_EXTERNAL + ">\n" +
             "    <img border=\"0\" alt=\"The Apache Software Foundation\" align=\"right\"\n" +
             "         src=\"{0}/images/asf-logo.svg\" style=\"width: 266px; height: 83px;\">\n" +
             "   </a>\n" +
@@ -159,8 +161,8 @@ public class Constants {
             "</tr>\n" +
             " <tr>\n" +
             "  <td class=\"row-left\"><a href=\"{1}\">{2}</a></td>\n" +
-            "  <td class=\"row-center\"><a href=\"{3}\">{4}</a></td>\n" +
-            "  <td class=\"row-center\"><a href=\"{5}\">{6}</a></td>\n" +
+            "  <td class=\"row-center\"><a href=\"{3}\" " + REL_EXTERNAL + ">{4}</a></td>\n" +
+            "  <td class=\"row-center\"><a href=\"{5}\" " + REL_EXTERNAL + ">{6}</a></td>\n" +
             "  <td class=\"row-right\"><a href=\"{7}\">{8}</a></td>\n" +
             " </tr>\n" +
             "</table>\n" +
@@ -215,6 +217,5 @@ public class Constants {
 
     public static final String XML_STYLE =
         "<?xml-stylesheet type=\"text/xsl\" href=\"{0}/xform.xsl\" ?>\n";
-
 }
 

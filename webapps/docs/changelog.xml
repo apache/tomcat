@@ -213,6 +213,10 @@
         Improve display of summary values on the status page of Manager web
         application: separate terms and values with a whitespace. (kkolinko)
       </fix>
+      <fix>
+        Do not add CSRF nonce parameter and suppress Referer header for external
+        links in Manager and Host Manager web applications. (kkolinko)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
