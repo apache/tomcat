@@ -127,7 +127,8 @@
         Use client's preferred language for the Server Status page of the
         Manager web application. Review and fix several cases when the
         client's language preference was not respected in Manager and
-        Host Manager web applications. (kkolinko)
+        Host Manager web applications. Improve wording of messages
+        for expire sessions command. (kkolinko)
       </fix>
       <fix>
         Fix messages used by Manager and Host Manager web applications.
