@@ -232,11 +232,11 @@ public class StatusManagerServlet
         args[0] = sm.getString("htmlManagerServlet.manager");
         args[1] = response.encodeURL(request.getContextPath() + "/html/list");
         args[2] = sm.getString("htmlManagerServlet.list");
-        args[3] = response.encodeURL
+        args[3] = // External link
             (request.getContextPath() + "/" +
              sm.getString("htmlManagerServlet.helpHtmlManagerFile"));
         args[4] = sm.getString("htmlManagerServlet.helpHtmlManager");
-        args[5] = response.encodeURL
+        args[5] = // External link
             (request.getContextPath() + "/" +
              sm.getString("htmlManagerServlet.helpManagerFile"));
         args[6] = sm.getString("htmlManagerServlet.helpManager");

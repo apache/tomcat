@@ -291,11 +291,11 @@ public final class HTMLHostManagerServlet extends HostManagerServlet {
         args[0] = smClient.getString("htmlHostManagerServlet.manager");
         args[1] = response.encodeURL(request.getContextPath() + "/html/list");
         args[2] = smClient.getString("htmlHostManagerServlet.list");
-        args[3] = response.encodeURL
+        args[3] = // External link
             (request.getContextPath() + "/" +
              smClient.getString("htmlHostManagerServlet.helpHtmlManagerFile"));
         args[4] = smClient.getString("htmlHostManagerServlet.helpHtmlManager");
-        args[5] = response.encodeURL
+        args[5] = // External link
             (request.getContextPath() + "/" +
              smClient.getString("htmlHostManagerServlet.helpManagerFile"));
         args[6] = smClient.getString("htmlHostManagerServlet.helpManager");
@@ -337,7 +337,8 @@ public final class HTMLHostManagerServlet extends HostManagerServlet {
 
             if (host != null ) {
                 args = new Object[2];
-                args[0] = Escape.htmlElementContent(hostName);
+                args[0] = // External link
+                        Escape.htmlElementContent(hostName);
                 String[] aliases = host.findAliases();
                 StringBuilder buf = new StringBuilder();
                 if (aliases.length > 0) {
@@ -487,7 +488,8 @@ public final class HTMLHostManagerServlet extends HostManagerServlet {
 
     private static final String HOSTS_ROW_DETAILS_SECTION =
         "<tr>\n" +
-        " <td class=\"row-left\"><small><a href=\"http://{0}\">{0}</a>" +
+        " <td class=\"row-left\"><small><a href=\"http://{0}\" "
+                + Constants.REL_EXTERNAL + ">{0}</a>" +
         "</small></td>\n" +
         " <td class=\"row-center\"><small>{1}</small></td>\n";
 
