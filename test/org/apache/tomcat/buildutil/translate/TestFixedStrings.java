@@ -38,11 +38,14 @@ public class TestFixedStrings {
         File fileEn = new File(dir, Constants.L10N_PREFIX + Constants.L10N_SUFFIX);
         Properties propsEn = Utils.load(fileEn);
 
-        for (File file : dir.listFiles()) {
-            String fileName = file.getName();
-            if (fileName.startsWith(Constants.L10N_PREFIX)) {
-                if (Utils.getLanguage(fileName) != "en") {
-                    doTestStartsFile(file, propsEn, text);
+        File[] files = dir.listFiles();
+        if (files != null) {
+            for (File file : files) {
+                String fileName = file.getName();
+                if (fileName.startsWith(Constants.L10N_PREFIX)) {
+                    if (!Utils.getLanguage(fileName).equals("en")) {
+                        doTestStartsFile(file, propsEn, text);
+                    }
                 }
             }
         }
