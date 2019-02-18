@@ -48,7 +48,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.junit.Assert;
-import org.junit.Assume;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -98,8 +97,6 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
         Connector connector = tomcat.getConnector();
         // Skip for NIO2
-        Assume.assumeFalse("This test may fail for NIO2",
-                connector.getProtocolHandlerClassName().contains("Nio2"));
         doTestNonBlockingRead(false, true);
     }
 

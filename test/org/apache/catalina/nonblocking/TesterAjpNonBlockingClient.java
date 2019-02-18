@@ -48,7 +48,7 @@ public class TesterAjpNonBlockingClient extends TomcatBaseTest {
 
         Map<String, List<String>> resHeaders = new HashMap<>();
         ByteChunk out = new ByteChunk();
-        int rc = postUrl(true, new DataWriter(2000), "http://localhost" +
+        int rc = postUrl(true, new DataWriter(2000, 5), "http://localhost" +
                 "/examples/servlets/nonblocking/bytecounter",
                 out, resHeaders, null);
 
