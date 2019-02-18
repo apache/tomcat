@@ -82,7 +82,7 @@ public class JmxRemoteLifecycleListener extends SSLHostConfig implements Lifecyc
     protected String accessFile = null;
     protected boolean useLocalPorts = false;
 
-    protected JMXConnectorServer csPlatform = null;
+    protected transient JMXConnectorServer csPlatform = null;
 
     /**
      * Get the inet address on which the Platform RMI server is exported.
