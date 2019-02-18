@@ -472,7 +472,6 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         private static final long serialVersionUID = 1L;
         private final boolean async;
         private final boolean ignoreIsReady;
-        public volatile TestReadListener listener;
 
         public NBReadServlet(boolean ignoreIsReady, boolean async) {
             this.async = async;
@@ -512,6 +511,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
             });
             // step 2 - notify on read
             ServletInputStream in = req.getInputStream();
+            TestReadListener listener;
             if (async) {
                 listener = new TestAsyncReadListener(actx, false, ignoreIsReady);
             } else {
