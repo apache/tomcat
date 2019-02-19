@@ -104,6 +104,10 @@
         <code>ServletRequest.getServerName()</code> and
         <code>ServletRequest.getServerPort()</code>. (markt)
       </fix>
+      <fix>
+        <bug>63182</bug>: Avoid extra notifications when using non container
+        threads on read causing thread safety problems. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="WebSocket">

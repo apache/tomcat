@@ -87,23 +87,29 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
 
     @Test
     public void testNonBlockingRead() throws Exception {
-        doTestNonBlockingRead(false);
+        doTestNonBlockingRead(false, false);
+    }
+
+
+    @Test
+    public void testNonBlockingReadAsync() throws Exception {
+        doTestNonBlockingRead(false, true);
     }
 
 
     @Test(expected=IOException.class)
     public void testNonBlockingReadIgnoreIsReady() throws Exception {
-        doTestNonBlockingRead(true);
+        doTestNonBlockingRead(true, false);
     }
 
 
-    private void doTestNonBlockingRead(boolean ignoreIsReady) throws Exception {
+    private void doTestNonBlockingRead(boolean ignoreIsReady, boolean async) throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
         Context ctx = tomcat.addContext("", null);
 
-        NBReadServlet servlet = new NBReadServlet(ignoreIsReady);
+        NBReadServlet servlet = new NBReadServlet(ignoreIsReady, async);
         String servletName = NBReadServlet.class.getName();
         Tomcat.addServlet(ctx, servletName, servlet);
         ctx.addServletMappingDecoded("/", servletName);
@@ -111,8 +117,8 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         tomcat.start();
 
         Map<String, List<String>> resHeaders = new HashMap<>();
-        int rc = postUrl(true, new DataWriter(500), "http://localhost:" +
-                getPort() + "/", new ByteChunk(), resHeaders, null);
+        int rc = postUrl(true, new DataWriter(async ? 0 : 500, async ? 2000000 : 5),
+                "http://localhost:" + getPort() + "/", new ByteChunk(), resHeaders, null);
 
         Assert.assertEquals(HttpServletResponse.SC_OK, rc);
     }
@@ -402,14 +408,15 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
 
 
     public static class DataWriter implements BytesStreamer {
-        final int max = 5;
+        int max = 5;
         int count = 0;
         long delay = 0;
         byte[] b = "WANTMORE".getBytes();
         byte[] f = "FINISHED".getBytes();
 
-        public DataWriter(long delay) {
+        public DataWriter(long delay, int max) {
             this.delay = delay;
+            this.max = max;
         }
 
         @Override
@@ -450,10 +457,12 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
     @WebServlet(asyncSupported = true)
     public class NBReadServlet extends TesterServlet {
         private static final long serialVersionUID = 1L;
+        private final boolean async;
         private final boolean ignoreIsReady;
         public volatile TestReadListener listener;
 
-        public NBReadServlet(boolean ignoreIsReady) {
+        public NBReadServlet(boolean ignoreIsReady, boolean async) {
+            this.async = async;
             this.ignoreIsReady = ignoreIsReady;
         }
 
@@ -490,7 +499,11 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
             });
             // step 2 - notify on read
             ServletInputStream in = req.getInputStream();
-            listener = new TestReadListener(actx, false, ignoreIsReady);
+            if (async) {
+                listener = new TestAsyncReadListener(actx, false, ignoreIsReady);
+            } else {
+                listener = new TestReadListener(actx, false, ignoreIsReady);
+            }
             in.setReadListener(listener);
         }
     }
@@ -560,10 +573,10 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
     }
 
     private class TestReadListener implements ReadListener {
-        private final AsyncContext ctx;
-        private final boolean usingNonBlockingWrite;
-        private final boolean ignoreIsReady;
-        private final StringBuilder body = new StringBuilder();
+        protected final AsyncContext ctx;
+        protected final boolean usingNonBlockingWrite;
+        protected final boolean ignoreIsReady;
+        protected final StringBuilder body = new StringBuilder();
         public volatile boolean onErrorInvoked = false;
 
 
@@ -594,7 +607,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
 
         @Override
         public void onAllDataRead() {
-            log.info("onAllDataRead");
+            log.info("onAllDataRead totalData=" + body.toString().length());
             // If non-blocking writes are being used, don't write here as it
             // will inject unexpected data into the write output.
             if (!usingNonBlockingWrite) {
@@ -619,6 +632,43 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
             throwable.printStackTrace();
             onErrorInvoked = true;
         }
+    }
+
+    private class TestAsyncReadListener extends TestReadListener {
+
+        public TestAsyncReadListener(AsyncContext ctx,
+                boolean usingNonBlockingWrite, boolean ignoreIsReady) {
+            super(ctx, usingNonBlockingWrite, ignoreIsReady);
+        }
+
+        @Override
+        public void onDataAvailable() throws IOException {
+            new Thread() {
+                @Override
+                public void run() {
+                    try {
+                        ServletInputStream in = ctx.getRequest().getInputStream();
+                        String s = "";
+                        byte[] b = new byte[1024];
+                        int read = in.read(b);
+                        if (read == -1) {
+                            return;
+                        }
+                        s += new String(b, 0, read);
+                        synchronized (body) {
+                            body.append(s);
+                        }
+                        if (ignoreIsReady || in.isReady()) {
+                            onDataAvailable();
+                        }
+                    } catch (IOException e) {
+                        onError(e);
+                    }
+                }
+            }.start();
+        }
+
+
     }
 
     private class TestWriteListener implements WriteListener {
@@ -927,7 +977,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         tomcat.start();
 
         Map<String, List<String>> resHeaders = new HashMap<>();
-        int rc = postUrl(true, new DataWriter(500), "http://localhost:" +
+        int rc = postUrl(true, new DataWriter(500, 5), "http://localhost:" +
                 getPort() + "/", new ByteChunk(), resHeaders, null);
 
         Assert.assertEquals(HttpServletResponse.SC_OK, rc);
