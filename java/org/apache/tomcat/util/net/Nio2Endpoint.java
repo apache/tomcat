@@ -786,7 +786,6 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
             synchronized (readCompletionHandler) {
                 // Fill the read buffer as best we can.
                 nRead = fillReadBuffer(block);
-
                 // Fill as much of the remaining byte array as possible with the
                 // data that was just read
                 if (nRead > 0) {
@@ -796,7 +795,6 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
                 } else if (nRead == 0 && !block && ContainerThreadMarker.isContainerThread()) {
                     readInterest = true;
                 }
-
                 if (log.isDebugEnabled()) {
                     log.debug("Socket: [" + this + "], Read: [" + nRead + "]");
                 }
@@ -853,7 +851,6 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
                     if (log.isDebugEnabled()) {
                         log.debug("Socket: [" + this + "], Read into buffer: [" + nRead + "]");
                     }
-
                     // Fill as much of the remaining byte array as possible with the
                     // data that was just read
                     if (nRead > 0) {
