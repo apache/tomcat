@@ -24,22 +24,50 @@ rem remove                 Remove the service from the System.
 rem
 rem name        (optional) If the second argument is present it is considered
 rem                        to be new service name
+rem                        Must be defined, if bin/Tomcat@VERSION_MAJOR@.exe and 
+rem                        bin/Tomcat@VERSION_MAJOR@w.exe are renamed (e.g. at installation)!
 rem ---------------------------------------------------------------------------
 
 setlocal
 
 set "SELF=%~dp0%service.bat"
+
+rem Set default Service name
+set SERVICE_NAME=Tomcat@VERSION_MAJOR@
+set DISPLAYNAME=Apache Tomcat @VERSION_MAJOR_MINOR@ %SERVICE_NAME%
+
+if "x%1x" == "xx" goto displayUsage
+set SERVICE_CMD=%1
+shift
+if "x%1x" == "xx" goto checkServiceCmd
+:checkUser
+if "x%1x" == "x/userx" goto runAsUser
+if "x%1x" == "x--userx" goto runAsUser
+set SERVICE_NAME=%1
+set DISPLAYNAME=Apache Tomcat @VERSION_MAJOR_MINOR@ %1
+shift
+if "x%1x" == "xx" goto checkServiceCmd
+goto checkUser
+:runAsUser
+shift
+if "x%1x" == "xx" goto displayUsage
+set SERVICE_USER=%1
+shift
+runas /env /savecred /user:%SERVICE_USER% "%COMSPEC% /K \"%SELF%\" %SERVICE_CMD% %SERVICE_NAME%"
+goto end
+:checkServiceCmd
+
 rem Guess CATALINA_HOME if not defined
 set "CURRENT_DIR=%cd%"
 if not "%CATALINA_HOME%" == "" goto gotHome
 set "CATALINA_HOME=%cd%"
-if exist "%CATALINA_HOME%\bin\tomcat@VERSION_MAJOR@.exe" goto okHome
+if exist "%CATALINA_HOME%\bin\%SERVICE_NAME%.exe" goto okHome
 rem CD to the upper dir
 cd ..
 set "CATALINA_HOME=%cd%"
 :gotHome
-if exist "%CATALINA_HOME%\bin\tomcat@VERSION_MAJOR@.exe" goto okHome
-echo The tomcat@VERSION_MAJOR@.exe was not found...
+if exist "%CATALINA_HOME%\bin\%SERVICE_NAME%.exe" goto okHome
+echo The %SERVICE_NAME%.exe was not found...
 echo The CATALINA_HOME environment variable is not defined correctly.
 echo This environment variable is needed to run this program
 goto end
@@ -75,11 +103,7 @@ if not "%CATALINA_BASE%" == "" goto gotBase
 set "CATALINA_BASE=%CATALINA_HOME%"
 :gotBase
 
-set "EXECUTABLE=%CATALINA_HOME%\bin\tomcat@VERSION_MAJOR@.exe"
-
-rem Set default Service name
-set SERVICE_NAME=Tomcat@VERSION_MAJOR@
-set DISPLAYNAME=Apache Tomcat @VERSION_MAJOR_MINOR@ %SERVICE_NAME%
+set "EXECUTABLE=%CATALINA_HOME%\bin\%SERVICE_NAME%.exe"
 
 rem Java 9 no longer supports the java.endorsed.dirs
 rem system property. Only try to use it if
@@ -94,26 +118,6 @@ if not exist "%CATALINA_HOME%\endorsed" goto doneEndorsed
 set ENDORSED_PROP=java.endorsed.dirs
 :doneEndorsed
 
-if "x%1x" == "xx" goto displayUsage
-set SERVICE_CMD=%1
-shift
-if "x%1x" == "xx" goto checkServiceCmd
-:checkUser
-if "x%1x" == "x/userx" goto runAsUser
-if "x%1x" == "x--userx" goto runAsUser
-set SERVICE_NAME=%1
-set DISPLAYNAME=Apache Tomcat @VERSION_MAJOR_MINOR@ %1
-shift
-if "x%1x" == "xx" goto checkServiceCmd
-goto checkUser
-:runAsUser
-shift
-if "x%1x" == "xx" goto displayUsage
-set SERVICE_USER=%1
-shift
-runas /env /savecred /user:%SERVICE_USER% "%COMSPEC% /K \"%SELF%\" %SERVICE_CMD% %SERVICE_NAME%"
-goto end
-:checkServiceCmd
 if /i %SERVICE_CMD% == install goto doInstall
 if /i %SERVICE_CMD% == remove goto doRemove
 if /i %SERVICE_CMD% == uninstall goto doRemove
