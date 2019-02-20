@@ -58,6 +58,7 @@ import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.catalina.valves.TesterAccessLogValve;
 import org.apache.tomcat.util.buf.ByteChunk;
+import org.apache.tomcat.util.net.ContainerThreadMarker;
 
 public class TestNonBlockingAPI extends TomcatBaseTest {
 
@@ -121,6 +122,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
                 "http://localhost:" + getPort() + "/", new ByteChunk(), resHeaders, null);
 
         Assert.assertEquals(HttpServletResponse.SC_OK, rc);
+        Assert.assertEquals(2000000 * 8, servlet.listener.body.length());
     }
 
 
@@ -465,6 +467,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         private static final long serialVersionUID = 1L;
         private final boolean async;
         private final boolean ignoreIsReady;
+        TestReadListener listener;
 
         public NBReadServlet(boolean ignoreIsReady, boolean async) {
             this.async = async;
@@ -504,7 +507,6 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
             });
             // step 2 - notify on read
             ServletInputStream in = req.getInputStream();
-            TestReadListener listener;
             if (async) {
                 listener = new TestAsyncReadListener(actx, false, ignoreIsReady);
             } else {
@@ -634,13 +636,18 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
 
         @Override
         public void onError(Throwable throwable) {
-            log.info("ReadListener.onError");
+            log.info("ReadListener.onError totalData=" + body.toString().length());
             throwable.printStackTrace();
             onErrorInvoked = true;
         }
     }
 
     private class TestAsyncReadListener extends TestReadListener {
+
+        volatile int isReadyCount = 0;
+        volatile int notReadyCount = 0;
+        volatile int containerThreadCount = 0;
+        volatile int nonContainerThreadCount = 0;
 
         public TestAsyncReadListener(AsyncContext ctx,
                 boolean usingNonBlockingWrite, boolean ignoreIsReady) {
@@ -649,6 +656,11 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
 
         @Override
         public void onDataAvailable() throws IOException {
+            if (ContainerThreadMarker.isContainerThread()) {
+                containerThreadCount++;
+            } else {
+                nonContainerThreadCount++;
+            }
             new Thread() {
                 @Override
                 public void run() {
@@ -664,7 +676,13 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
                         synchronized (body) {
                             body.append(s);
                         }
-                        if (ignoreIsReady || in.isReady()) {
+                        boolean isReady = ignoreIsReady || in.isReady();
+                        if (isReady) {
+                            isReadyCount++;
+                        } else {
+                            notReadyCount++;
+                        }
+                        if (isReady) {
                             onDataAvailable();
                         }
                     } catch (IOException e) {
@@ -674,7 +692,21 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
             }.start();
         }
 
+        @Override
+        public void onAllDataRead() {
+            super.onAllDataRead();
+            log.info("isReadyCount=" + isReadyCount + " notReadyCount=" + notReadyCount
+                    + " containerThreadCount=" + containerThreadCount
+                    + " nonContainerThreadCount=" + nonContainerThreadCount);
+        }
 
+        @Override
+        public void onError(Throwable throwable) {
+            super.onError(throwable);
+            log.info("isReadyCount=" + isReadyCount + " notReadyCount=" + notReadyCount
+                    + " containerThreadCount=" + containerThreadCount
+                    + " nonContainerThreadCount=" + nonContainerThreadCount);
+        }
     }
 
     private class TestWriteListener implements WriteListener {
