@@ -99,7 +99,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         Connector connector = tomcat.getConnector();
         // Skip for NIO2
         Assume.assumeFalse("This test fails for NIO2",
-                /*connector.getProtocolHandlerClassName().contains("Nio2")*/false);
+                connector.getProtocolHandlerClassName().contains("Nio2"));
         doTestNonBlockingRead(false, true);
     }
 
