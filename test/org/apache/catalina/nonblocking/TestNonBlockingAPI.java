@@ -122,7 +122,11 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
                 "http://localhost:" + getPort() + "/", new ByteChunk(), resHeaders, null);
 
         Assert.assertEquals(HttpServletResponse.SC_OK, rc);
-        Assert.assertEquals(2000000 * 8, servlet.listener.body.length());
+        if (async) {
+            Assert.assertEquals(2000000 * 8, servlet.listener.body.length());
+        } else {
+            Assert.assertEquals(5 * 8, servlet.listener.body.length());
+        }
     }
 
 
