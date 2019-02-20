@@ -598,11 +598,6 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
                         if (nBytes.intValue() < 0) {
                             failed(new EOFException(), attachment);
                         } else {
-                            /*if (Nio2Endpoint.isInline()) {
-                                System.out.println("Inline " + readInterest + " " + nBytes.intValue());
-                            } else {
-                                System.out.println("Not inline " + readInterest + " " + nBytes.intValue() + " " + Thread.currentThread().getName());
-                            }*/
                             if (readInterest && !Nio2Endpoint.isInline()) {
                                 readInterest = false;
                                 notify = true;
@@ -828,16 +823,6 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
 
         @Override
         public int read(boolean block, ByteBuffer to) throws IOException {
-            if (!ContainerThreadMarker.isContainerThread()) {
-                synchronized (this) {
-                    return readInternal(block, to);
-                }
-            } else {
-                return readInternal(block, to);
-            }
-        }
-
-        protected int readInternal(boolean block, ByteBuffer to) throws IOException {
             checkError();
 
             if (socketBufferHandler == null) {
@@ -892,9 +877,11 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
                         readInterest = true;
                     }
                 }
+
                 return nRead;
             }
         }
+
 
         @Override
         public void close() {
