@@ -203,6 +203,14 @@ public abstract class SSLUtilBase implements SSLUtil {
 
 
     @Override
+    public final SSLContext createSSLContext(List<String> negotiableProtocols) throws Exception {
+        SSLContext sslContext = createSSLContextInternal(negotiableProtocols);
+        sslContext.init(getKeyManagers(), getTrustManagers(), null);
+        return sslContext;
+    }
+
+
+    @Override
     public String[] getEnabledProtocols() {
         return enabledProtocols;
     }
@@ -217,4 +225,5 @@ public abstract class SSLUtilBase implements SSLUtil {
     protected abstract Log getLog();
     protected abstract boolean isTls13Available();
     protected abstract boolean isTls13RenegAuthAvailable();
+    protected abstract SSLContext createSSLContextInternal(List<String> negotiableProtocols) throws Exception;
 }
