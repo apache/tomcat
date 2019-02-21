@@ -21,7 +21,6 @@ import java.util.Set;
 
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.SSLSessionContext;
-import javax.net.ssl.TrustManager;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -97,14 +96,6 @@ public class OpenSSLUtil extends SSLUtilBase {
         }
     }
 
-    @Override
-    public TrustManager[] getTrustManagers() throws Exception {
-        if (jsseUtil != null) {
-            return jsseUtil.getTrustManagers();
-        } else {
-            return null;
-        }
-    }
 
     @Override
     public void configureSessionContext(SSLSessionContext sslSessionContext) {
