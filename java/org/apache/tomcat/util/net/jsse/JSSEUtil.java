@@ -184,7 +184,8 @@ public class JSSEUtil extends SSLUtilBase {
 
 
     @Override
-    public SSLContext createSSLContext(List<String> negotiableProtocols) throws NoSuchAlgorithmException {
+    public SSLContext createSSLContextInternal(List<String> negotiableProtocols)
+            throws NoSuchAlgorithmException {
         return new JSSESSLContext(sslHostConfig.getSslProtocol());
     }
 

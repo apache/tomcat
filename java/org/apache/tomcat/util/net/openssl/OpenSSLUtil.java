@@ -84,9 +84,10 @@ public class OpenSSLUtil extends SSLUtilBase {
 
 
     @Override
-    public SSLContext createSSLContext(List<String> negotiableProtocols) throws Exception {
+    public SSLContext createSSLContextInternal(List<String> negotiableProtocols) throws Exception {
         return new OpenSSLContext(certificate, negotiableProtocols);
     }
+
 
     @Override
     public KeyManager[] getKeyManagers() throws Exception {
