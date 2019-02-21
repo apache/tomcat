@@ -1475,11 +1475,14 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
 
 
         @Override
-        public void registerReadInterest(boolean polling) {
+        public void registerReadInterest() {
+            if (!ContainerThreadMarker.isContainerThread()) {
+                return;
+            }
             synchronized (readCompletionHandler) {
                 if (readPending.availablePermits() == 0) {
                     readInterest = true;
-                } else if (polling) {
+                } else {
                     // If no read is pending, start waiting for data
                     awaitBytes();
                 }

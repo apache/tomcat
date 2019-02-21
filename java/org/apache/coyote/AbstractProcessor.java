@@ -790,7 +790,7 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
         }
 
         if (!isRequestBodyFullyRead()) {
-            registerReadInterest(true);
+            registerReadInterest();
         }
 
         return false;
@@ -800,7 +800,7 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
     protected abstract boolean isRequestBodyFullyRead();
 
 
-    protected abstract void registerReadInterest(boolean body);
+    protected abstract void registerReadInterest();
 
 
     protected abstract boolean isReadyForWrite();

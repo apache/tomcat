@@ -1215,8 +1215,8 @@ public class Http11Processor extends AbstractProcessor {
 
 
     @Override
-    protected final void registerReadInterest(boolean body) {
-        socketWrapper.registerReadInterest(!body);
+    protected final void registerReadInterest() {
+        socketWrapper.registerReadInterest();
     }
 
 

@@ -263,7 +263,7 @@ class StreamProcessor extends AbstractProcessor {
 
 
     @Override
-    protected final void registerReadInterest(boolean body) {
+    protected final void registerReadInterest() {
         // Should never be called for StreamProcessor as isReadyForRead() is
         // overridden
         throw new UnsupportedOperationException();

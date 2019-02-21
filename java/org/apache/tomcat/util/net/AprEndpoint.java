@@ -2724,7 +2724,7 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
 
 
         @Override
-        public void registerReadInterest(boolean polling) {
+        public void registerReadInterest() {
             // Make sure an already closed socket is not added to the poller
             synchronized (closedLock) {
                 if (closed) {

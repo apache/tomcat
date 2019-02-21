@@ -903,7 +903,7 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
                     // processor. Continue to poll for the next request.
                     connections.remove(socket);
                     release(processor);
-                    wrapper.registerReadInterest(true);
+                    wrapper.registerReadInterest();
                 } else if (state == SocketState.SENDFILE) {
                     // Sendfile in progress. If it fails, the socket will be
                     // closed. If it works, the socket either be added to the
@@ -993,7 +993,7 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
                 //  - this is an upgraded connection
                 //  - the request line/headers have not been completely
                 //    read
-                socket.registerReadInterest(true);
+                socket.registerReadInterest();
             }
         }
 
