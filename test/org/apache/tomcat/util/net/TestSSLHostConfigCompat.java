@@ -38,6 +38,7 @@ import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.net.SSLHostConfigCertificate.Type;
+import org.apache.tomcat.util.net.TesterSupport.ClientSSLSocketFactory;
 
 /*
  * Tests compatibility of JSSE and OpenSSL settings.
@@ -75,31 +76,141 @@ public class TestSSLHostConfigCompat extends TomcatBaseTest {
 
     @Test
     public void testHostECPEM() throws Exception {
-        sslHostConfig.setCertificateFile(getPath(TesterSupport.LOCALHOST_EC_CERT_PEM));
-        sslHostConfig.setCertificateKeyFile(getPath(TesterSupport.LOCALHOST_EC_KEY_PEM));
+        configureHostECPEM();
         doTest();
     }
 
 
     @Test
     public void testHostRSAPEM() throws Exception {
-        sslHostConfig.setCertificateFile(getPath(TesterSupport.LOCALHOST_RSA_CERT_PEM));
-        sslHostConfig.setCertificateKeyFile(getPath(TesterSupport.LOCALHOST_RSA_KEY_PEM));
+        configureHostRSAPEM();
         doTest();
     }
 
 
     @Test
-    public void testHostRSAandECPEM() throws Exception {
+    public void testHostRSAandECPEMwithDefaultClient() throws Exception {
+        configureHostRSAPEM();
+        configureHostECPEM();
+        doTest();
+    }
+
+
+    @Test
+    public void testHostRSAandECPEMwithRSAClient() throws Exception {
+        configureHostRSAPEM();
+        configureHostECPEM();
+
+        // Configure cipher suite that requires an RSA certificate on the server
+        ClientSSLSocketFactory clientSSLSocketFactory = TesterSupport.configureClientSsl();
+        clientSSLSocketFactory.setCipher(new String[] {"TLS_DHE_RSA_WITH_AES_256_GCM_SHA384"});
+
+        doTest(false);
+    }
+
+
+    @Test
+    public void testHostRSAandECPEMwithECClient() throws Exception {
+        configureHostRSAPEM();
+        configureHostECPEM();
+
+        // Configure cipher suite that requires an EC certificate on the server
+        ClientSSLSocketFactory clientSSLSocketFactory = TesterSupport.configureClientSsl();
+        clientSSLSocketFactory.setCipher(new String[] {"TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384"});
+
+        doTest(false);
+    }
+
+
+    @Test
+    public void testHostRSAwithRSAClient() throws Exception {
+        configureHostRSAPEM();
+
+        // Configure cipher suite that requires an RSA certificate on the server
+        ClientSSLSocketFactory clientSSLSocketFactory = TesterSupport.configureClientSsl();
+        clientSSLSocketFactory.setCipher(new String[] {"TLS_DHE_RSA_WITH_AES_256_GCM_SHA384"});
+
+        doTest(false);
+    }
+
+
+    @Test(expected=javax.net.ssl.SSLHandshakeException.class)
+    public void testHostRSAwithECClient() throws Exception {
+        configureHostRSAPEM();
+
+        // Configure cipher suite that requires an EC certificate on the server
+        ClientSSLSocketFactory clientSSLSocketFactory = TesterSupport.configureClientSsl();
+        clientSSLSocketFactory.setCipher(new String[] {"TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384"});
+
+        doTest(false);
+    }
+
+
+    @Test
+    public void testHostRSAwithRSAandECClient() throws Exception {
+        configureHostRSAPEM();
+
+        // Configure cipher suite that requires an EC certificate on the server
+        ClientSSLSocketFactory clientSSLSocketFactory = TesterSupport.configureClientSsl();
+        clientSSLSocketFactory.setCipher(new String[] {
+                "TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384",
+                "TLS_DHE_RSA_WITH_AES_256_GCM_SHA384"});
+
+        doTest(false);
+    }
+
+
+    @Test(expected=javax.net.ssl.SSLHandshakeException.class)
+    public void testHostECPEMwithRSAClient() throws Exception {
+        configureHostECPEM();
+
+        // Configure cipher suite that requires an RSA certificate on the server
+        ClientSSLSocketFactory clientSSLSocketFactory = TesterSupport.configureClientSsl();
+        clientSSLSocketFactory.setCipher(new String[] {"TLS_DHE_RSA_WITH_AES_256_GCM_SHA384"});
+
+        doTest(false);
+    }
+
+
+    @Test
+    public void testHostECPEMwithECClient() throws Exception {
+        configureHostECPEM();
+
+        // Configure cipher suite that requires an EC certificate on the server
+        ClientSSLSocketFactory clientSSLSocketFactory = TesterSupport.configureClientSsl();
+        clientSSLSocketFactory.setCipher(new String[] {"TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384"});
+
+        doTest(false);
+    }
+
+
+    @Test
+    public void testHostECPEMwithRSAandECClient() throws Exception {
+        configureHostECPEM();
+
+        // Configure cipher suite that requires an RSA certificate on the server
+        ClientSSLSocketFactory clientSSLSocketFactory = TesterSupport.configureClientSsl();
+        clientSSLSocketFactory.setCipher(new String[] {
+                "TLS_DHE_RSA_WITH_AES_256_GCM_SHA384",
+                "TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384"});
+
+        doTest(false);
+    }
+
+
+    private void configureHostRSAPEM() {
         SSLHostConfigCertificate sslHostConfigCertificateRsa = new SSLHostConfigCertificate(sslHostConfig, Type.RSA);
         sslHostConfigCertificateRsa.setCertificateFile(getPath(TesterSupport.LOCALHOST_RSA_CERT_PEM));
         sslHostConfigCertificateRsa.setCertificateKeyFile(getPath(TesterSupport.LOCALHOST_RSA_KEY_PEM));
         sslHostConfig.addCertificate(sslHostConfigCertificateRsa);
+    }
+
+
+    private void configureHostECPEM() {
         SSLHostConfigCertificate sslHostConfigCertificateEc = new SSLHostConfigCertificate(sslHostConfig, Type.EC);
         sslHostConfigCertificateEc.setCertificateFile(getPath(TesterSupport.LOCALHOST_EC_CERT_PEM));
         sslHostConfigCertificateEc.setCertificateKeyFile(getPath(TesterSupport.LOCALHOST_EC_KEY_PEM));
         sslHostConfig.addCertificate(sslHostConfigCertificateEc);
-        doTest();
     }
 
 
@@ -112,6 +223,16 @@ public class TestSSLHostConfigCompat extends TomcatBaseTest {
 
 
     private void doTest() throws Exception {
+        // Use the default client TLS config
+        doTest(true);
+    }
+
+
+    private void doTest(boolean configureClientSsl) throws Exception {
+        if (configureClientSsl) {
+            TesterSupport.configureClientSsl();
+        }
+
         Tomcat tomcat = getTomcatInstance();
         tomcat.start();
 
@@ -134,8 +255,6 @@ public class TestSSLHostConfigCompat extends TomcatBaseTest {
         AprLifecycleListener listener = new AprLifecycleListener();
         Assume.assumeTrue(AprLifecycleListener.isAprAvailable());
 
-        TesterSupport.configureClientSsl();
-
         Tomcat tomcat = getTomcatInstance();
         Connector connector = tomcat.getConnector();
 
@@ -144,6 +263,7 @@ public class TestSSLHostConfigCompat extends TomcatBaseTest {
         connector.setSecure(true);
         connector.setProperty("SSLEnabled", "true");
         connector.setProperty("sslImplementationName", sslImplementationName);
+        sslHostConfig.setProtocols("TLSv1.2");
         connector.addSslHostConfig(sslHostConfig);
 
         StandardServer server = (StandardServer) tomcat.getServer();
