@@ -1243,7 +1243,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
 
 
         @Override
-        public void registerReadInterest() {
+        public void registerReadInterest(boolean polling) {
             getPoller().add(getSocket(), SelectionKey.OP_READ);
         }
 
@@ -1420,7 +1420,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                 } else if (handshake == -1 ) {
                     close(socket, key);
                 } else if (handshake == SelectionKey.OP_READ){
-                    socketWrapper.registerReadInterest();
+                    socketWrapper.registerReadInterest(true);
                 } else if (handshake == SelectionKey.OP_WRITE){
                     socketWrapper.registerWriteInterest();
                 }

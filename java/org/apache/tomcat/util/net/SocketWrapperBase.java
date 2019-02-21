@@ -763,7 +763,7 @@ public abstract class SocketWrapperBase<E> {
     }
 
 
-    public abstract void registerReadInterest();
+    public abstract void registerReadInterest(boolean polling);
 
     public abstract void registerWriteInterest();
 

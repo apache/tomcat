@@ -590,7 +590,7 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
             this.readCompletionHandler = new CompletionHandler<Integer, ByteBuffer>() {
                 @Override
                 public void completed(Integer nBytes, ByteBuffer attachment) {
-                    boolean notify = false;
+                    boolean readNotify = false;
                     if (log.isDebugEnabled()) {
                         log.debug("Socket: [" + Nio2SocketWrapper.this + "], Interest: [" + readInterest + "]");
                     }
@@ -599,16 +599,16 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
                             failed(new EOFException(), attachment);
                         } else {
                             if (readInterest && !Nio2Endpoint.isInline()) {
-                                readInterest = false;
-                                notify = true;
+                                readNotify = true;
                             } else {
                                 // Release here since there will be no
                                 // notify/dispatch to do the release.
                                 readPending.release();
                             }
+                            readInterest = false;
                         }
                     }
-                    if (notify) {
+                    if (readNotify) {
                         getEndpoint().processSocket(Nio2SocketWrapper.this, SocketEvent.OPEN_READ, false);
                     }
                 }
@@ -810,7 +810,7 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
                     socketBufferHandler.configureReadBufferForRead();
                     nRead = Math.min(nRead, len);
                     socketBufferHandler.getReadBuffer().get(b, off, nRead);
-                } else if (nRead == 0 && !block && ContainerThreadMarker.isContainerThread()) {
+                } else if (nRead == 0 && !block) {
                     readInterest = true;
                 }
                 if (log.isDebugEnabled()) {
@@ -873,7 +873,7 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
                     // data that was just read
                     if (nRead > 0) {
                         nRead = populateReadBuffer(to);
-                    } else if (nRead == 0 && !block && ContainerThreadMarker.isContainerThread()) {
+                    } else if (nRead == 0 && !block) {
                         readInterest = true;
                     }
                 }
@@ -1475,11 +1475,11 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
 
 
         @Override
-        public void registerReadInterest() {
+        public void registerReadInterest(boolean polling) {
             synchronized (readCompletionHandler) {
                 if (readPending.availablePermits() == 0) {
                     readInterest = true;
-                } else {
+                } else if (polling) {
                     // If no read is pending, start waiting for data
                     awaitBytes();
                 }

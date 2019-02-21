@@ -107,7 +107,7 @@ public class UpgradeServletInputStream extends ServletInputStream {
         if (ContainerThreadMarker.isContainerThread()) {
             processor.addDispatch(DispatchType.NON_BLOCKING_READ);
         } else {
-            socketWrapper.registerReadInterest();
+            socketWrapper.registerReadInterest(true);
         }
 
         // Switching to non-blocking. Don't know if data is available.

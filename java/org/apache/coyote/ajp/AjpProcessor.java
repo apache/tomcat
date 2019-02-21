@@ -1134,8 +1134,8 @@ public class AjpProcessor extends AbstractProcessor {
 
 
     @Override
-    protected final void registerReadInterest() {
-        socketWrapper.registerReadInterest();
+    protected final void registerReadInterest(boolean body) {
+        socketWrapper.registerReadInterest(!body);
     }
 
 
