@@ -44,6 +44,7 @@ import java.util.Set;
 
 import javax.net.ssl.CertPathTrustManagerParameters;
 import javax.net.ssl.ManagerFactoryParameters;
+import javax.net.ssl.SSLSessionContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
 
@@ -228,7 +229,24 @@ public abstract class SSLUtilBase implements SSLUtil {
     public final SSLContext createSSLContext(List<String> negotiableProtocols) throws Exception {
         SSLContext sslContext = createSSLContextInternal(negotiableProtocols);
         sslContext.init(getKeyManagers(), getTrustManagers(), null);
+
+        SSLSessionContext sessionContext = sslContext.getServerSessionContext();
+        if (sessionContext != null) {
+            configureSessionContext(sessionContext);
+        }
+
         return sslContext;
+    }
+
+
+    @Override
+    public void configureSessionContext(SSLSessionContext sslSessionContext) {
+        if (sslHostConfig.getSessionCacheSize() > 0) {
+            sslSessionContext.setSessionCacheSize(sslHostConfig.getSessionCacheSize());
+        }
+        if (sslHostConfig.getSessionTimeout() > 0) {
+            sslSessionContext.setSessionTimeout(sslHostConfig.getSessionTimeout());
+        }
     }
 
 
