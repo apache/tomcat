@@ -242,16 +242,6 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                 SSLContext.clearOptions(ctx, SSL.SSL_OP_NO_TICKET);
             }
 
-            // Set session cache size, if specified
-            if (sslHostConfig.getSessionCacheSize() > 0) {
-                SSLContext.setSessionCacheSize(ctx, sslHostConfig.getSessionCacheSize());
-            }
-
-            // Set session timeout, if specified
-            if (sslHostConfig.getSessionTimeout() > 0) {
-                SSLContext.setSessionCacheTimeout(ctx, sslHostConfig.getSessionTimeout());
-            }
-
             // List the ciphers that the client is permitted to negotiate
             SSLContext.setCipherSuite(ctx, sslHostConfig.getCiphers());
 

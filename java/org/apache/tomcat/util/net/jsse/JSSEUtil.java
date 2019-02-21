@@ -33,7 +33,6 @@ import java.util.Set;
 
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.KeyManagerFactory;
-import javax.net.ssl.SSLSessionContext;
 import javax.net.ssl.X509KeyManager;
 
 import org.apache.juli.logging.Log;
@@ -276,12 +275,5 @@ public class JSSEUtil extends SSLUtilBase {
         }
 
         return kms;
-    }
-
-
-    @Override
-    public void configureSessionContext(SSLSessionContext sslSessionContext) {
-        sslSessionContext.setSessionCacheSize(sslHostConfig.getSessionCacheSize());
-        sslSessionContext.setSessionTimeout(sslHostConfig.getSessionTimeout());
     }
 }

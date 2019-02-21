@@ -27,7 +27,6 @@ import java.util.Set;
 
 import javax.net.ssl.SSLEngine;
 import javax.net.ssl.SSLParameters;
-import javax.net.ssl.SSLSessionContext;
 
 import org.apache.tomcat.util.compat.JreCompat;
 import org.apache.tomcat.util.net.SSLHostConfig.Type;
@@ -113,10 +112,6 @@ public abstract class AbstractJsseEndpoint<S,U> extends AbstractEndpoint<S,U> {
                 throw new IllegalArgumentException(e.getMessage(), e);
             }
 
-            SSLSessionContext sessionContext = sslContext.getServerSessionContext();
-            if (sessionContext != null) {
-                sslUtil.configureSessionContext(sessionContext);
-            }
             certificate.setSslContext(sslContext);
         }
     }
