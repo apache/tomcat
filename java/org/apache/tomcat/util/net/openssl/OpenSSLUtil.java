@@ -27,7 +27,6 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.jni.SSL;
 import org.apache.tomcat.util.net.SSLContext;
-import org.apache.tomcat.util.net.SSLHostConfig;
 import org.apache.tomcat.util.net.SSLHostConfigCertificate;
 import org.apache.tomcat.util.net.SSLUtilBase;
 import org.apache.tomcat.util.net.jsse.JSSEUtil;
@@ -94,12 +93,7 @@ public class OpenSSLUtil extends SSLUtilBase {
         if (jsseUtil != null) {
             return jsseUtil.getKeyManagers();
         } else {
-            // Return something although it is not actually used
-            KeyManager[] managers = {
-                    new OpenSSLKeyManager(SSLHostConfig.adjustRelativePath(certificate.getCertificateFile()),
-                            SSLHostConfig.adjustRelativePath(certificate.getCertificateKeyFile()))
-            };
-            return managers;
+            return null;
         }
     }
 
