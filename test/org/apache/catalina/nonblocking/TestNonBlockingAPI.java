@@ -125,7 +125,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         if (async) {
             Assert.assertEquals(2000000 * 8, servlet.listener.body.length());
             TestAsyncReadListener listener = (TestAsyncReadListener) servlet.listener;
-            Assert.assertEquals(listener.notReadyCount, listener.containerThreadCount);
+            Assert.assertTrue(Math.abs(listener.containerThreadCount - listener.notReadyCount)  <= 1);
             Assert.assertEquals(listener.isReadyCount, listener.nonContainerThreadCount);
         } else {
             Assert.assertEquals(5 * 8, servlet.listener.body.length());
