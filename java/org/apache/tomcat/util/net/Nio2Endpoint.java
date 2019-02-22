@@ -810,7 +810,7 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
                     socketBufferHandler.configureReadBufferForRead();
                     nRead = Math.min(nRead, len);
                     socketBufferHandler.getReadBuffer().get(b, off, nRead);
-                } else if (nRead == 0 && !block && ContainerThreadMarker.isContainerThread()) {
+                } else if (nRead == 0 && !block) {
                     readInterest = true;
                 }
                 if (log.isDebugEnabled()) {
@@ -873,7 +873,7 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
                     // data that was just read
                     if (nRead > 0) {
                         nRead = populateReadBuffer(to);
-                    } else if (nRead == 0 && !block && ContainerThreadMarker.isContainerThread()) {
+                    } else if (nRead == 0 && !block) {
                         readInterest = true;
                     }
                 }
@@ -1479,7 +1479,7 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
             synchronized (readCompletionHandler) {
                 if (readPending.availablePermits() == 0) {
                     readInterest = true;
-                } else {
+                } else if (readInterest) {
                     // If no read is pending, start waiting for data
                     awaitBytes();
                 }
