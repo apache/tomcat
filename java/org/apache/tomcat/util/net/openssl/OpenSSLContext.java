@@ -245,42 +245,12 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
             // List the ciphers that the client is permitted to negotiate
             SSLContext.setCipherSuite(ctx, sslHostConfig.getCiphers());
 
-            // Load Server key and certificate
-            if (certificate.getCertificateFile() != null) {
-                // Set certificate
-                SSLContext.setCertificate(ctx,
-                        SSLHostConfig.adjustRelativePath(certificate.getCertificateFile()),
-                        SSLHostConfig.adjustRelativePath(certificate.getCertificateKeyFile()),
-                        certificate.getCertificateKeyPassword(), SSL.SSL_AIDX_RSA);
-                // Set certificate chain file
-                SSLContext.setCertificateChainFile(ctx,
-                        SSLHostConfig.adjustRelativePath(certificate.getCertificateChainFile()), false);
-                // Set revocation
-                SSLContext.setCARevocation(ctx,
-                        SSLHostConfig.adjustRelativePath(
-                                sslHostConfig.getCertificateRevocationListFile()),
-                        SSLHostConfig.adjustRelativePath(
-                                sslHostConfig.getCertificateRevocationListPath()));
-            } else {
+            if (certificate.getCertificateFile() == null) {
                 x509KeyManager = chooseKeyManager(kms);
-                String alias = certificate.getCertificateKeyAlias();
-                if (alias == null) {
-                    alias = "tomcat";
-                }
-                X509Certificate[] chain = x509KeyManager.getCertificateChain(alias);
-                if (chain == null) {
-                    alias = findAlias(x509KeyManager, certificate);
-                    chain = x509KeyManager.getCertificateChain(alias);
-                }
-                PrivateKey key = x509KeyManager.getPrivateKey(alias);
-                StringBuilder sb = new StringBuilder(BEGIN_KEY);
-                sb.append(Base64.getMimeEncoder(64, new byte[] {'\n'}).encodeToString(key.getEncoded()));
-                sb.append(END_KEY);
-                SSLContext.setCertificateRaw(ctx, chain[0].getEncoded(), sb.toString().getBytes(StandardCharsets.US_ASCII), SSL.SSL_AIDX_RSA);
-                for (int i = 1; i < chain.length; i++) {
-                    SSLContext.addChainCertificateRaw(ctx, chain[i].getEncoded());
-                }
             }
+
+            addCertificate(certificate);
+
             // Client certificate verification
             int value = 0;
             switch (sslHostConfig.getCertificateVerification()) {
@@ -403,6 +373,46 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
             destroy();
         }
     }
+
+
+    public void addCertificate(SSLHostConfigCertificate certificate) throws Exception {
+        // Load Server key and certificate
+        if (certificate.getCertificateFile() != null) {
+            // Set certificate
+            SSLContext.setCertificate(ctx,
+                    SSLHostConfig.adjustRelativePath(certificate.getCertificateFile()),
+                    SSLHostConfig.adjustRelativePath(certificate.getCertificateKeyFile()),
+                    certificate.getCertificateKeyPassword(), SSL.SSL_AIDX_RSA);
+            // Set certificate chain file
+            SSLContext.setCertificateChainFile(ctx,
+                    SSLHostConfig.adjustRelativePath(certificate.getCertificateChainFile()), false);
+            // Set revocation
+            SSLContext.setCARevocation(ctx,
+                    SSLHostConfig.adjustRelativePath(
+                            sslHostConfig.getCertificateRevocationListFile()),
+                    SSLHostConfig.adjustRelativePath(
+                            sslHostConfig.getCertificateRevocationListPath()));
+        } else {
+            String alias = certificate.getCertificateKeyAlias();
+            if (alias == null) {
+                alias = "tomcat";
+            }
+            X509Certificate[] chain = x509KeyManager.getCertificateChain(alias);
+            if (chain == null) {
+                alias = findAlias(x509KeyManager, certificate);
+                chain = x509KeyManager.getCertificateChain(alias);
+            }
+            PrivateKey key = x509KeyManager.getPrivateKey(alias);
+            StringBuilder sb = new StringBuilder(BEGIN_KEY);
+            sb.append(Base64.getMimeEncoder(64, new byte[] {'\n'}).encodeToString(key.getEncoded()));
+            sb.append(END_KEY);
+            SSLContext.setCertificateRaw(ctx, chain[0].getEncoded(), sb.toString().getBytes(StandardCharsets.US_ASCII), SSL.SSL_AIDX_RSA);
+            for (int i = 1; i < chain.length; i++) {
+                SSLContext.addChainCertificateRaw(ctx, chain[i].getEncoded());
+            }
+        }
+    }
+
 
     /*
      * Find a valid alias when none was specified in the config.
