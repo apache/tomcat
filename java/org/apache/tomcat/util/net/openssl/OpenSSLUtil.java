@@ -19,33 +19,19 @@ package org.apache.tomcat.util.net.openssl;
 import java.util.List;
 import java.util.Set;
 
-import javax.net.ssl.KeyManager;
-
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.jni.SSL;
 import org.apache.tomcat.util.net.SSLContext;
 import org.apache.tomcat.util.net.SSLHostConfigCertificate;
 import org.apache.tomcat.util.net.SSLUtilBase;
-import org.apache.tomcat.util.net.jsse.JSSEUtil;
 
 public class OpenSSLUtil extends SSLUtilBase {
 
     private static final Log log = LogFactory.getLog(OpenSSLUtil.class);
 
-    private final JSSEUtil jsseUtil;
-
     public OpenSSLUtil(SSLHostConfigCertificate certificate) {
         super(certificate);
-
-        if (certificate.getCertificateFile() == null) {
-            // Using JSSE configuration for keystore and truststore
-            // Missing protocols not a concern so don't warn on skip
-            jsseUtil = new JSSEUtil(certificate, false);
-        } else {
-            // Use OpenSSL configuration for certificates
-            jsseUtil = null;
-        }
     }
 
 
@@ -83,15 +69,5 @@ public class OpenSSLUtil extends SSLUtilBase {
     @Override
     public SSLContext createSSLContextInternal(List<String> negotiableProtocols) throws Exception {
         return new OpenSSLContext(certificate, negotiableProtocols);
-    }
-
-
-    @Override
-    public KeyManager[] getKeyManagers() throws Exception {
-        if (jsseUtil != null) {
-            return jsseUtil.getKeyManagers();
-        } else {
-            return null;
-        }
     }
 }
