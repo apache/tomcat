@@ -117,28 +117,6 @@ public abstract class AbstractJsseEndpoint<S,U> extends AbstractEndpoint<S,U> {
     }
 
 
-    protected void destroySsl() throws Exception {
-        if (isSSLEnabled()) {
-            for (SSLHostConfig sslHostConfig : sslHostConfigs.values()) {
-                releaseSSLContext(sslHostConfig);
-            }
-        }
-    }
-
-
-    @Override
-    protected void releaseSSLContext(SSLHostConfig sslHostConfig) {
-        for (SSLHostConfigCertificate certificate : sslHostConfig.getCertificates(true)) {
-            if (certificate.getSslContext() != null) {
-                SSLContext sslContext = certificate.getSslContext();
-                if (sslContext != null) {
-                    sslContext.destroy();
-                }
-            }
-        }
-    }
-
-
     protected SSLEngine createSSLEngine(String sniHostName, List<Cipher> clientRequestedCiphers,
             List<String> clientRequestedApplicationProtocols) {
         SSLHostConfig sslHostConfig = getSSLHostConfig(sniHostName);

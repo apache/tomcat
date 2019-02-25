@@ -314,13 +314,34 @@ public abstract class AbstractEndpoint<S,U> {
      */
     protected abstract void createSSLContext(SSLHostConfig sslHostConfig) throws Exception;
 
+
+    protected void destroySsl() throws Exception {
+        if (isSSLEnabled()) {
+            for (SSLHostConfig sslHostConfig : sslHostConfigs.values()) {
+                releaseSSLContext(sslHostConfig);
+            }
+        }
+    }
+
+
     /**
      * Release the SSLContext, if any, associated with the SSLHostConfig.
      *
      * @param sslHostConfig The SSLHostConfig for which the SSLContext should be
      *                      released
      */
-    protected abstract void releaseSSLContext(SSLHostConfig sslHostConfig);
+    protected void releaseSSLContext(SSLHostConfig sslHostConfig) {
+        for (SSLHostConfigCertificate certificate : sslHostConfig.getCertificates(true)) {
+            if (certificate.getSslContext() != null) {
+                SSLContext sslContext = certificate.getSslContext();
+                if (sslContext != null) {
+                    sslContext.destroy();
+                }
+            }
+        }
+    }
+
+
 
     protected SSLHostConfig getSSLHostConfig(String sniHostName) {
         SSLHostConfig result = null;
