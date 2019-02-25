@@ -153,9 +153,8 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                 } else if (Constants.SSL_PROTO_ALL.equalsIgnoreCase(protocol)) {
                     value |= SSL.SSL_PROTOCOL_ALL;
                 } else {
-                    // Protocol not recognized, fail to start as it is safer than
-                    // continuing with the default which might enable more than the
-                    // is required
+                    // Should not happen since filtering to build
+                    // enabled protocols removes invalid values.
                     throw new Exception(netSm.getString(
                             "endpoint.apr.invalidSslProtocol", protocol));
                 }

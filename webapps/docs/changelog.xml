@@ -111,6 +111,11 @@
       <fix>
         Make PEM file parser a public utility class. (remm)
       </fix>
+      <fix>
+        Refactor the APR/Native endpoint TLS configuration code to enable JSSE
+        style configuration - including JKS keystores - to be used with the
+        APR/Native connector. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="WebSocket">

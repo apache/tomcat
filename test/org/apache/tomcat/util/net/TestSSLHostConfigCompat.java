@@ -23,7 +23,6 @@ import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Assume;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -216,7 +215,6 @@ public class TestSSLHostConfigCompat extends TomcatBaseTest {
 
 
     @Test
-    @Ignore // Currently the APR/native connector cannot be configured using a Keystore
     public void testHostKeystore() throws Exception {
         sslHostConfig.setCertificateKeystoreFile(getPath(TesterSupport.LOCALHOST_JKS));
         doTest();
