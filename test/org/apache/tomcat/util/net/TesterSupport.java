@@ -70,8 +70,8 @@ public final class TesterSupport {
     public static final String CA_JKS = SSL_DIR + CA_ALIAS + ".jks";
     public static final String CLIENT_ALIAS = "user1";
     public static final String CLIENT_JKS = SSL_DIR + CLIENT_ALIAS + ".jks";
-    public static final String LOCALHOST_JKS = SSL_DIR + "localhost.jks";
-    public static final String LOCALHOST_KEYPASS_JKS = SSL_DIR + "localhost-copy1.jks";
+    public static final String LOCALHOST_JKS = SSL_DIR + "localhost-rsa.jks";
+    public static final String LOCALHOST_KEYPASS_JKS = SSL_DIR + "localhost-rsa-copy1.jks";
     public static final String JKS_PASS = "changeit";
     public static final String JKS_KEY_PASS = "tomcatpass";
     public static final String CA_CERT_PEM = SSL_DIR + CA_ALIAS + "-cert.pem";
