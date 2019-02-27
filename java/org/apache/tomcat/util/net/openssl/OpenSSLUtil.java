@@ -19,16 +19,23 @@ package org.apache.tomcat.util.net.openssl;
 import java.util.List;
 import java.util.Set;
 
+import javax.net.ssl.KeyManager;
+import javax.net.ssl.X509KeyManager;
+
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.jni.SSL;
 import org.apache.tomcat.util.net.SSLContext;
 import org.apache.tomcat.util.net.SSLHostConfigCertificate;
 import org.apache.tomcat.util.net.SSLUtilBase;
+import org.apache.tomcat.util.net.jsse.JSSEKeyManager;
+import org.apache.tomcat.util.res.StringManager;
 
 public class OpenSSLUtil extends SSLUtilBase {
 
     private static final Log log = LogFactory.getLog(OpenSSLUtil.class);
+    private static final StringManager sm = StringManager.getManager(OpenSSLContext.class);
+
 
     public OpenSSLUtil(SSLHostConfigCertificate certificate) {
         super(certificate);
@@ -69,5 +76,20 @@ public class OpenSSLUtil extends SSLUtilBase {
     @Override
     public SSLContext createSSLContextInternal(List<String> negotiableProtocols) throws Exception {
         return new OpenSSLContext(certificate, negotiableProtocols);
+    }
+
+
+    public static X509KeyManager chooseKeyManager(KeyManager[] managers) throws Exception {
+        for (KeyManager manager : managers) {
+            if (manager instanceof JSSEKeyManager) {
+                return (JSSEKeyManager) manager;
+            }
+        }
+        for (KeyManager manager : managers) {
+            if (manager instanceof X509KeyManager) {
+                return (X509KeyManager) manager;
+            }
+        }
+        throw new IllegalStateException(sm.getString("openssl.keyManagerMissing"));
     }
 }
