@@ -51,7 +51,6 @@ import org.apache.tomcat.util.net.Constants;
 import org.apache.tomcat.util.net.SSLHostConfig;
 import org.apache.tomcat.util.net.SSLHostConfigCertificate;
 import org.apache.tomcat.util.net.SSLHostConfigCertificate.Type;
-import org.apache.tomcat.util.net.jsse.JSSEKeyManager;
 import org.apache.tomcat.util.res.StringManager;
 
 public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
@@ -69,7 +68,6 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
     private final SSLHostConfig sslHostConfig;
     private final SSLHostConfigCertificate certificate;
     private OpenSSLSessionContext sessionContext;
-    private X509KeyManager x509KeyManager;
     private X509TrustManager x509TrustManager;
 
     private final List<String> negotiableProtocols;
@@ -250,7 +248,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
             SSLContext.setCipherSuite(ctx, sslHostConfig.getCiphers());
 
             if (certificate.getCertificateFile() == null) {
-                x509KeyManager = chooseKeyManager(kms);
+                certificate.setCertificateKeyManager(OpenSSLUtil.chooseKeyManager(kms));
             }
 
             addCertificate(certificate);
@@ -398,6 +396,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                             sslHostConfig.getCertificateRevocationListPath()));
         } else {
             String alias = certificate.getCertificateKeyAlias();
+            X509KeyManager x509KeyManager = certificate.getCertificateKeyManager();
             if (alias == null) {
                 alias = "tomcat";
             }
@@ -466,20 +465,6 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
         return result;
     }
 
-    private static X509KeyManager chooseKeyManager(KeyManager[] managers) throws Exception {
-        for (KeyManager manager : managers) {
-            if (manager instanceof JSSEKeyManager) {
-                return (JSSEKeyManager) manager;
-            }
-        }
-        for (KeyManager manager : managers) {
-            if (manager instanceof X509KeyManager) {
-                return (X509KeyManager) manager;
-            }
-        }
-        throw new IllegalStateException(sm.getString("openssl.keyManagerMissing"));
-    }
-
     private static X509TrustManager chooseTrustManager(TrustManager[] managers) {
         for (TrustManager m : managers) {
             if (m instanceof X509TrustManager) {
@@ -527,6 +512,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
     @Override
     public X509Certificate[] getCertificateChain(String alias) {
         X509Certificate[] chain = null;
+        X509KeyManager x509KeyManager = certificate.getCertificateKeyManager();
         if (x509KeyManager != null) {
             if (alias == null) {
                 alias = "tomcat";

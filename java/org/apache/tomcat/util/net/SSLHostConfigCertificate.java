@@ -23,6 +23,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import javax.management.ObjectName;
+import javax.net.ssl.X509KeyManager;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -63,6 +64,7 @@ public class SSLHostConfigCertificate implements Serializable {
     private String certificateKeystoreProvider = DEFAULT_KEYSTORE_PROVIDER;
     private String certificateKeystoreType = DEFAULT_KEYSTORE_TYPE;
     private transient KeyStore certificateKeystore = null;
+    private transient X509KeyManager certificateKeyManager = null;
 
     // OpenSSL
     private String certificateChainFile;
@@ -207,6 +209,16 @@ public class SSLHostConfigCertificate implements Serializable {
         }
 
         return result;
+    }
+
+
+    public void setCertificateKeyManager(X509KeyManager certificateKeyManager) {
+        this.certificateKeyManager = certificateKeyManager;
+    }
+
+
+    public X509KeyManager getCertificateKeyManager() {
+        return certificateKeyManager;
     }
 
 

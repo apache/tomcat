@@ -32,6 +32,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 
+import javax.net.ssl.KeyManager;
+
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.jni.Address;
@@ -410,6 +412,9 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
                     throw new IllegalArgumentException(e.getMessage(), e);
                 }
             } else {
+                SSLUtil sslUtil = new OpenSSLUtil(certificate);
+                KeyManager[] kms = sslUtil.getKeyManagers();
+                certificate.setCertificateKeyManager(OpenSSLUtil.chooseKeyManager(kms));
                 sslContext.addCertificate(certificate);
             }
 
