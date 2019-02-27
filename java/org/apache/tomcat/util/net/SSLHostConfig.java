@@ -91,7 +91,7 @@ public class SSLHostConfig implements Serializable {
     private Set<String> explicitlyRequestedProtocols = new HashSet<>();
     // Nested
     private SSLHostConfigCertificate defaultCertificate = null;
-    private Set<SSLHostConfigCertificate> certificates = new HashSet<>(4);
+    private Set<SSLHostConfigCertificate> certificates = new LinkedHashSet<>(4);
     // Common
     private String certificateRevocationListFile;
     private CertificateVerification certificateVerification = CertificateVerification.NONE;
