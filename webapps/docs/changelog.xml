@@ -58,6 +58,11 @@
         <code>catalina.properties</code> file for tomcat-i18n jar files.
         Use prefix pattern instead of listing each language. (kkolinko)
       </update>
+      <fix>
+        Restore the getter and setter for the access log valve attribute
+        <code>maxLogMessageBufferSize</code> that were accidentally removed.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
