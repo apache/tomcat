@@ -877,7 +877,6 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
                         readInterest = true;
                     }
                 }
-
                 return nRead;
             }
         }
