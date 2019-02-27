@@ -37,6 +37,7 @@ import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.compat.JreCompat;
+import org.apache.tomcat.util.net.SSLHostConfigCertificate.StoreType;
 import org.apache.tomcat.util.net.SSLHostConfigCertificate.Type;
 import org.apache.tomcat.util.net.TesterSupport.ClientSSLSocketFactory;
 
@@ -46,18 +47,20 @@ import org.apache.tomcat.util.net.TesterSupport.ClientSSLSocketFactory;
 @RunWith(Parameterized.class)
 public class TestSSLHostConfigCompat extends TomcatBaseTest {
 
-    @Parameterized.Parameters(name = "{0}")
+    @Parameterized.Parameters(name = "{0}-{3}")
     public static Collection<Object[]> parameters() {
         List<Object[]> parameterSets = new ArrayList<>();
 
-        parameterSets.add(new Object[] {"NIO-JSSE", "org.apache.coyote.http11.Http11NioProtocol",
-                "org.apache.tomcat.util.net.jsse.JSSEImplementation"});
+        for (StoreType storeType : new StoreType[] { StoreType.KEYSTORE, StoreType.PEM } ) {
+            parameterSets.add(new Object[] {"NIO-JSSE", "org.apache.coyote.http11.Http11NioProtocol",
+                    "org.apache.tomcat.util.net.jsse.JSSEImplementation", storeType});
 
-        parameterSets.add(new Object[] {"NIO-OpenSSL", "org.apache.coyote.http11.Http11NioProtocol",
-                "org.apache.tomcat.util.net.openssl.OpenSSLImplementation"});
+            parameterSets.add(new Object[] {"NIO-OpenSSL", "org.apache.coyote.http11.Http11NioProtocol",
+                    "org.apache.tomcat.util.net.openssl.OpenSSLImplementation", storeType});
 
-        parameterSets.add(new Object[] { "APR/Native", "org.apache.coyote.http11.Http11AprProtocol",
-                "org.apache.tomcat.util.net.openssl.OpenSSLImplementation"});
+            parameterSets.add(new Object[] { "APR/Native", "org.apache.coyote.http11.Http11AprProtocol",
+                    "org.apache.tomcat.util.net.openssl.OpenSSLImplementation", storeType});
+        }
 
         return parameterSets;
     }
@@ -71,35 +74,42 @@ public class TestSSLHostConfigCompat extends TomcatBaseTest {
     @Parameter(2)
     public String sslImplementationName;
 
+    @Parameter(3)
+    public StoreType storeType;
+
     private SSLHostConfig sslHostConfig = new SSLHostConfig();
 
 
     @Test
-    public void testHostECPEM() throws Exception {
-        configureHostECPEM();
+    public void testHostEC() throws Exception {
+        configureHostEC();
         doTest();
     }
 
 
     @Test
-    public void testHostRSAPEM() throws Exception {
-        configureHostRSAPEM();
+    public void testHostRSA() throws Exception {
+        configureHostRSA();
         doTest();
     }
 
 
     @Test
-    public void testHostRSAandECPEMwithDefaultClient() throws Exception {
-        configureHostRSAPEM();
-        configureHostECPEM();
+    public void testHostRSAandECwithDefaultClient() throws Exception {
+        configureHostRSA();
+        configureHostEC();
         doTest();
     }
 
 
+    /*
+     * This test and the next just swap the order in which the server certs are
+     * configured to ensure correct operation isn't dependent on order.
+     */
     @Test
-    public void testHostRSAandECPEMwithRSAClient() throws Exception {
-        configureHostRSAPEM();
-        configureHostECPEM();
+    public void testHostRSAandECwithRSAClient() throws Exception {
+        configureHostRSA();
+        configureHostEC();
 
         // Configure cipher suite that requires an RSA certificate on the server
         ClientSSLSocketFactory clientSSLSocketFactory = TesterSupport.configureClientSsl();
@@ -109,10 +119,48 @@ public class TestSSLHostConfigCompat extends TomcatBaseTest {
     }
 
 
+    /*
+     * This test and the previous just swap the order in which the server certs
+     * are configured to ensure correct operation isn't dependent on order.
+     */
     @Test
-    public void testHostRSAandECPEMwithECClient() throws Exception {
-        configureHostRSAPEM();
-        configureHostECPEM();
+    public void testHostECandRSAwithRSAClient() throws Exception {
+        configureHostEC();
+        configureHostRSA();
+
+        // Configure cipher suite that requires an RSA certificate on the server
+        ClientSSLSocketFactory clientSSLSocketFactory = TesterSupport.configureClientSsl();
+        clientSSLSocketFactory.setCipher(new String[] {"TLS_DHE_RSA_WITH_AES_256_GCM_SHA384"});
+
+        doTest(false);
+    }
+
+
+    /*
+     * This test and the next just swap the order in which the server certs are
+     * configured to ensure correct operation isn't dependent on order.
+     */
+    @Test
+    public void testHostRSAandECwithECClient() throws Exception {
+        configureHostRSA();
+        configureHostEC();
+
+        // Configure cipher suite that requires an EC certificate on the server
+        ClientSSLSocketFactory clientSSLSocketFactory = TesterSupport.configureClientSsl();
+        clientSSLSocketFactory.setCipher(new String[] {"TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384"});
+
+        doTest(false);
+    }
+
+
+    /*
+     * This test and the previous just swap the order in which the server certs
+     * are configured to ensure correct operation isn't dependent on order.
+     */
+    @Test
+    public void testHostECandRSAwithECClient() throws Exception {
+        configureHostEC();
+        configureHostRSA();
 
         // Configure cipher suite that requires an EC certificate on the server
         ClientSSLSocketFactory clientSSLSocketFactory = TesterSupport.configureClientSsl();
@@ -124,7 +172,7 @@ public class TestSSLHostConfigCompat extends TomcatBaseTest {
 
     @Test
     public void testHostRSAwithRSAClient() throws Exception {
-        configureHostRSAPEM();
+        configureHostRSA();
 
         // Configure cipher suite that requires an RSA certificate on the server
         ClientSSLSocketFactory clientSSLSocketFactory = TesterSupport.configureClientSsl();
@@ -136,7 +184,7 @@ public class TestSSLHostConfigCompat extends TomcatBaseTest {
 
     @Test(expected=javax.net.ssl.SSLHandshakeException.class)
     public void testHostRSAwithECClient() throws Exception {
-        configureHostRSAPEM();
+        configureHostRSA();
 
         // Configure cipher suite that requires an EC certificate on the server
         ClientSSLSocketFactory clientSSLSocketFactory = TesterSupport.configureClientSsl();
@@ -148,7 +196,7 @@ public class TestSSLHostConfigCompat extends TomcatBaseTest {
 
     @Test
     public void testHostRSAwithRSAandECClient() throws Exception {
-        configureHostRSAPEM();
+        configureHostRSA();
 
         // Configure cipher suite that requires an EC certificate on the server
         ClientSSLSocketFactory clientSSLSocketFactory = TesterSupport.configureClientSsl();
@@ -161,8 +209,8 @@ public class TestSSLHostConfigCompat extends TomcatBaseTest {
 
 
     @Test(expected=javax.net.ssl.SSLHandshakeException.class)
-    public void testHostECPEMwithRSAClient() throws Exception {
-        configureHostECPEM();
+    public void testHostECwithRSAClient() throws Exception {
+        configureHostEC();
 
         // Configure cipher suite that requires an RSA certificate on the server
         ClientSSLSocketFactory clientSSLSocketFactory = TesterSupport.configureClientSsl();
@@ -173,8 +221,8 @@ public class TestSSLHostConfigCompat extends TomcatBaseTest {
 
 
     @Test
-    public void testHostECPEMwithECClient() throws Exception {
-        configureHostECPEM();
+    public void testHostECwithECClient() throws Exception {
+        configureHostEC();
 
         // Configure cipher suite that requires an EC certificate on the server
         ClientSSLSocketFactory clientSSLSocketFactory = TesterSupport.configureClientSsl();
@@ -185,8 +233,8 @@ public class TestSSLHostConfigCompat extends TomcatBaseTest {
 
 
     @Test
-    public void testHostECPEMwithRSAandECClient() throws Exception {
-        configureHostECPEM();
+    public void testHostECwithRSAandECClient() throws Exception {
+        configureHostEC();
 
         // Configure cipher suite that requires an RSA certificate on the server
         ClientSSLSocketFactory clientSSLSocketFactory = TesterSupport.configureClientSsl();
@@ -198,26 +246,41 @@ public class TestSSLHostConfigCompat extends TomcatBaseTest {
     }
 
 
-    private void configureHostRSAPEM() {
-        SSLHostConfigCertificate sslHostConfigCertificateRsa = new SSLHostConfigCertificate(sslHostConfig, Type.RSA);
-        sslHostConfigCertificateRsa.setCertificateFile(getPath(TesterSupport.LOCALHOST_RSA_CERT_PEM));
-        sslHostConfigCertificateRsa.setCertificateKeyFile(getPath(TesterSupport.LOCALHOST_RSA_KEY_PEM));
-        sslHostConfig.addCertificate(sslHostConfigCertificateRsa);
+    private void configureHostRSA() {
+        switch (storeType) {
+        case KEYSTORE: {
+            SSLHostConfigCertificate sslHostConfigCertificateRsa = new SSLHostConfigCertificate(sslHostConfig, Type.RSA);
+            sslHostConfigCertificateRsa.setCertificateKeystoreFile(getPath(TesterSupport.LOCALHOST_RSA_JKS));
+            sslHostConfig.addCertificate(sslHostConfigCertificateRsa);
+            break;
+        }
+        case PEM: {
+            SSLHostConfigCertificate sslHostConfigCertificateRsa = new SSLHostConfigCertificate(sslHostConfig, Type.RSA);
+            sslHostConfigCertificateRsa.setCertificateFile(getPath(TesterSupport.LOCALHOST_RSA_CERT_PEM));
+            sslHostConfigCertificateRsa.setCertificateKeyFile(getPath(TesterSupport.LOCALHOST_RSA_KEY_PEM));
+            sslHostConfig.addCertificate(sslHostConfigCertificateRsa);
+            break;
+        }
+        }
     }
 
 
-    private void configureHostECPEM() {
-        SSLHostConfigCertificate sslHostConfigCertificateEc = new SSLHostConfigCertificate(sslHostConfig, Type.EC);
-        sslHostConfigCertificateEc.setCertificateFile(getPath(TesterSupport.LOCALHOST_EC_CERT_PEM));
-        sslHostConfigCertificateEc.setCertificateKeyFile(getPath(TesterSupport.LOCALHOST_EC_KEY_PEM));
-        sslHostConfig.addCertificate(sslHostConfigCertificateEc);
-    }
-
-
-    @Test
-    public void testHostKeystore() throws Exception {
-        sslHostConfig.setCertificateKeystoreFile(getPath(TesterSupport.LOCALHOST_JKS));
-        doTest();
+    private void configureHostEC() {
+        switch (storeType) {
+        case KEYSTORE: {
+            SSLHostConfigCertificate sslHostConfigCertificateEc = new SSLHostConfigCertificate(sslHostConfig, Type.EC);
+            sslHostConfigCertificateEc.setCertificateKeystoreFile(getPath(TesterSupport.LOCALHOST_EC_JKS));
+            sslHostConfig.addCertificate(sslHostConfigCertificateEc);
+            break;
+        }
+        case PEM: {
+            SSLHostConfigCertificate sslHostConfigCertificateEc = new SSLHostConfigCertificate(sslHostConfig, Type.EC);
+            sslHostConfigCertificateEc.setCertificateFile(getPath(TesterSupport.LOCALHOST_EC_CERT_PEM));
+            sslHostConfigCertificateEc.setCertificateKeyFile(getPath(TesterSupport.LOCALHOST_EC_KEY_PEM));
+            sslHostConfig.addCertificate(sslHostConfigCertificateEc);
+            break;
+        }
+        }
     }
 
 
