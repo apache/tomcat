@@ -191,7 +191,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
 
     @Override
     protected Type getSslConfigType() {
-        return SSLHostConfig.Type.OPENSSL;
+        return SSLHostConfig.Type.EITHER;
     }
 
 
