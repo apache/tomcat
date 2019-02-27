@@ -386,7 +386,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
             SSLContext.setCertificate(ctx,
                     SSLHostConfig.adjustRelativePath(certificate.getCertificateFile()),
                     SSLHostConfig.adjustRelativePath(certificate.getCertificateKeyFile()),
-                    certificate.getCertificateKeyPassword(), SSL.SSL_AIDX_RSA);
+                    certificate.getCertificateKeyPassword(), getCertificateIndex(certificate));
             // Set certificate chain file
             SSLContext.setCertificateChainFile(ctx,
                     SSLHostConfig.adjustRelativePath(certificate.getCertificateChainFile()), false);
@@ -414,11 +414,28 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
             }
             sb.append(encoded);
             sb.append(END_KEY);
-            SSLContext.setCertificateRaw(ctx, chain[0].getEncoded(), sb.toString().getBytes(StandardCharsets.US_ASCII), SSL.SSL_AIDX_RSA);
+            SSLContext.setCertificateRaw(ctx, chain[0].getEncoded(),
+                    sb.toString().getBytes(StandardCharsets.US_ASCII),
+                    getCertificateIndex(certificate));
             for (int i = 1; i < chain.length; i++) {
                 SSLContext.addChainCertificateRaw(ctx, chain[i].getEncoded());
             }
         }
+    }
+
+
+    private static int getCertificateIndex(SSLHostConfigCertificate certificate) {
+        int result;
+        if (certificate.getType() == Type.RSA) {
+            result = SSL.SSL_AIDX_RSA;
+        } else if (certificate.getType() == Type.EC) {
+            result = SSL.SSL_AIDX_ECC;
+        } else if (certificate.getType() == Type.DSA) {
+            result = SSL.SSL_AIDX_DSA;
+        } else {
+            result = SSL.SSL_AIDX_MAX;
+        }
+        return result;
     }
 
 
