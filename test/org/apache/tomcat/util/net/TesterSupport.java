@@ -69,7 +69,8 @@ public final class TesterSupport {
     public static final String CA_JKS = SSL_DIR + CA_ALIAS + ".jks";
     public static final String CLIENT_ALIAS = "user1";
     public static final String CLIENT_JKS = SSL_DIR + CLIENT_ALIAS + ".jks";
-    public static final String LOCALHOST_JKS = SSL_DIR + "localhost-rsa.jks";
+    public static final String LOCALHOST_EC_JKS = SSL_DIR + "localhost-ec.jks";
+    public static final String LOCALHOST_RSA_JKS = SSL_DIR + "localhost-rsa.jks";
     public static final String LOCALHOST_KEYPASS_JKS = SSL_DIR + "localhost-rsa-copy1.jks";
     public static final String JKS_PASS = "changeit";
     public static final String JKS_KEY_PASS = "tomcatpass";
@@ -114,7 +115,7 @@ public final class TesterSupport {
     }
 
     public static void initSsl(Tomcat tomcat) {
-        initSsl(tomcat, LOCALHOST_JKS, null, null);
+        initSsl(tomcat, LOCALHOST_RSA_JKS, null, null);
     }
 
     protected static void initSsl(Tomcat tomcat, String keystore,
