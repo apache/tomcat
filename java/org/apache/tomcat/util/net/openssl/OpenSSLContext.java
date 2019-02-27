@@ -92,9 +92,9 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
 
     static final CertificateFactory X509_CERT_FACTORY;
 
-    private static final String BEGIN_KEY = "-----BEGIN RSA PRIVATE KEY-----\n";
+    private static final String BEGIN_KEY = "-----BEGIN PRIVATE KEY-----\n";
 
-    private static final Object END_KEY = "\n-----END RSA PRIVATE KEY-----";
+    private static final Object END_KEY = "\n-----END PRIVATE KEY-----";
     private boolean initialized = false;
 
     static {
