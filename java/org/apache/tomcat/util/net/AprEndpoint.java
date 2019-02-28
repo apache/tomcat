@@ -55,7 +55,6 @@ import org.apache.tomcat.util.buf.ByteBufferUtils;
 import org.apache.tomcat.util.collections.SynchronizedStack;
 import org.apache.tomcat.util.net.AbstractEndpoint.Acceptor.AcceptorState;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
-import org.apache.tomcat.util.net.SSLHostConfig.Type;
 import org.apache.tomcat.util.net.openssl.OpenSSLContext;
 import org.apache.tomcat.util.net.openssl.OpenSSLUtil;
 
@@ -188,12 +187,6 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
     protected Sendfile sendfile = null;
     public Sendfile getSendfile() {
         return sendfile;
-    }
-
-
-    @Override
-    protected Type getSslConfigType() {
-        return SSLHostConfig.Type.EITHER;
     }
 
 
@@ -372,7 +365,6 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
         // Initialize SSL if needed
         if (isSSLEnabled()) {
             for (SSLHostConfig sslHostConfig : sslHostConfigs.values()) {
-                sslHostConfig.setConfigType(getSslConfigType());
                 createSSLContext(sslHostConfig);
             }
             SSLHostConfig defaultSSLHostConfig = sslHostConfigs.get(getDefaultSSLHostConfigName());
