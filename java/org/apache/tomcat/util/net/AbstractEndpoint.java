@@ -223,7 +223,6 @@ public abstract class AbstractEndpoint<S,U> {
         }
         if (bindState != BindState.UNBOUND && bindState != BindState.SOCKET_CLOSED_ON_STOP &&
                 isSSLEnabled()) {
-            sslHostConfig.setConfigType(getSslConfigType());
             try {
                 createSSLContext(sslHostConfig);
             } catch (Exception e) {
@@ -301,8 +300,6 @@ public abstract class AbstractEndpoint<S,U> {
     public SSLHostConfig[] findSslHostConfigs() {
         return sslHostConfigs.values().toArray(new SSLHostConfig[0]);
     }
-
-    protected abstract SSLHostConfig.Type getSslConfigType();
 
     /**
      * Create the SSLContextfor the the given SSLHostConfig.

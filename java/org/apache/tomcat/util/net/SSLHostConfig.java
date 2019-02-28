@@ -22,11 +22,9 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.security.KeyStore;
 import java.security.UnrecoverableKeyException;
-import java.util.EnumMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import javax.management.ObjectName;
@@ -65,8 +63,6 @@ public class SSLHostConfig implements Serializable {
     }
 
     private Type configType = null;
-    private Type currentConfigType = null;
-    private Map<Type, Set<String>> configuredProperties = new EnumMap<>(Type.class);
 
     private String hostName = DEFAULT_SSL_HOST_NAME;
 
@@ -152,39 +148,11 @@ public class SSLHostConfig implements Serializable {
     public String getConfigType() {
         return configType.name();
     }
-    public void setConfigType(Type configType) {
-        this.configType = configType;
-        if (configType == Type.EITHER) {
-            if (configuredProperties.remove(Type.JSSE) == null) {
-                configuredProperties.remove(Type.OPENSSL);
-            }
-        } else {
-            configuredProperties.remove(configType);
-        }
-        for (Map.Entry<Type,Set<String>> entry : configuredProperties.entrySet()) {
-            for (String property : entry.getValue()) {
-                log.warn(sm.getString("sslHostConfig.mismatch",
-                        property, getHostName(), entry.getKey(), configType));
-            }
-        }
-    }
 
 
     void setProperty(String name, Type configType) {
         if (this.configType == null) {
-            Set<String> properties = configuredProperties.get(configType);
-            if (properties == null) {
-                properties = new HashSet<>();
-                configuredProperties.put(configType, properties);
-            }
-            properties.add(name);
-        } else if (this.configType == Type.EITHER) {
-            if (currentConfigType == null) {
-                currentConfigType = configType;
-            } else if (currentConfigType != configType) {
-                log.warn(sm.getString("sslHostConfig.mismatch",
-                        name, getHostName(), configType, currentConfigType));
-            }
+            this.configType = configType;
         } else {
             if (configType != this.configType) {
                 log.warn(sm.getString("sslHostConfig.mismatch",
@@ -872,8 +840,7 @@ public class SSLHostConfig implements Serializable {
 
     public enum Type {
         JSSE,
-        OPENSSL,
-        EITHER
+        OPENSSL
     }
 
 
