@@ -1205,7 +1205,7 @@
              source="${compile.source}"
              target="${compile.target}"
              release="${compile.release}"
-             classpath="$tomcat.lcasses}"
+             classpath="$tomcat.classes}"
              excludes="**/CVS/**,**/.svn/**"
              encoding="ISO-8859-1"
              includeantruntime="false">
