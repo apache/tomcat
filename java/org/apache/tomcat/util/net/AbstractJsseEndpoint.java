@@ -29,8 +29,6 @@ import javax.net.ssl.SSLEngine;
 import javax.net.ssl.SSLParameters;
 
 import org.apache.tomcat.util.compat.JreCompat;
-import org.apache.tomcat.util.net.SSLHostConfig.Type;
-import org.apache.tomcat.util.net.openssl.OpenSSLImplementation;
 import org.apache.tomcat.util.net.openssl.ciphers.Cipher;
 
 public abstract class AbstractJsseEndpoint<S,U> extends AbstractEndpoint<S,U> {
@@ -65,22 +63,11 @@ public abstract class AbstractJsseEndpoint<S,U> extends AbstractEndpoint<S,U> {
     }
 
 
-    @Override
-    protected Type getSslConfigType() {
-        if (OpenSSLImplementation.class.getName().equals(sslImplementationName)) {
-            return SSLHostConfig.Type.EITHER;
-        } else {
-            return SSLHostConfig.Type.JSSE;
-        }
-    }
-
-
     protected void initialiseSsl() throws Exception {
         if (isSSLEnabled()) {
             sslImplementation = SSLImplementation.getInstance(getSslImplementationName());
 
             for (SSLHostConfig sslHostConfig : sslHostConfigs.values()) {
-                sslHostConfig.setConfigType(getSslConfigType());
                 createSSLContext(sslHostConfig);
             }
 
