@@ -48,8 +48,6 @@ tomcat.release.path=../../output/release
 tomcat.src.path=../../output/src-jars
 tomcat.embed.path=../../output/embed
 tomcat.embed.src.path=../../output/embed-src-jars
-tomcat.extras.path=../../output/extras
-tomcat.extras.src.path=../../output/extras-src-jars
 
 #Where do we find the POM files
 tomcat.pom.path=../../res/maven
