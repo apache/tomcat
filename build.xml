@@ -1115,7 +1115,7 @@
              debug="${compile.debug}" deprecation="${compile.deprecation}"
              source="${compile.source}"
              target="${compile.target}"
-             classpath="$tomcat.classes}"
+             classpath="${tomcat.classes}"
              excludes="**/CVS/**,**/.svn/**"
              encoding="ISO-8859-1"
              includeantruntime="false">
