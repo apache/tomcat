@@ -476,6 +476,7 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
         private final CompletionHandler<Integer, ByteBuffer> readCompletionHandler;
         private final Semaphore readPending = new Semaphore(1);
         private boolean readInterest = false; // Guarded by readCompletionHandler
+        private boolean readNotify = false;
 
         private final CompletionHandler<Integer, ByteBuffer> writeCompletionHandler;
         private final CompletionHandler<Long, ByteBuffer[]> gatheringWriteCompletionHandler;
@@ -493,6 +494,7 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
                     failed(new ClosedChannelException(), attachment);
                     return;
                 }
+                readNotify = true;
                 getEndpoint().processSocket(attachment, SocketEvent.OPEN_READ, Nio2Endpoint.isInline());
             }
 
@@ -590,10 +592,10 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
             this.readCompletionHandler = new CompletionHandler<Integer, ByteBuffer>() {
                 @Override
                 public void completed(Integer nBytes, ByteBuffer attachment) {
-                    boolean readNotify = false;
                     if (log.isDebugEnabled()) {
                         log.debug("Socket: [" + Nio2SocketWrapper.this + "], Interest: [" + readInterest + "]");
                     }
+                    readNotify = false;
                     synchronized (readCompletionHandler) {
                         if (nBytes.intValue() < 0) {
                             failed(new EOFException(), attachment);
@@ -742,6 +744,10 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
         @Override
         public boolean isReadyForRead() throws IOException {
             synchronized (readCompletionHandler) {
+                if (readNotify) {
+                    return true;
+                }
+
                 if (!readPending.tryAcquire()) {
                     readInterest = true;
                     return false;
@@ -776,18 +782,22 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
                 throw new IOException(sm.getString("socket.closed"));
             }
 
-            if (block) {
-                try {
-                    readPending.acquire();
-                } catch (InterruptedException e) {
-                    throw new IOException(e);
-                }
+            if (readNotify) {
+                readNotify = false;
             } else {
-                if (!readPending.tryAcquire()) {
-                    if (log.isDebugEnabled()) {
-                        log.debug("Socket: [" + this + "], Read in progress. Returning [0]");
+                if (block) {
+                    try {
+                        readPending.acquire();
+                    } catch (InterruptedException e) {
+                        throw new IOException(e);
                     }
-                    return 0;
+                } else {
+                    if (!readPending.tryAcquire()) {
+                        if (log.isDebugEnabled()) {
+                            log.debug("Socket: [" + this + "], Read in progress. Returning [0]");
+                        }
+                        return 0;
+                    }
                 }
             }
 
@@ -810,7 +820,7 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
                     socketBufferHandler.configureReadBufferForRead();
                     nRead = Math.min(nRead, len);
                     socketBufferHandler.getReadBuffer().get(b, off, nRead);
-                } else if (nRead == 0 && !block && ContainerThreadMarker.isContainerThread()) {
+                } else if (nRead == 0 && !block) {
                     readInterest = true;
                 }
                 if (log.isDebugEnabled()) {
@@ -829,18 +839,22 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
                 throw new IOException(sm.getString("socket.closed"));
             }
 
-            if (block) {
-                try {
-                    readPending.acquire();
-                } catch (InterruptedException e) {
-                    throw new IOException(e);
-                }
+            if (readNotify) {
+                readNotify = false;
             } else {
-                if (!readPending.tryAcquire()) {
-                    if (log.isDebugEnabled()) {
-                        log.debug("Socket: [" + this + "], Read in progress. Returning [0]");
+                if (block) {
+                    try {
+                        readPending.acquire();
+                    } catch (InterruptedException e) {
+                        throw new IOException(e);
                     }
-                    return 0;
+                } else {
+                    if (!readPending.tryAcquire()) {
+                        if (log.isDebugEnabled()) {
+                            log.debug("Socket: [" + this + "], Read in progress. Returning [0]");
+                        }
+                        return 0;
+                    }
                 }
             }
 
@@ -873,7 +887,7 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
                     // data that was just read
                     if (nRead > 0) {
                         nRead = populateReadBuffer(to);
-                    } else if (nRead == 0 && !block && ContainerThreadMarker.isContainerThread()) {
+                    } else if (nRead == 0 && !block) {
                         readInterest = true;
                     }
                 }
@@ -1720,11 +1734,6 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
 
         @Override
         protected void doRun() {
-            if (SocketEvent.OPEN_WRITE != event) {
-                // Anything other than OPEN_WRITE is a genuine read or an
-                // error condition so for all of those release the semaphore
-                ((Nio2SocketWrapper) socketWrapper).releaseReadPending();
-            }
             boolean launch = false;
             try {
                 int handshake = -1;
