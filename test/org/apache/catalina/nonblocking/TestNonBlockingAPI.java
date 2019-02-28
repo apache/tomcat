@@ -678,16 +678,12 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
                 public void run() {
                     try {
                         ServletInputStream in = ctx.getRequest().getInputStream();
-                        String s = "";
                         byte[] b = new byte[1024];
                         int read = in.read(b);
                         if (read == -1) {
                             return;
                         }
-                        s += new String(b, 0, read);
-                        synchronized (body) {
-                            body.append(s);
-                        }
+                        body.append(new String(b, 0, read));
                         boolean isReady = ignoreIsReady || in.isReady();
                         if (isReady) {
                             isReadyCount.incrementAndGet();
