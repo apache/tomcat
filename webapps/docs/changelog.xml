@@ -145,6 +145,9 @@
         Expand the coverage and quality of the Russian translations provided
         with Apache Tomcat. (kkolinko)
       </add>
+      <fix>
+        Fix the artifactId of <code>tomcat-i18n-de</code>. (rjung)
+      </fix>
     </changelog>
   </subsection>
 </section>

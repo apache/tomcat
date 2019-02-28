@@ -21,7 +21,7 @@
   http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.apache.tomcat</groupId>
-  <artifactId>tomcat-i18n-de</artifactId>
+  <artifactId>tomcat-i18n-cs</artifactId>
   <version>@MAVEN.DEPLOY.VERSION@</version>
   <description>Czech translations</description>
   <url>https://tomcat.apache.org/</url>
