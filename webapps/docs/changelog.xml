@@ -146,7 +146,7 @@
         with Apache Tomcat. (kkolinko)
       </add>
       <fix>
-        Fix the artifactId of <code>tomcat-i18n-de</code>. (rjung)
+        Fix the artifactId of <code>tomcat-i18n-cs</code>. (rjung)
       </fix>
     </changelog>
   </subsection>
