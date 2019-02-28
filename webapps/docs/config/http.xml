@@ -1318,14 +1318,12 @@
     </attribute>
 
     <attribute name="sessionCacheSize" required="false">
-      <p>JSSE only.</p>
       <p>The number of SSL sessions to maintain in the session cache. Use 0 to
       specify an unlimited cache size. If not specified, a default of 0 is
       used.</p>
     </attribute>
 
     <attribute name="sessionTimeout" required="false">
-      <p>JSSE only.</p>
       <p>The time, in seconds, after the creation of an SSL session that it will
       timeout. Use 0 to specify an unlimited timeout. If not specified, a
       default of 86400 (24 hours) is used.</p>
