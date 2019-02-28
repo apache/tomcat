@@ -566,13 +566,9 @@ public class Catalina {
             digester.push(this);
             digester.parse(inputSource);
         } catch (Exception e) {
-            if  (file == null) {
-                log.warn(sm.getString("catalina.configFail", getConfigFile() + "] or [server-embed.xml"), e);
-            } else {
-                log.warn(sm.getString("catalina.configFail", file.getAbsolutePath()), e);
-                if (file.exists() && !file.canRead()) {
-                    log.warn(sm.getString("catalina.incorrectPermissions"));
-                }
+            log.warn(sm.getString("catalina.configFail", file.getAbsolutePath()), e);
+            if (file.exists() && !file.canRead()) {
+                log.warn(sm.getString("catalina.incorrectPermissions"));
             }
             return;
         }

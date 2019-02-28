@@ -471,7 +471,7 @@ public class NioBlockingSelector {
         SelectionKey key = null;
 
         @Override
-        public void finalize() {
+        protected void finalize() {
             if (key!=null && key.isValid()) {
                 log.warn(sm.getString("nioBlockingSelector.possibleLeak"));
                 try {key.cancel();}catch (Exception ignore){}
