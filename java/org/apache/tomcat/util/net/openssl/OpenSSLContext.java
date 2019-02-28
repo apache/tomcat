@@ -416,7 +416,9 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
 
     private static int getCertificateIndex(SSLHostConfigCertificate certificate) {
         int result;
-        if (certificate.getType() == Type.RSA) {
+        // If the type is undefined there will only be one certificate (enforced
+        // in SSLHostConfig) so use the RSA slot.
+        if (certificate.getType() == Type.RSA || certificate.getType() == Type.UNDEFINED) {
             result = SSL.SSL_AIDX_RSA;
         } else if (certificate.getType() == Type.EC) {
             result = SSL.SSL_AIDX_ECC;
