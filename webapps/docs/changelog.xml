@@ -121,6 +121,12 @@
         style configuration - including JKS keystores - to be used with the
         APR/Native connector. (markt)
       </fix>
+      <add>
+        With the TLS configuration refactoring, the configuration attributes
+        <code>sessionCacheSize</code> and <code>sessionTimeout</code> are no
+        longer limited to JSSE implementations. They may now be used with
+        OpenSSL implementations as well. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="WebSocket">

@@ -99,11 +99,11 @@ public class SSLHostConfig implements Serializable {
     private List<String> jsseCipherNames = null;
     private String honorCipherOrder = null;
     private Set<String> protocols = new HashSet<>();
+    private int sessionCacheSize = 0;
+    private int sessionTimeout = 86400;
     // JSSE
     private String keyManagerAlgorithm = KeyManagerFactory.getDefaultAlgorithm();
     private boolean revocationEnabled = false;
-    private int sessionCacheSize = 0;
-    private int sessionTimeout = 86400;
     private String sslProtocol = Constants.SSL_PROTO_TLS;
     private String trustManagerClassName;
     private String truststoreAlgorithm = TrustManagerFactory.getDefaultAlgorithm();
@@ -496,6 +496,26 @@ public class SSLHostConfig implements Serializable {
     }
 
 
+    public void setSessionCacheSize(int sessionCacheSize) {
+        this.sessionCacheSize = sessionCacheSize;
+    }
+
+
+    public int getSessionCacheSize() {
+        return sessionCacheSize;
+    }
+
+
+    public void setSessionTimeout(int sessionTimeout) {
+        this.sessionTimeout = sessionTimeout;
+    }
+
+
+    public int getSessionTimeout() {
+        return sessionTimeout;
+    }
+
+
     // ---------------------------------- JSSE specific configuration properties
 
     // TODO: These certificate setters can be removed once it is no longer
@@ -570,28 +590,6 @@ public class SSLHostConfig implements Serializable {
 
     public boolean getRevocationEnabled() {
         return revocationEnabled;
-    }
-
-
-    public void setSessionCacheSize(int sessionCacheSize) {
-        setProperty("sessionCacheSize", Type.JSSE);
-        this.sessionCacheSize = sessionCacheSize;
-    }
-
-
-    public int getSessionCacheSize() {
-        return sessionCacheSize;
-    }
-
-
-    public void setSessionTimeout(int sessionTimeout) {
-        setProperty("sessionTimeout", Type.JSSE);
-        this.sessionTimeout = sessionTimeout;
-    }
-
-
-    public int getSessionTimeout() {
-        return sessionTimeout;
     }
 
 
