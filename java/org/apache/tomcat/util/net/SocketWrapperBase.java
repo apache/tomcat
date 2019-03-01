@@ -252,6 +252,11 @@ public abstract class SocketWrapperBase<E> {
     }
     public SocketBufferHandler getSocketBufferHandler() { return socketBufferHandler; }
 
+    public boolean hasDataToRead() {
+        // Return true because it is always safe to make a read attempt
+        return true;
+    }
+
     public boolean hasDataToWrite() {
         return !socketBufferHandler.isWriteBufferEmpty() || !nonBlockingWriteBuffer.isEmpty();
     }
