@@ -62,6 +62,7 @@ import org.apache.tomcat.util.net.SSLHostConfig.CertificateVerification;
 import org.apache.tomcat.util.net.jsse.JSSEKeyManager;
 import org.apache.tomcat.util.net.jsse.PEMFile;
 import org.apache.tomcat.util.res.StringManager;
+import org.apache.tomcat.util.security.KeyStoreUtil;
 
 /**
  * Common base class for {@link SSLUtil} implementations.
@@ -205,7 +206,7 @@ public abstract class SSLUtilBase implements SSLUtil {
                         "JKS".equalsIgnoreCase(type) || "PKCS12".equalsIgnoreCase(type))) {
                     storePass = pass.toCharArray();
                 }
-                ks.load(istream, storePass);
+                KeyStoreUtil.load(ks, istream, storePass);
             }
         } catch (FileNotFoundException fnfe) {
             throw fnfe;
