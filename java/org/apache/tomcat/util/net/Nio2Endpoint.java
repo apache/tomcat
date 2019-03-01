@@ -783,10 +783,8 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
 
             int nRead = populateReadBuffer(b, off, len);
             if (nRead > 0) {
-                if (readNotify) {
-                    // The code that was notified is now reading its data
-                    readNotify = false;
-                }
+                // The code that was notified is now reading its data
+                readNotify = false;
                 // This may be sufficient to complete the request and we
                 // don't want to trigger another read since if there is no
                 // more data to read and this request takes a while to
@@ -842,10 +840,8 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
 
             int nRead = populateReadBuffer(to);
             if (nRead > 0) {
-                if (readNotify) {
-                    // The code that was notified is now reading its data
-                    readNotify = false;
-                }
+                // The code that was notified is now reading its data
+                readNotify = false;
                 // This may be sufficient to complete the request and we
                 // don't want to trigger another read since if there is no
                 // more data to read and this request takes a while to
