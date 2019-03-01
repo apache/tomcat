@@ -70,6 +70,7 @@ public final class TesterSupport {
     public static final String LOCALHOST_KEYPASS_JKS = RESOURCE_PATH + "localhost-copy1.jks";
     public static final String JKS_PASS = "changeit";
     public static final String JKS_KEY_PASS = "tomcatpass";
+    public static final String CA_CERT_PEM = RESOURCE_PATH + CA_ALIAS + "-cert.pem";
     public static final String LOCALHOST_CERT_PEM = RESOURCE_PATH + "localhost-cert.pem";
     public static final String LOCALHOST_KEY_PEM = RESOURCE_PATH + "localhost-key.pem";
 
@@ -137,6 +138,10 @@ public final class TesterSupport {
             File sslCertificateKeyFile = toFile(sslCertificateKeyUrl);
             tomcat.getConnector().setAttribute("SSLCertificateKeyFile",
                     sslCertificateKeyFile.getAbsolutePath());
+
+            java.net.URL caUrl = cl.getResource(TesterSupport.CA_CERT_PEM);
+            File caFile = toFile(caUrl);
+            tomcat.getConnector().setAttribute("SSLCACertificateFile", caFile.getAbsolutePath());
         }
         tomcat.getConnector().setSecure(true);
         tomcat.getConnector().setProperty("SSLEnabled", "true");
@@ -411,6 +416,8 @@ public final class TesterSupport {
         }
 
         if (connector.getProtocolHandlerClassName().contains("Apr")) {
+            // Ensure Tomcat Native library is loaded
+            AprLifecycleListener.isAprAvailable();
             // APR connector so OpenSSL is used for TLS.
             if (SSL.version() >= 0x1010100f) {
                 return Constants.SSL_PROTO_TLSv1_3;

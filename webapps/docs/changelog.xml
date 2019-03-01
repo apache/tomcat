@@ -59,6 +59,15 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 7.0.94 (violetagg)">
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+        <bug>63194</bug>: Fix failing unit test so TLS1.3 client authentication
+        tests work correctly when using Java 11 onwards and the APR/Native
+        connector. (markt)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 7.0.93 (violetagg)" rtext="released 2019-02-21">
   <subsection name="Catalina">
