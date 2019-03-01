@@ -67,6 +67,7 @@ import org.apache.tomcat.util.net.Constants;
 import org.apache.tomcat.util.net.SSLUtil;
 import org.apache.tomcat.util.net.ServerSocketFactory;
 import org.apache.tomcat.util.res.StringManager;
+import org.apache.tomcat.util.security.KeyStoreUtil;
 
 /**
  * SSL server socket factory. It <b>requires</b> a valid RSA key and
@@ -494,7 +495,7 @@ public class JSSESocketFactory implements ServerSocketFactory, SSLUtil {
                     "JKS".equalsIgnoreCase(type) || "PKCS12".equalsIgnoreCase(type))) {
                 storePass = pass.toCharArray();
             }
-            ks.load(istream, storePass);
+            KeyStoreUtil.load(ks, istream, storePass);
         } catch (FileNotFoundException fnfe) {
             log.error(sm.getString("jsse.keystore_load_failed", type, path,
                     fnfe.getMessage()), fnfe);

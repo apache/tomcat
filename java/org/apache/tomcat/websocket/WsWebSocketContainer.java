@@ -71,6 +71,7 @@ import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.InstanceManager;
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.apache.tomcat.util.res.StringManager;
+import org.apache.tomcat.util.security.KeyStoreUtil;
 import org.apache.tomcat.websocket.pojo.PojoEndpointClient;
 
 public class WsWebSocketContainer
@@ -979,7 +980,7 @@ public class WsWebSocketContainer
                     InputStream is = null;
                     try {
                         is = new FileInputStream(keyStoreFile);
-                        ks.load(is, sslTrustStorePwdValue.toCharArray());
+                        KeyStoreUtil.load(ks, is, sslTrustStorePwdValue.toCharArray());
                     } finally {
                         if (is != null) {
                             try {

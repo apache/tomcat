@@ -66,6 +66,11 @@
         tests work correctly when using Java 11 onwards and the APR/Native
         connector. (markt)
       </fix>
+      <add>
+        <bug>63205</bug>: Add a work-around for a known
+        <a href="https://bugs.openjdk.java.net/browse/JDK-8157404">JRE KeyStore
+        loading bug</a>. (markt)
+      </add>
     </changelog>
   </subsection>
 </section>
