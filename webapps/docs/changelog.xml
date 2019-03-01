@@ -89,6 +89,11 @@
         longer limited to JSSE implementations. They may now be used with
         OpenSSL implementations as well. (markt)
       </add>
+      <add>
+        <bug>63205</bug>: Add a work-around for a known
+        <a href="https://bugs.openjdk.java.net/browse/JDK-8157404">JRE KeyStore
+        loading bug</a>. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="WebSocket">
