@@ -85,6 +85,13 @@
         longer limited to JSSE implementations. They may now be used with
         OpenSSL implementations as well. (markt)
       </add>
+      <fix>
+        Refactor NIO2 read pending strategy for the classic IO API. (remm)
+      </fix>
+      <fix>
+        <bug>63182</bug>: Avoid extra read notifications for HTTP/1.1 with
+        NIO2 when using asynchronous threads. (remm)
+      </fix>
       <add>
         <bug>63205</bug>: Add a work-around for a known
         <a href="https://bugs.openjdk.java.net/browse/JDK-8157404">JRE KeyStore
