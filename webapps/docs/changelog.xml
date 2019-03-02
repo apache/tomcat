@@ -75,10 +75,6 @@
         <code>ServletRequest.getServerPort()</code>. (markt)
       </fix>
       <fix>
-        <bug>63182</bug>: Avoid extra notifications when using non container
-        threads on read causing thread safety problems. (remm)
-      </fix>
-      <fix>
         Refactor the APR/Native endpoint TLS configuration code to enable JSSE
         style configuration - including JKS keystores - to be used with the
         APR/Native connector. (markt)
