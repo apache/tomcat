@@ -646,10 +646,10 @@
     </copy>
   </target>
 
-  <target name="compile" depends="compile-java6,check-java7,compile-java7" />
+  <target name="compile" depends="compile-java6, check-java7, compile-java7" />
 
   <target name="compile-java6"
-          depends="build-prepare,download-compile,compile-prepare,validate">
+          depends="build-prepare, download-compile, build-deps, compile-prepare, validate">
     <!-- Compile internal server components -->
     <javac srcdir="java" destdir="${tomcat.classes}"
            debug="${compile.debug}"
@@ -2626,6 +2626,10 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
 
   <!-- ================ Download and dependency building =================== -->
 
+  <target name="download-deps"
+          description="Download the dependencies required to build and test"
+          depends="download-compile, download-dist, download-test-compile, download-validate, download-cobertura, extras-commons-logging-prepare, extras-webservices-prepare" />
+
   <target name="download-validate"
           description="Download components necessary to validate source"
           if="${execute.validate}">
@@ -2642,7 +2646,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
   </target>
 
   <target name="download-compile"
-          description="Download (and build) components necessary to compile" >
+          description="Download components necessary to compile" >
 
     <!-- Download Commons Daemon -->
     <antcall target="downloadgz-2">
@@ -2672,17 +2676,6 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       <param name="checksum.value" value="${commons-dbcp-src.checksum.value}"/>
     </antcall>
     <mkdir dir="${tomcat-dbcp.home}"/>
-    <!-- Rebuild dbcp only if built jars do not exist -->
-    <!-- or new versions of pool or dbcp have been downloaded. -->
-    <condition property="no.build.dbcp">
-      <and>
-        <uptodate srcfile="${commons-pool.home}" targetfile="${tomcat-dbcp.jar}" />
-        <uptodate srcfile="${commons-pool.home}" targetfile="${tomcat-dbcp-src.jar}" />
-        <uptodate srcfile="${commons-dbcp.home}" targetfile="${tomcat-dbcp.jar}" />
-        <uptodate srcfile="${commons-dbcp.home}" targetfile="${tomcat-dbcp-src.jar}" />
-      </and>
-    </condition>
-    <antcall target="build-tomcat-dbcp" />
 
     <!-- Download JDT (Eclipse compiler) -->
     <antcall target="downloadfile-2">
@@ -2817,6 +2810,20 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
 
   <!-- =============== Targets for dependencies that need to =============== -->
   <!-- ================  be built rather than used directly ================ -->
+
+  <target name="build-deps">
+    <!-- Rebuild dbcp only if built jars do not exist -->
+    <!-- or new versions of pool or dbcp have been downloaded. -->
+    <condition property="no.build.dbcp">
+      <and>
+        <uptodate srcfile="${commons-pool.home}" targetfile="${tomcat-dbcp.jar}" />
+        <uptodate srcfile="${commons-pool.home}" targetfile="${tomcat-dbcp-src.jar}" />
+        <uptodate srcfile="${commons-dbcp.home}" targetfile="${tomcat-dbcp.jar}" />
+        <uptodate srcfile="${commons-dbcp.home}" targetfile="${tomcat-dbcp-src.jar}" />
+      </and>
+    </condition>
+    <antcall target="build-tomcat-dbcp" />
+  </target>
 
   <target name="build-tomcat-dbcp" depends="build-manifests" unless="no.build.dbcp">
     <copy todir="${tomcat-dbcp.home}">
@@ -3120,7 +3127,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
   <!-- ============================ IDE Support ============================ -->
 
   <target name="ide-eclipse"
-          depends="download-compile, extras-webservices-prepare, download-test-compile"
+          depends="download-compile, build-deps, extras-webservices-prepare, download-test-compile"
           description="Prepares the source tree to be built in Eclipse">
 
     <!-- Copy the sample project files into the root directory -->
@@ -3136,7 +3143,7 @@ Read the Building page on the Apache Tomcat documentation site for details on ho
   </target>
 
   <target name="ide-eclipse-websocket"
-          depends="download-compile, extras-webservices-prepare, download-test-compile"
+          depends="download-compile, build-deps, extras-webservices-prepare, download-test-compile"
           description="Prepares the source tree to be built in Eclipse - separate project to build classes that require Java 7">
 
     <!-- Create directory "../tomcat-7.0.x-java7" and configure Eclipse project there -->
