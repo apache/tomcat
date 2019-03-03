@@ -2617,7 +2617,7 @@ skip.installer property in build.properties" />
   </target>
 
   <target name="download-compile"
-          description="Download (and build) components necessary to compile" >
+          description="Download components necessary to compile" >
 
     <!-- Download Commons Daemon -->
     <antcall target="downloadgz-2">
