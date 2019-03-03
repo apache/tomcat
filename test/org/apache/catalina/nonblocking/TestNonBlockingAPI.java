@@ -32,6 +32,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.net.SocketFactory;
 import javax.servlet.AsyncContext;
@@ -59,10 +60,14 @@ import org.apache.catalina.startup.TesterServlet;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.catalina.valves.TesterAccessLogValve;
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.net.ContainerThreadMarker;
 
 public class TestNonBlockingAPI extends TomcatBaseTest {
+
+    private static final Log log = LogFactory.getLog(TestNonBlockingAPI.class);
 
     private static final int CHUNK_SIZE = 1024 * 1024;
     private static final int WRITE_SIZE  = CHUNK_SIZE * 10;
@@ -96,11 +101,6 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
 
     @Test
     public void testNonBlockingReadAsync() throws Exception {
-        Tomcat tomcat = getTomcatInstance();
-        Connector connector = tomcat.getConnector();
-        // Skip for NIO2
-        Assume.assumeFalse("This test fails for NIO2",
-                connector.getProtocolHandlerClassName().contains("Nio2"));
         doTestNonBlockingRead(false, true);
     }
 
@@ -585,7 +585,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         }
     }
 
-    private class TestReadListener implements ReadListener {
+    private static class TestReadListener implements ReadListener {
         protected final AsyncContext ctx;
         protected final boolean usingNonBlockingWrite;
         protected final boolean ignoreIsReady;
@@ -647,12 +647,12 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         }
     }
 
-    private class TestAsyncReadListener extends TestReadListener {
+    private static class TestAsyncReadListener extends TestReadListener {
 
-        volatile int isReadyCount = 0;
-        volatile int notReadyCount = 0;
-        volatile int containerThreadCount = 0;
-        volatile int nonContainerThreadCount = 0;
+        AtomicInteger isReadyCount = new AtomicInteger(0);
+        AtomicInteger notReadyCount = new AtomicInteger(0);
+        AtomicInteger containerThreadCount = new AtomicInteger(0);
+        AtomicInteger nonContainerThreadCount = new AtomicInteger(0);
 
         public TestAsyncReadListener(AsyncContext ctx,
                 boolean usingNonBlockingWrite, boolean ignoreIsReady) {
@@ -662,30 +662,26 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         @Override
         public void onDataAvailable() throws IOException {
             if (ContainerThreadMarker.isContainerThread()) {
-                containerThreadCount++;
+                containerThreadCount.incrementAndGet();
             } else {
-                nonContainerThreadCount++;
+                nonContainerThreadCount.incrementAndGet();
             }
             new Thread() {
                 @Override
                 public void run() {
                     try {
                         ServletInputStream in = ctx.getRequest().getInputStream();
-                        String s = "";
                         byte[] b = new byte[1024];
                         int read = in.read(b);
                         if (read == -1) {
                             return;
                         }
-                        s += new String(b, 0, read);
-                        synchronized (body) {
-                            body.append(s);
-                        }
+                        body.append(new String(b, 0, read));
                         boolean isReady = ignoreIsReady || in.isReady();
                         if (isReady) {
-                            isReadyCount++;
+                            isReadyCount.incrementAndGet();
                         } else {
-                            notReadyCount++;
+                            notReadyCount.incrementAndGet();
                         }
                         if (isReady) {
                             onDataAvailable();
