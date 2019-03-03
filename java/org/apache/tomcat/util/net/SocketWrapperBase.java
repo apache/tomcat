@@ -789,11 +789,32 @@ public abstract class SocketWrapperBase<E> {
     // ------------------------------------------------------- NIO 2 style APIs
 
 
+    public enum BlockingMode {
+        /**
+         * The operation will now block. If there are pending operations,
+         * the operation will return CompletionState.NOT_DONE.
+         */
+        NON_BLOCK,
+        /**
+         * The operation will block until pending operations are completed, but
+         * will not block after performing it.
+         */
+        SEMI_BLOCK,
+        /**
+         * The operation will block until completed.
+         */
+        BLOCK
+    }
+
     public enum CompletionState {
         /**
          * Operation is still pending.
          */
         PENDING,
+        /**
+         * Operation was pending and non blocking.
+         */
+        NOT_DONE,
         /**
          * The operation completed inline.
          */
@@ -853,13 +874,30 @@ public abstract class SocketWrapperBase<E> {
         @Override
         public CompletionHandlerCall callHandler(CompletionState state, ByteBuffer[] buffers,
                 int offset, int length) {
-            for (int i = 0; i < offset; i++) {
-                if (buffers[i].remaining() > 0) {
+            for (int i = 0; i < length; i++) {
+                if (buffers[offset + i].remaining() > 0) {
                     return CompletionHandlerCall.CONTINUE;
                 }
             }
             return (state == CompletionState.DONE) ? CompletionHandlerCall.DONE
                     : CompletionHandlerCall.NONE;
+        }
+    };
+
+    /**
+     * This utility CompletionCheck will cause the write to fully write
+     * all remaining data. The completion handler will then be called.
+     */
+    public static final CompletionCheck COMPLETE_WRITE_WITH_COMPLETION = new CompletionCheck() {
+        @Override
+        public CompletionHandlerCall callHandler(CompletionState state, ByteBuffer[] buffers,
+                int offset, int length) {
+            for (int i = 0; i < length; i++) {
+                if (buffers[offset + i].remaining() > 0) {
+                    return CompletionHandlerCall.CONTINUE;
+                }
+            }
+            return CompletionHandlerCall.DONE;
         }
     };
 
@@ -942,11 +980,7 @@ public abstract class SocketWrapperBase<E> {
      * behavior is used: the completion handler will be called as soon
      * as some data has been read, even if the read has completed inline.
      *
-     * @param block true to block until any pending read is done, if the
-     *        timeout occurs and a read is still pending, a
-     *        ReadPendingException will be thrown; false to
-     *        not block but any pending read operation will cause
-     *        a ReadPendingException
+     * @param block is the blocking mode that will be used for this operation
      * @param timeout timeout duration for the read
      * @param unit units for the timeout duration
      * @param attachment an object to attach to the I/O operation that will be
@@ -957,8 +991,9 @@ public abstract class SocketWrapperBase<E> {
      * @param <A> The attachment type
      * @return the completion state (done, done inline, or still pending)
      */
-    public final <A> CompletionState read(boolean block, long timeout, TimeUnit unit, A attachment,
-            CompletionCheck check, CompletionHandler<Long, ? super A> handler, ByteBuffer... dsts) {
+    public final <A> CompletionState read(BlockingMode block, long timeout,
+            TimeUnit unit, A attachment, CompletionCheck check,
+            CompletionHandler<Long, ? super A> handler, ByteBuffer... dsts) {
         if (dsts == null) {
             throw new IllegalArgumentException();
         }
@@ -977,11 +1012,7 @@ public abstract class SocketWrapperBase<E> {
      * @param dsts buffers
      * @param offset in the buffer array
      * @param length in the buffer array
-     * @param block true to block until any pending read is done, if the
-     *        timeout occurs and a read is still pending, a
-     *        ReadPendingException will be thrown; false to
-     *        not block but any pending read operation will cause
-     *        a ReadPendingException
+     * @param block is the blocking mode that will be used for this operation
      * @param timeout timeout duration for the read
      * @param unit units for the timeout duration
      * @param attachment an object to attach to the I/O operation that will be
@@ -991,9 +1022,9 @@ public abstract class SocketWrapperBase<E> {
      * @param <A> The attachment type
      * @return the completion state (done, done inline, or still pending)
      */
-    public <A> CompletionState read(ByteBuffer[] dsts, int offset, int length, boolean block,
-            long timeout, TimeUnit unit, A attachment, CompletionCheck check,
-            CompletionHandler<Long, ? super A> handler) {
+    public <A> CompletionState read(ByteBuffer[] dsts, int offset, int length,
+            BlockingMode block, long timeout, TimeUnit unit, A attachment,
+            CompletionCheck check, CompletionHandler<Long, ? super A> handler) {
         throw new UnsupportedOperationException();
     }
 
@@ -1007,11 +1038,7 @@ public abstract class SocketWrapperBase<E> {
      * if the write is incomplete and data remains in the buffers, or
      * if the write completed inline.
      *
-     * @param block true to block until any pending write is done, if the
-     *        timeout occurs and a write is still pending, a
-     *        WritePendingException will be thrown; false to
-     *        not block but any pending write operation will cause
-     *        a WritePendingException
+     * @param block is the blocking mode that will be used for this operation
      * @param timeout timeout duration for the write
      * @param unit units for the timeout duration
      * @param attachment an object to attach to the I/O operation that will be
@@ -1022,8 +1049,9 @@ public abstract class SocketWrapperBase<E> {
      * @param <A> The attachment type
      * @return the completion state (done, done inline, or still pending)
      */
-    public final <A> CompletionState write(boolean block, long timeout, TimeUnit unit, A attachment,
-            CompletionCheck check, CompletionHandler<Long, ? super A> handler, ByteBuffer... srcs) {
+    public final <A> CompletionState write(BlockingMode block, long timeout,
+            TimeUnit unit, A attachment, CompletionCheck check,
+            CompletionHandler<Long, ? super A> handler, ByteBuffer... srcs) {
         if (srcs == null) {
             throw new IllegalArgumentException();
         }
@@ -1043,11 +1071,7 @@ public abstract class SocketWrapperBase<E> {
      * @param srcs buffers
      * @param offset in the buffer array
      * @param length in the buffer array
-     * @param block true to block until any pending write is done, if the
-     *        timeout occurs and a write is still pending, a
-     *        WritePendingException will be thrown; false to
-     *        not block but any pending write operation will cause
-     *        a WritePendingException
+     * @param block is the blocking mode that will be used for this operation
      * @param timeout timeout duration for the write
      * @param unit units for the timeout duration
      * @param attachment an object to attach to the I/O operation that will be
@@ -1057,9 +1081,9 @@ public abstract class SocketWrapperBase<E> {
      * @param <A> The attachment type
      * @return the completion state (done, done inline, or still pending)
      */
-    public <A> CompletionState write(ByteBuffer[] srcs, int offset, int length, boolean block,
-            long timeout, TimeUnit unit, A attachment, CompletionCheck check,
-            CompletionHandler<Long, ? super A> handler) {
+    public <A> CompletionState write(ByteBuffer[] srcs, int offset, int length,
+            BlockingMode block, long timeout, TimeUnit unit, A attachment,
+            CompletionCheck check, CompletionHandler<Long, ? super A> handler) {
         throw new UnsupportedOperationException();
     }
 

@@ -135,6 +135,9 @@
         <a href="https://bugs.openjdk.java.net/browse/JDK-8157404">JRE KeyStore
         loading bug</a>. (markt)
       </add>
+      <update>
+        Sync with NIO2 async API from Tomcat 9 branch. (remm)
+      </update>
     </changelog>
   </subsection>
   <subsection name="WebSocket">
