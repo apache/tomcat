@@ -110,10 +110,6 @@
         <code>ServletRequest.getServerPort()</code>. (markt)
       </fix>
       <fix>
-        <bug>63182</bug>: Avoid extra notifications when using non container
-        threads on read causing thread safety problems. (remm)
-      </fix>
-      <fix>
         Make PEM file parser a public utility class. (remm)
       </fix>
       <fix>
