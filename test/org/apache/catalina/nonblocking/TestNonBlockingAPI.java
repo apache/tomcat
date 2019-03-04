@@ -49,12 +49,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.junit.Assert;
-import org.junit.Assume;
 import org.junit.Ignore;
 import org.junit.Test;
 
 import org.apache.catalina.Context;
-import org.apache.catalina.connector.Connector;
 import org.apache.catalina.startup.BytesStreamer;
 import org.apache.catalina.startup.TesterServlet;
 import org.apache.catalina.startup.Tomcat;
