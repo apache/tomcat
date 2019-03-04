@@ -971,6 +971,14 @@ public abstract class SocketWrapperBase<E> {
         return true;
     }
 
+    @Deprecated
+    public final <A> CompletionState read(boolean block, long timeout,
+            TimeUnit unit, A attachment, CompletionCheck check,
+            CompletionHandler<Long, ? super A> handler, ByteBuffer... dsts) {
+        return read(block ? BlockingMode.BLOCK : BlockingMode.NON_BLOCK,
+                timeout, unit, attachment, check, handler, dsts);
+    }
+
     /**
      * Scatter read. The completion handler will be called once some
      * data has been read or an error occurred. If a CompletionCheck
@@ -1026,6 +1034,14 @@ public abstract class SocketWrapperBase<E> {
             BlockingMode block, long timeout, TimeUnit unit, A attachment,
             CompletionCheck check, CompletionHandler<Long, ? super A> handler) {
         throw new UnsupportedOperationException();
+    }
+
+    @Deprecated
+    public final <A> CompletionState write(boolean block, long timeout,
+            TimeUnit unit, A attachment, CompletionCheck check,
+            CompletionHandler<Long, ? super A> handler, ByteBuffer... srcs) {
+        return write(block ? BlockingMode.BLOCK : BlockingMode.NON_BLOCK,
+                timeout, unit, attachment, check, handler, srcs);
     }
 
     /**
