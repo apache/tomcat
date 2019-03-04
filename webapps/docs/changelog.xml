@@ -89,6 +89,12 @@
         <code>maxLogMessageBufferSize</code> that were accidentally removed.
         (markt)
       </fix>
+      <fix>
+        <bug>63210</bug>: Ensure that the Apache Commons DBCP 2 based default
+        connection pool is correctly shutdown when it is no longer required.
+        This ensures that a non-daemon thread is not left running that will
+        prevent Tomcat from shutting down cleanly. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
