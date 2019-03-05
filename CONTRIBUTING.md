@@ -84,7 +84,7 @@ Download Page. There is one such page for every major Tomcat version:
 
 If you have chosen to attach a patch to the Bugzilla issue (or email
 one), then you'll need to download the sources as noted above, make your
-desired changes and then manually generate your patch using diff (other 
+desired changes and then manually generate your patch using diff (other
 other tool).
 
 ##### GitHub
