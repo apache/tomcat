@@ -2021,7 +2021,8 @@ public class JNDIRealm extends RealmBase {
                 Map<String, String> newThisRound = new HashMap<>(); // Stores the groups we find in this iteration
 
                 for (Entry<String, String> group : newGroups.entrySet()) {
-                    filter = roleFormat.format(new String[] { group.getKey(), group.getValue(), group.getValue() });
+                    filter = roleFormat.format(new String[] { doRFC2254Encoding(group.getKey()),
+                            group.getValue(), group.getValue() });
 
                     if (containerLog.isTraceEnabled()) {
                         containerLog.trace("Perform a nested group search with base "+ roleBase + " and filter " + filter);
