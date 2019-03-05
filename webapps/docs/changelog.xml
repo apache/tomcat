@@ -102,6 +102,11 @@
         This ensures that a non-daemon thread is not left running that will
         prevent Tomcat from shutting down cleanly. (markt)
       </fix>
+      <fix>
+        <bug>63213</bug>: Ensure the correct escaping of group names when
+        searching for nested groups when the JNDIRealm is configured with
+        <code>roleNested</code> set to <code>true</code>. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
