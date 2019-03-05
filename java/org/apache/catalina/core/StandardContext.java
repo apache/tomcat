@@ -822,8 +822,22 @@ public class StandardContext extends ContainerBase
 
     private final AtomicLong inProgressAsyncCount = new AtomicLong(0);
 
+    private boolean createUploadTargets = false;
+
 
     // ----------------------------------------------------- Context Properties
+
+    @Override
+    public void setCreateUploadTargets(boolean createUploadTargets) {
+        this.createUploadTargets = createUploadTargets;
+    }
+
+
+    @Override
+    public boolean getCreateUploadTargets() {
+        return createUploadTargets;
+    }
+
 
     @Override
     public void incrementInProgressAsyncCount() {
