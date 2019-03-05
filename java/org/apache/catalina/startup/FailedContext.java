@@ -750,4 +750,9 @@ public class FailedContext extends LifecycleMBeanBase implements Context {
     public void incrementInProgressAsyncCount() { /* NO-OP */ }
     @Override
     public void decrementInProgressAsyncCount() { /* NO-OP */ }
+
+    @Override
+    public void setCreateUploadTargets(boolean createUploadTargets) { /* NO-OP */}
+    @Override
+    public boolean getCreateUploadTargets() { return false; }
 }

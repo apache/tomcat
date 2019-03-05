@@ -59,6 +59,17 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 7.0.94 (violetagg)">
+  <subsection name="Catalina">
+    <changelog>
+      <add>
+        <bug>63206</bug>: Add a new attribute to <code>Context</code> -
+        <code>createUploadTargets</code> which, if <code>true</code> enables
+        Tomcat to create the temporary upload location used by a Servlet if the
+        location specified by the Servlet does not already exist. The deafult
+        value is <code>false</code>. (markt)
+      </add>
+    </changelog>
+  </subsection>
   <subsection name="Coyote">
     <changelog>
       <fix>
