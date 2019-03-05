@@ -16,10 +16,15 @@
  */
 package org.apache.tomcat.util.buf;
 
+import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Field;
 import java.nio.charset.Charset;
 import java.nio.charset.MalformedInputException;
 import java.nio.charset.StandardCharsets;
+import java.nio.charset.spi.CharsetProvider;
 import java.util.Locale;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -140,4 +145,84 @@ public class TestB2CConverter {
         }
         Assert.assertNotNull(e);
     }
+
+    @Test
+    public void testCommonEncodingsDontTriggerAvailableCharsetsCall() throws Exception {
+        resetCharsetFields();
+        B2CConverter.getCharset("utf-8");
+        B2CConverter.getCharset("UTF-8");
+        B2CConverter.getCharset("ISO-8859-1");
+        Field availableCharsets = B2CConverter.class.getDeclaredField("availableCharsets");
+        availableCharsets.setAccessible(true);
+        Assert.assertNull(availableCharsets.get(null));
+    }
+
+    @Test
+    public void testRepeatedUnsupportedEncodingExceptionsPopluatesLookup() throws Exception {
+        resetCharsetFields();
+        for (int i = 0; i < B2CConverter.UNSUPPORTED_ENCODING_THRESHOLD + 1; i++) {
+            try {
+                B2CConverter.getCharset("missing-" + i);
+            } catch (UnsupportedEncodingException ex) {
+            }
+        }
+        Field availableCharsets = B2CConverter.class.getDeclaredField("availableCharsets");
+        availableCharsets.setAccessible(true);
+        Assert.assertNotNull(availableCharsets.get(null));
+    }
+
+    @Test
+    public void testConcurrentAccess() throws Exception {
+        // See https://bz.apache.org/bugzilla/show_bug.cgi?id=51400
+        String enc = "test-concurrent-caching";
+        resetCharsetFields();
+
+        // Make a call to populate the cache
+        try {
+            B2CConverter.getCharset(enc);
+        } catch (UnsupportedEncodingException ex) {
+        }
+
+        // Get the standard provider so we can synchronize on it
+        Field standardProviderField = Charset.class.getDeclaredField("standardProvider");
+        standardProviderField.setAccessible(true);
+        CharsetProvider standardProvider = (CharsetProvider) standardProviderField.get(null);
+
+        // Create a thread that will trigger the provider on a cache miss
+        Object[] result = new Object[1];
+        Thread thread = new Thread() {
+            public void run() {
+                try {
+                    result[0] = B2CConverter.getCharset(enc);
+                } catch (UnsupportedEncodingException ex) {
+                    result[0] = ex;
+                }
+            };
+        };
+
+        // Lock the provider so that FastCharsetProvider.FastCharsetProvider will block
+        synchronized (standardProvider) {
+            // Trigger the thread, it should run because it finds the cached values
+            // and doesn't call the FastCharsetProvider
+            thread.start();
+            thread.join(1000);
+        }
+
+        // Check that our thread actually ran
+        Assert.assertTrue(result[0] instanceof UnsupportedEncodingException);
+    }
+
+    @SuppressWarnings("rawtypes")
+    private void resetCharsetFields() throws NoSuchFieldException, IllegalAccessException {
+        Field availableCharsets = B2CConverter.class.getDeclaredField("availableCharsets");
+        availableCharsets.setAccessible(true);
+        availableCharsets.set(null, null);
+        Field lookupFailureCount = B2CConverter.class.getDeclaredField("lookupFailureCount");
+        lookupFailureCount.setAccessible(true);
+        ((AtomicInteger) lookupFailureCount.get(null)).set(0);;
+        Field cache = B2CConverter.class.getDeclaredField("cache");
+        cache.setAccessible(true);
+        ((Map) cache.get(null)).clear();
+    }
+
 }

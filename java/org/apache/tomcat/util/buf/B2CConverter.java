@@ -25,9 +25,12 @@ import java.nio.charset.CharsetDecoder;
 import java.nio.charset.CoderResult;
 import java.nio.charset.CodingErrorAction;
 import java.nio.charset.StandardCharsets;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.tomcat.util.res.StringManager;
 
@@ -38,19 +41,29 @@ public class B2CConverter {
 
     private static final StringManager sm = StringManager.getManager(B2CConverter.class);
 
-    private static final Map<String, Charset> encodingToCharsetCache =
-            new HashMap<>();
+    private static volatile Map<String, Charset> availableCharsets;
+
+    private static final Map<String, Object> cache = new ConcurrentHashMap<>();
+
+    private static AtomicInteger lookupFailureCount = new AtomicInteger();
+
+
+    private static final String[] COMMON_CHARSET_NAMES = { "UTF-8", "ISO-8859-1" };
+
+    private static final Object UNSUPPORTED_CHARSET = new Object();
+
+    static final int UNSUPPORTED_ENCODING_THRESHOLD = 10;
 
     // Protected so unit tests can use it
     protected static final int LEFTOVER_SIZE = 9;
 
+
     static {
-        for (Charset charset: Charset.availableCharsets().values()) {
-            encodingToCharsetCache.put(
-                    charset.name().toLowerCase(Locale.ENGLISH), charset);
-            for (String alias : charset.aliases()) {
-                encodingToCharsetCache.put(
-                        alias.toLowerCase(Locale.ENGLISH), charset);
+        // Ensure requests for common charsets will resolve quickly
+        for (String charsetName : COMMON_CHARSET_NAMES) {
+            try {
+                cache.put(charsetName.toLowerCase(), Charset.forName(charsetName));
+            } catch (Exception ex) {
             }
         }
     }
@@ -67,18 +80,44 @@ public class B2CConverter {
      *                                      available
      */
     public static Charset getCharset(String enc) throws UnsupportedEncodingException {
-
         // Encoding names should all be ASCII
         String lowerCaseEnc = enc.toLowerCase(Locale.ENGLISH);
-
-        Charset charset = encodingToCharsetCache.get(lowerCaseEnc);
-
-        if (charset == null) {
-            // Pre-population of the cache means this must be invalid
-            throw new UnsupportedEncodingException(
-                    sm.getString("b2cConverter.unknownEncoding", lowerCaseEnc));
+        Map<String, Charset> available = availableCharsets;
+        if (available != null) {
+            return getCharsetResult(lowerCaseEnc, available.get(lowerCaseEnc));
         }
-        return charset;
+        return getCharsetResult(enc, cache.computeIfAbsent(lowerCaseEnc,
+                B2CConverter::computeCharsetResult));
+    }
+
+    private static Charset getCharsetResult(String lowerCaseEnc, Object result)
+            throws UnsupportedEncodingException {
+        if (result != null && result instanceof Charset) {
+            return (Charset) result;
+        }
+        throw new UnsupportedEncodingException(
+                    sm.getString("b2cConverter.unknownEncoding", lowerCaseEnc));
+    }
+
+    private static Object computeCharsetResult(String lowerCaseEnc) {
+        try {
+            return Charset.forName(lowerCaseEnc);
+        } catch (Exception ex) {
+            int count = lookupFailureCount.incrementAndGet();
+            if (count > UNSUPPORTED_ENCODING_THRESHOLD) {
+                availableCharsets = createAvailableCharsetsMap();
+            }
+            return UNSUPPORTED_CHARSET;
+        }
+    }
+
+    private static Map<String, Charset> createAvailableCharsetsMap() {
+        Map<String, Charset> result = new HashMap<>();
+        Charset.availableCharsets().forEach((name, charset) -> {
+            result.put(name.toLowerCase(Locale.ENGLISH), charset);
+            charset.aliases().forEach(alias -> result.put(alias.toLowerCase(Locale.ENGLISH), charset));
+        });
+        return Collections.unmodifiableMap(result);
     }
 
 
