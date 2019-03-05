@@ -1011,23 +1011,21 @@ public class NamingContextListener
         if (("javax.sql.DataSource".equals(ref.getClassName())  ||
             "javax.sql.XADataSource".equals(ref.getClassName())) &&
                 resource.getSingleton()) {
-            String factory = (String) resource.getProperty("factory");
-            if ((factory == null || factory.equals(Constants.DBCP_DATASOURCE_FACTORY)) &&
-                    !resource.getCloseMethodConfigured()) {
-                // Using Tomcat's built-in factory (DBCP2) and DBCP2 DataSources
-                // require an explicit close
-                resource.setCloseMethod("close");
-            }
+            Object actualResource = null;
             try {
                 ObjectName on = createObjectName(resource);
-                Object actualResource = envCtx.lookup(resource.getName());
+                actualResource = envCtx.lookup(resource.getName());
                 Registry.getRegistry(null, null).registerComponent(actualResource, on, null);
                 objectNames.put(resource.getName(), on);
             } catch (Exception e) {
                 log.warn(sm.getString("naming.jmxRegistrationFailed", e));
             }
+            // Bug 63210. DBCP2 DataSources require an explicit close. This goes
+            // further and cleans up and AutoCloseable DataSource by default.
+            if (actualResource instanceof AutoCloseable && !resource.getCloseMethodConfigured()) {
+                resource.setCloseMethod("close");
+            }
         }
-
     }
 
 
