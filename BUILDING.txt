@@ -93,13 +93,13 @@ source distribution, do the following:
 
 (3.1) Checkout or obtain the source code for Tomcat @VERSION_MAJOR_MINOR@
 
-Checkout the source using SVN, selecting a tag for released version or
-trunk for the current development code, or download and unpack a source
+Clone the source using git, then checkout a specific major branch or
+master for the latest code development, or download and unpack a source
 package.
 
- *  Tomcat SVN repository URL:
+ *  Tomcat GitHub repository URL:
 
-        https://svn.apache.org/repos/asf/tomcat/tc@VERSION_MAJOR_MINOR@.x/trunk/
+        https://github.com/apache/tomcat
 
  *  Source packages can be downloaded from:
 
@@ -184,7 +184,7 @@ each release package has the appropriate line-endings.
 (4) Updating sources and rebuilding
 
 It is recommended that you regularly update the downloaded Tomcat @VERSION_MAJOR_MINOR@
-sources using your SVN client.
+sources using your git client.
 
 For a quick rebuild of only modified code you can use:
 
