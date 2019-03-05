@@ -173,6 +173,23 @@
       <fix>
         Fix the artifactId of <code>tomcat-i18n-cs</code>. (rjung)
       </fix>
+      <add>
+        Expand the coverage and quality of the Korean translations provided
+        with Apache Tomcat. (woonsan)
+      </add>
+      <add>
+        Expand the coverage and quality of the Chinese translations provided
+        with Apache Tomcat. Includes contributions by winsonzhao. (markt)
+      </add>
+      <add>
+        Expand the coverage and quality of the Czech translations provided
+        with Apache Tomcat. Includes contributions by Arnošt Havelka. (markt)
+      </add>
+      <add>
+        Expand the coverage and quality of the Spanish translations provided
+        with Apache Tomcat. Includes contributions by Ulises Gonzalez Horta.
+        (markt)
+      </add>
     </changelog>
   </subsection>
 </section>
