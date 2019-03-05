@@ -89,6 +89,13 @@
         <code>maxLogMessageBufferSize</code> that were accidentally removed.
         (markt)
       </fix>
+      <add>
+        <bug>63206</bug>: Add a new attribute to <code>Context</code> -
+        <code>createUploadTargets</code> which, if <code>true</code> enables
+        Tomcat to create the temporary upload location used by a Servlet if the
+        location specified by the Servlet does not already exist. The deafult
+        value is <code>false</code>. (markt)
+      </add>
       <fix>
         <bug>63210</bug>: Ensure that the Apache Commons DBCP 2 based default
         connection pool is correctly shutdown when it is no longer required.

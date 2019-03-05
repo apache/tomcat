@@ -2867,6 +2867,15 @@ public class Request implements org.apache.catalina.servlet4preview.http.HttpSer
                 }
             }
 
+            if (!location.exists() && context.getCreateUploadTargets()) {
+                log.warn(sm.getString("coyoteRequest.uploadCreate",
+                        location.getAbsolutePath(), getMappingData().wrapper.getName()));
+                if (!location.mkdirs()) {
+                    log.warn(sm.getString("coyoteRequest.uploadCreateFail",
+                            location.getAbsolutePath()));
+                }
+            }
+
             if (!location.isDirectory()) {
                 parameters.setParseFailedReason(FailReason.MULTIPART_CONFIG_INVALID);
                 partsParseException = new IOException(

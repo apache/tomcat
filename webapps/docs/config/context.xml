@@ -336,6 +336,13 @@
         only on URL rewriting by the application.</p>
       </attribute>
 
+      <attribute name="createUploadTargets" required="false">
+        <p>Set to <code>true</code> if Tomcat should attempt to create the
+        temporary upload location specified in the <code>MultipartConfig</code>
+        for a Servlet if the location does not already exist. If not specified,
+        the default value of <code>false</code> will be used.</p>
+      </attribute>
+
       <attribute name="crossContext" required="false">
         <p>Set to <code>true</code> if you want calls within this application
         to <code>ServletContext.getContext()</code> to successfully return a
