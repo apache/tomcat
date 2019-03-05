@@ -1504,20 +1504,19 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
                 if (readNotify) {
                     return;
                 }
-                /*if (readPending.availablePermits() == 0) {
-                    readInterest = true;
-                } else {
-                    // If no read is pending, start waiting for data
-                    awaitBytes();
-                }*/
-                readInterest = true;
                 if (readPending.tryAcquire()) {
-                    try {
-                        fillReadBuffer(false);
-                    } catch (IOException e) {
-                        // Will never happen
-                        setError(e);
+                    // No read pending, so await bytes
+                    synchronized (readCompletionHandler) {
+                        readInterest = true;
+                        try {
+                            fillReadBuffer(false);
+                        } catch (IOException e) {
+                            // Will never happen
+                            setError(e);
+                        }
                     }
+                } else {
+                    readInterest = true;
                 }
             }
         }
