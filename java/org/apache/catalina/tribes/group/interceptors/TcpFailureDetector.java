@@ -133,7 +133,9 @@ public class TcpFailureDetector extends ChannelInterceptorBase implements TcpFai
                     membership.memberAlive(member);
                     notify = true;
                 } else {
-                    addSuspects.put(member, Long.valueOf(System.currentTimeMillis()));
+                    if (member instanceof StaticMember) {
+                        addSuspects.put(member, Long.valueOf(System.currentTimeMillis()));
+                    }
                 }
             }
         }
