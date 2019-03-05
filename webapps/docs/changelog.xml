@@ -68,6 +68,11 @@
         location specified by the Servlet does not already exist. The deafult
         value is <code>false</code>. (markt)
       </add>
+      <fix>
+        <bug>63213</bug>: Ensure the correct escaping of group names when
+        searching for nested groups when the JNDIRealm is configured with
+        <code>roleNested</code> set to <code>true</code>. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
