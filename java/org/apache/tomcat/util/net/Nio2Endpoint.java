@@ -30,6 +30,7 @@ import java.nio.channels.AsynchronousSocketChannel;
 import java.nio.channels.ClosedChannelException;
 import java.nio.channels.CompletionHandler;
 import java.nio.channels.FileChannel;
+import java.nio.channels.InterruptedByTimeoutException;
 import java.nio.channels.NetworkChannel;
 import java.nio.file.StandardOpenOption;
 import java.util.concurrent.ExecutionException;
@@ -1146,7 +1147,9 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
             @Override
             public void failed(Throwable exc, OperationState<A> state) {
                 IOException ioe;
-                if (exc instanceof IOException) {
+                if (exc instanceof InterruptedByTimeoutException) {
+                    ioe = new SocketTimeoutException();
+                } else if (exc instanceof IOException) {
                     ioe = (IOException) exc;
                 } else {
                     ioe = new IOException(exc);

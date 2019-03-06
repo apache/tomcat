@@ -156,6 +156,10 @@
       <update>
         Sync with NIO2 async API from Tomcat 9 branch. (remm)
       </update>
+      <fix>
+        NIO2 should try to use SocketTimeoutException everywhere rather than a
+        mix of it and InterruptedByTimeout. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="WebSocket">
