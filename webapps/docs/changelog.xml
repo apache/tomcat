@@ -115,6 +115,10 @@
         <a href="https://bugs.openjdk.java.net/browse/JDK-8157404">JRE KeyStore
         loading bug</a>. (markt)
       </add>
+      <fix>
+        NIO2 should try to use SocketTimeoutException everywhere rather than a
+        mix of it and InterruptedByTimeout. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="WebSocket">

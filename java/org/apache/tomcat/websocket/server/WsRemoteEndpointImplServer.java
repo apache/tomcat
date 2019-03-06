@@ -21,7 +21,6 @@ import java.io.IOException;
 import java.net.SocketTimeoutException;
 import java.nio.ByteBuffer;
 import java.nio.channels.CompletionHandler;
-import java.nio.channels.InterruptedByTimeoutException;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.TimeUnit;
 
@@ -110,9 +109,6 @@ public class WsRemoteEndpointImplServer extends WsRemoteEndpointImplBase {
                         }
                         @Override
                         public void failed(Throwable exc, Void attachment) {
-                            if (exc instanceof InterruptedByTimeoutException) {
-                                exc = new SocketTimeoutException();
-                            }
                             if (block) {
                                 SendResult sr = new SendResult(exc);
                                 handler.onResult(sr);
