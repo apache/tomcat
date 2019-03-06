@@ -18,16 +18,13 @@
 
 package org.apache.tomcat.util.digester;
 
-
 import org.apache.tomcat.util.IntrospectionUtils;
 import org.xml.sax.Attributes;
-
 
 /**
  * <p>Rule implementation that sets properties on the object at the top of the
  * stack, based on attributes with corresponding names.</p>
  */
-
 public class SetPropertiesRule extends Rule {
 
     /**
@@ -62,7 +59,7 @@ public class SetPropertiesRule extends Rule {
             if ("".equals(name)) {
                 name = attributes.getQName(i);
             }
-            String value = attributes.getValue(i);
+            String value = attributes.getValue(i).intern();
 
             if (digester.log.isDebugEnabled()) {
                 digester.log.debug("[SetPropertiesRule]{" + digester.match +
