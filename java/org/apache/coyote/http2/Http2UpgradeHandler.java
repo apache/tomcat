@@ -984,7 +984,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
                     sm.getString("upgradeHandler.stream.even", key), Http2Error.PROTOCOL_ERROR);
         }
 
-        pruneClosedStreams();
+        pruneClosedStreams(streamId);
 
         Stream result = new Stream(key, this);
         streams.put(key, result);
@@ -1018,7 +1018,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
     }
 
 
-    private void pruneClosedStreams() {
+    private void pruneClosedStreams(int streamId) {
         // Only prune every 10 new streams
         if (newStreamsSinceLastPrune < 9) {
             // Not atomic. Increments may be lost. Not a problem.
@@ -1130,7 +1130,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
 
         if (toClose > 0) {
             log.warn(sm.getString("upgradeHandler.pruneIncomplete", connectionId,
-                    Integer.toString(toClose)));
+                    Integer.toString(streamId), Integer.toString(toClose)));
         }
     }
 
