@@ -206,7 +206,7 @@ public class StandardContext extends ContainerBase
      * application, in the order they were encountered in the resulting merged
      * web.xml file.
      */
-    private String applicationListeners[] = new String[0];
+    private volatile String applicationListeners[] = new String[0];
 
     private final Object applicationListenersLock = new Object();
 
@@ -243,7 +243,7 @@ public class StandardContext extends ContainerBase
     /**
      * The set of application parameters defined for this application.
      */
-    private ApplicationParameter applicationParameters[] =
+    private volatile ApplicationParameter applicationParameters[] =
         new ApplicationParameter[0];
 
     private final Object applicationParametersLock = new Object();
@@ -517,7 +517,7 @@ public class StandardContext extends ContainerBase
     /**
      * The security roles for this application, keyed by role name.
      */
-    private String securityRoles[] = new String[0];
+    private volatile String securityRoles[] = new String[0];
 
     private final Object securityRolesLock = new Object();
 
@@ -558,7 +558,7 @@ public class StandardContext extends ContainerBase
     /**
      * The watched resources for this application.
      */
-    private String watchedResources[] = new String[0];
+    private volatile String watchedResources[] = new String[0];
 
     private final Object watchedResourcesLock = new Object();
 
@@ -566,7 +566,7 @@ public class StandardContext extends ContainerBase
     /**
      * The welcome files for this application.
      */
-    private String welcomeFiles[] = new String[0];
+    private volatile String welcomeFiles[] = new String[0];
 
     private final Object welcomeFilesLock = new Object();
 
@@ -575,7 +575,7 @@ public class StandardContext extends ContainerBase
      * The set of classnames of LifecycleListeners that will be added
      * to each newly created Wrapper by <code>createWrapper()</code>.
      */
-    private String wrapperLifecycles[] = new String[0];
+    private volatile String wrapperLifecycles[] = new String[0];
 
     private final Object wrapperLifecyclesLock = new Object();
 
@@ -583,7 +583,7 @@ public class StandardContext extends ContainerBase
      * The set of classnames of ContainerListeners that will be added
      * to each newly created Wrapper by <code>createWrapper()</code>.
      */
-    private String wrapperListeners[] = new String[0];
+    private volatile String wrapperListeners[] = new String[0];
 
     private final Object wrapperListenersLock = new Object();
 
