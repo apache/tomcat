@@ -160,6 +160,10 @@
         NIO2 should try to use SocketTimeoutException everywhere rather than a
         mix of it and InterruptedByTimeout. (remm)
       </fix>
+      <fix>
+        Correct an error in the request validation that meant that HTTP/2 push
+        requests always resulted in a 400 response. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="WebSocket">
