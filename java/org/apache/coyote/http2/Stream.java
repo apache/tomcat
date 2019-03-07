@@ -586,7 +586,12 @@ public class Stream extends AbstractStream implements HeaderEmitter {
     }
 
 
-    void sentEndOfStream() {
+    final void sentHeaders() {
+        state.sentStartOfHeaders();
+    }
+
+
+    final void sentEndOfStream() {
         streamOutputBuffer.endOfStreamSent = true;
         state.sentEndOfStream();
     }

@@ -181,7 +181,7 @@ public class StreamStateMachine {
                             Http2Error.PROTOCOL_ERROR, FrameType.PRIORITY,
                                                        FrameType.RST,
                                                        FrameType.WINDOW_UPDATE),
-        RESERVED_REMOTE    (false, false, true,  true,
+        RESERVED_REMOTE    (false,  true, true,  true,
                             Http2Error.PROTOCOL_ERROR, FrameType.HEADERS,
                                                        FrameType.PRIORITY,
                                                        FrameType.RST),
