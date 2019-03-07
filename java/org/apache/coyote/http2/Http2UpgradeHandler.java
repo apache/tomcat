@@ -551,6 +551,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
         synchronized (socketWrapper) {
             doWriteHeaders(stream, pushedStreamId, mimeHeaders, endOfStream, payloadSize);
         }
+        stream.sentHeaders();
         if (endOfStream) {
             stream.sentEndOfStream();
         }
@@ -1177,6 +1178,13 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
 
 
     void push(Request request, Stream associatedStream) throws IOException {
+        if (localSettings.getMaxConcurrentStreams() < activeRemoteStreamCount.incrementAndGet()) {
+            // If there are too many open streams, simply ignore the push
+            // request.
+            activeRemoteStreamCount.decrementAndGet();
+            return;
+        }
+
         Stream pushStream;
 
         // Synchronized since PUSH_PROMISE frames have to be sent in order. Once

@@ -123,6 +123,10 @@
         Correct an error in the request validation that meant that HTTP/2 push
         requests always resulted in a 400 response. (markt)
       </fix>
+      <fix>
+        <bug>63223</bug>: Correctly account for push requests when tracking
+        currently active HTTP/2 streams. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="WebSocket">
