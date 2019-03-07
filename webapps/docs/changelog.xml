@@ -134,6 +134,9 @@
         <bug>63223</bug>: Correctly account for push requests when tracking
         currently active HTTP/2 streams. (markt)
       </fix>
+      <fix>
+        Ensure enough buffer space when using TLS with NIO2 and HTTP/2. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="WebSocket">
