@@ -80,6 +80,9 @@ public class OpenSSLUtil extends SSLUtilBase {
 
 
     public static X509KeyManager chooseKeyManager(KeyManager[] managers) throws Exception {
+        if (managers == null) {
+            return null;
+        }
         for (KeyManager manager : managers) {
             if (manager instanceof JSSEKeyManager) {
                 return (JSSEKeyManager) manager;
@@ -92,4 +95,15 @@ public class OpenSSLUtil extends SSLUtilBase {
         }
         throw new IllegalStateException(sm.getString("openssl.keyManagerMissing"));
     }
+
+
+    @Override
+    public KeyManager[] getKeyManagers() throws Exception {
+        if (certificate.getCertificateFile() == null) {
+            return super.getKeyManagers();
+        } else {
+            return null;
+        }
+    }
+
 }
