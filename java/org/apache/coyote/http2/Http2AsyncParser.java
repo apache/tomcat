@@ -42,7 +42,11 @@ class Http2AsyncParser extends Http2Parser {
         socketWrapper.getSocketBufferHandler().expand(input.getMaxFrameSize());
         this.upgradeHandler = upgradeHandler;
         header = ByteBuffer.allocate(9);
-        framePaylod = ByteBuffer.allocate(input.getMaxFrameSize());
+        int frameBufferSize = input.getMaxFrameSize();
+        if (socketWrapper.isSecure()) {
+            frameBufferSize += 16676;
+        }
+        framePaylod = ByteBuffer.allocate(frameBufferSize);
     }
 
 
