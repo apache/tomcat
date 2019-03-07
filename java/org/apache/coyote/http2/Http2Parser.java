@@ -449,33 +449,6 @@ class Http2Parser {
     }
 
 
-    private void onHeadersComplete(int streamId) throws Http2Exception {
-        // Any left over data is a compression error
-        if (headerReadBuffer.position() > 0) {
-            throw new ConnectionException(
-                    sm.getString("http2Parser.processFrameHeaders.decodingDataLeft"),
-                    Http2Error.COMPRESSION_ERROR);
-        }
-
-        // Delay validation (and triggering any exception) until this point
-        // since all the headers still have to be read if a StreamException is
-        // going to be thrown.
-        hpackDecoder.getHeaderEmitter().validateHeaders();
-
-        output.headersEnd(streamId);
-
-        if (headersEndStream) {
-            output.receivedEndOfStream(streamId);
-            headersEndStream = false;
-        }
-
-        // Reset size for new request if the buffer was previously expanded
-        if (headerReadBuffer.capacity() > Constants.DEFAULT_HEADER_READ_BUFFER_SIZE) {
-            headerReadBuffer = ByteBuffer.allocate(Constants.DEFAULT_HEADER_READ_BUFFER_SIZE);
-        }
-    }
-
-
     private void readUnknownFrame(int streamId, FrameType frameType, int flags, int payloadSize)
             throws IOException {
         try {
@@ -514,6 +487,33 @@ class Http2Parser {
                 }
             }
             read += thisTime;
+        }
+    }
+
+
+    private void onHeadersComplete(int streamId) throws Http2Exception {
+        // Any left over data is a compression error
+        if (headerReadBuffer.position() > 0) {
+            throw new ConnectionException(
+                    sm.getString("http2Parser.processFrameHeaders.decodingDataLeft"),
+                    Http2Error.COMPRESSION_ERROR);
+        }
+
+        // Delay validation (and triggering any exception) until this point
+        // since all the headers still have to be read if a StreamException is
+        // going to be thrown.
+        hpackDecoder.getHeaderEmitter().validateHeaders();
+
+        output.headersEnd(streamId);
+
+        if (headersEndStream) {
+            output.receivedEndOfStream(streamId);
+            headersEndStream = false;
+        }
+
+        // Reset size for new request if the buffer was previously expanded
+        if (headerReadBuffer.capacity() > Constants.DEFAULT_HEADER_READ_BUFFER_SIZE) {
+            headerReadBuffer = ByteBuffer.allocate(Constants.DEFAULT_HEADER_READ_BUFFER_SIZE);
         }
     }
 

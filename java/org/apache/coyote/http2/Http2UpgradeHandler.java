@@ -242,17 +242,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
         }
 
         // Send the initial settings frame
-        try {
-            byte[] settings = localSettings.getSettingsFrameForPending();
-            socketWrapper.write(true, settings, 0, settings.length);
-            socketWrapper.flush(true);
-        } catch (IOException ioe) {
-            String msg = sm.getString("upgradeHandler.sendPrefaceFail", connectionId);
-            if (log.isDebugEnabled()) {
-                log.debug(msg);
-            }
-            throw new ProtocolException(msg, ioe);
-        }
+        writeSettings();
 
         // Make sure the client has sent a valid connection preface before we
         // send the response to the original request over HTTP/2.
@@ -527,6 +517,22 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
     }
 
 
+    private void writeSettings() {
+        // Send the initial settings frame
+        try {
+            byte[] settings = localSettings.getSettingsFrameForPending();
+            socketWrapper.write(true, settings, 0, settings.length);
+            socketWrapper.flush(true);
+        } catch (IOException ioe) {
+            String msg = sm.getString("upgradeHandler.sendPrefaceFail", connectionId);
+            if (log.isDebugEnabled()) {
+                log.debug(msg);
+            }
+            throw new ProtocolException(msg, ioe);
+        }
+    }
+
+
     private void writeGoAwayFrame(int maxStreamId, long errorCode, byte[] debugMsg)
             throws IOException {
         byte[] fixedPayload = new byte[8];
@@ -726,7 +732,6 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
         synchronized (socketWrapper) {
             if (socketWrapper.flush(false)) {
                 socketWrapper.registerWriteInterest();
-                return;
             }
         }
     }
