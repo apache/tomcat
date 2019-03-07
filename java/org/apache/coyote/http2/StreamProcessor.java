@@ -76,8 +76,6 @@ class StreamProcessor extends AbstractProcessor {
                             ConnectionException ce = new ConnectionException(sm.getString(
                                     "streamProcessor.error.connection", stream.getConnectionId(),
                                     stream.getIdentifier()), Http2Error.INTERNAL_ERROR);
-                            // TODO - Temporary debug code
-                            log.info(ce.getMessage(), ce);
                             stream.close(ce);
                         } else if (!getErrorState().isIoAllowed()) {
                             StreamException se = stream.getResetException();
@@ -93,10 +91,9 @@ class StreamProcessor extends AbstractProcessor {
                 } catch (Exception e) {
                     String msg = sm.getString("streamProcessor.error.connection",
                             stream.getConnectionId(), stream.getIdentifier());
-                    // TODO - Temporary debug code
-                    //if (log.isDebugEnabled()) {
-                        log.info(msg, e);
-                    //}
+                    if (log.isDebugEnabled()) {
+                        log.debug(msg, e);
+                    }
                     ConnectionException ce = new ConnectionException(msg, Http2Error.INTERNAL_ERROR);
                     ce.initCause(e);
                     stream.close(ce);
