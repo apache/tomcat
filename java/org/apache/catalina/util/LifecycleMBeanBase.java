@@ -238,7 +238,7 @@ public abstract class LifecycleMBeanBase extends LifecycleBase
         
         this.mserver = server;
         this.oname = name;
-        this.domain = name.getDomain();
+        this.domain = name.getDomain().intern();
 
         return oname;
     }
