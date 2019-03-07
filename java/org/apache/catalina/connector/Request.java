@@ -2876,7 +2876,7 @@ implements HttpServletRequest {
 
             if (!location.exists() && context.getCreateUploadTargets()) {
                 log.warn(sm.getString("coyoteRequest.uploadCreate",
-                        location.getAbsolutePath(), getMappingData().wrapper.getName()));
+                        location.getAbsolutePath(), ((Wrapper)getMappingData().wrapper).getName()));
                 if (!location.mkdirs()) {
                     log.warn(sm.getString("coyoteRequest.uploadCreateFail",
                             location.getAbsolutePath()));
