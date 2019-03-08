@@ -74,6 +74,9 @@
         <code>roleNested</code> set to <code>true</code>. (markt)
       </fix>
       <fix>
+        <bug>63235</bug>: Refactor Charset cache to reduce start time. (markt)
+      </fix>
+      <fix>
         <bug>63236</bug>: Use <code>String.intern()</code> as suggested by
         Phillip Webb to reduce memory wasted due to String duplication. This
         changes saves ~245k when starting a clean installation. With additional
