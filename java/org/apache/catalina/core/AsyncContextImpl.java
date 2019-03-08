@@ -176,7 +176,7 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
     }
 
     @Override
-    public void dispatch(ServletContext context, String path) {
+    public void dispatch(ServletContext servletContext, String path) {
         synchronized (asyncContextLock) {
             if (log.isDebugEnabled()) {
                 logDebug("dispatch   ");
@@ -193,7 +193,7 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
                 request.setAttribute(ASYNC_PATH_INFO, request.getPathInfo());
                 request.setAttribute(ASYNC_QUERY_STRING, request.getQueryString());
             }
-            final RequestDispatcher requestDispatcher = context.getRequestDispatcher(path);
+            final RequestDispatcher requestDispatcher = servletContext.getRequestDispatcher(path);
             if (!(requestDispatcher instanceof AsyncDispatcher)) {
                 throw new UnsupportedOperationException(
                         sm.getString("asyncContextImpl.noAsyncDispatcher"));
@@ -202,11 +202,16 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
                     (AsyncDispatcher) requestDispatcher;
             final ServletRequest servletRequest = getRequest();
             final ServletResponse servletResponse = getResponse();
+            // https://bz.apache.org/bugzilla/show_bug.cgi?id=63246
+            // Take a local copy as the dispatch may complete the
+            // request/response and that in turn may trigger recycling of this
+            // object before the in-progress count can be decremented
+            final Context context = this.context;
             this.dispatch = new AsyncRunnable(
                     request, applicationDispatcher, servletRequest, servletResponse);
             this.request.getCoyoteRequest().action(ActionCode.ASYNC_DISPATCH, null);
             clearServletRequestResponse();
-            this.context.decrementInProgressAsyncCount();
+            context.decrementInProgressAsyncCount();
         }
     }
 
