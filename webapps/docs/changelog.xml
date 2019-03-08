@@ -135,7 +135,8 @@
         currently active HTTP/2 streams. (markt)
       </fix>
       <fix>
-        Ensure enough buffer space when using TLS with NIO2 and HTTP/2. (remm)
+        Ensure enough buffer space when using TLS with NIO2 by using the main
+        read buffer to store additional decrypted data. (remm)
       </fix>
     </changelog>
   </subsection>

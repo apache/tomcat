@@ -1008,11 +1008,15 @@ public class SecureNio2Channel extends Nio2Channel  {
                         long read = 0;
                         //the SSL engine result
                         SSLEngineResult unwrap;
+                        ByteBuffer[] dsts2 = dsts;
+                        int length2 = length;
+                        boolean processOverflow = false;
                         do {
+                            processOverflow = false;
                             //prepare the buffer
                             netInBuffer.flip();
                             //unwrap the data
-                            unwrap = sslEngine.unwrap(netInBuffer, dsts, offset, length);
+                            unwrap = sslEngine.unwrap(netInBuffer, dsts2, offset, length2);
                             //compact the buffer
                             netInBuffer.compact();
                             if (unwrap.getStatus() == Status.OK || unwrap.getStatus() == Status.BUFFER_UNDERFLOW) {
@@ -1038,9 +1042,28 @@ public class SecureNio2Channel extends Nio2Channel  {
                                 //here we should trap BUFFER_OVERFLOW and call expand on the buffer
                                 //for now, throw an exception, as we initialized the buffers
                                 //in the constructor
-                                throw new IOException(sm.getString("channel.nio.ssl.unwrapFail", unwrap.getStatus()));
+                                ByteBuffer readBuffer = getBufHandler().getReadBuffer();
+                                boolean found = false;
+                                for (ByteBuffer buffer : dsts2) {
+                                    if (buffer == readBuffer) {
+                                        found = true;
+                                    }
+                                }
+                                if (found) {
+                                    throw new IOException(sm.getString("channel.nio.ssl.unwrapFail", unwrap.getStatus()));
+                                } else {
+                                    // Add the main read buffer in the destinations and try again
+                                    dsts2 = new ByteBuffer[dsts.length + 1];
+                                    for (int i = 0; i < dsts.length; i++) {
+                                        dsts2[i] = dsts[i];
+                                    }
+                                    dsts2[dsts.length] = readBuffer;
+                                    length2 = length + 1;
+                                    getBufHandler().configureReadBufferForWrite();
+                                    processOverflow = true;
+                                }
                             }
-                        } while (netInBuffer.position() != 0); //continue to unwrapping as long as the input buffer has stuff
+                        } while ((netInBuffer.position() != 0) || processOverflow); //continue to unwrapping as long as the input buffer has stuff
                         int capacity = 0;
                         final int endOffset = offset + length;
                         for (int i = offset; i < endOffset; i++) {
