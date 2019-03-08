@@ -53,6 +53,9 @@
         <code>RemoteIpFilter</code> and <code>RemoteIpValve</code>. (markt)
       </fix>
       <fix>
+        <bug>63235</bug>: Refactor Charset cache to reduce start time. (markt)
+      </fix>
+      <fix>
         <bug>63249</bug>: Use a consistent log level (<code>WARN</code>) when
         logging the failure to register or deregister a JMX Bean. (markt)
       </fix>
