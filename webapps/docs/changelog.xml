@@ -175,6 +175,10 @@
         <bug>63223</bug>: Correctly account for push requests when tracking
         currently active HTTP/2 streams. (markt)
       </fix>
+      <fix>
+        Verify HTTP/2 stream is still writable before assuming a timeout
+        occurred. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="WebSocket">

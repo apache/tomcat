@@ -1135,7 +1135,7 @@ public class Stream extends AbstractStream implements HeaderEmitter {
                             throw new IOException(sm.getString("stream.inputBuffer.reset"));
                         }
 
-                        if (inBuffer.position() == 0) {
+                        if (inBuffer.position() == 0 && isActive() && !isInputFinished()) {
                             String msg = sm.getString("stream.inputBuffer.readTimeout");
                             StreamException se = new StreamException(
                                     msg, Http2Error.ENHANCE_YOUR_CALM, getIdAsInt());
