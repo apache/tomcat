@@ -138,6 +138,10 @@
         Ensure enough buffer space when using TLS with NIO2 by using the main
         read buffer to store additional decrypted data. (remm)
       </fix>
+      <fix>
+        Verify HTTP/2 stream is still writable before assuming a timeout
+        occurred. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="WebSocket">
