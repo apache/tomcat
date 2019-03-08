@@ -88,6 +88,10 @@
         thanks to YourKit Java profiler for helping to track down the wasted
         memory and the root causes. (markt)
       </fix>
+      <fix>
+        <bug>63246</bug>: Fix a potential <code>NullPointerException</code> when
+        calling <code>AsyncContext.dispatch()</code>. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
