@@ -572,7 +572,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         int bytesProduced = 0;
         int idx = offset;
         // Do we have enough room in dsts to write decrypted data?
-        if (capacity < pendingApp) {
+        if (capacity == 0) {
             return new SSLEngineResult(SSLEngineResult.Status.BUFFER_OVERFLOW, getHandshakeStatus(), written, 0);
         }
 
