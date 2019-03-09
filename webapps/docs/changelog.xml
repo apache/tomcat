@@ -146,6 +146,10 @@
         Verify HTTP/2 stream is still writable before assuming a timeout
         occurred. (remm)
       </fix>
+      <fix>
+        Avoid some overflow cases with OpenSSL to improve efficiency, as the
+        OpenSSL engine has an internal buffer. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="WebSocket">

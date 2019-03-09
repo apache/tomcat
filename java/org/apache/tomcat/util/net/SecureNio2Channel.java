@@ -1012,6 +1012,10 @@ public class SecureNio2Channel extends Nio2Channel  {
                         int length2 = length;
                         boolean processOverflow = false;
                         do {
+                            boolean useOverflow = false;
+                            if (processOverflow) {
+                                useOverflow = true;
+                            }
                             processOverflow = false;
                             //prepare the buffer
                             netInBuffer.flip();
@@ -1022,6 +1026,10 @@ public class SecureNio2Channel extends Nio2Channel  {
                             if (unwrap.getStatus() == Status.OK || unwrap.getStatus() == Status.BUFFER_UNDERFLOW) {
                                 //we did receive some data, add it to our total
                                 read += unwrap.bytesProduced();
+                                if (useOverflow) {
+                                    // Remove the data read into the overflow buffer
+                                    read -= dsts2[dsts.length].position();
+                                }
                                 //perform any tasks if needed
                                 if (unwrap.getHandshakeStatus() == HandshakeStatus.NEED_TASK)
                                     tasks();
@@ -1038,7 +1046,7 @@ public class SecureNio2Channel extends Nio2Channel  {
                                 //buffer overflow can happen, if we have read data, then
                                 //empty out the dst buffer before we do another read
                                 break;
-                            } else {
+                            } else if (unwrap.getStatus() == Status.BUFFER_OVERFLOW) {
                                 //here we should trap BUFFER_OVERFLOW and call expand on the buffer
                                 //for now, throw an exception, as we initialized the buffers
                                 //in the constructor
@@ -1062,6 +1070,10 @@ public class SecureNio2Channel extends Nio2Channel  {
                                     getBufHandler().configureReadBufferForWrite();
                                     processOverflow = true;
                                 }
+                            } else if (unwrap.getStatus() == Status.CLOSED) {
+                                break;
+                            } else {
+                                throw new IOException(sm.getString("channel.nio.ssl.unwrapFail", unwrap.getStatus()));
                             }
                         } while ((netInBuffer.position() != 0) || processOverflow); //continue to unwrapping as long as the input buffer has stuff
                         int capacity = 0;
