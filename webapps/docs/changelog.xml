@@ -93,6 +93,9 @@
       <fix>
         Encode the output of the SSI <code>printenv</code> command. (markt)
       </fix>
+      <scode>
+        Use constants for SSI encoding values. (markt)
+      </scode>
     </changelog>
   </subsection>
   <subsection name="Coyote">
