@@ -22,7 +22,7 @@ import java.util.Collection;
 import java.util.Iterator;
 /**
  * Implements the Server-side #printenv command
- * 
+ *
  * @author Dan Sandberg
  * @author David Becker
  */
@@ -43,8 +43,7 @@ public class SSIPrintenv implements SSICommand {
             Iterator<String> iter = variableNames.iterator();
             while (iter.hasNext()) {
                 String variableName = iter.next();
-                String variableValue = ssiMediator
-                        .getVariableValue(variableName);
+                String variableValue = ssiMediator.getVariableValue(variableName, "entity");
                 //This shouldn't happen, since all the variable names must
                 // have values
                 if (variableValue == null) {
