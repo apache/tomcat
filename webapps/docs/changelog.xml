@@ -101,6 +101,9 @@
         Tomcat used to resolve standard XML DTDs and schemas when Tomcat is
         configured to validate XML configuration files such as web.xml. (markt)
       </fix>
+      <fix>
+        Encode the output of the SSI <code>printenv</code> command. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
