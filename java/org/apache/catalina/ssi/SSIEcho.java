@@ -30,7 +30,7 @@ import org.apache.tomcat.util.res.StringManager;
  */
 public class SSIEcho implements SSICommand {
     private static final StringManager sm = StringManager.getManager(SSIEcho.class);
-    protected static final String DEFAULT_ENCODING = "entity";
+    protected static final String DEFAULT_ENCODING = SSIMediator.ENCODING_ENTITY;
     protected static final String MISSING_VARIABLE_VALUE = "(none)";
 
 
@@ -53,11 +53,11 @@ public class SSIEcho implements SSICommand {
                     encoding = paramValue;
                 } else {
                     ssiMediator.log(sm.getString("ssiEcho.invalidEncoding", paramValue));
-                    writer.write(ssiMediator.encode(errorMessage, "entity"));
+                    writer.write(ssiMediator.encode(errorMessage, SSIMediator.ENCODING_ENTITY));
                 }
             } else {
                 ssiMediator.log(sm.getString("ssiCommand.invalidAttribute", paramName));
-                writer.write(ssiMediator.encode(errorMessage, "entity"));
+                writer.write(ssiMediator.encode(errorMessage, SSIMediator.ENCODING_ENTITY));
             }
         }
         String variableValue = ssiMediator.getVariableValue(originalValue, encoding);
@@ -70,8 +70,8 @@ public class SSIEcho implements SSICommand {
 
 
     protected boolean isValidEncoding(String encoding) {
-        return encoding.equalsIgnoreCase("url")
-                || encoding.equalsIgnoreCase("entity")
-                || encoding.equalsIgnoreCase("none");
+        return encoding.equalsIgnoreCase(SSIMediator.ENCODING_URL)
+                || encoding.equalsIgnoreCase(SSIMediator.ENCODING_ENTITY)
+                || encoding.equalsIgnoreCase(SSIMediator.ENCODING_NONE);
     }
 }
