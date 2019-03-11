@@ -27,7 +27,6 @@ import java.nio.channels.AsynchronousChannelGroup;
 import java.nio.channels.AsynchronousCloseException;
 import java.nio.channels.AsynchronousServerSocketChannel;
 import java.nio.channels.AsynchronousSocketChannel;
-import java.nio.channels.ClosedChannelException;
 import java.nio.channels.CompletionHandler;
 import java.nio.channels.FileChannel;
 import java.nio.channels.InterruptedByTimeoutException;
@@ -486,25 +485,6 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
         private boolean writeNotify = false;
         private volatile boolean closed = false;
 
-        private CompletionHandler<Integer, SocketWrapperBase<Nio2Channel>> awaitBytesHandler
-                = new CompletionHandler<Integer, SocketWrapperBase<Nio2Channel>>() {
-
-            @Override
-            public void completed(Integer nBytes, SocketWrapperBase<Nio2Channel> attachment) {
-                if (nBytes.intValue() < 0) {
-                    failed(new ClosedChannelException(), attachment);
-                    return;
-                }
-                readNotify = true;
-                getEndpoint().processSocket(attachment, SocketEvent.OPEN_READ, Nio2Endpoint.isInline());
-            }
-
-            @Override
-            public void failed(Throwable exc, SocketWrapperBase<Nio2Channel> attachment) {
-                getEndpoint().processSocket(attachment, SocketEvent.DISCONNECT, true);
-            }
-        };
-
         private CompletionHandler<Integer, SendfileData> sendfileHandler
             = new CompletionHandler<Integer, SendfileData>() {
 
@@ -540,7 +520,7 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
                                 break;
                             }
                             case OPEN: {
-                                awaitBytes();
+                                registerReadInterest();
                                 break;
                             }
                             }
@@ -1534,18 +1514,6 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
                     // If no write is pending, notify
                     getEndpoint().processSocket(this, SocketEvent.OPEN_WRITE, true);
                 }
-            }
-        }
-
-
-        public void awaitBytes() {
-            // NO-OP is there is already a read in progress.
-            if (readPending.tryAcquire()) {
-                getSocket().getBufHandler().configureReadBufferForWrite();
-                Nio2Endpoint.startInline();
-                getSocket().read(getSocket().getBufHandler().getReadBuffer(),
-                        toNio2Timeout(getReadTimeout()), TimeUnit.MILLISECONDS, this, awaitBytesHandler);
-                Nio2Endpoint.endInline();
             }
         }
 

@@ -150,6 +150,9 @@
         Avoid some overflow cases with OpenSSL to improve efficiency, as the
         OpenSSL engine has an internal buffer. (remm)
       </fix>
+      <fix>
+        Harmonize HTTP/1.1 NIO2 keepalive code. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="WebSocket">
