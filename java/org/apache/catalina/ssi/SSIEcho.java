@@ -53,15 +53,14 @@ public class SSIEcho implements SSICommand {
                     encoding = paramValue;
                 } else {
                     ssiMediator.log(sm.getString("ssiEcho.invalidEncoding", paramValue));
-                    writer.write(errorMessage);
+                    writer.write(ssiMediator.encode(errorMessage, "entity"));
                 }
             } else {
                 ssiMediator.log(sm.getString("ssiCommand.invalidAttribute", paramName));
-                writer.write(errorMessage);
+                writer.write(ssiMediator.encode(errorMessage, "entity"));
             }
         }
-        String variableValue = ssiMediator.getVariableValue(
-                originalValue, encoding);
+        String variableValue = ssiMediator.getVariableValue(originalValue, encoding);
         if (variableValue == null) {
             variableValue = MISSING_VARIABLE_VALUE;
         }
