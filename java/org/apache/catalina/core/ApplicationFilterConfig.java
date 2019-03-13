@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -189,7 +189,7 @@ public final class ApplicationFilterConfig implements FilterConfig, Serializable
     @Override
     public Enumeration<String> getInitParameterNames() {
         Map<String,String> map = filterDef.getParameterMap();
-        
+
         if (map == null) {
             return Collections.enumeration(emptyString);
         }
@@ -262,9 +262,9 @@ public final class ApplicationFilterConfig implements FilterConfig, Serializable
         // Identify the class loader we will be using
         String filterClass = filterDef.getFilterClass();
         this.filter = (Filter) getInstanceManager().newInstance(filterClass);
-        
+
         initFilter();
-        
+
         return (this.filter);
 
     }
@@ -284,7 +284,7 @@ public final class ApplicationFilterConfig implements FilterConfig, Serializable
         } else {
             filter.init(this);
         }
-        
+
         // Expose filter via JMX
         registerJMX();
     }
@@ -305,7 +305,7 @@ public final class ApplicationFilterConfig implements FilterConfig, Serializable
     void release() {
 
         unregisterJMX();
-        
+
         if (this.filter != null) {
             try {
                 if (Globals.IS_SECURITY_ENABLED) {
@@ -352,7 +352,7 @@ public final class ApplicationFilterConfig implements FilterConfig, Serializable
                 instanceManager = new DefaultInstanceManager(null,
                         new HashMap<String, Map<String, String>>(),
                         context,
-                        getClass().getClassLoader()); 
+                        getClass().getClassLoader());
             }
         }
         return instanceManager;
@@ -388,29 +388,26 @@ public final class ApplicationFilterConfig implements FilterConfig, Serializable
         }
         try {
             oname = new ObjectName(onameStr);
-            Registry.getRegistry(null, null).registerComponent(this, oname,
-                    null);
+            Registry.getRegistry(null, null).registerComponent(this, oname, null);
         } catch (Exception ex) {
-            log.info(sm.getString("applicationFilterConfig.jmxRegisterFail",
+            log.warn(sm.getString("applicationFilterConfig.jmxRegisterFail",
                     getFilterClass(), getFilterName()), ex);
         }
     }
-    
+
+
     private void unregisterJMX() {
         // unregister this component
         if (oname != null) {
             try {
                 Registry.getRegistry(null, null).unregisterComponent(oname);
                 if (log.isDebugEnabled())
-                    log.debug(sm.getString(
-                            "applicationFilterConfig.jmxUnregister",
+                    log.debug(sm.getString("applicationFilterConfig.jmxUnregister",
                             getFilterClass(), getFilterName()));
             } catch(Exception ex) {
-                log.error(sm.getString(
-                        "applicationFilterConfig.jmxUnregisterFail",
+                log.warn(sm.getString("applicationFilterConfig.jmxUnregisterFail",
                         getFilterClass(), getFilterName()), ex);
             }
         }
-
     }
 }

@@ -1735,7 +1735,7 @@ public class HostConfig
             Registry.getRegistry(null, null).registerComponent
                 (this, oname, this.getClass().getName());
         } catch (Exception e) {
-            log.error(sm.getString("hostConfig.jmx.register", oname), e);
+            log.warn(sm.getString("hostConfig.jmx.register", oname), e);
         }
 
         if (!appBase().isDirectory()) {
@@ -1763,7 +1763,7 @@ public class HostConfig
             try {
                 Registry.getRegistry(null, null).unregisterComponent(oname);
             } catch (Exception e) {
-                log.error(sm.getString("hostConfig.jmx.unregister", oname), e);
+                log.warn(sm.getString("hostConfig.jmx.unregister", oname), e);
             }
         }
         oname = null;
