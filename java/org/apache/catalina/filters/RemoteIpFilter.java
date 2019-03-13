@@ -710,7 +710,7 @@ public class RemoteIpFilter extends GenericFilter {
     /**
      * @see #setProtocolHeader(String)
      */
-    private String protocolHeader = null;
+    private String protocolHeader = "X-Forwarded-Proto";
 
     private String protocolHeaderHttpsValue = "https";
 
