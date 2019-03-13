@@ -357,13 +357,13 @@ public final class ApplicationFilterConfig implements FilterConfig, Serializable
         }
         try {
             oname = new ObjectName(onameStr);
-            Registry.getRegistry(null, null).registerComponent(this, oname,
-                    null);
+            Registry.getRegistry(null, null).registerComponent(this, oname, null);
         } catch (Exception ex) {
-            log.info(sm.getString("applicationFilterConfig.jmxRegisterFail",
+            log.warn(sm.getString("applicationFilterConfig.jmxRegisterFail",
                     getFilterClass(), getFilterName()), ex);
         }
     }
+
 
     private void unregisterJMX() {
         // unregister this component
@@ -371,16 +371,13 @@ public final class ApplicationFilterConfig implements FilterConfig, Serializable
             try {
                 Registry.getRegistry(null, null).unregisterComponent(oname);
                 if (log.isDebugEnabled())
-                    log.debug(sm.getString(
-                            "applicationFilterConfig.jmxUnregister",
+                    log.debug(sm.getString("applicationFilterConfig.jmxUnregister",
                             getFilterClass(), getFilterName()));
             } catch(Exception ex) {
-                log.error(sm.getString(
-                        "applicationFilterConfig.jmxUnregisterFail",
+                log.warn(sm.getString("applicationFilterConfig.jmxUnregisterFail",
                         getFilterClass(), getFilterName()), ex);
             }
         }
-
     }
 
 
