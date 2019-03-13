@@ -459,7 +459,7 @@ public class WebappLoader extends LifecycleMBeanBase
                         context.getParent().getName() + ",context=" + contextName);
                 Registry.getRegistry(null, null).unregisterComponent(cloname);
             } catch (Exception e) {
-                log.error("LifecycleException ", e);
+                log.warn("LifecycleException ", e);
             }
         }
 
