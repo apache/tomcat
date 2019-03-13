@@ -85,6 +85,11 @@
         calling <code>AsyncContext.dispatch()</code>. (markt)
       </fix>
       <fix>
+        <bug>63196</bug>: Provide a default (<code>X-Forwarded-Proto</code>) for
+        the <code>protocolHeader</code> attribute of the
+        <code>RemoteIpFilter</code> and <code>RemoteIpValve</code>. (markt)
+      </fix>
+      <fix>
         <bug>63249</bug>: Use a consistent log level (<code>WARN</code>) when
         logging the failure to register or deregister a JMX Bean. (markt)
       </fix>

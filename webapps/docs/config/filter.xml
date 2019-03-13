@@ -1594,7 +1594,7 @@ FINE: Request "/docs/config/manager.html" with response status "200"
       <attribute name="protocolHeader" required="false">
         <p>Name of the HTTP Header read by this valve that holds the protocol
         used by the client to connect to the proxy. If not specified, the
-        default of <code>null</code> is used.</p>
+        default of <code>X-Forwarded-Proto</code> is used.</p>
       </attribute>
 
       <attribute name="portHeader" required="false">
