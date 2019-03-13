@@ -455,7 +455,7 @@ public class WebappLoader extends LifecycleMBeanBase
                         context.getParent().getName() + ",context=" + contextName);
                 Registry.getRegistry(null, null).unregisterComponent(cloname);
             } catch (Exception e) {
-                log.error(sm.getString("webappLoader.stopError"), e);
+                log.warn(sm.getString("webappLoader.stopError"), e);
             }
         }
 
