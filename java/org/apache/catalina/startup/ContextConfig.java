@@ -582,9 +582,9 @@ public class ContextConfig implements LifecycleListener {
 
         File file = new File(docBase);
         if (!file.isAbsolute()) {
-            docBase = (new File(appBase, docBase)).getCanonicalPath();
+            docBase = (new File(appBase, docBase)).getAbsolutePath();
         } else {
-            docBase = file.getCanonicalPath();
+            docBase = file.getAbsolutePath();
         }
         file = new File(docBase);
         String origDocBase = docBase;
