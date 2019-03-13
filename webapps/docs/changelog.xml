@@ -92,6 +92,12 @@
         <bug>63246</bug>: Fix a potential <code>NullPointerException</code> when
         calling <code>AsyncContext.dispatch()</code>. (markt)
       </fix>
+      <fix>
+        Always use the absolute path of the <code>docBase</code> during the
+        deployment process to determine the Context name, deployment type,
+        whether the <code>docBase</code> is located within the
+        <code>appBase</code> etc. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
