@@ -56,6 +56,11 @@
         <bug>63249</bug>: Use a consistent log level (<code>WARN</code>) when
         logging the failure to register or deregister a JMX Bean. (markt)
       </fix>
+      <fix>
+        <bug>63249</bug>: Use a consistent log level (<code>ERROR</code>) when
+        logging the <code>LifecycleException</code> associated with the failure
+        to start or stop a component. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
