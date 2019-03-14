@@ -259,8 +259,7 @@ public abstract class LifecycleBase implements Lifecycle {
                 stop();
             } catch (LifecycleException e) {
                 // Just log. Still want to destroy.
-                log.warn(sm.getString(
-                        "lifecycleBase.destroyStopFail", toString()), e);
+                log.error(sm.getString("lifecycleBase.destroyStopFail", toString()), e);
             }
         }
 
