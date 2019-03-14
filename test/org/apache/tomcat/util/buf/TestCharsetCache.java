@@ -18,9 +18,12 @@ package org.apache.tomcat.util.buf;
 
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -29,18 +32,30 @@ public class TestCharsetCache {
 
     @Test
     public void testAllKnownCharsets() {
-        CharsetCache cache = new CharsetCache();
+
+        Set<String> known = new HashSet<String>();
+        known.addAll(Arrays.asList(CharsetCache.LAZY_CHARSETS));
+        Set<String> initial = new HashSet<String>();
+        initial.addAll(Arrays.asList(CharsetCache.INITIAL_CHARSETS));
 
         List<String> cacheMisses = new ArrayList<String>();
 
         for (Charset charset: Charset.availableCharsets().values()) {
-            if (cache.getCharset(charset.name()) == null) {
-                cacheMisses.add(charset.name());
-            } else {
-                for (String alias : charset.aliases()) {
-                    if (cache.getCharset(alias) == null) {
-                        cacheMisses.add(alias);
-                    }
+            String name = charset.name().toLowerCase(Locale.ENGLISH);
+
+            // No need to test the charsets that are pre-loaded
+            if (initial.contains(name)) {
+                continue;
+            }
+
+            if (!known.contains(name)) {
+                cacheMisses.add(name);
+            }
+
+            for (String alias : charset.aliases()) {
+                alias = alias.toLowerCase(Locale.ENGLISH);
+                if (!known.contains(alias)) {
+                    cacheMisses.add(alias);
                 }
             }
         }
