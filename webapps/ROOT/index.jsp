@@ -71,9 +71,6 @@ request.setAttribute("tomcatExamplesUrl", "/examples/");
                         <a class="container shadow" href="/host-manager/html"><span>Host Manager</span></a>
                     </div>
                 </div>
-                <!--
-                <br class="separator" />
-                -->
                 <br class="separator" />
             </div>
             <div id="middle" class="curved container">
