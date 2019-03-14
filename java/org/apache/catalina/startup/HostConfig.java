@@ -1413,8 +1413,7 @@ public class HostConfig implements LifecycleListener {
             try {
                 context.start();
             } catch (Exception e) {
-                log.warn(sm.getString
-                         ("hostConfig.context.restart", app.name), e);
+                log.error(sm.getString("hostConfig.context.restart", app.name), e);
             }
         }
     }

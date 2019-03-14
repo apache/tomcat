@@ -134,25 +134,25 @@ public class StandardService extends LifecycleMBeanBase implements Service {
                 try {
                     this.engine.start();
                 } catch (LifecycleException e) {
-                    log.warn(sm.getString("standardService.engine.startFailed"), e);
+                    log.error(sm.getString("standardService.engine.startFailed"), e);
                 }
             }
             // Restart MapperListener to pick up new engine.
             try {
                 mapperListener.stop();
             } catch (LifecycleException e) {
-                log.warn(sm.getString("standardService.mapperListener.stopFailed"), e);
+                log.error(sm.getString("standardService.mapperListener.stopFailed"), e);
             }
             try {
                 mapperListener.start();
             } catch (LifecycleException e) {
-                log.warn(sm.getString("standardService.mapperListener.startFailed"), e);
+                log.error(sm.getString("standardService.mapperListener.startFailed"), e);
             }
             if (oldEngine != null) {
                 try {
                     oldEngine.stop();
                 } catch (LifecycleException e) {
-                    log.warn(sm.getString("standardService.engine.stopFailed"), e);
+                    log.error(sm.getString("standardService.engine.stopFailed"), e);
                 }
             }
         }
