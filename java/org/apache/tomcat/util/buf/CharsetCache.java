@@ -60,7 +60,7 @@ public class CharsetCache {
 
     private static final Charset DUMMY_CHARSET = new DummyCharset("Dummy",  null);
 
-    private ConcurrentMap<String,Charset> cache = new ConcurrentHashMap<>();
+    private ConcurrentMap<String,Charset> cache = new ConcurrentHashMap<String, Charset>();
 
     public CharsetCache() {
         // Pre-populate the cache

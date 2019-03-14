@@ -31,7 +31,7 @@ public class TestCharsetCache {
     public void testAllKnownCharsets() {
         CharsetCache cache = new CharsetCache();
 
-        List<String> cacheMisses = new ArrayList<>();
+        List<String> cacheMisses = new ArrayList<String>();
 
         for (Charset charset: Charset.availableCharsets().values()) {
             if (cache.getCharset(charset.name()) == null) {

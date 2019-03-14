@@ -87,7 +87,7 @@ public class TestCharsetCachePerformance {
 
     private static class FullCsCache implements CsCache {
 
-        private static final Map<String,Charset> cache = new HashMap<>();
+        private static final Map<String,Charset> cache = new HashMap<String, Charset>();
 
         static {
             for (Charset charset: Charset.availableCharsets().values()) {
