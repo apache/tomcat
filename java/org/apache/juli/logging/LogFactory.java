@@ -16,6 +16,8 @@
  */
 package org.apache.juli.logging;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Properties;
 import java.util.logging.LogManager;
 
@@ -133,6 +135,38 @@ public class LogFactory {
      * Protected constructor that is not available for public use.
      */
     private LogFactory() {
+        /*
+         * Work-around known a JRE bug.
+         * https://bugs.openjdk.java.net/browse/JDK-8194653
+         *
+         * Pre-load the default file system. No performance impact as we need to
+         * load the default file system anyway. Just do it earlier to avoid the
+         * potential deadlock.
+         *
+         * This can be removed once the oldest JRE supported by Tomcat includes
+         * a fix.
+         *
+         * Bug affects Java 7 onwards but Tomcat 7 needs to run on Java 6 so we
+         * have to use reflection here. JreCompat isn't available as JULI has no
+         * external dependencies.
+         */
+        try {
+            Class<?> clazz = Class.forName("java.nio.file.FileSystems");
+            Method m = clazz.getMethod("getDefault");
+            // Static method - no instance nor arguments
+            m.invoke(null);
+        } catch (ClassNotFoundException e) {
+            // Ignore: Must be Java 6
+        } catch (NoSuchMethodException e) {
+            // Ignore: Must be Java 6
+        } catch (IllegalArgumentException e) {
+            // Ignore: Must be Java 6
+        } catch (IllegalAccessException e) {
+            // Ignore: Must be Java 6
+        } catch (InvocationTargetException e) {
+            // Ignore: Must be Java 6
+        }
+
         logConfig=new Properties();
     }
 
