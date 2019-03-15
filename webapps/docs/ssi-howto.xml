@@ -168,31 +168,37 @@ Used to run commands on the host system.
 </li>
 <li>
 <strong>exec</strong> - <code>&lt;!--#exec cgi=&quot;file-name&quot; --&gt;</code>
-This acts the same as the <strong>include</strong> directive, and doesn't actually execute any commands.
+This acts the same as the <strong>include virtual</strong> directive, and doesn't actually execute any commands.
 </li>
 <li>
 <strong>include</strong> -  <code>&lt;!--#include file=&quot;file-name&quot; --&gt;</code>
-inserts the contents, this is interpreted relative to the current directory.
+inserts the contents. The path is interpreted relative to the document where this directive
+is being used, and IS NOT a &quot;virtual&quot; path relative to either the context root or the server root.
 </li>
 <li>
 <strong>include</strong> -  <code>&lt;!--#include virtual=&quot;file-name&quot; --&gt;</code>
-inserts the contents, this is interpreted relative to the document being served.
+inserts the contents. The path is interpreted as a &quot;virtual&quot; path which is
+relative to either the context root or the server root (depending on the <strong>isVirtualWebappRelative</strong> parameter).
 </li>
 <li>
 <strong>flastmod</strong> - <code>&lt;!--#flastmod file=&quot;filename.shtml&quot; --&gt;</code>
-Returns the time that a file was lost modified, this is interpreted relative to the current directory.
+Returns the time that a file was last modified. The path is interpreted relative to the document where this directive
+is being used, and IS NOT a &quot;virtual&quot; path relative to either the context root or the server root.
 </li>
 <li>
 <strong>flastmod</strong> - <code>&lt;!--#flastmod virtual=&quot;filename.shtml&quot; --&gt;</code>
-Returns the time that a file was lost modified, this is interpreted relative to the document being served.
+Returns the time that a file was last modified. The path is interpreted as a &quot;virtual&quot; path which is
+relative to either the context root or the server root (depending on the <strong>isVirtualWebappRelative</strong> parameter).
 </li>
 <li>
 <strong>fsize</strong> - <code>&lt;!--#fsize file=&quot;filename.shtml&quot; --&gt;</code>
-Returns the size of a file, this is interpreted relative to the current directory.
+Returns the size of a file. The path is interpreted relative to the document where this directive
+is being used, and IS NOT a &quot;virtual&quot; path relative to either the context root or the server root.
 </li>
 <li>
 <strong>fsize</strong> - <code>&lt;!--#fsize virtual=&quot;filename.shtml&quot; --&gt;</code>
-Returns the size of a file, this is interpreted relative to the document being served.
+Returns the size of a file. The path is interpreted as a &quot;virtual&quot; path which is
+relative to either the context root or the server root (depending on the <strong>isVirtualWebappRelative</strong> parameter).
 </li>
 <li>
 <strong>printenv</strong> - <code>&lt;!--#printenv --&gt;</code>
