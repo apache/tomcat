@@ -22,26 +22,29 @@ package org.apache.tomcat.dbcp.pool;
  * Optional operations are implemented to either do nothing, return a value
  * indicating it is unsupported or throw {@link UnsupportedOperationException}.
  *
+ * @param <K> the type of keys in this pool
+ * @param <V> the type of objects held in this pool
+ *
  * @author Rodney Waldhoff
  * @author Sandy McArthur
  * @version $Revision: 1085933 $ $Date: 2011-03-27 06:40:20 -0700 (Sun, 27 Mar 2011) $
  * @since Pool 1.0
  */
-public abstract class BaseKeyedObjectPool implements KeyedObjectPool {
-    
+public abstract class BaseKeyedObjectPool<K, V> implements KeyedObjectPool<K, V> {
+
     /**
      * {@inheritDoc}
      */
-    public abstract Object borrowObject(Object key) throws Exception;
-    
+    public abstract V borrowObject(K key) throws Exception;
+
     /**
      * {@inheritDoc}
      */
-    public abstract void returnObject(Object key, Object obj) throws Exception;
-    
+    public abstract void returnObject(K key, V obj) throws Exception;
+
     /**
      * <p>Invalidates an object from the pool.</p>
-     * 
+     *
      * <p>By contract, <code>obj</code> <strong>must</strong> have been obtained
      * using {@link #borrowObject borrowObject} using a <code>key</code> that is
      * equivalent to the one used to borrow the <code>Object</code> in the first place.</p>
@@ -51,9 +54,9 @@ public abstract class BaseKeyedObjectPool implements KeyedObjectPool {
      *
      * @param key the key used to obtain the object
      * @param obj a {@link #borrowObject borrowed} instance to be returned.
-     * @throws Exception 
+     * @throws Exception
      */
-    public abstract void invalidateObject(Object key, Object obj) throws Exception;
+    public abstract void invalidateObject(K key, V obj) throws Exception;
 
     /**
      * Not supported in this base implementation.
@@ -62,7 +65,7 @@ public abstract class BaseKeyedObjectPool implements KeyedObjectPool {
      * @param key ignored
      * @throws UnsupportedOperationException
      */
-    public void addObject(Object key) throws Exception, UnsupportedOperationException {
+    public void addObject(K key) throws Exception, UnsupportedOperationException {
         throw new UnsupportedOperationException();
     }
 
@@ -71,7 +74,7 @@ public abstract class BaseKeyedObjectPool implements KeyedObjectPool {
      * @return a negative value.
      * @param key ignored
      */
-    public int getNumIdle(Object key) throws UnsupportedOperationException {
+    public int getNumIdle(K key) throws UnsupportedOperationException {
         return -1;
     }
 
@@ -80,7 +83,7 @@ public abstract class BaseKeyedObjectPool implements KeyedObjectPool {
      * @return a negative value.
      * @param key ignored
      */
-    public int getNumActive(Object key) throws UnsupportedOperationException {
+    public int getNumActive(K key) throws UnsupportedOperationException {
         return -1;
     }
 
@@ -113,7 +116,7 @@ public abstract class BaseKeyedObjectPool implements KeyedObjectPool {
      * @param key ignored
      * @throws UnsupportedOperationException
      */
-    public void clear(Object key) throws Exception, UnsupportedOperationException {
+    public void clear(K key) throws Exception, UnsupportedOperationException {
         throw new UnsupportedOperationException();
     }
 
@@ -132,7 +135,8 @@ public abstract class BaseKeyedObjectPool implements KeyedObjectPool {
      * @param factory the new KeyedPoolableObjectFactory
      * @deprecated to be removed in pool 2.0
      */
-    public void setFactory(KeyedPoolableObjectFactory factory) throws IllegalStateException, UnsupportedOperationException {
+    @Deprecated
+    public void setFactory(KeyedPoolableObjectFactory<K, V> factory) throws IllegalStateException, UnsupportedOperationException {
         throw new UnsupportedOperationException();
     }
 

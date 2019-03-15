@@ -64,6 +64,8 @@ package org.apache.tomcat.dbcp.pool;
  * at a time.
  * </p>
  *
+ * @param <T> the type of objects held in this pool
+ *
  * @see ObjectPool
  *
  * @author Rodney Waldhoff
@@ -71,7 +73,7 @@ package org.apache.tomcat.dbcp.pool;
  * @version $Revision: 777748 $ $Date: 2009-05-22 17:00:44 -0700 (Fri, 22 May 2009) $
  * @since Pool 1.0
  */
-public interface PoolableObjectFactory {
+public interface PoolableObjectFactory<T> {
   /**
    * Creates an instance that can be served by the pool.
    * Instances returned from this method should be in the
@@ -83,7 +85,7 @@ public interface PoolableObjectFactory {
    * @throws Exception if there is a problem creating a new instance,
    *    this will be propagated to the code requesting an object.
    */
-  Object makeObject() throws Exception;
+  T makeObject() throws Exception;
 
   /**
    * Destroys an instance no longer needed by the pool.
@@ -104,7 +106,7 @@ public interface PoolableObjectFactory {
    * @see #validateObject
    * @see ObjectPool#invalidateObject
    */
-  void destroyObject(Object obj) throws Exception;
+  void destroyObject(T obj) throws Exception;
 
   /**
    * Ensures that the instance is safe to be returned by the pool.
@@ -114,7 +116,7 @@ public interface PoolableObjectFactory {
    * @return <code>false</code> if <code>obj</code> is not valid and should
    *         be dropped from the pool, <code>true</code> otherwise.
    */
-  boolean validateObject(Object obj);
+  boolean validateObject(T obj);
 
   /**
    * Reinitialize an instance to be returned by the pool.
@@ -124,7 +126,7 @@ public interface PoolableObjectFactory {
    *    this exception may be swallowed by the pool.
    * @see #destroyObject
    */
-  void activateObject(Object obj) throws Exception;
+  void activateObject(T obj) throws Exception;
 
   /**
    * Uninitialize an instance to be returned to the idle object pool.
@@ -134,5 +136,5 @@ public interface PoolableObjectFactory {
    *    this exception may be swallowed by the pool.
    * @see #destroyObject
    */
-  void passivateObject(Object obj) throws Exception;
+  void passivateObject(T obj) throws Exception;
 }

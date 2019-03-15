@@ -38,15 +38,17 @@ import org.apache.tomcat.dbcp.pool.PoolableObjectFactory;
  * re-using <tt>Object</tt>s without introducing
  * artificial limits.
  *
+ * @param <T> the type of objects held in this pool
+ *
  * @author Rodney Waldhoff
  * @author Dirk Verbeeck
  * @author Sandy McArthur
  * @version $Revision: 965338 $ $Date: 2010-07-18 18:09:29 -0700 (Sun, 18 Jul 2010) $
  * @since Pool 1.0
  */
-public class StackObjectPool extends BaseObjectPool implements ObjectPool {
+public class StackObjectPool<T> extends BaseObjectPool<T> implements ObjectPool<T> {
     /**
-     * Create a new pool using no factory. Clients must first 
+     * Create a new pool using no factory. Clients must first
      * {@link #setFactory(PoolableObjectFactory) set the factory} or
      * else this pool will not behave correctly. Clients may first populate the pool
      * using {@link #returnObject(java.lang.Object)} before they can be {@link #borrowObject borrowed}
@@ -55,8 +57,9 @@ public class StackObjectPool extends BaseObjectPool implements ObjectPool {
      * @see #StackObjectPool(PoolableObjectFactory)
      * @deprecated to be removed in pool 2.0 - use {@link #StackObjectPool(PoolableObjectFactory)}
      */
+    @Deprecated
     public StackObjectPool() {
-        this((PoolableObjectFactory)null,DEFAULT_MAX_SLEEPING,DEFAULT_INIT_SLEEPING_CAPACITY);
+        this(null,DEFAULT_MAX_SLEEPING,DEFAULT_INIT_SLEEPING_CAPACITY);
     }
 
     /**
@@ -70,8 +73,9 @@ public class StackObjectPool extends BaseObjectPool implements ObjectPool {
      * @see #StackObjectPool(PoolableObjectFactory, int)
      * @deprecated to be removed in pool 2.0 - use {@link #StackObjectPool(PoolableObjectFactory, int)}
      */
+    @Deprecated
     public StackObjectPool(int maxIdle) {
-        this((PoolableObjectFactory)null,maxIdle,DEFAULT_INIT_SLEEPING_CAPACITY);
+        this(null,maxIdle,DEFAULT_INIT_SLEEPING_CAPACITY);
     }
 
     /**
@@ -87,8 +91,9 @@ public class StackObjectPool extends BaseObjectPool implements ObjectPool {
      * @see #StackObjectPool(PoolableObjectFactory, int, int)
      * @deprecated to be removed in pool 2.0 - use {@link #StackObjectPool(PoolableObjectFactory, int, int)}
      */
+    @Deprecated
     public StackObjectPool(int maxIdle, int initIdleCapacity) {
-        this((PoolableObjectFactory)null,maxIdle,initIdleCapacity);
+        this(null,maxIdle,initIdleCapacity);
     }
 
     /**
@@ -96,7 +101,7 @@ public class StackObjectPool extends BaseObjectPool implements ObjectPool {
      *
      * @param factory the {@link PoolableObjectFactory} used to populate the pool
      */
-    public StackObjectPool(PoolableObjectFactory factory) {
+    public StackObjectPool(PoolableObjectFactory<T> factory) {
         this(factory,DEFAULT_MAX_SLEEPING,DEFAULT_INIT_SLEEPING_CAPACITY);
     }
 
@@ -107,7 +112,7 @@ public class StackObjectPool extends BaseObjectPool implements ObjectPool {
      * @param factory the {@link PoolableObjectFactory} used to populate the pool
      * @param maxIdle cap on the number of "sleeping" instances in the pool
      */
-    public StackObjectPool(PoolableObjectFactory factory, int maxIdle) {
+    public StackObjectPool(PoolableObjectFactory<T> factory, int maxIdle) {
         this(factory,maxIdle,DEFAULT_INIT_SLEEPING_CAPACITY);
     }
 
@@ -117,7 +122,7 @@ public class StackObjectPool extends BaseObjectPool implements ObjectPool {
      * capable of containing at least <code>initIdleCapacity</code> instances.  The pool is not pre-populated.
      * The <code>initIdleCapacity</code> parameter just determines the initial size of the underlying
      * container, which can increase beyond this value if <code>maxIdle &gt; initIdleCapacity.</code></p>
-     * 
+     *
      * <p>Negative values of <code>maxIdle</code> are ignored (i.e., the pool is created using
      * {@link #DEFAULT_MAX_SLEEPING}) as are non-positive values for <code>initIdleCapacity.</code>
      *
@@ -126,39 +131,40 @@ public class StackObjectPool extends BaseObjectPool implements ObjectPool {
      * @param initIdleCapacity initial size of the pool (this specifies the size of the container,
      *             it does not cause the pool to be pre-populated.)
      */
-    public StackObjectPool(PoolableObjectFactory factory, int maxIdle, int initIdleCapacity) {
+    public StackObjectPool(PoolableObjectFactory<T> factory, int maxIdle, int initIdleCapacity) {
         _factory = factory;
         _maxSleeping = (maxIdle < 0 ? DEFAULT_MAX_SLEEPING : maxIdle);
         int initcapacity = (initIdleCapacity < 1 ? DEFAULT_INIT_SLEEPING_CAPACITY : initIdleCapacity);
-        _pool = new Stack();
+        _pool = new Stack<T>();
         _pool.ensureCapacity( initcapacity > _maxSleeping ? _maxSleeping : initcapacity);
     }
 
     /**
      * <p>Borrows an object from the pool.  If there are idle instances available on the stack,
      * the top element of the stack is popped to activate, validate and return to the client.  If there
-     * are no idle instances available, the {@link PoolableObjectFactory#makeObject() makeObject} 
+     * are no idle instances available, the {@link PoolableObjectFactory#makeObject() makeObject}
      * method of the pool's {@link PoolableObjectFactory} is invoked to create a new instance.</p>
-     * 
+     *
      * <p>All instances are {@link PoolableObjectFactory#activateObject(Object) activated} and
      * {@link PoolableObjectFactory#validateObject(Object) validated} before being returned to the
-     * client.  If validation fails or an exception occurs activating or validating an instance 
-     * popped from the idle instance stack, the failing instance is 
+     * client.  If validation fails or an exception occurs activating or validating an instance
+     * popped from the idle instance stack, the failing instance is
      * {@link PoolableObjectFactory#destroyObject(Object) destroyed} and the next instance on
      * the stack is popped, validated and activated.  This process continues until either the
      * stack is empty or an instance passes validation.  If the stack is empty on activation or
      * it does not contain any valid instances, the factory's <code>makeObject</code> method is used
      * to create a new instance.  If a null instance is returned by the factory or the created
      * instance either raises an exception on activation or fails validation, <code>NoSuchElementException</code>
-     * is thrown. Exceptions thrown by <code>MakeObject</code> are propagated to the caller; but 
+     * is thrown. Exceptions thrown by <code>MakeObject</code> are propagated to the caller; but
      * other than <code>ThreadDeath</code> or <code>VirtualMachineError</code>, exceptions generated by
      * activation, validation or destroy methods are swallowed silently.</p>
-     * 
+     *
      * @return an instance from the pool
      */
-    public synchronized Object borrowObject() throws Exception {
+    @Override
+    public synchronized T borrowObject() throws Exception {
         assertOpen();
-        Object obj = null;
+        T obj = null;
         boolean newlyCreated = false;
         while (null == obj) {
             if (!_pool.empty()) {
@@ -212,13 +218,14 @@ public class StackObjectPool extends BaseObjectPool implements ObjectPool {
      * If adding a validated, passivated returning instance to the stack would cause
      * {@link #getMaxSleeping() maxSleeping} to be exceeded, the oldest (bottom) instance on the stack
      * is destroyed to make room for the returning instance, which is pushed on top of the stack.</p>
-     * 
+     *
      * <p>Exceptions passivating or destroying instances are silently swallowed.  Exceptions validating
      * instances are propagated to the client.</p>
-     * 
+     *
      * @param obj instance to return to the pool
      */
-    public synchronized void returnObject(Object obj) throws Exception {
+    @Override
+    public synchronized void returnObject(T obj) throws Exception {
         boolean success = !isClosed();
         if(null != _factory) {
             if(!_factory.validateObject(obj)) {
@@ -236,7 +243,7 @@ public class StackObjectPool extends BaseObjectPool implements ObjectPool {
 
         _numActive--;
         if (success) {
-            Object toBeDestroyed = null;
+            T toBeDestroyed = null;
             if(_pool.size() >= _maxSleeping) {
                 shouldDestroy = true;
                 toBeDestroyed = _pool.remove(0); // remove the stalest object
@@ -258,7 +265,8 @@ public class StackObjectPool extends BaseObjectPool implements ObjectPool {
     /**
      * {@inheritDoc}
      */
-    public synchronized void invalidateObject(Object obj) throws Exception {
+    @Override
+    public synchronized void invalidateObject(T obj) throws Exception {
         _numActive--;
         if (null != _factory) {
             _factory.destroyObject(obj);
@@ -272,6 +280,7 @@ public class StackObjectPool extends BaseObjectPool implements ObjectPool {
      *
      * @return the number of instances currently idle in this pool
      */
+    @Override
     public synchronized int getNumIdle() {
         return _pool.size();
     }
@@ -281,6 +290,7 @@ public class StackObjectPool extends BaseObjectPool implements ObjectPool {
      *
      * @return the number of instances currently borrowed from this pool
      */
+    @Override
     public synchronized int getNumActive() {
         return _numActive;
     }
@@ -289,9 +299,10 @@ public class StackObjectPool extends BaseObjectPool implements ObjectPool {
      * Clears any objects sitting idle in the pool. Silently swallows any
      * exceptions thrown by {@link PoolableObjectFactory#destroyObject(Object)}.
      */
+    @Override
     public synchronized void clear() {
         if(null != _factory) {
-            Iterator it = _pool.iterator();
+            Iterator<T> it = _pool.iterator();
             while(it.hasNext()) {
                 try {
                     _factory.destroyObject(it.next());
@@ -306,13 +317,14 @@ public class StackObjectPool extends BaseObjectPool implements ObjectPool {
     /**
      * <p>Close this pool, and free any resources associated with it. Invokes
      * {@link #clear()} to destroy and remove instances in the pool.</p>
-     * 
+     *
      * <p>Calling {@link #addObject} or {@link #borrowObject} after invoking
      * this method on a pool will cause them to throw an
      * {@link IllegalStateException}.</p>
      *
      * @throws Exception never - exceptions clearing the pool are swallowed
      */
+    @Override
     public void close() throws Exception {
         super.close();
         clear();
@@ -321,27 +333,28 @@ public class StackObjectPool extends BaseObjectPool implements ObjectPool {
     /**
      * <p>Create an object, and place it on top of the stack.
      * This method is useful for "pre-loading" a pool with idle objects.</p>
-     * 
+     *
      * <p>Before being added to the pool, the newly created instance is
-     * {@link PoolableObjectFactory#validateObject(Object) validated} and 
+     * {@link PoolableObjectFactory#validateObject(Object) validated} and
      * {@link PoolableObjectFactory#passivateObject(Object) passivated}.  If validation
      * fails, the new instance is {@link PoolableObjectFactory#destroyObject(Object) destroyed}.
      * Exceptions generated by the factory <code>makeObject</code> or <code>passivate</code> are
      * propagated to the caller. Exceptions destroying instances are silently swallowed.</p>
-     * 
+     *
      * <p>If a new instance is created and successfully validated and passivated and adding this
      * instance to the pool causes {@link #getMaxSleeping() maxSleeping} to be exceeded, the oldest
      * (bottom) instance in the pool is destroyed to make room for the newly created instance, which
      * is pushed on top of the stack.
-     * 
+     *
      * @throws Exception when the {@link #getFactory() factory} has a problem creating or passivating an object.
      */
+    @Override
     public synchronized void addObject() throws Exception {
         assertOpen();
         if (_factory == null) {
             throw new IllegalStateException("Cannot add objects without a factory.");
         }
-        Object obj = _factory.makeObject();
+        T obj = _factory.makeObject();
 
         boolean success = true;
         if(!_factory.validateObject(obj)) {
@@ -353,7 +366,7 @@ public class StackObjectPool extends BaseObjectPool implements ObjectPool {
         boolean shouldDestroy = !success;
 
         if (success) {
-            Object toBeDestroyed = null;
+            T toBeDestroyed = null;
             if(_pool.size() >= _maxSleeping) {
                 shouldDestroy = true;
                 toBeDestroyed = _pool.remove(0); // remove the stalest object
@@ -382,7 +395,9 @@ public class StackObjectPool extends BaseObjectPool implements ObjectPool {
      * @throws IllegalStateException when the factory cannot be set at this time
      * @deprecated to be removed in pool 2.0
      */
-    public synchronized void setFactory(PoolableObjectFactory factory) throws IllegalStateException {
+    @Deprecated
+    @Override
+    public synchronized void setFactory(PoolableObjectFactory<T> factory) throws IllegalStateException {
         assertOpen();
         if(0 < getNumActive()) {
             throw new IllegalStateException("Objects are already active");
@@ -404,43 +419,47 @@ public class StackObjectPool extends BaseObjectPool implements ObjectPool {
      */
     protected static final int DEFAULT_INIT_SLEEPING_CAPACITY = 4;
 
-    /** 
+    /**
      * My pool.
-     * @deprecated to be made private in pool 2.0 
+     * @deprecated to be made private in pool 2.0
      */
-    protected Stack _pool = null;
+    @Deprecated
+    protected Stack<T> _pool = null;
 
-    /** 
+    /**
      * My {@link PoolableObjectFactory}.
      * @deprecated to be made private in pool 2.0 - use {@link #getFactory()}
      */
-    protected PoolableObjectFactory _factory = null;
+    @Deprecated
+    protected PoolableObjectFactory<T> _factory = null;
 
-    /** 
-     * The cap on the number of "sleeping" instances in the pool. 
+    /**
+     * The cap on the number of "sleeping" instances in the pool.
      * @deprecated to be made private in pool 2.0 - use {@link #getMaxSleeping()}
      */
+    @Deprecated
     protected int _maxSleeping = DEFAULT_MAX_SLEEPING;
-    
+
     /**
      * Number of objects borrowed but not yet returned to the pool.
      * @deprecated to be made private in pool 2.0 - use {@link #getNumActive()}
      */
+    @Deprecated
     protected int _numActive = 0;
 
     /**
      * Returns the {@link PoolableObjectFactory} used by this pool to create and manage object instances.
-     * 
+     *
      * @return the factory
      * @since 1.5.5
      */
-    public synchronized PoolableObjectFactory getFactory() {
+    public synchronized PoolableObjectFactory<T> getFactory() {
         return _factory;
     }
 
     /**
      * Returns the maximum number of idle instances in the pool.
-     * 
+     *
      * @return maxSleeping
      * @since 1.5.5
      */
@@ -448,5 +467,5 @@ public class StackObjectPool extends BaseObjectPool implements ObjectPool {
         return _maxSleeping;
     }
 
-   
+
 }

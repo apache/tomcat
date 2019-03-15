@@ -22,6 +22,8 @@ package org.apache.tomcat.dbcp.pool;
  * <p>
  * All operations defined here are essentially no-op's.
  *
+ * @param <T> the type of objects held in this pool
+ *
  * @see PoolableObjectFactory
  * @see BaseKeyedPoolableObjectFactory
  *
@@ -29,46 +31,46 @@ package org.apache.tomcat.dbcp.pool;
  * @version $Revision: 965336 $ $Date: 2010-07-18 17:58:33 -0700 (Sun, 18 Jul 2010) $
  * @since Pool 1.0
  */
-public abstract class BasePoolableObjectFactory implements PoolableObjectFactory {
-    
+public abstract class BasePoolableObjectFactory<T> implements PoolableObjectFactory<T> {
+
     /**
      * {@inheritDoc}
      */
-    public abstract Object makeObject() throws Exception;
+    public abstract T makeObject() throws Exception;
 
     /**
      *  No-op.
-     *  
+     *
      *  @param obj ignored
      */
-    public void destroyObject(Object obj)
+    public void destroyObject(T obj)
         throws Exception  {
     }
 
     /**
      * This implementation always returns <tt>true</tt>.
-     * 
+     *
      * @param obj ignored
      * @return <tt>true</tt>
      */
-    public boolean validateObject(Object obj) {
+    public boolean validateObject(T obj) {
         return true;
     }
 
     /**
      *  No-op.
-     *  
+     *
      *  @param obj ignored
      */
-    public void activateObject(Object obj) throws Exception {
+    public void activateObject(T obj) throws Exception {
     }
 
     /**
      *  No-op.
-     *  
+     *
      * @param obj ignored
      */
-    public void passivateObject(Object obj)
+    public void passivateObject(T obj)
         throws Exception {
     }
 }

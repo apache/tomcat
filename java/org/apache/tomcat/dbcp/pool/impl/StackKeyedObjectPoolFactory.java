@@ -24,6 +24,9 @@ import org.apache.tomcat.dbcp.pool.KeyedPoolableObjectFactory;
 /**
  * A factory for creating {@link StackKeyedObjectPool} instances.
  *
+ * @param <K> the type of keys in this pool
+ * @param <V> the type of objects held in this pool
+ *
  * @see StackKeyedObjectPool
  * @see KeyedObjectPoolFactory
  *
@@ -31,14 +34,14 @@ import org.apache.tomcat.dbcp.pool.KeyedPoolableObjectFactory;
  * @version $Revision: 958436 $ $Date: 2010-06-27 17:33:17 -0700 (Sun, 27 Jun 2010) $
  * @since Pool 1.0
  */
-public class StackKeyedObjectPoolFactory implements KeyedObjectPoolFactory {
+public class StackKeyedObjectPoolFactory<K, V> implements KeyedObjectPoolFactory<K, V> {
     /**
      * Create a new StackKeyedObjectPoolFactory.
      *
      * @see StackKeyedObjectPool#StackKeyedObjectPool()
      */
     public StackKeyedObjectPoolFactory() {
-        this((KeyedPoolableObjectFactory)null,StackKeyedObjectPool.DEFAULT_MAX_SLEEPING,StackKeyedObjectPool.DEFAULT_INIT_SLEEPING_CAPACITY);
+        this(null,StackKeyedObjectPool.DEFAULT_MAX_SLEEPING,StackKeyedObjectPool.DEFAULT_INIT_SLEEPING_CAPACITY);
     }
 
     /**
@@ -48,7 +51,7 @@ public class StackKeyedObjectPoolFactory implements KeyedObjectPoolFactory {
      * @see StackKeyedObjectPool#StackKeyedObjectPool(int)
      */
     public StackKeyedObjectPoolFactory(int maxSleeping) {
-        this((KeyedPoolableObjectFactory)null,maxSleeping,StackKeyedObjectPool.DEFAULT_INIT_SLEEPING_CAPACITY);
+        this(null,maxSleeping,StackKeyedObjectPool.DEFAULT_INIT_SLEEPING_CAPACITY);
     }
 
     /**
@@ -60,7 +63,7 @@ public class StackKeyedObjectPoolFactory implements KeyedObjectPoolFactory {
      * @see StackKeyedObjectPool#StackKeyedObjectPool(int, int)
      */
     public StackKeyedObjectPoolFactory(int maxSleeping, int initialCapacity) {
-        this((KeyedPoolableObjectFactory)null,maxSleeping,initialCapacity);
+        this(null,maxSleeping,initialCapacity);
     }
 
     /**
@@ -69,7 +72,7 @@ public class StackKeyedObjectPoolFactory implements KeyedObjectPoolFactory {
      * @param factory the KeyedPoolableObjectFactory used by created pools.
      * @see StackKeyedObjectPool#StackKeyedObjectPool(KeyedPoolableObjectFactory)
      */
-    public StackKeyedObjectPoolFactory(KeyedPoolableObjectFactory factory) {
+    public StackKeyedObjectPoolFactory(KeyedPoolableObjectFactory<K, V> factory) {
         this(factory,StackKeyedObjectPool.DEFAULT_MAX_SLEEPING,StackKeyedObjectPool.DEFAULT_INIT_SLEEPING_CAPACITY);
     }
 
@@ -80,7 +83,7 @@ public class StackKeyedObjectPoolFactory implements KeyedObjectPoolFactory {
      * @param maxSleeping cap on the number of "sleeping" instances in the pool.
      * @see StackKeyedObjectPool#StackKeyedObjectPool(KeyedPoolableObjectFactory, int)
      */
-    public StackKeyedObjectPoolFactory(KeyedPoolableObjectFactory factory, int maxSleeping) {
+    public StackKeyedObjectPoolFactory(KeyedPoolableObjectFactory<K, V> factory, int maxSleeping) {
         this(factory,maxSleeping,StackKeyedObjectPool.DEFAULT_INIT_SLEEPING_CAPACITY);
     }
 
@@ -93,7 +96,7 @@ public class StackKeyedObjectPoolFactory implements KeyedObjectPoolFactory {
      * it does not cause the pool to be pre-populated.)
      * @see StackKeyedObjectPool#StackKeyedObjectPool(KeyedPoolableObjectFactory, int, int)
      */
-    public StackKeyedObjectPoolFactory(KeyedPoolableObjectFactory factory, int maxSleeping, int initialCapacity) {
+    public StackKeyedObjectPoolFactory(KeyedPoolableObjectFactory<K, V> factory, int maxSleeping, int initialCapacity) {
         _factory = factory;
         _maxSleeping = maxSleeping;
         _initCapacity = initialCapacity;
@@ -101,44 +104,47 @@ public class StackKeyedObjectPoolFactory implements KeyedObjectPoolFactory {
 
     /**
      * Create a StackKeyedObjectPool with current property settings.
-     * 
+     *
      * @return a new StackKeyedObjectPool with the configured factory, maxSleeping and initialCapacity
      */
-    public KeyedObjectPool createPool() {
-        return new StackKeyedObjectPool(_factory,_maxSleeping,_initCapacity);
+    public KeyedObjectPool<K, V> createPool() {
+        return new StackKeyedObjectPool<K, V>(_factory,_maxSleeping,_initCapacity);
     }
 
-    /** 
+    /**
      * KeyedPoolableObjectFactory used by StackKeyedObjectPools created by this factory
-     * @deprecated to be removed in pool 2.0 
+     * @deprecated to be removed in pool 2.0
      */
-    protected KeyedPoolableObjectFactory _factory = null;
-    
-    /** 
+    @Deprecated
+    protected KeyedPoolableObjectFactory<K, V> _factory = null;
+
+    /**
      * Maximum number of idle instances in each keyed pool for StackKeyedObjectPools created by this factory
      * @deprecated to be removed in pool 2.0
      */
+    @Deprecated
     protected int _maxSleeping = StackKeyedObjectPool.DEFAULT_MAX_SLEEPING;
-    
+
     /**
      * Initial capacity of StackKeyedObjectPools created by this factory.
      * @deprecated to be removed in pool 2.0
      */
+    @Deprecated
     protected int _initCapacity = StackKeyedObjectPool.DEFAULT_INIT_SLEEPING_CAPACITY;
 
     /**
      * Returns the KeyedPoolableObjectFactory used by StackKeyedObjectPools created by this factory
-     * 
+     *
      * @return factory setting for created pools
      * @since 1.5.5
      */
-    public KeyedPoolableObjectFactory getFactory() {
+    public KeyedPoolableObjectFactory<K, V> getFactory() {
         return _factory;
     }
 
     /**
      * Returns the maximum number of idle instances in each keyed pool for StackKeyedObjectPools created by this factory
-     * 
+     *
      * @return maxSleeping setting for created pools
      * @since 1.5.5
      */
@@ -148,7 +154,7 @@ public class StackKeyedObjectPoolFactory implements KeyedObjectPoolFactory {
 
     /**
      * Returns the initial capacity of StackKeyedObjectPools created by this factory.
-     * 
+     *
      * @return initial capacity setting for created pools
      * @since 1.5.5
      */

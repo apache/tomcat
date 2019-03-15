@@ -18,17 +18,16 @@
 package org.apache.tomcat.dbcp.pool.impl;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.NoSuchElementException;
 import java.util.Set;
-import java.util.TreeMap;
 import java.util.TimerTask;
-import java.util.Map.Entry;
+import java.util.TreeMap;
 
 import org.apache.tomcat.dbcp.pool.BaseKeyedObjectPool;
 import org.apache.tomcat.dbcp.pool.KeyedObjectPool;
@@ -194,6 +193,10 @@ import org.apache.tomcat.dbcp.pool.PoolUtils;
  * ensure that no call to a factory method will occur within a synchronization
  * block. See POOL-125 and DBCP-44 for more information.
  * </p>
+ *
+ * * @param <K> the type of keys in this pool
+ * @param <V> the type of objects held in this pool
+ *
  * @see GenericObjectPool
  * @author Rodney Waldhoff
  * @author Dirk Verbeeck
@@ -201,7 +204,7 @@ import org.apache.tomcat.dbcp.pool.PoolUtils;
  * @version $Revision: 1206500 $ $Date: 2011-11-26 10:09:06 -0700 (Sat, 26 Nov 2011) $
  * @since Pool 1.0
  */
-public class GenericKeyedObjectPool extends BaseKeyedObjectPool implements KeyedObjectPool {
+public class GenericKeyedObjectPool<K, V> extends BaseKeyedObjectPool<K, V> implements KeyedObjectPool<K, V> {
 
     //--- public constants -------------------------------------------
 
@@ -368,7 +371,7 @@ public class GenericKeyedObjectPool extends BaseKeyedObjectPool implements Keyed
      * @param factory the <code>KeyedPoolableObjectFactory</code> to use to create, validate, and destroy
      * objects if not <code>null</code>
      */
-    public GenericKeyedObjectPool(KeyedPoolableObjectFactory factory) {
+    public GenericKeyedObjectPool(KeyedPoolableObjectFactory<K, V> factory) {
         this(factory, DEFAULT_MAX_ACTIVE, DEFAULT_WHEN_EXHAUSTED_ACTION, DEFAULT_MAX_WAIT, DEFAULT_MAX_IDLE,
                 DEFAULT_TEST_ON_BORROW, DEFAULT_TEST_ON_RETURN, DEFAULT_TIME_BETWEEN_EVICTION_RUNS_MILLIS,
                 DEFAULT_NUM_TESTS_PER_EVICTION_RUN, DEFAULT_MIN_EVICTABLE_IDLE_TIME_MILLIS, DEFAULT_TEST_WHILE_IDLE);
@@ -380,7 +383,7 @@ public class GenericKeyedObjectPool extends BaseKeyedObjectPool implements Keyed
      * if not <code>null</code>
      * @param config a non-<code>null</code> {@link GenericKeyedObjectPool.Config} describing the configuration
      */
-    public GenericKeyedObjectPool(KeyedPoolableObjectFactory factory, GenericKeyedObjectPool.Config config) {
+    public GenericKeyedObjectPool(KeyedPoolableObjectFactory<K, V> factory, GenericKeyedObjectPool.Config config) {
         this(factory, config.maxActive, config.whenExhaustedAction, config.maxWait, config.maxIdle, config.maxTotal,
                 config.minIdle, config.testOnBorrow, config.testOnReturn, config.timeBetweenEvictionRunsMillis,
                 config.numTestsPerEvictionRun, config.minEvictableIdleTimeMillis, config.testWhileIdle, config.lifo);
@@ -392,7 +395,7 @@ public class GenericKeyedObjectPool extends BaseKeyedObjectPool implements Keyed
      * if not <code>null</code>
      * @param maxActive the maximum number of objects that can be borrowed from me at one time (see {@link #setMaxActive})
      */
-    public GenericKeyedObjectPool(KeyedPoolableObjectFactory factory, int maxActive) {
+    public GenericKeyedObjectPool(KeyedPoolableObjectFactory<K, V> factory, int maxActive) {
         this(factory,maxActive, DEFAULT_WHEN_EXHAUSTED_ACTION, DEFAULT_MAX_WAIT, DEFAULT_MAX_IDLE,
                 DEFAULT_TEST_ON_BORROW, DEFAULT_TEST_ON_RETURN, DEFAULT_TIME_BETWEEN_EVICTION_RUNS_MILLIS,
                 DEFAULT_NUM_TESTS_PER_EVICTION_RUN, DEFAULT_MIN_EVICTABLE_IDLE_TIME_MILLIS, DEFAULT_TEST_WHILE_IDLE);
@@ -407,7 +410,7 @@ public class GenericKeyedObjectPool extends BaseKeyedObjectPool implements Keyed
      * @param maxWait the maximum amount of time to wait for an idle object when the pool is exhausted and
      *  <code>whenExhaustedAction</code> is {@link #WHEN_EXHAUSTED_BLOCK} (otherwise ignored) (see {@link #setMaxWait})
      */
-    public GenericKeyedObjectPool(KeyedPoolableObjectFactory factory, int maxActive, byte whenExhaustedAction,
+    public GenericKeyedObjectPool(KeyedPoolableObjectFactory<K, V> factory, int maxActive, byte whenExhaustedAction,
             long maxWait) {
         this(factory, maxActive, whenExhaustedAction, maxWait, DEFAULT_MAX_IDLE, DEFAULT_TEST_ON_BORROW,
                 DEFAULT_TEST_ON_RETURN, DEFAULT_TIME_BETWEEN_EVICTION_RUNS_MILLIS, DEFAULT_NUM_TESTS_PER_EVICTION_RUN,
@@ -427,7 +430,7 @@ public class GenericKeyedObjectPool extends BaseKeyedObjectPool implements Keyed
      * @param testOnReturn whether or not to validate objects after they are returned to the {@link #returnObject}
      * method (see {@link #setTestOnReturn})
      */
-    public GenericKeyedObjectPool(KeyedPoolableObjectFactory factory, int maxActive, byte whenExhaustedAction,
+    public GenericKeyedObjectPool(KeyedPoolableObjectFactory<K, V> factory, int maxActive, byte whenExhaustedAction,
             long maxWait, boolean testOnBorrow, boolean testOnReturn) {
         this(factory, maxActive, whenExhaustedAction, maxWait, DEFAULT_MAX_IDLE,testOnBorrow,testOnReturn,
                 DEFAULT_TIME_BETWEEN_EVICTION_RUNS_MILLIS, DEFAULT_NUM_TESTS_PER_EVICTION_RUN,
@@ -445,7 +448,7 @@ public class GenericKeyedObjectPool extends BaseKeyedObjectPool implements Keyed
      * <code>whenExhaustedAction</code> is {@link #WHEN_EXHAUSTED_BLOCK} (otherwise ignored) (see {@link #setMaxWait})
      * @param maxIdle the maximum number of idle objects in my pool (see {@link #setMaxIdle})
      */
-    public GenericKeyedObjectPool(KeyedPoolableObjectFactory factory, int maxActive, byte whenExhaustedAction,
+    public GenericKeyedObjectPool(KeyedPoolableObjectFactory<K, V> factory, int maxActive, byte whenExhaustedAction,
             long maxWait, int maxIdle) {
         this(factory, maxActive, whenExhaustedAction, maxWait, maxIdle, DEFAULT_TEST_ON_BORROW, DEFAULT_TEST_ON_RETURN,
                 DEFAULT_TIME_BETWEEN_EVICTION_RUNS_MILLIS, DEFAULT_NUM_TESTS_PER_EVICTION_RUN,
@@ -467,7 +470,7 @@ public class GenericKeyedObjectPool extends BaseKeyedObjectPool implements Keyed
      * @param testOnReturn whether or not to validate objects after they are returned to the {@link #returnObject}
      * method (see {@link #setTestOnReturn})
      */
-    public GenericKeyedObjectPool(KeyedPoolableObjectFactory factory, int maxActive, byte whenExhaustedAction,
+    public GenericKeyedObjectPool(KeyedPoolableObjectFactory<K, V> factory, int maxActive, byte whenExhaustedAction,
             long maxWait, int maxIdle, boolean testOnBorrow, boolean testOnReturn) {
         this(factory, maxActive, whenExhaustedAction, maxWait, maxIdle, testOnBorrow, testOnReturn,
                 DEFAULT_TIME_BETWEEN_EVICTION_RUNS_MILLIS, DEFAULT_NUM_TESTS_PER_EVICTION_RUN,
@@ -498,7 +501,7 @@ public class GenericKeyedObjectPool extends BaseKeyedObjectPool implements Keyed
      * @param testWhileIdle whether or not to validate objects in the idle object eviction thread, if any
      * (see {@link #setTestWhileIdle})
      */
-    public GenericKeyedObjectPool(KeyedPoolableObjectFactory factory, int maxActive, byte whenExhaustedAction,
+    public GenericKeyedObjectPool(KeyedPoolableObjectFactory<K, V> factory, int maxActive, byte whenExhaustedAction,
             long maxWait, int maxIdle, boolean testOnBorrow, boolean testOnReturn, long timeBetweenEvictionRunsMillis,
             int numTestsPerEvictionRun, long minEvictableIdleTimeMillis, boolean testWhileIdle) {
         this(factory, maxActive, whenExhaustedAction, maxWait, maxIdle, GenericKeyedObjectPool.DEFAULT_MAX_TOTAL,
@@ -530,7 +533,7 @@ public class GenericKeyedObjectPool extends BaseKeyedObjectPool implements Keyed
      * @param testWhileIdle whether or not to validate objects in the idle object eviction thread, if any
      * (see {@link #setTestWhileIdle})
      */
-    public GenericKeyedObjectPool(KeyedPoolableObjectFactory factory, int maxActive, byte whenExhaustedAction,
+    public GenericKeyedObjectPool(KeyedPoolableObjectFactory<K, V> factory, int maxActive, byte whenExhaustedAction,
             long maxWait, int maxIdle, int maxTotal, boolean testOnBorrow, boolean testOnReturn,
             long timeBetweenEvictionRunsMillis, int numTestsPerEvictionRun, long minEvictableIdleTimeMillis,
             boolean testWhileIdle) {
@@ -565,7 +568,7 @@ public class GenericKeyedObjectPool extends BaseKeyedObjectPool implements Keyed
      * (see {@link #setTestWhileIdle})
      * @since Pool 1.3
      */
-    public GenericKeyedObjectPool(KeyedPoolableObjectFactory factory, int maxActive, byte whenExhaustedAction,
+    public GenericKeyedObjectPool(KeyedPoolableObjectFactory<K, V> factory, int maxActive, byte whenExhaustedAction,
             long maxWait, int maxIdle, int maxTotal, int minIdle, boolean testOnBorrow, boolean testOnReturn,
             long timeBetweenEvictionRunsMillis, int numTestsPerEvictionRun, long minEvictableIdleTimeMillis,
             boolean testWhileIdle) {
@@ -601,7 +604,7 @@ public class GenericKeyedObjectPool extends BaseKeyedObjectPool implements Keyed
      * @param lifo whether or not the pools behave as LIFO (last in first out) queues (see {@link #setLifo})
      * @since Pool 1.4
      */
-    public GenericKeyedObjectPool(KeyedPoolableObjectFactory factory, int maxActive, byte whenExhaustedAction,
+    public GenericKeyedObjectPool(KeyedPoolableObjectFactory<K, V> factory, int maxActive, byte whenExhaustedAction,
             long maxWait, int maxIdle, int maxTotal, int minIdle, boolean testOnBorrow, boolean testOnReturn,
             long timeBetweenEvictionRunsMillis, int numTestsPerEvictionRun, long minEvictableIdleTimeMillis,
             boolean testWhileIdle, boolean lifo) {
@@ -630,8 +633,8 @@ public class GenericKeyedObjectPool extends BaseKeyedObjectPool implements Keyed
         _minEvictableIdleTimeMillis = minEvictableIdleTimeMillis;
         _testWhileIdle = testWhileIdle;
 
-        _poolMap = new HashMap();
-        _poolList = new CursorableLinkedList();
+        _poolMap = new HashMap<K, ObjectQueue>();
+        _poolList = new CursorableLinkedList<K>();
 
         startEvictor(_timeBetweenEvictionRunsMillis);
     }
@@ -1100,9 +1103,10 @@ public class GenericKeyedObjectPool extends BaseKeyedObjectPool implements Keyed
      * @return object instance from the keyed pool
      * @throws NoSuchElementException if a keyed object instance cannot be returned.
      */
-     public Object borrowObject(Object key) throws Exception {
+     @Override
+    public V borrowObject(K key) throws Exception {
         long starttime = System.currentTimeMillis();
-        Latch latch = new Latch(key);
+        Latch<K, V> latch = new Latch<K, V>(key);
         byte whenExhaustedAction;
         long maxWait;
         synchronized (this) {
@@ -1228,8 +1232,8 @@ public class GenericKeyedObjectPool extends BaseKeyedObjectPool implements Keyed
             boolean newlyCreated = false;
             if (null == latch.getPair()) {
                 try {
-                    Object obj = _factory.makeObject(key);
-                    latch.setPair(new ObjectTimestampPair(obj));
+                    V obj = _factory.makeObject(key);
+                    latch.setPair(new ObjectTimestampPair<V>(obj));
                     newlyCreated = true;
                 } finally {
                     if (!newlyCreated) {
@@ -1272,10 +1276,9 @@ public class GenericKeyedObjectPool extends BaseKeyedObjectPool implements Keyed
                 }
                 allocate();
                 if (newlyCreated) {
-                    NoSuchElementException nsee = new NoSuchElementException(
-                            "Unable to validate object");
-                    nsee.initCause(e);
-                    throw nsee;
+                    throw new NoSuchElementException(
+                       "Could not create a validated object, cause: " +
+                            e.getMessage());
                 }
                 else {
                     continue; // keep looping
@@ -1294,14 +1297,16 @@ public class GenericKeyedObjectPool extends BaseKeyedObjectPool implements Keyed
         boolean clearOldest = false;
 
         synchronized (this) {
-            if (isClosed()) return;
+            if (isClosed()) {
+                return;
+            }
 
-            Iterator allocationQueueIter = _allocationQueue.iterator();
+            Iterator<Latch<K, V>> allocationQueueIter = _allocationQueue.iterator();
 
             while (allocationQueueIter.hasNext()) {
                 // First use any objects in the pool to clear the queue
-                Latch latch = (Latch) allocationQueueIter.next();
-                ObjectQueue pool = (ObjectQueue)(_poolMap.get(latch.getkey()));
+                Latch<K, V> latch = allocationQueueIter.next();
+                ObjectQueue pool = (_poolMap.get(latch.getkey()));
                 if (null == pool) {
                     pool = new ObjectQueue();
                     _poolMap.put(latch.getkey(), pool);
@@ -1311,7 +1316,7 @@ public class GenericKeyedObjectPool extends BaseKeyedObjectPool implements Keyed
                 if (!pool.queue.isEmpty()) {
                     allocationQueueIter.remove();
                     latch.setPair(
-                            (ObjectTimestampPair) pool.queue.removeFirst());
+                            pool.queue.removeFirst());
                     pool.incrementInternalProcessingCount();
                     _totalIdle--;
                     synchronized (latch) {
@@ -1380,15 +1385,16 @@ public class GenericKeyedObjectPool extends BaseKeyedObjectPool implements Keyed
      * while removed items are being destroyed.</li>
      * <li>Exceptions encountered destroying idle instances are swallowed.</li></ul></p>
      */
+    @Override
     public void clear() {
-        Map toDestroy = new HashMap();
+        Map<K,  List<ObjectTimestampPair<V>>> toDestroy = new HashMap<K,  List<ObjectTimestampPair<V>>>();
         synchronized (this) {
-            for (Iterator it = _poolMap.keySet().iterator(); it.hasNext();) {
-                Object key = it.next();
-                ObjectQueue pool = (ObjectQueue)_poolMap.get(key);
+            for (Iterator<K> it = _poolMap.keySet().iterator(); it.hasNext();) {
+                K key = it.next();
+                ObjectQueue pool = _poolMap.get(key);
                 // Copy objects to new list so pool.queue can be cleared inside
                 // the sync
-                List objects = new ArrayList();
+                List<ObjectTimestampPair<V>> objects = new ArrayList<ObjectTimestampPair<V>>();
                 objects.addAll(pool.queue);
                 toDestroy.put(key, objects);
                 it.remove();
@@ -1410,15 +1416,15 @@ public class GenericKeyedObjectPool extends BaseKeyedObjectPool implements Keyed
      */
     public void clearOldest() {
         // Map of objects to destroy my key
-        final Map toDestroy = new HashMap();
+        final Map<K, List<ObjectTimestampPair<V>>> toDestroy = new HashMap<K, List<ObjectTimestampPair<V>>>();
 
         // build sorted map of idle objects
-        final Map map = new TreeMap();
+        final Map<ObjectTimestampPair<V>, K> map = new TreeMap<ObjectTimestampPair<V>, K>();
         synchronized (this) {
-            for (Iterator keyiter = _poolMap.keySet().iterator(); keyiter.hasNext();) {
-                final Object key = keyiter.next();
-                final CursorableLinkedList list = ((ObjectQueue)_poolMap.get(key)).queue;
-                for (Iterator it = list.iterator(); it.hasNext();) {
+            for (Iterator<K> keyiter = _poolMap.keySet().iterator(); keyiter.hasNext();) {
+                final K key = keyiter.next();
+                final List<ObjectTimestampPair<V>> list = _poolMap.get(key).queue;
+                for (Iterator<ObjectTimestampPair<V>> it = list.iterator(); it.hasNext();) {
                     // each item into the map uses the objectimestamppair object
                     // as the key.  It then gets sorted based on the timstamp field
                     // each value in the map is the parent list it belongs in.
@@ -1427,25 +1433,25 @@ public class GenericKeyedObjectPool extends BaseKeyedObjectPool implements Keyed
             }
 
             // Now iterate created map and kill the first 15% plus one to account for zero
-            Set setPairKeys = map.entrySet();
+            Set<Entry<ObjectTimestampPair<V>, K>> setPairKeys = map.entrySet();
             int itemsToRemove = ((int) (map.size() * 0.15)) + 1;
 
-            Iterator iter = setPairKeys.iterator();
+            Iterator<Entry<ObjectTimestampPair<V>, K>> iter = setPairKeys.iterator();
             while (iter.hasNext() && itemsToRemove > 0) {
-                Map.Entry entry = (Map.Entry) iter.next();
+                Entry<ObjectTimestampPair<V>, K> entry = iter.next();
                 // kind of backwards on naming.  In the map, each key is the objecttimestamppair
                 // because it has the ordering with the timestamp value.  Each value that the
                 // key references is the key of the list it belongs to.
-                Object key = entry.getValue();
-                ObjectTimestampPair pairTimeStamp = (ObjectTimestampPair) entry.getKey();
-                ObjectQueue objectQueue = (ObjectQueue)_poolMap.get(key);
-                final CursorableLinkedList list = objectQueue.queue;
+                K key = entry.getValue();
+                ObjectTimestampPair<V> pairTimeStamp = entry.getKey();
+                ObjectQueue objectQueue = _poolMap.get(key);
+                final List<ObjectTimestampPair<V>> list = objectQueue.queue;
                 list.remove(pairTimeStamp);
 
                 if (toDestroy.containsKey(key)) {
-                    ((List)toDestroy.get(key)).add(pairTimeStamp);
+                    toDestroy.get(key).add(pairTimeStamp);
                 } else {
-                    List listForKey = new ArrayList();
+                    List<ObjectTimestampPair<V>> listForKey = new ArrayList<ObjectTimestampPair<V>>();
                     listForKey.add(pairTimeStamp);
                     toDestroy.put(key, listForKey);
                 }
@@ -1463,12 +1469,13 @@ public class GenericKeyedObjectPool extends BaseKeyedObjectPool implements Keyed
      *
      * @param key the key to clear
      */
-    public void clear(Object key) {
-        Map toDestroy = new HashMap();
+    @Override
+    public void clear(K key) {
+        Map<K, List<ObjectTimestampPair<V>>> toDestroy = new HashMap<K , List<ObjectTimestampPair<V>>>();
 
         final ObjectQueue pool;
         synchronized (this) {
-            pool = (ObjectQueue)(_poolMap.remove(key));
+            pool = _poolMap.remove(key);
             if (pool == null) {
                 return;
             } else {
@@ -1476,7 +1483,7 @@ public class GenericKeyedObjectPool extends BaseKeyedObjectPool implements Keyed
             }
             // Copy objects to new list so pool.queue can be cleared inside
             // the sync
-            List objects = new ArrayList();
+            List<ObjectTimestampPair<V>> objects = new ArrayList<ObjectTimestampPair<V>>();
             objects.addAll(pool.queue);
             toDestroy.put(key, objects);
             _totalIdle = _totalIdle - pool.queue.size();
@@ -1494,21 +1501,21 @@ public class GenericKeyedObjectPool extends BaseKeyedObjectPool implements Keyed
      * @param m Map containing keyed pools to clear
      * @param factory KeyedPoolableObjectFactory used to destroy the objects
      */
-    private void destroy(Map m, KeyedPoolableObjectFactory factory) {
-        for (Iterator entries = m.entrySet().iterator(); entries.hasNext();) {
-            Map.Entry entry = (Entry) entries.next();
-            Object key = entry.getKey();
-            Collection c = (Collection) entry.getValue();
-            for (Iterator it = c.iterator(); it.hasNext();) {
+    private void destroy(Map<K,  List<ObjectTimestampPair<V>>> m, KeyedPoolableObjectFactory<K, V> factory) {
+        for (Iterator<Entry<K,  List<ObjectTimestampPair<V>>>> entries = m.entrySet().iterator(); entries.hasNext();) {
+            Entry<K,  List<ObjectTimestampPair<V>>> entry = entries.next();
+            K key = entry.getKey();
+            List<ObjectTimestampPair<V>> c = entry.getValue();
+            for (Iterator<ObjectTimestampPair<V>> it = c.iterator(); it.hasNext();) {
                 try {
                     factory.destroyObject(
-                            key,((ObjectTimestampPair)(it.next())).value);
+                            key,it.next().value);
                 } catch(Exception e) {
                     // ignore error, keep destroying the rest
                 } finally {
                     synchronized(this) {
                         ObjectQueue objectQueue =
-                                (ObjectQueue) _poolMap.get(key);
+                                _poolMap.get(key);
                         if (objectQueue != null) {
                             objectQueue.decrementInternalProcessingCount();
                             if (objectQueue.internalProcessingCount == 0 &&
@@ -1533,6 +1540,7 @@ public class GenericKeyedObjectPool extends BaseKeyedObjectPool implements Keyed
      *
      * @return the total number of instances currently borrowed from this pool
      */
+    @Override
     public synchronized int getNumActive() {
         return _totalActive;
     }
@@ -1542,6 +1550,7 @@ public class GenericKeyedObjectPool extends BaseKeyedObjectPool implements Keyed
      *
      * @return the total number of instances currently idle in this pool
      */
+    @Override
     public synchronized int getNumIdle() {
         return _totalIdle;
     }
@@ -1553,8 +1562,9 @@ public class GenericKeyedObjectPool extends BaseKeyedObjectPool implements Keyed
      * @param key the key to query
      * @return the number of instances corresponding to the given <code>key</code> currently borrowed in this pool
      */
+    @Override
     public synchronized int getNumActive(Object key) {
-        final ObjectQueue pool = (ObjectQueue)(_poolMap.get(key));
+        final ObjectQueue pool = (_poolMap.get(key));
         return pool != null ? pool.activeCount : 0;
     }
 
@@ -1564,8 +1574,9 @@ public class GenericKeyedObjectPool extends BaseKeyedObjectPool implements Keyed
      * @param key the key to query
      * @return the number of instances corresponding to the given <code>key</code> currently idle in this pool
      */
+    @Override
     public synchronized int getNumIdle(Object key) {
-        final ObjectQueue pool = (ObjectQueue)(_poolMap.get(key));
+        final ObjectQueue pool = (_poolMap.get(key));
         return pool != null ? pool.queue.size() : 0;
     }
 
@@ -1587,7 +1598,8 @@ public class GenericKeyedObjectPool extends BaseKeyedObjectPool implements Keyed
      * @param obj instance to return to the keyed pool
      * @throws Exception
      */
-    public void returnObject(Object key, Object obj) throws Exception {
+    @Override
+    public void returnObject(K key, V obj) throws Exception {
         try {
             addObjectToPool(key, obj, true);
         } catch (Exception e) {
@@ -1600,7 +1612,7 @@ public class GenericKeyedObjectPool extends BaseKeyedObjectPool implements Keyed
                 // TODO: Correctness here depends on control in addObjectToPool.
                 // These two methods should be refactored, removing the
                 // "behavior flag", decrementNumActive, from addObjectToPool.
-                ObjectQueue pool = (ObjectQueue) (_poolMap.get(key));
+                ObjectQueue pool = (_poolMap.get(key));
                 if (pool != null) {
                     synchronized(this) {
                         pool.decrementActiveCount();
@@ -1631,7 +1643,7 @@ public class GenericKeyedObjectPool extends BaseKeyedObjectPool implements Keyed
      * @param decrementNumActive whether or not to decrement the active count associated with the keyed pool
      * @throws Exception
      */
-    private void addObjectToPool(Object key, Object obj,
+    private void addObjectToPool(K key, V obj,
             boolean decrementNumActive) throws Exception {
 
         // if we need to validate this object, do so
@@ -1650,7 +1662,7 @@ public class GenericKeyedObjectPool extends BaseKeyedObjectPool implements Keyed
         boolean doAllocate = false;
         synchronized (this) {
             // grab the pool (list) of objects associated with the given key
-            pool = (ObjectQueue) (_poolMap.get(key));
+            pool = _poolMap.get(key);
             // if it doesn't exist, create it
             if (null == pool) {
                 pool = new ObjectQueue();
@@ -1668,9 +1680,9 @@ public class GenericKeyedObjectPool extends BaseKeyedObjectPool implements Keyed
                     // borrowObject always takes the first element from the queue,
                     // so for LIFO, push on top, FIFO add to end
                     if (_lifo) {
-                        pool.queue.addFirst(new ObjectTimestampPair(obj));
+                        pool.queue.addFirst(new ObjectTimestampPair<V>(obj));
                     } else {
-                        pool.queue.addLast(new ObjectTimestampPair(obj));
+                        pool.queue.addLast(new ObjectTimestampPair<V>(obj));
                     }
                     _totalIdle++;
                     if (decrementNumActive) {
@@ -1716,12 +1728,13 @@ public class GenericKeyedObjectPool extends BaseKeyedObjectPool implements Keyed
      * @param obj instance to invalidate
      * @throws Exception if an exception occurs destroying the object
      */
-    public void invalidateObject(Object key, Object obj) throws Exception {
+    @Override
+    public void invalidateObject(K key, V obj) throws Exception {
         try {
             _factory.destroyObject(key, obj);
         } finally {
             synchronized (this) {
-                ObjectQueue pool = (ObjectQueue) (_poolMap.get(key));
+                ObjectQueue pool = (_poolMap.get(key));
                 if (null == pool) {
                     pool = new ObjectQueue();
                     _poolMap.put(key, pool);
@@ -1743,12 +1756,13 @@ public class GenericKeyedObjectPool extends BaseKeyedObjectPool implements Keyed
      * @throws IllegalStateException when no {@link #setFactory factory} has been set or after {@link #close} has been
      * called on this pool.
      */
-    public void addObject(Object key) throws Exception {
+    @Override
+    public void addObject(K key) throws Exception {
         assertOpen();
         if (_factory == null) {
             throw new IllegalStateException("Cannot add objects without a factory.");
         }
-        Object obj = _factory.makeObject(key);
+        V obj = _factory.makeObject(key);
         try {
             assertOpen();
             addObjectToPool(key, obj, false);
@@ -1774,8 +1788,8 @@ public class GenericKeyedObjectPool extends BaseKeyedObjectPool implements Keyed
      * will be populated immediately.
      * @since Pool 1.3
      */
-    public synchronized void preparePool(Object key, boolean populateImmediately) {
-        ObjectQueue pool = (ObjectQueue)(_poolMap.get(key));
+    public synchronized void preparePool(K key, boolean populateImmediately) {
+        ObjectQueue pool = (_poolMap.get(key));
         if (null == pool) {
             pool = new ObjectQueue();
             _poolMap.put(key,pool);
@@ -1803,6 +1817,7 @@ public class GenericKeyedObjectPool extends BaseKeyedObjectPool implements Keyed
      *
      * @throws Exception
      */
+    @Override
     public void close() throws Exception {
         super.close();
         synchronized (this) {
@@ -1818,7 +1833,7 @@ public class GenericKeyedObjectPool extends BaseKeyedObjectPool implements Keyed
             startEvictor(-1L);
 
             while(_allocationQueue.size() > 0) {
-                Latch l = (Latch) _allocationQueue.removeFirst();
+                Latch<K, V> l = _allocationQueue.removeFirst();
 
                 synchronized (l) {
                     // notify the waiting thread
@@ -1839,21 +1854,23 @@ public class GenericKeyedObjectPool extends BaseKeyedObjectPool implements Keyed
      * @throws IllegalStateException if there are active (checked out) instances associated with this keyed object pool
      * @deprecated to be removed in version 2.0
      */
-    public void setFactory(KeyedPoolableObjectFactory factory) throws IllegalStateException {
-        Map toDestroy = new HashMap();
-        final KeyedPoolableObjectFactory oldFactory = _factory;
+    @Deprecated
+    @Override
+    public void setFactory(KeyedPoolableObjectFactory<K, V> factory) throws IllegalStateException {
+        Map<K, List<ObjectTimestampPair<V>>> toDestroy = new HashMap<K, List<ObjectTimestampPair<V>>>();
+        final KeyedPoolableObjectFactory<K, V> oldFactory = _factory;
         synchronized (this) {
             assertOpen();
             if (0 < getNumActive()) {
                 throw new IllegalStateException("Objects are already active");
             } else {
-                for (Iterator it = _poolMap.keySet().iterator(); it.hasNext();) {
-                    Object key = it.next();
-                    ObjectQueue pool = (ObjectQueue)_poolMap.get(key);
+                for (Iterator<K> it = _poolMap.keySet().iterator(); it.hasNext();) {
+                    K key = it.next();
+                    ObjectQueue pool = _poolMap.get(key);
                     if (pool != null) {
                         // Copy objects to new list so pool.queue can be cleared
                         // inside the sync
-                        List objects = new ArrayList();
+                        List<ObjectTimestampPair<V>> objects = new ArrayList<ObjectTimestampPair<V>>();
                         objects.addAll(pool.queue);
                         toDestroy.put(key, objects);
                         it.remove();
@@ -1887,7 +1904,7 @@ public class GenericKeyedObjectPool extends BaseKeyedObjectPool implements Keyed
      * @throws Exception when there is a problem evicting idle objects.
      */
     public void evict() throws Exception {
-        Object key = null;
+        K key = null;
         boolean testWhileIdle;
         long minEvictableIdleTimeMillis;
 
@@ -1906,7 +1923,7 @@ public class GenericKeyedObjectPool extends BaseKeyedObjectPool implements Keyed
         }
 
         for (int i=0, m=getNumTests(); i<m; i++) {
-            final ObjectTimestampPair pair;
+            final ObjectTimestampPair<V> pair;
             synchronized (this) {
                 // make sure pool map is not empty; otherwise do nothing
                 if (_poolMap == null || _poolMap.size() == 0) {
@@ -1969,10 +1986,10 @@ public class GenericKeyedObjectPool extends BaseKeyedObjectPool implements Keyed
                 // if LIFO and the _evictionCursor has a previous object,
                 // or FIFO and _evictionCursor has a next object, test it
                 pair = _lifo ?
-                        (ObjectTimestampPair) _evictionCursor.previous() :
-                        (ObjectTimestampPair) _evictionCursor.next();
+                        _evictionCursor.previous() :
+                        _evictionCursor.next();
                 _evictionCursor.remove();
-                ObjectQueue objectQueue = (ObjectQueue) _poolMap.get(key);
+                ObjectQueue objectQueue = _poolMap.get(key);
                 objectQueue.incrementInternalProcessingCount();
                 _totalIdle--;
             }
@@ -2013,7 +2030,7 @@ public class GenericKeyedObjectPool extends BaseKeyedObjectPool implements Keyed
             }
             synchronized (this) {
                 ObjectQueue objectQueue =
-                    (ObjectQueue)_poolMap.get(key);
+                    _poolMap.get(key);
                 objectQueue.decrementInternalProcessingCount();
                 if (removeObject) {
                     if (objectQueue.queue.isEmpty() &&
@@ -2062,9 +2079,9 @@ public class GenericKeyedObjectPool extends BaseKeyedObjectPool implements Keyed
         if (_poolMap == null) {
             return;
         }
-        ObjectQueue pool = (ObjectQueue) (_poolMap.get(key));
+        ObjectQueue pool = _poolMap.get(key);
         if (pool != null) {
-            CursorableLinkedList queue = pool.queue;
+            CursorableLinkedList<ObjectTimestampPair<V>> queue = pool.queue;
             _evictionCursor = queue.cursor(_lifo ? queue.size() : 0);
         }
     }
@@ -2076,6 +2093,7 @@ public class GenericKeyedObjectPool extends BaseKeyedObjectPool implements Keyed
      * @see #setMinIdle
      * @throws Exception If there was an error whilst creating the pooled objects.
      */
+    @SuppressWarnings("unchecked")
     private void ensureMinIdle() throws Exception {
         //Check if should sustain the pool
         if (getMinIdle() > 0) {
@@ -2090,7 +2108,7 @@ public class GenericKeyedObjectPool extends BaseKeyedObjectPool implements Keyed
             // If the number is less than the minIdle, do creation loop to boost numbers
             for (int i=0; i < keysCopy.length; i++) {
                 //Get the next key to process
-                ensureMinIdle(keysCopy[i]);
+                ensureMinIdle((K)keysCopy[i]);
             }
         }
     }
@@ -2106,11 +2124,11 @@ public class GenericKeyedObjectPool extends BaseKeyedObjectPool implements Keyed
      * @param key The key to process
      * @throws Exception If there was an error whilst creating the pooled objects
      */
-    private void ensureMinIdle(Object key) throws Exception {
+    private void ensureMinIdle(K key) throws Exception {
         // Calculate current pool objects
         ObjectQueue pool;
         synchronized(this) {
-            pool = (ObjectQueue)(_poolMap.get(key));
+            pool = (_poolMap.get(key));
         }
         if (pool == null) {
             return;
@@ -2165,9 +2183,9 @@ public class GenericKeyedObjectPool extends BaseKeyedObjectPool implements Keyed
         StringBuffer buf = new StringBuffer();
         buf.append("Active: ").append(getNumActive()).append("\n");
         buf.append("Idle: ").append(getNumIdle()).append("\n");
-        Iterator it = _poolMap.keySet().iterator();
+        Iterator<K> it = _poolMap.keySet().iterator();
         while (it.hasNext()) {
-            Object key = it.next();
+            K key = it.next();
             buf.append("\t").append(key).append(" ").append(_poolMap.get(key)).append("\n");
         }
         return buf.toString();
@@ -2234,7 +2252,7 @@ public class GenericKeyedObjectPool extends BaseKeyedObjectPool implements Keyed
         private int activeCount = 0;
 
         /** Idle instance queue */
-        private final CursorableLinkedList queue = new CursorableLinkedList();
+        private final CursorableLinkedList<ObjectTimestampPair<V>> queue = new CursorableLinkedList<ObjectTimestampPair<V>>();
 
         /** Number of instances in process of being created */
         private int internalProcessingCount = 0;
@@ -2281,26 +2299,22 @@ public class GenericKeyedObjectPool extends BaseKeyedObjectPool implements Keyed
      *
      * This is also used by {@link GenericObjectPool}.
      */
-    static class ObjectTimestampPair implements Comparable {
-        //CHECKSTYLE: stop VisibilityModifier
+    static class ObjectTimestampPair<T> implements Comparable<T> {
         /**
          * Object instance
-         * @deprecated this field will be made private and final in version 2.0
          */
-        Object value;
+        private final T value;
 
         /**
          * timestamp
-         * @deprecated this field will be made private and final in version 2.0
          */
-        long tstamp;
-        //CHECKSTYLE: resume VisibilityModifier
+        private final long tstamp;
 
         /**
          * Create a new ObjectTimestampPair using the given object and the current system time.
          * @param val object instance
          */
-        ObjectTimestampPair(Object val) {
+        ObjectTimestampPair(T val) {
             this(val, System.currentTimeMillis());
         }
 
@@ -2309,7 +2323,7 @@ public class GenericKeyedObjectPool extends BaseKeyedObjectPool implements Keyed
          * @param val object instance
          * @param time long representation of timestamp
          */
-        ObjectTimestampPair(Object val, long time) {
+        ObjectTimestampPair(T val, long time) {
             value = val;
             tstamp = time;
         }
@@ -2319,6 +2333,7 @@ public class GenericKeyedObjectPool extends BaseKeyedObjectPool implements Keyed
          *
          * @return String representing this ObjectTimestampPair
          */
+        @Override
         public String toString() {
             return value + ";" + tstamp;
         }
@@ -2330,8 +2345,9 @@ public class GenericKeyedObjectPool extends BaseKeyedObjectPool implements Keyed
          * @param obj object to cmpare
          * @return result of comparison
          */
+        @SuppressWarnings("unchecked")
         public int compareTo(Object obj) {
-            return compareTo((ObjectTimestampPair) obj);
+            return compareTo((ObjectTimestampPair<T>) obj);
         }
 
         /**
@@ -2341,7 +2357,7 @@ public class GenericKeyedObjectPool extends BaseKeyedObjectPool implements Keyed
          * @param other object to compare
          * @return result of comparison
          */
-        public int compareTo(ObjectTimestampPair other) {
+        public int compareTo(ObjectTimestampPair<T> other) {
             final long tstampdiff = this.tstamp - other.tstamp;
             if (tstampdiff == 0) {
                 // make sure the natural ordering is consistent with equals
@@ -2356,7 +2372,7 @@ public class GenericKeyedObjectPool extends BaseKeyedObjectPool implements Keyed
         /**
          * @return the value
          */
-        public Object getValue() {
+        public T getValue() {
             return value;
         }
 
@@ -2379,6 +2395,7 @@ public class GenericKeyedObjectPool extends BaseKeyedObjectPool implements Keyed
          * Since the Timer that invokes Evictors is shared for all Pools, we try
          * to restore the ContextClassLoader that created the pool.
          */
+        @Override
         public void run() {
             ClassLoader savedClassLoader =
                     Thread.currentThread().getContextClassLoader();
@@ -2479,16 +2496,16 @@ public class GenericKeyedObjectPool extends BaseKeyedObjectPool implements Keyed
      *
      * @since 1.5
      */
-    private static final class Latch {
+    private final class Latch<LK, LV> {
 
         /** key of associated pool */
-        private final Object _key;
+        private final LK _key;
 
         /** keyed pool associated with this latch */
         private ObjectQueue _pool;
 
         /** holds an ObjectTimestampPair when this latch has been allocated an instance */
-        private ObjectTimestampPair _pair;
+        private ObjectTimestampPair<LV> _pair;
 
         /** indicates that this latch can create an instance */
         private boolean _mayCreate = false;
@@ -2497,7 +2514,7 @@ public class GenericKeyedObjectPool extends BaseKeyedObjectPool implements Keyed
          * Create a latch with the given key
          * @param key key of the pool associated with this latch
          */
-        private Latch(Object key) {
+        private Latch(LK key) {
             _key = key;
         }
 
@@ -2505,7 +2522,7 @@ public class GenericKeyedObjectPool extends BaseKeyedObjectPool implements Keyed
          * Retuns the key of the associated pool
          * @return associated pool key
          */
-        private synchronized Object getkey() {
+        private synchronized LK getkey() {
             return _key;
         }
 
@@ -2530,7 +2547,7 @@ public class GenericKeyedObjectPool extends BaseKeyedObjectPool implements Keyed
          * Returns null if this latch does not have an instance allocated to it.
          * @return the associated ObjectTimestampPair
          */
-        private synchronized ObjectTimestampPair getPair() {
+        private synchronized ObjectTimestampPair<LV> getPair() {
             return _pair;
         }
 
@@ -2538,7 +2555,7 @@ public class GenericKeyedObjectPool extends BaseKeyedObjectPool implements Keyed
          * Allocate an ObjectTimestampPair to this latch.
          * @param pair ObjectTimestampPair on this latch
          */
-        private synchronized void setPair(ObjectTimestampPair pair) {
+        private synchronized void setPair(ObjectTimestampPair<LV> pair) {
             _pair = pair;
         }
 
@@ -2709,7 +2726,7 @@ public class GenericKeyedObjectPool extends BaseKeyedObjectPool implements Keyed
     private long _minEvictableIdleTimeMillis = DEFAULT_MIN_EVICTABLE_IDLE_TIME_MILLIS;
 
     /** My hash of pools (ObjectQueue). */
-    private Map _poolMap = null;
+    private Map<K, ObjectQueue> _poolMap = null;
 
     /** The total number of active instances. */
     private int _totalActive = 0;
@@ -2725,7 +2742,7 @@ public class GenericKeyedObjectPool extends BaseKeyedObjectPool implements Keyed
     private int _totalInternalProcessing = 0;
 
     /** My {@link KeyedPoolableObjectFactory}. */
-    private KeyedPoolableObjectFactory _factory = null;
+    private KeyedPoolableObjectFactory<K, V> _factory = null;
 
     /**
      * Class loader for evictor thread to use since in a J2EE or similar
@@ -2744,13 +2761,13 @@ public class GenericKeyedObjectPool extends BaseKeyedObjectPool implements Keyed
      * A cursorable list of my pools.
      * @see GenericKeyedObjectPool.Evictor#run
      */
-    private CursorableLinkedList _poolList = null;
+    private CursorableLinkedList<K> _poolList = null;
 
     /** Eviction cursor (over instances within-key) */
-    private CursorableLinkedList.Cursor _evictionCursor = null;
+    private CursorableLinkedList<ObjectTimestampPair<V>>.Cursor _evictionCursor = null;
 
     /** Eviction cursor (over keys) */
-    private CursorableLinkedList.Cursor _evictionKeyCursor = null;
+    private CursorableLinkedList<K>.Cursor _evictionKeyCursor = null;
 
     /** Whether or not the pools behave as LIFO queues (last in first out) */
     private boolean _lifo = DEFAULT_LIFO;
@@ -2760,6 +2777,6 @@ public class GenericKeyedObjectPool extends BaseKeyedObjectPool implements Keyed
      * that objects can be allocated in the order in which the threads requested
      * them.
      */
-    private LinkedList _allocationQueue = new LinkedList();
+    private final LinkedList<Latch<K, V>> _allocationQueue = new LinkedList<Latch<K, V>>();
 
 }

@@ -53,6 +53,8 @@ import java.util.NoSuchElementException;
  *
  * <p>See {@link BaseObjectPool} for a simple base implementation.</p>
  *
+ * @param <T> the type of objects held in this pool
+ *
  * @author Rodney Waldhoff
  * @author Sandy McArthur
  * @version $Revision: 962893 $ $Date: 2010-07-10 10:37:27 -0700 (Sat, 10 Jul 2010) $
@@ -62,7 +64,7 @@ import java.util.NoSuchElementException;
  * @see BaseObjectPool
  * @since Pool 1.0
  */
-public interface ObjectPool {
+public interface ObjectPool<T> {
     /**
      * Obtains an instance from this pool.
      * <p>
@@ -88,7 +90,7 @@ public interface ObjectPool {
      * @throws Exception when {@link PoolableObjectFactory#makeObject makeObject} throws an exception.
      * @throws NoSuchElementException when the pool is exhausted and cannot or will not return another instance.
      */
-    Object borrowObject() throws Exception, NoSuchElementException, IllegalStateException;
+    T borrowObject() throws Exception, NoSuchElementException, IllegalStateException;
 
     /**
      * Return an instance to the pool.
@@ -98,13 +100,13 @@ public interface ObjectPool {
      * or sub-interface.
      *
      * @param obj a {@link #borrowObject borrowed} instance to be returned.
-     * @throws Exception 
+     * @throws Exception
      */
-    void returnObject(Object obj) throws Exception;
+    void returnObject(T obj) throws Exception;
 
     /**
      * <p>Invalidates an object from the pool.</p>
-     * 
+     *
      * <p>By contract, <code>obj</code> <strong>must</strong> have been obtained
      * using {@link #borrowObject borrowObject} or a related method as defined in
      * an implementation or sub-interface.</p>
@@ -115,7 +117,7 @@ public interface ObjectPool {
      * @param obj a {@link #borrowObject borrowed} instance to be disposed.
      * @throws Exception
      */
-    void invalidateObject(Object obj) throws Exception;
+    void invalidateObject(T obj) throws Exception;
 
     /**
      * Create an object using the {@link PoolableObjectFactory factory} or other
@@ -186,5 +188,6 @@ public interface ObjectPool {
      * @throws UnsupportedOperationException if this implementation does not support the operation
      * @deprecated to be removed in pool 2.0
      */
-    void setFactory(PoolableObjectFactory factory) throws IllegalStateException, UnsupportedOperationException;
+    @Deprecated
+    void setFactory(PoolableObjectFactory<T> factory) throws IllegalStateException, UnsupportedOperationException;
 }

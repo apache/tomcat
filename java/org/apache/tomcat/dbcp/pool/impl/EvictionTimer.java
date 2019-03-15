@@ -35,6 +35,8 @@ import java.util.TimerTask;
  * This class has package scope to prevent its inclusion in the pool public API.
  * The class declaration below should *not* be changed to public.
  * </p>
+ * 
+ * @version $Id$
  */
 class EvictionTimer {
     
@@ -62,7 +64,7 @@ class EvictionTimer {
         if (null == _timer) {
             // Force the new Timer thread to be created with a context class
             // loader set to the class loader that loaded this library
-            ClassLoader ccl = (ClassLoader) AccessController.doPrivileged(
+            ClassLoader ccl = AccessController.doPrivileged(
                     new PrivilegedGetTccl());
             try {
                 AccessController.doPrivileged(new PrivilegedSetTccl(
@@ -92,12 +94,12 @@ class EvictionTimer {
     /** 
      * {@link PrivilegedAction} used to get the ContextClassLoader
      */
-    private static class PrivilegedGetTccl implements PrivilegedAction {
+    private static class PrivilegedGetTccl implements PrivilegedAction<ClassLoader> {
 
         /** 
          * {@inheritDoc}
          */
-        public Object run() {
+        public ClassLoader run() {
             return Thread.currentThread().getContextClassLoader();
         }
     }
@@ -105,7 +107,7 @@ class EvictionTimer {
     /** 
      * {@link PrivilegedAction} used to set the ContextClassLoader
      */
-    private static class PrivilegedSetTccl implements PrivilegedAction {
+    private static class PrivilegedSetTccl implements PrivilegedAction<ClassLoader> {
 
         /** ClassLoader */
         private final ClassLoader cl;
@@ -121,7 +123,7 @@ class EvictionTimer {
         /** 
          * {@inheritDoc}
          */
-        public Object run() {
+        public ClassLoader run() {
             Thread.currentThread().setContextClassLoader(cl);
             return null;
         }

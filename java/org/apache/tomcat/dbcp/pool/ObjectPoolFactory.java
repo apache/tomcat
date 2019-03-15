@@ -20,17 +20,19 @@ package org.apache.tomcat.dbcp.pool;
 /**
  * A factory interface for creating {@link ObjectPool}s.
  *
+ * @param <T> the type of objects held in this pool
+ *
  * @see ObjectPool
  *
  * @author Rodney Waldhoff
  * @version $Revision: 777748 $ $Date: 2009-05-22 17:00:44 -0700 (Fri, 22 May 2009) $
  * @since Pool 1.0
  */
-public interface ObjectPoolFactory {
+public interface ObjectPoolFactory<T> {
     /**
      * Create and return a new {@link ObjectPool}.
      * @return a new {@link ObjectPool}
      * @throws IllegalStateException when this pool factory is not configured properly
      */
-    ObjectPool createPool() throws IllegalStateException;
+    ObjectPool<T> createPool() throws IllegalStateException;
 }

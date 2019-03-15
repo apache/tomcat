@@ -64,6 +64,9 @@ package org.apache.tomcat.dbcp.pool;
  * at a time.
  * </p>
  *
+ * @param <K> the type of keys in this pool
+ * @param <V> the type of objects held in this pool
+ *
  * @see KeyedObjectPool
  *
  * @author Rodney Waldhoff
@@ -71,7 +74,7 @@ package org.apache.tomcat.dbcp.pool;
  * @version $Revision: 791676 $ $Date: 2009-07-06 19:29:56 -0700 (Mon, 06 Jul 2009) $
  * @since Pool 1.0
  */
-public interface KeyedPoolableObjectFactory {
+public interface KeyedPoolableObjectFactory<K, V> {
     /**
      * Create an instance that can be served by the pool.
      *
@@ -80,7 +83,7 @@ public interface KeyedPoolableObjectFactory {
      * @throws Exception if there is a problem creating a new instance,
      *    this will be propagated to the code requesting an object.
      */
-    Object makeObject(Object key) throws Exception;
+    V makeObject(K key) throws Exception;
 
     /**
      * Destroy an instance no longer needed by the pool.
@@ -102,7 +105,7 @@ public interface KeyedPoolableObjectFactory {
      * @see #validateObject
      * @see KeyedObjectPool#invalidateObject
      */
-    void destroyObject(Object key, Object obj) throws Exception;
+    void destroyObject(K key, V obj) throws Exception;
 
     /**
      * Ensures that the instance is safe to be returned by the pool.
@@ -113,7 +116,7 @@ public interface KeyedPoolableObjectFactory {
      * @return <code>false</code> if <code>obj</code> is not valid and should
      *         be dropped from the pool, <code>true</code> otherwise.
      */
-    boolean validateObject(Object key, Object obj);
+    boolean validateObject(K key, V obj);
 
     /**
      * Reinitialize an instance to be returned by the pool.
@@ -124,7 +127,7 @@ public interface KeyedPoolableObjectFactory {
      *    this exception may be swallowed by the pool.
      * @see #destroyObject
      */
-    void activateObject(Object key, Object obj) throws Exception;
+    void activateObject(K key, V obj) throws Exception;
 
     /**
      * Uninitialize an instance to be returned to the idle object pool.
@@ -135,5 +138,5 @@ public interface KeyedPoolableObjectFactory {
      *    this exception may be swallowed by the pool.
      * @see #destroyObject
      */
-    void passivateObject(Object key, Object obj) throws Exception;
+    void passivateObject(K key, V obj) throws Exception;
 }
