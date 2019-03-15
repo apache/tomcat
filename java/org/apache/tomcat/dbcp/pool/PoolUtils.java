@@ -2307,7 +2307,7 @@ public final class PoolUtils {
 
     /**
      * Decorates a keyed object pool, adding "eroding" behavior.  Based on the
-     * configured {@link #factor erosion factor}, objects returning to the pool
+     * configured {@link #erodingFactor erosion factor}, objects returning to the pool
      * may be invalidated instead of being added to idle capacity.
      *
      */
@@ -2334,7 +2334,7 @@ public final class PoolUtils {
          *
          * @param keyedPool underlying pool - must not be null
          * @param erodingFactor erosion factor - determines the frequency of erosion events
-         * @see #factor
+         * @see #erodingFactor
          */
         protected ErodingKeyedObjectPool(final KeyedObjectPool<K, V> keyedPool, final ErodingFactor erodingFactor) {
             if (keyedPool == null) {
