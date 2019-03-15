@@ -23,7 +23,6 @@ import javax.sql.PooledConnection;
  * Immutable poolable object holding a PooledConnection along with the username and password 
  * used to create the connection.
  * 
- * @version $Revision: 907288 $ $Date: 2010-02-06 14:42:58 -0500 (Sat, 06 Feb 2010) $
  */
 final class PooledConnectionAndInfo {
     private final PooledConnection pooledConnection;

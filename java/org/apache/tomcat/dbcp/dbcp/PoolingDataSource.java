@@ -39,7 +39,6 @@ import org.apache.tomcat.dbcp.pool.ObjectPool;
  * @author Glenn L. Nielsen
  * @author James House
  * @author Dirk Verbeeck
- * @version $Revision: 895844 $ $Date: 2010-01-04 20:50:04 -0500 (Mon, 04 Jan 2010) $
  */
 public class PoolingDataSource implements DataSource {
 

@@ -40,7 +40,6 @@ import org.apache.tomcat.dbcp.pool.KeyedPoolableObjectFactory;
  * @see PoolablePreparedStatement
  * @author Rodney Waldhoff
  * @author Dirk Verbeeck
- * @version $Revision: 885261 $ $Date: 2009-11-29 15:07:02 -0500 (Sun, 29 Nov 2009) $
  */
 public class PoolingConnection extends DelegatingConnection implements Connection, KeyedPoolableObjectFactory {
     /** Pool of {@link PreparedStatement}s. and {@link CallableStatement}s */

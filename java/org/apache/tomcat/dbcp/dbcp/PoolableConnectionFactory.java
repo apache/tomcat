@@ -36,7 +36,6 @@ import org.apache.tomcat.dbcp.pool.ObjectPool;
  * @author Glenn L. Nielsen
  * @author James House
  * @author Dirk Verbeeck
- * @version $Revision: 883393 $ $Date: 2009-11-23 11:18:35 -0500 (Mon, 23 Nov 2009) $
  */
 public class PoolableConnectionFactory implements PoolableObjectFactory {
     /**

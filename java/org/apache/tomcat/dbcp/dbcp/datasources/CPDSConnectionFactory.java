@@ -38,7 +38,6 @@ import org.apache.tomcat.dbcp.pool.PoolableObjectFactory;
  * {@link PoolableConnection}s.
  *
  * @author John D. McNally
- * @version $Revision: 907288 $ $Date: 2010-02-06 14:42:58 -0500 (Sat, 06 Feb 2010) $
  */
 class CPDSConnectionFactory
         implements PoolableObjectFactory, ConnectionEventListener, PooledConnectionManager {

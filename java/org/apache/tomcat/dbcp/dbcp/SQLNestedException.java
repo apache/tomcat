@@ -23,7 +23,6 @@ import java.sql.SQLException;
  * A SQLException subclass containing another Throwable
  * 
  * @author Dirk Verbeeck
- * @version $Revision: 894583 $ $Date: 2009-12-30 05:48:07 -0500 (Wed, 30 Dec 2009) $
  * @deprecated Use '(SQLException) new SQLException(msg).initCause(e)' instead; this class will be removed in DBCP 2.0
  */
 public class SQLNestedException extends SQLException {

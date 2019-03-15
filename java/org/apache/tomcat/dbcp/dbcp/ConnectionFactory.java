@@ -23,7 +23,6 @@ import java.sql.SQLException;
  * Abstract factory interface for creating {@link java.sql.Connection}s.
  *
  * @author Rodney Waldhoff
- * @version $Revision: 491655 $ $Date: 2007-01-01 17:05:30 -0500 (Mon, 01 Jan 2007) $
  */
 public interface ConnectionFactory {
     /**

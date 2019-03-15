@@ -24,7 +24,6 @@ import javax.sql.PooledConnection;
  * Methods to manage PoolableConnections and the connection pools that source them.
  * 
  * @since 1.3
- * @version $Revision: 907288 $ $Date: 2010-02-06 14:42:58 -0500 (Sat, 06 Feb 2010) $
  */
 interface PooledConnectionManager {
     /**

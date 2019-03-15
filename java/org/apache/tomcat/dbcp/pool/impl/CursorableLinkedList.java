@@ -52,10 +52,8 @@ import java.util.NoSuchElementException;
  * <b>Note that this implementation is not synchronized.</b>
  *
  * @param <E> the type of elements held in this collection
- * 
- * @see java.util.LinkedList
  *
- * @version $Id$
+ * @see java.util.LinkedList
  *
  * @author Rodney Waldhoff
  * @author Janek Bogucki
@@ -993,7 +991,7 @@ class CursorableLinkedList<E> implements List<E>, Serializable {
     //--- inner classes ----------------------------------------------
 
     static class Listable<E> implements Serializable {
-        
+
         /**
          * Generated serial version ID.
          */

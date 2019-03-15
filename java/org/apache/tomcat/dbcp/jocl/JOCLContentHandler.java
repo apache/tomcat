@@ -214,7 +214,6 @@ import java.util.ArrayList;
  * <b>Note that this class is not synchronized.</b>
  * <p>
  * @author Rodney Waldhoff
- * @version $Revision: 883416 $ $Date: 2009-11-23 12:12:14 -0500 (Mon, 23 Nov 2009) $
  */
 public class JOCLContentHandler extends DefaultHandler {
 

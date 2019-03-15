@@ -24,7 +24,6 @@ import java.lang.reflect.InvocationTargetException;
  * Miscellaneous {@link Constructor} related utility functions.
  *
  * @author Rodney Waldhoff
- * @version $Revision: 479137 $ $Date: 2006-11-25 10:51:48 -0500 (Sat, 25 Nov 2006) $
  */
 public class ConstructorUtil {
     /**

@@ -70,7 +70,6 @@ package org.apache.tomcat.dbcp.pool;
  *
  * @author Rodney Waldhoff
  * @author Sandy McArthur
- * @version $Revision: 777748 $ $Date: 2009-05-22 17:00:44 -0700 (Fri, 22 May 2009) $
  * @since Pool 1.0
  */
 public interface PoolableObjectFactory<T> {

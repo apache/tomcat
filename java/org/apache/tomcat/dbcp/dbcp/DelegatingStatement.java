@@ -41,7 +41,6 @@ import java.util.List;
  * @author Glenn L. Nielsen
  * @author James House
  * @author Dirk Verbeeck
- * @version $Revision: 896443 $ $Date: 2010-01-06 08:42:27 -0500 (Wed, 06 Jan 2010) $
  */
 public class DelegatingStatement extends AbandonedTrace implements Statement {
     /** My delegate. */

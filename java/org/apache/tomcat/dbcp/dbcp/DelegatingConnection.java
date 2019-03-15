@@ -60,7 +60,6 @@ import java.util.Properties;
  * @author Glenn L. Nielsen
  * @author James House
  * @author Dirk Verbeeck
- * @version $Revision: 896719 $ $Date: 2010-01-06 18:42:22 -0500 (Wed, 06 Jan 2010) $
  */
 public class DelegatingConnection extends AbandonedTrace
         implements Connection {

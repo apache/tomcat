@@ -30,7 +30,6 @@ import org.apache.tomcat.dbcp.pool.PoolableObjectFactory;
  * @see StackKeyedObjectPoolFactory
  *
  * @author Rodney Waldhoff
- * @version $Revision: 960705 $ $Date: 2010-07-05 14:19:10 -0700 (Mon, 05 Jul 2010) $
  * @since Pool 1.0
  */
 public class StackObjectPoolFactory<T> implements ObjectPoolFactory<T> {

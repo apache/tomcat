@@ -46,7 +46,6 @@ import org.apache.tomcat.dbcp.pool.PoolUtils;
  *
  * @author Rodney Waldhoff
  * @author Sandy McArthur
- * @version $Revision: 990437 $ $Date: 2010-08-28 13:17:57 -0700 (Sat, 28 Aug 2010) $
  * @see Stack
  * @since Pool 1.0
  */

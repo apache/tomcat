@@ -41,7 +41,6 @@ import javax.sql.DataSource;
  *
  * @author Craig R. McClanahan
  * @author Dirk Verbeeck
- * @version $Revision: 828639 $ $Date: 2009-10-22 06:27:43 -0400 (Thu, 22 Oct 2009) $
  */
 public class BasicDataSourceFactory implements ObjectFactory {
 

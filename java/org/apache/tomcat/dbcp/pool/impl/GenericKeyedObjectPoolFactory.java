@@ -32,7 +32,6 @@ import org.apache.tomcat.dbcp.pool.KeyedPoolableObjectFactory;
  *
  * @author Rodney Waldhoff
  * @author Dirk Verbeeck
- * @version $Revision: 965263 $ $Date: 2010-07-18 10:23:39 -0700 (Sun, 18 Jul 2010) $
  * @since Pool 1.0
  */
 public class GenericKeyedObjectPoolFactory<K, V> implements KeyedObjectPoolFactory<K, V> {

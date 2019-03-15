@@ -23,7 +23,6 @@ import java.io.PrintWriter;
  * Configuration settings for handling abandoned db connections.
  *
  * @author Glenn L. Nielsen
- * @version $Revision: 758745 $ $Date: 2009-03-26 13:02:20 -0400 (Thu, 26 Mar 2009) $
  */
 public class AbandonedConfig {
 

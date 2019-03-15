@@ -25,7 +25,6 @@ package org.apache.tomcat.dbcp.dbcp;
  *
  * @author Jonathan Fuerth
  * @author Dan Fraser
- * @version $Revision: 883425 $ $Date: 2009-11-23 12:19:43 -0500 (Mon, 23 Nov 2009) $
  * 
  * @deprecated This will be removed in a future version of DBCP.
  **/

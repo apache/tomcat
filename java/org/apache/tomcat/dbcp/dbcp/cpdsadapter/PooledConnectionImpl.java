@@ -41,7 +41,6 @@ import org.apache.tomcat.dbcp.pool.KeyedPoolableObjectFactory;
  * PooledConnectionDataSource.
  *
  * @author John D. McNally
- * @version $Revision: 899987 $ $Date: 2010-01-16 11:51:16 -0500 (Sat, 16 Jan 2010) $
  */
 class PooledConnectionImpl 
         implements PooledConnection, KeyedPoolableObjectFactory {

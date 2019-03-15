@@ -36,7 +36,6 @@ import org.apache.tomcat.dbcp.pool.KeyedObjectPool;
  * @author Glenn L. Nielsen
  * @author James House
  * @author Dirk Verbeeck
- * @version $Revision: 745860 $ $Date: 2009-02-19 08:45:07 -0500 (Thu, 19 Feb 2009) $
  */
 public class PoolablePreparedStatement extends DelegatingPreparedStatement implements PreparedStatement {
     /**

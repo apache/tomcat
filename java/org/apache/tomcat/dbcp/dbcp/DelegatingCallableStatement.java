@@ -53,7 +53,6 @@ import java.sql.SQLXML;
  * @author Glenn L. Nielsen
  * @author James House
  * @author Dirk Verbeeck
- * @version $Revision: 883941 $ $Date: 2009-11-24 19:58:50 -0500 (Tue, 24 Nov 2009) $
  */
 public class DelegatingCallableStatement extends DelegatingPreparedStatement
         implements CallableStatement {

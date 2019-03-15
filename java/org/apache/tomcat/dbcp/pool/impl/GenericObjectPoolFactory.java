@@ -30,7 +30,6 @@ import org.apache.tomcat.dbcp.pool.PoolableObjectFactory;
  * @see ObjectPoolFactory
  *
  * @author Rodney Waldhoff
- * @version $Revision: 965326 $ $Date: 2010-07-18 16:49:04 -0700 (Sun, 18 Jul 2010) $
  * @since Pool 1.0
  */
 public class GenericObjectPoolFactory<T> implements ObjectPoolFactory<T> {

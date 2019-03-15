@@ -25,7 +25,6 @@ package org.apache.tomcat.dbcp.pool;
  * @see ObjectPool
  *
  * @author Rodney Waldhoff
- * @version $Revision: 777748 $ $Date: 2009-05-22 17:00:44 -0700 (Fri, 22 May 2009) $
  * @since Pool 1.0
  */
 public interface ObjectPoolFactory<T> {

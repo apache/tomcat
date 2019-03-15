@@ -35,14 +35,12 @@ import java.util.TimerTask;
  * This class has package scope to prevent its inclusion in the pool public API.
  * The class declaration below should *not* be changed to public.
  * </p>
- * 
- * @version $Id$
  */
 class EvictionTimer {
-    
+
     /** Timer instance */
     private static Timer _timer; //@GuardedBy("this")
-    
+
     /** Static usage count tracker */
     private static int _usageCount; //@GuardedBy("this")
 
@@ -90,13 +88,13 @@ class EvictionTimer {
             _timer = null;
         }
     }
-    
-    /** 
+
+    /**
      * {@link PrivilegedAction} used to get the ContextClassLoader
      */
     private static class PrivilegedGetTccl implements PrivilegedAction<ClassLoader> {
 
-        /** 
+        /**
          * {@inheritDoc}
          */
         @Override
@@ -105,7 +103,7 @@ class EvictionTimer {
         }
     }
 
-    /** 
+    /**
      * {@link PrivilegedAction} used to set the ContextClassLoader
      */
     private static class PrivilegedSetTccl implements PrivilegedAction<ClassLoader> {
@@ -121,7 +119,7 @@ class EvictionTimer {
             this.cl = cl;
         }
 
-        /** 
+        /**
          * {@inheritDoc}
          */
         @Override

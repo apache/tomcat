@@ -26,7 +26,6 @@ package org.apache.tomcat.dbcp.pool;
  *
  * @author Rodney Waldhoff
  * @author Sandy McArthur
- * @version $Revision: 1084645 $ $Date: 2011-03-23 10:11:19 -0700 (Wed, 23 Mar 2011) $
  * @since Pool 1.0
  */
 public abstract class BaseObjectPool<T> implements ObjectPool<T> {

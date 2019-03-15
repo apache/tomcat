@@ -31,7 +31,6 @@ import org.apache.tomcat.dbcp.pool.impl.GenericObjectPool;
  * abandoned db connections recovered.
  *                                                                        
  * @author Glenn L. Nielsen
- * @version $Revision: 899987 $ $Date: 2010-01-16 11:51:16 -0500 (Sat, 16 Jan 2010) $
  */
 public class AbandonedObjectPool extends GenericObjectPool {
 

@@ -82,7 +82,6 @@ import org.apache.tomcat.dbcp.pool.impl.GenericKeyedObjectPool;
  * </p>
  *
  * @author John D. McNally
- * @version $Revision: 896266 $ $Date: 2010-01-05 18:20:12 -0500 (Tue, 05 Jan 2010) $
  */
 public class DriverAdapterCPDS
     implements ConnectionPoolDataSource, Referenceable, Serializable,

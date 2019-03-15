@@ -43,7 +43,6 @@ import org.apache.tomcat.dbcp.pool.PoolableObjectFactory;
  * @author Rodney Waldhoff
  * @author Dirk Verbeeck
  * @author Sandy McArthur
- * @version $Revision: 965338 $ $Date: 2010-07-18 18:09:29 -0700 (Sun, 18 Jul 2010) $
  * @since Pool 1.0
  */
 public class StackObjectPool<T> extends BaseObjectPool<T> implements ObjectPool<T> {

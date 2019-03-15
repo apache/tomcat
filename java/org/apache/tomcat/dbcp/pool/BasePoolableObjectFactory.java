@@ -28,7 +28,6 @@ package org.apache.tomcat.dbcp.pool;
  * @see BaseKeyedPoolableObjectFactory
  *
  * @author Rodney Waldhoff
- * @version $Revision: 965336 $ $Date: 2010-07-18 17:58:33 -0700 (Sun, 18 Jul 2010) $
  * @since Pool 1.0
  */
 public abstract class BasePoolableObjectFactory<T> implements PoolableObjectFactory<T> {

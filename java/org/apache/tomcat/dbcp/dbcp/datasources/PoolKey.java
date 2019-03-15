@@ -20,7 +20,6 @@ package org.apache.tomcat.dbcp.dbcp.datasources;
 import java.io.Serializable;
 
 /**
- * @version $Revision: 907288 $ $Date: 2010-02-06 14:42:58 -0500 (Sat, 06 Feb 2010) $
  */
 class PoolKey implements Serializable {
     private static final long serialVersionUID = 2252771047542484533L;

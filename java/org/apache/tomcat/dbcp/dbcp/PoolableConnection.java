@@ -29,7 +29,6 @@ import org.apache.tomcat.dbcp.pool.ObjectPool;
  * @author Rodney Waldhoff
  * @author Glenn L. Nielsen
  * @author James House
- * @version $Revision: 758745 $ $Date: 2009-03-26 13:02:20 -0400 (Thu, 26 Mar 2009) $
  */
 public class PoolableConnection extends DelegatingConnection {
     /** The pool to which I should return. */

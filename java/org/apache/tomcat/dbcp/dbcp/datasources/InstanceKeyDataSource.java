@@ -79,7 +79,6 @@ import org.apache.tomcat.dbcp.pool.impl.GenericObjectPool;
  * </p>
  *
  * @author John D. McNally
- * @version $Revision: 907428 $ $Date: 2010-02-07 09:59:08 -0500 (Sun, 07 Feb 2010) $
  */
 public abstract class InstanceKeyDataSource
         implements DataSource, Referenceable, Serializable {

@@ -186,7 +186,6 @@ import org.apache.tomcat.dbcp.pool.impl.GenericKeyedObjectPool.ObjectTimestampPa
  * @author Rodney Waldhoff
  * @author Dirk Verbeeck
  * @author Sandy McArthur
- * @version $Revision: 1206500 $ $Date: 2011-11-26 10:09:06 -0700 (Sat, 26 Nov 2011) $
  * @since Pool 1.0
  */
 public class GenericObjectPool<T> extends BaseObjectPool<T> implements ObjectPool<T> {

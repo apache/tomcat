@@ -27,7 +27,6 @@ package org.apache.tomcat.dbcp.pool;
  *
  * @author Rodney Waldhoff
  * @author Sandy McArthur
- * @version $Revision: 1085933 $ $Date: 2011-03-27 06:40:20 -0700 (Sun, 27 Mar 2011) $
  * @since Pool 1.0
  */
 public abstract class BaseKeyedObjectPool<K, V> implements KeyedObjectPool<K, V> {
