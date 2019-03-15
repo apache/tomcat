@@ -104,8 +104,7 @@
   <property name="jasper.jar" value="${tomcat.build}/lib/jasper.jar"/>
   <property name="jasper-el.jar" value="${tomcat.build}/lib/jasper-el.jar"/>
 
-  <property name="tomcat-dbcp.home" value="${base.path}/tomcat${version.major}-deps/dbcp" />
-  <property name="tomcat-dbcp.jar" value="${tomcat-dbcp.home}/tomcat-dbcp.jar"/>
+  <property name="tomcat-dbcp.jar" value="${tomcat.build}/lib/tomcat-dbcp.jar"/>
 
   <!-- Standard Source JARs -->
   <property name="bootstrap-src.jar" value="${tomcat.src.jars}/bootstrap-src.jar"/>
@@ -126,7 +125,7 @@
   <property name="jasper-src.jar" value="${tomcat.src.jars}/jasper-src.jar"/>
   <property name="jasper-el-src.jar" value="${tomcat.src.jars}/jasper-el-src.jar"/>
 
-  <property name="tomcat-dbcp-src.jar" value="${tomcat-dbcp.home}/tomcat-dbcp-src.jar"/>
+  <property name="tomcat-dbcp-src.jar" value="${tomcat.src.jars}/tomcat-dbcp-src.jar"/>
 
   <!-- Embedded JARs & source JARs -->
   <property name="tomcat-embed-core.jar" value="${tomcat.embed}/tomcat-embed-core.jar"/>
@@ -654,7 +653,7 @@
   <target name="compile" depends="compile-java6, check-java7, compile-java7" />
 
   <target name="compile-java6"
-          depends="build-prepare, download-compile, build-deps, compile-prepare, validate">
+          depends="build-prepare, download-compile, compile-prepare, validate">
     <!-- Compile internal server components -->
     <javac srcdir="java" destdir="${tomcat.classes}"
            debug="${compile.debug}"
@@ -816,6 +815,11 @@
     <jarIt jarfile="${jasper-el.jar}"
       filesDir="${tomcat.classes}"
       filesId="files.jasper-el" />
+
+    <!-- Re-packaged Apache Commons DBCP 1-->
+    <jarIt jarfile="${tomcat-dbcp.jar}"
+      filesDir="${tomcat.classes}"
+      filesId="files.tomcat-dbcp" />
 
     <!-- i18n JARs -->
     <jar jarfile="${tomcat.build}/lib/tomcat-i18n-es.jar"
@@ -1082,9 +1086,6 @@
     <!-- Add sources for examples -->
     <antcall target="examples-sources" />
 
-    <copy file="${tomcat-dbcp.jar}" todir="${tomcat.build}/lib"
-      failonerror="false"/>
-
     <!-- build the jdbc-pool jar and source jar-->
     <echo message="Building Tomcat JDBC pool libraries"/>
     <ant antfile="${tomcat.jdbc.dir}/build.xml" dir="${tomcat.jdbc.dir}"
@@ -1263,7 +1264,7 @@
 
   <target name="embed-sources"
           description="Create source jars for embedded jars"
-          depends="build-manifests" >
+          depends="build-manifests,package-src-jar" >
 
     <mkdir dir="${tomcat.embed.sources}" />
 
@@ -2201,7 +2202,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
   </target>
 
   <target name="release"
-    depends="clean,clean-depend,release-init,dist-deployer,installer,package-zip,package-winzip,package-tgz,package-deployer-zip,package-deployer-tgz,javadoc,package-docs-tgz,package-src-zip,package-src-tgz,package-src-jar"
+    depends="clean,release-init,dist-deployer,installer,package-zip,package-winzip,package-tgz,package-deployer-zip,package-deployer-tgz,javadoc,package-docs-tgz,package-src-zip,package-src-tgz,package-src-jar"
     description="Create a Tomcat 7 packaged distribution">
 
     <copy file="KEYS"
@@ -2587,7 +2588,10 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       filesId="files.jasper-el" />
 
     <!-- Repackaged DBCP 1.x -->
-    <copy file="${tomcat-dbcp-src.jar}" todir="${tomcat.src.jars}" />
+    <jarIt jarfile="${tomcat-dbcp-src.jar}"
+      filesDir="java"
+      filesId="files.tomcat-dbcp" />
+
     <!-- jdbc-pool JAR File -->
     <copy file="${tomcat-jdbc-src.jar}" todir="${tomcat.src.jars}" />
   </target>
@@ -2610,11 +2614,6 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
 
 
   <!-- ========================= Cleaning Targets ========================== -->
-
-  <target name="clean-depend"
-          description="Deletes the dependencies that are built from source">
-     <delete dir="${tomcat-dbcp.home}"/>
-  </target>
 
   <target name="clean"
           description="Delete the default output folders">
@@ -2662,25 +2661,6 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       <param name="checksum.algorithm" value="${commons-daemon.bin.checksum.algorithm}"/>
       <param name="checksum.value" value="${commons-daemon.bin.checksum.value}"/>
     </antcall>
-
-    <!-- Download src and build Tomcat DBCP 1.x bundle -->
-    <antcall target="downloadgz-2">
-      <param name="sourcefile.1" value="${commons-pool-src.loc.1}"/>
-      <param name="sourcefile.2" value="${commons-pool-src.loc.2}"/>
-      <param name="destfile" value="${commons-pool.home}/build.xml" />
-      <param name="checksum.enabled" value="${commons-pool-src.checksum.enabled}"/>
-      <param name="checksum.algorithm" value="${commons-pool-src.checksum.algorithm}"/>
-      <param name="checksum.value" value="${commons-pool-src.checksum.value}"/>
-    </antcall>
-    <antcall target="downloadgz-2">
-      <param name="sourcefile.1" value="${commons-dbcp-src.loc.1}"/>
-      <param name="sourcefile.2" value="${commons-dbcp-src.loc.2}"/>
-      <param name="destfile" value="${commons-dbcp.home}/build.xml" />
-      <param name="checksum.enabled" value="${commons-dbcp-src.checksum.enabled}"/>
-      <param name="checksum.algorithm" value="${commons-dbcp-src.checksum.algorithm}"/>
-      <param name="checksum.value" value="${commons-dbcp-src.checksum.value}"/>
-    </antcall>
-    <mkdir dir="${tomcat-dbcp.home}"/>
 
     <!-- Download JDT (Eclipse compiler) -->
     <antcall target="downloadfile-2">
@@ -2812,70 +2792,6 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
 
   </target>
 
-
-  <!-- =============== Targets for dependencies that need to =============== -->
-  <!-- ================  be built rather than used directly ================ -->
-
-  <target name="build-deps">
-    <!-- Rebuild dbcp only if built jars do not exist -->
-    <!-- or new versions of pool or dbcp have been downloaded. -->
-    <condition property="no.build.dbcp">
-      <and>
-        <uptodate srcfile="${commons-pool.home}" targetfile="${tomcat-dbcp.jar}" />
-        <uptodate srcfile="${commons-pool.home}" targetfile="${tomcat-dbcp-src.jar}" />
-        <uptodate srcfile="${commons-dbcp.home}" targetfile="${tomcat-dbcp.jar}" />
-        <uptodate srcfile="${commons-dbcp.home}" targetfile="${tomcat-dbcp-src.jar}" />
-      </and>
-    </condition>
-    <antcall target="build-tomcat-dbcp" />
-  </target>
-
-  <target name="build-tomcat-dbcp" depends="build-manifests" unless="no.build.dbcp">
-    <copy todir="${tomcat-dbcp.home}">
-      <fileset dir="${commons-pool.home}">
-        <include name="**/*.java" />
-        <exclude name="**/test/**" />
-      </fileset>
-      <fileset dir="${commons-dbcp.home}">
-        <include name="**/*.java" />
-        <exclude name="**/test/**" />
-        <exclude name="**/managed/**" />
-      </fileset>
-    </copy>
-    <replace dir="${tomcat-dbcp.home}/src/java/org/apache/commons"
-        encoding="ISO-8859-1">
-      <replacefilter token="org.apache.commons"
-            value="org.apache.tomcat.dbcp" />
-    </replace>
-    <replace dir="${tomcat-dbcp.home}/src/java/org/apache/commons/pool/impl"
-        encoding="ISO-8859-1">
-      <replacefilter token="enum"
-            value="enumeration" />
-    </replace>
-
-    <mkdir dir="${tomcat-dbcp.home}/src/java/org/apache/tomcat/dbcp" />
-    <move todir="${tomcat-dbcp.home}/src/java/org/apache/tomcat/dbcp">
-      <fileset dir="${tomcat-dbcp.home}/src/java/org/apache/commons" />
-    </move>
-    <mkdir dir="${tomcat-dbcp.home}/classes"/>
-    <javac destdir="${tomcat-dbcp.home}/classes"
-           debug="${compile.debug}"
-           deprecation="${compile.deprecation}"
-           source="${compile.source}"
-           target="${compile.target}"
-           sourcepath="${tomcat-dbcp.home}/src/java"
-           srcdir="${tomcat-dbcp.home}/src/java"
-           encoding="ISO-8859-1"
-           includeantruntime="false">
-      <include name="**" />
-    </javac>
-    <jarIt jarfile="${tomcat-dbcp.jar}"
-      filesDir="${tomcat-dbcp.home}/classes"
-      filesId="files.tomcat-dbcp" />
-    <jarIt jarfile="${tomcat-dbcp-src.jar}"
-      filesDir="${tomcat-dbcp.home}/src/java"
-      filesId="files.tomcat-dbcp" />
-  </target>
 
   <!-- =============== Utility Targets to support downloads ================ -->
 
@@ -3132,7 +3048,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
   <!-- ============================ IDE Support ============================ -->
 
   <target name="ide-eclipse"
-          depends="download-compile, build-deps, extras-webservices-prepare, download-test-compile"
+          depends="download-compile, extras-webservices-prepare, download-test-compile"
           description="Prepares the source tree to be built in Eclipse">
 
     <!-- Copy the sample project files into the root directory -->
@@ -3148,7 +3064,7 @@ Read the Building page on the Apache Tomcat documentation site for details on ho
   </target>
 
   <target name="ide-eclipse-websocket"
-          depends="download-compile, build-deps, extras-webservices-prepare, download-test-compile"
+          depends="download-compile, extras-webservices-prepare, download-test-compile"
           description="Prepares the source tree to be built in Eclipse - separate project to build classes that require Java 7">
 
     <!-- Create directory "../tomcat-7.0.x-java7" and configure Eclipse project there -->
