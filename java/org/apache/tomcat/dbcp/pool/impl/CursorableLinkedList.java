@@ -757,7 +757,7 @@ class CursorableLinkedList<E> implements List<E>, Serializable {
      * specified <i>after</i> element
      *
      * @return the newly created
-     * {@link org.apache.tomcat.dbcp.collections.CursorableLinkedList.Listable}
+     * {@link org.apache.tomcat.dbcp.pool.impl.CursorableLinkedList.Listable}
      */
     protected Listable<E> insertListable(Listable<E> before, Listable<E> after, E value) {
         _modCount++;
@@ -780,7 +780,7 @@ class CursorableLinkedList<E> implements List<E>, Serializable {
 
     /**
      * Removes the given
-     * {@link org.apache.tomcat.dbcp.collections.CursorableLinkedList.Listable}
+     * {@link org.apache.tomcat.dbcp.pool.impl.CursorableLinkedList.Listable}
      * from my list.
      */
     protected void removeListable(Listable<E> elt) {
@@ -803,7 +803,7 @@ class CursorableLinkedList<E> implements List<E>, Serializable {
 
     /**
      * Returns the
-     * {@link org.apache.tomcat.dbcp.collections.CursorableLinkedList.Listable}
+     * {@link org.apache.tomcat.dbcp.pool.impl.CursorableLinkedList.Listable}
      * at the specified index.
      *
      * @throws IndexOutOfBoundsException if index is less than zero or
@@ -974,7 +974,7 @@ class CursorableLinkedList<E> implements List<E>, Serializable {
      * non-null, as when I am a sublist for some larger list.
      * Use <tt>== _head.next()</tt> and <tt>== _head.prev()</tt> to determine
      * if a given
-     * {@link org.apache.tomcat.dbcp.collections.CursorableLinkedList.Listable}
+     * {@link org.apache.tomcat.dbcp.pool.impl.CursorableLinkedList.Listable}
      * is the first or last element in the list.
      */
     protected transient Listable<E> _head = new Listable<E>(null,null,null);

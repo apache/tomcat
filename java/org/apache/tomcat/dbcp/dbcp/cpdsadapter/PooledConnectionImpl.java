@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -42,16 +42,16 @@ import org.apache.tomcat.dbcp.pool.KeyedPoolableObjectFactory;
  *
  * @author John D. McNally
  */
-class PooledConnectionImpl 
+class PooledConnectionImpl
         implements PooledConnection, KeyedPoolableObjectFactory {
-    private static final String CLOSED 
+    private static final String CLOSED
             = "Attempted to use PooledConnection after closed() was called.";
 
     /**
      * The JDBC database connection that represents the physical db connection.
      */
     private Connection connection = null;
-    
+
     /**
      * A DelegatingConnection used to create a PoolablePreparedStatementStub
      */
@@ -81,10 +81,10 @@ class PooledConnectionImpl
     // TODO - make final?
     protected KeyedObjectPool pstmtPool = null;
 
-    /** 
-     * Controls access to the underlying connection 
+    /**
+     * Controls access to the underlying connection
      */
-    private boolean accessToUnderlyingConnectionAllowed = false; 
+    private boolean accessToUnderlyingConnectionAllowed = false;
 
     /**
      * Wrap the real connection.
@@ -102,7 +102,7 @@ class PooledConnectionImpl
         isClosed = false;
         if (pool != null) {
             pstmtPool = pool;
-            pstmtPool.setFactory(this);            
+            pstmtPool.setFactory(this);
         }
     }
 
@@ -126,14 +126,14 @@ class PooledConnectionImpl
     /* JDBC_4_ANT_KEY_END */
 
     /**
-     * Closes the physical connection and marks this 
-     * <code>PooledConnection</code> so that it may not be used 
+     * Closes the physical connection and marks this
+     * <code>PooledConnection</code> so that it may not be used
      * to generate any more logical <code>Connection</code>s.
      *
      * @exception SQLException if an error occurs or the connection is already closed
      */
     @Override
-    public void close() throws SQLException {        
+    public void close() throws SQLException {
         assertOpen();
         isClosed = true;
         try {
@@ -179,7 +179,7 @@ class PooledConnectionImpl
         if (logicalConnection != null && !logicalConnection.isClosed()) {
             // should notify pool of error so the pooled connection can
             // be removed !FIXME!
-            throw new SQLException("PooledConnection was reused, without" 
+            throw new SQLException("PooledConnection was reused, without"
                     + "its previous Connection being closed.");
         }
 
@@ -220,9 +220,9 @@ class PooledConnectionImpl
 
         // make sure the last connection is marked as closed
         if (logicalConnection != null && !logicalConnection.isClosed()) {
-            throw new SQLException("PooledConnection was gc'ed, without" 
+            throw new SQLException("PooledConnection was gc'ed, without"
                     + "its last Connection being closed.");
-        }        
+        }
     }
 
     /**
@@ -242,14 +242,14 @@ class PooledConnectionImpl
     /**
      * Create or obtain a {@link PreparedStatement} from my pool.
      * @param sql the SQL statement
-     * @return a {@link PoolablePreparedStatement}
+     * @return a {@link org.apache.tomcat.dbcp.dbcp.PoolablePreparedStatement}
      */
     PreparedStatement prepareStatement(String sql) throws SQLException {
         if (pstmtPool == null) {
             return connection.prepareStatement(sql);
         } else {
             try {
-                return (PreparedStatement) 
+                return (PreparedStatement)
                         pstmtPool.borrowObject(createKey(sql));
             } catch (RuntimeException e) {
                 throw e;
@@ -264,19 +264,19 @@ class PooledConnectionImpl
      * @param sql a <code>String</code> object that is the SQL statement to
      *            be sent to the database; may contain one or more '?' IN
      *            parameters
-     * @param resultSetType a result set type; one of 
-     *         <code>ResultSet.TYPE_FORWARD_ONLY</code>, 
+     * @param resultSetType a result set type; one of
+     *         <code>ResultSet.TYPE_FORWARD_ONLY</code>,
      *         <code>ResultSet.TYPE_SCROLL_INSENSITIVE</code>, or
      *         <code>ResultSet.TYPE_SCROLL_SENSITIVE</code>
      * @param resultSetConcurrency a concurrency type; one of
      *         <code>ResultSet.CONCUR_READ_ONLY</code> or
      *         <code>ResultSet.CONCUR_UPDATABLE</code>
-     * 
-     * @return a {@link PoolablePreparedStatement}
+     *
+     * @return a {@link org.apache.tomcat.dbcp.dbcp.PoolablePreparedStatement}
      * @see Connection#prepareStatement(String, int, int)
      */
-    PreparedStatement prepareStatement(String sql, int resultSetType, 
-                                       int resultSetConcurrency) 
+    PreparedStatement prepareStatement(String sql, int resultSetType,
+                                       int resultSetConcurrency)
             throws SQLException {
         if (pstmtPool == null) {
             return connection.prepareStatement(sql, resultSetType, resultSetConcurrency);
@@ -296,14 +296,14 @@ class PooledConnectionImpl
      * Create or obtain a {@link PreparedStatement} from my pool.
      * @param sql an SQL statement that may contain one or more '?' IN
      *        parameter placeholders
-     * @param autoGeneratedKeys a flag indicating whether auto-generated keys 
+     * @param autoGeneratedKeys a flag indicating whether auto-generated keys
      *        should be returned; one of
      *        <code>Statement.RETURN_GENERATED_KEYS</code> or
-     *        <code>Statement.NO_GENERATED_KEYS</code>  
-     * @return a {@link PoolablePreparedStatement}
+     *        <code>Statement.NO_GENERATED_KEYS</code>
+     * @return a {@link org.apache.tomcat.dbcp.dbcp.PoolablePreparedStatement}
      * @see Connection#prepareStatement(String, int)
      */
-    PreparedStatement prepareStatement(String sql, int autoGeneratedKeys) 
+    PreparedStatement prepareStatement(String sql, int autoGeneratedKeys)
             throws SQLException {
         if (pstmtPool == null) {
             return connection.prepareStatement(sql, autoGeneratedKeys);
@@ -403,12 +403,12 @@ class PooledConnectionImpl
     /**
      * Create a {*link PooledConnectionImpl.PStmtKey} for the given arguments.
      */
-    protected Object createKey(String sql, int resultSetType, 
+    protected Object createKey(String sql, int resultSetType,
                                int resultSetConcurrency) {
         return new PStmtKey(normalizeSQL(sql), resultSetType,
                             resultSetConcurrency);
     }
-    
+
     /**
      * Create a {*link PooledConnectionImpl.PStmtKey} for the given arguments.
      */
@@ -436,7 +436,7 @@ class PooledConnectionImpl
         } else {
             // _openPstmts++;
             PStmtKey key = (PStmtKey)obj;
-            if (null == key._resultSetType 
+            if (null == key._resultSetType
                     && null == key._resultSetConcurrency) {
                 if (null == key._autoGeneratedKeys) {
                     return new PoolablePreparedStatementStub(
@@ -511,7 +511,7 @@ class PooledConnectionImpl
 
     /**
      * Returns the value of the accessToUnderlyingConnectionAllowed property.
-     * 
+     *
      * @return true if access to the underlying is allowed, false otherwise.
      */
     public synchronized boolean isAccessToUnderlyingConnectionAllowed() {
@@ -522,13 +522,13 @@ class PooledConnectionImpl
      * Sets the value of the accessToUnderlyingConnectionAllowed property.
      * It controls if the PoolGuard allows access to the underlying connection.
      * (Default: false)
-     * 
+     *
      * @param allow Access to the underlying connection is granted when true.
      */
     public synchronized void setAccessToUnderlyingConnectionAllowed(boolean allow) {
         this.accessToUnderlyingConnectionAllowed = allow;
     }
-    
+
     /**
      * A key uniquely identifying {*link PreparedStatement}s.
      */
@@ -540,7 +540,7 @@ class PooledConnectionImpl
         protected Integer _resultSetHoldability = null;
         protected int _columnIndexes[] = null;
         protected String _columnNames[] = null;
-        
+
         PStmtKey(String sql) {
             _sql = sql;
         }
@@ -574,7 +574,7 @@ class PooledConnectionImpl
             _columnNames = columnNames;
         }
 
-        
+
         @Override
         public boolean equals(Object that) {
             try {

@@ -35,7 +35,7 @@ import org.apache.tomcat.dbcp.pool.PoolableObjectFactory;
 
 /**
  * A {@link PoolableObjectFactory} that creates
- * {@link PoolableConnection}s.
+ * {@link org.apache.tomcat.dbcp.dbcp.PoolableConnection}s.
  *
  * @author John D. McNally
  */
@@ -53,7 +53,7 @@ class CPDSConnectionFactory
     private String _username = null;
     private String _password = null;
 
-    /** 
+    /**
      * Map of PooledConnections for which close events are ignored.
      * Connections are muted when they are being validated.
      */
@@ -66,13 +66,13 @@ class CPDSConnectionFactory
 
     /**
      * Create a new <tt>PoolableConnectionFactory</tt>.
-     * 
+     *
      * @param cpds the ConnectionPoolDataSource from which to obtain
      * PooledConnection's
      * @param pool the {@link ObjectPool} in which to pool those
      * {@link Connection}s
      * @param validationQuery a query to use to {@link #validateObject validate}
-     * {@link Connection}s. Should return at least one row. May be 
+     * {@link Connection}s. Should return at least one row. May be
      * <tt>null</tt>
      * @param username
      * @param password
@@ -84,10 +84,10 @@ class CPDSConnectionFactory
                                  String password) {
         this(cpds, pool, validationQuery, false, username, password);
     }
-    
+
     /**
      * Create a new <tt>PoolableConnectionFactory</tt>.
-     * 
+     *
      * @param cpds the ConnectionPoolDataSource from which to obtain
      * PooledConnection's
      * @param pool the {@link ObjectPool} in which to pool those {@link
@@ -114,10 +114,10 @@ class CPDSConnectionFactory
          _password = password;
          _rollbackAfterValidation = rollbackAfterValidation;
      }
-     
+
      /**
       * Returns the object pool used to pool connections created by this factory.
-      * 
+      *
       * @return ObjectPool managing pooled connections
       */
      public ObjectPool getPool() {
@@ -159,7 +159,7 @@ class CPDSConnectionFactory
             PooledConnection pc = ((PooledConnectionAndInfo)obj).getPooledConnection();
             pc.removeConnectionEventListener(this);
             pcMap.remove(pc);
-            pc.close(); 
+            pc.close();
         }
     }
 
@@ -297,11 +297,11 @@ class CPDSConnectionFactory
             e.printStackTrace();
         }
     }
-    
+
     // ***********************************************************************
     // PooledConnectionManager implementation
     // ***********************************************************************
-    
+
     /**
      * Invalidates the PooledConnection in the pool.  The CPDSConnectionFactory
      * closes the connection and pool counters are updated appropriately.
@@ -319,19 +319,19 @@ class CPDSConnectionFactory
             _pool.close();  // Clear any other instances in this pool and kill others as they come back
         } catch (Exception ex) {
             throw (SQLException) new SQLException("Error invalidating connection").initCause(ex);
-        }   
+        }
     }
-    
+
     /**
      * Sets the database password used when creating new connections.
-     * 
+     *
      * @param password new password
      */
     @Override
     public synchronized void setPassword(String password) {
         _password = password;
     }
-    
+
     /**
      * Verifies that the username matches the user whose connections are being managed by this
      * factory and closes the pool if this is the case; otherwise does nothing.
@@ -347,7 +347,7 @@ class CPDSConnectionFactory
             _pool.close();
         } catch (Exception ex) {
             throw (SQLException) new SQLException("Error closing connection pool").initCause(ex);
-        } 
+        }
     }
-    
+
 }
