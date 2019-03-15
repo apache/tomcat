@@ -136,6 +136,24 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Other">
+    <changelog>
+      <scode>
+        Copy Apache Commons DBCP 1.4 and Apache Commons Pool 1.5.7 source code
+        into the Tomcat 7.0.x tree to enable additional fixes to be pulled in.
+        (markt)
+      </scode>
+      <fix>
+        Update the copy of Apache Commons DBCP 1.4.x and Apache Commons pool
+        1.5.x to the latest source code as of 2019-03-15 to pick up multiple bug
+        fixes including <bug>58338</bug>. (markt)
+      </fix>
+      <scode>
+        Update the copy of Apache Commons Pool to 1.6.x to pick up the generics
+        changes. (markt)
+      </scode>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 7.0.93 (violetagg)" rtext="released 2019-02-21">
   <subsection name="Catalina">
