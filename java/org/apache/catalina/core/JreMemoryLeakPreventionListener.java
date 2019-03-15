@@ -165,7 +165,7 @@ public class JreMemoryLeakPreventionListener implements LifecycleListener {
     /**
      * Protect against resources being read for JAR files and, as a side-effect,
      * the JAR file becoming locked. Note this disables caching for all
-     * {@link URLConnection}s, regardless of type. Defaults to
+     * {@link java.net.URLConnection}s, regardless of type. Defaults to
      * <code>true</code>.
      */
     private boolean urlCacheProtection = true;

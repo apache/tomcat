@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -141,13 +141,13 @@ class JspReader {
     }
 
     /**
-     * @return JSP compilation context with which this JspReader is 
+     * @return JSP compilation context with which this JspReader is
      * associated
      */
     JspCompilationContext getJspCompilationContext() {
         return context;
     }
-    
+
     /**
      * Returns the file at the given position in the list.
      *
@@ -157,16 +157,16 @@ class JspReader {
     String getFile(final int fileid) {
         return sourceFiles.get(fileid);
     }
-       
+
     /**
      * Checks if the current file has more input.
      *
      * @return True if more reading is possible
      * @throws JasperException if an error occurs
-     */ 
+     */
     boolean hasMoreInput() throws JasperException {
         if (current.cursor >= current.stream.length) {
-            if (singleFile) return false; 
+            if (singleFile) return false;
             while (popFile()) {
                 if (current.cursor < current.stream.length) return true;
             }
@@ -174,15 +174,15 @@ class JspReader {
         }
         return true;
     }
-    
+
     int nextChar() throws JasperException {
         if (!hasMoreInput())
             return -1;
-        
+
         int ch = current.stream[current.cursor];
 
         current.cursor++;
-        
+
         if (ch == '\n') {
             current.line++;
             current.col = 0;
@@ -428,7 +428,7 @@ class JspReader {
      * Skip until the given string is matched in the stream.
      * When returned, the context is positioned past the end of the match.
      *
-     * @param s The String to match.
+     * @param limit The String to match.
      * @return A non-null <code>Mark</code> instance (positioned immediately
      *         before the search string) if found, <strong>null</strong>
      *         otherwise.
@@ -467,7 +467,7 @@ class JspReader {
      * chars initially escaped by a '\' and any EL expressions.
      * When returned, the context is positioned past the end of the match.
      *
-     * @param s The String to match.
+     * @param limit    The String to match.
      * @param ignoreEL <code>true</code> if something that looks like EL should
      *                 not be treated as EL.
      * @return A non-null <code>Mark</code> instance (positioned immediately
@@ -502,7 +502,7 @@ class JspReader {
         }
         return null;
     }
-    
+
     /**
      * Skip until the given end tag is matched in the stream.
      * When returned, the context is positioned past the end of the tag.
@@ -577,22 +577,22 @@ class JspReader {
         StringBuilder StringBuilder = new StringBuilder();
         skipSpaces();
         StringBuilder.setLength(0);
-        
+
         if (!hasMoreInput()) {
             return "";
         }
 
         int ch = peekChar();
-        
+
         if (quoted) {
             if (ch == '"' || ch == '\'') {
 
                 char endQuote = ch == '"' ? '"' : '\'';
-                // Consume the open quote: 
+                // Consume the open quote:
                 ch = nextChar();
                 for (ch = nextChar(); ch != -1 && ch != endQuote;
                          ch = nextChar()) {
-                    if (ch == '\\') 
+                    if (ch == '\\')
                         ch = nextChar();
                     StringBuilder.append((char) ch);
                 }
@@ -642,7 +642,7 @@ class JspReader {
                     || ch == '/') {
                 return true;
             }
-            // Look for an end-of-comment or end-of-tag:                
+            // Look for an end-of-comment or end-of-tag:
             if (ch == '-') {
                 Mark mark = mark();
                 if (((ch = nextChar()) == '>')
@@ -678,7 +678,7 @@ class JspReader {
 
         return sourceFiles.size() - 1;
     }
-    
+
 
     /**
      * Unregister the source file.
@@ -702,7 +702,7 @@ class JspReader {
      * Push a file (and its associated Stream) on the file stack.  THe
      * current position in the current file is remembered.
      */
-    private void pushFile(String file, String encoding, 
+    private void pushFile(String file, String encoding,
                            InputStreamReader reader) throws JasperException {
 
         // Register the file
@@ -734,7 +734,7 @@ class JspReader {
                 caw.write(buf, 0, i);
             caw.close();
             if (current == null) {
-                current = new Mark(this, caw.toCharArray(), fileid, 
+                current = new Mark(this, caw.toCharArray(), fileid,
                                    getFile(fileid), master, encoding);
             } else {
                 current.pushStream(caw.toCharArray(), fileid, getFile(fileid),
