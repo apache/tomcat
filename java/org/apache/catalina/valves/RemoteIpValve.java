@@ -420,7 +420,7 @@ public class RemoteIpValve extends ValveBase {
     /**
      * @see #setProtocolHeader(String)
      */
-    private String protocolHeader = null;
+    private String protocolHeader = "X-Forwarded-Proto";
 
     /**
      * @see #setProtocolHeaderHttpsValue(String)

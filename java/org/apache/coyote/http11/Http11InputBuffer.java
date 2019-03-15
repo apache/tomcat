@@ -618,8 +618,10 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
         }
 
         try {
-            fill(false);
-            available = byteBuffer.remaining();
+            if (wrapper.hasDataToRead()) {
+                fill(false);
+                available = byteBuffer.remaining();
+            }
         } catch (IOException ioe) {
             if (log.isDebugEnabled()) {
                 log.debug(sm.getString("iib.available.readFail"), ioe);

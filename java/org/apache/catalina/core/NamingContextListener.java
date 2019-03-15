@@ -60,6 +60,7 @@ import org.apache.naming.ResourceLinkRef;
 import org.apache.naming.ResourceRef;
 import org.apache.naming.ServiceRef;
 import org.apache.naming.TransactionRef;
+import org.apache.naming.factory.Constants;
 import org.apache.naming.factory.ResourceLinkFactory;
 import org.apache.tomcat.util.descriptor.web.ContextEjb;
 import org.apache.tomcat.util.descriptor.web.ContextEnvironment;
@@ -1010,16 +1011,21 @@ public class NamingContextListener
         if (("javax.sql.DataSource".equals(ref.getClassName())  ||
             "javax.sql.XADataSource".equals(ref.getClassName())) &&
                 resource.getSingleton()) {
+            Object actualResource = null;
             try {
                 ObjectName on = createObjectName(resource);
-                Object actualResource = envCtx.lookup(resource.getName());
+                actualResource = envCtx.lookup(resource.getName());
                 Registry.getRegistry(null, null).registerComponent(actualResource, on, null);
                 objectNames.put(resource.getName(), on);
             } catch (Exception e) {
                 log.warn(sm.getString("naming.jmxRegistrationFailed", e));
             }
+            // Bug 63210. DBCP2 DataSources require an explicit close. This goes
+            // further and cleans up and AutoCloseable DataSource by default.
+            if (actualResource instanceof AutoCloseable && !resource.getCloseMethodConfigured()) {
+                resource.setCloseMethod("close");
+            }
         }
-
     }
 
 

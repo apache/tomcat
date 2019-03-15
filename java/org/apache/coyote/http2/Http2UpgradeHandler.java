@@ -551,6 +551,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
         synchronized (socketWrapper) {
             doWriteHeaders(stream, pushedStreamId, mimeHeaders, endOfStream, payloadSize);
         }
+        stream.sentHeaders();
         if (endOfStream) {
             stream.sentEndOfStream();
         }
@@ -1000,7 +1001,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
                     sm.getString("upgradeHandler.stream.even", key), Http2Error.PROTOCOL_ERROR);
         }
 
-        pruneClosedStreams();
+        pruneClosedStreams(streamId);
 
         Stream result = new Stream(key, this);
         streams.put(key, result);
@@ -1034,7 +1035,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
     }
 
 
-    private void pruneClosedStreams() {
+    private void pruneClosedStreams(int streamId) {
         // Only prune every 10 new streams
         if (newStreamsSinceLastPrune < 9) {
             // Not atomic. Increments may be lost. Not a problem.
@@ -1146,7 +1147,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
 
         if (toClose > 0) {
             log.warn(sm.getString("upgradeHandler.pruneIncomplete", connectionId,
-                    Integer.toString(toClose)));
+                    Integer.toString(streamId), Integer.toString(toClose)));
         }
     }
 
@@ -1177,6 +1178,13 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
 
 
     void push(Request request, Stream associatedStream) throws IOException {
+        if (localSettings.getMaxConcurrentStreams() < activeRemoteStreamCount.incrementAndGet()) {
+            // If there are too many open streams, simply ignore the push
+            // request.
+            activeRemoteStreamCount.decrementAndGet();
+            return;
+        }
+
         Stream pushStream;
 
         // Synchronized since PUSH_PROMISE frames have to be sent in order. Once

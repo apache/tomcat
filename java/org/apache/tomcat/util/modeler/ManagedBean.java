@@ -562,7 +562,7 @@ public class ManagedBean implements java.io.Serializable {
         StringUtils.join(operation.getSignature(), ',', (x) -> x.getType(), key);
         key.append(')');
 
-        return key.toString();
+        return key.toString().intern();
     }
 
 
@@ -572,6 +572,6 @@ public class ManagedBean implements java.io.Serializable {
         StringUtils.join(parameterTypes, ',', key);
         key.append(')');
 
-        return key.toString();
+        return key.toString().intern();
     }
 }

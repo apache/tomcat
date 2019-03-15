@@ -72,6 +72,7 @@ import org.apache.tomcat.util.buf.StringUtils;
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.apache.tomcat.util.collections.CaseInsensitiveKeyMap;
 import org.apache.tomcat.util.res.StringManager;
+import org.apache.tomcat.util.security.KeyStoreUtil;
 import org.apache.tomcat.websocket.pojo.PojoEndpointClient;
 
 public class WsWebSocketContainer implements WebSocketContainer, BackgroundProcess {
@@ -912,7 +913,7 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
                     File keyStoreFile = new File(sslTrustStoreValue);
                     KeyStore ks = KeyStore.getInstance("JKS");
                     try (InputStream is = new FileInputStream(keyStoreFile)) {
-                        ks.load(is, sslTrustStorePwdValue.toCharArray());
+                        KeyStoreUtil.load(ks, is, sslTrustStorePwdValue.toCharArray());
                     }
 
                     TrustManagerFactory tmf = TrustManagerFactory.getInstance(

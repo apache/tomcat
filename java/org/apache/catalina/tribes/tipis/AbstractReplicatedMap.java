@@ -385,7 +385,7 @@ public abstract class AbstractReplicatedMap<K,V>
     }
 
     @Override
-    public void finalize() throws Throwable {
+    protected void finalize() throws Throwable {
         try {
             breakdown();
         } finally {

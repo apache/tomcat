@@ -44,7 +44,30 @@
   They eventually become mixed with the numbered issues (i.e., numbered
   issues do not "pop up" wrt. others).
 -->
-<section name="Tomcat 9.0.17 (markt)" rtext="in development">
+<section name="Tomcat 9.0.18 (markt)" rtext="in development">
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        <bug>63196</bug>: Provide a default (<code>X-Forwarded-Proto</code>) for
+        the <code>protocolHeader</code> attribute of the
+        <code>RemoteIpFilter</code> and <code>RemoteIpValve</code>. (markt)
+      </fix>
+      <fix>
+        <bug>63235</bug>: Refactor Charset cache to reduce start time. (markt)
+      </fix>
+      <fix>
+        <bug>63249</bug>: Use a consistent log level (<code>WARN</code>) when
+        logging the failure to register or deregister a JMX Bean. (markt)
+      </fix>
+      <fix>
+        <bug>63249</bug>: Use a consistent log level (<code>ERROR</code>) when
+        logging the <code>LifecycleException</code> associated with the failure
+        to start or stop a component. (markt)
+      </fix>
+    </changelog>
+  </subsection>
+</section>
+<section name="Tomcat 9.0.17 (markt)" rtext="release in progress">
   <subsection name="Catalina">
     <changelog>
       <fix>
@@ -58,6 +81,46 @@
         <code>catalina.properties</code> file for tomcat-i18n jar files.
         Use prefix pattern instead of listing each language. (kkolinko)
       </update>
+      <fix>
+        Restore the getter and setter for the access log valve attribute
+        <code>maxLogMessageBufferSize</code> that were accidentally removed.
+        (markt)
+      </fix>
+      <add>
+        <bug>63206</bug>: Add a new attribute to <code>Context</code> -
+        <code>createUploadTargets</code> which, if <code>true</code> enables
+        Tomcat to create the temporary upload location used by a Servlet if the
+        location specified by the Servlet does not already exist. The deafult
+        value is <code>false</code>. (markt)
+      </add>
+      <fix>
+        <bug>63210</bug>: Ensure that the Apache Commons DBCP 2 based default
+        connection pool is correctly shutdown when it is no longer required.
+        This ensures that a non-daemon thread is not left running that will
+        prevent Tomcat from shutting down cleanly. (markt)
+      </fix>
+      <fix>
+        <bug>63213</bug>: Ensure the correct escaping of group names when
+        searching for nested groups when the JNDIRealm is configured with
+        <code>roleNested</code> set to <code>true</code>. (markt)
+      </fix>
+      <fix>
+        <bug>63236</bug>: Use <code>String.intern()</code> as suggested by
+        Phillip Webb to reduce memory wasted due to String duplication. This
+        changes saves ~245k when starting a clean installation. With additional
+        thanks to YourKit Java profiler for helping to track down the wasted
+        memory and the root causes. (markt)
+      </fix>
+      <fix>
+        <bug>63246</bug>: Fix a potential <code>NullPointerException</code> when
+        calling <code>AsyncContext.dispatch()</code>. (markt)
+      </fix>
+      <fix>
+        Always use the absolute path of the <code>docBase</code> during the
+        deployment process to determine the Context name, deployment type,
+        whether the <code>docBase</code> is located within the
+        <code>appBase</code> etc. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
@@ -68,6 +131,56 @@
         available via the standard methods
         <code>ServletRequest.getServerName()</code> and
         <code>ServletRequest.getServerPort()</code>. (markt)
+      </fix>
+      <fix>
+        Refactor the APR/Native endpoint TLS configuration code to enable JSSE
+        style configuration - including JKS keystores - to be used with the
+        APR/Native connector. (markt)
+      </fix>
+      <add>
+        With the TLS configuration refactoring, the configuration attributes
+        <code>sessionCacheSize</code> and <code>sessionTimeout</code> are no
+        longer limited to JSSE implementations. They may now be used with
+        OpenSSL implementations as well. (markt)
+      </add>
+      <fix>
+        Refactor NIO2 read pending strategy for the classic IO API. (remm)
+      </fix>
+      <fix>
+        <bug>63182</bug>: Avoid extra read notifications for HTTP/1.1 with
+        NIO2 when using asynchronous threads. (remm)
+      </fix>
+      <add>
+        <bug>63205</bug>: Add a work-around for a known
+        <a href="https://bugs.openjdk.java.net/browse/JDK-8157404">JRE KeyStore
+        loading bug</a>. (markt)
+      </add>
+      <fix>
+        NIO2 should try to use SocketTimeoutException everywhere rather than a
+        mix of it and InterruptedByTimeout. (remm)
+      </fix>
+      <fix>
+        Correct an error in the request validation that meant that HTTP/2 push
+        requests always resulted in a 400 response. (markt)
+      </fix>
+      <fix>
+        <bug>63223</bug>: Correctly account for push requests when tracking
+        currently active HTTP/2 streams. (markt)
+      </fix>
+      <fix>
+        Ensure enough buffer space when using TLS with NIO2 by using the main
+        read buffer to store additional decrypted data. (remm)
+      </fix>
+      <fix>
+        Verify HTTP/2 stream is still writable before assuming a timeout
+        occurred. (remm)
+      </fix>
+      <fix>
+        Avoid some overflow cases with OpenSSL to improve efficiency, as the
+        OpenSSL engine has an internal buffer. (remm)
+      </fix>
+      <fix>
+        Harmonize HTTP/1.1 NIO2 keepalive code. (remm)
       </fix>
     </changelog>
   </subsection>
@@ -107,6 +220,10 @@
         Add feature that discover local member from the static member list.
         (kfujino)
       </add>
+      <fix>
+        Ensure that members registered in the addSuspects list are static
+        members. (kfujino)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
@@ -124,6 +241,26 @@
       <add>
         Expand the coverage and quality of the Russian translations provided
         with Apache Tomcat. (kkolinko)
+      </add>
+      <fix>
+        Fix the artifactId of <code>tomcat-i18n-cs</code>. (rjung)
+      </fix>
+      <add>
+        Expand the coverage and quality of the Korean translations provided
+        with Apache Tomcat. (woonsan)
+      </add>
+      <add>
+        Expand the coverage and quality of the Chinese translations provided
+        with Apache Tomcat. Includes contributions by winsonzhao. (markt)
+      </add>
+      <add>
+        Expand the coverage and quality of the Czech translations provided
+        with Apache Tomcat. Includes contributions by Arnošt Havelka. (markt)
+      </add>
+      <add>
+        Expand the coverage and quality of the Spanish translations provided
+        with Apache Tomcat. Includes contributions by Ulises Gonzalez Horta.
+        (markt)
       </add>
     </changelog>
   </subsection>

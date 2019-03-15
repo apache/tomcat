@@ -988,10 +988,9 @@ public class StandardWrapper extends ContainerBase
 
             try {
                 jspMonitorON = new ObjectName(oname.toString());
-                Registry.getRegistry(null, null)
-                    .registerComponent(instance, jspMonitorON, null);
+                Registry.getRegistry(null, null).registerComponent(instance, jspMonitorON, null);
             } catch (Exception ex) {
-                log.info(sm.getString("standardWrapper.jspMonitorError", instance));
+                log.warn(sm.getString("standardWrapper.jspMonitorError", instance));
             }
         }
     }

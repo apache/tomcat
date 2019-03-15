@@ -20,7 +20,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.InetAddress;
 import java.net.Socket;
+import java.net.UnknownHostException;
 import java.security.KeyStore;
 import java.security.Principal;
 import java.security.PrivateKey;
@@ -31,6 +33,8 @@ import javax.net.ssl.KeyManager;
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLEngine;
+import javax.net.ssl.SSLSocket;
+import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.X509ExtendedKeyManager;
@@ -65,8 +69,9 @@ public final class TesterSupport {
     public static final String CA_JKS = SSL_DIR + CA_ALIAS + ".jks";
     public static final String CLIENT_ALIAS = "user1";
     public static final String CLIENT_JKS = SSL_DIR + CLIENT_ALIAS + ".jks";
-    public static final String LOCALHOST_JKS = SSL_DIR + "localhost.jks";
-    public static final String LOCALHOST_KEYPASS_JKS = SSL_DIR + "localhost-copy1.jks";
+    public static final String LOCALHOST_EC_JKS = SSL_DIR + "localhost-ec.jks";
+    public static final String LOCALHOST_RSA_JKS = SSL_DIR + "localhost-rsa.jks";
+    public static final String LOCALHOST_KEYPASS_JKS = SSL_DIR + "localhost-rsa-copy1.jks";
     public static final String JKS_PASS = "changeit";
     public static final String JKS_KEY_PASS = "tomcatpass";
     public static final String CA_CERT_PEM = SSL_DIR + CA_ALIAS + "-cert.pem";
@@ -110,7 +115,7 @@ public final class TesterSupport {
     }
 
     public static void initSsl(Tomcat tomcat) {
-        initSsl(tomcat, LOCALHOST_JKS, null, null);
+        initSsl(tomcat, LOCALHOST_RSA_JKS, null, null);
     }
 
     protected static void initSsl(Tomcat tomcat, String keystore,
@@ -183,16 +188,19 @@ public final class TesterSupport {
         return tmf.getTrustManagers();
     }
 
-    protected static void configureClientSsl() {
+    protected static ClientSSLSocketFactory configureClientSsl() {
+        ClientSSLSocketFactory clientSSLSocketFactory = null;
         try {
             SSLContext sc = SSLContext.getInstance(Constants.SSL_PROTO_TLS);
             sc.init(TesterSupport.getUser1KeyManagers(),
                     TesterSupport.getTrustManagers(),
                     null);
-            javax.net.ssl.HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
+            clientSSLSocketFactory = new ClientSSLSocketFactory(sc.getSocketFactory());
+            javax.net.ssl.HttpsURLConnection.setDefaultSSLSocketFactory(clientSSLSocketFactory);
         } catch (Exception e) {
             e.printStackTrace();
         }
+        return clientSSLSocketFactory;
     }
 
     private static KeyStore getKeyStore(String keystore) throws Exception {
@@ -561,6 +569,82 @@ public final class TesterSupport {
             if (!trust) {
                 throw new CertificateException();
             }
+        }
+    }
+
+
+    public static class ClientSSLSocketFactory extends SSLSocketFactory {
+
+        private final SSLSocketFactory delegate;
+
+        private String[] ciphers = null;
+
+
+        public ClientSSLSocketFactory(SSLSocketFactory delegate) {
+            this.delegate = delegate;
+        }
+
+        /**
+         * Forces the use of the specified cipher.
+         *
+         * @param ciphers Array of standard JSSE names of ciphers to use
+         */
+        public void setCipher(String[] ciphers) {
+            this.ciphers = ciphers;
+        }
+
+        @Override
+        public Socket createSocket(Socket s, String host, int port, boolean autoClose) throws IOException {
+            Socket result = delegate.createSocket(s, host, port, autoClose);
+            reconfigureSocket(result);
+            return result;
+        }
+
+        @Override
+        public String[] getDefaultCipherSuites() {
+            return delegate.getDefaultCipherSuites();
+        }
+
+        @Override
+        public String[] getSupportedCipherSuites() {
+            return delegate.getSupportedCipherSuites();
+        }
+
+        @Override
+        public Socket createSocket(String host, int port) throws IOException, UnknownHostException {
+            Socket result = delegate.createSocket(host, port);
+            reconfigureSocket(result);
+            return result;
+        }
+
+        @Override
+        public Socket createSocket(InetAddress host, int port) throws IOException {
+            Socket result = delegate.createSocket(host, port);
+            reconfigureSocket(result);
+            return result;
+        }
+
+        @Override
+        public Socket createSocket(String host, int port, InetAddress localHost, int localPort)
+                throws IOException, UnknownHostException {
+            Socket result = delegate.createSocket(host, port, localHost, localPort);
+            reconfigureSocket(result);
+            return result;
+        }
+
+        @Override
+        public Socket createSocket(InetAddress address, int port, InetAddress localAddress, int localPort)
+                throws IOException {
+            Socket result = delegate.createSocket(address, port, localAddress, localPort);
+            reconfigureSocket(result);
+            return result;
+        }
+
+        private Socket reconfigureSocket(Socket socket) {
+            if (ciphers != null) {
+                ((SSLSocket) socket).setEnabledCipherSuites(ciphers);
+            }
+            return socket;
         }
     }
 

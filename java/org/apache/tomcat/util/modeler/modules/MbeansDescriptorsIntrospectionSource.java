@@ -348,8 +348,8 @@ public class MbeansDescriptorsIntrospectionSource extends ModelerSource
                 for(int i=0; i<parms.length; i++ ) {
                     ParameterInfo pi=new ParameterInfo();
                     pi.setType(parms[i].getName());
-                    pi.setName( "param" + i);
-                    pi.setDescription("Introspected parameter param" + i);
+                    pi.setName(("param" + i).intern());
+                    pi.setDescription(("Introspected parameter param" + i).intern());
                     op.addParameter(pi);
                 }
                 mbean.addOperation(op);

@@ -58,6 +58,8 @@ class Stream extends AbstractStream implements HeaderEmitter {
 
     private static final MimeHeaders ACK_HEADERS;
 
+    private static final Integer HTTP_UPGRADE_STREAM = Integer.valueOf(1);
+
     static {
         Response response =  new Response();
         response.setStatus(100);
@@ -100,21 +102,23 @@ class Stream extends AbstractStream implements HeaderEmitter {
             this.inputBuffer = new StreamInputBuffer();
             this.coyoteRequest.setInputBuffer(inputBuffer);
         } else {
-            // HTTP/1.1 upgrade
+            // HTTP/2 Push or HTTP/1.1 upgrade
             this.coyoteRequest = coyoteRequest;
             this.inputBuffer = null;
             // Headers have been read by this point
             state.receivedStartOfHeaders();
-            // Populate coyoteRequest from headers
-            try {
-                prepareRequest();
-            } catch (IllegalArgumentException iae) {
-                // Something in the headers is invalid
-                // Set correct return status
-                coyoteResponse.setStatus(400);
-                // Set error flag. This triggers error processing rather than
-                // the normal mapping
-                coyoteResponse.setError();
+            if (HTTP_UPGRADE_STREAM.equals(identifier)) {
+                // Populate coyoteRequest from headers (HTTP/1.1 only)
+                try {
+                    prepareRequest();
+                } catch (IllegalArgumentException iae) {
+                    // Something in the headers is invalid
+                    // Set correct return status
+                    coyoteResponse.setStatus(400);
+                    // Set error flag. This triggers error processing rather than
+                    // the normal mapping
+                    coyoteResponse.setError();
+                }
             }
             // TODO Assuming the body has been read at this point is not valid
             state.receivedEndOfStream();
@@ -616,6 +620,11 @@ class Stream extends AbstractStream implements HeaderEmitter {
     }
 
 
+    final void sentHeaders() {
+        state.sentHeaders();
+    }
+
+
     final void sentEndOfStream() {
         streamOutputBuffer.endOfStreamSent = true;
         state.sentEndOfStream();
@@ -1043,7 +1052,7 @@ class Stream extends AbstractStream implements HeaderEmitter {
                             throw new IOException(sm.getString("stream.inputBuffer.reset"));
                         }
 
-                        if (inBuffer.position() == 0) {
+                        if (inBuffer.position() == 0 && isActive() && !isInputFinished()) {
                             String msg = sm.getString("stream.inputBuffer.readTimeout");
                             StreamException se = new StreamException(
                                     msg, Http2Error.ENHANCE_YOUR_CALM, getIdAsInt());

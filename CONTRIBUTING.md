@@ -1,7 +1,7 @@
 # Contributing to Apache Tomcat
 
 Firstly, thanks for your interest in contributing! I hope that this will be a
-pleasant first experience for you, and that you will return to continue
+pleasant experience for you, and that you will return to continue
 contributing.
 
 Please visit our [Get Involved page](https://tomcat.apache.org/getinvolved.html)
@@ -38,12 +38,12 @@ the issues marked 'Beginner', link below. Please note that the Beginner keyword
 is pretty new to the project, so if there aren't any issues in the filter feel
 free to ask on the [dev list](https://tomcat.apache.org/lists.html#tomcat-dev).
 
-* [Beginner issues](https://bz.apache.org/bugzilla/buglist.cgi?bug_status=NEW&bug_status=ASSIGNED&bug_status=REOPENED&bug_status=NEEDINFO&keywords=Beginner&keywords_type=allwords&list_id=160824&product=Tomcat%207&product=Tomcat%208&product=Tomcat%209&query_format=advanced) -
+* [Beginner issues](https://bz.apache.org/bugzilla/buglist.cgi?bug_status=NEW&bug_status=ASSIGNED&bug_status=REOPENED&bug_status=NEEDINFO&keywords=Beginner&keywords_type=allwords&list_id=160824&product=Tomcat%207&product=Tomcat%208.5&product=Tomcat%209&query_format=advanced) -
 issues which should only require a few lines of code, and a test or two to
 resolve.
 
 The list above shows all bugs that are marked 'Beginner' and are open in the
-currently supported Tomcat versions (7, 8, and 9).
+currently supported Tomcat versions (7, 8.5, and 9).
 
 If you prefer C over Java, you may also take a look at the tomcat-native and
 Tomcat Connectors products in Bugzilla.
@@ -57,11 +57,8 @@ committers of the project for review and acceptance.
 
 You can provide a patch in one of the following ways (in order of preference):
 
+* GitHub Pull Request
 * Patch attachment to the Bugzilla issue
-* Github Pull Request
-> **Note:** Github is a mirror of the SVN repository that Tomcat is stored in
-and therefore it can't be merged outright. Your contribution will be converted
-into an SVN patch and committed with a mention of your name for credit.
 * Email the patch to the developer list. This is not preferred, but if no bug
 is associated with the patch, or you would like a developer review, an email
 may be appropriate.
@@ -73,41 +70,33 @@ source code.
 
 ###### Download The Source Distribution
 
-This method works if you want to submit a patch (like you would do for SVN), but
+This method works if you want to submit a patch via email, but
 the difference in using the sources distribution and a VCS is that you have to
 manually generate the patch file by using diff. If this is what you want, you
 can download the sources from the "Source Code Distributions" section of the
 Download Page. There is one such page for every major Tomcat version:
+
 - [Tomcat 9](https://tomcat.apache.org/download-90.cgi)
 - [Tomcat 8](https://tomcat.apache.org/download-80.cgi)
 - [Tomcat 7](https://tomcat.apache.org/download-70.cgi)
 
-###### SVN
+##### Manual Patch Generation
 
 If you have chosen to attach a patch to the Bugzilla issue (or email
-one), then you'll need to checkout the SVN version. Instructions for new
-committers to learn how to do this are found
-[here](https://www.apache.org/dev/contributors.html#svnbasics). However, in the
-interest of a fast ramp up, the short version is below. Note that the root of
-the SVN repository is
-[tomcat/trunk](https://svn.apache.org/repos/asf/tomcat/trunk),
-but you can clone specific versions too, such as
-[tc8.5.x](https://svn.apache.org/repos/asf/tomcat/tc8.5.x/trunk/) or even tags (
-[TOMCAT_8_5_15](https://svn.apache.org/repos/asf/tomcat/tc8.5.x/tags/TOMCAT_8_5_15/)).
+one), then you'll need to download the sources as noted above, make your
+desired changes and then manually generate your patch using diff (other
+other tool).
 
-```
-$ svn co https://svn.apache.org/repos/asf/tomcat/trunk/
-```
+##### GitHub
 
-##### Github
-
-For Github, it's almost the same. Chose the major version that you want (for
-now they're in different repositories), fork the repository, and then clone
-your fork to do that work.
+To submit a GitHub Pull Request you'll need to fork the
+[repository](https://github.com/apache/tomcat), clone your fork to do the work:
 
 ```
 $ git clone https://github.com/$USERNAME/tomcat.git
 ```
+
+and then push your changes, and submit a Pull Request via the GitHub UI.
 
 #### Submitting Your Patch!
 
@@ -115,9 +104,9 @@ After you've chosen your method of submission, retrieved the sources, and
 fixed the issue it's time to submit your work. At this point, just follow
 the method of submission you chose earlier.
 
-* Bugzilla attachment - attach the SVN patch to the Bugzilla issue
-* Github PR - after resolving the issue in your local fork and pushing to your
-copy of the repository, open a Github PR for review.
+* GitHub PR - after resolving the issue in your local fork and pushing to your
+copy of the repository, open a GitHub PR for review.
+* Bugzilla attachment - attach the patch to the Bugzilla issue
 * Email - again, not preferred, but you may send an email to the developer list
 with a patch attached for review.
 

@@ -1411,8 +1411,7 @@ public class HostConfig implements LifecycleListener {
             try {
                 context.start();
             } catch (Exception e) {
-                log.warn(sm.getString
-                         ("hostConfig.context.restart", app.name), e);
+                log.error(sm.getString("hostConfig.context.restart", app.name), e);
             }
         }
     }
@@ -1563,7 +1562,7 @@ public class HostConfig implements LifecycleListener {
             Registry.getRegistry(null, null).registerComponent
                 (this, oname, this.getClass().getName());
         } catch (Exception e) {
-            log.error(sm.getString("hostConfig.jmx.register", oname), e);
+            log.warn(sm.getString("hostConfig.jmx.register", oname), e);
         }
 
         if (!host.getAppBaseFile().isDirectory()) {
@@ -1591,7 +1590,7 @@ public class HostConfig implements LifecycleListener {
             try {
                 Registry.getRegistry(null, null).unregisterComponent(oname);
             } catch (Exception e) {
-                log.error(sm.getString("hostConfig.jmx.unregister", oname), e);
+                log.warn(sm.getString("hostConfig.jmx.unregister", oname), e);
             }
         }
         oname = null;

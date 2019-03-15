@@ -752,7 +752,7 @@ public class CorsFilter extends GenericFilter {
         this.exposedHeaders.clear();
         this.exposedHeaders.addAll(setExposedHeaders);
 
-        // For any value other then 'true' this will be false.
+        // For any value other than 'true' this will be false.
         this.supportsCredentials = Boolean.parseBoolean(supportsCredentials);
 
         if (this.supportsCredentials && this.anyOriginAllowed) {
@@ -770,7 +770,7 @@ public class CorsFilter extends GenericFilter {
                     sm.getString("corsFilter.invalidPreflightMaxAge"), e);
         }
 
-        // For any value other then 'true' this will be false.
+        // For any value other than 'true' this will be false.
         this.decorateRequest = Boolean.parseBoolean(decorateRequest);
     }
 

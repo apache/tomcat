@@ -24,22 +24,15 @@ package org.apache.coyote;
  */
 public class ContainerThreadMarker {
 
-    private static final ThreadLocal<Boolean> marker = new ThreadLocal<>();
-
     public static boolean isContainerThread() {
-        Boolean flag = marker.get();
-        if (flag == null) {
-            return false;
-        } else {
-            return flag.booleanValue();
-        }
+        return org.apache.tomcat.util.net.ContainerThreadMarker.isContainerThread();
     }
 
     public static void set() {
-        marker.set(Boolean.TRUE);
+        org.apache.tomcat.util.net.ContainerThreadMarker.set();
     }
 
     public static void clear() {
-        marker.set(Boolean.FALSE);
+        org.apache.tomcat.util.net.ContainerThreadMarker.clear();
     }
 }

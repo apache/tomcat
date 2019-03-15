@@ -336,6 +336,13 @@
         only on URL rewriting by the application.</p>
       </attribute>
 
+      <attribute name="createUploadTargets" required="false">
+        <p>Set to <code>true</code> if Tomcat should attempt to create the
+        temporary upload location specified in the <code>MultipartConfig</code>
+        for a Servlet if the location does not already exist. If not specified,
+        the default value of <code>false</code> will be used.</p>
+      </attribute>
+
       <attribute name="crossContext" required="false">
         <p>Set to <code>true</code> if you want calls within this application
         to <code>ServletContext.getContext()</code> to successfully return a
@@ -1212,10 +1219,14 @@
         it is no longer required. This is intended to speed up clean-up of
         resources that would otherwise happen as part of garbage collection.
         This attribute is ignored if the <code>singleton</code> attribute is
-        false. If not specified, no default is defined and no close method will
-        be called.</p>
-        <p>For Apache Commons DBCP 2 and Apache Tomcat JDBC connection pools
-        you can use <code>closeMethod="close"</code>.</p>
+        false.</p>
+        <p>For <code>javax.sql.DataSource</code> and
+        <code>javax.sql.XADataSource</code> resources that implement
+        <code>AutoCloseable</code> such as Apache Commons DBCP 2 and the default
+        Apache Tomcat connection pool, this attribute is defaults to
+        <code>close</code>. This may be disabled by setting the attribute to the
+        empty string. For all other resource types no default is defined and no
+        close method will be called by default.</p>
       </attribute>
 
       <attribute name="description" required="false">

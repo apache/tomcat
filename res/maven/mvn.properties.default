@@ -39,7 +39,7 @@ maven.asf.release.repo.url=https://repository.apache.org/service/local/staging/d
 maven.asf.release.repo.repositoryId=apache.releases.https
 
 # Release version info
-maven.asf.release.deploy.version=9.0.17
+maven.asf.release.deploy.version=9.0.18
 
 #Where do we load the libraries from
 tomcat.lib.path=../../output/build/lib
@@ -48,8 +48,6 @@ tomcat.release.path=../../output/release
 tomcat.src.path=../../output/src-jars
 tomcat.embed.path=../../output/embed
 tomcat.embed.src.path=../../output/embed-src-jars
-tomcat.extras.path=../../output/extras
-tomcat.extras.src.path=../../output/extras-src-jars
 
 #Where do we find the POM files
 tomcat.pom.path=../../res/maven

@@ -486,6 +486,16 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
 
     // ------------------------------------------------------------- Properties
 
+    public int getMaxLogMessageBufferSize() {
+        return maxLogMessageBufferSize;
+    }
+
+
+    public void setMaxLogMessageBufferSize(int maxLogMessageBufferSize) {
+        this.maxLogMessageBufferSize = maxLogMessageBufferSize;
+    }
+
+
     public boolean getIpv6Canonical() {
         return ipv6Canonical;
     }

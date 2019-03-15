@@ -822,8 +822,22 @@ public class StandardContext extends ContainerBase
 
     private final AtomicLong inProgressAsyncCount = new AtomicLong(0);
 
+    private boolean createUploadTargets = false;
+
 
     // ----------------------------------------------------- Context Properties
+
+    @Override
+    public void setCreateUploadTargets(boolean createUploadTargets) {
+        this.createUploadTargets = createUploadTargets;
+    }
+
+
+    @Override
+    public boolean getCreateUploadTargets() {
+        return createUploadTargets;
+    }
+
 
     @Override
     public void incrementInProgressAsyncCount() {
@@ -2037,7 +2051,7 @@ public class StandardContext extends ContainerBase
                 oldNamingResources.stop();
                 oldNamingResources.destroy();
             } catch (LifecycleException e) {
-                log.warn(sm.getString("standardContext.namingResource.destroy.fail"), e);
+                log.error(sm.getString("standardContext.namingResource.destroy.fail"), e);
             }
         }
         if (namingResources != null) {
@@ -2045,7 +2059,7 @@ public class StandardContext extends ContainerBase
                 namingResources.init();
                 namingResources.start();
             } catch (LifecycleException e) {
-                log.warn(sm.getString("standardContext.namingResource.init.fail"), e);
+                log.error(sm.getString("standardContext.namingResource.init.fail"), e);
             }
         }
     }

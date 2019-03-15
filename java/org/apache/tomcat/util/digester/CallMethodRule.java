@@ -257,7 +257,7 @@ public class CallMethodRule extends Rule {
             throws Exception {
 
         if (paramCount == 0) {
-            this.bodyText = bodyText.trim();
+            this.bodyText = bodyText.trim().intern();
         }
 
     }
