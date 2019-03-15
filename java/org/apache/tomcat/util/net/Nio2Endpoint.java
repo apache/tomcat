@@ -958,6 +958,8 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
             if (timeout == -1) {
                 timeout = toNio2Timeout(getReadTimeout());
             }
+            // Disable any regular read notifications caused by registerReadInterest
+            readNotify = true;
             if (block != BlockingMode.NON_BLOCK) {
                 try {
                     if (!readPending.tryAcquire(timeout, unit)) {
