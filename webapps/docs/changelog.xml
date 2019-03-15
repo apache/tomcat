@@ -101,6 +101,11 @@
         logging the <code>LifecycleException</code> associated with the failure
         to start or stop a component. (markt)
       </fix>
+      <fix>
+        When the SSI directive <code>fsize</code> is used with an invalid
+        target, return a file size of <code>-</code> rather than
+        <code>1k</code>. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
