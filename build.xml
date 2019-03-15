@@ -490,6 +490,11 @@
 
   <!-- =========================== Build targets =========================== -->
 
+  <!-- Output the merged properties for the current Ant environment -->
+  <target name="echoproperties">
+    <echoproperties/>
+  </target>
+  
   <target name="build-prepare">
 
     <!-- Required so we can compile -->
