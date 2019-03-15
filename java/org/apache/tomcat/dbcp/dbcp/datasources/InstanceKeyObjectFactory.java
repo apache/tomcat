@@ -52,7 +52,7 @@ abstract class InstanceKeyObjectFactory
             if (obj instanceof String)
             {
                 try {
-                    max = Math.max(max, Integer.valueOf((String)obj).intValue());
+                    max = Math.max(max, new Integer((String)obj).intValue());
                 }
                 catch (NumberFormatException e) {
                     // no sweat, ignore those keys

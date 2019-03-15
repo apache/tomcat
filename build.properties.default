@@ -180,24 +180,6 @@ tomcat-native.loc.2=${base-tomcat.loc.2}/tomcat-connectors/native/${tomcat-nativ
 tomcat-native.win.1=${base-tomcat.loc.1}/tomcat-connectors/native/${tomcat-native.version}/binaries/tomcat-native-${tomcat-native.version}-openssl-1.1.1a-win32-bin.zip
 tomcat-native.win.2=${base-tomcat.loc.2}/tomcat-connectors/native/${tomcat-native.version}/binaries/tomcat-native-${tomcat-native.version}-openssl-1.1.1a-win32-bin.zip
 
-# ----- Commons DBCP 1.x, version 1.1 or later -----
-commons-dbcp.version=1.4
-commons-dbcp-src.checksum.enabled=true
-commons-dbcp-src.checksum.algorithm=SHA-256
-commons-dbcp-src.checksum.value=f5f10846e79fc71121fe7402c61d71575506b01b59e719e974ebc4d99e6df283
-commons-dbcp.home=${base.path}/commons-dbcp-${commons-dbcp.version}-src
-commons-dbcp-src.loc.1=${base-commons.loc.1}/dbcp/source/commons-dbcp-${commons-dbcp.version}-src.tar.gz
-commons-dbcp-src.loc.2=${base-commons.loc.2}/dbcp/source/commons-dbcp-${commons-dbcp.version}-src.tar.gz
-
-# ----- Commons Pool 1.x, version 1.1 or later -----
-commons-pool.version=1.5.7
-commons-pool-src.checksum.enabled=true
-commons-pool-src.checksum.algorithm=MD5|SHA-1
-commons-pool-src.checksum.value=fcec4e996efda82ec8643dd2aeb63c7c|58a3f48601b70f7a7db1da47907d53b43949d0a4
-commons-pool.home=${base.path}/commons-pool-${commons-pool.version}-src
-commons-pool-src.loc.1=${base-commons.loc.1}/pool/source/commons-pool-${commons-pool.version}-src.tar.gz
-commons-pool-src.loc.2=${base-commons.loc.2}/pool/source/commons-pool-${commons-pool.version}-src.tar.gz
-
 # ----- NSIS, version 3.0 or later -----
 nsis.version=3.04
 nsis.checksum.enabled=true

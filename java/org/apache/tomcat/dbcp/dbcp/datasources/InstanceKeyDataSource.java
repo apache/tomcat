@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -23,7 +23,6 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.NoSuchElementException;
 import java.util.Properties;
-
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
@@ -38,7 +37,7 @@ import org.apache.tomcat.dbcp.dbcp.SQLNestedException;
 import org.apache.tomcat.dbcp.pool.impl.GenericObjectPool;
 
 /**
- * <p>The base class for <code>SharedPoolDataSource</code> and 
+ * <p>The base class for <code>SharedPoolDataSource</code> and
  * <code>PerUserPoolDataSource</code>.  Many of the configuration properties
  * are shared and defined here.  This class is declared public in order
  * to allow particular usage with commons-beanutils; do not make direct
@@ -49,7 +48,7 @@ import org.apache.tomcat.dbcp.pool.impl.GenericObjectPool;
  * A J2EE container will normally provide some method of initializing the
  * <code>DataSource</code> whose attributes are presented
  * as bean getters/setters and then deploying it via JNDI.  It is then
- * available to an application as a source of pooled logical connections to 
+ * available to an application as a source of pooled logical connections to
  * the database.  The pool needs a source of physical connections.  This
  * source is in the form of a <code>ConnectionPoolDataSource</code> that
  * can be specified via the {@link #setDataSourceName(String)} used to
@@ -58,25 +57,25 @@ import org.apache.tomcat.dbcp.pool.impl.GenericObjectPool;
  *
  * <p>
  * Although normally used within a JNDI environment, A DataSource
- * can be instantiated and initialized as any bean.  In this case the 
+ * can be instantiated and initialized as any bean.  In this case the
  * <code>ConnectionPoolDataSource</code> will likely be instantiated in
  * a similar manner.  This class allows the physical source of connections
- * to be attached directly to this pool using the 
+ * to be attached directly to this pool using the
  * {@link #setConnectionPoolDataSource(ConnectionPoolDataSource)} method.
  * </p>
  *
  * <p>
- * The dbcp package contains an adapter, 
+ * The dbcp package contains an adapter,
  * {@link org.apache.tomcat.dbcp.dbcp.cpdsadapter.DriverAdapterCPDS},
  * that can be used to allow the use of <code>DataSource</code>'s based on this
- * class with jdbc driver implementations that do not supply a 
+ * class with JDBC driver implementations that do not supply a
  * <code>ConnectionPoolDataSource</code>, but still
  * provide a {@link java.sql.Driver} implementation.
  * </p>
  *
  * <p>
- * The <a href="package-summary.html">package documentation</a> contains an 
- * example using Apache Tomcat and JNDI and it also contains a non-JNDI example. 
+ * The <a href="package-summary.html">package documentation</a> contains an
+ * example using Apache Tomcat and JNDI and it also contains a non-JNDI example.
  * </p>
  *
  * @author John D. McNally
@@ -85,49 +84,49 @@ import org.apache.tomcat.dbcp.pool.impl.GenericObjectPool;
 public abstract class InstanceKeyDataSource
         implements DataSource, Referenceable, Serializable {
     private static final long serialVersionUID = -4243533936955098795L;
-    private static final String GET_CONNECTION_CALLED 
-            = "A Connection was already requested from this source, " 
+    private static final String GET_CONNECTION_CALLED
+            = "A Connection was already requested from this source, "
             + "further initialization is not allowed.";
     private static final String BAD_TRANSACTION_ISOLATION
         = "The requested TransactionIsolation level is invalid.";
     /**
-    * Internal constant to indicate the level is not set. 
+    * Internal constant to indicate the level is not set.
     */
     protected static final int UNKNOWN_TRANSACTIONISOLATION = -1;
-    
+
     /** Guards property setters - once true, setters throw IllegalStateException */
     private volatile boolean getConnectionCalled = false;
 
     /** Underlying source of PooledConnections */
     private ConnectionPoolDataSource dataSource = null;
-    
+
     /** DataSource Name used to find the ConnectionPoolDataSource */
     private String dataSourceName = null;
-    
+
     // Default connection properties
     private boolean defaultAutoCommit = false;
     private int defaultTransactionIsolation = UNKNOWN_TRANSACTIONISOLATION;
     private boolean defaultReadOnly = false;
-    
+
     /** Description */
     private String description = null;
-    
+
     /** Environment that may be used to set up a jndi initial context. */
     Properties jndiEnvironment = null;
-    
+
     /** Login TimeOut in seconds */
     private int loginTimeout = 0;
-    
+
     /** Log stream */
     private PrintWriter logWriter = null;
-    
+
     // Pool properties
     private boolean _testOnBorrow = GenericObjectPool.DEFAULT_TEST_ON_BORROW;
     private boolean _testOnReturn = GenericObjectPool.DEFAULT_TEST_ON_RETURN;
     private int _timeBetweenEvictionRunsMillis = (int)
         Math.min(Integer.MAX_VALUE,
                  GenericObjectPool.DEFAULT_TIME_BETWEEN_EVICTION_RUNS_MILLIS);
-    private int _numTestsPerEvictionRun = 
+    private int _numTestsPerEvictionRun =
         GenericObjectPool.DEFAULT_NUM_TESTS_PER_EVICTION_RUN;
     private int _minEvictableIdleTimeMillis = (int)
     Math.min(Integer.MAX_VALUE,
@@ -135,7 +134,7 @@ public abstract class InstanceKeyDataSource
     private boolean _testWhileIdle = GenericObjectPool.DEFAULT_TEST_WHILE_IDLE;
     private String validationQuery = null;
     private boolean rollbackAfterValidation = false;
-    
+
     /** true iff one of the setters for testOnBorrow, testOnReturn, testWhileIdle has been called. */
     private boolean testPositionSet = false;
 
@@ -164,7 +163,7 @@ public abstract class InstanceKeyDataSource
      * Close the connection pool being maintained by this datasource.
      */
     public abstract void close() throws Exception;
-    
+
     protected abstract PooledConnectionManager getConnectionManager(UserPassKey upkey);
 
     /* JDBC_4_ANT_KEY_BEGIN */
@@ -189,7 +188,7 @@ public abstract class InstanceKeyDataSource
     public ConnectionPoolDataSource getConnectionPoolDataSource() {
         return dataSource;
     }
-    
+
     /**
      * Set the backend ConnectionPoolDataSource.  This property should not be
      * set if using jndi to access the datasource.
@@ -202,7 +201,7 @@ public abstract class InstanceKeyDataSource
             throw new IllegalStateException(
                 "Cannot set the DataSource, if JNDI is used.");
         }
-        if (dataSource != null) 
+        if (dataSource != null)
         {
             throw new IllegalStateException(
                 "The CPDS has already been set. It cannot be altered.");
@@ -213,7 +212,7 @@ public abstract class InstanceKeyDataSource
 
     /**
      * Get the name of the ConnectionPoolDataSource which backs this pool.
-     * This name is used to look up the datasource from a jndi service 
+     * This name is used to look up the datasource from a jndi service
      * provider.
      *
      * @return value of dataSourceName.
@@ -221,10 +220,10 @@ public abstract class InstanceKeyDataSource
     public String getDataSourceName() {
         return dataSourceName;
     }
-    
+
     /**
      * Set the name of the ConnectionPoolDataSource which backs this pool.
-     * This name is used to look up the datasource from a jndi service 
+     * This name is used to look up the datasource from a jndi service
      * provider.
      *
      * @param v  Value to assign to dataSourceName.
@@ -236,18 +235,18 @@ public abstract class InstanceKeyDataSource
                 "Cannot set the JNDI name for the DataSource, if already " +
                 "set using setConnectionPoolDataSource.");
         }
-        if (dataSourceName != null) 
+        if (dataSourceName != null)
         {
             throw new IllegalStateException(
-                "The DataSourceName has already been set. " + 
+                "The DataSourceName has already been set. " +
                 "It cannot be altered.");
         }
         this.dataSourceName = v;
         instanceKey = InstanceKeyObjectFactory.registerNewInstance(this);
     }
 
-    /** 
-     * Get the value of defaultAutoCommit, which defines the state of 
+    /**
+     * Get the value of defaultAutoCommit, which defines the state of
      * connections handed out from this pool.  The value can be changed
      * on the Connection using Connection.setAutoCommit(boolean).
      * The default is true.
@@ -257,9 +256,9 @@ public abstract class InstanceKeyDataSource
     public boolean isDefaultAutoCommit() {
         return defaultAutoCommit;
     }
-    
+
     /**
-     * Set the value of defaultAutoCommit, which defines the state of 
+     * Set the value of defaultAutoCommit, which defines the state of
      * connections handed out from this pool.  The value can be changed
      * on the Connection using Connection.setAutoCommit(boolean).
      * The default is true.
@@ -272,7 +271,7 @@ public abstract class InstanceKeyDataSource
     }
 
     /**
-     * Get the value of defaultReadOnly, which defines the state of 
+     * Get the value of defaultReadOnly, which defines the state of
      * connections handed out from this pool.  The value can be changed
      * on the Connection using Connection.setReadOnly(boolean).
      * The default is false.
@@ -282,9 +281,9 @@ public abstract class InstanceKeyDataSource
     public boolean isDefaultReadOnly() {
         return defaultReadOnly;
     }
-    
+
     /**
-     * Set the value of defaultReadOnly, which defines the state of 
+     * Set the value of defaultReadOnly, which defines the state of
      * connections handed out from this pool.  The value can be changed
      * on the Connection using Connection.setReadOnly(boolean).
      * The default is false.
@@ -301,7 +300,7 @@ public abstract class InstanceKeyDataSource
      * connections handed out from this pool.  The value can be changed
      * on the Connection using Connection.setTransactionIsolation(int).
      * If this method returns -1, the default is JDBC driver dependent.
-     * 
+     *
      * @return value of defaultTransactionIsolation.
      */
     public int getDefaultTransactionIsolation() {
@@ -313,7 +312,7 @@ public abstract class InstanceKeyDataSource
      * connections handed out from this pool.  The value can be changed
      * on the Connection using Connection.setTransactionIsolation(int).
      * The default is JDBC driver dependent.
-     * 
+     *
      * @param v  Value to assign to defaultTransactionIsolation
      */
     public void setDefaultTransactionIsolation(int v) {
@@ -330,9 +329,9 @@ public abstract class InstanceKeyDataSource
         }
         this.defaultTransactionIsolation = v;
     }
-    
+
     /**
-     * Get the description.  This property is defined by jdbc as for use with
+     * Get the description.  This property is defined by JDBC as for use with
      * GUI (or other) tools that might deploy the datasource.  It serves no
      * internal purpose.
      *
@@ -341,18 +340,18 @@ public abstract class InstanceKeyDataSource
     public String getDescription() {
         return description;
     }
-    
+
     /**
-     * Set the description.  This property is defined by jdbc as for use with
+     * Set the description.  This property is defined by JDBC as for use with
      * GUI (or other) tools that might deploy the datasource.  It serves no
      * internal purpose.
-     * 
+     *
      * @param v  Value to assign to description.
      */
     public void setDescription(String v) {
         this.description = v;
     }
-        
+
     /**
      * Get the value of jndiEnvironment which is used when instantiating
      * a jndi InitialContext.  This InitialContext is used to locate the
@@ -367,12 +366,12 @@ public abstract class InstanceKeyDataSource
         }
         return value;
     }
-    
+
     /**
      * Sets the value of the given JNDI environment property to be used when
      * instantiating a JNDI InitialContext. This InitialContext is used to
      * locate the backend ConnectionPoolDataSource.
-     * 
+     *
      * @param key the JNDI environment property to set.
      * @param value the value assigned to specified JNDI environment property.
      */
@@ -382,7 +381,7 @@ public abstract class InstanceKeyDataSource
         }
         jndiEnvironment.setProperty(key, value);
     }
-    
+
     /**
      * Get the value of loginTimeout.
      * @return value of loginTimeout.
@@ -390,7 +389,7 @@ public abstract class InstanceKeyDataSource
     public int getLoginTimeout() {
         return loginTimeout;
     }
-    
+
     /**
      * Set the value of loginTimeout.
      * @param v  Value to assign to loginTimeout.
@@ -398,7 +397,7 @@ public abstract class InstanceKeyDataSource
     public void setLoginTimeout(int v) {
         this.loginTimeout = v;
     }
-        
+
     /**
      * Get the value of logWriter.
      * @return value of logWriter.
@@ -406,10 +405,10 @@ public abstract class InstanceKeyDataSource
     public PrintWriter getLogWriter() {
         if (logWriter == null) {
             logWriter = new PrintWriter(System.out);
-        }        
+        }
         return logWriter;
     }
-    
+
     /**
      * Set the value of logWriter.
      * @param v  Value to assign to logWriter.
@@ -417,14 +416,14 @@ public abstract class InstanceKeyDataSource
     public void setLogWriter(PrintWriter v) {
         this.logWriter = v;
     }
-    
+
     /**
      * @see #getTestOnBorrow
      */
     public final boolean isTestOnBorrow() {
         return getTestOnBorrow();
     }
-    
+
     /**
      * When <tt>true</tt>, objects will be
      * {*link PoolableObjectFactory#validateObject validated}
@@ -463,7 +462,7 @@ public abstract class InstanceKeyDataSource
     public final boolean isTestOnReturn() {
         return getTestOnReturn();
     }
-    
+
     /**
      * When <tt>true</tt>, objects will be
      * {*link PoolableObjectFactory#validateObject validated}
@@ -512,7 +511,7 @@ public abstract class InstanceKeyDataSource
      *
      * @see #getTimeBetweenEvictionRunsMillis
      */
-    public void 
+    public void
         setTimeBetweenEvictionRunsMillis(int timeBetweenEvictionRunsMillis) {
         assertInitializationAllowed();
             _timeBetweenEvictionRunsMillis = timeBetweenEvictionRunsMillis;
@@ -578,7 +577,7 @@ public abstract class InstanceKeyDataSource
     public final boolean isTestWhileIdle() {
         return getTestWhileIdle();
     }
-    
+
     /**
      * When <tt>true</tt>, objects will be
      * {*link PoolableObjectFactory#validateObject validated}
@@ -636,10 +635,10 @@ public abstract class InstanceKeyDataSource
     }
 
     /**
-     * Whether a rollback will be issued after executing the SQL query 
+     * Whether a rollback will be issued after executing the SQL query
      * that will be used to validate connections from this pool
      * before returning them to the caller.
-     * 
+     *
      * @return true if a rollback will be issued after executing the
      * validation query
      * @since 1.2.2
@@ -649,12 +648,12 @@ public abstract class InstanceKeyDataSource
     }
 
     /**
-     * Whether a rollback will be issued after executing the SQL query 
+     * Whether a rollback will be issued after executing the SQL query
      * that will be used to validate connections from this pool
      * before returning them to the caller. Default behavior is NOT
      * to issue a rollback. The setting will only have an effect
      * if a validation query is set
-     * 
+     *
      * @param rollbackAfterValidation new property value
      * @since 1.2.2
      */
@@ -667,7 +666,7 @@ public abstract class InstanceKeyDataSource
     // Instrumentation Methods
 
     // ----------------------------------------------------------------------
-    // DataSource implementation 
+    // DataSource implementation
 
     /**
      * Attempt to establish a database connection.
@@ -685,13 +684,13 @@ public abstract class InstanceKeyDataSource
      * did not match the password used to create the pooled connection.  If the connection attempt succeeds, this
      * means that the database password has been changed.  In this case, the <code>PooledConnectionAndInfo</code>
      * instance retrieved with the old password is destroyed and the <code>getPooledConnectionAndInfo</code> is
-     * repeatedly invoked until a <code>PooledConnectionAndInfo</code> instance with the new password is returned. 
-     * 
+     * repeatedly invoked until a <code>PooledConnectionAndInfo</code> instance with the new password is returned.
+     *
      */
     public Connection getConnection(String username, String password)
-            throws SQLException {        
+            throws SQLException {
         if (instanceKey == null) {
-            throw new SQLException("Must set the ConnectionPoolDataSource " 
+            throw new SQLException("Must set the ConnectionPoolDataSource "
                     + "through setDataSourceName or setConnectionPoolDataSource"
                     + " before calling getConnection.");
         }
@@ -705,15 +704,15 @@ public abstract class InstanceKeyDataSource
         } catch (RuntimeException e) {
             closeDueToException(info);
             throw e;
-        } catch (SQLException e) {            
+        } catch (SQLException e) {
             closeDueToException(info);
             throw e;
         } catch (Exception e) {
             closeDueToException(info);
             throw new SQLNestedException("Cannot borrow connection from pool", e);
         }
-        
-        if (!(null == password ? null == info.getPassword() 
+
+        if (!(null == password ? null == info.getPassword()
                 : password.equals(info.getPassword()))) {  // Password on PooledConnectionAndInfo does not match
             try { // See if password has changed by attempting connection
                 testCPDS(username, password);
@@ -735,7 +734,7 @@ public abstract class InstanceKeyDataSource
             manager.invalidate(info.getPooledConnection()); // Destroy and remove from pool
             manager.setPassword(upkey.getPassword()); // Reset the password on the factory if using CPDSConnectionFactory
             info = null;
-            for (int i = 0; i < 10; i++) { // Bound the number of retries - only needed if bad instances return 
+            for (int i = 0; i < 10; i++) { // Bound the number of retries - only needed if bad instances return
                 try {
                     info = getPooledConnectionAndInfo(username, password);
                 } catch (NoSuchElementException e) {
@@ -744,7 +743,7 @@ public abstract class InstanceKeyDataSource
                 } catch (RuntimeException e) {
                     closeDueToException(info);
                     throw e;
-                } catch (SQLException e) {            
+                } catch (SQLException e) {
                     closeDueToException(info);
                     throw e;
                 } catch (Exception e) {
@@ -759,21 +758,21 @@ public abstract class InstanceKeyDataSource
                     }
                     info = null;
                 }
-            }  
+            }
             if (info == null) {
                 throw new SQLException("Cannot borrow connection from pool - password change failure.");
             }
         }
 
         Connection con = info.getPooledConnection().getConnection();
-        try { 
+        try {
             setupDefaults(con, username);
             con.clearWarnings();
             return con;
-        } catch (SQLException ex) {  
+        } catch (SQLException ex) {
             try {
                 con.close();
-            } catch (Exception exc) { 
+            } catch (Exception exc) {
                 getLogWriter().println(
                      "ignoring exception during close: " + exc);
             }
@@ -781,14 +780,14 @@ public abstract class InstanceKeyDataSource
         }
     }
 
-    protected abstract PooledConnectionAndInfo 
+    protected abstract PooledConnectionAndInfo
         getPooledConnectionAndInfo(String username, String password)
         throws SQLException;
 
-    protected abstract void setupDefaults(Connection con, String username) 
+    protected abstract void setupDefaults(Connection con, String username)
         throws SQLException;
 
-        
+
     private void closeDueToException(PooledConnectionAndInfo info) {
         if (info != null) {
             try {
@@ -798,20 +797,20 @@ public abstract class InstanceKeyDataSource
                 // of handling another exception.  But record it because
                 // it potentially leaks connections from the pool.
                 getLogWriter().println("[ERROR] Could not return connection to "
-                    + "pool during exception handling. " + e.getMessage());   
+                    + "pool during exception handling. " + e.getMessage());
             }
         }
     }
 
-    protected ConnectionPoolDataSource 
+    protected ConnectionPoolDataSource
         testCPDS(String username, String password)
         throws javax.naming.NamingException, SQLException {
         // The source of physical db connections
         ConnectionPoolDataSource cpds = this.dataSource;
-        if (cpds == null) {            
+        if (cpds == null) {
             Context ctx = null;
             if (jndiEnvironment == null) {
-                ctx = new InitialContext();                
+                ctx = new InitialContext();
             } else {
                 ctx = new InitialContext(jndiEnvironment);
             }
@@ -825,7 +824,7 @@ public abstract class InstanceKeyDataSource
                     + " doesn't implement javax.sql.ConnectionPoolDataSource");
             }
         }
-        
+
         // try to get a connection with the supplied username/password
         PooledConnection conn = null;
         try {
@@ -861,10 +860,10 @@ public abstract class InstanceKeyDataSource
             whenExhausted = GenericObjectPool.WHEN_EXHAUSTED_FAIL;
         }
         return whenExhausted;
-    }    
+    }
 
     // ----------------------------------------------------------------------
-    // Referenceable implementation 
+    // Referenceable implementation
 
     /**
      * Retrieves the Reference of this object.
@@ -879,10 +878,10 @@ public abstract class InstanceKeyDataSource
      */
     // TODO: Remove the implementation of this method at next major
     // version release.
-    
+
     public Reference getReference() throws NamingException {
         final String className = getClass().getName();
-        final String factoryName = className + "Factory"; // XXX: not robust 
+        final String factoryName = className + "Factory"; // XXX: not robust
         Reference ref = new Reference(className, factoryName, null);
         ref.add(new StringRefAddr("instanceKey", instanceKey));
         return ref;

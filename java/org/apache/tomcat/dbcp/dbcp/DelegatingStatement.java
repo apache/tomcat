@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -73,10 +73,17 @@ public class DelegatingStatement extends AbandonedTrace implements Statement {
     }
 
     /**
-     * This method considers two objects to be equal 
-     * if the underlying jdbc objects are equal.
+     * <p>This method considers two objects to be equal
+     * if the underlying JDBC objects are equal.</p>
+     *
+     * <p>If {@code obj} is a DelegatingStatement, this DelegatingStatement's
+     * {@link #getInnermostDelegate() innermostDelegate} is compared with
+     * the innermost delegate of obj; otherwise obj itself is compared with the
+     * the Statement returned by {@link #getInnermostDelegate()}.</p>
+     *
      */
     public boolean equals(Object obj) {
+    	if (obj == this) return true;
         Statement delegate = getInnermostDelegate();
         if (delegate == null) {
             return false;
@@ -97,7 +104,7 @@ public class DelegatingStatement extends AbandonedTrace implements Statement {
         }
         return obj.hashCode();
     }
-    
+
     /**
      * If my underlying {@link Statement} is not a
      * <tt>DelegatingStatement</tt>, returns it,
@@ -135,7 +142,7 @@ public class DelegatingStatement extends AbandonedTrace implements Statement {
     protected void checkOpen() throws SQLException {
         if(isClosed()) {
             throw new SQLException
-                (this.getClass().getName() + " with address: \"" + 
+                (this.getClass().getName() + " with address: \"" +
                 this.toString() + "\" is closed.");
         }
     }
@@ -151,7 +158,7 @@ public class DelegatingStatement extends AbandonedTrace implements Statement {
                     _conn.removeTrace(this);
                     _conn = null;
                 }
-        
+
                 // The JDBC spec requires that a statment close any open
                 // ResultSet's when it is closed.
                 // FIXME The PreparedStatement we're wrapping should handle this for us.
@@ -164,7 +171,7 @@ public class DelegatingStatement extends AbandonedTrace implements Statement {
                     }
                     clearTrace();
                 }
-        
+
                 _stmt.close();
             }
             catch (SQLException e) {
@@ -204,6 +211,9 @@ public class DelegatingStatement extends AbandonedTrace implements Statement {
 
     public ResultSet executeQuery(String sql) throws SQLException {
         checkOpen();
+        if (_conn != null) {
+            _conn.setLastUsed();
+        }
         try {
             return DelegatingResultSet.wrapResultSet(this,_stmt.executeQuery(sql));
         }
@@ -224,8 +234,17 @@ public class DelegatingStatement extends AbandonedTrace implements Statement {
         }
     }
 
-    public int executeUpdate(String sql) throws SQLException
-    { checkOpen(); try { return _stmt.executeUpdate(sql); } catch (SQLException e) { handleException(e); return 0; } }
+    public int executeUpdate(String sql) throws SQLException {
+        checkOpen();
+        if (_conn != null) {
+            _conn.setLastUsed();
+        }
+        try {
+            return _stmt.executeUpdate(sql);
+        } catch (SQLException e) {
+            handleException(e); return 0;
+        }
+    }
 
     public int getMaxFieldSize() throws SQLException
     { checkOpen(); try { return _stmt.getMaxFieldSize(); } catch (SQLException e) { handleException(e); return 0; } }
@@ -260,8 +279,18 @@ public class DelegatingStatement extends AbandonedTrace implements Statement {
     public void setCursorName(String name) throws SQLException
     { checkOpen(); try { _stmt.setCursorName(name); } catch (SQLException e) { handleException(e); } }
 
-    public boolean execute(String sql) throws SQLException
-    { checkOpen(); try { return _stmt.execute(sql); } catch (SQLException e) { handleException(e); return false; } }
+    public boolean execute(String sql) throws SQLException {
+        checkOpen();
+        if (_conn != null) {
+            _conn.setLastUsed();
+        }
+        try {
+            return _stmt.execute(sql);
+        } catch (SQLException e) {
+            handleException(e);
+            return false;
+        }
+    }
 
     public int getUpdateCount() throws SQLException
     { checkOpen(); try { return _stmt.getUpdateCount(); } catch (SQLException e) { handleException(e); return 0; } }
@@ -293,8 +322,18 @@ public class DelegatingStatement extends AbandonedTrace implements Statement {
     public void clearBatch() throws SQLException
     { checkOpen(); try { _stmt.clearBatch(); } catch (SQLException e) { handleException(e); } }
 
-    public int[] executeBatch() throws SQLException
-    { checkOpen(); try { return _stmt.executeBatch(); } catch (SQLException e) { handleException(e); throw new AssertionError(); } }
+    public int[] executeBatch() throws SQLException {
+        checkOpen();
+        if (_conn != null) {
+            _conn.setLastUsed();
+        }
+        try {
+            return _stmt.executeBatch();
+        } catch (SQLException e) {
+            handleException(e);
+            throw new AssertionError();
+        }
+    }
 
     /**
      * Returns a String representation of this object.
@@ -319,23 +358,83 @@ public class DelegatingStatement extends AbandonedTrace implements Statement {
         }
     }
 
-    public int executeUpdate(String sql, int autoGeneratedKeys) throws SQLException
-    { checkOpen(); try { return _stmt.executeUpdate(sql, autoGeneratedKeys); } catch (SQLException e) { handleException(e); return 0; } }
+    public int executeUpdate(String sql, int autoGeneratedKeys) throws SQLException {
+        checkOpen();
+        if (_conn != null) {
+            _conn.setLastUsed();
+        }
+        try {
+            return _stmt.executeUpdate(sql, autoGeneratedKeys);
+        } catch (SQLException e) {
+            handleException(e);
+            return 0;
+        }
+    }
 
-    public int executeUpdate(String sql, int columnIndexes[]) throws SQLException
-    { checkOpen(); try { return _stmt.executeUpdate(sql, columnIndexes); } catch (SQLException e) { handleException(e); return 0; } }
+    public int executeUpdate(String sql, int columnIndexes[]) throws SQLException {
+        checkOpen();
+        if (_conn != null) {
+            _conn.setLastUsed();
+        }
+        try {
+            return _stmt.executeUpdate(sql, columnIndexes);
+        } catch (SQLException e) {
+            handleException(e);
+            return 0;
+        }
+    }
 
-    public int executeUpdate(String sql, String columnNames[]) throws SQLException
-    { checkOpen(); try { return _stmt.executeUpdate(sql, columnNames); } catch (SQLException e) { handleException(e); return 0; } }
+    public int executeUpdate(String sql, String columnNames[]) throws SQLException {
+        checkOpen();
+        if (_conn != null) {
+            _conn.setLastUsed();
+        }
+        try {
+            return _stmt.executeUpdate(sql, columnNames);
+        } catch (SQLException e) {
+            handleException(e);
+            return 0;
+        }
+    }
 
-    public boolean execute(String sql, int autoGeneratedKeys) throws SQLException
-    { checkOpen(); try { return _stmt.execute(sql, autoGeneratedKeys); } catch (SQLException e) { handleException(e); return false; } }
+    public boolean execute(String sql, int autoGeneratedKeys) throws SQLException {
+        checkOpen();
+        if (_conn != null) {
+            _conn.setLastUsed();
+        }
+        try {
+            return _stmt.execute(sql, autoGeneratedKeys);
+        } catch (SQLException e) {
+            handleException(e);
+            return false;
+        }
+    }
 
-    public boolean execute(String sql, int columnIndexes[]) throws SQLException
-    { checkOpen(); try { return _stmt.execute(sql, columnIndexes); } catch (SQLException e) { handleException(e); return false; } }
+    public boolean execute(String sql, int columnIndexes[]) throws SQLException {
+        checkOpen();
+        if (_conn != null) {
+            _conn.setLastUsed();
+        }
+        try {
+            return _stmt.execute(sql, columnIndexes);
+        } catch (SQLException e) {
+            handleException(e);
+            return false;
+        }
+    }
 
-    public boolean execute(String sql, String columnNames[]) throws SQLException
-    { checkOpen(); try { return _stmt.execute(sql, columnNames); } catch (SQLException e) { handleException(e); return false; } }
+    public boolean execute(String sql, String columnNames[]) throws SQLException {
+        checkOpen();
+        if (_conn != null) {
+            _conn.setLastUsed();
+        }
+        try {
+            return _stmt.execute(sql, columnNames);
+        } catch (SQLException e) {
+            handleException(e);
+            return false;
+        }
+    }
 
     public int getResultSetHoldability() throws SQLException
     { checkOpen(); try { return _stmt.getResultSetHoldability(); } catch (SQLException e) { handleException(e); return 0; } }

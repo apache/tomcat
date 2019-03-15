@@ -71,6 +71,7 @@ public class DelegatingPreparedStatement extends DelegatingStatement
     }
 
     public boolean equals(Object obj) {
+    	if (this == obj) return true;
         PreparedStatement delegate = (PreparedStatement) getInnermostDelegate();
         if (delegate == null) {
             return false;
@@ -92,6 +93,9 @@ public class DelegatingPreparedStatement extends DelegatingStatement
 
     public ResultSet executeQuery() throws SQLException {
         checkOpen();
+        if (_conn != null) {
+            _conn.setLastUsed();
+        }
         try {
             return DelegatingResultSet.wrapResultSet(this,((PreparedStatement)_stmt).executeQuery());
         }
@@ -101,8 +105,18 @@ public class DelegatingPreparedStatement extends DelegatingStatement
         }
     }
 
-    public int executeUpdate() throws SQLException
-    { checkOpen(); try { return ((PreparedStatement)_stmt).executeUpdate(); } catch (SQLException e) { handleException(e); return 0; } }
+    public int executeUpdate() throws SQLException {
+        checkOpen();
+        if (_conn != null) {
+            _conn.setLastUsed();
+        }
+        try {
+            return ((PreparedStatement) _stmt).executeUpdate();
+        } catch (SQLException e) {
+            handleException(e);
+            return 0;
+        }
+    }
 
     public void setNull(int parameterIndex, int sqlType) throws SQLException
     { checkOpen(); try { ((PreparedStatement)_stmt).setNull(parameterIndex,sqlType); } catch (SQLException e) { handleException(e); } }
@@ -168,8 +182,18 @@ public class DelegatingPreparedStatement extends DelegatingStatement
     public void setObject(int parameterIndex, Object x) throws SQLException
     { checkOpen(); try { ((PreparedStatement)_stmt).setObject(parameterIndex, x); } catch (SQLException e) { handleException(e); } }
 
-    public boolean execute() throws SQLException
-    { checkOpen(); try { return ((PreparedStatement)_stmt).execute(); } catch (SQLException e) { handleException(e); return false; } }
+    public boolean execute() throws SQLException {
+        checkOpen();
+        if (_conn != null) {
+            _conn.setLastUsed();
+        }
+        try {
+            return ((PreparedStatement) _stmt).execute();
+        } catch (SQLException e) {
+            handleException(e);
+            return false;
+        }
+    }
 
     public void addBatch() throws SQLException
     { checkOpen(); try { ((PreparedStatement)_stmt).addBatch(); } catch (SQLException e) { handleException(e); } }

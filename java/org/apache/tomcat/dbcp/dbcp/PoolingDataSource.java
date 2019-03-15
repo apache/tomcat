@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -27,7 +27,6 @@ import java.sql.SQLWarning;
 import java.sql.Statement;
 import java.util.Map;
 import java.util.NoSuchElementException;
-
 import javax.sql.DataSource;
 
 import org.apache.tomcat.dbcp.pool.ObjectPool;
@@ -45,7 +44,7 @@ import org.apache.tomcat.dbcp.pool.ObjectPool;
 public class PoolingDataSource implements DataSource {
 
     /** Controls access to the underlying connection */
-    private boolean accessToUnderlyingConnectionAllowed = false; 
+    private boolean accessToUnderlyingConnectionAllowed = false;
 
     public PoolingDataSource() {
         this(null);
@@ -67,7 +66,7 @@ public class PoolingDataSource implements DataSource {
 
     /**
      * Returns the value of the accessToUnderlyingConnectionAllowed property.
-     * 
+     *
      * @return true if access to the underlying is allowed, false otherwise.
      */
     public boolean isAccessToUnderlyingConnectionAllowed() {
@@ -78,7 +77,7 @@ public class PoolingDataSource implements DataSource {
      * Sets the value of the accessToUnderlyingConnectionAllowed property.
      * It controls if the PoolGuard allows access to the underlying connection.
      * (Default: false)
-     * 
+     *
      * @param allow Access to the underlying connection is granted when true.
      */
     public void setAccessToUnderlyingConnectionAllowed(boolean allow) {
@@ -94,7 +93,7 @@ public class PoolingDataSource implements DataSource {
         throw new SQLException("PoolingDataSource is not a wrapper.");
     }
     /* JDBC_4_ANT_KEY_END */
-    
+
     //--- DataSource methods -----------------------------------------
 
     /**
@@ -106,7 +105,7 @@ public class PoolingDataSource implements DataSource {
             Connection conn = (Connection)(_pool.borrowObject());
             if (conn != null) {
                 conn = new PoolGuardConnectionWrapper(conn);
-            } 
+            }
             return conn;
         } catch(SQLException e) {
             throw e;
@@ -168,13 +167,13 @@ public class PoolingDataSource implements DataSource {
     protected ObjectPool _pool = null;
 
     /**
-     * PoolGuardConnectionWrapper is a Connection wrapper that makes sure a 
+     * PoolGuardConnectionWrapper is a Connection wrapper that makes sure a
      * closed connection cannot be used anymore.
      */
     private class PoolGuardConnectionWrapper extends DelegatingConnection {
 
         private Connection delegate;
-    
+
         PoolGuardConnectionWrapper(Connection delegate) {
             super(delegate);
             this.delegate = delegate;
@@ -185,7 +184,7 @@ public class PoolingDataSource implements DataSource {
                 throw new SQLException("Connection is closed.");
             }
         }
-    
+
         public void close() throws SQLException {
             if (delegate != null) {
                 this.delegate.close();
@@ -229,7 +228,7 @@ public class PoolingDataSource implements DataSource {
                 return innerCon.equals(c);
             }
         }
-        
+
         public boolean getAutoCommit() throws SQLException {
             checkOpen();
             return delegate.getAutoCommit();
@@ -266,7 +265,7 @@ public class PoolingDataSource implements DataSource {
             }
             return delegate.hashCode();
         }
-        
+
         public boolean equals(Object obj) {
             if (obj == null) {
                 return false;
@@ -279,7 +278,7 @@ public class PoolingDataSource implements DataSource {
             if (conn == null) {
                 return false;
             }
-            if (obj instanceof DelegatingConnection) {    
+            if (obj instanceof DelegatingConnection) {
                 DelegatingConnection c = (DelegatingConnection) obj;
                 return c.innermostDelegateEquals(conn);
             }
@@ -359,7 +358,7 @@ public class PoolingDataSource implements DataSource {
             checkOpen();
             return delegate.getHoldability();
         }
-    
+
         public void setHoldability(int holdability) throws SQLException {
             checkOpen();
             delegate.setHoldability(holdability);

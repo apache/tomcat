@@ -50,6 +50,7 @@ public class BasicDataSourceFactory implements ObjectFactory {
     private final static String PROP_DEFAULTTRANSACTIONISOLATION = "defaultTransactionIsolation";
     private final static String PROP_DEFAULTCATALOG = "defaultCatalog";
     private final static String PROP_DRIVERCLASSNAME = "driverClassName";
+    private final static String PROP_LIFO = "lifo";
     private final static String PROP_MAXACTIVE = "maxActive";
     private final static String PROP_MAXIDLE = "maxIdle";
     private final static String PROP_MINIDLE = "minIdle";
@@ -60,6 +61,7 @@ public class BasicDataSourceFactory implements ObjectFactory {
     private final static String PROP_TIMEBETWEENEVICTIONRUNSMILLIS = "timeBetweenEvictionRunsMillis";
     private final static String PROP_NUMTESTSPEREVICTIONRUN = "numTestsPerEvictionRun";
     private final static String PROP_MINEVICTABLEIDLETIMEMILLIS = "minEvictableIdleTimeMillis";
+    private final static String PROP_SOFTMINEVICTABLEIDLETIMEMILLIS = "softMinEvictableIdleTimeMillis";
     private final static String PROP_TESTWHILEIDLE = "testWhileIdle";
     private final static String PROP_PASSWORD = "password";
     private final static String PROP_URL = "url";
@@ -67,11 +69,11 @@ public class BasicDataSourceFactory implements ObjectFactory {
     private final static String PROP_VALIDATIONQUERY = "validationQuery";
     private final static String PROP_VALIDATIONQUERY_TIMEOUT = "validationQueryTimeout";
     /**
-     * The property name for initConnectionSqls.
+     * The property name for connectionInitSqls.
      * The associated value String must be of the form [query;]*
      * @since 1.3
      */
-    private final static String PROP_INITCONNECTIONSQLS = "initConnectionSqls";
+    private final static String PROP_CONNECTIONINITSQLS = "connectionInitSqls";
     private final static String PROP_ACCESSTOUNDERLYINGCONNECTIONALLOWED = "accessToUnderlyingConnectionAllowed";
     private final static String PROP_REMOVEABANDONED = "removeAbandoned";
     private final static String PROP_REMOVEABANDONEDTIMEOUT = "removeAbandonedTimeout";
@@ -86,6 +88,7 @@ public class BasicDataSourceFactory implements ObjectFactory {
         PROP_DEFAULTTRANSACTIONISOLATION,
         PROP_DEFAULTCATALOG,
         PROP_DRIVERCLASSNAME,
+        PROP_LIFO,
         PROP_MAXACTIVE,
         PROP_MAXIDLE,
         PROP_MINIDLE,
@@ -96,13 +99,14 @@ public class BasicDataSourceFactory implements ObjectFactory {
         PROP_TIMEBETWEENEVICTIONRUNSMILLIS,
         PROP_NUMTESTSPEREVICTIONRUN,
         PROP_MINEVICTABLEIDLETIMEMILLIS,
+        PROP_SOFTMINEVICTABLEIDLETIMEMILLIS,
         PROP_TESTWHILEIDLE,
         PROP_PASSWORD,
         PROP_URL,
         PROP_USERNAME,
         PROP_VALIDATIONQUERY,
         PROP_VALIDATIONQUERY_TIMEOUT,
-        PROP_INITCONNECTIONSQLS,
+        PROP_CONNECTIONINITSQLS,
         PROP_ACCESSTOUNDERLYINGCONNECTIONALLOWED,
         PROP_REMOVEABANDONED,
         PROP_REMOVEABANDONEDTIMEOUT,
@@ -218,6 +222,11 @@ public class BasicDataSourceFactory implements ObjectFactory {
             dataSource.setDriverClassName(value);
         }
 
+        value = properties.getProperty(PROP_LIFO);
+        if (value != null) {
+            dataSource.setLifo(Boolean.valueOf(value).booleanValue());
+        }
+        
         value = properties.getProperty(PROP_MAXACTIVE);
         if (value != null) {
             dataSource.setMaxActive(Integer.parseInt(value));
@@ -266,6 +275,11 @@ public class BasicDataSourceFactory implements ObjectFactory {
         value = properties.getProperty(PROP_MINEVICTABLEIDLETIMEMILLIS);
         if (value != null) {
             dataSource.setMinEvictableIdleTimeMillis(Long.parseLong(value));
+        }
+        
+        value = properties.getProperty(PROP_SOFTMINEVICTABLEIDLETIMEMILLIS);
+        if (value != null) {
+            dataSource.setSoftMinEvictableIdleTimeMillis(Long.parseLong(value));
         }
 
         value = properties.getProperty(PROP_TESTWHILEIDLE);
@@ -328,7 +342,7 @@ public class BasicDataSourceFactory implements ObjectFactory {
             dataSource.setMaxOpenPreparedStatements(Integer.parseInt(value));
         }
 
-        value = properties.getProperty(PROP_INITCONNECTIONSQLS);
+        value = properties.getProperty(PROP_CONNECTIONINITSQLS);
         if (value != null) {
             StringTokenizer tokenizer = new StringTokenizer(value, ";");
             dataSource.setConnectionInitSqls(Collections.list(tokenizer));

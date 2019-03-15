@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -82,7 +82,7 @@ public class DelegatingResultSet extends AbandonedTrace implements ResultSet {
         this._stmt = stmt;
         this._res = res;
     }
-    
+
     /**
      * Create a wrapper for the ResultSet which traces this
      * ResultSet to the Connection which created it (via, for
@@ -96,7 +96,7 @@ public class DelegatingResultSet extends AbandonedTrace implements ResultSet {
         this._conn = conn;
         this._res = res;
     }
-    
+
     public static ResultSet wrapResultSet(Statement stmt, ResultSet rset) {
         if(null == rset) {
             return null;
@@ -118,6 +118,7 @@ public class DelegatingResultSet extends AbandonedTrace implements ResultSet {
     }
 
     public boolean equals(Object obj) {
+    	if (this == obj) return true;
         ResultSet delegate = getInnermostDelegate();
         if (delegate == null) {
             return false;
@@ -164,7 +165,7 @@ public class DelegatingResultSet extends AbandonedTrace implements ResultSet {
         }
         return r;
     }
-    
+
     public Statement getStatement() throws SQLException {
         return _stmt;
     }
@@ -203,7 +204,7 @@ public class DelegatingResultSet extends AbandonedTrace implements ResultSet {
         }
     }
 
-    public boolean next() throws SQLException 
+    public boolean next() throws SQLException
     { try { return _res.next(); } catch (SQLException e) { handleException(e); return false; } }
 
     public boolean wasNull() throws SQLException
@@ -1079,4 +1080,5 @@ public class DelegatingResultSet extends AbandonedTrace implements ResultSet {
         }
     }
 /* JDBC_4_ANT_KEY_END */
+
 }

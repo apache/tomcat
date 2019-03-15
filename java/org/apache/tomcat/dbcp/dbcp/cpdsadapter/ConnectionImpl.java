@@ -27,9 +27,9 @@ import org.apache.tomcat.dbcp.dbcp.DelegatingPreparedStatement;
 /**
  * This class is the <code>Connection</code> that will be returned
  * from <code>PooledConnectionImpl.getConnection()</code>.  
- * Most methods are wrappers around the jdbc 1.x <code>Connection</code>.  
+ * Most methods are wrappers around the JDBC 1.x <code>Connection</code>.  
  * A few exceptions include preparedStatement and close.
- * In accordance with the jdbc specification this Connection cannot
+ * In accordance with the JDBC specification this Connection cannot
  * be used after closed() is called.  Any further usage will result in an
  * SQLException.
  * 
@@ -65,7 +65,7 @@ class ConnectionImpl extends DelegatingConnection {
     /**
      * Marks the Connection as closed, and notifies the pool that the
      * pooled connection is available.
-     * In accordance with the jdbc specification this Connection cannot
+     * In accordance with the JDBC specification this Connection cannot
      * be used after closed() is called.  Any further usage will result in an
      * SQLException.
      *
@@ -82,7 +82,7 @@ class ConnectionImpl extends DelegatingConnection {
     /**
      * If pooling of <code>PreparedStatement</code>s is turned on in the
      * {@link DriverAdapterCPDS}, a pooled object may be returned, otherwise
-     * delegate to the wrapped jdbc 1.x {@link java.sql.Connection}.
+     * delegate to the wrapped JDBC 1.x {@link java.sql.Connection}.
      *
      * @param sql SQL statement to be prepared
      * @return the prepared statement
@@ -104,7 +104,7 @@ class ConnectionImpl extends DelegatingConnection {
     /**
      * If pooling of <code>PreparedStatement</code>s is turned on in the
      * {@link DriverAdapterCPDS}, a pooled object may be returned, otherwise
-     * delegate to the wrapped jdbc 1.x {@link java.sql.Connection}.
+     * delegate to the wrapped JDBC 1.x {@link java.sql.Connection}.
      *
      * @exception SQLException if this connection is closed or an error occurs
      * in the wrapped connection.

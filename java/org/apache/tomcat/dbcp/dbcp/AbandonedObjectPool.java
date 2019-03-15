@@ -65,7 +65,7 @@ public class AbandonedObjectPool extends GenericObjectPool {
      * getNumActive() > getMaxActive() - 3 and
      * getNumIdle() < 2
      * 
-     * @return Object jdbc Connection
+     * @return Object JDBC Connection
      * @throws Exception if an exception occurs retrieving a 
      * connection from the pool
      */
