@@ -2773,7 +2773,7 @@ public class GenericKeyedObjectPool<K, V> extends BaseKeyedObjectPool<K, V> impl
     private boolean _lifo = DEFAULT_LIFO;
 
     /**
-     * Used to track the order in which threads call {@link #borrowObject()} so
+     * Used to track the order in which threads call {@link #borrowObject(Object)} so
      * that objects can be allocated in the order in which the threads requested
      * them.
      */

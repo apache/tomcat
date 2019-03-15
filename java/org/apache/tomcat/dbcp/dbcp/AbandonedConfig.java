@@ -79,8 +79,9 @@ public class AbandonedConfig {
      * <p>Abandoned connection cleanup happens when
      * <code><ul>
      * <li><code>{@link #getRemoveAbandoned() removeAbandoned} == true</li>
-     * <li>{@link #getNumIdle() numIdle} &lt; 2</li>
-     * <li>{@link #getNumActive() numActive} &gt; {@link #getMaxActive() maxActive} - 3</li>
+     * <li>{@link AbandonedObjectPool#getNumIdle() numIdle} &lt; 2</li>
+     * <li>{@link AbandonedObjectPool#getNumActive() numActive} &gt;
+     *     {@link AbandonedObjectPool#getMaxActive() maxActive} - 3</li>
      * </ul></code></p>
      *
      * <p>The default value is 300 seconds.</p>
