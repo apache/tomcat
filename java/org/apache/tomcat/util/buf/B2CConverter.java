@@ -36,11 +36,8 @@ public class B2CConverter {
 
     private static final StringManager sm = StringManager.getManager(B2CConverter.class);
 
-    private static final CharsetCache charsetCache;
+    private static final CharsetCache charsetCache = new CharsetCache();
 
-    static {
-        charsetCache = new CharsetCache();
-    }
 
     // Protected so unit tests can use it
     protected static final int LEFTOVER_SIZE = 9;
