@@ -39,6 +39,7 @@ public abstract class BaseKeyedPoolableObjectFactory<K, V> implements KeyedPoola
      * @param key the key used when constructing the object
      * @return an instance that can be served by the pool
      */
+    @Override
     public abstract V makeObject(K key)
         throws Exception;
 
@@ -51,6 +52,7 @@ public abstract class BaseKeyedPoolableObjectFactory<K, V> implements KeyedPoola
      * @param key the key used when selecting the instance
      * @param obj the instance to be destroyed
      */
+    @Override
     public void destroyObject(K key, V obj)
         throws Exception {
     }
@@ -65,6 +67,7 @@ public abstract class BaseKeyedPoolableObjectFactory<K, V> implements KeyedPoola
      * @param obj the instance to be validated
      * @return always <code>true</code> in the default implementation
      */
+    @Override
     public boolean validateObject(K key, V obj) {
         return true;
     }
@@ -78,6 +81,7 @@ public abstract class BaseKeyedPoolableObjectFactory<K, V> implements KeyedPoola
      * @param key the key used when selecting the object
      * @param obj the instance to be activated
      */
+    @Override
     public void activateObject(K key, V obj)
         throws Exception {
     }
@@ -91,6 +95,7 @@ public abstract class BaseKeyedPoolableObjectFactory<K, V> implements KeyedPoola
      * @param key the key used when selecting the object
      * @param obj the instance to be passivated
      */
+    @Override
     public void passivateObject(K key, V obj)
         throws Exception {
     }

@@ -69,6 +69,7 @@ public class AbandonedObjectPool extends GenericObjectPool {
      * @throws Exception if an exception occurs retrieving a 
      * connection from the pool
      */
+    @Override
     public Object borrowObject() throws Exception {
         if (config != null
                 && config.getRemoveAbandoned()
@@ -95,6 +96,7 @@ public class AbandonedObjectPool extends GenericObjectPool {
      * @throws Exception if an exception occurs returning the connection
      * to the pool
      */
+    @Override
     public void returnObject(Object obj) throws Exception {
         if (config != null && config.getRemoveAbandoned()) {
             synchronized (trace) {
@@ -113,6 +115,7 @@ public class AbandonedObjectPool extends GenericObjectPool {
      * @param obj object to be returned
      * @throws Exception if an exception occurs invalidating the object
      */
+    @Override
     public void invalidateObject(Object obj) throws Exception {
         if (config != null && config.getRemoveAbandoned()) {
             synchronized (trace) {

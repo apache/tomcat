@@ -99,6 +99,7 @@ class EvictionTimer {
         /** 
          * {@inheritDoc}
          */
+        @Override
         public ClassLoader run() {
             return Thread.currentThread().getContextClassLoader();
         }
@@ -123,6 +124,7 @@ class EvictionTimer {
         /** 
          * {@inheritDoc}
          */
+        @Override
         public ClassLoader run() {
             Thread.currentThread().setContextClassLoader(cl);
             return null;

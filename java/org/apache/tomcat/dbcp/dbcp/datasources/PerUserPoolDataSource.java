@@ -87,6 +87,7 @@ public class PerUserPoolDataSource
     /**
      * Close pool(s) being maintained by this datasource.
      */
+    @Override
     public void close() {
         for (Iterator poolIter = managers.values().iterator();
              poolIter.hasNext();) {    
@@ -368,6 +369,7 @@ public class PerUserPoolDataSource
     // ----------------------------------------------------------------------
     // Inherited abstract methods
 
+    @Override
     protected PooledConnectionAndInfo 
         getPooledConnectionAndInfo(String username, String password)
         throws SQLException {
@@ -425,6 +427,7 @@ public class PerUserPoolDataSource
         return info;
     }
 
+    @Override
     protected void setupDefaults(Connection con, String username) 
         throws SQLException {
         boolean defaultAutoCommit = isDefaultAutoCommit();
@@ -464,6 +467,7 @@ public class PerUserPoolDataSource
         }
     }
     
+    @Override
     protected PooledConnectionManager getConnectionManager(UserPassKey upkey) {
         return (PooledConnectionManager) managers.get(getPoolKey(
                 upkey.getUsername(), upkey.getPassword()));
@@ -474,6 +478,7 @@ public class PerUserPoolDataSource
      * 
      * @since 1.2.2
      */
+    @Override
     public Reference getReference() throws NamingException {
         Reference ref = new Reference(getClass().getName(),
                 PerUserPoolDataSourceFactory.class.getName(), null);

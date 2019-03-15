@@ -76,6 +76,7 @@ public class PoolingConnection extends DelegatingConnection implements Connectio
      * Close and free all {@link PreparedStatement}s or {@link CallableStatement} from the pool, and
      * close the underlying connection.
      */
+    @Override
     public synchronized void close() throws SQLException {
         if(null != _pstmtPool) {
             KeyedObjectPool oldpool = _pstmtPool;            
@@ -98,6 +99,7 @@ public class PoolingConnection extends DelegatingConnection implements Connectio
      * @param sql the sql string used to define the PreparedStatement
      * @return a {@link PoolablePreparedStatement}
      */
+    @Override
     public PreparedStatement prepareStatement(String sql) throws SQLException {
         if (null == _pstmtPool) {
             throw new SQLException(
@@ -121,6 +123,7 @@ public class PoolingConnection extends DelegatingConnection implements Connectio
      * @param resultSetConcurrency result set concurrency
      * @return a {@link PoolablePreparedStatement}
      */
+    @Override
     public PreparedStatement prepareStatement(String sql, int resultSetType, int resultSetConcurrency) throws SQLException {
         if (null == _pstmtPool) {
             throw new SQLException(
@@ -144,6 +147,7 @@ public class PoolingConnection extends DelegatingConnection implements Connectio
      * @throws SQLException
      * @since 1.3
      */
+    @Override
     public CallableStatement prepareCall(String sql) throws SQLException {
         try {
             return (CallableStatement) (_pstmtPool.borrowObject(createKey(sql, STATEMENT_CALLABLESTMT)));
@@ -165,6 +169,7 @@ public class PoolingConnection extends DelegatingConnection implements Connectio
      * @throws SQLException
      * @since 1.3
      */
+    @Override
     public CallableStatement prepareCall(String sql, int resultSetType, int resultSetConcurrency) throws SQLException {
         try {
             return (CallableStatement) (_pstmtPool.borrowObject(createKey(sql, resultSetType,
@@ -275,6 +280,7 @@ public class PoolingConnection extends DelegatingConnection implements Connectio
      * @param obj the key for the {@link PreparedStatement} to be created
      * @see #createKey(String, int, int, byte)
      */
+    @Override
     public Object makeObject(Object obj) throws Exception {
         if(null == obj || !(obj instanceof PStmtKey)) {
             throw new IllegalArgumentException("Prepared statement key is null or invalid.");
@@ -306,6 +312,7 @@ public class PoolingConnection extends DelegatingConnection implements Connectio
      * @param key ignored
      * @param obj the pooled statement to be destroyed.
      */
+    @Override
     public void destroyObject(Object key, Object obj) throws Exception {
         if(obj instanceof DelegatingPreparedStatement) {
             ((DelegatingPreparedStatement)obj).getInnermostDelegate().close();
@@ -322,6 +329,7 @@ public class PoolingConnection extends DelegatingConnection implements Connectio
      * @param obj ignored
      * @return <tt>true</tt>
      */
+    @Override
     public boolean validateObject(Object key, Object obj) {
         return true;
     }
@@ -333,6 +341,7 @@ public class PoolingConnection extends DelegatingConnection implements Connectio
      * @param key ignored
      * @param obj pooled statement to be activated
      */
+    @Override
     public void activateObject(Object key, Object obj) throws Exception {
         ((DelegatingPreparedStatement)obj).activate();
     }
@@ -345,11 +354,13 @@ public class PoolingConnection extends DelegatingConnection implements Connectio
      * @param key ignored
      * @param obj a {@link PreparedStatement}
      */
+    @Override
     public void passivateObject(Object key, Object obj) throws Exception {
         ((PreparedStatement)obj).clearParameters();
         ((DelegatingPreparedStatement)obj).passivate();
     }
 
+    @Override
     public String toString() {
         if (_pstmtPool != null ) {
             return "PoolingConnection: " + _pstmtPool.toString();
@@ -417,6 +428,7 @@ public class PoolingConnection extends DelegatingConnection implements Connectio
             _stmtType = stmtType;
         }
 
+        @Override
         public boolean equals(Object that) {
             try {
                 PStmtKey key = (PStmtKey)that;
@@ -433,6 +445,7 @@ public class PoolingConnection extends DelegatingConnection implements Connectio
             }
         }
 
+        @Override
         public int hashCode() {
             if (_catalog==null)
                 return(null == _sql ? 0 : _sql.hashCode());
@@ -440,6 +453,7 @@ public class PoolingConnection extends DelegatingConnection implements Connectio
                 return(null == _sql ? _catalog.hashCode() : (_catalog + _sql).hashCode());
         }
 
+        @Override
         public String toString() {
             StringBuffer buf = new StringBuffer();
             buf.append("PStmtKey: sql=");

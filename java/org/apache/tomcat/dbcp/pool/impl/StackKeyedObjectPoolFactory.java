@@ -107,6 +107,7 @@ public class StackKeyedObjectPoolFactory<K, V> implements KeyedObjectPoolFactory
      *
      * @return a new StackKeyedObjectPool with the configured factory, maxSleeping and initialCapacity
      */
+    @Override
     public KeyedObjectPool<K, V> createPool() {
         return new StackKeyedObjectPool<K, V>(_factory,_maxSleeping,_initCapacity);
     }

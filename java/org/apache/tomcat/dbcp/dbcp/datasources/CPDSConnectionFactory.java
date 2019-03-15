@@ -125,6 +125,7 @@ class CPDSConnectionFactory
          return _pool;
      }
 
+    @Override
     public synchronized Object makeObject() {
         Object obj;
         try {
@@ -153,6 +154,7 @@ class CPDSConnectionFactory
     /**
      * Closes the PooledConnection and stops listening for events from it.
      */
+    @Override
     public void destroyObject(Object obj) throws Exception {
         if (obj instanceof PooledConnectionAndInfo) {
             PooledConnection pc = ((PooledConnectionAndInfo)obj).getPooledConnection();
@@ -162,6 +164,7 @@ class CPDSConnectionFactory
         }
     }
 
+    @Override
     public boolean validateObject(Object obj) {
         boolean valid = false;
         if (obj instanceof PooledConnectionAndInfo) {
@@ -224,9 +227,11 @@ class CPDSConnectionFactory
         return valid;
     }
 
+    @Override
     public void passivateObject(Object obj) {
     }
 
+    @Override
     public void activateObject(Object obj) {
     }
 
@@ -240,6 +245,7 @@ class CPDSConnectionFactory
      * method of this connection object. What we need to do here is to
      * release this PooledConnection from our pool...
      */
+    @Override
     public void connectionClosed(ConnectionEvent event) {
         PooledConnection pc = (PooledConnection) event.getSource();
         // if this event occured becase we were validating, ignore it
@@ -271,6 +277,7 @@ class CPDSConnectionFactory
      * If a fatal error occurs, close the underlying physical connection so as
      * not to be returned in the future
      */
+    @Override
     public void connectionErrorOccurred(ConnectionEvent event) {
         PooledConnection pc = (PooledConnection)event.getSource();
         if (null != event.getSQLException()) {
@@ -302,6 +309,7 @@ class CPDSConnectionFactory
      * Also closes the pool.  This ensures that all idle connections are closed
      * and connections that are checked out are closed on return.
      */
+    @Override
     public void invalidate(PooledConnection pc) throws SQLException {
         Object info = pcMap.get(pc);
         if (info == null) {
@@ -320,6 +328,7 @@ class CPDSConnectionFactory
      * 
      * @param password new password
      */
+    @Override
     public synchronized void setPassword(String password) {
         _password = password;
     }
@@ -328,6 +337,7 @@ class CPDSConnectionFactory
      * Verifies that the username matches the user whose connections are being managed by this
      * factory and closes the pool if this is the case; otherwise does nothing.
      */
+    @Override
     public void closePool(String username) throws SQLException {
         synchronized (this) {
             if (username == null || !username.equals(_username)) {

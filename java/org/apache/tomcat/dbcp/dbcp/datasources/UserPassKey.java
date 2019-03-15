@@ -63,6 +63,7 @@ class UserPassKey implements Serializable {
      * 
      * @see java.lang.Object#equals(java.lang.Object)
      */
+    @Override
     public boolean equals(Object obj) {
         if (obj == null) {
             return false;
@@ -86,11 +87,13 @@ class UserPassKey implements Serializable {
     /**
      * Returns the hash of the username. 
      */
+    @Override
     public int hashCode() {
         return (this.username != null ?
                 (this.username).hashCode() : 0);
     }
 
+    @Override
     public String toString() {
         StringBuffer sb = new StringBuffer(50);
         sb.append("UserPassKey(");

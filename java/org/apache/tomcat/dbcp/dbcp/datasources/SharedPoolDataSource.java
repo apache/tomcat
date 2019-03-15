@@ -70,6 +70,7 @@ public class SharedPoolDataSource
     /**
      * Close pool being maintained by this datasource.
      */
+    @Override
     public void close() throws Exception {
         if (pool != null) {
             pool.close();
@@ -159,6 +160,7 @@ public class SharedPoolDataSource
     // ----------------------------------------------------------------------
     // Inherited abstract methods
 
+    @Override
     protected PooledConnectionAndInfo 
         getPooledConnectionAndInfo(String username, String password)
         throws SQLException {
@@ -187,6 +189,7 @@ public class SharedPoolDataSource
         return info;
     }
     
+    @Override
     protected PooledConnectionManager getConnectionManager(UserPassKey upkey)  {
         return factory;
     }
@@ -196,6 +199,7 @@ public class SharedPoolDataSource
      * 
      * @since 1.2.2
      */
+    @Override
     public Reference getReference() throws NamingException {
         Reference ref = new Reference(getClass().getName(),
             SharedPoolDataSourceFactory.class.getName(), null);
@@ -230,6 +234,7 @@ public class SharedPoolDataSource
                                        isRollbackAfterValidation());
     }
 
+    @Override
     protected void setupDefaults(Connection con, String username) throws SQLException {
         boolean defaultAutoCommit = isDefaultAutoCommit();
         if (con.getAutoCommit() != defaultAutoCommit) {

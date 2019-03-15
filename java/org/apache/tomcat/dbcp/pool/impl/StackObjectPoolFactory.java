@@ -109,6 +109,7 @@ public class StackObjectPoolFactory<T> implements ObjectPoolFactory<T> {
      *
      * @return a new StackObjectPool with the configured factory, maxIdle and initial capacity settings
      */
+    @Override
     public ObjectPool<T> createPool() {
         return new StackObjectPool<T>(_factory,_maxSleeping,_initCapacity);
     }

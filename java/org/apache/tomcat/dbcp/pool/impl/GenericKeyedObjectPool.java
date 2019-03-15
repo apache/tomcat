@@ -2345,6 +2345,7 @@ public class GenericKeyedObjectPool<K, V> extends BaseKeyedObjectPool<K, V> impl
          * @param obj object to cmpare
          * @return result of comparison
          */
+        @Override
         @SuppressWarnings("unchecked")
         public int compareTo(Object obj) {
             return compareTo((ObjectTimestampPair<T>) obj);

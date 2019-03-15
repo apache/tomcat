@@ -61,7 +61,8 @@ public class PoolableConnection extends DelegatingConnection {
     /**
      * Returns me to my pool.
      */
-     public synchronized void close() throws SQLException {
+     @Override
+    public synchronized void close() throws SQLException {
         if (_closed) {
             // already closed
             return;

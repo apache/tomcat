@@ -422,6 +422,7 @@ public class JOCLContentHandler extends DefaultHandler {
 
     //--- Public Methods - DocumentHandler ---------------------------
 
+    @Override
     public void startElement(String uri, String localName, String qname, Attributes attr) throws SAXException {
         try {
             if(isJoclNamespace(uri,localName,qname)) {
@@ -485,6 +486,7 @@ public class JOCLContentHandler extends DefaultHandler {
         }
     }
 
+    @Override
     public void endElement(String uri, String localName, String qname) throws SAXException {
         try {
             if(isJoclNamespace(uri,localName,qname)) {
@@ -528,6 +530,7 @@ public class JOCLContentHandler extends DefaultHandler {
         }
     }
 
+    @Override
     public void setDocumentLocator(Locator locator) {
         _locator = locator;
     }

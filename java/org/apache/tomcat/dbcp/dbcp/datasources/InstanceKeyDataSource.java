@@ -167,10 +167,12 @@ public abstract class InstanceKeyDataSource
     protected abstract PooledConnectionManager getConnectionManager(UserPassKey upkey);
 
     /* JDBC_4_ANT_KEY_BEGIN */
+    @Override
     public boolean isWrapperFor(Class<?> iface) throws SQLException {
         return false;
     }
 
+    @Override
     public <T> T unwrap(Class<T> iface) throws SQLException {
         throw new SQLException("InstanceKeyDataSource is not a wrapper.");
     }
@@ -386,6 +388,7 @@ public abstract class InstanceKeyDataSource
      * Get the value of loginTimeout.
      * @return value of loginTimeout.
      */
+    @Override
     public int getLoginTimeout() {
         return loginTimeout;
     }
@@ -394,6 +397,7 @@ public abstract class InstanceKeyDataSource
      * Set the value of loginTimeout.
      * @param v  Value to assign to loginTimeout.
      */
+    @Override
     public void setLoginTimeout(int v) {
         this.loginTimeout = v;
     }
@@ -402,6 +406,7 @@ public abstract class InstanceKeyDataSource
      * Get the value of logWriter.
      * @return value of logWriter.
      */
+    @Override
     public PrintWriter getLogWriter() {
         if (logWriter == null) {
             logWriter = new PrintWriter(System.out);
@@ -413,6 +418,7 @@ public abstract class InstanceKeyDataSource
      * Set the value of logWriter.
      * @param v  Value to assign to logWriter.
      */
+    @Override
     public void setLogWriter(PrintWriter v) {
         this.logWriter = v;
     }
@@ -671,6 +677,7 @@ public abstract class InstanceKeyDataSource
     /**
      * Attempt to establish a database connection.
      */
+    @Override
     public Connection getConnection() throws SQLException {
         return getConnection(null, null);
     }
@@ -687,6 +694,7 @@ public abstract class InstanceKeyDataSource
      * repeatedly invoked until a <code>PooledConnectionAndInfo</code> instance with the new password is returned.
      *
      */
+    @Override
     public Connection getConnection(String username, String password)
             throws SQLException {
         if (instanceKey == null) {
@@ -879,6 +887,7 @@ public abstract class InstanceKeyDataSource
     // TODO: Remove the implementation of this method at next major
     // version release.
 
+    @Override
     public Reference getReference() throws NamingException {
         final String className = getClass().getName();
         final String factoryName = className + "Factory"; // XXX: not robust

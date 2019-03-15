@@ -45,10 +45,12 @@ class PoolablePreparedStatementStub extends PoolablePreparedStatement {
         super(stmt, key, pool, conn);
     }
 
+    @Override
     protected void activate() throws SQLException {
         super.activate();
     }
 
+    @Override
     protected void passivate() throws SQLException {
         super.passivate();
     }

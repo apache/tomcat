@@ -38,6 +38,7 @@ public class DataSourceConnectionFactory implements ConnectionFactory {
         _passwd = passwd;
     }
 
+    @Override
     public Connection createConnection() throws SQLException {
         if(null == _uname && null == _passwd) {
             return _source.getConnection();

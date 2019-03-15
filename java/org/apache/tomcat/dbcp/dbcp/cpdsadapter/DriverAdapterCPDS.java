@@ -146,6 +146,7 @@ public class DriverAdapterCPDS
      * Attempt to establish a database connection using the default
      * user and password.
      */
+    @Override
     public PooledConnection getPooledConnection() throws SQLException {
         return getPooledConnection(getUser(), getPassword());
     }
@@ -155,6 +156,7 @@ public class DriverAdapterCPDS
      * @param username name to be used for the connection
      * @param pass password to be used fur the connection
      */
+    @Override
     public PooledConnection getPooledConnection(String username,
                                                 String pass)
             throws SQLException {
@@ -232,6 +234,7 @@ public class DriverAdapterCPDS
     /**
      * <CODE>Referenceable</CODE> implementation.
      */
+    @Override
     public Reference getReference() throws NamingException {
         // this class implements its own factory
         String factory = getClass().getName();
@@ -271,6 +274,7 @@ public class DriverAdapterCPDS
     /**
      * implements ObjectFactory to create an instance of this class
      */
+    @Override
     public Object getObjectInstance(Object refObj, Name name,
                                     Context context, Hashtable env)
             throws Exception {
@@ -504,6 +508,7 @@ public class DriverAdapterCPDS
      * Gets the maximum time in seconds that this data source can wait
      * while attempting to connect to a database. NOT USED.
      */
+    @Override
     public int getLoginTimeout() {
         return loginTimeout;
     }
@@ -511,6 +516,7 @@ public class DriverAdapterCPDS
     /**
      * Get the log writer for this data source. NOT USED.
      */
+    @Override
     public PrintWriter getLogWriter() {
         return logWriter;
     }
@@ -519,6 +525,7 @@ public class DriverAdapterCPDS
      * Sets the maximum time in seconds that this data source will wait
      * while attempting to connect to a database. NOT USED.
      */
+    @Override
     public void setLoginTimeout(int seconds) {
         loginTimeout = seconds;
     }
@@ -526,6 +533,7 @@ public class DriverAdapterCPDS
     /**
      * Set the log writer for this data source. NOT USED.
      */
+    @Override
     public void setLogWriter(java.io.PrintWriter out) {
         logWriter = out;
     }

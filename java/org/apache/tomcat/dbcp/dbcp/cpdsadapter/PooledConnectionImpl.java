@@ -110,6 +110,7 @@ class PooledConnectionImpl
     /**
      * {@inheritDoc}
      */
+    @Override
     public void addConnectionEventListener(ConnectionEventListener listener) {
         if (!eventListeners.contains(listener)) {
             eventListeners.add(listener);
@@ -117,6 +118,7 @@ class PooledConnectionImpl
     }
 
     /* JDBC_4_ANT_KEY_BEGIN */
+    @Override
     public void addStatementEventListener(StatementEventListener listener) {
         if (!statementEventListeners.contains(listener)) {
             statementEventListeners.add(listener);
@@ -131,6 +133,7 @@ class PooledConnectionImpl
      *
      * @exception SQLException if an error occurs or the connection is already closed
      */
+    @Override
     public void close() throws SQLException {        
         assertOpen();
         isClosed = true;
@@ -170,6 +173,7 @@ class PooledConnectionImpl
      * @return The database connection.
      * @throws SQLException if the connection is not open or the previous logical connection is still open
      */
+    @Override
     public Connection getConnection() throws SQLException {
         assertOpen();
         // make sure the last connection is marked as closed
@@ -189,12 +193,14 @@ class PooledConnectionImpl
     /**
      * {@inheritDoc}
      */
+    @Override
     public void removeConnectionEventListener(
             ConnectionEventListener listener) {
         eventListeners.remove(listener);
     }
 
     /* JDBC_4_ANT_KEY_BEGIN */
+    @Override
     public void removeStatementEventListener(StatementEventListener listener) {
         statementEventListeners.remove(listener);
     }
@@ -204,6 +210,7 @@ class PooledConnectionImpl
      * Closes the physical connection and checks that the logical connection
      * was closed as well.
      */
+    @Override
     protected void finalize() throws Throwable {
         // Closing the Connection ensures that if anyone tries to use it,
         // an error will occur.
@@ -423,6 +430,7 @@ class PooledConnectionImpl
      * {*link PreparedStatement}s.
      * @param obj the key for the {*link PreparedStatement} to be created
      */
+    @Override
     public Object makeObject(Object obj) throws Exception {
         if (null == obj || !(obj instanceof PStmtKey)) {
             throw new IllegalArgumentException();
@@ -457,6 +465,7 @@ class PooledConnectionImpl
      * @param key ignored
      * @param obj the {*link PreparedStatement} to be destroyed.
      */
+    @Override
     public void destroyObject(Object key, Object obj) throws Exception {
         //_openPstmts--;
         if (obj instanceof DelegatingPreparedStatement) {
@@ -473,6 +482,7 @@ class PooledConnectionImpl
      * @param obj ignored
      * @return <tt>true</tt>
      */
+    @Override
     public boolean validateObject(Object key, Object obj) {
         return true;
     }
@@ -483,6 +493,7 @@ class PooledConnectionImpl
      * @param key ignored
      * @param obj ignored
      */
+    @Override
     public void activateObject(Object key, Object obj) throws Exception {
         ((PoolablePreparedStatementStub) obj).activate();
     }
@@ -493,6 +504,7 @@ class PooledConnectionImpl
      * @param key ignored
      * @param obj a {*link PreparedStatement}
      */
+    @Override
     public void passivateObject(Object key, Object obj) throws Exception {
         ((PreparedStatement) obj).clearParameters();
         ((PoolablePreparedStatementStub) obj).passivate();
@@ -564,6 +576,7 @@ class PooledConnectionImpl
         }
 
         
+        @Override
         public boolean equals(Object that) {
             try {
                 PStmtKey key = (PStmtKey) that;
@@ -582,10 +595,12 @@ class PooledConnectionImpl
             }
         }
 
+        @Override
         public int hashCode() {
             return(null == _sql ? 0 : _sql.hashCode());
         }
 
+        @Override
         public String toString() {
             StringBuffer buf = new StringBuffer();
             buf.append("PStmtKey: sql=");

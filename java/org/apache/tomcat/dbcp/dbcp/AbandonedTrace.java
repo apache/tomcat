@@ -220,6 +220,7 @@ public class AbandonedTrace {
 
         // Override getMessage to avoid creating objects and formatting
         // dates unless the log message will actually be used.
+        @Override
         public String getMessage() {
             String msg;
             synchronized(format) {

@@ -35,11 +35,13 @@ public abstract class BaseKeyedObjectPool<K, V> implements KeyedObjectPool<K, V>
     /**
      * {@inheritDoc}
      */
+    @Override
     public abstract V borrowObject(K key) throws Exception;
 
     /**
      * {@inheritDoc}
      */
+    @Override
     public abstract void returnObject(K key, V obj) throws Exception;
 
     /**
@@ -56,6 +58,7 @@ public abstract class BaseKeyedObjectPool<K, V> implements KeyedObjectPool<K, V>
      * @param obj a {@link #borrowObject borrowed} instance to be returned.
      * @throws Exception
      */
+    @Override
     public abstract void invalidateObject(K key, V obj) throws Exception;
 
     /**
@@ -65,6 +68,7 @@ public abstract class BaseKeyedObjectPool<K, V> implements KeyedObjectPool<K, V>
      * @param key ignored
      * @throws UnsupportedOperationException
      */
+    @Override
     public void addObject(K key) throws Exception, UnsupportedOperationException {
         throw new UnsupportedOperationException();
     }
@@ -74,6 +78,7 @@ public abstract class BaseKeyedObjectPool<K, V> implements KeyedObjectPool<K, V>
      * @return a negative value.
      * @param key ignored
      */
+    @Override
     public int getNumIdle(K key) throws UnsupportedOperationException {
         return -1;
     }
@@ -83,6 +88,7 @@ public abstract class BaseKeyedObjectPool<K, V> implements KeyedObjectPool<K, V>
      * @return a negative value.
      * @param key ignored
      */
+    @Override
     public int getNumActive(K key) throws UnsupportedOperationException {
         return -1;
     }
@@ -91,6 +97,7 @@ public abstract class BaseKeyedObjectPool<K, V> implements KeyedObjectPool<K, V>
      * Not supported in this base implementation.
      * @return a negative value.
      */
+    @Override
     public int getNumIdle() throws UnsupportedOperationException {
         return -1;
     }
@@ -99,6 +106,7 @@ public abstract class BaseKeyedObjectPool<K, V> implements KeyedObjectPool<K, V>
      * Not supported in this base implementation.
      * @return a negative value.
      */
+    @Override
     public int getNumActive() throws UnsupportedOperationException {
         return -1;
     }
@@ -107,6 +115,7 @@ public abstract class BaseKeyedObjectPool<K, V> implements KeyedObjectPool<K, V>
      * Not supported in this base implementation.
      * @throws UnsupportedOperationException
      */
+    @Override
     public void clear() throws Exception, UnsupportedOperationException {
         throw new UnsupportedOperationException();
     }
@@ -116,6 +125,7 @@ public abstract class BaseKeyedObjectPool<K, V> implements KeyedObjectPool<K, V>
      * @param key ignored
      * @throws UnsupportedOperationException
      */
+    @Override
     public void clear(K key) throws Exception, UnsupportedOperationException {
         throw new UnsupportedOperationException();
     }
@@ -124,6 +134,7 @@ public abstract class BaseKeyedObjectPool<K, V> implements KeyedObjectPool<K, V>
      * Close this pool.
      * This affects the behavior of <code>isClosed</code> and <code>assertOpen</code>.
      */
+    @Override
     public void close() throws Exception {
         closed = true;
     }
@@ -135,6 +146,7 @@ public abstract class BaseKeyedObjectPool<K, V> implements KeyedObjectPool<K, V>
      * @param factory the new KeyedPoolableObjectFactory
      * @deprecated to be removed in pool 2.0
      */
+    @Override
     @Deprecated
     public void setFactory(KeyedPoolableObjectFactory<K, V> factory) throws IllegalStateException, UnsupportedOperationException {
         throw new UnsupportedOperationException();

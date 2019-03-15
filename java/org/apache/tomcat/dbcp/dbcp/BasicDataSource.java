@@ -1133,6 +1133,7 @@ public class BasicDataSource implements DataSource {
      * @throws SQLException if a database access error occurs
      * @return a database connection
      */
+    @Override
     public Connection getConnection() throws SQLException {
         return createDataSource().getConnection();
     }
@@ -1149,6 +1150,7 @@ public class BasicDataSource implements DataSource {
      * @throws SQLException if a database access error occurs
      * @return nothing - always throws UnsupportedOperationException
      */
+    @Override
     public Connection getConnection(String user, String pass) throws SQLException {
         // This method isn't supported by the PoolingDataSource returned by
         // the createDataSource
@@ -1170,6 +1172,7 @@ public class BasicDataSource implements DataSource {
      *   does not support the login timeout feature.
      * @return login timeout in seconds
      */
+    @Override
     public int getLoginTimeout() throws SQLException {
         // This method isn't supported by the PoolingDataSource returned by
         // the createDataSource
@@ -1187,6 +1190,7 @@ public class BasicDataSource implements DataSource {
      * @throws SQLException if a database access error occurs
      * @return log writer in use
      */
+    @Override
     public PrintWriter getLogWriter() throws SQLException {
         return createDataSource().getLogWriter();
     }
@@ -1206,6 +1210,7 @@ public class BasicDataSource implements DataSource {
      *   does not support the login timeout feature.
      * @throws SQLException if a database access error occurs
      */
+    @Override
     public void setLoginTimeout(int loginTimeout) throws SQLException {
         // This method isn't supported by the PoolingDataSource returned by
         // the createDataSource
@@ -1223,6 +1228,7 @@ public class BasicDataSource implements DataSource {
      * @param logWriter The new log writer
      * @throws SQLException if a database access error occurs
      */
+    @Override
     public void setLogWriter(PrintWriter logWriter) throws SQLException {
         createDataSource().setLogWriter(logWriter);
         this.logWriter = logWriter;
@@ -1455,10 +1461,12 @@ public class BasicDataSource implements DataSource {
     }
 
     /* JDBC_4_ANT_KEY_BEGIN */
+    @Override
     public boolean isWrapperFor(Class<?> iface) throws SQLException {
         return false;
     }
 
+    @Override
     public <T> T unwrap(Class<T> iface) throws SQLException {
         throw new SQLException("BasicDataSource is not a wrapper.");
     }

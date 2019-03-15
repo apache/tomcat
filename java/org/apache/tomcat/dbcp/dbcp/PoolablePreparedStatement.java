@@ -73,6 +73,7 @@ public class PoolablePreparedStatement extends DelegatingPreparedStatement imple
     /**
      * Add batch.
      */
+    @Override
     public void addBatch() throws SQLException {
         super.addBatch();
         batchAdded = true;
@@ -81,6 +82,7 @@ public class PoolablePreparedStatement extends DelegatingPreparedStatement imple
     /**
      * Clear Batch.
      */
+    @Override
     public void clearBatch() throws SQLException {
         batchAdded = false;
         super.clearBatch();
@@ -89,6 +91,7 @@ public class PoolablePreparedStatement extends DelegatingPreparedStatement imple
     /**
      * Return me to my pool.
      */
+    @Override
     public void close() throws SQLException {
         // calling close twice should have no effect
         if (!isClosed()) {
@@ -104,6 +107,7 @@ public class PoolablePreparedStatement extends DelegatingPreparedStatement imple
         }
     }
     
+    @Override
     protected void activate() throws SQLException{
         _closed = false;
         if(_conn != null) {
@@ -112,6 +116,7 @@ public class PoolablePreparedStatement extends DelegatingPreparedStatement imple
         super.activate();
     }
   
+    @Override
     protected void passivate() throws SQLException {
         _closed = true;
         if(_conn != null) {

@@ -34,6 +34,7 @@ public class DriverConnectionFactory implements ConnectionFactory {
         _props = props;
     }
 
+    @Override
     public Connection createConnection() throws SQLException {
         return _driver.connect(_connectUri,_props);
     }
@@ -42,6 +43,7 @@ public class DriverConnectionFactory implements ConnectionFactory {
     protected String _connectUri = null;
     protected Properties _props = null;
 
+    @Override
     public String toString() {
         return this.getClass().getName() + " [" + String.valueOf(_driver) + ";" + String.valueOf(_connectUri) + ";"  + String.valueOf(_props) + "]";
     }

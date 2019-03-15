@@ -114,6 +114,7 @@ class KeyedCPDSConnectionFactory
      * @throws SQLException if the connection could not be created.
      * @see org.apache.tomcat.dbcp.pool.KeyedPoolableObjectFactory#makeObject(java.lang.Object)
      */
+    @Override
     public synchronized Object makeObject(Object key) throws Exception {
         Object obj = null;
         UserPassKey upkey = (UserPassKey)key;
@@ -143,6 +144,7 @@ class KeyedCPDSConnectionFactory
     /**
      * Closes the PooledConnection and stops listening for events from it.
      */
+    @Override
     public void destroyObject(Object key, Object obj) throws Exception {
         if (obj instanceof PooledConnectionAndInfo) {
             PooledConnection pc = ((PooledConnectionAndInfo)obj).getPooledConnection();
@@ -159,6 +161,7 @@ class KeyedCPDSConnectionFactory
      * @param obj {@link PooledConnectionAndInfo} containing the connection to validate
      * @return true if validation suceeds
      */
+    @Override
     public boolean validateObject(Object key, Object obj) {
         boolean valid = false;
         if (obj instanceof PooledConnectionAndInfo) {
@@ -221,9 +224,11 @@ class KeyedCPDSConnectionFactory
         return valid;
     }
 
+    @Override
     public void passivateObject(Object key, Object obj) {
     }
 
+    @Override
     public void activateObject(Object key, Object obj) {
     }
 
@@ -237,6 +242,7 @@ class KeyedCPDSConnectionFactory
      * method of this connection object. What we need to do here is to
      * release this PooledConnection from our pool...
      */
+    @Override
     public void connectionClosed(ConnectionEvent event) {
         PooledConnection pc = (PooledConnection)event.getSource();
         // if this event occurred because we were validating, or if this
@@ -269,6 +275,7 @@ class KeyedCPDSConnectionFactory
      * If a fatal error occurs, close the underlying physical connection so as
      * not to be returned in the future
      */
+    @Override
     public void connectionErrorOccurred(ConnectionEvent event) {
         PooledConnection pc = (PooledConnection)event.getSource();
         if (null != event.getSQLException()) {
@@ -301,6 +308,7 @@ class KeyedCPDSConnectionFactory
      * to create the PooledConnection.  Connections associated with this user
      * are not affected and they will not be automatically closed on return to the pool.
      */
+    @Override
     public void invalidate(PooledConnection pc) throws SQLException {
         PooledConnectionAndInfo info = (PooledConnectionAndInfo) pcMap.get(pc);
         if (info == null) {
@@ -318,6 +326,7 @@ class KeyedCPDSConnectionFactory
     /**
      * Does nothing.  This factory does not cache user credentials.
      */
+    @Override
     public void setPassword(String password) {
     }
     
@@ -326,6 +335,7 @@ class KeyedCPDSConnectionFactory
      * this would affect all users.  Instead, it clears the pool associated
      * with the given user.  This method is not currently used.
      */
+    @Override
     public void closePool(String username) throws SQLException {
         try {
             _pool.clear(new UserPassKey(username, null));

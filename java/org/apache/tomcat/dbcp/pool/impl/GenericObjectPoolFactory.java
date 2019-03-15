@@ -229,6 +229,7 @@ public class GenericObjectPoolFactory<T> implements ObjectPoolFactory<T> {
     /**
      * {@inheritDoc}
      */
+    @Override
     public ObjectPool<T> createPool() {
         return new GenericObjectPool<T>(_factory,_maxActive,_whenExhaustedAction,_maxWait,_maxIdle,_minIdle,_testOnBorrow,_testOnReturn,_timeBetweenEvictionRunsMillis,_numTestsPerEvictionRun,_minEvictableIdleTimeMillis,_testWhileIdle,_softMinEvictableIdleTimeMillis,_lifo);
     }

@@ -33,6 +33,7 @@ class PoolKey implements Serializable {
         this.username = username;
     }
     
+    @Override
     public boolean equals(Object obj) {
         if (obj instanceof PoolKey) {
             PoolKey pk = (PoolKey)obj;
@@ -43,6 +44,7 @@ class PoolKey implements Serializable {
         }
     }
 
+    @Override
     public int hashCode() {
         int h = 0;
         if (datasourceName != null) {
@@ -54,6 +56,7 @@ class PoolKey implements Serializable {
         return h;
     }
 
+    @Override
     public String toString() {
         StringBuffer sb = new StringBuffer(50);
         sb.append("PoolKey(");

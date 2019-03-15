@@ -34,10 +34,12 @@ public class PerUserPoolDataSourceFactory
     private static final String PER_USER_POOL_CLASSNAME =
         PerUserPoolDataSource.class.getName();
 
+    @Override
     protected boolean isCorrectClass(String className) {
         return PER_USER_POOL_CLASSNAME.equals(className);
     }
 
+    @Override
     protected InstanceKeyDataSource getNewInstance(Reference ref) 
         throws IOException, ClassNotFoundException {
         PerUserPoolDataSource pupds =  new PerUserPoolDataSource();

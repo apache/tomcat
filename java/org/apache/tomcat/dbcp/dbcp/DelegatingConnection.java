@@ -105,6 +105,7 @@ public class DelegatingConnection extends AbandonedTrace
      *
      * @since 1.2.2
      */
+    @Override
     public String toString() {
         String s = null;
 
@@ -174,6 +175,7 @@ public class DelegatingConnection extends AbandonedTrace
      * This method considers two objects to be equal
      * if the underlying JDBC objects are equal.
      */
+    @Override
     public boolean equals(Object obj) {
         if (obj == null) {
             return false;
@@ -194,6 +196,7 @@ public class DelegatingConnection extends AbandonedTrace
         }
     }
 
+    @Override
     public int hashCode() {
         Object obj = getInnermostDelegateInternal();
         if (obj == null) {
@@ -248,6 +251,7 @@ public class DelegatingConnection extends AbandonedTrace
      * Closes the underlying connection, and close
      * any Statements that were not explicitly closed.
      */
+    @Override
     public void close() throws SQLException {
         passivate();
         _conn.close();
@@ -257,6 +261,7 @@ public class DelegatingConnection extends AbandonedTrace
         throw e;
     }
 
+    @Override
     public Statement createStatement() throws SQLException {
         checkOpen();
         try {
@@ -268,6 +273,7 @@ public class DelegatingConnection extends AbandonedTrace
         }
     }
 
+    @Override
     public Statement createStatement(int resultSetType,
                                      int resultSetConcurrency) throws SQLException {
         checkOpen();
@@ -281,6 +287,7 @@ public class DelegatingConnection extends AbandonedTrace
         }
     }
 
+    @Override
     public PreparedStatement prepareStatement(String sql) throws SQLException {
         checkOpen();
         try {
@@ -293,6 +300,7 @@ public class DelegatingConnection extends AbandonedTrace
         }
     }
 
+    @Override
     public PreparedStatement prepareStatement(String sql,
                                               int resultSetType,
                                               int resultSetConcurrency) throws SQLException {
@@ -308,6 +316,7 @@ public class DelegatingConnection extends AbandonedTrace
         }
     }
 
+    @Override
     public CallableStatement prepareCall(String sql) throws SQLException {
         checkOpen();
         try {
@@ -319,6 +328,7 @@ public class DelegatingConnection extends AbandonedTrace
         }
     }
 
+    @Override
     public CallableStatement prepareCall(String sql,
                                          int resultSetType,
                                          int resultSetConcurrency) throws SQLException {
@@ -333,18 +343,23 @@ public class DelegatingConnection extends AbandonedTrace
         }
     }
 
+    @Override
     public void clearWarnings() throws SQLException
     { checkOpen(); try { _conn.clearWarnings(); } catch (SQLException e) { handleException(e); } }
 
+    @Override
     public void commit() throws SQLException
     { checkOpen(); try { _conn.commit(); } catch (SQLException e) { handleException(e); } }
 
+    @Override
     public boolean getAutoCommit() throws SQLException
     { checkOpen(); try { return _conn.getAutoCommit(); } catch (SQLException e) { handleException(e); return false; }
     }
+    @Override
     public String getCatalog() throws SQLException
     { checkOpen(); try { return _conn.getCatalog(); } catch (SQLException e) { handleException(e); return null; } }
 
+    @Override
     public DatabaseMetaData getMetaData() throws SQLException {
         checkOpen();
         try {
@@ -355,39 +370,51 @@ public class DelegatingConnection extends AbandonedTrace
         }
     }
 
+    @Override
     public int getTransactionIsolation() throws SQLException
     { checkOpen(); try { return _conn.getTransactionIsolation(); } catch (SQLException e) { handleException(e); return -1; } }
 
+    @Override
     public Map getTypeMap() throws SQLException
     { checkOpen(); try { return _conn.getTypeMap(); } catch (SQLException e) { handleException(e); return null; } }
 
+    @Override
     public SQLWarning getWarnings() throws SQLException
     { checkOpen(); try { return _conn.getWarnings(); } catch (SQLException e) { handleException(e); return null; } }
 
+    @Override
     public boolean isReadOnly() throws SQLException
     { checkOpen(); try { return _conn.isReadOnly(); } catch (SQLException e) { handleException(e); return false; } }
 
+    @Override
     public String nativeSQL(String sql) throws SQLException
     { checkOpen(); try { return _conn.nativeSQL(sql); } catch (SQLException e) { handleException(e); return null; } }
 
+    @Override
     public void rollback() throws SQLException
     { checkOpen(); try {  _conn.rollback(); } catch (SQLException e) { handleException(e); } }
 
+    @Override
     public void setAutoCommit(boolean autoCommit) throws SQLException
     { checkOpen(); try { _conn.setAutoCommit(autoCommit); } catch (SQLException e) { handleException(e); } }
 
+    @Override
     public void setCatalog(String catalog) throws SQLException
     { checkOpen(); try { _conn.setCatalog(catalog); } catch (SQLException e) { handleException(e); } }
 
+    @Override
     public void setReadOnly(boolean readOnly) throws SQLException
     { checkOpen(); try { _conn.setReadOnly(readOnly); } catch (SQLException e) { handleException(e); } }
 
+    @Override
     public void setTransactionIsolation(int level) throws SQLException
     { checkOpen(); try { _conn.setTransactionIsolation(level); } catch (SQLException e) { handleException(e); } }
 
+    @Override
     public void setTypeMap(Map map) throws SQLException
     { checkOpen(); try { _conn.setTypeMap(map); } catch (SQLException e) { handleException(e); } }
 
+    @Override
     public boolean isClosed() throws SQLException {
         return _closed || _conn.isClosed();
     }
@@ -448,24 +475,31 @@ public class DelegatingConnection extends AbandonedTrace
         }
     }
 
+    @Override
     public int getHoldability() throws SQLException
     { checkOpen(); try { return _conn.getHoldability(); } catch (SQLException e) { handleException(e); return 0; } }
 
+    @Override
     public void setHoldability(int holdability) throws SQLException
     { checkOpen(); try { _conn.setHoldability(holdability); } catch (SQLException e) { handleException(e); } }
 
+    @Override
     public java.sql.Savepoint setSavepoint() throws SQLException
     { checkOpen(); try { return _conn.setSavepoint(); } catch (SQLException e) { handleException(e); return null; } }
 
+    @Override
     public java.sql.Savepoint setSavepoint(String name) throws SQLException
     { checkOpen(); try { return _conn.setSavepoint(name); } catch (SQLException e) { handleException(e); return null; } }
 
+    @Override
     public void rollback(java.sql.Savepoint savepoint) throws SQLException
     { checkOpen(); try { _conn.rollback(savepoint); } catch (SQLException e) { handleException(e); } }
 
+    @Override
     public void releaseSavepoint(java.sql.Savepoint savepoint) throws SQLException
     { checkOpen(); try { _conn.releaseSavepoint(savepoint); } catch (SQLException e) { handleException(e); } }
 
+    @Override
     public Statement createStatement(int resultSetType,
                                      int resultSetConcurrency,
                                      int resultSetHoldability) throws SQLException {
@@ -480,6 +514,7 @@ public class DelegatingConnection extends AbandonedTrace
         }
     }
 
+    @Override
     public PreparedStatement prepareStatement(String sql, int resultSetType,
                                               int resultSetConcurrency,
                                               int resultSetHoldability) throws SQLException {
@@ -494,6 +529,7 @@ public class DelegatingConnection extends AbandonedTrace
         }
     }
 
+    @Override
     public CallableStatement prepareCall(String sql, int resultSetType,
                                          int resultSetConcurrency,
                                          int resultSetHoldability) throws SQLException {
@@ -508,6 +544,7 @@ public class DelegatingConnection extends AbandonedTrace
         }
     }
 
+    @Override
     public PreparedStatement prepareStatement(String sql, int autoGeneratedKeys) throws SQLException {
         checkOpen();
         try {
@@ -520,6 +557,7 @@ public class DelegatingConnection extends AbandonedTrace
         }
     }
 
+    @Override
     public PreparedStatement prepareStatement(String sql, int columnIndexes[]) throws SQLException {
         checkOpen();
         try {
@@ -532,6 +570,7 @@ public class DelegatingConnection extends AbandonedTrace
         }
     }
 
+    @Override
     public PreparedStatement prepareStatement(String sql, String columnNames[]) throws SQLException {
         checkOpen();
         try {
@@ -546,10 +585,12 @@ public class DelegatingConnection extends AbandonedTrace
 
 /* JDBC_4_ANT_KEY_BEGIN */
 
+    @Override
     public boolean isWrapperFor(Class<?> iface) throws SQLException {
         return iface.isAssignableFrom(getClass()) || _conn.isWrapperFor(iface);
     }
 
+    @Override
     public <T> T unwrap(Class<T> iface) throws SQLException {
         if (iface.isAssignableFrom(getClass())) {
             return iface.cast(this);
@@ -560,6 +601,7 @@ public class DelegatingConnection extends AbandonedTrace
         }
     }
 
+    @Override
     public Array createArrayOf(String typeName, Object[] elements) throws SQLException {
         checkOpen();
         try {
@@ -571,6 +613,7 @@ public class DelegatingConnection extends AbandonedTrace
         }
     }
 
+    @Override
     public Blob createBlob() throws SQLException {
         checkOpen();
         try {
@@ -582,6 +625,7 @@ public class DelegatingConnection extends AbandonedTrace
         }
     }
 
+    @Override
     public Clob createClob() throws SQLException {
         checkOpen();
         try {
@@ -593,6 +637,7 @@ public class DelegatingConnection extends AbandonedTrace
         }
     }
 
+    @Override
     public NClob createNClob() throws SQLException {
         checkOpen();
         try {
@@ -604,6 +649,7 @@ public class DelegatingConnection extends AbandonedTrace
         }
     }
 
+    @Override
     public SQLXML createSQLXML() throws SQLException {
         checkOpen();
         try {
@@ -615,6 +661,7 @@ public class DelegatingConnection extends AbandonedTrace
         }
     }
 
+    @Override
     public Struct createStruct(String typeName, Object[] attributes) throws SQLException {
         checkOpen();
         try {
@@ -626,6 +673,7 @@ public class DelegatingConnection extends AbandonedTrace
         }
     }
 
+    @Override
     public boolean isValid(int timeout) throws SQLException {
         checkOpen();
         try {
@@ -637,6 +685,7 @@ public class DelegatingConnection extends AbandonedTrace
         }
     }
 
+    @Override
     public void setClientInfo(String name, String value) throws SQLClientInfoException {
         try {
             checkOpen();
@@ -650,6 +699,7 @@ public class DelegatingConnection extends AbandonedTrace
         }
     }
 
+    @Override
     public void setClientInfo(Properties properties) throws SQLClientInfoException {
         try {
             checkOpen();
@@ -663,6 +713,7 @@ public class DelegatingConnection extends AbandonedTrace
         }
     }
 
+    @Override
     public Properties getClientInfo() throws SQLException {
         checkOpen();
         try {
@@ -674,6 +725,7 @@ public class DelegatingConnection extends AbandonedTrace
         }
     }
 
+    @Override
     public String getClientInfo(String name) throws SQLException {
         checkOpen();
         try {

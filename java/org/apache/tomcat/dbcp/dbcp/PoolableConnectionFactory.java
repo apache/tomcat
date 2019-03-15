@@ -578,6 +578,7 @@ public class PoolableConnectionFactory implements PoolableObjectFactory {
         _defaultCatalog = defaultCatalog;
     }
 
+    @Override
     public Object makeObject() throws Exception {
         Connection conn = _connFactory.createConnection();
         if (conn == null) {
@@ -623,12 +624,14 @@ public class PoolableConnectionFactory implements PoolableObjectFactory {
         }
     }
 
+    @Override
     public void destroyObject(Object obj) throws Exception {
         if(obj instanceof PoolableConnection) {
             ((PoolableConnection)obj).reallyClose();
         }
     }
 
+    @Override
     public boolean validateObject(Object obj) {
         if(obj instanceof Connection) {
             try {
@@ -678,6 +681,7 @@ public class PoolableConnectionFactory implements PoolableObjectFactory {
         }
     }
 
+    @Override
     public void passivateObject(Object obj) throws Exception {
         if(obj instanceof Connection) {
             Connection conn = (Connection)obj;
@@ -694,6 +698,7 @@ public class PoolableConnectionFactory implements PoolableObjectFactory {
         }
     }
 
+    @Override
     public void activateObject(Object obj) throws Exception {
         if(obj instanceof DelegatingConnection) {
             ((DelegatingConnection)obj).activate();

@@ -30,10 +30,12 @@ public class SharedPoolDataSourceFactory
     private static final String SHARED_POOL_CLASSNAME =
         SharedPoolDataSource.class.getName();
 
+    @Override
     protected boolean isCorrectClass(String className) {
         return SHARED_POOL_CLASSNAME.equals(className);
     }
 
+    @Override
     protected InstanceKeyDataSource getNewInstance(Reference ref) {
         SharedPoolDataSource spds = new SharedPoolDataSource();
         RefAddr ra = ref.get("maxActive");

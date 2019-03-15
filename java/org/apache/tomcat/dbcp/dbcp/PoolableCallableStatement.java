@@ -70,6 +70,7 @@ public class PoolableCallableStatement extends DelegatingCallableStatement imple
     /**
      * Returns the CallableStatement to the pool.  If {{@link #isClosed()}, this is a No-op.
      */
+    @Override
     public void close() throws SQLException {
         // calling close twice should have no effect
         if (!isClosed()) {
@@ -89,6 +90,7 @@ public class PoolableCallableStatement extends DelegatingCallableStatement imple
      * Activates after retrieval from the pool. Adds a trace for this CallableStatement to the Connection
      * that created it.
      */
+    @Override
     protected void activate() throws SQLException {
         _closed = false;
         if( _conn != null ) {
@@ -101,6 +103,7 @@ public class PoolableCallableStatement extends DelegatingCallableStatement imple
      * Passivates to prepare for return to the pool.  Removes the trace associated with this CallableStatement
      * from the Connection that created it.  Also closes any associated ResultSets.
      */
+    @Override
     protected void passivate() throws SQLException {
         _closed = true;
         if( _conn != null ) {
