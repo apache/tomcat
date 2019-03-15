@@ -69,6 +69,11 @@
         target, return a file size of <code>-</code> rather than
         <code>1k</code>. (markt)
       </fix>
+      <fix>
+        <bug>63251</bug>: Implement a work-around for a known JRE bug (<a
+        href="https://bugs.openjdk.java.net/browse/JDK-8194653">JDK-8194653</a>)
+        that may cause a dead-lock when Tomcat starts. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">

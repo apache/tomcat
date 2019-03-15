@@ -18,6 +18,7 @@ package org.apache.juli.logging;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.nio.file.FileSystems;
 import java.util.ServiceLoader;
 import java.util.logging.LogManager;
 
@@ -71,6 +72,19 @@ public class LogFactory {
      * Private constructor that is not available for public use.
      */
     private LogFactory() {
+        /*
+         * Work-around known a JRE bug.
+         * https://bugs.openjdk.java.net/browse/JDK-8194653
+         *
+         * Pre-load the default file system. No performance impact as we need to
+         * load the default file system anyway. Just do it earlier to avoid the
+         * potential deadlock.
+         *
+         * This can be removed once the oldest JRE supported by Tomcat includes
+         * a fix.
+         */
+        FileSystems.getDefault();
+
         // Look via a ServiceLoader for a Log implementation that has a
         // constructor taking the String name.
         ServiceLoader<Log> logLoader = ServiceLoader.load(Log.class);
