@@ -24,7 +24,6 @@ import java.util.NoSuchElementException;
 import java.util.Stack;
 
 import org.apache.tomcat.dbcp.pool.BaseKeyedObjectPool;
-import org.apache.tomcat.dbcp.pool.KeyedObjectPool;
 import org.apache.tomcat.dbcp.pool.KeyedPoolableObjectFactory;
 import org.apache.tomcat.dbcp.pool.PoolUtils;
 
@@ -49,7 +48,7 @@ import org.apache.tomcat.dbcp.pool.PoolUtils;
  * @see Stack
  * @since Pool 1.0
  */
-public class StackKeyedObjectPool<K, V> extends BaseKeyedObjectPool<K, V> implements KeyedObjectPool<K, V> {
+public class StackKeyedObjectPool<K, V> extends BaseKeyedObjectPool<K, V> {
     /**
      * Create a new pool using no factory.
      * Clients must first set the {@link #setFactory factory} or

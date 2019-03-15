@@ -1154,7 +1154,7 @@ class CursorableLinkedList<E> implements List<E>, Serializable {
         }
     }
 
-    public class Cursor extends ListIter implements ListIterator<E> {
+    public class Cursor extends ListIter {
         boolean _valid = false;
 
         Cursor(int index) {
@@ -1249,7 +1249,7 @@ class CursorableLinkedList<E> implements List<E>, Serializable {
 
 }
 
-class CursorableSubList<E> extends CursorableLinkedList<E> implements List<E> {
+class CursorableSubList<E> extends CursorableLinkedList<E> {
 
     //--- constructors -----------------------------------------------
 

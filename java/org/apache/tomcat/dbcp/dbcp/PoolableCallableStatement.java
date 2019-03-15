@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -34,7 +34,7 @@ import org.apache.tomcat.dbcp.pool.KeyedObjectPool;
  * @see PoolingConnection
  * @since 1.3
  */
-public class PoolableCallableStatement extends DelegatingCallableStatement implements CallableStatement {
+public class PoolableCallableStatement extends DelegatingCallableStatement {
 
     /**
      * The {@link KeyedObjectPool} from which this CallableStatement was obtained.
@@ -48,7 +48,7 @@ public class PoolableCallableStatement extends DelegatingCallableStatement imple
 
     /**
      * Constructor.
-     * 
+     *
      * @param stmt the underlying {@link CallableStatement}
      * @param key the key for this statement in the {@link KeyedObjectPool}
      * @param pool the {@link KeyedObjectPool} from which this CallableStatement was obtained
@@ -59,7 +59,7 @@ public class PoolableCallableStatement extends DelegatingCallableStatement imple
         _pool = pool;
         _key = key;
 
-        // Remove from trace now because this statement will be 
+        // Remove from trace now because this statement will be
         // added by the activate method.
         if(_conn != null) {
             _conn.removeTrace(this);

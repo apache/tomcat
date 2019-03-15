@@ -45,7 +45,7 @@ import org.apache.tomcat.dbcp.pool.PoolableObjectFactory;
  * @author Sandy McArthur
  * @since Pool 1.0
  */
-public class StackObjectPool<T> extends BaseObjectPool<T> implements ObjectPool<T> {
+public class StackObjectPool<T> extends BaseObjectPool<T> {
     /**
      * Create a new pool using no factory. Clients must first
      * {@link #setFactory(PoolableObjectFactory) set the factory} or

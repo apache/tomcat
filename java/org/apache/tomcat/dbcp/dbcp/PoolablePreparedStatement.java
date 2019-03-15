@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -37,7 +37,7 @@ import org.apache.tomcat.dbcp.pool.KeyedObjectPool;
  * @author James House
  * @author Dirk Verbeeck
  */
-public class PoolablePreparedStatement extends DelegatingPreparedStatement implements PreparedStatement {
+public class PoolablePreparedStatement extends DelegatingPreparedStatement {
     /**
      * The {@link KeyedObjectPool} from which I was obtained.
      */
@@ -62,7 +62,7 @@ public class PoolablePreparedStatement extends DelegatingPreparedStatement imple
         _pool = pool;
         _key = key;
 
-        // Remove from trace now because this statement will be 
+        // Remove from trace now because this statement will be
         // added by the activate method.
         if(_conn != null) {
             _conn.removeTrace(this);
@@ -105,7 +105,7 @@ public class PoolablePreparedStatement extends DelegatingPreparedStatement imple
             }
         }
     }
-    
+
     @Override
     protected void activate() throws SQLException{
         _closed = false;
@@ -114,7 +114,7 @@ public class PoolablePreparedStatement extends DelegatingPreparedStatement imple
         }
         super.activate();
     }
-  
+
     @Override
     protected void passivate() throws SQLException {
         _closed = true;
@@ -137,7 +137,7 @@ public class PoolablePreparedStatement extends DelegatingPreparedStatement imple
         if (batchAdded) {
             clearBatch();
         }
-        
+
         super.passivate();
     }
 

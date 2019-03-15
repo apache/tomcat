@@ -40,7 +40,7 @@ import org.apache.tomcat.dbcp.pool.PoolUtils;
  * @author Sandy McArthur
  * @since Pool 1.0
  */
-public class SoftReferenceObjectPool<T> extends BaseObjectPool<T> implements ObjectPool<T> {
+public class SoftReferenceObjectPool<T> extends BaseObjectPool<T> {
     /**
      * Create a <code>SoftReferenceObjectPool</code> without a factory.
      * {@link #setFactory(PoolableObjectFactory) setFactory} should be called

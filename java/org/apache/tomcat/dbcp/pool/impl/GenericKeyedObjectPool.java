@@ -30,7 +30,6 @@ import java.util.TimerTask;
 import java.util.TreeMap;
 
 import org.apache.tomcat.dbcp.pool.BaseKeyedObjectPool;
-import org.apache.tomcat.dbcp.pool.KeyedObjectPool;
 import org.apache.tomcat.dbcp.pool.KeyedPoolableObjectFactory;
 import org.apache.tomcat.dbcp.pool.PoolUtils;
 
@@ -203,7 +202,7 @@ import org.apache.tomcat.dbcp.pool.PoolUtils;
  * @author Sandy McArthur
  * @since Pool 1.0
  */
-public class GenericKeyedObjectPool<K, V> extends BaseKeyedObjectPool<K, V> implements KeyedObjectPool<K, V> {
+public class GenericKeyedObjectPool<K, V> extends BaseKeyedObjectPool<K, V> {
 
     //--- public constants -------------------------------------------
 
