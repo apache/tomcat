@@ -1493,8 +1493,49 @@
     <fail if="test.result.failure" message='Some tests completed with a Failure. See ${tomcat.build}/logs for details, search for "FAILED".' />
   </target>
 
+  <target name="test-only" description="Runs the JUnit test cases without additional processing"
+          depends="test-only-nio,test-only-nio2,test-only-apr" >
+    <fileset id="test.result.skippedtests" dir="${test.reports}" includes="*.txt">
+      <not>
+        <contains text="Skipped: 0" />
+      </not>
+    </fileset>
+    <fileset id="test.result.failedtests" dir="${test.reports}" includes="*.txt">
+      <not>
+        <contains text="Failures: 0, Errors: 0" />
+      </not>
+    </fileset>
+    <concat>
+      <header>Testsuites with skipped tests:${line.separator}</header>
+      <string>${toString:test.result.skippedtests}</string>
+      <filterchain>
+        <tokenfilter delimOutput="${line.separator}">
+          <stringtokenizer delims=";"/>
+        </tokenfilter>
+      </filterchain>
+    </concat>
+    <concat>
+      <header>Testsuites with failed tests:${line.separator}</header>
+      <string>${toString:test.result.failedtests}</string>
+      <filterchain>
+        <tokenfilter delimOutput="${line.separator}">
+          <stringtokenizer delims=";"/>
+        </tokenfilter>
+      </filterchain>
+    </concat>
+
+  	<fail if="test.result.error" message='Some tests completed with an Error. See ${tomcat.build}/logs for details, search for "ERROR".' />
+    <fail if="test.result.failure" message='Some tests completed with a Failure. See ${tomcat.build}/logs for details, search for "FAILED".' />
+  </target>
+
   <target name="test-nio" description="Runs the JUnit test cases for NIO. Does not stop on errors."
           depends="test-compile,deploy,cobertura-instrument,test-openssl-exists" if="${execute.test.nio}">
+    <runtests protocol="org.apache.coyote.http11.Http11NioProtocol"
+              extension=".NIO" />
+  </target>
+
+  <target name="test-only-nio" description="Runs the JUnit test cases for NIO. Does not stop on errors."
+          depends="cobertura-disabled,test-openssl-exists" if="${execute.test.nio}">
     <runtests protocol="org.apache.coyote.http11.Http11NioProtocol"
               extension=".NIO" />
   </target>
@@ -1505,9 +1546,21 @@
               extension=".NIO2" />
   </target>
 
+  <target name="test-only-nio2" description="Runs the JUnit test cases for NIO2. Does not stop on errors."
+          depends="cobertura-disabled,test-openssl-exists" if="${execute.test.nio2}">
+    <runtests protocol="org.apache.coyote.http11.Http11Nio2Protocol"
+              extension=".NIO2" />
+  </target>
+
   <target name="test-apr" description="Runs the JUnit test cases for APR. Does not stop on errors."
           depends="test-compile,deploy,test-apr-exists,cobertura-instrument,test-openssl-exists"
           if="${apr.exists}">
+    <runtests protocol="org.apache.coyote.http11.Http11AprProtocol"
+              extension=".APR" />
+  </target>
+
+  <target name="test-only-apr" description="Runs the JUnit test cases for APR. Does not stop on errors."
+          depends="cobertura-disabled,test-openssl-exists" if="${execute.test.apr}">
     <runtests protocol="org.apache.coyote.http11.Http11AprProtocol"
               extension=".APR" />
   </target>
