@@ -122,6 +122,15 @@
       </add>
     </changelog>
   </subsection>
+  <subsection name="Web applications">
+    <changelog>
+      <fix>
+        <bug>63184</bug>: Expand the SSI documentation to provide more
+        information on the supported directives and their attributes. Patch
+        provided by nightwatchcyber. (markt)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 7.0.93 (violetagg)" rtext="released 2019-02-21">
   <subsection name="Catalina">
