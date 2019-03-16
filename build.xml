@@ -2065,7 +2065,13 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
             -->
             <filename name="**/build.properties"/>
             <filename name="**/mvn.properties"/>
-            <filename name="**/*.iml" />
+            <and>
+              <!-- Don't exclude the ide support sample files for idea -->
+              <filename name="**/*.iml" />
+              <not>
+                <filename name="res/ide-support/idea/**" />
+              </not>
+            </and>
             <filename name="**/*.asc" />
             <filename name="**/*.tmp" />
             <filename name="**/*.jj" />
