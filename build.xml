@@ -508,7 +508,7 @@
   <target name="echoproperties">
     <echoproperties/>
   </target>
-  
+
   <target name="build-prepare">
 
     <!-- Required so we can compile -->
