@@ -152,6 +152,10 @@
         Update the copy of Apache Commons Pool to 1.6.x to pick up the generics
         changes. (markt)
       </scode>
+      <add>
+        Add JDBC 4.1 support to the default database connection pool provided by
+        Tomcat. (markt)
+      </add>
     </changelog>
   </subsection>
 </section>
