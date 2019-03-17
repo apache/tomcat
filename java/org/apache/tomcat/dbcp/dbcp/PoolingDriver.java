@@ -94,6 +94,7 @@ public class PoolingDriver implements Driver {
      *
      * @deprecated This will be removed in a future version of DBCP.
      */
+    @Deprecated
     public synchronized ObjectPool getPool(String name) {
         try {
             return getConnectionPool(name);

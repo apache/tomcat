@@ -39,6 +39,7 @@ public class StackObjectPoolFactory<T> implements ObjectPoolFactory<T> {
      * @see StackObjectPool#StackObjectPool()
      * @deprecated to be removed in pool 2.0 - use {@link #StackObjectPoolFactory(PoolableObjectFactory)}
      */
+    @Deprecated
     public StackObjectPoolFactory() {
         this(null,StackObjectPool.DEFAULT_MAX_SLEEPING,StackObjectPool.DEFAULT_INIT_SLEEPING_CAPACITY);
     }

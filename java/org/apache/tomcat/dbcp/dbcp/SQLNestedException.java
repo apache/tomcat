@@ -25,6 +25,7 @@ import java.sql.SQLException;
  * @author Dirk Verbeeck
  * @deprecated Use '(SQLException) new SQLException(msg).initCause(e)' instead; this class will be removed in DBCP 2.0
  */
+@Deprecated
 public class SQLNestedException extends SQLException {
 
     private static final long serialVersionUID = 1046151479543081202L;

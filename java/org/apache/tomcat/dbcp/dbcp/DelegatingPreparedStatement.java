@@ -179,6 +179,7 @@ public class DelegatingPreparedStatement extends DelegatingStatement
     { checkOpen(); try { ((PreparedStatement)_stmt).setAsciiStream(parameterIndex,x,length); } catch (SQLException e) { handleException(e); } }
 
     /** @deprecated */
+    @Deprecated
     @Override
     public void setUnicodeStream(int parameterIndex, java.io.InputStream x, int length) throws SQLException
     { checkOpen(); try { ((PreparedStatement)_stmt).setUnicodeStream(parameterIndex,x,length); } catch (SQLException e) { handleException(e); } }
