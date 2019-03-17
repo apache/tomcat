@@ -39,6 +39,7 @@ import java.sql.SQLXML;
 import java.sql.Struct;
 import java.util.Collections;
 import java.util.Properties;
+import java.util.concurrent.Executor;
 /* JDBC_4_ANT_KEY_END */
 
 /**
@@ -737,4 +738,36 @@ public class DelegatingConnection extends AbandonedTrace
     }
 /* JDBC_4_ANT_KEY_END */
 
+    /* JDBC_4_1_ANT_KEY_BEGIN */
+    // No @Override else it won't compile with Java 6
+    public void setSchema(String schema) throws SQLException {
+        checkOpen();
+        _conn.setSchema(schema);
+    }
+
+    // No @Override else it won't compile with Java 6
+    public String getSchema() throws SQLException {
+        checkOpen();
+        return _conn.getSchema();
+    }
+
+    // No @Override else it won't compile with Java 6
+    public void abort(Executor executor) throws SQLException {
+        checkOpen();
+        _conn.abort(executor);
+    }
+
+    // No @Override else it won't compile with Java 6
+    public void setNetworkTimeout(Executor executor, int milliseconds)
+            throws SQLException {
+        checkOpen();
+        _conn.setNetworkTimeout(executor, milliseconds);
+    }
+
+    // No @Override else it won't compile with Java 6
+    public int getNetworkTimeout() throws SQLException {
+        checkOpen();
+        return _conn.getNetworkTimeout();
+    }
+    /* JDBC_4_1_ANT_KEY_END */
 }

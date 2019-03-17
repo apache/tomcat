@@ -774,4 +774,31 @@ public class DelegatingCallableStatement extends DelegatingPreparedStatement
     }
 /* JDBC_4_ANT_KEY_END */
 
+    /* JDBC_4_1_ANT_KEY_BEGIN */
+    // No @Override else it won't compile with Java 6
+    public <T> T getObject(int parameterIndex, Class<T> type)
+            throws SQLException {
+        checkOpen();
+        try {
+            return ((CallableStatement)_stmt).getObject(parameterIndex, type);
+        }
+        catch (SQLException e) {
+            handleException(e);
+            return null;
+        }
+    }
+
+    // No @Override else it won't compile with Java 6
+    public <T> T getObject(String parameterName, Class<T> type)
+            throws SQLException {
+        checkOpen();
+        try {
+            return ((CallableStatement)_stmt).getObject(parameterName, type);
+        }
+        catch (SQLException e) {
+            handleException(e);
+            return null;
+        }
+    }
+    /* JDBC_4_1_ANT_KEY_END */
 }

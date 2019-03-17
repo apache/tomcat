@@ -19,10 +19,13 @@ package org.apache.tomcat.dbcp.dbcp.cpdsadapter;
 
 import java.util.Hashtable;
 import java.util.Properties;
+import java.util.logging.Logger;
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.sql.SQLFeatureNotSupportedException;
+
 import javax.sql.PooledConnection;
 import javax.sql.ConnectionPoolDataSource;
 import javax.naming.Name;
@@ -726,4 +729,11 @@ public class DriverAdapterCPDS
     {
         _maxPreparedStatements = maxPreparedStatements;
     }
+
+    /* JDBC_4_1_ANT_KEY_BEGIN */
+    // No @Override else it won't compile with Java 6
+    public Logger getParentLogger() throws SQLFeatureNotSupportedException {
+        throw new SQLFeatureNotSupportedException();
+    }
+    /* JDBC_4_1_ANT_KEY_END */
 }

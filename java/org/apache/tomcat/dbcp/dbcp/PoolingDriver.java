@@ -27,6 +27,7 @@ import java.sql.DriverManager;
 import java.sql.DriverPropertyInfo;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.SQLFeatureNotSupportedException;
 import java.sql.SQLWarning;
 import java.sql.Statement;
 import java.util.HashMap;
@@ -34,6 +35,8 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Properties;
 import java.util.Set;
+import java.util.logging.Logger;
+
 import org.apache.tomcat.dbcp.jocl.JOCLContentHandler;
 import org.apache.tomcat.dbcp.pool.ObjectPool;
 import org.xml.sax.SAXException;
@@ -242,6 +245,13 @@ public class PoolingDriver implements Driver {
     public DriverPropertyInfo[] getPropertyInfo(String url, Properties info) {
         return new DriverPropertyInfo[0];
     }
+
+    /* JDBC_4_1_ANT_KEY_BEGIN */
+    // No @Override else it won't compile with Java 6
+    public Logger getParentLogger() throws SQLFeatureNotSupportedException {
+        throw new SQLFeatureNotSupportedException();
+    }
+    /* JDBC_4_1_ANT_KEY_END */
 
     /** My URL prefix */
     protected static final String URL_PREFIX = "jdbc:apache:commons:dbcp:";

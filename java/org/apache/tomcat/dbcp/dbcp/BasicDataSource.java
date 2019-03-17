@@ -19,6 +19,7 @@ package org.apache.tomcat.dbcp.dbcp;
 
 import java.io.PrintWriter;
 import java.util.Properties;
+import java.util.logging.Logger;
 import java.util.Collection;
 import java.util.List;
 import java.util.ArrayList;
@@ -28,6 +29,8 @@ import java.sql.Connection;
 import java.sql.Driver;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.sql.SQLFeatureNotSupportedException;
+
 import javax.sql.DataSource;
 
 import org.apache.tomcat.dbcp.pool.KeyedObjectPoolFactory;
@@ -1471,6 +1474,13 @@ public class BasicDataSource implements DataSource {
     }
     /* JDBC_4_ANT_KEY_END */
 
+
+    /* JDBC_4_1_ANT_KEY_BEGIN */
+    // No @Override else it won't compile with Java 6
+    public Logger getParentLogger() throws SQLFeatureNotSupportedException {
+        throw new SQLFeatureNotSupportedException();
+    }
+    /* JDBC_4_1_ANT_KEY_END */
 
     // ------------------------------------------------------ Protected Methods
 

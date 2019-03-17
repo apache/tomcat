@@ -1382,4 +1382,31 @@ public class DelegatingDatabaseMetaData extends AbandonedTrace
 
     /* JDBC_4_ANT_KEY_END */
 
+    /* JDBC_4_1_ANT_KEY_BEGIN */
+    // No @Override else it won't compile with Java 6
+    public ResultSet getPseudoColumns(String catalog, String schemaPattern,
+            String tableNamePattern, String columnNamePattern)
+            throws SQLException {
+        _conn.checkOpen();
+        try {
+            return DelegatingResultSet.wrapResultSet(_conn,
+                    _meta.getPseudoColumns(catalog, schemaPattern,
+                            tableNamePattern, columnNamePattern));
+        } catch (SQLException e) {
+            handleException(e);
+            throw new AssertionError();
+        }
+    }
+
+    // No @Override else it won't compile with Java 6
+    public boolean generatedKeyAlwaysReturned() throws SQLException {
+        _conn.checkOpen();
+        try {
+            return _meta.generatedKeyAlwaysReturned();
+        } catch (SQLException e) {
+            handleException(e);
+            throw new AssertionError();
+        }
+    }
+    /* JDBC_4_1_ANT_KEY_END */
 }

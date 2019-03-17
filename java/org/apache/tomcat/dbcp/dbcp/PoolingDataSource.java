@@ -23,10 +23,13 @@ import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.SQLFeatureNotSupportedException;
 import java.sql.SQLWarning;
 import java.sql.Statement;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.logging.Logger;
+
 import javax.sql.DataSource;
 
 import org.apache.tomcat.dbcp.pool.ObjectPool;
@@ -94,6 +97,13 @@ public class PoolingDataSource implements DataSource {
         throw new SQLException("PoolingDataSource is not a wrapper.");
     }
     /* JDBC_4_ANT_KEY_END */
+
+    /* JDBC_4_1_ANT_KEY_BEGIN */
+    // No @Override else it won't compile with Java 6
+    public Logger getParentLogger() throws SQLFeatureNotSupportedException {
+        throw new SQLFeatureNotSupportedException();
+    }
+    /* JDBC_4_1_ANT_KEY_END */
 
     //--- DataSource methods -----------------------------------------
 
