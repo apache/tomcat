@@ -29,6 +29,9 @@ import java.sql.SQLException;
 import java.io.Reader;
 import java.sql.Statement;
 import java.util.Map;
+
+import org.apache.tomcat.util.compat.JreCompat;
+
 import java.sql.Connection;
 import java.sql.Ref;
 import java.sql.Blob;
@@ -1271,7 +1274,7 @@ public class DelegatingResultSet extends AbandonedTrace implements ResultSet {
     // No @Override else it won't compile with Java 6
     public <T> T getObject(int columnIndex, Class<T> type) throws SQLException {
         try {
-            return _res.getObject(columnIndex, type);
+            return JreCompat.getInstance().getObject(_res, columnIndex, type);
         } catch (SQLException e) {
             handleException(e);
             return null;
@@ -1282,7 +1285,7 @@ public class DelegatingResultSet extends AbandonedTrace implements ResultSet {
     public <T> T getObject(String columnLabel, Class<T> type)
             throws SQLException {
         try {
-            return _res.getObject(columnLabel, type);
+            return JreCompat.getInstance().getObject(_res, columnLabel, type);
         } catch (SQLException e) {
             handleException(e);
             return null;

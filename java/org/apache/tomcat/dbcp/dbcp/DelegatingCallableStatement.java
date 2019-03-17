@@ -24,6 +24,9 @@ import java.sql.Date;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.Map;
+
+import org.apache.tomcat.util.compat.JreCompat;
+
 import java.sql.Ref;
 import java.sql.Blob;
 import java.sql.Clob;
@@ -772,11 +775,10 @@ public class DelegatingCallableStatement extends DelegatingPreparedStatement
 
     /* JDBC_4_1_ANT_KEY_BEGIN */
     // No @Override else it won't compile with Java 6
-    public <T> T getObject(int parameterIndex, Class<T> type)
-            throws SQLException {
+    public <T> T getObject(int parameterIndex, Class<T> type) throws SQLException {
         checkOpen();
         try {
-            return ((CallableStatement)_stmt).getObject(parameterIndex, type);
+            return JreCompat.getInstance().getObject((CallableStatement)_stmt, parameterIndex, type);
         }
         catch (SQLException e) {
             handleException(e);
@@ -785,11 +787,10 @@ public class DelegatingCallableStatement extends DelegatingPreparedStatement
     }
 
     // No @Override else it won't compile with Java 6
-    public <T> T getObject(String parameterName, Class<T> type)
-            throws SQLException {
+    public <T> T getObject(String parameterName, Class<T> type) throws SQLException {
         checkOpen();
         try {
-            return ((CallableStatement)_stmt).getObject(parameterName, type);
+            return JreCompat.getInstance().getObject((CallableStatement)_stmt, parameterName, type);
         }
         catch (SQLException e) {
             handleException(e);

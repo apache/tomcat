@@ -23,6 +23,8 @@ import java.sql.ResultSet;
 import java.sql.RowIdLifetime;
 import java.sql.SQLException;
 
+import org.apache.tomcat.util.compat.JreCompat;
+
 /**
  * <p>A base delegating implementation of {@link DatabaseMetaData}.</p>
  *
@@ -1385,9 +1387,8 @@ public class DelegatingDatabaseMetaData extends AbandonedTrace
             throws SQLException {
         _conn.checkOpen();
         try {
-            return DelegatingResultSet.wrapResultSet(_conn,
-                    _meta.getPseudoColumns(catalog, schemaPattern,
-                            tableNamePattern, columnNamePattern));
+            return JreCompat.getInstance().getPseudoColumns(_meta,
+                    catalog, schemaPattern, tableNamePattern, columnNamePattern);
         } catch (SQLException e) {
             handleException(e);
             throw new AssertionError();
@@ -1398,7 +1399,7 @@ public class DelegatingDatabaseMetaData extends AbandonedTrace
     public boolean generatedKeyAlwaysReturned() throws SQLException {
         _conn.checkOpen();
         try {
-            return _meta.generatedKeyAlwaysReturned();
+            return JreCompat.getInstance().generatedKeyAlwaysReturned(_meta);
         } catch (SQLException e) {
             handleException(e);
             throw new AssertionError();

@@ -40,6 +40,8 @@ import java.util.Collections;
 import java.util.Properties;
 import java.util.concurrent.Executor;
 
+import org.apache.tomcat.util.compat.JreCompat;
+
 /**
  * A base delegating implementation of {@link Connection}.
  * <p>
@@ -736,32 +738,52 @@ public class DelegatingConnection extends AbandonedTrace
     // No @Override else it won't compile with Java 6
     public void setSchema(String schema) throws SQLException {
         checkOpen();
-        _conn.setSchema(schema);
+        try {
+            JreCompat.getInstance().setSchema(_conn, schema);
+        } catch (SQLException e) {
+            handleException(e);
+        }
     }
 
     // No @Override else it won't compile with Java 6
     public String getSchema() throws SQLException {
         checkOpen();
-        return _conn.getSchema();
+        try {
+            return JreCompat.getInstance().getSchema(_conn);
+        } catch (SQLException e) {
+            handleException(e);
+            return null;
+        }
     }
 
     // No @Override else it won't compile with Java 6
     public void abort(Executor executor) throws SQLException {
         checkOpen();
-        _conn.abort(executor);
+        try {
+            JreCompat.getInstance().abort(_conn, executor);
+        } catch (SQLException e) {
+            handleException(e);
+        }
     }
 
     // No @Override else it won't compile with Java 6
     public void setNetworkTimeout(Executor executor, int milliseconds)
             throws SQLException {
-        checkOpen();
-        _conn.setNetworkTimeout(executor, milliseconds);
+        try {
+            JreCompat.getInstance().setNetworkTimeout(_conn, executor, milliseconds);
+        } catch (SQLException e) {
+            handleException(e);
+        }
     }
 
     // No @Override else it won't compile with Java 6
     public int getNetworkTimeout() throws SQLException {
-        checkOpen();
-        return _conn.getNetworkTimeout();
+        try {
+            return JreCompat.getInstance().getNetworkTimeout(_conn);
+        } catch (SQLException e) {
+            handleException(e);
+            return 0;
+        }
     }
     /* JDBC_4_1_ANT_KEY_END */
 }

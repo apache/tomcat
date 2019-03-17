@@ -22,8 +22,16 @@ import java.io.OutputStream;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLConnection;
+import java.sql.CallableStatement;
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.SQLFeatureNotSupportedException;
+import java.sql.Statement;
 import java.util.Deque;
 import java.util.Locale;
+import java.util.concurrent.Executor;
 import java.util.jar.JarFile;
 import java.util.zip.GZIPOutputStream;
 
@@ -136,6 +144,92 @@ public class JreCompat {
         throw new UnsupportedOperationException(
                 sm.getString("jreCompat.noFlushableGzipOutputStream"));
     }
+
+
+    @SuppressWarnings("unused")
+    public <T> T getObject(CallableStatement callableStatement, int parameterIndex, Class<T> type)
+            throws SQLException {
+        throw new SQLFeatureNotSupportedException();
+    }
+
+
+    @SuppressWarnings("unused")
+    public <T> T getObject(CallableStatement callableStatement, String parameterName, Class<T> type)
+            throws SQLException {
+        throw new SQLFeatureNotSupportedException();
+    }
+
+
+    @SuppressWarnings("unused")
+    public void setSchema(Connection connection, String schema) throws SQLException {
+        throw new SQLFeatureNotSupportedException();
+    }
+
+
+    @SuppressWarnings("unused")
+    public String getSchema(Connection connection) throws SQLException {
+        throw new SQLFeatureNotSupportedException();
+    }
+
+
+    @SuppressWarnings("unused")
+    public void abort(Connection connection, Executor executor) throws SQLException {
+        throw new SQLFeatureNotSupportedException();
+    }
+
+
+    @SuppressWarnings("unused")
+    public void setNetworkTimeout(Connection connection, Executor executor, int milliseconds)
+            throws SQLException {
+        throw new SQLFeatureNotSupportedException();
+    }
+
+
+    @SuppressWarnings("unused")
+    public int getNetworkTimeout(Connection connection) throws SQLException {
+        throw new SQLFeatureNotSupportedException();
+    }
+
+
+    @SuppressWarnings("unused")
+    public ResultSet getPseudoColumns(DatabaseMetaData databaseMetaData, String catalog,
+            String schemaPattern, String tableNamePattern, String columnNamePattern)
+                    throws SQLException {
+        throw new SQLFeatureNotSupportedException();
+    }
+
+
+    @SuppressWarnings("unused")
+    public boolean generatedKeyAlwaysReturned(DatabaseMetaData databaseMetaData) throws SQLException {
+        throw new SQLFeatureNotSupportedException();
+    }
+
+
+    @SuppressWarnings("unused")
+    public <T> T getObject(ResultSet resultSet, int parameterIndex, Class<T> type)
+            throws SQLException {
+        throw new SQLFeatureNotSupportedException();
+    }
+
+
+    @SuppressWarnings("unused")
+    public <T> T getObject(ResultSet resultSet, String parameterName, Class<T> type)
+            throws SQLException {
+        throw new SQLFeatureNotSupportedException();
+    }
+
+
+    @SuppressWarnings("unused")
+    public void closeOnCompletion(Statement statement) throws SQLException {
+        throw new SQLFeatureNotSupportedException();
+    }
+
+
+    @SuppressWarnings("unused")
+    public boolean isCloseOnCompletion(Statement statement) throws SQLException {
+        throw new SQLFeatureNotSupportedException();
+    }
+
 
     // Java 6 implementation of Java 8 methods
 

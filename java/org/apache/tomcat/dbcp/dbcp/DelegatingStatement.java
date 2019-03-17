@@ -24,6 +24,8 @@ import java.sql.SQLWarning;
 import java.sql.Statement;
 import java.util.List;
 
+import org.apache.tomcat.util.compat.JreCompat;
+
 /**
  * A base delegating implementation of {@link Statement}.
  * <p>
@@ -532,13 +534,22 @@ public class DelegatingStatement extends AbandonedTrace implements Statement {
     // No @Override else it won't compile with Java 6
     public void closeOnCompletion() throws SQLException {
         checkOpen();
-        _stmt.closeOnCompletion();
+        try {
+            JreCompat.getInstance().closeOnCompletion(_stmt);
+        } catch (SQLException e) {
+            handleException(e);
+        }
     }
 
     // No @Override else it won't compile with Java 6
     public boolean isCloseOnCompletion() throws SQLException {
         checkOpen();
-        return _stmt.isCloseOnCompletion();
+        try {
+            return JreCompat.getInstance().isCloseOnCompletion(_stmt);
+        } catch (SQLException e) {
+            handleException(e);
+            return false;
+        }
     }
     /* JDBC_4_1_ANT_KEY_END */
 }
