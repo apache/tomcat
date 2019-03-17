@@ -1462,7 +1462,6 @@ public class BasicDataSource implements DataSource {
         return closed;
     }
 
-    /* JDBC_4_ANT_KEY_BEGIN */
     @Override
     public boolean isWrapperFor(Class<?> iface) throws SQLException {
         return false;
@@ -1472,7 +1471,6 @@ public class BasicDataSource implements DataSource {
     public <T> T unwrap(Class<T> iface) throws SQLException {
         throw new SQLException("BasicDataSource is not a wrapper.");
     }
-    /* JDBC_4_ANT_KEY_END */
 
 
     /* JDBC_4_1_ANT_KEY_BEGIN */

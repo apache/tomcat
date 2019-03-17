@@ -32,11 +32,9 @@ import java.util.Calendar;
 import java.io.InputStream;
 import java.io.Reader;
 import java.sql.SQLException;
-/* JDBC_4_ANT_KEY_BEGIN */
 import java.sql.NClob;
 import java.sql.RowId;
 import java.sql.SQLXML;
-/* JDBC_4_ANT_KEY_END */
 
 /**
  * A base delegating implementation of {@link CallableStatement}.
@@ -409,7 +407,6 @@ public class DelegatingCallableStatement extends DelegatingPreparedStatement
     public URL getURL(String parameterName) throws SQLException
     { checkOpen(); try { return ((CallableStatement)_stmt).getURL(parameterName); } catch (SQLException e) { handleException(e); return null; } }
 
-/* JDBC_4_ANT_KEY_BEGIN */
 
     @Override
     public RowId getRowId(int parameterIndex) throws SQLException {
@@ -772,7 +769,6 @@ public class DelegatingCallableStatement extends DelegatingPreparedStatement
             handleException(e);
         }
     }
-/* JDBC_4_ANT_KEY_END */
 
     /* JDBC_4_1_ANT_KEY_BEGIN */
     // No @Override else it won't compile with Java 6

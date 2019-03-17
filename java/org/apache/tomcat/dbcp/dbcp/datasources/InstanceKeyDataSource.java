@@ -168,7 +168,6 @@ public abstract class InstanceKeyDataSource
 
     protected abstract PooledConnectionManager getConnectionManager(UserPassKey upkey);
 
-    /* JDBC_4_ANT_KEY_BEGIN */
     @Override
     public boolean isWrapperFor(Class<?> iface) throws SQLException {
         return false;
@@ -178,7 +177,6 @@ public abstract class InstanceKeyDataSource
     public <T> T unwrap(Class<T> iface) throws SQLException {
         throw new SQLException("InstanceKeyDataSource is not a wrapper.");
     }
-    /* JDBC_4_ANT_KEY_END */
 
     /* JDBC_4_1_ANT_KEY_BEGIN */
     // No @Override else it won't compile with Java 6

@@ -28,7 +28,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.sql.ResultSet;
-/* JDBC_4_ANT_KEY_BEGIN */
 import java.sql.Array;
 import java.sql.Blob;
 import java.sql.ClientInfoStatus;
@@ -40,7 +39,6 @@ import java.sql.Struct;
 import java.util.Collections;
 import java.util.Properties;
 import java.util.concurrent.Executor;
-/* JDBC_4_ANT_KEY_END */
 
 /**
  * A base delegating implementation of {@link Connection}.
@@ -65,10 +63,8 @@ import java.util.concurrent.Executor;
 public class DelegatingConnection extends AbandonedTrace
         implements Connection {
 
-/* JDBC_4_ANT_KEY_BEGIN */
     private static final Map<String, ClientInfoStatus> EMPTY_FAILED_PROPERTIES =
         Collections.<String, ClientInfoStatus>emptyMap();
-/* JDBC_4_ANT_KEY_END */
 
     /** My delegate {@link Connection}. */
     protected Connection _conn = null;
@@ -583,7 +579,6 @@ public class DelegatingConnection extends AbandonedTrace
         }
     }
 
-/* JDBC_4_ANT_KEY_BEGIN */
 
     @Override
     public boolean isWrapperFor(Class<?> iface) throws SQLException {
@@ -736,7 +731,6 @@ public class DelegatingConnection extends AbandonedTrace
             return null;
         }
     }
-/* JDBC_4_ANT_KEY_END */
 
     /* JDBC_4_1_ANT_KEY_BEGIN */
     // No @Override else it won't compile with Java 6

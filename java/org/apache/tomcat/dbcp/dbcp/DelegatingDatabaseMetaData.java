@@ -20,9 +20,7 @@ package org.apache.tomcat.dbcp.dbcp;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
-/* JDBC_4_ANT_KEY_BEGIN */
 import java.sql.RowIdLifetime;
-/* JDBC_4_ANT_KEY_END */
 import java.sql.SQLException;
 
 /**
@@ -1286,7 +1284,6 @@ public class DelegatingDatabaseMetaData extends AbandonedTrace
         catch (SQLException e) { handleException(e); return false; } }
     }
 
-    /* JDBC_4_ANT_KEY_BEGIN */
 
     @Override
     public boolean isWrapperFor(Class<?> iface) throws SQLException {
@@ -1380,7 +1377,6 @@ public class DelegatingDatabaseMetaData extends AbandonedTrace
         }
     }
 
-    /* JDBC_4_ANT_KEY_END */
 
     /* JDBC_4_1_ANT_KEY_BEGIN */
     // No @Override else it won't compile with Java 6

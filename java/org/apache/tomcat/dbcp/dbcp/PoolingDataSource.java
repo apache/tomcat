@@ -86,7 +86,6 @@ public class PoolingDataSource implements DataSource {
         this.accessToUnderlyingConnectionAllowed = allow;
     }
 
-    /* JDBC_4_ANT_KEY_BEGIN */
     @Override
     public boolean isWrapperFor(Class<?> iface) throws SQLException {
         return false;
@@ -96,7 +95,6 @@ public class PoolingDataSource implements DataSource {
     public <T> T unwrap(Class<T> iface) throws SQLException {
         throw new SQLException("PoolingDataSource is not a wrapper.");
     }
-    /* JDBC_4_ANT_KEY_END */
 
     /* JDBC_4_1_ANT_KEY_BEGIN */
     // No @Override else it won't compile with Java 6
