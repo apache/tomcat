@@ -127,6 +127,7 @@
         <allow pkg="org.apache.tomcat.dbcp.dbcp"/>
         <allow pkg="org.apache.tomcat.dbcp.jocl"/>
         <allow pkg="org.apache.tomcat.dbcp.pool"/>
+        <allow pkg="org.apache.tomcat.util.compat"/>
         <subpackage name="managed">
           <allow pkg="javax.transaction"/>
         </subpackage>
@@ -145,6 +146,7 @@
       <disallow pkg="org.apache.util.scan"/>
       <subpackage name="compat">
         <allow pkg="javax.annotation"/>
+        <disallow pkg="org.apache.tomcat.util.net"/>
       </subpackage>
       <subpackage name="scan">
         <allow pkg="org.apache.tomcat" exact-match="true"/>

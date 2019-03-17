@@ -20,8 +20,6 @@ import java.security.NoSuchAlgorithmException;
 
 import javax.net.ssl.SSLContext;
 
-import org.apache.tomcat.util.net.Constants;
-
 /**
  * This class checks for the availability of TLS features.
  */
@@ -32,7 +30,9 @@ public class TLS {
     static {
         boolean ok = false;
         try {
-            SSLContext.getInstance(Constants.SSL_PROTO_TLSv1_3);
+            // Don't use org.apache.tomcat.util.net.SSL_PROTO_TLSv1_3 as that
+            // creates an unwanted dependency
+            SSLContext.getInstance("TLSv1.3");
             ok = true;
         } catch (NoSuchAlgorithmException ex) {
         }
