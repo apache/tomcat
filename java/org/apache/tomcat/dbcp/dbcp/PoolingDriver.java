@@ -60,7 +60,8 @@ public class PoolingDriver implements Driver {
     }
 
     /** The map of registered pools. */
-    protected static final HashMap _pools = new HashMap();
+    protected static final HashMap<String, ObjectPool<? extends Connection>> _pools =
+            new HashMap<String, ObjectPool<? extends Connection>>();
 
     /** Controls access to the underlying connection */
     private static boolean accessToUnderlyingConnectionAllowed = false;
@@ -95,7 +96,7 @@ public class PoolingDriver implements Driver {
      * @deprecated This will be removed in a future version of DBCP.
      */
     @Deprecated
-    public synchronized ObjectPool getPool(String name) {
+    public synchronized ObjectPool<? extends Connection> getPool(String name) {
         try {
             return getConnectionPool(name);
         }
@@ -104,8 +105,8 @@ public class PoolingDriver implements Driver {
         }
     }
 
-    public synchronized ObjectPool getConnectionPool(String name) throws SQLException {
-        ObjectPool pool = (ObjectPool)(_pools.get(name));
+    public synchronized ObjectPool<? extends Connection> getConnectionPool(String name) throws SQLException {
+        ObjectPool<? extends Connection> pool = _pools.get(name);
         if(null == pool) {
             InputStream in = this.getClass().getResourceAsStream(String.valueOf(name) + ".jocl");
             if (in == null) {
@@ -142,12 +143,12 @@ public class PoolingDriver implements Driver {
         return pool;
     }
 
-    public synchronized void registerPool(String name, ObjectPool pool) {
+    public synchronized void registerPool(String name, ObjectPool<? extends Connection> pool) {
         _pools.put(name,pool);
     }
 
     public synchronized void closePool(String name) throws SQLException {
-        ObjectPool pool = (ObjectPool) _pools.get(name);
+        ObjectPool<? extends Connection> pool = _pools.get(name);
         if (pool != null) {
             _pools.remove(name);
             try {
@@ -160,8 +161,8 @@ public class PoolingDriver implements Driver {
     }
 
     public synchronized String[] getPoolNames(){
-        Set names = _pools.keySet();
-        return (String[]) names.toArray(new String[names.size()]);
+        Set<String> names = _pools.keySet();
+        return names.toArray(new String[names.size()]);
     }
 
     @Override
@@ -176,12 +177,12 @@ public class PoolingDriver implements Driver {
     @Override
     public Connection connect(String url, Properties info) throws SQLException {
         if(acceptsURL(url)) {
-            ObjectPool pool = getConnectionPool(url.substring(URL_PREFIX_LEN));
+            ObjectPool<? extends Connection> pool = getConnectionPool(url.substring(URL_PREFIX_LEN));
             if(null == pool) {
                 throw new SQLException("No pool found for " + url + ".");
             } else {
                 try {
-                    Connection conn = (Connection)(pool.borrowObject());
+                    Connection conn = pool.borrowObject();
                     if (conn != null) {
                         conn = new PoolGuardConnectionWrapper(pool, conn);
                     }
@@ -213,7 +214,8 @@ public class PoolingDriver implements Driver {
     public void invalidateConnection(Connection conn) throws SQLException {
         if (conn instanceof PoolGuardConnectionWrapper) { // normal case
             PoolGuardConnectionWrapper pgconn = (PoolGuardConnectionWrapper) conn;
-            ObjectPool pool = pgconn.pool;
+            @SuppressWarnings("unchecked")
+            ObjectPool<Connection> pool = (ObjectPool<Connection>) pgconn.pool;
             Connection delegate = pgconn.delegate;
             try {
                 pool.invalidateObject(delegate);
@@ -268,10 +270,10 @@ public class PoolingDriver implements Driver {
      */
     static private class PoolGuardConnectionWrapper extends DelegatingConnection {
 
-        private final ObjectPool pool;
+        private final ObjectPool<? extends Connection> pool;
         private Connection delegate;
 
-        PoolGuardConnectionWrapper(ObjectPool pool, Connection delegate) {
+        PoolGuardConnectionWrapper(ObjectPool<? extends Connection> pool, Connection delegate) {
             super(delegate);
             this.pool = pool;
             this.delegate = delegate;
