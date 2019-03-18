@@ -37,16 +37,16 @@ import org.apache.tomcat.dbcp.pool.KeyedObjectPool;
  * @author James House
  * @author Dirk Verbeeck
  */
-public class PoolablePreparedStatement extends DelegatingPreparedStatement {
+public class PoolablePreparedStatement<K> extends DelegatingPreparedStatement {
     /**
      * The {@link KeyedObjectPool} from which I was obtained.
      */
-    protected KeyedObjectPool _pool = null;
+    protected KeyedObjectPool<K, PoolablePreparedStatement<K>> _pool = null;
 
     /**
      * My "key" as used by {@link KeyedObjectPool}.
      */
-    protected Object _key = null;
+    protected K _key = null;
 
     private volatile boolean batchAdded = false;
 
@@ -57,7 +57,8 @@ public class PoolablePreparedStatement extends DelegatingPreparedStatement {
      * @param pool the {@link KeyedObjectPool} from which I was obtained.
      * @param conn the {@link Connection} from which I was created
      */
-    public PoolablePreparedStatement(PreparedStatement stmt, Object key, KeyedObjectPool pool, Connection conn) {
+    public PoolablePreparedStatement(PreparedStatement stmt, K key,
+            KeyedObjectPool<K, PoolablePreparedStatement<K>> pool, Connection conn) {
         super((DelegatingConnection) conn, stmt);
         _pool = pool;
         _key = key;
@@ -126,9 +127,9 @@ public class PoolablePreparedStatement extends DelegatingPreparedStatement {
         // ResultSet's when it is closed.
         // FIXME The PreparedStatement we're wrapping should handle this for us.
         // See bug 17301 for what could happen when ResultSets are closed twice.
-        List resultSets = getTrace();
+        List<AbandonedTrace> resultSets = getTrace();
         if( resultSets != null) {
-            ResultSet[] set = (ResultSet[]) resultSets.toArray(new ResultSet[resultSets.size()]);
+            ResultSet[] set = resultSets.toArray(new ResultSet[resultSets.size()]);
             for (int i = 0; i < set.length; i++) {
                 set[i].close();
             }

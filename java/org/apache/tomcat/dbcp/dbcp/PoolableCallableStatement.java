@@ -23,6 +23,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
+import org.apache.tomcat.dbcp.dbcp.PoolingConnection.PStmtKey;
 import org.apache.tomcat.dbcp.pool.KeyedObjectPool;
 
 /**
@@ -39,12 +40,12 @@ public class PoolableCallableStatement extends DelegatingCallableStatement {
     /**
      * The {@link KeyedObjectPool} from which this CallableStatement was obtained.
      */
-    private final KeyedObjectPool _pool;
+    private final KeyedObjectPool<PStmtKey, DelegatingPreparedStatement> _pool;
 
     /**
      * Key for this statement in the containing {@link KeyedObjectPool}.
      */
-    private final Object _key;
+    private final PStmtKey _key;
 
     /**
      * Constructor.
@@ -54,7 +55,8 @@ public class PoolableCallableStatement extends DelegatingCallableStatement {
      * @param pool the {@link KeyedObjectPool} from which this CallableStatement was obtained
      * @param conn the {@link Connection} that created this CallableStatement
      */
-    public PoolableCallableStatement(CallableStatement stmt, Object key, KeyedObjectPool pool, Connection conn) {
+    public PoolableCallableStatement(CallableStatement stmt, PStmtKey key,
+            KeyedObjectPool<PStmtKey, DelegatingPreparedStatement> pool, Connection conn) {
         super((DelegatingConnection)conn, stmt);
         _pool = pool;
         _key = key;
@@ -113,9 +115,9 @@ public class PoolableCallableStatement extends DelegatingCallableStatement {
         // ResultSet's when it is closed.
         // FIXME The PreparedStatement we're wrapping should handle this for us.
         // See DBCP-10 for what could happen when ResultSets are closed twice.
-        List resultSets = getTrace();
+        List<AbandonedTrace> resultSets = getTrace();
         if(resultSets != null) {
-            ResultSet[] set = (ResultSet[])resultSets.toArray(new ResultSet[resultSets.size()]);
+            ResultSet[] set = resultSets.toArray(new ResultSet[resultSets.size()]);
             for(int i = 0; i < set.length; i++) {
                 set[i].close();
             }
