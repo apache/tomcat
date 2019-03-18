@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -29,7 +29,7 @@ import java.util.List;
  *
  * The JDBC Connection, Statement, and ResultSet classes
  * extend this class.
- * 
+ *
  * @author Glenn L. Nielsen
  */
 public class AbandonedTrace {
@@ -39,7 +39,7 @@ public class AbandonedTrace {
     /** A stack trace of the code that created me (if in debug mode) */
     private volatile Exception createdBy;
     /** A list of objects created by children of this object */
-    private final List traceList = new ArrayList();
+    private final List<AbandonedTrace> traceList = new ArrayList<AbandonedTrace>();
     /** Last time this connection was used */
     private volatile long lastUsed = 0;
 
@@ -78,7 +78,7 @@ public class AbandonedTrace {
      * @param parent AbandonedTrace parent object
      */
     private void init(AbandonedTrace parent) {
-        if (parent != null) {                  
+        if (parent != null) {
             parent.addTrace(this);
         }
 
@@ -131,9 +131,9 @@ public class AbandonedTrace {
      * object trace list.
      */
     protected void setStackTrace() {
-        if (config == null) {                 
-            return;                           
-        }                    
+        if (config == null) {
+            return;
+        }
         if (config.getLogAbandoned()) {
             createdBy = new AbandonedObjectException();
         }
@@ -167,9 +167,9 @@ public class AbandonedTrace {
      *
      * @return List of objects
      */
-    protected List getTrace() {
+    protected List<AbandonedTrace> getTrace() {
         synchronized (this.traceList) {
-            return new ArrayList(traceList);
+            return new ArrayList<AbandonedTrace>(traceList);
         }
     }
 
@@ -182,9 +182,9 @@ public class AbandonedTrace {
             createdBy.printStackTrace(config.getLogWriter());
         }
         synchronized(this.traceList) {
-            Iterator it = this.traceList.iterator();
+            Iterator<AbandonedTrace> it = this.traceList.iterator();
             while (it.hasNext()) {
-                AbandonedTrace at = (AbandonedTrace)it.next();
+                AbandonedTrace at = it.next();
                 at.printStackTrace();
             }
         }
