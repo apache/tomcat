@@ -63,17 +63,18 @@ public class PerUserPoolDataSource
     private int defaultMaxIdle = GenericObjectPool.DEFAULT_MAX_IDLE;
     private int defaultMaxWait = (int)Math.min(Integer.MAX_VALUE,
         GenericObjectPool.DEFAULT_MAX_WAIT);
-    Map perUserDefaultAutoCommit = null;
-    Map perUserDefaultTransactionIsolation = null;
-    Map perUserMaxActive = null;
-    Map perUserMaxIdle = null;
-    Map perUserMaxWait = null;
-    Map perUserDefaultReadOnly = null;
+    Map<String, Boolean> perUserDefaultAutoCommit = null;
+    Map<String, Integer> perUserDefaultTransactionIsolation = null;
+    Map<String, Integer> perUserMaxActive = null;
+    Map<String, Integer> perUserMaxIdle = null;
+    Map<String, Integer> perUserMaxWait = null;
+    Map<String, Boolean> perUserDefaultReadOnly = null;
 
     /**
      * Map to keep track of Pools for a given user
      */
-    private transient Map /* <PoolKey, PooledConnectionManager> */ managers = new HashMap();
+    private transient Map<PoolKey, PooledConnectionManager> managers =
+            new HashMap<PoolKey, PooledConnectionManager>();
 
     /**
      * Default no-arg constructor for Serialization
@@ -86,10 +87,9 @@ public class PerUserPoolDataSource
      */
     @Override
     public void close() {
-        for (Iterator poolIter = managers.values().iterator();
-             poolIter.hasNext();) {
+        for (Iterator<PooledConnectionManager> poolIter = managers.values().iterator(); poolIter.hasNext();) {
             try {
-              ((CPDSConnectionFactory) poolIter.next()).getPool().close();
+                ((CPDSConnectionFactory) poolIter.next()).getPool().close();
             } catch (Exception closePoolException) {
                     //ignore and try to close others.
             }
@@ -174,7 +174,7 @@ public class PerUserPoolDataSource
     public Boolean getPerUserDefaultAutoCommit(String key) {
         Boolean value = null;
         if (perUserDefaultAutoCommit != null) {
-            value = (Boolean) perUserDefaultAutoCommit.get(key);
+            value = perUserDefaultAutoCommit.get(key);
         }
         return value;
     }
@@ -186,7 +186,7 @@ public class PerUserPoolDataSource
     public void setPerUserDefaultAutoCommit(String username, Boolean value) {
         assertInitializationAllowed();
         if (perUserDefaultAutoCommit == null) {
-            perUserDefaultAutoCommit = new HashMap();
+            perUserDefaultAutoCommit = new HashMap<String, Boolean>();
         }
         perUserDefaultAutoCommit.put(username, value);
     }
@@ -198,7 +198,7 @@ public class PerUserPoolDataSource
     public Integer getPerUserDefaultTransactionIsolation(String username) {
         Integer value = null;
         if (perUserDefaultTransactionIsolation != null) {
-            value = (Integer) perUserDefaultTransactionIsolation.get(username);
+            value = perUserDefaultTransactionIsolation.get(username);
         }
         return value;
     }
@@ -211,7 +211,7 @@ public class PerUserPoolDataSource
                                                       Integer value) {
         assertInitializationAllowed();
         if (perUserDefaultTransactionIsolation == null) {
-            perUserDefaultTransactionIsolation = new HashMap();
+            perUserDefaultTransactionIsolation = new HashMap<String, Integer>();
         }
         perUserDefaultTransactionIsolation.put(username, value);
     }
@@ -225,7 +225,7 @@ public class PerUserPoolDataSource
     public Integer getPerUserMaxActive(String username) {
         Integer value = null;
         if (perUserMaxActive != null) {
-            value = (Integer) perUserMaxActive.get(username);
+            value = perUserMaxActive.get(username);
         }
         return value;
     }
@@ -239,7 +239,7 @@ public class PerUserPoolDataSource
     public void setPerUserMaxActive(String username, Integer value) {
         assertInitializationAllowed();
         if (perUserMaxActive == null) {
-            perUserMaxActive = new HashMap();
+            perUserMaxActive = new HashMap<String, Integer>();
         }
         perUserMaxActive.put(username, value);
     }
@@ -254,7 +254,7 @@ public class PerUserPoolDataSource
     public Integer getPerUserMaxIdle(String username) {
         Integer value = null;
         if (perUserMaxIdle != null) {
-            value = (Integer) perUserMaxIdle.get(username);
+            value = perUserMaxIdle.get(username);
         }
         return value;
     }
@@ -268,7 +268,7 @@ public class PerUserPoolDataSource
     public void setPerUserMaxIdle(String username, Integer value) {
         assertInitializationAllowed();
         if (perUserMaxIdle == null) {
-            perUserMaxIdle = new HashMap();
+            perUserMaxIdle = new HashMap<String, Integer>();
         }
         perUserMaxIdle.put(username, value);
     }
@@ -284,7 +284,7 @@ public class PerUserPoolDataSource
     public Integer getPerUserMaxWait(String username) {
         Integer value = null;
         if (perUserMaxWait != null) {
-            value = (Integer) perUserMaxWait.get(username);
+            value = perUserMaxWait.get(username);
         }
         return value;
     }
@@ -300,7 +300,7 @@ public class PerUserPoolDataSource
     public void setPerUserMaxWait(String username, Integer value) {
         assertInitializationAllowed();
         if (perUserMaxWait == null) {
-            perUserMaxWait = new HashMap();
+            perUserMaxWait = new HashMap<String, Integer>();
         }
         perUserMaxWait.put(username, value);
     }
@@ -312,7 +312,7 @@ public class PerUserPoolDataSource
     public Boolean getPerUserDefaultReadOnly(String username) {
         Boolean value = null;
         if (perUserDefaultReadOnly != null) {
-            value = (Boolean) perUserDefaultReadOnly.get(username);
+            value = perUserDefaultReadOnly.get(username);
         }
         return value;
     }
@@ -324,7 +324,7 @@ public class PerUserPoolDataSource
     public void setPerUserDefaultReadOnly(String username, Boolean value) {
         assertInitializationAllowed();
         if (perUserDefaultReadOnly == null) {
-            perUserDefaultReadOnly = new HashMap();
+            perUserDefaultReadOnly = new HashMap<String, Boolean>();
         }
         perUserDefaultReadOnly.put(username, value);
     }
@@ -343,7 +343,7 @@ public class PerUserPoolDataSource
      * Get the number of active connections in the pool for a given user.
      */
     public int getNumActive(String username, @SuppressWarnings("unused") String password) {
-        ObjectPool pool = getPool(getPoolKey(username));
+        ObjectPool<PooledConnectionAndInfo> pool = getPool(getPoolKey(username));
         return (pool == null) ? 0 : pool.getNumActive();
     }
 
@@ -358,7 +358,7 @@ public class PerUserPoolDataSource
      * Get the number of idle connections in the pool for a given user.
      */
     public int getNumIdle(String username, @SuppressWarnings("unused") String password) {
-        ObjectPool pool = getPool(getPoolKey(username));
+        ObjectPool<PooledConnectionAndInfo> pool = getPool(getPoolKey(username));
         return (pool == null) ? 0 : pool.getNumIdle();
     }
 
@@ -372,14 +372,14 @@ public class PerUserPoolDataSource
         throws SQLException {
 
         final PoolKey key = getPoolKey(username);
-        ObjectPool pool;
+        ObjectPool<PooledConnectionAndInfo> pool;
         PooledConnectionManager manager;
         synchronized(this) {
-            manager = (PooledConnectionManager) managers.get(key);
+            manager = managers.get(key);
             if (manager == null) {
                 try {
                     registerPool(username, password);
-                    manager = (PooledConnectionManager) managers.get(key);
+                    manager = managers.get(key);
                 } catch (NamingException e) {
                     throw new SQLException("RegisterPool failed", e);
                 }
@@ -389,7 +389,7 @@ public class PerUserPoolDataSource
 
         PooledConnectionAndInfo info = null;
         try {
-            info = (PooledConnectionAndInfo) pool.borrowObject();
+            info = pool.borrowObject();
         }
         catch (NoSuchElementException ex) {
             throw new SQLException(
@@ -415,7 +415,7 @@ public class PerUserPoolDataSource
                 throw new SQLException("RegisterPool failed", ne);
             }
             try {
-                info = (PooledConnectionAndInfo)(pool).borrowObject();
+                info = pool.borrowObject();
             } catch (Exception ex) {
                 throw (SQLException) new SQLException(
                 "Could not retrieve connection info from pool").initCause(ex);
@@ -466,7 +466,7 @@ public class PerUserPoolDataSource
 
     @Override
     protected PooledConnectionManager getConnectionManager(UserPassKey upkey) {
-        return (PooledConnectionManager) managers.get(getPoolKey(upkey.getUsername()));
+        return managers.get(getPoolKey(upkey.getUsername()));
     }
 
     /**
@@ -503,7 +503,8 @@ public class PerUserPoolDataSource
             getDefaultMaxWait() : userMax.intValue();
 
         // Create an object pool to contain our PooledConnections
-        GenericObjectPool pool = new GenericObjectPool(null);
+        GenericObjectPool<PooledConnectionAndInfo> pool =
+                new GenericObjectPool<PooledConnectionAndInfo>(null);
         pool.setMaxActive(maxActive);
         pool.setMaxIdle(maxIdle);
         pool.setMaxWait(maxWait);
@@ -558,8 +559,8 @@ public class PerUserPoolDataSource
      * @return the GenericObjectPool pooling connections for the username and datasource
      * specified by the PoolKey
      */
-    private GenericObjectPool getPool(PoolKey key) {
+    private ObjectPool<PooledConnectionAndInfo> getPool(PoolKey key) {
         CPDSConnectionFactory mgr = (CPDSConnectionFactory) managers.get(key);
-        return mgr == null ? null : (GenericObjectPool) mgr.getPool();
+        return mgr == null ? null : mgr.getPool();
     }
 }

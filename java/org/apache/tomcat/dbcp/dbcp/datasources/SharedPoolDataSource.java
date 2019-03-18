@@ -56,7 +56,7 @@ public class SharedPoolDataSource
     private int maxIdle = GenericObjectPool.DEFAULT_MAX_IDLE;
     private int maxWait = (int)Math.min(Integer.MAX_VALUE,
         GenericObjectPool.DEFAULT_MAX_WAIT);
-    private transient KeyedObjectPool pool = null;
+    private transient KeyedObjectPool<UserPassKey, PooledConnectionAndInfo> pool = null;
     private transient KeyedCPDSConnectionFactory factory = null;
 
     /**
@@ -178,7 +178,7 @@ public class SharedPoolDataSource
         UserPassKey key = new UserPassKey(username, password);
 
         try {
-            info = (PooledConnectionAndInfo) pool.borrowObject(key);
+            info = pool.borrowObject(key);
         }
         catch (Exception e) {
             throw new SQLException(
@@ -212,7 +212,8 @@ public class SharedPoolDataSource
         ConnectionPoolDataSource cpds = testCPDS(username, password);
 
         // Create an object pool to contain our PooledConnections
-        GenericKeyedObjectPool tmpPool = new GenericKeyedObjectPool(null);
+        GenericKeyedObjectPool<UserPassKey, PooledConnectionAndInfo> tmpPool =
+                new GenericKeyedObjectPool<UserPassKey, PooledConnectionAndInfo>(null);
         tmpPool.setMaxActive(getMaxActive());
         tmpPool.setMaxIdle(getMaxIdle());
         tmpPool.setMaxWait(getMaxWait());
