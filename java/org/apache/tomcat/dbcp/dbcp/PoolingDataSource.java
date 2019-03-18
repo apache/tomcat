@@ -43,7 +43,7 @@ import org.apache.tomcat.dbcp.pool.ObjectPool;
  * @author James House
  * @author Dirk Verbeeck
  */
-public class PoolingDataSource implements DataSource {
+public class PoolingDataSource<C extends Connection> implements DataSource {
 
     /** Controls access to the underlying connection */
     private boolean accessToUnderlyingConnectionAllowed = false;
@@ -52,11 +52,11 @@ public class PoolingDataSource implements DataSource {
         this(null);
     }
 
-    public PoolingDataSource(ObjectPool pool) {
+    public PoolingDataSource(ObjectPool<C> pool) {
         _pool = pool;
     }
 
-    public void setPool(ObjectPool pool) throws IllegalStateException, NullPointerException {
+    public void setPool(ObjectPool<C> pool) throws IllegalStateException, NullPointerException {
         if(null != _pool) {
             throw new IllegalStateException("Pool already set");
         } else if(null == pool) {
@@ -112,7 +112,7 @@ public class PoolingDataSource implements DataSource {
     @Override
     public Connection getConnection() throws SQLException {
         try {
-            Connection conn = (Connection)(_pool.borrowObject());
+            Connection conn = _pool.borrowObject();
             if (conn != null) {
                 conn = new PoolGuardConnectionWrapper(conn);
             }
@@ -179,7 +179,7 @@ public class PoolingDataSource implements DataSource {
     /** My log writer. */
     protected PrintWriter _logWriter = null;
 
-    protected ObjectPool _pool = null;
+    protected ObjectPool<C> _pool = null;
 
     /**
      * PoolGuardConnectionWrapper is a Connection wrapper that makes sure a
