@@ -373,7 +373,7 @@ public class DelegatingConnection extends AbandonedTrace
     { checkOpen(); try { return _conn.getTransactionIsolation(); } catch (SQLException e) { handleException(e); return -1; } }
 
     @Override
-    public Map getTypeMap() throws SQLException
+    public Map<String, Class<?>> getTypeMap() throws SQLException
     { checkOpen(); try { return _conn.getTypeMap(); } catch (SQLException e) { handleException(e); return null; } }
 
     @Override
@@ -409,7 +409,7 @@ public class DelegatingConnection extends AbandonedTrace
     { checkOpen(); try { _conn.setTransactionIsolation(level); } catch (SQLException e) { handleException(e); } }
 
     @Override
-    public void setTypeMap(Map map) throws SQLException
+    public void setTypeMap(Map<String, Class<?>> map) throws SQLException
     { checkOpen(); try { _conn.setTypeMap(map); } catch (SQLException e) { handleException(e); } }
 
     @Override

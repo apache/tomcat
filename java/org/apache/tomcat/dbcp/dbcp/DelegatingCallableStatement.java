@@ -168,7 +168,7 @@ public class DelegatingCallableStatement extends DelegatingPreparedStatement
     { checkOpen(); try { return ((CallableStatement)_stmt).getBigDecimal( parameterIndex); } catch (SQLException e) { handleException(e); return null; } }
 
     @Override
-    public Object getObject(int i, Map map) throws SQLException
+    public Object getObject(int i, Map<String, Class<?>> map) throws SQLException
     { checkOpen(); try { return ((CallableStatement)_stmt).getObject( i, map); } catch (SQLException e) { handleException(e); return null; } }
 
     @Override
@@ -376,7 +376,7 @@ public class DelegatingCallableStatement extends DelegatingPreparedStatement
     { checkOpen(); try { return ((CallableStatement)_stmt).getBigDecimal(parameterName); } catch (SQLException e) { handleException(e); return null; } }
 
     @Override
-    public Object getObject(String parameterName, Map map) throws SQLException
+    public Object getObject(String parameterName, Map<String, Class<?>> map) throws SQLException
     { checkOpen(); try { return ((CallableStatement)_stmt).getObject(parameterName, map); } catch (SQLException e) { handleException(e); return null; } }
 
     @Override

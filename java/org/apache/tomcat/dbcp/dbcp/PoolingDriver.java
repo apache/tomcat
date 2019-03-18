@@ -359,7 +359,7 @@ public class PoolingDriver implements Driver {
         }
 
         @Override
-        public Map getTypeMap() throws SQLException {
+        public Map<String, Class<?>> getTypeMap() throws SQLException {
             checkOpen();
             return delegate.getTypeMap();
         }
@@ -445,7 +445,7 @@ public class PoolingDriver implements Driver {
         }
 
         @Override
-        public void setTypeMap(Map map) throws SQLException {
+        public void setTypeMap(Map<String, Class<?>> map) throws SQLException {
             checkOpen();
             delegate.setTypeMap(map);
         }
