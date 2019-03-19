@@ -919,7 +919,7 @@ public class ConnectionPool {
 
     /**
      * Checks whether this connection has {@link PooledConnection#isMaxAgeExpired() expired} and tries to reconnect if it has.
-     *
+     * @param con PooledConnection
      * @return true if the connection was either not expired or expired but reconnecting succeeded,
      * false if reconnecting failed (either because a new connection could not be established or
      * validating the newly created connection failed)
