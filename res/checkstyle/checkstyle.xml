@@ -23,6 +23,10 @@
   <!-- 'Standard Checks' in the Checkstyle documentation:                    -->
   <!-- http://checkstyle.sourceforge.net/config_coding.html                  -->
 
+  <!-- Cache what has passed checkstyle -->
+  <property name="cacheFile"
+            value="${tomcat.output}/res/checkstyle/cachefile-checkstyle.xml"/>
+
   <!-- Headers -->
   <module name="RegexpHeader">
     <property name="headerFile" value="${basedir}/res/checkstyle/header-al2.txt"/>
@@ -34,9 +38,6 @@
   <module name="FileTabCharacter"/>
 
   <module name="TreeWalker">
-    <!-- Cache what has passed checkstyle -->
-    <property name="cacheFile"
-              value="${tomcat.output}/res/checkstyle/cachefile-checkstyle.xml"/>
 
     <!-- Annotations -->
     <module name="AnnotationLocation"/>
