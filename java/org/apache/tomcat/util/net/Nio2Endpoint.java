@@ -930,7 +930,7 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
 
         @Override
         public boolean hasAsyncIO() {
-            return false;
+            return true;
         }
 
         /**
