@@ -93,6 +93,15 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="jdbc-pool">
+    <changelog>
+      <fix>
+        Improved maxAge handling. Add support for age check on idle connections.
+        Connection that expired reconnects rather than closes it. Patch provided
+        by toby1984. (kfujino)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 9.0.17 (markt)" rtext="2019-03-18">
   <subsection name="Catalina">
