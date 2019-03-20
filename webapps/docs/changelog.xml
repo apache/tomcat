@@ -111,6 +111,10 @@
         href="https://bugs.openjdk.java.net/browse/JDK-8194653">JDK-8194653</a>)
         that may cause a dead-lock when Tomcat starts. (markt)
       </fix>
+      <fix>
+        Ensure that the JarScanner correctly tests whether JARs found on the
+        class path should be skipped when running on Java 9 or later. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

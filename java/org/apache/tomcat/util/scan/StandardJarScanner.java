@@ -259,9 +259,17 @@ public class StandardJarScanner implements JarScanner {
             // Process URLs
             for (URL url : urls) {
                 if (!processedURLs.contains(url)) {
+                    // Avoid duplicates
+                    processedURLs.add(url);
+
+                    // Extract the jarName if there is one to be found
+                    String jarName = getJarName(url);
+                    if (jarName != null && Matcher.matchName(ignoredJars, jarName)) {
+                        continue;
+                    }
+
                     try {
                         process(callback, url);
-                        processedURLs.add(url);
                     } catch (IOException ioe) {
                         log.warn(sm.getString("jarScan.classloaderFail",url), ioe);
                     }
