@@ -90,7 +90,7 @@
   <subsection name="Jasper">
     <changelog>
       <add>
-        Add support for specifying Java 10 (with the value <code>10</code>) as
+        Add support for specifying Java 11 (with the value <code>11</code>) as
         the compiler source and/or compiler target for JSP compilation. (markt)
       </add>
     </changelog>
