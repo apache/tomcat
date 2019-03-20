@@ -379,6 +379,10 @@ public class JDTCompiler extends org.apache.jasper.compiler.Compiler {
                 // Constant not available in latest ECJ version that runs on
                 // Java 7
                 settings.put(CompilerOptions.OPTION_Source, "10");
+            } else if(opt.equals("11")) {
+                // Constant not available in latest ECJ version that runs on
+                // Java 7
+                settings.put(CompilerOptions.OPTION_Source, "11");
             } else {
                 log.warn("Unknown source VM " + opt + " ignored.");
                 settings.put(CompilerOptions.OPTION_Source,
@@ -435,6 +439,11 @@ public class JDTCompiler extends org.apache.jasper.compiler.Compiler {
                 // Java 7
                 settings.put(CompilerOptions.OPTION_TargetPlatform, "10");
                 settings.put(CompilerOptions.OPTION_Compliance, "10");
+            } else if(opt.equals("11")) {
+                // Constant not available in latest ECJ version that runs on
+                // Java 7
+                settings.put(CompilerOptions.OPTION_TargetPlatform, "11");
+                settings.put(CompilerOptions.OPTION_Compliance, "11");
             } else {
                 log.warn("Unknown target VM " + opt + " ignored.");
                 settings.put(CompilerOptions.OPTION_TargetPlatform,
