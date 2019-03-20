@@ -153,7 +153,8 @@ wsdl4j-lib.loc=${base-maven.loc}/wsdl4j/wsdl4j/${wsdl4j-lib.version}/wsdl4j-${ws
 wsdl4j-lib.jar=${wsdl4j-lib.home}/wsdl4j-${wsdl4j-lib.version}.jar
 
 # ----- Eclipse JDT, version 4.4 or later -----#
-# See https://wiki.apache.org/tomcat/JDTCoreBatchCompiler before updating
+# 4.4.2 is the latest release that runs on Java 6
+# Later versions can be used but the official builds need to use 4.4.2
 jdt.version=4.4.2
 jdt.release=R-4.4.2-201502041700
 jdt.checksum.enabled=true
