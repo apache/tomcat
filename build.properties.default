@@ -124,6 +124,9 @@ wsdl4j-lib.jar=${wsdl4j-lib.home}/wsdl4j-${wsdl4j-lib.version}.jar
 # ----- Eclipse JDT, version 4.5.1 or later -----#
 # See https://wiki.apache.org/tomcat/JDTCoreBatchCompiler before updating
 #
+# 4.6.3 is the latest release that runs on Java 7
+# Later versions can be used but the official builds need to use 4.6.3
+#
 # Checksum is from "SHA512 Checksums for 4.6.3" link at
 # http://archive.eclipse.org/eclipse/downloads/drops4/R-4.6.3-201703010400/
 # http://archive.eclipse.org/eclipse/downloads/drops4/R-4.6.3-201703010400/checksum/eclipse-4.6.3-SUMSSHA512
