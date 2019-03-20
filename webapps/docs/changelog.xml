@@ -82,6 +82,9 @@
         Fix bad interaction between NIO2 async read API and the regular read.
         (remm)
       </fix>
+      <fix>
+        Refactor NIO2 write pending strategy for the classic IO API. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
