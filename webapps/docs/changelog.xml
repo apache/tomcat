@@ -65,7 +65,7 @@
         <bug>63206</bug>: Add a new attribute to <code>Context</code> -
         <code>createUploadTargets</code> which, if <code>true</code> enables
         Tomcat to create the temporary upload location used by a Servlet if the
-        location specified by the Servlet does not already exist. The deafult
+        location specified by the Servlet does not already exist. The default
         value is <code>false</code>. (markt)
       </add>
       <fix>
