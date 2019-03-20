@@ -87,6 +87,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Jasper">
+    <changelog>
+      <add>
+        Add support for specifying Java 10 (with the value <code>10</code>) as
+        the compiler source and/or compiler target for JSP compilation. (markt)
+      </add>
+    </changelog>
+  </subsection>
   <subsection name="Web applications">
     <changelog>
       <fix>
