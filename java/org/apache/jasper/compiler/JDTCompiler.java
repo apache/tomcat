@@ -377,14 +377,26 @@ public class JDTCompiler extends org.apache.jasper.compiler.Compiler {
                              JDT_JAVA_9_VERSION);
             } else if(opt.equals("10")) {
                 // Constant not available in latest ECJ version that runs on
-                // Java 7
+                // Java 6.
+                // This is checked against the actual version below.
                 settings.put(CompilerOptions.OPTION_Source, "10");
             } else if(opt.equals("11")) {
                 // Constant not available in latest ECJ version that runs on
-                // Java 7
+                // Java 6.
+                // This is checked against the actual version below.
                 settings.put(CompilerOptions.OPTION_Source, "11");
+            } else if(opt.equals("12")) {
+                // Constant not available in latest available ECJ version.
+                // May be supported in a snapshot build.
+                // This is checked against the actual version below.
+                settings.put(CompilerOptions.OPTION_Source, "12");
+            } else if(opt.equals("13")) {
+                // Constant not available in latest available ECJ version.
+                // May be supported in a snapshot build.
+                // This is checked against the actual version below.
+                settings.put(CompilerOptions.OPTION_Source, "13");
             } else {
-                log.warn("Unknown source VM " + opt + " ignored.");
+                log.warn(Localizer.getMessage("jsp.warning.unknown.sourceVM", opt));
                 settings.put(CompilerOptions.OPTION_Source,
                         CompilerOptions.VERSION_1_6);
             }
@@ -436,16 +448,30 @@ public class JDTCompiler extends org.apache.jasper.compiler.Compiler {
                              JDT_JAVA_9_VERSION);
             } else if(opt.equals("10")) {
                 // Constant not available in latest ECJ version that runs on
-                // Java 7
+                // Java 6.
+                // This is checked against the actual version below.
                 settings.put(CompilerOptions.OPTION_TargetPlatform, "10");
                 settings.put(CompilerOptions.OPTION_Compliance, "10");
             } else if(opt.equals("11")) {
                 // Constant not available in latest ECJ version that runs on
-                // Java 7
+                // Java 6.
+                // This is checked against the actual version below.
                 settings.put(CompilerOptions.OPTION_TargetPlatform, "11");
                 settings.put(CompilerOptions.OPTION_Compliance, "11");
+            } else if(opt.equals("12")) {
+                // Constant not available in latest available ECJ version.
+                // May be supported in a snapshot build.
+                // This is checked against the actual version below.
+                settings.put(CompilerOptions.OPTION_TargetPlatform, "12");
+                settings.put(CompilerOptions.OPTION_Compliance, "12");
+            } else if(opt.equals("13")) {
+                // Constant not available in latest available ECJ version.
+                // May be supported in a snapshot build.
+                // This is checked against the actual version below.
+                settings.put(CompilerOptions.OPTION_TargetPlatform, "13");
+                settings.put(CompilerOptions.OPTION_Compliance, "13");
             } else {
-                log.warn("Unknown target VM " + opt + " ignored.");
+                log.warn(Localizer.getMessage("jsp.warning.unknown.targetVM", opt));
                 settings.put(CompilerOptions.OPTION_TargetPlatform,
                         CompilerOptions.VERSION_1_6);
             }
@@ -526,6 +552,25 @@ public class JDTCompiler extends org.apache.jasper.compiler.Compiler {
             compilationUnits[i] = new CompilationUnit(fileNames[i], className);
         }
         CompilerOptions cOptions = new CompilerOptions(settings);
+
+        // Check source/target JDK versions as the newest versions are allowed
+        // in Tomcat configuration but may not be supported by the ECJ version
+        // being used.
+        String requestedSource = ctxt.getOptions().getCompilerSourceVM();
+        if (requestedSource != null) {
+            String actualSource = CompilerOptions.versionFromJdkLevel(cOptions.sourceLevel);
+            if (!requestedSource.equals(actualSource)) {
+                log.warn(Localizer.getMessage("jsp.warning.unsupported.sourceVM", requestedSource, actualSource));
+            }
+        }
+        String requestedTarget = ctxt.getOptions().getCompilerTargetVM();
+        if (requestedTarget != null) {
+            String actualTarget = CompilerOptions.versionFromJdkLevel(cOptions.targetJDK);
+            if (!requestedTarget.equals(actualTarget)) {
+                log.warn(Localizer.getMessage("jsp.warning.unsupported.targetVM", requestedTarget, actualTarget));
+            }
+        }
+
         cOptions.parseLiteralExpressionsAsConstants = true;
         Compiler compiler = new Compiler(env,
                                          policy,
