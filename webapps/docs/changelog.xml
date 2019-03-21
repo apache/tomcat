@@ -181,6 +181,12 @@
         Add JDBC 4.1 support to the default database connection pool provided by
         Tomcat. (markt)
       </add>
+      <update>
+        Switch from Checkstyle to the JRE6 backport and update to version 8.17.
+        This allows Tomcat 7 to use the newer configuration format (required by
+        Gump that uses the latest Checkstyle snapshot) while still building with
+        Java 6. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>

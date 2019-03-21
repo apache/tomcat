@@ -83,6 +83,9 @@ base-maven.loc=https://repo.maven.apache.org/maven2
 # Mirror, was used when there were problems with the main SF downloads site
 # base-sf.loc=https://sunet.dl.sourceforge.net
 
+# checkstyle-backport-jre6
+base-checkstyle.loc=https://rnveach.github.io/checkstyle-backport-jre6/maven2
+
 # ----- Commons Logging, version 1.1 or later -----
 # If this version is updated, check the versions required for the dependencies below
 # - avalon-framework
@@ -272,13 +275,17 @@ objenesis.jar=${objenesis.home}/objenesis-${objenesis.version}.jar
 
 # ----- Checkstyle, version 6.0 or later -----
 # Limited to 6.1.1 since that is the latest release that supports Java 6
-checkstyle.version=6.1.1
+# Gump uses the latest checkstyle and the configuration format is incompatible
+# between the latest version and 6.1.1
+# Therefore, use checkstyle-backport-jre6
+checkstyle.version=8.17
 checkstyle.checksum.enabled=true
 checkstyle.checksum.algorithm=MD5|SHA-1
-checkstyle.checksum.value=bfbbd909c0b9c6724434421a202e0912|aeb92ff49b80c958fd29f5e8f349f8b5fd4342bd
-checkstyle.home=${base.path}/checkstyle-${checkstyle.version}
-checkstyle.loc=${base-sf.loc}/checkstyle/checkstyle/${checkstyle.version}/checkstyle-${checkstyle.version}-all.jar
+checkstyle.checksum.value=e268f16a5cab5b291546fae909e3f9b3|b626c3e518f315faf860b521807c31a03c9e2d8a
+checkstyle.home=${base.path}/checkstyle-backport-jre6-${checkstyle.version}
+checkstyle.loc=${base-checkstyle.loc}/com/puppycrawl/tools/checkstyle-backport-jre6/${checkstyle.version}/checkstyle-backport-jre6-${checkstyle.version}-all.jar
 checkstyle.jar=${checkstyle.home}/checkstyle-${checkstyle.version}-all.jar
+
 
 # ----- JSON Libraries (for bayeux module) -----
 json-lib.home=${base.path}/json-20080701
