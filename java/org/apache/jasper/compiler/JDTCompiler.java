@@ -324,6 +324,9 @@ public class JDTCompiler extends org.apache.jasper.compiler.Compiler {
             } else if(opt.equals("11")) {
                 settings.put(CompilerOptions.OPTION_Source,
                              CompilerOptions.VERSION_11);
+            } else if(opt.equals("12")) {
+            // Constant not available in latest ECJ version
+                settings.put(CompilerOptions.OPTION_Source, "12");
             } else {
                 log.warn(Localizer.getMessage("jsp.warning.unknown.sourceVM", opt));
                 settings.put(CompilerOptions.OPTION_Source,
@@ -387,6 +390,10 @@ public class JDTCompiler extends org.apache.jasper.compiler.Compiler {
                         CompilerOptions.VERSION_11);
                 settings.put(CompilerOptions.OPTION_Compliance,
                         CompilerOptions.VERSION_11);
+            } else if(opt.equals("12")) {
+            // Constant not available in latest ECJ version
+                settings.put(CompilerOptions.OPTION_TargetPlatform, "12");
+                settings.put(CompilerOptions.OPTION_Compliance, "12");
             } else {
                 log.warn(Localizer.getMessage("jsp.warning.unknown.targetVM", opt));
                 settings.put(CompilerOptions.OPTION_TargetPlatform,
