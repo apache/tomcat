@@ -115,6 +115,11 @@
         Ensure that the JarScanner correctly tests whether JARs found on the
         class path should be skipped when running on Java 9 or later. (markt)
       </fix>
+      <fix>
+        <bug>63275</bug>: When using a <code>RequestDispatcher</code> ensure
+        that <code>HttpServletRequest.getContextPath()</code> returns an encoded
+        path in the dispatched request. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

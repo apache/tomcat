@@ -372,8 +372,11 @@ public class TestApplicationContextGetRequestDispatcher extends TomcatBaseTest {
         // Setup Tomcat instance
         Tomcat tomcat = getTomcatInstance();
 
+        // Need to make sure we use UTF-8 for the URI
+        tomcat.getConnector().setURIEncoding("UTF-8");
+
         // No file system docBase required
-        Context ctx = tomcat.addContext("/test", null);
+        Context ctx = tomcat.addContext("/test\u6771\u4eac", null);
         ctx.setDispatchersUseEncodedPaths(useEncodedDispatchPaths);
 
         // Add a default servlet to return 404 for not found resources
@@ -399,7 +402,7 @@ public class TestApplicationContextGetRequestDispatcher extends TomcatBaseTest {
 
         StringBuilder url = new StringBuilder("http://localhost:");
         url.append(getPort());
-        url.append("/test");
+        url.append("/test%E6%9D%B1%E4%BA%AC");
         url.append(startPath);
         if (startQueryString != null) {
             url.append('?');
@@ -466,7 +469,12 @@ public class TestApplicationContextGetRequestDispatcher extends TomcatBaseTest {
                 throws ServletException, IOException {
             resp.setContentType("text/plain");
             resp.setCharacterEncoding("UTF-8");
-            resp.getWriter().print(OK);
+            String contextPath = req.getContextPath();
+            if ("/test%E6%9D%B1%E4%BA%AC".equals(contextPath)) {
+                resp.getWriter().print(OK);
+            } else {
+                resp.getWriter().print("FAIL - ContextPath");
+            }
             String qs = req.getQueryString();
             if (qs != null) {
                 resp.getWriter().print(qs);
