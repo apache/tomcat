@@ -74,6 +74,11 @@
         href="https://bugs.openjdk.java.net/browse/JDK-8194653">JDK-8194653</a>)
         that may cause a dead-lock when Tomcat starts. (markt)
       </fix>
+      <fix>
+        <bug>63275</bug>: When using a <code>RequestDispatcher</code> ensure
+        that <code>HttpServletRequest.getContextPath()</code> returns an encoded
+        path in the dispatched request. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
