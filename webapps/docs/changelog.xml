@@ -93,6 +93,14 @@
         Add support for specifying Java 11 (with the value <code>11</code>) as
         the compiler source and/or compiler target for JSP compilation. (markt)
       </add>
+      <add>
+        Add support for specifying Java 12 (with the value <code>12</code>) and
+        Java 13 (with the value <code>13</code>) as the compiler source and/or
+        compiler target for JSP compilation. If used with an ECJ version that
+        does not support these values, a warning will be logged and the latest
+        supported version will used. Based on a patch by Thomas Collignon.
+        (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Web applications">
