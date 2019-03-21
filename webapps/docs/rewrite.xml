@@ -422,6 +422,17 @@ public interface RewriteMap {
       applied. This may not be the originally requested URL,
       which may already have matched a previous rule, and have been
       altered.</p>
+    
+      <p><strong>Security warning:</strong> Due to the way Java's
+      regex matching is done, poorly formed regex patterns are vulnerable
+      to "catastrophic backtracking", also known as "regular expression
+      denial of service" or ReDoS. Therefore, extra caution should be used
+      for RewriteRule patterns. In general it is difficult to automatically
+      detect such vulnerable regex, and so a good defense is to read a bit
+      on the subject of catastrophic backtracking. A good reference is the
+      <a href="https://www.owasp.org/index.php/Regular_expression_Denial_of_Service_-_ReDoS">
+      OWASP ReDoS guide</a>.</p>
+      
 
       <p>Some hints on the syntax of regular
       expressions:</p>
