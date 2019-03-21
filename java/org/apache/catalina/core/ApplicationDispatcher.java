@@ -371,7 +371,7 @@ final class ApplicationDispatcher implements AsyncDispatcher, RequestDispatcher 
                 wrequest.setAttribute(RequestDispatcher.FORWARD_MAPPING, hrequest.getHttpServletMapping());
             }
 
-            wrequest.setContextPath(context.getPath());
+            wrequest.setContextPath(context.getEncodedPath());
             wrequest.setRequestURI(requestURI);
             wrequest.setServletPath(servletPath);
             wrequest.setPathInfo(pathInfo);
@@ -618,7 +618,7 @@ final class ApplicationDispatcher implements AsyncDispatcher, RequestDispatcher 
         wrequest.setAttribute(Globals.DISPATCHER_REQUEST_PATH_ATTR, getCombinedPath());
         wrequest.setAttribute(AsyncContext.ASYNC_MAPPING, hrequest.getHttpServletMapping());
 
-        wrequest.setContextPath(context.getPath());
+        wrequest.setContextPath(context.getEncodedPath());
         wrequest.setRequestURI(requestURI);
         wrequest.setServletPath(servletPath);
         wrequest.setPathInfo(pathInfo);
