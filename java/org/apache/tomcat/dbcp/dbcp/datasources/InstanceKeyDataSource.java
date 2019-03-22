@@ -726,8 +726,9 @@ public abstract class InstanceKeyDataSource
             throw new SQLException("Cannot borrow connection from pool", e);
         }
 
+        // Password on PooledConnectionAndInfo does not match
         if (!(null == password ? null == info.getPassword()
-                : password.equals(info.getPassword()))) {  // Password on PooledConnectionAndInfo does not match
+                : password.equals(info.getPassword()))) {
             try { // See if password has changed by attempting connection
                 testCPDS(username, password);
             } catch (SQLException ex) {
@@ -736,8 +737,7 @@ public abstract class InstanceKeyDataSource
                 throw new SQLException("Given password did not match password used"
                                        + " to create the PooledConnection.");
             } catch (javax.naming.NamingException ne) {
-                throw (SQLException) new SQLException(
-                        "NamingException encountered connecting to database").initCause(ne);
+                throw new SQLException("NamingException encountered connecting to database", ne);
             }
             /*
              * Password must have changed -> destroy connection and keep retrying until we get a new, good one,
@@ -764,7 +764,7 @@ public abstract class InstanceKeyDataSource
                     closeDueToException(info);
                     throw new SQLException("Cannot borrow connection from pool", e);
                 }
-                if (info != null && password.equals(info.getPassword())) {
+                if (info != null && password != null && password.equals(info.getPassword())) {
                     break;
                 } else {
                     if (info != null) {
