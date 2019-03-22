@@ -315,9 +315,8 @@ public class Catalina {
                             "setGlobalNamingResources",
                             "org.apache.catalina.deploy.NamingResourcesImpl");
 
-        digester.addObjectCreate("Server/Listener",
-                                 null, // MUST be specified in the element
-                                 "className");
+        digester.addRule("Server/Listener",
+                new ListenerCreateRule(null, "className"));
         digester.addSetProperties("Server/Listener");
         digester.addSetNext("Server/Listener",
                             "addLifecycleListener",
