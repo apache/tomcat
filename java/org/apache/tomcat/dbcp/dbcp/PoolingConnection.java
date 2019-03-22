@@ -389,13 +389,13 @@ public class PoolingConnection extends DelegatingConnection
     }
 
     private String getSchemaOrNull() {
-        String catalog = null;
+        String schema = null;
         try {
-            catalog = getSchema();
+            schema = getSchema();
         } catch (final SQLException e) {
             // Ignored
         }
-        return catalog;
+        return schema;
     }
 
     /**
@@ -484,7 +484,7 @@ public class PoolingConnection extends DelegatingConnection
         }
     }
 
-    protected enum StatementType {
+    public enum StatementType {
         CALLABLE_STATEMENT,
         PREPARED_STATEMENT
     }

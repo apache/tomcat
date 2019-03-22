@@ -37,6 +37,8 @@ import javax.naming.RefAddr;
 import javax.naming.StringRefAddr;
 import javax.naming.NamingException;
 
+import org.apache.tomcat.dbcp.dbcp.DelegatingPreparedStatement;
+import org.apache.tomcat.dbcp.dbcp.PStmtKey;
 import org.apache.tomcat.dbcp.pool.KeyedObjectPool;
 import org.apache.tomcat.dbcp.pool.impl.GenericKeyedObjectPool;
 
@@ -171,13 +173,13 @@ public class DriverAdapterCPDS
         int numTestsPerEvictionRun, long minEvictableIdleTimeMillis,
         boolean testWhileIdle) {
         */
-        KeyedObjectPool stmtPool = null;
+        KeyedObjectPool<PStmtKey, DelegatingPreparedStatement> stmtPool = null;
         if (isPoolPreparedStatements()) {
             if (getMaxPreparedStatements() <= 0)
             {
                 // since there is no limit, create a prepared statement pool with an eviction thread
                 //  evictor settings are the same as the connection pool settings.
-                stmtPool = new GenericKeyedObjectPool(null,
+                stmtPool = new GenericKeyedObjectPool<PStmtKey, DelegatingPreparedStatement>(null,
                     getMaxActive(), GenericKeyedObjectPool.WHEN_EXHAUSTED_GROW, 0,
                     getMaxIdle(), false, false,
                     getTimeBetweenEvictionRunsMillis(),getNumTestsPerEvictionRun(),getMinEvictableIdleTimeMillis(),
@@ -188,7 +190,7 @@ public class DriverAdapterCPDS
                 // since there is limit, create a prepared statement pool without an eviction thread
                 //  pool has LRU functionality so when the limit is reached, 15% of the pool is cleared.
                 // see org.apache.tomcat.dbcp.pool.impl.GenericKeyedObjectPool.clearOldest method
-                stmtPool = new GenericKeyedObjectPool(null,
+                stmtPool = new GenericKeyedObjectPool<PStmtKey, DelegatingPreparedStatement>(null,
                     getMaxActive(), GenericKeyedObjectPool.WHEN_EXHAUSTED_GROW, 0,
                     getMaxIdle(), getMaxPreparedStatements(), false, false,
                     -1,0,0, // -1 tells the pool that there should be no eviction thread.

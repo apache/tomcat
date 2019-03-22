@@ -108,7 +108,7 @@ public class PoolablePreparedStatement<K> extends DelegatingPreparedStatement {
     }
 
     @Override
-    protected void activate() throws SQLException{
+    public void activate() throws SQLException{
         _closed = false;
         if(_conn != null) {
             _conn.addTrace(this);
@@ -117,7 +117,7 @@ public class PoolablePreparedStatement<K> extends DelegatingPreparedStatement {
     }
 
     @Override
-    protected void passivate() throws SQLException {
+    public void passivate() throws SQLException {
         _closed = true;
         if(_conn != null) {
             _conn.removeTrace(this);
