@@ -468,4 +468,10 @@ public class PoolingConnection extends DelegatingConnection implements KeyedPool
             return buf.toString();
         }
     }
+
+
+    protected enum StatementType {
+        CALLABLE_STATEMENT,
+        PREPARED_STATEMENT
+    }
 }
