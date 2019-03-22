@@ -978,7 +978,7 @@ public class BasicDataSource implements DataSource {
      *
      * @since 1.3
      */
-    protected volatile List connectionInitSqls;
+    protected volatile List<String> connectionInitSqls;
 
     /**
      * Returns the list of SQL statements executed when a physical connection
@@ -988,10 +988,10 @@ public class BasicDataSource implements DataSource {
      * @return initialization SQL statements
      * @since 1.3
      */
-    public Collection getConnectionInitSqls() {
-        Collection result = connectionInitSqls;
+    public Collection<String> getConnectionInitSqls() {
+        Collection<String> result = connectionInitSqls;
         if (result == null) {
-            return Collections.EMPTY_LIST;
+            return Collections.emptyList();
         }
         return result;
     }
@@ -1008,17 +1008,16 @@ public class BasicDataSource implements DataSource {
      * @param connectionInitSqls Collection of SQL statements to execute
      * on connection creation
      */
-    public void setConnectionInitSqls(Collection connectionInitSqls) {
+    public void setConnectionInitSqls(Collection<String> connectionInitSqls) {
         if ((connectionInitSqls != null) && (connectionInitSqls.size() > 0)) {
-            ArrayList newVal = null;
-            for (Iterator iterator = connectionInitSqls.iterator();
+            ArrayList<String> newVal = null;
+            for (Iterator<String> iterator = connectionInitSqls.iterator();
             iterator.hasNext();) {
-                Object o = iterator.next();
-                if (o != null) {
-                    String s = o.toString();
+                String s = iterator.next();
+                if (s != null) {
                     if (s.trim().length() > 0) {
                         if (newVal == null) {
-                            newVal = new ArrayList();
+                            newVal = new ArrayList<String>();
                         }
                         newVal.add(s);
                     }
@@ -1067,7 +1066,7 @@ public class BasicDataSource implements DataSource {
     /**
      * The object pool that internally manages our connections.
      */
-    protected volatile GenericObjectPool connectionPool = null;
+    protected volatile GenericObjectPool<PoolableConnection> connectionPool = null;
 
     /**
      * The connection properties that will be sent to our JDBC driver when
@@ -1396,7 +1395,7 @@ public class BasicDataSource implements DataSource {
      */
     public synchronized void close() throws SQLException {
         closed = true;
-        GenericObjectPool oldpool = connectionPool;
+        GenericObjectPool<PoolableConnection> oldpool = connectionPool;
         connectionPool = null;
         dataSource = null;
         try {
@@ -1550,7 +1549,7 @@ public class BasicDataSource implements DataSource {
      */
     protected ConnectionFactory createConnectionFactory() throws SQLException {
         // Load the JDBC driver class
-        Class driverFromCCL = null;
+        Class<?> driverFromCCL = null;
         if (driverClassName != null) {
             try {
                 try {
@@ -1634,12 +1633,12 @@ public class BasicDataSource implements DataSource {
      */
     protected void createConnectionPool() {
         // Create an object pool to contain our active connections
-        GenericObjectPool gop;
+        GenericObjectPool<PoolableConnection> gop;
         if ((abandonedConfig != null) && (abandonedConfig.getRemoveAbandoned())) {
-            gop = new AbandonedObjectPool(null,abandonedConfig);
+            gop = new AbandonedObjectPool<PoolableConnection>(null,abandonedConfig);
         }
         else {
-            gop = new GenericObjectPool();
+            gop = new GenericObjectPool<PoolableConnection>();
         }
         gop.setMaxActive(maxActive);
         gop.setMaxIdle(maxIdle);
@@ -1658,7 +1657,7 @@ public class BasicDataSource implements DataSource {
      * Closes the connection pool, silently swallowing any exception that occurs.
      */
     private void closeConnectionPool() {
-        GenericObjectPool oldpool = connectionPool;
+        GenericObjectPool<PoolableConnection> oldpool = connectionPool;
         connectionPool = null;
         try {
             if (oldpool != null) {
@@ -1686,7 +1685,8 @@ public class BasicDataSource implements DataSource {
      * @throws SQLException if unable to create a datasource instance
      */
     protected void createDataSourceInstance() throws SQLException {
-        PoolingDataSource pds = new PoolingDataSource(connectionPool);
+        PoolingDataSource<PoolableConnection> pds =
+                new PoolingDataSource<PoolableConnection>(connectionPool);
         pds.setAccessToUnderlyingConnectionAllowed(isAccessToUnderlyingConnectionAllowed());
         pds.setLogWriter(logWriter);
         dataSource = pds;

@@ -23,8 +23,8 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Properties;
 import java.util.StringTokenizer;
-import java.util.Collections;
-
+import java.util.ArrayList;
+import java.util.Collection;
 import javax.naming.Context;
 import javax.naming.Name;
 import javax.naming.RefAddr;
@@ -344,8 +344,7 @@ public class BasicDataSourceFactory implements ObjectFactory {
 
         value = properties.getProperty(PROP_CONNECTIONINITSQLS);
         if (value != null) {
-            StringTokenizer tokenizer = new StringTokenizer(value, ";");
-            dataSource.setConnectionInitSqls(Collections.list(tokenizer));
+            dataSource.setConnectionInitSqls(parseList(value, ';'));
         }
 
         value = properties.getProperty(PROP_CONNECTIONPROPERTIES);
@@ -380,5 +379,23 @@ public class BasicDataSourceFactory implements ObjectFactory {
         p.load(new ByteArrayInputStream(propText.replace(';', '\n').getBytes()));
       }
       return p;
+    }
+
+    /**
+     * Parse list of property values from a delimited string
+     *
+     * @param value
+     *            delimited list of values
+     * @param delimiter
+     *            character used to separate values in the list
+     * @return String Collection of values
+     */
+    private static Collection<String> parseList(final String value, final char delimiter) {
+        final StringTokenizer tokenizer = new StringTokenizer(value, Character.toString(delimiter));
+        final Collection<String> tokens = new ArrayList<String>(tokenizer.countTokens());
+        while (tokenizer.hasMoreTokens()) {
+            tokens.add(tokenizer.nextToken());
+        }
+        return tokens;
     }
 }
