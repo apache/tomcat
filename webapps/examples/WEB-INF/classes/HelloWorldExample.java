@@ -56,7 +56,7 @@ public class HelloWorldExample extends HttpServlet {
 
         // note that all links are created to be relative. this
         // ensures that we can move the web application that this
-        // servlet belongs to to a different place in the url
+        // servlet belongs to a different place in the url
         // tree and not have any harmful side effects.
 
         // XXX

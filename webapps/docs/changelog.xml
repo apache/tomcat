@@ -608,7 +608,7 @@
       <update>
         Add dns-ping support to enumerate cluster members. This is much simpler
         than getting the pod list but it does not indicate pod status.
-        Submitted by by Maxime Beck. (remm)
+        Submitted by Maxime Beck. (remm)
       </update>
       <fix>
         Never expire the local member from a Membership. (remm)
@@ -1678,7 +1678,7 @@
         Followup sync fix for NIO2 async IO blocking read/writes. (remm)
       </fix>
       <fix>
-        Log an error message if the AJP connector detects the the reverse proxy
+        Log an error message if the AJP connector detects that the reverse proxy
         is sending AJP messages that are too large for the configured
         <code>packetSize</code>. (markt)
       </fix>
@@ -3798,7 +3798,7 @@
     <changelog>
       <fix>
         Review those places where Tomcat re-encodes a URI or URI component and
-        ensure that that correct encoding (path differs from query string) is
+        ensure that the correct encoding (path differs from query string) is
         applied and that the encoding is applied consistently. (markt)
       </fix>
       <fix>
