@@ -79,6 +79,13 @@
         that <code>HttpServletRequest.getContextPath()</code> returns an encoded
         path in the dispatched request. (markt)
       </fix>
+      <update>
+        Add optional listeners for Server/Listener, as a slight variant of
+        a standard listener. The difference is that loading is not fatal when
+        it fails. This would allow adding example configuration to the standard
+        server.xml if deemed useful. Storeconfig will not attempt to persist
+        the new listener. (remm)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Coyote">

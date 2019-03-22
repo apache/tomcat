@@ -94,18 +94,7 @@ public class ObjectCreateRule extends Rule {
     public void begin(String namespace, String name, Attributes attributes)
             throws Exception {
 
-        // Identify the name of the class to instantiate
-        String realClassName = className;
-        if (attributeName != null) {
-            String value = attributes.getValue(attributeName);
-            if (value != null) {
-                realClassName = value;
-            }
-        }
-        if (digester.log.isDebugEnabled()) {
-            digester.log.debug("[ObjectCreateRule]{" + digester.match +
-                    "}New " + realClassName);
-        }
+        String realClassName = getRealClassName(attributes);
 
         if (realClassName == null) {
             throw new NullPointerException(sm.getString("rule.noClassName", namespace, name));
@@ -115,6 +104,24 @@ public class ObjectCreateRule extends Rule {
         Class<?> clazz = digester.getClassLoader().loadClass(realClassName);
         Object instance = clazz.getConstructor().newInstance();
         digester.push(instance);
+    }
+
+
+    /**
+     * Return the actual class name of the class to be instantiated.
+     * @param attributes The attribute list for this element
+     * @return the class name
+     */
+    protected String getRealClassName(Attributes attributes) {
+        // Identify the name of the class to instantiate
+        String realClassName = className;
+        if (attributeName != null) {
+            String value = attributes.getValue(attributeName);
+            if (value != null) {
+                realClassName = value;
+            }
+        }
+        return realClassName;
     }
 
 
