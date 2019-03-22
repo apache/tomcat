@@ -180,7 +180,7 @@ To enable and configue SSI support, please see the ssi-howto.html page.
 Security manager URLs:
 ======================
 In order to grant security permissions to JARs located inside the
-web application repository, use URLs of of the following format
+web application repository, use URLs of the following format
 in your policy file:
 
 file:${catalina.base}/webapps/examples/WEB-INF/lib/driver.jar
