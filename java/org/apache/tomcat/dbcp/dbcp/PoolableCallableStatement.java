@@ -80,7 +80,7 @@ public class PoolableCallableStatement extends DelegatingCallableStatement {
             } catch(RuntimeException e) {
                 throw e;
             } catch(Exception e) {
-                throw new SQLNestedException("Cannot close CallableStatement (return to pool failed)", e);
+                throw new SQLException("Cannot close CallableStatement (return to pool failed)", e);
             }
         }
     }

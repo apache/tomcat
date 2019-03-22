@@ -31,8 +31,6 @@ import javax.naming.Reference;
 import javax.naming.StringRefAddr;
 import javax.sql.ConnectionPoolDataSource;
 
-import org.apache.tomcat.dbcp.dbcp.SQLNestedException;
-
 import org.apache.tomcat.dbcp.pool.ObjectPool;
 import org.apache.tomcat.dbcp.pool.impl.GenericObjectPool;
 
@@ -383,7 +381,7 @@ public class PerUserPoolDataSource
                     registerPool(username, password);
                     manager = (PooledConnectionManager) managers.get(key);
                 } catch (NamingException e) {
-                    throw new SQLNestedException("RegisterPool failed", e);
+                    throw new SQLException("RegisterPool failed", e);
                 }
             }
             pool = ((CPDSConnectionFactory) manager).getPool();
@@ -394,7 +392,7 @@ public class PerUserPoolDataSource
             info = (PooledConnectionAndInfo) pool.borrowObject();
         }
         catch (NoSuchElementException ex) {
-            throw new SQLNestedException(
+            throw new SQLException(
                     "Could not retrieve connection info from pool", ex);
         }
         catch (Exception e) {
@@ -414,7 +412,7 @@ public class PerUserPoolDataSource
                 registerPool(username, password);
                 pool = getPool(key);
             } catch (NamingException ne) {
-                throw new SQLNestedException("RegisterPool failed", ne);
+                throw new SQLException("RegisterPool failed", ne);
             }
             try {
                 info = (PooledConnectionAndInfo)(pool).borrowObject();

@@ -101,7 +101,7 @@ public class PoolablePreparedStatement extends DelegatingPreparedStatement {
             } catch(RuntimeException e) {
                 throw e;
             } catch(Exception e) {
-                throw new SQLNestedException("Cannot close preparedstatement (return to pool failed)", e);
+                throw new SQLException("Cannot close preparedstatement (return to pool failed)", e);
             }
         }
     }

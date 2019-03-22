@@ -1408,7 +1408,7 @@ public class BasicDataSource implements DataSource {
         } catch(RuntimeException e) {
             throw e;
         } catch(Exception e) {
-            throw new SQLNestedException("Cannot close connection pool", e);
+            throw new SQLException("Cannot close connection pool", e);
         }
     }
 
@@ -1523,7 +1523,7 @@ public class BasicDataSource implements DataSource {
             }
         } catch (Exception e) {
             closeConnectionPool();
-            throw new SQLNestedException("Error preloading the connection pool", e);
+            throw new SQLException("Error preloading the connection pool", e);
         }
 
         // If timeBetweenEvictionRunsMillis > 0, start the pool's evictor task
@@ -1570,7 +1570,7 @@ public class BasicDataSource implements DataSource {
                     driverClassName + "'";
                 logWriter.println(message);
                 t.printStackTrace(logWriter);
-                throw new SQLNestedException(message, t);
+                throw new SQLException(message, t);
             }
         }
 
@@ -1593,7 +1593,7 @@ public class BasicDataSource implements DataSource {
                 "' for connect URL '" + url + "'";
             logWriter.println(message);
             t.printStackTrace(logWriter);
-            throw new SQLNestedException(message, t);
+            throw new SQLException(message, t);
         }
 
         // Can't test without a validationQuery
@@ -1721,7 +1721,7 @@ public class BasicDataSource implements DataSource {
         } catch (RuntimeException e) {
             throw e;
         } catch (Exception e) {
-            throw new SQLNestedException("Cannot create PoolableConnectionFactory (" + e.getMessage() + ")", e);
+            throw new SQLException("Cannot create PoolableConnectionFactory (" + e.getMessage() + ")", e);
         }
     }
 

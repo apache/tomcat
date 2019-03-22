@@ -30,7 +30,6 @@ import javax.sql.StatementEventListener;
 
 import org.apache.tomcat.dbcp.dbcp.DelegatingConnection;
 import org.apache.tomcat.dbcp.dbcp.DelegatingPreparedStatement;
-import org.apache.tomcat.dbcp.dbcp.SQLNestedException;
 import org.apache.tomcat.dbcp.pool.KeyedObjectPool;
 import org.apache.tomcat.dbcp.pool.KeyedPoolableObjectFactory;
 
@@ -143,7 +142,7 @@ class PooledConnectionImpl
         } catch (RuntimeException e) {
             throw e;
         } catch (Exception e) {
-            throw new SQLNestedException("Cannot close connection (return to pool failed)", e);
+            throw new SQLException("Cannot close connection (return to pool failed)", e);
         } finally {
             try {
                 connection.close();
@@ -248,7 +247,7 @@ class PooledConnectionImpl
             } catch (RuntimeException e) {
                 throw e;
             } catch (Exception e) {
-                throw new SQLNestedException("Borrow prepareStatement from pool failed", e);
+                throw new SQLException("Borrow prepareStatement from pool failed", e);
             }
         }
     }
@@ -281,7 +280,7 @@ class PooledConnectionImpl
             } catch (RuntimeException e) {
                 throw e;
             } catch (Exception e) {
-                throw new SQLNestedException("Borrow prepareStatement from pool failed", e);
+                throw new SQLException("Borrow prepareStatement from pool failed", e);
             }
         }
     }
@@ -308,7 +307,7 @@ class PooledConnectionImpl
             } catch (RuntimeException e) {
                 throw e;
             } catch (Exception e) {
-                throw new SQLNestedException("Borrow prepareStatement from pool failed", e);
+                throw new SQLException("Borrow prepareStatement from pool failed", e);
             }
         }
     }
@@ -327,7 +326,7 @@ class PooledConnectionImpl
             } catch (RuntimeException e) {
                 throw e;
             } catch (Exception e) {
-                throw new SQLNestedException("Borrow prepareStatement from pool failed", e);
+                throw new SQLException("Borrow prepareStatement from pool failed", e);
             }
         }
     }
@@ -343,7 +342,7 @@ class PooledConnectionImpl
             } catch (RuntimeException e) {
                 throw e;
             } catch (Exception e) {
-                throw new SQLNestedException("Borrow prepareStatement from pool failed", e);
+                throw new SQLException("Borrow prepareStatement from pool failed", e);
             }
         }
     }
@@ -359,7 +358,7 @@ class PooledConnectionImpl
             } catch (RuntimeException e) {
                 throw e;
             } catch (Exception e) {
-                throw new SQLNestedException("Borrow prepareStatement from pool failed", e);
+                throw new SQLException("Borrow prepareStatement from pool failed", e);
             }
         }
     }
