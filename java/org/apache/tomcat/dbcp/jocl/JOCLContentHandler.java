@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -379,8 +379,8 @@ public class JOCLContentHandler extends DefaultHandler {
      * Clears all the values and types in my list.
      */
     public void clear() {
-        _typeList = new ArrayList();
-        _valueList = new ArrayList();
+        _typeList = new ArrayList<Class<?>>();
+        _valueList = new ArrayList<Object>();
     }
 
     /**
@@ -394,8 +394,8 @@ public class JOCLContentHandler extends DefaultHandler {
     /**
      * Returns the type of the object at the specified index.
      */
-    public Class getType(int i) {
-        return(Class)(_typeList.get(i));
+    public Class<?> getType(int i) {
+        return _typeList.get(i);
     }
 
     /**
@@ -499,8 +499,8 @@ public class JOCLContentHandler extends DefaultHandler {
                     } else {
                         _cur.addArgument(temp.getType(),temp.createObject());
                     }
-                } 
-                /* 
+                }
+                /*
                 else if(ELT_BOOLEAN.equals(localName)) {
                     // nothing to do here
                 } else if(ELT_BYTE.equals(localName)) {
@@ -544,7 +544,7 @@ public class JOCLContentHandler extends DefaultHandler {
      * @see #_acceptEmptyNamespaceForElements
      * @see #_acceptJoclPrefixForElements
      */
-    protected boolean isJoclNamespace(String uri, String localname, String qname) {
+    protected boolean isJoclNamespace(String uri, @SuppressWarnings("unused") String localname, String qname) {
         if(JOCL_NAMESPACE_URI.equals(uri)) {
             return true;
         } else if(_acceptEmptyNamespaceForElements && (null == uri || "".equals(uri))) {
@@ -594,7 +594,7 @@ public class JOCLContentHandler extends DefaultHandler {
      * Add the specified object either to my type/value list, or
      * as an argument to the object I'm currently constructing.
      */
-    protected void addObject(Class type, Object val) {
+    protected void addObject(Class<?> type, Object val) {
         if(null == _cur) {
             _typeList.add(type);
             _valueList.add(val);
@@ -618,12 +618,12 @@ public class JOCLContentHandler extends DefaultHandler {
     /**
      * A list of the types ({@link Class}es) already created via the parse.
      */
-    protected ArrayList _typeList = new ArrayList();
+    protected ArrayList<Class<?>> _typeList = new ArrayList<Class<?>>();
 
     /**
      * A list of the values ({@link Object}s) already created via the parse.
      */
-    protected ArrayList _valueList = new ArrayList();
+    protected ArrayList<Object> _valueList = new ArrayList<Object>();
 
     /**
      * The object I'm currently working on.
@@ -725,9 +725,9 @@ public class JOCLContentHandler extends DefaultHandler {
 
     static class ConstructorDetails {
         private ConstructorDetails _parent = null;
-        private Class _type = null;
-        private ArrayList _argTypes = null;
-        private ArrayList _argValues = null;
+        private Class<?> _type = null;
+        private ArrayList<Class<?>> _argTypes = null;
+        private ArrayList<Object> _argValues = null;
         private boolean _isnull = false;
         private boolean _isgroup = false;
 
@@ -749,11 +749,11 @@ public class JOCLContentHandler extends DefaultHandler {
         /**
          * @since 1.3
          */
-        public ConstructorDetails(Class type, ConstructorDetails parent, boolean isnull, boolean isgroup) {
+        public ConstructorDetails(Class<?> type, ConstructorDetails parent, boolean isnull, boolean isgroup) {
             _parent = parent;
             _type = type;
-            _argTypes = new ArrayList();
-            _argValues = new ArrayList();
+            _argTypes = new ArrayList<Class<?>>();
+            _argValues = new ArrayList<Object>();
             _isnull = isnull;
             _isgroup = isgroup;
         }
@@ -762,7 +762,7 @@ public class JOCLContentHandler extends DefaultHandler {
             addArgument(value.getClass(),value);
         }
 
-        public void addArgument(Class type, Object val) {
+        public void addArgument(Class<?> type, Object val) {
             if(_isnull) {
                 throw new NullPointerException("can't add arguments to null instances");
             }
@@ -770,7 +770,7 @@ public class JOCLContentHandler extends DefaultHandler {
             _argValues.add(val);
         }
 
-        public Class getType() {
+        public Class<?> getType() {
             return _type;
         }
 
@@ -790,8 +790,8 @@ public class JOCLContentHandler extends DefaultHandler {
                     throw new IllegalStateException("implementation error: unhandled _type:" + _type);
                 }
             } else {
-                Class k = getType();
-                Class[] argtypes = (Class[])_argTypes.toArray(new Class[0]);
+                Class<?> k = getType();
+                Class<?>[] argtypes = _argTypes.toArray(new Class[0]);
                 Object[] argvals = _argValues.toArray();
                 return ConstructorUtil.invokeConstructor(k,argtypes,argvals);
             }

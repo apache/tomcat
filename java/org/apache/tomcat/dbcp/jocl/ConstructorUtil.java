@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -36,11 +36,11 @@ public class ConstructorUtil {
      *         if no such <tt>Constructor</tt> can be found.
      * @see #invokeConstructor
      */
-    public static Constructor getConstructor(Class type, Class[] argTypes) {
+    public static <T> Constructor<T> getConstructor(Class<T> type, Class<?>[] argTypes) {
         if(null == type || null == argTypes) {
             throw new NullPointerException();
         }
-        Constructor ctor = null;
+        Constructor<T> ctor = null;
         try {
             ctor = type.getConstructor(argTypes);
         } catch(Exception e) {
@@ -51,9 +51,10 @@ public class ConstructorUtil {
             // look for something that will work
             // XXX this should really be more careful to
             //     adhere to the jls mechanism for late binding
-            Constructor[] ctors = type.getConstructors();
+            @SuppressWarnings("unchecked")
+            Constructor<T>[] ctors = (Constructor<T>[]) type.getConstructors();
             for(int i=0;i<ctors.length;i++) {
-                Class[] paramtypes = ctors[i].getParameterTypes();
+                Class<?>[] paramtypes = ctors[i].getParameterTypes();
                 if(paramtypes.length == argTypes.length) {
                     boolean canuse = true;
                     for(int j=0;j<paramtypes.length;j++) {
@@ -89,7 +90,7 @@ public class ConstructorUtil {
      * @exception IllegalAccessException
      * @exception InvocationTargetException
      */
-    public static Object invokeConstructor(Class type, Class[] argTypes, Object[] argValues) throws InstantiationException, IllegalAccessException, InvocationTargetException {
+    public static <T> T invokeConstructor(Class<T> type, Class<?>[] argTypes, Object[] argValues) throws InstantiationException, IllegalAccessException, InvocationTargetException {
         return ConstructorUtil.getConstructor(type,argTypes).newInstance(argValues);
     }
 }
