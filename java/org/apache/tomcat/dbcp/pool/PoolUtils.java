@@ -2117,15 +2117,6 @@ public final class PoolUtils {
         }
 
         /**
-         * Updates internal state based on numIdle and the current time.
-         *
-         * @param numIdle number of idle elements in the pool
-         */
-        public void update(final int numIdle) {
-            update(System.currentTimeMillis(), numIdle);
-        }
-
-        /**
          * Updates internal state using the supplied time and numIdle.
          *
          * @param now current time
