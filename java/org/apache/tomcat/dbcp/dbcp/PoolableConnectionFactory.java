@@ -49,7 +49,8 @@ public class PoolableConnectionFactory implements PoolableObjectFactory<Poolable
      * @param defaultAutoCommit the default "auto commit" setting for returned {@link Connection}s
      */
     public PoolableConnectionFactory(ConnectionFactory connFactory, ObjectPool<PoolableConnection> pool,
-            KeyedObjectPoolFactory stmtPoolFactory, String validationQuery, boolean defaultReadOnly, boolean defaultAutoCommit) {
+            KeyedObjectPoolFactory<PStmtKey, DelegatingPreparedStatement> stmtPoolFactory, String validationQuery,
+            boolean defaultReadOnly, boolean defaultAutoCommit) {
         _connFactory = connFactory;
         _pool = pool;
         _pool.setFactory(this);
@@ -71,7 +72,8 @@ public class PoolableConnectionFactory implements PoolableObjectFactory<Poolable
      * @since 1.3
      */
     public PoolableConnectionFactory(ConnectionFactory connFactory, ObjectPool<PoolableConnection> pool,
-            KeyedObjectPoolFactory stmtPoolFactory, String validationQuery, Collection<String> connectionInitSqls, boolean defaultReadOnly, boolean defaultAutoCommit) {
+            KeyedObjectPoolFactory<PStmtKey, DelegatingPreparedStatement> stmtPoolFactory, String validationQuery,
+            Collection<String> connectionInitSqls, boolean defaultReadOnly, boolean defaultAutoCommit) {
         _connFactory = connFactory;
         _pool = pool;
         _pool.setFactory(this);
@@ -94,7 +96,8 @@ public class PoolableConnectionFactory implements PoolableObjectFactory<Poolable
      * @since 1.3
      */
     public PoolableConnectionFactory(ConnectionFactory connFactory, ObjectPool<PoolableConnection> pool,
-            KeyedObjectPoolFactory stmtPoolFactory, String validationQuery, int validationQueryTimeout, boolean defaultReadOnly, boolean defaultAutoCommit) {
+            KeyedObjectPoolFactory<PStmtKey, DelegatingPreparedStatement> stmtPoolFactory, String validationQuery,
+            int validationQueryTimeout, boolean defaultReadOnly, boolean defaultAutoCommit) {
         _connFactory = connFactory;
         _pool = pool;
         _pool.setFactory(this);
@@ -118,7 +121,8 @@ public class PoolableConnectionFactory implements PoolableObjectFactory<Poolable
      * @since 1.3
      */
     public PoolableConnectionFactory(ConnectionFactory connFactory, ObjectPool<PoolableConnection> pool,
-            KeyedObjectPoolFactory stmtPoolFactory, String validationQuery, int validationQueryTimeout, Collection<String> connectionInitSqls, boolean defaultReadOnly, boolean defaultAutoCommit) {
+            KeyedObjectPoolFactory<PStmtKey, DelegatingPreparedStatement> stmtPoolFactory, String validationQuery,
+            int validationQueryTimeout, Collection<String> connectionInitSqls, boolean defaultReadOnly, boolean defaultAutoCommit) {
         _connFactory = connFactory;
         _pool = pool;
         _pool.setFactory(this);
@@ -141,7 +145,8 @@ public class PoolableConnectionFactory implements PoolableObjectFactory<Poolable
      * @param defaultTransactionIsolation the default "Transaction Isolation" setting for returned {@link Connection}s
      */
     public PoolableConnectionFactory(ConnectionFactory connFactory, ObjectPool<PoolableConnection> pool,
-            KeyedObjectPoolFactory stmtPoolFactory, String validationQuery, boolean defaultReadOnly, boolean defaultAutoCommit, int defaultTransactionIsolation) {
+            KeyedObjectPoolFactory<PStmtKey, DelegatingPreparedStatement> stmtPoolFactory, String validationQuery,
+            boolean defaultReadOnly, boolean defaultAutoCommit, int defaultTransactionIsolation) {
         _connFactory = connFactory;
         _pool = pool;
         _pool.setFactory(this);
@@ -165,7 +170,8 @@ public class PoolableConnectionFactory implements PoolableObjectFactory<Poolable
      * @since 1.3
      */
     public PoolableConnectionFactory(ConnectionFactory connFactory, ObjectPool<PoolableConnection> pool,
-            KeyedObjectPoolFactory stmtPoolFactory, String validationQuery, Collection<String> connectionInitSqls, boolean defaultReadOnly, boolean defaultAutoCommit, int defaultTransactionIsolation) {
+            KeyedObjectPoolFactory<PStmtKey, DelegatingPreparedStatement> stmtPoolFactory, String validationQuery,
+            Collection<String> connectionInitSqls, boolean defaultReadOnly, boolean defaultAutoCommit, int defaultTransactionIsolation) {
         _connFactory = connFactory;
         _pool = pool;
         _pool.setFactory(this);
@@ -190,7 +196,8 @@ public class PoolableConnectionFactory implements PoolableObjectFactory<Poolable
      * @since 1.3
      */
     public PoolableConnectionFactory(ConnectionFactory connFactory, ObjectPool<PoolableConnection> pool,
-            KeyedObjectPoolFactory stmtPoolFactory, String validationQuery, int validationQueryTimeout, boolean defaultReadOnly, boolean defaultAutoCommit, int defaultTransactionIsolation) {
+            KeyedObjectPoolFactory<PStmtKey, DelegatingPreparedStatement> stmtPoolFactory, String validationQuery,
+            int validationQueryTimeout, boolean defaultReadOnly, boolean defaultAutoCommit, int defaultTransactionIsolation) {
         _connFactory = connFactory;
         _pool = pool;
         _pool.setFactory(this);
@@ -216,7 +223,8 @@ public class PoolableConnectionFactory implements PoolableObjectFactory<Poolable
      * @since 1.3
      */
     public PoolableConnectionFactory(ConnectionFactory connFactory, ObjectPool<PoolableConnection> pool,
-            KeyedObjectPoolFactory stmtPoolFactory, String validationQuery, int validationQueryTimeout, Collection<String> connectionInitSqls, boolean defaultReadOnly, boolean defaultAutoCommit, int defaultTransactionIsolation) {
+            KeyedObjectPoolFactory<PStmtKey, DelegatingPreparedStatement> stmtPoolFactory, String validationQuery,
+            int validationQueryTimeout, Collection<String> connectionInitSqls, boolean defaultReadOnly, boolean defaultAutoCommit, int defaultTransactionIsolation) {
         _connFactory = connFactory;
         _pool = pool;
         _pool.setFactory(this);
@@ -242,7 +250,7 @@ public class PoolableConnectionFactory implements PoolableObjectFactory<Poolable
     public PoolableConnectionFactory(
         ConnectionFactory connFactory,
         ObjectPool<PoolableConnection> pool,
-        KeyedObjectPoolFactory stmtPoolFactory,
+        KeyedObjectPoolFactory<PStmtKey, DelegatingPreparedStatement> stmtPoolFactory,
         String validationQuery,
         boolean defaultReadOnly,
         boolean defaultAutoCommit,
@@ -272,7 +280,7 @@ public class PoolableConnectionFactory implements PoolableObjectFactory<Poolable
     public PoolableConnectionFactory(
         ConnectionFactory connFactory,
         ObjectPool<PoolableConnection> pool,
-        KeyedObjectPoolFactory stmtPoolFactory,
+        KeyedObjectPoolFactory<PStmtKey, DelegatingPreparedStatement> stmtPoolFactory,
         String validationQuery,
         boolean defaultReadOnly,
         boolean defaultAutoCommit,
@@ -305,7 +313,7 @@ public class PoolableConnectionFactory implements PoolableObjectFactory<Poolable
     public PoolableConnectionFactory(
         ConnectionFactory connFactory,
         ObjectPool<PoolableConnection> pool,
-        KeyedObjectPoolFactory stmtPoolFactory,
+        KeyedObjectPoolFactory<PStmtKey, DelegatingPreparedStatement> stmtPoolFactory,
         String validationQuery,
         boolean defaultReadOnly,
         boolean defaultAutoCommit,
@@ -340,7 +348,7 @@ public class PoolableConnectionFactory implements PoolableObjectFactory<Poolable
     public PoolableConnectionFactory(
         ConnectionFactory connFactory,
         ObjectPool<PoolableConnection> pool,
-        KeyedObjectPoolFactory stmtPoolFactory,
+        KeyedObjectPoolFactory<PStmtKey, DelegatingPreparedStatement> stmtPoolFactory,
         String validationQuery,
         Boolean defaultReadOnly,
         boolean defaultAutoCommit,
@@ -377,7 +385,7 @@ public class PoolableConnectionFactory implements PoolableObjectFactory<Poolable
     public PoolableConnectionFactory(
         ConnectionFactory connFactory,
         ObjectPool<PoolableConnection> pool,
-        KeyedObjectPoolFactory stmtPoolFactory,
+        KeyedObjectPoolFactory<PStmtKey, DelegatingPreparedStatement> stmtPoolFactory,
         String validationQuery,
         Collection<String> connectionInitSqls,
         Boolean defaultReadOnly,
@@ -416,7 +424,7 @@ public class PoolableConnectionFactory implements PoolableObjectFactory<Poolable
     public PoolableConnectionFactory(
         ConnectionFactory connFactory,
         ObjectPool<PoolableConnection> pool,
-        KeyedObjectPoolFactory stmtPoolFactory,
+        KeyedObjectPoolFactory<PStmtKey, DelegatingPreparedStatement> stmtPoolFactory,
         String validationQuery,
         int validationQueryTimeout,
         Boolean defaultReadOnly,
@@ -456,7 +464,7 @@ public class PoolableConnectionFactory implements PoolableObjectFactory<Poolable
     public PoolableConnectionFactory(
         ConnectionFactory connFactory,
         ObjectPool<PoolableConnection> pool,
-        KeyedObjectPoolFactory stmtPoolFactory,
+        KeyedObjectPoolFactory<PStmtKey, DelegatingPreparedStatement> stmtPoolFactory,
         String validationQuery,
         int validationQueryTimeout,
         Collection<String> connectionInitSqls,
@@ -550,7 +558,7 @@ public class PoolableConnectionFactory implements PoolableObjectFactory<Poolable
      * Set to <tt>null</tt> to disable {@link java.sql.PreparedStatement} pooling.
      * @param stmtPoolFactory the {@link KeyedObjectPoolFactory} to use to create {@link KeyedObjectPool}s for pooling {@link java.sql.PreparedStatement}s
      */
-    public void setStatementPoolFactory(KeyedObjectPoolFactory stmtPoolFactory) {
+    public void setStatementPoolFactory(KeyedObjectPoolFactory<PStmtKey, DelegatingPreparedStatement> stmtPoolFactory) {
         _stmtPoolFactory = stmtPoolFactory;
     }
 
@@ -594,7 +602,7 @@ public class PoolableConnectionFactory implements PoolableObjectFactory<Poolable
         }
         initializeConnection(conn);
         if(null != _stmtPoolFactory) {
-            KeyedObjectPool stmtpool = _stmtPoolFactory.createPool();
+            KeyedObjectPool<PStmtKey, DelegatingPreparedStatement> stmtpool = _stmtPoolFactory.createPool();
             conn = new PoolingConnection(conn,stmtpool);
             stmtpool.setFactory((PoolingConnection)conn);
         }
@@ -719,7 +727,7 @@ public class PoolableConnectionFactory implements PoolableObjectFactory<Poolable
     protected volatile int _validationQueryTimeout = -1;
     protected Collection<String> _connectionInitSqls = null;
     protected volatile ObjectPool<PoolableConnection> _pool = null;
-    protected volatile KeyedObjectPoolFactory _stmtPoolFactory = null;
+    protected volatile KeyedObjectPoolFactory<PStmtKey, DelegatingPreparedStatement> _stmtPoolFactory = null;
     protected Boolean _defaultReadOnly = null;
     protected boolean _defaultAutoCommit = true;
     protected int _defaultTransactionIsolation = UNKNOWN_TRANSACTIONISOLATION;

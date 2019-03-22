@@ -23,7 +23,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
-import org.apache.tomcat.dbcp.dbcp.PoolingConnection.PStmtKey;
 import org.apache.tomcat.dbcp.pool.KeyedObjectPool;
 
 /**

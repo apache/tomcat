@@ -1470,9 +1470,9 @@ public class BasicDataSource implements DataSource {
         createConnectionPool();
 
         // Set up statement pool, if desired
-        GenericKeyedObjectPoolFactory statementPoolFactory = null;
+        GenericKeyedObjectPoolFactory<PStmtKey, DelegatingPreparedStatement> statementPoolFactory = null;
         if (isPoolPreparedStatements()) {
-            statementPoolFactory = new GenericKeyedObjectPoolFactory(null,
+            statementPoolFactory = new GenericKeyedObjectPoolFactory<PStmtKey, DelegatingPreparedStatement>(null,
                         -1, // unlimited maxActive (per key)
                         GenericKeyedObjectPool.WHEN_EXHAUSTED_FAIL,
                         0, // maxWait
@@ -1702,7 +1702,8 @@ public class BasicDataSource implements DataSource {
      * @throws SQLException if an error occurs creating the PoolableConnectionFactory
      */
     protected void createPoolableConnectionFactory(ConnectionFactory driverConnectionFactory,
-            KeyedObjectPoolFactory statementPoolFactory, AbandonedConfig configuration) throws SQLException {
+            KeyedObjectPoolFactory<PStmtKey, DelegatingPreparedStatement> statementPoolFactory,
+            AbandonedConfig configuration) throws SQLException {
         PoolableConnectionFactory connectionFactory = null;
         try {
             connectionFactory =
