@@ -88,7 +88,6 @@ public class BasicDataSource implements DataSource {
      */
     public void setDefaultAutoCommit(boolean defaultAutoCommit) {
         this.defaultAutoCommit = defaultAutoCommit;
-        this.restartNeeded = true;
     }
 
 
@@ -122,7 +121,6 @@ public class BasicDataSource implements DataSource {
      */
     public void setDefaultReadOnly(boolean defaultReadOnly) {
         this.defaultReadOnly = defaultReadOnly ? Boolean.TRUE : Boolean.FALSE;
-        this.restartNeeded = true;
     }
 
     /**
@@ -156,7 +154,6 @@ public class BasicDataSource implements DataSource {
      */
     public void setDefaultTransactionIsolation(int defaultTransactionIsolation) {
         this.defaultTransactionIsolation = defaultTransactionIsolation;
-        this.restartNeeded = true;
     }
 
 
@@ -191,7 +188,6 @@ public class BasicDataSource implements DataSource {
         else {
             this.defaultCatalog = null;
         }
-        this.restartNeeded = true;
     }
 
 
@@ -226,7 +222,6 @@ public class BasicDataSource implements DataSource {
         else {
             this.driverClassName = null;
         }
-        this.restartNeeded = true;
     }
 
     /**
@@ -259,7 +254,6 @@ public class BasicDataSource implements DataSource {
     public synchronized void setDriverClassLoader(
             ClassLoader driverClassLoader) {
         this.driverClassLoader = driverClassLoader;
-        this.restartNeeded = true;
     }
 
     /**
@@ -433,7 +427,6 @@ public class BasicDataSource implements DataSource {
      */
     public synchronized void setInitialSize(int initialSize) {
         this.initialSize = initialSize;
-        this.restartNeeded = true;
     }
 
     /**
@@ -499,7 +492,6 @@ public class BasicDataSource implements DataSource {
      */
     public synchronized void setPoolPreparedStatements(boolean poolingStatements) {
         this.poolPreparedStatements = poolingStatements;
-        this.restartNeeded = true;
     }
 
     /**
@@ -539,7 +531,6 @@ public class BasicDataSource implements DataSource {
      */
     public synchronized void setMaxOpenPreparedStatements(int maxOpenStatements) {
         this.maxOpenPreparedStatements = maxOpenStatements;
-        this.restartNeeded = true;
     }
 
     /**
@@ -843,7 +834,6 @@ public class BasicDataSource implements DataSource {
      */
     public void setPassword(String password) {
         this.password = password;
-        this.restartNeeded = true;
     }
 
     /**
@@ -874,7 +864,6 @@ public class BasicDataSource implements DataSource {
      */
     public synchronized void setUrl(String url) {
         this.url = url;
-        this.restartNeeded = true;
     }
 
     /**
@@ -905,7 +894,6 @@ public class BasicDataSource implements DataSource {
      */
     public void setUsername(String username) {
         this.username = username;
-        this.restartNeeded = true;
     }
 
     /**
@@ -943,7 +931,6 @@ public class BasicDataSource implements DataSource {
         } else {
             this.validationQuery = null;
         }
-        this.restartNeeded = true;
     }
 
     /**
@@ -979,7 +966,6 @@ public class BasicDataSource implements DataSource {
      */
     public void setValidationQueryTimeout(int timeout) {
         this.validationQueryTimeout = timeout;
-        restartNeeded = true;
     }
 
     /**
@@ -1042,7 +1028,6 @@ public class BasicDataSource implements DataSource {
         } else {
             this.connectionInitSqls = null;
         }
-        this.restartNeeded = true;
     }
 
 
@@ -1075,30 +1060,9 @@ public class BasicDataSource implements DataSource {
      */
     public synchronized void setAccessToUnderlyingConnectionAllowed(boolean allow) {
         this.accessToUnderlyingConnectionAllowed = allow;
-        this.restartNeeded = true;
     }
 
     // ----------------------------------------------------- Instance Variables
-
-    // TODO: review & make isRestartNeeded() public, restartNeeded protected
-
-    /**
-     * A property setter has been invoked that will require the connection
-     * pool to be re-initialized. Currently, restart is not triggered, so
-     * this property has no effect.
-     */
-    private volatile boolean restartNeeded = false;
-
-    /**
-     * Returns whether or not a restart is needed.
-     *
-     * Note: restart is not currently triggered by property changes.
-     *
-     * @return true if a restart is needed
-     */
-    private boolean isRestartNeeded() {
-        return restartNeeded;
-    }
 
     /**
      * The object pool that internally manages our connections.
@@ -1283,7 +1247,6 @@ public class BasicDataSource implements DataSource {
             abandonedConfig = new AbandonedConfig();
         }
         abandonedConfig.setRemoveAbandoned(removeAbandoned);
-        this.restartNeeded = true;
     }
 
     /**
@@ -1325,7 +1288,6 @@ public class BasicDataSource implements DataSource {
             abandonedConfig = new AbandonedConfig();
         }
         abandonedConfig.setRemoveAbandonedTimeout(removeAbandonedTimeout);
-        this.restartNeeded = true;
     }
 
     /**
@@ -1353,7 +1315,6 @@ public class BasicDataSource implements DataSource {
             abandonedConfig = new AbandonedConfig();
         }
         abandonedConfig.setLogAbandoned(logAbandoned);
-        this.restartNeeded = true;
     }
 
     // --------------------------------------------------------- Public Methods
@@ -1370,7 +1331,6 @@ public class BasicDataSource implements DataSource {
      */
     public void addConnectionProperty(String name, String value) {
         connectionProperties.put(name, value);
-        this.restartNeeded = true;
     }
 
     /**
@@ -1381,7 +1341,6 @@ public class BasicDataSource implements DataSource {
      */
     public void removeConnectionProperty(String name) {
         connectionProperties.remove(name);
-        this.restartNeeded = true;
     }
 
     /**
@@ -1415,7 +1374,6 @@ public class BasicDataSource implements DataSource {
             }
         }
         this.connectionProperties = properties;
-        this.restartNeeded = true;
     }
 
     protected boolean closed;
@@ -1777,17 +1735,6 @@ public class BasicDataSource implements DataSource {
         }
         finally {
             connectionFactory.destroyObject(conn);
-        }
-    }
-
-    /**
-     * Not used currently
-     */
-    private void restart() {
-        try {
-            close();
-        } catch (SQLException e) {
-            log("Could not restart DataSource, cause: " + e.getMessage());
         }
     }
 
