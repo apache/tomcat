@@ -62,12 +62,12 @@ class PooledConnectionImpl
     /**
      * ConnectionEventListeners
      */
-    private final Vector eventListeners;
+    private final Vector<ConnectionEventListener> eventListeners;
 
     /**
      * StatementEventListeners
      */
-    private final Vector statementEventListeners = new Vector();
+    private final Vector<StatementEventListener> statementEventListeners = new Vector<StatementEventListener>();
 
     /**
      * flag set to true, once close() is called.
@@ -95,7 +95,7 @@ class PooledConnectionImpl
         } else {
             this.delegatingConnection = new DelegatingConnection(connection);
         }
-        eventListeners = new Vector();
+        eventListeners = new Vector<ConnectionEventListener>();
         isClosed = false;
         if (pool != null) {
             pstmtPool = pool;

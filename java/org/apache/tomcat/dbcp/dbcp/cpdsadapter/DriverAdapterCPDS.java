@@ -278,7 +278,7 @@ public class DriverAdapterCPDS
      */
     @Override
     public Object getObjectInstance(Object refObj, Name name,
-                                    Context context, Hashtable env)
+                                    Context context, Hashtable<?, ?> env)
             throws Exception {
         // The spec says to return null if we can't create an instance
         // of the reference
