@@ -342,8 +342,8 @@ public class PerUserPoolDataSource
     /**
      * Get the number of active connections in the pool for a given user.
      */
-    public int getNumActive(String username, String password) {
-        ObjectPool pool = getPool(getPoolKey(username,password));
+    public int getNumActive(String username, @SuppressWarnings("unused") String password) {
+        ObjectPool pool = getPool(getPoolKey(username));
         return (pool == null) ? 0 : pool.getNumActive();
     }
 
@@ -357,8 +357,8 @@ public class PerUserPoolDataSource
     /**
      * Get the number of idle connections in the pool for a given user.
      */
-    public int getNumIdle(String username, String password) {
-        ObjectPool pool = getPool(getPoolKey(username,password));
+    public int getNumIdle(String username, @SuppressWarnings("unused") String password) {
+        ObjectPool pool = getPool(getPoolKey(username));
         return (pool == null) ? 0 : pool.getNumIdle();
     }
 
@@ -371,7 +371,7 @@ public class PerUserPoolDataSource
         getPooledConnectionAndInfo(String username, String password)
         throws SQLException {
 
-        final PoolKey key = getPoolKey(username,password);
+        final PoolKey key = getPoolKey(username);
         ObjectPool pool;
         PooledConnectionManager manager;
         synchronized(this) {
@@ -466,8 +466,7 @@ public class PerUserPoolDataSource
 
     @Override
     protected PooledConnectionManager getConnectionManager(UserPassKey upkey) {
-        return (PooledConnectionManager) managers.get(getPoolKey(
-                upkey.getUsername(), upkey.getPassword()));
+        return (PooledConnectionManager) managers.get(getPoolKey(upkey.getUsername()));
     }
 
     /**
@@ -483,7 +482,7 @@ public class PerUserPoolDataSource
         return ref;
     }
 
-    private PoolKey getPoolKey(String username, String password) {
+    private PoolKey getPoolKey(String username) {
         return new PoolKey(getDataSourceName(), username);
     }
 
@@ -523,7 +522,7 @@ public class PerUserPoolDataSource
         CPDSConnectionFactory factory = new CPDSConnectionFactory(cpds, pool, getValidationQuery(),
                 isRollbackAfterValidation(), username, password);
 
-        Object old = managers.put(getPoolKey(username,password), factory);
+        Object old = managers.put(getPoolKey(username), factory);
         if (old != null) {
             throw new IllegalStateException("Pool already contains an entry for this user/password: "+username);
         }
