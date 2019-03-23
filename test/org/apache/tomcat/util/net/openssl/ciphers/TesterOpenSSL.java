@@ -307,6 +307,18 @@ public class TesterOpenSSL {
             unimplemented.add(Cipher.TLS_RSA_PSK_WITH_ARIA_256_GCM_SHA384);
         }
 
+        String skipCiphers = System.getProperty("tomcat.test.openssl.unimplemented", "");
+        if (!skipCiphers.isEmpty()) {
+            String[] skip = skipCiphers.split(",");
+            for (Cipher c : Cipher.values()) {
+                for (String s : skip) {
+                    if (c.toString().contains(s)) {
+                        unimplemented.add(c);
+                    }
+                }
+            }
+        }
+
         OPENSSL_UNIMPLEMENTED_CIPHERS = Collections.unmodifiableSet(unimplemented);
 
         Map<String,String> renamed = new HashMap<>();
@@ -346,7 +358,6 @@ public class TesterOpenSSL {
             result.add(cipher);
         }
         return result;
-
     }
 
 
