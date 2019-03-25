@@ -89,13 +89,6 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
 
     private Nio2Acceptor acceptor = null;
 
-    public Nio2Endpoint() {
-        // Override the defaults for NIO2
-        // Disable maxConnections by default for NIO2 (see BZ58103)
-        setMaxConnections(-1);
-    }
-
-
     // ------------------------------------------------------------- Properties
 
     /**

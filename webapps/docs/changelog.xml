@@ -97,6 +97,10 @@
       <fix>
         Refactor NIO2 write pending strategy for the classic IO API. (remm)
       </fix>
+      <fix>
+        Restore original maxConnections default for NIO2 as the underlying
+        close issues have been fixed. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
