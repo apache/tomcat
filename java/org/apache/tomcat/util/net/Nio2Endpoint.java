@@ -915,13 +915,6 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
 
 
         @Override
-        public boolean isWritePending() {
-            synchronized (writeCompletionHandler) {
-                return writePending.availablePermits() == 0;
-            }
-        }
-
-        @Override
         public boolean hasAsyncIO() {
             return true;
         }
@@ -1407,9 +1400,8 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
         @Override
         public boolean hasDataToRead() {
             synchronized (readCompletionHandler) {
-                return !socketBufferHandler.isReadBufferEmpty() ||
-                        readNotify ||
-                        getError() != null;
+                return !socketBufferHandler.isReadBufferEmpty()
+                        || readNotify || getError() != null;
             }
         }
 
@@ -1417,11 +1409,8 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
         @Override
         public boolean hasDataToWrite() {
             synchronized (writeCompletionHandler) {
-                return !socketBufferHandler.isWriteBufferEmpty() ||
-                        writeNotify ||
-                        !nonBlockingWriteBuffer.isEmpty() ||
-                        writePending.availablePermits() == 0 ||
-                        getError() != null;
+                return !socketBufferHandler.isWriteBufferEmpty() || !nonBlockingWriteBuffer.isEmpty()
+                        || writeNotify || writePending.availablePermits() == 0 || getError() != null;
             }
         }
 
@@ -1430,6 +1419,14 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
         public boolean isReadPending() {
             synchronized (readCompletionHandler) {
                 return readPending.availablePermits() == 0;
+            }
+        }
+
+
+        @Override
+        public boolean isWritePending() {
+            synchronized (writeCompletionHandler) {
+                return writePending.availablePermits() == 0;
             }
         }
 
@@ -1463,19 +1460,6 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
             }
         }
 
-        /*
-         * This should only be called from a thread that currently holds a lock
-         * on the socket. This prevents a race condition between a pending read
-         * being completed and processed and a thread triggering a new read.
-         */
-        void releaseReadPending() {
-            synchronized (readCompletionHandler) {
-                if (readPending.availablePermits() == 0) {
-                    readPending.release();
-                }
-            }
-        }
-
 
         @Override
         public void registerReadInterest() {
@@ -1486,12 +1470,12 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
                 }
                 readInterest = true;
                 if (readPending.tryAcquire()) {
-                    // No read pending, so await bytes
+                    // No read pending, so do a read
                     try {
                         if (fillReadBuffer(false) > 0) {
-                            // Special case where the read completes inline, there is no notification
-                            // in that case and it cannot happen elsewhere
-                            getEndpoint().processSocket(Nio2SocketWrapper.this, SocketEvent.OPEN_READ, true);
+                            // Special case where the read completed inline, there is no notification
+                            // in that case so it has to be done here
+                            getEndpoint().processSocket(this, SocketEvent.OPEN_READ, true);
                         }
                     } catch (IOException e) {
                         // Will never happen
@@ -1511,7 +1495,7 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
                 }
                 writeInterest = true;
                 if (writePending.availablePermits() == 1) {
-                    // If no write is pending, notify
+                    // If no write is pending, notify that writing is possible
                     getEndpoint().processSocket(this, SocketEvent.OPEN_WRITE, true);
                 }
             }
