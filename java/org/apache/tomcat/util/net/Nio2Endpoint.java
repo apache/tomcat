@@ -750,7 +750,7 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
                     writeInterest = true;
                     return false;
                 }
-                // If the buffer is empty, it is possible to write to it 
+                // If the buffer is empty, it is possible to write to it
                 if (socketBufferHandler.isWriteBufferEmpty() && nonBlockingWriteBuffer.isEmpty()) {
                     writePending.release();
                     return true;
