@@ -777,7 +777,9 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
             try {
                 if (processor == null) {
                     String negotiatedProtocol = wrapper.getNegotiatedProtocol();
-                    if (negotiatedProtocol != null) {
+                    // OpenSSL typically returns null whereas JSSE typically
+                    // returns "" when no protocol is negotiated
+                    if (negotiatedProtocol != null && negotiatedProtocol.length() > 0) {
                         UpgradeProtocol upgradeProtocol =
                                 getProtocol().getNegotiatedProtocol(negotiatedProtocol);
                         if (upgradeProtocol != null) {
