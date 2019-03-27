@@ -93,6 +93,11 @@
       <fix>
         Harmonize NIO2 isReadyForWrite with isReadyForRead code. (remm)
       </fix>
+      <fix>
+        When using a JSSE TLS connector that supported ALPN (Java 9 onwards) and
+        a protocol was not negotiated, Tomcat failed to fallback to HTTP/1.1 and
+        instead dropped the connection. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
