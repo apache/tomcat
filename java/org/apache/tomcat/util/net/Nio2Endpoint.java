@@ -731,7 +731,22 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
                 if (writeNotify) {
                     return true;
                 }
-                return super.isReadyForWrite();
+
+                if (!writePending.tryAcquire()) {
+                    writeInterest = true;
+                    return false;
+                }
+
+                if (socketBufferHandler.isWriteBufferEmpty() && nonBlockingWriteBuffer.isEmpty()) {
+                    writePending.release();
+                    return true;
+                }
+
+                boolean isReady = !flushNonBlockingInternal(true);
+                if (!isReady) {
+                    writeInterest = true;
+                }
+                return isReady;
             }
         }
 
@@ -1233,6 +1248,7 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
             // indicate the end of a write
             // Uses: if (writePending.tryAcquire(socketWrapper.getTimeout(), TimeUnit.MILLISECONDS))
             synchronized (writeCompletionHandler) {
+                checkError();
                 if (writeNotify || writePending.tryAcquire()) {
                     // No pending completion handler, so writing to the main buffer
                     // is possible
@@ -1244,7 +1260,7 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
                         // Remaining data must be buffered
                         nonBlockingWriteBuffer.add(buf, off, len);
                     }
-                    flushNonBlocking(true);
+                    flushNonBlockingInternal(true);
                 } else {
                     nonBlockingWriteBuffer.add(buf, off, len);
                 }
@@ -1283,6 +1299,7 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
             // indicate the end of a write
             // Uses: if (writePending.tryAcquire(socketWrapper.getTimeout(), TimeUnit.MILLISECONDS))
             synchronized (writeCompletionHandler) {
+                checkError();
                 if (writeNotify || writePending.tryAcquire()) {
                     // No pending completion handler, so writing to the main buffer
                     // is possible
@@ -1292,7 +1309,7 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
                         // Remaining data must be buffered
                         nonBlockingWriteBuffer.add(from);
                     }
-                    flushNonBlocking(true);
+                    flushNonBlockingInternal(true);
                 } else {
                     nonBlockingWriteBuffer.add(from);
                 }
@@ -1357,11 +1374,11 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
 
         @Override
         protected boolean flushNonBlocking() throws IOException {
-            return flushNonBlocking(false);
+            checkError();
+            return flushNonBlockingInternal(false);
         }
 
-        private boolean flushNonBlocking(boolean hasPermit) throws IOException {
-            checkError();
+        private boolean flushNonBlockingInternal(boolean hasPermit) {
             synchronized (writeCompletionHandler) {
                 if (writeNotify || hasPermit || writePending.tryAcquire()) {
                     // The code that was notified is now writing its data
