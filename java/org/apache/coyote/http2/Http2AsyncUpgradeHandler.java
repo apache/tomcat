@@ -264,13 +264,6 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
     }
 
     @Override
-    protected void processWrites() throws IOException {
-        if (socketWrapper.isWritePending()) {
-            socketWrapper.registerWriteInterest();
-        }
-    }
-
-    @Override
     protected SendfileState processSendfile(SendfileData sendfile) {
         if (sendfile != null) {
             try {
