@@ -701,22 +701,22 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
         @Override
         public boolean isReadyForRead() throws IOException {
             synchronized (readCompletionHandler) {
+                // A notification has been sent, it is possible to read at least once
                 if (readNotify) {
                     return true;
                 }
-
+                // If a read is pending, reading is not possible until a notification is sent
                 if (!readPending.tryAcquire()) {
                     readInterest = true;
                     return false;
                 }
-
+                // It is possible to read directly from the buffer contents
                 if (!socketBufferHandler.isReadBufferEmpty()) {
                     readPending.release();
                     return true;
                 }
-
-                int nRead = fillReadBuffer(false);
-                boolean isReady = nRead > 0;
+                // Try to read some data
+                boolean isReady = fillReadBuffer(false) > 0;
                 if (!isReady) {
                     readInterest = true;
                 }
@@ -728,20 +728,21 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
         @Override
         public boolean isReadyForWrite() {
             synchronized (writeCompletionHandler) {
+                // A notification has been sent, it is possible to write at least once
                 if (writeNotify) {
                     return true;
                 }
-
+                // If a write is pending, writing is not possible until a notification is sent
                 if (!writePending.tryAcquire()) {
                     writeInterest = true;
                     return false;
                 }
-
+                // If the buffer is empty, it is possible to write to it 
                 if (socketBufferHandler.isWriteBufferEmpty() && nonBlockingWriteBuffer.isEmpty()) {
                     writePending.release();
                     return true;
                 }
-
+                // Try to flush all data
                 boolean isReady = !flushNonBlockingInternal(true);
                 if (!isReady) {
                     writeInterest = true;
