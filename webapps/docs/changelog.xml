@@ -150,6 +150,40 @@
       <update>
         Update to the Eclipse JDT compiler 4.10. (markt)
       </update>
+      <add>
+        Expand the coverage and quality of the Spanish translations provided
+        with Apache Tomcat. Includes contributions by Ulises Gonzalez Horta.
+        (markt)
+      </add>
+      <add>
+        Expand the coverage and quality of the Czech translations provided
+        with Apache Tomcat. Includes contributions by Arnošt Havelka. (markt)
+      </add>
+      <add>
+        Expand the coverage and quality of the Chinese translations provided
+        with Apache Tomcat. Includes contributions by winsonzhao and wjt.
+        (markt)
+      </add>
+      <add>
+        Expand the coverage and quality of the Russian translations provided
+        with Apache Tomcat. (kkolinko)
+      </add>
+      <add>
+        Expand the coverage and quality of the Japanese translations provided
+        with Apache Tomcat. (kfujino)
+      </add>
+      <add>
+        Expand the coverage and quality of the Korean translations provided
+        with Apache Tomcat. (woonsan)
+      </add>
+      <add>
+        Expand the coverage and quality of the German translations provided
+        with Apache Tomcat. (fschumacher)
+      </add>
+      <add>
+        Expand the coverage and quality of the French translations provided
+        with Apache Tomcat. (remm)
+      </add>
     </changelog>
   </subsection>
 </section>
