@@ -101,6 +101,9 @@
         Restore original maxConnections default for NIO2 as the underlying
         close issues have been fixed. (remm)
       </fix>
+      <fix>
+        Harmonize NIO2 isReadyForWrite with isReadyForRead code. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
