@@ -90,6 +90,9 @@
       <fix>
         Refactor NIO2 write pending strategy for the classic IO API. (remm)
       </fix>
+      <fix>
+        Harmonize NIO2 isReadyForWrite with isReadyForRead code. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">

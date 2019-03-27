@@ -953,6 +953,7 @@ public abstract class SocketWrapperBase<E> {
      *  <code>false</code> if the operation is still pending and
      *  the specified timeout has passed
      */
+    @Deprecated
     public boolean awaitReadComplete(long timeout, TimeUnit unit) {
         return true;
     }
@@ -967,6 +968,7 @@ public abstract class SocketWrapperBase<E> {
      *  <code>false</code> if the operation is still pending and
      *  the specified timeout has passed
      */
+    @Deprecated
     public boolean awaitWriteComplete(long timeout, TimeUnit unit) {
         return true;
     }
