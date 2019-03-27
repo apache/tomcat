@@ -731,29 +731,7 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
                 if (writeNotify) {
                     return true;
                 }
-
-                if (!writePending.tryAcquire()) {
-                    writeInterest = true;
-                    return false;
-                }
-
-                if (socketBufferHandler.isWriteBufferEmpty() && nonBlockingWriteBuffer.isEmpty()) {
-                    writePending.release();
-                    return true;
-                }
-
-                boolean dataLeft = false;
-                try {
-                    dataLeft = flushNonBlocking(true);
-                } catch (IOException e) {
-                    setError(e);
-                    return true;
-                }
-                boolean isReady = !dataLeft;
-                if (!isReady) {
-                    writeInterest = true;
-                }
-                return isReady;
+                return super.isReadyForWrite();
             }
         }
 
