@@ -72,7 +72,7 @@ public class MessageDigestCredentialHandler extends DigestCredentialHandlerBase 
             try {
                 this.encoding = B2CConverter.getCharset(encodingName);
             } catch (UnsupportedEncodingException e) {
-                log.warn(sm.getString("mdCredentialHandler.unknownEncoding",
+                log.error(sm.getString("mdCredentialHandler.unknownEncoding",
                         encodingName, encoding.name()));
             }
         }
