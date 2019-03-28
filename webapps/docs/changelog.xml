@@ -86,6 +86,10 @@
         server.xml if deemed useful. Storeconfig will not attempt to persist
         the new listener. (remm)
       </update>
+      <fix>
+        <bug>63287</bug>: Make loggin levels more consistent for similar issues
+        of similar severity. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
