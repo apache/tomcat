@@ -16,6 +16,7 @@
  */
 package org.apache.tomcat.util.net.openssl;
 
+import java.io.IOException;
 import java.security.KeyStoreException;
 import java.util.List;
 import java.util.Set;
@@ -102,7 +103,9 @@ public class OpenSSLUtil extends SSLUtilBase {
     public KeyManager[] getKeyManagers() throws Exception {
         try {
             return super.getKeyManagers();
-        } catch (KeyStoreException e) {
+        } catch (KeyStoreException | IOException e) {
+            // Depending on what is presented, JSSE may throw either of the
+            // above exceptions if it doesn't understand the provided file.
             if (certificate.getCertificateFile() != null) {
                 if (log.isDebugEnabled()) {
                     log.info(sm.getString("openssl.nonJsseCertficate",
