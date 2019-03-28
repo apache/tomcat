@@ -749,7 +749,7 @@ public class Connector extends LifecycleMBeanBase  {
         try {
             uriCharset = B2CConverter.getCharset(URIEncoding);
         } catch (UnsupportedEncodingException e) {
-            log.warn(sm.getString("coyoteConnector.invalidEncoding",
+            log.error(sm.getString("coyoteConnector.invalidEncoding",
                     URIEncoding, uriCharset.name()), e);
         }
     }
