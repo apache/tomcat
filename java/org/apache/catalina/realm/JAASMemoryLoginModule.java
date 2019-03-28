@@ -381,14 +381,14 @@ public class JAASMemoryLoginModule extends MemoryRealm implements LoginModule {
         if (!file.isAbsolute()) {
             String catalinaBase = getCatalinaBase();
             if (catalinaBase == null) {
-                log.warn(sm.getString("jaasMemoryLoginModule.noCatalinaBase", pathname));
+                log.error(sm.getString("jaasMemoryLoginModule.noCatalinaBase", pathname));
                 return;
             } else {
                 file = new File(catalinaBase, pathname);
             }
         }
         if (!file.canRead()) {
-            log.warn(sm.getString("jaasMemoryLoginModule.noConfig", file.getAbsolutePath()));
+            log.error(sm.getString("jaasMemoryLoginModule.noConfig", file.getAbsolutePath()));
             return;
         }
 
@@ -400,7 +400,7 @@ public class JAASMemoryLoginModule extends MemoryRealm implements LoginModule {
             digester.push(this);
             digester.parse(file);
         } catch (Exception e) {
-            log.warn(sm.getString("jaasMemoryLoginModule.parseError", file.getAbsolutePath()), e);
+            log.error(sm.getString("jaasMemoryLoginModule.parseError", file.getAbsolutePath()), e);
         } finally {
             digester.reset();
         }
