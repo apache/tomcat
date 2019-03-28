@@ -271,7 +271,7 @@ public class StaticMembershipProvider extends MembershipProviderBase implements 
         try {
             if (!useThread) ping();
         } catch (ChannelException e) {
-            log.error(sm.getString("staticMembershipProvider.heartbeat.failed"), e);
+            log.warn(sm.getString("staticMembershipProvider.heartbeat.failed"), e);
         }
     }
 
