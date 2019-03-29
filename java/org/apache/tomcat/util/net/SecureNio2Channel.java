@@ -256,7 +256,7 @@ public class SecureNio2Channel extends Nio2Channel  {
                         return 0;
                     } else {
                         if (async) {
-                            sc.write(netOutBuffer, Nio2Endpoint.toNio2Timeout(timeout),
+                            sc.write(netOutBuffer, AbstractEndpoint.toTimeout(timeout),
                                     TimeUnit.MILLISECONDS, socket, handshakeWriteCompletionHandler);
                         } else {
                             try {
@@ -294,7 +294,7 @@ public class SecureNio2Channel extends Nio2Channel  {
                     if (handshakeStatus != HandshakeStatus.NEED_UNWRAP || netOutBuffer.remaining() > 0) {
                         //should actually return OP_READ if we have NEED_UNWRAP
                         if (async) {
-                            sc.write(netOutBuffer, Nio2Endpoint.toNio2Timeout(timeout),
+                            sc.write(netOutBuffer, AbstractEndpoint.toTimeout(timeout),
                                     TimeUnit.MILLISECONDS, socket, handshakeWriteCompletionHandler);
                         } else {
                             try {
@@ -326,7 +326,7 @@ public class SecureNio2Channel extends Nio2Channel  {
                         }
                         //read more data
                         if (async) {
-                            sc.read(netInBuffer, Nio2Endpoint.toNio2Timeout(timeout),
+                            sc.read(netInBuffer, AbstractEndpoint.toTimeout(timeout),
                                     TimeUnit.MILLISECONDS, socket, handshakeReadCompletionHandler);
                         } else {
                             try {
@@ -371,7 +371,7 @@ public class SecureNio2Channel extends Nio2Channel  {
         // an optimisation for the typical case so we don't create an
         // SNIExtractor only to discover there is no data to process
         if (netInBuffer.position() == 0) {
-            sc.read(netInBuffer, Nio2Endpoint.toNio2Timeout(endpoint.getConnectionTimeout()),
+            sc.read(netInBuffer, AbstractEndpoint.toTimeout(endpoint.getConnectionTimeout()),
                     TimeUnit.MILLISECONDS, socket, handshakeReadCompletionHandler);
             return 1;
         }
@@ -387,7 +387,7 @@ public class SecureNio2Channel extends Nio2Channel  {
                     Integer.toString(newLimit)));
 
             netInBuffer = ByteBufferUtils.expand(netInBuffer, newLimit);
-            sc.read(netInBuffer, Nio2Endpoint.toNio2Timeout(endpoint.getConnectionTimeout()),
+            sc.read(netInBuffer, AbstractEndpoint.toTimeout(endpoint.getConnectionTimeout()),
                     TimeUnit.MILLISECONDS, socket, handshakeReadCompletionHandler);
             return 1;
         }
@@ -405,7 +405,7 @@ public class SecureNio2Channel extends Nio2Channel  {
             clientRequestedCiphers = extractor.getClientRequestedCiphers();
             break;
         case NEED_READ:
-            sc.read(netInBuffer, Nio2Endpoint.toNio2Timeout(endpoint.getConnectionTimeout()),
+            sc.read(netInBuffer, AbstractEndpoint.toTimeout(endpoint.getConnectionTimeout()),
                     TimeUnit.MILLISECONDS, socket, handshakeReadCompletionHandler);
             return 1;
         case UNDERFLOW:

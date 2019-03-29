@@ -114,11 +114,7 @@ public class NioBlockingSelector {
                 try {
                     if ( att.getWriteLatch()==null || att.getWriteLatch().getCount()==0) att.startWriteLatch(1);
                     poller.add(att,SelectionKey.OP_WRITE,reference);
-                    if (writeTimeout < 0) {
-                        att.awaitWriteLatch(Long.MAX_VALUE,TimeUnit.MILLISECONDS);
-                    } else {
-                        att.awaitWriteLatch(writeTimeout,TimeUnit.MILLISECONDS);
-                    }
+                    att.awaitWriteLatch(AbstractEndpoint.toTimeout(writeTimeout),TimeUnit.MILLISECONDS);
                 } catch (InterruptedException ignore) {
                     // Ignore
                 }
@@ -184,11 +180,7 @@ public class NioBlockingSelector {
                 try {
                     if ( att.getReadLatch()==null || att.getReadLatch().getCount()==0) att.startReadLatch(1);
                     poller.add(att,SelectionKey.OP_READ, reference);
-                    if (readTimeout < 0) {
-                        att.awaitReadLatch(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
-                    } else {
-                        att.awaitReadLatch(readTimeout, TimeUnit.MILLISECONDS);
-                    }
+                    att.awaitReadLatch(AbstractEndpoint.toTimeout(readTimeout), TimeUnit.MILLISECONDS);
                 } catch (InterruptedException ignore) {
                     // Ignore
                 }

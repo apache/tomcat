@@ -134,6 +134,11 @@ public abstract class AbstractEndpoint<S,U> {
     }
 
 
+    public static long toTimeout(long timeout) {
+        // Many calls can't do infinite timeout so use Long.MAX_VALUE if timeout is <= 0
+        return (timeout > 0) ? timeout : Long.MAX_VALUE;
+    }
+
     // ----------------------------------------------------------------- Fields
 
     /**
