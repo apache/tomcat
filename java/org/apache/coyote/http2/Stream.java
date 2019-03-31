@@ -126,7 +126,7 @@ class Stream extends AbstractStream implements HeaderEmitter {
         this.coyoteRequest.setSendfile(handler.hasAsyncIO() && handler.getProtocol().getUseSendfile());
         this.coyoteResponse.setOutputBuffer(http2OutputBuffer);
         this.coyoteRequest.setResponse(coyoteResponse);
-        this.coyoteRequest.protocol().setString("HTTP/2.0");
+        this.coyoteRequest.protocol().setString("HTTP/2");
         if (this.coyoteRequest.getStartTime() < 0) {
             this.coyoteRequest.setStartTime(System.currentTimeMillis());
         }
