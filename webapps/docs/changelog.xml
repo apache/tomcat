@@ -79,6 +79,12 @@
         that <code>HttpServletRequest.getContextPath()</code> returns an encoded
         path in the dispatched request. (markt)
       </fix>
+      <fix>
+        <bug>63286</bug>: Document the differences in behaviour between the
+        <code>LogFormat</code> directive in httpd and the <code>pattern</code>
+        attribute in the <code>AccessLogValve</code> for <code>%D</code> and
+        <code>%T</code>. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

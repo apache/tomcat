@@ -294,8 +294,13 @@
     <li><b>%u</b> - Remote user that was authenticated (if any), else '-'</li>
     <li><b>%U</b> - Requested URL path</li>
     <li><b>%v</b> - Local server name</li>
-    <li><b>%D</b> - Time taken to process the request, in millis</li>
-    <li><b>%T</b> - Time taken to process the request, in seconds</li>
+    <li><b>%D</b> - Time taken to process the request in millis. Note: In
+                    httpd %D is microseconds. Behaviour will be aligned to httpd
+                    in Tomcat 10 onwards.</li>
+    <li><b>%T</b> - Time taken to process the request, in seconds. Note: This
+                    value has millisecond resolution whereas in httpd it has
+                    second resolution. Behaviour will be align to httpd
+                    in Tomcat 10 onwards.</li>
     <li><b>%F</b> - Time taken to commit the response, in millis</li>
     <li><b>%I</b> - Current request thread name (can compare later with stacktraces)</li>
     <li><b>%X</b> - Connection status when response is completed:
