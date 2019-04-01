@@ -87,7 +87,7 @@
         the new listener. (remm)
       </update>
       <fix>
-        <bug>63287</bug>: Make loggin levels more consistent for similar issues
+        <bug>63287</bug>: Make logging levels more consistent for similar issues
         of similar severity. (markt)
       </fix>
     </changelog>
