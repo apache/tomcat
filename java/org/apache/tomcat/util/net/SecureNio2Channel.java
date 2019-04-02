@@ -942,7 +942,7 @@ public class SecureNio2Channel extends Nio2Channel  {
                                         getBufHandler().expand(
                                                 sslEngine.getSession().getApplicationBufferSize());
                                         dst2 = getBufHandler().getReadBuffer();
-                                    } else if (dst2 == getAppReadBufHandler().getByteBuffer()) {
+                                    } else if (getAppReadBufHandler() != null && dst2 == getAppReadBufHandler().getByteBuffer()) {
                                         getAppReadBufHandler()
                                                 .expand(sslEngine.getSession().getApplicationBufferSize());
                                         dst2 = getAppReadBufHandler().getByteBuffer();
@@ -1028,7 +1028,7 @@ public class SecureNio2Channel extends Nio2Channel  {
                                 read += unwrap.bytesProduced();
                                 if (useOverflow) {
                                     // Remove the data read into the overflow buffer
-                                    read -= dsts2[dsts.length].position();
+                                    read -= getBufHandler().getReadBuffer().position();
                                 }
                                 //perform any tasks if needed
                                 if (unwrap.getHandshakeStatus() == HandshakeStatus.NEED_TASK)
@@ -1052,20 +1052,42 @@ public class SecureNio2Channel extends Nio2Channel  {
                                 //in the constructor
                                 ByteBuffer readBuffer = getBufHandler().getReadBuffer();
                                 boolean found = false;
-                                for (ByteBuffer buffer : dsts2) {
-                                    if (buffer == readBuffer) {
+                                boolean resized = true;
+                                for (int i = 0; i < length2; i++) {
+                                    // The SSL session has increased the required buffer size
+                                    // since the buffer was created.
+                                    if (dsts[offset + i] == getBufHandler().getReadBuffer()) {
+                                        getBufHandler().expand(sslEngine.getSession().getApplicationBufferSize());
+                                        if (dsts[offset + i] == getBufHandler().getReadBuffer()) {
+                                            resized = false;
+                                        }
+                                        dsts[offset + i] = getBufHandler().getReadBuffer();
+                                        found = true;
+                                    } else if (getAppReadBufHandler() != null && dsts[offset + i] == getAppReadBufHandler().getByteBuffer()) {
+                                        getAppReadBufHandler().expand(sslEngine.getSession().getApplicationBufferSize());
+                                        if (dsts[offset + i] == getAppReadBufHandler().getByteBuffer()) {
+                                            resized = false;
+                                        }
+                                        dsts[offset + i] = getAppReadBufHandler().getByteBuffer();
                                         found = true;
                                     }
                                 }
                                 if (found) {
-                                    throw new IOException(sm.getString("channel.nio.ssl.unwrapFail", unwrap.getStatus()));
+                                    if (!resized) {
+                                        throw new IOException(sm.getString("channel.nio.ssl.unwrapFail", unwrap.getStatus()));
+                                    }
                                 } else {
                                     // Add the main read buffer in the destinations and try again
                                     dsts2 = new ByteBuffer[dsts.length + 1];
-                                    for (int i = 0; i < dsts.length; i++) {
-                                        dsts2[i] = dsts[i];
+                                    int dstOffset = 0;
+                                    for (int i = 0; i < dsts.length + 1; i++) {
+                                        if (i == offset + length) {
+                                            dsts2[i] = readBuffer;
+                                            dstOffset = -1;
+                                        } else {
+                                            dsts2[i] = dsts[i + dstOffset];
+                                        }
                                     }
-                                    dsts2[dsts.length] = readBuffer;
                                     length2 = length + 1;
                                     getBufHandler().configureReadBufferForWrite();
                                     processOverflow = true;
