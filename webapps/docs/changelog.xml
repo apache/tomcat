@@ -124,6 +124,9 @@
         that prevented the use of PKCS#8 private keys with OpenSSL based
         connectors. (markt)
       </fix>
+      <fix>
+        Fix NIO2 SSL edge cases. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
