@@ -720,6 +720,7 @@ public class SecureNioChannel extends NioChannel {
                                 dsts2[i] = dsts[i + dstOffset];
                             }
                         }
+                        dsts = dsts2;
                         length++;
                         getBufHandler().configureReadBufferForWrite();
                         processOverflow = true;
