@@ -507,6 +507,14 @@
     initialisation parameter should not be set to <code>10</code> or higher on a
     production system because the debug page is not secure.</p>
 
+    <p>When using the CGI Servlet on Windows with
+    <code>enableCmdLineArguments</code> enabled, review the setting of
+    <code>cmdLineArgumentsDecoded</code> carefully and ensure that it is
+    appropriate for your environment. The default value is secure. Insecure
+    configurations may expose the server to remote code execution. Further
+    information on the potential risks and mitigations may be found by
+    following the links in the <a href="cgi-howto.html">CGI How To</a>.</p>
+
     <p><a href="config/filter.html">FailedRequestFilter</a>
     can be configured and used to reject requests that had errors during
     request parameter parsing. Without the filter the default behaviour is
