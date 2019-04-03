@@ -144,6 +144,14 @@
         3875. This restriction may be relaxed by the use of the new
         initialisation parameter <code>cmdLineArgumentsEncoded</code>. (markt)
       </add>
+      <add>
+        When the CGI Servlet is configured with
+        <code>enableCmdLineArguments</code> set to true, limit the decoded form
+        of the individual command line arguments to known safe values when
+        running on Windows. This restriction may be relaxed by the use of the
+        new initialisation parameter <code>cmdLineArgumentsDecoded</code>. This
+        is the fix for CVE-2019-0232. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
