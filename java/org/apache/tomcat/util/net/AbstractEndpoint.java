@@ -741,6 +741,14 @@ public abstract class AbstractEndpoint<S,U> {
     public boolean getDaemon() { return daemon; }
 
 
+    /**
+     * Expose async IO capability.
+     */
+    private boolean useAsyncIO = true;
+    public void setUseAsyncIO(boolean useAsyncIO) { this.useAsyncIO = useAsyncIO; }
+    public boolean getUseAsyncIO() { return useAsyncIO; }
+
+
     protected abstract boolean getDeferAccept();
 
 
