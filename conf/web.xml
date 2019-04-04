@@ -335,6 +335,14 @@
   <!--                        If not set, then webAppRootDir is used.       -->
   <!--                        Recommended value: WEB-INF/cgi                -->
   <!--                                                                      -->
+  <!--   cmdLineArgumentsEncoded                                            -->
+  <!--                        Only used when enableCmdLineArguments is      -->
+  <!--                        true. The pattern that individual encoded     -->
+  <!--                        command line arguments must match else the    -->
+  <!--                        request will be rejected. The default matches -->
+  <!--                        the allowed values defined by RFC3875.        -->
+  <!--                        [[a-zA-Z0-9\Q%;/?:@&,$-_.!~*'()\E]+]          -->
+  <!--                                                                      -->
   <!--   enableCmdLineArguments                                             -->
   <!--                        Are command line parameters generated from    -->
   <!--                        the query string as per section 4.4 of 3875   -->

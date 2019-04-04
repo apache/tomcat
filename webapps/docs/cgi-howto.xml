@@ -102,6 +102,11 @@ the web application root directory + File.separator + this prefix.
 By default there is no value, which results in the web application root
 directory being used as the search path. The recommended value is
 <code>WEB-INF/cgi</code></li>
+<li><strong>cmdLineArgumentsEncoded</strong> - If command line argumemnts
+are enabled (via <strong>enableCmdLineArguments</strong>) individual encoded
+command line argument must match this pattern else the request will be rejected.
+The default matches the allowed values defined by RFC3875 and is
+<code>[a-zA-Z0-9\Q%;/?:@&amp;,$-_.!~*'()\E]+</code></li>
 <li><strong>enableCmdLineArguments</strong> - Are command line parameters
 generated from the query string as per section 4.4 of 3875 RFC? The default is
 <code>true</code>.</li>
