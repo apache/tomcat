@@ -129,6 +129,10 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
     public boolean getDeferAccept() { return deferAccept; }
 
 
+    @Override
+    public boolean getUseAsyncIO() { return false; }
+
+
     private boolean ipv6v6only = false;
     public void setIpv6v6only(boolean ipv6v6only) { this.ipv6v6only = ipv6v6only; }
     public boolean getIpv6v6only() { return ipv6v6only; }

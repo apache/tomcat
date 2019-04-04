@@ -19,6 +19,8 @@ package org.apache.tomcat.util.net;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.ByteChannel;
+import java.nio.channels.GatheringByteChannel;
+import java.nio.channels.ScatteringByteChannel;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
@@ -33,7 +35,7 @@ import org.apache.tomcat.util.res.StringManager;
  *
  * @version 1.0
  */
-public class NioChannel implements ByteChannel {
+public class NioChannel implements ByteChannel, ScatteringByteChannel, GatheringByteChannel {
 
     protected static final StringManager sm = StringManager.getManager(NioChannel.class);
 
@@ -134,6 +136,18 @@ public class NioChannel implements ByteChannel {
         return sc.write(src);
     }
 
+    @Override
+    public long write(ByteBuffer[] srcs) throws IOException {
+        return write(srcs, 0, srcs.length);
+    }
+
+    @Override
+    public long write(ByteBuffer[] srcs, int offset, int length)
+            throws IOException {
+        checkInterruptStatus();
+        return sc.write(srcs, offset, length);
+    }
+
     /**
      * Reads a sequence of bytes from this channel into the given buffer.
      *
@@ -145,6 +159,17 @@ public class NioChannel implements ByteChannel {
     @Override
     public int read(ByteBuffer dst) throws IOException {
         return sc.read(dst);
+    }
+
+    @Override
+    public long read(ByteBuffer[] dsts) throws IOException {
+        return read(dsts, 0, dsts.length);
+    }
+
+    @Override
+    public long read(ByteBuffer[] dsts, int offset, int length)
+            throws IOException {
+        return sc.read(dsts, offset, length);
     }
 
     public Object getAttachment() {
@@ -241,4 +266,5 @@ public class NioChannel implements ByteChannel {
     protected ApplicationBufferHandler getAppReadBufHandler() {
         return appReadBufHandler;
     }
+
 }
