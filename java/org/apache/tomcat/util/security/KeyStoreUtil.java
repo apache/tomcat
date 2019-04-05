@@ -34,6 +34,9 @@ public class KeyStoreUtil {
      * Loads a KeyStore from an InputStream working around the known JDK bug
      * https://bugs.openjdk.java.net/browse/JDK-8157404.
      *
+     * This code can be removed once the minimum Java version for Tomcat is 13.
+     *
+     *
      * @param keystore The KeyStore to load from the InputStream
      * @param is The InputStream to use to populate the KeyStore
      * @param storePass The password to access the KeyStore
@@ -59,7 +62,7 @@ public class KeyStoreUtil {
                 baos.write(buf, 0, numRead);
             }
             baos.close();
-            // Don't close is. That remains the callers responsibilty.
+            // Don't close is. That remains the callers responsibility.
 
             ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
 
