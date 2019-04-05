@@ -144,8 +144,12 @@ public class CharsetCache {
             // Added from OpenJDK 11.0.1
             "932", "cp932", "cpeuccn", "ibm-1252", "ibm-932", "ibm-euccn", "ibm1252", "ibm932", "ibmeuccn", "x-ibm932",
             // Added from OpenJDK 12 ea28
-            "1129", "cp1129", "ibm-1129", "ibm-euctw", "ibm1129", "x-ibm1129"
-            // Added from OpenJDK 13 ea4 (no additions)
+            "1129", "cp1129", "ibm-1129", "ibm-euctw", "ibm1129", "x-ibm1129",
+            // Added from OpenJDK 13 ea15
+            "29626c", "833", "cp29626c", "ibm-1140", "ibm-1141", "ibm-1142", "ibm-1143", "ibm-1144", "ibm-1145",
+            "ibm-1146", "ibm-1147", "ibm-1148", "ibm-1149", "ibm-29626c", "ibm-858", "ibm-eucjp", "ibm1140", "ibm1141",
+            "ibm1142", "ibm1143", "ibm1144", "ibm1145", "ibm1146", "ibm1147", "ibm1148", "ibm1149", "ibm29626c",
+            "ibm858", "x-ibm29626c"
             };
 
     private static final Charset DUMMY_CHARSET = new DummyCharset("Dummy",  null);
