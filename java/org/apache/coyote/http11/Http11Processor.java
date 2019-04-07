@@ -513,6 +513,7 @@ public class Http11Processor extends AbstractProcessor {
         dest.method().duplicate(source.method());
         dest.getMimeHeaders().duplicate(source.getMimeHeaders());
         dest.requestURI().duplicate(source.requestURI());
+        dest.queryString().duplicate(source.queryString());
 
         return dest;
 
