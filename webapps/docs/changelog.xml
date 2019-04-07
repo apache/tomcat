@@ -109,6 +109,11 @@
         that prevented the use of PKCS#8 private keys with OpenSSL based
         connectors. (markt)
       </fix>
+      <fix>
+        When performing an upgrade from HTTP/1.1 to HTTP/2, ensure that any
+        query string present in the original HTTP/1.1 request is passed to the
+        HTTP/2 request processing. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
