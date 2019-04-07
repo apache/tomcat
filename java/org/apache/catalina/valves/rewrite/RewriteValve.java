@@ -53,6 +53,20 @@ import org.apache.tomcat.util.buf.UDecoder;
 import org.apache.tomcat.util.buf.UriUtil;
 import org.apache.tomcat.util.http.RequestUtil;
 
+/**
+ * Note: Extra caution should be used when adding a Rewrite Rule. When
+ * specifying a regex to match for in a Rewrite Rule, certain regex could allow
+ * an attacker to DoS your server, as Java's regex parsing is vulnerable to
+ * "catastrophic backtracking" (also known as "Regular expression Denial of
+ * Service", or ReDoS). There are some open source tools to help detect
+ * vulnerable regex, though in general it is a hard problem. A good defence is
+ * to use a regex debugger on your desired regex, and read more on the subject
+ * of catastrophic backtracking.
+ *
+ * @see <a href=
+ *      "https://www.owasp.org/index.php/Regular_expression_Denial_of_Service_-_ReDoS">OWASP
+ *      ReDoS</a>
+ */
 public class RewriteValve extends ValveBase {
 
     /**

@@ -144,6 +144,11 @@
         information on the supported directives and their attributes. Patch
         provided by nightwatchcyber. (markt)
       </fix>
+      <add>
+        Add a note to the documentation about the risk of DoS with poorly
+        written regular expressions and the <code>RewriteValve</code>. Patch
+        provided by salgattas. (markt)
+      </add>
     </changelog>
   </subsection>
 </section>

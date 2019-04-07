@@ -399,6 +399,10 @@
       handling can be configured within each web application. Alternatively, you
       can explicitly configure an <a href="config/valve.html">ErrorReportValve</a>
       and set its <strong>showReport</strong> attribute to <code>false</code>.</p>
+
+      <p>The RewriteValve uses regular expressions and poorly formed regex
+      patterns may be vulnerable to "catastrophic backtracking" or "ReDoS". See
+      <a href="rewrite.html">Rewrite docs</a> for more details.</p>
     </subsection>
 
     <subsection name="Realms">
