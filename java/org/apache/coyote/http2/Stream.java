@@ -676,7 +676,7 @@ class Stream extends AbstractStream implements HeaderEmitter {
     }
 
 
-    private final boolean isInputFinished() {
+    final boolean isInputFinished() {
         return !state.isFrameTypePermitted(FrameType.DATA);
     }
 

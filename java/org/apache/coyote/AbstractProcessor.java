@@ -197,7 +197,7 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
 
 
     @Override
-    public final SocketState dispatch(SocketEvent status) {
+    public final SocketState dispatch(SocketEvent status) throws IOException {
 
         if (status == SocketEvent.OPEN_WRITE && response.getWriteListener() != null) {
             asyncStateMachine.asyncOperation();
@@ -950,6 +950,9 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
      *
      * @return The state to return for the socket once the clean-up for the
      *         current request has completed
+     *
+     * @throws IOException If an I/O error occurs while attempting to end the
+     *         request
      */
-    protected abstract SocketState dispatchEndRequest();
+    protected abstract SocketState dispatchEndRequest() throws IOException;
 }

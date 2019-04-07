@@ -132,6 +132,11 @@
         query string present in the original HTTP/1.1 request is passed to the
         HTTP/2 request processing. (markt)
       </fix>
+      <fix>
+        When Tomcat writes a final response without reading all of an HTTP/2
+        request, reset the stream to inform the client that the remaining
+        request body is not required. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
