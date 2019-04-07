@@ -96,6 +96,11 @@
         <bug>63287</bug>: Make logging levels more consistent for similar issues
         of similar severity. (markt)
       </fix>
+      <fix>
+        <bug>63311</bug>: Add support for https URLs to the local resolver within
+        Tomcat used to resolve standard XML DTDs and schemas when Tomcat is
+        configured to validate XML configuration files such as web.xml. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
