@@ -42,7 +42,7 @@ import org.apache.juli.logging.LogFactory;
  * users - regardless of whether or not they provide a session token with their
  * requests.
  */
-public class CrawlerSessionManagerValve extends ValveBase implements HttpSessionBindingListener {
+public class CrawlerSessionManagerValve extends ValveBase {
 
     private static final Log log = LogFactory.getLog(CrawlerSessionManagerValve.class);
 
@@ -241,7 +241,7 @@ public class CrawlerSessionManagerValve extends ValveBase implements HttpSession
                     clientIdSessionId.put(clientIdentifier, s.getId());
                     sessionIdClientId.put(s.getId(), clientIdentifier);
                     // #valueUnbound() will be called on session expiration
-                    s.setAttribute(this.getClass().getName(), this);
+                    s.setAttribute(this.getClass().getName(), new CrawlerHttpSessionBindingListener(clientIdSessionId, sessionIdClientId));
                     s.setMaxInactiveInterval(sessionInactiveInterval);
 
                     if (log.isDebugEnabled()) {
@@ -269,18 +269,26 @@ public class CrawlerSessionManagerValve extends ValveBase implements HttpSession
         return result.toString();
     }
 
+    private static class CrawlerHttpSessionBindingListener implements HttpSessionBindingListener {
+        private final Map<String, String> clientIdSessionId;
+        private final Map<String, String> sessionIdClientId;
 
-    @Override
-    public void valueBound(HttpSessionBindingEvent event) {
-        // NOOP
-    }
+        public CrawlerHttpSessionBindingListener(Map<String, String> clientIdSessionId, Map<String, String> sessionIdClientId) {
+            this.clientIdSessionId = clientIdSessionId;
+            this.sessionIdClientId = sessionIdClientId;
+        }
 
+        @Override
+        public void valueBound(HttpSessionBindingEvent event) {
+            // NOOP
+        }
 
-    @Override
-    public void valueUnbound(HttpSessionBindingEvent event) {
-        String clientIdentifier = sessionIdClientId.remove(event.getSession().getId());
-        if (clientIdentifier != null) {
-            clientIdSessionId.remove(clientIdentifier);
+        @Override
+        public void valueUnbound(HttpSessionBindingEvent event) {
+            String clientIdentifier = sessionIdClientId.remove(event.getSession().getId());
+            if (clientIdentifier != null) {
+                clientIdSessionId.remove(clientIdentifier);
+            }
         }
     }
 }
