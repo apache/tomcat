@@ -22,7 +22,13 @@ import java.util.Collections;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpSession;
+import javax.servlet.http.HttpSessionBindingListener;
 
+import org.apache.catalina.Manager;
+import org.apache.catalina.core.StandardContext;
+import org.apache.catalina.session.StandardManager;
+import org.apache.catalina.session.StandardSession;
+import org.hamcrest.CoreMatchers;
 import org.junit.Test;
 
 import org.apache.catalina.Context;
@@ -33,7 +39,19 @@ import org.apache.catalina.connector.Response;
 import org.easymock.EasyMock;
 import org.easymock.IExpectationSetters;
 
+import static org.hamcrest.CoreMatchers.*;
+import static org.hamcrest.MatcherAssert.assertThat;
+
 public class TestCrawlerSessionManagerValve {
+
+    private static final Manager TEST_MANAGER;
+
+    static {
+        TEST_MANAGER = new StandardManager();
+        TEST_MANAGER.setContext(new StandardContext());
+    }
+
+
 
     @Test
     public void testCrawlerIpsPositive() throws Exception {
@@ -79,6 +97,32 @@ public class TestCrawlerSessionManagerValve {
         verifyCrawlingLocalhost(valve, "example.invalid");
     }
 
+    @Test
+    public void testCrawlersSessionIdIsRemovedAfterSessionExpiry() throws IOException, ServletException {
+        CrawlerSessionManagerValve valve = new CrawlerSessionManagerValve();
+        valve.setCrawlerIps("216\\.58\\.206\\.174");
+        valve.setCrawlerUserAgents(valve.getCrawlerUserAgents());
+        valve.setNext(EasyMock.createMock(Valve.class));
+        valve.setSessionInactiveInterval(0);
+        StandardSession session = new StandardSession(TEST_MANAGER);
+        session.setId("id");
+        session.setValid(true);
+
+        Request request = createRequestExpectations("216.58.206.174", session, true);
+
+        EasyMock.replay(request);
+
+        valve.invoke(request, EasyMock.createMock(Response.class));
+
+        EasyMock.verify(request);
+
+        assertThat(valve.getClientIpSessionId().values(), hasItem("id"));
+
+        session.expire();
+
+        assertThat(valve.getClientIpSessionId().values().size(), is(0));
+    }
+
 
     private void verifyCrawlingLocalhost(CrawlerSessionManagerValve valve, String hostname)
             throws IOException, ServletException {
@@ -97,7 +141,7 @@ public class TestCrawlerSessionManagerValve {
         HttpSession session = EasyMock.createMock(HttpSession.class);
         if (isBot) {
             EasyMock.expect(session.getId()).andReturn("id").times(2);
-            session.setAttribute(valve.getClass().getName(), valve);
+            session.setAttribute(EasyMock.eq(valve.getClass().getName()), EasyMock.anyObject(HttpSessionBindingListener.class));
             EasyMock.expectLastCall();
             session.setMaxInactiveInterval(60);
             EasyMock.expectLastCall();
