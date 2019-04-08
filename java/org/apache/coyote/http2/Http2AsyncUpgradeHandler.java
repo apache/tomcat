@@ -103,7 +103,7 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
     void sendStreamReset(StreamException se) throws IOException {
         if (log.isDebugEnabled()) {
             log.debug(sm.getString("upgradeHandler.rst.debug", connectionId,
-                    Integer.toString(se.getStreamId()), se.getError()));
+                    Integer.toString(se.getStreamId()), se.getError(), se.getMessage()));
         }
         // Write a RST frame
         byte[] rstFrame = new byte[13];
