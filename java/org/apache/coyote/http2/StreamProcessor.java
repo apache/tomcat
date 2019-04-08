@@ -417,6 +417,14 @@ class StreamProcessor extends AbstractProcessor {
 
     private void endRequest() throws IOException {
         if (!stream.isInputFinished() && getErrorState().isIoAllowed()) {
+            if (handler.hasAsyncIO() && !stream.isContentLengthInconsistent()) {
+                // Need an additional checks for asyncIO as the end of stream
+                // might have been set on the header frame but not processed
+                // yet. Checking for this here so the extra processing only
+                // occurs on the potential error condition rather than on every
+                // request.
+                return;
+            }
             // The request has been processed but the request body has not been
             // fully read. This typically occurs when Tomcat rejects an upload
             // of some form (e.g. PUT or POST). Need to tell the client not to
