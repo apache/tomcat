@@ -17,6 +17,7 @@
 package org.apache.catalina.valves;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.Enumeration;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -241,7 +242,7 @@ public class CrawlerSessionManagerValve extends ValveBase {
                     clientIdSessionId.put(clientIdentifier, s.getId());
                     sessionIdClientId.put(s.getId(), clientIdentifier);
                     // #valueUnbound() will be called on session expiration
-                    s.setAttribute(this.getClass().getName(), new CrawlerHttpSessionBindingListener(clientIdSessionId, sessionIdClientId));
+                    s.setAttribute(this.getClass().getName(), new CrawlerHttpSessionBindingListener(clientIdSessionId, clientIdentifier));
                     s.setMaxInactiveInterval(sessionInactiveInterval);
 
                     if (log.isDebugEnabled()) {
@@ -269,13 +270,13 @@ public class CrawlerSessionManagerValve extends ValveBase {
         return result.toString();
     }
 
-    private static class CrawlerHttpSessionBindingListener implements HttpSessionBindingListener {
-        private final Map<String, String> clientIdSessionId;
-        private final Map<String, String> sessionIdClientId;
+    private static class CrawlerHttpSessionBindingListener implements HttpSessionBindingListener, Serializable {
+        private final transient Map<String, String> clientIdSessionId;
+        private final transient String clientIdentifier;
 
-        public CrawlerHttpSessionBindingListener(Map<String, String> clientIdSessionId, Map<String, String> sessionIdClientId) {
+        private CrawlerHttpSessionBindingListener(Map<String, String> clientIdSessionId, String clientIdentifier) {
             this.clientIdSessionId = clientIdSessionId;
-            this.sessionIdClientId = sessionIdClientId;
+            this.clientIdentifier = clientIdentifier;
         }
 
         @Override
@@ -285,8 +286,8 @@ public class CrawlerSessionManagerValve extends ValveBase {
 
         @Override
         public void valueUnbound(HttpSessionBindingEvent event) {
-            String clientIdentifier = sessionIdClientId.remove(event.getSession().getId());
-            if (clientIdentifier != null) {
+            if (clientIdentifier != null && clientIdSessionId != null) {
+                if(clientIdSessionId.get(clientIdentifier).equals(event.getSession().getId()))
                 clientIdSessionId.remove(clientIdentifier);
             }
         }

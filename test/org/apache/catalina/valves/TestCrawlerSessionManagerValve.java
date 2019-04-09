@@ -28,7 +28,6 @@ import org.apache.catalina.Manager;
 import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.session.StandardManager;
 import org.apache.catalina.session.StandardSession;
-import org.hamcrest.CoreMatchers;
 import org.junit.Test;
 
 import org.apache.catalina.Context;
