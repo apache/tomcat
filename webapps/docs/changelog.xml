@@ -161,6 +161,14 @@
       </add>
     </changelog>
   </subsection>
+  <subsection name="jdbc-pool">
+    <changelog>
+      <fix>
+        <bug>63320</bug>: Ensure that <code>StatementCache</code> caches
+        statements that include arrays in arguments. (kfujino)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 8.5.39 (markt)" rtext="2019-03-19">
   <subsection name="Catalina">
