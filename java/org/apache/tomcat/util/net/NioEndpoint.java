@@ -81,28 +81,6 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
 
     public static final int OP_REGISTER = 0x100; //register interest op
 
-    /**
-     * Allows detecting if a completion handler completes inline.
-     */
-    private static ThreadLocal<Boolean> inlineCompletion = new ThreadLocal<>();
-
-    public static void startInline() {
-        inlineCompletion.set(Boolean.TRUE);
-    }
-
-    public static void endInline() {
-        inlineCompletion.set(Boolean.FALSE);
-    }
-
-    public static boolean isInline() {
-        Boolean flag = inlineCompletion.get();
-        if (flag == null) {
-            return false;
-        } else {
-            return flag.booleanValue();
-        }
-    }
-
     // ----------------------------------------------------------------- Fields
 
     private NioSelectorPool selectorPool = new NioSelectorPool();
@@ -1454,6 +1432,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                 this.semaphore = semaphore;
                 this.completion = completion;
             }
+            private volatile boolean inline = true;
             private volatile long nBytes = 0;
             private volatile CompletionState state = CompletionState.PENDING;
 
@@ -1483,6 +1462,8 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                     }
                     completion.failed(error, this);
                 } else {
+                    // As soon as the operation uses the poller, it is no longer inline
+                    inline = false;
                     if (read) {
                         registerReadInterest();
                     } else {
@@ -1526,7 +1507,6 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
             OperationState<A> state = new OperationState<>(true, dsts, offset, length, block,
                     timeout, unit, attachment, check, handler, readPending, completion);
             readOperation = state;
-            startInline();
             long nBytes = 0;
             if (!socketBufferHandler.isReadBufferEmpty()) {
                 // There is still data inside the main read buffer, use it to fill out the destination buffers
@@ -1542,7 +1522,6 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
             if (nBytes == 0) {
                 state.run();
             }
-            endInline();
             if (block == BlockingMode.BLOCK) {
                 synchronized (state) {
                     if (state.state == CompletionState.PENDING) {
@@ -1603,10 +1582,8 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
             OperationState<A> state = new OperationState<>(false, srcs, offset, length, block,
                     timeout, unit, attachment, check, handler, writePending, completion);
             writeOperation = state;
-            startInline();
             // It should be less necessary to check the buffer state as it is easy to flush before
             state.run();
-            endInline();
             if (block == BlockingMode.BLOCK) {
                 synchronized (state) {
                     if (state.state == CompletionState.PENDING) {
@@ -1632,7 +1609,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                     failed(new EOFException(), state);
                 } else {
                     state.nBytes += nBytes.longValue();
-                    CompletionState currentState = isInline() ? CompletionState.INLINE : CompletionState.DONE;
+                    CompletionState currentState = state.inline ? CompletionState.INLINE : CompletionState.DONE;
                     boolean complete = true;
                     boolean completion = true;
                     if (state.check != null) {
@@ -1695,14 +1672,14 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                 if (state.block == BlockingMode.BLOCK) {
                     notify = true;
                 } else {
-                    state.state = isInline() ? CompletionState.ERROR : CompletionState.DONE;
+                    state.state = state.inline ? CompletionState.ERROR : CompletionState.DONE;
                 }
                 if (state.handler != null) {
                     state.handler.failed(ioe, state.attachment);
                 }
                 if (notify) {
                     synchronized (state) {
-                        state.state = isInline() ? CompletionState.ERROR : CompletionState.DONE;
+                        state.state = state.inline ? CompletionState.ERROR : CompletionState.DONE;
                         state.notify();
                     }
                 }
