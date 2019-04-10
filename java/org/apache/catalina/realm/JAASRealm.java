@@ -470,6 +470,7 @@ public class JAASRealm extends RealmBase {
         return principal;
         } catch( Throwable t) {
             log.error( "error ", t);
+            //JAAS throws exception different than LoginException so mark the realm as unavailable
             invocationSuccess = false;
             return null;
         }
