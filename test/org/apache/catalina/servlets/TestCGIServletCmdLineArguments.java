@@ -28,7 +28,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 
-import org.apache.tomcat.util.compat.JrePlatform;
+import org.apache.naming.resources.JrePlatform;
 
 @RunWith(Parameterized.class)
 public class TestCGIServletCmdLineArguments {
@@ -50,7 +50,9 @@ public class TestCGIServletCmdLineArguments {
                 Field f = CGIServlet.class.getDeclaredField("cmdLineArgumentsDecodedPattern");
                 f.setAccessible(true);
                 p = (Pattern) f.get(cgiServlet);
-            } catch (IllegalAccessException | NoSuchFieldException | SecurityException e) {
+            } catch (IllegalAccessException e) {
+            } catch (NoSuchFieldException e) {
+            } catch (SecurityException e) {
             }
 
             Assert.assertEquals(defaultDecodedPatternWindows, p);
@@ -59,7 +61,7 @@ public class TestCGIServletCmdLineArguments {
 
     @Parameterized.Parameters(name = "{index}: argument[{0}], allowed[{1}]")
     public static Collection<Object[]> parameters() {
-        List<Object[]> params = new ArrayList<>();
+        List<Object[]> params = new ArrayList<Object[]>();
         params.add(new Object[] { "", Boolean.FALSE } );
         params.add(new Object[] { "<", Boolean.FALSE } );
         params.add(new Object[] { "\"", Boolean.FALSE } );
