@@ -167,6 +167,10 @@ public class JAASRealm extends RealmBase {
     protected volatile Configuration jaasConfiguration;
     protected volatile boolean jaasConfigurationLoaded = false;
 
+    /**
+     * Last invocation attempt.
+     */
+    private volatile boolean invocationSuccess = true;
 
     // ------------------------------------------------------------- Properties
 
@@ -391,6 +395,7 @@ public class JAASRealm extends RealmBase {
         } catch (Throwable e) {
             ExceptionUtils.handleThrowable(e);
             log.error(sm.getString("jaasRealm.unexpectedError"), e);
+            invocationSuccess = false;
             return null;
         } finally {
             if(!isUseContextClassLoader()) {
@@ -406,6 +411,7 @@ public class JAASRealm extends RealmBase {
         try {
             loginContext.login();
             subject = loginContext.getSubject();
+            invocationSuccess = true;
             if (subject == null) {
                 if( log.isDebugEnabled())
                     log.debug(sm.getString("jaasRealm.failedLogin", username));
@@ -414,21 +420,26 @@ public class JAASRealm extends RealmBase {
         } catch (AccountExpiredException e) {
             if (log.isDebugEnabled())
                 log.debug(sm.getString("jaasRealm.accountExpired", username));
+            invocationSuccess = true;
             return null;
         } catch (CredentialExpiredException e) {
             if (log.isDebugEnabled())
                 log.debug(sm.getString("jaasRealm.credentialExpired", username));
+            invocationSuccess = true;
             return null;
         } catch (FailedLoginException e) {
             if (log.isDebugEnabled())
                 log.debug(sm.getString("jaasRealm.failedLogin", username));
+            invocationSuccess = true;
             return null;
         } catch (LoginException e) {
             log.warn(sm.getString("jaasRealm.loginException", username), e);
+            invocationSuccess = true;
             return null;
         } catch (Throwable e) {
             ExceptionUtils.handleThrowable(e);
             log.error(sm.getString("jaasRealm.unexpectedError"), e);
+            invocationSuccess = false;
             return null;
         }
 
@@ -448,6 +459,7 @@ public class JAASRealm extends RealmBase {
         return principal;
         } catch( Throwable t) {
             log.error( "error ", t);
+            invocationSuccess = false;
             return null;
         }
     }
@@ -627,5 +639,10 @@ public class JAASRealm extends RealmBase {
                 IllegalArgumentException ex) {
             throw new RuntimeException(ex);
         }
+    }
+    
+    @Override
+    public boolean isAvailable() {
+    	return invocationSuccess;
     }
 }
