@@ -317,7 +317,7 @@ public final class CGIServlet extends HttpServlet {
      * See https://tools.ietf.org/html/rfc3875#section-4.4
      * 4.4.  The Script Command Line
      */
-    private boolean enableCmdLineArguments = true;
+    private boolean enableCmdLineArguments = false;
 
     /**
      * Limits the encoded form of individual command line arguments. By default

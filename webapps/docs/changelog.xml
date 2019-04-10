@@ -152,6 +152,11 @@
         new initialisation parameter <code>cmdLineArgumentsDecoded</code>. This
         is the fix for CVE-2019-0232. (markt)
       </add>
+      <update>
+        Change the default for the <code>enableCmdLineArguments</code> parameter
+        of the CGI servlet from <code>true</code> to <code>false</code> as
+        additional hardening against CVE-2019-0232. (markt)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Coyote">
