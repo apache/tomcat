@@ -53,7 +53,8 @@ public class TestCGIServletCmdLineArguments {
             } catch (IllegalAccessException | NoSuchFieldException | SecurityException e) {
             }
 
-            Assert.assertEquals(defaultDecodedPatternWindows, p);
+            Assert.assertNotNull(p);
+            Assert.assertEquals(defaultDecodedPatternWindows.toString(), p.toString());
         }
     }
 
