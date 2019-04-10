@@ -55,7 +55,8 @@ public class TestCGIServletCmdLineArguments {
             } catch (SecurityException e) {
             }
 
-            Assert.assertEquals(defaultDecodedPatternWindows, p);
+            Assert.assertNotNull(p);
+            Assert.assertEquals(defaultDecodedPatternWindows.toString(), p.toString());
         }
     }
 
