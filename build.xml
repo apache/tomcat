@@ -258,8 +258,10 @@
     <include name="**/*.dtd"/>
     <include name="**/*.htm"/>
     <include name="**/*.html"/>
+    <include name="**/*.iml"/>
     <include name="**/*.ini"/>
     <include name="**/*.java"/>
+    <include name="**/*.jj"/>
     <include name="**/*.jjt"/>
     <include name="**/*.json"/>
     <include name="**/*.jsp"/>
@@ -291,6 +293,8 @@
     <include name="**/*.xml"/>
     <include name="**/*.xsd"/>
     <include name="**/*.xsl"/>
+    <include name="**/*.yaml"/>
+    <include name="**/Dockerfile"/>
     <!-- Exclude files that use 16-bit encodings. -->
     <!-- This prevents fixcrlf corrupting them during a release -->
     <exclude name="**/bom-none-prolog-utf16?e.jspx"/>
@@ -569,6 +573,7 @@
         <exclude name="**/*_2.xml"/>
         <exclude name="res/checkstyle/header-al2.txt"/>
         <!-- Exclude auto-generated files -->
+        <exclude name="java/org/apache/el/parser/ELParser.jj" />
         <exclude name="java/org/apache/el/parser/ELParser*.java" />
         <exclude name="java/org/apache/el/parser/Node.java" />
         <exclude name="java/org/apache/**/parser/JJT*ParserState.java" />
@@ -2075,13 +2080,13 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
             </and>
             <filename name="**/*.asc" />
             <filename name="**/*.tmp" />
-            <filename name="**/*.jj" />
             <filename name="**/maven-ant-tasks-*.jar" />
             <filename name="**/thumbs.db" />
             <filename name="**/Thumbs.db" />
             <filename name="*.launch"/>
             <filename name="bin/setenv.*" />
             <filename name="java/org/apache/catalina/startup/catalina.properties" />
+            <filename name="java/org/apache/el/parser/ELParser.jj" />
             <filename name="logs/**" />
             <filename name="webapps/docs/jdbc-pool.xml" />
             <filename name="work/**" />

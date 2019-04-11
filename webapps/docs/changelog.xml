@@ -65,6 +65,19 @@
       </add>
     </changelog>
   </subsection>
+  <subsection name="Other">
+    <changelog>
+      <fix>
+        Ensure that the correct files are included in the source distribution
+        for javacc based parsers depending on whether jjtree is used or not.
+        (markt)
+      </fix>
+      <fix>
+        Ensure that text files in the source distribution have the correct line
+        endings for the target platform. (markt)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 9.0.18 (markt)" rtext="release in progress">
   <subsection name="Catalina">
