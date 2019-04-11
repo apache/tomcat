@@ -214,6 +214,11 @@ public class TestRegistration extends TomcatBaseTest {
         additional.removeAll(expected);
         Assert.assertTrue("Unexpected Tomcat MBeans: " + additional, additional.isEmpty());
 
+        // Check a known attribute
+        String connectorName = Arrays.asList(connectorMBeanNames("auto-" + index, protocol)).get(0);
+        // This should normally return "http", but any non null non exception is good enough
+        Assert.assertNotNull(mbeanServer.getAttribute(new ObjectName(connectorName), "scheme"));
+
         tomcat.stop();
 
         // There should still be some Tomcat MBeans
