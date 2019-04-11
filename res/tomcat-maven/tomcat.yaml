@@ -2,7 +2,7 @@ kind: Deployment
 apiVersion: extensions/v1beta1
 metadata:
   name: tomcat
-  creationTimestamp: 
+  creationTimestamp:
   labels:
     run: tomcat
 spec:
@@ -12,7 +12,7 @@ spec:
       run: tomcat
   template:
     metadata:
-      creationTimestamp: 
+      creationTimestamp:
       labels:
         run: tomcat
     spec:
