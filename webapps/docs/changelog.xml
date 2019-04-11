@@ -61,7 +61,7 @@
         Add asynchronous IO from NIO2 to the NIO connector, with support for
         the async IO implementations for HTTP/2 and Websockets. The
         <code>useAsyncIO</code> boolean attribute on the Connector element
-        allows disabling usage of the asynchronous IO API. (remm)
+        allows enabling use of the asynchronous IO API. (remm)
       </add>
     </changelog>
   </subsection>
