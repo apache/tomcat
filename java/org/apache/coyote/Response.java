@@ -80,7 +80,7 @@ public final class Response {
     /**
      * Committed flag.
      */
-    boolean committed = false;
+    private boolean committed = false;
 
 
     /**
@@ -207,12 +207,12 @@ public final class Response {
     }
 
 
-    public boolean isCommitted() {
+    public synchronized boolean isCommitted() {
         return committed;
     }
 
 
-    public void setCommitted(boolean v) {
+    public synchronized void setCommitted(boolean v) {
         if (v && !this.committed) {
             this.commitTime = System.currentTimeMillis();
         }
@@ -258,7 +258,7 @@ public final class Response {
 
     public void reset() throws IllegalStateException {
 
-        if (committed) {
+        if (isCommitted()) {
             throw new IllegalStateException();
         }
 
@@ -498,7 +498,7 @@ public final class Response {
 
     // --------------------
 
-    public void recycle() {
+    public synchronized void recycle() {
 
         contentType = null;
         contentLanguage = null;
@@ -515,6 +515,8 @@ public final class Response {
 
         // update counters
         contentWritten=0;
+
+        new Throwable().printStackTrace();
     }
 
     /**
