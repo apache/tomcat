@@ -48,7 +48,7 @@ public class TestAbstractArchiveResource extends TomcatBaseTest {
         expectedURL.append(docBase.getCanonicalFile().toURI().toURL().toString());
         expectedURL.append("*/WEB-INF/lib/test.jar!/META-INF/resources/index.html");
 
-        Assert.assertTrue(expectedURL.toString().equalsIgnoreCase(webResource.getURL().toString()));
+        Assert.assertEquals(expectedURL.toString(), webResource.getURL().toString());
     }
 
 
@@ -71,7 +71,7 @@ public class TestAbstractArchiveResource extends TomcatBaseTest {
         expectedURL.append(docBase.getCanonicalFile().toURI().toURL().toString());
         expectedURL.append("WEB-INF/lib/test-lib.jar!/META-INF/tags/echo.tag");
 
-        Assert.assertTrue(expectedURL.toString().equalsIgnoreCase(webResource.getURL().toString()));
+        Assert.assertEquals(expectedURL.toString(), webResource.getURL().toString());
     }
 
 }
