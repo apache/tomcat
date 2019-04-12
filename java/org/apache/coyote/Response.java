@@ -515,8 +515,6 @@ public final class Response {
 
         // update counters
         contentWritten=0;
-
-        new Throwable().printStackTrace();
     }
 
     /**
