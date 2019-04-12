@@ -1418,9 +1418,9 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
             private final Semaphore semaphore;
             private final VectoredIOCompletionHandler<A> completion;
             private OperationState(boolean read, ByteBuffer[] buffers, int offset, int length,
-                    BlockingMode block, long timeout, TimeUnit unit, A attachment,
-                    CompletionCheck check, CompletionHandler<Long, ? super A> handler,
-                    Semaphore semaphore, VectoredIOCompletionHandler<A> completion) {
+                    BlockingMode block, A attachment, CompletionCheck check,
+                    CompletionHandler<Long, ? super A> handler, Semaphore semaphore,
+                    VectoredIOCompletionHandler<A> completion) {
                 this.read = read;
                 this.buffers = buffers;
                 this.offset = offset;
@@ -1505,7 +1505,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
             }
             VectoredIOCompletionHandler<A> completion = new VectoredIOCompletionHandler<>();
             OperationState<A> state = new OperationState<>(true, dsts, offset, length, block,
-                    timeout, unit, attachment, check, handler, readPending, completion);
+                    attachment, check, handler, readPending, completion);
             readOperation = state;
             long nBytes = 0;
             if (!socketBufferHandler.isReadBufferEmpty()) {
@@ -1580,7 +1580,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
             }
             VectoredIOCompletionHandler<A> completion = new VectoredIOCompletionHandler<>();
             OperationState<A> state = new OperationState<>(false, srcs, offset, length, block,
-                    timeout, unit, attachment, check, handler, writePending, completion);
+                    attachment, check, handler, writePending, completion);
             writeOperation = state;
             // It should be less necessary to check the buffer state as it is easy to flush before
             state.run();
