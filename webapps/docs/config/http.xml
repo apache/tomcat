@@ -762,7 +762,7 @@
 
       <attribute name="useAsyncIO" required="false">
         <p>(bool)Use this attribute to enable or disable usage of the
-        asynchronous IO API. The default value is <code>false</code>.</p>
+        asynchronous IO API. The default value is <code>true</code>.</p>
       </attribute>
 
       <attribute name="useSendfile" required="false">
@@ -906,7 +906,7 @@
 
       <attribute name="useAsyncIO" required="false">
         <p>(bool)Use this attribute to enable or disable usage of the
-        asynchronous IO API. The default value is <code>false</code>.</p>
+        asynchronous IO API. The default value is <code>true</code>.</p>
       </attribute>
 
       <attribute name="useSendfile" required="false">

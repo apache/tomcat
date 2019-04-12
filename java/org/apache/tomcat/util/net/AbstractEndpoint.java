@@ -742,9 +742,9 @@ public abstract class AbstractEndpoint<S,U> {
 
 
     /**
-     * Expose async IO capability.
+     * Expose asynchronous IO capability.
      */
-    private boolean useAsyncIO = false;
+    private boolean useAsyncIO = true;
     public void setUseAsyncIO(boolean useAsyncIO) { this.useAsyncIO = useAsyncIO; }
     public boolean getUseAsyncIO() { return useAsyncIO; }
 
