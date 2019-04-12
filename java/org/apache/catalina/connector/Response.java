@@ -205,7 +205,7 @@ public class Response implements HttpServletResponse {
     /**
      * The application commit flag.
      */
-    protected boolean appCommitted = false;
+    private volatile boolean appCommitted = false;
 
 
     /**
@@ -282,7 +282,7 @@ public class Response implements HttpServletResponse {
      * Release all object references, and initialize instance variables, in
      * preparation for reuse of this object.
      */
-    public void recycle() {
+    public synchronized void recycle() {
 
         outputBuffer.recycle();
         usingOutputStream = false;
@@ -353,7 +353,7 @@ public class Response implements HttpServletResponse {
      *
      * @param appCommitted The new application committed flag value
      */
-    public void setAppCommitted(boolean appCommitted) {
+    public synchronized void setAppCommitted(boolean appCommitted) {
         this.appCommitted = appCommitted;
     }
 
@@ -361,7 +361,7 @@ public class Response implements HttpServletResponse {
     /**
      * Application commit flag accessor.
      */
-    public boolean isAppCommitted() {
+    public synchronized boolean isAppCommitted() {
         return (this.appCommitted || isCommitted() || isSuspended()
                 || ((getContentLength() > 0)
                     && (getContentWritten() >= getContentLength())));
@@ -704,7 +704,7 @@ public class Response implements HttpServletResponse {
      *  been committed
      */
     @Override
-    public void reset() {
+    public synchronized void reset() {
         // Ignore any call from an included servlet
         if (included) {
             return;
