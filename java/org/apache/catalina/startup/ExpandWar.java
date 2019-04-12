@@ -68,7 +68,7 @@ public class ExpandWar {
      * @exception IOException if an input/output error was encountered
      *  during expansion
      *
-     * @return The absolute path to the expanded directory foe the given WAR
+     * @return The absolute path to the expanded directory for the given WAR
      */
     public static String expand(Host host, URL war, String pathname)
         throws IOException {
