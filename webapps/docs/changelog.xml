@@ -45,6 +45,13 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 9.0.20 (markt)" rtext="in development">
+  <subsection name="Catalina">
+    <changelog>
+      Fix some edge cases where the docBase was not being set using a canonical
+      path which in turn meant resource URLs were not being constructed as
+      expected. (markt)
+    </changelog>
+  </subsection>
   <subsection name="Coyote">
     <changelog>
       <fix>
