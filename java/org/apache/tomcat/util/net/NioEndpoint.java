@@ -676,24 +676,27 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
             addEvent(r);
         }
 
-        public NioSocketWrapper cancelledKey(SelectionKey key) {
-            NioSocketWrapper ka = null;
+        public NioSocketWrapper cancelledKey(SelectionKey sk) {
+            NioSocketWrapper socketWrapper = null;
             try {
-                if ( key == null ) return null;//nothing to do
-                ka = (NioSocketWrapper) key.attach(null);
-                if (ka != null) {
+                if (sk == null) {
+                    // Nothing to do
+                    return null;
+                }
+                socketWrapper = (NioSocketWrapper) sk.attach(null);
+                if (socketWrapper != null) {
                     // If attachment is non-null then there may be a current
                     // connection with an associated processor.
-                    getHandler().release(ka);
+                    getHandler().release(socketWrapper);
                 }
-                if (key.isValid()) key.cancel();
+                if (sk.isValid()) sk.cancel();
                 // If it is available, close the NioChannel first which should
                 // in turn close the underlying SocketChannel. The NioChannel
                 // needs to be closed first, if available, to ensure that TLS
                 // connections are shut down cleanly.
-                if (ka != null) {
+                if (socketWrapper != null) {
                     try {
-                        ka.getSocket().close(true);
+                        socketWrapper.getSocket().close(true);
                     } catch (Exception e){
                         if (log.isDebugEnabled()) {
                             log.debug(sm.getString(
@@ -703,9 +706,9 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                 }
                 // The SocketChannel is also available via the SelectionKey. If
                 // it hasn't been closed in the block above, close it now.
-                if (key.channel().isOpen()) {
+                if (sk.channel().isOpen()) {
                     try {
-                        key.channel().close();
+                        sk.channel().close();
                     } catch (Exception e) {
                         if (log.isDebugEnabled()) {
                             log.debug(sm.getString(
@@ -714,22 +717,24 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                     }
                 }
                 try {
-                    if (ka != null && ka.getSendfileData() != null
-                            && ka.getSendfileData().fchannel != null
-                            && ka.getSendfileData().fchannel.isOpen()) {
-                        ka.getSendfileData().fchannel.close();
+                    if (socketWrapper != null && socketWrapper.getSendfileData() != null
+                            && socketWrapper.getSendfileData().fchannel != null
+                            && socketWrapper.getSendfileData().fchannel.isOpen()) {
+                        socketWrapper.getSendfileData().fchannel.close();
                     }
                 } catch (Exception ignore) {
                 }
-                if (ka != null) {
+                if (socketWrapper != null) {
                     countDownConnection();
-                    ka.closed = true;
+                    socketWrapper.closed = true;
                 }
             } catch (Throwable e) {
                 ExceptionUtils.handleThrowable(e);
-                if (log.isDebugEnabled()) log.error("",e);
+                if (log.isDebugEnabled()) {
+                    log.error("", e);
+                }
             }
-            return ka;
+            return socketWrapper;
         }
 
         /**
