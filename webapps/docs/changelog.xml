@@ -58,6 +58,9 @@
         The <code>useAsyncIO</code> boolean attribute on the Connector element
         value now defaults to <code>true</code>. (remm)
       </fix>
+      <fix>
+        Possible HTTP/2 connection leak issue when using async. (remm)
+      </fix>
     </changelog>
   </subsection>
 </section>
