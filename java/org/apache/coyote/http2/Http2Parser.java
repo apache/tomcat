@@ -580,12 +580,12 @@ class Http2Parser {
         // going to be thrown.
         hpackDecoder.getHeaderEmitter().validateHeaders();
 
+        output.headersEnd(streamId);
+
         if (headersEndStream) {
             output.receivedEndOfStream(streamId);
             headersEndStream = false;
         }
-
-        output.headersEnd(streamId);
 
         // Reset size for new request if the buffer was previously expanded
         if (headerReadBuffer.capacity() > Constants.DEFAULT_HEADER_READ_BUFFER_SIZE) {

@@ -121,8 +121,8 @@ public class TestStream extends Http2TestBase {
                 "3-HeadersStart\n" +
                 "3-Header-[x-trailer-2]-[Trailer value two]\n" +
                 "3-Header-[x-trailer-1]-[Trailer value one]\n" +
-                "3-EndOfStream\n" +
-                "3-HeadersEnd\n", output.getTrace());
+                "3-HeadersEnd\n" +
+                "3-EndOfStream\n", output.getTrace());
     }
 
 
