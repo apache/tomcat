@@ -1459,38 +1459,36 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
 
             @Override
             public void run() {
-                synchronized (semaphore) {
-                    // Perform the IO operation
-                    // Called from the poller to continue the IO operation
-                    long nBytes = 0;
-                    if (getError() == null) {
-                        try {
-                            if (read) {
-                                nBytes = getSocket().read(buffers, offset, length);
-                            } else {
-                                nBytes = getSocket().write(buffers, offset, length);
-                            }
-                        } catch (IOException e) {
-                            setError(e);
-                        }
-                    }
-                    if (nBytes > 0) {
-                        // The bytes read are only updated in the completion handler
-                        completion.completed(Long.valueOf(nBytes), this);
-                    } else if (nBytes < 0 || getError() != null) {
-                        IOException error = getError();
-                        if (error == null) {
-                            error = new EOFException();
-                        }
-                        completion.failed(error, this);
-                    } else {
-                        // As soon as the operation uses the poller, it is no longer inline
-                        inline = false;
+                // Perform the IO operation
+                // Called from the poller to continue the IO operation
+                long nBytes = 0;
+                if (getError() == null) {
+                    try {
                         if (read) {
-                            registerReadInterest();
+                            nBytes = getSocket().read(buffers, offset, length);
                         } else {
-                            registerWriteInterest();
+                            nBytes = getSocket().write(buffers, offset, length);
                         }
+                    } catch (IOException e) {
+                        setError(e);
+                    }
+                }
+                if (nBytes > 0) {
+                    // The bytes read are only updated in the completion handler
+                    completion.completed(Long.valueOf(nBytes), this);
+                } else if (nBytes < 0 || getError() != null) {
+                    IOException error = getError();
+                    if (error == null) {
+                        error = new EOFException();
+                    }
+                    completion.failed(error, this);
+                } else {
+                    // As soon as the operation uses the poller, it is no longer inline
+                    inline = false;
+                    if (read) {
+                        registerReadInterest();
+                    } else {
+                        registerWriteInterest();
                     }
                 }
             }
