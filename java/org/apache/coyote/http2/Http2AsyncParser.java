@@ -237,6 +237,9 @@ class Http2AsyncParser extends Http2Parser {
             // Always a fatal IO error
             error = e;
             if (state == null || state == CompletionState.DONE) {
+                if (log.isDebugEnabled()) {
+                    log.debug(sm.getString("http2Parser.error", connectionId, Integer.valueOf(streamId), frameType), e);
+                }
                 upgradeHandler.upgradeDispatch(SocketEvent.ERROR);
             }
         }
