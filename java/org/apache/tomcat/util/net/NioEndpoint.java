@@ -531,8 +531,10 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                         // processed. Count down the connections at this point
                         // since it won't have been counted down when the socket
                         // closed.
-                        socket.socketWrapper.getEndpoint().countDownConnection();
-                        ((NioSocketWrapper) socket.socketWrapper).closed = true;
+                        try {
+                            socket.socketWrapper.close();
+                        } catch (Exception ignore) {
+                        }
                     } else {
                         final NioSocketWrapper socketWrapper = (NioSocketWrapper) key.attachment();
                         if (socketWrapper != null) {
@@ -685,24 +687,17 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                 }
                 socketWrapper = (NioSocketWrapper) sk.attach(null);
                 if (socketWrapper != null) {
-                    // If attachment is non-null then there may be a current
-                    // connection with an associated processor.
-                    getHandler().release(socketWrapper);
-                }
-                if (sk.isValid()) sk.cancel();
-                // If it is available, close the NioChannel first which should
-                // in turn close the underlying SocketChannel. The NioChannel
-                // needs to be closed first, if available, to ensure that TLS
-                // connections are shut down cleanly.
-                if (socketWrapper != null) {
                     try {
-                        socketWrapper.getSocket().close(true);
-                    } catch (Exception e){
+                        socketWrapper.close();
+                    } catch (Exception e) {
                         if (log.isDebugEnabled()) {
                             log.debug(sm.getString(
-                                    "endpoint.debug.socketCloseFail"), e);
+                                    "endpoint.debug.channelCloseFail"), e);
                         }
                     }
+                }
+                if (sk.isValid()) {
+                    sk.cancel();
                 }
                 // The SocketChannel is also available via the SelectionKey. If
                 // it hasn't been closed in the block above, close it now.
@@ -715,18 +710,6 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                                     "endpoint.debug.channelCloseFail"), e);
                         }
                     }
-                }
-                try {
-                    if (socketWrapper != null && socketWrapper.getSendfileData() != null
-                            && socketWrapper.getSendfileData().fchannel != null
-                            && socketWrapper.getSendfileData().fchannel.isOpen()) {
-                        socketWrapper.getSendfileData().fchannel.close();
-                    }
-                } catch (Exception ignore) {
-                }
-                if (socketWrapper != null) {
-                    countDownConnection();
-                    socketWrapper.closed = true;
                 }
             } catch (Throwable e) {
                 ExceptionUtils.handleThrowable(e);
@@ -1215,7 +1198,44 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
 
         @Override
         public void close() throws IOException {
-            getSocket().close();
+            if (log.isDebugEnabled()) {
+                log.debug("Calling [" + getEndpoint() + "].closeSocket([" + this + "])", new Exception());
+            }
+            try {
+                getEndpoint().getHandler().release(this);
+            } catch (Throwable e) {
+                ExceptionUtils.handleThrowable(e);
+                if (log.isDebugEnabled()) {
+                    log.error("Channel close error", e);
+                }
+            }
+            try {
+                synchronized (getSocket()) {
+                    if (!closed) {
+                        closed = true;
+                        getEndpoint().countDownConnection();
+                    }
+                    if (getSocket().isOpen()) {
+                        getSocket().close(true);
+                    }
+                }
+            } catch (Throwable e) {
+                ExceptionUtils.handleThrowable(e);
+                if (log.isDebugEnabled()) {
+                    log.error("Channel close error", e);
+                }
+            }
+            try {
+                SendfileData data = getSendfileData();
+                if (data != null && data.fchannel != null && data.fchannel.isOpen()) {
+                    data.fchannel.close();
+                }
+            } catch (Throwable e) {
+                ExceptionUtils.handleThrowable(e);
+                if (log.isDebugEnabled()) {
+                    log.error("Channel close error", e);
+                }
+            }
         }
 
 

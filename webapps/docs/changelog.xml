@@ -61,6 +61,10 @@
       <fix>
         Possible HTTP/2 connection leak issue when using async. (remm)
       </fix>
+      <fix>
+        Fix socket close discrepancies for NIO, now the wrapper close
+        is used everywhere except for socket accept problems. (remm)
+      </fix>
     </changelog>
   </subsection>
 </section>
