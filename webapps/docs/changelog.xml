@@ -59,7 +59,7 @@
         value now defaults to <code>true</code>. (remm)
       </fix>
       <fix>
-        Possible HTTP/2 connection leak issue when using async. (remm)
+        Possible HTTP/2 connection leak issue when using async with NIO. (remm)
       </fix>
       <fix>
         Fix socket close discrepancies for NIO, now the wrapper close
