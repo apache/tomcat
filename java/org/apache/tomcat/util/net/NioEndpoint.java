@@ -970,7 +970,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                     keycount++;
                     try {
                         NioSocketWrapper socketWrapper = (NioSocketWrapper) key.attachment();
-                        if ( socketWrapper == null ) {
+                        if (socketWrapper == null) {
                             // We don't support any keys without attachments
                             cancelledKey(key);
                         } else if (close) {
@@ -989,6 +989,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                                 long timeout = socketWrapper.getReadTimeout();
                                 isTimedOut = timeout > 0 && delta > timeout;
                                 readTimeout = true;
+                                System.out.println("Timeout: " + timeout + " Delta: " + delta + " isTimedOut: " + isTimedOut);
                             }
                             // Check for write timeout
                             if (!isTimedOut && (socketWrapper.interestOps() & SelectionKey.OP_WRITE) == SelectionKey.OP_WRITE) {
@@ -1003,15 +1004,19 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                                 socketWrapper.interestOps(0);
                                 socketWrapper.setError(new SocketTimeoutException());
                                 if (readTimeout && socketWrapper.readOperation != null) {
-                                    getExecutor().execute(socketWrapper.readOperation);
+                                    if (!socketWrapper.readOperation.process()) {
+                                        cancelledKey(key);
+                                    }
                                 } else if (writeTimeout && socketWrapper.writeOperation != null) {
-                                    getExecutor().execute(socketWrapper.writeOperation);
+                                    if (!socketWrapper.writeOperation.process()) {
+                                        cancelledKey(key);
+                                    }
                                 } else if (!processSocket(socketWrapper, SocketEvent.ERROR, true)) {
                                     cancelledKey(key);
                                 }
                             }
                         }
-                    }catch ( CancelledKeyException ckx ) {
+                    } catch (CancelledKeyException ckx) {
                         cancelledKey(key);
                     }
                 }
@@ -1491,8 +1496,10 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                     try {
                         if (read) {
                             nBytes = getSocket().read(buffers, offset, length);
+                            updateLastRead();
                         } else {
                             nBytes = getSocket().write(buffers, offset, length);
+                            updateLastWrite();
                         }
                     } catch (IOException e) {
                         setError(e);

@@ -65,6 +65,9 @@
         Fix socket close discrepancies for NIO, now the wrapper close
         is used everywhere except for socket accept problems. (remm)
       </fix>
+      <fix>
+        Implement poller timeout when using async IO with NIO. (remm)
+      </fix>
     </changelog>
   </subsection>
 </section>
