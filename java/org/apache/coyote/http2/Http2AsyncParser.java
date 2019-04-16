@@ -31,14 +31,16 @@ import org.apache.tomcat.util.net.SocketWrapperBase.CompletionState;
 class Http2AsyncParser extends Http2Parser {
 
     private final SocketWrapperBase<?> socketWrapper;
+    private final Http2AsyncUpgradeHandler upgradeHandler;
     private Throwable error = null;
     private final ByteBuffer header;
     private final ByteBuffer framePaylod;
 
-    Http2AsyncParser(String connectionId, Input input, Output output, SocketWrapperBase<?> socketWrapper) {
+    Http2AsyncParser(String connectionId, Input input, Output output, SocketWrapperBase<?> socketWrapper, Http2AsyncUpgradeHandler upgradeHandler) {
         super(connectionId, input, output);
         this.socketWrapper = socketWrapper;
         socketWrapper.getSocketBufferHandler().expand(input.getMaxFrameSize());
+        this.upgradeHandler = upgradeHandler;
         header = ByteBuffer.allocate(9);
         framePaylod = ByteBuffer.allocate(input.getMaxFrameSize());
     }
@@ -226,7 +228,7 @@ class Http2AsyncParser extends Http2Parser {
             if (state == CompletionState.DONE) {
                 // The call was not completed inline, so must start reading new frames
                 // or process the stream exception
-                socketWrapper.processSocket(SocketEvent.OPEN_READ, false);
+                upgradeHandler.upgradeDispatch(SocketEvent.OPEN_READ);
             }
         }
 
@@ -238,7 +240,7 @@ class Http2AsyncParser extends Http2Parser {
                 log.debug(sm.getString("http2Parser.error", connectionId, Integer.valueOf(streamId), frameType), e);
             }
             if (state == null || state == CompletionState.DONE) {
-                socketWrapper.processSocket(SocketEvent.ERROR, true);
+                upgradeHandler.upgradeDispatch(SocketEvent.ERROR);
             }
         }
 
