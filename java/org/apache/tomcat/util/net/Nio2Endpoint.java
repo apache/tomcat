@@ -902,7 +902,7 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
             } catch (Throwable e) {
                 ExceptionUtils.handleThrowable(e);
                 if (log.isDebugEnabled()) {
-                    log.error("Channel close error", e);
+                    log.error(sm.getString("endpoint.debug.handlerRelease"), e);
                 }
             }
             try {
@@ -918,7 +918,7 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
             } catch (Throwable e) {
                 ExceptionUtils.handleThrowable(e);
                 if (log.isDebugEnabled()) {
-                    log.error("Channel close error", e);
+                    log.error(sm.getString("endpoint.debug.channelCloseFail"), e);
                 }
             }
             try {
@@ -929,7 +929,7 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
             } catch (Throwable e) {
                 ExceptionUtils.handleThrowable(e);
                 if (log.isDebugEnabled()) {
-                    log.error("Channel close error", e);
+                    log.error(sm.getString("endpoint.sendfile.closeError"), e);
                 }
             }
         }

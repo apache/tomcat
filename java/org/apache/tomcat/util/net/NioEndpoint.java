@@ -687,14 +687,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                 }
                 socketWrapper = (NioSocketWrapper) sk.attach(null);
                 if (socketWrapper != null) {
-                    try {
-                        socketWrapper.close();
-                    } catch (Exception e) {
-                        if (log.isDebugEnabled()) {
-                            log.debug(sm.getString(
-                                    "endpoint.debug.channelCloseFail"), e);
-                        }
-                    }
+                    socketWrapper.close();
                 }
                 if (sk.isValid()) {
                     sk.cancel();
@@ -702,19 +695,12 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                 // The SocketChannel is also available via the SelectionKey. If
                 // it hasn't been closed in the block above, close it now.
                 if (sk.channel().isOpen()) {
-                    try {
-                        sk.channel().close();
-                    } catch (Exception e) {
-                        if (log.isDebugEnabled()) {
-                            log.debug(sm.getString(
-                                    "endpoint.debug.channelCloseFail"), e);
-                        }
-                    }
+                    sk.channel().close();
                 }
             } catch (Throwable e) {
                 ExceptionUtils.handleThrowable(e);
                 if (log.isDebugEnabled()) {
-                    log.error("", e);
+                    log.error(sm.getString("endpoint.debug.channelCloseFail"), e);
                 }
             }
             return socketWrapper;
@@ -760,7 +746,9 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                     continue;
                 }
                 // Either we timed out or we woke up, process events first
-                if ( keyCount == 0 ) hasEvents = (hasEvents | events());
+                if (keyCount == 0) {
+                    hasEvents = (hasEvents | events());
+                }
 
                 Iterator<SelectionKey> iterator =
                     keyCount > 0 ? selector.selectedKeys().iterator() : null;
@@ -768,14 +756,14 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                 // any active event.
                 while (iterator != null && iterator.hasNext()) {
                     SelectionKey sk = iterator.next();
-                    NioSocketWrapper attachment = (NioSocketWrapper)sk.attachment();
+                    NioSocketWrapper socketWrapper = (NioSocketWrapper) sk.attachment();
                     // Attachment may be null if another thread has called
                     // cancelledKey()
-                    if (attachment == null) {
+                    if (socketWrapper == null) {
                         iterator.remove();
                     } else {
                         iterator.remove();
-                        processKey(sk, attachment);
+                        processKey(sk, socketWrapper);
                     }
                 }
 
@@ -792,7 +780,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                     cancelledKey(sk);
                 } else if (sk.isValid() && socketWrapper != null) {
                     if (sk.isReadable() || sk.isWritable()) {
-                        if ( socketWrapper.getSendfileData() != null ) {
+                        if (socketWrapper.getSendfileData() != null) {
                             processSendfile(sk, socketWrapper, false);
                         } else {
                             unreg(sk, socketWrapper, sk.readyOps());
@@ -855,10 +843,10 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                 // Configure output channel
                 sc = socketWrapper.getSocket();
                 // TLS/SSL channel is slightly different
-                WritableByteChannel wc = ((sc instanceof SecureNioChannel)?sc:sc.getIOChannel());
+                WritableByteChannel wc = ((sc instanceof SecureNioChannel) ? sc : sc.getIOChannel());
 
                 // We still have data in the buffer
-                if (sc.getOutboundRemaining()>0) {
+                if (sc.getOutboundRemaining() > 0) {
                     if (sc.flushOutbound()) {
                         socketWrapper.updateLastWrite();
                     }
@@ -928,7 +916,9 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                     return SendfileState.PENDING;
                 }
             } catch (IOException x) {
-                if (log.isDebugEnabled()) log.debug("Unable to complete sendfile request:", x);
+                if (log.isDebugEnabled()) {
+                    log.debug("Unable to complete sendfile request:", x);
+                }
                 if (!calledByProcessor && sc != null) {
                     close(sc, sk);
                 }
@@ -1070,13 +1060,13 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
         }
 
         public Poller getPoller() { return poller; }
-        public void setPoller(Poller poller){this.poller = poller; }
+        public void setPoller(Poller poller) { this.poller = poller; }
         public int interestOps() { return interestOps; }
         public int interestOps(int ops) { this.interestOps  = ops; return ops; }
         public CountDownLatch getReadLatch() { return readLatch; }
         public CountDownLatch getWriteLatch() { return writeLatch; }
         protected CountDownLatch resetLatch(CountDownLatch latch) {
-            if (latch==null || latch.getCount() == 0) {
+            if (latch == null || latch.getCount() == 0) {
                 return null;
             } else {
                 throw new IllegalStateException(sm.getString("endpoint.nio.latchMustBeZero"));
@@ -1108,7 +1098,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
         public void awaitWriteLatch(long timeout, TimeUnit unit) throws InterruptedException { awaitLatch(writeLatch, timeout, unit); }
 
         public void setSendfileData(SendfileData sf) { this.sendfileData = sf;}
-        public SendfileData getSendfileData() { return this.sendfileData;}
+        public SendfileData getSendfileData() { return this.sendfileData; }
 
         public void updateLastWrite() { lastWrite = System.currentTimeMillis(); }
         public long getLastWrite() { return lastWrite; }
@@ -1201,7 +1191,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
 
 
         @Override
-        public void close() throws IOException {
+        public void close() {
             if (log.isDebugEnabled()) {
                 log.debug("Calling [" + getEndpoint() + "].closeSocket([" + this + "])", new Exception());
             }
@@ -1210,7 +1200,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
             } catch (Throwable e) {
                 ExceptionUtils.handleThrowable(e);
                 if (log.isDebugEnabled()) {
-                    log.error("Channel close error", e);
+                    log.error(sm.getString("endpoint.debug.handlerRelease"), e);
                 }
             }
             try {
@@ -1226,7 +1216,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
             } catch (Throwable e) {
                 ExceptionUtils.handleThrowable(e);
                 if (log.isDebugEnabled()) {
-                    log.error("Channel close error", e);
+                    log.error(sm.getString("endpoint.debug.channelCloseFail"), e);
                 }
             }
             try {
@@ -1237,7 +1227,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
             } catch (Throwable e) {
                 ExceptionUtils.handleThrowable(e);
                 if (log.isDebugEnabled()) {
-                    log.error("Channel close error", e);
+                    log.error(sm.getString("endpoint.sendfile.closeError"), e);
                 }
             }
         }
