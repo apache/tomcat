@@ -989,7 +989,6 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                                 long timeout = socketWrapper.getReadTimeout();
                                 isTimedOut = timeout > 0 && delta > timeout;
                                 readTimeout = true;
-                                System.out.println("Timeout: " + timeout + " Delta: " + delta + " isTimedOut: " + isTimedOut);
                             }
                             // Check for write timeout
                             if (!isTimedOut && (socketWrapper.interestOps() & SelectionKey.OP_WRITE) == SelectionKey.OP_WRITE) {
