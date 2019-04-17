@@ -891,8 +891,17 @@ public class JspUtil {
 
         InputStreamReader reader = null;
         InputStream in = getInputStream(fname, jar, ctxt);
-        for (int i = 0; i < skip; i++) {
-            in.read();
+        try {
+            for (int i = 0; i < skip; i++) {
+                in.read();
+            }
+        } catch (IOException ioe) {
+            try {
+                in.close();
+            } catch (IOException e) {
+                // Ignore
+            }
+            throw ioe;
         }
         try {
             reader = new InputStreamReader(in, encoding);
