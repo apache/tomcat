@@ -445,31 +445,32 @@ public class DataSourceRealm
         }
     }
 
+
     /**
      * Return the password associated with the given principal's user name.
+     *
      * @param dbConnection The database connection to be used
      * @param username Username for which password should be retrieved
+     *
+     * @return the password for the specified user
      */
-    protected String getPassword(Connection dbConnection,
-                                 String username) {
+    protected String getPassword(Connection dbConnection, String username) {
 
         ResultSet rs = null;
         PreparedStatement stmt = null;
         String dbCredentials = null;
 
         try {
-            stmt = credentials(dbConnection, username);
+            stmt = dbConnection.prepareStatement(preparedCredentials);
+            stmt.setString(1, username);
             rs = stmt.executeQuery();
             if (rs.next()) {
                 dbCredentials = rs.getString(1);
             }
 
             return (dbCredentials != null) ? dbCredentials.trim() : null;
-
-        } catch(SQLException e) {
-            containerLog.error(
-                    sm.getString("dataSourceRealm.getPassword.exception",
-                                 username), e);
+        } catch (SQLException e) {
+            containerLog.error(sm.getString("dataSourceRealm.getPassword.exception", username), e);
         } finally {
             try {
                 if (rs != null) {
@@ -530,13 +531,16 @@ public class DataSourceRealm
         }
     }
 
+
     /**
-     * Return the roles associated with the given user name
+     * Return the roles associated with the given user name.
+     *
      * @param dbConnection The database connection to be used
-     * @param username Username for which roles should be retrieved
+     * @param username User name for which roles should be retrieved
+     *
+     * @return an array list of the role names
      */
-    protected ArrayList<String> getRoles(Connection dbConnection,
-                                     String username) {
+    protected ArrayList<String> getRoles(Connection dbConnection, String username) {
 
         if (allRolesMode != AllRolesMode.STRICT_MODE && !isRoleStoreDefined()) {
             // Using an authentication only configuration and no role store has
@@ -549,7 +553,8 @@ public class DataSourceRealm
         ArrayList<String> list = null;
 
         try {
-            stmt = roles(dbConnection, username);
+            stmt = dbConnection.prepareStatement(preparedRoles);
+            stmt.setString(1, username);
             rs = stmt.executeQuery();
             list = new ArrayList<String>();
 
@@ -561,8 +566,7 @@ public class DataSourceRealm
             }
             return list;
         } catch(SQLException e) {
-            containerLog.error(
-                sm.getString("dataSourceRealm.getRoles.exception", username), e);
+            containerLog.error(sm.getString("dataSourceRealm.getRoles.exception", username), e);
         }
         finally {
             try {
@@ -574,53 +578,11 @@ public class DataSourceRealm
                 }
             } catch (SQLException e) {
                     containerLog.error(
-                        sm.getString("dataSourceRealm.getRoles.exception",
-                                     username), e);
+                            sm.getString("dataSourceRealm.getRoles.exception", username), e);
             }
         }
 
         return null;
-    }
-
-    /**
-     * Return a PreparedStatement configured to perform the SELECT required
-     * to retrieve user credentials for the specified username.
-     *
-     * @param dbConnection The database connection to be used
-     * @param username Username for which credentials should be retrieved
-     *
-     * @exception SQLException if a database error occurs
-     */
-    private PreparedStatement credentials(Connection dbConnection,
-                                            String username)
-        throws SQLException {
-
-        PreparedStatement credentials =
-            dbConnection.prepareStatement(preparedCredentials);
-
-        credentials.setString(1, username);
-        return (credentials);
-
-    }
-
-    /**
-     * Return a PreparedStatement configured to perform the SELECT required
-     * to retrieve user roles for the specified username.
-     *
-     * @param dbConnection The database connection to be used
-     * @param username Username for which roles should be retrieved
-     *
-     * @exception SQLException if a database error occurs
-     */
-    private PreparedStatement roles(Connection dbConnection, String username)
-        throws SQLException {
-
-        PreparedStatement roles =
-            dbConnection.prepareStatement(preparedRoles);
-
-        roles.setString(1, username);
-        return (roles);
-
     }
 
 

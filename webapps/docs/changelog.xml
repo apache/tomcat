@@ -73,6 +73,10 @@
         Fix a potential concurrency issue in the main Sendfile thread of the APR
         connector. Identified by Coverity scan. (markt)
       </fix>
+      <fix>
+        Fix a potential resource leak on some exception paths in the
+        <code>DataSourceRealm</code>. Identified by Coverity scan. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
