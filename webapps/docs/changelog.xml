@@ -52,6 +52,10 @@
         path which in turn meant resource URLs were not being constructed as
         expected. (markt)
       </fix>
+      <fix>
+        Fix a potential resource leak when executing CGI scripts from a WAR
+        file. Identified by Coverity scan. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
