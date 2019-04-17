@@ -41,10 +41,18 @@
   There is no ordering by add/update/fix/scode.
 
   Other fixed issues are added to the end of the list, chronologically.
-  They eventually become mixed with the numbered issues. (I.e., numbered
+  They eventually become mixed with the numbered issues (i.e., numbered
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 8.5.41 (markt)" rtext="in development">
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        Fix a potential resource leak when executing CGI scripts from a WAR
+        file. Identified by Coverity scan. (markt)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 8.5.40 (markt)" rtext="2019-04-12">
   <subsection name="Catalina">
