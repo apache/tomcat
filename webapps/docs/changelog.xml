@@ -70,6 +70,9 @@
       <fix>
         Implement poller timeout when using async IO with NIO. (remm)
       </fix>
+      <fix>
+        Avoid creating and using object caches when they are disabled. (remm)
+      </fix>
     </changelog>
   </subsection>
 </section>

@@ -262,15 +262,21 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
             running = true;
             paused = false;
 
-            processorCache = new SynchronizedStack<>(SynchronizedStack.DEFAULT_SIZE,
-                    socketProperties.getProcessorCache());
-            eventCache = new SynchronizedStack<>(SynchronizedStack.DEFAULT_SIZE,
-                            socketProperties.getEventCache());
-            nioChannels = new SynchronizedStack<>(SynchronizedStack.DEFAULT_SIZE,
-                    socketProperties.getBufferPool());
+            if (socketProperties.getProcessorCache() != 0) {
+                processorCache = new SynchronizedStack<>(SynchronizedStack.DEFAULT_SIZE,
+                        socketProperties.getProcessorCache());
+            }
+            if (socketProperties.getEventCache() != 0) {
+                eventCache = new SynchronizedStack<>(SynchronizedStack.DEFAULT_SIZE,
+                        socketProperties.getEventCache());
+            }
+            if (socketProperties.getBufferPool() != 0) {
+                nioChannels = new SynchronizedStack<>(SynchronizedStack.DEFAULT_SIZE,
+                        socketProperties.getBufferPool());
+            }
 
             // Create worker collection
-            if ( getExecutor() == null ) {
+            if (getExecutor() == null) {
                 createExecutor();
             }
 
@@ -314,9 +320,18 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                 log.warn(sm.getString("endpoint.nio.stopLatchAwaitInterrupted"), e);
             }
             shutdownExecutor();
-            eventCache.clear();
-            nioChannels.clear();
-            processorCache.clear();
+            if (eventCache != null) {
+                eventCache.clear();
+                eventCache = null;
+            }
+            if (nioChannels != null) {
+                nioChannels.clear();
+                nioChannels = null;
+            }
+            if (processorCache != null) {
+                processorCache.clear();
+                processorCache = null;
+            }
         }
     }
 
@@ -390,7 +405,10 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
             Socket sock = socket.socket();
             socketProperties.setProperties(sock);
 
-            NioChannel channel = nioChannels.pop();
+            NioChannel channel = null;
+            if (nioChannels != null) {
+                channel = nioChannels.pop();
+            }
             if (channel == null) {
                 SocketBufferHandler bufhandler = new SocketBufferHandler(
                         socketProperties.getAppReadBufSize(),
@@ -478,7 +496,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                     log.debug("Socket: [" + socket + "] closed");
                 }
                 if (running && !paused) {
-                    if (!nioChannels.push(socket)) {
+                    if (nioChannels == null || !nioChannels.push(socket)) {
                         socket.free();
                     }
                 }
@@ -615,7 +633,10 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
          *                    the Poller
          */
         public void add(final NioChannel socket, final int interestOps) {
-            PollerEvent r = eventCache.pop();
+            PollerEvent r = null;
+            if (eventCache != null) {
+                r = eventCache.pop();
+            }
             if (r == null) {
                 r = new PollerEvent(socket, null, interestOps);
             } else {
@@ -643,7 +664,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                 try {
                     pe.run();
                     pe.reset();
-                    if (running && !paused) {
+                    if (running && !paused && eventCache != null) {
                         eventCache.push(pe);
                     }
                 } catch ( Throwable x ) {
@@ -668,8 +689,11 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
             socketWrapper.setWriteTimeout(getConnectionTimeout());
             socketWrapper.setKeepAliveLeft(NioEndpoint.this.getMaxKeepAliveRequests());
             socketWrapper.setSecure(isSSLEnabled());
-            PollerEvent r = eventCache.pop();
             socketWrapper.interestOps(SelectionKey.OP_READ);//this is what OP_REGISTER turns into.
+            PollerEvent r = null;
+            if (eventCache != null) {
+                r = eventCache.pop();
+            }
             if (r == null) {
                 r = new PollerEvent(socket, socketWrapper, OP_REGISTER);
             } else {
@@ -1809,7 +1833,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                 socketWrapper = null;
                 event = null;
                 //return to cache
-                if (running && !paused) {
+                if (running && !paused && processorCache != null) {
                     processorCache.push(this);
                 }
             }
