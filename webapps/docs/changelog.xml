@@ -81,6 +81,10 @@
         Fix a potential resource leak on an exception path when parsing JSP
         files. Identified by Coverity scan. (markt)
       </fix>
+      <fix>
+        Fix a potential resource leak when a JNDI lookup returns an object of an
+        in compatible class. Identified by Coverity scan. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
