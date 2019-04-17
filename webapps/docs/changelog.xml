@@ -51,6 +51,10 @@
         Fix a potential resource leak when executing CGI scripts from a WAR
         file. Identified by Coverity scan. (markt)
       </fix>
+      <fix>
+        Fix a potential concurrency issue in the StringCache identifed by
+        Coverity scan. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
