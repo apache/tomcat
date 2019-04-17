@@ -2305,7 +2305,9 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
                     maintainTime = 0;
                     try {
                         synchronized (this) {
-                            this.wait();
+                            if (sendfileRunning && sendfileCount < 1 && addS.size() < 1) {
+                                this.wait();
+                            }
                         }
                     } catch (InterruptedException e) {
                         // Ignore
