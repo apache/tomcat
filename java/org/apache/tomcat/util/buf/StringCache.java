@@ -79,7 +79,7 @@ public class StringCache {
     /**
      * Cache for byte chunk.
      */
-    protected static ByteEntry[] bcCache = null;
+    protected static volatile ByteEntry[] bcCache = null;
 
 
     /**
@@ -98,7 +98,7 @@ public class StringCache {
     /**
      * Cache for char chunk.
      */
-    protected static CharEntry[] ccCache = null;
+    protected static volatile CharEntry[] ccCache = null;
 
 
     /**
