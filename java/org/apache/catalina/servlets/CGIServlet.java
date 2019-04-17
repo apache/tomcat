@@ -1203,59 +1203,57 @@ public final class CGIServlet extends HttpServlet {
                 return;
             }
 
-            File f = new File(destPath.toString());
-            if (f.exists()) {
+            try {
+                File f = new File(destPath.toString());
+                if (f.exists()) {
+                    // Don't need to expand if it already exists
+                    return;
+                }
+
+                // create directories
+                File dir = f.getParentFile();
+                if (!dir.mkdirs() && !dir.isDirectory()) {
+                    log.warn(sm.getString("cgiServlet.expandCreateDirFail", dir.getAbsolutePath()));
+                    return;
+                }
+
+                try {
+                    synchronized (expandFileLock) {
+                        // make sure file doesn't exist
+                        if (f.exists()) {
+                            return;
+                        }
+
+                        // create file
+                        if (!f.createNewFile()) {
+                            return;
+                        }
+                        FileOutputStream fos = new FileOutputStream(f);
+
+                        try {
+                            // copy data
+                            IOTools.flow(is, fos);
+                        } finally {
+                            fos.close();
+                        }
+                        if (log.isDebugEnabled()) {
+                            log.debug(sm.getString("cgiServlet.expandOk", srcPath, destPath));
+                        }
+                    }
+                } catch (IOException ioe) {
+                    log.warn(sm.getString("cgiServlet.expandFail", srcPath, destPath), ioe);
+                    // delete in case file is corrupted
+                    if (f.exists()) {
+                        if (!f.delete()) {
+                            log.warn(sm.getString("cgiServlet.expandDeleteFail", f.getAbsolutePath()));
+                        }
+                    }
+                }
+            } finally {
                 try {
                     is.close();
                 } catch (IOException e) {
                     log.warn(sm.getString("cgiServlet.expandCloseFail", srcPath), e);
-                }
-                // Don't need to expand if it already exists
-                return;
-            }
-
-            // create directories
-            File dir = f.getParentFile();
-            if (!dir.mkdirs() && !dir.isDirectory()) {
-                log.warn(sm.getString("cgiServlet.expandCreateDirFail", dir.getAbsolutePath()));
-                return;
-            }
-
-            try {
-                synchronized (expandFileLock) {
-                    // make sure file doesn't exist
-                    if (f.exists()) {
-                        return;
-                    }
-
-                    // create file
-                    if (!f.createNewFile()) {
-                        return;
-                    }
-                    FileOutputStream fos = new FileOutputStream(f);
-
-                    try {
-                        // copy data
-                        IOTools.flow(is, fos);
-                    } finally {
-                        try {
-                            is.close();
-                        } catch (IOException e) {
-                            log.warn(sm.getString("cgiServlet.expandError"), e);
-                        }
-                        fos.close();
-                    }
-                    if (log.isDebugEnabled()) {
-                        log.debug(sm.getString("cgiServlet.expandOk", srcPath, destPath));
-                    }
-                }
-            } catch (IOException ioe) {
-                log.warn(sm.getString("cgiServlet.expandFail", srcPath, destPath), ioe);
-                // delete in case file is corrupted
-                if (f.exists()) {
-                    if (!f.delete()) {
-                        log.warn(sm.getString("cgiServlet.expandDeleteFail", f.getAbsolutePath()));
-                    }
                 }
             }
         }
