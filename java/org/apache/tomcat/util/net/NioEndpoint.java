@@ -92,7 +92,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
     private volatile ServerSocketChannel serverSock = null;
 
     /**
-     *
+     * Stop latch used to wait for poller stop
      */
     private volatile CountDownLatch stopLatch = null;
 
@@ -122,8 +122,8 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
             } else {
                 return super.setProperty(name, value);
             }
-        }catch ( Exception x ) {
-            log.error(sm.getString("endpoint.setAttributeError", name, value), x);
+        } catch (Exception e) {
+            log.error(sm.getString("endpoint.setAttributeError", name, value), e);
             return false;
         }
     }
@@ -152,8 +152,9 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
     public int getPollerThreadCount() { return pollerThreadCount; }
 
     private long selectorTimeout = 1000;
-    public void setSelectorTimeout(long timeout){ this.selectorTimeout = timeout;}
-    public long getSelectorTimeout(){ return this.selectorTimeout; }
+    public void setSelectorTimeout(long timeout) { this.selectorTimeout = timeout;}
+    public long getSelectorTimeout() { return this.selectorTimeout; }
+
     /**
      * The socket pollers.
      */
@@ -185,6 +186,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
 
 
     // --------------------------------------------------------- Public Methods
+
     /**
      * Number of keep-alive sockets.
      *
@@ -196,7 +198,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
             return 0;
         } else {
             int sum = 0;
-            for (int i=0; i<pollers.length; i++) {
+            for (int i = 0; i < pollers.length; i++) {
                 sum += pollers[i].getKeyCount();
             }
             return sum;
@@ -284,9 +286,9 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
 
             // Start poller threads
             pollers = new Poller[getPollerThreadCount()];
-            for (int i=0; i<pollers.length; i++) {
+            for (int i = 0; i < pollers.length; i++) {
                 pollers[i] = new Poller();
-                Thread pollerThread = new Thread(pollers[i], getName() + "-ClientPoller-"+i);
+                Thread pollerThread = new Thread(pollers[i], getName() + "-ClientPoller-" + i);
                 pollerThread.setPriority(threadPriority);
                 pollerThread.setDaemon(true);
                 pollerThread.start();
@@ -307,8 +309,10 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
         }
         if (running) {
             running = false;
-            for (int i=0; pollers!=null && i<pollers.length; i++) {
-                if (pollers[i]==null) continue;
+            for (int i = 0; pollers != null && i < pollers.length; i++) {
+                if (pollers[i] == null) {
+                    continue;
+                }
                 pollers[i].destroy();
                 pollers[i] = null;
             }
@@ -875,7 +879,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                         socketWrapper.updateLastWrite();
                     }
                 } else {
-                    long written = sd.fchannel.transferTo(sd.pos,sd.length,wc);
+                    long written = sd.fchannel.transferTo(sd.pos, sd.length, wc);
                     if (written > 0) {
                         sd.pos += written;
                         sd.length -= written;
@@ -890,7 +894,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                 }
                 if (sd.length <= 0 && sc.getOutboundRemaining()<=0) {
                     if (log.isDebugEnabled()) {
-                        log.debug("Send file complete for: "+sd.fileName);
+                        log.debug("Send file complete for: " + sd.fileName);
                     }
                     socketWrapper.setSendfileData(null);
                     try {
@@ -922,7 +926,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                             if (log.isDebugEnabled()) {
                                 log.debug("Connection is keep alive, registering back for OP_READ");
                             }
-                            reg(sk,socketWrapper,SelectionKey.OP_READ);
+                            reg(sk, socketWrapper, SelectionKey.OP_READ);
                             break;
                         }
                         }
@@ -933,15 +937,15 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                         log.debug("OP_WRITE for sendfile: " + sd.fileName);
                     }
                     if (calledByProcessor) {
-                        add(socketWrapper.getSocket(),SelectionKey.OP_WRITE);
+                        add(socketWrapper.getSocket(), SelectionKey.OP_WRITE);
                     } else {
-                        reg(sk,socketWrapper,SelectionKey.OP_WRITE);
+                        reg(sk, socketWrapper, SelectionKey.OP_WRITE);
                     }
                     return SendfileState.PENDING;
                 }
-            } catch (IOException x) {
+            } catch (IOException e) {
                 if (log.isDebugEnabled()) {
-                    log.debug("Unable to complete sendfile request:", x);
+                    log.debug("Unable to complete sendfile request:", e);
                 }
                 if (!calledByProcessor && sc != null) {
                     close(sc, sk);
@@ -992,8 +996,8 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                             // Avoid duplicate stop calls
                             socketWrapper.interestOps(0);
                             processKey(key,socketWrapper);
-                        } else if ((socketWrapper.interestOps()&SelectionKey.OP_READ) == SelectionKey.OP_READ ||
-                                  (socketWrapper.interestOps()&SelectionKey.OP_WRITE) == SelectionKey.OP_WRITE) {
+                        } else if ((socketWrapper.interestOps() & SelectionKey.OP_READ) == SelectionKey.OP_READ ||
+                                  (socketWrapper.interestOps() & SelectionKey.OP_WRITE) == SelectionKey.OP_WRITE) {
                             boolean isTimedOut = false;
                             boolean readTimeout = false;
                             boolean writeTimeout = false;
