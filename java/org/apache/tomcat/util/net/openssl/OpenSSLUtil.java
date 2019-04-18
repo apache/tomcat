@@ -26,7 +26,6 @@ import javax.net.ssl.X509KeyManager;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
-import org.apache.tomcat.jni.SSL;
 import org.apache.tomcat.util.net.SSLContext;
 import org.apache.tomcat.util.net.SSLHostConfigCertificate;
 import org.apache.tomcat.util.net.SSLUtilBase;
@@ -59,12 +58,6 @@ public class OpenSSLUtil extends SSLUtilBase {
     @Override
     protected Set<String> getImplementedCiphers() {
         return OpenSSLEngine.AVAILABLE_CIPHER_SUITES;
-    }
-
-
-    @Override
-    protected boolean isTls13Available() {
-        return SSL.version() >= 0x1010100f;
     }
 
 

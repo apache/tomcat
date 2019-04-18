@@ -27,7 +27,6 @@ import java.util.Set;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.compat.JreVendor;
-import org.apache.tomcat.util.compat.TLS;
 import org.apache.tomcat.util.net.Constants;
 import org.apache.tomcat.util.net.SSLContext;
 import org.apache.tomcat.util.net.SSLHostConfigCertificate;
@@ -130,12 +129,6 @@ public class JSSEUtil extends SSLUtilBase {
     @Override
     protected Set<String> getImplementedCiphers() {
         return implementedCiphers;
-    }
-
-
-    @Override
-    protected boolean isTls13Available() {
-        return TLS.isTlsv13Available();
     }
 
 

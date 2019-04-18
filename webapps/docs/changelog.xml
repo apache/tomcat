@@ -81,6 +81,14 @@
       </scode>
     </changelog>
   </subsection>
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+        When running on newer JREs that don't support SSLv2Hello, don't warn
+        that it is not available unless explicitly configured. (markt)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 8.5.40 (markt)" rtext="2019-04-12">
   <subsection name="Catalina">
