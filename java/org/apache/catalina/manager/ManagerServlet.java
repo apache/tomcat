@@ -66,6 +66,7 @@ import org.apache.coyote.ProtocolHandler;
 import org.apache.coyote.http11.AbstractHttp11Protocol;
 import org.apache.tomcat.util.Diagnostics;
 import org.apache.tomcat.util.ExceptionUtils;
+import org.apache.tomcat.util.IntrospectionUtils;
 import org.apache.tomcat.util.modeler.Registry;
 import org.apache.tomcat.util.net.SSLContext;
 import org.apache.tomcat.util.net.SSLHostConfig;
@@ -1131,21 +1132,31 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
             writer.println(smClient.getString("managerServlet.resourcesAll"));
         }
 
-        Class<?> clazz = null;
-        try {
-            if (type != null) {
-                clazz = Class.forName(type);
-            }
-        } catch (Throwable t) {
-            ExceptionUtils.handleThrowable(t);
-            log("ManagerServlet.resources[" + type + "]", t);
-            writer.println(smClient.getString("managerServlet.exception",
-                    t.toString()));
-            return;
-        }
+        printResources(writer, "", global, type, smClient);
 
-        printResources(writer, "", global, type, clazz, smClient);
+    }
 
+
+    /**
+     * List the resources of the given context.
+     *
+     * @param writer Writer to render to
+     * @param prefix Path for recursion
+     * @param namingContext The naming context for lookups
+     * @param type Fully qualified class name of the resource type of interest,
+     *  or <code>null</code> to list resources of all types
+     * @param clazz Unused
+     * @param smClient i18n support for current client's locale
+     *
+     * @deprecated Use {@link #printResources(PrintWriter, String,
+     *             javax.naming.Context, String, StringManager)}
+     *             This method will be removed in Tomcat 10.x onwards
+     */
+    @Deprecated
+    protected void printResources(PrintWriter writer, String prefix,
+            javax.naming.Context namingContext,
+            String type, Class<?> clazz, StringManager smClient) {
+        printResources(writer, prefix, namingContext, type, smClient);
     }
 
 
@@ -1156,27 +1167,23 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
      * @param namingContext The naming context for lookups
      * @param type Fully qualified class name of the resource type of interest,
      *  or <code>null</code> to list resources of all types
-     * @param clazz The resource class or <code>null</code> to list
-     *  resources of all types
      * @param smClient i18n support for current client's locale
      */
     protected void printResources(PrintWriter writer, String prefix,
                                   javax.naming.Context namingContext,
-                                  String type, Class<?> clazz,
+                                  String type,
                                   StringManager smClient) {
-
         try {
             NamingEnumeration<Binding> items = namingContext.listBindings("");
             while (items.hasMore()) {
                 Binding item = items.next();
-                if (item.getObject() instanceof javax.naming.Context) {
-                    printResources
-                        (writer, prefix + item.getName() + "/",
-                         (javax.naming.Context) item.getObject(), type, clazz,
-                         smClient);
+                Object obj = item.getObject();
+                if (obj instanceof javax.naming.Context) {
+                    printResources(writer, prefix + item.getName() + "/",
+                            (javax.naming.Context) obj, type, smClient);
                 } else {
-                    if ((clazz != null) &&
-                        (!(clazz.isInstance(item.getObject())))) {
+                    if (type != null && (obj == null ||
+                            !IntrospectionUtils.isInstance(obj.getClass(), type))) {
                         continue;
                     }
                     writer.print(prefix + item.getName());
@@ -1192,7 +1199,6 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
             writer.println(smClient.getString("managerServlet.exception",
                     t.toString()));
         }
-
     }
 
 
