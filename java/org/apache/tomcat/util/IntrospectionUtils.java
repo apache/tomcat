@@ -433,6 +433,28 @@ public final class IntrospectionUtils {
         return result;
     }
 
+
+    public static boolean isInstance(Class<?> clazz, String type) {
+        if (type.equals(clazz.getName())) {
+            return true;
+        }
+
+        Class<?>[] ifaces = clazz.getInterfaces();
+        for (Class<?> iface : ifaces) {
+            if (isInstance(iface, type)) {
+                return true;
+            }
+        }
+
+        Class<?> superClazz = clazz.getSuperclass();
+        if (superClazz == null) {
+            return false;
+        } else {
+            return isInstance(superClazz, type);
+        }
+    }
+
+
     // -------------------- Get property --------------------
     // This provides a layer of abstraction
 
