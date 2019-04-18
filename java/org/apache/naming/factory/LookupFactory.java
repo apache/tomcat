@@ -16,6 +16,7 @@
  */
 package org.apache.naming.factory;
 
+import java.lang.reflect.Method;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Set;
@@ -135,9 +136,10 @@ public class LookupFactory implements ObjectFactory {
                     NamingException ne = new NamingException(msg);
                     log.warn(msg, ne);
                     // Close the resource we no longer need if we know how to do so
-                    if (result instanceof AutoCloseable) {
+                    if (isInstance(result.getClass(), "java.lang.AutoCloseable")) {
                         try {
-                            ((AutoCloseable) result).close();
+                            Method m = result.getClass().getMethod("close");
+                            m.invoke(result);
                         } catch (Exception e) {
                             // Ignore
                         }
@@ -151,5 +153,26 @@ public class LookupFactory implements ObjectFactory {
 
 
         return result;
+    }
+
+
+    private static boolean isInstance(Class<?> clazz, String type) {
+        if (type.equals(clazz.getName())) {
+            return true;
+        }
+
+        Class<?>[] ifaces = clazz.getInterfaces();
+        for (Class<?> iface : ifaces) {
+            if (isInstance(iface, type)) {
+                return true;
+            }
+        }
+
+        Class<?> superClazz = clazz.getSuperclass();
+        if (superClazz == null) {
+            return false;
+        } else {
+            return isInstance(superClazz, type);
+        }
     }
 }
