@@ -90,13 +90,21 @@ public abstract class SSLUtilBase implements SSLUtil {
 
         // Calculate the enabled protocols
         Set<String> configuredProtocols = sslHostConfig.getProtocols();
-        if (!isTls13Available() &&
+        Set<String> implementedProtocols = getImplementedProtocols();
+        // If TLSv1.3 is not implemented and not explicitly requested we can
+        // ignore it. It is included in the defaults so it may be configured.
+        if (!implementedProtocols.contains(Constants.SSL_PROTO_TLSv1_3) &&
                 !sslHostConfig.isExplicitlyRequestedProtocol(Constants.SSL_PROTO_TLSv1_3)) {
-            // TLS 1.3 not implemented and not explicitly requested so ignore it
-            // if present
             configuredProtocols.remove(Constants.SSL_PROTO_TLSv1_3);
         }
-        Set<String> implementedProtocols = getImplementedProtocols();
+        // Newer JREs are dropping support for SSLv2Hello. If it is not
+        // implemented and not explicitly requested we can ignore it. It is
+        // included in the defaults so it may be configured.
+        if (!implementedProtocols.contains(Constants.SSL_PROTO_SSLv2Hello) &&
+                !sslHostConfig.isExplicitlyRequestedProtocol(Constants.SSL_PROTO_SSLv2Hello)) {
+            configuredProtocols.remove(Constants.SSL_PROTO_SSLv2Hello);
+        }
+
         List<String> enabledProtocols =
                 getEnabled("protocols", getLog(), warnTls13, configuredProtocols, implementedProtocols);
         if (enabledProtocols.contains("SSLv3")) {
@@ -527,7 +535,6 @@ public abstract class SSLUtilBase implements SSLUtil {
     protected abstract Set<String> getImplementedProtocols();
     protected abstract Set<String> getImplementedCiphers();
     protected abstract Log getLog();
-    protected abstract boolean isTls13Available();
     protected abstract boolean isTls13RenegAuthAvailable();
     protected abstract SSLContext createSSLContextInternal(List<String> negotiableProtocols) throws Exception;
 }
