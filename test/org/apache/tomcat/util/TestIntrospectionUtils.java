@@ -62,7 +62,8 @@ public class TestIntrospectionUtils {
 
     @Test
     public void testIsInstanceStandardContext06() {
-        Assert.assertTrue(IntrospectionUtils.isInstance(
+        // This interface doesn't exist in 7.0.x
+        Assert.assertFalse(IntrospectionUtils.isInstance(
                 StandardContext.class, "org.apache.catalina.JmxEnabled"));
     }
 
@@ -83,7 +84,8 @@ public class TestIntrospectionUtils {
 
     @Test
     public void testIsInstanceStandardContext09() {
-        Assert.assertTrue(IntrospectionUtils.isInstance(
+        // This interface doesn't exist in 7.0.x
+        Assert.assertFalse(IntrospectionUtils.isInstance(
                 StandardContext.class, "org.apache.tomcat.ContextBind"));
     }
 
