@@ -43,8 +43,6 @@ public class NioBlockingSelector {
     private static final Log log = LogFactory.getLog(NioBlockingSelector.class);
     protected static final StringManager sm = StringManager.getManager(NioBlockingSelector.class);
 
-    private static final AtomicInteger threadCounter = new AtomicInteger();
-
     private final SynchronizedStack<KeyReference> keyReferenceStack =
             new SynchronizedStack<>();
 
@@ -55,12 +53,12 @@ public class NioBlockingSelector {
 
     }
 
-    public void open(Selector selector) {
+    public void open(String name, Selector selector) {
         sharedSelector = selector;
         poller = new BlockPoller();
         poller.selector = sharedSelector;
         poller.setDaemon(true);
-        poller.setName("NioBlockingSelector.BlockPoller-" + threadCounter.incrementAndGet());
+        poller.setName(name + "-BlockPoller");
         poller.start();
     }
 

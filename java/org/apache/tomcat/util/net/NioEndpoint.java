@@ -233,7 +233,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
         // Initialize SSL if needed
         initialiseSsl();
 
-        selectorPool.open();
+        selectorPool.open(getName());
     }
 
     // Separated out to make it easier for folks that extend NioEndpoint to

@@ -113,6 +113,10 @@
         Change default value of <code>pollerThreadCount</code> of NIO
         to <code>1</code>. (remm)
       </fix>
+      <fix>
+        Associate BlockPoller thread name with its NIO connector for better
+        readability. (remm)
+      </fix>
     </changelog>
   </subsection>
 </section>

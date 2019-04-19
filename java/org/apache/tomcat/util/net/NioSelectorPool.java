@@ -112,12 +112,12 @@ public class NioSelectorPool {
         }
     }
 
-    public void open() throws IOException {
+    public void open(String name) throws IOException {
         enabled = true;
         getSharedSelector();
         if (SHARED) {
             blockingSelector = new NioBlockingSelector();
-            blockingSelector.open(getSharedSelector());
+            blockingSelector.open(name, getSharedSelector());
         }
 
     }
