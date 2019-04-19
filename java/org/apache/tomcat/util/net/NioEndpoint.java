@@ -1310,33 +1310,39 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
 
         @Override
         protected void doWrite(boolean block, ByteBuffer from) throws IOException {
-            long writeTimeout = getWriteTimeout();
-            Selector selector = null;
-            try {
-                selector = pool.get();
-            } catch (IOException x) {
-                // Ignore
-            }
-            try {
-                pool.write(from, getSocket(), selector, writeTimeout, block);
-                if (block) {
-                    // Make sure we are flushed
-                    do {
-                        if (getSocket().flush(true, selector, writeTimeout)) {
-                            break;
-                        }
-                    } while (true);
+            if (block) {
+                long writeTimeout = getWriteTimeout();
+                Selector selector = null;
+                try {
+                    selector = pool.get();
+                } catch (IOException x) {
+                    // Ignore
                 }
-                updateLastWrite();
-            } finally {
-                if (selector != null) {
-                    pool.put(selector);
+                try {
+                    pool.write(from, getSocket(), selector, writeTimeout, block);
+                    if (block) {
+                        // Make sure we are flushed
+                        do {
+                            if (getSocket().flush(true, selector, writeTimeout)) {
+                                break;
+                            }
+                        } while (true);
+                    }
+                } finally {
+                    if (selector != null) {
+                        pool.put(selector);
+                    }
+                }
+                // If there is data left in the buffer the socket will be registered for
+                // write further up the stack. This is to ensure the socket is only
+                // registered for write once as both container and user code can trigger
+                // write registration.
+            } else {
+                if (getSocket().write(from) == -1) {
+                    throw new EOFException();
                 }
             }
-            // If there is data left in the buffer the socket will be registered for
-            // write further up the stack. This is to ensure the socket is only
-            // registered for write once as both container and user code can trigger
-            // write registration.
+            updateLastWrite();
         }
 
 
