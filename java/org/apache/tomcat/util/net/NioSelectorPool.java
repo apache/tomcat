@@ -141,9 +141,7 @@ public class NioSelectorPool {
      * @param socket        The socket to write data to
      * @param selector      The selector to use for blocking, if null then a busy write will be initiated
      * @param writeTimeout  The timeout for this write operation in milliseconds, -1 means no timeout
-     * @param block         <code>true</code> to perform a blocking write
-     *                      otherwise a non-blocking write will be performed
-     * @return int - returns the number of bytes written
+     * @return the number of bytes written
      * @throws EOFException if write returns -1
      * @throws SocketTimeoutException if the write times out
      * @throws IOException if an IO Exception occurs in the underlying socket logic
@@ -212,7 +210,7 @@ public class NioSelectorPool {
      * @param socket SocketChannel - the socket to write data to
      * @param selector Selector - the selector to use for blocking, if null then a busy read will be initiated
      * @param readTimeout long - the timeout for this read operation in milliseconds, -1 means no timeout
-     * @return int - returns the number of bytes read
+     * @return the number of bytes read
      * @throws EOFException if read returns -1
      * @throws SocketTimeoutException if the read times out
      * @throws IOException if an IO Exception occurs in the underlying socket logic
