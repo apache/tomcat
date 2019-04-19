@@ -147,7 +147,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
     /**
      * Poller thread count.
      */
-    private int pollerThreadCount = Math.min(2,Runtime.getRuntime().availableProcessors());
+    private int pollerThreadCount = 1;
     public void setPollerThreadCount(int pollerThreadCount) { this.pollerThreadCount = pollerThreadCount; }
     public int getPollerThreadCount() { return pollerThreadCount; }
 
@@ -166,8 +166,12 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
      * @return The next poller in sequence
      */
     public Poller getPoller0() {
-        int idx = Math.abs(pollerRotater.incrementAndGet()) % pollers.length;
-        return pollers[idx];
+        if (pollerThreadCount == 1) {
+            return pollers[0];
+        } else {
+            int idx = Math.abs(pollerRotater.incrementAndGet()) % pollers.length;
+            return pollers[idx];
+        }
     }
 
 

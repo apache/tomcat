@@ -109,6 +109,10 @@
         When running on newer JREs that don't support SSLv2Hello, don't warn
         that it is not available unless explicitly configured. (markt)
       </fix>
+      <fix>
+        Change default value of <code>pollerThreadCount</code> of NIO
+        to <code>1</code>. (remm)
+      </fix>
     </changelog>
   </subsection>
 </section>
