@@ -875,6 +875,16 @@
         value is set to false. Default value is <code>-1</code> (unlimited).</p>
       </attribute>
 
+      <attribute name="selectorPool.shared" required="false">
+        <p>(bool)Set this value to <code>false</code> if you wish to
+        use a selector for each thread. When you set it to <code>false</code>, you can
+        control the size of the pool of selectors by using the
+        <strong>selectorPool.maxSelectors</strong> attribute.
+        Default is <code>true</code> or the value of the
+        <code>org.apache.tomcat.util.net.NioSelectorShared</code> system
+        property if present.</p>
+      </attribute>
+
       <attribute name="useInheritedChannel" required="false">
         <p>(bool)Defines if this connector should inherit an inetd/systemd network socket.
         Only one connector can inherit a network socket. This can option can be

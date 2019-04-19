@@ -127,7 +127,7 @@ public class SecureNioChannel extends NioChannel {
         if (!block) {
             flush(netOutBuffer);
         } else {
-            pool.write(netOutBuffer, this, s, timeout, block);
+            pool.write(netOutBuffer, this, s, timeout);
         }
         return !netOutBuffer.hasRemaining();
     }
