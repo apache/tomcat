@@ -125,6 +125,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Other">
+    <changelog>
+      <fix>
+        <bug>63370</bug>: Message files (LocalStrings_*.properties) of the
+        examples webapp not converted to ascii. (woonsan)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 9.0.19 (markt)" rtext="release in progress">
   <subsection name="Catalina">
