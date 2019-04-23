@@ -143,6 +143,15 @@ public class Registry implements RegistryMBean, MBeanRegistration {
     }
 
 
+    public static synchronized void disableRegistry() {
+        if (registry == null) {
+            registry = new NoDescriptorRegistry();
+        } else {
+            log.warn(sm.getString("registry.noDisable"));
+        }
+    }
+
+
     // -------------------- Generic methods --------------------
 
     /**

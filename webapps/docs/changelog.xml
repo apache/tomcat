@@ -84,6 +84,12 @@
         Refactor <code>ManagerServlet</code> to avoid loading classes when
         filtering JNDI resources for resources of a specified type. (markt)
       </scode>
+      <add>
+        <fix>63361</fix>: Add a new method
+        (<code>Registry.disableRegistry()</code>) that can be used to disbale
+        JMX registration of Tomcat components providing it is called before the
+        first component is registered. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
