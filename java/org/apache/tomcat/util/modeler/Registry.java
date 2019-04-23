@@ -114,7 +114,7 @@ public class Registry implements RegistryMBean, MBeanRegistration {
 
     // ----------------------------------------------------------- Constructors
 
-    public Registry() {
+    protected Registry() {
         super();
     }
 

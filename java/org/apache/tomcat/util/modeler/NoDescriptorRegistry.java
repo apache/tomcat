@@ -44,7 +44,7 @@ import javax.management.QueryExp;
 import javax.management.ReflectionException;
 import javax.management.loading.ClassLoaderRepository;
 
-/*
+/**
  * An implementation of the MBean registry that effectively disables MBean
  * registration. This is typically used when low memory footprint is a primary
  * concern.
