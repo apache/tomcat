@@ -203,13 +203,13 @@ public class NoDescriptorRegistry extends Registry {
 
         @Override
         public Set<ObjectInstance> queryMBeans(ObjectName name, QueryExp query) {
-            return null;
+            return Collections.emptySet();
         }
 
 
         @Override
         public Set<ObjectName> queryNames(ObjectName name, QueryExp query) {
-            return null;
+            return Collections.emptySet();
         }
 
 
