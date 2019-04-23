@@ -76,11 +76,6 @@ public class Registry implements RegistryMBean, MBeanRegistration {
     // Support for the factory methods
 
     /**
-     * Will be used to isolate different apps and enhance security.
-     */
-    private static final HashMap<Object, Registry> perLoaderRegistries = null;
-
-    /**
      * The registry instance created by our factory method the first time it is
      * called.
      */
@@ -131,38 +126,13 @@ public class Registry implements RegistryMBean, MBeanRegistration {
      * Factory method to create (if necessary) and return our
      * <code>Registry</code> instance.
      *
-     * The current version uses a static - future versions could use the thread
-     * class loader.
-     *
-     * @param key Support for application isolation. If null, the context class
-     *            loader will be used ( if setUseContextClassLoader is called )
-     *            or the default registry is returned.
+     * @param key Unused
      * @param guard Prevent access to the registry by untrusted components
+     *
      * @return the registry
      * @since 1.1
      */
     public static synchronized Registry getRegistry(Object key, Object guard) {
-        Registry localRegistry;
-        if (perLoaderRegistries != null) {
-            if (key == null)
-                key = Thread.currentThread().getContextClassLoader();
-            if (key != null) {
-                localRegistry = perLoaderRegistries.get(key);
-                if (localRegistry == null) {
-                    localRegistry = new Registry();
-                    // localRegistry.key=key;
-                    localRegistry.guard = guard;
-                    perLoaderRegistries.put(key, localRegistry);
-                    return localRegistry;
-                }
-                if (localRegistry.guard != null && localRegistry.guard != guard) {
-                    return null; // XXX Should I throw a permission ex ?
-                }
-                return localRegistry;
-            }
-        }
-
-        // static
         if (registry == null) {
             registry = new Registry();
         }
