@@ -36,7 +36,6 @@ import org.apache.catalina.User;
 import org.apache.catalina.UserDatabase;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
-import org.apache.tomcat.util.modeler.Registry;
 import org.apache.tomcat.util.res.StringManager;
 
 
@@ -60,12 +59,6 @@ public class GlobalResourcesLifecycleListener implements LifecycleListener {
      * The owning Catalina component that we are attached to.
      */
     protected Lifecycle component = null;
-
-
-    /**
-     * The configuration information registry for our managed beans.
-     */
-    protected static final Registry registry = MBeanUtils.createRegistry();
 
 
     // ---------------------------------------------- LifecycleListener Methods
