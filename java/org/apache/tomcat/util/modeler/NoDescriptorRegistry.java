@@ -46,23 +46,30 @@ import javax.management.loading.ClassLoaderRepository;
 
 // skip Tomcat MBeans, goal is really to skip mbean-descriptors.xml reading which is slow for small apps.
 public class NoDescriptorRegistry extends Registry {
+
     private final MBeanServer mBeanServer = new NoJmxMBeanServer();
     private final ManagedBean defaultMBean = new PassthroughMBean();
 
+
     @Override
-    public void registerComponent(final Object bean, final String oname, final String type) throws Exception {
+    public void registerComponent(final Object bean, final String oname, final String type)
+            throws Exception {
         // no-op
     }
+
 
     @Override
     public void unregisterComponent(final String oname) {
         // no-op
     }
 
+
     @Override
-    public void invoke(final List<ObjectName> mbeans, final String operation, final boolean failFirst) throws Exception {
+    public void invoke(final List<ObjectName> mbeans, final String operation,
+            final boolean failFirst) throws Exception {
         // no-op
     }
+
 
     @SuppressWarnings("sync-override")
     @Override
@@ -70,50 +77,63 @@ public class NoDescriptorRegistry extends Registry {
         return 0;
     }
 
+
     @Override
     public void addManagedBean(final ManagedBean bean) {
         // no-op
     }
+
 
     @Override
     public ManagedBean findManagedBean(final String name) {
         return defaultMBean;
     }
 
+
     @Override
     public String getType(final ObjectName oname, final String attName) {
         return null;
     }
+
 
     @Override
     public MBeanOperationInfo getMethodInfo(final ObjectName oname, final String opName) {
         return null;
     }
 
+
     @Override
-    public ManagedBean findManagedBean(final Object bean, final Class<?> beanClass, final String type) throws Exception {
+    public ManagedBean findManagedBean(final Object bean, final Class<?> beanClass,
+            final String type) throws Exception {
         return null;
     }
 
+
     @Override
-    public List<ObjectName> load(final String sourceType, final Object source, final String param) throws Exception {
+    public List<ObjectName> load(final String sourceType, final Object source, final String param)
+            throws Exception {
         return Collections.emptyList();
     }
+
 
     @Override
     public void loadDescriptors(final String packageName, final ClassLoader classLoader) {
         // no-op
     }
 
+
     @Override
-    public void registerComponent(final Object bean, final ObjectName oname, final String type) throws Exception {
+    public void registerComponent(final Object bean, final ObjectName oname, final String type)
+            throws Exception {
         // no-op
     }
+
 
     @Override
     public void unregisterComponent(final ObjectName oname) {
         // no-op
     }
+
 
     @Override
     public MBeanServer getMBeanServer() {
@@ -121,180 +141,254 @@ public class NoDescriptorRegistry extends Registry {
     }
 
     private static class NoJmxMBeanServer implements MBeanServer {
+
         @Override
-        public ObjectInstance createMBean(String className, ObjectName name) throws ReflectionException, InstanceAlreadyExistsException, MBeanRegistrationException, NotCompliantMBeanException, MBeanRegistrationException {
+        public ObjectInstance createMBean(String className, ObjectName name)
+                throws ReflectionException, InstanceAlreadyExistsException,
+                MBeanRegistrationException, NotCompliantMBeanException, MBeanRegistrationException {
             return null;
         }
 
+
         @Override
-        public ObjectInstance createMBean(String className, ObjectName name, ObjectName loaderName) throws ReflectionException, InstanceAlreadyExistsException, MBeanRegistrationException, NotCompliantMBeanException, InstanceNotFoundException, MBeanRegistrationException {
+        public ObjectInstance createMBean(String className, ObjectName name, ObjectName loaderName)
+                throws ReflectionException, InstanceAlreadyExistsException,
+                MBeanRegistrationException, NotCompliantMBeanException, InstanceNotFoundException,
+                MBeanRegistrationException {
             return null;
         }
 
+
         @Override
-        public ObjectInstance createMBean(String className, ObjectName name, Object[] params, String[] signature) throws ReflectionException, InstanceAlreadyExistsException, MBeanRegistrationException, NotCompliantMBeanException, MBeanRegistrationException {
+        public ObjectInstance createMBean(String className, ObjectName name, Object[] params,
+                String[] signature) throws ReflectionException, InstanceAlreadyExistsException,
+                MBeanRegistrationException, NotCompliantMBeanException, MBeanRegistrationException {
             return null;
         }
 
+
         @Override
-        public ObjectInstance createMBean(String className, ObjectName name, ObjectName loaderName, Object[] params, String[] signature) throws ReflectionException, InstanceAlreadyExistsException, MBeanRegistrationException, NotCompliantMBeanException, InstanceNotFoundException, MBeanRegistrationException {
+        public ObjectInstance createMBean(String className, ObjectName name, ObjectName loaderName,
+                Object[] params, String[] signature) throws ReflectionException,
+                InstanceAlreadyExistsException, MBeanRegistrationException,
+                NotCompliantMBeanException, InstanceNotFoundException, MBeanRegistrationException {
             return null;
         }
 
+
         @Override
-        public ObjectInstance registerMBean(Object object, ObjectName name) throws InstanceAlreadyExistsException, MBeanRegistrationException, NotCompliantMBeanException {
+        public ObjectInstance registerMBean(Object object, ObjectName name)
+                throws InstanceAlreadyExistsException, MBeanRegistrationException,
+                NotCompliantMBeanException {
             return null;
         }
 
+
         @Override
-        public void unregisterMBean(ObjectName name) throws InstanceNotFoundException, MBeanRegistrationException {
+        public void unregisterMBean(ObjectName name)
+                throws InstanceNotFoundException, MBeanRegistrationException {
 
         }
+
 
         @Override
         public ObjectInstance getObjectInstance(ObjectName name) throws InstanceNotFoundException {
             return null;
         }
 
+
         @Override
         public Set<ObjectInstance> queryMBeans(ObjectName name, QueryExp query) {
             return null;
         }
+
 
         @Override
         public Set<ObjectName> queryNames(ObjectName name, QueryExp query) {
             return null;
         }
 
+
         @Override
         public boolean isRegistered(ObjectName name) {
             return false;
         }
+
 
         @Override
         public Integer getMBeanCount() {
             return null;
         }
 
+
         @Override
-        public Object getAttribute(ObjectName name, String attribute) throws MBeanException, AttributeNotFoundException, InstanceNotFoundException, ReflectionException {
+        public Object getAttribute(ObjectName name, String attribute) throws MBeanException,
+                AttributeNotFoundException, InstanceNotFoundException, ReflectionException {
             return null;
         }
 
+
         @Override
-        public AttributeList getAttributes(ObjectName name, String[] attributes) throws InstanceNotFoundException, ReflectionException {
+        public AttributeList getAttributes(ObjectName name, String[] attributes)
+                throws InstanceNotFoundException, ReflectionException {
             return null;
         }
 
+
         @Override
-        public void setAttribute(ObjectName name, Attribute attribute) throws InstanceNotFoundException, AttributeNotFoundException, InvalidAttributeValueException, MBeanException, ReflectionException {
+        public void setAttribute(ObjectName name, Attribute attribute)
+                throws InstanceNotFoundException, AttributeNotFoundException,
+                InvalidAttributeValueException, MBeanException, ReflectionException {
 
         }
 
+
         @Override
-        public AttributeList setAttributes(ObjectName name, AttributeList attributes) throws InstanceNotFoundException, ReflectionException {
+        public AttributeList setAttributes(ObjectName name, AttributeList attributes)
+                throws InstanceNotFoundException, ReflectionException {
             return null;
         }
 
+
         @Override
-        public Object invoke(ObjectName name, String operationName, Object[] params, String[] signature) throws InstanceNotFoundException, MBeanException, ReflectionException {
+        public Object invoke(ObjectName name, String operationName, Object[] params,
+                String[] signature)
+                throws InstanceNotFoundException, MBeanException, ReflectionException {
             return null;
         }
+
 
         @Override
         public String getDefaultDomain() {
             return null;
         }
 
+
         @Override
         public String[] getDomains() {
             return new String[0];
         }
 
+
         @Override
-        public void addNotificationListener(ObjectName name, NotificationListener listener, NotificationFilter filter, Object handback) throws InstanceNotFoundException {
+        public void addNotificationListener(ObjectName name, NotificationListener listener,
+                NotificationFilter filter, Object handback) throws InstanceNotFoundException {
 
         }
 
+
         @Override
-        public void addNotificationListener(ObjectName name, ObjectName listener, NotificationFilter filter, Object handback) throws InstanceNotFoundException {
+        public void addNotificationListener(ObjectName name, ObjectName listener,
+                NotificationFilter filter, Object handback) throws InstanceNotFoundException {
 
         }
 
+
         @Override
-        public void removeNotificationListener(ObjectName name, ObjectName listener) throws InstanceNotFoundException, ListenerNotFoundException {
+        public void removeNotificationListener(ObjectName name, ObjectName listener)
+                throws InstanceNotFoundException, ListenerNotFoundException {
 
         }
 
+
         @Override
-        public void removeNotificationListener(ObjectName name, ObjectName listener, NotificationFilter filter, Object handback) throws InstanceNotFoundException, ListenerNotFoundException {
+        public void removeNotificationListener(ObjectName name, ObjectName listener,
+                NotificationFilter filter, Object handback)
+                throws InstanceNotFoundException, ListenerNotFoundException {
 
         }
 
+
         @Override
-        public void removeNotificationListener(ObjectName name, NotificationListener listener) throws InstanceNotFoundException, ListenerNotFoundException {
+        public void removeNotificationListener(ObjectName name, NotificationListener listener)
+                throws InstanceNotFoundException, ListenerNotFoundException {
 
         }
 
+
         @Override
-        public void removeNotificationListener(ObjectName name, NotificationListener listener, NotificationFilter filter, Object handback) throws InstanceNotFoundException, ListenerNotFoundException {
+        public void removeNotificationListener(ObjectName name, NotificationListener listener,
+                NotificationFilter filter, Object handback)
+                throws InstanceNotFoundException, ListenerNotFoundException {
 
         }
 
+
         @Override
-        public MBeanInfo getMBeanInfo(ObjectName name) throws InstanceNotFoundException, IntrospectionException, ReflectionException {
+        public MBeanInfo getMBeanInfo(ObjectName name)
+                throws InstanceNotFoundException, IntrospectionException, ReflectionException {
             return null;
         }
 
+
         @Override
-        public boolean isInstanceOf(ObjectName name, String className) throws InstanceNotFoundException {
+        public boolean isInstanceOf(ObjectName name, String className)
+                throws InstanceNotFoundException {
             return false;
         }
+
 
         @Override
         public Object instantiate(String className) throws ReflectionException, MBeanException {
             return null;
         }
 
+
         @Override
-        public Object instantiate(String className, ObjectName loaderName) throws ReflectionException, MBeanException, InstanceNotFoundException {
+        public Object instantiate(String className, ObjectName loaderName)
+                throws ReflectionException, MBeanException, InstanceNotFoundException {
             return null;
         }
 
+
         @Override
-        public Object instantiate(String className, Object[] params, String[] signature) throws ReflectionException, MBeanException {
+        public Object instantiate(String className, Object[] params, String[] signature)
+                throws ReflectionException, MBeanException {
             return null;
         }
 
+
         @Override
-        public Object instantiate(String className, ObjectName loaderName, Object[] params, String[] signature) throws ReflectionException, MBeanException, InstanceNotFoundException {
+        public Object instantiate(String className, ObjectName loaderName, Object[] params,
+                String[] signature)
+                throws ReflectionException, MBeanException, InstanceNotFoundException {
             return null;
         }
 
+
         @Override
-        public ObjectInputStream deserialize(ObjectName name, byte[] data) throws InstanceNotFoundException, OperationsException {
+        public ObjectInputStream deserialize(ObjectName name, byte[] data)
+                throws InstanceNotFoundException, OperationsException {
             return null;
         }
 
+
         @Override
-        public ObjectInputStream deserialize(String className, byte[] data) throws OperationsException, ReflectionException {
+        public ObjectInputStream deserialize(String className, byte[] data)
+                throws OperationsException, ReflectionException {
             return null;
         }
 
+
         @Override
-        public ObjectInputStream deserialize(String className, ObjectName loaderName, byte[] data) throws InstanceNotFoundException, OperationsException, ReflectionException {
+        public ObjectInputStream deserialize(String className, ObjectName loaderName, byte[] data)
+                throws InstanceNotFoundException, OperationsException, ReflectionException {
             return null;
         }
 
+
         @Override
-        public ClassLoader getClassLoaderFor(ObjectName mbeanName) throws InstanceNotFoundException {
+        public ClassLoader getClassLoaderFor(ObjectName mbeanName)
+                throws InstanceNotFoundException {
             return null;
         }
+
 
         @Override
         public ClassLoader getClassLoader(ObjectName loaderName) throws InstanceNotFoundException {
             return null;
         }
+
 
         @Override
         public ClassLoaderRepository getClassLoaderRepository() {
