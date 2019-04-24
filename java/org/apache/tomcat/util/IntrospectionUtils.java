@@ -434,6 +434,23 @@ public final class IntrospectionUtils {
     }
 
 
+    /**
+     * Checks to see if the specified class is an instance of or assignable from
+     * the specified type. The class <code>clazz</code>, all its superclasses,
+     * interfaces and those superinterfaces are tested for a match against
+     * the type name <code>type</code>.
+     *
+     * This is similar to <code>instanceof</code> or {@link Class#isAssignableFrom}
+     * except that the target type will not be resolved into a Class
+     * object, which provides some security and memory benefits.
+     *
+     * @param clazz The class to test for a match.
+     * @param type The name of the type that <code>clazz</code> must be.
+     *
+     * @return <code>true</code> if the <code>clazz</code> tested is an
+     *         instance of the specified <code>type</code>,
+     *         <code>false</code> otherwise.
+     */
     public static boolean isInstance(Class<?> clazz, String type) {
         if (type.equals(clazz.getName())) {
             return true;
