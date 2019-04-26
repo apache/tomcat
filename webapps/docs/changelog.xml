@@ -136,6 +136,10 @@
         <bug>63370</bug>: Message files (LocalStrings_*.properties) of the
         examples webapp not converted to ascii. (woonsan)
       </fix>
+      <add>
+        Expand the coverage and quality of the French translations provided
+        with Apache Tomcat. (remm)
+      </add>
     </changelog>
   </subsection>
 </section>
