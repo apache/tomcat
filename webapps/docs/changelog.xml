@@ -140,6 +140,10 @@
         Expand the coverage and quality of the French translations provided
         with Apache Tomcat. (remm)
       </add>
+      <add>
+        Expand the coverage and quality of the Japanese translations provided
+        with Apache Tomcat. Includes contributions by motohashi.yuki. (markt)
+      </add>
     </changelog>
   </subsection>
 </section>
