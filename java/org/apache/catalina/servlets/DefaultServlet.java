@@ -73,6 +73,7 @@ import org.apache.catalina.connector.RequestFacade;
 import org.apache.catalina.connector.ResponseFacade;
 import org.apache.catalina.util.ServerInfo;
 import org.apache.catalina.util.URLEncoder;
+import org.apache.catalina.webresources.CachedResource;
 import org.apache.tomcat.util.buf.B2CConverter;
 import org.apache.tomcat.util.http.ResponseUtil;
 import org.apache.tomcat.util.res.StringManager;
@@ -1071,11 +1072,18 @@ public class DefaultServlet extends HttpServlet {
                         } else {
                             if (!checkSendfile(request, response, resource, contentLength, null)) {
                                 // sendfile not possible so check if resource
-                                // content is available directly
-                                byte[] resourceBody = resource.getContent();
+                                // content is available directly via
+                                // CachedResource. Do not want to call
+                                // getContent() on other resource
+                                // implementations as that could trigger loading
+                                // the contents of a very large file into memory
+                                byte[] resourceBody = null;
+                                if (resource instanceof CachedResource) {
+                                    resourceBody = resource.getContent();
+                                }
                                 if (resourceBody == null) {
-                                    // Resource content not available, use
-                                    // inputstream
+                                    // Resource content not directly available,
+                                    // use InputStream
                                     renderResult = resource.getInputStream();
                                 } else {
                                     // Use the resource content directly

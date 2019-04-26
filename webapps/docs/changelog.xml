@@ -90,6 +90,11 @@
         JMX registration of Tomcat components providing it is called before the
         first component is registered. (markt)
       </add>
+      <fix>
+        Avoid <code>OutOfMemoryError</code>s and
+        <code>ArrayIndexOutOfBoundsException</code>s when accessing large files
+        via the default servlet when resource caching has been disabled. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
