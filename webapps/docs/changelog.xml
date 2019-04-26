@@ -144,6 +144,10 @@
         Expand the coverage and quality of the Japanese translations provided
         with Apache Tomcat. Includes contributions by motohashi.yuki. (markt)
       </add>
+      <add>
+        Expand the coverage and quality of the Czech translations provided
+        with Apache Tomcat. Includes contributions by Arnošt Havelka. (markt)
+      </add>
     </changelog>
   </subsection>
 </section>
