@@ -608,7 +608,7 @@ public class DefaultServlet extends HttpServlet {
         }
 
         try (RandomAccessFile randAccessContentFile =
-            new RandomAccessFile(contentFile, "rw");) {
+            new RandomAccessFile(contentFile, "rw")) {
 
             WebResource oldResource = resources.getResource(path);
 
@@ -616,7 +616,7 @@ public class DefaultServlet extends HttpServlet {
             if (oldResource.isFile()) {
                 try (BufferedInputStream bufOldRevStream =
                     new BufferedInputStream(oldResource.getInputStream(),
-                            BUFFER_SIZE);) {
+                            BUFFER_SIZE)) {
 
                     int numBytesRead;
                     byte[] copyBuffer = new byte[BUFFER_SIZE];
@@ -634,7 +634,7 @@ public class DefaultServlet extends HttpServlet {
             int numBytesRead;
             byte[] transferBuffer = new byte[BUFFER_SIZE];
             try (BufferedInputStream requestBufInStream =
-                new BufferedInputStream(req.getInputStream(), BUFFER_SIZE);) {
+                new BufferedInputStream(req.getInputStream(), BUFFER_SIZE)) {
                 while ((numBytesRead = requestBufInStream.read(transferBuffer)) != -1) {
                     randAccessContentFile.write(transferBuffer, 0, numBytesRead);
                 }
@@ -920,7 +920,7 @@ public class DefaultServlet extends HttpServlet {
             }
         }
 
-        // Check to see if a Filter, Valve of wrapper has written some content.
+        // Check to see if a Filter, Valve or wrapper has written some content.
         // If it has, disable range requests and setting of a content length
         // since neither can be done reliably.
         ServletResponse r = response;
@@ -1523,7 +1523,7 @@ public class DefaultServlet extends HttpServlet {
             StreamResult out = new StreamResult(osWriter);
             transformer.transform(xmlSource, out);
             osWriter.flush();
-            return (new ByteArrayInputStream(stream.toByteArray()));
+            return new ByteArrayInputStream(stream.toByteArray());
         } catch (TransformerException e) {
             throw new ServletException("XSL transformer error", e);
         } finally {
@@ -1691,7 +1691,7 @@ public class DefaultServlet extends HttpServlet {
         // Return an input stream to the underlying bytes
         writer.write(sb.toString());
         writer.flush();
-        return (new ByteArrayInputStream(stream.toByteArray()));
+        return new ByteArrayInputStream(stream.toByteArray());
 
     }
 
@@ -1740,7 +1740,7 @@ public class DefaultServlet extends HttpServlet {
             if (resource.isFile()) {
                 StringWriter buffer = new StringWriter();
                 InputStreamReader reader = null;
-                try (InputStream is = resource.getInputStream();){
+                try (InputStream is = resource.getInputStream()){
                     if (encoding != null) {
                         reader = new InputStreamReader(is, encoding);
                     } else {
