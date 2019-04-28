@@ -24,8 +24,8 @@ import java.util.Set;
  * included in the JAR file that contains the SCI implementation.
  * <p>
  * SCI processing is performed regardless of the setting of metadata-complete.
- * SCI processing can be controlled per JAR file via fragment ordering. If an
- * absolute ordering is defined, the only those JARs included in the ordering
+ * SCI processing can be controlled per JAR file via fragment ordering. If
+ * absolute ordering is defined, then only the JARs included in the ordering
  * will be processed for SCIs. To disable SCI processing completely, an empty
  * absolute ordering may be defined.
  * <p>
