@@ -33,16 +33,12 @@ class Http2AsyncParser extends Http2Parser {
     private final SocketWrapperBase<?> socketWrapper;
     private final Http2AsyncUpgradeHandler upgradeHandler;
     private Throwable error = null;
-    private final ByteBuffer header;
-    private final ByteBuffer framePaylod;
 
     Http2AsyncParser(String connectionId, Input input, Output output, SocketWrapperBase<?> socketWrapper, Http2AsyncUpgradeHandler upgradeHandler) {
         super(connectionId, input, output);
         this.socketWrapper = socketWrapper;
         socketWrapper.getSocketBufferHandler().expand(input.getMaxFrameSize());
         this.upgradeHandler = upgradeHandler;
-        header = ByteBuffer.allocate(9);
-        framePaylod = ByteBuffer.allocate(input.getMaxFrameSize());
     }
 
 
@@ -54,8 +50,8 @@ class Http2AsyncParser extends Http2Parser {
             return super.readFrame(block, expected);
         }
         handleAsyncException();
-        header.clear();
-        framePaylod.clear();
+        ByteBuffer header = ByteBuffer.allocate(9);
+        ByteBuffer framePaylod = ByteBuffer.allocate(input.getMaxFrameSize());
         FrameCompletionHandler handler = new FrameCompletionHandler(expected, header, framePaylod);
         CompletionState state =
                 socketWrapper.read(BlockingMode.NON_BLOCK, socketWrapper.getReadTimeout(), TimeUnit.MILLISECONDS, null, handler, handler, header, framePaylod);

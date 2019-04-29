@@ -138,6 +138,10 @@
         Associate BlockPoller thread name with its NIO connector for better
         readability. (remm)
       </fix>
+      <fix>
+        The async HTTP/2 frame parser should tolerate concurrency so clearing
+        shared buffers before attempting a read is not possible. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
