@@ -367,6 +367,11 @@ public class Stream extends AbstractStream implements HeaderEmitter {
             return;
         }
 
+        if (name.length() == 0) {
+            throw new HpackException(sm.getString("stream.header.empty",
+                    getConnectionId(), getIdentifier()));
+        }
+
         boolean pseudoHeader = name.charAt(0) == ':';
 
         if (pseudoHeader && headerState != HEADER_STATE_PSEUDO) {
