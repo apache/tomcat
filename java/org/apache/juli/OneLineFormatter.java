@@ -18,6 +18,7 @@ package org.apache.juli;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.io.Writer;
 import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadInfo;
 import java.lang.management.ThreadMXBean;
@@ -38,7 +39,6 @@ import java.util.logging.LogRecord;
  */
 public class OneLineFormatter extends Formatter {
 
-    private static final String ST_SEP = System.lineSeparator() + " ";
     private static final String UNKNOWN_THREAD_NAME = "Unknown thread with ID ";
     private static final Object threadMxBeanLock = new Object();
     private static volatile ThreadMXBean threadMxBean = null;
@@ -141,9 +141,9 @@ public class OneLineFormatter extends Formatter {
 
         // Stack trace
         if (record.getThrown() != null) {
-            sb.append(ST_SEP);
+            sb.append(System.lineSeparator());
             StringWriter sw = new StringWriter();
-            PrintWriter pw = new PrintWriter(sw);
+            PrintWriter pw = new IndentingPrintWriter(sw);
             record.getThrown().printStackTrace(pw);
             pw.close();
             sb.append(sw.getBuffer());
@@ -230,6 +230,24 @@ public class OneLineFormatter extends Formatter {
         @Override
         protected boolean removeEldestEntry(Entry<Integer, String> eldest) {
             return (size() > cacheSize);
+        }
+    }
+
+
+    /*
+     * Minimal implementation to indent the printing of stack traces. This
+     * implementation depends on Throwable using WrappedPrintWriter.
+     */
+    private static class IndentingPrintWriter extends PrintWriter {
+
+        public IndentingPrintWriter(Writer out) {
+            super(out);
+        }
+
+        @Override
+        public void println(Object x) {
+            super.print('\t');
+            super.println(x);
         }
     }
 }
