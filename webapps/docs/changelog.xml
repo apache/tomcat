@@ -94,15 +94,6 @@
         defined in <code>server.xml</code> with a <code>docBase</code> but not
         the optional <code>path</code>. (markt)
       </fix>
-      <fix>
-        <bug>63335</bug>: Ensure that stack traces written by the
-        <code>OneLineFormatter</code> are fully indented. The entire stack trace
-        is now indented by an additional TAB character. (markt)
-      </fix>
-      <fix>
-        When using the <code>OneLineFormatter</code>, don't print a blank line
-        in the log after printing a stack trace. (markt)
-      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
@@ -112,6 +103,15 @@
         JULI&apos;s <code>OneLineFormatter</code> to enable the format of the
         time stamp used in log messages to be configured. (markt)
       </add>
+      <fix>
+        <bug>63335</bug>: Ensure that stack traces written by the
+        <code>OneLineFormatter</code> are fully indented. The entire stack trace
+        is now indented by an additional TAB character. (markt)
+      </fix>
+      <fix>
+        When using the <code>OneLineFormatter</code>, don't print a blank line
+        in the log after printing a stack trace. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
