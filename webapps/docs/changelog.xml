@@ -89,6 +89,11 @@
         Refactor <code>ManagerServlet</code> to avoid loading classes when
         filtering JNDI resources for resources of a specified type. (markt)
       </scode>
+      <fix>
+        Avoid a <code>NullPointerException</code> when a <code>Context</code> is
+        defined in <code>server.xml</code> with a <code>docBase</code> but not
+        the optional <code>path</code>. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
