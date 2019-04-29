@@ -40,6 +40,7 @@ import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleListener;
 import org.apache.catalina.Valve;
 import org.apache.catalina.loader.WebappClassLoaderBase;
+import org.apache.catalina.util.ContextName;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.ExceptionUtils;
@@ -726,11 +727,20 @@ public class StandardHost extends ContainerBase implements Host {
     @Override
     public void addChild(Container child) {
 
-        child.addLifecycleListener(new MemoryLeakTrackingListener());
-
         if (!(child instanceof Context))
             throw new IllegalArgumentException
                 (sm.getString("standardHost.notContext"));
+
+        child.addLifecycleListener(new MemoryLeakTrackingListener());
+
+        // Avoid NPE for case where Context is defined in server.xml with only a
+        // docBase
+        Context context = (Context) child;
+        if (context.getPath() == null) {
+            ContextName cn = new ContextName(context.getDocBase(), true);
+            context.setPath(cn.getPath());
+        }
+
         super.addChild(child);
 
     }

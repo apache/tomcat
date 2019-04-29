@@ -84,6 +84,11 @@
         <code>ArrayIndexOutOfBoundsException</code>s when accessing large files
         via the default servlet when resource caching has been disabled. (markt)
       </fix>
+      <fix>
+        Avoid a <code>NullPointerException</code> when a <code>Context</code> is
+        defined in <code>server.xml</code> with a <code>docBase</code> but not
+        the optional <code>path</code>. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
