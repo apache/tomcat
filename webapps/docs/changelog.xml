@@ -105,15 +105,6 @@
         defined in <code>server.xml</code> with a <code>docBase</code> but not
         the optional <code>path</code>. (markt)
       </fix>
-      <fix>
-        <bug>63335</bug>: Ensure that stack traces written by the
-        <code>OneLineFormatter</code> are fully indented. The entire stack trace
-        is now indented by an additional TAB character. (markt)
-      </fix>
-      <fix>
-        When using the <code>OneLineFormatter</code>, don't print a blank line
-        in the log after printing a stack trace. (markt)
-      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
@@ -156,6 +147,11 @@
   <subsection name="Other">
     <changelog>
       <fix>
+        <bug>63335</bug>: Ensure that stack traces written by the
+        <code>OneLineFormatter</code> are fully indented. The entire stack trace
+        is now indented by an additional TAB character. (markt)
+      </fix>
+      <fix>
         <bug>63370</bug>: Message files (LocalStrings_*.properties) of the
         examples webapp not converted to ascii. (woonsan)
       </fix>
@@ -171,6 +167,10 @@
         Expand the coverage and quality of the Czech translations provided
         with Apache Tomcat. Includes contributions by Arnošt Havelka. (markt)
       </add>
+      <fix>
+        When using the <code>OneLineFormatter</code>, don't print a blank line
+        in the log after printing a stack trace. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
