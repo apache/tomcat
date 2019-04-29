@@ -94,6 +94,11 @@
         defined in <code>server.xml</code> with a <code>docBase</code> but not
         the optional <code>path</code>. (markt)
       </fix>
+      <fix>
+        <bug>63335</bug>: Ensure that stack traces written by the
+        <code>OneLineFormatter</code> are fully indented. The entire stack trace
+        is now indented by an additional TAB character. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
