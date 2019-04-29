@@ -220,21 +220,20 @@ public class StandardService extends LifecycleMBeanBase implements Service {
             System.arraycopy(connectors, 0, results, 0, connectors.length);
             results[connectors.length] = connector;
             connectors = results;
-
-            if (getState().isAvailable()) {
-                try {
-                    connector.start();
-                } catch (LifecycleException e) {
-                    log.error(sm.getString(
-                            "standardService.connector.startFailed",
-                            connector), e);
-                }
-            }
-
-            // Report this property change to interested listeners
-            support.firePropertyChange("connector", null, connector);
         }
 
+        if (getState().isAvailable()) {
+            try {
+                connector.start();
+            } catch (LifecycleException e) {
+                log.error(sm.getString(
+                        "standardService.connector.startFailed",
+                        connector), e);
+            }
+        }
+
+        // Report this property change to interested listeners
+        support.firePropertyChange("connector", null, connector);
     }
 
 
