@@ -89,6 +89,18 @@
         defined in <code>server.xml</code> with a <code>docBase</code> but not
         the optional <code>path</code>. (markt)
       </fix>
+    </changelog>
+  </subsection>
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+        When running on newer JREs that don't support SSLv2Hello, don't warn
+        that it is not available unless explicitly configured. (markt)
+      </fix>
+    </changelog>
+  </subsection>
+  <subsection name="Other">
+    <changelog>
       <fix>
         <bug>63335</bug>: Ensure that stack traces written by the
         <code>OneLineFormatter</code> are fully indented. The entire stack trace
@@ -97,14 +109,6 @@
       <fix>
         When using the <code>OneLineFormatter</code>, don't print a blank line
         in the log after printing a stack trace. (markt)
-      </fix>
-    </changelog>
-  </subsection>
-  <subsection name="Coyote">
-    <changelog>
-      <fix>
-        When running on newer JREs that don't support SSLv2Hello, don't warn
-        that it is not available unless explicitly configured. (markt)
       </fix>
     </changelog>
   </subsection>
