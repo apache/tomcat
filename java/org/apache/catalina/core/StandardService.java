@@ -222,14 +222,13 @@ public class StandardService extends LifecycleMBeanBase implements Service {
             connectors = results;
         }
 
-        if (getState().isAvailable()) {
-            try {
+        try {
+            if (getState().isAvailable()) {
                 connector.start();
-            } catch (LifecycleException e) {
-                log.error(sm.getString(
-                        "standardService.connector.startFailed",
-                        connector), e);
             }
+        } catch (LifecycleException e) {
+            throw new IllegalArgumentException(
+                    sm.getString("standardService.connector.startFailed", connector), e);
         }
 
         // Report this property change to interested listeners
@@ -614,5 +613,4 @@ public class StandardService extends LifecycleMBeanBase implements Service {
     public final String getObjectNameKeyProperties() {
         return "type=Service";
     }
-
 }

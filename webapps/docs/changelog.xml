@@ -85,7 +85,12 @@
         filtering JNDI resources for resources of a specified type. (markt)
       </scode>
       <add>
-        <fix>63361</fix>: Add a new method
+        <bug>63358</bug>: Expand the <code>throwOnFailure</code> support in the
+        <code>Connector</code> to include the adding of a <code>Connector</code>
+        to a running <code>Service</code>. (markt)
+      </add>
+      <add>
+        <bug>63361</bug>: Add a new method
         (<code>Registry.disableRegistry()</code>) that can be used to disbale
         JMX registration of Tomcat components providing it is called before the
         first component is registered. (markt)
