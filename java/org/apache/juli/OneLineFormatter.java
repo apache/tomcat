@@ -85,8 +85,9 @@ public class OneLineFormatter extends Formatter {
      * @param timeFormat The format to use using the
      *                   {@link java.text.SimpleDateFormat} syntax
      */
-    public void setTimeFormat(String timeFormat) {
-        DateFormatCache globalDateCache = new DateFormatCache(globalCacheSize, timeFormat, null);
+    public void setTimeFormat(final String timeFormat) {
+        final DateFormatCache globalDateCache =
+                new DateFormatCache(globalCacheSize, timeFormat, null);
         localDateCache = new ThreadLocal<DateFormatCache>() {
             @Override
             protected DateFormatCache initialValue() {
