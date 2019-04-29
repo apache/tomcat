@@ -99,6 +99,10 @@
         <code>OneLineFormatter</code> are fully indented. The entire stack trace
         is now indented by an additional TAB character. (markt)
       </fix>
+      <fix>
+        When using the <code>OneLineFormatter</code>, don't print a blank line
+        in the log after printing a stack trace. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">

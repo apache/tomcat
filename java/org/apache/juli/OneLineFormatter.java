@@ -141,18 +141,17 @@ public class OneLineFormatter extends Formatter {
         sb.append(' ');
         sb.append(formatMessage(record));
 
+        // New line for next record
+        sb.append(LINE_SEP);
+
         // Stack trace
         if (record.getThrown() != null) {
-            sb.append(LINE_SEP);
             StringWriter sw = new StringWriter();
             PrintWriter pw = new IndentingPrintWriter(sw);
             record.getThrown().printStackTrace(pw);
             pw.close();
             sb.append(sw.getBuffer());
         }
-
-        // New line for next record
-        sb.append(LINE_SEP);
 
         return sb.toString();
     }
