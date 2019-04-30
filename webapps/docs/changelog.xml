@@ -142,6 +142,10 @@
         The async HTTP/2 frame parser should tolerate concurrency so clearing
         shared buffers before attempting a read is not possible. (remm)
       </fix>
+      <update>
+        Update the HTTP/2 connection preface and initial frame reading to be
+        asynchronous instead of blocking IO. (remm)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Other">

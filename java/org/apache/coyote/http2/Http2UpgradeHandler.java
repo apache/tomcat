@@ -231,7 +231,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
         // Make sure the client has sent a valid connection preface before we
         // send the response to the original request over HTTP/2.
         try {
-            parser.readConnectionPreface();
+            parser.readConnectionPreface(webConnection, stream);
         } catch (Http2Exception e) {
             String msg = sm.getString("upgradeHandler.invalidPreface", connectionId);
             if (log.isDebugEnabled()) {
@@ -243,6 +243,10 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
             log.debug(sm.getString("upgradeHandler.prefaceReceived", connectionId));
         }
 
+        processConnection(webConnection, stream);
+    }
+
+    protected void processConnection(WebConnection webConnection, Stream stream) {
         // Send a ping to get an idea of round trip time as early as possible
         try {
             pingManager.sendPing(true);
@@ -255,13 +259,12 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
         }
     }
 
-
     protected Http2Parser getParser(String connectionId) {
         return new Http2Parser(connectionId, this, this);
     }
 
 
-    private void processStreamOnContainerThread(Stream stream) {
+    protected void processStreamOnContainerThread(Stream stream) {
         StreamProcessor streamProcessor = new StreamProcessor(this, stream, adapter, socketWrapper);
         streamProcessor.setSslSupport(sslSupport);
         processStreamOnContainerThread(streamProcessor, SocketEvent.OPEN_READ);

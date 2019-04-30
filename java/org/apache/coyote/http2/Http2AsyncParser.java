@@ -21,6 +21,9 @@ import java.nio.ByteBuffer;
 import java.nio.channels.CompletionHandler;
 import java.util.concurrent.TimeUnit;
 
+import javax.servlet.http.WebConnection;
+
+import org.apache.coyote.ProtocolException;
 import org.apache.tomcat.util.net.SocketEvent;
 import org.apache.tomcat.util.net.SocketWrapperBase;
 import org.apache.tomcat.util.net.SocketWrapperBase.BlockingMode;
@@ -43,18 +46,85 @@ class Http2AsyncParser extends Http2Parser {
 
 
     @Override
+    void readConnectionPreface(WebConnection webConnection, Stream stream) throws Http2Exception {
+        byte[] data = new byte[CLIENT_PREFACE_START.length];
+        socketWrapper.read(BlockingMode.NON_BLOCK, socketWrapper.getReadTimeout(), TimeUnit.MILLISECONDS, null,
+                SocketWrapperBase.COMPLETE_READ_WITH_COMPLETION, new CompletionHandler<Long, Void>() {
+            @Override
+            public void completed(Long result, Void attachment) {
+                for (int i = 0; i < CLIENT_PREFACE_START.length; i++) {
+                    if (CLIENT_PREFACE_START[i] != data[i]) {
+                        failed(new ProtocolException(sm.getString("http2Parser.preface.invalid")), null);
+                        return;
+                    }
+                }
+                // Must always be followed by a settings frame
+                try {
+                    ByteBuffer header = ByteBuffer.allocate(9);
+                    ByteBuffer framePaylod = ByteBuffer.allocate(input.getMaxFrameSize());
+                    FrameCompletionHandler handler = new FrameCompletionHandler(FrameType.SETTINGS, header, framePaylod) {
+                        @Override
+                        public void completed(Long result, Void attachment) {
+                            if (streamException || error == null) {
+                                ByteBuffer payload = buffers[1];
+                                payload.flip();
+                                try {
+                                    if (streamException) {
+                                        swallow(streamId, payloadSize, false, payload);
+                                    } else {
+                                        switch (frameType) {
+                                        case SETTINGS:
+                                            readSettingsFrame(flags, payloadSize, payload);
+                                            break;
+                                        default:
+                                            // Should never happen as the frame has been validated as SETTINGS
+                                            throw new StreamException(sm.getString("http2Parser.processFrame.unexpectedType",
+                                                    FrameType.SETTINGS, frameType), Http2Error.PROTOCOL_ERROR, streamId);
+                                        }
+                                    }
+                                } catch (RuntimeException | IOException | Http2Exception e) {
+                                    error = e;
+                                }
+                                if (payload.hasRemaining()) {
+                                    socketWrapper.unRead(payload);
+                                }
+                            }
+                            // Continue processing the intial parts of the connection
+                            upgradeHandler.processConnectionCallback(webConnection, stream);
+                            if (state == CompletionState.DONE) {
+                                // The call was not completed inline, so must start reading new frames
+                                // or process the stream exception
+                                upgradeHandler.upgradeDispatch(SocketEvent.OPEN_READ);
+                            }
+                        }};
+                    socketWrapper.read(BlockingMode.NON_BLOCK, socketWrapper.getReadTimeout(), TimeUnit.MILLISECONDS,
+                            null, handler, handler, header, framePaylod);
+                } catch (Exception e) {
+                    failed(e, null);
+                }
+            }
+            @Override
+            public void failed(Throwable exc, Void attachment) {
+                if (exc instanceof IOException) {
+                    error = new ProtocolException(sm.getString("http2Parser.preface.invalid"));
+                } else {
+                    error = exc;
+                }
+                upgradeHandler.upgradeDispatch(SocketEvent.ERROR);
+            }
+        }, ByteBuffer.wrap(data));
+    }
+
+
+    @Override
     protected boolean readFrame(boolean block, FrameType expected)
             throws IOException, Http2Exception {
-        if (block) {
-            // Only used when reading the connection preface
-            return super.readFrame(block, expected);
-        }
         handleAsyncException();
         ByteBuffer header = ByteBuffer.allocate(9);
         ByteBuffer framePaylod = ByteBuffer.allocate(input.getMaxFrameSize());
         FrameCompletionHandler handler = new FrameCompletionHandler(expected, header, framePaylod);
         CompletionState state =
-                socketWrapper.read(BlockingMode.NON_BLOCK, socketWrapper.getReadTimeout(), TimeUnit.MILLISECONDS, null, handler, handler, header, framePaylod);
+                socketWrapper.read(block ? BlockingMode.BLOCK : BlockingMode.NON_BLOCK, socketWrapper.getReadTimeout(), TimeUnit.MILLISECONDS, null, handler, handler, header, framePaylod);
         if (state == CompletionState.ERROR || state == CompletionState.INLINE) {
             handleAsyncException();
             return true;
@@ -84,13 +154,13 @@ class Http2AsyncParser extends Http2Parser {
         private boolean validated = false;
 
         private final FrameType expected;
-        private final ByteBuffer[] buffers;
-        private int payloadSize;
-        private FrameType frameType;
-        private int flags;
-        private int streamId;
-        private boolean streamException = false;
-        private CompletionState state = null;
+        protected final ByteBuffer[] buffers;
+        protected int payloadSize;
+        protected FrameType frameType;
+        protected int flags;
+        protected int streamId;
+        protected boolean streamException = false;
+        protected CompletionState state = null;
 
         private FrameCompletionHandler(FrameType expected, ByteBuffer... buffers) {
             this.expected = expected;
