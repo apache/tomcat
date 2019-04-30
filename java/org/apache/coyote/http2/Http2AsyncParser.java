@@ -108,25 +108,19 @@ class Http2AsyncParser extends Http2Parser {
                     if (streamException) {
                         swallow(streamId, payloadSize, false, payload);
                     } else {
-                        switch (frameType) {
-                        case SETTINGS:
-                            readSettingsFrame(flags, payloadSize, payload);
-                            break;
-                        default:
-                            // Should never happen as the frame has been validated as SETTINGS
-                            throw new StreamException(sm.getString("http2Parser.processFrame.unexpectedType",
-                                    FrameType.SETTINGS, frameType), Http2Error.PROTOCOL_ERROR, streamId);
-                        }
+                        readSettingsFrame(flags, payloadSize, payload);
                     }
                 } catch (RuntimeException | IOException | Http2Exception e) {
                     error = e;
                 }
+                // Any extra frame is not processed yet, so put back any leftover data
                 if (payload.hasRemaining()) {
                     socketWrapper.unRead(payload);
                 }
             }
-            // Continue processing the intial parts of the connection
+            // Finish processing the connection
             upgradeHandler.processConnectionCallback(webConnection, stream);
+            // Continue reading frames
             upgradeHandler.upgradeDispatch(SocketEvent.OPEN_READ);
         }
 
@@ -166,17 +160,17 @@ class Http2AsyncParser extends Http2Parser {
 
     private class FrameCompletionHandler implements CompletionCheck, CompletionHandler<Long, Void> {
 
-        protected boolean parsedFrameHeader = false;
-        protected boolean validated = false;
-
         private final FrameType expected;
         protected final ByteBuffer[] buffers;
+
+        private boolean parsedFrameHeader = false;
+        private boolean validated = false;
+        private CompletionState state = null;
         protected int payloadSize;
         protected FrameType frameType;
         protected int flags;
         protected int streamId;
         protected boolean streamException = false;
-        protected CompletionState state = null;
 
         private FrameCompletionHandler(FrameType expected, ByteBuffer... buffers) {
             this.expected = expected;
