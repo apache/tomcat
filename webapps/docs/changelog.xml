@@ -152,6 +152,10 @@
         Update the HTTP/2 connection preface and initial frame reading to be
         asynchronous instead of blocking IO. (remm)
       </update>
+      <scode>
+        Refactor Hostname validation to improve performance. Patch provided by
+        Uwe Hees. (markt)
+      </scode>
     </changelog>
   </subsection>
   <subsection name="Other">
