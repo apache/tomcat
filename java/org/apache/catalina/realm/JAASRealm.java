@@ -175,6 +175,14 @@ public class JAASRealm extends RealmBase {
     protected Configuration jaasConfiguration;
     protected volatile boolean jaasConfigurationLoaded = false;
 
+    /**
+     * Keeps track if JAAS invocation of login modules was successful or not. By
+     * default it is true unless we detect JAAS login module can't perform the
+     * login. This will be used for realm's {@link #isAvailable()} status so
+     * that {@link LockOutRealm} will not lock the user out if JAAS login
+     * modules are unavailable to perform the actual login.
+     */
+    private volatile boolean invocationSuccess = true;
 
     // ------------------------------------------------------------- Properties
 
@@ -402,7 +410,10 @@ public class JAASRealm extends RealmBase {
         } catch (Throwable e) {
             ExceptionUtils.handleThrowable(e);
             log.error(sm.getString("jaasRealm.unexpectedError"), e);
-            return (null);
+            // There is configuration issue with JAAS so mark the realm as
+            // unavailable
+            invocationSuccess = false;
+            return null;
         } finally {
             if(!isUseContextClassLoader()) {
               Thread.currentThread().setContextClassLoader(ocl);
@@ -417,6 +428,11 @@ public class JAASRealm extends RealmBase {
         try {
             loginContext.login();
             subject = loginContext.getSubject();
+            // We were able to perform login successfully so mark JAAS realm as
+            // available as it could have been set to false in prior attempts.
+            // Change invocationSuccess variable only when we know the outcome
+            // of the JAAS operation to keep variable consistent.
+            invocationSuccess = true;
             if (subject == null) {
                 if( log.isDebugEnabled())
                     log.debug(sm.getString("jaasRealm.failedLogin", username));
@@ -425,22 +441,37 @@ public class JAASRealm extends RealmBase {
         } catch (AccountExpiredException e) {
             if (log.isDebugEnabled())
                 log.debug(sm.getString("jaasRealm.accountExpired", username));
-            return (null);
+            // JAAS checked LoginExceptions are successful authentication
+            // invocations so mark JAAS realm as available
+            invocationSuccess = true;
+            return null;
         } catch (CredentialExpiredException e) {
             if (log.isDebugEnabled())
                 log.debug(sm.getString("jaasRealm.credentialExpired", username));
-            return (null);
+            // JAAS checked LoginExceptions are successful authentication
+            // invocations so mark JAAS realm as available
+            invocationSuccess = true;
+            return null;
         } catch (FailedLoginException e) {
             if (log.isDebugEnabled())
                 log.debug(sm.getString("jaasRealm.failedLogin", username));
-            return (null);
+            // JAAS checked LoginExceptions are successful authentication
+            // invocations so mark JAAS realm as available
+            invocationSuccess = true;
+            return null;
         } catch (LoginException e) {
             log.warn(sm.getString("jaasRealm.loginException", username), e);
-            return (null);
+            // JAAS checked LoginExceptions are successful authentication
+            // invocations so mark JAAS realm as available
+            invocationSuccess = true;
+            return null;
         } catch (Throwable e) {
             ExceptionUtils.handleThrowable(e);
             log.error(sm.getString("jaasRealm.unexpectedError"), e);
-            return (null);
+            // JAAS throws exception different than LoginException so mark the
+            // realm as unavailable
+            invocationSuccess = false;
+            return null;
         }
 
         if( log.isDebugEnabled())
@@ -459,6 +490,8 @@ public class JAASRealm extends RealmBase {
         return (principal);
         } catch( Throwable t) {
             log.error( "error ", t);
+            //JAAS throws exception different than LoginException so mark the realm as unavailable
+            invocationSuccess = false;
             return null;
         }
     }
@@ -658,5 +691,10 @@ public class JAASRealm extends RealmBase {
             throw new RuntimeException(ex);
         }
 
+    }
+
+    @Override
+    public boolean isAvailable() {
+        return invocationSuccess;
     }
 }
