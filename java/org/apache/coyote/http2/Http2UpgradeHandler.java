@@ -801,7 +801,26 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
                 if (allocation == 0) {
                     if (block) {
                         try {
-                            stream.wait();
+                            // Connection level window is empty. Although this
+                            // request is for a stream, use the connection
+                            // timeout
+                            long writeTimeout = protocol.getWriteTimeout();
+                            if (writeTimeout < 0) {
+                                stream.wait();
+                            } else {
+                                stream.wait(writeTimeout);
+                            }
+                            // Has this stream been granted an allocation
+                            int[] value = backLogStreams.get(stream);
+                            if (value[1] == 0) {
+                                // No allocation
+                                // Close the connection. Do this first since
+                                // closing the stream will raise an exception
+                                close();
+                                // Close the stream (in app code so need to
+                                // signal to app stream is closing)
+                                stream.doWriteTimeout();
+                            }
                         } catch (InterruptedException e) {
                             throw new IOException(sm.getString(
                                     "upgradeHandler.windowSizeReservationInterrupted", connectionId,
@@ -1024,11 +1043,20 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
 
 
     private void close() {
-        connectionState.set(ConnectionState.CLOSED);
+        ConnectionState previous = connectionState.getAndSet(ConnectionState.CLOSED);
+        if (previous == ConnectionState.CLOSED) {
+            // Already closed
+            return;
+        }
+
         for (Stream stream : streams.values()) {
             // The connection is closing. Close the associated streams as no
             // longer required.
             stream.receiveReset(Http2Error.CANCEL.getCode());
+            // Release any streams waiting for an allocation
+            synchronized (stream) {
+                stream.notifyAll();
+            }
         }
         try {
             socketWrapper.close();

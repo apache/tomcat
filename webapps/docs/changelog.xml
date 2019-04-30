@@ -171,6 +171,10 @@
         for possible use with an asynchronous workflow like CompletableFuture.
         (remm)
       </update>
+      <fix>
+        Expand HTTP/2 timeout handling to include connection window exhaustion
+        on write. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
