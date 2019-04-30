@@ -113,6 +113,10 @@
         Refactor Hostname validation to improve performance. Patch provided by
         Uwe Hees. (markt)
       </scode>
+      <fix>
+        Expand HTTP/2 timeout handling to include connection window exhaustion
+        on write. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
