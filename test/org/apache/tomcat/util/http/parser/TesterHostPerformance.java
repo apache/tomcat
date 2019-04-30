@@ -36,6 +36,7 @@ public class TesterHostPerformance {
         List<Object[]> result = new ArrayList<Object[]>();
         result.add(new Object[] { "localhost" });
         result.add(new Object[] { "tomcat.apache.org" });
+        result.add(new Object[] { "tomcat.apache.org." });
         result.add(new Object[] { "127.0.0.1" });
         result.add(new Object[] { "255.255.255.255" });
         result.add(new Object[] { "[::1]" });

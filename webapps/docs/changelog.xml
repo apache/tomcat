@@ -96,6 +96,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Coyote">
+    <changelog>
+      <scode>
+        Refactor Hostname validation to improve performance. Patch provided by
+        Uwe Hees. (markt)
+      </scode>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <add>
