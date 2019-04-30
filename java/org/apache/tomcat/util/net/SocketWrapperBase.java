@@ -892,7 +892,7 @@ public abstract class SocketWrapperBase<E> {
         public CompletionHandlerCall callHandler(CompletionState state, ByteBuffer[] buffers,
                 int offset, int length) {
             for (int i = 0; i < length; i++) {
-                if (buffers[offset + i].remaining() > 0) {
+                if (buffers[offset + i].hasRemaining()) {
                     return CompletionHandlerCall.CONTINUE;
                 }
             }
@@ -910,7 +910,7 @@ public abstract class SocketWrapperBase<E> {
         public CompletionHandlerCall callHandler(CompletionState state, ByteBuffer[] buffers,
                 int offset, int length) {
             for (int i = 0; i < length; i++) {
-                if (buffers[offset + i].remaining() > 0) {
+                if (buffers[offset + i].hasRemaining()) {
                     return CompletionHandlerCall.CONTINUE;
                 }
             }
@@ -931,6 +931,20 @@ public abstract class SocketWrapperBase<E> {
                     : CompletionHandlerCall.NONE;
         }
     };
+
+    /**
+     * This utility CompletionCheck will cause the completion handler
+     * to be called once the given buffers are full. The completion
+     * handler will then be called.
+     */
+    public static final CompletionCheck COMPLETE_READ_WITH_COMPLETION = COMPLETE_WRITE_WITH_COMPLETION;
+
+    /**
+     * This utility CompletionCheck will cause the completion handler
+     * to be called once the given buffers are full. If the operation
+     * completes inline, the completion handler will not be called.
+     */
+    public static final CompletionCheck COMPLETE_READ = COMPLETE_WRITE;
 
     /**
      * Allows using NIO2 style read/write only for connectors that can
