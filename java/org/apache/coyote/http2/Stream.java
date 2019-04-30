@@ -273,8 +273,8 @@ class Stream extends AbstractStream implements HeaderEmitter {
                 throw new CloseNowException(sm.getString("stream.notWritable",
                         getConnectionId(), getIdentifier()));
             }
-            try {
-                if (block) {
+            if (block) {
+                try {
                     long writeTimeout = handler.getProtocol().getStreamWriteTimeout();
                     if (writeTimeout < 0) {
                         wait();
@@ -295,14 +295,14 @@ class Stream extends AbstractStream implements HeaderEmitter {
                         streamOutputBuffer.reset = se;
                         throw new CloseNowException(msg, se);
                     }
-                } else {
-                    return 0;
+                } catch (InterruptedException e) {
+                    // Possible shutdown / rst or similar. Use an IOException to
+                    // signal to the client that further I/O isn't possible for this
+                    // Stream.
+                    throw new IOException(e);
                 }
-            } catch (InterruptedException e) {
-                // Possible shutdown / rst or similar. Use an IOException to
-                // signal to the client that further I/O isn't possible for this
-                // Stream.
-                throw new IOException(e);
+            } else {
+                return 0;
             }
         }
         int allocation;
