@@ -74,6 +74,7 @@ import org.apache.tomcat.util.buf.UriUtil;
 import org.apache.tomcat.util.descriptor.web.LoginConfig;
 import org.apache.tomcat.util.file.ConfigFileLoader;
 import org.apache.tomcat.util.file.ConfigurationSource;
+import org.apache.tomcat.util.modeler.Registry;
 import org.apache.tomcat.util.res.StringManager;
 
 // TODO: lazy init for the temp dir - only when a JSP is compiled or
@@ -1437,6 +1438,8 @@ public class Tomcat {
                 path = args[i];
             } else if (args[i].equals("--await")) {
                 await = true;
+            } else if (args[i].equals("--no-jmx")) {
+                Registry.disableRegistry();
             } else {
                 throw new IllegalArgumentException(sm.getString("tomcat.invalidCommandLine", args[i]));
             }

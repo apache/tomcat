@@ -111,6 +111,10 @@
         credentials trigger account lock out when the <code>LockOutRealm</code>
         is in use. Patch provided by jchobantonov. (markt)
       </fix>
+      <fix>
+        Add <code>--no-jmx</code> flag to allow disabling JMX in
+        <code>startup.Tomcat.main</code>. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
