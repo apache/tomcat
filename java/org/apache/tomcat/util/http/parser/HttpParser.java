@@ -910,7 +910,14 @@ public class HttpParser {
         }
 
         public DomainParseState next(int c) {
-            if (HttpParser.isAlpha(c)) {
+            if (c == -1) {
+                if (allowsEnd) {
+                    return END;
+                } else {
+                    throw new IllegalArgumentException(
+                            sm.getString("http.invalidSegmentEndState", this.name()));
+                }
+            } else if (HttpParser.isAlpha(c)) {
                 return ALPHA;
             } else if (HttpParser.isNumeric(c)) {
                 return NUMERIC;
@@ -927,13 +934,6 @@ public class HttpParser {
                 } else {
                     throw new IllegalArgumentException(sm.getString("http.invalidCharacterDomain",
                             Character.toString((char) c), errorLocation));
-                }
-            } else if (c == -1) {
-                if (allowsEnd) {
-                    return END;
-                } else {
-                    throw new IllegalArgumentException(
-                            sm.getString("http.invalidSegmentEndState", this.name()));
                 }
             } else if (c == '-') {
                 if (allowsHyphen) {

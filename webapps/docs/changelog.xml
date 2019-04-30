@@ -103,6 +103,10 @@
         When running on newer JREs that don't support SSLv2Hello, don't warn
         that it is not available unless explicitly configured. (markt)
       </fix>
+      <scode>
+        Refactor Hostname validation to improve performance. Patch provided by
+        Uwe Hees. (markt)
+      </scode>
     </changelog>
   </subsection>
   <subsection name="Other">
