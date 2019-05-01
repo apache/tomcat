@@ -211,32 +211,54 @@ public class JspRuntimeLibrary {
             if (propertyEditorClass != null) {
                 return getValueFromBeanInfoPropertyEditor(
                                     t, propertyName, s, propertyEditorClass);
-            } else if ( t.equals(Boolean.class) || t.equals(Boolean.TYPE) ) {
-                if (s.equalsIgnoreCase("on") || s.equalsIgnoreCase("true"))
-                    s = "true";
-                else
-                    s = "false";
+            } else if (t.equals(Boolean.class) || t.equals(Boolean.TYPE)) {
                 return Boolean.valueOf(s);
-            } else if ( t.equals(Byte.class) || t.equals(Byte.TYPE) ) {
-                return Byte.valueOf(s);
+            } else if (t.equals(Byte.class) || t.equals(Byte.TYPE)) {
+                if (s.length() == 0) {
+                    return Byte.valueOf((byte)0);
+                } else {
+                    return Byte.valueOf(s);
+                }
             } else if (t.equals(Character.class) || t.equals(Character.TYPE)) {
-                return s.length() > 0 ? Character.valueOf(s.charAt(0)) : null;
-            } else if ( t.equals(Short.class) || t.equals(Short.TYPE) ) {
-                return Short.valueOf(s);
-            } else if ( t.equals(Integer.class) || t.equals(Integer.TYPE) ) {
-                return Integer.valueOf(s);
-            } else if ( t.equals(Float.class) || t.equals(Float.TYPE) ) {
-                return Float.valueOf(s);
-            } else if ( t.equals(Long.class) || t.equals(Long.TYPE) ) {
-                return Long.valueOf(s);
-            } else if ( t.equals(Double.class) || t.equals(Double.TYPE) ) {
-                return Double.valueOf(s);
+                if (s.length() == 0) {
+                    return Character.valueOf((char) 0);
+                } else {
+                    return Character.valueOf(s.charAt(0));
+                }
+            } else if (t.equals(Double.class) || t.equals(Double.TYPE)) {
+                if (s.length() == 0) {
+                    return Double.valueOf(0);
+                } else {
+                    return Double.valueOf(s);
+                }
+            } else if (t.equals(Integer.class) || t.equals(Integer.TYPE)) {
+                if (s.length() == 0) {
+                    return Integer.valueOf(0);
+                } else {
+                    return Integer.valueOf(s);
+                }
+            } else if (t.equals(Float.class) || t.equals(Float.TYPE)) {
+                if (s.length() == 0) {
+                    return Float.valueOf(0);
+                } else {
+                    return Float.valueOf(s);
+                }
+            } else if (t.equals(Long.class) || t.equals(Long.TYPE)) {
+                if (s.length() == 0) {
+                    return Long.valueOf(0);
+                } else {
+                    return Long.valueOf(s);
+                }
+            } else if (t.equals(Short.class) || t.equals(Short.TYPE)) {
+                if (s.length() == 0) {
+                    return Short.valueOf((short) 0);
+                } else {
+                    return Short.valueOf(s);
+                }
             } else if ( t.equals(String.class) ) {
                 return s;
-            } else if ( t.equals(java.io.File.class) ) {
-                return new java.io.File(s);
             } else if (t.getName().equals("java.lang.Object")) {
-                return new Object[] {s};
+                return new String(s);
             } else {
                 return getValueFromPropertyEditorManager(
                                             t, propertyName, s);
@@ -761,10 +783,14 @@ public class JspRuntimeLibrary {
             pe.setAsText(attrValue);
             return pe.getValue();
         } catch (Exception ex) {
-            throw new JasperException(
-                Localizer.getMessage("jsp.error.beans.property.conversion",
-                                     attrValue, attrClass.getName(), attrName,
-                                     ex.getMessage()));
+            if (attrValue.length() == 0) {
+                return null;
+            } else {
+                throw new JasperException(
+                    Localizer.getMessage("jsp.error.beans.property.conversion",
+                                         attrValue, attrClass.getName(), attrName,
+                                         ex.getMessage()));
+            }
         }
     }
 
@@ -778,15 +804,21 @@ public class JspRuntimeLibrary {
             if (propEditor != null) {
                 propEditor.setAsText(attrValue);
                 return propEditor.getValue();
+            } else if (attrValue.length() == 0) {
+                return null;
             } else {
                 throw new IllegalArgumentException(
                     Localizer.getMessage("jsp.error.beans.propertyeditor.notregistered"));
             }
         } catch (IllegalArgumentException ex) {
-            throw new JasperException(
-                Localizer.getMessage("jsp.error.beans.property.conversion",
-                                     attrValue, attrClass.getName(), attrName,
-                                     ex.getMessage()));
+            if (attrValue.length() == 0) {
+                return null;
+            } else {
+                throw new JasperException(
+                    Localizer.getMessage("jsp.error.beans.property.conversion",
+                                         attrValue, attrClass.getName(), attrName,
+                                         ex.getMessage()));
+            }
         }
     }
 

@@ -173,6 +173,16 @@
       </update>
     </changelog>
   </subsection>
+  <subsection name="Jasper">
+    <changelog>
+      <fix>
+        <bug>63359</bug>: Ensure that the type conversions used when converting
+        from strings for <code>jsp:setProperty</code> actions are correctly
+        implemented as per section JSP.1.14.2.1 of the JSP 2.3 specification.
+        (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <fix>
