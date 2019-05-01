@@ -90,6 +90,12 @@
         the optional <code>path</code>. (markt)
       </fix>
       <fix>
+        <bug>63324</bug>: Refactor the <code>CrawlerSessionManagerValve</code>
+        so that the object placed in the session is compatible with session
+        serialization with mem-cached. Patch provided by Martin Lemanski.
+        (markt)
+      </fix>
+      <fix>
         <bug>63333</bug>: Override the <code>isAvailable()</code> method in the
         <code>JAASRealm</code> so that only login failures caused by invalid
         credentials trigger account lock out when the <code>LockOutRealm</code>
