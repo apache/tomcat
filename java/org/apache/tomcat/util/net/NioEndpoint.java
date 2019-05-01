@@ -31,11 +31,13 @@ import java.nio.channels.CompletionHandler;
 import java.nio.channels.FileChannel;
 import java.nio.channels.InterruptedByTimeoutException;
 import java.nio.channels.NetworkChannel;
+import java.nio.channels.ReadPendingException;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 import java.nio.channels.WritableByteChannel;
+import java.nio.channels.WritePendingException;
 import java.util.ConcurrentModificationException;
 import java.util.Iterator;
 import java.util.concurrent.CountDownLatch;
@@ -1568,7 +1570,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
             } else if (unit.toMillis(timeout) != getReadTimeout()) {
                 setReadTimeout(unit.toMillis(timeout));
             }
-            if (block != BlockingMode.NON_BLOCK) {
+            if (block == BlockingMode.BLOCK || block == BlockingMode.SEMI_BLOCK) {
                 try {
                     if (!readPending.tryAcquire(timeout, unit)) {
                         handler.failed(new SocketTimeoutException(), attachment);
@@ -1580,7 +1582,12 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                 }
             } else {
                 if (!readPending.tryAcquire()) {
-                    return CompletionState.NOT_DONE;
+                    if (block == BlockingMode.NON_BLOCK) {
+                        return CompletionState.NOT_DONE;
+                    } else {
+                        handler.failed(new ReadPendingException(), attachment);
+                        return CompletionState.ERROR;
+                    }
                 }
             }
             VectoredIOCompletionHandler<A> completion = new VectoredIOCompletionHandler<>();
@@ -1634,7 +1641,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
             } else if (unit.toMillis(timeout) != getWriteTimeout()) {
                 setWriteTimeout(unit.toMillis(timeout));
             }
-            if (block != BlockingMode.NON_BLOCK) {
+            if (block == BlockingMode.BLOCK || block == BlockingMode.SEMI_BLOCK) {
                 try {
                     if (!writePending.tryAcquire(timeout, unit)) {
                         handler.failed(new SocketTimeoutException(), attachment);
@@ -1646,7 +1653,12 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                 }
             } else {
                 if (!writePending.tryAcquire()) {
-                    return CompletionState.NOT_DONE;
+                    if (block == BlockingMode.NON_BLOCK) {
+                        return CompletionState.NOT_DONE;
+                    } else {
+                        handler.failed(new WritePendingException(), attachment);
+                        return CompletionState.ERROR;
+                    }
                 }
             }
             if (!socketBufferHandler.isWriteBufferEmpty()) {

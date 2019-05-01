@@ -808,7 +808,12 @@ public abstract class SocketWrapperBase<E> {
 
     public enum BlockingMode {
         /**
-         * The operation will now block. If there are pending operations,
+         * The operation will not block. If there are pending operations,
+         * the operation will throw a pending exception.
+         */
+        CLASSIC,
+        /**
+         * The operation will not block. If there are pending operations,
          * the operation will return CompletionState.NOT_DONE.
          */
         NON_BLOCK,
@@ -1006,6 +1011,29 @@ public abstract class SocketWrapperBase<E> {
 
     /**
      * Scatter read. The completion handler will be called once some
+     * data has been read or an error occurred. The default NIO2
+     * behavior is used: the completion handler will be called as soon
+     * as some data has been read, even if the read has completed inline.
+     *
+     * @param timeout timeout duration for the read
+     * @param unit units for the timeout duration
+     * @param attachment an object to attach to the I/O operation that will be
+     *        used when calling the completion handler
+     * @param handler to call when the IO is complete
+     * @param dsts buffers
+     * @param <A> The attachment type
+     * @return the completion state (done, done inline, or still pending)
+     */
+    public final <A> CompletionState read(long timeout, TimeUnit unit, A attachment,
+            CompletionHandler<Long, ? super A> handler, ByteBuffer... dsts) {
+        if (dsts == null) {
+            throw new IllegalArgumentException();
+        }
+        return read(dsts, 0, dsts.length, BlockingMode.CLASSIC, timeout, unit, attachment, null, handler);
+    }
+
+    /**
+     * Scatter read. The completion handler will be called once some
      * data has been read or an error occurred. If a CompletionCheck
      * object has been provided, the completion handler will only be
      * called if the callHandler method returned true. If no
@@ -1059,6 +1087,30 @@ public abstract class SocketWrapperBase<E> {
             BlockingMode block, long timeout, TimeUnit unit, A attachment,
             CompletionCheck check, CompletionHandler<Long, ? super A> handler) {
         throw new UnsupportedOperationException();
+    }
+
+    /**
+     * Gather write. The completion handler will be called once some
+     * data has been written or an error occurred. The default NIO2
+     * behavior is used: the completion handler will be called, even
+     * if the write is incomplete and data remains in the buffers, or
+     * if the write completed inline.
+     *
+     * @param timeout timeout duration for the write
+     * @param unit units for the timeout duration
+     * @param attachment an object to attach to the I/O operation that will be
+     *        used when calling the completion handler
+     * @param handler to call when the IO is complete
+     * @param srcs buffers
+     * @param <A> The attachment type
+     * @return the completion state (done, done inline, or still pending)
+     */
+    public final <A> CompletionState write(long timeout, TimeUnit unit, A attachment,
+            CompletionHandler<Long, ? super A> handler, ByteBuffer... srcs) {
+        if (srcs == null) {
+            throw new IllegalArgumentException();
+        }
+        return write(srcs, 0, srcs.length, BlockingMode.CLASSIC, timeout, unit, attachment, null, handler);
     }
 
     /**

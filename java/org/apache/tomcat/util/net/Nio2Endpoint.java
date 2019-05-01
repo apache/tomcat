@@ -31,6 +31,8 @@ import java.nio.channels.CompletionHandler;
 import java.nio.channels.FileChannel;
 import java.nio.channels.InterruptedByTimeoutException;
 import java.nio.channels.NetworkChannel;
+import java.nio.channels.ReadPendingException;
+import java.nio.channels.WritePendingException;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
@@ -1007,7 +1009,7 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
             }
             // Disable any regular read notifications caused by registerReadInterest
             readNotify = true;
-            if (block != BlockingMode.NON_BLOCK) {
+            if (block == BlockingMode.BLOCK || block == BlockingMode.SEMI_BLOCK) {
                 try {
                     if (!readPending.tryAcquire(timeout, unit)) {
                         handler.failed(new SocketTimeoutException(), attachment);
@@ -1019,7 +1021,12 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
                 }
             } else {
                 if (!readPending.tryAcquire()) {
-                    return CompletionState.NOT_DONE;
+                    if (block == BlockingMode.NON_BLOCK) {
+                        return CompletionState.NOT_DONE;
+                    } else {
+                        handler.failed(new ReadPendingException(), attachment);
+                        return CompletionState.ERROR;
+                    }
                 }
             }
             OperationState<A> state = new OperationState<>(true, dsts, offset, length, block,
@@ -1076,7 +1083,7 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
             }
             // Disable any regular write notifications caused by registerWriteInterest
             writeNotify = true;
-            if (block != BlockingMode.NON_BLOCK) {
+            if (block == BlockingMode.BLOCK || block == BlockingMode.SEMI_BLOCK) {
                 try {
                     if (!writePending.tryAcquire(timeout, unit)) {
                         handler.failed(new SocketTimeoutException(), attachment);
@@ -1088,7 +1095,12 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
                 }
             } else {
                 if (!writePending.tryAcquire()) {
-                    return CompletionState.NOT_DONE;
+                    if (block == BlockingMode.NON_BLOCK) {
+                        return CompletionState.NOT_DONE;
+                    } else {
+                        handler.failed(new WritePendingException(), attachment);
+                        return CompletionState.ERROR;
+                    }
                 }
             }
             if (!socketBufferHandler.isWriteBufferEmpty()) {

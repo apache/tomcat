@@ -166,6 +166,11 @@
         Refactor Hostname validation to improve performance. Patch provided by
         Uwe Hees. (markt)
       </scode>
+      <update>
+        Add additional NIO2 style read and write methods closer to core NIO2,
+        for possible use with an asynchronous workflow like CompletableFuture.
+        (remm)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Other">
