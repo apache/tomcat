@@ -84,6 +84,12 @@
         Refactor <code>ManagerServlet</code> to avoid loading classes when
         filtering JNDI resources for resources of a specified type. (markt)
       </scode>
+      <fix>
+        <bug>63324</bug>: Refactor the <code>CrawlerSessionManagerValve</code>
+        so that the object placed in the session is compatible with session
+        serialization with mem-cached. Patch provided by Martin Lemanski.
+        (markt)
+      </fix>
       <add>
         <bug>63358</bug>: Expand the <code>throwOnFailure</code> support in the
         <code>Connector</code> to include the adding of a <code>Connector</code>

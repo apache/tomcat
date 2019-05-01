@@ -17,6 +17,7 @@
 package org.apache.catalina.valves;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.Enumeration;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -42,7 +43,7 @@ import org.apache.juli.logging.LogFactory;
  * users - regardless of whether or not they provide a session token with their
  * requests.
  */
-public class CrawlerSessionManagerValve extends ValveBase implements HttpSessionBindingListener {
+public class CrawlerSessionManagerValve extends ValveBase {
 
     private static final Log log = LogFactory.getLog(CrawlerSessionManagerValve.class);
 
@@ -241,7 +242,8 @@ public class CrawlerSessionManagerValve extends ValveBase implements HttpSession
                     clientIdSessionId.put(clientIdentifier, s.getId());
                     sessionIdClientId.put(s.getId(), clientIdentifier);
                     // #valueUnbound() will be called on session expiration
-                    s.setAttribute(this.getClass().getName(), this);
+                    s.setAttribute(this.getClass().getName(),
+                            new CrawlerHttpSessionBindingListener(clientIdSessionId, clientIdentifier));
                     s.setMaxInactiveInterval(sessionInactiveInterval);
 
                     if (log.isDebugEnabled()) {
@@ -269,12 +271,22 @@ public class CrawlerSessionManagerValve extends ValveBase implements HttpSession
         return result.toString();
     }
 
+    private static class CrawlerHttpSessionBindingListener implements HttpSessionBindingListener, Serializable {
+        private static final long serialVersionUID = 1L;
 
-    @Override
-    public void valueUnbound(HttpSessionBindingEvent event) {
-        String clientIdentifier = sessionIdClientId.remove(event.getSession().getId());
-        if (clientIdentifier != null) {
-            clientIdSessionId.remove(clientIdentifier);
+        private final transient Map<String, String> clientIdSessionId;
+        private final transient String clientIdentifier;
+
+        private CrawlerHttpSessionBindingListener(Map<String, String> clientIdSessionId, String clientIdentifier) {
+            this.clientIdSessionId = clientIdSessionId;
+            this.clientIdentifier = clientIdentifier;
+        }
+
+        @Override
+        public void valueUnbound(HttpSessionBindingEvent event) {
+            if (clientIdentifier != null && clientIdSessionId != null) {
+                clientIdSessionId.remove(clientIdentifier, event.getSession().getId());
+            }
         }
     }
 }
