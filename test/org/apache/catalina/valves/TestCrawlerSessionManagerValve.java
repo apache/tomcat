@@ -48,7 +48,7 @@ public class TestCrawlerSessionManagerValve {
 
     static {
         TEST_MANAGER = new StandardManager();
-        TEST_MANAGER.setContext(new StandardContext());
+        TEST_MANAGER.setContainer(new StandardContext());
     }
 
 
