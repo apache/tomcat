@@ -21,6 +21,7 @@ import org.apache.tomcat.util.codec.BinaryDecoder;
 import org.apache.tomcat.util.codec.BinaryEncoder;
 import org.apache.tomcat.util.codec.DecoderException;
 import org.apache.tomcat.util.codec.EncoderException;
+import org.apache.tomcat.util.res.StringManager;
 
 /**
  * Abstract superclass for Base-N encoders and decoders.
@@ -31,6 +32,8 @@ import org.apache.tomcat.util.codec.EncoderException;
  */
 @SuppressWarnings("deprecation")
 public abstract class BaseNCodec implements BinaryEncoder, BinaryDecoder {
+
+    protected static final StringManager sm = StringManager.getManager(BaseNCodec.class);
 
     /**
      * Holds thread context so classes can be thread-safe.

@@ -278,7 +278,7 @@ public class Base64 extends BaseNCodec {
         if (lineSeparator != null) {
             if (containsAlphabetOrPad(lineSeparator)) {
                 final String sep = StringUtils.newStringUtf8(lineSeparator);
-                throw new IllegalArgumentException("lineSeparator must not contain base64 characters: [" + sep + "]");
+                throw new IllegalArgumentException(sm.getString("base64.lineSeparator", sep));
             }
             if (lineLength > 0){ // null line-sep forces no chunking rather than throwing IAE
                 this.encodeSize = BYTES_PER_ENCODED_BLOCK + lineSeparator.length;
@@ -366,7 +366,8 @@ public class Base64 extends BaseNCodec {
                     }
                     break;
                 default:
-                    throw new IllegalStateException("Impossible modulus "+context.modulus);
+                    throw new IllegalStateException(sm.getString(
+                            "base64.impossibleModulus", Integer.valueOf(context.modulus)));
             }
             context.currentLinePos += context.pos - savedPos; // keep track of current line position
             // if currentPos == 0 we are at the start of a line, so don't add CRLF
@@ -477,7 +478,8 @@ public class Base64 extends BaseNCodec {
                     buffer[context.pos++] = (byte) ((context.ibitWorkArea) & MASK_8BITS);
                     break;
                 default:
-                    throw new IllegalStateException("Impossible modulus "+context.modulus);
+                    throw new IllegalStateException(sm.getString(
+                            "base64.impossibleModulus", Integer.valueOf(context.modulus)));
             }
         }
     }
@@ -652,10 +654,8 @@ public class Base64 extends BaseNCodec {
         final Base64 b64 = isChunked ? new Base64(urlSafe) : new Base64(0, CHUNK_SEPARATOR, urlSafe);
         final long len = b64.getEncodedLength(binaryData);
         if (len > maxResultSize) {
-            throw new IllegalArgumentException("Input array too big, the output array would be bigger (" +
-                len +
-                ") than the specified maximum size of " +
-                maxResultSize);
+            throw new IllegalArgumentException(sm.getString(
+                    "base64.inputTooLarge", Long.valueOf(len), Integer.valueOf(maxResultSize)));
         }
 
         return b64.encode(binaryData);
@@ -722,7 +722,7 @@ public class Base64 extends BaseNCodec {
      */
     public static byte[] encodeInteger(final BigInteger bigInt) {
         if (bigInt == null) {
-            throw new NullPointerException("encodeInteger called with null parameter");
+            throw new NullPointerException(sm.getString("base64.nullEncodeParameter"));
         }
         return encodeBase64(toIntegerBytes(bigInt), false);
     }
