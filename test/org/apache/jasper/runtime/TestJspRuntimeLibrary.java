@@ -59,12 +59,12 @@ public class TestJspRuntimeLibrary extends TomcatBaseTest {
         assertEcho(result, "41-\u0000");
         assertEcho(result, "42-f");
         assertEcho(result, "43-b");
-        assertEcho(result, "44-\n");
+        assertEcho(result, "44-" + System.lineSeparator().charAt(0));
 
         assertEcho(result, "51-\u0000");
         assertEcho(result, "52-f");
         assertEcho(result, "53-b");
-        assertEcho(result, "54-\n");
+        assertEcho(result, "54-" + System.lineSeparator().charAt(0));
 
         assertEcho(result, "61-0.0");
         assertEcho(result, "62-42.0");
