@@ -135,6 +135,10 @@
         Update the internal fork of Apache Commons Pool 2 to 0664f4d
         (2019-04-30) to pick up some enhancements and bug fixes. (markt)
       </update>
+      <update>
+        Update the internal fork of Apache Commons FileUpload to 41e4047
+        (2019-04-24) pick up some enhancements. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>

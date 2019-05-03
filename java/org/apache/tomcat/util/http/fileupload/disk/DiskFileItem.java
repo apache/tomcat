@@ -223,7 +223,7 @@ public class DiskFileItem
         ParameterParser parser = new ParameterParser();
         parser.setLowerCaseNames(true);
         // Parameter parser can handle null input
-        Map<String,String> params = parser.parse(getContentType(), ';');
+        Map<String, String> params = parser.parse(getContentType(), ';');
         return params.get("charset");
     }
 
@@ -391,6 +391,12 @@ public class DiskFileItem
                  * in a temporary location so move it to the
                  * desired file.
                  */
+                if (file.exists()) {
+                    if (!file.delete()) {
+                        throw new FileUploadException(
+                                "Cannot write uploaded file to disk!");
+                    }
+                }
                 if (!outputFile.renameTo(file)) {
                     BufferedInputStream in = null;
                     BufferedOutputStream out = null;
@@ -569,8 +575,7 @@ public class DiskFileItem
                 tempDir = new File(System.getProperty("java.io.tmpdir"));
             }
 
-            String tempFileName =
-                    String.format("upload_%s_%s.tmp", UID, getUniqueId());
+            String tempFileName = String.format("upload_%s_%s.tmp", UID, getUniqueId());
 
             tempFile = new File(tempDir, tempFileName);
         }

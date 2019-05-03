@@ -279,6 +279,7 @@ public abstract class FileUploadBase {
         try {
             FileItemIterator iter = getItemIterator(ctx);
             FileItemFactory fac = getFileItemFactory();
+            final byte[] buffer = new byte[Streams.DEFAULT_BUFFER_SIZE];
             if (fac == null) {
                 throw new NullPointerException("No FileItemFactory has been set.");
             }
@@ -290,7 +291,7 @@ public abstract class FileUploadBase {
                                                    item.isFormField(), fileName);
                 items.add(fileItem);
                 try {
-                    Streams.copy(item.openStream(), fileItem.getOutputStream(), true);
+                    Streams.copy(item.openStream(), fileItem.getOutputStream(), true, buffer);
                 } catch (FileUploadIOException e) {
                     throw (FileUploadException) e.getCause();
                 } catch (IOException e) {
@@ -403,8 +404,7 @@ public abstract class FileUploadBase {
                 ParameterParser parser = new ParameterParser();
                 parser.setLowerCaseNames(true);
                 // Parameter parser can handle null input
-                Map<String,String> params =
-                    parser.parse(pContentDisposition, ';');
+                Map<String, String> params = parser.parse(pContentDisposition, ';');
                 if (params.containsKey("filename")) {
                     fileName = params.get("filename");
                     if (fileName != null) {
@@ -446,7 +446,7 @@ public abstract class FileUploadBase {
             ParameterParser parser = new ParameterParser();
             parser.setLowerCaseNames(true);
             // Parameter parser can handle null input
-            Map<String,String> params = parser.parse(pContentDisposition, ';');
+            Map<String, String> params = parser.parse(pContentDisposition, ';');
             fieldName = params.get("name");
             if (fieldName != null) {
                 fieldName = fieldName.trim();
@@ -606,20 +606,23 @@ public abstract class FileUploadBase {
                 fieldName = pFieldName;
                 contentType = pContentType;
                 formField = pFormField;
-                final ItemInputStream itemStream = multi.newInputStream();
-                InputStream istream = itemStream;
-                if (fileSizeMax != -1) {
+                if (fileSizeMax != -1) { // Check if limit is already exceeded
                     if (pContentLength != -1
-                            &&  pContentLength > fileSizeMax) {
+                            && pContentLength > fileSizeMax) {
                         FileSizeLimitExceededException e =
-                            new FileSizeLimitExceededException(
-                                String.format("The field %s exceeds its maximum permitted size of %s bytes.",
-                                        fieldName, Long.valueOf(fileSizeMax)),
-                                pContentLength, fileSizeMax);
+                                new FileSizeLimitExceededException(
+                                        String.format("The field %s exceeds its maximum permitted size of %s bytes.",
+                                                       fieldName, Long.valueOf(fileSizeMax)),
+                                        pContentLength, fileSizeMax);
                         e.setFileName(pName);
                         e.setFieldName(pFieldName);
                         throw new FileUploadIOException(e);
                     }
+                }
+                // OK to construct stream now
+                final ItemInputStream itemStream = multi.newInputStream();
+                InputStream istream = itemStream;
+                if (fileSizeMax != -1) {
                     istream = new LimitedInputStream(istream, fileSizeMax) {
                         @Override
                         protected void raiseError(long pSizeMax, long pCount)
