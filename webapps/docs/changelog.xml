@@ -215,8 +215,12 @@
         (2019-04-24) pick up some enhancements. (markt)
       </update>
       <update>
-        Update the internal fork of Apache Commons DBCP 2 to 
+        Update the internal fork of Apache Commons DBCP 2 to dcdbc72 
         (2019-04-24) to pick up some clean-up and enhancements. (markt)
+      </update>
+      <update>
+        Update the internal fork of Apache Commons Pool 2 to 0664f4d
+        (2019-04-30) to pick up some enhancements and bug fixes. (markt)
       </update>
     </changelog>
   </subsection>

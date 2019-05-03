@@ -69,4 +69,4 @@ Pool2
 Sub-tree
 src/main/java/org/apache/commons/pool2
 The SHA1 ID for the most recent commit to be merged to Tomcat is:
-d4e0e88227ad91d8c8ef36ba01d656f71c770f83
+0664f4dac9ef653703624cbe67272134cf0151cb (2019-04-30)
