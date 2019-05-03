@@ -750,6 +750,21 @@ public class BasicDataSource implements DataSource, BasicDataSourceMXBean, MBean
     }
 
     /**
+     * If the connection pool implements {@link org.apache.tomcat.dbcp.pool2.UsageTracking UsageTracking}, should the
+     * connection pool record a stack trace every time a method is called on a pooled connection and retain the most
+     * recent stack trace to aid debugging of abandoned connections?
+     *
+     * @return <code>true</code> if usage tracking is enabled
+     */
+    @Override
+    public boolean getAbandonedUsageTracking() {
+        if (abandonedConfig != null) {
+            return abandonedConfig.getUseUsageTracking();
+        }
+        return false;
+    }
+
+    /**
      * Returns the value of the flag that controls whether or not connections being returned to the pool will be checked
      * and configured with {@link Connection#setAutoCommit(boolean) Connection.setAutoCommit(true)} if the auto commit
      * setting is {@code false} when the connection is returned. It is <code>true</code> by default.
@@ -1630,21 +1645,6 @@ public class BasicDataSource implements DataSource, BasicDataSourceMXBean, MBean
         if (gop != null) {
             gop.setAbandonedConfig(abandonedConfig);
         }
-    }
-
-    /**
-     * If the connection pool implements {@link org.apache.tomcat.dbcp.pool2.UsageTracking UsageTracking}, should the
-     * connection pool record a stack trace every time a method is called on a pooled connection and retain the most
-     * recent stack trace to aid debugging of abandoned connections?
-     *
-     * @return <code>true</code> if usage tracking is enabled
-     */
-    @Override
-    public boolean getAbandonedUsageTracking() {
-        if (abandonedConfig != null) {
-            return abandonedConfig.getUseUsageTracking();
-        }
-        return false;
     }
 
     /**

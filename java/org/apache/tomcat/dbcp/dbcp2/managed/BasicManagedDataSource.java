@@ -52,7 +52,7 @@ import org.apache.tomcat.dbcp.dbcp2.Utils;
  */
 public class BasicManagedDataSource extends BasicDataSource {
 
-    /** Transaction Synchronization Registry */
+    /** Transaction Registry */
     private TransactionRegistry transactionRegistry;
 
     /** Transaction Manager */
