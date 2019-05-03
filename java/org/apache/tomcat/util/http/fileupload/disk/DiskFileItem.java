@@ -392,7 +392,10 @@ public class DiskFileItem
                  * desired file.
                  */
                 if (file.exists()) {
-                    file.delete();
+                    if (!file.delete()) {
+                        throw new FileUploadException(
+                                "Cannot write uploaded file to disk!");
+                    }
                 }
                 if (!outputFile.renameTo(file)) {
                     BufferedInputStream in = null;
