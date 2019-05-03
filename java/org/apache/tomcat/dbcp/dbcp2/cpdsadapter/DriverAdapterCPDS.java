@@ -730,4 +730,49 @@ public class DriverAdapterCPDS implements ConnectionPoolDataSource, Referenceabl
             }
         }
     }
+
+    /**
+     * Does not print the userName and userPassword field nor the 'user' or 'password' in the connectionProperties.
+     *
+     * @since 2.6.0
+     */
+    @Override
+    public synchronized String toString() {
+        final StringBuilder builder = new StringBuilder(super.toString());
+        builder.append("[description=");
+        builder.append(description);
+        builder.append(", url=");
+        // TODO What if the connection string contains a 'user' or 'password' query parameter but that connection string is not in a legal URL format?
+        builder.append(url);
+        builder.append(", driver=");
+        builder.append(driver);
+        builder.append(", loginTimeout=");
+        builder.append(loginTimeout);
+        builder.append(", poolPreparedStatements=");
+        builder.append(poolPreparedStatements);
+        builder.append(", maxIdle=");
+        builder.append(maxIdle);
+        builder.append(", timeBetweenEvictionRunsMillis=");
+        builder.append(timeBetweenEvictionRunsMillis);
+        builder.append(", numTestsPerEvictionRun=");
+        builder.append(numTestsPerEvictionRun);
+        builder.append(", minEvictableIdleTimeMillis=");
+        builder.append(minEvictableIdleTimeMillis);
+        builder.append(", maxPreparedStatements=");
+        builder.append(maxPreparedStatements);
+        builder.append(", getConnectionCalled=");
+        builder.append(getConnectionCalled);
+        builder.append(", connectionProperties=");
+        Properties tmpProps = connectionProperties;
+        final String pwdKey = "password";
+        if (connectionProperties.contains(pwdKey)) {
+            tmpProps = (Properties) connectionProperties.clone();
+            tmpProps.remove(pwdKey);
+        }
+        builder.append(tmpProps);
+        builder.append(", accessToUnderlyingConnectionAllowed=");
+        builder.append(accessToUnderlyingConnectionAllowed);
+        builder.append("]");
+        return builder.toString();
+    }
 }

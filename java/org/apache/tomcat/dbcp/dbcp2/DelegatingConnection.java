@@ -88,7 +88,7 @@ public class DelegatingConnection<C extends Connection> extends AbandonedTrace i
      * Returns a string representation of the metadata associated with the innermost delegate connection.
      */
     @Override
-    public String toString() {
+    public synchronized String toString() {
         String s = null;
 
         final Connection c = this.getInnermostDelegateInternal();
@@ -928,7 +928,7 @@ public class DelegatingConnection<C extends Connection> extends AbandonedTrace i
     public void setSchema(final String schema) throws SQLException {
         checkOpen();
         try {
-            connection.setSchema(schema);
+            Jdbc41Bridge.setSchema(connection, schema);
         } catch (final SQLException e) {
             handleException(e);
         }
@@ -938,7 +938,7 @@ public class DelegatingConnection<C extends Connection> extends AbandonedTrace i
     public String getSchema() throws SQLException {
         checkOpen();
         try {
-            return connection.getSchema();
+            return Jdbc41Bridge.getSchema(connection);
         } catch (final SQLException e) {
             handleException(e);
             return null;
@@ -949,7 +949,7 @@ public class DelegatingConnection<C extends Connection> extends AbandonedTrace i
     public void abort(final Executor executor) throws SQLException {
         checkOpen();
         try {
-            connection.abort(executor);
+            Jdbc41Bridge.abort(connection, executor);
         } catch (final SQLException e) {
             handleException(e);
         }
@@ -959,7 +959,7 @@ public class DelegatingConnection<C extends Connection> extends AbandonedTrace i
     public void setNetworkTimeout(final Executor executor, final int milliseconds) throws SQLException {
         checkOpen();
         try {
-            connection.setNetworkTimeout(executor, milliseconds);
+            Jdbc41Bridge.setNetworkTimeout(connection, executor, milliseconds);
         } catch (final SQLException e) {
             handleException(e);
         }
@@ -969,7 +969,7 @@ public class DelegatingConnection<C extends Connection> extends AbandonedTrace i
     public int getNetworkTimeout() throws SQLException {
         checkOpen();
         try {
-            return connection.getNetworkTimeout();
+            return Jdbc41Bridge.getNetworkTimeout(connection);
         } catch (final SQLException e) {
             handleException(e);
             return 0;

@@ -397,4 +397,30 @@ class CPDSConnectionFactory
             }
         }
     }
+
+    /**
+     * @since 2.6.0
+     */
+    @Override
+    public synchronized String toString() {
+        final StringBuilder builder = new StringBuilder(super.toString());
+        builder.append("[cpds=");
+        builder.append(cpds);
+        builder.append(", validationQuery=");
+        builder.append(validationQuery);
+        builder.append(", validationQueryTimeoutSeconds=");
+        builder.append(validationQueryTimeoutSeconds);
+        builder.append(", rollbackAfterValidation=");
+        builder.append(rollbackAfterValidation);
+        builder.append(", pool=");
+        builder.append(pool);
+        builder.append(", maxConnLifetimeMillis=");
+        builder.append(maxConnLifetimeMillis);
+        builder.append(", validatingSet=");
+        builder.append(validatingSet);
+        builder.append(", pcMap=");
+        builder.append(pcMap);
+        builder.append("]");
+        return builder.toString();
+    }
 }

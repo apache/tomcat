@@ -30,6 +30,7 @@ import javax.sql.StatementEventListener;
 
 import org.apache.tomcat.dbcp.dbcp2.DelegatingConnection;
 import org.apache.tomcat.dbcp.dbcp2.DelegatingPreparedStatement;
+import org.apache.tomcat.dbcp.dbcp2.Jdbc41Bridge;
 import org.apache.tomcat.dbcp.dbcp2.PStmtKey;
 import org.apache.tomcat.dbcp.dbcp2.PoolableCallableStatement;
 import org.apache.tomcat.dbcp.dbcp2.PoolablePreparedStatement;
@@ -295,7 +296,7 @@ class PooledConnectionImpl
 
     private String getSchemaOrNull() {
         try {
-            return connection == null ? null : connection.getSchema();
+            return connection == null ? null : Jdbc41Bridge.getSchema(connection);
         } catch (final SQLException e) {
             return null;
         }

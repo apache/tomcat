@@ -75,7 +75,7 @@ public class PoolingDataSource<C extends Connection> implements DataSource, Auto
      * @since 2.1
      */
     @Override
-    public void close() throws Exception {
+    public void close() throws RuntimeException, SQLException {
         try {
             pool.close();
         } catch (final RuntimeException rte) {

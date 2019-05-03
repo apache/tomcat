@@ -579,7 +579,7 @@ public class PoolingConnection extends DelegatingConnection<Connection>
     }
 
     @Override
-    public String toString() {
+    public synchronized String toString() {
         if (pstmtPool != null) {
             return "PoolingConnection: " + pstmtPool.toString();
         }

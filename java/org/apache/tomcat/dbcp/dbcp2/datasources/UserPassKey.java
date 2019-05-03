@@ -125,9 +125,10 @@ class UserPassKey implements Serializable {
 
     @Override
     public String toString() {
-        final StringBuffer sb = new StringBuffer(50);
-        sb.append("UserPassKey(");
-        sb.append(userName).append(", ").append(userPassword).append(')');
+        final StringBuffer sb = new StringBuffer(super.toString());
+        sb.append("[");
+        sb.append(userName);
+        sb.append(']');
         return sb.toString();
     }
 }
