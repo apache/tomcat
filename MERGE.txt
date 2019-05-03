@@ -22,27 +22,6 @@ ideal. These include:
 - a large JAR where Tomcat only depends on a small fraction
 
 
-SVN
-===
-
-For sources hosted in svn the approach is to svn copy the classes to the Tomcat
-source tree, modify them (always with a package rename, sometimes with
-additional changes) and then keep them in sync with the original via regular svn
-merges. This file keeps track of these copies to assist committers in keeping
-them up to date.
-
-BCEL
-----
-org.apache.tomcat.util.bcel is copied from:
-/commons/proper/bcel/trunk/src/main/java/org/apache/bcel
-
-Codec
------
-org.apache.tomcat.util.codec is copied from:
-/commons/proper/codec/trunk/src/main/java/org/apache/commons/codec/
-Note: Only classes required for Base64 encoding/decoding. The rest are removed.
-
-
 GIT
 ===
 
@@ -51,6 +30,21 @@ using:
 git diff <last SHA1>:<sub-tree> HEAD:<sub-tree> > temp.patch
 The most recently merged SHA1 for the component below should be updated after
 the patch file has been applied and committed
+
+BCEL
+----
+Sub-tree:
+src/main/java/org/apache/bcel
+The SHA1 ID for the most recent commit to be merged to Tomcat is:
+0b486d19a5f923b32c25806b380b592c61176819
+
+Codec
+-----
+Sub-tree:
+src/main/java/org/apache/commons/codec
+The SHA1 ID for the most recent commit to be merged to Tomcat is:
+163d643d1176e0dc9334ee83e21b9ce21d24fc1a
+Note: Only classes required for Base64 encoding/decoding. The rest are removed.
 
 FileUpload
 ----------
