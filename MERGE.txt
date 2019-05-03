@@ -43,7 +43,7 @@ Codec
 Sub-tree:
 src/main/java/org/apache/commons/codec
 The SHA1 ID for the most recent commit to be merged to Tomcat is:
-163d643d1176e0dc9334ee83e21b9ce21d24fc1a
+8502e2f14a6eafb0afa0964b34d1d1bb02b44f64 (2019-04-23)
 Note: Only classes required for Base64 encoding/decoding. The rest are removed.
 
 FileUpload
