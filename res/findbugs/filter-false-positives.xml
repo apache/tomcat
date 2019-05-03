@@ -961,6 +961,13 @@
     <Bug code="Dm" />
   </Match>
   <Match>
+    <!-- As per the comment, FileSystems.getDefault() does have a
+         side-effect. -->
+    <Class name="org.apache.juli.logging.LogFactory"/>
+    <Method name="&lt;init&gt;"/>
+    <Bug pattern="RV_RETURN_VALUE_IGNORED_NO_SIDE_EFFECT" />
+  </Match>
+  <Match>
     <!-- Reference.equals() implementation correctly handles sub-classes -->
     <Class name="org.apache.naming.ServiceRef" />
     <Pattern code="EQ_DOESNT_OVERRIDE_EQUALS" />
