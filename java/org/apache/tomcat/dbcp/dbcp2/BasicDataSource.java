@@ -418,12 +418,12 @@ public class BasicDataSource implements DataSource, BasicDataSourceMXBean, MBean
             registeredJmxObjectName = null;
         }
         closed = true;
-        final GenericObjectPool<?> oldpool = connectionPool;
+        final GenericObjectPool<?> oldPool = connectionPool;
         connectionPool = null;
         dataSource = null;
         try {
-            if (oldpool != null) {
-                oldpool.close();
+            if (oldPool != null) {
+                oldPool.close();
             }
         } catch (final RuntimeException e) {
             throw e;
@@ -1506,7 +1506,8 @@ public class BasicDataSource implements DataSource, BasicDataSourceMXBean, MBean
     /**
      * Manually evicts idle connections.
      *
-     * @throws Exception when there is a problem evicting idle objects.
+     * @throws Exception Thrown by {@link GenericObjectPool#evict()}.
+     * @see GenericObjectPool#evict()
      */
     public void evict() throws Exception {
         if (connectionPool != null) {

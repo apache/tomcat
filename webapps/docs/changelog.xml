@@ -210,10 +210,14 @@
         When using the <code>OneLineFormatter</code>, don't print a blank line
         in the log after printing a stack trace. (markt)
       </fix>
-      <add>
-        Update the internal fork of Apache Commons FileUpload to pick up the
-        changes since the Apache Commons FileUpload 1.4 release. (markt)
-      </add>
+      <update>
+        Update the internal fork of Apache Commons FileUpload to 41e4047
+        (2019-04-24) pick up some enhancements. (markt)
+      </update>
+      <update>
+        Update the internal fork of Apache Commons DBCP 2 to 
+        (2019-04-24) to pick up some clean-up and enhancements. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
