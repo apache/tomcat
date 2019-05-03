@@ -1145,26 +1145,28 @@ public class GenericKeyedObjectPool<K, T> extends BaseGenericObjectPool<T>
      * @param k The key to de-register
      */
     private void deregister(final K k) {
+        Lock lock = keyLock.readLock();
         ObjectDeque<T> objectDeque;
-
-        objectDeque = poolMap.get(k);
-        final long numInterested = objectDeque.getNumInterested().decrementAndGet();
-        if (numInterested == 0 && objectDeque.getCreateCount().get() == 0) {
-            // Potential to remove key
-            final Lock writeLock = keyLock.writeLock();
-            writeLock.lock();
-            try {
-                if (objectDeque.getCreateCount().get() == 0 &&
-                        objectDeque.getNumInterested().get() == 0) {
+        try {
+            lock.lock();
+            objectDeque = poolMap.get(k);
+            final long numInterested = objectDeque.getNumInterested().decrementAndGet();
+            if (numInterested == 0 && objectDeque.getCreateCount().get() == 0) {
+                // Potential to remove key
+                // Upgrade to write lock
+                lock.unlock();
+                lock = keyLock.writeLock();
+                lock.lock();
+                if (objectDeque.getCreateCount().get() == 0 && objectDeque.getNumInterested().get() == 0) {
                     // NOTE: Keys must always be removed from both poolMap and
                     //       poolKeyList at the same time while protected by
                     //       keyLock.writeLock()
                     poolMap.remove(k);
                     poolKeyList.remove(k);
                 }
-            } finally {
-                writeLock.unlock();
             }
+        } finally {
+            lock.unlock();
         }
     }
 

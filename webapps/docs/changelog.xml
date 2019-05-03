@@ -131,6 +131,10 @@
         (2019-04-24) to pick up some clean-up and enhancements less the JDBC 4.2
         related changes that require Java 8. (markt)
       </update>
+      <update>
+        Update the internal fork of Apache Commons Pool 2 to 0664f4d
+        (2019-04-30) to pick up some enhancements and bug fixes. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
