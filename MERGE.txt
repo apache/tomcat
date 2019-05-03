@@ -22,45 +22,39 @@ ideal. These include:
 - a large JAR where Tomcat only depends on a small fraction
 
 
-SVN
-===
-
-For sources hosted in svn the approach is to svn copy the classes to the Tomcat
-source tree, modify them (always with a package rename, sometimes with
-additional changes) and then keep them in sync with the original via regular svn
-merges. This file keeps track of these copies to assist committers in keeping
-them up to date.
-
-BCEL
-----
-org.apache.tomcat.util.bcel is copied from:
-/commons/proper/bcel/trunk/src/main/java/org/apache/bcel
-
-Codec
------
-org.apache.tomcat.util.codec is copied from:
-/commons/proper/codec/trunk/src/main/java/org/apache/commons/codec/
-Note: Only classes required for Base64 encoding/decoding. The rest are removed.
-
-
 GIT
 ===
 
 Updates from Git are applied manually via patch files. Patch files are generated
 using:
 git diff <last SHA1>:<sub-tree> HEAD:<sub-tree> > temp.patch
-The more recently merged SHA1 for the component below should be updated after
+The most recently merged SHA1 for the component below should be updated after
 the patch file has been applied and committed
+
+BCEL
+----
+Sub-tree:
+src/main/java/org/apache/bcel
+The SHA1 ID for the most recent commit to be merged to Tomcat is:
+33b9f8718ac00b2cbbcc3bf498e55872a3066f19 (2019-04-27)
+
+Codec
+-----
+Sub-tree:
+src/main/java/org/apache/commons/codec
+The SHA1 ID for the most recent commit to be merged to Tomcat is:
+8502e2f14a6eafb0afa0964b34d1d1bb02b44f64 (2019-04-23)
+Note: Only classes required for Base64 encoding/decoding. The rest are removed.
 
 FileUpload
 ----------
 Sub-tree:
-src/main/java/org/apache/commons/fileupload
+src/main/java/org/apache/commons/fileupload2
 The SHA1 ID for the most recent commit to be merged to Tomcat is:
-b1498c9877d751f8bc4635a6f252ebdfcba28518
+41e40479f3000dc456d27951060fda01b87fbe9a (2019-04-24)
 
-Note: Tomcat's copy of fileupload also includes classes copied manually (rather
-      than svn copied) from Commons IO.
+Note: Tomcat's copy of fileupload also includes classes copied manually from
+      Commons IO.
 
 DBCP
 ----
@@ -69,10 +63,10 @@ Sub-tree
 src/main/java/org/apache/commons/dbcp2
 src/main/resources/org/apache/commons/dbcp2
 The SHA1 ID for the most recent commit to be merged to Tomcat is:
-171528a88cca65f5b192be643c2425458d1edfbb
+dcdbc72acf51155d2a6c3f10461d9712a3623686 (2019-04-24)
 
 Pool2
 Sub-tree
 src/main/java/org/apache/commons/pool2
 The SHA1 ID for the most recent commit to be merged to Tomcat is:
-d4e0e88227ad91d8c8ef36ba01d656f71c770f83
+0664f4dac9ef653703624cbe67272134cf0151cb (2019-04-30)
