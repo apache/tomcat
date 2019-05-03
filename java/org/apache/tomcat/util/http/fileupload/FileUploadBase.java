@@ -279,6 +279,7 @@ public abstract class FileUploadBase {
         try {
             FileItemIterator iter = getItemIterator(ctx);
             FileItemFactory fac = getFileItemFactory();
+            final byte[] buffer = new byte[Streams.DEFAULT_BUFFER_SIZE];
             if (fac == null) {
                 throw new NullPointerException("No FileItemFactory has been set.");
             }
@@ -290,7 +291,7 @@ public abstract class FileUploadBase {
                                                    item.isFormField(), fileName);
                 items.add(fileItem);
                 try {
-                    Streams.copy(item.openStream(), fileItem.getOutputStream(), true);
+                    Streams.copy(item.openStream(), fileItem.getOutputStream(), true, buffer);
                 } catch (FileUploadIOException e) {
                     throw (FileUploadException) e.getCause();
                 } catch (IOException e) {
