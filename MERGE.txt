@@ -36,7 +36,7 @@ BCEL
 Sub-tree:
 src/main/java/org/apache/bcel
 The SHA1 ID for the most recent commit to be merged to Tomcat is:
-0b486d19a5f923b32c25806b380b592c61176819
+33b9f8718ac00b2cbbcc3bf498e55872a3066f19 (2019-04-27)
 
 Codec
 -----
