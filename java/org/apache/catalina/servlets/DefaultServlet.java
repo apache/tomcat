@@ -1701,11 +1701,11 @@ public class DefaultServlet extends HttpServlet {
 
         StringBuilder sb = new StringBuilder();
 
-        String[] entries = resources.list(resource.getWebappPath());
+        String directoryWebappPath = resource.getWebappPath();
+        WebResource[] entries = resources.listResources(directoryWebappPath);
 
         // rewriteUrl(contextPath) is expensive. cache result for later reuse
         String rewrittenContextPath =  rewriteUrl(contextPath);
-        String directoryWebappPath = resource.getWebappPath();
 
         // Render the page header
         sb.append("<html>\r\n");
@@ -1797,13 +1797,12 @@ public class DefaultServlet extends HttpServlet {
         }
 
         boolean shade = false;
-        for (String entry : entries) {
-            if (entry.equalsIgnoreCase("WEB-INF") ||
-                entry.equalsIgnoreCase("META-INF"))
+        for (WebResource childResource : entries) {
+            String filename = childResource.getName();
+            if (filename.equalsIgnoreCase("WEB-INF") ||
+                filename.equalsIgnoreCase("META-INF"))
                 continue;
 
-            WebResource childResource =
-                    resources.getResource(directoryWebappPath + entry);
             if (!childResource.exists()) {
                 continue;
             }
@@ -1817,11 +1816,11 @@ public class DefaultServlet extends HttpServlet {
             sb.append("<td align=\"left\">&nbsp;&nbsp;\r\n");
             sb.append("<a href=\"");
             sb.append(rewrittenContextPath);
-            sb.append(rewriteUrl(directoryWebappPath + entry));
+            sb.append(rewriteUrl(childResource.getWebappPath()));
             if (childResource.isDirectory())
                 sb.append("/");
             sb.append("\"><tt>");
-            sb.append(Escape.htmlElementContent(entry));
+            sb.append(Escape.htmlElementContent(filename));
             if (childResource.isDirectory())
                 sb.append("/");
             sb.append("</tt></a></td>\r\n");
