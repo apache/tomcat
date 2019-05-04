@@ -234,7 +234,7 @@ public final class LegacyCookieProcessor extends CookieProcessorBase {
 
 
     @Override
-    public String generateHeader(Cookie cookie) {
+    public String generateHeader(Cookie cookie, SameSiteCookies sameSiteCookies) {
         /*
          * The spec allows some latitude on when to send the version attribute
          * with a Set-Cookie header. To be nice to clients, we'll make sure the
@@ -324,6 +324,12 @@ public final class LegacyCookieProcessor extends CookieProcessorBase {
         if (cookie.isHttpOnly()) {
             buf.append("; HttpOnly");
         }
+
+        if (!sameSiteCookies.equals(SameSiteCookies.NONE)) {
+            buf.append("; SameSite=");
+            buf.append(sameSiteCookies.toString());
+        }
+
         return buf.toString();
     }
 

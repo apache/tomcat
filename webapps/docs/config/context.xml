@@ -492,6 +492,16 @@
         string, else the default value will be <code>jsp</code>.</p>
       </attribute>
 
+      <attribute name="sameSiteCookies" required="false">
+        <p>Enables setting same-site cookie attribute.</p>
+
+        <p>If value is <code>none</code> then the same-site cookie attribute won't be set. This is the default value.</p>
+
+        <p>If value is <code>lax</code> then the browser only sends the cookie in same-site requests and cross-site top level GET requests. </p>
+
+        <p>If value is <code>strict</code> then the browser prevents sending the cookie in any cross-site request.</p>
+      </attribute>
+
       <attribute name="sendRedirectBody" required="false">
         <p>If <code>true</code>, redirect responses will include a short
         response body that includes details of the redirect as recommended by

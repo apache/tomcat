@@ -98,7 +98,7 @@ public class Rfc6265CookieProcessor extends CookieProcessorBase {
 
 
     @Override
-    public String generateHeader(javax.servlet.http.Cookie cookie) {
+    public String generateHeader(javax.servlet.http.Cookie cookie, SameSiteCookies sameSiteCookies) {
 
         // Can't use StringBuilder due to DateFormat
         StringBuffer header = new StringBuffer();
@@ -160,6 +160,11 @@ public class Rfc6265CookieProcessor extends CookieProcessorBase {
 
         if (cookie.isHttpOnly()) {
             header.append("; HttpOnly");
+        }
+
+        if (!sameSiteCookies.equals(SameSiteCookies.NONE)) {
+            header.append("; SameSite=");
+            header.append(sameSiteCookies.toString());
         }
 
         return header.toString();

@@ -130,6 +130,7 @@ import org.apache.tomcat.util.descriptor.web.SecurityCollection;
 import org.apache.tomcat.util.descriptor.web.SecurityConstraint;
 import org.apache.tomcat.util.http.CookieProcessor;
 import org.apache.tomcat.util.http.Rfc6265CookieProcessor;
+import org.apache.tomcat.util.http.SameSiteCookies;
 import org.apache.tomcat.util.scan.StandardJarScanner;
 import org.apache.tomcat.util.security.PrivilegedGetTccl;
 import org.apache.tomcat.util.security.PrivilegedSetTccl;
@@ -664,6 +665,10 @@ public class StandardContext extends ContainerBase
      */
     private boolean useHttpOnly = true;
 
+    /**
+     * The sameSiteCookies setting. Value can be none, lax or strict.
+     */
+    private SameSiteCookies sameSiteCookies = SameSiteCookies.NONE;
 
     /**
      * The domain to use for session cookies. <code>null</code> indicates that
@@ -1553,6 +1558,34 @@ public class StandardContext extends ContainerBase
         support.firePropertyChange("useHttpOnly",
                 oldUseHttpOnly,
                 this.useHttpOnly);
+    }
+
+
+    /**
+     * Gets the value of the sameSiteCookies setting.
+     *
+     * @return  The value of the setting (<code>none</code>, <code>lax</code>, <code>strict</code>)
+     *
+     */
+    @Override
+    public SameSiteCookies getSameSiteCookies() {
+        return sameSiteCookies;
+    }
+
+
+    /**
+     * Sets the value of the sameSiteCookies setting.
+     *
+     * @param value   Can be set to <code>none</code>, <code>lax</code>, <code>strict</code>.
+     *
+     */
+    @Override
+    public void setSameSiteCookies(String value) {
+        SameSiteCookies oldSameSiteCookies = this.sameSiteCookies;
+        this.sameSiteCookies = SameSiteCookies.toAttribute(value);
+        support.firePropertyChange("sameSiteCookies",
+                oldSameSiteCookies,
+                this.sameSiteCookies);
     }
 
 

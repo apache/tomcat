@@ -973,7 +973,7 @@ public class Response implements HttpServletResponse {
             return AccessController.doPrivileged(
                     new PrivilegedGenerateCookieString(getContext(), cookie));
         } else {
-            return getContext().getCookieProcessor().generateHeader(cookie);
+            return getContext().getCookieProcessor().generateHeader(cookie, getContext().getSameSiteCookies());
         }
     }
 
@@ -1839,7 +1839,7 @@ public class Response implements HttpServletResponse {
 
         @Override
         public String run(){
-            return context.getCookieProcessor().generateHeader(cookie);
+            return context.getCookieProcessor().generateHeader(cookie, context.getSameSiteCookies());
         }
     }
 

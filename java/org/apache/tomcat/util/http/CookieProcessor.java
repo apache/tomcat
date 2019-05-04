@@ -36,10 +36,12 @@ public interface CookieProcessor {
      *
      * @param cookie The cookie for which the header will be generated
      *
+     * @param sameSiteCookies The sameSiteCookies attribute specified in context.
+     *
      * @return The header value in a form that can be added directly to the
      *         response
      */
-    String generateHeader(Cookie cookie);
+    String generateHeader(Cookie cookie, SameSiteCookies sameSiteCookies);
 
     /**
      * Obtain the character set that will be used when converting between bytes

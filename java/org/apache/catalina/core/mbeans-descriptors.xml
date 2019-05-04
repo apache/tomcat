@@ -264,6 +264,10 @@
                description="Should Tomcat renew the threads of the thread pool when the application is stopped to avoid memory leaks because of uncleaned ThreadLocal variables."
                type="boolean"/>
 
+    <attribute name="sameSiteCookies"
+               description="The setting to use for the same site cookie attribute."
+               type="java.lang.String"/>
+
     <attribute name="server"
                description="The J2EE Server this module is deployed on"
                type="java.lang.String"/>

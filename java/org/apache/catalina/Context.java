@@ -39,6 +39,7 @@ import org.apache.tomcat.util.descriptor.web.FilterMap;
 import org.apache.tomcat.util.descriptor.web.LoginConfig;
 import org.apache.tomcat.util.descriptor.web.SecurityConstraint;
 import org.apache.tomcat.util.http.CookieProcessor;
+import org.apache.tomcat.util.http.SameSiteCookies;
 
 /**
  * A <b>Context</b> is a Container that represents a servlet context, and
@@ -250,6 +251,24 @@ public interface Context extends Container, ContextBind {
      *                          for session cookies
      */
     public void setUseHttpOnly(boolean useHttpOnly);
+
+
+    /**
+     * Gets the value of the sameSiteCookies setting.
+     *
+     * @return  The value of the setting (<code>none</code>, <code>lax</code>, <code>strict</code>)
+     *
+     */
+    public SameSiteCookies getSameSiteCookies();
+
+
+    /**
+     * Sets the value of the sameSiteCookies setting.
+     *
+     * @param value   Can be set to <code>none</code>, <code>lax</code>, <code>strict</code>.
+     *
+     */
+    public void setSameSiteCookies(String value);
 
 
     /**
