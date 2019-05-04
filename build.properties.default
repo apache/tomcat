@@ -264,13 +264,13 @@ cobertura.jar=${cobertura.home}/cobertura-${cobertura.version}.jar
 cobertura.loc=${base-sf.loc}/cobertura/cobertura-2.1.1-bin.tar.gz
 
 # ----- Findbugs -----
-findbugs.version=3.0.1
+findbugs.version=3.1.12
 findbugs.checksum.enabled=true
 findbugs.checksum.algorithm=MD5|SHA-1
-findbugs.checksum.value=dec8828de8657910fcb258ce5383c168|59a24064ca6869e483ce9a04d3c50d14a227d5e6
-findbugs.home=${base.path}/findbugs-${findbugs.version}
-findbugs.jar=${findbugs.home}/lib/findbugs-ant.jar
-findbugs.loc=${base-sf.loc}/project/findbugs/findbugs/${findbugs.version}/findbugs-${findbugs.version}.tar.gz
+findbugs.checksum.value=8c54502a8e1b78ea6b173a186ce6f379|95114d9aaeeba7bd4ea5a3d6a2167cd6c87bb943
+findbugs.home=${base.path}/spotbugs-${findbugs.version}
+findbugs.jar=${findbugs.home}/lib/spotbugs-ant.jar
+findbugs.loc=${base-maven.loc}/com/github/spotbugs/spotbugs/${findbugs.version}/spotbugs-${findbugs.version}.tgz
 
 # ----- SAAJ API, used by Code Signing for releases -----
 # ----- No longer part of JRE from Java 11 onwards  -----

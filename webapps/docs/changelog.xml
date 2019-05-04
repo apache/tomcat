@@ -45,6 +45,11 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 9.0.21 (markt)" rtext="in development">
+  <subsection name="Other">
+    <changelog>
+      <update>Switch from FindBugs to SpotBugs. (fschumacher)</update>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 9.0.20 (markt)" rtext="release in progress">
   <subsection name="Catalina">

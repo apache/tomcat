@@ -523,7 +523,7 @@ target. The command is:
 NOTE: FindBugs is licensed under LGPL. Using Findbugs during Tomcat build is
       optional and is off by default.
 
-      See http://findbugs.sourceforge.net/ for more information.
+      See https://spotbugs.github.io/ for more information.
 
 To enable FindBugs, add the following property to build.properties file:
 
