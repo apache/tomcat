@@ -77,3 +77,18 @@ If using the Kubernetes cloud clustering membership provider, the pod needs to h
 ```
 oc policy add-role-to-user view system:serviceaccount:$(oc project -q):default -n $(oc project -q)
 ```
+
+## Native Image
+
+```
+export JAVA_HOME=/home/remm/Work/graalvm-ce-1.0.0-rc17
+export JAVA_OPTS=-agentlib:native-image-agent=config-output-dir=./target/
+java -jar ./target/tomcat-maven-1.0.jar
+```
+Then exercise necessary paths of your service with the Tomcat configuration.
+
+And generate the native image using the generated reflection metadata.
+```
+cd target
+$JAVA_HOME/bin/native-image -H:+ReportUnsupportedElementsAtRuntime -H:ConfigurationFileDirectories=./ -jar tomcat-maven-1.0.jar
+```
