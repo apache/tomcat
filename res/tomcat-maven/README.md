@@ -73,7 +73,7 @@ An example `tomcat.yaml` is included which uses the Docker image. It uses the he
 
 ### Cluster
 
-If using the Kubernetes cloud clustering membership provider, the pod needs to have the persmission to view other pods. For exemple with Openshift, this is done with:
+If using the Kubernetes cloud clustering membership provider, the pod needs to have the permission to view other pods. For exemple with Openshift, this is done with:
 ```
 oc policy add-role-to-user view system:serviceaccount:$(oc project -q):default -n $(oc project -q)
 ```
@@ -81,9 +81,7 @@ oc policy add-role-to-user view system:serviceaccount:$(oc project -q):default -
 ## Native Image
 
 ```
-export JAVA_HOME=/home/remm/Work/graalvm-ce-1.0.0-rc17
-export JAVA_OPTS=-agentlib:native-image-agent=config-output-dir=./target/
-java -jar ./target/tomcat-maven-1.0.jar
+$JAVA_HOME/bin/java -agentlib:native-image-agent=config-output-dir=./target/ -jar ./target/tomcat-maven-1.0.jar
 ```
 Then exercise necessary paths of your service with the Tomcat configuration.
 
