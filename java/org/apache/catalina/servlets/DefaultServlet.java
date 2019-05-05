@@ -37,12 +37,14 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.security.AccessController;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.StringTokenizer;
-
 import javax.servlet.DispatcherType;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
@@ -256,6 +258,15 @@ public class DefaultServlet extends HttpServlet {
      */
     protected boolean showServerInfo = true;
 
+    /**
+     * Flag to determine if resources should be sorted.
+     */
+    protected boolean sortListings = false;
+
+    /**
+     * The sorting manager for sorting files and directories.
+     */
+    protected SortManager sortManager;
 
     // --------------------------------------------------------- Public Methods
 
@@ -341,6 +352,21 @@ public class DefaultServlet extends HttpServlet {
 
         if (getServletConfig().getInitParameter("showServerInfo") != null) {
             showServerInfo = Boolean.parseBoolean(getServletConfig().getInitParameter("showServerInfo"));
+        }
+
+        if (getServletConfig().getInitParameter("sortListings") != null) {
+            sortListings = Boolean.parseBoolean(getServletConfig().getInitParameter("sortListings"));
+
+            if(sortListings) {
+                boolean sortDirectoriesFirst;
+                if (getServletConfig().getInitParameter("sortDirectoriesFirst") != null) {
+                    sortDirectoriesFirst = Boolean.parseBoolean(getServletConfig().getInitParameter("sortDirectoriesFirst"));
+                } else {
+                    sortDirectoriesFirst = false;
+                }
+
+                sortManager = new SortManager(sortDirectoriesFirst);
+            }
         }
     }
 
@@ -1023,7 +1049,7 @@ public class DefaultServlet extends HttpServlet {
                     // Output via a writer so can't use sendfile or write
                     // content directly.
                     if (resource.isDirectory()) {
-                        renderResult = render(getPathPrefix(request), resource, inputEncoding);
+                        renderResult = render(request, getPathPrefix(request), resource, inputEncoding);
                     } else {
                         renderResult = resource.getInputStream();
                         if (included) {
@@ -1041,7 +1067,7 @@ public class DefaultServlet extends HttpServlet {
                 } else {
                     // Output is via an OutputStream
                     if (resource.isDirectory()) {
-                        renderResult = render(getPathPrefix(request), resource, inputEncoding);
+                        renderResult = render(request, getPathPrefix(request), resource, inputEncoding);
                     } else {
                         // Output is content of resource
                         // Check to see if conversion is required
@@ -1544,16 +1570,36 @@ public class DefaultServlet extends HttpServlet {
      *
      * @throws IOException an IO error occurred
      * @throws ServletException rendering error
+     *
+     * @deprecated Use {@link #render(HttpServletRequest, String, WebResource, String)} instead
      */
     protected InputStream render(String contextPath, WebResource resource, String encoding)
+        throws IOException, ServletException {
+
+        return render(null, contextPath, resource, encoding);
+    }
+
+    /**
+     * Decide which way to render. HTML or XML.
+     *
+     * @param contextPath The path
+     * @param resource    The resource
+     * @param encoding    The encoding to use to process the readme (if any)
+     *
+     * @return the input stream with the rendered output
+     *
+     * @throws IOException an IO error occurred
+     * @throws ServletException rendering error
+     */
+    protected InputStream render(HttpServletRequest request, String contextPath, WebResource resource, String encoding)
         throws IOException, ServletException {
 
         Source xsltSource = findXsltSource(resource);
 
         if (xsltSource == null) {
-            return renderHtml(contextPath, resource, encoding);
+            return renderHtml(request, contextPath, resource, encoding);
         }
-        return renderXml(contextPath, resource, xsltSource, encoding);
+        return renderXml(request, contextPath, resource, xsltSource, encoding);
     }
 
 
@@ -1570,8 +1616,31 @@ public class DefaultServlet extends HttpServlet {
      *
      * @throws IOException an IO error occurred
      * @throws ServletException rendering error
+     * @deprecated Use {@link #render(HttpServletRequest, String, WebResource, String)} instead
      */
     protected InputStream renderXml(String contextPath, WebResource resource, Source xsltSource,
+            String encoding)
+        throws ServletException, IOException
+    {
+        return renderXml(null, contextPath, resource, xsltSource, encoding);
+    }
+
+    /**
+     * Return an InputStream to an XML representation of the contents this
+     * directory.
+     *
+     * @param request     The HttpServletRequest being served
+     * @param contextPath Context path to which our internal paths are relative
+     * @param resource    The associated resource
+     * @param xsltSource  The XSL stylesheet
+     * @param encoding    The encoding to use to process the readme (if any)
+     *
+     * @return the XML data
+     *
+     * @throws IOException an IO error occurred
+     * @throws ServletException rendering error
+     */
+    protected InputStream renderXml(HttpServletRequest request, String contextPath, WebResource resource, Source xsltSource,
             String encoding)
         throws IOException, ServletException {
 
@@ -1700,8 +1769,27 @@ public class DefaultServlet extends HttpServlet {
      * @return the HTML data
      *
      * @throws IOException an IO error occurred
+     *
+     * @deprecated Use {@link #renderHtml(HttpServletRequest, String, WebResource, String)} instead
      */
     protected InputStream renderHtml(String contextPath, WebResource resource, String encoding)
+        throws IOException {
+        return renderHtml(null, contextPath, resource, encoding);
+    }
+
+    /**
+     * Return an InputStream to an HTML representation of the contents of this
+     * directory.
+     *
+     * @param contextPath Context path to which our internal paths are relative
+     * @param resource    The associated resource
+     * @param encoding    The encoding to use to process the readme (if any)
+     *
+     * @return the HTML data
+     *
+     * @throws IOException an IO error occurred
+     */
+    protected InputStream renderHtml(HttpServletRequest request, String contextPath, WebResource resource, String encoding)
         throws IOException {
 
         // Prepare a writer to a buffered area
@@ -1760,18 +1848,51 @@ public class DefaultServlet extends HttpServlet {
         sb.append("<table width=\"100%\" cellspacing=\"0\"" +
                      " cellpadding=\"5\" align=\"center\">\r\n");
 
+        SortManager.Order order;
+        if(sortListings && null != request)
+            order = sortManager.getOrder(request.getQueryString());
+        else
+            order = null;
         // Render the column headings
         sb.append("<tr>\r\n");
         sb.append("<td align=\"left\"><font size=\"+1\"><strong>");
-        sb.append(sm.getString("directory.filename"));
+        if(sortListings && null != request) {
+            sb.append("<a href=\"?C=N;O=");
+            sb.append(getOrderChar(order, 'N'));
+            sb.append("\">");
+            sb.append(sm.getString("directory.filename"));
+            sb.append("</a>");
+        } else {
+            sb.append(sm.getString("directory.filename"));
+        }
         sb.append("</strong></font></td>\r\n");
         sb.append("<td align=\"center\"><font size=\"+1\"><strong>");
-        sb.append(sm.getString("directory.size"));
+        if(sortListings && null != request) {
+            sb.append("<a href=\"?C=S;O=");
+            sb.append(getOrderChar(order, 'S'));
+            sb.append("\">");
+            sb.append(sm.getString("directory.size"));
+            sb.append("</a>");
+        } else {
+            sb.append(sm.getString("directory.size"));
+        }
         sb.append("</strong></font></td>\r\n");
         sb.append("<td align=\"right\"><font size=\"+1\"><strong>");
-        sb.append(sm.getString("directory.lastModified"));
+        if(sortListings && null != request) {
+            sb.append("<a href=\"?C=M;O=");
+            sb.append(getOrderChar(order, 'M'));
+            sb.append("\">");
+            sb.append(sm.getString("directory.lastModified"));
+            sb.append("</a>");
+        } else {
+            sb.append(sm.getString("directory.lastModified"));
+        }
         sb.append("</strong></font></td>\r\n");
         sb.append("</tr>");
+
+        if(null != sortManager && null != request) {
+            sortManager.sort(entries, request.getQueryString());
+        }
 
         boolean shade = false;
         for (WebResource childResource : entries) {
@@ -2571,6 +2692,366 @@ public class DefaultServlet extends HttpServlet {
                 IOException {
             throw new SAXException(sm.getString("defaultServlet.blockExternalEntity2",
                     name, publicId, baseURI, systemId));
+        }
+    }
+
+    /**
+     * Gets the ordering character to be used for a particular column.
+     *
+     * @param order  The order that is currently being applied
+     * @param column The column that will be rendered.
+     *
+     * @return Either 'A' or 'D', to indicate "ascending" or "descending" sort
+     *         order.
+     */
+    private char getOrderChar(SortManager.Order order, char column) {
+        if(column == order.column) {
+            if(order.ascending) {
+                return 'D';
+            } else {
+                return 'A';
+            }
+        } else {
+            return 'D';
+        }
+    }
+
+    /**
+     * A class encapsulating the sorting of resources.
+     */
+    private static class SortManager
+    {
+        /**
+         * The default sort.
+         */
+        protected Comparator<WebResource> defaultResourceComparator;
+
+        /**
+         * Comparator to use when sorting resources by name.
+         */
+        protected Comparator<WebResource> resourceNameComparator;
+
+        /**
+         * Comparator to use when sorting files by name, ascending (reverse).
+         */
+        protected Comparator<WebResource> resourceNameComparatorAsc;
+
+        /**
+         * Comparator to use when sorting resources by size.
+         */
+        protected Comparator<WebResource> resourceSizeComparator;
+
+        /**
+         * Comparator to use when sorting files by size, ascending (reverse).
+         */
+        protected Comparator<WebResource> resourceSizeComparatorAsc;
+
+        /**
+         * Comparator to use when sorting resources by last-modified date.
+         */
+        protected Comparator<WebResource> resourceLastModifiedComparator;
+
+        /**
+         * Comparator to use when sorting files by last-modified date, ascending (reverse).
+         */
+        protected Comparator<WebResource> resourceLastModifiedComparatorAsc;
+
+        public SortManager(boolean directoriesFirst) {
+            resourceNameComparator = new ResourceNameComparator();
+            resourceNameComparatorAsc = Collections.reverseOrder(resourceNameComparator);
+            resourceSizeComparator = new ResourceSizeComparator(resourceNameComparator);
+            resourceSizeComparatorAsc = Collections.reverseOrder(resourceSizeComparator);
+            resourceLastModifiedComparator = new ResourceLastModifiedDateComparator(resourceNameComparator);
+            resourceLastModifiedComparatorAsc = Collections.reverseOrder(resourceLastModifiedComparator);
+
+            if(directoriesFirst) {
+                resourceNameComparator = new DirsFirstComparator(resourceNameComparator);
+                resourceNameComparatorAsc = new DirsFirstComparator(resourceNameComparatorAsc);
+                resourceSizeComparator = new DirsFirstComparator(resourceSizeComparator);
+                resourceSizeComparatorAsc = new DirsFirstComparator(resourceSizeComparatorAsc);
+                resourceLastModifiedComparator = new DirsFirstComparator(resourceLastModifiedComparator);
+                resourceLastModifiedComparatorAsc = new DirsFirstComparator(resourceLastModifiedComparatorAsc);
+            }
+
+            defaultResourceComparator = resourceNameComparator;
+        }
+
+        /**
+         * Sorts an array of resources according to an ordering string.
+         *
+         * @param resources The array to sort.
+         * @param order     The ordering string.
+         *
+         * @see {@link #getOrder(String)}
+         */
+        public void sort(WebResource[] resources, String order) {
+            Comparator<WebResource> comparator = getComparator(order);
+
+            if(null != comparator)
+                Arrays.sort(resources, comparator);
+        }
+
+        public Comparator<WebResource> getComparator(String order) {
+            return getComparator(getOrder(order));
+        }
+
+        public Comparator<WebResource> getComparator(Order order) {
+            if(null == order)
+                return defaultResourceComparator;
+
+            if('N' == order.column) {
+                if(order.ascending) {
+                    return resourceNameComparatorAsc;
+                } else {
+                    return resourceNameComparator;
+                }
+            }
+
+            if('S' == order.column) {
+                if(order.ascending) {
+                    return resourceSizeComparatorAsc;
+                } else {
+                    return resourceSizeComparator;
+                }
+            }
+
+            if('M' == order.column) {
+                if(order.ascending) {
+                    return resourceLastModifiedComparatorAsc;
+                } else {
+                    return resourceLastModifiedComparator;
+                }
+            }
+
+            return defaultResourceComparator;
+        }
+
+        /**
+         * Gets the Order to apply given an ordering-string. This
+         * ordering-string matches a subset of the ordering-strings
+         * supported by
+         * <a href="https://httpd.apache.org/docs/2.4/mod/mod_autoindex.html#query">Apache httpd</a>.
+         *
+         * @param order The ordering-string provided by the client.
+         *
+         * @return An Order specifying the column and ascending/descending to
+         *         be applied to resources.
+         */
+        public Order getOrder(String order) {
+            if(null == order || 0 == order.trim().length())
+                return Order.DEFAULT;
+
+            String[] options = split(order);
+
+            if(0 == options.length)
+                return Order.DEFAULT;
+
+            char column = '\0';
+            boolean ascending = false;
+
+            for(String option : options) {
+                option = option.trim();
+
+                if(2 < option.length()) {
+                    char opt = option.charAt(0);
+                    if('C' == opt)
+                        column = option.charAt(2);
+                    else if('O' == opt)
+                        ascending = ('A' == option.charAt(2));
+                }
+            }
+
+            if('N' == column) {
+                if(ascending) {
+                    return Order.NAME_ASC;
+                } else {
+                    return Order.NAME;
+                }
+            }
+
+            if('S' == column) {
+                if(ascending) {
+                    return Order.SIZE_ASC;
+                } else {
+                    return Order.SIZE;
+                }
+            }
+
+            if('M' == column) {
+                if(ascending) {
+                    return Order.LAST_MODIFIED_ASC;
+                } else {
+                    return Order.LAST_MODIFIED;
+                }
+            }
+
+            return Order.DEFAULT;
+        }
+
+        /**
+         * Split a string using a semicolon as a delimiter.
+         *
+         * @param s The string to split.
+         *
+         * @return An array of non-empty/null strings which have been
+         *         separated by semicolons.
+         */
+        private String[] split(String s) {
+            if(null == s)
+                return new String[0];
+            s = s.trim();
+            int length = s.length();
+            if(0 == length)
+                return new String[0];
+
+            String[] strings;
+
+            int index = 0;
+            int start = 0;
+            int pos = s.indexOf(';');
+
+            if(0 <= pos) {
+                int len = 2;
+                strings = new String[len]; // Usually just 2 options
+
+                while(0 <= pos) {
+                    if(len > 9)
+                        pos = length; // Maximum of 10 options
+
+                    if(index + 1 > len) {
+                        // Expand by double
+                        String[] old = strings;
+                        strings = new String[old.length << 1];
+                        System.arraycopy(old, 0, strings, 0, len);
+                        len = len << 1;
+                    }
+
+                    String option = s.substring(start, pos).trim();
+
+                    if(0 < option.length()) {
+                        strings[index++] = option;
+                    }
+
+                    start = pos + 1;
+                    pos = s.indexOf(';', start);
+                }
+
+                if(start < length) {
+                    String option = s.substring(start).trim();
+
+                    if(0 < option.length()) {
+                        strings[index] = option;
+                    } else {
+                        index--;
+                    }
+                } else {
+                    index--;
+                }
+
+                if(len > index) {
+                    // Shrink
+                    String[] old = strings;
+                    strings = new String[index + 1];
+                    System.arraycopy(old, 0, strings, 0, index + 1);
+                }
+            } else {
+                strings = new String[] { s };
+            }
+
+            return strings;
+        }
+
+        public static class Order {
+            final char column;
+            final boolean ascending;
+
+            public Order(char column, boolean ascending) {
+                this.column = column;
+                this.ascending = ascending;
+            }
+
+            public static Order NAME = new Order('N', false);
+            public static Order NAME_ASC = new Order('N', true);
+            public static Order SIZE = new Order('S', false);
+            public static Order SIZE_ASC = new Order('S', true);
+            public static Order LAST_MODIFIED = new Order('M', false);
+            public static Order LAST_MODIFIED_ASC = new Order('M', true);
+
+            public static Order DEFAULT = NAME;
+        }
+    }
+
+    private static class DirsFirstComparator
+        implements Comparator<WebResource>
+    {
+        private final Comparator<WebResource> base;
+
+        public DirsFirstComparator(Comparator<WebResource> core) {
+            this.base = core;
+        }
+
+        @Override
+        public int compare(WebResource r1, WebResource r2) {
+            if(r1.isDirectory()) {
+                if(r2.isDirectory()) {
+                    return base.compare(r1, r2);
+                } else {
+                    return -1; // r1, directory, first
+                }
+            } else if(r2.isDirectory()) {
+                return 1; // r2, directory, first
+            } else {
+                return base.compare(r1, r2);
+            }
+        }
+    }
+
+    private static class ResourceNameComparator
+        implements Comparator<WebResource>
+    {
+        @Override
+        public int compare(WebResource r1, WebResource r2) {
+            return r1.getName().compareTo(r2.getName());
+        }
+    }
+
+    private static class ResourceSizeComparator
+        implements Comparator<WebResource>
+    {
+        private Comparator<WebResource> base;
+
+        public ResourceSizeComparator(Comparator<WebResource> base) {
+            this.base = base;
+        }
+
+        @Override
+        public int compare(WebResource r1, WebResource r2) {
+            int c = Long.compare(r1.getContentLength(), r2.getContentLength());
+
+            if(0 == c)
+                return base.compare(r1, r2);
+            else
+                return c;
+        }
+    }
+
+    private static class ResourceLastModifiedDateComparator
+        implements Comparator<WebResource>
+    {
+        private Comparator<WebResource> base;
+
+        public ResourceLastModifiedDateComparator(Comparator<WebResource> base) {
+            this.base = base;
+        }
+
+        @Override
+        public int compare(WebResource r1, WebResource r2) {
+            int c = Long.compare(r1.getLastModified(), r2.getLastModified());
+
+            if(0 == c)
+                return base.compare(r1, r2);
+            else
+                return c;
         }
     }
 }
