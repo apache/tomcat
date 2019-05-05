@@ -80,13 +80,21 @@ oc policy add-role-to-user view system:serviceaccount:$(oc project -q):default -
 
 ## Native Image
 
+Build Graal native-image-configure tool.
 ```
-$JAVA_HOME/bin/java -agentlib:native-image-agent=config-output-dir=./target/ -jar ./target/tomcat-maven-1.0.jar
+export JAVA_HOME=/path...to/graalvm-ce-1.0.0-rc16
+cd $JAVA_HOME/jre/tools/native-image-configure
+$JAVA_HOME/bin/native-image -H:-ParseRuntimeOptions -jar svm-configure.jar -H:Name=native-image-configure
+```
+Run Tomcat with the agent in full trace mode.
+```
+$JAVA_HOME/bin/java -agentlib:native-image-agent=trace-output=./target/trace-file.json -jar ./target/tomcat-maven-1.0.jar
 ```
 Then exercise necessary paths of your service with the Tomcat configuration.
 
-And generate the native image using the generated reflection metadata.
+Generate the final json using native-image-configuration then use native image using the generated reflection metadata.
 ```
 cd target
+$JAVA_HOME/jre/tools/native-image-configure/native-image-configure generate --trace-input=trace-file.json --output-dir=.
 $JAVA_HOME/bin/native-image -H:+ReportUnsupportedElementsAtRuntime -H:ConfigurationFileDirectories=./ -jar tomcat-maven-1.0.jar
 ```
