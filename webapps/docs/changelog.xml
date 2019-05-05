@@ -52,7 +52,7 @@
       </update>
       <update>
         Start Graal native image compatibility. Support is initially targeted
-        using the tomcat-native packaging. (remm)
+        at the tomcat-maven packaging. (remm)
       </update>
     </changelog>
   </subsection>
