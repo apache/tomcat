@@ -80,6 +80,8 @@ oc policy add-role-to-user view system:serviceaccount:$(oc project -q):default -
 
 ## Native Image
 
+Note: Graal support in Tomcat is not functional yet.
+
 Build Graal native-image-configure tool.
 ```
 export JAVA_HOME=/path...to/graalvm-ce-1.0.0-rc16
@@ -96,5 +98,5 @@ Generate the final json using native-image-configuration then use native image u
 ```
 cd target
 $JAVA_HOME/jre/tools/native-image-configure/native-image-configure generate --trace-input=trace-file.json --output-dir=.
-$JAVA_HOME/bin/native-image -H:+ReportUnsupportedElementsAtRuntime -H:ConfigurationFileDirectories=./ -jar tomcat-maven-1.0.jar
+$JAVA_HOME/bin/native-image -H:+ReportUnsupportedElementsAtRuntime -H:ConfigurationFileDirectories=./ -H:ReflectionConfigurationFiles=../tomcat-reflection.json -jar tomcat-maven-1.0.jar
 ```
