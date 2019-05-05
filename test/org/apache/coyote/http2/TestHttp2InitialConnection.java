@@ -118,12 +118,14 @@ public class TestHttp2InitialConnection extends Http2TestBase {
              */
             int serverInfoLength = ServerInfo.getServerInfo().getBytes().length;
             StringManager sm = StringManager.getManager(ErrorReportValve.class);
-            int statusHeaderLength = sm.getString(
-                    "errorReportValve.statusHeader", "", "").getBytes().length;
+            int statusHeaderLength = sm
+                    .getString("errorReportValve.statusHeader", "", "")
+                    .getBytes(StandardCharsets.UTF_8).length;
             int len = 1073 + serverInfoLength + statusHeaderLength * 2;
             String contentLength = String.valueOf(len);
-            return getResponseBodyFrameTrace(streamId, testData.getExpectedStatus(),
-                    "text/html;charset=utf-8", "en", contentLength, contentLength);
+            return getResponseBodyFrameTrace(streamId,
+                    testData.getExpectedStatus(), "text/html;charset=utf-8",
+                    sm.getLocale().getLanguage(), contentLength, contentLength);
         } else {
             Assert.fail();
             // To keep the IDE happy

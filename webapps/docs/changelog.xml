@@ -61,6 +61,10 @@
         Start Graal native image compatibility. Support is initially targeted
         at the tomcat-maven packaging. (remm)
       </update>
+      <fix>
+        <bug>63403</bug>: Fix TestHttp2InitialConnection test failures when
+        running with a non-English locale. (kkolinko)
+      </fix>
     </changelog>
   </subsection>
 </section>
