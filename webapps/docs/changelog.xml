@@ -47,7 +47,13 @@
 <section name="Tomcat 9.0.21 (markt)" rtext="in development">
   <subsection name="Other">
     <changelog>
-      <update>Switch from FindBugs to SpotBugs. (fschumacher)</update>
+      <update>
+        Switch from FindBugs to SpotBugs. (fschumacher)
+      </update>
+      <update>
+        Start Graal native image compatibility. Support is initially targeted
+        using the tomcat-native packaging. (remm)
+      </update>
     </changelog>
   </subsection>
 </section>
