@@ -45,6 +45,13 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 9.0.21 (markt)" rtext="in development">
+  <subsection name="Catalina">
+    <changelog>
+      <add>
+        <bug>57287</bug>: Add file sorting to DefaultServlet (schultz)
+      </add>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <update>
