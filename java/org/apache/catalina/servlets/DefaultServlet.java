@@ -1583,6 +1583,7 @@ public class DefaultServlet extends HttpServlet {
     /**
      * Decide which way to render. HTML or XML.
      *
+     * @param request     The HttpServletRequest being served
      * @param contextPath The path
      * @param resource    The resource
      * @param encoding    The encoding to use to process the readme (if any)
@@ -1782,6 +1783,7 @@ public class DefaultServlet extends HttpServlet {
      * Return an InputStream to an HTML representation of the contents of this
      * directory.
      *
+     * @param request     The HttpServletRequest being served
      * @param contextPath Context path to which our internal paths are relative
      * @param resource    The associated resource
      * @param encoding    The encoding to use to process the readme (if any)
