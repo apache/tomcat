@@ -74,7 +74,13 @@
   </subsection>
   <subsection name="Other">
     <changelog>
-      <update>Switch from FindBugs to SpotBugs. (fschumacher)</update>
+      <update>
+        Switch from FindBugs to SpotBugs. (fschumacher)
+      </update>
+      <fix>
+        <bug>63403</bug>: Fix TestHttp2InitialConnection test failures when
+        running with a non-English locale. (kkolinko)
+      </fix>
     </changelog>
   </subsection>
 </section>
