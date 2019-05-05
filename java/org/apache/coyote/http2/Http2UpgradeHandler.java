@@ -815,6 +815,10 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
                             //       requested write has been fully allocated
                             int[] value = backLogStreams.get(stream);
                             if (value != null && value[1] == 0) {
+                                if (log.isDebugEnabled()) {
+                                    log.debug(sm.getString("upgradeHandler.noAllocation",
+                                            connectionId));
+                                }
                                 // No allocation
                                 // Close the connection. Do this first since
                                 // closing the stream will raise an exception
