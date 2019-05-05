@@ -180,6 +180,12 @@ directory listings are disabled and debugging is turned off.
         Should server information be presented in the response sent to clients
         when directory listing is enabled. [true]
   </property>
+  <property name="sortListings">
+        Should the server sort the listings in a directory. [false]
+  </property>
+  <property name="sortDirectoriesFirst">
+        Should the server list all directories before all files. [false]
+  </property>
 </properties>
 </section>
 
