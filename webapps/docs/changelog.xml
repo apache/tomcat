@@ -52,6 +52,15 @@
       </add>
     </changelog>
   </subsection>
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+        NIO poller seems to create some unwanted concurrency, causing rare
+        CI test failures. Add sync when processing async operation to avoid
+        this. (remm)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <update>

@@ -1517,7 +1517,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
             }
 
             @Override
-            public void run() {
+            public synchronized void run() {
                 // Perform the IO operation
                 // Called from the poller to continue the IO operation
                 long nBytes = 0;
