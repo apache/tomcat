@@ -1499,6 +1499,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
             private volatile boolean inline = true;
             private volatile long nBytes = 0;
             private volatile CompletionState state = CompletionState.PENDING;
+            private boolean completionDone = true;
 
             public boolean process() {
                 try {
@@ -1517,18 +1518,26 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
             }
 
             @Override
-            public synchronized void run() {
+            public void run() {
                 // Perform the IO operation
                 // Called from the poller to continue the IO operation
                 long nBytes = 0;
                 if (getError() == null) {
                     try {
-                        if (read) {
-                            nBytes = getSocket().read(buffers, offset, length);
-                            updateLastRead();
-                        } else {
-                            nBytes = getSocket().write(buffers, offset, length);
-                            updateLastWrite();
+                        synchronized (this) {
+                            if (!completionDone) {
+                                return;
+                            }
+                            if (read) {
+                                nBytes = getSocket().read(buffers, offset, length);
+                                updateLastRead();
+                            } else {
+                                nBytes = getSocket().write(buffers, offset, length);
+                                updateLastWrite();
+                            }
+                            if (nBytes != 0) {
+                                completionDone = false;
+                            }
                         }
                     } catch (IOException e) {
                         setError(e);
@@ -1732,13 +1741,17 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                         if (completion && state.handler != null) {
                             state.handler.completed(Long.valueOf(state.nBytes), state.attachment);
                         }
-                        if (notify) {
-                            synchronized (state) {
+                        synchronized (state) {
+                            state.completionDone = true;
+                            if (notify) {
                                 state.state = currentState;
                                 state.notify();
                             }
                         }
                     } else {
+                        synchronized (state) {
+                            state.completionDone = true;
+                        }
                         state.run();
                     }
                 }
@@ -1769,8 +1782,9 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                 if (state.handler != null) {
                     state.handler.failed(ioe, state.attachment);
                 }
-                if (notify) {
-                    synchronized (state) {
+                synchronized (state) {
+                    state.completionDone = true;
+                    if (notify) {
                         state.state = state.inline ? CompletionState.ERROR : CompletionState.DONE;
                         state.notify();
                     }
