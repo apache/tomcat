@@ -59,6 +59,9 @@
         CI test failures. Add sync when processing async operation to avoid
         this. (remm)
       </fix>
+      <fix>
+        Filter out some cases of incorrect HTTP/2 connection timeout. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">

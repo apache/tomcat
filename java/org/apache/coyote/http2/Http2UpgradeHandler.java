@@ -810,24 +810,24 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
                             } else {
                                 long t1 = System.currentTimeMillis();
                                 stream.wait(writeTimeout);
-                                writeTimeout -= (System.currentTimeMillis() - t1);
-                            }
-                            // Has this stream been granted an allocation
-                            // Note: If the stream in not in this Map then the
-                            //       requested write has been fully allocated
-                            int[] value = backLogStreams.get(stream);
-                            if (writeTimeout <= 0 && value != null && value[1] == 0) {
-                                if (log.isDebugEnabled()) {
-                                    log.debug(sm.getString("upgradeHandler.noAllocation",
-                                            connectionId));
+                                writeTimeout -= (System.currentTimeMillis() + 1 - t1);
+                                // Has this stream been granted an allocation
+                                // Note: If the stream in not in this Map then the
+                                //       requested write has been fully allocated
+                                int[] value = backLogStreams.get(stream);
+                                if (writeTimeout <= 0 && value != null && value[1] == 0) {
+                                    if (log.isDebugEnabled()) {
+                                        log.debug(sm.getString("upgradeHandler.noAllocation",
+                                                connectionId));
+                                    }
+                                    // No allocation
+                                    // Close the connection. Do this first since
+                                    // closing the stream will raise an exception
+                                    close();
+                                    // Close the stream (in app code so need to
+                                    // signal to app stream is closing)
+                                    stream.doWriteTimeout();
                                 }
-                                // No allocation
-                                // Close the connection. Do this first since
-                                // closing the stream will raise an exception
-                                close();
-                                // Close the stream (in app code so need to
-                                // signal to app stream is closing)
-                                stream.doWriteTimeout();
                             }
                         } catch (InterruptedException e) {
                             throw new IOException(sm.getString(
