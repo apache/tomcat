@@ -23,8 +23,16 @@ class GraalCompat extends JreCompat {
     private static final boolean GRAAL;
 
     static {
-        String runtime = System.getProperty("java.runtime.version");
-        GRAAL = (runtime != null && (runtime.indexOf(".buildslave.jdk8u") != -1));
+        boolean result = false;
+        try {
+            Class<?> nativeImageClazz = Class.forName("org.graalvm.nativeimage");
+            result = (nativeImageClazz.getMethod("inImageCode").invoke(null) == Boolean.TRUE);
+        } catch (ClassNotFoundException e) {
+            // Must be Java 8
+        } catch (ReflectiveOperationException | IllegalArgumentException e) {
+            // Should never happen
+        }
+        GRAAL = result;
     }
 
 

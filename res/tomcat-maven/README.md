@@ -96,7 +96,9 @@ Then exercise necessary paths of your service with the Tomcat configuration.
 
 Generate the final json using native-image-configuration then use native image using the generated reflection metadata.
 ```
-cd target
-$JAVA_HOME/jre/tools/native-image-configure/native-image-configure generate --trace-input=trace-file.json --output-dir=.
-$JAVA_HOME/bin/native-image -H:+ReportUnsupportedElementsAtRuntime -H:ConfigurationFileDirectories=./ -H:ReflectionConfigurationFiles=../tomcat-reflection.json -jar tomcat-maven-1.0.jar
+$JAVA_HOME/jre/tools/native-image-configure/native-image-configure generate --trace-input=./target/trace-file.json --output-dir=./target
+$JAVA_HOME/bin/native-image -H:+ReportUnsupportedElementsAtRuntime -H:ConfigurationFileDirectories=./target/ -H:ReflectionConfigurationFiles=./tomcat-reflection.json -jar target/tomcat-maven-1.0.jar
+./tomcat-maven-1.0 -Dcatalina.base=. -Djava.util.logging.config.file=conf/logging.properties -Djava.util.logging.manager=org.apache.juli.ClassLoaderLogManager
 ```
+Note: -H:ConfigurationFileDirectories does not appear to work properly, so it could be needed to add the content of reflect-config.json
+ to tomcat-reflection.json.
