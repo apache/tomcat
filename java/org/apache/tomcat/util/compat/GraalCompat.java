@@ -23,7 +23,8 @@ class GraalCompat extends JreCompat {
     private static final boolean GRAAL;
 
     static {
-        GRAAL = (System.getProperty("java.runtime.version") == null);
+        String runtime = System.getProperty("java.runtime.version");
+        GRAAL = (runtime != null && (runtime.indexOf(".buildslave.jdk8u") != -1));
     }
 
 
