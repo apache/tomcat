@@ -152,6 +152,8 @@ class Http2AsyncParser extends Http2Parser {
                 throw (Http2Exception) error;
             } else if (error instanceof IOException) {
                 throw (IOException) error;
+            } else if (error instanceof RuntimeException) {
+                throw (RuntimeException) error;
             } else {
                 throw new RuntimeException(error);
             }

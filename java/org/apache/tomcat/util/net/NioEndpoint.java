@@ -1763,13 +1763,12 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
             }
             @Override
             public void failed(Throwable exc, OperationState<A> state) {
-                IOException ioe;
+                IOException ioe = null;
                 if (exc instanceof InterruptedByTimeoutException) {
                     ioe = new SocketTimeoutException();
+                    exc = ioe;
                 } else if (exc instanceof IOException) {
                     ioe = (IOException) exc;
-                } else {
-                    ioe = new IOException(exc);
                 }
                 setError(ioe);
                 boolean notify = false;
@@ -1785,7 +1784,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                     state.state = state.inline ? CompletionState.ERROR : CompletionState.DONE;
                 }
                 if (state.handler != null) {
-                    state.handler.failed(ioe, state.attachment);
+                    state.handler.failed(exc, state.attachment);
                 }
                 synchronized (state) {
                     state.completionDone = true;
