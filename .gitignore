@@ -30,6 +30,8 @@ mvn.properties
 .settings
 .idea
 *.iml
+*.ipr
+*.iws
 *.asc
 *.jj
 *.tmp
