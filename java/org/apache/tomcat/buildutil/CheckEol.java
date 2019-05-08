@@ -60,7 +60,7 @@ public class CheckEol extends Task {
     /**
      * Sets the line ending mode.
      *
-     * @param mode
+     * @param mode The line ending mode (either LF or CRLF)
      */
     public void setMode( String mode ) {
         this.mode = Mode.valueOf( mode.toUpperCase() );
