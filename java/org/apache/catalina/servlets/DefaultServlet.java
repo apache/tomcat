@@ -1488,7 +1488,7 @@ public class DefaultServlet extends HttpServlet {
 
         rangeHeader = rangeHeader.substring(6);
 
-        // Vector which will contain all the ranges which are successfully
+        // Collection which will contain all the ranges which are successfully
         // parsed.
         ArrayList<Range> result = new ArrayList<>();
         StringTokenizer commaTokenizer = new StringTokenizer(rangeHeader, ",");
