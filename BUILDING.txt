@@ -545,15 +545,12 @@ The report file by default is written to
 You usually would not need to run this check. You can skip this section.
 
 Apache Tomcat project has convention that all of its textual source files,
-stored in Subversion repository, are marked with Subversion property
-"svn:eol-style" with value of "native". This convention makes the editing
-of source code on different platforms easier.
+stored in the Git repository, use Unix style LF line endings.
 
 This test is used by developers to check that the source code adheres to
 this convention. It verifies that the ends of lines in textual files are
-appropriate for the operating system where it is run. The idea is to run
-this check regularly on two different platforms and notify developers when
-an inconsistency is detected.
+appropriate. The idea is to run this check regularly and notify developers
+when an inconsistency is detected.
 
 The command to run this test is:
 
