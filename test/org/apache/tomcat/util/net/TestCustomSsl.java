@@ -42,7 +42,7 @@ import org.apache.tomcat.websocket.server.WsContextListener;
  */
 public class TestCustomSsl extends TomcatBaseTest {
 
-    private static enum TrustType {
+    private enum TrustType {
         ALL,
         CA,
         NONE

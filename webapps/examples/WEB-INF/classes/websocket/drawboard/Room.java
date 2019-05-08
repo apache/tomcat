@@ -52,7 +52,7 @@ public final class Room {
      * The number (single char) will be prefixed to the string when sending
      * the message.
      */
-    public static enum MessageType {
+    public enum MessageType {
         /**
          * '0': Error: contains error message.
          */

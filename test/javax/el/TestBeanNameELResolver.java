@@ -606,7 +606,7 @@ public class TestBeanNameELResolver {
     }
 
 
-    private static enum MethodUnderTest {
+    private enum MethodUnderTest {
         GET_VALUE,
         SET_VALUE,
         GET_TYPE,

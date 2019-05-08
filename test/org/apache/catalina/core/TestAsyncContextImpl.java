@@ -1676,7 +1676,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
                 REQUEST_TIME);
     }
 
-    private static enum ErrorPageAsyncMode {
+    private enum ErrorPageAsyncMode {
         NO_COMPLETE,
         COMPLETE,
         DISPATCH
