@@ -22,13 +22,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
-import java.util.Vector;
+
+import java.util.ArrayList;
 
 import org.apache.jasper.Constants;
 import org.apache.jasper.JasperException;
 import org.apache.jasper.JspCompilationContext;
 import org.apache.tomcat.Jar;
 import org.apache.tomcat.util.security.Escape;
+
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 
@@ -129,12 +131,12 @@ public class JspUtil {
 
         // AttributesImpl.removeAttribute is broken, so we do this...
         int tempLength = (attrs == null) ? 0 : attrs.getLength();
-        Vector<String> temp = new Vector<>(tempLength, 1);
+        ArrayList<String> temp = new ArrayList<>(tempLength);
         for (int i = 0; i < tempLength; i++) {
             @SuppressWarnings("null")  // If attrs==null, tempLength == 0
             String qName = attrs.getQName(i);
             if ((!qName.equals("xmlns")) && (!qName.startsWith("xmlns:"))) {
-                temp.addElement(qName);
+                temp.add(qName);
             }
         }
 
@@ -146,7 +148,7 @@ public class JspUtil {
                 Node node = tagBody.getNode(i);
                 if (node instanceof Node.NamedAttribute) {
                     String attrName = node.getAttributeValue("name");
-                    temp.addElement(attrName);
+                    temp.add(attrName);
                     // Check if this value appear in the attribute of the node
                     if (n.getAttributeValue(attrName) != null) {
                         err.jspError(n,
@@ -196,11 +198,8 @@ public class JspUtil {
         }
 
         // Now check to see if the rest of the attributes are valid too.
-        String attribute = null;
-
-        for (int j = 0; j < attrLeftLength; j++) {
+        for(String attribute : temp) {
             valid = false;
-            attribute = temp.elementAt(j);
             for (int i = 0; i < validAttributes.length; i++) {
                 if (attribute.equals(validAttributes[i].name)) {
                     valid = true;
@@ -763,7 +762,7 @@ public class JspUtil {
      * @return the components of the path
      */
     private static final String[] split(String path, String pat) {
-        Vector<String> comps = new Vector<>();
+        ArrayList<String> comps = new ArrayList<>();
         int pos = path.indexOf(pat);
         int start = 0;
         while (pos >= 0) {
@@ -777,11 +776,7 @@ public class JspUtil {
         if (start < path.length()) {
             comps.add(path.substring(start));
         }
-        String[] result = new String[comps.size()];
-        for (int i = 0; i < comps.size(); i++) {
-            result[i] = comps.elementAt(i);
-        }
-        return result;
+        return comps.toArray(new String[comps.size()]);
     }
 
     /**
