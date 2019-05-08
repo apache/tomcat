@@ -2844,7 +2844,7 @@ public class DefaultServlet extends HttpServlet {
             if(null == order || 0 == order.trim().length())
                 return Order.DEFAULT;
 
-            String[] options = split(order);
+            String[] options = order.split(";");
 
             if(0 == options.length)
                 return Order.DEFAULT;
@@ -2889,79 +2889,6 @@ public class DefaultServlet extends HttpServlet {
             }
 
             return Order.DEFAULT;
-        }
-
-        /**
-         * Split a string using a semicolon as a delimiter.
-         *
-         * @param s The string to split.
-         *
-         * @return An array of non-empty/null strings which have been
-         *         separated by semicolons.
-         */
-        private String[] split(String s) {
-            if(null == s)
-                return new String[0];
-            s = s.trim();
-            int length = s.length();
-            if(0 == length)
-                return new String[0];
-
-            String[] strings;
-
-            int index = 0;
-            int start = 0;
-            int pos = s.indexOf(';');
-
-            if(0 <= pos) {
-                int len = 2;
-                strings = new String[len]; // Usually just 2 options
-
-                while(0 <= pos) {
-                    if(len > 9)
-                        pos = length; // Maximum of 10 options
-
-                    if(index + 1 > len) {
-                        // Expand by double
-                        String[] old = strings;
-                        strings = new String[old.length << 1];
-                        System.arraycopy(old, 0, strings, 0, len);
-                        len = len << 1;
-                    }
-
-                    String option = s.substring(start, pos).trim();
-
-                    if(0 < option.length()) {
-                        strings[index++] = option;
-                    }
-
-                    start = pos + 1;
-                    pos = s.indexOf(';', start);
-                }
-
-                if(start < length) {
-                    String option = s.substring(start).trim();
-
-                    if(0 < option.length()) {
-                        strings[index] = option;
-                    } else {
-                        index--;
-                    }
-                } else {
-                    index--;
-                }
-
-                if(len > index) {
-                    // Shrink
-                    String[] old = strings;
-                    strings = new String[index + 1];
-                    System.arraycopy(old, 0, strings, 0, index + 1);
-                }
-            } else {
-                strings = new String[] { s };
-            }
-
-            return strings;
         }
 
         public static class Order {
