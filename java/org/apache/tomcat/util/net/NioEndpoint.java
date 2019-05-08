@@ -1719,15 +1719,11 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                     boolean complete = true;
                     boolean completion = true;
                     if (state.check != null) {
-                        switch (state.check.callHandler(currentState, state.buffers, state.offset, state.length)) {
-                        case CONTINUE:
+                        CompletionHandlerCall call = state.check.callHandler(currentState, state.buffers, state.offset, state.length);
+                        if (call == CompletionHandlerCall.CONTINUE) {
                             complete = false;
-                            break;
-                        case DONE:
-                            break;
-                        case NONE:
+                        } else if (call == CompletionHandlerCall.NONE) {
                             completion = false;
-                            break;
                         }
                     }
                     if (complete) {
