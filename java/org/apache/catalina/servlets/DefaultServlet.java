@@ -1574,6 +1574,7 @@ public class DefaultServlet extends HttpServlet {
      *
      * @deprecated Use {@link #render(HttpServletRequest, String, WebResource, String)} instead
      */
+    @Deprecated
     protected InputStream render(String contextPath, WebResource resource, String encoding)
         throws IOException, ServletException {
 
@@ -1620,6 +1621,7 @@ public class DefaultServlet extends HttpServlet {
      * @throws ServletException rendering error
      * @deprecated Use {@link #render(HttpServletRequest, String, WebResource, String)} instead
      */
+    @Deprecated
     protected InputStream renderXml(String contextPath, WebResource resource, Source xsltSource,
             String encoding)
         throws ServletException, IOException
@@ -1774,6 +1776,7 @@ public class DefaultServlet extends HttpServlet {
      *
      * @deprecated Use {@link #renderHtml(HttpServletRequest, String, WebResource, String)} instead
      */
+    @Deprecated
     protected InputStream renderHtml(String contextPath, WebResource resource, String encoding)
         throws IOException {
         return renderHtml(null, contextPath, resource, encoding);
