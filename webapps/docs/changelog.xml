@@ -52,6 +52,22 @@
       </add>
     </changelog>
   </subsection>
+  <subsection name="Coyote">
+    <changelog>
+      <update>
+        Add additional NIO2 style read and write methods closer to core NIO2,
+        for possible use with an asynchronous workflow like CompletableFuture.
+        (remm)
+      </update>
+      <fix>
+        Avoid useless exception wrapping in async IO. (remm)
+      </fix>
+      <fix>
+        <bug>63412</bug>: Security manager failure when using the async IO
+        API from a webapp. (remm)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <update>Switch from FindBugs to SpotBugs. (fschumacher)</update>

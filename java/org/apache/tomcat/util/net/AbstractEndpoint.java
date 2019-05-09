@@ -152,6 +152,11 @@ public abstract class AbstractEndpoint<S> {
     private static final int MAX_ERROR_DELAY = 1600;
 
 
+    public static long toTimeout(long timeout) {
+        // Many calls can't do infinite timeout so use Long.MAX_VALUE if timeout is <= 0
+        return (timeout > 0) ? timeout : Long.MAX_VALUE;
+    }
+
     // ----------------------------------------------------------------- Fields
 
     /**
@@ -738,6 +743,14 @@ public abstract class AbstractEndpoint<S> {
     private boolean daemon = true;
     public void setDaemon(boolean b) { daemon = b; }
     public boolean getDaemon() { return daemon; }
+
+
+    /**
+     * Expose asynchronous IO capability.
+     */
+    private boolean useAsyncIO = true;
+    public void setUseAsyncIO(boolean useAsyncIO) { this.useAsyncIO = useAsyncIO; }
+    public boolean getUseAsyncIO() { return useAsyncIO; }
 
 
     protected abstract boolean getDeferAccept();

@@ -26,6 +26,10 @@ import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.net.SocketWrapperBase.BlockingMode;
+import org.apache.tomcat.util.net.SocketWrapperBase.CompletionCheck;
+import org.apache.tomcat.util.net.SocketWrapperBase.CompletionHandlerCall;
+import org.apache.tomcat.util.net.SocketWrapperBase.CompletionState;
 import org.apache.tomcat.util.res.StringManager;
 
 public abstract class SocketWrapperBase<E> {
@@ -791,7 +795,12 @@ public abstract class SocketWrapperBase<E> {
 
     public enum BlockingMode {
         /**
-         * The operation will now block. If there are pending operations,
+         * The operation will not block. If there are pending operations,
+         * the operation will throw a pending exception.
+         */
+        CLASSIC,
+        /**
+         * The operation will not block. If there are pending operations,
          * the operation will return CompletionState.NOT_DONE.
          */
         NON_BLOCK,
@@ -875,7 +884,7 @@ public abstract class SocketWrapperBase<E> {
         public CompletionHandlerCall callHandler(CompletionState state, ByteBuffer[] buffers,
                 int offset, int length) {
             for (int i = 0; i < length; i++) {
-                if (buffers[offset + i].remaining() > 0) {
+                if (buffers[offset + i].hasRemaining()) {
                     return CompletionHandlerCall.CONTINUE;
                 }
             }
@@ -893,7 +902,7 @@ public abstract class SocketWrapperBase<E> {
         public CompletionHandlerCall callHandler(CompletionState state, ByteBuffer[] buffers,
                 int offset, int length) {
             for (int i = 0; i < length; i++) {
-                if (buffers[offset + i].remaining() > 0) {
+                if (buffers[offset + i].hasRemaining()) {
                     return CompletionHandlerCall.CONTINUE;
                 }
             }
@@ -914,6 +923,20 @@ public abstract class SocketWrapperBase<E> {
                     : CompletionHandlerCall.NONE;
         }
     };
+
+    /**
+     * This utility CompletionCheck will cause the completion handler
+     * to be called once the given buffers are full. The completion
+     * handler will then be called.
+     */
+    public static final CompletionCheck COMPLETE_READ_WITH_COMPLETION = COMPLETE_WRITE_WITH_COMPLETION;
+
+    /**
+     * This utility CompletionCheck will cause the completion handler
+     * to be called once the given buffers are full. If the operation
+     * completes inline, the completion handler will not be called.
+     */
+    public static final CompletionCheck COMPLETE_READ = COMPLETE_WRITE;
 
     /**
      * Allows using NIO2 style read/write only for connectors that can
@@ -973,12 +996,27 @@ public abstract class SocketWrapperBase<E> {
         return true;
     }
 
-    @Deprecated
-    public final <A> CompletionState read(boolean block, long timeout,
-            TimeUnit unit, A attachment, CompletionCheck check,
+    /**
+     * Scatter read. The completion handler will be called once some
+     * data has been read or an error occurred. The default NIO2
+     * behavior is used: the completion handler will be called as soon
+     * as some data has been read, even if the read has completed inline.
+     *
+     * @param timeout timeout duration for the read
+     * @param unit units for the timeout duration
+     * @param attachment an object to attach to the I/O operation that will be
+     *        used when calling the completion handler
+     * @param handler to call when the IO is complete
+     * @param dsts buffers
+     * @param <A> The attachment type
+     * @return the completion state (done, done inline, or still pending)
+     */
+    public final <A> CompletionState read(long timeout, TimeUnit unit, A attachment,
             CompletionHandler<Long, ? super A> handler, ByteBuffer... dsts) {
-        return read(block ? BlockingMode.BLOCK : BlockingMode.NON_BLOCK,
-                timeout, unit, attachment, check, handler, dsts);
+        if (dsts == null) {
+            throw new IllegalArgumentException();
+        }
+        return read(dsts, 0, dsts.length, BlockingMode.CLASSIC, timeout, unit, attachment, null, handler);
     }
 
     /**
@@ -1038,12 +1076,28 @@ public abstract class SocketWrapperBase<E> {
         throw new UnsupportedOperationException();
     }
 
-    @Deprecated
-    public final <A> CompletionState write(boolean block, long timeout,
-            TimeUnit unit, A attachment, CompletionCheck check,
+    /**
+     * Gather write. The completion handler will be called once some
+     * data has been written or an error occurred. The default NIO2
+     * behavior is used: the completion handler will be called, even
+     * if the write is incomplete and data remains in the buffers, or
+     * if the write completed inline.
+     *
+     * @param timeout timeout duration for the write
+     * @param unit units for the timeout duration
+     * @param attachment an object to attach to the I/O operation that will be
+     *        used when calling the completion handler
+     * @param handler to call when the IO is complete
+     * @param srcs buffers
+     * @param <A> The attachment type
+     * @return the completion state (done, done inline, or still pending)
+     */
+    public final <A> CompletionState write(long timeout, TimeUnit unit, A attachment,
             CompletionHandler<Long, ? super A> handler, ByteBuffer... srcs) {
-        return write(block ? BlockingMode.BLOCK : BlockingMode.NON_BLOCK,
-                timeout, unit, attachment, check, handler, srcs);
+        if (srcs == null) {
+            throw new IllegalArgumentException();
+        }
+        return write(srcs, 0, srcs.length, BlockingMode.CLASSIC, timeout, unit, attachment, null, handler);
     }
 
     /**
