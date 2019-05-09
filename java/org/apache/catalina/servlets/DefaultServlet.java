@@ -2785,7 +2785,7 @@ public class DefaultServlet extends HttpServlet {
          * @param resources The array to sort.
          * @param order     The ordering string.
          *
-         * @see {@link #getOrder(String)}
+         * @see #getOrder(String)
          */
         public void sort(WebResource[] resources, String order) {
             Comparator<WebResource> comparator = getComparator(order);
