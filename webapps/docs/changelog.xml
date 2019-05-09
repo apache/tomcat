@@ -63,6 +63,9 @@
         Filter out some cases of incorrect HTTP/2 connection timeout. (remm)
       </fix>
       <fix>
+        Avoid useless exception wrapping in async IO. (remm)
+      </fix>
+      <fix>
         <bug>63412</bug>: Security manager failure when using the async IO
         API from a webapp. (remm)
       </fix>
@@ -80,9 +83,6 @@
       <fix>
         <bug>63403</bug>: Fix TestHttp2InitialConnection test failures when
         running with a non-English locale. (kkolinko)
-      </fix>
-      <fix>
-        Avoid useless exception wrapping in async IO. (remm)
       </fix>
     </changelog>
   </subsection>
