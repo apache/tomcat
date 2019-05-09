@@ -34,7 +34,6 @@ import java.nio.channels.NetworkChannel;
 import java.nio.channels.ReadPendingException;
 import java.nio.channels.WritePendingException;
 import java.nio.file.StandardOpenOption;
-import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
@@ -88,8 +87,6 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
      * Bytebuffer cache, each channel holds a set of buffers (two, except for SSL holds four)
      */
     private SynchronizedStack<Nio2Channel> nioChannels;
-
-    private Nio2Acceptor acceptor = null;
 
     // ------------------------------------------------------------- Properties
 
@@ -180,19 +177,17 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
             }
 
             initializeConnectionLatch();
-            startAcceptorThreads();
+            startAcceptorThread();
         }
     }
 
     @Override
-    protected void startAcceptorThreads() {
+    protected void startAcceptorThread() {
         // Instead of starting a real acceptor thread, this will instead call
         // an asynchronous accept operation
         if (acceptor == null) {
-            acceptors = new ArrayList<>(1);
             acceptor = new Nio2Acceptor(this);
-            acceptor.setThreadName(getName() + "-Acceptor-0");
-            acceptors.add(acceptor);
+            acceptor.setThreadName(getName() + "-Acceptor");
         }
         acceptor.state = AcceptorState.RUNNING;
         getExecutor().execute(acceptor);

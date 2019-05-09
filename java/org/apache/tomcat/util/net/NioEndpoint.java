@@ -300,7 +300,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                 pollerThread.start();
             }
 
-            startAcceptorThreads();
+            startAcceptorThread();
         }
     }
 

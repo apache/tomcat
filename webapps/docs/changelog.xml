@@ -69,6 +69,12 @@
         <bug>63412</bug>: Security manager failure when using the async IO
         API from a webapp. (remm)
       </fix>
+      <fix>
+        Remove <code>acceptorThreadCount</code> Connector attribute,
+        one accept thread is sufficient. As documented, value <code>2</code>
+        was the only other sensible value, but without and impact beyond
+        certain microbenchmarks. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">

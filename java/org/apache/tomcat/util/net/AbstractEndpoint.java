@@ -172,9 +172,9 @@ public abstract class AbstractEndpoint<S,U> {
     }
 
     /**
-     * Threads used to accept new connections and pass them to worker threads.
+     * Thread used to accept new connections and pass them to worker threads.
      */
-    protected List<Acceptor<U>> acceptors;
+    protected Acceptor<U> acceptor;
 
     /**
      * Cache for SocketProcessor objects
@@ -406,10 +406,10 @@ public abstract class AbstractEndpoint<S,U> {
      */
     protected int acceptorThreadCount = 1;
 
-    public void setAcceptorThreadCount(int acceptorThreadCount) {
-        this.acceptorThreadCount = acceptorThreadCount;
-    }
-    public int getAcceptorThreadCount() { return acceptorThreadCount; }
+    @Deprecated
+    public void setAcceptorThreadCount(int acceptorThreadCount) {}
+    @Deprecated
+    public int getAcceptorThreadCount() { return 1; }
 
 
     /**
@@ -923,13 +923,7 @@ public abstract class AbstractEndpoint<S,U> {
      */
     private void unlockAccept() {
         // Only try to unlock the acceptor if it is necessary
-        int unlocksRequired = 0;
-        for (Acceptor<U> acceptor : acceptors) {
-            if (acceptor.getState() == AcceptorState.RUNNING) {
-                unlocksRequired++;
-            }
-        }
-        if (unlocksRequired == 0) {
+        if (acceptor == null || acceptor.getState() != AcceptorState.RUNNING) {
             return;
         }
 
@@ -948,46 +942,42 @@ public abstract class AbstractEndpoint<S,U> {
         try {
             unlockAddress = getUnlockAddress(localAddress);
 
-            for (int i = 0; i < unlocksRequired; i++) {
-                try (java.net.Socket s = new java.net.Socket()) {
-                    int stmo = 2 * 1000;
-                    int utmo = 2 * 1000;
-                    if (getSocketProperties().getSoTimeout() > stmo)
-                        stmo = getSocketProperties().getSoTimeout();
-                    if (getSocketProperties().getUnlockTimeout() > utmo)
-                        utmo = getSocketProperties().getUnlockTimeout();
-                    s.setSoTimeout(stmo);
-                    s.setSoLinger(getSocketProperties().getSoLingerOn(),getSocketProperties().getSoLingerTime());
-                    if (getLog().isDebugEnabled()) {
-                        getLog().debug("About to unlock socket for:" + unlockAddress);
-                    }
-                    s.connect(unlockAddress,utmo);
-                    if (getDeferAccept()) {
-                        /*
-                         * In the case of a deferred accept / accept filters we need to
-                         * send data to wake up the accept. Send OPTIONS * to bypass
-                         * even BSD accept filters. The Acceptor will discard it.
-                         */
-                        OutputStreamWriter sw;
+            try (java.net.Socket s = new java.net.Socket()) {
+                int stmo = 2 * 1000;
+                int utmo = 2 * 1000;
+                if (getSocketProperties().getSoTimeout() > stmo)
+                    stmo = getSocketProperties().getSoTimeout();
+                if (getSocketProperties().getUnlockTimeout() > utmo)
+                    utmo = getSocketProperties().getUnlockTimeout();
+                s.setSoTimeout(stmo);
+                s.setSoLinger(getSocketProperties().getSoLingerOn(),getSocketProperties().getSoLingerTime());
+                if (getLog().isDebugEnabled()) {
+                    getLog().debug("About to unlock socket for:" + unlockAddress);
+                }
+                s.connect(unlockAddress,utmo);
+                if (getDeferAccept()) {
+                    /*
+                     * In the case of a deferred accept / accept filters we need to
+                     * send data to wake up the accept. Send OPTIONS * to bypass
+                     * even BSD accept filters. The Acceptor will discard it.
+                     */
+                    OutputStreamWriter sw;
 
-                        sw = new OutputStreamWriter(s.getOutputStream(), "ISO-8859-1");
-                        sw.write("OPTIONS * HTTP/1.0\r\n" +
-                                 "User-Agent: Tomcat wakeup connection\r\n\r\n");
-                        sw.flush();
-                    }
-                    if (getLog().isDebugEnabled()) {
-                        getLog().debug("Socket unlock completed for:" + unlockAddress);
-                    }
+                    sw = new OutputStreamWriter(s.getOutputStream(), "ISO-8859-1");
+                    sw.write("OPTIONS * HTTP/1.0\r\n" +
+                            "User-Agent: Tomcat wakeup connection\r\n\r\n");
+                    sw.flush();
+                }
+                if (getLog().isDebugEnabled()) {
+                    getLog().debug("Socket unlock completed for:" + unlockAddress);
                 }
             }
             // Wait for upto 1000ms acceptor threads to unlock
             long waitLeft = 1000;
-            for (Acceptor<U> acceptor : acceptors) {
-                while (waitLeft > 0 &&
-                        acceptor.getState() == AcceptorState.RUNNING) {
-                    Thread.sleep(5);
-                    waitLeft -= 5;
-                }
+            while (waitLeft > 0 &&
+                    acceptor.getState() == AcceptorState.RUNNING) {
+                Thread.sleep(5);
+                waitLeft -= 5;
             }
         } catch(Throwable t) {
             ExceptionUtils.handleThrowable(t);
@@ -1209,20 +1199,14 @@ public abstract class AbstractEndpoint<S,U> {
     }
 
 
-    protected void startAcceptorThreads() {
-        int count = getAcceptorThreadCount();
-        acceptors = new ArrayList<>(count);
-
-        for (int i = 0; i < count; i++) {
-            Acceptor<U> acceptor = new Acceptor<>(this);
-            String threadName = getName() + "-Acceptor-" + i;
-            acceptor.setThreadName(threadName);
-            acceptors.add(acceptor);
-            Thread t = new Thread(acceptor, threadName);
-            t.setPriority(getAcceptorThreadPriority());
-            t.setDaemon(getDaemon());
-            t.start();
-        }
+    protected void startAcceptorThread() {
+        acceptor = new Acceptor<>(this);
+        String threadName = getName() + "-Acceptor";
+        acceptor.setThreadName(threadName);
+        Thread t = new Thread(acceptor, threadName);
+        t.setPriority(getAcceptorThreadPriority());
+        t.setDaemon(getDaemon());
+        t.start();
     }
 
 

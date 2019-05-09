@@ -310,11 +310,12 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
         return endpoint.getConnectionCount();
     }
 
+    @Deprecated
     public void setAcceptorThreadCount(int threadCount) {
-        endpoint.setAcceptorThreadCount(threadCount);
     }
+    @Deprecated
     public int getAcceptorThreadCount() {
-      return endpoint.getAcceptorThreadCount();
+      return 1;
     }
 
     public void setAcceptorThreadPriority(int threadPriority) {
