@@ -315,7 +315,7 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
      *
      * @param threadCount Unused
      *
-     * @Deprecated Will be removed in Tomcat 10.
+     * @deprecated Will be removed in Tomcat 10.
      */
     @Deprecated
     public void setAcceptorThreadCount(int threadCount) {
@@ -326,7 +326,7 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
      *
      * @return Always 1.
      *
-     * @Deprecated Will be removed in Tomcat 10.
+     * @deprecated Will be removed in Tomcat 10.
      */
     @Deprecated
     public int getAcceptorThreadCount() {

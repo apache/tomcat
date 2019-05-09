@@ -411,7 +411,7 @@ public abstract class AbstractEndpoint<S,U> {
      *
      * @param acceptorThreadCount Unused
      *
-     * @Deprecated Will be removed in Tomcat 10.
+     * @deprecated Will be removed in Tomcat 10.
      */
     @Deprecated
     public void setAcceptorThreadCount(int acceptorThreadCount) {}
@@ -421,7 +421,7 @@ public abstract class AbstractEndpoint<S,U> {
      *
      * @return Always 1.
      *
-     * @Deprecated Will be removed in Tomcat 10.
+     * @deprecated Will be removed in Tomcat 10.
      */
     @Deprecated
     public int getAcceptorThreadCount() { return 1; }
