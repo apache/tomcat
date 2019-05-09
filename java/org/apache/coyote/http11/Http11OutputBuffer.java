@@ -303,7 +303,10 @@ public class Http11OutputBuffer implements HttpOutputBuffer {
             // Sending the response header buffer
             headerBuffer.flip();
             try {
-                socketWrapper.write(isBlocking(), headerBuffer);
+                SocketWrapperBase<?> socketWrapper = this.socketWrapper;
+                if (socketWrapper != null) {
+                    socketWrapper.write(isBlocking(), headerBuffer);
+                }
             } finally {
                 headerBuffer.position(0).limit(headerBuffer.capacity());
             }

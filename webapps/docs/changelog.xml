@@ -75,6 +75,10 @@
         was the only other sensible value, but without and impact beyond
         certain microbenchmarks. (remm)
       </fix>
+      <fix>
+        Avoid possible NPE in <code>Http11OutputBuffer.commit</code> on
+        connector stopclose. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
