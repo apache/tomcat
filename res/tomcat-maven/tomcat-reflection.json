@@ -3,6 +3,15 @@
   "name" : "com.sun.org.apache.xerces.internal.jaxp.SAXParserFactoryImpl",
   "methods" : [{"name": "<init>","parameterTypes":[] }]
 },
+{
+  "name" : "com.sun.org.apache.xerces.internal.jaxp.DocumentBuilderFactoryImpl",
+  "methods" : [{"name": "<init>","parameterTypes":[] }]
+},
+{
+  "name" : "org.apache.catalina.authenticator.jaspic.AuthConfigFactoryImpl",
+  "methods" : [{"name": "<init>","parameterTypes":[] }]
+},
+{ "name":"javax.servlet.http.HttpServlet" },
 { "name":"org.apache.catalina.AccessLog" },
 { "name":"org.apache.catalina.AsyncDispatcher" },
 { "name":"org.apache.catalina.Authenticator" },

@@ -1,0 +1,19 @@
+{
+  "bundles":[
+    {"name":"javax.servlet.LocalStrings"},
+    {"name":"javax.servlet.http.LocalStrings"},
+    {"name":"org.apache.catalina.connector.LocalStrings"},
+    {"name":"org.apache.catalina.core.LocalStrings"},
+    {"name":"org.apache.catalina.loader.LocalStrings"},
+    {"name":"org.apache.catalina.startup.LocalStrings"},
+    {"name":"org.apache.coyote.LocalStrings"},
+    {"name":"org.apache.coyote.http11.LocalStrings"},
+    {"name":"org.apache.coyote.http2.LocalStrings"}
+  ],
+  "resources":[
+    {"pattern":".*/mbeans-descriptors.xml$"},
+    {"pattern":".*/*.properties$"},
+    {"pattern":".*/*.dtd$"},
+    {"pattern":".*/*.xsd$"}
+  ]
+}
