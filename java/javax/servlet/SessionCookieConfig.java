@@ -83,6 +83,10 @@ public interface SessionCookieConfig {
     public void setHttpOnly(boolean httpOnly);
 
     public boolean isHttpOnly();
+    
+    public void setSameSiteEnforcement(String sameSiteEnforcement);
+    
+    public String getSameSiteEnforcement();
 
     /**
      * Sets the secure flag for the session cookie.

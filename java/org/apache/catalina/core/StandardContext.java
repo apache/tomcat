@@ -664,6 +664,7 @@ public class StandardContext extends ContainerBase
      */
     private boolean useHttpOnly = true;
 
+    private String sameSiteEnforcement;
 
     /**
      * The domain to use for session cookies. <code>null</code> indicates that
@@ -1555,6 +1556,19 @@ public class StandardContext extends ContainerBase
                 this.useHttpOnly);
     }
 
+    @Override
+    public String getSameSiteEnforcement() {
+        return sameSiteEnforcement;
+    }
+    
+    @Override
+    public void setSameSiteEnforcement(String sameSiteEnforcement) {
+        String oldSameSiteEnforcement = this.sameSiteEnforcement;
+        this.sameSiteEnforcement = sameSiteEnforcement;
+        support.firePropertyChange("sameSiteEnforcement",
+                oldSameSiteEnforcement,
+                this.sameSiteEnforcement);
+    }
 
     /**
      * Gets the domain to use for session cookies. Overrides any setting that

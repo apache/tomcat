@@ -136,6 +136,7 @@ public class Cookie implements Cloneable, Serializable {
     private String path; // ;Path=VALUE ... URLs that see the cookie
     private boolean secure; // ;Secure ... e.g. use SSL
     private boolean httpOnly; // Not in cookie specs, but supported by browsers
+    private String sameSiteEnforcement; // SameSite Cookie : https://tools.ietf.org/html/draft-ietf-httpbis-rfc6265bis-03
 
     /**
      * Constructs a cookie with a specified name and value.
@@ -427,8 +428,31 @@ public class Cookie implements Cloneable, Serializable {
     public boolean isHttpOnly() {
         return httpOnly;
     }
+    
+    public String getSameSite() {
+        return sameSiteEnforcement;
+    }
+    
+    public void setSameSite(String sameSiteEnforcement) {
+        if (sameSiteEnforcement != null) {
+            switch (sameSiteEnforcement.toLowerCase()) {
+                case "strict":
+                    this.sameSiteEnforcement = "Strict";
+                    break;
+                case "lax":
+                    this.sameSiteEnforcement = "Lax";
+                    break;
+                case "none":
+                    this.sameSiteEnforcement = "None";
+                    break;
+                default:
+                    String errMsg = CookieNameValidator.lStrings.getString("err.cookie_incorrect_samesite_enforcement");
+                    throw new IllegalArgumentException(MessageFormat.format(errMsg, sameSiteEnforcement));
+            }
+        }
+        this.sameSiteEnforcement = sameSiteEnforcement;
+    }
 }
-
 
 class CookieNameValidator {
     private static final String LSTRING_FILE = "javax.servlet.http.LocalStrings";

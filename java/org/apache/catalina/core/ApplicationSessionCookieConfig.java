@@ -41,6 +41,7 @@ public class ApplicationSessionCookieConfig implements SessionCookieConfig {
     private String name;
     private String path;
     private StandardContext context;
+    private String sameSiteEnforcement;
 
     public ApplicationSessionCookieConfig(StandardContext context) {
         this.context = context;
@@ -69,6 +70,11 @@ public class ApplicationSessionCookieConfig implements SessionCookieConfig {
     @Override
     public String getPath() {
         return path;
+    }
+    
+    @Override
+    public String getSameSiteEnforcement() {
+        return sameSiteEnforcement;
     }
 
     @Override
@@ -149,6 +155,16 @@ public class ApplicationSessionCookieConfig implements SessionCookieConfig {
                     context.getPath()));
         }
         this.secure = secure;
+    }
+    
+    @Override
+    public void setSameSiteEnforcement(String sameSiteEnforcement) {
+        if (!context.getState().equals(LifecycleState.STARTING_PREP)) {
+            throw new IllegalStateException(sm.getString(
+                    "applicationSessionCookieConfig.ise", "sameSiteEnforcement",
+                    context.getPath()));
+        }
+        this.sameSiteEnforcement = sameSiteEnforcement;
     }
 
     /**

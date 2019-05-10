@@ -162,6 +162,12 @@ public class Rfc6265CookieProcessor extends CookieProcessorBase {
             header.append("; HttpOnly");
         }
 
+        // SameSite Enforcement
+        if (cookie.getSameSite() != null && !cookie.getSameSite().isEmpty()) {
+            header.append("; SameSite=");
+            header.append(cookie.getSameSite());
+        }
+
         return header.toString();
     }
 
