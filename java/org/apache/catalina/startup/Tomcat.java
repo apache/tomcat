@@ -1391,6 +1391,12 @@ public class Tomcat {
      * @throws Exception if an error occurs
      */
     public static void main(String[] args) throws Exception {
+        // Process some command line parameters
+        for (int i = 0; i < args.length; i++) {
+            if (args[i].equals("--no-jmx")) {
+                Registry.disableRegistry();
+            }
+        }
         org.apache.catalina.startup.Tomcat tomcat = new org.apache.catalina.startup.Tomcat();
         // Create a Catalina instance and let it parse the configuration files
         // It will also set a shutdown hook to stop the Server when needed
@@ -1439,7 +1445,7 @@ public class Tomcat {
             } else if (args[i].equals("--await")) {
                 await = true;
             } else if (args[i].equals("--no-jmx")) {
-                Registry.disableRegistry();
+                // This was already processed before
             } else {
                 throw new IllegalArgumentException(sm.getString("tomcat.invalidCommandLine", args[i]));
             }

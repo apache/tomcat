@@ -50,6 +50,10 @@
       <add>
         <bug>57287</bug>: Add file sorting to DefaultServlet (schultz)
       </add>
+      <fix>
+        Fix <code>--no-jmx</code> flag processing, which was called after
+        registry initialization. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
@@ -94,6 +98,10 @@
       <fix>
         <bug>63403</bug>: Fix TestHttp2InitialConnection test failures when
         running with a non-English locale. (kkolinko)
+      </fix>
+      <fix>
+        Add Graal JreCompat, and use it to disable JMX and URL stream handlers.
+        (remm)
       </fix>
     </changelog>
   </subsection>

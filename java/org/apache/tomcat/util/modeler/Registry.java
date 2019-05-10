@@ -38,6 +38,7 @@ import javax.management.ObjectName;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.compat.JreCompat;
 import org.apache.tomcat.util.modeler.modules.ModelerSource;
 import org.apache.tomcat.util.res.StringManager;
 
@@ -134,7 +135,11 @@ public class Registry implements RegistryMBean, MBeanRegistration {
      */
     public static synchronized Registry getRegistry(Object key, Object guard) {
         if (registry == null) {
-            registry = new Registry();
+            if (JreCompat.isGraalAvailable()) {
+                disableRegistry();
+            } else {
+                registry = new Registry();
+            }
         }
         if (registry.guard != null && registry.guard != guard) {
             return null;

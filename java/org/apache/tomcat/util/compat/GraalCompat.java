@@ -25,10 +25,10 @@ class GraalCompat extends JreCompat {
     static {
         boolean result = false;
         try {
-            Class<?> nativeImageClazz = Class.forName("org.graalvm.nativeimage");
+            Class<?> nativeImageClazz = Class.forName("org.graalvm.nativeimage.ImageInfo");
             result = (nativeImageClazz.getMethod("inImageCode").invoke(null) == Boolean.TRUE);
         } catch (ClassNotFoundException e) {
-            // Must be Java 8
+            // Must be Graal
         } catch (ReflectiveOperationException | IllegalArgumentException e) {
             // Should never happen
         }

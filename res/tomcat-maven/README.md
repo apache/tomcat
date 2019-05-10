@@ -82,11 +82,11 @@ oc policy add-role-to-user view system:serviceaccount:$(oc project -q):default -
 
 Note: Graal support in Tomcat is not functional yet.
 
-Build Graal native-image-configure tool.
+Download Graal native-image and tools.
 ```
-export JAVA_HOME=/path...to/graalvm-ce-1.0.0-rc16
-cd $JAVA_HOME/jre/tools/native-image-configure
-$JAVA_HOME/bin/native-image -H:-ParseRuntimeOptions -jar svm-configure.jar -H:Name=native-image-configure
+export JAVA_HOME=/path...to/graalvm-ce-19.0.0
+cd $JAVA_HOME/bin
+./gu install native-image
 ```
 Run Tomcat with the agent in full trace mode.
 ```
@@ -96,9 +96,9 @@ Then exercise necessary paths of your service with the Tomcat configuration.
 
 Generate the final json using native-image-configuration then use native image using the generated reflection metadata.
 ```
-$JAVA_HOME/jre/tools/native-image-configure/native-image-configure generate --trace-input=./target/trace-file.json --output-dir=./target
-$JAVA_HOME/bin/native-image -H:+ReportUnsupportedElementsAtRuntime -H:ConfigurationFileDirectories=./target/ -H:ReflectionConfigurationFiles=./tomcat-reflection.json -jar target/tomcat-maven-1.0.jar
-./tomcat-maven-1.0 -Dcatalina.base=. -Djava.util.logging.config.file=conf/logging.properties -Djava.util.logging.manager=org.apache.juli.ClassLoaderLogManager
+$JAVA_HOME/bin/native-image-configure generate --trace-input=./target/trace-file.json --output-dir=./target
+$JAVA_HOME/bin/native-image --allow-incomplete-classpath -H:+ReportUnsupportedElementsAtRuntime -H:ConfigurationFileDirectories=./target/ -H:ReflectionConfigurationFiles=./tomcat-reflection.json -jar target/tomcat-maven-1.0.jar
+./tomcat-maven-1.0 --no-jmx -Dcatalina.base=. -Djava.util.logging.config.file=conf/logging.properties -Djava.util.logging.manager=org.apache.juli.ClassLoaderLogManager
 ```
 Note: -H:ConfigurationFileDirectories does not appear to work properly, so it could be needed to add the content of reflect-config.json
  to tomcat-reflection.json.

@@ -38,20 +38,25 @@ public class JreCompat {
     private static final int RUNTIME_MAJOR_VERSION = 8;
 
     private static final JreCompat instance;
+    private static final boolean graalAvailable;
     private static final boolean jre9Available;
     private static final StringManager sm = StringManager.getManager(JreCompat.class);
 
     static {
         // This is Tomcat 9 with a minimum Java version of Java 8.
         // Look for the highest supported JVM first
+        System.out.println("GraalCompat : " + GraalCompat.isSupported());
         if (GraalCompat.isSupported()) {
             instance = new GraalCompat();
+            graalAvailable = true;
             jre9Available = false;
         } else if (Jre9Compat.isSupported()) {
             instance = new Jre9Compat();
+            graalAvailable = false;
             jre9Available = true;
         } else {
             instance = new JreCompat();
+            graalAvailable = false;
             jre9Available = false;
         }
     }
@@ -59,6 +64,11 @@ public class JreCompat {
 
     public static JreCompat getInstance() {
         return instance;
+    }
+
+
+    public static boolean isGraalAvailable() {
+        return graalAvailable;
     }
 
 
