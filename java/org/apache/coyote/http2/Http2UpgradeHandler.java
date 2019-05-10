@@ -820,7 +820,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
                                 if (value != null && value[1] == 0) {
                                     if (log.isDebugEnabled()) {
                                         log.debug(sm.getString("upgradeHandler.noAllocation",
-                                                connectionId));
+                                                connectionId, stream.getIdentifier()));
                                     }
                                     // No allocation
                                     // Close the connection. Do this first since
