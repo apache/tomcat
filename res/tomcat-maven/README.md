@@ -92,7 +92,7 @@ cd $JAVA_HOME/bin
 Run Tomcat with the agent in full trace mode.
 ```
 cd $TOMCAT_MAVEN
-$JAVA_HOME/bin/java -agentlib:native-image-agent=trace-output=./target/trace-file.json -jar ./target/tomcat-maven-1.0.jar
+$JAVA_HOME/bin/java -agentlib:native-image-agent=trace-output=$TOMCAT_MAVEN/target/trace-file.json -jar target/tomcat-maven-1.0.jar
 ```
 Then exercise necessary paths of your service with the Tomcat configuration. Do not try to run any JSPs.
 
