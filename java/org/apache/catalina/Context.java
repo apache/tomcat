@@ -253,6 +253,21 @@ public interface Context extends Container, ContextBind {
 
 
     /**
+     * Gets the value of the SameSite enforcement value for session cookies.
+     *
+     * @return SameSite enforcement value if the SameSiteEnforcement should be set on session
+     *         cookies
+     */
+    public String getSameSiteEnforcement();
+
+    /**
+     * Sets the SameSite enforcement value to use for session cookies.
+     *
+     * @param sameSiteEnforcement   The enforcement to use
+     */
+    public void setSameSiteEnforcement(String sameSiteEnforcement);
+
+    /**
      * Gets the domain to use for session cookies. Overrides any setting that
      * may be specified by the application.
      *
