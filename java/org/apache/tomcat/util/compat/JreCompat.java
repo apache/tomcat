@@ -45,7 +45,6 @@ public class JreCompat {
     static {
         // This is Tomcat 9 with a minimum Java version of Java 8.
         // Look for the highest supported JVM first
-        System.out.println("GraalCompat : " + GraalCompat.isSupported());
         if (GraalCompat.isSupported()) {
             instance = new GraalCompat();
             graalAvailable = true;

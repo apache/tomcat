@@ -85,6 +85,7 @@ Note: Graal support in Tomcat is not functional yet.
 Download Graal native-image and tools.
 ```
 export JAVA_HOME=/path...to/graalvm-ce-19.0.0
+export TOMCAT_MAVEN=/path...to/tomcat-maven
 cd $JAVA_HOME/bin
 ./gu install native-image
 ```
@@ -97,7 +98,7 @@ Then exercise necessary paths of your service with the Tomcat configuration.
 Generate the final json using native-image-configuration then use native image using the generated reflection metadata.
 ```
 $JAVA_HOME/bin/native-image-configure generate --trace-input=./target/trace-file.json --output-dir=./target
-$JAVA_HOME/bin/native-image --allow-incomplete-classpath -H:+ReportUnsupportedElementsAtRuntime -H:ConfigurationFileDirectories=./target/ -H:ReflectionConfigurationFiles=./tomcat-reflection.json -jar target/tomcat-maven-1.0.jar
+$JAVA_HOME/bin/native-image --allow-incomplete-classpath -H:+ReportUnsupportedElementsAtRuntime -H:ConfigurationFileDirectories=$TOMCAT_MAVEN/target/ -H:ReflectionConfigurationFiles=$TOMCAT_MAVEN/tomcat-reflection.json -jar target/tomcat-maven-1.0.jar
 ./tomcat-maven-1.0 --no-jmx -Dcatalina.base=. -Djava.util.logging.config.file=conf/logging.properties -Djava.util.logging.manager=org.apache.juli.ClassLoaderLogManager
 ```
 Note: -H:ConfigurationFileDirectories does not appear to work properly, so it could be needed to add the content of reflect-config.json
