@@ -752,7 +752,6 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
         // this thread until after this thread enters wait()
         int allocation = 0;
         synchronized (stream) {
-            long writeTimeout = protocol.getWriteTimeout();
             do {
                 synchronized (this) {
                     if (!stream.canWrite()) {
@@ -805,17 +804,16 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
                             // Connection level window is empty. Although this
                             // request is for a stream, use the connection
                             // timeout
+                            long writeTimeout = protocol.getWriteTimeout();
                             if (writeTimeout < 0) {
                                 stream.wait();
                             } else {
-                                long t1 = System.currentTimeMillis();
                                 stream.wait(writeTimeout);
-                                writeTimeout -= (System.currentTimeMillis() + 1 - t1);
                                 // Has this stream been granted an allocation
                                 // Note: If the stream in not in this Map then the
                                 //       requested write has been fully allocated
                                 int[] value = backLogStreams.get(stream);
-                                if (writeTimeout <= 0 && value != null && value[1] == 0) {
+                                if (value != null && value[1] == 0) {
                                     if (log.isDebugEnabled()) {
                                         log.debug(sm.getString("upgradeHandler.noAllocation",
                                                 connectionId));
