@@ -812,7 +812,11 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
                                 // Has this stream been granted an allocation
                                 // Note: If the stream in not in this Map then the
                                 //       requested write has been fully allocated
-                                int[] value = backLogStreams.get(stream);
+                                int[] value;
+                                // Ensure allocations made in other threads are visible
+                                synchronized (this) {
+                                    value = backLogStreams.get(stream);
+                                }
                                 if (value != null && value[1] == 0) {
                                     if (log.isDebugEnabled()) {
                                         log.debug(sm.getString("upgradeHandler.noAllocation",

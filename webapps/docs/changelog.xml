@@ -60,7 +60,8 @@
         this. (remm)
       </fix>
       <fix>
-        Filter out some cases of incorrect HTTP/2 connection timeout. (remm)
+        Fix concurrency issue that lean to incorrect HTTP/2 connection timeout.
+        (remm/markt)
       </fix>
       <fix>
         Avoid useless exception wrapping in async IO. (remm)
