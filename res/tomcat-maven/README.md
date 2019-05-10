@@ -84,22 +84,21 @@ Note: Graal support in Tomcat is not functional yet.
 
 Download Graal native-image and tools.
 ```
-export JAVA_HOME=/path...to/graalvm-ce-19.0.0
-export TOMCAT_MAVEN=/path...to/tomcat-maven
+export JAVA_HOME=/absolute...path...to/graalvm-ce-19.0.0
+export TOMCAT_MAVEN=/absolute...path...to/tomcat-maven
 cd $JAVA_HOME/bin
 ./gu install native-image
 ```
 Run Tomcat with the agent in full trace mode.
 ```
+cd $TOMCAT_MAVEN
 $JAVA_HOME/bin/java -agentlib:native-image-agent=trace-output=./target/trace-file.json -jar ./target/tomcat-maven-1.0.jar
 ```
-Then exercise necessary paths of your service with the Tomcat configuration.
+Then exercise necessary paths of your service with the Tomcat configuration. Do not try to run any JSPs.
 
-Generate the final json using native-image-configuration then use native image using the generated reflection metadata.
+Generate the final json files using native-image-configuration then use native image using the generated reflection metadata:
 ```
-$JAVA_HOME/bin/native-image-configure generate --trace-input=./target/trace-file.json --output-dir=./target
-$JAVA_HOME/bin/native-image --allow-incomplete-classpath -H:+ReportUnsupportedElementsAtRuntime -H:ConfigurationFileDirectories=$TOMCAT_MAVEN/target/ -H:ReflectionConfigurationFiles=$TOMCAT_MAVEN/tomcat-reflection.json -jar target/tomcat-maven-1.0.jar
-./tomcat-maven-1.0 --no-jmx -Dcatalina.base=. -Djava.util.logging.config.file=conf/logging.properties -Djava.util.logging.manager=org.apache.juli.ClassLoaderLogManager
+$JAVA_HOME/bin/native-image-configure generate --trace-input=$TOMCAT_MAVEN/target/trace-file.json --output-dir=$TOMCAT_MAVEN/target
+$JAVA_HOME/bin/native-image --allow-incomplete-classpath -H:+ReportUnsupportedElementsAtRuntime -H:ConfigurationFileDirectories=$TOMCAT_MAVEN/target/ -H:ReflectionConfigurationFiles=$TOMCAT_MAVEN/tomcat-reflection.json -jar $TOMCAT_MAVEN/target/tomcat-maven-1.0.jar
+./tomcat-maven-1.0 -Dcatalina.base=. -Djava.util.logging.config.file=conf/logging.properties -Djava.util.logging.manager=org.apache.juli.ClassLoaderLogManager
 ```
-Note: -H:ConfigurationFileDirectories does not appear to work properly, so it could be needed to add the content of reflect-config.json
- to tomcat-reflection.json.
