@@ -72,6 +72,8 @@ class Stream extends AbstractStream implements HeaderEmitter {
 
     private final Http2UpgradeHandler handler;
     private final StreamStateMachine state;
+    private final Object connectionAllocationLock = new Object();
+
     // State machine would be too much overhead
     private int headerState = HEADER_STATE_START;
     private StreamException headerException = null;
@@ -229,9 +231,18 @@ class Stream extends AbstractStream implements HeaderEmitter {
         if (inputBuffer != null) {
             inputBuffer.receiveReset();
         }
-        // Writes wait on Stream so we can notify directly
+        cancelAllocationRequests();
+    }
+
+
+    final void cancelAllocationRequests() {
+        // Cancel wait on stream allocation request (if any)
         synchronized (this) {
-            this.notifyAll();
+            this.notify();
+        }
+        // Cancel wait on connection allocation request (if any)
+        synchronized (connectionAllocationLock) {
+            connectionAllocationLock.notify();
         }
     }
 
@@ -252,7 +263,7 @@ class Stream extends AbstractStream implements HeaderEmitter {
         if (notify && getWindowSize() > 0) {
             if (coyoteResponse.getWriteListener() == null) {
                 // Blocking, so use notify to release StreamOutputBuffer
-                notifyAll();
+                notify();
             } else {
                 // Non-blocking so dispatch
                 coyoteResponse.action(ActionCode.DISPATCH_WRITE, null);
@@ -769,6 +780,11 @@ class Stream extends AbstractStream implements HeaderEmitter {
 
     StreamException getResetException() {
         return streamOutputBuffer.reset;
+    }
+
+
+    Object getConnectionAllocationLock() {
+        return connectionAllocationLock;
     }
 
 
