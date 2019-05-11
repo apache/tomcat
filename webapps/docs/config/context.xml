@@ -492,6 +492,11 @@
         string, else the default value will be <code>jsp</code>.</p>
       </attribute>
 
+      <attribute name="sameSiteEnforcement" required="false">
+        <p>Set the SameSite cookie attribute on session cookie.
+        Valid Enforcement value : <code>None</code>, <code>Lax</code>, <code>Strict</code>.</p>
+      </attribute>
+
       <attribute name="sendRedirectBody" required="false">
         <p>If <code>true</code>, redirect responses will include a short
         response body that includes details of the redirect as recommended by

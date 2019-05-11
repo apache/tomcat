@@ -70,6 +70,16 @@ public class TesterSessionCookieConfig implements SessionCookieConfig {
     public boolean isHttpOnly() {
         throw new UnsupportedOperationException();
     }
+    
+    @Override
+    public String getSameSiteEnforcement() {
+        throw new UnsupportedOperationException();
+    }
+    
+    @Override
+    public void setSameSiteEnforcement(String sameSiteEnforcement) {
+        throw new UnsupportedOperationException();
+    }
 
     @Override
     public void setSecure(boolean secure) {

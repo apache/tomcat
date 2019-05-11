@@ -62,6 +62,7 @@ public class TestLoadBalancerDrainingValve {
         private boolean httpOnly;
         private boolean secure;
         private int maxAge;
+        private String sameSiteEnforcement;
 
         @Override
         public String getName() {
@@ -102,6 +103,14 @@ public class TestLoadBalancerDrainingValve {
         @Override
         public void setHttpOnly(boolean httpOnly) {
             this.httpOnly = httpOnly;
+        }
+        @Override
+        public String getSameSiteEnforcement() {
+            return sameSiteEnforcement;
+        }
+        @Override
+        public void setSameSiteEnforcement(String sameSiteEnforcement) {
+            this.sameSiteEnforcement = sameSiteEnforcement;
         }
         @Override
         public boolean isSecure() {

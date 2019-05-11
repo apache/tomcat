@@ -213,6 +213,15 @@ public class ApplicationSessionCookieConfig implements SessionCookieConfig {
             cookie.setHttpOnly(true);
         }
 
+        // Set SameSite Enforcement        
+        if (context.getSameSiteEnforcement() == null) {
+            if (scc.getSameSiteEnforcement() != null && !scc.getSameSiteEnforcement().isEmpty()) {
+                cookie.setSameSite(scc.getSameSiteEnforcement());
+            }
+        } else if (!context.getSameSiteEnforcement().isEmpty()) {
+            cookie.setSameSite(context.getSameSiteEnforcement());
+        }
+
         cookie.setPath(SessionConfig.getSessionCookiePath(context));
 
         return cookie;
