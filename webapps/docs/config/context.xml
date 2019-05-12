@@ -494,7 +494,8 @@
 
       <attribute name="sameSiteEnforcement" required="false">
         <p>Set the SameSite cookie attribute on session cookie.
-        Valid Enforcement value : <code>None</code>, <code>Lax</code>, <code>Strict</code>.</p>
+        Valid Enforcement value : <code>None</code>, <code>Lax</code>, <code>Strict</code>.
+        Disabled by default.</p>
       </attribute>
 
       <attribute name="sendRedirectBody" required="false">
