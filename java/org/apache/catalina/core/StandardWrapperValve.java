@@ -29,6 +29,7 @@ import javax.servlet.ServletException;
 import javax.servlet.UnavailableException;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.catalina.Container;
 import org.apache.catalina.Context;
 import org.apache.catalina.Globals;
 import org.apache.catalina.LifecycleException;
@@ -174,6 +175,7 @@ final class StandardWrapperValve
 
         // Call the filter chain for this request
         // NOTE: This also calls the servlet's service() method
+        Container container = this.container;
         try {
             if ((servlet != null) && (filterChain != null)) {
                 // Swallow output if needed

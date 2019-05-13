@@ -81,8 +81,7 @@
         certain microbenchmarks. (remm)
       </fix>
       <fix>
-        Avoid possible NPE in <code>Http11OutputBuffer.commit</code> on
-        connector stopclose. (remm)
+        Avoid possible NPEs in on connector stop. (remm)
       </fix>
     </changelog>
   </subsection>

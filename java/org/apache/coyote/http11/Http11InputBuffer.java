@@ -22,6 +22,7 @@ import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
+import org.apache.coyote.CloseNowException;
 import org.apache.coyote.InputBuffer;
 import org.apache.coyote.Request;
 import org.apache.juli.logging.Log;
@@ -728,7 +729,13 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
             byteBuffer.position(byteBuffer.limit());
         }
         byteBuffer.limit(byteBuffer.capacity());
-        int nRead = wrapper.read(block, byteBuffer);
+        SocketWrapperBase<?> socketWrapper = this.wrapper;
+        int nRead = -1;
+        if (socketWrapper != null) {
+            nRead = socketWrapper.read(block, byteBuffer);
+        } else {
+            throw new CloseNowException(sm.getString("iib.eof.error"));
+        }
         byteBuffer.limit(byteBuffer.position()).reset();
         if (nRead > 0) {
             return true;
