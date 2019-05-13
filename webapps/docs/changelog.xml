@@ -96,6 +96,10 @@
         Remove <code>pollerThreadCount</code> Connector attribute for NIO,
         one poller thread is sufficient. (remm)
       </update>
+      <add>
+        Add async IO for APR connector for consistency, but disable it by
+        default due to low performance. (remm)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Other">

@@ -639,6 +639,12 @@
       system property.</p>
     </attribute>
 
+    <attribute name="useAsyncIO" required="false">
+      <p>(bool)Use this attribute to enable or disable usage of the
+      asynchronous IO API. The default value is <code>true</code> except when
+      using the APR connector due to low performance.</p>
+    </attribute>
+
   </attributes>
 
   </subsection>
@@ -738,11 +744,6 @@
         poller. This value is important, since connection clean up is done on
         the same thread, so do not set this value to an extremely high one. The
         default value is <code>1000</code> milliseconds.</p>
-      </attribute>
-
-      <attribute name="useAsyncIO" required="false">
-        <p>(bool)Use this attribute to enable or disable usage of the
-        asynchronous IO API. The default value is <code>true</code>.</p>
       </attribute>
 
       <attribute name="useSendfile" required="false">
@@ -893,11 +894,6 @@
     <p>The following attributes are specific to the NIO2 connector.</p>
 
     <attributes>
-
-      <attribute name="useAsyncIO" required="false">
-        <p>(bool)Use this attribute to enable or disable usage of the
-        asynchronous IO API. The default value is <code>true</code>.</p>
-      </attribute>
 
       <attribute name="useSendfile" required="false">
         <p>(bool)Use this attribute to enable or disable sendfile capability.
