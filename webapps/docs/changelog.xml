@@ -66,6 +66,10 @@
         <bug>63832</bug>: Properly mark container as FAILED when a JVM error
         occurs on stop. (remm)
       </fix>
+      <fix>
+        Make a best efforts attempt to clean-up if a request fails during
+        processing due to an <code>OutOfMemoryException</code>. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
