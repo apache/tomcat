@@ -49,9 +49,6 @@ import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.collections.SynchronizedStack;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
-import org.apache.tomcat.util.net.SocketWrapperBase.BlockingMode;
-import org.apache.tomcat.util.net.SocketWrapperBase.CompletionHandlerCall;
-import org.apache.tomcat.util.net.SocketWrapperBase.CompletionState;
 import org.apache.tomcat.util.net.jsse.JSSESupport;
 
 /**

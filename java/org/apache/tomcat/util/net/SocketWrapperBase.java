@@ -26,10 +26,6 @@ import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
-import org.apache.tomcat.util.net.SocketWrapperBase.BlockingMode;
-import org.apache.tomcat.util.net.SocketWrapperBase.CompletionCheck;
-import org.apache.tomcat.util.net.SocketWrapperBase.CompletionHandlerCall;
-import org.apache.tomcat.util.net.SocketWrapperBase.CompletionState;
 import org.apache.tomcat.util.res.StringManager;
 
 public abstract class SocketWrapperBase<E> {
