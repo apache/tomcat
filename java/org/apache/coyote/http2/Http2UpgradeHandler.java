@@ -251,7 +251,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
         try {
             pingManager.sendPing(true);
         } catch (IOException ioe) {
-            throw new ProtocolException(sm.getString("upgradeHandler.pingFailed"), ioe);
+            throw new ProtocolException(sm.getString("upgradeHandler.pingFailed", connectionId), ioe);
         }
 
         if (webConnection != null) {
