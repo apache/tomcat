@@ -11,6 +11,7 @@
   "name" : "org.apache.catalina.authenticator.jaspic.AuthConfigFactoryImpl",
   "methods" : [{"name": "<init>","parameterTypes":[] }]
 },
+{ "name":"java.lang.Object" },
 { "name":"javax.servlet.http.HttpServlet" },
 { "name":"org.apache.catalina.AccessLog" },
 { "name":"org.apache.catalina.AsyncDispatcher" },

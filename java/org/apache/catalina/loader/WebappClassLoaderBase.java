@@ -1614,19 +1614,21 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
             }
         }
 
-        // De-register any remaining JDBC drivers
-        clearReferencesJdbc();
+        if (!JreCompat.isGraalAvailable()) {
+            // De-register any remaining JDBC drivers
+            clearReferencesJdbc();
+        }
 
         // Stop any threads the web application started
         clearReferencesThreads();
 
         // Clear any references retained in the serialization caches
-        if (clearReferencesObjectStreamClassCaches) {
+        if (clearReferencesObjectStreamClassCaches && !JreCompat.isGraalAvailable()) {
             clearReferencesObjectStreamClassCaches();
         }
 
         // Check for leaks triggered by ThreadLocals loaded by this class loader
-        if (clearReferencesThreadLocals) {
+        if (clearReferencesThreadLocals && !JreCompat.isGraalAvailable()) {
             checkThreadLocalsForLeaks();
         }
 
