@@ -1212,13 +1212,31 @@ public class Request implements HttpServletRequest {
                 (sm.getString("coyoteRequest.getReader.ise"));
         }
 
+        // InputBuffer has no easily accessible reference chain to the Context
+        // to check for a default request character encoding at the Context.
+        // Therefore, if a Context default should be used, it is set explicitly
+        // here. Need to do this before setting usingReader.
+        if (coyoteRequest.getCharacterEncoding() == null) {
+            // Nothing currently set explicitly.
+            // Check the content
+            Context context = getContext();
+            if (context != null) {
+                String enc = context.getRequestCharacterEncoding();
+                if (enc != null) {
+                    // Explicitly set the context default so it is visible to
+                    // InputBuffer when creating the Reader.
+                    setCharacterEncoding(enc);
+                }
+            }
+        }
+
         usingReader = true;
+
         inputBuffer.checkConverter();
         if (reader == null) {
             reader = new CoyoteReader(inputBuffer);
         }
         return reader;
-
     }
 
 

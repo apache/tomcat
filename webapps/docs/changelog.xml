@@ -54,6 +54,11 @@
         Fix <code>--no-jmx</code> flag processing, which was called after
         registry initialization. (remm)
       </fix>
+      <fix>
+        Ensure that a default request character encoding set on a
+        <code>ServletContext</code> is used when calling
+        <code>ServletRequest#getReader()</code>. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
