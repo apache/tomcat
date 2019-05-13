@@ -81,8 +81,12 @@
         certain microbenchmarks. (remm)
       </fix>
       <fix>
-        Avoid possible NPEs in on connector stop. (remm)
+        Avoid possible NPEs on connector stop. (remm)
       </fix>
+      <update>
+        Remove <code>pollerThreadCount</code> Connector attribute for NIO,
+        one poller thread is sufficient. (remm)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Other">

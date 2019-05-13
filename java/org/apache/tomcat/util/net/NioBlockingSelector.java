@@ -82,7 +82,7 @@ public class NioBlockingSelector {
      */
     public int write(ByteBuffer buf, NioChannel socket, long writeTimeout)
             throws IOException {
-        SelectionKey key = socket.getIOChannel().keyFor(socket.getPoller().getSelector());
+        SelectionKey key = socket.getIOChannel().keyFor(socket.getSocketWrapper().getPoller().getSelector());
         if (key == null) {
             throw new IOException(sm.getString("nioBlockingSelector.keyNotRegistered"));
         }
@@ -158,7 +158,7 @@ public class NioBlockingSelector {
      * @throws IOException if an IO Exception occurs in the underlying socket logic
      */
     public int read(ByteBuffer buf, NioChannel socket, long readTimeout) throws IOException {
-        SelectionKey key = socket.getIOChannel().keyFor(socket.getPoller().getSelector());
+        SelectionKey key = socket.getIOChannel().keyFor(socket.getSocketWrapper().getPoller().getSelector());
         if (key == null) {
             throw new IOException(sm.getString("nioBlockingSelector.keyNotRegistered"));
         }
