@@ -59,6 +59,10 @@
         <code>ServletContext</code> is used when calling
         <code>ServletRequest#getReader()</code>. (markt)
       </fix>
+      <fix>
+        Make a best efforts attempt to clean-up if a request fails during
+        processing due to an <code>OutOfMemoryException</code>. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

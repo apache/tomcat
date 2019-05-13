@@ -986,7 +986,13 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
             // Future developers: if you discover any other
             // rare-but-nonfatal exceptions, catch them here, and log as
             // above.
-            catch (Throwable e) {
+            catch (OutOfMemoryError oome) {
+                // Try and handle this here to give Tomcat a chance to close the
+                // connection and prevent clients waiting until they time out.
+                // Worst case, it isn't recoverable and the attempt at logging
+                // will trigger another OOME.
+                getLog().error(sm.getString("abstractConnectionHandler.oome"), oome);
+            } catch (Throwable e) {
                 ExceptionUtils.handleThrowable(e);
                 // any other exception or error is odd. Here we log it
                 // with "ERROR" level, so it will show up even on
