@@ -66,6 +66,10 @@
         <bug>63412</bug>: Security manager failure when using the async IO
         API from a webapp. (remm)
       </fix>
+      <fix>
+        Fix concurrency issue that lead to incorrect HTTP/2 connection timeout.
+        (remm/markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
