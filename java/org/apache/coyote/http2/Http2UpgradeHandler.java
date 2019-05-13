@@ -748,8 +748,8 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
 
 
     int reserveWindowSize(Stream stream, int reservation, boolean block) throws IOException {
-        // Need to be holding the stream lock so releaseBacklog() can't notify
-        // this thread until after this thread enters wait()
+        // Need to be holding the connection allocation lock so releaseBacklog()
+        // can't notify this thread until after this thread enters wait()
         int allocation = 0;
         Object connectionAllocationLock = stream.getConnectionAllocationLock();
         synchronized (connectionAllocationLock) {
@@ -848,7 +848,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
 
 
 
-    @SuppressWarnings("sync-override") // notifyAll() needs to be outside sync
+    @SuppressWarnings("sync-override") // notify() needs to be outside sync
                                        // to avoid deadlock
     @Override
     protected void incrementWindowSize(int increment) throws Http2Exception {
