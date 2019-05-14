@@ -267,7 +267,7 @@ public class DefaultServlet extends HttpServlet {
     /**
      * The sorting manager for sorting files and directories.
      */
-    protected SortManager sortManager;
+    protected transient SortManager sortManager;
 
     // --------------------------------------------------------- Public Methods
 
@@ -2903,14 +2903,14 @@ public class DefaultServlet extends HttpServlet {
                 this.ascending = ascending;
             }
 
-            public static Order NAME = new Order('N', false);
-            public static Order NAME_ASC = new Order('N', true);
-            public static Order SIZE = new Order('S', false);
-            public static Order SIZE_ASC = new Order('S', true);
-            public static Order LAST_MODIFIED = new Order('M', false);
-            public static Order LAST_MODIFIED_ASC = new Order('M', true);
+            public static final Order NAME = new Order('N', false);
+            public static final Order NAME_ASC = new Order('N', true);
+            public static final Order SIZE = new Order('S', false);
+            public static final Order SIZE_ASC = new Order('S', true);
+            public static final Order LAST_MODIFIED = new Order('M', false);
+            public static final Order LAST_MODIFIED_ASC = new Order('M', true);
 
-            public static Order DEFAULT = NAME;
+            public static final Order DEFAULT = NAME;
         }
     }
 
