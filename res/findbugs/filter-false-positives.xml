@@ -822,8 +822,8 @@
     <!-- Notify is correct. Condition changed outside of this method. -->
     <Class name="org.apache.coyote.http2.Stream" />
     <Or>
+      <Method name="cancelAllocationRequests" />
       <Method name="incrementWindowSize" />
-      <Method name="receiveReset" />
     </Or>
     <Bug pattern="NN_NAKED_NOTIFY" />
   </Match>
