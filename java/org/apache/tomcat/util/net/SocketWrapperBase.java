@@ -1005,7 +1005,6 @@ public abstract class SocketWrapperBase<E> {
         }
         protected volatile long nBytes = 0;
         protected volatile CompletionState state = CompletionState.PENDING;
-        protected volatile boolean inline = true;
         protected boolean completionDone = true;
 
         /**
@@ -1017,7 +1016,7 @@ public abstract class SocketWrapperBase<E> {
         /**
          * Process the operation using the connector executor.
          * @return true if the operation was accepted, false if the executor
-         *     rejected execurtion
+         *     rejected execution
          */
         protected boolean process() {
             try {
@@ -1131,10 +1130,9 @@ public abstract class SocketWrapperBase<E> {
     }
 
     /**
-     * Allows using NIO2 style read/write only for connectors that can
-     * efficiently support it.
+     * Allows using NIO2 style read/write.
      *
-     * @return This default implementation always returns {@code false}
+     * @return {@code true} if the connector has the capability enabled
      */
     public boolean hasAsyncIO() {
         // The semaphores are only created if async IO is enabled
@@ -1281,7 +1279,7 @@ public abstract class SocketWrapperBase<E> {
      * @param <A> The attachment type
      * @return the completion state (done, done inline, or still pending)
      */
-    public <A> CompletionState read(ByteBuffer[] dsts, int offset, int length,
+    public final <A> CompletionState read(ByteBuffer[] dsts, int offset, int length,
             BlockingMode block, long timeout, TimeUnit unit, A attachment,
             CompletionCheck check, CompletionHandler<Long, ? super A> handler) {
         return vectoredOperation(true, dsts, offset, length, block, timeout, unit, attachment, check, handler);
@@ -1364,7 +1362,7 @@ public abstract class SocketWrapperBase<E> {
      * @param <A> The attachment type
      * @return the completion state (done, done inline, or still pending)
      */
-    public <A> CompletionState write(ByteBuffer[] srcs, int offset, int length,
+    public final <A> CompletionState write(ByteBuffer[] srcs, int offset, int length,
             BlockingMode block, long timeout, TimeUnit unit, A attachment,
             CompletionCheck check, CompletionHandler<Long, ? super A> handler) {
         return vectoredOperation(false, srcs, offset, length, block, timeout, unit, attachment, check, handler);
@@ -1394,7 +1392,7 @@ public abstract class SocketWrapperBase<E> {
      * @param <A> The attachment type
      * @return the completion state (done, done inline, or still pending)
      */
-    protected <A> CompletionState vectoredOperation(boolean read,
+    protected final <A> CompletionState vectoredOperation(boolean read,
             ByteBuffer[] buffers, int offset, int length,
             BlockingMode block, long timeout, TimeUnit unit, A attachment,
             CompletionCheck check, CompletionHandler<Long, ? super A> handler) {
@@ -1404,7 +1402,8 @@ public abstract class SocketWrapperBase<E> {
             return CompletionState.ERROR;
         }
         if (timeout == -1) {
-            timeout = toTimeout(read ? getReadTimeout() : getWriteTimeout());
+            timeout = AbstractEndpoint.toTimeout(read ? getReadTimeout() : getWriteTimeout());
+            unit = TimeUnit.MILLISECONDS;
         } else if (!hasPerOperationTimeout() && (unit.toMillis(timeout) != (read ? getReadTimeout() : getWriteTimeout()))) {
             if (read) {
                 setReadTimeout(unit.toMillis(timeout));
@@ -1466,11 +1465,6 @@ public abstract class SocketWrapperBase<E> {
             Semaphore semaphore, VectoredIOCompletionHandler<A> completion);
 
     // --------------------------------------------------------- Utility methods
-
-    protected static long toTimeout(long timeout) {
-        // Many calls can't do infinite timeout so use Long.MAX_VALUE if timeout is <= 0
-        return (timeout > 0) ? timeout : Long.MAX_VALUE;
-    }
 
     protected static int transfer(byte[] from, int offset, int length, ByteBuffer to) {
         int max = Math.min(length, to.remaining());

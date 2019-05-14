@@ -1426,6 +1426,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
         }
 
         private class NioOperationState<A> extends OperationState<A> {
+            private volatile boolean inline = true;
             private NioOperationState(boolean read, ByteBuffer[] buffers, int offset, int length,
                     BlockingMode block, long timeout, TimeUnit unit, A attachment, CompletionCheck check,
                     CompletionHandler<Long, ? super A> handler, Semaphore semaphore,
@@ -1478,7 +1479,9 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                                 // Write from main buffer first
                                 if (!socketBufferHandler.isWriteBufferEmpty()) {
                                     // There is still data inside the main write buffer, it needs to be written first
-                                    doWrite(false);
+                                    socketBufferHandler.configureWriteBufferForRead();
+                                    getSocket().write(socketBufferHandler.getWriteBuffer());
+                                    // Start operation only if the main write buffer is now empty
                                     if (!socketBufferHandler.isWriteBufferEmpty()) {
                                         doWrite = false;
                                     }

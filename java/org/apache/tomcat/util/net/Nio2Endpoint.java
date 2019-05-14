@@ -469,6 +469,7 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
         private final CompletionHandler<Long, ByteBuffer[]> gatheringWriteCompletionHandler;
         private boolean writeInterest = false; // Guarded by writeCompletionHandler
         private boolean writeNotify = false;
+
         private volatile boolean closed = false;
 
         private CompletionHandler<Integer, SendfileData> sendfileHandler
@@ -952,7 +953,7 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
 
         @Override
         public boolean hasPerOperationTimeout() {
-            return false;
+            return true;
         }
 
         @Override
@@ -997,8 +998,9 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
             public void run() {
                 if (read) {
                     long nBytes = 0;
+                    // Read from main buffer first
                     if (!socketBufferHandler.isReadBufferEmpty()) {
-                        // There is still data inside the main read buffer, use it to fill out the destination buffers
+                        // There is still data inside the main read buffer, it needs to be read first
                         synchronized (readCompletionHandler) {
                             // Note: It is not necessary to put this code in the completion handler
                             socketBufferHandler.configureReadBufferForRead();
@@ -1014,8 +1016,9 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
                         getSocket().read(buffers, offset, length, timeout, unit, this, completion);
                     }
                 } else {
+                    // Write from main buffer first
                     if (!socketBufferHandler.isWriteBufferEmpty()) {
-                        // First flush the main buffer as needed
+                        // There is still data inside the main write buffer, it needs to be written first
                         socketBufferHandler.configureWriteBufferForRead();
                         getSocket().write(socketBufferHandler.getWriteBuffer(), null, new CompletionHandler<Integer, Void>() {
                             @Override

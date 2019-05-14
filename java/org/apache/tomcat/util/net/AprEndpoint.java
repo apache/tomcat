@@ -2773,6 +2773,7 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
         }
 
         private class AprOperationState<A>  extends OperationState<A> {
+            private volatile boolean inline = true;
             private AprOperationState(boolean read, ByteBuffer[] buffers, int offset, int length,
                     BlockingMode block, long timeout, TimeUnit unit, A attachment, CompletionCheck check,
                     CompletionHandler<Long, ? super A> handler, Semaphore semaphore,
@@ -2807,7 +2808,6 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
                                 }
                                 return;
                             }
-
                             if (!read && flush(false)) {
                                 inline = false;
                                 registerWriteInterest();
