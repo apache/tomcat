@@ -2850,12 +2850,12 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
                                 }
                                 return;
                             }
+
                             if (!read && flush(false)) {
                                 inline = false;
                                 registerWriteInterest();
                                 return;
                             }
-
                             // Find the buffer on which the operation will be performed (no vectoring with APR)
                             ByteBuffer buffer = null;
                             for (int i = 0; i < length; i++) {
@@ -2874,6 +2874,15 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
                                 int remaining = buffer.remaining();
                                 writeNonBlockingDirect(buffer);
                                 nBytes = remaining - buffer.remaining();
+                                if (nBytes > 0) {
+                                    try {
+                                        if (flush(false)) {
+                                            registerWriteInterest();
+                                        }
+                                    } catch (IOException e) {
+                                        // Ignore, will be delayed to later
+                                    }
+                                }
                             }
                             if (nBytes != 0) {
                                 completionDone = false;
@@ -2884,13 +2893,6 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
                     }
                 }
                 if (nBytes > 0) {
-                    try {
-                        if (!read && flush(false)) {
-                            registerWriteInterest();
-                        }
-                    } catch (IOException e) {
-                        // Ignore, will be delayed to later
-                    }
                     // The bytes read are only updated in the completion handler
                     completion.completed(Long.valueOf(nBytes), this);
                 } else if (nBytes < 0 || getError() != null) {
@@ -2916,61 +2918,18 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
         public <A> CompletionState read(ByteBuffer[] dsts, int offset, int length,
                 BlockingMode block, long timeout, TimeUnit unit, A attachment,
                 CompletionCheck check, CompletionHandler<Long, ? super A> handler) {
-            IOException ioe = getError();
-            if (ioe != null) {
-                handler.failed(ioe, attachment);
-                return CompletionState.ERROR;
-            }
-            if (timeout == -1) {
-                timeout = toTimeout(getReadTimeout());
-            } else if (unit.toMillis(timeout) != getReadTimeout()) {
-                setReadTimeout(unit.toMillis(timeout));
-            }
-            if (block == BlockingMode.BLOCK || block == BlockingMode.SEMI_BLOCK) {
-                try {
-                    if (!readPending.tryAcquire(timeout, unit)) {
-                        handler.failed(new SocketTimeoutException(), attachment);
-                        return CompletionState.ERROR;
-                    }
-                } catch (InterruptedException e) {
-                    handler.failed(e, attachment);
-                    return CompletionState.ERROR;
-                }
-            } else {
-                if (!readPending.tryAcquire()) {
-                    if (block == BlockingMode.NON_BLOCK) {
-                        return CompletionState.NOT_DONE;
-                    } else {
-                        handler.failed(new ReadPendingException(), attachment);
-                        return CompletionState.ERROR;
-                    }
-                }
-            }
-            VectoredIOCompletionHandler<A> completion = new VectoredIOCompletionHandler<>();
-            OperationState<A> state = new OperationState<>(true, dsts, offset, length, block,
-                    attachment, check, handler, readPending, completion);
-            readOperation = state;
-            state.run();
-            if (block == BlockingMode.BLOCK) {
-                synchronized (state) {
-                    if (state.state == CompletionState.PENDING) {
-                        try {
-                            state.wait(unit.toMillis(timeout));
-                            if (state.state == CompletionState.PENDING) {
-                                return CompletionState.ERROR;
-                            }
-                        } catch (InterruptedException e) {
-                            handler.failed(new SocketTimeoutException(), attachment);
-                            return CompletionState.ERROR;
-                        }
-                    }
-                }
-            }
-            return state.state;
+            return readOrWrite(true, dsts, offset, length, block, timeout, unit, attachment, check, handler);
         }
 
         @Override
         public <A> CompletionState write(ByteBuffer[] srcs, int offset, int length,
+                BlockingMode block, long timeout, TimeUnit unit, A attachment,
+                CompletionCheck check, CompletionHandler<Long, ? super A> handler) {
+            return readOrWrite(false, srcs, offset, length, block, timeout, unit, attachment, check, handler);
+        }
+
+        private <A> CompletionState readOrWrite(boolean read,
+                ByteBuffer[] buffers, int offset, int length,
                 BlockingMode block, long timeout, TimeUnit unit, A attachment,
                 CompletionCheck check, CompletionHandler<Long, ? super A> handler) {
             IOException ioe = getError();
@@ -2979,13 +2938,17 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
                 return CompletionState.ERROR;
             }
             if (timeout == -1) {
-                timeout = toTimeout(getWriteTimeout());
-            } else if (unit.toMillis(timeout) != getWriteTimeout()) {
-                setWriteTimeout(unit.toMillis(timeout));
+                timeout = toTimeout(read ? getReadTimeout() : getWriteTimeout());
+            } else if (unit.toMillis(timeout) != (read ? getReadTimeout() : getWriteTimeout())) {
+                if (read) {
+                    setReadTimeout(unit.toMillis(timeout));
+                } else {
+                    setWriteTimeout(unit.toMillis(timeout));
+                }
             }
             if (block == BlockingMode.BLOCK || block == BlockingMode.SEMI_BLOCK) {
                 try {
-                    if (!writePending.tryAcquire(timeout, unit)) {
+                    if (read ? !readPending.tryAcquire(timeout, unit) : !writePending.tryAcquire(timeout, unit)) {
                         handler.failed(new SocketTimeoutException(), attachment);
                         return CompletionState.ERROR;
                     }
@@ -2994,19 +2957,23 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
                     return CompletionState.ERROR;
                 }
             } else {
-                if (!writePending.tryAcquire()) {
+                if (read ? !readPending.tryAcquire() : !writePending.tryAcquire()) {
                     if (block == BlockingMode.NON_BLOCK) {
                         return CompletionState.NOT_DONE;
                     } else {
-                        handler.failed(new WritePendingException(), attachment);
+                        handler.failed(read ? new ReadPendingException() : new WritePendingException(), attachment);
                         return CompletionState.ERROR;
                     }
                 }
             }
             VectoredIOCompletionHandler<A> completion = new VectoredIOCompletionHandler<>();
-            OperationState<A> state = new OperationState<>(false, srcs, offset, length, block,
-                    attachment, check, handler, writePending, completion);
-            writeOperation = state;
+            OperationState<A> state = new OperationState<>(read, buffers, offset, length, block,
+                    attachment, check, handler, read ? readPending : writePending, completion);
+            if (read) {
+                readOperation = state;
+            } else {
+                writeOperation = state;
+            }
             state.run();
             if (block == BlockingMode.BLOCK) {
                 synchronized (state) {
