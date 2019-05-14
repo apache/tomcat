@@ -100,6 +100,10 @@
         Add async IO for APR connector for consistency, but disable it by
         default due to low performance. (remm)
       </add>
+      <fix>
+        Avoid blocking write of internal buffer for NIO when using async IO.
+        (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
