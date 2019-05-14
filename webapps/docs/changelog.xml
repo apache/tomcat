@@ -106,8 +106,7 @@
         default due to low performance. (remm)
       </add>
       <fix>
-        Avoid blocking write of internal buffer for NIO when using async IO.
-        (remm)
+        Avoid blocking write of internal buffer when using async IO. (remm)
       </fix>
     </changelog>
   </subsection>
