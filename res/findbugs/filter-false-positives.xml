@@ -1211,7 +1211,7 @@
       <Field name="bcCache"/>
       <Field name="ccCache"/>
     </Or>
-    <Bug pattern="VO_VOLATILE_REFERENCE_TO_ARRAY"/>    
+    <Bug pattern="VO_VOLATILE_REFERENCE_TO_ARRAY"/>
   </Match>
   <Match>
     <!-- mb.toString() can be null because
