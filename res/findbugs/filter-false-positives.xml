@@ -351,6 +351,8 @@
     </Or>
     <Or>
       <Method name="credentials" />
+      <Method name="getPassword" />
+      <Method name="getRoles" />
       <Method name="roles" />
     </Or>
     <Bug pattern="SQL_PREPARED_STATEMENT_GENERATED_FROM_NONCONSTANT_STRING" />
@@ -810,7 +812,10 @@
     <!-- Notify is correct. Condition changed outside of this method. -->
     <Class name="org.apache.coyote.http2.Http2UpgradeHandler" />
     <Method name="incrementWindowSize" />
-    <Bug pattern="NN_NAKED_NOTIFY" />
+    <Or>
+      <Bug pattern="NN_NAKED_NOTIFY" />
+      <Bug pattern="NO_NOTIFY_NOT_NOTIFYALL" />
+    </Or>
   </Match>
   <Match>
     <!-- Return value is intentionally ignored. -->
@@ -825,7 +830,10 @@
       <Method name="cancelAllocationRequests" />
       <Method name="incrementWindowSize" />
     </Or>
-    <Bug pattern="NN_NAKED_NOTIFY" />
+    <Or>
+      <Bug pattern="NN_NAKED_NOTIFY" />
+      <Bug pattern="NO_NOTIFY_NOT_NOTIFYALL" />
+    </Or>
   </Match>
   <Match>
     <!-- Returning null is required by the EL specification -->
@@ -1195,6 +1203,15 @@
     <!-- server so statics are appropriate -->
     <Class name="org.apache.tomcat.util.buf.StringCache"/>
     <Bug code="ST" />
+  </Match>
+  <Match>
+    <!-- Array is only ever updated as a whole, not element by element -->
+    <Class name="org.apache.tomcat.util.buf.StringCache"/>
+    <Or>
+      <Field name="bcCache"/>
+      <Field name="ccCache"/>
+    </Or>
+    <Bug pattern="VO_VOLATILE_REFERENCE_TO_ARRAY"/>    
   </Match>
   <Match>
     <!-- mb.toString() can be null because
@@ -1639,6 +1656,12 @@
     <Class name="org.apache.catalina.nonblocking.TestNonBlockingAPI"/>
     <Method name="testDelayedNBWrite"/>
     <Bug pattern="RV_RETURN_VALUE_IGNORED"/>
+  </Match>
+  <Match>
+    <!-- Deliberate hack for the purposes of the test -->
+    <Class name="org.apache.catalina.nonblocking.TestNonBlockingAPI$NBReadServlet"/>
+    <Filed name="listener"/>
+    <Bug pattern="MSF_MUTABLE_SERVLET_FIELD"/>
   </Match>
   <Match>
     <!-- Return value of read is intentionally ignored -->
