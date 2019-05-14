@@ -108,6 +108,10 @@
       <fix>
         Avoid blocking write of internal buffer when using async IO. (remm)
       </fix>
+      <scode>
+        Refactor async IO implementation to the <code>SocketWrapperBase</code>.
+        (remm)
+      </scode>
     </changelog>
   </subsection>
   <subsection name="Other">

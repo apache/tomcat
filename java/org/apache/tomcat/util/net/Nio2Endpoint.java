@@ -29,15 +29,11 @@ import java.nio.channels.AsynchronousServerSocketChannel;
 import java.nio.channels.AsynchronousSocketChannel;
 import java.nio.channels.CompletionHandler;
 import java.nio.channels.FileChannel;
-import java.nio.channels.InterruptedByTimeoutException;
 import java.nio.channels.NetworkChannel;
-import java.nio.channels.ReadPendingException;
-import java.nio.channels.WritePendingException;
 import java.nio.file.StandardOpenOption;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
-import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -466,13 +462,11 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
         private SendfileData sendfileData = null;
 
         private final CompletionHandler<Integer, ByteBuffer> readCompletionHandler;
-        private final Semaphore readPending = new Semaphore(1);
         private boolean readInterest = false; // Guarded by readCompletionHandler
         private boolean readNotify = false;
 
         private final CompletionHandler<Integer, ByteBuffer> writeCompletionHandler;
         private final CompletionHandler<Long, ByteBuffer[]> gatheringWriteCompletionHandler;
-        private final Semaphore writePending = new Semaphore(1);
         private boolean writeInterest = false; // Guarded by writeCompletionHandler
         private boolean writeNotify = false;
         private volatile boolean closed = false;
@@ -951,63 +945,42 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
             return getEndpoint().getUseAsyncIO();
         }
 
-        /**
-         * Internal state tracker for scatter/gather operations.
-         */
-        protected class OperationState<A> implements Runnable {
-            protected final boolean read;
-            protected final ByteBuffer[] buffers;
-            protected final int offset;
-            protected final int length;
-            protected final A attachment;
-            protected final long timeout;
-            protected final TimeUnit unit;
-            protected final BlockingMode block;
-            protected final CompletionCheck check;
-            protected final CompletionHandler<Long, ? super A> handler;
-            protected final Semaphore semaphore;
-            protected final VectoredIOCompletionHandler<A> completion;
-            protected OperationState(boolean read, ByteBuffer[] buffers, int offset, int length,
+        @Override
+        public boolean needSemaphores() {
+            return true;
+        }
+
+        @Override
+        public boolean hasPerOperationTimeout() {
+            return false;
+        }
+
+        @Override
+        protected <A> OperationState<A> newOperationState(boolean read,
+                ByteBuffer[] buffers, int offset, int length,
+                BlockingMode block, long timeout, TimeUnit unit, A attachment,
+                CompletionCheck check, CompletionHandler<Long, ? super A> handler,
+                Semaphore semaphore, VectoredIOCompletionHandler<A> completion) {
+            return new Nio2OperationState<A>(read, buffers, offset, length, block,
+                    timeout, unit, attachment, check, handler, semaphore, completion);
+        }
+
+        private class Nio2OperationState<A> extends OperationState<A> {
+            private Nio2OperationState(boolean read, ByteBuffer[] buffers, int offset, int length,
                     BlockingMode block, long timeout, TimeUnit unit, A attachment,
                     CompletionCheck check, CompletionHandler<Long, ? super A> handler,
                     Semaphore semaphore, VectoredIOCompletionHandler<A> completion) {
-                this.read = read;
-                this.buffers = buffers;
-                this.offset = offset;
-                this.length = length;
-                this.block = block;
-                this.timeout = timeout;
-                this.unit = unit;
-                this.attachment = attachment;
-                this.check = check;
-                this.handler = handler;
-                this.semaphore = semaphore;
-                this.completion = completion;
+                super(read, buffers, offset, length, block,
+                    timeout, unit, attachment, check, handler, semaphore, completion);
             }
-            protected volatile long nBytes = 0;
-            protected volatile CompletionState state = CompletionState.PENDING;
 
-            public boolean isInline() {
+            @Override
+            protected boolean isInline() {
                 return Nio2Endpoint.isInline();
             }
 
-            public boolean process() {
-                try {
-                    getEndpoint().getExecutor().execute(this);
-                } catch (RejectedExecutionException ree) {
-                    log.warn(sm.getString("endpoint.executor.fail", Nio2SocketWrapper.this) , ree);
-                    return false;
-                } catch (Throwable t) {
-                    ExceptionUtils.handleThrowable(t);
-                    // This means we got an OOM or similar creating a thread, or that
-                    // the pool and its queue are full
-                    log.error(sm.getString("endpoint.process.fail"), t);
-                    return false;
-                }
-                return true;
-            }
-
-            public void start() {
+            @Override
+            protected void start() {
                 if (read) {
                     // Disable any regular read notifications caused by registerReadInterest
                     readNotify = true;
@@ -1051,150 +1024,13 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
                             }
                             @Override
                             public void failed(Throwable exc, Void attachment) {
-                                handler.failed(exc, OperationState.this.attachment);
+                                handler.failed(exc, Nio2OperationState.this.attachment);
                             }
                         });
                         return;
                     }
                     // It should be less necessary to check the buffer state as it is easy to flush before
                     getSocket().write(buffers, offset, length, timeout, unit, this, completion);
-                }
-            }
-        }
-
-        @Override
-        public <A> CompletionState read(ByteBuffer[] dsts, int offset, int length,
-                BlockingMode block, long timeout, TimeUnit unit, A attachment,
-                CompletionCheck check, CompletionHandler<Long, ? super A> handler) {
-            return readOrWrite(true, dsts, offset, length, block, timeout, unit, attachment, check, handler);
-        }
-
-        @Override
-        public <A> CompletionState write(ByteBuffer[] srcs, int offset, int length,
-                BlockingMode block, long timeout, TimeUnit unit, A attachment,
-                CompletionCheck check, CompletionHandler<Long, ? super A> handler) {
-            return readOrWrite(false, srcs, offset, length, block, timeout, unit, attachment, check, handler);
-        }
-
-        private <A> CompletionState readOrWrite(boolean read,
-                ByteBuffer[] buffers, int offset, int length,
-                BlockingMode block, long timeout, TimeUnit unit, A attachment,
-                CompletionCheck check, CompletionHandler<Long, ? super A> handler) {
-            IOException ioe = getError();
-            if (ioe != null) {
-                handler.failed(ioe, attachment);
-                return CompletionState.ERROR;
-            }
-            if (timeout == -1) {
-                timeout = toTimeout(read ? getReadTimeout() : getWriteTimeout());
-            }
-            if (block == BlockingMode.BLOCK || block == BlockingMode.SEMI_BLOCK) {
-                try {
-                    if (read ? !readPending.tryAcquire(timeout, unit) : !writePending.tryAcquire(timeout, unit)) {
-                        handler.failed(new SocketTimeoutException(), attachment);
-                        return CompletionState.ERROR;
-                    }
-                } catch (InterruptedException e) {
-                    handler.failed(e, attachment);
-                    return CompletionState.ERROR;
-                }
-            } else {
-                if (read ? !readPending.tryAcquire() : !writePending.tryAcquire()) {
-                    if (block == BlockingMode.NON_BLOCK) {
-                        return CompletionState.NOT_DONE;
-                    } else {
-                        handler.failed(read ? new ReadPendingException() : new WritePendingException(), attachment);
-                        return CompletionState.ERROR;
-                    }
-                }
-            }
-            VectoredIOCompletionHandler<A> completion = new VectoredIOCompletionHandler<>();
-            OperationState<A> state = new OperationState<>(read, buffers, offset, length, block, timeout, unit,
-                    attachment, check, handler, read ? readPending : writePending, completion);
-            state.start();
-            if (block == BlockingMode.BLOCK) {
-                synchronized (state) {
-                    if (state.state == CompletionState.PENDING) {
-                        try {
-                            state.wait(unit.toMillis(timeout));
-                            if (state.state == CompletionState.PENDING) {
-                                return CompletionState.ERROR;
-                            }
-                        } catch (InterruptedException e) {
-                            handler.failed(new SocketTimeoutException(), attachment);
-                            return CompletionState.ERROR;
-                        }
-                    }
-                }
-            }
-            return state.state;
-        }
-
-        private class VectoredIOCompletionHandler<A> implements CompletionHandler<Long, OperationState<A>> {
-            @Override
-            public void completed(Long nBytes, OperationState<A> state) {
-                if (nBytes.longValue() < 0) {
-                    failed(new EOFException(), state);
-                } else {
-                    state.nBytes += nBytes.longValue();
-                    CompletionState currentState = state.isInline() ? CompletionState.INLINE : CompletionState.DONE;
-                    boolean complete = true;
-                    boolean completion = true;
-                    if (state.check != null) {
-                        CompletionHandlerCall call = state.check.callHandler(currentState, state.buffers, state.offset, state.length);
-                        if (call == CompletionHandlerCall.CONTINUE) {
-                            complete = false;
-                        } else if (call == CompletionHandlerCall.NONE) {
-                            completion = false;
-                        }
-                    }
-                    if (complete) {
-                        boolean notify = false;
-                        state.semaphore.release();
-                        if (state.block == BlockingMode.BLOCK && currentState != CompletionState.INLINE) {
-                            notify = true;
-                        } else {
-                            state.state = currentState;
-                        }
-                        if (completion && state.handler != null) {
-                            state.handler.completed(Long.valueOf(state.nBytes), state.attachment);
-                        }
-                        if (notify) {
-                            synchronized (state) {
-                                state.state = currentState;
-                                state.notify();
-                            }
-                        }
-                    } else {
-                        state.run();
-                    }
-                }
-            }
-            @Override
-            public void failed(Throwable exc, OperationState<A> state) {
-                IOException ioe = null;
-                if (exc instanceof InterruptedByTimeoutException) {
-                    ioe = new SocketTimeoutException();
-                    exc = ioe;
-                } else if (exc instanceof IOException) {
-                    ioe = (IOException) exc;
-                }
-                setError(ioe);
-                boolean notify = false;
-                state.semaphore.release();
-                if (state.block == BlockingMode.BLOCK) {
-                    notify = true;
-                } else {
-                    state.state = state.isInline() ? CompletionState.ERROR : CompletionState.DONE;
-                }
-                if (state.handler != null) {
-                    state.handler.failed(exc, state.attachment);
-                }
-                if (notify) {
-                    synchronized (state) {
-                        state.state = state.isInline() ? CompletionState.ERROR : CompletionState.DONE;
-                        state.notify();
-                    }
                 }
             }
         }
