@@ -26,7 +26,7 @@ class GraalCompat extends JreCompat {
         boolean result = false;
         try {
             Class<?> nativeImageClazz = Class.forName("org.graalvm.nativeimage.ImageInfo");
-            result = (nativeImageClazz.getMethod("inImageCode").invoke(null) == Boolean.TRUE);
+            result = Boolean.TRUE.equals(nativeImageClazz.getMethod("inImageCode").invoke(null));
         } catch (ClassNotFoundException e) {
             // Must be Graal
         } catch (ReflectiveOperationException | IllegalArgumentException e) {
