@@ -190,6 +190,8 @@ public final class SecurityClassLoad {
         loader.loadClass(basePackage + "util.net.NioBlockingSelector$BlockPoller$RunnableAdd");
         loader.loadClass(basePackage + "util.net.NioBlockingSelector$BlockPoller$RunnableCancel");
         loader.loadClass(basePackage + "util.net.NioBlockingSelector$BlockPoller$RunnableRemove");
+        loader.loadClass(basePackage + "util.net.AprEndpoint$AprSocketWrapper$OperationState");
+        loader.loadClass(basePackage + "util.net.AprEndpoint$AprSocketWrapper$VectoredIOCompletionHandler");
         loader.loadClass(basePackage + "util.net.NioEndpoint$NioSocketWrapper$OperationState");
         loader.loadClass(basePackage + "util.net.NioEndpoint$NioSocketWrapper$VectoredIOCompletionHandler");
         loader.loadClass(basePackage + "util.net.Nio2Endpoint$Nio2SocketWrapper$OperationState");
