@@ -52,10 +52,22 @@ public class Rfc6265CookieProcessor extends CookieProcessorBase {
         domainValid.set('-');
     }
 
+    private SameSiteCookies sameSiteCookies = SameSiteCookies.NONE;
+
 
     @Override
     public Charset getCharset() {
         return StandardCharsets.UTF_8;
+    }
+
+
+    public SameSiteCookies getSameSiteCookies() {
+        return sameSiteCookies;
+    }
+
+
+    public void setSameSiteCookies(String sameSiteCookies) {
+        this.sameSiteCookies = SameSiteCookies.toAttribute(sameSiteCookies);
     }
 
 
@@ -98,7 +110,7 @@ public class Rfc6265CookieProcessor extends CookieProcessorBase {
 
 
     @Override
-    public String generateHeader(javax.servlet.http.Cookie cookie, SameSiteCookies sameSiteCookies) {
+    public String generateHeader(javax.servlet.http.Cookie cookie) {
 
         // Can't use StringBuilder due to DateFormat
         StringBuffer header = new StringBuffer();

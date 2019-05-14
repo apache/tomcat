@@ -161,7 +161,7 @@ public class ApplicationPushBuilder implements PushBuilder {
         }
         List<String> cookieValues = new ArrayList<>(1);
         cookieValues.add(generateCookieHeader(cookies,
-                catalinaRequest.getContext().getCookieProcessor(), context));
+                catalinaRequest.getContext().getCookieProcessor()));
         headers.put("cookie", cookieValues);
 
         // Authentication
@@ -425,7 +425,7 @@ public class ApplicationPushBuilder implements PushBuilder {
     }
 
 
-    private static String generateCookieHeader(List<Cookie> cookies, CookieProcessor cookieProcessor, Context context) {
+    private static String generateCookieHeader(List<Cookie> cookies, CookieProcessor cookieProcessor) {
         StringBuilder result = new StringBuilder();
         boolean first = true;
         for (Cookie cookie : cookies) {
@@ -439,7 +439,7 @@ public class ApplicationPushBuilder implements PushBuilder {
             // However, if passed a Cookie with just a name and value set it
             // will generate an appropriate header for the Cookie header on the
             // pushed request.
-            result.append(cookieProcessor.generateHeader(cookie, context.getSameSiteCookies()));
+            result.append(cookieProcessor.generateHeader(cookie));
         }
         return result.toString();
     }

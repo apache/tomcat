@@ -63,7 +63,6 @@ import org.apache.tomcat.util.descriptor.web.FilterMap;
 import org.apache.tomcat.util.descriptor.web.LoginConfig;
 import org.apache.tomcat.util.descriptor.web.SecurityConstraint;
 import org.apache.tomcat.util.http.CookieProcessor;
-import org.apache.tomcat.util.http.SameSiteCookies;
 
 /**
  * Minimal implementation for use in unit tests.
@@ -417,16 +416,6 @@ public class TesterContext implements Context {
 
     @Override
     public void setUseHttpOnly(boolean useHttpOnly) {
-        // NO-OP
-    }
-
-    @Override
-    public SameSiteCookies getSameSiteCookies() {
-        return null;
-    }
-
-    @Override
-    public void setSameSiteCookies(String value) {
         // NO-OP
     }
 

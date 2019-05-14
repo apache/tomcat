@@ -79,6 +79,7 @@ public final class LegacyCookieProcessor extends CookieProcessorBase {
 
     private final BitSet allowedWithoutQuotes = new BitSet(128);
 
+    private SameSiteCookies sameSiteCookies = SameSiteCookies.NONE;
 
     public LegacyCookieProcessor() {
         // BitSet elements will default to false
@@ -195,6 +196,16 @@ public final class LegacyCookieProcessor extends CookieProcessorBase {
     }
 
 
+    public SameSiteCookies getSameSiteCookies() {
+        return sameSiteCookies;
+    }
+
+
+    public void setSameSiteCookies(String sameSiteCookies) {
+        this.sameSiteCookies = SameSiteCookies.toAttribute(sameSiteCookies);
+    }
+
+
     @Override
     public Charset getCharset() {
         return StandardCharsets.ISO_8859_1;
@@ -234,7 +245,7 @@ public final class LegacyCookieProcessor extends CookieProcessorBase {
 
 
     @Override
-    public String generateHeader(Cookie cookie, SameSiteCookies sameSiteCookies) {
+    public String generateHeader(Cookie cookie) {
         /*
          * The spec allows some latitude on when to send the version attribute
          * with a Set-Cookie header. To be nice to clients, we'll make sure the

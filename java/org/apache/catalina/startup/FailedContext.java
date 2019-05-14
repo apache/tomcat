@@ -62,7 +62,6 @@ import org.apache.tomcat.util.descriptor.web.FilterMap;
 import org.apache.tomcat.util.descriptor.web.LoginConfig;
 import org.apache.tomcat.util.descriptor.web.SecurityConstraint;
 import org.apache.tomcat.util.http.CookieProcessor;
-import org.apache.tomcat.util.http.SameSiteCookies;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -345,11 +344,6 @@ public class FailedContext extends LifecycleMBeanBase implements Context {
     public boolean getUseHttpOnly() { return false; }
     @Override
     public void setUseHttpOnly(boolean useHttpOnly) { /* NO-OP */ }
-
-    @Override
-    public SameSiteCookies getSameSiteCookies() { return null; }
-    @Override
-    public void setSameSiteCookies(String sameSiteCookies) { /* NO-OP */ }
 
     @Override
     public String getSessionCookieDomain() { return null; }
