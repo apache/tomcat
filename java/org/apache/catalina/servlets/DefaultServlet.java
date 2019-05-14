@@ -1212,7 +1212,9 @@ public class DefaultServlet extends HttpServlet {
             skip(is, 2);
             return StandardCharsets.UTF_16BE;
         }
-        if (b0 == 0xFF && b1 == 0xFE) {
+        // Delay the UTF_16LE check if there are more that 2 bytes since it
+        // overlaps with UTF32-LE.
+        if (count == 2 && b0 == 0xFF && b1 == 0xFE) {
             skip(is, 2);
             return StandardCharsets.UTF_16LE;
         }
@@ -1242,6 +1244,14 @@ public class DefaultServlet extends HttpServlet {
         }
         if (b0 == 0xFF && b1 == 0xFE && b2 == 0x00 && b3 == 0x00) {
             return Charset.forName("UTF32-LE");
+        }
+
+        // Now we can check for UTF16-LE. There is an assumption here that we
+        // won't see a UTF16-LE file with a BOM where the first real data is
+        // 0x00 0x00
+        if (b0 == 0xFF && b1 == 0xFE) {
+            skip(is, 2);
+            return StandardCharsets.UTF_16LE;
         }
 
         skip(is, 0);

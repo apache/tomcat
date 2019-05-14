@@ -63,6 +63,11 @@
         Make a best efforts attempt to clean-up if a request fails during
         processing due to an <code>OutOfMemoryException</code>. (markt)
       </fix>
+      <fix>
+        Improve the BoM detection for static files handled by the default
+        servlet for the rarely used UTF-32 encodings. Identified by Coverity
+        Scan. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
