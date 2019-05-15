@@ -349,6 +349,11 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
     }
 
 
+    protected SynchronizedStack<Nio2Channel> getNioChannels() {
+        return nioChannels;
+    }
+
+
     @Override
     protected NetworkChannel getServerSocket() {
         return serverSock;
@@ -555,7 +560,7 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
 
         public Nio2SocketWrapper(Nio2Channel channel, final Nio2Endpoint endpoint) {
             super(channel, endpoint);
-            nioChannels = endpoint.nioChannels;
+            nioChannels = endpoint.getNioChannels();
             socketBufferHandler = channel.getBufHandler();
 
             this.readCompletionHandler = new CompletionHandler<Integer, ByteBuffer>() {

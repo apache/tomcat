@@ -358,8 +358,18 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
 
     // ------------------------------------------------------ Protected Methods
 
-    public NioSelectorPool getSelectorPool() {
+    protected NioSelectorPool getSelectorPool() {
         return selectorPool;
+    }
+
+
+    protected SynchronizedStack<NioChannel> getNioChannels() {
+        return nioChannels;
+    }
+
+
+    protected Poller getPoller() {
+        return poller;
     }
 
 
@@ -407,7 +417,13 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                 channel.setIOChannel(socket);
                 channel.reset();
             }
-            poller.register(channel);
+            NioSocketWrapper socketWrapper = new NioSocketWrapper(channel, this);
+            channel.setSocketWrapper(socketWrapper);
+            socketWrapper.setReadTimeout(getConnectionTimeout());
+            socketWrapper.setWriteTimeout(getConnectionTimeout());
+            socketWrapper.setKeepAliveLeft(NioEndpoint.this.getMaxKeepAliveRequests());
+            socketWrapper.setSecure(isSSLEnabled());
+            poller.register(channel, socketWrapper);
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
             try {
@@ -636,14 +652,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
          *
          * @param socket    The newly created socket
          */
-        public void register(final NioChannel socket) {
-            NioSocketWrapper socketWrapper = new NioSocketWrapper(socket, NioEndpoint.this);
-            socket.setSocketWrapper(socketWrapper);
-            socketWrapper.setPoller(this);
-            socketWrapper.setReadTimeout(getConnectionTimeout());
-            socketWrapper.setWriteTimeout(getConnectionTimeout());
-            socketWrapper.setKeepAliveLeft(NioEndpoint.this.getMaxKeepAliveRequests());
-            socketWrapper.setSecure(isSSLEnabled());
+        public void register(final NioChannel socket, final NioSocketWrapper socketWrapper) {
             socketWrapper.interestOps(SelectionKey.OP_READ);//this is what OP_REGISTER turns into.
             PollerEvent r = null;
             if (eventCache != null) {
@@ -1016,8 +1025,8 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
 
         private final NioSelectorPool pool;
         private final SynchronizedStack<NioChannel> nioChannels;
+        private final Poller poller;
 
-        private Poller poller = null;
         private int interestOps = 0;
         private CountDownLatch readLatch = null;
         private CountDownLatch writeLatch = null;
@@ -1028,12 +1037,12 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
         public NioSocketWrapper(NioChannel channel, NioEndpoint endpoint) {
             super(channel, endpoint);
             pool = endpoint.getSelectorPool();
+            nioChannels = endpoint.getNioChannels();
+            poller = endpoint.getPoller();
             socketBufferHandler = channel.getBufHandler();
-            nioChannels = endpoint.nioChannels;
         }
 
         public Poller getPoller() { return poller; }
-        public void setPoller(Poller poller) { this.poller = poller; }
         public int interestOps() { return interestOps; }
         public int interestOps(int ops) { this.interestOps  = ops; return ops; }
         public CountDownLatch getReadLatch() { return readLatch; }
