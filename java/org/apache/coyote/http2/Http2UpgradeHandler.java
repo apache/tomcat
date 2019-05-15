@@ -1066,7 +1066,11 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
             // longer required (also notifies any threads waiting for allocations).
             stream.receiveReset(Http2Error.CANCEL.getCode());
         }
-        socketWrapper.close();
+        try {
+            socketWrapper.close();
+        } catch (Exception e) {
+            log.debug(sm.getString("upgradeHandler.socketCloseFailed"), e);
+        }
     }
 
 
