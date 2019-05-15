@@ -1421,7 +1421,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                 BlockingMode block, long timeout, TimeUnit unit, A attachment,
                 CompletionCheck check, CompletionHandler<Long, ? super A> handler,
                 Semaphore semaphore, VectoredIOCompletionHandler<A> completion) {
-            return new NioOperationState<A>(read, buffers, offset, length, block,
+            return new NioOperationState<>(read, buffers, offset, length, block,
                     timeout, unit, attachment, check, handler, semaphore, completion);
         }
 

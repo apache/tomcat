@@ -962,7 +962,7 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
                 BlockingMode block, long timeout, TimeUnit unit, A attachment,
                 CompletionCheck check, CompletionHandler<Long, ? super A> handler,
                 Semaphore semaphore, VectoredIOCompletionHandler<A> completion) {
-            return new Nio2OperationState<A>(read, buffers, offset, length, block,
+            return new Nio2OperationState<>(read, buffers, offset, length, block,
                     timeout, unit, attachment, check, handler, semaphore, completion);
         }
 

@@ -2768,7 +2768,7 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
                 BlockingMode block, long timeout, TimeUnit unit, A attachment,
                 CompletionCheck check, CompletionHandler<Long, ? super A> handler,
                 Semaphore semaphore, VectoredIOCompletionHandler<A> completion) {
-            return new AprOperationState<A>(read, buffers, offset, length, block,
+            return new AprOperationState<>(read, buffers, offset, length, block,
                     timeout, unit, attachment, check, handler, semaphore, completion);
         }
 
