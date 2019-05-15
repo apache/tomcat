@@ -220,7 +220,7 @@ public class WsRemoteEndpointImplServer extends WsRemoteEndpointImplBase {
         }
         try {
             socketWrapper.close();
-        } catch (IOException e) {
+        } catch (Exception e) {
             if (log.isInfoEnabled()) {
                 log.info(sm.getString("wsRemoteEndpointServer.closeFailed"), e);
             }
