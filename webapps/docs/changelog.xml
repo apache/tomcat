@@ -112,6 +112,18 @@
         Refactor async IO implementation to the <code>SocketWrapperBase</code>.
         (remm)
       </scode>
+      <update>
+        Refactor <code>SocketWrapperBase</code> close using an atomic boolean
+        and a <code>doClose</code> method that subclasses will implement, with
+        a guarantee that it will be run only once. (remm)
+      </update>
+      <fix>
+        Decouple the socket wrapper, which is not recycled, from the NIOx
+        channel after close, and replace it with a dummy static object. (remm)
+      </fix>
+      <fix>
+        Clear buffers on socket wrapper close. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">

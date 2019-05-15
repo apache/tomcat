@@ -22,6 +22,12 @@ import org.apache.tomcat.util.buf.ByteBufferUtils;
 
 public class SocketBufferHandler {
 
+    static SocketBufferHandler EMPTY = new SocketBufferHandler(0, 0, false) {
+        @Override
+        public void expand(int newSize) {
+        }
+    };
+
     private volatile boolean readBufferConfiguredForWrite = true;
     private volatile ByteBuffer readBuffer;
 

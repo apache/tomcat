@@ -459,6 +459,8 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
 
     public static class Nio2SocketWrapper extends SocketWrapperBase<Nio2Channel> {
 
+        private final SynchronizedStack<Nio2Channel> nioChannels;
+
         private SendfileData sendfileData = null;
 
         private final CompletionHandler<Integer, ByteBuffer> readCompletionHandler;
@@ -469,8 +471,6 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
         private final CompletionHandler<Long, ByteBuffer[]> gatheringWriteCompletionHandler;
         private boolean writeInterest = false; // Guarded by writeCompletionHandler
         private boolean writeNotify = false;
-
-        private volatile boolean closed = false;
 
         private CompletionHandler<Integer, SendfileData> sendfileHandler
             = new CompletionHandler<Integer, SendfileData>() {
@@ -555,6 +555,7 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
 
         public Nio2SocketWrapper(Nio2Channel channel, final Nio2Endpoint endpoint) {
             super(channel, endpoint);
+            nioChannels = endpoint.nioChannels;
             socketBufferHandler = channel.getBufHandler();
 
             this.readCompletionHandler = new CompletionHandler<Integer, ByteBuffer>() {
@@ -894,7 +895,7 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
 
 
         @Override
-        public void close() {
+        protected void doClose() {
             if (log.isDebugEnabled()) {
                 log.debug("Calling [" + getEndpoint() + "].closeSocket([" + this + "])", new Exception());
             }
@@ -908,12 +909,16 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
             }
             try {
                 synchronized (getSocket()) {
-                    if (!closed) {
-                        closed = true;
-                        getEndpoint().countDownConnection();
-                    }
+                    getEndpoint().countDownConnection();
                     if (getSocket().isOpen()) {
                         getSocket().close(true);
+                    }
+                    socketBufferHandler = SocketBufferHandler.EMPTY;
+                    nonBlockingWriteBuffer.clear();
+                    if (getEndpoint().running && !getEndpoint().paused) {
+                        if (nioChannels == null || !nioChannels.push(getSocket())) {
+                            getSocket().free();
+                        }
                     }
                 }
             } catch (Throwable e) {
@@ -921,6 +926,8 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
                 if (log.isDebugEnabled()) {
                     log.error(sm.getString("endpoint.debug.channelCloseFail"), e);
                 }
+            } finally {
+                reset(Nio2Channel.CLOSED_NIO2_CHANNEL);
             }
             try {
                 SendfileData data = getSendfileData();
@@ -934,12 +941,6 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
                 }
             }
         }
-
-        @Override
-        public boolean isClosed() {
-            return closed;
-        }
-
 
         @Override
         public boolean hasAsyncIO() {
@@ -1630,21 +1631,11 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
                     if (state == SocketState.CLOSED) {
                         // Close socket and pool
                         socketWrapper.close();
-                        if (running && !paused) {
-                            if (nioChannels == null || !nioChannels.push(socketWrapper.getSocket())) {
-                                socketWrapper.getSocket().free();
-                            }
-                        }
                     } else if (state == SocketState.UPGRADING) {
                         launch = true;
                     }
                 } else if (handshake == -1 ) {
                     socketWrapper.close();
-                    if (running && !paused) {
-                        if (nioChannels == null || !nioChannels.push(socketWrapper.getSocket())) {
-                            socketWrapper.getSocket().free();
-                        }
-                    }
                 }
             } catch (VirtualMachineError vme) {
                 ExceptionUtils.handleThrowable(vme);
