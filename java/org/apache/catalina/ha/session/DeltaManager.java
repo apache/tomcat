@@ -468,13 +468,16 @@ public class DeltaManager extends ClusterManagerBase{
      */
     @Override
     public Session createEmptySession() {
-        return getNewDeltaSession() ;
+        return new DeltaSession(this);
     }
 
     /**
      * Get new session class to be used in the doLoad() method.
      * @return a new session
+     *
+     * @deprecated Unused. This will be removed in Tomcat 10.
      */
+    @Deprecated
     protected DeltaSession getNewDeltaSession() {
         return new DeltaSession(this);
     }

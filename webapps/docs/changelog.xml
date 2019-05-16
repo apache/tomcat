@@ -129,6 +129,16 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Cluster">
+    <changelog>
+      <fix>
+        <bug>63441</bug>: Further streamline the processing of session creation
+        messages in the <code>DeltaManager</code> to reduce the possibility of a
+        session update message being processed before the session has been
+        created. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <update>
