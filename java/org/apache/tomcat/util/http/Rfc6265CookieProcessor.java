@@ -166,7 +166,7 @@ public class Rfc6265CookieProcessor extends CookieProcessorBase {
 
         if (!sameSiteCookiesValue.equals(SameSiteCookies.NONE)) {
             header.append("; SameSite=");
-            header.append(sameSiteCookiesValue.toString());
+            header.append(sameSiteCookiesValue.getValue());
         }
 
         return header.toString();

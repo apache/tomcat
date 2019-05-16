@@ -44,7 +44,7 @@ public abstract class CookieProcessorBase implements CookieProcessor {
     }
 
     public void setSameSiteCookies(String sameSiteCookies) {
-        this.sameSiteCookies = SameSiteCookies.toAttribute(sameSiteCookies);
+        this.sameSiteCookies = SameSiteCookies.fromString(sameSiteCookies);
     }
 
     protected static final String ANCIENT_DATE;
