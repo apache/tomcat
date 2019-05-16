@@ -38,6 +38,7 @@ import org.apache.catalina.session.ManagerBase;
 import org.apache.catalina.tribes.Member;
 import org.apache.catalina.tribes.io.ReplicationStream;
 import org.apache.tomcat.util.ExceptionUtils;
+import org.apache.tomcat.util.collections.SynchronizedStack;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -97,7 +98,8 @@ public class DeltaManager extends ClusterManagerBase{
         new ArrayList<SessionMessage>() ;
     private boolean receiverQueue = false ;
     private boolean stateTimestampDrop = true ;
-    private long stateTransferCreateSendTime;
+    private volatile long stateTransferCreateSendTime;
+    private SynchronizedStack<DeltaRequest> deltaRequestPool = new SynchronizedStack<DeltaRequest>();
 
     // ------------------------------------------------------------------ stats attributes
 
@@ -938,26 +940,27 @@ public class DeltaManager extends ClusterManagerBase{
     @Override
     public ClusterMessage requestCompleted(String sessionId) {
          return requestCompleted(sessionId, false);
-     }
+    }
 
-     /**
-      * When the request has been completed, the replication valve will notify
-      * the manager, and the manager will decide whether any replication is
-      * needed or not. If there is a need for replication, the manager will
-      * create a session message and that will be replicated. The cluster
-      * determines where it gets sent.
-      *
-      * Session expiration also calls this method, but with expires == true.
-      *
-      * @param sessionId -
-      *            the sessionId that just completed.
-      * @param expires -
-      *            whether this method has been called during session expiration
-      * @return a SessionMessage to be sent,
-      */
-     public ClusterMessage requestCompleted(String sessionId, boolean expires) {
+    /**
+     * When the request has been completed, the replication valve will notify
+     * the manager, and the manager will decide whether any replication is
+     * needed or not. If there is a need for replication, the manager will
+     * create a session message and that will be replicated. The cluster
+     * determines where it gets sent.
+     *
+     * Session expiration also calls this method, but with expires == true.
+     *
+     * @param sessionId -
+     *            the sessionId that just completed.
+     * @param expires -
+     *            whether this method has been called during session expiration
+     * @return a SessionMessage to be sent,
+     */
+    public ClusterMessage requestCompleted(String sessionId, boolean expires) {
         DeltaSession session = null;
         SessionMessage msg = null;
+        DeltaRequest deltaRequest = null;
         try {
             session = (DeltaSession) findSession(sessionId);
             if (session == null) {
@@ -965,8 +968,12 @@ public class DeltaManager extends ClusterManagerBase{
                 // removed the session from the Manager.
                 return null;
             }
-            DeltaRequest deltaRequest = session.getDeltaRequest();
-            session.lock();
+            DeltaRequest newDeltaRequest = deltaRequestPool.pop();
+            if (newDeltaRequest == null) {
+                // Will be configured in replaceDeltaRequest()
+                newDeltaRequest = new DeltaRequest();
+            }
+            deltaRequest = session.replaceDeltaRequest(newDeltaRequest);
             if (deltaRequest.getSize() > 0) {
                 counterSend_EVT_SESSION_DELTA++;
                 byte[] data = serializeDeltaRequest(session,deltaRequest);
@@ -975,13 +982,16 @@ public class DeltaManager extends ClusterManagerBase{
                                              data,
                                              sessionId,
                                              sessionId + "-" + System.currentTimeMillis());
-                session.resetDeltaRequest();
             }
         } catch (IOException x) {
             log.error(sm.getString("deltaManager.createMessage.unableCreateDeltaRequest",sessionId), x);
             return null;
-        }finally {
-            if (session!=null) session.unlock();
+        } finally {
+            if (deltaRequest != null) {
+                // Reset the instance before it is returned to the pool
+                deltaRequest.reset();
+                deltaRequestPool.push(deltaRequest);
+            }
         }
         if(msg == null) {
             if(!expires && !session.isPrimarySession()) {

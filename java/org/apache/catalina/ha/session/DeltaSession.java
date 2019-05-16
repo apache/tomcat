@@ -618,6 +618,26 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
         return deltaRequest;
     }
 
+    /**
+     * Replace the existing deltaRequest with the provided replacement.
+     *
+     * @param deltaRequest The new deltaRequest. Expected to be either a newly
+     *                     created object or an instance that has been reset.
+     *
+     * @return The old deltaRequest
+     */
+    DeltaRequest replaceDeltaRequest(DeltaRequest deltaRequest) {
+        lock();
+        try {
+            DeltaRequest oldDeltaRequest = this.deltaRequest;
+            this.deltaRequest = deltaRequest;
+            this.deltaRequest.setSessionId(getIdInternal());
+            return oldDeltaRequest;
+        } finally {
+            unlock();
+        }
+    }
+
 
     // ------------------------------------------------- HttpSession Properties
 
