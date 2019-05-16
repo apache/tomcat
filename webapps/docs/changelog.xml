@@ -88,6 +88,17 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Tribes">
+    <changelog>
+      <fix>
+        Treat <code>NoRouteToHostException</code> the same way as
+        <code>SocketTimeoutException</code> when checking the health of group
+        members. This avoids a SEVERE log message every time the check is
+        performed when the host associated with a group member is not powered
+        on. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <update>

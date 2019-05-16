@@ -19,6 +19,7 @@ package org.apache.catalina.tribes.group.interceptors;
 import java.net.ConnectException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.net.NoRouteToHostException;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.util.Arrays;
@@ -353,9 +354,7 @@ public class TcpFailureDetector extends ChannelInterceptorBase implements TcpFai
                 }
             }//end if
             return true;
-        } catch (SocketTimeoutException sx) {
-            //do nothing, we couldn't connect
-        } catch (ConnectException cx) {
+        } catch (SocketTimeoutException | ConnectException | NoRouteToHostException noop) {
             //do nothing, we couldn't connect
         } catch (Exception x) {
             log.error(sm.getString("tcpFailureDetector.failureDetection.failed", mbr),x);
