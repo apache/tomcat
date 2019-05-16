@@ -39,6 +39,7 @@ import org.apache.catalina.tribes.io.ReplicationStream;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.ExceptionUtils;
+import org.apache.tomcat.util.collections.SynchronizedStack;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -93,7 +94,8 @@ public class DeltaManager extends ClusterManagerBase{
             new ArrayList<>();
     private boolean receiverQueue = false ;
     private boolean stateTimestampDrop = true ;
-    private long stateTransferCreateSendTime;
+    private volatile long stateTransferCreateSendTime;
+    private SynchronizedStack<DeltaRequest> deltaRequestPool = new SynchronizedStack<>();
 
     // -------------------------------------------------------- stats attributes
 
@@ -960,10 +962,10 @@ public class DeltaManager extends ClusterManagerBase{
      *            whether this method has been called during session expiration
      * @return a SessionMessage to be sent,
      */
-    @SuppressWarnings("null") // session can't be null when it is used
     public ClusterMessage requestCompleted(String sessionId, boolean expires) {
         DeltaSession session = null;
         SessionMessage msg = null;
+        DeltaRequest deltaRequest = null;
         try {
             session = (DeltaSession) findSession(sessionId);
             if (session == null) {
@@ -971,8 +973,12 @@ public class DeltaManager extends ClusterManagerBase{
                 // removed the session from the Manager.
                 return null;
             }
-            DeltaRequest deltaRequest = session.getDeltaRequest();
-            session.lock();
+            DeltaRequest newDeltaRequest = deltaRequestPool.pop();
+            if (newDeltaRequest == null) {
+                // Will be configured in replaceDeltaRequest()
+                newDeltaRequest = new DeltaRequest();
+            }
+            deltaRequest = session.replaceDeltaRequest(newDeltaRequest);
             if (deltaRequest.getSize() > 0) {
                 counterSend_EVT_SESSION_DELTA++;
                 byte[] data = serializeDeltaRequest(session,deltaRequest);
@@ -981,14 +987,17 @@ public class DeltaManager extends ClusterManagerBase{
                                              data,
                                              sessionId,
                                              sessionId + "-" + System.currentTimeMillis());
-                session.resetDeltaRequest();
             }
         } catch (IOException x) {
             log.error(sm.getString("deltaManager.createMessage.unableCreateDeltaRequest",
                     sessionId), x);
             return null;
         } finally {
-            if (session!=null) session.unlock();
+            if (deltaRequest != null) {
+                // Reset the instance before it is returned to the pool
+                deltaRequest.reset();
+                deltaRequestPool.push(deltaRequest);
+            }
         }
         if(msg == null) {
             if(!expires && !session.isPrimarySession()) {

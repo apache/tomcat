@@ -75,6 +75,12 @@
   <subsection name="Cluster">
     <changelog>
       <fix>
+        <bug>62841</bug>: Refactor the <code>DeltaRequest</code> serialization
+        to reduce the window during which the <code>DeltaSession</code> is
+        locked and to remove a potential cause of deadlocks during
+        serialization. (markt)
+      </fix>
+      <fix>
         <bug>63441</bug>: Further streamline the processing of session creation
         messages in the <code>DeltaManager</code> to reduce the possibility of a
         session update message being processed before the session has been
