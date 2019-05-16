@@ -75,6 +75,10 @@
         <code>Http2Protocol</code> from 200 to 100 to align with typical
         defaults for HTTP/2 implementations. (markt)
       </update>
+      <update>
+        Reduce the default HTTP/2 header list size from 4GB to 32kB to align
+        with typical HTTP/2 implementations. (markt)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Cluster">
