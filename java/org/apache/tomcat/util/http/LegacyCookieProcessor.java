@@ -79,8 +79,6 @@ public final class LegacyCookieProcessor extends CookieProcessorBase {
 
     private final BitSet allowedWithoutQuotes = new BitSet(128);
 
-    private SameSiteCookies sameSiteCookies = SameSiteCookies.NONE;
-
     public LegacyCookieProcessor() {
         // BitSet elements will default to false
         for (char c : HTTP_SEPARATORS) {
@@ -193,16 +191,6 @@ public final class LegacyCookieProcessor extends CookieProcessorBase {
 
     public void setAlwaysAddExpires(boolean alwaysAddExpires) {
         this.alwaysAddExpires = alwaysAddExpires;
-    }
-
-
-    public SameSiteCookies getSameSiteCookies() {
-        return sameSiteCookies;
-    }
-
-
-    public void setSameSiteCookies(String sameSiteCookies) {
-        this.sameSiteCookies = SameSiteCookies.toAttribute(sameSiteCookies);
     }
 
 
@@ -336,9 +324,11 @@ public final class LegacyCookieProcessor extends CookieProcessorBase {
             buf.append("; HttpOnly");
         }
 
-        if (!sameSiteCookies.equals(SameSiteCookies.NONE)) {
+        SameSiteCookies sameSiteCookiesValue = getSameSiteCookies();
+
+        if (!sameSiteCookiesValue.equals(SameSiteCookies.NONE)) {
             buf.append("; SameSite=");
-            buf.append(sameSiteCookies.toString());
+            buf.append(sameSiteCookiesValue.toString());
         }
 
         return buf.toString();

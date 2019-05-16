@@ -52,22 +52,10 @@ public class Rfc6265CookieProcessor extends CookieProcessorBase {
         domainValid.set('-');
     }
 
-    private SameSiteCookies sameSiteCookies = SameSiteCookies.NONE;
-
 
     @Override
     public Charset getCharset() {
         return StandardCharsets.UTF_8;
-    }
-
-
-    public SameSiteCookies getSameSiteCookies() {
-        return sameSiteCookies;
-    }
-
-
-    public void setSameSiteCookies(String sameSiteCookies) {
-        this.sameSiteCookies = SameSiteCookies.toAttribute(sameSiteCookies);
     }
 
 
@@ -174,9 +162,11 @@ public class Rfc6265CookieProcessor extends CookieProcessorBase {
             header.append("; HttpOnly");
         }
 
-        if (!sameSiteCookies.equals(SameSiteCookies.NONE)) {
+        SameSiteCookies sameSiteCookiesValue = getSameSiteCookies();
+
+        if (!sameSiteCookiesValue.equals(SameSiteCookies.NONE)) {
             header.append("; SameSite=");
-            header.append(sameSiteCookies.toString());
+            header.append(sameSiteCookiesValue.toString());
         }
 
         return header.toString();
