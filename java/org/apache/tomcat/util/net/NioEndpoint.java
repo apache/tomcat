@@ -1456,10 +1456,15 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                                 if (!socketBufferHandler.isWriteBufferEmpty()) {
                                     // There is still data inside the main write buffer, it needs to be written first
                                     socketBufferHandler.configureWriteBufferForRead();
-                                    getSocket().write(socketBufferHandler.getWriteBuffer());
-                                    // Start operation only if the main write buffer is now empty
+                                    do {
+                                        nBytes = getSocket().write(socketBufferHandler.getWriteBuffer());
+                                    } while (!socketBufferHandler.isWriteBufferEmpty() && nBytes > 0);
                                     if (!socketBufferHandler.isWriteBufferEmpty()) {
                                         doWrite = false;
+                                    }
+                                    // Preserve a negative value since it is an error
+                                    if (nBytes > 0) {
+                                        nBytes = 0;
                                     }
                                 }
                                 if (doWrite) {

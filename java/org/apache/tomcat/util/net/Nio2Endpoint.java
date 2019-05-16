@@ -1011,18 +1011,24 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
             }
 
             @Override
+            protected void end() {
+                // Restore regular notifications
+                if (read) {
+                    readNotify = false;
+                } else {
+                    writeNotify = false;
+                }
+            }
+
+            @Override
             public void run() {
                 if (read) {
                     long nBytes = 0;
-                    // Read from main buffer first
+                    // If there is still data inside the main read buffer, it needs to be read first
                     if (!socketBufferHandler.isReadBufferEmpty()) {
-                        // There is still data inside the main read buffer, it needs to be read first
-                        synchronized (readCompletionHandler) {
-                            // Note: It is not necessary to put this code in the completion handler
-                            socketBufferHandler.configureReadBufferForRead();
-                            for (int i = 0; i < length && !socketBufferHandler.isReadBufferEmpty(); i++) {
-                                nBytes += transfer(socketBufferHandler.getReadBuffer(), buffers[offset + i]);
-                            }
+                        socketBufferHandler.configureReadBufferForRead();
+                        for (int i = 0; i < length && !socketBufferHandler.isReadBufferEmpty(); i++) {
+                            nBytes += transfer(socketBufferHandler.getReadBuffer(), buffers[offset + i]);
                         }
                         if (nBytes > 0) {
                             completion.completed(Long.valueOf(nBytes), this);
@@ -1032,24 +1038,27 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
                         getSocket().read(buffers, offset, length, timeout, unit, this, completion);
                     }
                 } else {
-                    // Write from main buffer first
+                    // If there is still data inside the main write buffer, it needs to be written first
                     if (!socketBufferHandler.isWriteBufferEmpty()) {
-                        // There is still data inside the main write buffer, it needs to be written first
                         socketBufferHandler.configureWriteBufferForRead();
                         getSocket().write(socketBufferHandler.getWriteBuffer(), null, new CompletionHandler<Integer, Void>() {
                             @Override
-                            public void completed(Integer result, Void attachment) {
-                                run();
+                            public void completed(Integer nBytes, Void attachment) {
+                                if (nBytes.intValue() < 0) {
+                                    failed(new EOFException(), null);
+                                } else {
+                                    // Continue until everything is written
+                                    run();
+                                }
                             }
                             @Override
                             public void failed(Throwable exc, Void attachment) {
-                                handler.failed(exc, Nio2OperationState.this.attachment);
+                                completion.failed(exc, Nio2OperationState.this);
                             }
                         });
-                        return;
+                    } else {
+                        getSocket().write(buffers, offset, length, timeout, unit, this, completion);
                     }
-                    // It should be less necessary to check the buffer state as it is easy to flush before
-                    getSocket().write(buffers, offset, length, timeout, unit, this, completion);
                 }
             }
         }
