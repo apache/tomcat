@@ -688,8 +688,6 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
 
     public void setAttribute(String name, Object value, boolean notify,boolean addDeltaRequest) {
 
-        log.info("setAttribute name [" + name + ", value [" + value + "]");
-
         // Name cannot be null
         if (name == null) throw new IllegalArgumentException(sm.getString("standardSession.setAttribute.namenull"));
 
