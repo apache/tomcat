@@ -1484,7 +1484,7 @@ public abstract class SocketWrapperBase<E> {
                             return CompletionState.ERROR;
                         }
                     } catch (InterruptedException e) {
-                        handler.failed(new SocketTimeoutException(), attachment);
+                        completion.failed(new SocketTimeoutException(), state);
                         return CompletionState.ERROR;
                     }
                 }
