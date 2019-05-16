@@ -124,6 +124,9 @@
       <fix>
         Clear buffers on socket wrapper close. (remm)
       </fix>
+      <fix>
+        NIO2 failed to properly close sockets on connector stop. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">

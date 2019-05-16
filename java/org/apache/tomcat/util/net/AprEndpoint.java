@@ -674,30 +674,26 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
     @Override
     protected boolean setSocketOptions(Long socket) {
         try {
-            // During shutdown, executor may be null - avoid NPE
-            if (running) {
-                if (log.isDebugEnabled()) {
-                    log.debug(sm.getString("endpoint.debug.socket", socket));
-                }
-                AprSocketWrapper wrapper = new AprSocketWrapper(socket, this);
-                wrapper.setKeepAliveLeft(getMaxKeepAliveRequests());
-                wrapper.setSecure(isSSLEnabled());
-                wrapper.setReadTimeout(getConnectionTimeout());
-                wrapper.setWriteTimeout(getConnectionTimeout());
-                connections.put(socket, wrapper);
-                getExecutor().execute(new SocketWithOptionsProcessor(wrapper));
+            if (log.isDebugEnabled()) {
+                log.debug(sm.getString("endpoint.debug.socket", socket));
             }
+            AprSocketWrapper wrapper = new AprSocketWrapper(socket, this);
+            wrapper.setKeepAliveLeft(getMaxKeepAliveRequests());
+            wrapper.setSecure(isSSLEnabled());
+            wrapper.setReadTimeout(getConnectionTimeout());
+            wrapper.setWriteTimeout(getConnectionTimeout());
+            connections.put(socket, wrapper);
+            getExecutor().execute(new SocketWithOptionsProcessor(wrapper));
+            return true;
         } catch (RejectedExecutionException x) {
             log.warn(sm.getString("endpoint.rejectedExecution", socket), x);
-            return false;
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
             // This means we got an OOM or similar creating a thread, or that
             // the pool and its queue are full
             log.error(sm.getString("endpoint.process.fail"), t);
-            return false;
         }
-        return true;
+        return false;
     }
 
 
@@ -2337,6 +2333,9 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
 
         @Override
         protected void doClose() {
+            if (log.isDebugEnabled()) {
+                log.debug("Calling [" + getEndpoint() + "].closeSocket([" + this + "])", new Exception());
+            }
             try {
                 getEndpoint().getHandler().release(this);
             } catch (Throwable e) {
@@ -2760,7 +2759,7 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
                     timeout, unit, attachment, check, handler, semaphore, completion);
         }
 
-        private class AprOperationState<A>  extends OperationState<A> {
+        private class AprOperationState<A> extends OperationState<A> {
             private volatile boolean inline = true;
             private AprOperationState(boolean read, ByteBuffer[] buffers, int offset, int length,
                     BlockingMode block, long timeout, TimeUnit unit, A attachment, CompletionCheck check,
