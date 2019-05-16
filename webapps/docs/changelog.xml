@@ -127,6 +127,11 @@
       <fix>
         NIO2 failed to properly close sockets on connector stop. (remm)
       </fix>
+      <update>
+        Reduce the default for <code>maxConcurrentStreams</code> on the
+        <code>Http2Protocol</code> from 200 to 100 to align with typical
+        defaults for HTTP/2 implementations. (markt)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Cluster">
