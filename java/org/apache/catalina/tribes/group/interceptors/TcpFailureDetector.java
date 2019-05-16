@@ -19,6 +19,7 @@ package org.apache.catalina.tribes.group.interceptors;
 import java.net.ConnectException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.net.NoRouteToHostException;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.util.Arrays;
@@ -184,7 +185,7 @@ public class TcpFailureDetector extends ChannelInterceptorBase {
                     log.info("Verification complete. Member disappeared["+member+"]");
                 super.memberDisappeared(member);
             } else {
-                if(log.isInfoEnabled()) 
+                if(log.isInfoEnabled())
                     log.info("Verification complete. Member still alive["+member+"]");
             }
         }
@@ -354,9 +355,11 @@ public class TcpFailureDetector extends ChannelInterceptorBase {
                 }
             }//end if
             return true;
-        } catch ( SocketTimeoutException sx) {
+        } catch (SocketTimeoutException sx) {
             //do nothing, we couldn't connect
-        } catch ( ConnectException cx) {
+        } catch (ConnectException cx) {
+            //do nothing, we couldn't connect
+        } catch (NoRouteToHostException nre) {
             //do nothing, we couldn't connect
         }catch (Exception x ) {
             log.error("Unable to perform failure detection check, assuming member down.[" + mbr + "]",x);
