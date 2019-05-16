@@ -43,7 +43,7 @@ abstract class ConnectionSettingsBase<T extends Throwable> {
     static final long DEFAULT_MAX_CONCURRENT_STREAMS = UNLIMITED;
     static final int DEFAULT_INITIAL_WINDOW_SIZE = (1 << 16) - 1;
     static final int DEFAULT_MAX_FRAME_SIZE = MIN_MAX_FRAME_SIZE;
-    static final long DEFAULT_MAX_HEADER_LIST_SIZE = UNLIMITED;
+    static final long DEFAULT_MAX_HEADER_LIST_SIZE = 1 << 15;
 
     Map<Setting, Long> current = new EnumMap<>(Setting.class);
     Map<Setting, Long> pending = new EnumMap<>(Setting.class);
