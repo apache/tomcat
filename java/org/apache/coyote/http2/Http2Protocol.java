@@ -47,7 +47,7 @@ public class Http2Protocol implements UpgradeProtocol {
     static final long DEFAULT_STREAM_READ_TIMEOUT = 20000;
     static final long DEFAULT_STREAM_WRITE_TIMEOUT = 20000;
     // The HTTP/2 specification recommends a minimum default of 100
-    static final long DEFAULT_MAX_CONCURRENT_STREAMS = 200;
+    static final long DEFAULT_MAX_CONCURRENT_STREAMS = 100;
     // Maximum amount of streams which can be concurrently executed over
     // a single connection
     static final int DEFAULT_MAX_CONCURRENT_STREAM_EXECUTION = 20;
