@@ -1011,16 +1011,6 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
             }
 
             @Override
-            protected void end() {
-                // Restore regular notifications
-                if (read) {
-                    readNotify = false;
-                } else {
-                    writeNotify = false;
-                }
-            }
-
-            @Override
             public void run() {
                 if (read) {
                     long nBytes = 0;
