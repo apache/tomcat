@@ -1047,23 +1047,30 @@ public abstract class SocketWrapperBase<E> {
         protected boolean process() {
             try {
                 getEndpoint().getExecutor().execute(this);
+                return true;
             } catch (RejectedExecutionException ree) {
                 log.warn(sm.getString("endpoint.executor.fail", SocketWrapperBase.this) , ree);
-                return false;
             } catch (Throwable t) {
                 ExceptionUtils.handleThrowable(t);
                 // This means we got an OOM or similar creating a thread, or that
                 // the pool and its queue are full
                 log.error(sm.getString("endpoint.process.fail"), t);
-                return false;
             }
-            return true;
+            return false;
         }
 
         /**
          * Start the operation, this will typically call run.
          */
-        protected abstract void start();
+        protected void start() {
+            run();
+        }
+
+        /**
+         * End the operation.
+         */
+        protected void end() {
+        }
 
     }
 
@@ -1102,6 +1109,7 @@ public abstract class SocketWrapperBase<E> {
                     } else {
                         state.state = currentState;
                     }
+                    state.end();
                     if (completion && state.handler != null) {
                         state.handler.completed(Long.valueOf(state.nBytes), state.attachment);
                     }
@@ -1142,6 +1150,7 @@ public abstract class SocketWrapperBase<E> {
             } else {
                 state.state = state.isInline() ? CompletionState.ERROR : CompletionState.DONE;
             }
+            state.end();
             if (state.handler != null) {
                 state.handler.failed(exc, state.attachment);
             }

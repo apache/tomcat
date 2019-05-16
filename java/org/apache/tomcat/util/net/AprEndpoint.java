@@ -2775,11 +2775,6 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
             }
 
             @Override
-            protected void start() {
-                run();
-            }
-
-            @Override
             public void run() {
                 // Perform the IO operation
                 // Called from the poller to continue the IO operation
