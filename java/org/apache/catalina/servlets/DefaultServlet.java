@@ -74,6 +74,7 @@ import org.apache.catalina.WebResource;
 import org.apache.catalina.WebResourceRoot;
 import org.apache.catalina.connector.RequestFacade;
 import org.apache.catalina.connector.ResponseFacade;
+import org.apache.catalina.util.IOTools;
 import org.apache.catalina.util.ServerInfo;
 import org.apache.catalina.util.URLEncoder;
 import org.apache.catalina.webresources.CachedResource;
@@ -2087,11 +2088,16 @@ public class DefaultServlet extends HttpServlet {
          */
         if (globalXsltFile != null) {
             File f = validateGlobalXsltFile();
-            if (f != null){
-                try (FileInputStream fis = new FileInputStream(f)){
-                    byte b[] = new byte[(int)f.length()]; /* danger! */
-                    fis.read(b);
-                    return new StreamSource(new ByteArrayInputStream(b));
+            if (f != null) {
+                long globalXsltFileSize = f.length();
+                if (globalXsltFileSize > Integer.MAX_VALUE) {
+                    log("globalXsltFile [" + f.getAbsolutePath() + "] is too big to buffer");
+                } else {
+                    try (FileInputStream fis = new FileInputStream(f)){
+                        byte b[] = new byte[(int)f.length()];
+                        IOTools.readFully(fis, b);
+                        return new StreamSource(new ByteArrayInputStream(b));
+                    }
                 }
             }
         }

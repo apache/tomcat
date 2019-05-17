@@ -68,6 +68,10 @@
         servlet for the rarely used UTF-32 encodings. Identified by Coverity
         Scan. (markt)
       </fix>
+      <fix>
+        Ensure that the default servlet reads the entire global XSLT file if
+        one is defined. Identified by Coverity Scan. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
