@@ -1016,9 +1016,11 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
                     long nBytes = 0;
                     // If there is still data inside the main read buffer, it needs to be read first
                     if (!socketBufferHandler.isReadBufferEmpty()) {
-                        socketBufferHandler.configureReadBufferForRead();
-                        for (int i = 0; i < length && !socketBufferHandler.isReadBufferEmpty(); i++) {
-                            nBytes += transfer(socketBufferHandler.getReadBuffer(), buffers[offset + i]);
+                        synchronized (readCompletionHandler) {
+                            socketBufferHandler.configureReadBufferForRead();
+                            for (int i = 0; i < length && !socketBufferHandler.isReadBufferEmpty(); i++) {
+                                nBytes += transfer(socketBufferHandler.getReadBuffer(), buffers[offset + i]);
+                            }
                         }
                         if (nBytes > 0) {
                             completion.completed(Long.valueOf(nBytes), this);
