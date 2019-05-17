@@ -68,6 +68,7 @@ import javax.xml.transform.stream.StreamSource;
 import org.apache.catalina.Globals;
 import org.apache.catalina.connector.RequestFacade;
 import org.apache.catalina.connector.ResponseFacade;
+import org.apache.catalina.util.IOTools;
 import org.apache.catalina.util.RequestUtil;
 import org.apache.catalina.util.ServerInfo;
 import org.apache.catalina.util.URLEncoder;
@@ -1745,17 +1746,22 @@ public class DefaultServlet
             File f = validateGlobalXsltFile();
             if (f != null){
                 FileInputStream fis = null;
-                try {
-                    fis = new FileInputStream(f);
-                    byte b[] = new byte[(int)f.length()]; /* danger! */
-                    fis.read(b);
-                    return new StreamSource(new ByteArrayInputStream(b));
-                } finally {
-                    if (fis != null) {
-                        try {
-                            fis.close();
-                        } catch (IOException ioe) {
-                            // Ignore
+                long globalXsltFileSize = f.length();
+                if (globalXsltFileSize > Integer.MAX_VALUE) {
+                    log("globalXsltFile [" + f.getAbsolutePath() + "] is too big to buffer");
+                } else {
+                    try {
+                        fis = new FileInputStream(f);
+                        byte b[] = new byte[(int)f.length()];
+                        IOTools.readFully(fis, b);
+                        return new StreamSource(new ByteArrayInputStream(b));
+                    } finally {
+                        if (fis != null) {
+                            try {
+                                fis.close();
+                            } catch (IOException ioe) {
+                                // Ignore
+                            }
                         }
                     }
                 }
@@ -1763,7 +1769,6 @@ public class DefaultServlet
         }
 
         return null;
-
     }
 
 

@@ -100,6 +100,10 @@
         serialization with mem-cached. Patch provided by Martin Lemanski.
         (markt)
       </fix>
+      <fix>
+        Ensure that the default servlet reads the entire global XSLT file if
+        one is defined. Identified by Coverity Scan. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
