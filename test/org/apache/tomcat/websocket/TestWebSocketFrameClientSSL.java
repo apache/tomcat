@@ -87,9 +87,6 @@ public class TestWebSocketFrameClientSSL extends WebSocketBaseTest {
     }
 
 
-    /*
-     * TODO: Fails intermittently with NIO2.
-     */
     @Test
     public void testBug56032() throws Exception {
         Tomcat tomcat = getTomcatInstance();
