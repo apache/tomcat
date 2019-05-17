@@ -606,6 +606,7 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
     }
 
     public void resetDeltaRequest() {
+        lock();
         try {
             deltaRequest.reset();
             deltaRequest.setSessionId(getIdInternal());
