@@ -816,7 +816,7 @@ public class CoyoteAdapter implements Adapter {
             if (wrapper != null) {
                 String[] methods = wrapper.getServletMethods();
                 if (methods != null) {
-                    for (int i=0; i<methods.length; i++) {
+                    for (int i=0; i < methods.length; i++) {
                         if ("TRACE".equals(methods[i])) {
                             continue;
                         }
@@ -828,7 +828,9 @@ public class CoyoteAdapter implements Adapter {
                     }
                 }
             }
-            res.addHeader("Allow", header);
+            if (header != null) {
+                res.addHeader("Allow", header);
+            }
             response.sendError(405, "TRACE method is not allowed");
             // Safe to skip the remainder of this method.
             return true;
