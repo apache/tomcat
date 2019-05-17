@@ -2763,6 +2763,7 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
 
         private class AprOperationState<A> extends OperationState<A> {
             private volatile boolean inline = true;
+            private volatile long flushBytes = 0;
             private AprOperationState(boolean read, ByteBuffer[] buffers, int offset, int length,
                     BlockingMode block, long timeout, TimeUnit unit, A attachment, CompletionCheck check,
                     CompletionHandler<Long, ? super A> handler, Semaphore semaphore,
@@ -2800,21 +2801,35 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
                                     break;
                                 }
                             }
-                            if (buffer == null) {
+                            if (buffer == null && flushBytes == 0) {
                                 // Nothing to do
                                 return;
                             }
                             if (read) {
                                 nBytes = read(false, buffer);
                             } else {
-                                if (!flush(false)) {
-                                    int remaining = buffer.remaining();
-                                    writeNonBlockingDirect(buffer);
-                                    nBytes = remaining - buffer.remaining();
-                                    if (nBytes > 0 && !buffer.isDirect() && flush(block == BlockingMode.BLOCK)) {
-                                        inline = false;
-                                        registerWriteInterest();
+                                if (!flush(block == BlockingMode.BLOCK)) {
+                                    if (flushBytes > 0) {
+                                        // Flushing was done, continue processing
+                                        nBytes = flushBytes;
+                                        flushBytes = 0;
+                                    } else {
+                                        int remaining = buffer.remaining();
+                                        write(block == BlockingMode.BLOCK, buffer);
+                                        nBytes = remaining - buffer.remaining();
+                                        if (nBytes > 0 && flush(block == BlockingMode.BLOCK)) {
+                                            // We have to flush and it's incomplete, save the bytes written until done
+                                            inline = false;
+                                            registerWriteInterest();
+                                            flushBytes = nBytes;
+                                            return;
+                                        }
                                     }
+                                } else {
+                                    // Continue flushing
+                                    inline = false;
+                                    registerWriteInterest();
+                                    return;
                                 }
                             }
                             if (nBytes != 0) {
