@@ -80,13 +80,12 @@ public class WsRemoteEndpointImplServer extends WsRemoteEndpointImplBase {
                 }
             } else {
                 this.handler = handler;
+                timeout = getSendTimeout();
                 if (timeout > 0) {
-                    // TODO This block in unreachable
                     // Register with timeout thread
                     timeoutExpiry = timeout + System.currentTimeMillis();
                     wsWriteTimeout.register(this);
                 }
-                timeout = getSendTimeout();
             }
             socketWrapper.write(block ? BlockingMode.BLOCK : BlockingMode.SEMI_BLOCK, timeout,
                     TimeUnit.MILLISECONDS, null, SocketWrapperBase.COMPLETE_WRITE_WITH_COMPLETION,
