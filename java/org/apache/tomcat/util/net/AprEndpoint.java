@@ -122,7 +122,7 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
         // - no IO vectoring
         // - mandatory use of direct buffers causing required output buffering
         // - needs extra output flushes due to the buffering
-        setUseAsyncIO(false);
+        //setUseAsyncIO(false);
     }
 
     // ------------------------------------------------------------- Properties
@@ -1319,15 +1319,17 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
                             Long.valueOf(socket)));
                 }
                 AprSocketWrapper socketWrapper = connections.get(Long.valueOf(socket));
-                socketWrapper.setError(new SocketTimeoutException());
-                if (socketWrapper.readOperation != null || socketWrapper.writeOperation != null) {
-                    if (socketWrapper.readOperation != null) {
-                        socketWrapper.readOperation.process();
+                if (socketWrapper != null) {
+                    socketWrapper.setError(new SocketTimeoutException());
+                    if (socketWrapper.readOperation != null || socketWrapper.writeOperation != null) {
+                        if (socketWrapper.readOperation != null) {
+                            socketWrapper.readOperation.process();
+                        } else {
+                            socketWrapper.writeOperation.process();
+                        }
                     } else {
-                        socketWrapper.writeOperation.process();
+                        processSocket(socketWrapper, SocketEvent.ERROR, true);
                     }
-                } else {
-                    processSocket(socketWrapper, SocketEvent.ERROR, true);
                 }
                 socket = timeouts.check(date);
             }
@@ -2790,11 +2792,6 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
                                 }
                                 return;
                             }
-                            if (!read && flush(false)) {
-                                inline = false;
-                                registerWriteInterest();
-                                return;
-                            }
                             // Find the buffer on which the operation will be performed (no vectoring with APR)
                             ByteBuffer buffer = null;
                             for (int i = 0; i < length; i++) {
@@ -2803,23 +2800,20 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
                                     break;
                                 }
                             }
-                            if (buffer == null ) {
+                            if (buffer == null) {
                                 // Nothing to do
                                 return;
                             }
                             if (read) {
                                 nBytes = read(false, buffer);
                             } else {
-                                int remaining = buffer.remaining();
-                                writeNonBlockingDirect(buffer);
-                                nBytes = remaining - buffer.remaining();
-                                if (nBytes > 0) {
-                                    try {
-                                        if (flush(false)) {
-                                            registerWriteInterest();
-                                        }
-                                    } catch (IOException e) {
-                                        // Ignore, will be delayed to later
+                                if (!flush(false)) {
+                                    int remaining = buffer.remaining();
+                                    writeNonBlockingDirect(buffer);
+                                    nBytes = remaining - buffer.remaining();
+                                    if (nBytes > 0 && !buffer.isDirect() && flush(block == BlockingMode.BLOCK)) {
+                                        inline = false;
+                                        registerWriteInterest();
                                     }
                                 }
                             }
@@ -2832,7 +2826,7 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
                     }
                 }
                 if (nBytes > 0) {
-                    // The bytes read are only updated in the completion handler
+                    // The bytes processed are only updated in the completion handler
                     completion.completed(Long.valueOf(nBytes), this);
                 } else if (nBytes < 0 || getError() != null) {
                     IOException error = getError();
