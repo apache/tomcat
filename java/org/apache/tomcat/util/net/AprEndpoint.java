@@ -120,9 +120,9 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
         setMaxConnections(8 * 1024);
         // Asynchronous IO has significantly lower performance with APR:
         // - no IO vectoring
-        // - mandatory use of direct buffers causing required output buffering
-        // - needs extra output flushes due to the buffering
-        //setUseAsyncIO(false);
+        // - mandatory use of direct buffers forces output buffering
+        // - needs extra output flushes due to buffering
+        setUseAsyncIO(false);
     }
 
     // ------------------------------------------------------------- Properties
