@@ -104,6 +104,10 @@
         Ensure that the default servlet reads the entire global XSLT file if
         one is defined. Identified by Coverity Scan. (markt)
       </fix>
+      <fix>
+        Avoid potential <code>NullPointerException</code> when generating an
+        HTTP <code>Allow</code> header. Identified by Coverity Scan. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
