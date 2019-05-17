@@ -81,6 +81,7 @@ public class WsRemoteEndpointImplServer extends WsRemoteEndpointImplBase {
             } else {
                 this.handler = handler;
                 if (timeout > 0) {
+                    // TODO This block in unreachable
                     // Register with timeout thread
                     timeoutExpiry = timeout + System.currentTimeMillis();
                     wsWriteTimeout.register(this);
