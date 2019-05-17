@@ -230,7 +230,8 @@
         configured to validate XML configuration files such as web.xml. (markt)
       </fix>
       <fix>
-        Encode the output of the SSI <code>printenv</code> command. (markt)
+        Encode the output of the SSI <code>printenv</code> command. This is the
+        fix for CVE-2019-0221. (markt)
       </fix>
       <scode>
         Use constants for SSI encoding values. (markt)
