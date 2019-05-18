@@ -2814,6 +2814,7 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
                                         nBytes = flushBytes;
                                         flushBytes = 0;
                                     } else {
+                                        @SuppressWarnings("null") // Not possible
                                         int remaining = buffer.remaining();
                                         write(block == BlockingMode.BLOCK, buffer);
                                         nBytes = remaining - buffer.remaining();
