@@ -1413,10 +1413,11 @@ public class StandardSession implements HttpSession, Session, Serializable {
             throw new IllegalStateException(
                     sm.getString("standardSession.setAttribute.ise", getIdInternal()));
         }
-        if ((manager != null) && manager.getContext().getDistributable() &&
-                !isAttributeDistributable(name, value) && !exclude(name, value)) {
-            throw new IllegalArgumentException(
-                    sm.getString("standardSession.setAttribute.iae", name));
+
+        Context context = manager.getContext();
+
+        if (context.getDistributable() && !isAttributeDistributable(name, value) && !exclude(name, value)) {
+            throw new IllegalArgumentException(sm.getString("standardSession.setAttribute.iae", name));
         }
         // Construct an event with the new value
         HttpSessionBindingEvent event = null;
@@ -1461,7 +1462,6 @@ public class StandardSession implements HttpSession, Session, Serializable {
         }
 
         // Notify interested application event listeners
-        Context context = manager.getContext();
         Object listeners[] = context.getApplicationEventListeners();
         if (listeners == null) {
             return;
