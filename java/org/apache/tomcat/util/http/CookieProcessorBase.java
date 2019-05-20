@@ -37,6 +37,12 @@ public abstract class CookieProcessorBase implements CookieProcessor {
         }
     };
 
+    protected static final String ANCIENT_DATE;
+
+    static {
+        ANCIENT_DATE = COOKIE_DATE_FORMAT.get().format(new Date(10000));
+    }
+
     private SameSiteCookies sameSiteCookies = SameSiteCookies.NONE;
 
     public SameSiteCookies getSameSiteCookies() {
@@ -45,11 +51,5 @@ public abstract class CookieProcessorBase implements CookieProcessor {
 
     public void setSameSiteCookies(String sameSiteCookies) {
         this.sameSiteCookies = SameSiteCookies.fromString(sameSiteCookies);
-    }
-
-    protected static final String ANCIENT_DATE;
-
-    static {
-        ANCIENT_DATE = COOKIE_DATE_FORMAT.get().format(new Date(10000));
     }
 }
