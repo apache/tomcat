@@ -324,6 +324,14 @@ public final class LegacyCookieProcessor extends CookieProcessorBase {
         if (cookie.isHttpOnly()) {
             buf.append("; HttpOnly");
         }
+
+        SameSiteCookies sameSiteCookiesValue = getSameSiteCookies();
+
+        if (!sameSiteCookiesValue.equals(SameSiteCookies.NONE)) {
+            buf.append("; SameSite=");
+            buf.append(sameSiteCookiesValue.getValue());
+        }
+
         return buf.toString();
     }
 

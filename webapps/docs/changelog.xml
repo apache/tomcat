@@ -87,6 +87,10 @@
         Reduce the default HTTP/2 header list size from 4GB to 32kB to align
         with typical HTTP/2 implementations. (markt)
       </update>
+      <add>
+        Add support for same-site cookie attribute. Patch provided by John
+        Kelly. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Cluster">
