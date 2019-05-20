@@ -1032,25 +1032,34 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
                 } else {
                     // If there is still data inside the main write buffer, it needs to be written first
                     if (!socketBufferHandler.isWriteBufferEmpty()) {
-                        socketBufferHandler.configureWriteBufferForRead();
-                        getSocket().write(socketBufferHandler.getWriteBuffer(), null, new CompletionHandler<Integer, Void>() {
-                            @Override
-                            public void completed(Integer nBytes, Void attachment) {
-                                if (nBytes.intValue() < 0) {
-                                    failed(new EOFException(), null);
-                                } else {
-                                    // Continue until everything is written
-                                    run();
-                                }
+                        synchronized (writeCompletionHandler) {
+                            socketBufferHandler.configureWriteBufferForRead();
+                            ByteBuffer[] array = nonBlockingWriteBuffer.toArray(socketBufferHandler.getWriteBuffer());
+                            if (arrayHasData(array)) {
+                                getSocket().write(array, 0, array.length, timeout, unit,
+                                        array, new CompletionHandler<Long, ByteBuffer[]>() {
+                                            @Override
+                                            public void completed(Long nBytes, ByteBuffer[] buffers) {
+                                                if (nBytes.longValue() < 0) {
+                                                    failed(new EOFException(), null);
+                                                } else if (arrayHasData(buffers)) {
+                                                    getSocket().write(array, 0, array.length, toTimeout(getWriteTimeout()),
+                                                            TimeUnit.MILLISECONDS, array, this);
+                                                } else {
+                                                    // Continue until everything is written
+                                                    process();
+                                                }
+                                            }
+                                            @Override
+                                            public void failed(Throwable exc, ByteBuffer[] buffers) {
+                                                completion.failed(exc, Nio2OperationState.this);
+                                            }
+                                        });
+                                return;
                             }
-                            @Override
-                            public void failed(Throwable exc, Void attachment) {
-                                completion.failed(exc, Nio2OperationState.this);
-                            }
-                        });
-                    } else {
-                        getSocket().write(buffers, offset, length, timeout, unit, this, completion);
+                        }
                     }
+                    getSocket().write(buffers, offset, length, timeout, unit, this, completion);
                 }
             }
         }
