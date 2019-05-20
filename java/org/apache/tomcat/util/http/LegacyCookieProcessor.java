@@ -79,7 +79,6 @@ public final class LegacyCookieProcessor extends CookieProcessorBase {
 
     private final BitSet allowedWithoutQuotes = new BitSet(128);
 
-
     public LegacyCookieProcessor() {
         // BitSet elements will default to false
         for (char c : HTTP_SEPARATORS) {
@@ -324,6 +323,14 @@ public final class LegacyCookieProcessor extends CookieProcessorBase {
         if (cookie.isHttpOnly()) {
             buf.append("; HttpOnly");
         }
+
+        SameSiteCookies sameSiteCookiesValue = getSameSiteCookies();
+
+        if (!sameSiteCookiesValue.equals(SameSiteCookies.NONE)) {
+            buf.append("; SameSite=");
+            buf.append(sameSiteCookiesValue.getValue());
+        }
+
         return buf.toString();
     }
 

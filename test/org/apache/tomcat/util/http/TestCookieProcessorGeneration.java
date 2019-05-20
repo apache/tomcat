@@ -254,6 +254,55 @@ public class TestCookieProcessorGeneration {
         doV1TestPath("exa\tmple", "foo=bar; Version=1; Path=\"exa\tmple\"", null);
     }
 
+    @Test
+    public void testSameSiteCookies() {
+        LegacyCookieProcessor legacy = new LegacyCookieProcessor();
+        Rfc6265CookieProcessor rfc6265 = new Rfc6265CookieProcessor();
+
+        Cookie cookie = new Cookie("foo", "bar");
+
+        Assert.assertEquals("foo=bar", legacy.generateHeader(cookie));
+        Assert.assertEquals("foo=bar", rfc6265.generateHeader(cookie));
+
+        legacy.setSameSiteCookies("none");
+        rfc6265.setSameSiteCookies("none");
+
+        Assert.assertEquals("foo=bar", legacy.generateHeader(cookie));
+        Assert.assertEquals("foo=bar", rfc6265.generateHeader(cookie));
+
+        legacy.setSameSiteCookies("lax");
+        rfc6265.setSameSiteCookies("lax");
+
+        Assert.assertEquals("foo=bar; SameSite=Lax", legacy.generateHeader(cookie));
+        Assert.assertEquals("foo=bar; SameSite=Lax", rfc6265.generateHeader(cookie));
+
+        legacy.setSameSiteCookies("strict");
+        rfc6265.setSameSiteCookies("strict");
+
+        Assert.assertEquals("foo=bar; SameSite=Strict", legacy.generateHeader(cookie));
+        Assert.assertEquals("foo=bar; SameSite=Strict", rfc6265.generateHeader(cookie));
+
+        cookie.setSecure(true);
+        cookie.setHttpOnly(true);
+
+        legacy.setSameSiteCookies("none");
+        rfc6265.setSameSiteCookies("none");
+
+        Assert.assertEquals("foo=bar; Secure; HttpOnly", legacy.generateHeader(cookie));
+        Assert.assertEquals("foo=bar; Secure; HttpOnly", rfc6265.generateHeader(cookie));
+
+        legacy.setSameSiteCookies("lax");
+        rfc6265.setSameSiteCookies("lax");
+
+        Assert.assertEquals("foo=bar; Secure; HttpOnly; SameSite=Lax", legacy.generateHeader(cookie));
+        Assert.assertEquals("foo=bar; Secure; HttpOnly; SameSite=Lax", rfc6265.generateHeader(cookie));
+
+        legacy.setSameSiteCookies("strict");
+        rfc6265.setSameSiteCookies("strict");
+
+        Assert.assertEquals("foo=bar; Secure; HttpOnly; SameSite=Strict", legacy.generateHeader(cookie));
+        Assert.assertEquals("foo=bar; Secure; HttpOnly; SameSite=Strict", rfc6265.generateHeader(cookie));
+    }
 
     private void doTest(Cookie cookie, String expected) {
         doTest(cookie, expected, expected);
