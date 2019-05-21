@@ -95,7 +95,6 @@ public class DeltaManager extends ClusterManagerBase{
     private boolean receiverQueue = false ;
     private boolean stateTimestampDrop = true ;
     private volatile long stateTransferCreateSendTime;
-    private SynchronizedStack<DeltaRequest> deltaRequestPool = new SynchronizedStack<>();
 
     // -------------------------------------------------------- stats attributes
 
@@ -569,7 +568,12 @@ public class DeltaManager extends ClusterManagerBase{
      * @return The request
      * @throws ClassNotFoundException Serialization error
      * @throws IOException IO error with serialization
+     *
+     * @deprecated Unused. This will be removed in Tomcat 10.
+     *             Calling this method may result in a deadlock. See:
+     *             https://bz.apache.org/bugzilla/show_bug.cgi?id=62841
      */
+    @Deprecated
     protected DeltaRequest deserializeDeltaRequest(DeltaSession session, byte[] data)
             throws ClassNotFoundException, IOException {
         session.lock();
@@ -970,6 +974,7 @@ public class DeltaManager extends ClusterManagerBase{
     public ClusterMessage requestCompleted(String sessionId, boolean expires) {
         DeltaSession session = null;
         SessionMessage msg = null;
+        SynchronizedStack<DeltaRequest> deltaRequestPool = getDeltaRequestPool();
         DeltaRequest deltaRequest = null;
         try {
             session = (DeltaSession) findSession(sessionId);
@@ -1258,14 +1263,8 @@ public class DeltaManager extends ClusterManagerBase{
                 log.debug(sm.getString("deltaManager.receiveMessage.delta",
                         getName(), msg.getSessionID()));
             }
-            session.lock();
-            try {
-                DeltaRequest dreq = deserializeDeltaRequest(session, delta);
-                dreq.execute(session, isNotifyListenersOnReplication());
-                session.setPrimarySession(false);
-            } finally {
-                session.unlock();
-            }
+
+            session.deserializeAndExecuteDeltaRequest(delta);
         }
     }
 

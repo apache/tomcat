@@ -41,9 +41,11 @@ import org.apache.catalina.ha.ClusterMessage;
 import org.apache.catalina.ha.ClusterSession;
 import org.apache.catalina.session.ManagerBase;
 import org.apache.catalina.session.StandardSession;
+import org.apache.catalina.tribes.io.ReplicationStream;
 import org.apache.catalina.tribes.tipis.ReplicatedMapEntry;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.collections.SynchronizedStack;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -627,6 +629,35 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
     }
 
 
+    protected void deserializeAndExecuteDeltaRequest(byte[] delta) throws IOException, ClassNotFoundException {
+        if (manager instanceof ClusterManagerBase) {
+            SynchronizedStack<DeltaRequest> deltaRequestPool =
+                    ((ClusterManagerBase) manager).getDeltaRequestPool();
+
+            DeltaRequest newDeltaRequest = deltaRequestPool.pop();
+            if (newDeltaRequest == null) {
+                newDeltaRequest = new DeltaRequest();
+            }
+
+            ReplicationStream ois = ((ClusterManagerBase) manager).getReplicationStream(delta);
+            newDeltaRequest.readExternal(ois);
+            ois.close();
+
+            DeltaRequest oldDeltaRequest = null;
+            lock();
+            try {
+                oldDeltaRequest = replaceDeltaRequest(newDeltaRequest);
+                newDeltaRequest.execute(this, ((ClusterManagerBase) manager).isNotifyListenersOnReplication());
+                setPrimarySession(false);
+            } finally {
+                unlock();
+                if (oldDeltaRequest != null) {
+                    oldDeltaRequest.reset();
+                    deltaRequestPool.push(oldDeltaRequest);
+                }
+            }
+        }
+    }
     // ------------------------------------------------- HttpSession Properties
 
     // ----------------------------------------------HttpSession Public Methods
