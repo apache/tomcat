@@ -138,12 +138,29 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
      */
     @Override
     public byte[] getDiff() throws IOException {
-        lockInternal();
-        try {
-            return getDeltaRequest().serialize();
-        } finally{
-            unlockInternal();
+        SynchronizedStack<DeltaRequest> deltaRequestPool = null;
+        DeltaRequest newDeltaRequest = null;
+
+        if (manager instanceof ClusterManagerBase) {
+            deltaRequestPool = ((ClusterManagerBase) manager).getDeltaRequestPool();
+            newDeltaRequest = deltaRequestPool.pop();
         }
+        if (newDeltaRequest == null) {
+            newDeltaRequest = new DeltaRequest();
+        }
+
+        DeltaRequest oldDeltaRequest = replaceDeltaRequest(newDeltaRequest);
+
+        byte[] result = oldDeltaRequest.serialize();
+
+        if (deltaRequestPool != null) {
+            // Only need to reset the old request if it is going to be pooled.
+            // Otherwise let GC do its thing.
+            oldDeltaRequest.reset();
+            deltaRequestPool.push(oldDeltaRequest);
+        }
+
+        return result;
     }
 
     public ClassLoader[] getClassLoaders() {
@@ -183,32 +200,46 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
     }
 
     /**
-     * Resets the current diff state and resets the dirty flag
+     * {@inheritDoc}
+     * <p>
+     * This implementation is a NO-OP. The diff is reset in {@link #getDiff()}.
      */
     @Override
     public void resetDiff() {
         resetDeltaRequest();
     }
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     * This implementation is a NO-OP. Any required locking takes place in the
+     * methods that make modifications.
+     */
     @Override
     public void lock() {
-        lockInternal();
-    }
-
-    @Override
-    public void unlock() {
-        unlockInternal();
+        // NO-OP
     }
 
     /**
-     * Lock during serialization
+     * {@inheritDoc}
+     * <p>
+     * This implementation is a NO-OP. Any required unlocking takes place in the
+     * methods that make modifications.
+     */
+    @Override
+    public void unlock() {
+        // NO-OP
+    }
+
+    /**
+     * Lock during serialization.
      */
     private void lockInternal() {
         diffLock.lock();
     }
 
     /**
-     * Unlock after serialization
+     * Unlock after serialization.
      */
     private void unlockInternal() {
         diffLock.unlock();
