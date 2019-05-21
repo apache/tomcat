@@ -90,7 +90,7 @@ compile.debug=true
 # Do not pass -deprecation (-Xlint:deprecation) flag to javac
 compile.deprecation=false
 
-base-apache.loc.1=https://www.apache.org/dyn/closer.lua?action=download&filename=
+base-apache.loc.1=http://www.apache.org/dyn/closer.lua?action=download&filename=
 base-apache.loc.2=https://archive.apache.org/dist
 base-commons.loc.1=${base-apache.loc.1}/commons
 base-commons.loc.2=${base-apache.loc.2}/commons
@@ -126,8 +126,8 @@ wsdl4j-lib.loc=${base-maven.loc}/wsdl4j/wsdl4j/${wsdl4j-lib.version}/wsdl4j-${ws
 # See https://wiki.apache.org/tomcat/JDTCoreBatchCompiler before updating
 #
 # Checksum is from "SHA512 Checksums for 4.10" link at
-# https://download.eclipse.org/eclipse/downloads/drops4/R-4.10-201812060815/
-# https://download.eclipse.org/eclipse/downloads/drops4/R-4.10-201812060815/checksum/eclipse-4.10-SUMSSHA512
+# http://download.eclipse.org/eclipse/downloads/drops4/R-4.10-201812060815/
+# http://download.eclipse.org/eclipse/downloads/drops4/R-4.10-201812060815/checksum/eclipse-4.10-SUMSSHA512
 #
 jdt.version=4.10
 jdt.release=R-4.10-201812060815
@@ -137,8 +137,8 @@ jdt.checksum.value=6528d1933d752f909e61456f1a3cbb3ae3999d263701a459e6f4fc33f97f7
 jdt.home=${base.path}/ecj-${jdt.version}
 jdt.jar=${jdt.home}/ecj-${jdt.version}.jar
 # The download will be moved to the archive area eventually. We are taking care of that in advance.
-jdt.loc.1=https://archive.eclipse.org/eclipse/downloads/drops4/${jdt.release}/ecj-${jdt.version}.jar
-jdt.loc.2=https://download.eclipse.org/eclipse/downloads/drops4/${jdt.release}/ecj-${jdt.version}.jar
+jdt.loc.1=http://archive.eclipse.org/eclipse/downloads/drops4/${jdt.release}/ecj-${jdt.version}.jar
+jdt.loc.2=http://download.eclipse.org/eclipse/downloads/drops4/${jdt.release}/ecj-${jdt.version}.jar
 
 # ----- Tomcat native library -----
 tomcat-native.version=1.2.21
