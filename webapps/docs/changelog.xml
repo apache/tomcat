@@ -166,6 +166,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="WebSocket">
+    <changelog>
+      <fix>
+        Fix timeout logic for async non blocking writes. Identified by
+        Coverity Scan. (remm)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Tribes">
     <changelog>
       <fix>
@@ -174,14 +182,6 @@
         members. This avoids a SEVERE log message every time the check is
         performed when the host associated with a group member is not powered
         on. (markt)
-      </fix>
-    </changelog>
-  </subsection>
-  <subsection name="WebSocket">
-    <changelog>
-      <fix>
-        Fix timeout logic for async non blocking writes. Identified by
-        Coverity Scan. (remm)
       </fix>
     </changelog>
   </subsection>
