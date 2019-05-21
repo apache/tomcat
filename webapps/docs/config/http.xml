@@ -1561,148 +1561,202 @@
 
   <p>The following NIO and NIO2 SSL configuration attributes have been
   deprecated in favor of the default
-  <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a> element.
+  <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a> element with
+  the <code>hostName</code> of <code>_default_</code>. If this
+  <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a> element is not
+  explicitly defined, it will be created..
   </p>
 
   <attributes>
 
     <attribute name="algorithm" required="false">
       <p>This is an alias for the <code>keyManagerAlgorithm</code> attribute of
-      the default <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a>
-      element.</p>
+      the <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a> element with
+      the <code>hostName</code> of <code>_default_</code>. If this
+      <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a> element is not
+      explicitly defined, it will be created.</p>
     </attribute>
 
     <attribute name="ciphers" required="false">
-      <p>This is an alias for the <code>ciphers</code> attribute of the default
-      <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a> element.</p>
+      <p>This is an alias for the <code>ciphers</code> attribute of the
+      <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a> element with the
+      <code>hostName</code> of <code>_default_</code>. If this
+      <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a> element is not
+      explicitly defined, it will be created.</p>
     </attribute>
 
     <attribute name="clientAuth" required="false">
       <p>This is an alias for the <code>certificateVerification</code> attribute
-      of the default <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a>
-      element.</p>
+      of the <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a> element
+      with the <code>hostName</code> of <code>_default_</code>. If this
+      <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a> element is not
+      explicitly defined, it will be created.</p>
     </attribute>
 
     <attribute name="crlFile" required="false">
       <p>This is an alias for the <code>certificateRevocationListFile</code>
-      attribute of the default
-      <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a> element.</p>
+      attribute of the <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a>
+      element with the <code>hostName</code> of <code>_default_</code>. If this
+      <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a> element is not
+      explicitly defined, it will be created.</p>
     </attribute>
 
     <attribute name="keyAlias" required="false">
       <p>This is an alias for the <code>certificateKeyAlias</code> attribute of
       the first <a href="#SSL_Support_-_Certificate">Certificate</a> element
-      nested in the default
-      <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a> element.</p>
+      nested in the <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a>
+      element with the <code>hostName</code> of <code>_default_</code>. If this
+      <a href="#SSL_Support_-_Certificate">Certificate</a> and/or
+      <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a> element is not
+      explicitly defined, they will be created.</p>
     </attribute>
 
     <attribute name="keyPass" required="false">
       <p>This is an alias for the <code>certificateKeyPassword</code> attribute
       of the first <a href="#SSL_Support_-_Certificate">Certificate</a> element
-      nested in the default
-      <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a> element.</p>
+      nested in the <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a>
+      element with the <code>hostName</code> of <code>_default_</code>. If this
+      <a href="#SSL_Support_-_Certificate">Certificate</a> and/or
+      <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a> element is not
+      explicitly defined, they will be created.</p>
     </attribute>
 
     <attribute name="keystoreFile" required="false">
       <p>This is an alias for the <code>certificateKeystoreFile</code> attribute
       of the first <a href="#SSL_Support_-_Certificate">Certificate</a> element
-      nested in the default
-      <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a> element.</p>
+      nested in the <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a>
+      element with the <code>hostName</code> of <code>_default_</code>. If this
+      <a href="#SSL_Support_-_Certificate">Certificate</a> and/or
+      <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a> element is not
+      explicitly defined, they will be created.</p>
     </attribute>
 
     <attribute name="keystorePass" required="false">
       <p>This is an alias for the <code>certificateKeystorePassword</code>
       attribute of the first
       <a href="#SSL_Support_-_Certificate">Certificate</a> element nested in the
-      default <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a>
-      element.</p>
+      <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a>
+      element with the <code>hostName</code> of <code>_default_</code>. If this
+      <a href="#SSL_Support_-_Certificate">Certificate</a> and/or
+      <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a> element is not
+      explicitly defined, they will be created.</p>
     </attribute>
 
     <attribute name="keystoreProvider" required="false">
       <p>This is an alias for the <code>certificateKeystoreProvider</code>
       attribute of the first
       <a href="#SSL_Support_-_Certificate">Certificate</a> element nested in the
-      default <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a>
-      element.</p>
+      <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a>
+      element with the <code>hostName</code> of <code>_default_</code>. If this
+      <a href="#SSL_Support_-_Certificate">Certificate</a> and/or
+      <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a> element is not
+      explicitly defined, they will be created.</p>
     </attribute>
 
     <attribute name="keystoreType" required="false">
       <p>This is an alias for the <code>certificateKeystoreType</code> attribute
       of the first <a href="#SSL_Support_-_Certificate">Certificate</a> element
-      nested in the default
-      <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a> element.</p>
+      nested in the <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a>
+      element with the <code>hostName</code> of <code>_default_</code>. If this
+      <a href="#SSL_Support_-_Certificate">Certificate</a> and/or
+      <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a> element is not
+      explicitly defined, they will be created.</p>
     </attribute>
 
     <attribute name="sessionCacheSize" required="false">
       <p>This is an alias for the <code>sessionCacheSize</code> attribute of the
-      default <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a>
-      element.</p>
+      <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a> element with
+      the <code>hostName</code> of <code>_default_</code>. If this
+      <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a> element is not
+      explicitly defined, it will be created.</p>
     </attribute>
 
     <attribute name="sessionTimeout" required="false">
       <p>This is an alias for the <code>sessionTimeout</code> attribute of the
-      default <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a>
-      element.</p>
+      <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a> element with
+      the <code>hostName</code> of <code>_default_</code>. If this
+      <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a> element is not
+      explicitly defined, it will be created.</p>
     </attribute>
 
     <attribute name="sslEnabledProtocols" required="false">
       <p>This is an alias for the <code>protocols</code> attribute of the
-      default <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a>
-      element.</p>
+      <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a> element with
+      the <code>hostName</code> of <code>_default_</code>. If this
+      <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a> element is not
+      explicitly defined, it will be created.</p>
     </attribute>
 
     <attribute name="sslProtocol" required="false">
       <p>This is an alias for the <code>sslProtocol</code> attribute of the
-      default <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a>
-      element.</p>
+      <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a> element with
+      the <code>hostName</code> of <code>_default_</code>. If this
+      <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a> element is not
+      explicitly defined, it will be created.</p>
     </attribute>
 
     <attribute name="trustManagerClassName" required="false">
       <p>This is an alias for the <code>trustManagerClassName</code> attribute
-      of the default <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a>
-      element.</p>
+      of the <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a> element
+      with the <code>hostName</code> of <code>_default_</code>. If this
+      <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a> element is not
+      explicitly defined, it will be created.</p>
     </attribute>
 
     <attribute name="trustMaxCertLength" required="false">
       <p>This is an alias for the <code>certificateVerificationDepth</code>
-      attribute of the default
-      <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a> element.</p>
+      attribute of the <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a>
+      element with the <code>hostName</code> of <code>_default_</code>. If this
+      <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a> element is not
+      explicitly defined, it will be created.</p>
     </attribute>
 
     <attribute name="truststoreAlgorithm" required="false">
       <p>This is an alias for the <code>truststoreAlgorithm</code> attribute of
-      the default <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a>
-      element.</p>
+      <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a> element with
+      the <code>hostName</code> of <code>_default_</code>. If this
+      <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a> element is not
+      explicitly defined, it will be created.</p>
     </attribute>
 
     <attribute name="truststoreFile" required="false">
       <p>This is an alias for the <code>truststoreFile</code> attribute of
-      the default <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a>
-      element.</p>
+      <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a> element with
+      the <code>hostName</code> of <code>_default_</code>. If this
+      <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a> element is not
+      explicitly defined, it will be created.</p>
     </attribute>
 
     <attribute name="truststorePass" required="false">
       <p>This is an alias for the <code>truststorePassword</code> attribute of
-      the default <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a>
-      element.</p>
+      <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a> element with
+      the <code>hostName</code> of <code>_default_</code>. If this
+      <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a> element is not
+      explicitly defined, it will be created.</p>
     </attribute>
 
     <attribute name="truststoreProvider" required="false">
       <p>This is an alias for the <code>truststoreProvider</code> attribute of
-      the default <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a>
-      element.</p>
+      <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a> element with
+      the <code>hostName</code> of <code>_default_</code>. If this
+      <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a> element is not
+      explicitly defined, it will be created.</p>
     </attribute>
 
     <attribute name="truststoreType" required="false">
       <p>This is an alias for the <code>truststoreType</code> attribute of
-      the default <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a>
-      element.</p>
+      <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a> element with
+      the <code>hostName</code> of <code>_default_</code>. If this
+      <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a> element is not
+      explicitly defined, it will be created.</p>
      </attribute>
 
     <attribute name="useServerCipherSuitesOrder" required="false">
       <p>This is an alias for the <code>honorCipherOrder</code> attribute of the
-      default <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a>
-      element.</p>
+      <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a> element with
+      <code>hostName</code> of <code>_default_</code>. If this
+      <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a> element is not
+      explicitly defined, it will be created.</p>
     </attribute>
 
   </attributes>
@@ -1728,89 +1782,121 @@
   <attributes>
 
     <attribute name="SSLCACertificateFile" required="false">
-      <p>This is an alias for the <code>caCertificateFile</code>
-      attribute of the default
-      <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a> element.</p>
+      <p>This is an alias for the <code>caCertificateFile</code> attribute of
+      the <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a> element with
+      the <code>hostName</code> of <code>_default_</code>. If this
+      <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a> element is not
+      explicitly defined, it will be created.</p>
     </attribute>
 
     <attribute name="SSLCACertificatePath" required="false">
-      <p>This is an alias for the <code>caCertificatePath</code>
-      attribute of the default
-      <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a> element.</p>
+      <p>This is an alias for the <code>caCertificatePath</code> attribute of
+      the <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a> element with
+      the <code>hostName</code> of <code>_default_</code>. If this
+      <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a> element is not
+      explicitly defined, it will be created.</p>
     </attribute>
 
     <attribute name="SSLCARevocationFile" required="false">
       <p>This is an alias for the <code>certificateRevocationListFile</code>
-      attribute of the default
-      <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a> element.</p>
+      attribute of the <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a>
+      element with the <code>hostName</code> of <code>_default_</code>. If this
+      <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a> element is not
+      explicitly defined, it will be created.</p>
     </attribute>
 
     <attribute name="SSLCARevocationPath" required="false">
       <p>This is an alias for the <code>certificateRevocationListPath</code>
-      attribute of the default
-      <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a> element.</p>
+      attribute of the <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a>
+      element with the <code>hostName</code> of <code>_default_</code>. If this
+      <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a> element is not
+      explicitly defined, it will be created.</p>
     </attribute>
 
     <attribute name="SSLCertificateFile" required="true">
       <p>This is an alias for the <code>certificateFile</code> attribute of the
       first <a href="#SSL_Support_-_Certificate">Certificate</a> element nested
-      in the default <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a>
-      element.</p>
+      in the <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a> element
+      with the <code>hostName</code> of <code>_default_</code>. If this
+      <a href="#SSL_Support_-_Certificate">Certificate</a> and/or
+      <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a> element is not
+      explicitly defined, they will be created.</p>
     </attribute>
 
     <attribute name="SSLCertificateKeyFile" required="false">
-      <p>This is an alias for the <code>certificateKeyFile</code> attribute of the
-      first <a href="#SSL_Support_-_Certificate">Certificate</a> element nested
-      in the default <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a>
-      element.</p>
+      <p>This is an alias for the <code>certificateKeyFile</code> attribute of
+      the first <a href="#SSL_Support_-_Certificate">Certificate</a> element
+      nested in the <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a>
+      element with the <code>hostName</code> of <code>_default_</code>. If this
+      <a href="#SSL_Support_-_Certificate">Certificate</a> and/or
+      <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a> element is not
+      explicitly defined, they will be created.</p>
     </attribute>
 
     <attribute name="SSLCipherSuite" required="false">
-      <p>This is an alias for the <code>ciphers</code> attribute of the default
-      <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a> element.</p>
+      <p>This is an alias for the <code>ciphers</code> attribute of the
+      <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a> element with the
+      <code>hostName</code> of <code>_default_</code>. If this
+      <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a> element is not
+      explicitly defined, it will be created.</p>
     </attribute>
 
     <attribute name="SSLDisableCompression" required="false">
       <p>This is an alias for the <code>disableCompression</code> attribute of
-      the default <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a>
-      element.</p>
+      the <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a> element with
+      the <code>hostName</code> of <code>_default_</code>. If this
+      <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a> element is not
+      explicitly defined, it will be created.</p>
     </attribute>
 
     <attribute name="SSLHonorCipherOrder" required="false">
       <p>This is an alias for the <code>honorCipherOrder</code> attribute of the
-      default <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a>
-      element.</p>
+      <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a> element with the
+      <code>hostName</code> of <code>_default_</code>. If this
+      <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a> element is not
+      explicitly defined, it will be created.</p>
     </attribute>
 
     <attribute name="SSLPassword" required="false">
       <p>This is an alias for the <code>certificateKeyPassword</code> attribute
       of the first <a href="#SSL_Support_-_Certificate">Certificate</a> element
-      nested in the default
-      <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a> element.</p>
+      nested in the <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a>
+      element with the <code>hostName</code> of <code>_default_</code>. If this
+      <a href="#SSL_Support_-_Certificate">Certificate</a> and/or
+      <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a> element is not
+      explicitly defined, they will be created.</p>
     </attribute>
 
     <attribute name="SSLProtocol" required="false">
       <p>This is an alias for the <code>protocols</code> attribute of the
-      default <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a>
-      element.</p>
+      <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a> element with the
+      <code>hostName</code> of <code>_default_</code>. If this
+      <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a> element is not
+      explicitly defined, it will be created.</p>
     </attribute>
 
     <attribute name="SSLVerifyClient" required="false">
       <p>This is an alias for the <code>certificateVerification</code> attribute
-      of the default <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a>
-      element.</p>
+      of the <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a> element
+      with the <code>hostName</code> of <code>_default_</code>. If this
+      <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a> element is not
+      explicitly defined, it will be created.</p>
     </attribute>
 
     <attribute name="SSLVerifyDepth" required="false">
       <p>This is an alias for the <code>certificateVerificationDepth</code>
-      attribute of the default
-      <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a> element.</p>
+      attribute of the <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a>
+      element with the <code>hostName</code> of <code>_default_</code>. If this
+      <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a> element is not
+      explicitly defined, it will be created.</p>
     </attribute>
 
     <attribute name="SSLDisableSessionTickets" required="false">
       <p>This is an alias for the <code>disableSessionTickets</code> attribute
-      of the default <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a>
-      element.</p>
+      of the <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a> element
+      with the <code>hostName</code> of <code>_default_</code>. If this
+      <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a> element is not
+      explicitly defined, it will be created.</p>
     </attribute>
 
   </attributes>
