@@ -585,7 +585,12 @@ public class DeltaManager extends ClusterManagerBase{
      * @param deltaRequest The request to serialize
      * @return serialized delta request
      * @throws IOException IO error with serialization
+     *
+     * @deprecated Unused. This will be removed in Tomcat 10.
+     *             Calling this method may result in a deadlock. See:
+     *             https://bz.apache.org/bugzilla/show_bug.cgi?id=62841
      */
+    @Deprecated
     protected byte[] serializeDeltaRequest(DeltaSession session, DeltaRequest deltaRequest)
             throws IOException {
         session.lock();
@@ -973,7 +978,7 @@ public class DeltaManager extends ClusterManagerBase{
             deltaRequest = session.replaceDeltaRequest(newDeltaRequest);
             if (deltaRequest.getSize() > 0) {
                 counterSend_EVT_SESSION_DELTA++;
-                byte[] data = serializeDeltaRequest(session,deltaRequest);
+                byte[] data = deltaRequest.serialize();
                 msg = new SessionMessageImpl(getName(),
                                              SessionMessage.EVT_SESSION_DELTA,
                                              data,
