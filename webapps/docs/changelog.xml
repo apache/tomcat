@@ -214,6 +214,11 @@
         Expand the coverage and quality of the Czech translations provided
         with Apache Tomcat. Includes contributions by Arnošt Havelka. (markt)
       </add>
+      <add>
+        Expand the coverage and quality of the German translations provided
+        with Apache Tomcat. Includes contributions by Niklasmerz and dusiema.
+        (markt)
+      </add>
     </changelog>
   </subsection>
 </section>
