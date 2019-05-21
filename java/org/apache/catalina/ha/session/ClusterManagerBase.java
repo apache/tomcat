@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -33,9 +33,10 @@ import org.apache.catalina.session.ManagerBase;
 import org.apache.catalina.tribes.io.ReplicationStream;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.collections.SynchronizedStack;
 
 /**
- * 
+ *
  * @author Filip Hanik
  */
 public abstract class ClusterManagerBase extends ManagerBase
@@ -62,6 +63,14 @@ public abstract class ClusterManagerBase extends ManagerBase
      * send all actions of session attributes.
      */
     private boolean recordAllActions = false;
+
+    private SynchronizedStack<DeltaRequest> deltaRequestPool = new SynchronizedStack<DeltaRequest>();
+
+
+    protected SynchronizedStack<DeltaRequest> getDeltaRequestPool() {
+        return deltaRequestPool;
+    }
+
 
     @Override
     public CatalinaCluster getCluster() {
@@ -164,7 +173,7 @@ public abstract class ClusterManagerBase extends ManagerBase
     public ReplicationStream getReplicationStream(byte[] data, int offset, int length) throws IOException {
         ByteArrayInputStream fis = new ByteArrayInputStream(data, offset, length);
         return new ReplicationStream(fis, getClassLoaders());
-    }    
+    }
 
 
     //  ---------------------------------------------------- persistence handler
@@ -175,7 +184,7 @@ public abstract class ClusterManagerBase extends ManagerBase
      */
     @Override
     public void load() {
-        // NOOP 
+        // NOOP
     }
 
     /**
@@ -229,7 +238,7 @@ public abstract class ClusterManagerBase extends ManagerBase
 
                     if(replicationValve == null && log.isDebugEnabled()) {
                         log.debug("no ReplicationValve found for CrossContext Support");
-                    }//endif 
+                    }//endif
                 }//end if
             }//endif
         }//end if
