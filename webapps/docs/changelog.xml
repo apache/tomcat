@@ -148,6 +148,10 @@
         Add support for same-site cookie attribute. Patch provided by John
         Kelly. (markt)
       </add>
+      <fix>
+        Drop legacy NIO double socket close (close channel, then close
+        socket). (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">

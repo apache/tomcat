@@ -350,7 +350,6 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
     protected void doCloseServerSocket() throws IOException {
         if (!getUseInheritedChannel() && serverSock != null) {
             // Close server socket
-            serverSock.socket().close();
             serverSock.close();
         }
         serverSock = null;
@@ -441,13 +440,6 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
     @Override
     protected void closeSocket(SocketChannel socket) {
         countDownConnection();
-        try {
-            socket.socket().close();
-        } catch (IOException ioe)  {
-            if (log.isDebugEnabled()) {
-                log.debug(sm.getString("endpoint.err.close"), ioe);
-            }
-        }
         try {
             socket.close();
         } catch (IOException ioe) {

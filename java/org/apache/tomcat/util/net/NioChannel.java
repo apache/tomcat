@@ -40,10 +40,9 @@ public class NioChannel implements ByteChannel, ScatteringByteChannel, Gathering
 
     protected static final ByteBuffer emptyBuf = ByteBuffer.allocate(0);
 
+    protected final SocketBufferHandler bufHandler;
     protected SocketChannel sc = null;
     protected NioSocketWrapper socketWrapper = null;
-
-    protected final SocketBufferHandler bufHandler;
 
     public NioChannel(SocketChannel channel, SocketBufferHandler bufHandler) {
         this.sc = channel;
@@ -102,7 +101,6 @@ public class NioChannel implements ByteChannel, ScatteringByteChannel, Gathering
      */
     @Override
     public void close() throws IOException {
-        sc.socket().close();
         sc.close();
     }
 
@@ -114,7 +112,9 @@ public class NioChannel implements ByteChannel, ScatteringByteChannel, Gathering
      * @throws IOException If closing the secure channel fails.
      */
     public void close(boolean force) throws IOException {
-        if (isOpen() || force ) close();
+        if (isOpen() || force) {
+            close();
+        }
     }
 
     /**
