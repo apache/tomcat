@@ -38,7 +38,6 @@ import org.apache.catalina.session.ManagerBase;
 import org.apache.catalina.tribes.Member;
 import org.apache.catalina.tribes.io.ReplicationStream;
 import org.apache.tomcat.util.ExceptionUtils;
-import org.apache.tomcat.util.collections.SynchronizedStack;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -971,8 +970,6 @@ public class DeltaManager extends ClusterManagerBase{
     public ClusterMessage requestCompleted(String sessionId, boolean expires) {
         DeltaSession session = null;
         SessionMessage msg = null;
-        SynchronizedStack<DeltaRequest> deltaRequestPool = getDeltaRequestPool();
-        DeltaRequest deltaRequest = null;
         try {
             session = (DeltaSession) findSession(sessionId);
             if (session == null) {
@@ -980,30 +977,17 @@ public class DeltaManager extends ClusterManagerBase{
                 // removed the session from the Manager.
                 return null;
             }
-            DeltaRequest newDeltaRequest = deltaRequestPool.pop();
-            if (newDeltaRequest == null) {
-                // Will be configured in replaceDeltaRequest()
-                newDeltaRequest = new DeltaRequest(null, isRecordAllActions());
-            }
-            deltaRequest = session.replaceDeltaRequest(newDeltaRequest);
-            if (deltaRequest.getSize() > 0) {
+            if (session.isDirty()) {
                 counterSend_EVT_SESSION_DELTA++;
-                byte[] data = deltaRequest.serialize();
                 msg = new SessionMessageImpl(getName(),
                                              SessionMessage.EVT_SESSION_DELTA,
-                                             data,
+                                             session.getDiff(),
                                              sessionId,
                                              sessionId + "-" + System.currentTimeMillis());
             }
         } catch (IOException x) {
             log.error(sm.getString("deltaManager.createMessage.unableCreateDeltaRequest",sessionId), x);
             return null;
-        } finally {
-            if (deltaRequest != null) {
-                // Reset the instance before it is returned to the pool
-                deltaRequest.reset();
-                deltaRequestPool.push(deltaRequest);
-            }
         }
         if(msg == null) {
             if(!expires && !session.isPrimarySession()) {
