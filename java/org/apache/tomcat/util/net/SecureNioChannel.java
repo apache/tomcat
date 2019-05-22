@@ -535,7 +535,6 @@ public class SecureNioChannel extends NioChannel {
         } finally {
             if (force || closed) {
                 closed = true;
-                sc.socket().close();
                 sc.close();
             }
         }
