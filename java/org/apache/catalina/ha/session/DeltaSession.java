@@ -143,8 +143,10 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
         if (manager instanceof ClusterManagerBase) {
             deltaRequestPool = ((ClusterManagerBase) manager).getDeltaRequestPool();
             newDeltaRequest = deltaRequestPool.pop();
-        }
-        if (newDeltaRequest == null) {
+            if (newDeltaRequest == null) {
+                newDeltaRequest = new DeltaRequest(null, ((ClusterManagerBase) manager).isRecordAllActions());
+            }
+        } else {
             newDeltaRequest = new DeltaRequest();
         }
 
@@ -675,7 +677,7 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
 
             DeltaRequest newDeltaRequest = deltaRequestPool.pop();
             if (newDeltaRequest == null) {
-                newDeltaRequest = new DeltaRequest();
+                newDeltaRequest = new DeltaRequest(null, ((ClusterManagerBase) manager).isRecordAllActions());
             }
 
             ReplicationStream ois = ((ClusterManagerBase) manager).getReplicationStream(delta);
