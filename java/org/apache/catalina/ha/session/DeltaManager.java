@@ -978,7 +978,7 @@ public class DeltaManager extends ClusterManagerBase{
             DeltaRequest newDeltaRequest = deltaRequestPool.pop();
             if (newDeltaRequest == null) {
                 // Will be configured in replaceDeltaRequest()
-                newDeltaRequest = new DeltaRequest();
+                newDeltaRequest = new DeltaRequest(null, isRecordAllActions());
             }
             deltaRequest = session.replaceDeltaRequest(newDeltaRequest);
             if (deltaRequest.getSize() > 0) {
