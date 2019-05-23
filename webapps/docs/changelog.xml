@@ -152,6 +152,9 @@
         Drop legacy NIO double socket close (close channel, then close
         socket). (remm)
       </fix>
+      <fix>
+        Fix HTTP/2 end of stream concurrency with async. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">

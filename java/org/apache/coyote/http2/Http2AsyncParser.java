@@ -240,14 +240,14 @@ class Http2AsyncParser extends Http2Parser {
                         if (streamException) {
                             swallow(streamId, payloadSize, false, payload);
                         } else {
-                            // TODO: Find why this sync is needed
-                            synchronized (input) {
                             switch (frameType) {
                             case DATA:
                                 readDataFrame(streamId, flags, payloadSize, payload);
                                 break;
                             case HEADERS:
-                                readHeadersFrame(streamId, flags, payloadSize, payload);
+                                synchronized (upgradeHandler) {
+                                    readHeadersFrame(streamId, flags, payloadSize, payload);
+                                }
                                 break;
                             case PRIORITY:
                                 readPriorityFrame(streamId, payload);
@@ -275,7 +275,6 @@ class Http2AsyncParser extends Http2Parser {
                                 break;
                             case UNKNOWN:
                                 readUnknownFrame(streamId, frameType, flags, payloadSize, payload);
-                            }
                             }
                         }
                         // See if there is a new 9 byte header and continue parsing if possible
