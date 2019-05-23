@@ -24,7 +24,6 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Iterator;
 
 import org.apache.catalina.Engine;
 import org.apache.catalina.Host;
@@ -303,7 +302,7 @@ public class DeltaManager extends ClusterManagerBase{
 
     /**
      * Set that state transferred is complete
-     * @param stateTransfered Fag value
+     * @param stateTransfered Flag value
      */
     public void setStateTransfered(boolean stateTransfered) {
         this.stateTransfered = stateTransfered;
@@ -432,7 +431,7 @@ public class DeltaManager extends ClusterManagerBase{
         if (log.isDebugEnabled())
             log.debug(sm.getString("deltaManager.createSession.newSession",
                     session.getId(), Integer.valueOf(sessions.size())));
-        return (session);
+        return session;
     }
 
     /**
@@ -479,6 +478,7 @@ public class DeltaManager extends ClusterManagerBase{
 
     /**
      * Get new session class to be used in the doLoad() method.
+     *
      * @return a new session
      *
      * @deprecated Unused. This will be removed in Tomcat 10.
@@ -775,9 +775,7 @@ public class DeltaManager extends ClusterManagerBase{
                 waitForSendAllSessions(beforeSendTime);
             } finally {
                 synchronized(receivedMessageQueue) {
-                    for (Iterator<SessionMessage> iter = receivedMessageQueue.iterator();
-                            iter.hasNext();) {
-                        SessionMessage smsg = iter.next();
+                    for (SessionMessage smsg : receivedMessageQueue) {
                         if (!stateTimestampDrop) {
                             messageReceived(smsg, smsg.getAddress());
                         } else {
@@ -864,7 +862,7 @@ public class DeltaManager extends ClusterManagerBase{
                         new Date(beforeSendTime), Long.valueOf(reqNow - beforeSendTime)));
         } else {
             if (log.isInfoEnabled())
-                log.info(sm.getString("deltaManager.sessionReceived",getName(),
+                log.info(sm.getString("deltaManager.sessionReceived", getName(),
                         new Date(beforeSendTime), Long.valueOf(reqNow - beforeSendTime)));
         }
     }
@@ -1025,7 +1023,7 @@ public class DeltaManager extends ClusterManagerBase{
                                              sessionId + "-" + System.currentTimeMillis());
                 if (log.isDebugEnabled()) {
                     log.debug(sm.getString("deltaManager.createMessage.access",
-                            getName(),sessionId));
+                            getName(), sessionId));
                 }
             }
         }
@@ -1112,7 +1110,7 @@ public class DeltaManager extends ClusterManagerBase{
         int expireDirect  = 0 ;
         int expireIndirect = 0 ;
 
-        if(log.isDebugEnabled()) {
+        if (log.isDebugEnabled()) {
             log.debug("Start expire all sessions " + getName() + " at " + timeNow +
                     " sessioncount " + sessions.length);
         }
@@ -1130,13 +1128,12 @@ public class DeltaManager extends ClusterManagerBase{
             }//end if
         }//for
         long timeEnd = System.currentTimeMillis();
-        if(log.isDebugEnabled()) {
+        if (log.isDebugEnabled()) {
             log.debug("End expire sessions " + getName() +
                     " expire processingTime " + (timeEnd - timeNow) +
                     " expired direct sessions: " + expireDirect +
                     " expired direct sessions: " + expireIndirect);
         }
-
     }
 
     @Override
