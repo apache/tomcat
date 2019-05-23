@@ -88,7 +88,6 @@ public class ClusterSessionListener extends ClusterListener {
                         cluster.send(replymsg, msg.getAddress());
                     }
                 }
-
             }
         }
     }

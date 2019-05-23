@@ -473,6 +473,7 @@ public class DeltaManager extends ClusterManagerBase{
 
     /**
      * Get new session class to be used in the doLoad() method.
+     *
      * @return a new session
      *
      * @deprecated Unused. This will be removed in Tomcat 10.
@@ -856,7 +857,7 @@ public class DeltaManager extends ClusterManagerBase{
                         new Date(beforeSendTime), Long.valueOf(reqNow - beforeSendTime)));
         } else {
             if (log.isInfoEnabled())
-                log.info(sm.getString("deltaManager.sessionReceived",getName(),
+                log.info(sm.getString("deltaManager.sessionReceived", getName(),
                         new Date(beforeSendTime), Long.valueOf(reqNow - beforeSendTime)));
         }
     }
@@ -1017,7 +1018,7 @@ public class DeltaManager extends ClusterManagerBase{
                                              sessionId + "-" + System.currentTimeMillis());
                 if (log.isDebugEnabled()) {
                     log.debug(sm.getString("deltaManager.createMessage.access",
-                            getName(),sessionId));
+                            getName(), sessionId));
                 }
             }
         }
@@ -1104,7 +1105,7 @@ public class DeltaManager extends ClusterManagerBase{
         int expireDirect  = 0 ;
         int expireIndirect = 0 ;
 
-        if(log.isDebugEnabled()) {
+        if (log.isDebugEnabled()) {
             log.debug("Start expire all sessions " + getName() + " at " + timeNow +
                     " sessioncount " + sessions.length);
         }
@@ -1122,13 +1123,12 @@ public class DeltaManager extends ClusterManagerBase{
             }//end if
         }//for
         long timeEnd = System.currentTimeMillis();
-        if(log.isDebugEnabled()) {
+        if (log.isDebugEnabled()) {
             log.debug("End expire sessions " + getName() +
                     " expire processingTime " + (timeEnd - timeNow) +
                     " expired direct sessions: " + expireDirect +
                     " expired direct sessions: " + expireIndirect);
         }
-
     }
 
     @Override

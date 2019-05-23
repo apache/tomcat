@@ -341,7 +341,7 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
             lockInternal();
             try {
                 deltaRequest.setMaxInactiveInterval(interval);
-            } finally{
+            } finally {
                 unlockInternal();
             }
         }
@@ -364,7 +364,7 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
             lockInternal();
             try {
                 deltaRequest.setNew(isNew);
-            } finally{
+            } finally {
                 unlockInternal();
             }
         }
@@ -531,7 +531,7 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
         try {
             super.recycle();
             deltaRequest.clear();
-        } finally{
+        } finally {
             unlockInternal();
         }
     }
@@ -591,7 +591,7 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
         lockInternal();
         try {
             readObjectData(in);
-        } finally{
+        } finally {
             unlockInternal();
         }
     }
