@@ -94,6 +94,10 @@
         defined in <code>server.xml</code> with a <code>docBase</code> but not
         the optional <code>path</code>. (markt)
       </fix>
+      <add>
+        <bug>43548</bug>: Add an XML schema for the tomcat-users.xml file.
+        (markt)
+      </add>
       <fix>
         <bug>63324</bug>: Refactor the <code>CrawlerSessionManagerValve</code>
         so that the object placed in the session is compatible with session
