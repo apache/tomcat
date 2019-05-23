@@ -17,7 +17,6 @@
 package org.apache.catalina.ha.session;
 
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 
 import org.apache.catalina.DistributedManager;
@@ -45,7 +44,7 @@ public class BackupManager extends ClusterManagerBase
     /**
      * The string manager for this package.
      */
-    protected static final StringManager sm = StringManager.getManager(Constants.Package);
+    protected static final StringManager sm = StringManager.getManager(BackupManager.class);
 
     protected static long DEFAULT_REPL_TIMEOUT = 15000;//15 seconds
 
@@ -132,7 +131,7 @@ public class BackupManager extends ClusterManagerBase
 //=========================================================================
     @Override
     public void objectMadePrimay(Object key, Object value) {
-        if (value!=null && value instanceof DeltaSession) {
+        if (value instanceof DeltaSession) {
             DeltaSession session = (DeltaSession)value;
             synchronized (session) {
                 session.access();
@@ -172,10 +171,9 @@ public class BackupManager extends ClusterManagerBase
 
         try {
             if (cluster == null) throw new LifecycleException(sm.getString("backupManager.noCluster", getName()));
-            LazyReplicatedMap<String,Session> map =
-                    new LazyReplicatedMap<String,Session>(this,
-                            cluster.getChannel(), rpcTimeout, getMapName(),
-                            getClassLoaders(), terminateOnStartFailure);
+            LazyReplicatedMap<String,Session> map = new LazyReplicatedMap<String,Session>(
+                    this, cluster.getChannel(), rpcTimeout, getMapName(),
+                    getClassLoaders(), terminateOnStartFailure);
             map.setChannelSendOptions(mapSendOptions);
             map.setAccessTimeout(accessTimeout);
             this.sessions = map;
@@ -286,9 +284,8 @@ public class BackupManager extends ClusterManagerBase
         Set<String> sessionIds = new HashSet<String>();
         LazyReplicatedMap<String,Session> map =
                 (LazyReplicatedMap<String,Session>)sessions;
-        Iterator<String> keys = map.keySetFull().iterator();
-        while (keys.hasNext()) {
-            sessionIds.add(keys.next());
+        for (String id : map.keySetFull()) {
+            sessionIds.add(id);
         }
         return sessionIds;
     }

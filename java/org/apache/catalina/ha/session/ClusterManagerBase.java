@@ -14,11 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.catalina.ha.session;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 
 import org.apache.catalina.Cluster;
 import org.apache.catalina.Container;
@@ -39,8 +39,7 @@ import org.apache.tomcat.util.collections.SynchronizedStack;
  *
  * @author Filip Hanik
  */
-public abstract class ClusterManagerBase extends ManagerBase
-        implements ClusterManager {
+public abstract class ClusterManagerBase extends ManagerBase implements ClusterManager {
 
     private final Log log = LogFactory.getLog(ClusterManagerBase.class); // must not be static
 
@@ -147,21 +146,25 @@ public abstract class ClusterManagerBase extends ManagerBase
 
 
     public static ClassLoader[] getClassLoaders(Container container) {
-        Loader loader = null;
+        ClassLoader tccl = Thread.currentThread().getContextClassLoader();
+        Loader loader = container.getLoader();
         ClassLoader classLoader = null;
-        if (container != null) loader = container.getLoader();
-        if (loader != null) classLoader = loader.getClassLoader();
-        else classLoader = Thread.currentThread().getContextClassLoader();
-        if ( classLoader == Thread.currentThread().getContextClassLoader() ) {
+        if (loader != null) {
+            classLoader = loader.getClassLoader();
+        }
+        if (classLoader == null) {
+            classLoader = tccl;
+        }
+        if (classLoader == tccl) {
             return new ClassLoader[] {classLoader};
         } else {
-            return new ClassLoader[] {classLoader,Thread.currentThread().getContextClassLoader()};
+            return new ClassLoader[] {classLoader, tccl};
         }
     }
 
 
     public ClassLoader[] getClassLoaders() {
-        return getClassLoaders(container);
+        return getClassLoaders(getContainer());
     }
 
     @Override
@@ -209,14 +212,22 @@ public abstract class ClusterManagerBase extends ManagerBase
         copy.setSecureRandomAlgorithm(getSecureRandomAlgorithm());
         if (getSessionIdGenerator() != null) {
             try {
-                SessionIdGenerator copyIdGenerator = sessionIdGeneratorClass.newInstance();
+                SessionIdGenerator copyIdGenerator = sessionIdGeneratorClass.getConstructor().newInstance();
                 copyIdGenerator.setSessionIdLength(getSessionIdGenerator().getSessionIdLength());
                 copyIdGenerator.setJvmRoute(getSessionIdGenerator().getJvmRoute());
                 copy.setSessionIdGenerator(copyIdGenerator);
             } catch (InstantiationException e) {
-             // Ignore
+                // Ignore
             } catch (IllegalAccessException e) {
-             // Ignore
+                // Ignore
+            } catch (IllegalArgumentException e) {
+                // Ignore
+            } catch (SecurityException e) {
+                // Ignore
+            } catch (InvocationTargetException e) {
+                // Ignore
+            } catch (NoSuchMethodException e) {
+                // Ignore
             }
         }
         copy.setRecordAllActions(isRecordAllActions());

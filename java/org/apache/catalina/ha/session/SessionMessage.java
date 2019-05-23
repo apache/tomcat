@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -71,7 +71,7 @@ public interface SessionMessage extends ClusterMessage {
      * When a session state is transferred, this is the event.
      */
     public static final int EVT_ALL_SESSION_DATA = 12;
-    
+
     /**
      * When a session state is complete transferred, this is the event.
      */
@@ -89,14 +89,14 @@ public interface SessionMessage extends ClusterMessage {
     public static final int EVT_ALL_SESSION_NOCONTEXTMANAGER = 16;
 
     public String getContextName();
-    
+
     public String getEventTypeString();
-    
+
     /**
      * returns the event type
      * @return one of the event types EVT_XXXX
      */
-    public int getEventType(); 
+    public int getEventType();
     /**
      * @return the serialized data for the session
      */

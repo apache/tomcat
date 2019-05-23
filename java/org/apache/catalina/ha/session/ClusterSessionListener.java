@@ -60,13 +60,13 @@ public class ClusterSessionListener extends ClusterListener {
     /**
      * Callback from the cluster, when a message is received, The cluster will
      * broadcast it invoking the messageReceived on the receiver.
-     * 
+     *
      * @param myobj
      *            ClusterMessage - the message received from the cluster
      */
     @Override
     public void messageReceived(ClusterMessage myobj) {
-        if (myobj != null && myobj instanceof SessionMessage) {
+        if (myobj instanceof SessionMessage) {
             SessionMessage msg = (SessionMessage) myobj;
             String ctxname = msg.getContextName();
             //check if the message is a EVT_GET_ALL_SESSIONS,
@@ -104,12 +104,11 @@ public class ClusterSessionListener extends ClusterListener {
                 }
             }
         }
-        return;
     }
 
     /**
      * Accept only SessionMessage
-     * 
+     *
      * @param msg
      *            ClusterMessage
      * @return boolean - returns true to indicate that messageReceived should be
@@ -118,7 +117,7 @@ public class ClusterSessionListener extends ClusterListener {
      */
     @Override
     public boolean accept(ClusterMessage msg) {
-        return (msg instanceof SessionMessage);
+        return msg instanceof SessionMessage;
     }
 }
 
