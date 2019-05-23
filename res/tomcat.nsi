@@ -15,8 +15,11 @@
 
 ; Tomcat script for Nullsoft Installer
 
-  ;General
+!ifdef UNINSTALLONLY
+  OutFile "tempinstaller.exe"
+!else
   OutFile tomcat-installer.exe
+!endif
 
   ;Compression options
   CRCCheck on
@@ -110,9 +113,11 @@ Var ServiceInstallLog
   Page custom CheckUserType
   !insertmacro MUI_PAGE_FINISH
 
-  ;Uninstall Page order
-  !insertmacro MUI_UNPAGE_CONFIRM
-  !insertmacro MUI_UNPAGE_INSTFILES
+  !ifdef UNINSTALLONLY
+    ;Uninstall Page order
+    !insertmacro MUI_UNPAGE_CONFIRM
+    !insertmacro MUI_UNPAGE_INSTFILES
+  !endif
 
   ;Language
   !insertmacro MUI_LANGUAGE English
@@ -339,7 +344,11 @@ Section -post
     Call createShortcuts
   ${EndIf}
 
-  WriteUninstaller "$INSTDIR\Uninstall.exe"
+  !ifndef UNINSTALLONLY
+    SetOutPath $INSTDIR
+    ; this packages the signed uninstaller
+    File Uninstall.exe
+  !endif
 
   WriteRegStr HKLM "SOFTWARE\Apache Software Foundation\Tomcat\@VERSION_MAJOR_MINOR@\$TomcatServiceName" "InstallPath" $INSTDIR
   WriteRegStr HKLM "SOFTWARE\Apache Software Foundation\Tomcat\@VERSION_MAJOR_MINOR@\$TomcatServiceName" "Version" @VERSION@
@@ -377,6 +386,14 @@ Function ReadFromConfigIni
 FunctionEnd
 
 Function .onInit
+  !ifdef UNINSTALLONLY
+    ; If UNINSTALLONLY is defined, then we aren't supposed to do anything except write out
+    ; the installer.  This is better than processing a command line option as it means
+    ; this entire code path is not present in the final (real) installer.
+    WriteUninstaller "$EXEDIR\Uninstall.exe"
+    Quit
+  !endif
+
   ${GetParameters} $R0
   ClearErrors
 
@@ -1158,138 +1175,141 @@ FunctionEnd
 ;--------------------------------
 ;Uninstaller Section
 
-Section Uninstall
+!ifdef UNINSTALLONLY
+  Section Uninstall
 
-  ${If} $TomcatServiceName == ""
-    MessageBox MB_ICONSTOP|MB_OK \
-        "No service name specified to uninstall. This will be provided automatically if you uninstall via \
-         Add/Remove Programs or the shortcut on the Start menu. Alternatively, call the installer from \
-         the command line with -ServiceName=$\"<name of service>$\"."
-    Quit
-  ${EndIf}
+    ${If} $TomcatServiceName == ""
+      MessageBox MB_ICONSTOP|MB_OK \
+          "No service name specified to uninstall. This will be provided automatically if you uninstall via \
+           Add/Remove Programs or the shortcut on the Start menu. Alternatively, call the installer from \
+           the command line with -ServiceName=$\"<name of service>$\"."
+      Quit
+    ${EndIf}
 
-  Delete "$INSTDIR\Uninstall.exe"
+    Delete "$INSTDIR\Uninstall.exe"
 
-  ; Stop Tomcat service monitor if running
-  DetailPrint "Stopping $TomcatServiceName service monitor"
-  nsExec::ExecToLog '"$INSTDIR\bin\$TomcatServiceManagerFileName" //MQ//$TomcatServiceName'
-  ; Delete Tomcat service
-  DetailPrint "Uninstalling $TomcatServiceName service"
-  nsExec::ExecToLog '"$INSTDIR\bin\$TomcatServiceFileName" //DS//$TomcatServiceName --LogPath "$INSTDIR\logs"'
-  ClearErrors
+    ; Stop Tomcat service monitor if running
+    DetailPrint "Stopping $TomcatServiceName service monitor"
+    nsExec::ExecToLog '"$INSTDIR\bin\$TomcatServiceManagerFileName" //MQ//$TomcatServiceName'
+    ; Delete Tomcat service
+    DetailPrint "Uninstalling $TomcatServiceName service"
+    nsExec::ExecToLog '"$INSTDIR\bin\$TomcatServiceFileName" //DS//$TomcatServiceName --LogPath "$INSTDIR\logs"'
+    ClearErrors
 
-  ; Don't know if 32-bit or 64-bit registry was used so, for now, remove both
-  SetRegView 32
-  DeleteRegKey HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Apache Tomcat @VERSION_MAJOR_MINOR@ $TomcatServiceName"
-  DeleteRegKey HKLM "SOFTWARE\Apache Software Foundation\Tomcat\@VERSION_MAJOR_MINOR@\$TomcatServiceName"
-  DeleteRegValue HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Run" "ApacheTomcatMonitor@VERSION_MAJOR_MINOR@_$TomcatServiceName"
-  DeleteRegValue HKCU "Software\Microsoft\Windows\CurrentVersion\Run" "ApacheTomcatMonitor@VERSION_MAJOR_MINOR@_$TomcatServiceName"
-  SetRegView 64
-  DeleteRegKey HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Apache Tomcat @VERSION_MAJOR_MINOR@ $TomcatServiceName"
-  DeleteRegKey HKLM "SOFTWARE\Apache Software Foundation\Tomcat\@VERSION_MAJOR_MINOR@\$TomcatServiceName"
-  DeleteRegValue HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Run" "ApacheTomcatMonitor@VERSION_MAJOR_MINOR@_$TomcatServiceName"
-  DeleteRegValue HKCU "Software\Microsoft\Windows\CurrentVersion\Run" "ApacheTomcatMonitor@VERSION_MAJOR_MINOR@_$TomcatServiceName"
+    ; Don't know if 32-bit or 64-bit registry was used so, for now, remove both
+    SetRegView 32
+    DeleteRegKey HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Apache Tomcat @VERSION_MAJOR_MINOR@ $TomcatServiceName"
+    DeleteRegKey HKLM "SOFTWARE\Apache Software Foundation\Tomcat\@VERSION_MAJOR_MINOR@\$TomcatServiceName"
+    DeleteRegValue HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Run" "ApacheTomcatMonitor@VERSION_MAJOR_MINOR@_$TomcatServiceName"
+    DeleteRegValue HKCU "Software\Microsoft\Windows\CurrentVersion\Run" "ApacheTomcatMonitor@VERSION_MAJOR_MINOR@_$TomcatServiceName"
+    SetRegView 64
+    DeleteRegKey HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Apache Tomcat @VERSION_MAJOR_MINOR@ $TomcatServiceName"
+    DeleteRegKey HKLM "SOFTWARE\Apache Software Foundation\Tomcat\@VERSION_MAJOR_MINOR@\$TomcatServiceName"
+    DeleteRegValue HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Run" "ApacheTomcatMonitor@VERSION_MAJOR_MINOR@_$TomcatServiceName"
+    DeleteRegValue HKCU "Software\Microsoft\Windows\CurrentVersion\Run" "ApacheTomcatMonitor@VERSION_MAJOR_MINOR@_$TomcatServiceName"
 
-  ; Don't know if short-cuts were created for all users, one user or not at all so, for now, remove both
-  SetShellVarContext all
-  RMDir /r "$SMPROGRAMS\Apache Tomcat @VERSION_MAJOR_MINOR@ $TomcatServiceName"
-  SetShellVarContext current
-  RMDir /r "$SMPROGRAMS\Apache Tomcat @VERSION_MAJOR_MINOR@ $TomcatServiceName"
+    ; Don't know if short-cuts were created for all users, one user or not at all so, for now, remove both
+    SetShellVarContext all
+    RMDir /r "$SMPROGRAMS\Apache Tomcat @VERSION_MAJOR_MINOR@ $TomcatServiceName"
+    SetShellVarContext current
+    RMDir /r "$SMPROGRAMS\Apache Tomcat @VERSION_MAJOR_MINOR@ $TomcatServiceName"
 
-  ; Before files are removed using recursive deletes, remove any symbolic
-  ; links in the installation directory and the directory structure below it
-  ; to ensure the recursive deletes don't result in any nasty surprises.
-  Push "$INSTDIR"
-  Call un.RemoveSymlinks
+    ; Before files are removed using recursive deletes, remove any symbolic
+    ; links in the installation directory and the directory structure below it
+    ; to ensure the recursive deletes don't result in any nasty surprises.
+    Push "$INSTDIR"
+    Call un.RemoveSymlinks
 
-  Delete "$INSTDIR\tomcat.ico"
-  Delete "$INSTDIR\LICENSE"
-  Delete "$INSTDIR\NOTICE"
-  RMDir /r "$INSTDIR\bin"
-  RMDir /r "$INSTDIR\lib"
-  Delete "$INSTDIR\conf\*.dtd"
-  RMDir "$INSTDIR\logs"
-  RMDir /r "$INSTDIR\webapps\docs"
-  RMDir /r "$INSTDIR\webapps\examples"
-  RMDir /r "$INSTDIR\work"
-  RMDir /r "$INSTDIR\temp"
-  RMDir "$INSTDIR"
+    Delete "$INSTDIR\tomcat.ico"
+    Delete "$INSTDIR\LICENSE"
+    Delete "$INSTDIR\NOTICE"
+    RMDir /r "$INSTDIR\bin"
+    RMDir /r "$INSTDIR\lib"
+    Delete "$INSTDIR\conf\*.dtd"
+    RMDir "$INSTDIR\logs"
+    RMDir /r "$INSTDIR\webapps\docs"
+    RMDir /r "$INSTDIR\webapps\examples"
+    RMDir /r "$INSTDIR\work"
+    RMDir /r "$INSTDIR\temp"
+    RMDir "$INSTDIR"
 
-  IfSilent Removed 0
+    IfSilent Removed 0
 
-  ; if $INSTDIR was removed, skip these next ones
-  IfFileExists "$INSTDIR" 0 Removed
-    MessageBox MB_YESNO|MB_ICONQUESTION \
-      "Remove all files in your Apache Tomcat @VERSION_MAJOR_MINOR@ $TomcatServiceName directory? (If you have anything  \
- you created that you want to keep, click No)" IDNO Removed
-    ; these would be skipped if the user hits no
-    RMDir /r "$INSTDIR\webapps"
-    RMDir /r "$INSTDIR\logs"
-    RMDir /r "$INSTDIR\conf"
-    Delete "$INSTDIR\*.*"
-    RMDir /r "$INSTDIR"
-    Sleep 500
+    ; if $INSTDIR was removed, skip these next ones
     IfFileExists "$INSTDIR" 0 Removed
-      MessageBox MB_OK|MB_ICONEXCLAMATION \
-                 "Note: $INSTDIR could not be removed."
-  Removed:
+      MessageBox MB_YESNO|MB_ICONQUESTION \
+        "Remove all files in your Apache Tomcat @VERSION_MAJOR_MINOR@ $TomcatServiceName directory? (If you have anything  \
+   you created that you want to keep, click No)" IDNO Removed
+      ; these would be skipped if the user hits no
+      RMDir /r "$INSTDIR\webapps"
+      RMDir /r "$INSTDIR\logs"
+      RMDir /r "$INSTDIR\conf"
+      Delete "$INSTDIR\*.*"
+      RMDir /r "$INSTDIR"
+      Sleep 500
+      IfFileExists "$INSTDIR" 0 Removed
+        MessageBox MB_OK|MB_ICONEXCLAMATION \
+                   "Note: $INSTDIR could not be removed."
+    Removed:
 
-SectionEnd
+  SectionEnd
 
+  ; =================
+  ; uninstall init function
+  ;
+  ; Read the command line parameter and set up the service name variables so the
+  ; uninstaller knows which service it is working with
+  ; =================
+  Function un.onInit
+    ${GetParameters} $R0
+    ${GetOptions} $R0 "-ServiceName=" $R1
+    StrCpy $TomcatServiceName $R1
+    StrCpy $TomcatServiceFileName $R1.exe
+    StrCpy $TomcatServiceManagerFileName $R1w.exe
+  FunctionEnd
 
-; =================
-; uninstall init function
-;
-; Read the command line parameter and set up the service name variables so the
-; uninstaller knows which service it is working with
-; =================
-Function un.onInit
-  ${GetParameters} $R0
-  ${GetOptions} $R0 "-ServiceName=" $R1
-  StrCpy $TomcatServiceName $R1
-  StrCpy $TomcatServiceFileName $R1.exe
-  StrCpy $TomcatServiceManagerFileName $R1w.exe
-FunctionEnd
+  ; =================
+  ; Removes symbolic links from the path found on top of the stack.
+  ; The path is removed from the stack as a result of calling this function.
+  ; =================
+  Function un.RemoveSymlinks
+    Pop $0
+    ${GetFileAttributes} "$0" "REPARSE_POINT" $3
+    ; DetailPrint "Processing directory [$0] [$3]"
+    FindFirst $1 $2 $0\*.*
+    ; DetailPrint "Search [$1] found [$2]"
+    StrCmp $3 "1" RemoveSymlinks-delete
+  RemoveSymlinks-loop:
+    ; DetailPrint "Search [$1] processing [$0\$2]"
+    StrCmp $2 "" RemoveSymlinks-exit
+    StrCmp $2 "." RemoveSymlinks-skip
+    StrCmp $2 ".." RemoveSymlinks-skip
+    IfFileExists $0\$2\*.* RemoveSymlinks-directory
+  RemoveSymlinks-skip:
+    ; DetailPrint "Search [$1] ignoring file [$0\$2]"
+    FindNext $1 $2
+    StrCmp $2 "" RemoveSymlinks-exit
+    goto RemoveSymlinks-loop
+  RemoveSymlinks-directory:
+    ; DetailPrint "Search [$1] found directory [$0\$2]"
+    Push $0
+    Push $1
+    Push $0\$2
+    Call un.RemoveSymlinks
+    Pop $1
+    Pop $0
+    ; DetailPrint "Search [$1] restored for [$0]"
+    FindNext $1 $2
+    goto RemoveSymlinks-loop
+  RemoveSymlinks-delete:
+    ; DetailPrint "Deleting symlink [$0]"
+    SetFileAttributes "$0" "NORMAL"
+    System::Call "kernel32::RemoveDirectoryW(w `$0`) i.n"
+  RemoveSymlinks-exit:
+    ; DetailPrint "Search [$1] closed"
+   FindClose $1
+  FunctionEnd
 
-; =================
-; Removes symbolic links from the path found on top of the stack.
-; The path is removed from the stack as a result of calling this function.
-; =================
-Function un.RemoveSymlinks
-  Pop $0
-  ${GetFileAttributes} "$0" "REPARSE_POINT" $3
-  ; DetailPrint "Processing directory [$0] [$3]"
-  FindFirst $1 $2 $0\*.*
-  ; DetailPrint "Search [$1] found [$2]"
-  StrCmp $3 "1" RemoveSymlinks-delete
-RemoveSymlinks-loop:
-  ; DetailPrint "Search [$1] processing [$0\$2]"
-  StrCmp $2 "" RemoveSymlinks-exit
-  StrCmp $2 "." RemoveSymlinks-skip
-  StrCmp $2 ".." RemoveSymlinks-skip
-  IfFileExists $0\$2\*.* RemoveSymlinks-directory
-RemoveSymlinks-skip:
-  ; DetailPrint "Search [$1] ignoring file [$0\$2]"
-  FindNext $1 $2
-  StrCmp $2 "" RemoveSymlinks-exit
-  goto RemoveSymlinks-loop
-RemoveSymlinks-directory:
-  ; DetailPrint "Search [$1] found directory [$0\$2]"
-  Push $0
-  Push $1
-  Push $0\$2
-  Call un.RemoveSymlinks
-  Pop $1
-  Pop $0
-  ; DetailPrint "Search [$1] restored for [$0]"
-  FindNext $1 $2
-  goto RemoveSymlinks-loop
-RemoveSymlinks-delete:
-  ; DetailPrint "Deleting symlink [$0]"
-  SetFileAttributes "$0" "NORMAL"
-  System::Call "kernel32::RemoveDirectoryW(w `$0`) i.n"
-RemoveSymlinks-exit:
-  ; DetailPrint "Search [$1] closed"
- FindClose $1
-FunctionEnd
+!endif
+
 ;eof

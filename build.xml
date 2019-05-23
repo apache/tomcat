@@ -498,7 +498,7 @@
   <target name="echoproperties">
     <echoproperties/>
   </target>
-  
+
   <target name="build-prepare">
 
     <!-- Required so we can compile -->
@@ -2168,9 +2168,26 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
     </copy>
   </target>
 
-  <target name="installer" description="Create Windows installer"
-      unless="skip.installer" depends="dist-static">
-    <echo message="Builds a Windows installer based on Nullsoft Installer"/>
+  <target name="-installer-pre-init">
+    <property environment="env" />
+    <condition property="wine.ok">
+      <or>
+        <os family="windows" />
+        <available file="wine" filepath="${env.PATH}" />
+        <isset property="skip.installer"/>
+      </or>
+    </condition>
+  </target>
+
+  <target name="-installer-init" depends="-installer-pre-init" unless="${wine.ok}">
+    <fail message="The executable wine was not found on the current path.
+Wine is required to build the Windows installer when running a release build on
+a non-Windows platform. To skip building the Windows installer, set the
+skip.installer property in build.properties" />
+  </target>
+
+  <target name="-installer-prep"
+      unless="skip.installer" depends="dist-static,-installer-init">
     <copy todir="${tomcat.dist}">
       <fileset dir="res">
         <include name="INSTALLLICENSE" />
@@ -2187,12 +2204,61 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
     <copy file="res/tomcat.nsi" tofile="${tomcat.dist}/tomcat.nsi" overwrite="true" encoding="ISO-8859-1">
       <filterset refid="version.filters"/>
     </copy>
-
     <fixcrlf srcdir="${tomcat.dist}" eol="crlf"
         encoding="ISO-8859-1" fixlast="false" >
       <patternset refid="text.files" />
     </fixcrlf>
+  </target>
 
+  <target name="-installer-create-tempinstaller"
+      unless="skip.installer" depends="-installer-prep">
+    <exec dir="${tomcat.dist}" executable="${nsis.exe}" osfamily="windows">
+      <arg value="/DUNINSTALLONLY" />
+      <arg value="/DNSISDIR=${nsis.home}" />
+      <arg value="/V2" />
+      <arg value="tomcat.nsi" />
+    </exec>
+    <exec dir="${tomcat.dist}" executable="wine" osfamily="unix">
+      <arg value="${nsis.exe}" />
+      <arg value="/DUNINSTALLONLY" />
+      <arg value="/DNSISDIR=${nsis.home}" />
+      <arg value="/V2" />
+      <arg value="tomcat.nsi" />
+    </exec>
+  </target>
+
+  <target name="-installer-create-uninstaller"
+      unless="skip.installer" depends="-installer-create-tempinstaller">
+    <!-- Execute the temporary installer to create the uninstaller -->
+    <exec dir="${tomcat.dist}" executable="${tomcat.dist}/tempinstaller.exe"
+        osfamily="windows"  />
+    <exec dir="${tomcat.dist}" executable="wine" osfamily="unix">
+      <arg value="${tomcat.dist}/tempinstaller.exe" />
+    </exec>
+
+  </target>
+
+  <target name="-installer-sign-uninstaller"
+      unless="skip.installer" depends="-installer-create-uninstaller"
+      if="${do.codesigning}">
+    <taskdef name="signcode"
+        classname="org.apache.tomcat.buildutil.SignCode"
+        classpath="${tomcat.classes}" />
+    <signcode userName="${codesigning.user}" password="${codesigning.pwd}"
+        partnerCode="${codesigning.partnercode}"
+        keyStore="${codesigning.keyStore}"
+        keyStorePassword="${codesigning.keyStorePassword}"
+        applicationName="Apache Tomcat ${version.major.minor} Uninstaller"
+        applicationversion="${version}"
+        signingService="${codesigning.service}">
+      <fileset dir="${tomcat.dist}">
+        <filename name="Uninstall.exe"/>
+      </fileset>
+    </signcode>
+  </target>
+
+  <target name="-installer" unless="skip.installer"
+      depends="-installer-sign-uninstaller">
     <exec dir="${tomcat.dist}" executable="${nsis.exe}" osfamily="windows">
       <arg value="/DNSISDIR=${nsis.home}" />
       <arg value="/V2" />
@@ -2204,14 +2270,36 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       <arg value="/V2" />
       <arg value="tomcat.nsi" />
     </exec>
-
     <move file="${tomcat.dist}/tomcat-installer.exe" tofile="${tomcat.release}/v${version}/bin/${final.name}.exe" />
     <hashAndSign file="${tomcat.release}/v${version}/bin/${final.name}.exe" />
   </target>
 
+  <target name="installer-sign"
+      description="Builds and optionally signs the Windows installer"
+      depends="-installer" if="${do.codesigning}" >
+    <taskdef name="signcode"
+        classname="org.apache.tomcat.buildutil.SignCode"
+        classpath="${tomcat.classes}" />
+    <signcode userName="${codesigning.user}" password="${codesigning.pwd}"
+              partnerCode="${codesigning.partnercode}"
+              keyStore="${codesigning.keyStore}"
+              keyStorePassword="${codesigning.keyStorePassword}"
+              applicationName="Apache Tomcat ${version.major.minor}"
+              applicationversion="${version}"
+              signingService="${codesigning.service}">
+      <fileset dir="${tomcat.release}">
+        <filename name="v${version}/bin/${final.name}.exe"/>
+      </fileset>
+    </signcode>
+    <!-- .exe has changed so need to redo checksums and OpenPGP signature -->
+    <delete file="${tomcat.release}/v${version}/bin/${final.name}.exe.asc" />
+    <delete file="${tomcat.release}/v${version}/bin/${final.name}.exe.sha512" />
+    <hashAndSign file="${tomcat.release}/v${version}/bin/${final.name}.exe" />
+  </target>
+
   <target name="release"
-    depends="clean,release-init,dist-deployer,installer,package-zip,package-winzip,package-tgz,package-deployer-zip,package-deployer-tgz,javadoc,package-docs-tgz,package-src-zip,package-src-tgz,package-src-jar"
-    description="Create a Tomcat 7 packaged distribution">
+    depends="clean,release-init,dist-deployer,installer-sign,package-zip,package-winzip,package-tgz,package-deployer-zip,package-deployer-tgz,javadoc,package-docs-tgz,package-src-zip,package-src-tgz,package-src-jar"
+    description="Create a Tomcat packaged distribution">
 
     <copy file="KEYS"
          todir="${tomcat.release}/v${version}"/>
@@ -2680,6 +2768,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       <param name="checksum.algorithm" value="${jdt.checksum.algorithm}"/>
       <param name="checksum.value" value="${jdt.checksum.value}"/>
     </antcall>
+
   </target>
 
   <target name="download-test-compile"
@@ -2799,7 +2888,6 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
     </antcall>
 
   </target>
-
 
   <!-- =============== Utility Targets to support downloads ================ -->
 
@@ -3054,6 +3142,8 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
   </target>
 
   <!-- ============================ IDE Support ============================ -->
+
+  <!-- ============================ Eclipse ================================ -->
 
   <target name="ide-eclipse"
           depends="download-compile, extras-webservices-prepare, download-test-compile"
