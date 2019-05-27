@@ -786,6 +786,11 @@ public class TesterContext implements Context {
     }
 
     @Override
+    public InstanceManager createInstanceManager() {
+        return null;
+    }
+
+    @Override
     public Wrapper createWrapper() {
         return null;
     }

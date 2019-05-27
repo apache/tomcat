@@ -5109,14 +5109,7 @@ public class StandardContext extends ContainerBase
 
             if (ok ) {
                 if (getInstanceManager() == null) {
-                    javax.naming.Context context = null;
-                    if (isUseNaming() && getNamingContextListener() != null) {
-                        context = getNamingContextListener().getEnvContext();
-                    }
-                    Map<String, Map<String, String>> injectionMap = buildInjectionMap(
-                            getIgnoreAnnotations() ? new NamingResourcesImpl(): getNamingResources());
-                    setInstanceManager(new DefaultInstanceManager(context,
-                            injectionMap, this, this.getClass().getClassLoader()));
+                    setInstanceManager(createInstanceManager());
                 }
                 getServletContext().setAttribute(
                         InstanceManager.class.getName(), getInstanceManager());
@@ -5246,6 +5239,18 @@ public class StandardContext extends ContainerBase
                     "standardContext.webappClassLoader.missingProperty",
                     name, Boolean.toString(value)));
         }
+    }
+
+    @Override
+    public InstanceManager createInstanceManager() {
+        javax.naming.Context context = null;
+        if (isUseNaming() && getNamingContextListener() != null) {
+            context = getNamingContextListener().getEnvContext();
+        }
+        Map<String, Map<String, String>> injectionMap = buildInjectionMap(
+                getIgnoreAnnotations() ? new NamingResourcesImpl(): getNamingResources());
+       return new DefaultInstanceManager(context, injectionMap,
+               this, this.getClass().getClassLoader());
     }
 
     private Map<String, Map<String, String>> buildInjectionMap(NamingResourcesImpl namingResources) {

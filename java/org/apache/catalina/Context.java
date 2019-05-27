@@ -931,6 +931,14 @@ public interface Context extends Container, ContextBind {
 
 
     /**
+     * Factory method to create and return a new InstanceManager
+     * instance. This can be used for framework integration or easier
+     * configuration with custom Context implementations.
+     * @return the instance manager
+     */
+    public InstanceManager createInstanceManager();
+
+    /**
      * Factory method to create and return a new Wrapper instance, of
      * the Java implementation class appropriate for this Context
      * implementation.  The constructor of the instantiated Wrapper

@@ -76,6 +76,10 @@
         Avoid potential <code>NullPointerException</code> when generating an
         HTTP <code>Allow</code> header. Identified by Coverity Scan. (markt)
       </fix>
+      <scode>
+        Add <code>Context.createInstanceManager()</code> for easier framework
+        integration. (remm)
+      </scode>
     </changelog>
   </subsection>
   <subsection name="Coyote">
