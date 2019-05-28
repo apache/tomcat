@@ -72,7 +72,9 @@ public class SetPropertiesRule extends Rule {
             if (!digester.isFakeAttribute(top, name)
                     && !IntrospectionUtils.setProperty(top, name, value)
                     && digester.getRulesValidation()) {
-                digester.log.warn(sm.getString("rule.noProperty", digester.match, name, value));
+                if (!"optional".equals(name)) {
+                    digester.log.warn(sm.getString("rule.noProperty", digester.match, name, value));
+                }
             }
         }
 
