@@ -107,13 +107,13 @@ public class ThreadLocalLeakPreventionListener extends FrameworkListener {
 
     }
 
-    protected void processContainerRemoveChild(Container parent,
-        Container child) {
+    @Override
+    protected void processContainerRemoveChild(Container child) {
         if (child instanceof Context) {
             Context context = (Context) child;
             context.removeLifecycleListener(this);
         } else {
-            super.processContainerRemoveChild(parent, child);
+            super.processContainerRemoveChild(child);
         }
     }
 

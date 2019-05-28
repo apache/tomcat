@@ -57,11 +57,9 @@ public abstract class FrameworkListener implements LifecycleListener, ContainerL
     public void containerEvent(ContainerEvent event) {
         String type = event.getType();
         if (Container.ADD_CHILD_BEFORE_START_EVENT.equals(type)) {
-            processContainerAddChild(event.getContainer(),
-                    (Container) event.getData());
+            processContainerAddChild((Container) event.getData());
         } else if (Container.REMOVE_CHILD_BEFORE_STOP_EVENT.equals(type)) {
-            processContainerRemoveChild(event.getContainer(),
-                    (Container) event.getData());
+            processContainerRemoveChild((Container) event.getData());
         }
     }
 
@@ -95,7 +93,7 @@ public abstract class FrameworkListener implements LifecycleListener, ContainerL
         context.addLifecycleListener(createLifecycleListener(context));
     }
 
-    protected void processContainerAddChild(Container parent, Container child) {
+    protected void processContainerAddChild(Container child) {
         if (child instanceof Context) {
             registerContextListener((Context) child);
         } else if (child instanceof Engine) {
@@ -105,7 +103,7 @@ public abstract class FrameworkListener implements LifecycleListener, ContainerL
         }
     }
 
-    protected void processContainerRemoveChild(Container parent, Container child) {
+    protected void processContainerRemoveChild(Container child) {
         if (child instanceof Host || child instanceof Engine) {
             child.removeContainerListener(this);
         }
