@@ -230,6 +230,10 @@
         with Apache Tomcat. Includes contributions by Niklasmerz and dusiema.
         (markt)
       </add>
+      <add>
+        Expand the coverage and quality of the French translations provided
+        with Apache Tomcat. (remm)
+      </add>
     </changelog>
   </subsection>
 </section>
