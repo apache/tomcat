@@ -65,7 +65,7 @@ public abstract class FrameworkListener implements LifecycleListener, ContainerL
         }
     }
 
-    private void registerListenersForServer(Server server) {
+    protected void registerListenersForServer(Server server) {
         for (Service service : server.findServices()) {
             Engine engine = service.getContainer();
             if (engine != null) {
@@ -76,7 +76,7 @@ public abstract class FrameworkListener implements LifecycleListener, ContainerL
 
     }
 
-    private void registerListenersForEngine(Engine engine) {
+    protected void registerListenersForEngine(Engine engine) {
         for (Container hostContainer : engine.findChildren()) {
             Host host = (Host) hostContainer;
             host.addContainerListener(this);
@@ -84,18 +84,18 @@ public abstract class FrameworkListener implements LifecycleListener, ContainerL
         }
     }
 
-    private void registerListenersForHost(Host host) {
+    protected void registerListenersForHost(Host host) {
         for (Container contextContainer : host.findChildren()) {
             Context context = (Context) contextContainer;
             registerContextListener(context);
         }
     }
 
-    private void registerContextListener(Context context) {
+    protected void registerContextListener(Context context) {
         context.addLifecycleListener(createLifecycleListener(context));
     }
 
-    private void processContainerAddChild(Container parent, Container child) {
+    protected void processContainerAddChild(Container parent, Container child) {
         if (child instanceof Context) {
             registerContextListener((Context) child);
         } else if (child instanceof Engine) {
@@ -105,7 +105,7 @@ public abstract class FrameworkListener implements LifecycleListener, ContainerL
         }
     }
 
-    private void processContainerRemoveChild(Container parent, Container child) {
+    protected void processContainerRemoveChild(Container parent, Container child) {
         if (child instanceof Host || child instanceof Engine) {
             child.removeContainerListener(this);
         }
