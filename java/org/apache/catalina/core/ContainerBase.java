@@ -703,6 +703,8 @@ public abstract class ContainerBase extends LifecycleMBeanBase
             children.put(child.getName(), child);
         }
 
+        fireContainerEvent(ADD_CHILD_BEFORE_START_EVENT, child);
+
         // Start child
         // Don't do this inside sync block - start can be a slow process and
         // locking the children object can cause problems elsewhere
@@ -797,6 +799,8 @@ public abstract class ContainerBase extends LifecycleMBeanBase
         if (child == null) {
             return;
         }
+
+        fireContainerEvent(REMOVE_CHILD_BEFORE_STOP_EVENT, child);
 
         try {
             if (child.getState().isAvailable()) {

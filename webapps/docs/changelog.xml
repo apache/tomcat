@@ -80,6 +80,16 @@
         Add <code>Context.createInstanceManager()</code> for easier framework
         integration. (remm)
       </scode>
+      <scode>
+        Add utility <code>org.apache.catalina.core.FrameworkListener</code> to
+        allow replicating adding a Listener to context.xml in a programmatic
+        way. (remm)
+      </scode>
+      <scode>
+        Add <code>Container.ADD_CHILD_BEFORE_START_EVENT</code> and
+        <code>Container.REMOVE_CHILD_BEFORE_STOP_EVENT</code> to allow
+        configuration of containers before a possible lifecycle event. (remm)
+      </scode>
     </changelog>
   </subsection>
   <subsection name="Coyote">
