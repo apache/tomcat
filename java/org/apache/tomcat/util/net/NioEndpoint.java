@@ -1215,7 +1215,10 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
 
         private int fillReadBuffer(boolean block, ByteBuffer to) throws IOException {
             int nRead;
-            NioChannel channel = getSocket();
+            NioChannel socket = getSocket();
+            if (socket instanceof ClosedNioChannel) {
+                throw new ClosedChannelException();
+            }
             if (block) {
                 Selector selector = null;
                 try {
@@ -1224,14 +1227,14 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                     // Ignore
                 }
                 try {
-                    nRead = pool.read(to, channel, selector, getReadTimeout());
+                    nRead = pool.read(to, socket, selector, getReadTimeout());
                 } finally {
                     if (selector != null) {
                         pool.put(selector);
                     }
                 }
             } else {
-                nRead = channel.read(to);
+                nRead = socket.read(to);
                 if (nRead == -1) {
                     throw new EOFException();
                 }

@@ -246,7 +246,6 @@ public class NioChannel implements ByteChannel, ScatteringByteChannel, Gathering
         }
     }
 
-
     private ApplicationBufferHandler appReadBufHandler;
     public void setAppReadBufHandler(ApplicationBufferHandler handler) {
         this.appReadBufHandler = handler;
@@ -258,7 +257,7 @@ public class NioChannel implements ByteChannel, ScatteringByteChannel, Gathering
     static final NioChannel CLOSED_NIO_CHANNEL = new ClosedNioChannel();
     public static class ClosedNioChannel extends NioChannel {
         public ClosedNioChannel() {
-            super(null, null);
+            super(null, SocketBufferHandler.EMPTY);
         }
         @Override
         public void close() throws IOException {
@@ -272,6 +271,15 @@ public class NioChannel implements ByteChannel, ScatteringByteChannel, Gathering
         }
         @Override
         public void free() {
+        }
+        @Override
+        void setSocketWrapper(NioSocketWrapper socketWrapper) {
+        }
+        @Override
+        public void setIOChannel(SocketChannel sc) {
+        }
+        @Override
+        public void setAppReadBufHandler(ApplicationBufferHandler handler) {
         }
         @Override
         public int read(ByteBuffer dst) throws IOException {
@@ -297,4 +305,5 @@ public class NioChannel implements ByteChannel, ScatteringByteChannel, Gathering
             return "Closed NioChannel";
         }
     }
+
 }
