@@ -27,6 +27,7 @@ import java.net.SocketTimeoutException;
 import java.nio.ByteBuffer;
 import java.nio.channels.CancelledKeyException;
 import java.nio.channels.Channel;
+import java.nio.channels.ClosedChannelException;
 import java.nio.channels.CompletionHandler;
 import java.nio.channels.FileChannel;
 import java.nio.channels.NetworkChannel;
@@ -52,6 +53,7 @@ import org.apache.tomcat.util.IntrospectionUtils;
 import org.apache.tomcat.util.collections.SynchronizedQueue;
 import org.apache.tomcat.util.collections.SynchronizedStack;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
+import org.apache.tomcat.util.net.NioChannel.ClosedNioChannel;
 import org.apache.tomcat.util.net.jsse.JSSESupport;
 
 /**
@@ -1240,6 +1242,10 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
 
         @Override
         protected void doWrite(boolean block, ByteBuffer from) throws IOException {
+            NioChannel socket = getSocket();
+            if (socket instanceof ClosedNioChannel) {
+                throw new ClosedChannelException();
+            }
             if (block) {
                 long writeTimeout = getWriteTimeout();
                 Selector selector = null;
@@ -1249,11 +1255,11 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                     // Ignore
                 }
                 try {
-                    pool.write(from, getSocket(), selector, writeTimeout);
+                    pool.write(from, socket, selector, writeTimeout);
                     if (block) {
                         // Make sure we are flushed
                         do {
-                            if (getSocket().flush(true, selector, writeTimeout)) {
+                            if (socket.flush(true, selector, writeTimeout)) {
                                 break;
                             }
                         } while (true);
@@ -1268,7 +1274,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                 // registered for write once as both container and user code can trigger
                 // write registration.
             } else {
-                if (getSocket().write(from) == -1) {
+                if (socket.write(from) == -1) {
                     throw new EOFException();
                 }
             }
