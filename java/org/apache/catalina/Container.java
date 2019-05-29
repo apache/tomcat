@@ -84,13 +84,6 @@ public interface Container extends Lifecycle {
 
     /**
      * The ContainerEvent event type sent when a child container is added
-     * by <code>addChild()</code>, but before it is started.
-     */
-    public static final String ADD_CHILD_BEFORE_START_EVENT = "addChildBeforeStart";
-
-
-    /**
-     * The ContainerEvent event type sent when a child container is added
      * by <code>addChild()</code>.
      */
     public static final String ADD_CHILD_EVENT = "addChild";
@@ -101,13 +94,6 @@ public interface Container extends Lifecycle {
      * by <code>addValve()</code>, if this Container supports pipelines.
      */
     public static final String ADD_VALVE_EVENT = "addValve";
-
-
-    /**
-     * The ContainerEvent event type sent when a child container is removed
-     * by <code>removeChild()</code>, but before it is stopped.
-     */
-    public static final String REMOVE_CHILD_BEFORE_STOP_EVENT = "removeChildBeforeStop";
 
 
     /**

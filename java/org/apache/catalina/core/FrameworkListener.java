@@ -56,9 +56,9 @@ public abstract class FrameworkListener implements LifecycleListener, ContainerL
     @Override
     public void containerEvent(ContainerEvent event) {
         String type = event.getType();
-        if (Container.ADD_CHILD_BEFORE_START_EVENT.equals(type)) {
+        if (Container.ADD_CHILD_EVENT.equals(type)) {
             processContainerAddChild((Container) event.getData());
-        } else if (Container.REMOVE_CHILD_BEFORE_STOP_EVENT.equals(type)) {
+        } else if (Container.REMOVE_CHILD_EVENT.equals(type)) {
             processContainerRemoveChild((Container) event.getData());
         }
     }

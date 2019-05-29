@@ -693,8 +693,10 @@ public abstract class ContainerBase extends LifecycleMBeanBase
 
     private void addChildInternal(Container child) {
 
-        if( log.isDebugEnabled() )
+        if (log.isDebugEnabled()) {
             log.debug("Add child " + child + " " + this);
+        }
+
         synchronized(children) {
             if (children.get(child.getName()) != null)
                 throw new IllegalArgumentException(
@@ -703,7 +705,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
             children.put(child.getName(), child);
         }
 
-        fireContainerEvent(ADD_CHILD_BEFORE_START_EVENT, child);
+        fireContainerEvent(ADD_CHILD_EVENT, child);
 
         // Start child
         // Don't do this inside sync block - start can be a slow process and
@@ -716,8 +718,6 @@ public abstract class ContainerBase extends LifecycleMBeanBase
             }
         } catch (LifecycleException e) {
             throw new IllegalStateException(sm.getString("containerBase.child.start"), e);
-        } finally {
-            fireContainerEvent(ADD_CHILD_EVENT, child);
         }
     }
 
@@ -800,8 +800,6 @@ public abstract class ContainerBase extends LifecycleMBeanBase
             return;
         }
 
-        fireContainerEvent(REMOVE_CHILD_BEFORE_STOP_EVENT, child);
-
         try {
             if (child.getState().isAvailable()) {
                 child.stop();
@@ -821,13 +819,14 @@ public abstract class ContainerBase extends LifecycleMBeanBase
             log.error(sm.getString("containerBase.child.destroy"), e);
         }
 
+        fireContainerEvent(REMOVE_CHILD_EVENT, child);
+
         synchronized(children) {
             if (children.get(child.getName()) == null)
                 return;
             children.remove(child.getName());
         }
 
-        fireContainerEvent(REMOVE_CHILD_EVENT, child);
     }
 
 

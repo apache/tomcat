@@ -86,9 +86,10 @@
         way. (remm)
       </scode>
       <scode>
-        Add <code>Container.ADD_CHILD_BEFORE_START_EVENT</code> and
-        <code>Container.REMOVE_CHILD_BEFORE_STOP_EVENT</code> to allow
-        configuration of containers before a possible lifecycle event. (remm)
+        Move <code>Container.ADD_CHILD_EVENT</code> to before the child
+        container start, and <code>Container.REMOVE_CHILD_EVENT</code> to
+        before removal of the child from the internal child collection.
+        (remm)
       </scode>
     </changelog>
   </subsection>
