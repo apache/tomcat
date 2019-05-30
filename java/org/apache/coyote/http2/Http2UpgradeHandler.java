@@ -132,26 +132,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
     private final AtomicInteger nextLocalStreamId = new AtomicInteger(2);
     private final PingManager pingManager = getPingManager();
     private volatile int newStreamsSinceLastPrune = 0;
-    // Tracking for when the connection is blocked (windowSize < 1)
-    // The int array must have 3 elements. There are:
-    //   [0] - The number of bytes the Stream requires from the connection
-    //         window. This excludes any allocation that has already been made.
-    //   [1] - The number of bytes that has been allocated from the connection
-    //         window. This excludes any bytes that have been written since the
-    //         allocation was made.
-    //   [2] - 1 if the stream thread has been notified that an allocation has
-    //         been made but has not yet consumed that allocation. 0 in all
-    //         other cases. The purpose of this is to avoid the incorrect
-    //         triggering of a timeout for the following sequence of events:
-    //         window update 1
-    //         allocation 1
-    //         notify 1
-    //         window update 2
-    //         allocation 2
-    //         act on notify 1 (using allocation 1 and 2)
-    //         notify 2
-    //         act on notify 2 (timeout due to no allocation)
-    private final Map<AbstractStream,int[]> backLogStreams = new ConcurrentHashMap<>();
+    private final Map<AbstractStream, BacklogTracker> backLogStreams = new ConcurrentHashMap<>();
     private long backLogSize = 0;
 
     // Stream concurrency control
@@ -781,21 +762,21 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
                     long windowSize = getWindowSize();
                     if (windowSize < 1 || backLogSize > 0) {
                         // Has this stream been granted an allocation
-                        int[] value = backLogStreams.get(stream);
-                        if (value == null) {
-                            value = new int[] { reservation, 0, 0 };
-                            backLogStreams.put(stream, value);
+                        BacklogTracker tracker = backLogStreams.get(stream);
+                        if (tracker == null) {
+                            tracker = new BacklogTracker(reservation);
+                            backLogStreams.put(stream, tracker);
                             backLogSize += reservation;
                             // Add the parents as well
                             AbstractStream parent = stream.getParentStream();
-                            while (parent != null && backLogStreams.putIfAbsent(parent, new int[3]) == null) {
+                            while (parent != null && backLogStreams.putIfAbsent(parent, new BacklogTracker()) == null) {
                                 parent = parent.getParentStream();
                             }
                         } else {
-                            if (value[1] > 0) {
-                                allocation = value[1];
+                            if (tracker.getUnusedAllocation() > 0) {
+                                allocation = tracker.getUnusedAllocation();
                                 decrementWindowSize(allocation);
-                                if (value[0] == 0) {
+                                if (tracker.getRemainingReservation() == 0) {
                                     // The reservation has been fully allocated
                                     // so this stream can be removed from the
                                     // backlog.
@@ -804,10 +785,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
                                     // This allocation has been used. Leave the
                                     // stream on the backlog as it still has
                                     // more bytes to write.
-                                    // Reset the allocation to zero.
-                                    value[1] = 0;
-                                    // Clear the notify in progress marker
-                                    value[2] = 0;
+                                    tracker.useAllocation();
                                 }
                             }
                         }
@@ -833,12 +811,12 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
                                 // Has this stream been granted an allocation
                                 // Note: If the stream in not in this Map then the
                                 //       requested write has been fully allocated
-                                int[] value;
+                                BacklogTracker tracker;
                                 // Ensure allocations made in other threads are visible
                                 synchronized (this) {
-                                    value = backLogStreams.get(stream);
+                                    tracker = backLogStreams.get(stream);
                                 }
-                                if (value != null && value[1] == 0) {
+                                if (tracker != null && tracker.getUnusedAllocation() == 0) {
                                     if (log.isDebugEnabled()) {
                                         log.debug(sm.getString("upgradeHandler.noAllocation",
                                                 connectionId, stream.getIdentifier()));
@@ -947,13 +925,13 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
             while (leftToAllocate > 0) {
                 leftToAllocate = allocate(this, leftToAllocate);
             }
-            for (Entry<AbstractStream,int[]> entry : backLogStreams.entrySet()) {
-                int allocation = entry.getValue()[1];
+            for (Entry<AbstractStream,BacklogTracker> entry : backLogStreams.entrySet()) {
+                int allocation = entry.getValue().getUnusedAllocation();
                 if (allocation > 0) {
                     backLogSize -= allocation;
-                    if (entry.getValue()[2] == 0) {
+                    if (!entry.getValue().isNotifyInProgress()) {
                         result.add(entry.getKey());
-                        entry.getValue()[2] = 1;
+                        entry.getValue().startNotify();
                     }
                 }
             }
@@ -968,19 +946,13 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
                     stream.getIdentifier(), Integer.toString(allocation)));
         }
         // Allocate to the specified stream
-        int[] value = backLogStreams.get(stream);
-        if (value[0] >= allocation) {
-            value[0] -= allocation;
-            value[1] += allocation;
+        BacklogTracker tracker = backLogStreams.get(stream);
+
+        int leftToAllocate = tracker.allocate(allocation);
+
+        if (leftToAllocate == 0) {
             return 0;
         }
-
-        // There was some left over so allocate that to the children of the
-        // stream.
-        int leftToAllocate = allocation;
-        value[1] = value[0];
-        value[0] = 0;
-        leftToAllocate -= value[1];
 
         if (log.isDebugEnabled()) {
             log.debug(sm.getString("upgradeHandler.allocate.left",
@@ -1739,6 +1711,82 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
         @Override
         public void expandPayload() {
             payload = ByteBuffer.allocate(payload.capacity() * 2);
+        }
+    }
+
+
+    private static class BacklogTracker {
+
+        private int remainingReservation;
+        private int unusedAllocation;
+        private boolean notifyInProgress;
+
+        public BacklogTracker() {
+        }
+
+        public BacklogTracker(int reservation) {
+            remainingReservation = reservation;
+        }
+
+        /**
+         * @return The number of bytes requiring an allocation from the
+         *         Connection flow control window
+         */
+        public int getRemainingReservation() {
+            return remainingReservation;
+        }
+
+        /**
+         *
+         * @return The number of bytes allocated from the Connection flow
+         *         control window but not yet written
+         */
+        public int getUnusedAllocation() {
+            return unusedAllocation;
+        }
+
+        /**
+         * The purpose of this is to avoid the incorrect triggering of a timeout
+         * for the following sequence of events:
+         * <ol>
+         * <li>window update 1</li>
+         * <li>allocation 1</li>
+         * <li>notify 1</li>
+         * <li>window update 2</li>
+         * <li>allocation 2</li>
+         * <li>act on notify 1 (using allocation 1 and 2)</li>
+         * <li>notify 2</li>
+         * <li>act on notify 2 (timeout due to no allocation)</li>
+         * </ol>
+         *
+         * @return {@code true} if a notify has been issued but the associated
+         *         allocation has not been used, otherwise {@code false}
+         */
+        public boolean isNotifyInProgress() {
+            return notifyInProgress;
+        }
+
+        public void useAllocation() {
+            unusedAllocation = 0;
+            notifyInProgress = false;
+        }
+
+        public void startNotify() {
+            notifyInProgress = true;
+        }
+
+        private int allocate(int allocation) {
+            if (remainingReservation >= allocation) {
+                remainingReservation -= allocation;
+                unusedAllocation += allocation;
+                return 0;
+            }
+
+            int left = allocation - remainingReservation;
+            unusedAllocation += remainingReservation;
+            remainingReservation = 0;
+
+            return left;
         }
     }
 }
