@@ -228,7 +228,7 @@ fi
 
 # Bugzilla 37848: When no TTY is available, don't output to console
 have_tty=0
-if [ "`tty`" != "not a tty" ]; then
+if [ -t 1 ]; then
     have_tty=1
 fi
 
