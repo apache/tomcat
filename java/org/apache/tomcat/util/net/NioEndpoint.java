@@ -1314,19 +1314,10 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
 
         @Override
         protected void populateRemoteAddr() {
-            InetAddress inetAddr = getSocket().getIOChannel().socket().getInetAddress();
-            if (inetAddr != null) {
-                remoteAddr = inetAddr.getHostAddress();
-            }
-        }
-
-
-        @Override
-        protected void populateRemoteHost() {
-            InetAddress inetAddr = getSocket().getIOChannel().socket().getInetAddress();
-            if (inetAddr != null) {
-                remoteHost = inetAddr.getHostName();
-                if (remoteAddr == null) {
+            SocketChannel sc = getSocket().getIOChannel();
+            if (sc != null) {
+                InetAddress inetAddr = sc.socket().getInetAddress();
+                if (inetAddr != null) {
                     remoteAddr = inetAddr.getHostAddress();
                 }
             }
@@ -1334,32 +1325,59 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
 
 
         @Override
+        protected void populateRemoteHost() {
+            SocketChannel sc = getSocket().getIOChannel();
+            if (sc != null) {
+                InetAddress inetAddr = sc.socket().getInetAddress();
+                if (inetAddr != null) {
+                    remoteHost = inetAddr.getHostName();
+                    if (remoteAddr == null) {
+                        remoteAddr = inetAddr.getHostAddress();
+                    }
+                }
+            }
+        }
+
+
+        @Override
         protected void populateRemotePort() {
-            remotePort = getSocket().getIOChannel().socket().getPort();
+            SocketChannel sc = getSocket().getIOChannel();
+            if (sc != null) {
+                remotePort = sc.socket().getPort();
+            }
         }
 
 
         @Override
         protected void populateLocalName() {
-            InetAddress inetAddr = getSocket().getIOChannel().socket().getLocalAddress();
-            if (inetAddr != null) {
-                localName = inetAddr.getHostName();
+            SocketChannel sc = getSocket().getIOChannel();
+            if (sc != null) {
+                InetAddress inetAddr = sc.socket().getInetAddress();
+                if (inetAddr != null) {
+                    localName = inetAddr.getHostName();
+                }
             }
         }
 
 
         @Override
         protected void populateLocalAddr() {
-            InetAddress inetAddr = getSocket().getIOChannel().socket().getLocalAddress();
-            if (inetAddr != null) {
-                localAddr = inetAddr.getHostAddress();
+            SocketChannel sc = getSocket().getIOChannel();
+            if (sc != null) {
+                InetAddress inetAddr = sc.socket().getInetAddress();
+                if (inetAddr != null) {
+                    localAddr = inetAddr.getHostAddress();
+                }
             }
         }
 
 
         @Override
         protected void populateLocalPort() {
-            localPort = getSocket().getIOChannel().socket().getLocalPort();
+            SocketChannel sc = getSocket().getIOChannel();
+            if (sc != null) {
+                localPort = sc.socket().getLocalPort();
+            }
         }
 
 
