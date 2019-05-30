@@ -165,6 +165,11 @@
         When using the <code>OneLineFormatter</code>, don't print a blank line
         in the log after printing a stack trace. (markt)
       </fix>
+      <fix>
+        Use the <code>test</code> command to check for terminal availability
+        rather than the <code>tty</code> command since the <code>tty</code>
+        based test fails on non-Eglish locales. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
