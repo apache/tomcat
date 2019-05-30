@@ -79,12 +79,16 @@ public abstract class Http2TestBase extends TomcatBaseTest {
     protected static final String TRAILER_HEADER_NAME = "x-trailertest";
     protected static final String TRAILER_HEADER_VALUE = "test";
 
+    // Client
     private Socket s;
     protected HpackEncoder hpackEncoder;
     protected Input input;
     protected TestOutput output;
     protected Http2Parser parser;
     protected OutputStream os;
+
+    // Server
+    protected Http2Protocol http2Protocol;
 
     private long pingAckDelayMillis = 0;
 
@@ -534,7 +538,7 @@ public abstract class Http2TestBase extends TomcatBaseTest {
 
     protected void enableHttp2(long maxConcurrentStreams) {
         Connector connector = getTomcatInstance().getConnector();
-        Http2Protocol http2Protocol = new Http2Protocol();
+        http2Protocol = new Http2Protocol();
         // Short timeouts for now. May need to increase these for CI systems.
         http2Protocol.setReadTimeout(6000);
         http2Protocol.setWriteTimeout(6000);

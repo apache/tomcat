@@ -47,8 +47,6 @@ public class TestHttp2Section_8_1 extends Http2TestBase {
     private void doTestPostWithTrailerHeaders(boolean allowTrailerHeader) throws Exception{
         http2Connect();
         if (allowTrailerHeader) {
-            Http2Protocol http2Protocol =
-                    (Http2Protocol) getTomcatInstance().getConnector().findUpgradeProtocols()[0];
             http2Protocol.setAllowedTrailerHeaders(TRAILER_HEADER_NAME);
         }
 
