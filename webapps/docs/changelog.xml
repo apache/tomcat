@@ -129,6 +129,11 @@
         <bug>63403</bug>: Fix TestHttp2InitialConnection test failures when
         running with a non-English locale. (kkolinko)
       </fix>
+      <fix>
+        Use the <code>test</code> command to check for terminal availability
+        rather than the <code>tty</code> command since the <code>tty</code>
+        based test fails on non-Eglish locales. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
