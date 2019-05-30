@@ -1320,7 +1320,6 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
     }
 
 
-
     @Override
     public void endRequestBodyFrame(int streamId) throws Http2Exception {
         Stream stream = getStream(streamId, true);
