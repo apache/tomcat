@@ -139,6 +139,24 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
     private final PingManager pingManager = new PingManager();
     private volatile int newStreamsSinceLastPrune = 0;
     // Tracking for when the connection is blocked (windowSize < 1)
+    // The int array must have 3 elements. There are:
+    //   [0] - The number of bytes the Stream requires from the connection
+    //         window. This excludes any allocation that has already been made.
+    //   [1] - The number of bytes that has been allocated from the connection
+    //         window. This excludes any bytes that have been written since the
+    //         allocation was made.
+    //   [2] - 1 if the stream thread has been notified that an allocation has
+    //         been made but has not yet consumed that allocation. 0 in all
+    //         other cases. The purpose of this is to avoid the incorrect
+    //         triggering of a timeout for the following sequence of events:
+    //         window update 1
+    //         allocation 1
+    //         notify 1
+    //         window update 2
+    //         allocation 2
+    //         act on notify 1 (using allocation 1 and 2)
+    //         notify 2
+    //         act on notify 2 (timeout due to no allocation)
     private final ConcurrentMap<AbstractStream,int[]> backLogStreams = new ConcurrentHashMap<>();
     private long backLogSize = 0;
 
@@ -769,12 +787,12 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
                         // Has this stream been granted an allocation
                         int[] value = backLogStreams.get(stream);
                         if (value == null) {
-                            value = new int[] { reservation, 0 };
+                            value = new int[] { reservation, 0, 0 };
                             backLogStreams.put(stream, value);
                             backLogSize += reservation;
                             // Add the parents as well
                             AbstractStream parent = stream.getParentStream();
-                            while (parent != null && backLogStreams.putIfAbsent(parent, new int[2]) == null) {
+                            while (parent != null && backLogStreams.putIfAbsent(parent, new int[3]) == null) {
                                 parent = parent.getParentStream();
                             }
                         } else {
@@ -787,11 +805,13 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
                                     // backlog.
                                     backLogStreams.remove(stream);
                                 } else {
-                                    // This allocation has been used. Reset the
-                                    // allocation to zero. Leave the stream on
-                                    // the backlog as it still has more bytes to
-                                    // write.
+                                    // This allocation has been used. Leave the
+                                    // stream on the backlog as it still has
+                                    // more bytes to write.
+                                    // Reset the allocation to zero.
                                     value[1] = 0;
+                                    // Clear the notify in progress marker
+                                    value[2] = 0;
                                 }
                             }
                         }
@@ -922,7 +942,10 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
                 int allocation = entry.getValue()[1];
                 if (allocation > 0) {
                     backLogSize -= allocation;
-                    result.add(entry.getKey());
+                    if (entry.getValue()[2] == 0) {
+                        result.add(entry.getKey());
+                        entry.getValue()[2] = 1;
+                    }
                 }
             }
         }
