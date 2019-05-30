@@ -37,8 +37,6 @@ public class TestAbortedUpload extends Http2TestBase {
     public void testAbortedRequest() throws Exception {
         http2Connect();
 
-        Http2Protocol http2Protocol =
-                (Http2Protocol) getTomcatInstance().getConnector().findUpgradeProtocols()[0];
         http2Protocol.setAllowedTrailerHeaders(TRAILER_HEADER_NAME);
 
         int bodySize = 8192;

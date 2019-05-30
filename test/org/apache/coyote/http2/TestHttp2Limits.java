@@ -193,8 +193,6 @@ public class TestHttp2Limits extends Http2TestBase {
 
         enableHttp2();
 
-        Http2Protocol http2Protocol =
-                (Http2Protocol) getTomcatInstance().getConnector().findUpgradeProtocols()[0];
         http2Protocol.setMaxHeaderCount(maxHeaderCount);
         http2Protocol.setMaxHeaderSize(maxHeaderSize);
 
@@ -432,8 +430,6 @@ public class TestHttp2Limits extends Http2TestBase {
             FailureMode failMode) throws Exception {
         enableHttp2();
 
-        Http2Protocol http2Protocol =
-                    (Http2Protocol) getTomcatInstance().getConnector().findUpgradeProtocols()[0];
         http2Protocol.setAllowedTrailerHeaders(TRAILER_HEADER_NAME);
         http2Protocol.setMaxTrailerCount(maxTrailerCount);
         http2Protocol.setMaxTrailerSize(maxTrailerSize);
