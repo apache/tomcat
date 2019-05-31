@@ -1467,29 +1467,15 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
 
         @Override
         protected void populateRemoteAddr() {
-            SocketAddress socketAddress = null;
-            try {
-                socketAddress = getSocket().getIOChannel().getRemoteAddress();
-            } catch (IOException e) {
-                // Ignore
-            }
-            if (socketAddress instanceof InetSocketAddress) {
-                remoteAddr = ((InetSocketAddress) socketAddress).getAddress().getHostAddress();
-            }
-        }
-
-
-        @Override
-        protected void populateRemoteHost() {
-            SocketAddress socketAddress = null;
-            try {
-                socketAddress = getSocket().getIOChannel().getRemoteAddress();
-            } catch (IOException e) {
-                log.warn(sm.getString("endpoint.warn.noRemoteHost", getSocket()), e);
-            }
-            if (socketAddress instanceof InetSocketAddress) {
-                remoteHost = ((InetSocketAddress) socketAddress).getAddress().getHostName();
-                if (remoteAddr == null) {
+            AsynchronousSocketChannel sc = getSocket().getIOChannel();
+            if (sc != null) {
+                SocketAddress socketAddress = null;
+                try {
+                    socketAddress = sc.getRemoteAddress();
+                } catch (IOException e) {
+                    // Ignore
+                }
+                if (socketAddress instanceof InetSocketAddress) {
                     remoteAddr = ((InetSocketAddress) socketAddress).getAddress().getHostAddress();
                 }
             }
@@ -1497,57 +1483,89 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
 
 
         @Override
-        protected void populateRemotePort() {
-            SocketAddress socketAddress = null;
-            try {
-                socketAddress = getSocket().getIOChannel().getRemoteAddress();
-            } catch (IOException e) {
-                log.warn(sm.getString("endpoint.warn.noRemotePort", getSocket()), e);
+        protected void populateRemoteHost() {
+            AsynchronousSocketChannel sc = getSocket().getIOChannel();
+            if (sc != null) {
+                SocketAddress socketAddress = null;
+                try {
+                    socketAddress = sc.getRemoteAddress();
+                } catch (IOException e) {
+                    log.warn(sm.getString("endpoint.warn.noRemoteHost", getSocket()), e);
+                }
+                if (socketAddress instanceof InetSocketAddress) {
+                    remoteHost = ((InetSocketAddress) socketAddress).getAddress().getHostName();
+                    if (remoteAddr == null) {
+                        remoteAddr = ((InetSocketAddress) socketAddress).getAddress().getHostAddress();
+                    }
+                }
             }
-            if (socketAddress instanceof InetSocketAddress) {
-                remotePort = ((InetSocketAddress) socketAddress).getPort();
+        }
+
+
+        @Override
+        protected void populateRemotePort() {
+            AsynchronousSocketChannel sc = getSocket().getIOChannel();
+            if (sc != null) {
+                SocketAddress socketAddress = null;
+                try {
+                    socketAddress = sc.getRemoteAddress();
+                } catch (IOException e) {
+                    log.warn(sm.getString("endpoint.warn.noRemotePort", getSocket()), e);
+                }
+                if (socketAddress instanceof InetSocketAddress) {
+                    remotePort = ((InetSocketAddress) socketAddress).getPort();
+                }
             }
         }
 
 
         @Override
         protected void populateLocalName() {
-            SocketAddress socketAddress = null;
-            try {
-                socketAddress = getSocket().getIOChannel().getLocalAddress();
-            } catch (IOException e) {
-                log.warn(sm.getString("endpoint.warn.noLocalName", getSocket()), e);
-            }
-            if (socketAddress instanceof InetSocketAddress) {
-                localName = ((InetSocketAddress) socketAddress).getHostName();
+            AsynchronousSocketChannel sc = getSocket().getIOChannel();
+            if (sc != null) {
+                SocketAddress socketAddress = null;
+                try {
+                    socketAddress = sc.getLocalAddress();
+                } catch (IOException e) {
+                    log.warn(sm.getString("endpoint.warn.noLocalName", getSocket()), e);
+                }
+                if (socketAddress instanceof InetSocketAddress) {
+                    localName = ((InetSocketAddress) socketAddress).getHostName();
+                }
             }
         }
 
 
         @Override
         protected void populateLocalAddr() {
-            SocketAddress socketAddress = null;
-            try {
-                socketAddress = getSocket().getIOChannel().getLocalAddress();
-            } catch (IOException e) {
-                log.warn(sm.getString("endpoint.warn.noLocalAddr", getSocket()), e);
-            }
-            if (socketAddress instanceof InetSocketAddress) {
-                localAddr = ((InetSocketAddress) socketAddress).getAddress().getHostAddress();
+            AsynchronousSocketChannel sc = getSocket().getIOChannel();
+            if (sc != null) {
+                SocketAddress socketAddress = null;
+                try {
+                    socketAddress = sc.getLocalAddress();
+                } catch (IOException e) {
+                    log.warn(sm.getString("endpoint.warn.noLocalAddr", getSocket()), e);
+                }
+                if (socketAddress instanceof InetSocketAddress) {
+                    localAddr = ((InetSocketAddress) socketAddress).getAddress().getHostAddress();
+                }
             }
         }
 
 
         @Override
         protected void populateLocalPort() {
-            SocketAddress socketAddress = null;
-            try {
-                socketAddress = getSocket().getIOChannel().getLocalAddress();
-            } catch (IOException e) {
-                log.warn(sm.getString("endpoint.warn.noLocalPort", getSocket()), e);
-            }
-            if (socketAddress instanceof InetSocketAddress) {
-                localPort = ((InetSocketAddress) socketAddress).getPort();
+            AsynchronousSocketChannel sc = getSocket().getIOChannel();
+            if (sc != null) {
+                SocketAddress socketAddress = null;
+                try {
+                    socketAddress = sc.getLocalAddress();
+                } catch (IOException e) {
+                    log.warn(sm.getString("endpoint.warn.noLocalPort", getSocket()), e);
+                }
+                if (socketAddress instanceof InetSocketAddress) {
+                    localPort = ((InetSocketAddress) socketAddress).getPort();
+                }
             }
         }
 
