@@ -46,9 +46,13 @@
       only if the new code is made subject to such option by the copyright
       holder.
 
+    </xsd:documentation>
+  </xsd:annotation>
+
+  <xsd:annotation>
+    <xsd:documentation>
       The Apache Software Foundation elects to include this software under the
       CDDL license.
-
     </xsd:documentation>
   </xsd:annotation>
 
