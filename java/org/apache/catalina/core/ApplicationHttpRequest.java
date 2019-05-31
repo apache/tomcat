@@ -45,9 +45,11 @@ import org.apache.catalina.connector.RequestFacade;
 import org.apache.catalina.servlet4preview.http.PushBuilder;
 import org.apache.catalina.servlet4preview.http.ServletMapping;
 import org.apache.catalina.util.ParameterMap;
+import org.apache.catalina.util.URLEncoder;
 import org.apache.tomcat.util.buf.B2CConverter;
 import org.apache.tomcat.util.buf.MessageBytes;
 import org.apache.tomcat.util.http.Parameters;
+import org.apache.tomcat.util.res.StringManager;
 
 
 /**
@@ -68,9 +70,7 @@ import org.apache.tomcat.util.http.Parameters;
 class ApplicationHttpRequest
         extends org.apache.catalina.servlet4preview.http.HttpServletRequestWrapper {
 
-
-    // ------------------------------------------------------- Static Variables
-
+    private static final StringManager sm = StringManager.getManager(ApplicationHttpRequest.class);
 
     /**
      * The set of attribute names that are special for request dispatchers.
@@ -319,11 +319,20 @@ class ApplicationHttpRequest
         if (context == null)
             return (null);
 
+        if (path == null) {
+            return null;
+        }
+
+        int fragmentPos = path.indexOf('#');
+        if (fragmentPos > -1) {
+            context.getLogger().warn(sm.getString("applicationHttpRequest.fragmentInDispatchPath", path));
+            path = path.substring(0, fragmentPos);
+        }
+
         // If the path is already context-relative, just pass it through
-        if (path == null)
-            return (null);
-        else if (path.startsWith("/"))
-            return (context.getServletContext().getRequestDispatcher(path));
+        if (path.startsWith("/")) {
+            return context.getServletContext().getRequestDispatcher(path);
+        }
 
         // Convert a request-relative path to a context-relative one
         String servletPath =
@@ -343,10 +352,19 @@ class ApplicationHttpRequest
 
         int pos = requestPath.lastIndexOf('/');
         String relative = null;
-        if (pos >= 0) {
-            relative = requestPath.substring(0, pos + 1) + path;
+        if (context.getDispatchersUseEncodedPaths()) {
+            if (pos >= 0) {
+                relative = URLEncoder.DEFAULT.encode(
+                        requestPath.substring(0, pos + 1), StandardCharsets.UTF_8) + path;
+            } else {
+                relative = URLEncoder.DEFAULT.encode(requestPath, StandardCharsets.UTF_8) + path;
+            }
         } else {
-            relative = requestPath + path;
+            if (pos >= 0) {
+                relative = requestPath.substring(0, pos + 1) + path;
+            } else {
+                relative = requestPath + path;
+            }
         }
 
         return (context.getServletContext().getRequestDispatcher(relative));

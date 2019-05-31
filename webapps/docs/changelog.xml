@@ -58,6 +58,11 @@
         Avoid potential <code>NullPointerException</code> when generating an
         HTTP <code>Allow</code> header. Identified by Coverity Scan. (markt)
       </fix>
+      <add>
+        Remove any fragment included in the target path used to obtain a
+        <code>RequestDispatcher</code>. The requested target path is logged as a
+        warning since this is an application error. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
