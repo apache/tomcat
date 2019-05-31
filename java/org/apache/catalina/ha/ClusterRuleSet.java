@@ -110,80 +110,80 @@ public class ClusterRuleSet extends RuleSetBase {
 
 
         String channelPrefix = prefix + "Channel/";
-        { //channel properties
-            digester.addObjectCreate(channelPrefix + "Membership",
-                                     null, // MUST be specified in the element
-                                     "className");
-            digester.addSetProperties(channelPrefix + "Membership");
-            digester.addSetNext(channelPrefix + "Membership",
-                                "setMembershipService",
-                                "org.apache.catalina.tribes.MembershipService");
 
-            digester.addObjectCreate(channelPrefix + "MembershipListener",
-                                     null, // MUST be specified in the element
-                                     "className");
-            digester.addSetProperties(channelPrefix + "MembershipListener");
-            digester.addSetNext(channelPrefix + "MembershipListener",
-                                "addMembershipListener",
-                                "org.apache.catalina.tribes.MembershipListener");
+        //channel properties
+        digester.addObjectCreate(channelPrefix + "Membership",
+                                 null, // MUST be specified in the element
+                                 "className");
+        digester.addSetProperties(channelPrefix + "Membership");
+        digester.addSetNext(channelPrefix + "Membership",
+                            "setMembershipService",
+                            "org.apache.catalina.tribes.MembershipService");
 
-            digester.addObjectCreate(channelPrefix + "Sender",
-                                     null, // MUST be specified in the element
-                                     "className");
-            digester.addSetProperties(channelPrefix + "Sender");
-            digester.addSetNext(channelPrefix + "Sender",
-                                "setChannelSender",
-                                "org.apache.catalina.tribes.ChannelSender");
+        digester.addObjectCreate(channelPrefix + "MembershipListener",
+                                 null, // MUST be specified in the element
+                                 "className");
+        digester.addSetProperties(channelPrefix + "MembershipListener");
+        digester.addSetNext(channelPrefix + "MembershipListener",
+                            "addMembershipListener",
+                            "org.apache.catalina.tribes.MembershipListener");
 
-            digester.addObjectCreate(channelPrefix + "Sender/Transport",
-                                     null, // MUST be specified in the element
-                                     "className");
-            digester.addSetProperties(channelPrefix + "Sender/Transport");
-            digester.addSetNext(channelPrefix + "Sender/Transport",
-                                "setTransport",
-                                "org.apache.catalina.tribes.transport.MultiPointSender");
+        digester.addObjectCreate(channelPrefix + "Sender",
+                                 null, // MUST be specified in the element
+                                 "className");
+        digester.addSetProperties(channelPrefix + "Sender");
+        digester.addSetNext(channelPrefix + "Sender",
+                            "setChannelSender",
+                            "org.apache.catalina.tribes.ChannelSender");
+
+        digester.addObjectCreate(channelPrefix + "Sender/Transport",
+                                 null, // MUST be specified in the element
+                                 "className");
+        digester.addSetProperties(channelPrefix + "Sender/Transport");
+        digester.addSetNext(channelPrefix + "Sender/Transport",
+                            "setTransport",
+                            "org.apache.catalina.tribes.transport.MultiPointSender");
 
 
-            digester.addObjectCreate(channelPrefix + "Receiver",
-                                     null, // MUST be specified in the element
-                                     "className");
-            digester.addSetProperties(channelPrefix + "Receiver");
-            digester.addSetNext(channelPrefix + "Receiver",
-                                "setChannelReceiver",
-                                "org.apache.catalina.tribes.ChannelReceiver");
+        digester.addObjectCreate(channelPrefix + "Receiver",
+                                 null, // MUST be specified in the element
+                                 "className");
+        digester.addSetProperties(channelPrefix + "Receiver");
+        digester.addSetNext(channelPrefix + "Receiver",
+                            "setChannelReceiver",
+                            "org.apache.catalina.tribes.ChannelReceiver");
 
-            digester.addObjectCreate(channelPrefix + "Interceptor",
-                                     null, // MUST be specified in the element
-                                     "className");
-            digester.addSetProperties(channelPrefix + "Interceptor");
-            digester.addSetNext(channelPrefix + "Interceptor",
-                                "addInterceptor",
-                                "org.apache.catalina.tribes.ChannelInterceptor");
+        digester.addObjectCreate(channelPrefix + "Interceptor",
+                                 null, // MUST be specified in the element
+                                 "className");
+        digester.addSetProperties(channelPrefix + "Interceptor");
+        digester.addSetNext(channelPrefix + "Interceptor",
+                            "addInterceptor",
+                            "org.apache.catalina.tribes.ChannelInterceptor");
 
-            digester.addObjectCreate(channelPrefix + "Interceptor/LocalMember",
-                                     null, // MUST be specified in the element
-                                     "className");
-            digester.addSetProperties(channelPrefix + "Interceptor/LocalMember");
-            digester.addSetNext(channelPrefix + "Interceptor/LocalMember",
-                                "setLocalMember",
-                                "org.apache.catalina.tribes.Member");
+        digester.addObjectCreate(channelPrefix + "Interceptor/LocalMember",
+                                 null, // MUST be specified in the element
+                                 "className");
+        digester.addSetProperties(channelPrefix + "Interceptor/LocalMember");
+        digester.addSetNext(channelPrefix + "Interceptor/LocalMember",
+                            "setLocalMember",
+                            "org.apache.catalina.tribes.Member");
 
-            digester.addObjectCreate(channelPrefix + "Interceptor/Member",
-                                     null, // MUST be specified in the element
-                                     "className");
-            digester.addSetProperties(channelPrefix + "Interceptor/Member");
-            digester.addSetNext(channelPrefix + "Interceptor/Member",
-                                "addStaticMember",
-                                "org.apache.catalina.tribes.Member");
+        digester.addObjectCreate(channelPrefix + "Interceptor/Member",
+                                 null, // MUST be specified in the element
+                                 "className");
+        digester.addSetProperties(channelPrefix + "Interceptor/Member");
+        digester.addSetNext(channelPrefix + "Interceptor/Member",
+                            "addStaticMember",
+                            "org.apache.catalina.tribes.Member");
 
-            digester.addObjectCreate(channelPrefix + "ChannelListener",
-                                     null, // MUST be specified in the element
-                                     "className");
-            digester.addSetProperties(channelPrefix + "ChannelListener");
-            digester.addSetNext(channelPrefix + "ChannelListener",
-                                "addChannelListener",
-                                "org.apache.catalina.tribes.ChannelListener");
-        }
+        digester.addObjectCreate(channelPrefix + "ChannelListener",
+                                 null, // MUST be specified in the element
+                                 "className");
+        digester.addSetProperties(channelPrefix + "ChannelListener");
+        digester.addSetNext(channelPrefix + "ChannelListener",
+                            "addChannelListener",
+                            "org.apache.catalina.tribes.ChannelListener");
 
         digester.addObjectCreate(prefix + "Valve",
                                  null, // MUST be specified in the element

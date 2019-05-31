@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
   Licensed to the Apache Software Foundation (ASF) under one or more
   contributor license agreements.  See the NOTICE file distributed with
@@ -36,26 +36,27 @@
 
   <!-- Whitespace -->
   <module name="FileTabCharacter"/>
+  <module name="RegexpSingleline">
+    <!-- No trailing whitespace -->
+    <property name="format" value="\s+$"/>
+  </module>
 
   <module name="TreeWalker">
 
     <!-- Annotations -->
     <module name="AnnotationLocation"/>
-    <!-- 1 false positive, fixed in later Checkstyle release but can't upgrade
-         as it requires Java 7.
     <module name="AnnotationUseStyle"/>
-    -->
     <module name="MissingOverride"/>
     <module name="PackageAnnotation"/>
 
     <!-- Block Checks -->
-    <!--  ~60 errors
-    <module name="AvoidNestedBlocks"/>
-    -->
+    <module name="AvoidNestedBlocks">
+      <property name="allowInSwitchCase" value="true"/>
+    </module>
 
     <!-- Coding -->
     <module name="IllegalInstantiation"/>
-    
+
     <!-- Imports -->
     <module name="AvoidStarImport"/>
     <module name="AvoidStaticImport">
@@ -73,23 +74,20 @@
     </module>
     <module name="RedundantImport"/>
     <module name="UnusedImports"/>
-    
+
     <!--  Modifiers -->
     <module name="ModifierOrder"/>
     <!-- ~1750 errors
     <module name="RedundantModifier"/>
     -->
-    
+
     <!-- Whitespace -->
-    <!-- Can't handle HashMap<String,Class<?>[]>
-    https://sourceforge.net/tracker/?func=detail&aid=3039718&group_id=29721&atid=397078
     <module name="GenericWhitespace"/>
-    -->
     <module name="EmptyForInitializerPad"/>
     <module name="EmptyForIteratorPad"/>
     <!--  ~ 1000 errors
     <module name="OperatorWrap">
-      <property name="option" value="oel"/>
+      <property name="option" value="eol"/>
     </module>
     -->
   </module>

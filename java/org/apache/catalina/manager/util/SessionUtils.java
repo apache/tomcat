@@ -71,8 +71,8 @@ public class SessionUtils {
      * Try to get user locale from the session, if possible.
      * IMPLEMENTATION NOTE: this method has explicit support for Tapestry 3, Struts 1.x and Spring
      * JSF check the browser meta tag "accept languages" to choose what language to display.
-     * @param in_session
-     * @return String
+     * @param in_session The session
+     * @return the locale
      */
     public static Locale guessLocaleFromSession(final Session in_session) {
         return guessLocaleFromSession(in_session.getSession());
@@ -87,17 +87,17 @@ public class SessionUtils {
             // First search "known locations"
             for (int i = 0; i < LOCALE_TEST_ATTRIBUTES.length; ++i) {
                 Object obj = in_session.getAttribute(LOCALE_TEST_ATTRIBUTES[i]);
-                if (null != obj && obj instanceof Locale) {
+                if (obj instanceof Locale) {
                     locale = (Locale) obj;
                     break;
                 }
                 obj = in_session.getAttribute(LOCALE_TEST_ATTRIBUTES[i].toLowerCase(Locale.ENGLISH));
-                if (null != obj && obj instanceof Locale) {
+                if (obj instanceof Locale) {
                     locale = (Locale) obj;
                     break;
                 }
                 obj = in_session.getAttribute(LOCALE_TEST_ATTRIBUTES[i].toUpperCase(Locale.ENGLISH));
-                if (null != obj && obj instanceof Locale) {
+                if (obj instanceof Locale) {
                     locale = (Locale) obj;
                     break;
                 }
@@ -109,31 +109,29 @@ public class SessionUtils {
 
             // Tapestry 3.0: Engine stored in session under "org.apache.tapestry.engine:" + config.getServletName()
             // TODO: Tapestry 4+
-            {
-                final List<Object> tapestryArray = new ArrayList<Object>();
-                for (Enumeration<String> enumeration = in_session.getAttributeNames(); enumeration.hasMoreElements();) {
-                    String name = enumeration.nextElement();
-                    if (name.indexOf("tapestry") > -1 && name.indexOf("engine") > -1 && null != in_session.getAttribute(name)) {//$NON-NLS-1$ //$NON-NLS-2$
-                        tapestryArray.add(in_session.getAttribute(name));
-                    }
+            final List<Object> tapestryArray = new ArrayList<Object>();
+            for (Enumeration<String> enumeration = in_session.getAttributeNames(); enumeration.hasMoreElements();) {
+                String name = enumeration.nextElement();
+                if (name.indexOf("tapestry") > -1 && name.indexOf("engine") > -1 && null != in_session.getAttribute(name)) {//$NON-NLS-1$ //$NON-NLS-2$
+                    tapestryArray.add(in_session.getAttribute(name));
                 }
-                if (tapestryArray.size() == 1) {
-                    // found a potential Engine! Let's call getLocale() on it.
-                    Object probableEngine = tapestryArray.get(0);
-                    if (null != probableEngine) {
-                        try {
-                            Method readMethod = probableEngine.getClass().getMethod("getLocale", (Class<?>[])null);//$NON-NLS-1$
-                            // Call the property getter and return the value
-                            Object possibleLocale = readMethod.invoke(probableEngine, (Object[]) null);
-                            if (null != possibleLocale && possibleLocale instanceof Locale) {
-                                locale = (Locale) possibleLocale;
-                            }
-                        } catch (Exception e) {
-                            Throwable t = ExceptionUtils
-                                    .unwrapInvocationTargetException(e);
-                            ExceptionUtils.handleThrowable(t);
-                            // stay silent
+            }
+            if (tapestryArray.size() == 1) {
+                // found a potential Engine! Let's call getLocale() on it.
+                Object probableEngine = tapestryArray.get(0);
+                if (null != probableEngine) {
+                    try {
+                        Method readMethod = probableEngine.getClass().getMethod("getLocale", (Class<?>[])null);//$NON-NLS-1$
+                        // Call the property getter and return the value
+                        Object possibleLocale = readMethod.invoke(probableEngine, (Object[]) null);
+                        if (possibleLocale instanceof Locale) {
+                            locale = (Locale) possibleLocale;
                         }
+                    } catch (Exception e) {
+                        Throwable t = ExceptionUtils
+                                .unwrapInvocationTargetException(e);
+                        ExceptionUtils.handleThrowable(t);
+                        // stay silent
                     }
                 }
             }
@@ -144,18 +142,16 @@ public class SessionUtils {
 
             // Last guess: iterate over all attributes, to find a Locale
             // If there is only one, consider it to be /the/ locale
-            {
-                final List<Object> localeArray = new ArrayList<Object>();
-                for (Enumeration<String> enumeration = in_session.getAttributeNames(); enumeration.hasMoreElements();) {
-                    String name = enumeration.nextElement();
-                    Object obj = in_session.getAttribute(name);
-                    if (null != obj && obj instanceof Locale) {
-                        localeArray.add(obj);
-                    }
+            final List<Object> localeArray = new ArrayList<Object>();
+            for (Enumeration<String> enumeration = in_session.getAttributeNames(); enumeration.hasMoreElements();) {
+                String name = enumeration.nextElement();
+                Object obj = in_session.getAttribute(name);
+                if (obj instanceof Locale) {
+                    localeArray.add(obj);
                 }
-                if (localeArray.size() == 1) {
-                    locale = (Locale) localeArray.get(0);
-                }
+            }
+            if (localeArray.size() == 1) {
+                locale = (Locale) localeArray.get(0);
             }
 
             return locale;
@@ -167,8 +163,8 @@ public class SessionUtils {
 
     /**
      * Try to get user from the session, if possible.
-     * @param in_session
-     * @return Object
+     * @param in_session The session
+     * @return the user
      */
     public static Object guessUserFromSession(final Session in_session) {
         if (null == in_session) {
@@ -208,18 +204,16 @@ public class SessionUtils {
 
             // Last guess: iterate over all attributes, to find a java.security.Principal or javax.security.auth.Subject
             // If there is only one, consider it to be /the/ user
-            {
-                final List<Object> principalArray = new ArrayList<Object>();
-                for (Enumeration<String> enumeration = httpSession.getAttributeNames(); enumeration.hasMoreElements();) {
-                    String name = enumeration.nextElement();
-                    Object obj = httpSession.getAttribute(name);
-                    if (null != obj && (obj instanceof Principal || obj instanceof Subject)) {
-                        principalArray.add(obj);
-                    }
+            final List<Object> principalArray = new ArrayList<Object>();
+            for (Enumeration<String> enumeration = httpSession.getAttributeNames(); enumeration.hasMoreElements();) {
+                String name = enumeration.nextElement();
+                Object obj = httpSession.getAttribute(name);
+                if (obj instanceof Principal || obj instanceof Subject) {
+                    principalArray.add(obj);
                 }
-                if (principalArray.size() == 1) {
-                    user = principalArray.get(0);
-                }
+            }
+            if (principalArray.size() == 1) {
+                user = principalArray.get(0);
             }
 
             if (null != user) {
