@@ -34,7 +34,7 @@ import javax.servlet.jsp.PageContext;
  */
 public class TagAdapter implements Tag {
     /** The simple tag that's being adapted. */
-    private SimpleTag simpleTagAdaptee;
+    private final SimpleTag simpleTagAdaptee;
 
     /** The parent, of this tag, converted (if necessary) to be of type Tag. */
     private Tag parent;

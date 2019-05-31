@@ -81,11 +81,12 @@ package javax.servlet.jsp.tagext;
  * thus where synchronization is needed as illustrated by the table below.
  * <b>Note:</b> the synchronization of the variable(s) will occur <em>after</em>
  * the respective method has been called. <blockquote>
- * <table cellpadding="2" cellspacing="2" border="0" width="55%" style="background-color:#999999" summary="Variable Synchronization Points">
+ * <table cellpadding="2" cellspacing="2" border="0" width="55%"
+ *        style="background-color:#999999" summary="Variable Synchronization Points">
  * <tbody>
  * <tr align="center">
- * <td valign="top" colspan="6" style="background-color:#999999"><u><b>Variable Synchronization
- * Points</b></u><br>
+ * <td valign="top" colspan="6" style="background-color:#999999">
+ *   <u><b>Variable Synchronization Points</b></u><br>
  * </td>
  * </tr>
  * <tr>
