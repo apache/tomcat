@@ -91,6 +91,11 @@
         before removal of the child from the internal child collection.
         (remm)
       </scode>
+      <add>
+        Remove any fragment included in the target path used to obtain a
+        <code>RequestDispatcher</code>. The requested target path is logged as a
+        warning since this is an application error. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
