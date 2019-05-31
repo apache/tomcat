@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -39,9 +39,11 @@ import org.apache.catalina.Globals;
 import org.apache.catalina.Manager;
 import org.apache.catalina.Session;
 import org.apache.catalina.util.ParameterMap;
+import org.apache.catalina.util.URLEncoder;
 import org.apache.tomcat.util.buf.B2CConverter;
 import org.apache.tomcat.util.buf.MessageBytes;
 import org.apache.tomcat.util.http.Parameters;
+import org.apache.tomcat.util.res.StringManager;
 
 
 /**
@@ -61,9 +63,7 @@ import org.apache.tomcat.util.http.Parameters;
  */
 class ApplicationHttpRequest extends HttpServletRequestWrapper {
 
-
-    // ------------------------------------------------------- Static Variables
-
+    private static final StringManager sm = StringManager.getManager(ApplicationHttpRequest.class);
 
     /**
      * The set of attribute names that are special for request dispatchers.
@@ -74,9 +74,9 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
       RequestDispatcher.INCLUDE_SERVLET_PATH,
       RequestDispatcher.INCLUDE_PATH_INFO,
       RequestDispatcher.INCLUDE_QUERY_STRING,
-      RequestDispatcher.FORWARD_REQUEST_URI, 
+      RequestDispatcher.FORWARD_REQUEST_URI,
       RequestDispatcher.FORWARD_CONTEXT_PATH,
-      RequestDispatcher.FORWARD_SERVLET_PATH, 
+      RequestDispatcher.FORWARD_SERVLET_PATH,
       RequestDispatcher.FORWARD_PATH_INFO,
       RequestDispatcher.FORWARD_QUERY_STRING };
 
@@ -194,7 +194,7 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
      * Special attributes.
      */
     protected Object[] specialAttributes = new Object[specials.length];
-    
+
 
     // ------------------------------------------------- ServletRequest Methods
 
@@ -221,7 +221,7 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
             if ( requestDispatcherPath != null ){
                 return requestDispatcherPath.toString();
             } else {
-                return null;   
+                return null;
             }
         }
 
@@ -229,10 +229,10 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
         if (pos == -1) {
             return getRequest().getAttribute(name);
         } else {
-            if ((specialAttributes[pos] == null) 
+            if ((specialAttributes[pos] == null)
                 && (specialAttributes[5] == null) && (pos >= 5)) {
                 // If it's a forward special attribute, and null, it means this
-                // is an include, so we check the wrapped request since 
+                // is an include, so we check the wrapped request since
                 // the request could have been forwarded before the include
                 return getRequest().getAttribute(name);
             } else {
@@ -305,14 +305,23 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
         if (context == null)
             return (null);
 
+        if (path == null) {
+            return null;
+        }
+
+        int fragmentPos = path.indexOf('#');
+        if (fragmentPos > -1) {
+            context.getLogger().warn(sm.getString("applicationHttpRequest.fragmentInDispatchPath", path));
+            path = path.substring(0, fragmentPos);
+        }
+
         // If the path is already context-relative, just pass it through
-        if (path == null)
-            return (null);
-        else if (path.startsWith("/"))
-            return (context.getServletContext().getRequestDispatcher(path));
+        if (path.startsWith("/")) {
+            return context.getServletContext().getRequestDispatcher(path);
+        }
 
         // Convert a request-relative path to a context-relative one
-        String servletPath = 
+        String servletPath =
             (String) getAttribute(RequestDispatcher.INCLUDE_SERVLET_PATH);
         if (servletPath == null)
             servletPath = getServletPath();
@@ -329,20 +338,29 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
 
         int pos = requestPath.lastIndexOf('/');
         String relative = null;
-        if (pos >= 0) {
-            relative = requestPath.substring(0, pos + 1) + path;
+        if (context.getDispatchersUseEncodedPaths()) {
+            if (pos >= 0) {
+                relative = URLEncoder.DEFAULT.encode(
+                        requestPath.substring(0, pos + 1), "UTF-8") + path;
+            } else {
+                relative = URLEncoder.DEFAULT.encode(requestPath, "UTF-8") + path;
+            }
         } else {
-            relative = requestPath + path;
+            if (pos >= 0) {
+                relative = requestPath.substring(0, pos + 1) + path;
+            } else {
+                relative = requestPath + path;
+            }
         }
 
         return (context.getServletContext().getRequestDispatcher(relative));
 
     }
 
-    
+
     /**
      * Override the getDispatcherType() method of the wrapped request.
-     * 
+     *
      */
     @Override
     public DispatcherType getDispatcherType() {
@@ -533,7 +551,7 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
     public HttpSession getSession(boolean create) {
 
         if (crossContext) {
-            
+
             // There cannot be a session if no context has been assigned yet
             if (context == null)
                 return (null);
@@ -546,7 +564,7 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
             HttpSession other = super.getSession(false);
             if (create && (other == null)) {
                 // First create a session in the first context: the problem is
-                // that the top level request is the only one which can 
+                // that the top level request is the only one which can
                 // create the cookie safely
                 other = super.getSession(true);
             }
@@ -562,7 +580,7 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
                     // Ignore
                 }
                 if (localSession == null && create) {
-                    localSession = 
+                    localSession =
                         context.getManager().createSession(other.getId());
                 }
                 if (localSession != null) {
@@ -686,7 +704,7 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
 
         // Initialize the attributes for this request
         dispatcherType = (DispatcherType)request.getAttribute(Globals.DISPATCHER_TYPE_ATTR);
-        requestDispatcherPath = 
+        requestDispatcherPath =
             request.getAttribute(Globals.DISPATCHER_REQUEST_PATH_ATTR);
 
         // Initialize the path elements for this request
@@ -775,7 +793,7 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
     /**
      * Get a special attribute.
      *
-     * @return the special attribute pos, or -1 if it is not a special 
+     * @return the special attribute pos, or -1 if it is not a special
      *         attribute
      */
     protected int getSpecial(String name) {
@@ -790,7 +808,7 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
 
     /**
      * Set a special attribute.
-     * 
+     *
      * @return true if the attribute was a special attribute, false otherwise
      */
     protected boolean setSpecial(String name, Object value) {
@@ -806,7 +824,7 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
 
     /**
      * Remove a special attribute.
-     * 
+     *
      * @return true if the attribute was a special attribute, false otherwise
      */
     protected boolean removeSpecial(String name) {
@@ -931,7 +949,7 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
 
         @Override
         public boolean hasMoreElements() {
-            return ((pos != last) || (next != null) 
+            return ((pos != last) || (next != null)
                     || ((next = findNext()) != null));
         }
 

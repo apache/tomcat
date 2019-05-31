@@ -1392,11 +1392,19 @@ implements HttpServletRequest {
             return null;
         }
 
-        // If the path is already context-relative, just pass it through
         if (path == null) {
             return null;
-        } else if (path.startsWith("/")) {
-            return (context.getServletContext().getRequestDispatcher(path));
+        }
+
+        int fragmentPos = path.indexOf('#');
+        if (fragmentPos > -1) {
+            log.warn(sm.getString("request.fragmentInDispatchPath", path));
+            path = path.substring(0, fragmentPos);
+        }
+
+        // If the path is already context-relative, just pass it through
+        if (path.startsWith("/")) {
+            return context.getServletContext().getRequestDispatcher(path);
         }
 
         /*
