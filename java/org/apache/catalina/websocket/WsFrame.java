@@ -30,9 +30,9 @@ import org.apache.tomcat.util.res.StringManager;
 /**
  * Represents a complete WebSocket frame with the exception of the payload for
  * non-control frames.
- * 
+ *
  * @deprecated  Replaced by the JSR356 WebSocket 1.1 implementation and will be
- *              removed in Tomcat 8.0.x.  
+ *              removed in Tomcat 8.0.x.
  */
 @Deprecated
 public class WsFrame {

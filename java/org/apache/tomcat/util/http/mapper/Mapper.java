@@ -259,7 +259,7 @@ public final class Mapper {
                 welcomeResources, resources, null);
     }
 
-    
+
     /**
      * Add a new Context to an existing Host.
      *
@@ -281,8 +281,8 @@ public final class Mapper {
         addContextVersion(hostName, host, path, version, context, welcomeResources, resources,
                 wrappers, false, false);
     }
-    
-    
+
+
     /**
      * Add a new Context to an existing Host.
      *
@@ -324,7 +324,7 @@ public final class Mapper {
             newContextVersion.resources = resources;
             newContextVersion.mapperContextRootRedirectEnabled = mapperContextRootRedirectEnabled;
             newContextVersion.mapperDirectoryRedirectEnabled = mapperDirectoryRedirectEnabled;
-            
+
             if (wrappers != null) {
                 addWrappers(newContextVersion, wrappers);
             }

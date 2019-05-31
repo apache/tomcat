@@ -36,7 +36,7 @@ import java.util.Set;
  * @since Servlet 3.0
  */
 public interface ServletContainerInitializer {
-    
+
     /**
      * Receives notification during startup of a web application of the classes
      * within the web application that matched the criteria defined via the

@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -38,11 +38,11 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
- * 
+ *
  * @since 2.1
  */
 public abstract class ExpressionFactory {
-    
+
     private static final boolean IS_SECURITY_ENABLED =
         (System.getSecurityManager() != null);
 
@@ -152,13 +152,13 @@ public abstract class ExpressionFactory {
     /**
      * Create a new {@link ExpressionFactory} passing in the provided
      * {@link Properties}. Search order is the same as {@link #newInstance()}.
-     * 
+     *
      * @param properties the properties to be passed to the new instance (may be null)
      * @return the new ExpressionFactory
      */
     public static ExpressionFactory newInstance(Properties properties) {
         ExpressionFactory result = null;
-        
+
         ClassLoader tccl = Util.getContextClassLoader();
 
         CacheValue cacheValue;
@@ -260,10 +260,10 @@ public abstract class ExpressionFactory {
                     "Unable to create ExpressionFactory of type: " + clazz.getName(),
                     e);
         }
-        
+
         return result;
     }
-    
+
     /**
      * Key used to cache ExpressionFactory discovery information per class
      * loader. The class loader reference is never {@code null}, because
@@ -379,7 +379,7 @@ public abstract class ExpressionFactory {
 
     private static String getClassNameServices(ClassLoader tccl) {
         InputStream is = null;
-        
+
         if (tccl == null) {
             is = ClassLoader.getSystemResourceAsStream(SERVICE_RESOURCE_NAME);
         } else {
@@ -419,10 +419,10 @@ public abstract class ExpressionFactory {
                 } catch (IOException ioe) {/*Ignore*/}
             }
         }
-        
+
         return null;
     }
-    
+
     private static String getClassNameJreDir() {
         File file = new File(PROPERTY_FILE);
         if (file.canRead()) {
@@ -451,7 +451,7 @@ public abstract class ExpressionFactory {
         }
         return null;
     }
-    
+
     private static final String getClassNameSysProp() {
         String value = System.getProperty(PROPERTY_NAME);
         if (value != null && value.trim().length() > 0) {

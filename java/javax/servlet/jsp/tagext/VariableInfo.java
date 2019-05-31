@@ -187,7 +187,7 @@ public class VariableInfo {
     /**
      * Constructor These objects can be created (at translation time) by the
      * TagExtraInfo instances.
-     * 
+     *
      * @param varName
      *            The name of the scripting variable
      * @param className
@@ -210,7 +210,7 @@ public class VariableInfo {
 
     /**
      * Returns the name of the scripting variable.
-     * 
+     *
      * @return the name of the scripting variable
      */
     public String getVarName() {
@@ -219,7 +219,7 @@ public class VariableInfo {
 
     /**
      * Returns the type of this variable.
-     * 
+     *
      * @return the type of this variable
      */
     public String getClassName() {
@@ -229,7 +229,7 @@ public class VariableInfo {
     /**
      * Returns whether this is a new variable. If so, in some languages this
      * will require a declaration.
-     * 
+     *
      * @return whether this is a new variable.
      */
     public boolean getDeclare() {
@@ -238,7 +238,7 @@ public class VariableInfo {
 
     /**
      * Returns the lexical scope of the variable.
-     * 
+     *
      * @return the lexical scope of the variable, either AT_BEGIN, AT_END, or
      *         NESTED.
      * @see #AT_BEGIN

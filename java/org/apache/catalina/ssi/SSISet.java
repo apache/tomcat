@@ -20,7 +20,7 @@ package org.apache.catalina.ssi;
 import java.io.PrintWriter;
 /**
  * Implements the Server-side #set command
- * 
+ *
  * @author Paul Speed
  * @author Dan Sandberg
  * @author David Becker

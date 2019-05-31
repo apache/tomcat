@@ -20,7 +20,7 @@ package javax.servlet.jsp.el;
 /**
  * Represents any of the exception conditions that arise during the operation
  * evaluation of the evaluator.
- * 
+ *
  * @since 2.0
  * @deprecated As of JSP 2.1, replaced by javax.el.ELException
  */
@@ -38,7 +38,7 @@ public class ELException extends Exception {
 
     /**
      * Creates an ELException with the provided detail message.
-     * 
+     *
      * @param pMessage
      *            the detail message
      **/
@@ -48,7 +48,7 @@ public class ELException extends Exception {
 
     /**
      * Creates an ELException with the given root cause.
-     * 
+     *
      * @param pRootCause
      *            the originating cause of this exception
      **/
@@ -59,7 +59,7 @@ public class ELException extends Exception {
     // -------------------------------------
     /**
      * Creates an ELException with the given detail message and root cause.
-     * 
+     *
      * @param pMessage
      *            the detail message
      * @param pRootCause
@@ -72,7 +72,7 @@ public class ELException extends Exception {
     // -------------------------------------
     /**
      * Returns the root cause.
-     * 
+     *
      * @return the root cause of this exception
      */
     public Throwable getRootCause() {

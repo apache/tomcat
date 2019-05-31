@@ -19,7 +19,7 @@ package org.apache.catalina.loader;
 import org.apache.catalina.LifecycleException;
 
 public class WebappClassLoader extends WebappClassLoaderBase {
-    
+
     public WebappClassLoader() {
         super();
     }

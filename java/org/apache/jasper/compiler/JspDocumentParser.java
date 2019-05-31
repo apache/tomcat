@@ -259,29 +259,29 @@ class JspDocumentParser
         }
     }
 
-    
+
     @Override
     public InputSource getExternalSubset(String name, String baseURI)
             throws SAXException, IOException {
         return entityResolver.getExternalSubset(name, baseURI);
     }
 
-    
-    
+
+
     @Override
     public InputSource resolveEntity(String publicId, String systemId)
             throws SAXException, IOException {
         return entityResolver.resolveEntity(publicId, systemId);
     }
 
-    
+
     @Override
     public InputSource resolveEntity(String name, String publicId, String baseURI, String systemId)
             throws SAXException, IOException {
         return entityResolver.resolveEntity(name, publicId, baseURI, systemId);
     }
 
-    
+
     /*
      * Receives notification of the start of an element.
      *

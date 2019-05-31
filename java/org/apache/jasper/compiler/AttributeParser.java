@@ -28,7 +28,7 @@ package org.apache.jasper.compiler;
  */
 public class AttributeParser {
 
-    /* System property that controls if the strict quoting rules are applied. */ 
+    /* System property that controls if the strict quoting rules are applied. */
     private static final boolean STRICT_QUOTE_ESCAPING = Boolean.parseBoolean(
             System.getProperty(
                     "org.apache.jasper.compiler.Parser.STRICT_QUOTE_ESCAPING",
@@ -37,7 +37,7 @@ public class AttributeParser {
     /**
      * Parses the provided input String as a JSP attribute and returns an
      * unquoted value.
-     * 
+     *
      * @param input         The input.
      * @param quote         The quote character for the attribute or 0 for
      *                      scripting expressions.
@@ -62,7 +62,7 @@ public class AttributeParser {
     /**
      * Provided solely for unit test purposes and allows per call overriding of
      * the STRICT_QUOTE_ESCAPING system property.
-     * 
+     *
      * @param input         The input.
      * @param quote         The quote character for the attribute or 0 for
      *                      scripting expressions.
@@ -86,34 +86,34 @@ public class AttributeParser {
 
     /* The quoted input string. */
     private final String input;
-    
+
     /* The quote used for the attribute - null for scripting expressions. */
     private final char quote;
-    
+
     /* Is expression language being ignored - affects unquoting. \$ and \# are
      * treated as literals rather than quoted values. */
     private final boolean isELIgnored;
-    
+
     /* Are deferred expression treated as literals */
     private final boolean isDeferredSyntaxAllowedAsLiteral;
-    
+
     /* Overrides the STRICT_QUOTE_ESCAPING. Used for Unit tests only. */
     private final boolean strict;
-    
+
     private final boolean quoteAttributeEL;
 
     /* The type ($ or #) of expression. Literals have a type of null. */
     private char type;
-    
+
     /* The length of the quoted input string. */
     private final int size;
-    
+
     /* Tracks the current position of the parser in the input String. */
     private int i = 0;
-    
+
     /* Indicates if the last character returned by nextChar() was escaped. */
     private boolean lastChEscaped = false;
-    
+
     /* The unquoted result. */
     private StringBuilder result;
 
@@ -275,7 +275,7 @@ public class AttributeParser {
     private char nextChar() {
         lastChEscaped = false;
         char ch = input.charAt(i);
-        
+
         if (ch == '&') {
             if (i + 5 < size && input.charAt(i + 1) == 'a' &&
                     input.charAt(i + 2) == 'p' && input.charAt(i + 3) == 'o' &&

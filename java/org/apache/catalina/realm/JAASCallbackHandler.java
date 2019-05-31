@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -37,7 +37,7 @@ import org.apache.tomcat.util.res.StringManager;
  * (or possible).</p>
  *
  * <p>This <code>CallbackHandler</code> will pre-digest the supplied
- * password, if required by the <code>&lt;Realm&gt;</code> element in 
+ * password, if required by the <code>&lt;Realm&gt;</code> element in
  * <code>server.xml</code>.</p>
  * <p>At present, <code>JAASCallbackHandler</code> knows how to handle callbacks of
  * type <code>javax.security.auth.callback.NameCallback</code> and
@@ -75,7 +75,7 @@ public class JAASCallbackHandler implements CallbackHandler {
         }
     }
 
-    
+
     /**
      * Construct a callback handler for DIGEST authentication.
      *
@@ -89,7 +89,7 @@ public class JAASCallbackHandler implements CallbackHandler {
      * @param realmName     Realm name
      * @param md5a2         Second MD5 digest used to calculate the digest
      *                      MD5(Method + ":" + uri)
-     * @param authMethod    The authentication method in use 
+     * @param authMethod    The authentication method in use
      */
     public JAASCallbackHandler(JAASRealm realm, String username,
                                String password, String nonce, String nc,
@@ -133,12 +133,12 @@ public class JAASCallbackHandler implements CallbackHandler {
      * Server generated nonce.
      */
     protected String nonce = null;
-    
+
     /**
      * Nonce count.
      */
     protected String nc = null;
-    
+
     /**
      * Client generated nonce.
      */
@@ -172,7 +172,7 @@ public class JAASCallbackHandler implements CallbackHandler {
      * This implementation only recognizes {@link NameCallback},
      * {@link PasswordCallback} and {@link TextInputCallback}.
      * {@link TextInputCallback} is used to pass the various additional
-     * parameters required for DIGEST authentication. 
+     * parameters required for DIGEST authentication.
      *
      * @param callbacks The set of <code>Callback</code>s to be processed
      *

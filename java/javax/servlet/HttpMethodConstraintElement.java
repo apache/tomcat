@@ -38,7 +38,7 @@ public class HttpMethodConstraintElement extends HttpConstraintElement {
         }
         this.methodName = methodName;
     }
-    
+
     public HttpMethodConstraintElement(String methodName,
             HttpConstraintElement constraint) {
         super(constraint.getEmptyRoleSemantic(),
@@ -50,7 +50,7 @@ public class HttpMethodConstraintElement extends HttpConstraintElement {
         }
         this.methodName = methodName;
     }
-    
+
     public String getMethodName() {
         return methodName;
     }

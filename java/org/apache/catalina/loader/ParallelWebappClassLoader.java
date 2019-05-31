@@ -56,12 +56,12 @@ public class ParallelWebappClassLoader extends WebappClassLoaderBase {
         }
     }
 
-    
+
     public ParallelWebappClassLoader() {
         super();
     }
 
-    
+
     public ParallelWebappClassLoader(ClassLoader parent) {
         super(parent);
     }

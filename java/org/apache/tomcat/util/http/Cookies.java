@@ -64,7 +64,7 @@ public final class Cookies {
         this.headers=headers;
     }
 
-    
+
     public void setLimit(int limit) {
         this.limit = limit;
         if (limit > -1 && scookies.length > limit && cookieCount <= limit) {
@@ -75,7 +75,7 @@ public final class Cookies {
         }
     }
 
-    
+
     /**
      * Recycle.
      */

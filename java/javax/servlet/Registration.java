@@ -24,13 +24,13 @@ import java.util.Set;
  * @since Servlet 3.0
  */
 public interface Registration {
-    
+
     public String getName();
-    
+
     public String getClassName();
 
     /**
-     * 
+     *
      * @param name
      * @param value
      * @return TODO
@@ -40,9 +40,9 @@ public interface Registration {
     public boolean setInitParameter(String name, String value);
 
     public String getInitParameter(String name);
-    
+
     /**
-     * 
+     *
      * @param initParameters
      * @return TODO
      * @throws IllegalArgumentException
@@ -53,9 +53,9 @@ public interface Registration {
     public Map<String, String> getInitParameters();
 
     public interface Dynamic extends Registration {
-        
+
         /**
-         * 
+         *
          * @param isAsyncSupported
          * @throws IllegalStateException
          */

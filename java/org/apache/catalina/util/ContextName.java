@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -31,44 +31,44 @@ public final class ContextName {
     private final String path;
     private final String version;
     private final String name;
-    
+
     /**
      * Creates an instance from a context name, display name, base name,
      * directory name, WAR name or context.xml name.
-     * 
+     *
      * @param name  The name to use as the basis for this object
-     * 
+     *
      * @deprecated  Use {@link ContextName#ContextName(String, boolean)}
      */
     @Deprecated
     public ContextName(String name) {
         this(name, true);
     }
-    
-    
+
+
     /**
      * Creates an instance from a context name, display name, base name,
      * directory name, WAR name or context.xml name.
-     * 
+     *
      * @param name  The name to use as the basis for this object
      * @param stripFileExtension    If a .war or .xml file extension is present
      *                              at the end of the provided name should it be
      *                              removed?
      */
     public ContextName(String name, boolean stripFileExtension) {
-        
+
         String tmp1 = name;
-        
+
         // Convert Context names and display names to base names
-        
+
         // Strip off any leading "/"
         if (tmp1.startsWith("/")) {
             tmp1 = tmp1.substring(1);
         }
-        
+
         // Replace any remaining /
         tmp1 = tmp1.replaceAll("/", FWD_SLASH_REPLACEMENT);
-        
+
         // Insert the ROOT name if required
         if (tmp1.startsWith(VERSION_MARKER) || "".equals(tmp1)) {
             tmp1 = ROOT_NAME + tmp1;
@@ -82,7 +82,7 @@ public final class ContextName {
         }
 
         baseName = tmp1;
-        
+
         String tmp2;
         // Extract version number
         int versionIndex = baseName.indexOf(VERSION_MARKER);
@@ -99,17 +99,17 @@ public final class ContextName {
         } else {
             path = "/" + tmp2.replaceAll(FWD_SLASH_REPLACEMENT, "/");
         }
-        
+
         if (versionIndex > -1) {
             this.name = path + VERSION_MARKER + version;
         } else {
             this.name = path;
         }
     }
-    
+
     /**
      * Construct an instance from a path and version.
-     * 
+     *
      * @param path      Context path to use
      * @param version   Context version to use
      */
@@ -127,7 +127,7 @@ public final class ContextName {
         } else {
             this.version = version;
         }
-        
+
         // Name is path + version
         if ("".equals(this.version)) {
             name = this.path;
@@ -153,15 +153,15 @@ public final class ContextName {
     public String getBaseName() {
         return baseName;
     }
-    
+
     public String getPath() {
         return path;
     }
-    
+
     public String getVersion() {
         return version;
     }
-    
+
     public String getName() {
         return name;
     }
@@ -173,15 +173,15 @@ public final class ContextName {
         } else {
             tmp.append(path);
         }
-        
+
         if (!"".equals(version)) {
             tmp.append(VERSION_MARKER);
             tmp.append(version);
         }
-        
+
         return tmp.toString();
     }
-    
+
     @Override
     public String toString() {
         return getDisplayName();

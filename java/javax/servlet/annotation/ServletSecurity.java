@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -29,7 +29,7 @@ import java.lang.annotation.Target;
  * The container applies constraints to the URL patterns mapped to each Servlet
  * which declares this annotation.<br>
  * <br>
- * 
+ *
  * @since Servlet 3.0
  */
 @Inherited
@@ -75,7 +75,7 @@ public @interface ServletSecurity {
     /**
      * The default constraint to apply to requests not handled by specific
      * method constraints
-     * 
+     *
      * @return http constraint
      */
     HttpConstraint value() default @HttpConstraint;
@@ -83,7 +83,7 @@ public @interface ServletSecurity {
     /**
      * An array of HttpMethodConstraint objects to which the security constraint
      * will be applied
-     * 
+     *
      * @return array of http method constraint
      */
     HttpMethodConstraint[] httpMethodConstraints() default {};

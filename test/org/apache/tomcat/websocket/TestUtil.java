@@ -35,7 +35,7 @@ public class TestUtil {
     public static void generateMask() {
         Util.generateMask();
     }
-    
+
     @Test
     public void testGetMessageTypeSimple() {
         Assert.assertEquals(

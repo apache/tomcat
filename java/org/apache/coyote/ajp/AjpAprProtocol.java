@@ -35,8 +35,8 @@ import org.apache.tomcat.util.net.SocketWrapper;
  * @author Costin Manolache
  */
 public class AjpAprProtocol extends AbstractAjpProtocol<Long> {
-    
-    
+
+
     private static final Log log = LogFactory.getLog(AjpAprProtocol.class);
 
     @Override
@@ -70,7 +70,7 @@ public class AjpAprProtocol extends AbstractAjpProtocol<Long> {
         ((AprEndpoint) endpoint).setUseSendfile(false);
     }
 
-    
+
     // ----------------------------------------------------- Instance Variables
 
 

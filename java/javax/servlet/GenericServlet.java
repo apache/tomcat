@@ -68,7 +68,7 @@ public abstract class GenericServlet implements Servlet, ServletConfig,
      * <p>
      * This method is supplied for convenience. It gets the value of the named
      * parameter from the servlet's <code>ServletConfig</code> object.
-     * 
+     *
      * @param name
      *            a <code>String</code> specifying the name of the
      *            initialization parameter
@@ -88,7 +88,7 @@ public abstract class GenericServlet implements Servlet, ServletConfig,
      * <p>
      * This method is supplied for convenience. It gets the parameter names from
      * the servlet's <code>ServletConfig</code> object.
-     * 
+     *
      * @return Enumeration an enumeration of <code>String</code> objects
      *         containing the names of the servlet's initialization parameters
      */
@@ -99,7 +99,7 @@ public abstract class GenericServlet implements Servlet, ServletConfig,
 
     /**
      * Returns this servlet's {@link ServletConfig} object.
-     * 
+     *
      * @return ServletConfig the <code>ServletConfig</code> object that
      *         initialized this servlet
      */
@@ -114,7 +114,7 @@ public abstract class GenericServlet implements Servlet, ServletConfig,
      * <p>
      * This method is supplied for convenience. It gets the context from the
      * servlet's <code>ServletConfig</code> object.
-     * 
+     *
      * @return ServletContext the <code>ServletContext</code> object passed to
      *         this servlet by the <code>init</code> method
      */
@@ -128,7 +128,7 @@ public abstract class GenericServlet implements Servlet, ServletConfig,
      * copyright. By default, this method returns an empty string. Override this
      * method to have it return a meaningful value. See
      * {@link Servlet#getServletInfo}.
-     * 
+     *
      * @return String information about this servlet, by default an empty string
      */
     @Override
@@ -143,7 +143,7 @@ public abstract class GenericServlet implements Servlet, ServletConfig,
      * This implementation stores the {@link ServletConfig} object it receives
      * from the servlet container for later use. When overriding this form of
      * the method, call <code>super.init(config)</code>.
-     * 
+     *
      * @param config
      *            the <code>ServletConfig</code> object that contains
      *            configuration information for this servlet
@@ -167,7 +167,7 @@ public abstract class GenericServlet implements Servlet, ServletConfig,
      * <code>GenericServlet.init(ServletConfig config)</code>. The
      * <code>ServletConfig</code> object can still be retrieved via
      * {@link #getServletConfig}.
-     * 
+     *
      * @exception ServletException
      *                if an exception occurs that interrupts the servlet's
      *                normal operation
@@ -179,7 +179,7 @@ public abstract class GenericServlet implements Servlet, ServletConfig,
     /**
      * Writes the specified message to a servlet log file, prepended by the
      * servlet's name. See {@link ServletContext#log(String)}.
-     * 
+     *
      * @param msg
      *            a <code>String</code> specifying the message to be written to
      *            the log file
@@ -192,7 +192,7 @@ public abstract class GenericServlet implements Servlet, ServletConfig,
      * Writes an explanatory message and a stack trace for a given
      * <code>Throwable</code> exception to the servlet log file, prepended by
      * the servlet's name. See {@link ServletContext#log(String, Throwable)}.
-     * 
+     *
      * @param message
      *            a <code>String</code> that describes the error or exception
      * @param t
@@ -208,7 +208,7 @@ public abstract class GenericServlet implements Servlet, ServletConfig,
      * <p>
      * This method is declared abstract so subclasses, such as
      * <code>HttpServlet</code>, must override it.
-     * 
+     *
      * @param req
      *            the <code>ServletRequest</code> object that contains the
      *            client's request
@@ -228,7 +228,7 @@ public abstract class GenericServlet implements Servlet, ServletConfig,
     /**
      * Returns the name of this servlet instance. See
      * {@link ServletConfig#getServletName}.
-     * 
+     *
      * @return the name of this servlet instance
      */
     @Override

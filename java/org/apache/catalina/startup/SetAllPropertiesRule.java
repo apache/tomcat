@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -26,16 +26,16 @@ import org.xml.sax.Attributes;
 
 /**
  * Rule that uses the introspection utils to set properties.
- * 
+ *
  * @author Remy Maucherat
  * @author Filip Hanik
  */
 public class SetAllPropertiesRule extends Rule {
 
-    
+
     // ----------------------------------------------------------- Constructors
     public SetAllPropertiesRule() {}
-    
+
     public SetAllPropertiesRule(String[] exclude) {
         for (int i=0; i<exclude.length; i++ ) if (exclude[i]!=null) this.excludes.put(exclude[i],exclude[i]);
     }
@@ -64,8 +64,8 @@ public class SetAllPropertiesRule extends Rule {
             }
             String value = attributes.getValue(i);
             if ( !excludes.containsKey(name)) {
-                if (!digester.isFakeAttribute(digester.peek(), name) 
-                        && !IntrospectionUtils.setProperty(digester.peek(), name, value) 
+                if (!digester.isFakeAttribute(digester.peek(), name)
+                        && !IntrospectionUtils.setProperty(digester.peek(), name, value)
                         && digester.getRulesValidation()) {
                     digester.getLogger().warn("[SetAllPropertiesRule]{" + digester.getMatch() +
                             "} Setting property '" + name + "' to '" +

@@ -22,10 +22,10 @@
                domain="Catalina"
                 group="Manager"
                  type="org.apache.catalina.session.StandardManager">
-                 
+
     <attribute   name="activeSessions"
           description="Number of active sessions at this moment"
-                 type="int" 
+                 type="int"
             writeable="false"/>
 
     <attribute   name="className"
@@ -37,7 +37,7 @@
           description="The distributable flag for Sessions created by this
                        Manager"
                  type="boolean"/>
-                 
+
     <attribute   name="duplicates"
           description="Number of duplicated session ids generated"
                  type="int" />
@@ -45,12 +45,12 @@
     <attribute   name="expiredSessions"
           description="Number of sessions that expired ( doesn't include explicit invalidations )"
                  type="long" />
-                 
+
     <attribute   name="jvmRoute"
           description="Retrieve the JvmRoute for the enclosing Engine"
                  type="java.lang.String"
            writeable = "false" />
-                 
+
     <attribute   name="maxActive"
           description="Maximum number of active sessions so far"
                  type="int" />
@@ -70,7 +70,7 @@
                        (for logging)"
                  type="java.lang.String"
             writeable="false"/>
-            
+
     <attribute   name="pathname"
           description="Path name of the disk file in which active sessions"
                  type="java.lang.String"/>
@@ -82,7 +82,7 @@
     <attribute   name="processingTime"
           description="Time spent doing housekeeping and expiration"
                  type="long" />
-               
+
     <attribute   name="secureRandomAlgorithm"
           description="The secure random number generator algorithm name"
                  type="java.lang.String"/>
@@ -108,12 +108,12 @@
     <attribute   name="sessionCounter"
           description="Total number of sessions created by this manager"
                  type="long" />
-                 
+
     <attribute   name="sessionExpireRate"
           description="Session expiration rate in sessions per minute"
                  type="int"
             writeable="false" />
-                 
+
     <attribute   name="sessionIdLength"
           description="The session id length (in bytes) of Sessions
                        created by this Manager"
@@ -122,7 +122,7 @@
     <attribute   name="sessionMaxAliveTime"
           description="Longest time an expired session had been alive"
                  type="int" />
-                 
+
     <attribute   name="stateName"
           description="The name of the LifecycleState that this component is currently in"
                  type="java.lang.String"
@@ -132,7 +132,7 @@
           description="Number of sessions we rejected due to maxActive being reached"
                  type="int"
             writeable="false"/>
-                 
+
     <attribute   name="sessionAttributeNameFilter"
           description="The string pattern used for including session attributes in distribution. Null means all attributes are included."
                  type="java.lang.String"/>
@@ -150,7 +150,7 @@
                impact="ACTION"
            returnType="void">
     </operation>
-                 
+
     <operation   name="expireSession"
           description="Expire a session"
                impact="ACTION"
@@ -159,7 +159,7 @@
           description="Id of the session"
                  type="java.lang.String"/>
     </operation>
-    
+
     <operation   name="getCreationTime"
           description="Get the creation time"
                impact="ACTION"
@@ -168,7 +168,7 @@
           description="Id of the session"
                  type="java.lang.String"/>
     </operation>
-    
+
     <operation   name="getCreationTimestamp"
           description="Get the creation timestamp"
                impact="ACTION"
@@ -177,7 +177,7 @@
           description="Id of the session"
                  type="java.lang.String"/>
     </operation>
-    
+
     <operation   name="getLastAccessedTime"
           description="Get the last access time"
                impact="ACTION"
@@ -195,7 +195,7 @@
           description="Id of the session"
                  type="java.lang.String"/>
     </operation>
-    
+
     <operation   name="getSessionAttribute"
           description="Return a session attribute"
                impact="ACTION"
@@ -224,7 +224,7 @@
 
     <attribute   name="activeSessions"
           description="Number of active sessions at this moment"
-                 type="int" 
+                 type="int"
             writeable="false"/>
 
     <attribute   name="className"
@@ -235,7 +235,7 @@
     <attribute   name="distributable"
           description="The distributable flag for Sessions created by this Manager"
                  type="boolean"/>
-                 
+
     <attribute   name="duplicates"
           description="Number of duplicated session ids generated"
                  type="int" />
@@ -243,12 +243,12 @@
     <attribute   name="expiredSessions"
           description="Number of sessions that expired ( doesn't include explicit invalidations )"
                  type="long" />
-                 
+
     <attribute   name="jvmRoute"
           description="Retrieve the JvmRoute for the enclosing Engine"
                  type="java.lang.String"
            writeable = "false" />
-                 
+
     <attribute   name="maxActive"
           description="Maximum number of active sessions so far"
                  type="int" />
@@ -257,11 +257,11 @@
           description="The maximum number of active Sessions allowed, or -1
                        for no limit"
                  type="int"/>
-                 
+
     <attribute   name="maxIdleBackup"
           description="Indicates how many seconds old a session can get, after its last use in a request, before it should be backed up to the store. -1 means sessions are not backed up."
                  type="int"/>
-                 
+
     <attribute   name="maxIdleSwap"
           description="Indicates how many seconds old a session can get, after its last use in a request, before it should be backed up to the store. -1 means sessions are not backed up."
                  type="int"/>
@@ -269,7 +269,7 @@
     <attribute   name="maxInactiveInterval"
           description="The default maximum inactive interval for Sessions created by this Manager"
                  type="int"/>
-                 
+
     <attribute   name="minIdleSwap"
           description=" The minimum time in seconds that a session must be idle before it can be swapped out of memory, or -1 if it can be swapped out at any time."
                  type="int"/>
@@ -286,11 +286,11 @@
     <attribute   name="processingTime"
           description="Time spent doing housekeeping and expiration"
                  type="long" />
-                 
+
     <attribute   name="saveOnRestart"
           description="Indicates whether sessions are saved when the Manager is shut down properly. This requires the unload() method to be called."
                  type="boolean" />
-               
+
     <attribute   name="secureRandomClass"
           description="The random number generator class name"
                  type="java.lang.String"/>
@@ -308,7 +308,7 @@
     <attribute   name="sessionCounter"
           description="Total number of sessions created by this manager"
                  type="long" />
-                 
+
     <attribute   name="sessionExpireRate"
           description="Session expiration rate in sessions per minute"
                  type="int"
@@ -322,7 +322,7 @@
     <attribute   name="sessionMaxAliveTime"
           description="Longest time an expired session had been alive"
                  type="int" />
-                 
+
     <attribute   name="stateName"
           description="The name of the LifecycleState that this component is currently in"
                  type="java.lang.String"
@@ -350,7 +350,7 @@
                impact="ACTION"
            returnType="void">
     </operation>
-                 
+
     <operation   name="expireSession"
           description="Expire a session"
                impact="ACTION"
@@ -359,7 +359,7 @@
           description="Id of the session"
                  type="java.lang.String"/>
     </operation>
-    
+
     <operation   name="getCreationTime"
           description="Get the creation time"
                impact="ACTION"
@@ -368,7 +368,7 @@
           description="Id of the session"
                  type="java.lang.String"/>
     </operation>
-    
+
     <operation   name="getCreationTimestamp"
           description="Get the creation timestamp"
                impact="ACTION"
@@ -377,7 +377,7 @@
           description="Id of the session"
                  type="java.lang.String"/>
     </operation>
-    
+
     <operation   name="getLastAccessedTime"
           description="Get the last access time"
                impact="ACTION"
@@ -395,7 +395,7 @@
           description="Id of the session"
                  type="java.lang.String"/>
     </operation>
-    
+
     <operation   name="getSessionAttribute"
           description="Return a session attribute"
                impact="ACTION"

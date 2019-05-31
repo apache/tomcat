@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -55,13 +55,13 @@ import java.util.regex.Pattern;
  * named {prefix}{date}{suffix} in a configured directory.
  *
  * <p>The following configuration properties are available:</p>
- * 
+ *
  * <ul>
  *   <li><code>directory</code> - The directory where to create the log file.
  *    If the path is not absolute, it is relative to the current working
  *    directory of the application. The Apache Tomcat configuration files usually
  *    specify an absolute path for this property,
- *    <code>${catalina.base}/logs</code> 
+ *    <code>${catalina.base}/logs</code>
  *    Default value: <code>logs</code></li>
  *   <li><code>rotatable</code> - If <code>true</code>, the log file will be
  *    rotated on the first write past midnight and the filename will be

@@ -51,7 +51,7 @@ import org.apache.tomcat.util.res.StringManager;
  * nodes. After all that, the session stickiness will work directly to the
  * backup node and the traffic will not go back to the failed node after it is
  * restarted!
- * 
+ *
  * <p>
  * For this valve to function correctly, so that all nodes of the cluster
  * receive the sessionid change notifications that it generates, the following
@@ -60,7 +60,7 @@ import org.apache.tomcat.util.res.StringManager;
  * JvmRouteSessionIDBinderListener} since Tomcat 5.5.10, and both
  * JvmRouteSessionIDBinderListener and JvmRouteSessionIDBinderLifecycleListener
  * for earlier versions of Tomcat.
- * 
+ *
  * <p>
  * Add this Valve to your cluster definition at conf/server.xml .
  *
@@ -390,10 +390,10 @@ public class JvmRouteBinderValve extends ValveBase implements ClusterValve {
             request.setAttribute(sessionIdAttribute, sessionId);
         }
     }
-    
+
     /**
      * Send the changed Sessionid to all clusternodes.
-     * 
+     *
      * @see JvmRouteSessionIDBinderListener#messageReceived(
      *            org.apache.catalina.ha.ClusterMessage)
      * @param sessionId

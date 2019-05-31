@@ -86,7 +86,7 @@
     <env-entry-type>java.lang.Integer</env-entry-type>
     <env-entry-value>66</env-entry-value>
   </env-entry>
-  
+
   <servlet>
     <servlet-name>injection</servlet-name>
     <servlet-class>org.apache.naming.TesterInjectionServlet</servlet-class>

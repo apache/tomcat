@@ -169,7 +169,7 @@ have a JDK that is up to date, or disable sendfile behavior in the Connector.<br
 Enabling SSI and CGI Support:
 =============================
 Because of the security risks associated with CGI and SSI available
-to web applications, these features are disabled by default.  
+to web applications, these features are disabled by default.
 
 To enable and configure CGI support, please see the cgi-howto.html page.
 

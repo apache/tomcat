@@ -24,7 +24,7 @@ import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 /**
  * Represents a parsed expression.
- * 
+ *
  * @author Paul Speed
  */
 public class ExpressionParseTree {
@@ -351,7 +351,7 @@ public class ExpressionParseTree {
         protected int compareBranches() {
             String val1 = ((StringNode)left).getValue();
             String val2 = ((StringNode)right).getValue();
-            
+
             int val2Len = val2.length();
             if (val2Len > 1 && val2.charAt(0) == '/' &&
                     val2.charAt(val2Len - 1) == '/') {

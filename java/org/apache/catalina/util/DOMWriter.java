@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -169,7 +169,7 @@ public class DOMWriter {
             // print element with attributes
          case Node.ELEMENT_NODE: {
                out.print('<');
-               if (this.qualifiedNames) { 
+               if (this.qualifiedNames) {
                   out.print(node.getNodeName());
                } else {
                   out.print(node.getLocalName());
@@ -183,7 +183,7 @@ public class DOMWriter {
                   } else {
                      out.print(attr.getLocalName());
                   }
-                  
+
                   out.print("=\"");
                   out.print(normalize(attr.getNodeValue()));
                   out.print('"');
@@ -247,7 +247,7 @@ public class DOMWriter {
                } else {
                   out.print(node.getLocalName());
                }
-               
+
                String data = node.getNodeValue();
                if ( data != null && data.length() > 0 ) {
                   out.print(' ');

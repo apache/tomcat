@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -172,11 +172,11 @@ public class ApplicationSessionCookieConfig implements SessionCookieConfig {
 
         Cookie cookie = new Cookie(
                 SessionConfig.getSessionCookieName(context), sessionId);
-       
+
         // Just apply the defaults.
         cookie.setMaxAge(scc.getMaxAge());
         cookie.setComment(scc.getComment());
-       
+
         if (context.getSessionCookieDomain() == null) {
             // Avoid possible NPE
             if (scc.getDomain() != null) {
@@ -195,7 +195,7 @@ public class ApplicationSessionCookieConfig implements SessionCookieConfig {
         if (scc.isHttpOnly() || context.getUseHttpOnly()) {
             cookie.setHttpOnly(true);
         }
-       
+
         String contextPath = context.getSessionCookiePath();
         if (contextPath == null || contextPath.length() == 0) {
             contextPath = scc.getPath();
@@ -237,7 +237,7 @@ public class ApplicationSessionCookieConfig implements SessionCookieConfig {
     public static String getSessionCookieName(Context context) {
         return SessionConfig.getSessionCookieName(context);
     }
-    
+
     /**
      * Determine the name to use for the session cookie for the provided
      * context.

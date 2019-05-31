@@ -35,7 +35,7 @@ import org.apache.catalina.tribes.membership.Membership;
 public class Arrays {
     private static final Charset CHARSET_ISO_8859_1 =
         Charset.forName("ISO-8859-1");
-    
+
     public static boolean contains(byte[] source, int srcoffset, byte[] key, int keyoffset, int length) {
         if ( srcoffset < 0 || srcoffset >= source.length) throw new ArrayIndexOutOfBoundsException("srcoffset is out of bounds.");
         if ( keyoffset < 0 || keyoffset >= key.length) throw new ArrayIndexOutOfBoundsException("keyoffset is out of bounds.");
@@ -49,7 +49,7 @@ public class Arrays {
         }
         return match;
     }
-    
+
     public static String toString(byte[] data) {
         return toString(data,0,data!=null?data.length:0);
     }
@@ -81,7 +81,7 @@ public class Arrays {
     public static String toString(Object[] data) {
         return toString(data,0,data!=null?data.length:0);
     }
-    
+
     public static String toString(Object[] data, int offset, int length) {
         StringBuilder buf = new StringBuilder("{");
         if ( data != null && length > 0 ) {
@@ -93,11 +93,11 @@ public class Arrays {
         buf.append("}");
         return buf.toString();
     }
-    
+
     public static String toNameString(Member[] data) {
         return toNameString(data,0,data!=null?data.length:0);
     }
-    
+
     public static String toNameString(Member[] data, int offset, int length) {
         StringBuilder buf = new StringBuilder("{");
         if ( data != null && length > 0 ) {
@@ -115,7 +115,7 @@ public class Arrays {
         for (int i=0;i<data.length; i++ ) result += data[i];
         return result;
     }
-    
+
     public static UniqueId getUniqudId(ChannelMessage msg) {
         return new UniqueId(msg.getUniqueId());
     }
@@ -123,7 +123,7 @@ public class Arrays {
     public static UniqueId getUniqudId(byte[] data) {
         return new UniqueId(data);
     }
-    
+
     public static boolean equals(byte[] o1, byte[] o2) {
         return java.util.Arrays.equals(o1,o2);
     }
@@ -133,13 +133,13 @@ public class Arrays {
         if ( result ) for (int i=0; i<o1.length && result; i++ ) result = o1[i].equals(o2[i]);
         return result;
     }
-    
+
     public static boolean sameMembers(Member[] m1, Member[] m2) {
         AbsoluteOrder.absoluteOrder(m1);
         AbsoluteOrder.absoluteOrder(m2);
         return equals(m1,m2);
     }
-    
+
     public static Member[] merge(Member[] m1, Member[] m2) {
         AbsoluteOrder.absoluteOrder(m1);
         AbsoluteOrder.absoluteOrder(m2);
@@ -151,11 +151,11 @@ public class Arrays {
         AbsoluteOrder.absoluteOrder(result);
         return result;
     }
-    
+
     public static void fill(Membership mbrship, Member[] m) {
         for (int i=0; i<m.length; i++ ) mbrship.addMember((MemberImpl)m[i]);
     }
-    
+
     public static Member[] diff(Membership complete, Membership local, MemberImpl ignore) {
         ArrayList<Member> result = new ArrayList<Member>();
         MemberImpl[] comp = complete.getMembers();
@@ -165,32 +165,32 @@ public class Arrays {
         }
         return result.toArray(new MemberImpl[result.size()]);
     }
-    
+
     public static Member[] remove(Member[] all, Member remove) {
         return extract(all,new Member[] {remove});
     }
-    
+
     public static Member[] extract(Member[] all, Member[] remove) {
         List<Member> alist = java.util.Arrays.asList(all);
         ArrayList<Member> list = new ArrayList<Member>(alist);
         for (int i=0; i<remove.length; i++ ) list.remove(remove[i]);
         return list.toArray(new Member[list.size()]);
     }
-    
+
     public static int indexOf(Member member, Member[] members) {
         int result = -1;
-        for (int i=0; (result==-1) && (i<members.length); i++ ) 
+        for (int i=0; (result==-1) && (i<members.length); i++ )
             if ( member.equals(members[i]) ) result = i;
         return result;
     }
-    
+
     public static int nextIndex(Member member, Member[] members) {
         int idx = indexOf(member,members)+1;
         if (idx >= members.length ) idx = ((members.length>0)?0:-1);
-        
+
         return idx;
     }
-    
+
     public static int hashCode(byte a[]) {
         if (a == null)
             return 0;
@@ -202,8 +202,8 @@ public class Arrays {
         }
         return result;
     }
-    
-    public static byte[] fromString(String value) { 
+
+    public static byte[] fromString(String value) {
         if ( value == null ) return null;
         if ( !value.startsWith("{") ) throw new RuntimeException("byte arrays must be represented as {1,3,4,5,6}");
         StringTokenizer t = new StringTokenizer(value,"{,}",false);

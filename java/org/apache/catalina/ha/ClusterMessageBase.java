@@ -31,7 +31,7 @@ import org.apache.catalina.tribes.Member;
  * @version 1.0
  */
 public class ClusterMessageBase implements ClusterMessage {
-    
+
     private static final long serialVersionUID = 1L;
 
     protected transient Member address;

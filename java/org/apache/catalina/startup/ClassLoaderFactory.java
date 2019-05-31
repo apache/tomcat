@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -57,7 +57,7 @@ public final class ClassLoaderFactory {
 
 
     private static final Log log = LogFactory.getLog(ClassLoaderFactory.class);
-    
+
     // --------------------------------------------------------- Public Methods
 
 
@@ -66,10 +66,10 @@ public final class ClassLoaderFactory {
      * defaults and the specified directory paths:
      *
      * @param unpacked Array of pathnames to unpacked directories that should
-     *  be added to the repositories of the class loader, or <code>null</code> 
+     *  be added to the repositories of the class loader, or <code>null</code>
      * for no unpacked directories to be considered
      * @param packed Array of pathnames to directories containing JAR files
-     *  that should be added to the repositories of the class loader, 
+     *  that should be added to the repositories of the class loader,
      * or <code>null</code> for no directories of JAR files to be considered
      * @param parent Parent class loader for the new class loader, or
      *  <code>null</code> for the system class loader.
@@ -308,20 +308,20 @@ public final class ClassLoaderFactory {
         JAR,
         URL
     }
-    
+
     public static class Repository {
         private String location;
         private RepositoryType type;
-        
+
         public Repository(String location, RepositoryType type) {
             this.location = location;
             this.type = type;
         }
-        
+
         public String getLocation() {
             return location;
         }
-        
+
         public RepositoryType getType() {
             return type;
         }

@@ -38,7 +38,7 @@ public interface WebConnection {
      * data to the client.
      */
     AbstractServletOutputStream getOutputStream() throws IOException;
-    
+
     /**
      * The Servlet 3.1 interface extends AutoCloseable but that is not available
      * in Java 6 so this is the single method from that interface.

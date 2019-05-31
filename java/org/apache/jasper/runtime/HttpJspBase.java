@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -34,21 +34,21 @@ import org.apache.jasper.compiler.Localizer;
  * @author Anil K. Vijendran
  */
 public abstract class HttpJspBase extends HttpServlet implements HttpJspPage {
-    
+
     private static final long serialVersionUID = 1L;
 
     protected HttpJspBase() {
     }
 
     @Override
-    public final void init(ServletConfig config) 
-        throws ServletException 
+    public final void init(ServletConfig config)
+        throws ServletException
     {
         super.init(config);
         jspInit();
         _jspInit();
     }
-    
+
     @Override
     public String getServletInfo() {
         return Localizer.getMessage("jsp.engine.info");
@@ -64,12 +64,12 @@ public abstract class HttpJspBase extends HttpServlet implements HttpJspPage {
      * Entry point into service.
      */
     @Override
-    public final void service(HttpServletRequest request, HttpServletResponse response) 
-        throws ServletException, IOException 
+    public final void service(HttpServletRequest request, HttpServletResponse response)
+        throws ServletException, IOException
     {
         _jspService(request, response);
     }
-    
+
     @Override
     public void jspInit() {
     }
@@ -85,7 +85,7 @@ public abstract class HttpJspBase extends HttpServlet implements HttpJspPage {
     }
 
     @Override
-    public abstract void _jspService(HttpServletRequest request, 
-                                     HttpServletResponse response) 
+    public abstract void _jspService(HttpServletRequest request,
+                                     HttpServletResponse response)
         throws ServletException, IOException;
 }

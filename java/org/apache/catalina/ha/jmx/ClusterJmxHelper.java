@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -30,7 +30,7 @@ import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.modeler.ManagedBean;
 import org.apache.tomcat.util.modeler.Registry;
 /**
- * 
+ *
  * @author Filip Hanik
  *
  * @deprecated  Unused - registration now happens via
@@ -38,15 +38,15 @@ import org.apache.tomcat.util.modeler.Registry;
  */
 @Deprecated
 public class ClusterJmxHelper {
-    
+
     protected static Registry registry = Registry.getRegistry(null,null);
-    
+
     private static final Log log = LogFactory.getLog(ClusterJmxHelper.class);
-    
+
     protected static boolean jmxEnabled = true;
-    
+
     protected static MBeanServer mbeanServer = null;
-    
+
     public static Registry getRegistry() {
         return registry;
     }
@@ -61,7 +61,7 @@ public class ClusterJmxHelper {
         }
         return mbeanServer;
     }
-    
+
     protected static boolean initMetaData(Class<?> clazz) {
         try {
             if (clazz==null) return false;
@@ -72,7 +72,7 @@ public class ClusterJmxHelper {
         }
         return true;
     }
-    
+
     public static DynamicMBean getManagedBean(Object object) throws Exception {
         DynamicMBean mbean = null;
         if (getRegistry() != null) {
@@ -82,12 +82,12 @@ public class ClusterJmxHelper {
         return mbean;
     }
 
-    
+
     protected static void initDefaultCluster() {
         initMetaData(SimpleTcpCluster.class);
         initMetaData(FarmWarDeployer.class); //not functional yet
     }
-    
+
     public static boolean registerDefaultCluster(SimpleTcpCluster cluster)  {
         try {
             initDefaultCluster();
@@ -130,5 +130,5 @@ public class ClusterJmxHelper {
         ObjectName clusterName = new ObjectName(domain + clusterType);
         return clusterName;
     }
-    
+
 }

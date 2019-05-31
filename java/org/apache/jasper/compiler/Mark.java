@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -23,7 +23,7 @@ import java.util.Stack;
 import org.apache.jasper.JspCompilationContext;
 
 /**
- * Mark represents a point in the JSP input. 
+ * Mark represents a point in the JSP input.
  *
  * @author Anil K. Vijendran
  */
@@ -126,7 +126,7 @@ final class Mark {
 
     /**
      * Constructor
-     */    
+     */
     Mark(JspCompilationContext ctxt, String filename, int line, int col) {
 
         this.reader = null;
@@ -153,11 +153,11 @@ final class Mark {
      * @param inEncoding encoding of new file
      */
     public void pushStream(char[] inStream, int inFileId, String name,
-                           String inBaseDir, String inEncoding) 
+                           String inBaseDir, String inEncoding)
     {
         // store current state in stack
         includeStack.push(new IncludeState(cursor, line, col, fileId,
-                                           fileName, baseDir, 
+                                           fileName, baseDir,
                                            encoding, stream) );
 
         // set new variables
@@ -240,10 +240,10 @@ final class Mark {
     public boolean equals(Object other) {
         if (other instanceof Mark) {
             Mark m = (Mark) other;
-            return this.reader == m.reader && this.fileId == m.fileId 
-                && this.cursor == m.cursor && this.line == m.line 
+            return this.reader == m.reader && this.fileId == m.fileId
+                && this.cursor == m.cursor && this.line == m.line
                 && this.col == m.col;
-        } 
+        }
         return false;
     }
 
@@ -260,7 +260,7 @@ final class Mark {
         String baseDir;
         char[] stream = null;
 
-        IncludeState(int inCursor, int inLine, int inCol, int inFileId, 
+        IncludeState(int inCursor, int inLine, int inCol, int inFileId,
                      String name, String inBaseDir, String inEncoding,
                      char[] inStream) {
             cursor = inCursor;

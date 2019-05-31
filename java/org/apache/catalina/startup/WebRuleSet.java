@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -78,17 +78,17 @@ public class WebRuleSet extends RuleSetBase {
      * The <code>SetSessionConfig</code> rule used to parse the web.xml
      */
     protected SetSessionConfig sessionConfig = new SetSessionConfig();
-    
-    
+
+
     /**
      * The <code>SetLoginConfig</code> rule used to parse the web.xml
      */
     protected SetLoginConfig loginConfig = new SetLoginConfig();
 
-    
+
     /**
      * The <code>SetJspConfig</code> rule used to parse the web.xml
-     */    
+     */
     protected SetJspConfig jspConfig = new SetJspConfig();
 
 
@@ -276,7 +276,7 @@ public class WebRuleSet extends RuleSetBase {
 
          digester.addCallMethod(fullPrefix + "/listener/listener-class",
                                 "addListener", 0);
-         
+
         digester.addRule(fullPrefix + "/jsp-config",
                          jspConfig);
 
@@ -400,7 +400,7 @@ public class WebRuleSet extends RuleSetBase {
                               "setServletClass", 0);
         digester.addCallMethod(fullPrefix + "/servlet/servlet-name",
                               "setServletName", 0);
-        
+
         digester.addObjectCreate(fullPrefix + "/servlet/multipart-config",
                                  "org.apache.catalina.deploy.MultipartDef");
         digester.addSetNext(fullPrefix + "/servlet/multipart-config",
@@ -420,7 +420,7 @@ public class WebRuleSet extends RuleSetBase {
         digester.addCallMethod(fullPrefix + "/servlet/enabled",
                                "setEnabled", 0);
 
-        
+
         digester.addRule(fullPrefix + "/servlet-mapping",
                                new CallMethodMultiRule("addServletMapping", 2, 0));
         digester.addCallParam(fullPrefix + "/servlet-mapping/servlet-name", 1);
@@ -510,7 +510,7 @@ public class WebRuleSet extends RuleSetBase {
         //ejb-ref
         digester.addObjectCreate(fullPrefix + "/ejb-ref",
                                  "org.apache.catalina.deploy.ContextEjb");
-        digester.addSetNext(fullPrefix + "/ejb-ref", 
+        digester.addSetNext(fullPrefix + "/ejb-ref",
                             "addEjbRef",
                             "org.apache.catalina.deploy.ContextEjb");
         digester.addCallMethod(fullPrefix + "/ejb-ref/description",
@@ -716,7 +716,7 @@ public class WebRuleSet extends RuleSetBase {
 
 
 /**
- * Rule to check that the <code>login-config</code> is occurring 
+ * Rule to check that the <code>login-config</code> is occurring
  * only 1 time within the web.xml
  */
 final class SetLoginConfig extends Rule {
@@ -739,7 +739,7 @@ final class SetLoginConfig extends Rule {
 
 
 /**
- * Rule to check that the <code>jsp-config</code> is occurring 
+ * Rule to check that the <code>jsp-config</code> is occurring
  * only 1 time within the web.xml
  */
 final class SetJspConfig extends Rule {
@@ -762,7 +762,7 @@ final class SetJspConfig extends Rule {
 
 
 /**
- * Rule to check that the <code>session-config</code> is occurring 
+ * Rule to check that the <code>session-config</code> is occurring
  * only 1 time within the web.xml
  */
 final class SetSessionConfig extends Rule {
@@ -869,7 +869,7 @@ final class SetPublicIdRule extends Rule {
 
         m.invoke(top, (Object [])paramValues);
         if (digester.getLogger().isDebugEnabled())
-            digester.getLogger().debug("" + top.getClass().getName() + "." 
+            digester.getLogger().debug("" + top.getClass().getName() + "."
                                        + method + "(" + paramValues[0] + ")");
 
     }
@@ -943,7 +943,7 @@ final class CallParamMultiRule extends CallParamRule {
 final class CallMethodMultiRule extends CallMethodRule {
 
     int multiParamIndex = 0;
-    
+
     public CallMethodMultiRule(String methodName, int paramCount, int multiParamIndex) {
         super(methodName, paramCount);
         this.multiParamIndex = multiParamIndex;
@@ -951,11 +951,11 @@ final class CallMethodMultiRule extends CallMethodRule {
 
     /**
      * Process the end of this element.
-     * 
-     * @param namespace the namespace URI of the matching element, or an 
+     *
+     * @param namespace the namespace URI of the matching element, or an
      *   empty string if the parser is not namespace aware or the element has
      *   no namespace
-     * @param name the local name if the parser is namespace aware, or just 
+     * @param name the local name if the parser is namespace aware, or just
      *   the element name otherwise
      */
     @Override
@@ -969,18 +969,18 @@ final class CallMethodMultiRule extends CallMethodRule {
             parameters = new Object[0];
             super.end(namespace, name);
         }
-        
+
         ArrayList<?> multiParams = (ArrayList<?>) parameters[multiParamIndex];
-        
+
         // Construct the parameter values array we will need
         // We only do the conversion if the param value is a String and
-        // the specified paramType is not String. 
+        // the specified paramType is not String.
         Object paramValues[] = new Object[paramTypes.length];
         for (int i = 0; i < paramTypes.length; i++) {
             if (i != multiParamIndex) {
-                // convert nulls and convert stringy parameters 
+                // convert nulls and convert stringy parameters
                 // for non-stringy param types
-                if(parameters[i] == null || (parameters[i] instanceof String 
+                if(parameters[i] == null || (parameters[i] instanceof String
                         && !String.class.isAssignableFrom(paramTypes[i]))) {
                     paramValues[i] =
                         IntrospectionUtils.convert((String) parameters[i], paramTypes[i]);
@@ -1010,17 +1010,17 @@ final class CallMethodMultiRule extends CallMethodRule {
             sb.append(")");
             throw new org.xml.sax.SAXException(sb.toString());
         }
-        
+
         if (multiParams == null) {
             paramValues[multiParamIndex] = null;
             IntrospectionUtils.callMethodN(target, methodName, paramValues,
-                    paramTypes);   
+                    paramTypes);
             return;
         }
-        
+
         for (int j = 0; j < multiParams.size(); j++) {
             Object param = multiParams.get(j);
-            if(param == null || (param instanceof String 
+            if(param == null || (param instanceof String
                     && !String.class.isAssignableFrom(paramTypes[multiParamIndex]))) {
                 paramValues[multiParamIndex] =
                     IntrospectionUtils.convert((String) param, paramTypes[multiParamIndex]);
@@ -1028,9 +1028,9 @@ final class CallMethodMultiRule extends CallMethodRule {
                 paramValues[multiParamIndex] = param;
             }
             IntrospectionUtils.callMethodN(target, methodName, paramValues,
-                    paramTypes);   
+                    paramTypes);
         }
-        
+
     }
 
 }
@@ -1039,7 +1039,7 @@ final class CallMethodMultiRule extends CallMethodRule {
 
 /**
  * A Rule that check if the annotations have to be loaded.
- * 
+ *
  */
 
 final class IgnoreAnnotationsRule extends Rule {
@@ -1069,7 +1069,7 @@ final class IgnoreAnnotationsRule extends Rule {
 
 /**
  * A Rule that records the spec version of the web.xml being parsed
- * 
+ *
  */
 
 final class VersionRule extends Rule {
@@ -1083,7 +1083,7 @@ final class VersionRule extends Rule {
         throws Exception {
         WebXml webxml = (WebXml) digester.peek(digester.getCount() - 1);
         webxml.setVersion(attributes.getValue("version"));
-        
+
         if (digester.getLogger().isDebugEnabled()) {
             digester.getLogger().debug
                 (webxml.getClass().getName() + ".setVersion( " +
@@ -1098,13 +1098,13 @@ final class VersionRule extends Rule {
  * A rule that ensures only a single name element is present.
  */
 final class NameRule extends Rule {
-    
+
     boolean isNameSet = false;
 
     public NameRule() {
         // NO-OP
     }
-    
+
     @Override
     public void begin(String namespace, String name, Attributes attributes)
         throws Exception {
@@ -1120,7 +1120,7 @@ final class NameRule extends Rule {
             throws Exception {
         super.body(namespace, name, text);
         ((WebXml) digester.peek()).setName(text);
-    } 
+    }
 }
 
 
@@ -1163,14 +1163,14 @@ final class AbsoluteOrderingRule extends Rule {
  * A rule that logs a warning if relative ordering is configured.
  */
 final class RelativeOrderingRule extends Rule {
-    
+
     boolean isRelativeOrderingSet = false;
     private final boolean fragment;
 
     public RelativeOrderingRule(boolean fragment) {
         this.fragment = fragment;
     }
-    
+
     @Override
     public void begin(String namespace, String name, Attributes attributes)
             throws Exception {
@@ -1184,12 +1184,12 @@ final class RelativeOrderingRule extends Rule {
         } else {
             isRelativeOrderingSet = true;
         }
-    } 
+    }
 }
 
 /**
  * A Rule that sets soap headers on the ContextHandler.
- * 
+ *
  */
 final class SoapHeaderRule extends Rule {
 
@@ -1200,10 +1200,10 @@ final class SoapHeaderRule extends Rule {
     /**
      * Process the body text of this element.
      *
-     * @param namespace the namespace URI of the matching element, or an 
+     * @param namespace the namespace URI of the matching element, or an
      *   empty string if the parser is not namespace aware or the element has
      *   no namespace
-     * @param name the local name if the parser is namespace aware, or just 
+     * @param name the local name if the parser is namespace aware, or just
      *   the element name otherwise
      * @param text The body text of this element
      */
@@ -1225,7 +1225,7 @@ final class SoapHeaderRule extends Rule {
 
 /**
  * A Rule that sets service qname on the ContextService.
- * 
+ *
  */
 final class ServiceQnameRule extends Rule {
 
@@ -1236,10 +1236,10 @@ final class ServiceQnameRule extends Rule {
     /**
      * Process the body text of this element.
      *
-     * @param namespace the namespace URI of the matching element, or an 
+     * @param namespace the namespace URI of the matching element, or an
      *   empty string if the parser is not namespace aware or the element has
      *   no namespace
-     * @param name the local name if the parser is namespace aware, or just 
+     * @param name the local name if the parser is namespace aware, or just
      *   the element name otherwise
      * @param text The body text of this element
      */
@@ -1258,20 +1258,20 @@ final class ServiceQnameRule extends Rule {
         contextService.setServiceqnameLocalpart(localpart);
         contextService.setServiceqnameNamespaceURI(namespaceuri);
     }
-    
+
 }
 
 /**
- * A rule that checks if the taglib element is in the right place. 
+ * A rule that checks if the taglib element is in the right place.
  */
 final class TaglibLocationRule extends Rule {
 
     final boolean isServlet24OrLater;
-    
+
     public TaglibLocationRule(boolean isServlet24OrLater) {
         this.isServlet24OrLater = isServlet24OrLater;
     }
-    
+
     @Override
     public void begin(String namespace, String name, Attributes attributes)
             throws Exception {

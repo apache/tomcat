@@ -157,7 +157,7 @@ public class TestELParser {
         doTestParser(" ${ do:it( a eq 1 ? true : false, y ) } ", null);
     }
 
-    
+
     @Test
     public void testTernary08() throws JasperException {
         doTestParser(" ${ do:it ( a eq 1 ? true : false, y ) } ", null);

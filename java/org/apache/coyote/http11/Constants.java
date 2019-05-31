@@ -39,21 +39,21 @@ public final class Constants {
     public static final int DEFAULT_CONNECTION_LINGER = -1;
     public static final int DEFAULT_CONNECTION_TIMEOUT = 60000;
     public static final boolean DEFAULT_TCP_NO_DELAY = true;
-    
-    
+
+
     /**
      * CRLF.
      */
     public static final String CRLF = "\r\n";
 
-    
+
     /**
      * Server string.
      */
-    public static final byte[] SERVER_BYTES = 
+    public static final byte[] SERVER_BYTES =
         ByteChunk.convertToBytes("Server: Apache-Coyote/1.1" + CRLF);
 
-    
+
     /**
      * CR.
      */
@@ -82,7 +82,7 @@ public final class Constants {
      * COLON.
      */
     public static final byte COLON = (byte) ':';
-    
+
     /**
      * SEMI_COLON.
      */
@@ -123,22 +123,22 @@ public final class Constants {
     /* Various constant "strings" */
     public static final String CONNECTION = "Connection";
     public static final String CLOSE = "close";
-    public static final byte[] CLOSE_BYTES = 
+    public static final byte[] CLOSE_BYTES =
         ByteChunk.convertToBytes(CLOSE);
     public static final String KEEPALIVE = "keep-alive";
-    public static final byte[] KEEPALIVE_BYTES = 
+    public static final byte[] KEEPALIVE_BYTES =
         ByteChunk.convertToBytes(KEEPALIVE);
     public static final String CHUNKED = "chunked";
-    public static final byte[] ACK_BYTES = 
+    public static final byte[] ACK_BYTES =
         ByteChunk.convertToBytes("HTTP/1.1 100 Continue" + CRLF + CRLF);
     public static final String TRANSFERENCODING = "Transfer-Encoding";
-    public static final byte[] _200_BYTES = 
+    public static final byte[] _200_BYTES =
         ByteChunk.convertToBytes("200");
-    public static final byte[] _400_BYTES = 
+    public static final byte[] _400_BYTES =
         ByteChunk.convertToBytes("400");
-    public static final byte[] _404_BYTES = 
+    public static final byte[] _404_BYTES =
         ByteChunk.convertToBytes("404");
-    
+
 
     /**
      * Identity filters (input and output).
@@ -180,7 +180,7 @@ public final class Constants {
      * HTTP/1.1.
      */
     public static final String HTTP_11 = "HTTP/1.1";
-    public static final byte[] HTTP_11_BYTES = 
+    public static final byte[] HTTP_11_BYTES =
         ByteChunk.convertToBytes(HTTP_11);
 
 

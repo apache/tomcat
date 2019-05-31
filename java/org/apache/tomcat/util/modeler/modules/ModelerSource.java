@@ -35,8 +35,8 @@ public abstract class ModelerSource {
     @Deprecated
     protected String location;
 
-    /** Load data, returns a list of items. 
-     * 
+    /** Load data, returns a list of items.
+     *
      * @param registry
      * @param location
      * @param type
@@ -51,10 +51,10 @@ public abstract class ModelerSource {
             String type, Object source) throws Exception {
         return loadDescriptors(registry, type, source);
     }
-    
+
     /** Callback from the BaseMBean to notify that an attribute has changed.
      * Can be used to implement persistence.
-     * 
+     *
      * @param oname
      * @param name
      * @param value
@@ -63,7 +63,7 @@ public abstract class ModelerSource {
     @Deprecated
     public void updateField( ObjectName oname, String name,
                              Object value ) {
-        // nothing by default 
+        // nothing by default
     }
 
     /**
@@ -86,13 +86,13 @@ public abstract class ModelerSource {
             return url.openStream();
         } else if( source instanceof File ) {
             location=((File)source).getAbsolutePath();
-            return new FileInputStream((File)source);            
+            return new FileInputStream((File)source);
         } else if( source instanceof String) {
             location=(String)source;
-            return new FileInputStream((String)source);            
+            return new FileInputStream((String)source);
         } else if( source instanceof InputStream ) {
             return (InputStream)source;
-        } 
+        }
         return null;
     }
 

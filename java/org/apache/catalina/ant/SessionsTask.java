@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -32,15 +32,15 @@ public class SessionsTask extends AbstractCatalinaCommandTask {
 
 
     protected String idle = null;
-    
+
     public String getIdle() {
         return this.idle;
     }
-    
+
     public void setIdle(String idle) {
         this.idle = idle;
     }
-    
+
     @Override
     public StringBuilder createQueryString(String command) {
         StringBuilder buffer = super.createQueryString(command);
@@ -50,7 +50,7 @@ public class SessionsTask extends AbstractCatalinaCommandTask {
         }
         return buffer;
     }
-    
+
     /**
      * Execute the requested operation.
      *
@@ -61,7 +61,7 @@ public class SessionsTask extends AbstractCatalinaCommandTask {
 
         super.execute();
         execute(createQueryString("/sessions").toString());
-        
+
     }
 
 }

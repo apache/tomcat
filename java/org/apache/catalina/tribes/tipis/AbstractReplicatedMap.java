@@ -1016,7 +1016,7 @@ public abstract class AbstractReplicatedMap<K,V>
                     if ( backup != null && backup.length > 0) {
                         getChannel().send(backup, msg, getChannelSendOptions());
                     }
-                    
+
                     //invalidate the previous primary
                     msg = new MapMessage(getMapContextName(),MapMessage.MSG_PROXY,false,(Serializable)key,null,null,channel.getLocalMember(false),backup);
                     Member[] dest = getMapMembersExcl(backup);

@@ -51,7 +51,7 @@ import org.apache.juli.logging.LogFactory;
  * '{@code Cache-Control: max-age=}' headers to HTTP response according to its
  * '{@code Content-Type}'.
  * </p>
- * 
+ *
  * <p>
  * Following documentation is inspired by <a
  * href="https://httpd.apache.org/docs/2.2/mod/mod_expires.html">mod_expires</a>
@@ -113,7 +113,7 @@ import org.apache.juli.logging.LogFactory;
  * </pre>
  *
  * <h2>Configuration Parameters</h2>
- * 
+ *
  * <h3>{@code ExpiresByType <content-type>}</h3>
  * <p>
  * This directive defines the value of the {@code Expires} header and the
@@ -154,7 +154,7 @@ import org.apache.juli.logging.LogFactory;
  *    <param-name>ExpiresByType text/html</param-name>
  *    <param-value>access plus 1 month 15 days 2 hours</param-value>
  * </init-param>
- *  
+ *
  * <init-param>
  *    <!-- 2592000 seconds = 30 days -->
  *    <param-name>ExpiresByType image/gif</param-name>
@@ -219,7 +219,7 @@ import org.apache.juli.logging.LogFactory;
  *    <param-name>ExpiresDefault</param-name>
  *    <param-value><base> [plus] {<num> <type>}*</param-value>
  * </init-param>
- *  
+ *
  * <init-param>
  *    <param-name>ExpiresByType type/encoding</param-name>
  *    <param-value><base> [plus] {<num> <type>}*</param-value>
@@ -257,12 +257,12 @@ import org.apache.juli.logging.LogFactory;
  *    <param-name>ExpiresDefault</param-name>
  *    <param-value>access plus 1 month</param-value>
  * </init-param>
- *  
+ *
  * <init-param>
  *    <param-name>ExpiresDefault</param-name>
  *    <param-value>access plus 4 weeks</param-value>
  * </init-param>
- *  
+ *
  * <init-param>
  *    <param-name>ExpiresDefault</param-name>
  *    <param-value>access plus 30 days</param-value>
@@ -280,7 +280,7 @@ import org.apache.juli.logging.LogFactory;
  *    <param-name>ExpiresByType text/html</param-name>
  *    <param-value>access plus 1 month 15 days 2 hours</param-value>
  * </init-param>
- *  
+ *
  * <init-param>
  *    <param-name>ExpiresByType image/gif</param-name>
  *    <param-value>modification plus 5 hours 3 minutes</param-value>
@@ -386,29 +386,29 @@ import org.apache.juli.logging.LogFactory;
  * <p>
  * Extract of logging.properties
  * </p>
- * 
+ *
  * <code><pre>
  * org.apache.catalina.filters.ExpiresFilter.level = FINE
  * </pre></code>
  * <p>
  * Sample of initialization log message :
  * </p>
- * 
+ *
  * <code><pre>
  * Mar 26, 2010 2:01:41 PM org.apache.catalina.filters.ExpiresFilter init
  * FINE: Filter initialized with configuration ExpiresFilter[
- *    excludedResponseStatusCode=[304], 
- *    default=null, 
+ *    excludedResponseStatusCode=[304],
+ *    default=null,
  *    byType={
- *       image=ExpiresConfiguration[startingPoint=ACCESS_TIME, duration=[10 MINUTE]], 
- *       text/css=ExpiresConfiguration[startingPoint=ACCESS_TIME, duration=[10 MINUTE]], 
+ *       image=ExpiresConfiguration[startingPoint=ACCESS_TIME, duration=[10 MINUTE]],
+ *       text/css=ExpiresConfiguration[startingPoint=ACCESS_TIME, duration=[10 MINUTE]],
  *       application/javascript=ExpiresConfiguration[startingPoint=ACCESS_TIME, duration=[10 MINUTE]]}]
  * </pre></code>
  * <p>
  * Sample of per-request log message where {@code ExpiresFilter} adds an
  * expiration date
  * </p>
- * 
+ *
  * <code><pre>
  * Mar 26, 2010 2:09:47 PM org.apache.catalina.filters.ExpiresFilter onBeforeWriteResponseBody
  * FINE: Request "/tomcat.gif" with response status "200" content-type "image/gif", set expiration date 3/26/10 2:19 PM
@@ -417,12 +417,12 @@ import org.apache.juli.logging.LogFactory;
  * Sample of per-request log message where {@code ExpiresFilter} does not add
  * an expiration date
  * </p>
- * 
+ *
  * <code><pre>
  * Mar 26, 2010 2:10:27 PM org.apache.catalina.filters.ExpiresFilter onBeforeWriteResponseBody
  * FINE: Request "/docs/config/manager.html" with response status "200" content-type "text/html", no expiration configured
  * </pre></code>
- * 
+ *
  */
 public class ExpiresFilter extends FilterBase {
 
@@ -1040,7 +1040,7 @@ public class ExpiresFilter extends FilterBase {
 
     /**
      * Convert a comma delimited list of numbers into an {@code int[]}.
-     * 
+     *
      * @param commaDelimitedInts
      *            can be {@code null}
      * @return never {@code null} array
@@ -1064,7 +1064,7 @@ public class ExpiresFilter extends FilterBase {
 
     /**
      * Convert a given comma delimited list of strings into an array of String
-     * 
+     *
      * @return array of patterns (non {@code null})
      */
     protected static String[] commaDelimitedListToStringArray(
@@ -1122,7 +1122,7 @@ public class ExpiresFilter extends FilterBase {
     /**
      * Return {@code true} if the given {@code string} starts with the
      * given {@code prefix} ignoring case.
-     * 
+     *
      * @param string
      *            can be {@code null}
      * @param prefix
@@ -1144,7 +1144,7 @@ public class ExpiresFilter extends FilterBase {
      * occurrence of the given {@code separator}. Return {@code null}
      * if the given {@code str} or the given {@code separator} is
      * null. Return and empty string if the {@code separator} is empty.
-     * 
+     *
      * @param str
      *            can be {@code null}
      * @param separator
@@ -1233,7 +1233,7 @@ public class ExpiresFilter extends FilterBase {
      * <p>
      * {@code protected} for extension.
      * </p>
-     * 
+     *
      * @see HttpServletResponse#getContentType()
      */
     protected Date getExpirationDate(XHttpServletResponse response) {
@@ -1390,7 +1390,7 @@ public class ExpiresFilter extends FilterBase {
     }
 
     /**
-     * 
+     *
      * <p>
      * {@code protected} for extension.
      * </p>
@@ -1482,7 +1482,7 @@ public class ExpiresFilter extends FilterBase {
      * Parse configuration lines like
      * '{@code access plus 1 month 15 days 2 hours}' or
      * '{@code modification 1 day 2 hours 5 seconds}'
-     * 
+     *
      * @param inputLine
      */
     protected ExpiresConfiguration parseExpiresConfiguration(String inputLine) {

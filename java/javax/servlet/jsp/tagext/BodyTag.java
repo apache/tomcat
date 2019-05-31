@@ -104,7 +104,7 @@ public interface BodyTag extends IterationTag {
      * Deprecated constant that has the same value as EVAL_BODY_BUFFERED and
      * EVAL_BODY_AGAIN. This name has been marked as deprecated to encourage the
      * use of the two different terms, which are much more descriptive.
-     * 
+     *
      * @deprecated As of Java JSP API 1.2, use BodyTag.EVAL_BODY_BUFFERED or
      *             IterationTag.EVAL_BODY_AGAIN.
      */
@@ -135,7 +135,7 @@ public interface BodyTag extends IterationTag {
      * The BodyContent object is available and with the appropriate content
      * until after the invocation of the doEndTag method, at which case it may
      * be reused.
-     * 
+     *
      * @param b
      *            the BodyContent
      * @see #doInitBody
@@ -153,7 +153,7 @@ public interface BodyTag extends IterationTag {
      * The JSP container will resynchronize the values of any AT_BEGIN and
      * NESTED variables (defined by the associated TagExtraInfo or TLD) after
      * the invocation of doInitBody().
-     * 
+     *
      * @throws JspException
      *             if an error occurred while processing this tag
      * @see #doAfterBody

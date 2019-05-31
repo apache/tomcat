@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -40,7 +40,7 @@ import org.apache.juli.logging.LogFactory;
  * specified Request (before processing) and the corresponding Response
  * (after processing).  It is especially useful in debugging problems
  * related to headers and cookies.</p>
- * 
+ *
  * <p>When using this Filter, it is strongly recommended that the
  * <code>org.apache.catalina.filter.RequestDumperFilter</code> logger is
  * directed to a dedicated file and that the
@@ -86,7 +86,7 @@ public class RequestDumperFilter implements Filter {
 
         HttpServletRequest hRequest = null;
         HttpServletResponse hResponse = null;
-        
+
         if (request instanceof HttpServletRequest) {
             hRequest = (HttpServletRequest) request;
         }
@@ -96,7 +96,7 @@ public class RequestDumperFilter implements Filter {
 
         // Log pre-service information
         doLog("START TIME        ", getTimestamp());
-        
+
         if (hRequest == null) {
             doLog("        requestURI", NON_HTTP_REQ_MSG);
             doLog("          authType", NON_HTTP_REQ_MSG);
@@ -104,12 +104,12 @@ public class RequestDumperFilter implements Filter {
             doLog("        requestURI", hRequest.getRequestURI());
             doLog("          authType", hRequest.getAuthType());
         }
-        
+
         doLog(" characterEncoding", request.getCharacterEncoding());
         doLog("     contentLength",
                 Integer.toString(request.getContentLength()));
         doLog("       contentType", request.getContentType());
-        
+
         if (hRequest == null) {
             doLog("       contextPath", NON_HTTP_REQ_MSG);
             doLog("            cookie", NON_HTTP_REQ_MSG);
@@ -133,15 +133,15 @@ public class RequestDumperFilter implements Filter {
                 }
             }
         }
-        
+
         doLog("            locale", request.getLocale().toString());
-        
+
         if (hRequest == null) {
             doLog("            method", NON_HTTP_REQ_MSG);
         } else {
             doLog("            method", hRequest.getMethod());
         }
-        
+
         Enumeration<String> pnames = request.getParameterNames();
         while (pnames.hasMoreElements()) {
             String pname = pnames.nextElement();
@@ -156,24 +156,24 @@ public class RequestDumperFilter implements Filter {
             }
             doLog("         parameter", result.toString());
         }
-        
+
         if (hRequest == null) {
             doLog("          pathInfo", NON_HTTP_REQ_MSG);
         } else {
             doLog("          pathInfo", hRequest.getPathInfo());
         }
-        
+
         doLog("          protocol", request.getProtocol());
-        
+
         if (hRequest == null) {
             doLog("       queryString", NON_HTTP_REQ_MSG);
         } else {
             doLog("       queryString", hRequest.getQueryString());
         }
-        
+
         doLog("        remoteAddr", request.getRemoteAddr());
         doLog("        remoteHost", request.getRemoteHost());
-        
+
         if (hRequest == null) {
             doLog("        remoteUser", NON_HTTP_REQ_MSG);
             doLog("requestedSessionId", NON_HTTP_REQ_MSG);
@@ -181,18 +181,18 @@ public class RequestDumperFilter implements Filter {
             doLog("        remoteUser", hRequest.getRemoteUser());
             doLog("requestedSessionId", hRequest.getRequestedSessionId());
         }
-        
+
         doLog("            scheme", request.getScheme());
         doLog("        serverName", request.getServerName());
         doLog("        serverPort",
                 Integer.toString(request.getServerPort()));
-        
+
         if (hRequest == null) {
             doLog("       servletPath", NON_HTTP_REQ_MSG);
         } else {
             doLog("       servletPath", hRequest.getServletPath());
         }
-        
+
         doLog("          isSecure",
                 Boolean.valueOf(request.isSecure()).toString());
         doLog("------------------",
@@ -209,9 +209,9 @@ public class RequestDumperFilter implements Filter {
         } else {
             doLog("          authType", hRequest.getAuthType());
         }
-        
+
         doLog("       contentType", response.getContentType());
-        
+
         if (hResponse == null) {
             doLog("            header", NON_HTTP_RES_MSG);
         } else {
@@ -229,7 +229,7 @@ public class RequestDumperFilter implements Filter {
         } else {
             doLog("        remoteUser", hRequest.getRemoteUser());
         }
-        
+
         if (hResponse == null) {
             doLog("            status", NON_HTTP_RES_MSG);
         } else {
@@ -255,7 +255,7 @@ public class RequestDumperFilter implements Filter {
     private String getTimestamp() {
         Timestamp ts = timestamp.get();
         long currentTime = System.currentTimeMillis();
-        
+
         if ((ts.date.getTime() + 999) < currentTime) {
             ts.date.setTime(currentTime - (currentTime % 1000));
             ts.update();

@@ -21,7 +21,7 @@ package org.apache.coyote;
  * ActionCodes represent callbacks from the servlet container to the coyote
  * connector. Actions are implemented by ProtocolHandler, using the ActionHook
  * interface.
- * 
+ *
  * @see ProtocolHandler
  * @see ActionHook
  * @author Remy Maucherat
@@ -65,7 +65,7 @@ public enum ActionCode {
     /**
      * Hook called if swallowing request input should be disabled.
      * Example: Cancel a large file upload.
-     * 
+     *
      */
     DISABLE_SWALLOW_INPUT,
 
@@ -169,28 +169,28 @@ public enum ActionCode {
      * {@link javax.servlet.AsyncContext#complete()}.
      */
     ASYNC_COMPLETE,
-    
+
     /**
      * Callback to trigger the processing of an async timeout.
      */
     ASYNC_TIMEOUT,
-    
+
     /**
      * Callback to trigger the error processing.
      */
     ASYNC_ERROR,
-    
+
     /**
      * Callback for an async call to
      * {@link javax.servlet.AsyncContext#setTimeout(long)}
      */
     ASYNC_SETTIMEOUT,
-    
+
     /**
      * Callback to determine if async processing is in progress.
      */
     ASYNC_IS_ASYNC,
-    
+
     /**
      * Callback to determine if async dispatch is in progress.
      */
@@ -226,7 +226,7 @@ public enum ActionCode {
      * handling to trigger essential processing that otherwise would be skipped.
      */
     ASYNC_POST_PROCESS,
-    
+
     /**
      * Callback to trigger the Servlet 3.1 based HTTP upgrade process.
      */

@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -45,7 +45,7 @@ public class SerializablePrincipal  implements java.io.Serializable {
 
     private static final org.apache.juli.logging.Log log =
         org.apache.juli.logging.LogFactory.getLog(SerializablePrincipal.class);
-    
+
     /**
      * The string manager for this package.
      */
@@ -57,8 +57,8 @@ public class SerializablePrincipal  implements java.io.Serializable {
     public SerializablePrincipal() {
         super();
     }
-    
-    
+
+
     /**
      * Construct a new Principal, associated with the specified Realm, for the
      * specified username and password.
@@ -87,7 +87,7 @@ public class SerializablePrincipal  implements java.io.Serializable {
         this(name, password, roles, null);
     }
 
-    
+
     /**
      * Construct a new Principal, associated with the specified Realm, for the
      * specified username and password, with the specified role names
@@ -168,7 +168,7 @@ public class SerializablePrincipal  implements java.io.Serializable {
      * The user principal, if present.
      */
     protected Principal userPrincipal = null;
-    
+
     // --------------------------------------------------------- Public Methods
 
 
@@ -201,7 +201,7 @@ public class SerializablePrincipal  implements java.io.Serializable {
                 getRoles()!=null?Arrays.asList(getRoles()):null,
                 userPrincipal);
     }
-    
+
     public static GenericPrincipal readPrincipal(ObjectInput in)
             throws IOException, ClassNotFoundException {
         String name = in.readUTF();
@@ -225,7 +225,7 @@ public class SerializablePrincipal  implements java.io.Serializable {
         return new GenericPrincipal(name,pwd,Arrays.asList(roles),
                 userPrincipal);
     }
-    
+
     public static void writePrincipal(GenericPrincipal p, ObjectOutput out)
             throws IOException {
         out.writeUTF(p.getName());

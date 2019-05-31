@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -65,7 +65,7 @@ public class ContextEnvironmentMBean extends BaseModelMBean {
 
     // ------------------------------------------------------------- Attributes
 
-    
+
     /**
      * Set the value of a specific attribute of this MBean.
      *
@@ -85,7 +85,7 @@ public class ContextEnvironmentMBean extends BaseModelMBean {
         ReflectionException {
 
         super.setAttribute(attribute);
-        
+
         ContextEnvironment ce = null;
         try {
             ce = (ContextEnvironment) getManagedResource();
@@ -94,12 +94,12 @@ public class ContextEnvironmentMBean extends BaseModelMBean {
         } catch (InvalidTargetObjectTypeException e) {
              throw new MBeanException(e);
         }
-        
-        // cannot use side-effects.  It's removed and added back each time 
+
+        // cannot use side-effects.  It's removed and added back each time
         // there is a modification in a resource.
         NamingResources nr = ce.getNamingResources();
         nr.removeEnvironment(ce.getName());
         nr.addEnvironment(ce);
     }
-    
+
 }

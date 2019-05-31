@@ -15,7 +15,7 @@
 * limitations under the License.
 */
 
- 
+
 package javax.servlet.jsp.tagext;
 
 
@@ -33,7 +33,7 @@ package javax.servlet.jsp.tagext;
  * h.setPageContext(pc);  // initialize as desired
  * h.setParent(null);
  * h.setFoo("foo");
- * 
+ *
  * // tag invocation protocol; see Tag.java
  * try {
  *   doStartTag()...
@@ -46,7 +46,7 @@ package javax.servlet.jsp.tagext;
  *   // restore data invariants and release per-invocation resources
  *   h.doFinally();
  * }
- * 
+ *
  * ... other invocations perhaps with some new setters
  * ...
  * h.release();  // release long-term resources
@@ -72,10 +72,10 @@ public interface TryCatchFinally {
      * condition.
      *
      * @param t The throwable exception navigating through this tag.
-     * @throws Throwable if the exception is to be rethrown further up 
+     * @throws Throwable if the exception is to be rethrown further up
      *     the nest chain.
      */
- 
+
     void doCatch(Throwable t) throws Throwable;
 
     /**

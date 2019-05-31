@@ -42,7 +42,7 @@ public class ValidationMessage {
      * element, or if no jsp:id attributes were passed on. If non-null, the
      * value of id must be the value of a jsp:id attribute for the PageData
      * passed into the validate() method.
-     * 
+     *
      * @param id
      *            Either null, or the value of a jsp:id attribute.
      * @param message
@@ -55,7 +55,7 @@ public class ValidationMessage {
 
     /**
      * Get the jsp:id. Null means that there is no information available.
-     * 
+     *
      * @return The jsp:id information.
      */
     public String getId() {
@@ -64,7 +64,7 @@ public class ValidationMessage {
 
     /**
      * Get the localized validation message.
-     * 
+     *
      * @return A validation message
      */
     public String getMessage() {

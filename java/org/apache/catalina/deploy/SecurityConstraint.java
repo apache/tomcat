@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -470,7 +470,7 @@ public class SecurityConstraint implements Serializable {
     /**
      * Convert a {@link ServletSecurityElement} to an array of
      * {@link SecurityConstraint}(s).
-     * 
+     *
      * @param element       The element to be converted
      * @param urlPattern    The url pattern that the element should be applied
      *                      to
@@ -480,7 +480,7 @@ public class SecurityConstraint implements Serializable {
     public static SecurityConstraint[] createConstraints(
             ServletSecurityElement element, String urlPattern) {
         Set<SecurityConstraint> result = new HashSet<SecurityConstraint>();
-        
+
         // Add the per method constraints
         Collection<HttpMethodConstraintElement> methods =
             element.getHttpMethodConstraints();
@@ -494,7 +494,7 @@ public class SecurityConstraint implements Serializable {
             collection.addMethod(methodElement.getMethodName());
             result.add(constraint);
         }
-        
+
         // Add the constraint for all the other methods
         SecurityConstraint constraint = createConstraint(element, urlPattern, false);
         if (constraint != null) {
@@ -504,21 +504,21 @@ public class SecurityConstraint implements Serializable {
             while (ommittedMethod.hasNext()) {
                 collection.addOmittedMethod(ommittedMethod.next());
             }
-            
+
             result.add(constraint);
-            
+
         }
-        
+
         return result.toArray(new SecurityConstraint[result.size()]);
     }
-    
+
     private static SecurityConstraint createConstraint(
             HttpConstraintElement element, String urlPattern, boolean alwaysCreate) {
 
         SecurityConstraint constraint = new SecurityConstraint();
         SecurityCollection collection = new SecurityCollection();
         boolean create = alwaysCreate;
-        
+
         if (element.getTransportGuarantee() !=
                 ServletSecurity.TransportGuarantee.NONE) {
             constraint.setUserConstraint(element.getTransportGuarantee().name());
@@ -535,13 +535,13 @@ public class SecurityConstraint implements Serializable {
             constraint.setAuthConstraint(true);
             create = true;
         }
-        
+
         if (create) {
             collection.addPattern(urlPattern);
             constraint.addCollection(collection);
             return constraint;
         }
-        
+
         return null;
     }
 }

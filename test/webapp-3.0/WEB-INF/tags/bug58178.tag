@@ -19,7 +19,7 @@
 <c:catch var="error">
   <jsp:doBody/>
 </c:catch>
-   
+
 <c:if test="${error != null}">
   <p>PASS<br/>
   Error detected<br/>

@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -27,35 +27,35 @@ import javax.servlet.DispatcherType;
 /**
  * The annotation used to declare a Servlet {@link javax.servlet.Filter}. <br>
  * <br>
- * 
+ *
  * This annotation will be processed by the container during deployment, the
  * Filter class in which it is found will be created as per the configuration
  * and applied to the URL patterns, {@link javax.servlet.Servlet}s and
  * {@link javax.servlet.DispatcherType}s.<br>
  * <br>
- * 
+ *
  * If the name attribute is not defined, the fully qualified name of the class
  * is used.<br>
  * <br>
- * 
+ *
  * At least one URL pattern MUST be declared in either the {@code value} or
  * {@code urlPattern} attribute of the annotation, but not both.<br>
  * <br>
- * 
+ *
  * The {@code value} attribute is recommended for use when the URL pattern is
  * the only attribute being set, otherwise the {@code urlPattern} attribute
  * should be used.<br>
  * <br>
- * 
+ *
  * The annotated class MUST implement {@link javax.servlet.Filter}.
- * 
+ *
  * E.g.
- * 
+ *
  * <code>@WebFilter("/path/*")</code><br>
  * <code>public class AnExampleFilter implements Filter { ... </code><br>
- * 
+ *
  * @since Servlet 3.0 (Section 8.1.2)
- * 
+ *
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
@@ -99,7 +99,7 @@ public @interface WebFilter {
 
     /**
      * A convenience method, to allow extremely simple annotation of a class.
-     * 
+     *
      * @return array of URL patterns
      * @see #urlPatterns()
      */

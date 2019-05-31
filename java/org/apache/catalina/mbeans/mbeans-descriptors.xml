@@ -137,7 +137,7 @@
           description="MBean Name of the associated parent component"
                  type="java.lang.String"/>
     </operation>
-    
+
     <operation   name="createUserDatabaseRealm"
           description="Create a new  UserDatabaseRealm"
                impact="ACTION"
@@ -222,13 +222,13 @@
                  type="java.lang.String"/>
       <parameter name="autoDeploy"
           description="The auto deploy flag for this Host"
-               type="boolean"/>           
+               type="boolean"/>
       <parameter name="deployOnStartup"
           description="The deploy on startup flag for this Host"
                type="boolean"/>
       <parameter name="deployXML"
           description="deploy Context XML config files property"
-               type="boolean"/> 
+               type="boolean"/>
       <parameter name="unpackWARs"
           description="Unpack WARs property"
                type="boolean"/>

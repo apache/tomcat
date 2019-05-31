@@ -23,7 +23,7 @@ import org.apache.juli.logging.LogFactory;
 /**
  *
  * @author Filip Hanik
- * 
+ *
  * @version 1.0
  */
 public class BufferPool {
@@ -88,5 +88,5 @@ public class BufferPool {
         public void returnBuffer(XByteBuffer buffer);
 
         public void clear();
-    }    
+    }
 }

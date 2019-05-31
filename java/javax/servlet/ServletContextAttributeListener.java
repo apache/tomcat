@@ -23,7 +23,7 @@ import java.util.EventListener;
  * attribute list on the servlet context of a web application. To receive
  * notification events, the implementation class must be configured in the
  * deployment descriptor for the web application.
- * 
+ *
  * @see ServletContextAttributeEvent
  * @since v 2.3
  */

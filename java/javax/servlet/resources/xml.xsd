@@ -44,7 +44,7 @@
         &lt;type . . .>
          . . .
          &lt;attributeGroup ref="xml:specialAttrs"/>
- 
+
          will define a type which will schema-validate an instance
          element with any of those attributes</xs:documentation>
  </xs:annotation>

@@ -57,7 +57,7 @@ public class Http11Processor extends AbstractHttp11Processor<Socket> {
             String relaxedQueryChars) {
 
         super(endpoint);
-        
+
         httpParser = new HttpParser(relaxedPathChars, relaxedQueryChars);
 
         inputBuffer = new InternalInputBuffer(request, headerBufferSize, rejectIllegalHeaderName,
@@ -91,7 +91,7 @@ public class Http11Processor extends AbstractHttp11Processor<Socket> {
      */
     protected SSLSupport sslSupport;
 
-    
+
     /**
      * The percentage of threads that have to be in use before keep-alive is
      * disabled to aid scalability.
@@ -122,7 +122,7 @@ public class Http11Processor extends AbstractHttp11Processor<Socket> {
 
     @Override
     protected boolean disableKeepAlive() {
-        int threadRatio = -1;   
+        int threadRatio = -1;
         // These may return zero or negative values
         // Only calculate a thread ratio when both are >0 to ensure we get a
         // sensible result
@@ -131,24 +131,24 @@ public class Http11Processor extends AbstractHttp11Processor<Socket> {
                 && (threadsBusy = endpoint.getCurrentThreadsBusy()) > 0) {
             threadRatio = (threadsBusy * 100) / maxThreads;
         }
-        // Disable keep-alive if we are running low on threads      
-        if (threadRatio > getDisableKeepAlivePercentage()) {     
+        // Disable keep-alive if we are running low on threads
+        if (threadRatio > getDisableKeepAlivePercentage()) {
             return true;
         }
-        
+
         return false;
     }
 
 
     @Override
     protected void setRequestLineReadTimeout() throws IOException {
-        
+
         /*
          * When there is no data in the buffer and this is not the first
          * request on this connection and timeouts are being used the
          * first read for this request may need a different timeout to
          * take account of time spent waiting for a processing thread.
-         * 
+         *
          * This is a little hacky but better than exposing the socket
          * and the timeout info to the InputBuffer
          */
@@ -196,8 +196,8 @@ public class Http11Processor extends AbstractHttp11Processor<Socket> {
     protected void setSocketTimeout(int timeout) throws IOException {
         socketWrapper.getSocket().setSoTimeout(timeout);
     }
-    
-    
+
+
     @Override
     protected void setCometTimeouts(SocketWrapper<Socket> socketWrapper) {
         // NO-OP for BIO
@@ -215,7 +215,7 @@ public class Http11Processor extends AbstractHttp11Processor<Socket> {
         return false;
     }
 
-    
+
     @Override
     protected void resetTimeouts() {
         // NOOP for BIO

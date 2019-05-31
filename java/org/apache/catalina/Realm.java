@@ -66,7 +66,7 @@ public interface Realm {
 
     // --------------------------------------------------------- Public Methods
 
-    
+
     /**
      * Add a property change listener to this component.
      *

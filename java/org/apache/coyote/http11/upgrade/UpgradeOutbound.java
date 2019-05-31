@@ -22,7 +22,7 @@ import java.io.OutputStream;
 
 /**
  * Allows data to be written to the upgraded connection.
- * 
+ *
  * @deprecated  Will be removed in Tomcat 8.0.x.
  */
 @Deprecated

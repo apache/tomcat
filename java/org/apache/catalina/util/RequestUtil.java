@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -176,8 +176,8 @@ public final class RequestUtil {
     public static String URLDecode(String str) {
         return URLDecode(str, null);
     }
-    
-    
+
+
     /**
      * Decode and return the specified URL-encoded String. It is assumed the
      * string is not a query string.
@@ -191,7 +191,7 @@ public final class RequestUtil {
     public static String URLDecode(String str, String enc) {
         return URLDecode(str, enc, false);
     }
-    
+
     /**
      * Decode and return the specified URL-encoded String.
      *
@@ -267,7 +267,7 @@ public final class RequestUtil {
      * by a valid 2-digit hexadecimal number
      */
     public static String URLDecode(byte[] bytes, String enc, boolean isQuery) {
-    
+
         if (bytes == null)
             return null;
 
@@ -367,7 +367,7 @@ public final class RequestUtil {
             String encoding) throws UnsupportedEncodingException {
 
         Charset charset = B2CConverter.getCharset(encoding);
-        
+
         if (data != null && data.length > 0) {
             int    ix = 0;
             int    ox = 0;
@@ -390,8 +390,8 @@ public final class RequestUtil {
                         ox = 0;
                     } else {
                         data[ox++] = c;
-                    }                   
-                    break;  
+                    }
+                    break;
                 case '+':
                     data[ox++] = (byte)' ';
                     break;

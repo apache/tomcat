@@ -38,8 +38,8 @@ import org.apache.tomcat.util.net.SocketWrapper;
  * @author Costin Manolache
  */
 public class AjpProtocol extends AbstractAjpProtocol<Socket> {
-    
-    
+
+
     private static final Log log = LogFactory.getLog(AjpProtocol.class);
 
     @Override
@@ -64,10 +64,10 @@ public class AjpProtocol extends AbstractAjpProtocol<Socket> {
         setTcpNoDelay(Constants.DEFAULT_TCP_NO_DELAY);
     }
 
-    
+
     // ----------------------------------------------------- Instance Variables
 
-    
+
     /**
      * Connection handler for AJP.
      */
@@ -94,7 +94,7 @@ public class AjpProtocol extends AbstractAjpProtocol<Socket> {
         public AjpConnectionHandler(AjpProtocol proto) {
             this.proto = proto;
         }
-        
+
         @Override
         protected AbstractProtocol<Socket> getProtocol() {
             return proto;
@@ -114,7 +114,7 @@ public class AjpProtocol extends AbstractAjpProtocol<Socket> {
         /**
          * Expected to be used by the handler once the processor is no longer
          * required.
-         * 
+         *
          * @param socket            Ignored for BIO
          * @param processor
          * @param isSocketClosing

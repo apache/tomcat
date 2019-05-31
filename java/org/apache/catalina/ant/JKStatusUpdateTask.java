@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -25,7 +25,7 @@ import org.apache.tools.ant.BuildException;
 /**
  * Ant task that implements the <code>/status</code> command, supported by the
  * mod_jk status (1.2.9) application.
- * 
+ *
  * @author Peter Rossbach
  * @since 5.5.9
  */
@@ -54,13 +54,13 @@ public class JKStatusUpdateTask extends AbstractCatalinaTask {
     private Boolean workerDisabled = Boolean.FALSE;
 
     private Boolean workerStopped = Boolean.FALSE;
-    
+
     private boolean isLBMode = true;
 
     private String workerLb;
 
     /**
-     *  
+     *
      */
     public JKStatusUpdateTask() {
         super();
@@ -223,14 +223,14 @@ public class JKStatusUpdateTask extends AbstractCatalinaTask {
     public Boolean getWorkerStopped() {
         return workerStopped;
     }
-    
+
     /**
      * @param workerStopped The workerStopped to set.
      */
     public void setWorkerStopped(Boolean workerStopped) {
         this.workerStopped = workerStopped;
     }
-    
+
     /**
      * @return Returns the workerLoadFactor.
      */
@@ -263,7 +263,7 @@ public class JKStatusUpdateTask extends AbstractCatalinaTask {
 
     /**
      * Execute the requested operation.
-     * 
+     *
      * @exception BuildException
      *                if an error occurs
      */
@@ -286,7 +286,7 @@ public class JKStatusUpdateTask extends AbstractCatalinaTask {
      * </b>http://localhost/status?cmd=update&mime=txt&w=node1&l=lb&wf=1&wd=false&ws=false
      * </li>
      * </ul>
-     * 
+     *
      * @return create jkstatus link
      */
     private StringBuilder createLink() {

@@ -20,12 +20,12 @@
 </head>
 <body>
 <p>Implementation classes - should not be used directly. The API is not stable
-but eventually the code will be refactored as a collection of mbeans that will be useable 
+but eventually the code will be refactored as a collection of mbeans that will be useable
 ( more or less ) independently.</p>
 
 <p>The MbeanDescriptors* classes are used to extract metadata from different sources. They
 are result of few stages of refactoring - now they look very similar with ant tasks and are
-close to normal mbeans, with an execute() method. DOM, SER, Introspection and Dynamic mbean 
+close to normal mbeans, with an execute() method. DOM, SER, Introspection and Dynamic mbean
 will load metadata from the corresponding sources.
 </p>
 
@@ -46,10 +46,10 @@ if this attribute should be saved ). The solution is to use the persistence fiel
 spec - with some reasonable defaults or patterns for introspection or backward compat.
 </p>
 
-<p>Another problem is implementing adding and removing components. In catalina, a 
-factory is used to create the components, and save will operate on all mbeans. 
+<p>Another problem is implementing adding and removing components. In catalina, a
+factory is used to create the components, and save will operate on all mbeans.
 For creation we need to also use a factory - using the "Type" as a parameter. This
-will also work very well with Ant1.6 where we can use the component factory to 
+will also work very well with Ant1.6 where we can use the component factory to
 do a "natural" mapping ( i.e. mbeans can be treated as tasks, with attributes as
 task attributes ). The second part can be solve by either using a parameter on
 the factory method ( saveTo ? ), or by having a single mbeans source per domain.

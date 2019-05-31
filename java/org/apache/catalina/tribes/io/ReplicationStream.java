@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -36,12 +36,12 @@ import java.lang.reflect.Proxy;
  */
 public final class ReplicationStream extends ObjectInputStream {
 
-    
+
     /**
      * The class loader we will use to resolve classes.
      */
     private ClassLoader[] classLoaders = null;
-    
+
     /**
      * Construct a new instance of CustomObjectInputStream
      *
@@ -77,7 +77,7 @@ public final class ReplicationStream extends ObjectInputStream {
             return super.resolveClass(classDesc);
         }
     }
-    
+
     public Class<?> resolveClass(String name)
         throws ClassNotFoundException, IOException {
 
@@ -94,15 +94,15 @@ public final class ReplicationStream extends ObjectInputStream {
                 return findReplicationClass(name);
         }
     }
-    
+
     /**
-     * ObjectInputStream.resolveProxyClass has some funky way of using 
+     * ObjectInputStream.resolveProxyClass has some funky way of using
      * the incorrect class loader to resolve proxy classes, let's do it our way instead
      */
     @Override
     protected Class<?> resolveProxyClass(String[] interfaces)
             throws IOException, ClassNotFoundException {
-        
+
         ClassLoader latestLoader;
         if (classLoaders != null && classLoaders.length > 0) {
             latestLoader = classLoaders[0];
@@ -138,7 +138,7 @@ public final class ReplicationStream extends ObjectInputStream {
         }
     }
 
-    
+
     public Class<?> findReplicationClass(String name)
         throws ClassNotFoundException, IOException {
         Class<?> clazz = Class.forName(name, false, getClass().getClassLoader());
@@ -153,12 +153,12 @@ public final class ReplicationStream extends ObjectInputStream {
                 return clazz;
             } catch ( ClassNotFoundException x ) {
                 cnfe = x;
-            } 
+            }
         }
         if ( cnfe != null ) throw cnfe;
         else throw new ClassNotFoundException(name);
     }
-    
+
     @Override
     public void close() throws IOException  {
         this.classLoaders = null;

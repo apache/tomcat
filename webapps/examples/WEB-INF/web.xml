@@ -357,7 +357,7 @@
       <servlet-name>stock</servlet-name>
       <url-pattern>/async/stockticker</url-pattern>
     </servlet-mapping>
-    
+
     <!-- WebSocket Examples using Deprecated Tomcat 7 API-->
     <servlet>
       <servlet-name>wsEchoStream</servlet-name>

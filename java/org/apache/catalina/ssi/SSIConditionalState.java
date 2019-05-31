@@ -21,7 +21,7 @@ package org.apache.catalina.ssi;
  * This class is used by SSIMediator and SSIConditional to keep track of state
  * information necessary to process the nested conditional commands ( if, elif,
  * else, endif ).
- * 
+ *
  * @author Dan Sandberg
  * @author Paul Speed
  */

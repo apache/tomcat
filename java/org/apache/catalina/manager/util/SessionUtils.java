@@ -180,7 +180,7 @@ public class SessionUtils {
         HttpSession httpSession = in_session.getSession();
         if (httpSession == null)
             return null;
-        
+
         try {
             Object user = null;
             // First search "known locations"

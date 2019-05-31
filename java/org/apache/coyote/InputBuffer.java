@@ -28,7 +28,7 @@ import org.apache.tomcat.util.buf.ByteChunk;
  * This class is used only in the protocol implementation. All reading from
  * Tomcat ( or adapter ) should be done using Request.doRead().
  *
- * 
+ *
  * @author Remy Maucherat
  */
 public interface InputBuffer {
@@ -39,7 +39,7 @@ public interface InputBuffer {
         buffer and return a pointer to it in ByteChunk ( i.e. the param will
         have chunk.getBytes()==null before call, and the result after the call ).
     */
-    public int doRead(ByteChunk chunk, Request request) 
+    public int doRead(ByteChunk chunk, Request request)
         throws IOException;
 
 

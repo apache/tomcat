@@ -25,7 +25,7 @@ public abstract class AbstractHttp11JsseProtocol<S>
 
     public String getAlgorithm() { return endpoint.getAlgorithm();}
     public void setAlgorithm(String s ) { endpoint.setAlgorithm(s);}
-    
+
     public String getClientAuth() { return endpoint.getClientAuth();}
     public void setClientAuth(String s ) { endpoint.setClientAuth(s);}
 
@@ -34,7 +34,7 @@ public abstract class AbstractHttp11JsseProtocol<S>
 
     public String getKeystorePass() { return endpoint.getKeystorePass();}
     public void setKeystorePass(String s ) { endpoint.setKeystorePass(s);}
-    
+
     public String getKeystoreType() { return endpoint.getKeystoreType();}
     public void setKeystoreType(String s ) { endpoint.setKeystoreType(s);}
 
@@ -47,7 +47,7 @@ public abstract class AbstractHttp11JsseProtocol<S>
 
     public String getSslProtocol() { return endpoint.getSslProtocol();}
     public void setSslProtocol(String s) { endpoint.setSslProtocol(s);}
-    
+
     public String getCiphers() { return endpoint.getCiphers();}
     public void setCiphers(String s) { endpoint.setCiphers(s);}
 
@@ -56,7 +56,7 @@ public abstract class AbstractHttp11JsseProtocol<S>
 
     public String getKeyPass() { return endpoint.getKeyPass();}
     public void setKeyPass(String s ) { endpoint.setKeyPass(s);}
-    
+
     public void setTruststoreFile(String f){ endpoint.setTruststoreFile(f);}
     public String getTruststoreFile(){ return endpoint.getTruststoreFile();}
 
@@ -79,23 +79,23 @@ public abstract class AbstractHttp11JsseProtocol<S>
     public String getTruststoreAlgorithm(){
         return endpoint.getTruststoreAlgorithm();
     }
-    
+
     public void setTrustMaxCertLength(String s){
         endpoint.setTrustMaxCertLength(s);
     }
     public String getTrustMaxCertLength(){
         return endpoint.getTrustMaxCertLength();
     }
-    
+
     public void setCrlFile(String s){endpoint.setCrlFile(s);}
     public String getCrlFile(){ return endpoint.getCrlFile();}
-    
+
     public void setSessionCacheSize(String s){endpoint.setSessionCacheSize(s);}
     public String getSessionCacheSize(){ return endpoint.getSessionCacheSize();}
 
     public void setSessionTimeout(String s){endpoint.setSessionTimeout(s);}
     public String getSessionTimeout(){ return endpoint.getSessionTimeout();}
-    
+
     public void setAllowUnsafeLegacyRenegotiation(String s) {
         endpoint.setAllowUnsafeLegacyRenegotiation(s);
     }

@@ -26,14 +26,14 @@ import org.apache.catalina.ha.ClusterMessageBase;
  * @author Peter Rossbach
  */
 public class SessionMessageImpl extends ClusterMessageBase implements SessionMessage {
-    
+
     private static final long serialVersionUID = 1L;
 
 
     public SessionMessageImpl() {
     }
-    
-    
+
+
     /*
      * Private serializable variables to keep the messages state
      */
@@ -169,7 +169,7 @@ public class SessionMessageImpl extends ClusterMessageBase implements SessionMes
     public void setUniqueId(String uniqueId) {
         this.uniqueId = uniqueId;
     }
-    
+
     @Override
     public String toString() {
         return getEventTypeString() + "#" + getContextName() + "#" + getSessionID() ;

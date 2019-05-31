@@ -81,7 +81,7 @@ public interface Part {
      * Behaviour of other containers may be different.
      */
     public void delete() throws IOException;
-    
+
     /**
      * Obtains the value of the specified part header as a String. If there are
      * multiple headers with the same name, this method returns the first header

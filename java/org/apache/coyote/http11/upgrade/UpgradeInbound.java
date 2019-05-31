@@ -23,7 +23,7 @@ import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 /**
  * Receives notification that there is data to be read on the upgraded
  * connection and processes it.
- * 
+ *
  * @deprecated  Will be removed in Tomcat 8.0.x.
  */
 @Deprecated

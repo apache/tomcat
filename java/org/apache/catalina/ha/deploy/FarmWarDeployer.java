@@ -55,7 +55,7 @@ import org.apache.tomcat.util.res.StringManager;
  * </ul>
  * Currently we only support deployment of WAR files since they are easier to
  * send across the wire.
- * 
+ *
  * @author Filip Hanik
  * @author Peter Rossbach
  */
@@ -167,12 +167,12 @@ public class FarmWarDeployer extends ClusterListener
             return ;
         }
         host = (Host) hcontainer;
-    
+
         // Check to correct engine and host setup
         Container econtainer = host.getParent();
         if(!(econtainer instanceof Engine)) {
             log.error(sm.getString("farmWarDeployer.hostParentEngine",
-                    host.getName())); 
+                    host.getName()));
             return ;
         }
         Engine engine = (Engine) econtainer;
@@ -219,7 +219,7 @@ public class FarmWarDeployer extends ClusterListener
 
     /*
      * stop cluster wide deployments
-     * 
+     *
      * @see org.apache.catalina.ha.ClusterDeployer#stop()
      */
     @Override
@@ -244,7 +244,7 @@ public class FarmWarDeployer extends ClusterListener
     /**
      * Callback from the cluster, when a message is received, The cluster will
      * broadcast it invoking the messageReceived on the receiver.
-     * 
+     *
      * @param msg
      *            ClusterMessage - the message received from the cluster
      */
@@ -326,7 +326,7 @@ public class FarmWarDeployer extends ClusterListener
 
     /**
      * create factory for all transported war files
-     * 
+     *
      * @param msg
      * @return Factory for all app message (war files)
      * @throws java.io.FileNotFoundException
@@ -346,7 +346,7 @@ public class FarmWarDeployer extends ClusterListener
 
     /**
      * Remove file (war) from messages)
-     * 
+     *
      * @param msg
      */
     public void removeFactory(FileMessage msg) {
@@ -357,7 +357,7 @@ public class FarmWarDeployer extends ClusterListener
      * Before the cluster invokes messageReceived the cluster will ask the
      * receiver to accept or decline the message, In the future, when messages
      * get big, the accept method will only take a message header
-     * 
+     *
      * @param msg
      *            ClusterMessage
      * @return boolean - returns true to indicate that messageReceived should be
@@ -377,14 +377,14 @@ public class FarmWarDeployer extends ClusterListener
      * If this application is successfully installed locally, a ContainerEvent
      * of type <code>INSTALL_EVENT</code> will be sent to all registered
      * listeners, with the newly created <code>Context</code> as an argument.
-     * 
+     *
      * @param contextName
      *            The context name to which this application should be installed
      *            (must be unique)
      * @param webapp
      *            A WAR file or unpacked directory structure containing the web
      *            application to be installed
-     * 
+     *
      * @exception IllegalArgumentException
      *                if the specified context name is malformed
      * @exception IllegalStateException
@@ -428,12 +428,12 @@ public class FarmWarDeployer extends ClusterListener
      * listeners, with the removed <code>Context</code> as an argument.
      * Deletes the web application war file and/or directory if they exist in
      * the Host's appBase.
-     * 
+     *
      * @param contextName
      *            The context name of the application to be removed
      * @param undeploy
      *            boolean flag to remove web application from server
-     * 
+     *
      * @exception IllegalArgumentException
      *                if the specified context name is malformed
      * @exception IllegalArgumentException
@@ -480,7 +480,7 @@ public class FarmWarDeployer extends ClusterListener
 
     /*
      * Modification from watchDir war detected!
-     * 
+     *
      * @see org.apache.catalina.ha.deploy.FileChangeListener#fileModified(File)
      */
     @Override
@@ -517,7 +517,7 @@ public class FarmWarDeployer extends ClusterListener
 
     /*
      * War remove from watchDir
-     * 
+     *
      * @see org.apache.catalina.ha.deploy.FileChangeListener#fileRemoved(File)
      */
     @Override
@@ -592,7 +592,7 @@ public class FarmWarDeployer extends ClusterListener
     /**
      * Delete the specified directory, including all of its contents and
      * subdirectories recursively.
-     * 
+     *
      * @param dir
      *            File object representing the directory to be deleted
      */
@@ -619,7 +619,7 @@ public class FarmWarDeployer extends ClusterListener
 
     /*
      * Call watcher to check for deploy changes
-     * 
+     *
      * @see org.apache.catalina.ha.ClusterDeployer#backgroundProcess()
      */
     @Override
@@ -758,7 +758,7 @@ public class FarmWarDeployer extends ClusterListener
 
     /**
      * Set the watcher checks frequency.
-     * 
+     *
      * @param processExpiresFrequency
      *            the new manager checks frequency
      */

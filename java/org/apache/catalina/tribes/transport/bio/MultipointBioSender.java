@@ -38,7 +38,7 @@ public class MultipointBioSender extends AbstractSender implements MultiPointSen
     public MultipointBioSender() {
         // NO-OP
     }
-    
+
     /**
      * @deprecated  Unused - will be removed in Tomcat 8.0.x
      */

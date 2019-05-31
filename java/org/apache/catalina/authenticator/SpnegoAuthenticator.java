@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -58,7 +58,7 @@ import org.ietf.jgss.Oid;
 public class SpnegoAuthenticator extends AuthenticatorBase {
 
     private final Log log = LogFactory.getLog(SpnegoAuthenticator.class); // must not be static
-    
+
     private String loginConfigName = Constants.DEFAULT_LOGIN_MODULE_NAME;
     public String getLoginConfigName() {
         return loginConfigName;
@@ -149,10 +149,10 @@ public class SpnegoAuthenticator extends AuthenticatorBase {
             return true;
         }
 
-        MessageBytes authorization = 
+        MessageBytes authorization =
             request.getCoyoteRequest().getMimeHeaders()
             .getValue("authorization");
-        
+
         if (authorization == null) {
             if (log.isDebugEnabled()) {
                 log.debug(sm.getString("authenticator.noAuthHeader"));
@@ -161,7 +161,7 @@ public class SpnegoAuthenticator extends AuthenticatorBase {
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
             return false;
         }
-        
+
         authorization.toBytes();
         ByteChunk authorizationBC = authorization.getByteChunk();
 
@@ -176,7 +176,7 @@ public class SpnegoAuthenticator extends AuthenticatorBase {
         }
 
         authorizationBC.setOffset(authorizationBC.getOffset() + 10);
-                
+
         byte[] decoded = Base64.decodeBase64(authorizationBC.getBuffer(),
                 authorizationBC.getOffset(),
                 authorizationBC.getLength());

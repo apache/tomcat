@@ -10,9 +10,9 @@
     <xsd:documentation>
 
       DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
-      
+
       Copyright 2003-2009 Sun Microsystems, Inc. All rights reserved.
-      
+
       The contents of this file are subject to the terms of either the
       GNU General Public License Version 2 only ("GPL") or the Common
       Development and Distribution License("CDDL") (collectively, the
@@ -22,7 +22,7 @@
       glassfish/bootstrap/legal/LICENSE.txt.  See the License for the
       specific language governing permissions and limitations under the
       License.
-      
+
       When distributing the software, include this License Header
       Notice in each file and include the License file at
       glassfish/bootstrap/legal/LICENSE.txt.  Sun designates this
@@ -32,9 +32,9 @@
       below the License Header, with the fields enclosed by brackets []
       replaced by your own identifying information:
       "Portions Copyrighted [year] [name of copyright owner]"
-      
+
       Contributor(s):
-      
+
       If you wish your version of this file to be governed by only the
       CDDL or only the GPL Version 2, indicate your decision by adding
       "[Contributor] elects to include this software in this
@@ -46,7 +46,7 @@
       code and therefore, elected the GPL Version 2 license, then the
       option applies only if the new code is made subject to such
       option by the copyright holder.
-      
+
     </xsd:documentation>
   </xsd:annotation>
 
@@ -65,25 +65,25 @@
       in the web fragment's jar file.  All Servlet deployment descriptors
       must indicate the web application schema by using the Java EE
       namespace:
-      
-      http://java.sun.com/xml/ns/javaee 
-      
-      and by indicating the version of the schema by 
-      using the version element as shown below: 
-      
+
+      http://java.sun.com/xml/ns/javaee
+
+      and by indicating the version of the schema by
+      using the version element as shown below:
+
       <web-fragment xmlns="http://java.sun.com/xml/ns/javaee"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xsi:schemaLocation="..."
-      version="3.0"> 
+      version="3.0">
       ...
       </web-fragment>
-      
+
       The instance documents may indicate the published version of
       the schema using the xsi:schemaLocation attribute for Java EE
       namespace with the following location:
-      
+
       http://java.sun.com/xml/ns/javaee/web-fragment_3_0.xsd
-      
+
       ]]>
     </xsd:documentation>
   </xsd:annotation>
@@ -93,7 +93,7 @@
 
       The following conventions apply to all Java EE
       deployment descriptor elements unless indicated otherwise.
-      
+
       - In elements that specify a pathname to a file within the
       same JAR file, relative filenames (i.e., those not
       starting with "/") are considered relative to the root of
@@ -102,7 +102,7 @@
       JAR file's namespace.  In general, relative names are
       preferred.  The exception is .war files where absolute
       names are preferred for consistency with the Servlet API.
-      
+
     </xsd:documentation>
   </xsd:annotation>
 
@@ -129,8 +129,8 @@
         must concatenate the element contents.  The multiple occurence
         of the element distributable is redundant and the container
         treats that case exactly in the same way when there is only
-        one distributable. 
-        
+        one distributable.
+
       </xsd:documentation>
     </xsd:annotation>
     <xsd:unique name="web-common-servlet-name-uniqueness">
@@ -139,7 +139,7 @@
 
           The servlet element contains the name of a servlet.
           The name must be unique within the web application.
-          
+
         </xsd:documentation>
       </xsd:annotation>
       <xsd:selector xpath="javaee:servlet"/>
@@ -151,7 +151,7 @@
 
           The filter element contains the name of a filter.
           The name must be unique within the web application.
-          
+
         </xsd:documentation>
       </xsd:annotation>
       <xsd:selector xpath="javaee:filter"/>
@@ -166,9 +166,9 @@
           application's environment and is relative to the
           java:comp/env context.  The name must be unique within
           the web application.
-          
+
           It is recommended that name is prefixed with "ejb/".
-          
+
         </xsd:documentation>
       </xsd:annotation>
       <xsd:selector xpath="javaee:ejb-local-ref"/>
@@ -183,9 +183,9 @@
           application's environment and is relative to the
           java:comp/env context.  The name must be unique within
           the web application.
-          
+
           It is recommended that name is prefixed with "ejb/".
-          
+
         </xsd:documentation>
       </xsd:annotation>
       <xsd:selector xpath="javaee:ejb-ref"/>
@@ -200,7 +200,7 @@
           environment entry name used in the web application code.
           The name is a JNDI name relative to the java:comp/env
           context and must be unique within a web application.
-          
+
         </xsd:documentation>
       </xsd:annotation>
       <xsd:selector xpath="javaee:resource-env-ref"/>
@@ -215,7 +215,7 @@
           environment entry name used in the web application code.
           The name is a JNDI name relative to the java:comp/env
           context and must be unique within a web application.
-          
+
         </xsd:documentation>
       </xsd:annotation>
       <xsd:selector xpath="javaee:message-destination-ref"/>
@@ -229,7 +229,7 @@
           resource manager connection factory reference.  The name
           is a JNDI name relative to the java:comp/env context.
           The name must be unique within a web application.
-          
+
         </xsd:documentation>
       </xsd:annotation>
       <xsd:selector xpath="javaee:resource-ref"/>
@@ -243,7 +243,7 @@
           application's environment entry.  The name is a JNDI
           name relative to the java:comp/env context.  The name
           must be unique within a web application.
-          
+
         </xsd:documentation>
       </xsd:annotation>
       <xsd:selector xpath="javaee:env-entry"/>
@@ -255,7 +255,7 @@
 
           A role-name-key is specified to allow the references
           from the security-role-refs.
-          
+
         </xsd:documentation>
       </xsd:annotation>
       <xsd:selector xpath="javaee:security-role"/>
@@ -268,7 +268,7 @@
 
           The keyref indicates the references from
           security-role-ref to a specified role-name.
-          
+
         </xsd:documentation>
       </xsd:annotation>
       <xsd:selector xpath="javaee:servlet/javaee:security-role-ref"/>

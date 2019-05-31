@@ -55,7 +55,7 @@ public class EchoEndpoint extends Endpoint {
             }
         }
     }
-    
+
     private static class EchoMessageHandlerBinary
             implements MessageHandler.Partial<ByteBuffer> {
 
@@ -64,7 +64,7 @@ public class EchoEndpoint extends Endpoint {
         private EchoMessageHandlerBinary(RemoteEndpoint.Basic remoteEndpointBasic) {
             this.remoteEndpointBasic = remoteEndpointBasic;
         }
-        
+
         @Override
         public void onMessage(ByteBuffer message, boolean last) {
             try {

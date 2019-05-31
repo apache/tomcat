@@ -34,7 +34,7 @@ public class ClusterSessionListener extends ClusterListener {
 
     private static final Log log =
         LogFactory.getLog(ClusterSessionListener.class);
-    
+
     /**
      * The descriptive information about this implementation.
      */

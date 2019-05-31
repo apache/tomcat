@@ -32,7 +32,7 @@ public class TooManyActiveSessionsException
 
     /**
      * Creates a new TooManyActiveSessionsException.
-     * 
+     *
      * @param message A description for the exception.
      * @param maxActive The maximum number of active sessions allowed by the
      *                  session manager.
@@ -41,10 +41,10 @@ public class TooManyActiveSessionsException
                                           int maxActive)
     {
         super(message);
-        
+
         maxActiveSessions = maxActive;
     }
-    
+
     /**
      * Gets the maximum number of sessions allowed by the session manager.
      *

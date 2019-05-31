@@ -5,15 +5,15 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */ 
+ */
 
 
 package org.apache.tomcat.util.digester;
@@ -47,11 +47,11 @@ import org.xml.sax.helpers.DefaultHandler;
  *   {@link org.w3c.dom.DocumentFragment DocumentFragment}, which will contain
  *   only the XML content under the element the rule was triggered on.</li>
  * </ul>
- * The created node will be normalized, meaning it will not contain text nodes 
+ * The created node will be normalized, meaning it will not contain text nodes
  * that only contain white space characters.
- * 
+ *
 
- * 
+ *
  * <p>The created <code>Node</code> will be pushed on Digester's object stack
  * when done. To use it in the context of another DOM
  * {@link org.w3c.dom.Document Document}, it must be imported first, using the
@@ -60,12 +60,12 @@ import org.xml.sax.helpers.DefaultHandler;
  * </p>
  *
  * <p><strong>Important Note:</strong> This is implemented by replacing the SAX
- * {@link org.xml.sax.ContentHandler ContentHandler} in the parser used by 
- * Digester, and resetting it when the matched element is closed. As a side 
- * effect, rules that would match XML nodes under the element that matches 
- * a <code>NodeCreateRule</code> will never be triggered by Digester, which 
+ * {@link org.xml.sax.ContentHandler ContentHandler} in the parser used by
+ * Digester, and resetting it when the matched element is closed. As a side
+ * effect, rules that would match XML nodes under the element that matches
+ * a <code>NodeCreateRule</code> will never be triggered by Digester, which
  * usually is the behavior one would expect.</p>
- * 
+ *
  * <p><strong>Note</strong> that the current implementation does not set the namespace prefixes
  * in the exported nodes. The (usually more important) namespace URIs are set,
  * of course.</p>
@@ -80,7 +80,7 @@ public class NodeCreateRule extends Rule {
 
 
     /**
-     * The SAX content handler that does all the actual work of assembling the 
+     * The SAX content handler that does all the actual work of assembling the
      * DOM node tree from the SAX events.
      */
     private class NodeBuilder
@@ -92,16 +92,16 @@ public class NodeCreateRule extends Rule {
 
         /**
          * Constructor.
-         * 
-         * <p>Stores the content handler currently used by Digester so it can 
-         * be reset when done, and initializes the DOM objects needed to 
+         *
+         * <p>Stores the content handler currently used by Digester so it can
+         * be reset when done, and initializes the DOM objects needed to
          * build the node.</p>
-         * 
+         *
          * @param doc the document to use to create nodes
          * @param root the root node
-         * @throws ParserConfigurationException if the DocumentBuilderFactory 
+         * @throws ParserConfigurationException if the DocumentBuilderFactory
          *   could not be instantiated
-         * @throws SAXException if the XMLReader could not be instantiated by 
+         * @throws SAXException if the XMLReader could not be instantiated by
          *   Digester (should not happen)
          */
         public NodeBuilder(Document doc, Node root)
@@ -110,7 +110,7 @@ public class NodeCreateRule extends Rule {
             this.doc = doc;
             this.root = root;
             this.top = root;
-            
+
             oldContentHandler = digester.getXMLReader().getContentHandler();
 
         }
@@ -120,7 +120,7 @@ public class NodeCreateRule extends Rule {
 
 
         /**
-         * The content handler used by Digester before it was set to this 
+         * The content handler used by Digester before it was set to this
          * content handler.
          */
         protected ContentHandler oldContentHandler = null;
@@ -156,7 +156,7 @@ public class NodeCreateRule extends Rule {
 
         /**
          * Appends a {@link org.w3c.dom.Text Text} node to the current node.
-         * 
+         *
          * @param ch the characters from the XML document
          * @param start the start position in the array
          * @param length the number of characters to read from the array
@@ -168,7 +168,7 @@ public class NodeCreateRule extends Rule {
 
             try {
                 String str = new String(ch, start, length);
-                if (str.trim().length() > 0) { 
+                if (str.trim().length() > 0) {
                     top.appendChild(doc.createTextNode(str));
                 }
             } catch (DOMException e) {
@@ -180,7 +180,7 @@ public class NodeCreateRule extends Rule {
 
         /**
          * Checks whether control needs to be returned to Digester.
-         * 
+         *
          * @param namespaceURI the namespace URI
          * @param localName the local name
          * @param qName the qualified (prefixed) name
@@ -190,7 +190,7 @@ public class NodeCreateRule extends Rule {
         public void endElement(String namespaceURI, String localName,
                                String qName)
             throws SAXException {
-            
+
             try {
                 if (depth == 0) {
                     getDigester().getXMLReader().setContentHandler(
@@ -198,7 +198,7 @@ public class NodeCreateRule extends Rule {
                     getDigester().push(root);
                     getDigester().endElement(namespaceURI, localName, qName);
                 }
-    
+
                 top = top.getParentNode();
                 depth--;
             } catch (DOMException e) {
@@ -210,18 +210,18 @@ public class NodeCreateRule extends Rule {
 
         /**
          * Adds a new
-         * {@link org.w3c.dom.ProcessingInstruction ProcessingInstruction} to 
+         * {@link org.w3c.dom.ProcessingInstruction ProcessingInstruction} to
          * the current node.
-         * 
+         *
          * @param target the processing instruction target
-         * @param data the processing instruction data, or null if none was 
+         * @param data the processing instruction data, or null if none was
          *   supplied
          * @throws SAXException if the DOM implementation throws an exception
          */
         @Override
         public void processingInstruction(String target, String data)
             throws SAXException {
-            
+
             try {
                 top.appendChild(doc.createProcessingInstruction(target, data));
             } catch (DOMException e) {
@@ -234,7 +234,7 @@ public class NodeCreateRule extends Rule {
         /**
          * Adds a new child {@link org.w3c.dom.Element Element} to the current
          * node.
-         * 
+         *
          * @param namespaceURI the namespace URI
          * @param localName the local name
          * @param qName the qualified (prefixed) name
@@ -248,7 +248,7 @@ public class NodeCreateRule extends Rule {
 
             try {
                 Node previousTop = top;
-                if ((localName == null) || (localName.length() == 0)) { 
+                if ((localName == null) || (localName.length() == 0)) {
                     top = doc.createElement(qName);
                 } else {
                     top = doc.createElementNS(namespaceURI, localName);
@@ -294,10 +294,10 @@ public class NodeCreateRule extends Rule {
 
     /**
      * Constructor. Creates an instance of this rule that will create a DOM
-     * {@link org.w3c.dom.Element Element}, but lets you specify the JAXP 
+     * {@link org.w3c.dom.Element Element}, but lets you specify the JAXP
      * <code>DocumentBuilder</code> that should be used when constructing the
      * node tree.
-     * 
+     *
      * @param documentBuilder the JAXP <code>DocumentBuilder</code> to use
      */
     public NodeCreateRule(DocumentBuilder documentBuilder) {
@@ -308,13 +308,13 @@ public class NodeCreateRule extends Rule {
 
 
     /**
-     * Constructor. Creates an instance of this rule that will create either a 
-     * DOM {@link org.w3c.dom.Element Element} or a DOM 
+     * Constructor. Creates an instance of this rule that will create either a
+     * DOM {@link org.w3c.dom.Element Element} or a DOM
      * {@link org.w3c.dom.DocumentFragment DocumentFragment}, depending on the
      * value of the <code>nodeType</code> parameter.
-     * 
+     *
      * @param nodeType the type of node to create, which can be either
-     *   {@link org.w3c.dom.Node#ELEMENT_NODE Node.ELEMENT_NODE} or 
+     *   {@link org.w3c.dom.Node#ELEMENT_NODE Node.ELEMENT_NODE} or
      *   {@link org.w3c.dom.Node#DOCUMENT_FRAGMENT_NODE Node.DOCUMENT_FRAGMENT_NODE}
      * @throws IllegalArgumentException if the node type is not supported
      */
@@ -327,15 +327,15 @@ public class NodeCreateRule extends Rule {
 
 
     /**
-     * Constructor. Creates an instance of this rule that will create either a 
-     * DOM {@link org.w3c.dom.Element Element} or a DOM 
+     * Constructor. Creates an instance of this rule that will create either a
+     * DOM {@link org.w3c.dom.Element Element} or a DOM
      * {@link org.w3c.dom.DocumentFragment DocumentFragment}, depending on the
      * value of the <code>nodeType</code> parameter. This constructor lets you
      * specify the JAXP <code>DocumentBuilder</code> that should be used when
      * constructing the node tree.
-     * 
+     *
      * @param nodeType the type of node to create, which can be either
-     *   {@link org.w3c.dom.Node#ELEMENT_NODE Node.ELEMENT_NODE} or 
+     *   {@link org.w3c.dom.Node#ELEMENT_NODE Node.ELEMENT_NODE} or
      *   {@link org.w3c.dom.Node#DOCUMENT_FRAGMENT_NODE Node.DOCUMENT_FRAGMENT_NODE}
      * @param documentBuilder the JAXP <code>DocumentBuilder</code> to use
      * @throws IllegalArgumentException if the node type is not supported
@@ -365,7 +365,7 @@ public class NodeCreateRule extends Rule {
     /**
      * The type of the node that should be created. Must be one of the
      * constants defined in {@link org.w3c.dom.Node Node}, but currently only
-     * {@link org.w3c.dom.Node#ELEMENT_NODE Node.ELEMENT_NODE} and 
+     * {@link org.w3c.dom.Node#ELEMENT_NODE Node.ELEMENT_NODE} and
      * {@link org.w3c.dom.Node#DOCUMENT_FRAGMENT_NODE Node.DOCUMENT_FRAGMENT_NODE}
      * are allowed values.
      */
@@ -376,13 +376,13 @@ public class NodeCreateRule extends Rule {
 
 
     /**
-     * Implemented to replace the content handler currently in use by a 
+     * Implemented to replace the content handler currently in use by a
      * NodeBuilder.
-     * 
-     * @param namespaceURI the namespace URI of the matching element, or an 
+     *
+     * @param namespaceURI the namespace URI of the matching element, or an
      *   empty string if the parser is not namespace aware or the element has
      *   no namespace
-     * @param name the local name if the parser is namespace aware, or just 
+     * @param name the local name if the parser is namespace aware, or just
      *   the element name otherwise
      * @param attributes The attribute list of this element
      * @throws Exception indicates a JAXP configuration problem
@@ -422,11 +422,11 @@ public class NodeCreateRule extends Rule {
 
     /**
      * Pop the Node off the top of the stack.
-     * 
-     * @param namespace the namespace URI of the matching element, or an 
+     *
+     * @param namespace the namespace URI of the matching element, or an
      *   empty string if the parser is not namespace aware or the element has
      *   no namespace
-     * @param name the local name if the parser is namespace aware, or just 
+     * @param name the local name if the parser is namespace aware, or just
      *   the element name otherwise
      */
     @Override

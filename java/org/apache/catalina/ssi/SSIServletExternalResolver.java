@@ -41,7 +41,7 @@ import org.apache.tomcat.util.http.RequestUtil;
 
 /**
  * An implementation of SSIExternalResolver that is used with servlets.
- * 
+ *
  * @author Dan Sandberg
  * @author David Becker
  */
@@ -246,7 +246,7 @@ public class SSIServletExternalResolver implements SSIExternalResolver {
                     if (queryString != null) {
                         String uriEncoding = null;
                         boolean useBodyEncodingForURI = false;
-                
+
                         // Get encoding settings from request / connector if
                         // possible
                         String requestEncoding = req.getCharacterEncoding();
@@ -255,7 +255,7 @@ public class SSIServletExternalResolver implements SSIExternalResolver {
                             uriEncoding = connector.getURIEncoding();
                             useBodyEncodingForURI = connector.getUseBodyEncodingForURI();
                         }
-                
+
                         String queryStringEncoding;
 
                         // If valid, apply settings from request / connector
@@ -267,7 +267,7 @@ public class SSIServletExternalResolver implements SSIExternalResolver {
                             // Use default as a last resort
                             queryStringEncoding = Constants.DEFAULT_CHARACTER_ENCODING;
                         }
-                
+
                         try {
                             retVal = URLDecoder.decode(queryString, queryStringEncoding);
                         } catch (UnsupportedEncodingException e) {

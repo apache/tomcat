@@ -167,7 +167,7 @@ public class ClusterSingleSignOn extends SingleSignOn implements ClusterValve, M
      */
     @Override
     protected synchronized void startInternal() throws LifecycleException {
-        
+
         // Load the cluster component, if any
         try {
             if(cluster == null) {

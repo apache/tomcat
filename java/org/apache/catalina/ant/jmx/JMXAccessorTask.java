@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -59,21 +59,21 @@ import org.apache.tools.ant.Project;
  * <li>Show Get, Call, Query result at Ant console log</li>
  * <li>Bind Get, Call, Query result at Ant properties</li>
  * </ul>
- * 
+ *
  * Examples: open server with reference and authorisation
- * 
+ *
  * <pre>
- * 
+ *
  *    &lt;jmxOpen
  *            host=&quot;127.0.0.1&quot;
  *            port=&quot;9014&quot;
  *            username=&quot;monitorRole&quot;
  *            password=&quot;mysecret&quot;
- *            ref=&quot;jmx.myserver&quot; 
+ *            ref=&quot;jmx.myserver&quot;
  *        /&gt;
- *  
+ *
  * </pre>
- * 
+ *
  * All calls after opening with same refid reuse the connection.
  * <p>
  * First call to a remote MBeanserver save the JMXConnection a referenz
@@ -83,7 +83,7 @@ import org.apache.tools.ant.Project;
  * <em>unless</em>. With <em>if</em> the task is only execute when property
  * exist and with <em>unless</em> when property not exists. <br><b>NOTE
  * </b>: These tasks require Ant 1.6 or later interface.
- * 
+ *
  * @author Peter Rossbach
  * @since 5.5.10
  */
@@ -302,7 +302,7 @@ public class JMXAccessorTask extends BaseRedirectorHelperTask {
     /**
      * Only execute if a property of the given name exists in the current
      * project.
-     * 
+     *
      * @param c property name
      */
     public void setIf(String c) {
@@ -319,7 +319,7 @@ public class JMXAccessorTask extends BaseRedirectorHelperTask {
     /**
      * Only execute if a property of the given name does not exist in the
      * current project.
-     * 
+     *
      * @param c property name
      */
     public void setUnless(String c) {
@@ -332,7 +332,7 @@ public class JMXAccessorTask extends BaseRedirectorHelperTask {
      * Execute the specified command. This logic only performs the common
      * attribute validation required by all subclasses; it does not perform any
      * functional logic directly.
-     * 
+     *
      * @exception BuildException
      *                if a validation error occurs
      */
@@ -388,7 +388,7 @@ public class JMXAccessorTask extends BaseRedirectorHelperTask {
 
     /**
      * test the if condition
-     * 
+     *
      * @return true if there is no if condition, or the named property exists
      */
     protected boolean testIfCondition() {
@@ -400,7 +400,7 @@ public class JMXAccessorTask extends BaseRedirectorHelperTask {
 
     /**
      * test the unless condition
-     * 
+     *
      * @return true if there is no unless condition, or there is a named
      *         property but it doesn't exist
      */
@@ -413,7 +413,7 @@ public class JMXAccessorTask extends BaseRedirectorHelperTask {
 
     /**
      * Get Current Connection from <em>ref</em> parameter or create a new one!
-     * 
+     *
      * @return The server connection
      * @throws MalformedURLException
      * @throws IOException
@@ -449,7 +449,7 @@ public class JMXAccessorTask extends BaseRedirectorHelperTask {
 
     /**
      * get JMXConnection
-     * 
+     *
      * @return The connection
      * @throws MalformedURLException
      * @throws IOException
@@ -489,7 +489,7 @@ public class JMXAccessorTask extends BaseRedirectorHelperTask {
      * Execute the specified command, based on the configured properties. The
      * input stream will be closed upon completion of this task, whether it was
      * executed successfully or not.
-     * 
+     *
      * @exception Exception
      *                if an error occurs
      */
@@ -507,7 +507,7 @@ public class JMXAccessorTask extends BaseRedirectorHelperTask {
     /**
      * Convert string to datatype FIXME How we can transfer values from ant
      * project reference store (ref)?
-     * 
+     *
      * @param value The value
      * @param valueType The type
      * @return The converted object
@@ -588,7 +588,7 @@ public class JMXAccessorTask extends BaseRedirectorHelperTask {
 
     /**
      * create result as property with name from attribute resultproperty
-     * 
+     *
      * @param result The result
      * @see #createProperty(String, Object)
      */
@@ -605,7 +605,7 @@ public class JMXAccessorTask extends BaseRedirectorHelperTask {
      * result array length at <code>resultproperty.length</code>. Other
      * option is that you delimit your result with a delimiter
      * (java.util.StringTokenizer is used).
-     * 
+     *
      * @param propertyPrefix
      * @param result
      */

@@ -126,9 +126,9 @@ public class TagPluginManager {
         } else {
             blockExternal = Boolean.parseBoolean(blockExternalString);
         }
-        
+
         ParserUtils pu = new ParserUtils(false, blockExternal);
-        
+
         TreeNode root = pu.parseXMLDocument(TAG_PLUGINS_XML, is);
 
         if (!TAG_PLUGINS_ROOT_ELEM.equals(root.getName())) {

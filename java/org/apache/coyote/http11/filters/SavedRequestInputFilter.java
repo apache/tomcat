@@ -36,7 +36,7 @@ public class SavedRequestInputFilter implements InputFilter {
 
     /**
      * Create a new SavedRequestInputFilter.
-     * 
+     *
      * @param input The saved request body to be replayed.
      */
     public SavedRequestInputFilter(ByteChunk input) {
@@ -50,20 +50,20 @@ public class SavedRequestInputFilter implements InputFilter {
     public int doRead(ByteChunk chunk, org.apache.coyote.Request request)
             throws IOException {
         int writeLength = 0;
-        
+
         if (chunk.getLimit() > 0 && chunk.getLimit() < input.getLength()) {
             writeLength = chunk.getLimit();
         } else {
             writeLength = input.getLength();
         }
-        
+
         if(input.getOffset()>= input.getEnd())
             return -1;
-        
+
         input.substract(chunk.getBuffer(), 0, writeLength);
         chunk.setOffset(0);
         chunk.setEnd(writeLength);
-        
+
         return writeLength;
     }
 
@@ -106,7 +106,7 @@ public class SavedRequestInputFilter implements InputFilter {
     public int available() {
         return input.getLength();
     }
-    
+
     /**
      * End the current request (has no effect).
      */

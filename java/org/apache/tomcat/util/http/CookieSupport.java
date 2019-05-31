@@ -63,7 +63,7 @@ public final class CookieSupport {
     public static final boolean ALLOW_NAME_ONLY;
 
     /**
-     * If set to true, the cookie header will be preserved. In most cases 
+     * If set to true, the cookie header will be preserved. In most cases
      * except debugging, this is not useful.
      */
     public static final boolean PRESERVE_COOKIE_HEADER;

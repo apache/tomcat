@@ -44,7 +44,7 @@ public class Http11Protocol extends AbstractHttp11JsseProtocol<Socket> {
 
     private static final org.apache.juli.logging.Log log
         = org.apache.juli.logging.LogFactory.getLog(Http11Protocol.class);
-    
+
     @Override
     protected Log getLog() { return log; }
 
@@ -67,7 +67,7 @@ public class Http11Protocol extends AbstractHttp11JsseProtocol<Socket> {
         setTcpNoDelay(Constants.DEFAULT_TCP_NO_DELAY);
     }
 
-    
+
     // ----------------------------------------------------------------- Fields
 
     protected Http11ConnectionHandler cHandler;
@@ -89,7 +89,7 @@ public class Http11Protocol extends AbstractHttp11JsseProtocol<Socket> {
             this.disableKeepAlivePercentage = disableKeepAlivePercentage;
         }
     }
-    
+
     // ----------------------------------------------------- JMX related methods
 
     @Override
@@ -104,7 +104,7 @@ public class Http11Protocol extends AbstractHttp11JsseProtocol<Socket> {
             extends AbstractConnectionHandler<Socket, Http11Processor> implements Handler {
 
         protected Http11Protocol proto;
-            
+
         Http11ConnectionHandler(Http11Protocol proto) {
             this.proto = proto;
         }
@@ -118,7 +118,7 @@ public class Http11Protocol extends AbstractHttp11JsseProtocol<Socket> {
         protected Log getLog() {
             return log;
         }
-        
+
         @Override
         public SSLImplementation getSslImplementation() {
             return proto.sslImplementation;
@@ -127,7 +127,7 @@ public class Http11Protocol extends AbstractHttp11JsseProtocol<Socket> {
         /**
          * Expected to be used by the handler once the processor is no longer
          * required.
-         * 
+         *
          * @param socket            Not used in BIO
          * @param processor
          * @param isSocketClosing   Not used in HTTP
@@ -201,7 +201,7 @@ public class Http11Protocol extends AbstractHttp11JsseProtocol<Socket> {
             return new org.apache.coyote.http11.upgrade.UpgradeBioProcessor(
                     socket, inbound);
         }
-        
+
         @Override
         protected Processor<Socket> createUpgradeProcessor(
                 SocketWrapper<Socket> socket,

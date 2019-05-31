@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -40,17 +40,17 @@ import org.apache.juli.logging.LogFactory;
  * serviceChannel() method stores the key reference in the thread object then
  * calls notify() to wake it up. When the channel has been drained, the worker
  * thread returns itself to its parent pool.
- * 
+ *
  * @author Filip Hanik
  */
 public class BioReplicationTask extends AbstractRxTask {
 
 
     private static final Log log = LogFactory.getLog( BioReplicationTask.class );
-    
+
     protected Socket socket;
     protected ObjectReader reader;
-    
+
     public BioReplicationTask (ListenCallback callback) {
         super(callback);
     }
@@ -86,12 +86,12 @@ public class BioReplicationTask extends AbstractRxTask {
         if ( getTaskPool() != null ) getTaskPool().returnWorker (this);
     }
 
-    
+
     public synchronized void serviceSocket(Socket socket, ObjectReader reader) {
         this.socket = socket;
         this.reader = reader;
     }
-    
+
     protected void execute(ObjectReader reader) throws Exception{
         int pkgcnt = reader.count();
 
@@ -99,7 +99,7 @@ public class BioReplicationTask extends AbstractRxTask {
             ChannelMessage[] msgs = reader.execute();
             for ( int i=0; i<msgs.length; i++ ) {
                 /**
-                 * Use send ack here if you want to ack the request to the remote 
+                 * Use send ack here if you want to ack the request to the remote
                  * server before completing the request
                  * This is considered an asynchronous request
                  */
@@ -121,10 +121,10 @@ public class BioReplicationTask extends AbstractRxTask {
                     BufferPool.getBufferPool().returnBuffer(msgs[i].getMessage());
                     msgs[i].setMessage(null);
                 }
-            }                       
+            }
         }
 
-       
+
     }
 
     /**
@@ -164,7 +164,7 @@ public class BioReplicationTask extends AbstractRxTask {
             log.warn("Unable to send ACK back through channel, channel disconnected?: "+x.getMessage());
         }
     }
-    
+
     @Override
     public void close() {
         setDoRun(false);

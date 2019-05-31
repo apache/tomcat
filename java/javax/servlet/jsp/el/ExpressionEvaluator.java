@@ -50,7 +50,7 @@ package javax.servlet.jsp.el;
  * <li><code>${8 * 8}</code></li>
  * <li><code>${my:reverse('hello')}</code></li>
  * </ul>
- * 
+ *
  * @since 2.0
  * @deprecated As of JSP 2.1, replaced by javax.el.ExpressionFactory
  */
@@ -62,7 +62,7 @@ public abstract class ExpressionEvaluator {
      * Prepare an expression for later evaluation. This method should perform
      * syntactic validation of the expression; if in doing so it detects errors,
      * it should raise an ELParseException.
-     * 
+     *
      * @param expression
      *            The expression to be evaluated.
      * @param expectedType
@@ -91,7 +91,7 @@ public abstract class ExpressionEvaluator {
      * validation and, if so, it should raise an ELParseException error if it
      * encounters syntactic errors. EL evaluation errors should cause an
      * ELException to be raised.
-     * 
+     *
      * @param expression
      *            The expression to be evaluated.
      * @param expectedType

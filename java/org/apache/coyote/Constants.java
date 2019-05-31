@@ -28,7 +28,7 @@ public final class Constants {
     // -------------------------------------------------------------- Constants
 
     public static final String Package = "org.apache.coyote";
-    
+
     public static final String DEFAULT_CHARACTER_ENCODING="ISO-8859-1";
 
     public static final int MAX_NOTES = 32;

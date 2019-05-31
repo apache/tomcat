@@ -239,7 +239,7 @@ public class NioSender extends AbstractSender {
             dataChannel.connect(daddr);
             completeConnect();
             dataChannel.register(getSelector(),SelectionKey.OP_WRITE, this);
-            
+
         } else {
             InetSocketAddress addr = new InetSocketAddress(getAddress(),getPort());
             if ( socketChannel != null ) throw new IOException("Socket channel has already been established. Connection might be in progress.");
@@ -348,7 +348,7 @@ public class NioSender extends AbstractSender {
                 if (writebuf.capacity() < length) {
                     writebuf = getBuffer(length);
                 }
-           
+
                 // TODO use ByteBuffer.wrap to avoid copying the data.
                 writebuf.put(data,offset,length);
                 writebuf.flip();

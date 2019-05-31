@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -37,15 +37,15 @@ import org.xml.sax.InputSource;
  * provided and in Servlet 3.0 / JSP 2.2 environments an application's web.xml
  * may be the result of merging a number of web-fragment.xml files and/or
  * annotations with the main web.xml
- * 
- * Clients *must* ensure that they call {@link #close()} to clean up resources. 
+ *
+ * Clients *must* ensure that they call {@link #close()} to clean up resources.
  */
 public class WebXml {
     private static final String FILE_PROTOCOL = "file:";
     private static final String WEB_XML = "/WEB-INF/web.xml";
 
     private final Log log = LogFactory.getLog(WebXml.class); // must not be static
-            
+
     private InputStream stream;
     private InputSource source;
     private String systemId;
@@ -58,7 +58,7 @@ public class WebXml {
             source = new InputSource(new StringReader(webXml));
             systemId = org.apache.tomcat.util.scan.Constants.MERGED_WEB_XML;
         }
-        
+
         // If not available as context attribute, look for an alternative
         // location
         if (source == null) {
@@ -79,7 +79,7 @@ public class WebXml {
                 }
             }
         }
-        
+
         // Finally, try the default /WEB-INF/web.xml
         if (source == null) {
             URL uri = ctxt.getResource(WEB_XML);
@@ -99,7 +99,7 @@ public class WebXml {
             source.setSystemId(systemId);
         }
     }
-    
+
     public String getSystemId() {
         return systemId;
     }

@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -26,7 +26,7 @@ import org.apache.tomcat.InstanceManager;
 
 /**
  * Pool of tag handlers that can be reused.
- * 
+ *
  * @author Jan Luehe
  */
 public class TagHandlerPool {
@@ -89,7 +89,7 @@ public class TagHandlerPool {
     /**
      * Gets the next available tag handler from this tag handler pool,
      * instantiating one if this tag handler pool is empty.
-     * 
+     *
      * @param handlerClass
      *            Tag handler class
      * @return Reused or newly instantiated tag handler
@@ -127,7 +127,7 @@ public class TagHandlerPool {
      * Adds the given tag handler to this tag handler pool, unless this tag
      * handler pool has already reached its capacity, in which case the tag
      * handler's release() method is called.
-     * 
+     *
      * @param handler
      *            Tag handler to add to this tag handler pool
      */

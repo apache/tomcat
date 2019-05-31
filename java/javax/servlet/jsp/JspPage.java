@@ -13,7 +13,7 @@
 * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 * See the License for the specific language governing permissions and
 * limitations under the License.
-*/ 
+*/
 package javax.servlet.jsp;
 
 import javax.servlet.Servlet;
@@ -79,7 +79,7 @@ public interface JspPage extends Servlet {
     /**
      * The jspDestroy() method is invoked when the JSP page is about to be
      * destroyed.
-     * 
+     *
      * A JSP page can override this method by including a definition for it
      * in a declaration element.
      *

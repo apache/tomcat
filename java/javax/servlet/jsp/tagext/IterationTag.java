@@ -55,7 +55,7 @@ import javax.servlet.jsp.JspException;
  *
  * <p><B>Empty and Non-Empty Action</B>
  * <p> If the TagLibraryDescriptor file indicates that the action must
- * always have an empty element body, by a &lt;body-content&gt; entry of 
+ * always have an empty element body, by a &lt;body-content&gt; entry of
  * "empty", then the doStartTag() method must return SKIP_BODY.
  *
  * <p>Note that which methods are invoked after the doStartTag() depends on
@@ -68,8 +68,8 @@ import javax.servlet.jsp.JspException;
  *
  * <p>
  * If EVAL_BODY_INCLUDE is returned, and the custom action element is not
- * empty, the body is evaluated and "passed through" to the current out, 
- * then doAfterBody() is invoked and, after zero or more iterations, 
+ * empty, the body is evaluated and "passed through" to the current out,
+ * then doAfterBody() is invoked and, after zero or more iterations,
  * doEndTag() is invoked.
  */
 
@@ -81,9 +81,9 @@ public interface IterationTag extends Tag {
      *
      * For compatibility with JSP 1.1, the value is carefully selected
      * to be the same as the, now deprecated, BodyTag.EVAL_BODY_TAG,
-     * 
+     *
      */
- 
+
     public static final int EVAL_BODY_AGAIN = 2;
 
     /**
@@ -100,7 +100,7 @@ public interface IterationTag extends Tag {
      *
      * <p>
      * If this tag handler implements BodyTag and doAfterBody returns
-     * SKIP_BODY, the value of out will be restored using the popBody 
+     * SKIP_BODY, the value of out will be restored using the popBody
      * method in pageContext prior to invoking doEndTag.
      *
      * <p>

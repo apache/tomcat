@@ -29,9 +29,9 @@ import org.apache.tomcat.util.res.StringManager;
  * on messages. Applications should extend this class to provide application
  * specific functionality. Applications that wish to operate on a stream basis
  * rather than a message basis should use {@link StreamInbound}.
- * 
+ *
  * @deprecated  Replaced by the JSR356 WebSocket 1.1 implementation and will be
- *              removed in Tomcat 8.0.x.  
+ *              removed in Tomcat 8.0.x.
  */
 @Deprecated
 public abstract class MessageInbound extends StreamInbound {

@@ -1101,7 +1101,7 @@ public class RequestFacade implements HttpServletRequest {
             throws IOException {
         request.doUpgrade(inbound);
     }
-    
+
     public <T extends HttpUpgradeHandler> T upgrade(
             Class<T> httpUpgradeHandlerClass) throws ServletException {
         return request.upgrade(httpUpgradeHandlerClass);

@@ -5,15 +5,15 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */ 
+ */
 
 
 package org.apache.naming.java;
@@ -36,7 +36,7 @@ import org.apache.naming.SelectorContext;
  * <b>Important note</b> : This factory MUST be associated with the "java" URL
  * prefix, which can be done by either :
  * <ul>
- * <li>Adding a 
+ * <li>Adding a
  * java.naming.factory.url.pkgs=org.apache.naming property
  * to the JNDI properties file</li>
  * <li>Setting an environment variable named Context.URL_PKG_PREFIXES with
@@ -44,7 +44,7 @@ import org.apache.naming.SelectorContext;
  * More detail about this can be found in the JNDI documentation :
  * {@link javax.naming.spi.NamingManager#getURLContext(java.lang.String, java.util.Hashtable)}.</li>
  * </ul>
- * 
+ *
  * @author Remy Maucherat
  */
 public class javaURLContextFactory
@@ -83,7 +83,7 @@ public class javaURLContextFactory
     public Object getObjectInstance(Object obj, Name name, Context nameCtx,
                                     Hashtable<?,?> environment)
         throws NamingException {
-        if ((ContextBindings.isThreadBound()) || 
+        if ((ContextBindings.isThreadBound()) ||
             (ContextBindings.isClassLoaderBound())) {
             return new SelectorContext((Hashtable<String,Object>)environment);
         }
@@ -98,7 +98,7 @@ public class javaURLContextFactory
     @Override
     public Context getInitialContext(Hashtable<?,?> environment)
         throws NamingException {
-        if (ContextBindings.isThreadBound() || 
+        if (ContextBindings.isThreadBound() ||
             (ContextBindings.isClassLoaderBound())) {
             // Redirect the request to the bound initial context
             return new SelectorContext(

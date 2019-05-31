@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -43,9 +43,9 @@ public class JspFactoryImpl extends JspFactory {
     private final Log log = LogFactory.getLog(JspFactoryImpl.class); // must not be static
 
     private static final String SPEC_VERSION = "2.2";
-    private static final boolean USE_POOL = 
+    private static final boolean USE_POOL =
         Boolean.parseBoolean(System.getProperty("org.apache.jasper.runtime.JspFactoryImpl.USE_POOL", "true"));
-    private static final int POOL_SIZE = 
+    private static final int POOL_SIZE =
         Integer.parseInt(System.getProperty("org.apache.jasper.runtime.JspFactoryImpl.POOL_SIZE", "8"));
 
     private ThreadLocal<PageContextPool> localPool = new ThreadLocal<PageContextPool>();
@@ -108,7 +108,7 @@ public class JspFactoryImpl extends JspFactory {
             } else {
                 pc = new PageContextImpl();
             }
-            pc.initialize(servlet, request, response, errorPageURL, 
+            pc.initialize(servlet, request, response, errorPageURL,
                     needsSession, bufferSize, autoflush);
             return pc;
         } catch (Throwable ex) {

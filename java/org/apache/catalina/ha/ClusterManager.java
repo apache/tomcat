@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -61,21 +61,21 @@ public interface ClusterManager extends Manager {
     * @return String[] The invalidated sessions
     */
    public String[] getInvalidatedSessions();
-   
+
    /**
     * Return the name of the manager, at host /context name and at engine hostname+/context.
     * @return String
     * @since 5.5.10
     */
    public String getName();
-   
+
    /**
     * Set the name of the manager, at host /context name and at engine hostname+/context
     * @param name
     * @since 5.5.10
     */
    public void setName(String name);
-         
+
    public CatalinaCluster getCluster();
 
    public void setCluster(CatalinaCluster cluster);
@@ -91,7 +91,7 @@ public interface ClusterManager extends Manager {
    public ReplicationStream getReplicationStream(byte[] data) throws IOException;
 
    public ReplicationStream getReplicationStream(byte[] data, int offset, int length) throws IOException;
-   
+
    public boolean isNotifyListenersOnReplication();
 
    public ClusterManager cloneFromTemplate();

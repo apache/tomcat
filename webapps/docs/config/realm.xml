@@ -1037,14 +1037,14 @@
     listed. Authentication against any Realm will be sufficient to authenticate
     the user. The authenticated user, and their associated roles, will be taken
     from the first Realm that successfully authenticates the user.</p>
-    
+
     <p>See the <a href="../realm-howto.html">Container-Managed Security
     Guide</a> for more information on setting up container managed security
     using the CombinedRealm component.</p>
 
     <p>The CombinedRealm implementation supports the following additional
     attributes.</p>
-    
+
     <attributes>
 
       <attribute name="allRolesMode" required="false">
@@ -1059,7 +1059,7 @@
         are defined in web.xml in which case the user must be assigned at least
         one of those roles.</p>
       </attribute>
-     
+
       <attribute name="transportGuaranteeRedirectStatus" required="false">
         <p>The HTTP status code to use when the container needs to issue an HTTP
            redirect to meet the requirements of a configured transport
@@ -1110,7 +1110,7 @@
         are defined in web.xml in which case the user must be assigned at least
         one of those roles.</p>
       </attribute>
-      
+
       <attribute name="cacheRemovalWarningTime" required="false">
        <p>If a failed user is removed from the cache because the cache is too
        big before it has been in the cache for at least this period of time (in

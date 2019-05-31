@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -30,7 +30,7 @@ public class CompositeELResolver extends ELResolver {
             clazz =
                 Class.forName("javax.servlet.jsp.el.ScopedAttributeELResolver");
         } catch (ClassNotFoundException e) {
-            // Ignore. This is expected if using the EL stand-alone 
+            // Ignore. This is expected if using the EL stand-alone
         }
         SCOPED_ATTRIBUTE_EL_RESOLVER = clazz;
     }
@@ -193,7 +193,7 @@ public class CompositeELResolver extends ELResolver {
             this.idx = 0;
             this.guaranteeIterator();
         }
-        
+
         private void guaranteeIterator() {
             while (this.itr == null && this.idx < this.size) {
                 this.itr = this.resolvers[this.idx].getFeatureDescriptors(
@@ -203,7 +203,7 @@ public class CompositeELResolver extends ELResolver {
         }
 
         @Override
-        public boolean hasNext() {          
+        public boolean hasNext() {
             if (this.next != null)
                 return true;
             if (this.itr != null){

@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -43,25 +43,25 @@ public class FilterMap implements Serializable {
 
 
     private static final long serialVersionUID = 1L;
-    
+
     /**
      * The name of this filter to be executed when this mapping matches
      * a particular request.
      */
-    
+
     public static final int ERROR = 1;
     public static final int FORWARD = 2;
     public static final int INCLUDE = 4;
     public static final int REQUEST = 8;
     public static final int ASYNC = 16;
-    
-    // represents nothing having been set. This will be seen 
+
+    // represents nothing having been set. This will be seen
     // as equal to a REQUEST
     private static final int NOT_SET = 0;
-    
+
     private int dispatcherMapping = NOT_SET;
-    
-    private String filterName = null;    
+
+    private String filterName = null;
 
     public String getFilterName() {
         return (this.filterName);
@@ -96,27 +96,27 @@ public class FilterMap implements Serializable {
         }
     }
 
-    
+
     /**
      * The flag that indicates this mapping will match all url-patterns
      */
     private boolean matchAllUrlPatterns = false;
-    
+
     public boolean getMatchAllUrlPatterns() {
         return matchAllUrlPatterns;
     }
-    
+
 
     /**
      * The flag that indicates this mapping will match all servlet-names
      */
     private boolean matchAllServletNames = false;
-    
+
     public boolean getMatchAllServletNames() {
         return matchAllServletNames;
     }
 
-    
+
     /**
      * The URL pattern this mapping matches.
      */
@@ -140,7 +140,7 @@ public class FilterMap implements Serializable {
             urlPatterns = results;
         }
     }
-    
+
     /**
      *
      * This method will be used to set the current state of the FilterMap
@@ -148,7 +148,7 @@ public class FilterMap implements Serializable {
      */
     public void setDispatcher(String dispatcherString) {
         String dispatcher = dispatcherString.toUpperCase(Locale.ENGLISH);
-        
+
         if (dispatcher.equals(DispatcherType.FORWARD.name())) {
             // apply FORWARD to the global dispatcherMapping.
             dispatcherMapping |= FORWARD;
@@ -166,13 +166,13 @@ public class FilterMap implements Serializable {
             dispatcherMapping |= ASYNC;
         }
     }
-    
+
     public int getDispatcherMapping() {
         // per the SRV.6.2.5 absence of any dispatcher elements is
         // equivalent to a REQUEST value
         if (dispatcherMapping == NOT_SET) return REQUEST;
-        
-        return dispatcherMapping; 
+
+        return dispatcherMapping;
     }
 
     public String[] getDispatcherNames() {

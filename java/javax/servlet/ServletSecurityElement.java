@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -27,12 +27,12 @@ import javax.servlet.annotation.HttpMethodConstraint;
 import javax.servlet.annotation.ServletSecurity;
 
 /**
- * 
+ *
  * @since Servlet 3.0
  * TODO SERVLET3 - Add comments
  */
 public class ServletSecurityElement extends HttpConstraintElement {
-    
+
     private final Map<String,HttpMethodConstraintElement> methodConstraints =
         new HashMap<String,HttpMethodConstraintElement>();
 
@@ -42,8 +42,8 @@ public class ServletSecurityElement extends HttpConstraintElement {
     public ServletSecurityElement() {
         super();
     }
-    
-    
+
+
     /**
      * Use specific constraints for specified methods and default
      * HttpConstraintElement for all other methods.
@@ -56,7 +56,7 @@ public class ServletSecurityElement extends HttpConstraintElement {
         super();
         addHttpMethodConstraints(httpMethodConstraints);
     }
-    
+
     /**
      * Use specified HttpConstraintElement.
      * @param httpConstraintElement
@@ -64,7 +64,7 @@ public class ServletSecurityElement extends HttpConstraintElement {
     public ServletSecurityElement(HttpConstraintElement httpConstraintElement) {
         this (httpConstraintElement, null);
     }
-    
+
     /**
      * Use specified HttpConstraintElement as default and specific constraints
      * for specified methods.
@@ -79,7 +79,7 @@ public class ServletSecurityElement extends HttpConstraintElement {
                 httpConstraintElement.getRolesAllowed());
         addHttpMethodConstraints(httpMethodConstraints);
     }
-    
+
     /**
      * Create from an annotation.
      * @param annotation
@@ -89,7 +89,7 @@ public class ServletSecurityElement extends HttpConstraintElement {
         this(new HttpConstraintElement(annotation.value().value(),
                 annotation.value().transportGuarantee(),
                 annotation.value().rolesAllowed()));
-        
+
         List<HttpMethodConstraintElement> l =
             new ArrayList<HttpMethodConstraintElement>();
         HttpMethodConstraint[] constraints = annotation.httpMethodConstraints();
@@ -106,20 +106,20 @@ public class ServletSecurityElement extends HttpConstraintElement {
         }
         addHttpMethodConstraints(l);
     }
-    
+
     public Collection<HttpMethodConstraintElement> getHttpMethodConstraints() {
         Collection<HttpMethodConstraintElement> result =
                 new HashSet<HttpMethodConstraintElement>();
         result.addAll(methodConstraints.values());
         return result;
     }
-    
+
     public Collection<String> getMethodNames() {
         Collection<String> result = new HashSet<String>();
         result.addAll(methodConstraints.keySet());
         return result;
     }
-    
+
     private void addHttpMethodConstraints(
             Collection<HttpMethodConstraintElement> httpMethodConstraints) {
         if (httpMethodConstraints == null) {

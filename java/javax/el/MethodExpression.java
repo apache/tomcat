@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -40,7 +40,7 @@ public abstract class MethodExpression extends Expression {
      *              Wraps any exception throw whilst resolving the property
      */
     public abstract MethodInfo getMethodInfo(ELContext context) throws NullPointerException, PropertyNotFoundException, MethodNotFoundException, ELException;
-    
+
     /**
      * @param context The EL context for this evaluation
      * @param params  The parameters with which to invoke this method expression
@@ -59,10 +59,10 @@ public abstract class MethodExpression extends Expression {
      *              coercion of the result to the expected return type fails
      */
     public abstract Object invoke(ELContext context, Object[] params) throws NullPointerException, PropertyNotFoundException, MethodNotFoundException, ELException;
-    
+
     /**
      * @since EL 2.2
-     * 
+     *
      * Note: The spelling mistake is deliberate.
      * isParmetersProvided()  - Specification definition
      * isParametersProvided() - Corrected spelling

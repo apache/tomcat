@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -41,7 +41,7 @@ import org.apache.el.util.ReflectionUtil;
 
 /**
  * An <code>Expression</code> that can get or set a value.
- * 
+ *
  * <p>
  * In previous incarnations of this API, expressions could only be read.
  * <code>ValueExpression</code> objects can now be used both to retrieve a
@@ -53,13 +53,13 @@ import org.apache.el.util.ReflectionUtil;
  * details. Expressions that cannot be used as l-values must always return
  * <code>true</code> from <code>isReadOnly()</code>.
  * </p>
- * 
+ *
  * <p>
  * <code>The {@link javax.el.ExpressionFactory#createValueExpression} method
  * can be used to parse an expression string and return a concrete instance
  * of <code>ValueExpression</code> that encapsulates the parsed expression.
- * The {@link FunctionMapper} is used at parse time, not evaluation time, 
- * so one is not needed to evaluate an expression using this class.  
+ * The {@link FunctionMapper} is used at parse time, not evaluation time,
+ * so one is not needed to evaluate an expression using this class.
  * However, the {@link ELContext} is needed at evaluation time.</p>
  *
  * <p>The {@link #getValue}, {@link #setValue}, {@link #isReadOnly} and
@@ -76,14 +76,14 @@ import org.apache.el.util.ReflectionUtil;
  * method, depending on which was called on the <code>ValueExpression</code>.
  * </p>
  *
- * <p>See the notes about comparison, serialization and immutability in 
+ * <p>See the notes about comparison, serialization and immutability in
  * the {@link javax.el.Expression} javadocs.
  *
  * @see javax.el.ELResolver
  * @see javax.el.Expression
  * @see javax.el.ExpressionFactory
  * @see javax.el.ValueExpression
- * 
+ *
  * @author Jacob Hookom [jacob@hookom.net]
  */
 public final class ValueExpressionImpl extends ValueExpression implements
@@ -104,7 +104,7 @@ public final class ValueExpressionImpl extends ValueExpression implements
     }
 
     /**
-     * 
+     *
      */
     public ValueExpressionImpl(String expr, Node node, FunctionMapper fnMapper,
             VariableMapper varMapper, Class<?> expectedType) {
@@ -117,7 +117,7 @@ public final class ValueExpressionImpl extends ValueExpression implements
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
@@ -134,7 +134,7 @@ public final class ValueExpressionImpl extends ValueExpression implements
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see javax.el.ValueExpression#getExpectedType()
      */
     @Override
@@ -145,11 +145,11 @@ public final class ValueExpressionImpl extends ValueExpression implements
     /**
      * Returns the type the result of the expression will be coerced to after
      * evaluation.
-     * 
+     *
      * @return the <code>expectedType</code> passed to the
      *         <code>ExpressionFactory.createValueExpression</code> method
      *         that created this <code>ValueExpression</code>.
-     * 
+     *
      * @see javax.el.Expression#getExpressionString()
      */
     @Override
@@ -166,7 +166,7 @@ public final class ValueExpressionImpl extends ValueExpression implements
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see javax.el.ValueExpression#getType(javax.el.ELContext)
      */
     @Override
@@ -179,7 +179,7 @@ public final class ValueExpressionImpl extends ValueExpression implements
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see javax.el.ValueExpression#getValue(javax.el.ELContext)
      */
     @Override
@@ -196,7 +196,7 @@ public final class ValueExpressionImpl extends ValueExpression implements
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see java.lang.Object#hashCode()
      */
     @Override
@@ -206,7 +206,7 @@ public final class ValueExpressionImpl extends ValueExpression implements
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see javax.el.ValueExpression#isLiteralText()
      */
     @Override
@@ -220,7 +220,7 @@ public final class ValueExpressionImpl extends ValueExpression implements
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see javax.el.ValueExpression#isReadOnly(javax.el.ELContext)
      */
     @Override
@@ -245,7 +245,7 @@ public final class ValueExpressionImpl extends ValueExpression implements
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see javax.el.ValueExpression#setValue(javax.el.ELContext,
      *      java.lang.Object)
      */
@@ -281,5 +281,5 @@ public final class ValueExpressionImpl extends ValueExpression implements
                 this.varMapper);
         return this.getNode().getValueReference(ctx);
     }
-    
+
 }

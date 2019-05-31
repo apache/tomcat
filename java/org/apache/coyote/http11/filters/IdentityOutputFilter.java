@@ -26,7 +26,7 @@ import org.apache.tomcat.util.buf.ByteChunk;
 
 /**
  * Identity output filter.
- * 
+ *
  * @author Remy Maucherat
  */
 public class IdentityOutputFilter implements OutputFilter {
@@ -58,7 +58,7 @@ public class IdentityOutputFilter implements OutputFilter {
 
     /**
      * Write some bytes.
-     * 
+     *
      * @return number of bytes written by the filter
      */
     @Override
@@ -74,7 +74,7 @@ public class IdentityOutputFilter implements OutputFilter {
                     // The chunk is longer than the number of bytes remaining
                     // in the body; changing the chunk length to the number
                     // of bytes remaining
-                    chunk.setBytes(chunk.getBytes(), chunk.getStart(), 
+                    chunk.setBytes(chunk.getBytes(), chunk.getStart(),
                                    (int) remaining);
                     result = (int) remaining;
                     remaining = 0;
@@ -83,7 +83,7 @@ public class IdentityOutputFilter implements OutputFilter {
                 }
                 buffer.doWrite(chunk, res);
             } else {
-                // No more bytes left to be written : return -1 and clear the 
+                // No more bytes left to be written : return -1 and clear the
                 // buffer
                 chunk.recycle();
                 result = -1;
@@ -109,7 +109,7 @@ public class IdentityOutputFilter implements OutputFilter {
 
 
     /**
-     * Some filters need additional parameters from the response. All the 
+     * Some filters need additional parameters from the response. All the
      * necessary reading can occur in that method, as this method is called
      * after the response header processing is complete.
      */

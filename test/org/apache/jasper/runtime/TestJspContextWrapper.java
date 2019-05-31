@@ -44,7 +44,7 @@ public class TestJspContextWrapper extends TomcatBaseTest {
         ctxt.setAliases("/WEB-INF/lib=" + lib.getCanonicalPath());
 
         tomcat.start();
-        
+
         ByteChunk out = new ByteChunk();
 
         int rc = getUrl("http://localhost:" + getPort() + "/test/bug5nnnn/bug58178.jsp", out, null);

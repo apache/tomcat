@@ -35,7 +35,7 @@ import org.apache.tomcat.util.res.StringManager;
 /**
  * Chunked input filter. Parses chunked data according to
  * <a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec3.html#sec3.6.1">http://www.w3.org/Protocols/rfc2616/rfc2616-sec3.html#sec3.6.1</a><br>
- * 
+ *
  * @author Remy Maucherat
  * @author Filip Hanik
  */
@@ -120,7 +120,7 @@ public class ChunkedInputFilter implements InputFilter {
      * Request being parsed.
      */
     private Request request;
-    
+
 
     /**
      * Limit for extension size.
@@ -167,10 +167,10 @@ public class ChunkedInputFilter implements InputFilter {
 
     /**
      * Read bytes.
-     * 
+     *
      * @return If the filter does request length control, this value is
      * significant; it should be the number of bytes consumed from the buffer,
-     * up until the end of the current request body, or the buffer length, 
+     * up until the end of the current request body, or the buffer length,
      * whichever is greater. If the filter does not do request body length
      * control, the returned value should be -1.
      */
@@ -216,7 +216,7 @@ public class ChunkedInputFilter implements InputFilter {
             pos = pos + remaining;
             remaining = 0;
             //we need a CRLF
-            if ((pos+1) >= lastValid) {   
+            if ((pos+1) >= lastValid) {
                 //if we call parseCRLF we overrun the buffer here
                 //so we defer it to the next call BZ 11117
                 needCRLFParse = true;
@@ -267,7 +267,7 @@ public class ChunkedInputFilter implements InputFilter {
     public int available() {
         return lastValid - pos;
     }
-    
+
 
     /**
      * Set the next buffer in the filter pipeline.
@@ -296,7 +296,7 @@ public class ChunkedInputFilter implements InputFilter {
 
 
     /**
-     * Return the name of the associated encoding; Here, the value is 
+     * Return the name of the associated encoding; Here, the value is
      * "identity".
      */
     @Override
@@ -453,7 +453,7 @@ public class ChunkedInputFilter implements InputFilter {
         }
     }
 
-    
+
     private boolean parseHeader() throws IOException {
 
         MimeHeaders headers = request.getMimeHeaders();
@@ -466,33 +466,33 @@ public class ChunkedInputFilter implements InputFilter {
                throwEOFException(sm.getString("chunkedInputFilter.eosTrailer"));
             }
         }
-    
+
         chr = buf[pos];
-    
+
         // CRLF terminates the request
         if (chr == Constants.CR || chr == Constants.LF) {
             parseCRLF(false);
             return false;
         }
-    
+
         // Mark the current buffer position
         int startPos = trailingHeaders.getEnd();
-    
+
         //
         // Reading the header name
         // Header name is always US-ASCII
         //
-    
+
         boolean colon = false;
         while (!colon) {
-    
+
             // Read new bytes if needed
             if (pos >= lastValid) {
                 if (readBytes() <0) {
                     throwEOFException(sm.getString("chunkedInputFilter.eosTrailer"));
                 }
             }
-    
+
             chr = buf[pos];
             if ((chr >= Constants.A) && (chr <= Constants.Z)) {
                 chr = (byte) (chr - Constants.LC_OFFSET);
@@ -503,34 +503,34 @@ public class ChunkedInputFilter implements InputFilter {
             } else {
                 trailingHeaders.append(chr);
             }
-    
+
             pos++;
-    
+
         }
         int colonPos = trailingHeaders.getEnd();
-    
+
         //
         // Reading the header value (which can be spanned over multiple lines)
         //
-    
+
         boolean eol = false;
         boolean validLine = true;
         int lastSignificantChar = 0;
-    
+
         while (validLine) {
-    
+
             boolean space = true;
-    
+
             // Skipping spaces
             while (space) {
-    
+
                 // Read new bytes if needed
                 if (pos >= lastValid) {
                     if (readBytes() <0) {
                         throwEOFException(sm.getString("chunkedInputFilter.eosTrailer"));
                     }
                 }
-    
+
                 chr = buf[pos];
                 if ((chr == Constants.SP) || (chr == Constants.HT)) {
                     pos++;
@@ -544,19 +544,19 @@ public class ChunkedInputFilter implements InputFilter {
                 } else {
                     space = false;
                 }
-    
+
             }
-    
+
             // Reading bytes until the end of the line
             while (!eol) {
-    
+
                 // Read new bytes if needed
                 if (pos >= lastValid) {
                     if (readBytes() <0) {
                         throwEOFException(sm.getString("chunkedInputFilter.eosTrailer"));
                     }
                 }
-    
+
                 chr = buf[pos];
                 if (chr == Constants.CR || chr == Constants.LF) {
                     parseCRLF(true);
@@ -567,22 +567,22 @@ public class ChunkedInputFilter implements InputFilter {
                     trailingHeaders.append(chr);
                     lastSignificantChar = trailingHeaders.getEnd();
                 }
-    
+
                 if (!eol) {
                     pos++;
                 }
             }
-    
+
             // Checking the first character of the new line. If the character
             // is a LWS, then it's a multiline header
-    
+
             // Read new bytes if needed
             if (pos >= lastValid) {
                 if (readBytes() <0) {
                     throwEOFException(sm.getString("chunkedInputFilter.eosTrailer"));
                 }
             }
-    
+
             chr = buf[pos];
             if ((chr != Constants.SP) && (chr != Constants.HT)) {
                 validLine = false;
@@ -592,12 +592,12 @@ public class ChunkedInputFilter implements InputFilter {
                 // be at least one space inserted between the lines)
                 trailingHeaders.append(chr);
             }
-    
+
         }
-    
+
         String headerName = new String(trailingHeaders.getBytes(), startPos,
                 colonPos - startPos, "ISO_8859_1");
-    
+
         if (allowedTrailerHeaders.contains(headerName.toLowerCase(Locale.ENGLISH))) {
             MessageBytes headerValue = headers.addValue(headerName);
 

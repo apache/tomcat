@@ -63,7 +63,7 @@ public class PersistentValve extends ValveBase {
         super(true);
     }
 
-    
+
     // ----------------------------------------------------- Instance Variables
 
     /**
@@ -197,7 +197,7 @@ public class PersistentValve extends ValveBase {
                                         " stale: " + isSessionStale(session,
                                                 System.currentTimeMillis()));
                             }
-                        }                    
+                        }
                     } else {
                         if (container.getLogger().isDebugEnabled()) {
                             container.getLogger().debug("newsessionId Manager: " +
@@ -241,7 +241,7 @@ public class PersistentValve extends ValveBase {
             if (Globals.IS_SECURITY_ENABLED) {
                 PrivilegedAction<Void> pa =
                         new PrivilegedSetTccl(context.getLoader().getClassLoader());
-                AccessController.doPrivileged(pa);                
+                AccessController.doPrivileged(pa);
             } else {
                 Thread.currentThread().setContextClassLoader(context.getLoader().getClassLoader());
             }
@@ -253,7 +253,7 @@ public class PersistentValve extends ValveBase {
         if (clBindRequired) {
             if (Globals.IS_SECURITY_ENABLED) {
                 PrivilegedAction<Void> pa = new PrivilegedSetTccl(MY_CLASSLOADER);
-                AccessController.doPrivileged(pa);                
+                AccessController.doPrivileged(pa);
             } else {
                 Thread.currentThread().setContextClassLoader(MY_CLASSLOADER);
             }

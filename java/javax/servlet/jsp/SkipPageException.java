@@ -26,7 +26,7 @@ package javax.servlet.jsp;
  * should not be thrown manually in a JSP page or tag file - the behavior is
  * undefined. The exception is intended to be thrown inside SimpleTag handlers
  * and in JSP fragments.
- * 
+ *
  * @see javax.servlet.jsp.tagext.SimpleTag#doTag
  * @see javax.servlet.jsp.tagext.JspFragment#invoke
  * @see javax.servlet.jsp.tagext.Tag#doEndTag
@@ -45,7 +45,7 @@ public class SkipPageException extends JspException {
 
     /**
      * Creates a SkipPageException with the provided message.
-     * 
+     *
      * @param message
      *            the detail message
      */
@@ -55,7 +55,7 @@ public class SkipPageException extends JspException {
 
     /**
      * Creates a SkipPageException with the provided message and root cause.
-     * 
+     *
      * @param message
      *            the detail message
      * @param rootCause
@@ -67,7 +67,7 @@ public class SkipPageException extends JspException {
 
     /**
      * Creates a SkipPageException with the provided root cause.
-     * 
+     *
      * @param rootCause
      *            the originating cause of this exception
      */

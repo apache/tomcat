@@ -28,7 +28,7 @@ public class SocketWrapper<E> {
     // thread to the thread checking the timeout.
     protected volatile long lastAccess = System.currentTimeMillis();
     protected volatile long timeout = -1;
-    
+
     protected boolean error = false;
     protected long lastRegistered = 0;
     protected volatile int keepAliveLeft = 100;

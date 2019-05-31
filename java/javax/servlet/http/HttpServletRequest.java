@@ -60,7 +60,7 @@ public interface HttpServletRequest extends ServletRequest {
      * returned.
      * <p>
      * Same as the value of the CGI variable AUTH_TYPE.
-     * 
+     *
      * @return one of the static members BASIC_AUTH, FORM_AUTH, CLIENT_CERT_AUTH,
      *         DIGEST_AUTH (suitable for == comparison) or the
      *         container-specific string indicating the authentication scheme,
@@ -72,7 +72,7 @@ public interface HttpServletRequest extends ServletRequest {
      * Returns an array containing all of the <code>Cookie</code> objects the
      * client sent with this request. This method returns <code>null</code> if
      * no cookies were sent.
-     * 
+     *
      * @return an array of all the <code>Cookies</code> included with this
      *         request, or <code>null</code> if the request has no cookies
      */
@@ -89,7 +89,7 @@ public interface HttpServletRequest extends ServletRequest {
      * If the request did not have a header of the specified name, this method
      * returns -1. If the header can't be converted to a date, the method throws
      * an <code>IllegalArgumentException</code>.
-     * 
+     *
      * @param name
      *            a <code>String</code> specifying the name of the header
      * @return a <code>long</code> value representing the date specified in the
@@ -108,7 +108,7 @@ public interface HttpServletRequest extends ServletRequest {
      * multiple headers with the same name, this method returns the first head
      * in the request. The header name is case insensitive. You can use this
      * method with any request header.
-     * 
+     *
      * @param name
      *            a <code>String</code> specifying the header name
      * @return a <code>String</code> containing the value of the requested
@@ -128,7 +128,7 @@ public interface HttpServletRequest extends ServletRequest {
      * If the request did not include any headers of the specified name, this
      * method returns an empty <code>Enumeration</code>. The header name is case
      * insensitive. You can use this method with any request header.
-     * 
+     *
      * @param name
      *            a <code>String</code> specifying the header name
      * @return an <code>Enumeration</code> containing the values of the requested
@@ -144,7 +144,7 @@ public interface HttpServletRequest extends ServletRequest {
      * <p>
      * Some servlet containers do not allow servlets to access headers using
      * this method, in which case this method returns <code>null</code>
-     * 
+     *
      * @return an enumeration of all the header names sent with this request; if
      *         the request has no headers, an empty enumeration; if the servlet
      *         container does not allow servlets to use this method,
@@ -159,7 +159,7 @@ public interface HttpServletRequest extends ServletRequest {
      * throws a <code>NumberFormatException</code>.
      * <p>
      * The header name is case insensitive.
-     * 
+     *
      * @param name
      *            a <code>String</code> specifying the name of a request header
      * @return an integer expressing the value of the request header or -1 if the
@@ -174,7 +174,7 @@ public interface HttpServletRequest extends ServletRequest {
      * Returns the name of the HTTP method with which this request was made, for
      * example, GET, POST, or PUT. Same as the value of the CGI variable
      * REQUEST_METHOD.
-     * 
+     *
      * @return a <code>String</code> specifying the name of the method with
      *         which this request was made
      */
@@ -190,7 +190,7 @@ public interface HttpServletRequest extends ServletRequest {
      * information.
      * <p>
      * Same as the value of the CGI variable PATH_INFO.
-     * 
+     *
      * @return a <code>String</code>, decoded by the web container, specifying
      *         extra path information that comes after the servlet path but
      *         before the query string in the request URL; or <code>null</code>
@@ -207,7 +207,7 @@ public interface HttpServletRequest extends ServletRequest {
      * <code>null</code> or the servlet container cannot translate the virtual
      * path to a real path for any reason (such as when the web application is
      * executed from an archive). The web container does not decode this string.
-     * 
+     *
      * @return a <code>String</code> specifying the real path, or
      *         <code>null</code> if the URL does not have any extra path
      *         information
@@ -220,7 +220,7 @@ public interface HttpServletRequest extends ServletRequest {
      * starts with a "/" character but does not end with a "/" character. For
      * servlets in the default (root) context, this method returns "". The
      * container does not decode this string.
-     * 
+     *
      * @return a <code>String</code> specifying the portion of the request URI
      *         that indicates the context of the request
      */
@@ -230,7 +230,7 @@ public interface HttpServletRequest extends ServletRequest {
      * Returns the query string that is contained in the request URL after the
      * path. This method returns <code>null</code> if the URL does not have a
      * query string. Same as the value of the CGI variable QUERY_STRING.
-     * 
+     *
      * @return a <code>String</code> containing the query string or
      *         <code>null</code> if the URL contains no query string. The value
      *         is not decoded by the container.
@@ -243,7 +243,7 @@ public interface HttpServletRequest extends ServletRequest {
      * authenticated. Whether the user name is sent with each subsequent request
      * depends on the browser and type of authentication. Same as the value of
      * the CGI variable REMOTE_USER.
-     * 
+     *
      * @return a <code>String</code> specifying the login of the user making
      *         this request, or <code>null</code> if the user login is not known
      */
@@ -254,7 +254,7 @@ public interface HttpServletRequest extends ServletRequest {
      * in the specified logical "role". Roles and role membership can be defined
      * using deployment descriptors. If the user has not been authenticated, the
      * method returns <code>false</code>.
-     * 
+     *
      * @param role
      *            a <code>String</code> specifying the name of the role
      * @return a <code>boolean</code> indicating whether the user making this
@@ -267,7 +267,7 @@ public interface HttpServletRequest extends ServletRequest {
      * Returns a <code>java.security.Principal</code> object containing the name
      * of the current authenticated user. If the user has not been
      * authenticated, the method returns <code>null</code>.
-     * 
+     *
      * @return a <code>java.security.Principal</code> containing the name of the
      *         user making this request; <code>null</code> if the user has not
      *         been authenticated
@@ -278,7 +278,7 @@ public interface HttpServletRequest extends ServletRequest {
      * Returns the session ID specified by the client. This may not be the same
      * as the ID of the current valid session for this request. If the client
      * did not specify a session ID, this method returns <code>null</code>.
-     * 
+     *
      * @return a <code>String</code> specifying the session ID, or
      *         <code>null</code> if the request did not specify a session ID
      * @see #isRequestedSessionIdValid
@@ -309,7 +309,7 @@ public interface HttpServletRequest extends ServletRequest {
      * <p>
      * To reconstruct an URL with a scheme and host, use
      * {@link #getRequestURL}.
-     * 
+     *
      * @return a <code>String</code> containing the part of the URL from the
      *         protocol name up to the query string
      * @see #getRequestURL
@@ -326,7 +326,7 @@ public interface HttpServletRequest extends ServletRequest {
      * <p>
      * This method is useful for creating redirect messages and for reporting
      * errors.
-     * 
+     *
      * @return a <code>StringBuffer</code> object containing the reconstructed
      *         URL
      */
@@ -340,7 +340,7 @@ public interface HttpServletRequest extends ServletRequest {
      * <p>
      * This method will return an empty string ("") if the servlet used to
      * process this request was matched using the "/*" pattern.
-     * 
+     *
      * @return a <code>String</code> containing the name or path of the servlet
      *         being called, as specified in the request URL, decoded, or an
      *         empty string if the servlet used to process the request is
@@ -361,7 +361,7 @@ public interface HttpServletRequest extends ServletRequest {
      * cookies to maintain session integrity and is asked to create a new
      * session when the response is committed, an IllegalStateException is
      * thrown.
-     * 
+     *
      * @param create
      *            <code>true</code> to create a new session for this request if
      *            necessary; <code>false</code> to return <code>null</code> if
@@ -376,7 +376,7 @@ public interface HttpServletRequest extends ServletRequest {
     /**
      * Returns the current session associated with this request, or if the
      * request does not have a session, creates one.
-     * 
+     *
      * @return the <code>HttpSession</code> associated with this request
      * @see #getSession(boolean)
      */
@@ -384,7 +384,7 @@ public interface HttpServletRequest extends ServletRequest {
 
     /**
      * Checks whether the requested session ID is still valid.
-     * 
+     *
      * @return <code>true</code> if this request has an id for a valid session
      *         in the current session context; <code>false</code> otherwise
      * @see #getRequestedSessionId
@@ -394,7 +394,7 @@ public interface HttpServletRequest extends ServletRequest {
 
     /**
      * Checks whether the requested session ID came in as a cookie.
-     * 
+     *
      * @return <code>true</code> if the session ID came in as a cookie;
      *         otherwise, <code>false</code>
      * @see #getSession
@@ -404,7 +404,7 @@ public interface HttpServletRequest extends ServletRequest {
     /**
      * Checks whether the requested session ID came in as part of the request
      * URL.
-     * 
+     *
      * @return <code>true</code> if the session ID came in as part of a URL;
      *         otherwise, <code>false</code>
      * @see #getSession
@@ -461,7 +461,7 @@ public interface HttpServletRequest extends ServletRequest {
 
     /**
      * Return a collection of all uploaded Parts.
-     * 
+     *
      * @return A collection of all uploaded Parts.
      * @throws IOException
      *             if an I/O error occurs
@@ -477,7 +477,7 @@ public interface HttpServletRequest extends ServletRequest {
     /**
      * Gets the named Part or null if the Part does not exist. Triggers upload
      * of all Parts.
-     * 
+     *
      * @param name
      * @return The named Part or null if the Part does not exist
      * @throws IOException

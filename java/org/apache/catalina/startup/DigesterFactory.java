@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -30,7 +30,7 @@ import org.apache.tomcat.util.digester.RuleSet;
  * Wrapper class around the Digester that hide Digester's initialization details
  *
  * @author Jean-Francois Arcand
- * 
+ *
  * @deprecated Use {@link org.apache.tomcat.util.descriptor.DigesterFactory}
  */
 @Deprecated
@@ -51,7 +51,7 @@ public class DigesterFactory {
         return newDigester(false, false, null);
     }
 
-    
+
     /**
      * Create a <code>Digester</code> parser with XML validation turned off.
      * @param rule an instance of <code>RuleSet</code> used for parsing the xml.
@@ -63,7 +63,7 @@ public class DigesterFactory {
         return newDigester(false,false,rule);
     }
 
-    
+
     /**
      * Create a <code>Digester</code> parser.
      * @param xmlValidation turn on/off xml validation
@@ -80,7 +80,7 @@ public class DigesterFactory {
 
         SchemaResolver schemaResolver = new SchemaResolver(digester);
         registerLocalSchema(schemaResolver);
-        
+
         digester.setEntityResolver(schemaResolver);
         if ( rule != null ) {
             digester.addRuleSet(rule);
@@ -135,10 +135,10 @@ public class DigesterFactory {
                 schemaResolver);
 
         // TLD
-        register(Constants.TldDtdResourcePath_11,  
+        register(Constants.TldDtdResourcePath_11,
                  Constants.TldDtdPublicId_11,
                  schemaResolver);
-        
+
         register(Constants.TldDtdResourcePath_12,
                  Constants.TldDtdPublicId_12,
                  schemaResolver);
@@ -151,7 +151,7 @@ public class DigesterFactory {
                 Constants.TldSchemaPublicId_21,
                 schemaResolver);
 
-        // web.xml    
+        // web.xml
         register(Constants.WebDtdResourcePath_22,
                  Constants.WebDtdPublicId_22,
                  schemaResolver);
@@ -175,7 +175,7 @@ public class DigesterFactory {
         register(Constants.WebCommonSchemaResourcePath_30,
                 Constants.WebCommonSchemaPublicId_30,
                 schemaResolver);
-        
+
         register(Constants.WebFragmentSchemaResourcePath_30,
                 Constants.WebFragmentSchemaPublicId_30,
                 schemaResolver);
@@ -213,7 +213,7 @@ public class DigesterFactory {
     protected static void register(String resourceURL, String resourcePublicId,
             SchemaResolver schemaResolver){
         URL url = DigesterFactory.class.getResource(resourceURL);
-   
+
         if(url == null) {
             log.warn("Could not get url for " + resourceURL);
         } else {

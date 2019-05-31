@@ -31,7 +31,7 @@ import java.io.InputStream;
  * <p>
  * This is an abstract class that a servlet container implements. Subclasses of
  * this class must implement the <code>java.io.InputStream.read()</code> method.
- * 
+ *
  * @author Various
  * @see ServletRequest
  */
@@ -51,7 +51,7 @@ public abstract class ServletInputStream extends InputStream {
      * <p>
      * This method returns -1 if it reaches the end of the input stream before
      * reading the maximum number of bytes.
-     * 
+     *
      * @param b
      *            an array of bytes into which data is read
      * @param off

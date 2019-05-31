@@ -29,7 +29,7 @@ import javax.servlet.jsp.PageContext;
  * created to wrap the SimpleTag parent, and the adapter is passed to
  * setParent() instead. A classic Tag Handler can call getAdaptee() to retrieve
  * the encapsulated SimpleTag instance.
- * 
+ *
  * @since 2.0
  */
 public class TagAdapter implements Tag {
@@ -45,7 +45,7 @@ public class TagAdapter implements Tag {
     /**
      * Creates a new TagAdapter that wraps the given SimpleTag and returns the
      * parent tag when getParent() is called.
-     * 
+     *
      * @param adaptee
      *            The SimpleTag being adapted as a Tag.
      */
@@ -59,7 +59,7 @@ public class TagAdapter implements Tag {
 
     /**
      * Must not be called.
-     * 
+     *
      * @param pc
      *            ignored.
      * @throws UnsupportedOperationException
@@ -74,7 +74,7 @@ public class TagAdapter implements Tag {
     /**
      * Must not be called. The parent of this tag is always
      * getAdaptee().getParent().
-     * 
+     *
      * @param parentTag
      *            ignored.
      * @throws UnsupportedOperationException
@@ -91,7 +91,7 @@ public class TagAdapter implements Tag {
      * This will either be the enclosing Tag (if getAdaptee().getParent()
      * implements Tag), or an adapter to the enclosing Tag (if
      * getAdaptee().getParent() does not implement Tag).
-     * 
+     *
      * @return The parent of the tag being adapted.
      */
     @Override
@@ -116,7 +116,7 @@ public class TagAdapter implements Tag {
      * Gets the tag that is being adapted to the Tag interface. This should be
      * an instance of SimpleTag in JSP 2.0, but room is left for other kinds of
      * tags in future spec versions.
-     * 
+     *
      * @return the tag that is being adapted
      */
     public JspTag getAdaptee() {
@@ -125,7 +125,7 @@ public class TagAdapter implements Tag {
 
     /**
      * Must not be called.
-     * 
+     *
      * @return always throws UnsupportedOperationException
      * @throws UnsupportedOperationException
      *             Must not be called
@@ -140,7 +140,7 @@ public class TagAdapter implements Tag {
 
     /**
      * Must not be called.
-     * 
+     *
      * @return always throws UnsupportedOperationException
      * @throws UnsupportedOperationException
      *             Must not be called
@@ -155,7 +155,7 @@ public class TagAdapter implements Tag {
 
     /**
      * Must not be called.
-     * 
+     *
      * @throws UnsupportedOperationException
      *             Must not be called
      */

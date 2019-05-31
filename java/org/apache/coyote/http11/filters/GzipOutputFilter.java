@@ -29,7 +29,7 @@ import org.apache.tomcat.util.compat.JreCompat;
 
 /**
  * Gzip output filter.
- * 
+ *
  * @author Remy Maucherat
  */
 public class GzipOutputFilter implements OutputFilter {
@@ -68,7 +68,7 @@ public class GzipOutputFilter implements OutputFilter {
 
     /**
      * Write some bytes.
-     * 
+     *
      * @return number of bytes written by the filter
      */
     @Override
@@ -82,7 +82,7 @@ public class GzipOutputFilter implements OutputFilter {
                 compressionStream = new FlushableGZIPOutputStream(fakeOutputStream);
             }
         }
-        compressionStream.write(chunk.getBytes(), chunk.getStart(), 
+        compressionStream.write(chunk.getBytes(), chunk.getStart(),
                                 chunk.getLength());
         return chunk.getLength();
     }
@@ -115,7 +115,7 @@ public class GzipOutputFilter implements OutputFilter {
     }
 
     /**
-     * Some filters need additional parameters from the response. All the 
+     * Some filters need additional parameters from the response. All the
      * necessary reading can occur in that method, as this method is called
      * after the response header processing is complete.
      */
@@ -174,7 +174,7 @@ public class GzipOutputFilter implements OutputFilter {
         @Override
         public void write(int b)
             throws IOException {
-            // Shouldn't get used for good performance, but is needed for 
+            // Shouldn't get used for good performance, but is needed for
             // compatibility with Sun JDK 1.4.0
             singleByteBuffer[0] = (byte) (b & 0xff);
             outputChunk.setBytes(singleByteBuffer, 0, 1);

@@ -435,7 +435,7 @@
       <p>Note that for APR/native on Windows, the configured value will be
       reduced to the highest multiple of 1024 that is less than or equal to
       maxConnections. This is done for performance reasons.<br/>
-      If set to a value of -1, the maxConnections feature is disabled 
+      If set to a value of -1, the maxConnections feature is disabled
       and connections are not counted.</p>
     </attribute>
 
@@ -731,11 +731,11 @@
         <p>(int)The number of threads to be used to run for the polling events.
         Default value is <code>1</code> per processor up to and including version 7.0.27.
         Default value as of version 7.0.28 is <code>1</code> per processor but not more than 2.<br/>
-        When accepting a socket, the operating system holds a global lock. So the benefit of 
-        going above 2 threads diminishes rapidly. Having more than one thread is for 
-        system that need to accept connections very rapidly. However usually just 
-        increasing <code>acceptCount</code> will solve that problem. 
-        Increasing this value may also be beneficial when a large amount of send file 
+        When accepting a socket, the operating system holds a global lock. So the benefit of
+        going above 2 threads diminishes rapidly. Having more than one thread is for
+        system that need to accept connections very rapidly. However usually just
+        increasing <code>acceptCount</code> will solve that problem.
+        Increasing this value may also be beneficial when a large amount of send file
         operations are going on.
         </p>
       </attribute>
@@ -1151,7 +1151,7 @@
       supported by the SSL implementation will be enabled.  If not specified,
       the JVM default (excluding SSLv2 and SSLv3 if the JVM enables either or
       both of them by default) is used. The permitted values may be obtained from the
-      JVM documentation for the allowed values for 
+      JVM documentation for the allowed values for
       <code>SSLSocket.setEnabledProtocols()</code> e.g.
       <a href="http://docs.oracle.com/javase/6/docs/technotes/guides/security/StandardNames.html#jssenames">
       Oracle Java 6</a> and

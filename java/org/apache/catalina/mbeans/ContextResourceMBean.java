@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -82,7 +82,7 @@ public class ContextResourceMBean extends BaseModelMBean {
     public Object getAttribute(String name)
         throws AttributeNotFoundException, MBeanException,
         ReflectionException {
- 
+
         // Validate the input parameters
         if (name == null)
             throw new RuntimeOperationsException
@@ -97,16 +97,16 @@ public class ContextResourceMBean extends BaseModelMBean {
         } catch (InvalidTargetObjectTypeException e) {
              throw new MBeanException(e);
         }
-        
+
         String value = null;
         if ("auth".equals(name)) {
             return (cr.getAuth());
         } else if ("description".equals(name)) {
             return (cr.getDescription());
         } else if ("name".equals(name)) {
-            return (cr.getName());              
+            return (cr.getName());
         } else if ("scope".equals(name)) {
-            return (cr.getScope());  
+            return (cr.getScope());
         } else if ("type".equals(name)) {
             return (cr.getType());
         } else {
@@ -116,12 +116,12 @@ public class ContextResourceMBean extends BaseModelMBean {
                     ("Cannot find attribute "+name);
             }
         }
-        
+
         return value;
-        
+
     }
 
-    
+
     /**
      * Set the value of a specific attribute of this MBean.
      *
@@ -150,8 +150,8 @@ public class ContextResourceMBean extends BaseModelMBean {
         if (name == null)
             throw new RuntimeOperationsException
                 (new IllegalArgumentException("Attribute name is null"),
-                 "Attribute name is null"); 
-        
+                 "Attribute name is null");
+
         ContextResource cr = null;
         try {
             cr = (ContextResource) getManagedResource();
@@ -160,26 +160,26 @@ public class ContextResourceMBean extends BaseModelMBean {
         } catch (InvalidTargetObjectTypeException e) {
              throw new MBeanException(e);
         }
-        
+
         if ("auth".equals(name)) {
             cr.setAuth((String)value);
         } else if ("description".equals(name)) {
             cr.setDescription((String)value);
         } else if ("name".equals(name)) {
-            cr.setName((String)value);              
+            cr.setName((String)value);
         } else if ("scope".equals(name)) {
-            cr.setScope((String)value);  
+            cr.setScope((String)value);
         } else if ("type".equals(name)) {
             cr.setType((String)value);
         } else {
             cr.setProperty(name, ""+value);
         }
-        
-        // cannot use side-effects.  It's removed and added back each time 
+
+        // cannot use side-effects.  It's removed and added back each time
         // there is a modification in a resource.
         NamingResources nr = cr.getNamingResources();
         nr.removeResource(cr.getName());
         nr.addResource(cr);
     }
-    
+
 }

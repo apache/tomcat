@@ -38,7 +38,7 @@ package javax.servlet;
  * the servlet container more robust. Specifically, the servlet container might
  * block requests to the servlet or filter for a period of time suggested by the
  * exception, rather than rejecting them until the servlet container restarts.
- * 
+ *
  * @author Various
  */
 public class UnavailableException extends ServletException {
@@ -94,7 +94,7 @@ public class UnavailableException extends ServletException {
     /**
      * Constructs a new exception with a descriptive message indicating that the
      * servlet is permanently unavailable.
-     * 
+     *
      * @param msg
      *            a <code>String</code> specifying the descriptive message
      */
@@ -115,7 +115,7 @@ public class UnavailableException extends ServletException {
      * to report how long it will take to be restored to functionality. This can
      * be indicated with a negative or zero value for the <code>seconds</code>
      * argument.
-     * 
+     *
      * @param msg
      *            a <code>String</code> specifying the descriptive message,
      *            which can be written to a log file or displayed for the user.
@@ -139,7 +139,7 @@ public class UnavailableException extends ServletException {
      * Returns a <code>boolean</code> indicating whether the servlet is
      * permanently unavailable. If so, something is wrong with the servlet, and
      * the system administrator must take some corrective action.
-     * 
+     *
      * @return <code>true</code> if the servlet is permanently unavailable;
      *         <code>false</code> if the servlet is available or temporarily
      *         unavailable
@@ -150,7 +150,7 @@ public class UnavailableException extends ServletException {
 
     /**
      * Returns the servlet that is reporting its unavailability.
-     * 
+     *
      * @return the <code>Servlet</code> object that is throwing the
      *         <code>UnavailableException</code>
      * @deprecated As of Java Servlet API 2.2, with no replacement.
@@ -169,7 +169,7 @@ public class UnavailableException extends ServletException {
      * unavailable or cannot provide an estimate of how long it will be
      * unavailable. No effort is made to correct for the time elapsed since the
      * exception was first reported.
-     * 
+     *
      * @return an integer specifying the number of seconds the servlet will be
      *         temporarily unavailable, or a negative number if the servlet is
      *         permanently unavailable or cannot make an estimate

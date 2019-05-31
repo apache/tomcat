@@ -44,10 +44,10 @@ import org.w3c.dom.Node;
 /** This will create mbeans based on a config file.
  *  The format is an extended version of MLET.
  *
- * Classloading. We don't support any explicit classloader tag. 
+ * Classloading. We don't support any explicit classloader tag.
  * A ClassLoader is just an mbean ( it can be the standard MLetMBean or
- * a custom one ). 
- * 
+ * a custom one ).
+ *
  * XXX add a special attribute to reference the loader mbean,
  * XXX figure out how to deal with private loaders
  *
@@ -73,7 +73,7 @@ public class MbeansSource extends ModelerSource implements MbeansSourceMBean
 
     public void setRegistry(Registry reg) {
         this.registry=reg;
-    }          
+    }
 
     public void setLocation( String loc ) {
         this.location=loc;
@@ -100,7 +100,7 @@ public class MbeansSource extends ModelerSource implements MbeansSourceMBean
     public String getLocation() {
         return location;
     }
-    
+
     /** Return the list of mbeans created by this source.
      *  It can be used to implement runtime services.
      */
@@ -120,25 +120,25 @@ public class MbeansSource extends ModelerSource implements MbeansSourceMBean
     }
 
     public void start() throws Exception {
-        registry.invoke(mbeans, "start", false);        
+        registry.invoke(mbeans, "start", false);
     }
 
     public void stop() throws Exception {
-        registry.invoke(mbeans, "stop", false);        
+        registry.invoke(mbeans, "stop", false);
     }
-    
+
     @Override
     public void init() throws Exception {
         if( mbeans==null) execute();
         if( registry==null ) registry=Registry.getRegistry(null, null);
-        
+
         registry.invoke(mbeans, "init", false);
     }
-    
+
     public void destroy() throws Exception {
-        registry.invoke(mbeans, "destroy", false);                
+        registry.invoke(mbeans, "destroy", false);
     }
-    
+
     @Override
     public void load() throws Exception {
         execute(); // backward compat
@@ -180,7 +180,7 @@ public class MbeansSource extends ModelerSource implements MbeansSourceMBean
                 server.registerMBean(mlet, defaultLoader);
                 loaderLoaded=true;
             }
-        
+
             // Process nodes
             for (Node mbeanN = firstMbeanN; mbeanN != null;
                  mbeanN= DomUtil.getNext(mbeanN, null, Node.ELEMENT_NODE))
@@ -195,7 +195,7 @@ public class MbeansSource extends ModelerSource implements MbeansSourceMBean
                     if( objectName==null ) {
                         objectName=DomUtil.getAttribute( mbeanN, "name" );
                     }
-                    
+
                     if( log.isDebugEnabled())
                         log.debug( "Processing mbean objectName=" + objectName +
                                 " code=" + code);
@@ -211,11 +211,11 @@ public class MbeansSource extends ModelerSource implements MbeansSourceMBean
                         if( ! server.isRegistered( oname )) {
                             // We wrap everything in a model mbean.
                             // XXX need to support "StandardMBeanDescriptorsSource"
-                            String modelMBean=BaseModelMBean.class.getName();                            
+                            String modelMBean=BaseModelMBean.class.getName();
                             server.createMBean(modelMBean, oname,
                                     new Object[] { code, this},
                                     new String[] { String.class.getName(),
-                                                  ModelerSource.class.getName() } 
+                                                  ModelerSource.class.getName() }
                                     );
                             mbeans.add(oname);
                         }
@@ -274,9 +274,9 @@ public class MbeansSource extends ModelerSource implements MbeansSourceMBean
             log.error( "Error reading mbeans ", ex);
         }
     }
-    
+
     @Override
-    public void updateField( ObjectName oname, String name, 
+    public void updateField( ObjectName oname, String name,
                              Object value )
     {
         if( loading ) return;
@@ -293,7 +293,7 @@ public class MbeansSource extends ModelerSource implements MbeansSourceMBean
             attNode=n.getOwnerDocument().createElement("attribute");
             DomUtil.setAttribute(attNode, "name", name);
             n.appendChild(attNode);
-        } 
+        }
         String oldValue=DomUtil.getAttribute(attNode, "value");
         if( oldValue != null ) {
             // we'll convert all values to text content
@@ -303,14 +303,14 @@ public class MbeansSource extends ModelerSource implements MbeansSourceMBean
 
         //store();
     }
-    
-    /** Store the mbeans. 
-     * XXX add a background thread to store it periodically 
-     */ 
+
+    /** Store the mbeans.
+     * XXX add a background thread to store it periodically
+     */
     @Override
     public void save() {
         // XXX customize no often than ( based on standard descriptor ), etc.
-        // It doesn't work very well if we call this on each set att - 
+        // It doesn't work very well if we call this on each set att -
         // the triger will work for the first att, but all others will be delayed
         long time=System.currentTimeMillis();
         if( location!=null &&

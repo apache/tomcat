@@ -15,7 +15,7 @@
 * limitations under the License.
 */
 
- 
+
 package javax.servlet.jsp.tagext;
 
 /**
@@ -39,7 +39,7 @@ public class TagFileInfo {
      * design error, which may be fixed in the future.
      *
      * @param name The unique action name of this tag
-     * @param path Where to find the .tag file implementing this 
+     * @param path Where to find the .tag file implementing this
      *     action, relative to the location of the TLD file.
      * @param tagInfo The detailed information about this tag, as parsed
      *     from the directives in the tag file.
@@ -62,7 +62,7 @@ public class TagFileInfo {
     /**
      * Where to find the .tag file implementing this action.
      *
-     * @return The path of the tag file, relative to the TLD, or "." if 
+     * @return The path of the tag file, relative to the TLD, or "." if
      *     the tag file was defined in an implicit tag file.
      */
     public String getPath() {
@@ -70,7 +70,7 @@ public class TagFileInfo {
     }
 
     /**
-     * Returns information about this tag, parsed from the directives 
+     * Returns information about this tag, parsed from the directives
      * in the tag file.
      *
      * @return a TagInfo object containing information about this tag

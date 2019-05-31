@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -47,7 +47,7 @@ public class ELFunctionMapper {
      *
      * @param page The current compilation unit.
      */
-    public static void map(Node.Nodes page) 
+    public static void map(Node.Nodes page)
                 throws JasperException {
 
         ELFunctionMapper map = new ELFunctionMapper();
@@ -70,7 +70,7 @@ public class ELFunctionMapper {
      * for functions, and if found functions mappers are created.
      */
     class ELFunctionVisitor extends Node.Visitor {
-        
+
         /**
          * Use a global name map to facilitate reuse of function maps.
          * The key used is prefix:function:uri.
@@ -149,7 +149,7 @@ public class ELFunctionMapper {
             doMap(n.getEL());
         }
 
-        private void doMap(Node.JspAttribute attr) 
+        private void doMap(Node.JspAttribute attr)
                 throws JasperException {
             if (attr != null) {
                 doMap(attr.getEL());
@@ -159,7 +159,7 @@ public class ELFunctionMapper {
         /**
          * Creates function mappers, if needed, from ELNodes
          */
-        private void doMap(ELNode.Nodes el) 
+        private void doMap(ELNode.Nodes el)
                 throws JasperException {
 
             // Only care about functions in ELNode's
@@ -195,7 +195,7 @@ public class ELFunctionMapper {
                 el.setMapName(decName);
                 return;
             }
-        
+
             // Generate declaration for the map statically
             decName = getMapName();
             ss.append("private static org.apache.jasper.runtime.ProtectedFunctionMapper " + decName + ";\n");
@@ -296,13 +296,13 @@ public class ELFunctionMapper {
         /**
          * Convert a binary class name into a canonical one that can be used
          * when generating Java source code.
-         * 
+         *
          * @param className Binary class name
          * @return          Canonical equivalent
          */
         private String getCanonicalName(String className) throws JasperException {
             Class<?> clazz;
-            
+
             ClassLoader tccl;
             if (Constants.IS_SECURITY_ENABLED) {
                 PrivilegedAction<ClassLoader> pa = new PrivilegedGetTccl();

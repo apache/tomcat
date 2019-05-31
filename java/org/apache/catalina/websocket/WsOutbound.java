@@ -31,9 +31,9 @@ import org.apache.tomcat.util.res.StringManager;
  * that write to the client (or update a buffer that is later written to the
  * client) are synchronized to prevent multiple threads trying to write to the
  * client at the same time.
- * 
+ *
  * @deprecated  Replaced by the JSR356 WebSocket 1.1 implementation and will be
- *              removed in Tomcat 8.0.x.  
+ *              removed in Tomcat 8.0.x.
  */
 @Deprecated
 public class WsOutbound {
@@ -48,7 +48,7 @@ public class WsOutbound {
      * occur such as https://bz.apache.org/bugzilla/show_bug.cgi?id=55524
      */
     private final Object stateLock = new Object();
-    
+
     private UpgradeOutbound upgradeOutbound;
     private StreamInbound streamInbound;
     private ByteBuffer bb;
@@ -92,7 +92,7 @@ public class WsOutbound {
                 if (closed) {
                     throw new IOException(sm.getString("outbound.closed"));
                 }
-        
+
                 if (bb.position() == bb.capacity()) {
                     doFlush(false);
                 }
@@ -134,11 +134,11 @@ public class WsOutbound {
                 if (closed) {
                     throw new IOException(sm.getString("outbound.closed"));
                 }
-        
+
                 if (cb.position() == cb.capacity()) {
                     doFlush(false);
                 }
-        
+
                 if (text == null) {
                     text = Boolean.TRUE;
                 } else if (Boolean.FALSE.equals(text)) {
@@ -176,7 +176,7 @@ public class WsOutbound {
                 if (closed) {
                     throw new IOException(sm.getString("outbound.closed"));
                 }
-        
+
                 if (text != null) {
                     // Empty the buffer
                     flush();
@@ -212,7 +212,7 @@ public class WsOutbound {
                 if (closed) {
                     throw new IOException(sm.getString("outbound.closed"));
                 }
-        
+
                 if (text != null) {
                     // Empty the buffer
                     flush();
@@ -343,14 +343,14 @@ public class WsOutbound {
                 if (closed) {
                     return;
                 }
-        
+
                 // Send any partial data we have
                 try {
                     doFlush(false);
                 } finally {
                     closed = true;
                 }
-        
+
                 upgradeOutbound.write(0x88);
                 if (status == 0) {
                     upgradeOutbound.write(0);
@@ -366,7 +366,7 @@ public class WsOutbound {
                             data.limit() - data.position());
                 }
                 upgradeOutbound.flush();
-        
+
                 bb = null;
                 cb = null;
                 upgradeOutbound = null;
@@ -420,9 +420,9 @@ public class WsOutbound {
                 if (closed) {
                     throw new IOException(sm.getString("outbound.closed"));
                 }
-        
+
                 doFlush(false);
-        
+
                 upgradeOutbound.write(0x80 | opcode);
                 if (data == null) {
                     upgradeOutbound.write(0);
@@ -431,7 +431,7 @@ public class WsOutbound {
                     upgradeOutbound.write(data.array(), data.position(),
                             data.limit() - data.position());
                 }
-        
+
                 upgradeOutbound.flush();
             }
         } catch (IOException ioe) {

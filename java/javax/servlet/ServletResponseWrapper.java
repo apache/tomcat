@@ -25,7 +25,7 @@ import java.util.Locale;
  * can be subclassed by developers wishing to adapt the response from a Servlet.
  * This class implements the Wrapper or Decorator pattern. Methods default to
  * calling through to the wrapped response object.
- * 
+ *
  * @author Various
  * @since v 2.3
  * @see javax.servlet.ServletResponse
@@ -35,7 +35,7 @@ public class ServletResponseWrapper implements ServletResponse {
 
     /**
      * Creates a ServletResponse adaptor wrapping the given response object.
-     * 
+     *
      * @throws java.lang.IllegalArgumentException
      *             if the response is null.
      */
@@ -55,7 +55,7 @@ public class ServletResponseWrapper implements ServletResponse {
 
     /**
      * Sets the response being wrapped.
-     * 
+     *
      * @throws java.lang.IllegalArgumentException
      *             if the response is null.
      */
@@ -69,7 +69,7 @@ public class ServletResponseWrapper implements ServletResponse {
     /**
      * The default behavior of this method is to call
      * setCharacterEncoding(String charset) on the wrapped response object.
-     * 
+     *
      * @since 2.4
      */
     @Override
@@ -125,7 +125,7 @@ public class ServletResponseWrapper implements ServletResponse {
     /**
      * The default behavior of this method is to return getContentType() on the
      * wrapped response object.
-     * 
+     *
      * @since 2.4
      */
     @Override

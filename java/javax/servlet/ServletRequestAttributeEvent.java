@@ -19,7 +19,7 @@ package javax.servlet;
 /**
  * This is the event class for notifications of changes to the attributes of the
  * servlet request in an application.
- * 
+ *
  * @see ServletRequestAttributeListener
  * @since Servlet 2.4
  */
@@ -33,7 +33,7 @@ public class ServletRequestAttributeEvent extends ServletRequestEvent {
      * Construct a ServletRequestAttributeEvent giving the servlet context of
      * this web application, the ServletRequest whose attributes are changing
      * and the name and value of the attribute.
-     * 
+     *
      * @param sc
      *            the ServletContext that is sending the event.
      * @param request
@@ -52,7 +52,7 @@ public class ServletRequestAttributeEvent extends ServletRequestEvent {
 
     /**
      * Return the name of the attribute that changed on the ServletRequest.
-     * 
+     *
      * @return the name of the changed request attribute
      */
     public String getName() {
@@ -64,7 +64,7 @@ public class ServletRequestAttributeEvent extends ServletRequestEvent {
      * replaced. If the attribute was added, this is the value of the attribute.
      * If the attribute was removed, this is the value of the removed attribute.
      * If the attribute was replaced, this is the old value of the attribute.
-     * 
+     *
      * @return the value of the changed request attribute
      */
     public Object getValue() {

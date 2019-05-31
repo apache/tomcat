@@ -74,7 +74,7 @@ public class PooledParallelSender extends PooledSender {
             throw new RuntimeException("Unable to open NIO selector.",x);
         }
     }
-    
+
     @Override
     public synchronized void disconnect() {
         this.connected = false;
@@ -86,5 +86,5 @@ public class PooledParallelSender extends PooledSender {
         this.connected = true;
         super.connect();
     }
-   
+
 }

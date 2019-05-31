@@ -142,7 +142,7 @@ public class StaticMembershipInterceptor extends ChannelInterceptorBase {
         if (this.localMember != null ) return localMember;
         else return super.getLocalMember(incAlive);
     }
-    
+
     /**
      * Send notifications upwards
      * @param svc int
@@ -150,8 +150,8 @@ public class StaticMembershipInterceptor extends ChannelInterceptorBase {
      */
     @Override
     public void start(int svc) throws ChannelException {
-        if ( (Channel.SND_RX_SEQ&svc)==Channel.SND_RX_SEQ ) super.start(Channel.SND_RX_SEQ); 
-        if ( (Channel.SND_TX_SEQ&svc)==Channel.SND_TX_SEQ ) super.start(Channel.SND_TX_SEQ); 
+        if ( (Channel.SND_RX_SEQ&svc)==Channel.SND_RX_SEQ ) super.start(Channel.SND_RX_SEQ);
+        if ( (Channel.SND_TX_SEQ&svc)==Channel.SND_TX_SEQ ) super.start(Channel.SND_TX_SEQ);
         final ChannelInterceptorBase base = this;
         for (final Member member : members) {
             Thread t = new Thread() {

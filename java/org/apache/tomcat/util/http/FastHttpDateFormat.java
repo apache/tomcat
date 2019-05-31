@@ -96,7 +96,7 @@ public final class FastHttpDateFormat {
     /**
      * Parser cache.
      */
-    private static final Map<String, Long> parseCache = 
+    private static final Map<String, Long> parseCache =
             new ConcurrentHashMap<String, Long>(CACHE_SIZE);
 
 

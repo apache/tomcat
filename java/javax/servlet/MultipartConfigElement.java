@@ -23,12 +23,12 @@ import javax.servlet.annotation.MultipartConfig;
  * TODO SERVLET3 - Add comments
  */
 public class MultipartConfigElement {
-    
+
     private final String location;// = "";
     private final long maxFileSize;// = -1;
     private final long maxRequestSize;// = -1;
     private final int fileSizeThreshold;// = 0;
-    
+
     public MultipartConfigElement(String location) {
         // Keep empty string default if location is null
         if (location != null) {
@@ -40,7 +40,7 @@ public class MultipartConfigElement {
         this.maxRequestSize = -1;
         this.fileSizeThreshold = 0;
     }
-    
+
     public MultipartConfigElement(String location, long maxFileSize,
             long maxRequestSize, int fileSizeThreshold) {
         // Keep empty string default if location is null
@@ -59,26 +59,26 @@ public class MultipartConfigElement {
             this.fileSizeThreshold = 0;
         }
     }
-    
+
     public MultipartConfigElement(MultipartConfig annotation) {
         location = annotation.location();
         maxFileSize = annotation.maxFileSize();
         maxRequestSize = annotation.maxRequestSize();
         fileSizeThreshold = annotation.fileSizeThreshold();
     }
-    
+
     public String getLocation() {
         return location;
     }
-    
+
     public long getMaxFileSize() {
         return maxFileSize;
     }
-    
+
     public long getMaxRequestSize() {
         return maxRequestSize;
     }
-    
+
     public int getFileSizeThreshold() {
         return fileSizeThreshold;
     }

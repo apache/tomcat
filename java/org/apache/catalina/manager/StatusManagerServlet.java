@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -196,7 +196,7 @@ public class StatusManagerServlet
         // mode is flag for HTML or XML output
         int mode = 0;
         // if ?XML=true, set the mode to XML
-        if (request.getParameter("XML") != null 
+        if (request.getParameter("XML") != null
             && request.getParameter("XML").equals("true")) {
             mode = 1;
         }
@@ -205,7 +205,7 @@ public class StatusManagerServlet
         PrintWriter writer = response.getWriter();
 
         boolean completeStatus = false;
-        if ((request.getPathInfo() != null) 
+        if ((request.getPathInfo() != null)
             && (request.getPathInfo().equals("/all"))) {
             completeStatus = true;
         }
@@ -341,7 +341,7 @@ public class StatusManagerServlet
                      requestProcessors, mode, args);
             }
 
-            if ((request.getPathInfo() != null) 
+            if ((request.getPathInfo() != null)
                 && (request.getPathInfo().equals("/all"))) {
                 // Note: Retrieving the full status is much slower
                 // use StatusTransformer to output status
@@ -366,7 +366,7 @@ public class StatusManagerServlet
                                    java.lang.Object handback) {
 
         if (notification instanceof MBeanServerNotification) {
-            ObjectName objectName = 
+            ObjectName objectName =
                 ((MBeanServerNotification) notification).getMBeanName();
             if (notification.getType().equals
                 (MBeanServerNotification.REGISTRATION_NOTIFICATION)) {
@@ -398,7 +398,7 @@ public class StatusManagerServlet
                 }
                 String j2eeType = objectName.getKeyProperty("j2eeType");
                 if (j2eeType != null) {
-                    
+
                 }
             }
         }

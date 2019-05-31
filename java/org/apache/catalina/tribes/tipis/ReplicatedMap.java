@@ -31,7 +31,7 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
 /**
- * All-to-all replication for a hash map implementation. Each node in the cluster will carry an identical 
+ * All-to-all replication for a hash map implementation. Each node in the cluster will carry an identical
  * copy of the map.<br><br>
  * This map implementation doesn't have a background thread running to replicate changes.
  * If you do have changes without invoking put/remove then you need to invoke one of the following methods:
@@ -137,7 +137,7 @@ public class ReplicatedMap<K,V> extends AbstractReplicatedMap<K,V> {
         if (backup == null || backup.length == 0) return null;
 
         try {
-            
+
             //publish the data out to all nodes
             MapMessage msg = new MapMessage(getMapContextName(), MapMessage.MSG_COPY, false,
                     (Serializable) key, (Serializable) value, null,channel.getLocalMember(false), backup);

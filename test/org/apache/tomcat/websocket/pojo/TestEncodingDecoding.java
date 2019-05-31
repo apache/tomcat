@@ -168,7 +168,7 @@ public class TestEncodingDecoding extends TomcatBaseTest {
         i = testEvent(MsgByteDecoder.class.getName()+":destroy", i);
     }
 
-    
+
     @Test
     public void testGenericsCoders() throws Exception {
         // Set up utility classes

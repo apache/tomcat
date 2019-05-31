@@ -164,7 +164,7 @@ public final class Constants {
             "BASELINE-CONTROL",
             "MKACTIVITY"
     };
-    
+
     /**
      * Converts an AJP coded HTTP method to the method name.
      * @param code the coded value
@@ -233,7 +233,7 @@ public final class Constants {
             "Status",
             "WWW-Authenticate"
     };
-    
+
     /**
      * Converts an AJP coded response header name to the HTTP response header name.
      * @param code the coded value
@@ -257,7 +257,7 @@ public final class Constants {
         catch (Exception e) {
             // Do nothing
         }
-    }    
+    }
 
     public static final int getResponseAjpIndex(String header)
     {
@@ -268,7 +268,7 @@ public final class Constants {
             return i.intValue();
     }
 
-    
+
     /**
      * CRLF.
      * @deprecated  Unused - will be removed in 8.0.x

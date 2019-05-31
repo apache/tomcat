@@ -37,8 +37,8 @@ public abstract class ChannelInterceptorBase implements ChannelInterceptor {
     public ChannelInterceptorBase() {
 
     }
-    
-    public boolean okToProcess(int messageFlags) { 
+
+    public boolean okToProcess(int messageFlags) {
         if (this.optionFlag == 0 ) return true;
         return ((optionFlag&messageFlags) == optionFlag);
     }
@@ -145,7 +145,7 @@ public abstract class ChannelInterceptorBase implements ChannelInterceptor {
         if ( getNext()!=null ) return getNext().getLocalMember(incAlive);
         else return null;
     }
-    
+
     /**
      * Starts up the channel. This can be called multiple times for individual services to start
      * The svc parameter can be the logical or value of any constants
@@ -178,7 +178,7 @@ public abstract class ChannelInterceptorBase implements ChannelInterceptor {
         if (getNext() != null) getNext().stop(svc);
         channel = null;
     }
-    
+
     @Override
     public void fireInterceptorEvent(InterceptorEvent event) {
         //empty operation

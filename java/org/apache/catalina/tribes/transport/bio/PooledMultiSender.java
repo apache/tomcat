@@ -35,12 +35,12 @@ import org.apache.catalina.tribes.transport.PooledSender;
  * @version 1.0
  */
 public class PooledMultiSender extends PooledSender {
-    
+
 
     public PooledMultiSender() {
         // NO-OP
     }
-    
+
     @Override
     public void sendMessage(Member[] destination, ChannelMessage msg) throws ChannelException {
         MultiPointSender sender = null;

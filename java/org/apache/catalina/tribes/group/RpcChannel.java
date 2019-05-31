@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -38,12 +38,12 @@ import org.apache.juli.logging.LogFactory;
  */
 public class RpcChannel implements ChannelListener {
     private static final Log log = LogFactory.getLog(RpcChannel.class);
-    
+
     public static final int FIRST_REPLY = 1;
     public static final int MAJORITY_REPLY = 2;
     public static final int ALL_REPLY = 3;
     public static final int NO_REPLY = 4;
-    
+
     private Channel channel;
     private RpcCallback callback;
     private byte[] rpcId;
@@ -64,8 +64,8 @@ public class RpcChannel implements ChannelListener {
         this.rpcId = rpcId;
         channel.addChannelListener(this);
     }
-    
-    
+
+
     /**
      * Send a message and wait for the response.
      * @param destination Member[] - the destination for the message, and the members you request a reply from
@@ -76,18 +76,18 @@ public class RpcChannel implements ChannelListener {
      * @return Response[] - an array of response objects.
      * @throws ChannelException
      */
-    public Response[] send(Member[] destination, 
+    public Response[] send(Member[] destination,
                            Serializable message,
-                           int rpcOptions, 
+                           int rpcOptions,
                            int channelOptions,
                            long timeout) throws ChannelException {
-        
+
         if ( destination==null || destination.length == 0 ) return new Response[0];
-        
+
         //avoid dead lock
         int sendOptions =
             channelOptions & ~Channel.SEND_OPTIONS_SYNCHRONIZED_ACK;
-        
+
         RpcCollectorKey key = new RpcCollectorKey(UUIDGenerator.randomUUID(false));
         RpcCollector collector = new RpcCollector(key,rpcOptions,destination.length);
         try {
@@ -104,7 +104,7 @@ public class RpcChannel implements ChannelListener {
         }
         return collector.getResponses();
     }
-    
+
     @Override
     public void messageReceived(Serializable msg, Member sender) {
         RpcMessage rmsg = (RpcMessage)msg;
@@ -118,13 +118,13 @@ public class RpcChannel implements ChannelListener {
                 synchronized (collector) {
                     //make sure it hasn't been removed
                     if ( responseMap.containsKey(key) ) {
-                        if ( (rmsg instanceof RpcMessage.NoRpcChannelReply) ) 
+                        if ( (rmsg instanceof RpcMessage.NoRpcChannelReply) )
                             collector.destcnt--;
-                        else 
+                        else
                             collector.addResponse(rmsg.message, sender);
                         if (collector.isComplete()) collector.notifyAll();
                     } else {
-                        if (! (rmsg instanceof RpcMessage.NoRpcChannelReply) ) 
+                        if (! (rmsg instanceof RpcMessage.NoRpcChannelReply) )
                             callback.leftOver(rmsg.message, sender);
                     }
                 }//synchronized
@@ -171,17 +171,17 @@ public class RpcChannel implements ChannelListener {
             }
         }//end if
     }
-    
+
     public void breakdown() {
         channel.removeChannelListener(this);
     }
-    
+
     @Override
     public void finalize() throws Throwable {
         breakdown();
         super.finalize();
     }
-    
+
     @Override
     public boolean accept(Serializable msg, Member sender) {
         if ( msg instanceof RpcMessage ) {
@@ -189,7 +189,7 @@ public class RpcChannel implements ChannelListener {
             return Arrays.equals(rmsg.rpcId,rpcId);
         } else return false;
     }
-    
+
     public Channel getChannel() {
         return channel;
     }
@@ -221,15 +221,15 @@ public class RpcChannel implements ChannelListener {
     public void setReplyMessageOptions(int replyMessageOptions) {
         this.replyMessageOptions = replyMessageOptions;
     }
-        
+
     /**
-     * 
+     *
      * Class that holds all response.
      * @author not attributable
      * @version 1.0
      */
     public static class RpcCollector {
-        public ArrayList<Response> responses = new ArrayList<Response>(); 
+        public ArrayList<Response> responses = new ArrayList<Response>();
         public RpcCollectorKey key;
         public int options;
         public int destcnt;
@@ -252,7 +252,7 @@ public class RpcChannel implements ChannelListener {
             this.destcnt = destcnt;
             this.timeout = timeout;
         }
-        
+
         public RpcCollector(RpcCollectorKey key, int options, int destcnt) {
             this(key, options, destcnt, 0);
         }
@@ -261,7 +261,7 @@ public class RpcChannel implements ChannelListener {
             Response resp = new Response(sender,message);
             responses.add(resp);
         }
-        
+
         public boolean isComplete() {
             if ( destcnt <= 0 ) return true;
             switch (options) {
@@ -278,12 +278,12 @@ public class RpcChannel implements ChannelListener {
                     return false;
             }
         }
-        
+
         @Override
         public int hashCode() {
             return key.hashCode();
         }
-        
+
         @Override
         public boolean equals(Object o) {
             if ( o instanceof RpcCollector ) {
@@ -291,18 +291,18 @@ public class RpcChannel implements ChannelListener {
                 return r.key.equals(this.key);
             } else return false;
         }
-        
+
         public Response[] getResponses() {
             return responses.toArray(new Response[responses.size()]);
         }
     }
-    
+
     public static class RpcCollectorKey {
         byte[] id;
         public RpcCollectorKey(byte[] id) {
             this.id = id;
         }
-        
+
         @Override
         public int hashCode() {
             return id[0]+id[1]+id[2]+id[3];
@@ -315,9 +315,9 @@ public class RpcChannel implements ChannelListener {
                 return Arrays.equals(id,r.id);
             } else return false;
         }
-        
+
     }
-    
+
     /**
      * @deprecated  Unused - will be removed in Tomcat 8.0.x
      */

@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -31,7 +31,7 @@ import org.apache.tomcat.util.threads.ThreadPoolExecutor;
 
 public class StandardThreadExecutor extends LifecycleMBeanBase
         implements Executor, ResizableExecutor {
-    
+
     // ---------------------------------------------- Properties
     /**
      * Default thread priority
@@ -42,37 +42,37 @@ public class StandardThreadExecutor extends LifecycleMBeanBase
      * Run threads in daemon or non-daemon state
      */
     protected boolean daemon = true;
-    
+
     /**
      * Default name prefix for the thread name
      */
     protected String namePrefix = "tomcat-exec-";
-    
+
     /**
      * max number of threads
      */
     protected int maxThreads = 200;
-    
+
     /**
      * min number of threads
      */
     protected int minSpareThreads = 25;
-    
+
     /**
      * idle time in milliseconds
      */
     protected int maxIdleTime = 60000;
-    
+
     /**
      * The executor we use for this component
      */
     protected ThreadPoolExecutor executor = null;
-    
+
     /**
      * the name of this thread pool
      */
     protected String name;
-    
+
     /**
      * prestart threads?
      */
@@ -82,15 +82,15 @@ public class StandardThreadExecutor extends LifecycleMBeanBase
      * The maximum number of elements that can queue up before we reject them
      */
     protected int maxQueueSize = Integer.MAX_VALUE;
-    
+
     /**
      * After a context is stopped, threads in the pool are renewed. To avoid
      * renewing all threads at the same time, this delay is observed between 2
      * threads being renewed.
      */
-    protected long threadRenewalDelay = 
+    protected long threadRenewalDelay =
         org.apache.tomcat.util.threads.Constants.DEFAULT_THREAD_RENEWAL_DELAY;
-    
+
     private TaskQueue taskqueue = null;
     // ---------------------------------------------- Constructors
     public StandardThreadExecutor() {
@@ -99,13 +99,13 @@ public class StandardThreadExecutor extends LifecycleMBeanBase
 
 
     // ---------------------------------------------- Public Methods
-    
+
     @Override
     protected void initInternal() throws LifecycleException {
         super.initInternal();
     }
 
-    
+
     /**
      * Start the component and implement the requirements
      * of {@link org.apache.catalina.util.LifecycleBase#startInternal()}.
@@ -145,23 +145,23 @@ public class StandardThreadExecutor extends LifecycleMBeanBase
         taskqueue = null;
     }
 
-    
+
     @Override
     protected void destroyInternal() throws LifecycleException {
         super.destroyInternal();
     }
 
-    
+
     @Override
     public void execute(Runnable command, long timeout, TimeUnit unit) {
         if ( executor != null ) {
             executor.execute(command,timeout,unit);
-        } else { 
+        } else {
             throw new IllegalStateException("StandardThreadExecutor not started.");
         }
     }
-    
-    
+
+
     @Override
     public void execute(Runnable command) {
         if ( executor != null ) {
@@ -173,7 +173,7 @@ public class StandardThreadExecutor extends LifecycleMBeanBase
             }
         } else throw new IllegalStateException("StandardThreadPool not started.");
     }
-    
+
     public void contextStopping() {
         if (executor != null) {
             executor.contextStopping();
@@ -255,15 +255,15 @@ public class StandardThreadExecutor extends LifecycleMBeanBase
     public void setName(String name) {
         this.name = name;
     }
-    
+
     public void setMaxQueueSize(int size) {
         this.maxQueueSize = size;
     }
-    
+
     public int getMaxQueueSize() {
         return maxQueueSize;
     }
-    
+
     public long getThreadRenewalDelay() {
         return threadRenewalDelay;
     }
@@ -318,7 +318,7 @@ public class StandardThreadExecutor extends LifecycleMBeanBase
     public boolean resizeQueue(int capacity) {
         return false;
     }
-    
+
 
     @Override
     protected String getDomainInternal() {

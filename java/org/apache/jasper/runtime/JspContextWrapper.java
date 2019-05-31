@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -50,12 +50,12 @@ import org.apache.jasper.compiler.Localizer;
 
 /**
  * Implementation of a JSP Context Wrapper.
- * 
+ *
  * The JSP Context Wrapper is a JspContext created and maintained by a tag
  * handler implementation. It wraps the Invoking JSP Context, that is, the
  * JspContext instance passed to the tag handler by the invoking page via
  * setJspContext().
- * 
+ *
  * @author Kin-man Chung
  * @author Jan Luehe
  * @author Jacob Hookom
@@ -398,7 +398,7 @@ public class JspContextWrapper extends PageContext implements VariableResolver {
     /**
      * Copies the variables of the given scope from the virtual page scope of
      * this JSP context wrapper to the page scope of the invoking JSP context.
-     * 
+     *
      * @param scope
      *            variable scope (one of NESTED, AT_BEGIN, or AT_END)
      */
@@ -475,7 +475,7 @@ public class JspContextWrapper extends PageContext implements VariableResolver {
     /**
      * Checks to see if the given variable name is used as an alias, and if so,
      * returns the variable name for which it is used as an alias.
-     * 
+     *
      * @param varName
      *            The variable name to check
      * @return The variable name for which varName is used as an alias, or

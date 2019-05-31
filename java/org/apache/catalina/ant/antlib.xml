@@ -31,7 +31,7 @@
         classname="org.apache.catalina.ant.ReloadTask" />
   <typedef
         name="stop"
-        classname="org.apache.catalina.ant.StopTask" />        
+        classname="org.apache.catalina.ant.StopTask" />
   <typedef
         name="undeploy"
         classname="org.apache.catalina.ant.UndeployTask" />
@@ -43,7 +43,7 @@
         classname="org.apache.catalina.ant.SessionsTask" />
   <typedef
         name="findleaks"
-        classname="org.apache.catalina.ant.FindLeaksTask" />  
+        classname="org.apache.catalina.ant.FindLeaksTask" />
   <typedef
         name="vminfo"
         classname="org.apache.catalina.ant.VminfoTask" />

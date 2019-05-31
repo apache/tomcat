@@ -47,7 +47,7 @@ public class TestRealmBase {
     private static final String ROLE2 = "role2";
     private static final String ROLE3 = "role3";
     private static final String ROLE99 = "role99";
-    
+
     // All digested passwords are the digested form of "password"
     private static final String PWD_MD5 = "5f4dcc3b5aa765d61d8327deb882cf99";
     private static final String PWD_SHA = "5baa61e4c9b93f3f0682250b6cf8331b7ee68fd8";

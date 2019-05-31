@@ -242,7 +242,7 @@ public class McastService implements MembershipService,MembershipListener,Messag
     public void setRecoveryCounter(int recoveryCounter) {
         properties.setProperty("recoveryCounter", String.valueOf(recoveryCounter));
     }
-    
+
     public int getRecoveryCounter(){
         String p = properties.getProperty("recoveryCounter");
         if(p != null){
@@ -254,7 +254,7 @@ public class McastService implements MembershipService,MembershipListener,Messag
     public void setRecoveryEnabled(boolean recoveryEnabled) {
         properties.setProperty("recoveryEnabled", String.valueOf(recoveryEnabled));
     }
-    
+
     public boolean getRecoveryEnabled() {
         String p = properties.getProperty("recoveryEnabled");
         if(p != null){
@@ -266,7 +266,7 @@ public class McastService implements MembershipService,MembershipListener,Messag
     public void setRecoverySleepTime(long recoverySleepTime) {
         properties.setProperty("recoverySleepTime", String.valueOf(recoverySleepTime));
     }
-    
+
     public long getRecoverySleepTime(){
         String p = properties.getProperty("recoverySleepTime");
         if(p != null){
@@ -278,7 +278,7 @@ public class McastService implements MembershipService,MembershipListener,Messag
     public void setLocalLoopbackDisabled(boolean localLoopbackDisabled) {
         properties.setProperty("localLoopbackDisabled",String.valueOf(localLoopbackDisabled));
     }
-    
+
     public boolean getLocalLoopbackDisabled(boolean localLoopbackDisabled) {
         String p = properties.getProperty("localLoopbackDisabled");
         if(p != null){
@@ -528,11 +528,11 @@ public class McastService implements MembershipService,MembershipListener,Messag
     public void setMembershipListener(MembershipListener listener) {
         this.listener = listener;
     }
-    
+
     public void setMessageListener(MessageListener listener) {
         this.msglistener = listener;
     }
-    
+
     public void removeMessageListener() {
         this.msglistener = null;
     }
@@ -558,12 +558,12 @@ public class McastService implements MembershipService,MembershipListener,Messag
     {
         if ( listener!=null ) listener.memberDisappeared(member);
     }
-    
+
     @Override
     public void messageReceived(ChannelMessage msg) {
-        if (msglistener!=null && msglistener.accept(msg)) msglistener.messageReceived(msg); 
+        if (msglistener!=null && msglistener.accept(msg)) msglistener.messageReceived(msg);
     }
-    
+
     @Override
     public boolean accept(ChannelMessage msg) {
         return true;
@@ -572,7 +572,7 @@ public class McastService implements MembershipService,MembershipListener,Messag
     public void broadcast(ChannelMessage message) throws ChannelException {
         if (impl==null || (impl.startLevel & Channel.MBR_TX_SEQ)!=Channel.MBR_TX_SEQ )
             throw new ChannelException("Multicast send is not started or enabled.");
-        
+
         byte[] data = XByteBuffer.createDataPackage((ChannelData)message);
         if (data.length>McastServiceImpl.MAX_PACKET_SIZE) {
             throw new ChannelException("Packet length["+data.length+"] exceeds max packet size of "+McastServiceImpl.MAX_PACKET_SIZE+" bytes.");

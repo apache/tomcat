@@ -27,7 +27,7 @@ import org.apache.tomcat.util.buf.HexUtils;
 
 /**
  * Chunked output filter.
- * 
+ *
  * @author Remy Maucherat
  */
 public class ChunkedOutputFilter implements OutputFilter {
@@ -44,7 +44,7 @@ public class ChunkedOutputFilter implements OutputFilter {
 
 
     static {
-        byte[] END_CHUNK_BYTES = {(byte) '0', (byte) '\r', (byte) '\n', 
+        byte[] END_CHUNK_BYTES = {(byte) '0', (byte) '\r', (byte) '\n',
                                   (byte) '\r', (byte) '\n'};
         END_CHUNK.setBytes(END_CHUNK_BYTES, 0, END_CHUNK_BYTES.length);
     }
@@ -92,7 +92,7 @@ public class ChunkedOutputFilter implements OutputFilter {
 
     /**
      * Write some bytes.
-     * 
+     *
      * @return number of bytes written by the filter
      */
     @Override
@@ -136,7 +136,7 @@ public class ChunkedOutputFilter implements OutputFilter {
 
 
     /**
-     * Some filters need additional parameters from the response. All the 
+     * Some filters need additional parameters from the response. All the
      * necessary reading can occur in that method, as this method is called
      * after the response header processing is complete.
      */
@@ -165,7 +165,7 @@ public class ChunkedOutputFilter implements OutputFilter {
 
         // Write end chunk
         buffer.doWrite(END_CHUNK, null);
-        
+
         return 0;
 
     }

@@ -35,9 +35,9 @@ import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
  * on streams. Applications should extend this class to provide application
  * specific functionality. Applications that wish to operate on a message basis
  * rather than a stream basis should use {@link MessageInbound}.
- * 
+ *
  * @deprecated  Replaced by the JSR356 WebSocket 1.1 implementation and will be
- *              removed in Tomcat 8.0.x.  
+ *              removed in Tomcat 8.0.x.
  */
 @Deprecated
 public abstract class StreamInbound implements UpgradeInbound {
@@ -214,7 +214,7 @@ public abstract class StreamInbound implements UpgradeInbound {
     /**
      * Package private so the outbound connection can signal that the connection
      * has been closed - usually due to an error.
-     *  
+     *
      * @param status    The WebSocket status code to report to the application
      */
     void doOnClose(int status) {
@@ -240,7 +240,7 @@ public abstract class StreamInbound implements UpgradeInbound {
             t.setContextClassLoader(cl);
         }
     }
-    
+
     @Override
     public final void onUpgradeComplete() {
         // Need to call onOpen using the web application's class loader

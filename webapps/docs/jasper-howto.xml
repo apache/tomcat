@@ -390,16 +390,16 @@ The first of these extension points is the tag plug-in mechanism. This allows
 alternative implementations of tag handlers to be provided for a web application
 to use. Tag plug-ins are registered via a <code>tagPlugins.xml</code> file
 located under <code>WEB-INF</code>. A sample plug-in for the JSTL is included
-with Jasper. 
+with Jasper.
 </p>
 
 <p>
 The second extension point is the Expression Language interpreter. Alternative
 interpreters may be configured through the <code>ServletContext</code>. See the
 <code>ELInterpreterFactory</code> javadoc for details of how to configure an
-alternative EL interpreter. 
+alternative EL interpreter.
 </p>
-</section> 
+</section>
 
 </body>
 

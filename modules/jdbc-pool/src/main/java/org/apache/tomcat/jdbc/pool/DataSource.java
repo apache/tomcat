@@ -98,7 +98,7 @@ public class DataSource extends DataSourceProxy implements javax.sql.DataSource,
     @Override
     public ObjectName preRegister(MBeanServer server, ObjectName name) throws Exception {
         try {
-            if ( isJmxEnabled() ) { 
+            if ( isJmxEnabled() ) {
                 this.oname = createObjectName(name);
                 if (oname!=null) registerJmx();
             }

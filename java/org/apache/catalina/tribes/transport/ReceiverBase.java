@@ -86,7 +86,7 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
     private boolean useBufferPool = true;
     private boolean daemon = true;
     private long maxIdleTime = 60000;
-    
+
     private ExecutorService executor;
     private Channel channel;
 
@@ -617,6 +617,6 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
 
     public void setMaxIdleTime(long maxIdleTime) {
         this.maxIdleTime = maxIdleTime;
-    }    
-    
+    }
+
 }

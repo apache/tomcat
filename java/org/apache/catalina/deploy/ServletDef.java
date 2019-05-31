@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -83,7 +83,7 @@ public class ServletDef implements Serializable {
     public void setSmallIcon(String smallIcon) {
         this.smallIcon = smallIcon;
     }
-    
+
     /**
      * The large icon associated with this servlet.
      */
@@ -234,54 +234,54 @@ public class ServletDef implements Serializable {
         securityRoleRefs.add(srr);
     }
 
-    
+
     /**
      * The multipart configuration, if any, for this servlet
      */
     private MultipartDef multipartDef = null;
-    
+
     public MultipartDef getMultipartDef() {
         return this.multipartDef;
     }
-    
+
     public void setMultipartDef(MultipartDef multipartDef) {
         this.multipartDef = multipartDef;
     }
-    
-    
+
+
     /**
      * Does this servlet support async.
      */
     private Boolean asyncSupported = null;
-    
+
     public Boolean getAsyncSupported() {
         return this.asyncSupported;
     }
-    
+
     public void setAsyncSupported(String asyncSupported) {
         this.asyncSupported = Boolean.valueOf(asyncSupported);
     }
 
-    
+
     /**
      * Is this servlet enabled.
      */
     private Boolean enabled = null;
-    
+
     public Boolean getEnabled() {
         return this.enabled;
     }
-    
+
     public void setEnabled(String enabled) {
         this.enabled = Boolean.valueOf(enabled);
     }
 
-    
+
     /**
      * Can this ServletDef be overridden by an SCI?
      */
     private boolean overridable = false;
-    
+
     public boolean isOverridable() {
         return overridable;
     }

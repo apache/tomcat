@@ -5,15 +5,15 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */ 
+ */
 
 
 package org.apache.naming.resources;
@@ -78,7 +78,7 @@ public class ProxyDirContext implements DirContext {
             BaseDirContext baseDirContext = (BaseDirContext) dirContext;
             if (baseDirContext.isCached()) {
                 try {
-                    cache = (ResourceCache) 
+                    cache = (ResourceCache)
                         Class.forName(cacheClassName).newInstance();
                 } catch (Exception e) {
                     throw new IllegalArgumentException(sm.getString(
@@ -160,7 +160,7 @@ public class ProxyDirContext implements DirContext {
     /**
      * Cache class.
      */
-    protected String cacheClassName = 
+    protected String cacheClassName =
         "org.apache.naming.resources.ResourceCache";
 
 
@@ -250,11 +250,11 @@ public class ProxyDirContext implements DirContext {
 
 
     /**
-     * Retrieves the named object. If name is empty, returns a new instance 
-     * of this context (which represents the same naming context as this 
-     * context, but its environment may be modified independently and it may 
+     * Retrieves the named object. If name is empty, returns a new instance
+     * of this context (which represents the same naming context as this
+     * context, but its environment may be modified independently and it may
      * be accessed concurrently).
-     * 
+     *
      * @param name the name of the object to look up
      * @return the object bound to name
      * @exception NamingException if a naming exception is encountered
@@ -284,7 +284,7 @@ public class ProxyDirContext implements DirContext {
 
     /**
      * Retrieves the named object.
-     * 
+     *
      * @param name the name of the object to look up
      * @return the object bound to name
      * @exception NamingException if a naming exception is encountered
@@ -318,10 +318,10 @@ public class ProxyDirContext implements DirContext {
 
 
     /**
-     * Binds a name to an object. All intermediate contexts and the target 
-     * context (that named by all but terminal atomic component of the name) 
+     * Binds a name to an object. All intermediate contexts and the target
+     * context (that named by all but terminal atomic component of the name)
      * must already exist.
-     * 
+     *
      * @param name the name to bind; may not be empty
      * @param obj the object to bind; possibly null
      * @exception javax.naming.NameAlreadyBoundException if name is already
@@ -340,7 +340,7 @@ public class ProxyDirContext implements DirContext {
 
     /**
      * Binds a name to an object.
-     * 
+     *
      * @param name the name to bind; may not be empty
      * @param obj the object to bind; possibly null
      * @exception javax.naming.NameAlreadyBoundException if name is already
@@ -358,14 +358,14 @@ public class ProxyDirContext implements DirContext {
 
 
     /**
-     * Binds a name to an object, overwriting any existing binding. All 
-     * intermediate contexts and the target context (that named by all but 
+     * Binds a name to an object, overwriting any existing binding. All
+     * intermediate contexts and the target context (that named by all but
      * terminal atomic component of the name) must already exist.
      * <p>
-     * If the object is a DirContext, any existing attributes associated with 
-     * the name are replaced with those of the object. Otherwise, any 
+     * If the object is a DirContext, any existing attributes associated with
+     * the name are replaced with those of the object. Otherwise, any
      * existing attributes associated with the name remain unchanged.
-     * 
+     *
      * @param name the name to bind; may not be empty
      * @param obj the object to bind; possibly null
      * @exception javax.naming.directory.InvalidAttributesException if object
@@ -382,7 +382,7 @@ public class ProxyDirContext implements DirContext {
 
     /**
      * Binds a name to an object, overwriting any existing binding.
-     * 
+     *
      * @param name the name to bind; may not be empty
      * @param obj the object to bind; possibly null
      * @exception javax.naming.directory.InvalidAttributesException if object
@@ -398,16 +398,16 @@ public class ProxyDirContext implements DirContext {
 
 
     /**
-     * Unbinds the named object. Removes the terminal atomic name in name 
-     * from the target context--that named by all but the terminal atomic 
+     * Unbinds the named object. Removes the terminal atomic name in name
+     * from the target context--that named by all but the terminal atomic
      * part of name.
      * <p>
-     * This method is idempotent. It succeeds even if the terminal atomic 
-     * name is not bound in the target context, but throws 
-     * NameNotFoundException if any of the intermediate contexts do not exist. 
-     * 
+     * This method is idempotent. It succeeds even if the terminal atomic
+     * name is not bound in the target context, but throws
+     * NameNotFoundException if any of the intermediate contexts do not exist.
+     *
      * @param name the name to bind; may not be empty
-     * @exception NameNotFoundException if an intermediate context does not 
+     * @exception NameNotFoundException if an intermediate context does not
      * exist
      * @exception NamingException if a naming exception is encountered
      */
@@ -421,9 +421,9 @@ public class ProxyDirContext implements DirContext {
 
     /**
      * Unbinds the named object.
-     * 
+     *
      * @param name the name to bind; may not be empty
-     * @exception NameNotFoundException if an intermediate context does not 
+     * @exception NameNotFoundException if an intermediate context does not
      * exist
      * @exception NamingException if a naming exception is encountered
      */
@@ -436,11 +436,11 @@ public class ProxyDirContext implements DirContext {
 
 
     /**
-     * Binds a new name to the object bound to an old name, and unbinds the 
-     * old name. Both names are relative to this context. Any attributes 
-     * associated with the old name become associated with the new name. 
+     * Binds a new name to the object bound to an old name, and unbinds the
+     * old name. Both names are relative to this context. Any attributes
+     * associated with the old name become associated with the new name.
      * Intermediate contexts of the old name are not changed.
-     * 
+     *
      * @param oldName the name of the existing binding; may not be empty
      * @param newName the name of the new binding; may not be empty
      * @exception javax.naming.NameAlreadyBoundException if name is already
@@ -456,9 +456,9 @@ public class ProxyDirContext implements DirContext {
 
 
     /**
-     * Binds a new name to the object bound to an old name, and unbinds the 
+     * Binds a new name to the object bound to an old name, and unbinds the
      * old name.
-     * 
+     *
      * @param oldName the name of the existing binding; may not be empty
      * @param newName the name of the new binding; may not be empty
      * @exception javax.naming.NameAlreadyBoundException if name is already
@@ -474,15 +474,15 @@ public class ProxyDirContext implements DirContext {
 
 
     /**
-     * Enumerates the names bound in the named context, along with the class 
-     * names of objects bound to them. The contents of any subcontexts are 
+     * Enumerates the names bound in the named context, along with the class
+     * names of objects bound to them. The contents of any subcontexts are
      * not included.
      * <p>
-     * If a binding is added to or removed from this context, its effect on 
+     * If a binding is added to or removed from this context, its effect on
      * an enumeration previously returned is undefined.
-     * 
+     *
      * @param name the name of the context to list
-     * @return an enumeration of the names and class names of the bindings in 
+     * @return an enumeration of the names and class names of the bindings in
      * this context. Each element of the enumeration is of type NameClassPair.
      * @exception NamingException if a naming exception is encountered
      */
@@ -494,11 +494,11 @@ public class ProxyDirContext implements DirContext {
 
 
     /**
-     * Enumerates the names bound in the named context, along with the class 
+     * Enumerates the names bound in the named context, along with the class
      * names of objects bound to them.
-     * 
+     *
      * @param name the name of the context to list
-     * @return an enumeration of the names and class names of the bindings in 
+     * @return an enumeration of the names and class names of the bindings in
      * this context. Each element of the enumeration is of type NameClassPair.
      * @exception NamingException if a naming exception is encountered
      */
@@ -510,15 +510,15 @@ public class ProxyDirContext implements DirContext {
 
 
     /**
-     * Enumerates the names bound in the named context, along with the 
-     * objects bound to them. The contents of any subcontexts are not 
+     * Enumerates the names bound in the named context, along with the
+     * objects bound to them. The contents of any subcontexts are not
      * included.
      * <p>
-     * If a binding is added to or removed from this context, its effect on 
+     * If a binding is added to or removed from this context, its effect on
      * an enumeration previously returned is undefined.
-     * 
+     *
      * @param name the name of the context to list
-     * @return an enumeration of the bindings in this context. 
+     * @return an enumeration of the bindings in this context.
      * Each element of the enumeration is of type Binding.
      * @exception NamingException if a naming exception is encountered
      */
@@ -530,11 +530,11 @@ public class ProxyDirContext implements DirContext {
 
 
     /**
-     * Enumerates the names bound in the named context, along with the 
+     * Enumerates the names bound in the named context, along with the
      * objects bound to them.
-     * 
+     *
      * @param name the name of the context to list
-     * @return an enumeration of the bindings in this context. 
+     * @return an enumeration of the bindings in this context.
      * Each element of the enumeration is of type Binding.
      * @exception NamingException if a naming exception is encountered
      */
@@ -546,26 +546,26 @@ public class ProxyDirContext implements DirContext {
 
 
     /**
-     * Destroys the named context and removes it from the namespace. Any 
-     * attributes associated with the name are also removed. Intermediate 
+     * Destroys the named context and removes it from the namespace. Any
+     * attributes associated with the name are also removed. Intermediate
      * contexts are not destroyed.
      * <p>
-     * This method is idempotent. It succeeds even if the terminal atomic 
-     * name is not bound in the target context, but throws 
-     * NameNotFoundException if any of the intermediate contexts do not exist. 
-     * 
-     * In a federated naming system, a context from one naming system may be 
-     * bound to a name in another. One can subsequently look up and perform 
-     * operations on the foreign context using a composite name. However, an 
-     * attempt destroy the context using this composite name will fail with 
-     * NotContextException, because the foreign context is not a "subcontext" 
-     * of the context in which it is bound. Instead, use unbind() to remove 
-     * the binding of the foreign context. Destroying the foreign context 
-     * requires that the destroySubcontext() be performed on a context from 
+     * This method is idempotent. It succeeds even if the terminal atomic
+     * name is not bound in the target context, but throws
+     * NameNotFoundException if any of the intermediate contexts do not exist.
+     *
+     * In a federated naming system, a context from one naming system may be
+     * bound to a name in another. One can subsequently look up and perform
+     * operations on the foreign context using a composite name. However, an
+     * attempt destroy the context using this composite name will fail with
+     * NotContextException, because the foreign context is not a "subcontext"
+     * of the context in which it is bound. Instead, use unbind() to remove
+     * the binding of the foreign context. Destroying the foreign context
+     * requires that the destroySubcontext() be performed on a context from
      * the foreign context's "native" naming system.
-     * 
+     *
      * @param name the name of the context to be destroyed; may not be empty
-     * @exception NameNotFoundException if an intermediate context does not 
+     * @exception NameNotFoundException if an intermediate context does not
      * exist
      * @exception javax.naming.NotContextException if the name is bound but does
      * not name a context, or does not name a context of the appropriate type
@@ -580,9 +580,9 @@ public class ProxyDirContext implements DirContext {
 
     /**
      * Destroys the named context and removes it from the namespace.
-     * 
+     *
      * @param name the name of the context to be destroyed; may not be empty
-     * @exception NameNotFoundException if an intermediate context does not 
+     * @exception NameNotFoundException if an intermediate context does not
      * exist
      * @exception javax.naming.NotContextException if the name is bound but does
      * not name a context, or does not name a context of the appropriate type
@@ -596,11 +596,11 @@ public class ProxyDirContext implements DirContext {
 
 
     /**
-     * Creates and binds a new context. Creates a new context with the given 
-     * name and binds it in the target context (that named by all but 
-     * terminal atomic component of the name). All intermediate contexts and 
+     * Creates and binds a new context. Creates a new context with the given
+     * name and binds it in the target context (that named by all but
+     * terminal atomic component of the name). All intermediate contexts and
      * the target context must already exist.
-     * 
+     *
      * @param name the name of the context to create; may not be empty
      * @return the newly created context
      * @exception javax.naming.NameAlreadyBoundException if name is already
@@ -620,7 +620,7 @@ public class ProxyDirContext implements DirContext {
 
     /**
      * Creates and binds a new context.
-     * 
+     *
      * @param name the name of the context to create; may not be empty
      * @return the newly created context
      * @exception javax.naming.NameAlreadyBoundException if name is already
@@ -639,12 +639,12 @@ public class ProxyDirContext implements DirContext {
 
 
     /**
-     * Retrieves the named object, following links except for the terminal 
-     * atomic component of the name. If the object bound to name is not a 
+     * Retrieves the named object, following links except for the terminal
+     * atomic component of the name. If the object bound to name is not a
      * link, returns the object itself.
-     * 
+     *
      * @param name the name of the object to look up
-     * @return the object bound to name, not following the terminal link 
+     * @return the object bound to name, not following the terminal link
      * (if any).
      * @exception NamingException if a naming exception is encountered
      */
@@ -656,11 +656,11 @@ public class ProxyDirContext implements DirContext {
 
 
     /**
-     * Retrieves the named object, following links except for the terminal 
+     * Retrieves the named object, following links except for the terminal
      * atomic component of the name.
-     * 
+     *
      * @param name the name of the object to look up
-     * @return the object bound to name, not following the terminal link 
+     * @return the object bound to name, not following the terminal link
      * (if any).
      * @exception NamingException if a naming exception is encountered
      */
@@ -672,16 +672,16 @@ public class ProxyDirContext implements DirContext {
 
 
     /**
-     * Retrieves the parser associated with the named context. In a 
-     * federation of namespaces, different naming systems will parse names 
-     * differently. This method allows an application to get a parser for 
-     * parsing names into their atomic components using the naming convention 
-     * of a particular naming system. Within any single naming system, 
-     * NameParser objects returned by this method must be equal (using the 
+     * Retrieves the parser associated with the named context. In a
+     * federation of namespaces, different naming systems will parse names
+     * differently. This method allows an application to get a parser for
+     * parsing names into their atomic components using the naming convention
+     * of a particular naming system. Within any single naming system,
+     * NameParser objects returned by this method must be equal (using the
      * equals() test).
-     * 
+     *
      * @param name the name of the context from which to get the parser
-     * @return a name parser that can parse compound names into their atomic 
+     * @return a name parser that can parse compound names into their atomic
      * components
      * @exception NamingException if a naming exception is encountered
      */
@@ -694,9 +694,9 @@ public class ProxyDirContext implements DirContext {
 
     /**
      * Retrieves the parser associated with the named context.
-     * 
+     *
      * @param name the name of the context from which to get the parser
-     * @return a name parser that can parse compound names into their atomic 
+     * @return a name parser that can parse compound names into their atomic
      * components
      * @exception NamingException if a naming exception is encountered
      */
@@ -710,13 +710,13 @@ public class ProxyDirContext implements DirContext {
     /**
      * Composes the name of this context with a name relative to this context.
      * <p>
-     * Given a name (name) relative to this context, and the name (prefix) 
-     * of this context relative to one of its ancestors, this method returns 
-     * the composition of the two names using the syntax appropriate for the 
-     * naming system(s) involved. That is, if name names an object relative 
-     * to this context, the result is the name of the same object, but 
+     * Given a name (name) relative to this context, and the name (prefix)
+     * of this context relative to one of its ancestors, this method returns
+     * the composition of the two names using the syntax appropriate for the
+     * naming system(s) involved. That is, if name names an object relative
+     * to this context, the result is the name of the same object, but
      * relative to the ancestor context. None of the names may be null.
-     * 
+     *
      * @param name a name relative to this context
      * @param prefix the name of this context relative to one of its ancestors
      * @return the composition of prefix and name
@@ -732,7 +732,7 @@ public class ProxyDirContext implements DirContext {
 
     /**
      * Composes the name of this context with a name relative to this context.
-     * 
+     *
      * @param name a name relative to this context
      * @param prefix the name of this context relative to one of its ancestors
      * @return the composition of prefix and name
@@ -746,10 +746,10 @@ public class ProxyDirContext implements DirContext {
 
 
     /**
-     * Adds a new environment property to the environment of this context. If 
+     * Adds a new environment property to the environment of this context. If
      * the property already exists, its value is overwritten.
-     * 
-     * @param propName the name of the environment property to add; may not 
+     *
+     * @param propName the name of the environment property to add; may not
      * be null
      * @param propVal the value of the property to add; may not be null
      * @exception NamingException if a naming exception is encountered
@@ -762,9 +762,9 @@ public class ProxyDirContext implements DirContext {
 
 
     /**
-     * Removes an environment property from the environment of this context. 
-     * 
-     * @param propName the name of the environment property to remove; 
+     * Removes an environment property from the environment of this context.
+     *
+     * @param propName the name of the environment property to remove;
      * may not be null
      * @exception NamingException if a naming exception is encountered
      */
@@ -776,12 +776,12 @@ public class ProxyDirContext implements DirContext {
 
 
     /**
-     * Retrieves the environment in effect for this context. See class 
-     * description for more details on environment properties. 
-     * The caller should not make any changes to the object returned: their 
-     * effect on the context is undefined. The environment of this context 
+     * Retrieves the environment in effect for this context. See class
+     * description for more details on environment properties.
+     * The caller should not make any changes to the object returned: their
+     * effect on the context is undefined. The environment of this context
      * may be changed using addToEnvironment() and removeFromEnvironment().
-     * 
+     *
      * @return the environment of this context; never null
      * @exception NamingException if a naming exception is encountered
      */
@@ -793,13 +793,13 @@ public class ProxyDirContext implements DirContext {
 
 
     /**
-     * Closes this context. This method releases this context's resources 
-     * immediately, instead of waiting for them to be released automatically 
+     * Closes this context. This method releases this context's resources
+     * immediately, instead of waiting for them to be released automatically
      * by the garbage collector.
-     * This method is idempotent: invoking it on a context that has already 
-     * been closed has no effect. Invoking any other method on a closed 
+     * This method is idempotent: invoking it on a context that has already
+     * been closed has no effect. Invoking any other method on a closed
      * context is not allowed, and results in undefined behaviour.
-     * 
+     *
      * @exception NamingException if a naming exception is encountered
      */
     @Override
@@ -812,15 +812,15 @@ public class ProxyDirContext implements DirContext {
     /**
      * Retrieves the full name of this context within its own namespace.
      * <p>
-     * Many naming services have a notion of a "full name" for objects in 
-     * their respective namespaces. For example, an LDAP entry has a 
-     * distinguished name, and a DNS record has a fully qualified name. This 
-     * method allows the client application to retrieve this name. The string 
-     * returned by this method is not a JNDI composite name and should not be 
-     * passed directly to context methods. In naming systems for which the 
-     * notion of full name does not make sense, 
+     * Many naming services have a notion of a "full name" for objects in
+     * their respective namespaces. For example, an LDAP entry has a
+     * distinguished name, and a DNS record has a fully qualified name. This
+     * method allows the client application to retrieve this name. The string
+     * returned by this method is not a JNDI composite name and should not be
+     * passed directly to context methods. In naming systems for which the
+     * notion of full name does not make sense,
      * OperationNotSupportedException is thrown.
-     * 
+     *
      * @return this context's name in its own namespace; never null
      * @exception javax.naming.OperationNotSupportedException if the naming
      * system does not have the notion of a full name
@@ -837,9 +837,9 @@ public class ProxyDirContext implements DirContext {
 
 
     /**
-     * Retrieves all of the attributes associated with a named object. 
-     * 
-     * @return the set of attributes associated with name. 
+     * Retrieves all of the attributes associated with a named object.
+     *
+     * @return the set of attributes associated with name.
      * Returns an empty attribute set if name has no attributes; never null.
      * @param name the name of the object from which to retrieve attributes
      * @exception NamingException if a naming exception is encountered
@@ -864,7 +864,7 @@ public class ProxyDirContext implements DirContext {
 
     /**
      * Retrieves all of the attributes associated with a named object.
-     * 
+     *
      * @return the set of attributes associated with name
      * @param name the name of the object from which to retrieve attributes
      * @exception NamingException if a naming exception is encountered
@@ -888,21 +888,21 @@ public class ProxyDirContext implements DirContext {
 
 
     /**
-     * Retrieves selected attributes associated with a named object. 
-     * See the class description regarding attribute models, attribute type 
+     * Retrieves selected attributes associated with a named object.
+     * See the class description regarding attribute models, attribute type
      * names, and operational attributes.
-     * 
+     *
      * @return the requested attributes; never null
      * @param name the name of the object from which to retrieve attributes
-     * @param attrIds the identifiers of the attributes to retrieve. null 
-     * indicates that all attributes should be retrieved; an empty array 
+     * @param attrIds the identifiers of the attributes to retrieve. null
+     * indicates that all attributes should be retrieved; an empty array
      * indicates that none should be retrieved
      * @exception NamingException if a naming exception is encountered
      */
     @Override
     public Attributes getAttributes(Name name, String[] attrIds)
         throws NamingException {
-        Attributes attributes = 
+        Attributes attributes =
             dirContext.getAttributes(parseName(name), attrIds);
         if (!(attributes instanceof ResourceAttributes)) {
             attributes = new ResourceAttributes(attributes);
@@ -913,18 +913,18 @@ public class ProxyDirContext implements DirContext {
 
     /**
      * Retrieves selected attributes associated with a named object.
-     * 
+     *
      * @return the requested attributes; never null
      * @param name the name of the object from which to retrieve attributes
-     * @param attrIds the identifiers of the attributes to retrieve. null 
-     * indicates that all attributes should be retrieved; an empty array 
+     * @param attrIds the identifiers of the attributes to retrieve. null
+     * indicates that all attributes should be retrieved; an empty array
      * indicates that none should be retrieved
      * @exception NamingException if a naming exception is encountered
      */
      @Override
     public Attributes getAttributes(String name, String[] attrIds)
          throws NamingException {
-        Attributes attributes = 
+        Attributes attributes =
             dirContext.getAttributes(parseName(name), attrIds);
         if (!(attributes instanceof ResourceAttributes)) {
             attributes = new ResourceAttributes(attributes);
@@ -934,14 +934,14 @@ public class ProxyDirContext implements DirContext {
 
 
     /**
-     * Modifies the attributes associated with a named object. The order of 
-     * the modifications is not specified. Where possible, the modifications 
+     * Modifies the attributes associated with a named object. The order of
+     * the modifications is not specified. Where possible, the modifications
      * are performed atomically.
-     * 
+     *
      * @param name the name of the object whose attributes will be updated
-     * @param mod_op the modification operation, one of: ADD_ATTRIBUTE, 
+     * @param mod_op the modification operation, one of: ADD_ATTRIBUTE,
      * REPLACE_ATTRIBUTE, REMOVE_ATTRIBUTE
-     * @param attrs the attributes to be used for the modification; may not 
+     * @param attrs the attributes to be used for the modification; may not
      * be null
      * @exception javax.naming.directory.AttributeModificationException if the
      * modification cannot be completed successfully
@@ -957,11 +957,11 @@ public class ProxyDirContext implements DirContext {
 
     /**
      * Modifies the attributes associated with a named object.
-     * 
+     *
      * @param name the name of the object whose attributes will be updated
-     * @param mod_op the modification operation, one of: ADD_ATTRIBUTE, 
+     * @param mod_op the modification operation, one of: ADD_ATTRIBUTE,
      * REPLACE_ATTRIBUTE, REMOVE_ATTRIBUTE
-     * @param attrs the attributes to be used for the modification; may not 
+     * @param attrs the attributes to be used for the modification; may not
      * be null
      * @exception javax.naming.directory.AttributeModificationException if the
      * modification cannot be completed successfully
@@ -976,14 +976,14 @@ public class ProxyDirContext implements DirContext {
 
 
     /**
-     * Modifies the attributes associated with a named object using an an 
-     * ordered list of modifications. The modifications are performed in the 
-     * order specified. Each modification specifies a modification operation 
-     * code and an attribute on which to operate. Where possible, the 
+     * Modifies the attributes associated with a named object using an an
+     * ordered list of modifications. The modifications are performed in the
+     * order specified. Each modification specifies a modification operation
+     * code and an attribute on which to operate. Where possible, the
      * modifications are performed atomically.
-     * 
+     *
      * @param name the name of the object whose attributes will be updated
-     * @param mods an ordered sequence of modifications to be performed; may 
+     * @param mods an ordered sequence of modifications to be performed; may
      * not be null
      * @exception javax.naming.directory.AttributeModificationException if the
      * modification cannot be completed successfully
@@ -998,11 +998,11 @@ public class ProxyDirContext implements DirContext {
 
 
     /**
-     * Modifies the attributes associated with a named object using an an 
+     * Modifies the attributes associated with a named object using an an
      * ordered list of modifications.
-     * 
+     *
      * @param name the name of the object whose attributes will be updated
-     * @param mods an ordered sequence of modifications to be performed; may 
+     * @param mods an ordered sequence of modifications to be performed; may
      * not be null
      * @exception javax.naming.directory.AttributeModificationException if the
      * modification cannot be completed successfully
@@ -1017,12 +1017,12 @@ public class ProxyDirContext implements DirContext {
 
 
     /**
-     * Binds a name to an object, along with associated attributes. If attrs 
-     * is null, the resulting binding will have the attributes associated 
-     * with obj if obj is a DirContext, and no attributes otherwise. If attrs 
-     * is non-null, the resulting binding will have attrs as its attributes; 
+     * Binds a name to an object, along with associated attributes. If attrs
+     * is null, the resulting binding will have the attributes associated
+     * with obj if obj is a DirContext, and no attributes otherwise. If attrs
+     * is non-null, the resulting binding will have attrs as its attributes;
      * any attributes associated with obj are ignored.
-     * 
+     *
      * @param name the name to bind; may not be empty
      * @param obj the object to bind; possibly null
      * @param attrs the attributes to associate with the binding
@@ -1042,7 +1042,7 @@ public class ProxyDirContext implements DirContext {
 
     /**
      * Binds a name to an object, along with associated attributes.
-     * 
+     *
      * @param name the name to bind; may not be empty
      * @param obj the object to bind; possibly null
      * @param attrs the attributes to associate with the binding
@@ -1061,16 +1061,16 @@ public class ProxyDirContext implements DirContext {
 
 
     /**
-     * Binds a name to an object, along with associated attributes, 
-     * overwriting any existing binding. If attrs is null and obj is a 
-     * DirContext, the attributes from obj are used. If attrs is null and obj 
+     * Binds a name to an object, along with associated attributes,
+     * overwriting any existing binding. If attrs is null and obj is a
+     * DirContext, the attributes from obj are used. If attrs is null and obj
      * is not a DirContext, any existing attributes associated with the object
-     * already bound in the directory remain unchanged. If attrs is non-null, 
-     * any existing attributes associated with the object already bound in 
-     * the directory are removed and attrs is associated with the named 
-     * object. If obj is a DirContext and attrs is non-null, the attributes 
+     * already bound in the directory remain unchanged. If attrs is non-null,
+     * any existing attributes associated with the object already bound in
+     * the directory are removed and attrs is associated with the named
+     * object. If obj is a DirContext and attrs is non-null, the attributes
      * of obj are ignored.
-     * 
+     *
      * @param name the name to bind; may not be empty
      * @param obj the object to bind; possibly null
      * @param attrs the attributes to associate with the binding
@@ -1087,9 +1087,9 @@ public class ProxyDirContext implements DirContext {
 
 
     /**
-     * Binds a name to an object, along with associated attributes, 
+     * Binds a name to an object, along with associated attributes,
      * overwriting any existing binding.
-     * 
+     *
      * @param name the name to bind; may not be empty
      * @param obj the object to bind; possibly null
      * @param attrs the attributes to associate with the binding
@@ -1106,14 +1106,14 @@ public class ProxyDirContext implements DirContext {
 
 
     /**
-     * Creates and binds a new context, along with associated attributes. 
-     * This method creates a new subcontext with the given name, binds it in 
-     * the target context (that named by all but terminal atomic component of 
-     * the name), and associates the supplied attributes with the newly 
-     * created object. All intermediate and target contexts must already 
-     * exist. If attrs is null, this method is equivalent to 
+     * Creates and binds a new context, along with associated attributes.
+     * This method creates a new subcontext with the given name, binds it in
+     * the target context (that named by all but terminal atomic component of
+     * the name), and associates the supplied attributes with the newly
+     * created object. All intermediate and target contexts must already
+     * exist. If attrs is null, this method is equivalent to
      * Context.createSubcontext().
-     * 
+     *
      * @param name the name of the context to create; may not be empty
      * @param attrs the attributes to associate with the newly created context
      * @return the newly created context
@@ -1126,7 +1126,7 @@ public class ProxyDirContext implements DirContext {
     @Override
     public DirContext createSubcontext(Name name, Attributes attrs)
         throws NamingException {
-        DirContext context = 
+        DirContext context =
             dirContext.createSubcontext(parseName(name), attrs);
         cacheUnload(name.toString());
         return context;
@@ -1135,7 +1135,7 @@ public class ProxyDirContext implements DirContext {
 
     /**
      * Creates and binds a new context, along with associated attributes.
-     * 
+     *
      * @param name the name of the context to create; may not be empty
      * @param attrs the attributes to associate with the newly created context
      * @return the newly created context
@@ -1148,7 +1148,7 @@ public class ProxyDirContext implements DirContext {
     @Override
     public DirContext createSubcontext(String name, Attributes attrs)
         throws NamingException {
-        DirContext context = 
+        DirContext context =
             dirContext.createSubcontext(parseName(name), attrs);
         cacheUnload(name);
         return context;
@@ -1156,13 +1156,13 @@ public class ProxyDirContext implements DirContext {
 
 
     /**
-     * Retrieves the schema associated with the named object. The schema 
-     * describes rules regarding the structure of the namespace and the 
-     * attributes stored within it. The schema specifies what types of 
-     * objects can be added to the directory and where they can be added; 
-     * what mandatory and optional attributes an object can have. The range 
+     * Retrieves the schema associated with the named object. The schema
+     * describes rules regarding the structure of the namespace and the
+     * attributes stored within it. The schema specifies what types of
+     * objects can be added to the directory and where they can be added;
+     * what mandatory and optional attributes an object can have. The range
      * of support for schemas is directory-specific.
-     * 
+     *
      * @param name the name of the object whose schema is to be retrieved
      * @return the schema associated with the context; never null
      * @exception javax.naming.OperationNotSupportedException if schema not
@@ -1178,7 +1178,7 @@ public class ProxyDirContext implements DirContext {
 
     /**
      * Retrieves the schema associated with the named object.
-     * 
+     *
      * @param name the name of the object whose schema is to be retrieved
      * @return the schema associated with the context; never null
      * @exception javax.naming.OperationNotSupportedException if schema not
@@ -1193,12 +1193,12 @@ public class ProxyDirContext implements DirContext {
 
 
     /**
-     * Retrieves a context containing the schema objects of the named 
+     * Retrieves a context containing the schema objects of the named
      * object's class definitions.
-     * 
-     * @param name the name of the object whose object class definition is to 
+     *
+     * @param name the name of the object whose object class definition is to
      * be retrieved
-     * @return the DirContext containing the named object's class 
+     * @return the DirContext containing the named object's class
      * definitions; never null
      * @exception javax.naming.OperationNotSupportedException if schema not
      * supported
@@ -1212,12 +1212,12 @@ public class ProxyDirContext implements DirContext {
 
 
     /**
-     * Retrieves a context containing the schema objects of the named 
+     * Retrieves a context containing the schema objects of the named
      * object's class definitions.
-     * 
-     * @param name the name of the object whose object class definition is to 
+     *
+     * @param name the name of the object whose object class definition is to
      * be retrieved
-     * @return the DirContext containing the named object's class 
+     * @return the DirContext containing the named object's class
      * definitions; never null
      * @exception javax.naming.OperationNotSupportedException if schema not
      * supported
@@ -1231,19 +1231,19 @@ public class ProxyDirContext implements DirContext {
 
 
     /**
-     * Searches in a single context for objects that contain a specified set 
-     * of attributes, and retrieves selected attributes. The search is 
+     * Searches in a single context for objects that contain a specified set
+     * of attributes, and retrieves selected attributes. The search is
      * performed using the default SearchControls settings.
-     * 
+     *
      * @param name the name of the context to search
-     * @param matchingAttributes the attributes to search for. If empty or 
+     * @param matchingAttributes the attributes to search for. If empty or
      * null, all objects in the target context are returned.
-     * @param attributesToReturn the attributes to return. null indicates 
-     * that all attributes are to be returned; an empty array indicates that 
+     * @param attributesToReturn the attributes to return. null indicates
+     * that all attributes are to be returned; an empty array indicates that
      * none are to be returned.
-     * @return a non-null enumeration of SearchResult objects. Each 
-     * SearchResult contains the attributes identified by attributesToReturn 
-     * and the name of the corresponding object, named relative to the 
+     * @return a non-null enumeration of SearchResult objects. Each
+     * SearchResult contains the attributes identified by attributesToReturn
+     * and the name of the corresponding object, named relative to the
      * context named by name.
      * @exception NamingException if a naming exception is encountered
      */
@@ -1251,24 +1251,24 @@ public class ProxyDirContext implements DirContext {
     public NamingEnumeration<SearchResult> search(Name name,
             Attributes matchingAttributes, String[] attributesToReturn)
         throws NamingException {
-        return dirContext.search(parseName(name), matchingAttributes, 
+        return dirContext.search(parseName(name), matchingAttributes,
                                  attributesToReturn);
     }
 
 
     /**
-     * Searches in a single context for objects that contain a specified set 
+     * Searches in a single context for objects that contain a specified set
      * of attributes, and retrieves selected attributes.
-     * 
+     *
      * @param name the name of the context to search
-     * @param matchingAttributes the attributes to search for. If empty or 
+     * @param matchingAttributes the attributes to search for. If empty or
      * null, all objects in the target context are returned.
-     * @param attributesToReturn the attributes to return. null indicates 
-     * that all attributes are to be returned; an empty array indicates that 
+     * @param attributesToReturn the attributes to return. null indicates
+     * that all attributes are to be returned; an empty array indicates that
      * none are to be returned.
-     * @return a non-null enumeration of SearchResult objects. Each 
-     * SearchResult contains the attributes identified by attributesToReturn 
-     * and the name of the corresponding object, named relative to the 
+     * @return a non-null enumeration of SearchResult objects. Each
+     * SearchResult contains the attributes identified by attributesToReturn
+     * and the name of the corresponding object, named relative to the
      * context named by name.
      * @exception NamingException if a naming exception is encountered
      */
@@ -1276,23 +1276,23 @@ public class ProxyDirContext implements DirContext {
     public NamingEnumeration<SearchResult> search(String name,
             Attributes matchingAttributes, String[] attributesToReturn)
         throws NamingException {
-        return dirContext.search(parseName(name), matchingAttributes, 
+        return dirContext.search(parseName(name), matchingAttributes,
                                  attributesToReturn);
     }
 
 
     /**
-     * Searches in a single context for objects that contain a specified set 
-     * of attributes. This method returns all the attributes of such objects. 
-     * It is equivalent to supplying null as the atributesToReturn parameter 
+     * Searches in a single context for objects that contain a specified set
+     * of attributes. This method returns all the attributes of such objects.
+     * It is equivalent to supplying null as the atributesToReturn parameter
      * to the method search(Name, Attributes, String[]).
-     * 
+     *
      * @param name the name of the context to search
-     * @param matchingAttributes the attributes to search for. If empty or 
+     * @param matchingAttributes the attributes to search for. If empty or
      * null, all objects in the target context are returned.
-     * @return a non-null enumeration of SearchResult objects. Each 
-     * SearchResult contains the attributes identified by attributesToReturn 
-     * and the name of the corresponding object, named relative to the 
+     * @return a non-null enumeration of SearchResult objects. Each
+     * SearchResult contains the attributes identified by attributesToReturn
+     * and the name of the corresponding object, named relative to the
      * context named by name.
      * @exception NamingException if a naming exception is encountered
      */
@@ -1304,15 +1304,15 @@ public class ProxyDirContext implements DirContext {
 
 
     /**
-     * Searches in a single context for objects that contain a specified set 
+     * Searches in a single context for objects that contain a specified set
      * of attributes.
-     * 
+     *
      * @param name the name of the context to search
-     * @param matchingAttributes the attributes to search for. If empty or 
+     * @param matchingAttributes the attributes to search for. If empty or
      * null, all objects in the target context are returned.
-     * @return a non-null enumeration of SearchResult objects. Each 
-     * SearchResult contains the attributes identified by attributesToReturn 
-     * and the name of the corresponding object, named relative to the 
+     * @return a non-null enumeration of SearchResult objects. Each
+     * SearchResult contains the attributes identified by attributesToReturn
+     * and the name of the corresponding object, named relative to the
      * context named by name.
      * @exception NamingException if a naming exception is encountered
      */
@@ -1324,17 +1324,17 @@ public class ProxyDirContext implements DirContext {
 
 
     /**
-     * Searches in the named context or object for entries that satisfy the 
-     * given search filter. Performs the search as specified by the search 
+     * Searches in the named context or object for entries that satisfy the
+     * given search filter. Performs the search as specified by the search
      * controls.
-     * 
+     *
      * @param name the name of the context or object to search
-     * @param filter the filter expression to use for the search; may not be 
+     * @param filter the filter expression to use for the search; may not be
      * null
-     * @param cons the search controls that control the search. If null, 
-     * the default search controls are used (equivalent to 
+     * @param cons the search controls that control the search. If null,
+     * the default search controls are used (equivalent to
      * (new SearchControls())).
-     * @return an enumeration of SearchResults of the objects that satisfy 
+     * @return an enumeration of SearchResults of the objects that satisfy
      * the filter; never null
      * @exception javax.naming.directory.InvalidSearchFilterException if the
      * search filter specified is not supported or understood by the underlying
@@ -1344,7 +1344,7 @@ public class ProxyDirContext implements DirContext {
      * @exception NamingException if a naming exception is encountered
      */
     @Override
-    public NamingEnumeration<SearchResult> search(Name name, String filter, 
+    public NamingEnumeration<SearchResult> search(Name name, String filter,
                                     SearchControls cons)
         throws NamingException {
         return dirContext.search(parseName(name), filter, cons);
@@ -1352,17 +1352,17 @@ public class ProxyDirContext implements DirContext {
 
 
     /**
-     * Searches in the named context or object for entries that satisfy the 
-     * given search filter. Performs the search as specified by the search 
+     * Searches in the named context or object for entries that satisfy the
+     * given search filter. Performs the search as specified by the search
      * controls.
-     * 
+     *
      * @param name the name of the context or object to search
-     * @param filter the filter expression to use for the search; may not be 
+     * @param filter the filter expression to use for the search; may not be
      * null
-     * @param cons the search controls that control the search. If null, 
-     * the default search controls are used (equivalent to 
+     * @param cons the search controls that control the search. If null,
+     * the default search controls are used (equivalent to
      * (new SearchControls())).
-     * @return an enumeration of SearchResults of the objects that satisfy 
+     * @return an enumeration of SearchResults of the objects that satisfy
      * the filter; never null
      * @exception javax.naming.directory.InvalidSearchFilterException if the
      * search filter specified is not supported or understood by the underlying
@@ -1372,7 +1372,7 @@ public class ProxyDirContext implements DirContext {
      * @exception NamingException if a naming exception is encountered
      */
     @Override
-    public NamingEnumeration<SearchResult> search(String name, String filter, 
+    public NamingEnumeration<SearchResult> search(String name, String filter,
                                     SearchControls cons)
         throws NamingException {
         return dirContext.search(parseName(name), filter, cons);
@@ -1380,22 +1380,22 @@ public class ProxyDirContext implements DirContext {
 
 
     /**
-     * Searches in the named context or object for entries that satisfy the 
-     * given search filter. Performs the search as specified by the search 
+     * Searches in the named context or object for entries that satisfy the
+     * given search filter. Performs the search as specified by the search
      * controls.
-     * 
+     *
      * @param name the name of the context or object to search
-     * @param filterExpr the filter expression to use for the search. 
-     * The expression may contain variables of the form "{i}" where i is a 
+     * @param filterExpr the filter expression to use for the search.
+     * The expression may contain variables of the form "{i}" where i is a
      * nonnegative integer. May not be null.
-     * @param filterArgs the array of arguments to substitute for the 
-     * variables in filterExpr. The value of filterArgs[i] will replace each 
+     * @param filterArgs the array of arguments to substitute for the
+     * variables in filterExpr. The value of filterArgs[i] will replace each
      * occurrence of "{i}". If null, equivalent to an empty array.
-     * @param cons the search controls that control the search. If null, the 
+     * @param cons the search controls that control the search. If null, the
      * default search controls are used (equivalent to (new SearchControls())).
-     * @return an enumeration of SearchResults of the objects that satisy the 
+     * @return an enumeration of SearchResults of the objects that satisy the
      * filter; never null
-     * @exception ArrayIndexOutOfBoundsException if filterExpr contains {i} 
+     * @exception ArrayIndexOutOfBoundsException if filterExpr contains {i}
      * expressions where i is outside the bounds of the array filterArgs
      * @exception javax.naming.directory.InvalidSearchControlsException if cons
      * contains invalid settings
@@ -1407,28 +1407,28 @@ public class ProxyDirContext implements DirContext {
     public NamingEnumeration<SearchResult> search(Name name, String filterExpr,
                                     Object[] filterArgs, SearchControls cons)
         throws NamingException {
-        return dirContext.search(parseName(name), filterExpr, filterArgs, 
+        return dirContext.search(parseName(name), filterExpr, filterArgs,
                                  cons);
     }
 
 
     /**
-     * Searches in the named context or object for entries that satisfy the 
-     * given search filter. Performs the search as specified by the search 
+     * Searches in the named context or object for entries that satisfy the
+     * given search filter. Performs the search as specified by the search
      * controls.
-     * 
+     *
      * @param name the name of the context or object to search
-     * @param filterExpr the filter expression to use for the search. 
-     * The expression may contain variables of the form "{i}" where i is a 
+     * @param filterExpr the filter expression to use for the search.
+     * The expression may contain variables of the form "{i}" where i is a
      * nonnegative integer. May not be null.
-     * @param filterArgs the array of arguments to substitute for the 
-     * variables in filterExpr. The value of filterArgs[i] will replace each 
+     * @param filterArgs the array of arguments to substitute for the
+     * variables in filterExpr. The value of filterArgs[i] will replace each
      * occurrence of "{i}". If null, equivalent to an empty array.
-     * @param cons the search controls that control the search. If null, the 
+     * @param cons the search controls that control the search. If null, the
      * default search controls are used (equivalent to (new SearchControls())).
-     * @return an enumeration of SearchResults of the objects that satisy the 
+     * @return an enumeration of SearchResults of the objects that satisy the
      * filter; never null
-     * @exception ArrayIndexOutOfBoundsException if filterExpr contains {i} 
+     * @exception ArrayIndexOutOfBoundsException if filterExpr contains {i}
      * expressions where i is outside the bounds of the array filterArgs
      * @exception javax.naming.directory.InvalidSearchControlsException if cons
      * contains invalid settings
@@ -1440,7 +1440,7 @@ public class ProxyDirContext implements DirContext {
     public NamingEnumeration<SearchResult> search(String name,
             String filterExpr, Object[] filterArgs, SearchControls cons)
         throws NamingException {
-        return dirContext.search(parseName(name), filterExpr, filterArgs, 
+        return dirContext.search(parseName(name), filterExpr, filterArgs,
                                  cons);
     }
 
@@ -1450,7 +1450,7 @@ public class ProxyDirContext implements DirContext {
 
     /**
      * Retrieves the named object as a cache entry, without any exception.
-     * 
+     *
      * @param name the name of the object to look up
      * @return the cache entry bound to name
      */
@@ -1489,7 +1489,7 @@ public class ProxyDirContext implements DirContext {
 
     /**
      * Parses a name.
-     * 
+     *
      * @return the parsed name
      * @throws NamingException if the name cannot be parsed
      */
@@ -1500,7 +1500,7 @@ public class ProxyDirContext implements DirContext {
 
     /**
      * Parses a name.
-     * 
+     *
      * @return the parsed name
      * @throws NamingException if the name cannot be parsed
      */
@@ -1538,7 +1538,7 @@ public class ProxyDirContext implements DirContext {
                     cacheUnload(cacheEntry.name);
                     return (null);
                 } else {
-                    cacheEntry.timestamp = 
+                    cacheEntry.timestamp =
                         System.currentTimeMillis() + cacheTTL;
                 }
             }
@@ -1554,7 +1554,7 @@ public class ProxyDirContext implements DirContext {
     protected boolean validate(CacheEntry entry) {
         if (((!entry.exists)
              || (entry.context != null)
-             || ((entry.resource != null) 
+             || ((entry.resource != null)
                  && (entry.resource.getContent() != null)))
             && (System.currentTimeMillis() < entry.timestamp)) {
             return true;
@@ -1567,7 +1567,7 @@ public class ProxyDirContext implements DirContext {
      * Revalidate entry.
      */
     protected boolean revalidate(CacheEntry entry) {
-        // Get the attributes at the given path, and check the last 
+        // Get the attributes at the given path, and check the last
         // modification date
         if (!entry.exists)
             return false;
@@ -1587,7 +1587,7 @@ public class ProxyDirContext implements DirContext {
             }
             long lastModified2 = attributes.getLastModified();
             long contentLength2 = attributes.getContentLength();
-            return (lastModified == lastModified2) 
+            return (lastModified == lastModified2)
                 && (contentLength == contentLength2);
         } catch (NamingException e) {
             return false;
@@ -1610,7 +1610,7 @@ public class ProxyDirContext implements DirContext {
             try {
                 Attributes attributes = dirContext.getAttributes(name);
                 if (!(attributes instanceof ResourceAttributes)) {
-                    entry.attributes = 
+                    entry.attributes =
                         new ResourceAttributes(attributes);
                 } else {
                     entry.attributes = (ResourceAttributes) attributes;
@@ -1640,13 +1640,13 @@ public class ProxyDirContext implements DirContext {
         }
 
         // Load object content
-        if ((exists) && (entry.resource != null) 
-            && (entry.resource.getContent() == null) 
+        if ((exists) && (entry.resource != null)
+            && (entry.resource.getContent() == null)
             && (entry.attributes.getContentLength() >= 0)
-            && (entry.attributes.getContentLength() < 
+            && (entry.attributes.getContentLength() <
                 (cacheObjectMaxSize * 1024))) {
             int length = (int) entry.attributes.getContentLength();
-            // The entry size is 1 + the resource size in KB, if it will be 
+            // The entry size is 1 + the resource size in KB, if it will be
             // cached
             entry.size += (entry.attributes.getContentLength() / 1024);
             InputStream is = null;

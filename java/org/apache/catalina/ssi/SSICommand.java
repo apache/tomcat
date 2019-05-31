@@ -21,7 +21,7 @@ import java.io.PrintWriter;
 /**
  * The interface that all SSI commands ( SSIEcho, SSIInclude, ...) must
  * implement.
- * 
+ *
  * @author Bip Thelin
  * @author Dan Sandberg
  * @author David Becker
@@ -29,7 +29,7 @@ import java.io.PrintWriter;
 public interface SSICommand {
     /**
      * Write the output of the command to the writer.
-     * 
+     *
      * @param ssiMediator
      *            the ssi mediator
      * @param commandName

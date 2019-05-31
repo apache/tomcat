@@ -301,7 +301,7 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol<NioChannel> {
                     socket, inbound,
                     ((Http11NioProtocol) getProtocol()).getEndpoint().getSelectorPool());
         }
-        
+
         @Override
         protected Processor<NioChannel> createUpgradeProcessor(
                 SocketWrapper<NioChannel> socket,

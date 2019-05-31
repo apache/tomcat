@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -21,7 +21,7 @@ import org.apache.catalina.ha.ClusterMessageBase;
 import org.apache.catalina.tribes.Member;
 
 /**
- * Contains the data for a file being transferred over TCP, this is 
+ * Contains the data for a file being transferred over TCP, this is
  * essentially a fragment of a file, read and written by the FileMessageFactory
  * @author Filip Hanik
  * @version 1.0
@@ -33,12 +33,12 @@ public class FileMessage extends ClusterMessageBase {
     private int messageNumber;
     private byte[] data;
     private int dataLength;
-    
+
     private long totalLength;
     private long totalNrOfMsgs;
     private String fileName;
     private String contextName;
-    
+
     public FileMessage(Member source,
                        String fileName,
                        String contextName) {
@@ -46,17 +46,17 @@ public class FileMessage extends ClusterMessageBase {
         this.fileName=fileName;
         this.contextName=contextName;
     }
-    
+
     /*
     public void writeExternal(ObjectOutput out) throws IOException {
-                   
+
     }
-    
+
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
-                  
+
     }
     */
-   
+
     public int getMessageNumber() {
         return messageNumber;
     }
@@ -99,7 +99,7 @@ public class FileMessage extends ClusterMessageBase {
         return result.toString();
     }
 
-    
+
     public String getFileName() {
         return fileName;
     }
@@ -109,5 +109,5 @@ public class FileMessage extends ClusterMessageBase {
     public String getContextName() {
         return contextName;
     }
-    
+
 }

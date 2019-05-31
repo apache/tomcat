@@ -46,14 +46,14 @@ public class RequestInfo  {
     public RequestGroupInfo getGlobalProcessor() {
         return global;
     }
-    
+
     public void setGlobalProcessor(RequestGroupInfo global) {
         if( global != null) {
             this.global=global;
             global.addRequestProcessor( this );
         } else {
             if (this.global != null) {
-                this.global.removeRequestProcessor( this ); 
+                this.global.removeRequestProcessor( this );
                 this.global = null;
             }
         }
@@ -148,7 +148,7 @@ public class RequestInfo  {
     private int requestCount;
     // number of response codes >= 400
     private int errorCount;
-    
+
     //the time of the last request
     private long lastRequestProcessingTime = 0;
 

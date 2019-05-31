@@ -162,8 +162,8 @@ public abstract class SimpleNode extends ELSupport implements Node {
             Class<?>[] paramTypes) throws ELException {
         throw new UnsupportedOperationException();
     }
-    
-    
+
+
     @Override
     public int hashCode() {
         final int prime = 31;
@@ -206,7 +206,7 @@ public abstract class SimpleNode extends ELSupport implements Node {
     public ValueReference getValueReference(EvaluationContext ctx) {
         return null;
     }
-    
+
     /**
      * @since EL 2.2
      */

@@ -22,7 +22,7 @@ import java.io.PrintWriter;
 import java.text.DecimalFormat;
 /**
  * Implements the Server-side #fsize command
- * 
+ *
  * @author Bip Thelin
  * @author Paul Speed
  * @author Dan Sandberg

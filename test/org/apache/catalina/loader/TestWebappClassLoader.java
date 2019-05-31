@@ -37,7 +37,7 @@ public class TestWebappClassLoader extends TomcatBaseTest {
         tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
 
         tomcat.start();
-        
+
         ByteChunk out = new ByteChunk();
 
         int rc = getUrl("http://localhost:" + getPort() + "/test/bug5nnnn/bug58096.jsp", out, null);

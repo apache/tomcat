@@ -5,15 +5,15 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */ 
+ */
 
 
 package org.apache.tomcat.util.digester;
@@ -25,15 +25,15 @@ import org.xml.sax.Attributes;
 
 /**
  * <p>Rule implementation that calls a method on an object on the stack
- * (normally the top/parent object), passing arguments collected from 
+ * (normally the top/parent object), passing arguments collected from
  * subsequent <code>CallParamRule</code> rules or from the body of this
  * element. </p>
  *
- * <p>By using {@link #CallMethodRule(String methodName)} 
+ * <p>By using {@link #CallMethodRule(String methodName)}
  * a method call can be made to a method which accepts no
  * arguments.</p>
  *
- * <p>Incompatible method parameter types are converted 
+ * <p>Incompatible method parameter types are converted
  * using <code>org.apache.commons.beanutils.ConvertUtils</code>.
  * </p>
  *
@@ -43,16 +43,16 @@ import org.xml.sax.Attributes;
  * </a> by default.
  * This increases the kinds of methods successfully and allows primitives
  * to be matched by passing in wrapper classes.
- * There are rare cases when org.apache.commons.beanutils.MethodUtils#invokeExactMethod 
+ * There are rare cases when org.apache.commons.beanutils.MethodUtils#invokeExactMethod
  * (the old default) is required.
  * This method is much stricter in its reflection.
- * Setting the <code>UseExactMatch</code> to true reverts to the use of this 
+ * Setting the <code>UseExactMatch</code> to true reverts to the use of this
  * method.</p>
  *
  * <p>Note that the target method is invoked when the  <i>end</i> of
  * the tag the CallMethodRule fired on is encountered, <i>not</i> when the
  * last parameter becomes available. This implies that rules which fire on
- * tags nested within the one associated with the CallMethodRule will 
+ * tags nested within the one associated with the CallMethodRule will
  * fire before the CallMethodRule invokes the target method. This behaviour is
  * not configurable. </p>
  *
@@ -86,7 +86,7 @@ public class CallMethodRule extends Rule {
      * parameter types (if any) default to java.lang.String.
      *
      * @param targetOffset location of the target object. Positive numbers are
-     * relative to the top of the digester object stack. Negative numbers 
+     * relative to the top of the digester object stack. Negative numbers
      * are relative to the bottom of the stack. Zero implies the top
      * object on the stack.
      * @param methodName Method name of the parent method to call
@@ -99,7 +99,7 @@ public class CallMethodRule extends Rule {
 
         this.targetOffset = targetOffset;
         this.methodName = methodName;
-        this.paramCount = paramCount;        
+        this.paramCount = paramCount;
         if (paramCount == 0) {
             this.paramTypes = new Class[] { String.class };
         } else {
@@ -112,34 +112,34 @@ public class CallMethodRule extends Rule {
     }
 
     /**
-     * Construct a "call method" rule with the specified method name.  
+     * Construct a "call method" rule with the specified method name.
      * The method should accept no parameters.
      *
      * @param methodName Method name of the parent method to call
      */
     public CallMethodRule(String methodName) {
-    
+
         this(0, methodName, 0, (Class[]) null);
-    
+
     }
-    
+
 
     /**
-     * Construct a "call method" rule with the specified method name.  
+     * Construct a "call method" rule with the specified method name.
      * The method should accept no parameters.
      *
      * @param targetOffset location of the target object. Positive numbers are
-     * relative to the top of the digester object stack. Negative numbers 
+     * relative to the top of the digester object stack. Negative numbers
      * are relative to the bottom of the stack. Zero implies the top
      * object on the stack.
      * @param methodName Method name of the parent method to call
      */
     public CallMethodRule(int targetOffset, String methodName) {
-    
+
         this(targetOffset, methodName, 0, (Class[]) null);
-    
+
     }
-    
+
 
     /**
      * Construct a "call method" rule with the specified method name and
@@ -158,7 +158,7 @@ public class CallMethodRule extends Rule {
      */
     public CallMethodRule(
                             String methodName,
-                            int paramCount, 
+                            int paramCount,
                             String paramTypes[]) {
         this(0, methodName, paramCount, paramTypes);
     }
@@ -171,7 +171,7 @@ public class CallMethodRule extends Rule {
      * case the rule will call the specified method with no arguments.
      *
      * @param targetOffset location of the target object. Positive numbers are
-     * relative to the top of the digester object stack. Negative numbers 
+     * relative to the top of the digester object stack. Negative numbers
      * are relative to the bottom of the stack. Zero implies the top
      * object on the stack.
      * @param methodName Method name of the parent method to call
@@ -184,7 +184,7 @@ public class CallMethodRule extends Rule {
      */
     public CallMethodRule(  int targetOffset,
                             String methodName,
-                            int paramCount, 
+                            int paramCount,
                             String paramTypes[]) {
 
         this.targetOffset = targetOffset;
@@ -197,7 +197,7 @@ public class CallMethodRule extends Rule {
             }
         } else {
             // copy the parameter class names into an array
-            // the classes will be loaded when the digester is set 
+            // the classes will be loaded when the digester is set
             this.paramClassNames = new String[paramTypes.length];
             for (int i = 0; i < this.paramClassNames.length; i++) {
                 this.paramClassNames[i] = paramTypes[i];
@@ -225,7 +225,7 @@ public class CallMethodRule extends Rule {
      */
     public CallMethodRule(
                             String methodName,
-                            int paramCount, 
+                            int paramCount,
                             Class<?> paramTypes[]) {
         this(0, methodName, paramCount, paramTypes);
     }
@@ -238,7 +238,7 @@ public class CallMethodRule extends Rule {
      * case the rule will call the specified method with no arguments.
      *
      * @param targetOffset location of the target object. Positive numbers are
-     * relative to the top of the digester object stack. Negative numbers 
+     * relative to the top of the digester object stack. Negative numbers
      * are relative to the bottom of the stack. Zero implies the top
      * object on the stack.
      * @param methodName Method name of the parent method to call
@@ -252,7 +252,7 @@ public class CallMethodRule extends Rule {
      */
     public CallMethodRule(  int targetOffset,
                             String methodName,
-                            int paramCount, 
+                            int paramCount,
                             Class<?> paramTypes[]) {
 
         this.targetOffset = targetOffset;
@@ -282,7 +282,7 @@ public class CallMethodRule extends Rule {
     protected String bodyText = null;
 
 
-    /** 
+    /**
      * location of the target object for the call, relative to the
      * top of the digester object stack. The default value of zero
      * means the target object is the one on top of the stack.
@@ -313,14 +313,14 @@ public class CallMethodRule extends Rule {
      * This attribute allows creation of the classes to be postponed until the digester is set.
      */
     protected String paramClassNames[] = null;
-    
+
     /**
      * Should <code>MethodUtils.invokeExactMethod</code> be used for reflection.
      */
     protected boolean useExactMatch = false;
-    
+
     // --------------------------------------------------------- Public Methods
-    
+
     /**
      * Should <code>MethodUtils.invokeExactMethod</code>
      * be used for the reflection.
@@ -328,13 +328,13 @@ public class CallMethodRule extends Rule {
     public boolean getUseExactMatch() {
         return useExactMatch;
     }
-    
+
     /**
      * Set whether <code>MethodUtils.invokeExactMethod</code>
      * should be used for the reflection.
-     */    
+     */
     public void setUseExactMatch(boolean useExactMatch)
-    { 
+    {
         this.useExactMatch = useExactMatch;
     }
 
@@ -366,10 +366,10 @@ public class CallMethodRule extends Rule {
     /**
      * Process the start of this element.
      *
-     * @param namespace the namespace URI of the matching element, or an 
+     * @param namespace the namespace URI of the matching element, or an
      *   empty string if the parser is not namespace aware or the element has
      *   no namespace
-     * @param name the local name if the parser is namespace aware, or just 
+     * @param name the local name if the parser is namespace aware, or just
      *   the element name otherwise
      * @param attributes The attribute list for this element
      */
@@ -392,10 +392,10 @@ public class CallMethodRule extends Rule {
     /**
      * Process the body text of this element.
      *
-     * @param namespace the namespace URI of the matching element, or an 
+     * @param namespace the namespace URI of the matching element, or an
      *   empty string if the parser is not namespace aware or the element has
      *   no namespace
-     * @param name the local name if the parser is namespace aware, or just 
+     * @param name the local name if the parser is namespace aware, or just
      *   the element name otherwise
      * @param bodyText The body text of this element
      */
@@ -412,11 +412,11 @@ public class CallMethodRule extends Rule {
 
     /**
      * Process the end of this element.
-     * 
-     * @param namespace the namespace URI of the matching element, or an 
+     *
+     * @param namespace the namespace URI of the matching element, or an
      *   empty string if the parser is not namespace aware or the element has
      *   no namespace
-     * @param name the local name if the parser is namespace aware, or just 
+     * @param name the local name if the parser is namespace aware, or just
      *   the element name otherwise
      */
     @Override
@@ -427,13 +427,13 @@ public class CallMethodRule extends Rule {
         if (paramCount > 0) {
 
             parameters = (Object[]) digester.popParams();
-            
+
             if (digester.log.isTraceEnabled()) {
                 for (int i=0,size=parameters.length;i<size;i++) {
                     digester.log.trace("[CallMethodRule](" + i + ")" + parameters[i]) ;
                 }
             }
-            
+
             // In the case where the parameter for the method
             // is taken from an attribute, and that attribute
             // isn't actually defined in the source XML file,
@@ -458,16 +458,16 @@ public class CallMethodRule extends Rule {
 
         // Construct the parameter values array we will need
         // We only do the conversion if the param value is a String and
-        // the specified paramType is not String. 
+        // the specified paramType is not String.
         Object paramValues[] = new Object[paramTypes.length];
         for (int i = 0; i < paramTypes.length; i++) {
-            // convert nulls and convert stringy parameters 
+            // convert nulls and convert stringy parameters
             // for non-stringy param types
             if(
                 parameters[i] == null ||
-                 (parameters[i] instanceof String && 
+                 (parameters[i] instanceof String &&
                    !String.class.isAssignableFrom(paramTypes[i]))) {
-                
+
                 paramValues[i] =
                         IntrospectionUtils.convert((String) parameters[i], paramTypes[i]);
             } else {
@@ -482,7 +482,7 @@ public class CallMethodRule extends Rule {
         } else {
             target = digester.peek( digester.getCount() + targetOffset );
         }
-        
+
         if (target == null) {
             StringBuilder sb = new StringBuilder();
             sb.append("[CallMethodRule]{");
@@ -495,7 +495,7 @@ public class CallMethodRule extends Rule {
             sb.append(")");
             throw new org.xml.sax.SAXException(sb.toString());
         }
-        
+
         // Invoke the required method on the top object
         if (digester.log.isDebugEnabled()) {
             StringBuilder sb = new StringBuilder("[CallMethodRule]{");
@@ -525,7 +525,7 @@ public class CallMethodRule extends Rule {
             digester.log.debug(sb.toString());
         }
         Object result = IntrospectionUtils.callMethodN(target, methodName,
-                paramValues, paramTypes);   
+                paramValues, paramTypes);
         processMethodCallResult(result);
     }
 
@@ -541,7 +541,7 @@ public class CallMethodRule extends Rule {
     }
 
     /**
-     * Subclasses may override this method to perform additional processing of the 
+     * Subclasses may override this method to perform additional processing of the
      * invoked method's result.
      *
      * @param result the Object returned by the method invoked, possibly null

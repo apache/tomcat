@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -35,23 +35,23 @@ public class RxTaskPool
 
     List<AbstractRxTask> idle = new LinkedList<AbstractRxTask>();
     List<AbstractRxTask> used = new LinkedList<AbstractRxTask>();
-    
+
     Object mutex = new Object();
     boolean running = true;
-    
+
     private int maxTasks;
     private int minTasks;
-    
+
     private TaskCreator creator = null;
 
-    
+
     public RxTaskPool (int maxTasks, int minTasks, TaskCreator creator) throws Exception {
         // fill up the pool with worker threads
         this.maxTasks = maxTasks;
         this.minTasks = minTasks;
         this.creator = creator;
     }
-    
+
     protected void configureTask(AbstractRxTask task) {
         synchronized (task) {
             task.setTaskPool(this);
@@ -92,7 +92,7 @@ public class RxTaskPool
         }
         return (worker);
     }
-    
+
     public int available() {
         return idle.size();
     }
@@ -150,7 +150,7 @@ public class RxTaskPool
     public TaskCreator getTaskCreator() {
         return this.creator;
     }
-    
+
     public static interface TaskCreator  {
         public AbstractRxTask createRxTask();
     }

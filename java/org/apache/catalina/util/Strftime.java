@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -26,7 +26,7 @@ import java.util.TimeZone;
 /**
  * Converts dates to strings using the same format specifiers as strftime
  *
- * Note: This does not mimic strftime perfectly.  Certain strftime commands, 
+ * Note: This does not mimic strftime perfectly.  Certain strftime commands,
  *       are not supported, and will convert as if they were literals.
  *
  *       Certain complicated commands, like those dealing with the week of the year
@@ -118,7 +118,7 @@ public class Strftime {
 
     /**
      * Create an instance of this date formatting class
-     * 
+     *
      * @param origFormat the strftime-style formatting string
      * @param locale the locale to use for locale-specific conversions
      */
@@ -196,7 +196,7 @@ public class Strftime {
                         buf.append("'");
                         inside = true;
                     }
-                    
+
                     buf.append(c);
                 }
             }
@@ -237,14 +237,14 @@ public class Strftime {
         //O and E are modifiers, they mean to present an alternative representation of the next char
         //we just handle the next char as if the O or E wasn't there
         if ( firstChar == 'O' || firstChar == 'E' ) {
-            if ( index + 1 < pattern.length() ) {               
+            if ( index + 1 < pattern.length() ) {
                 newInside = translateCommand( buf, pattern, index + 1, oldInside );
             } else {
                 buf.append( quote("%" + firstChar, oldInside ) );
             }
         } else {
             String command = translate.getProperty( String.valueOf( firstChar ) );
-            
+
             //If we don't find a format, treat it as a literal--That's what apache does
             if ( command == null ) {
                 buf.append( quote( "%" + firstChar, oldInside ) );

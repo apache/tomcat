@@ -14,7 +14,7 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
- 
+
 package javax.servlet.jsp;
 
 import java.io.IOException;
@@ -31,7 +31,7 @@ import javax.servlet.http.HttpServletResponse;
  * The behaviour is identical to that of the JspPage, except for the signature
  * of the _jspService method, which is now expressible in the Java type
  * system and included explicitly in the interface.
- * 
+ *
  * @see JspPage
  */
 
@@ -48,8 +48,8 @@ public interface HttpJspPage extends JspPage {
      *
      * @param request Provides client request information to the JSP.
      * @param response Assists the JSP in sending a response to the client.
-     * @throws ServletException Thrown if an error occurred during the 
-     *     processing of the JSP and that the container should take 
+     * @throws ServletException Thrown if an error occurred during the
+     *     processing of the JSP and that the container should take
      *     appropriate action to clean up the request.
      * @throws IOException Thrown if an error occurred while writing the
      *     response for this page.

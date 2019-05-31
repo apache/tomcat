@@ -111,8 +111,8 @@ public class TesterContext implements Context {
     public void removeConstraint(SecurityConstraint constraint) {
         securityConstraints.remove(constraint);
     }
-    
-    
+
+
     @Override
     public Log getLogger() {
         return log;

@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -48,9 +48,9 @@ import org.apache.tomcat.util.threads.ThreadPoolExecutor;
  * pool after executing their task, see
  * {@link org.apache.tomcat.util.threads.ThreadPoolExecutor}.afterExecute().
  * </p>
- * 
+ *
  * This listener must be declared in server.xml to be active.
- * 
+ *
  */
 public class ThreadLocalLeakPreventionListener implements LifecycleListener,
         ContainerListener {
@@ -188,7 +188,7 @@ public class ThreadLocalLeakPreventionListener implements LifecycleListener,
     /**
      * Updates each ThreadPoolExecutor with the current time, which is the time
      * when a context is being stopped.
-     * 
+     *
      * @param context
      *            the context being stopped, used to discover all the Connectors
      *            of its parent Service.

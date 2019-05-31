@@ -5,15 +5,15 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */ 
+ */
 
 
 package org.apache.naming.factory;
@@ -32,7 +32,7 @@ import org.apache.naming.EjbRef;
 
 /**
  * Object factory for EJBs.
- * 
+ *
  * @author Jacek Laskowski
  * @author Remy Maucherat
  */
@@ -42,7 +42,7 @@ public class OpenEjbFactory implements ObjectFactory {
     // -------------------------------------------------------------- Constants
 
 
-    protected static final String DEFAULT_OPENEJB_FACTORY = 
+    protected static final String DEFAULT_OPENEJB_FACTORY =
         "org.openejb.client.LocalInitialContextFactory";
 
 
@@ -51,7 +51,7 @@ public class OpenEjbFactory implements ObjectFactory {
 
     /**
      * Create a new EJB instance using OpenEJB.
-     * 
+     *
      * @param obj The reference object describing the DataSource
      */
     @Override

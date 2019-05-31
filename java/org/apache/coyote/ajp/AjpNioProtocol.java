@@ -37,8 +37,8 @@ import org.apache.tomcat.util.net.SocketWrapper;
  * will not fit Jk protocols like JNI.
  */
 public class AjpNioProtocol extends AbstractAjpProtocol<NioChannel> {
-    
-    
+
+
     private static final Log log = LogFactory.getLog(AjpNioProtocol.class);
 
     @Override
@@ -65,7 +65,7 @@ public class AjpNioProtocol extends AbstractAjpProtocol<NioChannel> {
         ((NioEndpoint) endpoint).setUseSendfile(false);
     }
 
-    
+
     // ----------------------------------------------------- Instance Variables
 
 
@@ -118,7 +118,7 @@ public class AjpNioProtocol extends AbstractAjpProtocol<NioChannel> {
          */
         @Override
         public void release(SocketChannel socket) {
-            if (log.isDebugEnabled()) 
+            if (log.isDebugEnabled())
                 log.debug("Iterating through our connections to release a socket channel:"+socket);
             boolean released = false;
             Iterator<java.util.Map.Entry<NioChannel, Processor<NioChannel>>> it = connections.entrySet().iterator();
@@ -133,10 +133,10 @@ public class AjpNioProtocol extends AbstractAjpProtocol<NioChannel> {
                     break;
                 }
             }
-            if (log.isDebugEnabled()) 
+            if (log.isDebugEnabled())
                 log.debug("Done iterating through our connections to release a socket channel:"+socket +" released:"+released);
         }
-        
+
         /**
          * Expected to be used by the Poller to release resources on socket
          * close, errors etc.

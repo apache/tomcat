@@ -23,7 +23,7 @@ import org.apache.tomcat.util.net.SocketWrapper;
 import org.apache.tomcat.util.res.StringManager;
 
 public abstract class AbstractAjpProtocol<S> extends AbstractProtocol<S> {
-    
+
     /**
      * The string manager for this package.
      */
@@ -40,7 +40,7 @@ public abstract class AbstractAjpProtocol<S> extends AbstractProtocol<S> {
 
     // ------------------------------------------------- AJP specific properties
     // ------------------------------------------ managed in the ProtocolHandler
-    
+
     /**
      * Send AJP flush packet when flushing.
      * An flush packet is a zero byte AJP13 SEND_BODY_CHUNK
@@ -128,7 +128,7 @@ public abstract class AbstractAjpProtocol<S> extends AbstractProtocol<S> {
             // TODO should fail - throw IOE
             return null;
         }
-        
+
         @Override
         protected P createUpgradeProcessor(SocketWrapper<S> socket,
                 HttpUpgradeHandler httpUpgradeHandler) {

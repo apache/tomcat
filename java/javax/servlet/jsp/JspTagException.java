@@ -28,7 +28,7 @@ public class JspTagException extends JspException {
     /**
      * Constructs a new JspTagException with the specified message. The message
      * can be written to the server log and/or displayed for the user.
-     * 
+     *
      * @param msg
      *            a <code>String</code> specifying the text of the exception
      *            message
@@ -48,7 +48,7 @@ public class JspTagException extends JspException {
      * Constructs a new JspTagException when the JSP Tag needs to throw an
      * exception and include a message about the "root cause" exception that
      * interfered with its normal operation, including a description message.
-     * 
+     *
      * @param message
      *            a <code>String</code> containing the text of the exception
      *            message
@@ -72,7 +72,7 @@ public class JspTagException extends JspException {
      * <code>Throwable</code> exception to get a localized exception message.
      * When subclassing <code>JspTagException</code>, this method can be
      * overridden to create an exception message designed for a specific locale.
-     * 
+     *
      * @param rootCause
      *            the <code>Throwable</code> exception that interfered with the
      *            JSP Tag's normal operation, making the JSP Tag exception

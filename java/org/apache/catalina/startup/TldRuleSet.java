@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -88,10 +88,10 @@ public class TldRuleSet extends RuleSetBase {
     public void addRuleInstances(Digester digester) {
 
         // Note the sharing of state between rules
-        TaglibUriRule taglibUriRule = new TaglibUriRule(); 
+        TaglibUriRule taglibUriRule = new TaglibUriRule();
 
         digester.addRule(prefix + "taglib", new TaglibRule(taglibUriRule));
-        
+
         digester.addRule(prefix + "taglib/uri", taglibUriRule);
 
         digester.addRule(prefix + "taglib/listener/listener-class",
@@ -107,11 +107,11 @@ public class TldRuleSet extends RuleSetBase {
  */
 final class TaglibRule extends Rule {
     private final TaglibUriRule taglibUriRule;
-    
+
     public TaglibRule(TaglibUriRule taglibUriRule) {
         this.taglibUriRule = taglibUriRule;
     }
-    
+
     @Override
     public void body(String namespace, String name, String text)
     throws Exception {
@@ -121,10 +121,10 @@ final class TaglibRule extends Rule {
 }
 
 final class TaglibUriRule extends Rule {
-    
+
     // This is set to false for each file processed by the TaglibRule
     private boolean duplicateUri;
-    
+
     public TaglibUriRule() {
     }
 
@@ -152,7 +152,7 @@ final class TaglibUriRule extends Rule {
             tldConfig.addTaglibUri(text);
         }
     }
-    
+
     public boolean isDuplicateUri() {
         return duplicateUri;
     }
@@ -164,9 +164,9 @@ final class TaglibUriRule extends Rule {
 }
 
 final class TaglibListenerRule extends Rule {
-    
+
     private final TaglibUriRule taglibUriRule;
-    
+
     public TaglibListenerRule(TaglibUriRule taglibUriRule) {
         this.taglibUriRule = taglibUriRule;
     }
@@ -176,11 +176,11 @@ final class TaglibListenerRule extends Rule {
             throws Exception {
         TldConfig tldConfig =
             (TldConfig) digester.peek(digester.getCount() - 1);
-        
+
         // Only process the listener if the URI is not a duplicate
         if (!taglibUriRule.isDuplicateUri()) {
             tldConfig.addApplicationListener(text.trim());
         }
     }
-    
+
 }

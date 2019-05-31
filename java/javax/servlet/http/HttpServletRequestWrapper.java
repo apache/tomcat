@@ -28,7 +28,7 @@ import javax.servlet.ServletRequestWrapper;
  * can be subclassed by developers wishing to adapt the request to a Servlet.
  * This class implements the Wrapper or Decorator pattern. Methods default to
  * calling through to the wrapped request object.
- * 
+ *
  * @see javax.servlet.http.HttpServletRequest
  * @since v 2.3
  */
@@ -37,7 +37,7 @@ public class HttpServletRequestWrapper extends ServletRequestWrapper implements
 
     /**
      * Constructs a request object wrapping the given request.
-     * 
+     *
      * @throws java.lang.IllegalArgumentException
      *             if the request is null
      */
@@ -268,7 +268,7 @@ public class HttpServletRequestWrapper extends ServletRequestWrapper implements
     /**
      * The default behavior of this method is to return
      * isRequestedSessionIdFromUrl() on the wrapped request object.
-     * 
+     *
      * @deprecated As of Version 3.0 of the Java Servlet API
      */
     @Override

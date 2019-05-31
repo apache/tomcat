@@ -25,7 +25,7 @@ import org.apache.catalina.util.Strftime;
 
 /**
  * Implements the Server-side #flastmod command
- * 
+ *
  * @author Bip Thelin
  * @author Paul Speed
  * @author Dan Sandberg
