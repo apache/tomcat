@@ -1368,7 +1368,10 @@
   <property name="junit.formatter.extension" value=".txt" />
 
   <target name="test" description="Runs the JUnit test cases"
-          depends="test-nio,test-nio2,test-apr,cobertura-report" >
+          depends="test-nio,test-nio2,test-apr,cobertura-report,test-status" />
+
+  <target name="test-status"
+          description="Analyses logs directory and reports on skipped tests, test failures and test errors">
     <fileset id="test.result.skippedtests" dir="${test.reports}" includes="*.txt">
       <not>
         <contains text="Skipped: 0" />
