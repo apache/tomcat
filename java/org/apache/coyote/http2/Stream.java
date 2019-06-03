@@ -72,7 +72,7 @@ class Stream extends AbstractStream implements HeaderEmitter {
 
     private final Http2UpgradeHandler handler;
     private final StreamStateMachine state;
-    private final Object connectionAllocationLock = new Object();
+    private final WindowAllocationManager allocationManager = new WindowAllocationManager(this);
 
     // State machine would be too much overhead
     private int headerState = HEADER_STATE_START;
@@ -236,14 +236,7 @@ class Stream extends AbstractStream implements HeaderEmitter {
 
 
     final void cancelAllocationRequests() {
-        // Cancel wait on stream allocation request (if any)
-        synchronized (this) {
-            this.notify();
-        }
-        // Cancel wait on connection allocation request (if any)
-        synchronized (connectionAllocationLock) {
-            connectionAllocationLock.notify();
-        }
+        allocationManager.notifyAny();
     }
 
 
@@ -261,17 +254,7 @@ class Stream extends AbstractStream implements HeaderEmitter {
         boolean notify = getWindowSize() < 1;
         super.incrementWindowSize(windowSizeIncrement);
         if (notify && getWindowSize() > 0) {
-            if (coyoteResponse.getWriteListener() == null) {
-                // Blocking, so use notify to release StreamOutputBuffer
-                notify();
-            } else {
-                // Non-blocking so dispatch
-                coyoteResponse.action(ActionCode.DISPATCH_WRITE, null);
-                // Need to explicitly execute dispatches on the StreamProcessor
-                // as this thread is being processed by an UpgradeProcessor
-                // which won't see this dispatch
-                coyoteResponse.action(ActionCode.DISPATCH_EXECUTE, null);
-            }
+            allocationManager.notifyStream();
         }
     }
 
@@ -287,11 +270,7 @@ class Stream extends AbstractStream implements HeaderEmitter {
             if (block) {
                 try {
                     long writeTimeout = handler.getProtocol().getStreamWriteTimeout();
-                    if (writeTimeout < 0) {
-                        wait();
-                    } else {
-                        wait(writeTimeout);
-                    }
+                    allocationManager.waitForStream(writeTimeout);
                     windowSize = getWindowSize();
                     if (windowSize == 0) {
                         doWriteTimeout();
@@ -303,6 +282,7 @@ class Stream extends AbstractStream implements HeaderEmitter {
                     throw new IOException(e);
                 }
             } else {
+                allocationManager.waitForStreamNonBlocking();
                 return 0;
             }
         }
@@ -329,6 +309,21 @@ class Stream extends AbstractStream implements HeaderEmitter {
         // Trigger a reset once control returns to Tomcat
         streamOutputBuffer.reset = se;
         throw new CloseNowException(msg, se);
+    }
+
+
+    void waitForConnectionAllocation(long timeout) throws InterruptedException {
+        allocationManager.waitForConnection(timeout);
+    }
+
+
+    void waitForConnectionAllocationNonBlocking() {
+        allocationManager.waitForConnectionNonBlocking();
+    }
+
+
+    void notifyConnection() {
+        allocationManager.notifyConnection();
     }
 
 
@@ -780,11 +775,6 @@ class Stream extends AbstractStream implements HeaderEmitter {
 
     StreamException getResetException() {
         return streamOutputBuffer.reset;
-    }
-
-
-    Object getConnectionAllocationLock() {
-        return connectionAllocationLock;
     }
 
 

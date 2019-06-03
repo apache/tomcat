@@ -35,12 +35,10 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import javax.servlet.http.WebConnection;
 
-import org.apache.coyote.ActionCode;
 import org.apache.coyote.Adapter;
 import org.apache.coyote.CloseNowException;
 import org.apache.coyote.ProtocolException;
 import org.apache.coyote.Request;
-import org.apache.coyote.Response;
 import org.apache.coyote.http11.upgrade.InternalHttpUpgradeHandler;
 import org.apache.coyote.http2.HpackDecoder.HeaderEmitter;
 import org.apache.coyote.http2.HpackEncoder.State;
@@ -747,11 +745,10 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
 
 
     int reserveWindowSize(Stream stream, int reservation, boolean block) throws IOException {
-        // Need to be holding the connection allocation lock so releaseBacklog()
-        // can't notify this thread until after this thread enters wait()
+        // Need to be holding the stream lock so releaseBacklog() can't notify
+        // this thread until after this thread enters wait()
         int allocation = 0;
-        Object connectionAllocationLock = stream.getConnectionAllocationLock();
-        synchronized (connectionAllocationLock) {
+        synchronized (stream) {
             do {
                 synchronized (this) {
                     if (!stream.canWrite()) {
@@ -804,38 +801,35 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
                             // request is for a stream, use the connection
                             // timeout
                             long writeTimeout = protocol.getWriteTimeout();
-                            if (writeTimeout < 0) {
-                                connectionAllocationLock.wait();
-                            } else {
-                                connectionAllocationLock.wait(writeTimeout);
-                                // Has this stream been granted an allocation
-                                // Note: If the stream in not in this Map then the
-                                //       requested write has been fully allocated
-                                BacklogTracker tracker;
-                                // Ensure allocations made in other threads are visible
-                                synchronized (this) {
-                                    tracker = backLogStreams.get(stream);
-                                }
-                                if (tracker != null && tracker.getUnusedAllocation() == 0) {
-                                    if (log.isDebugEnabled()) {
-                                        log.debug(sm.getString("upgradeHandler.noAllocation",
-                                                connectionId, stream.getIdentifier()));
-                                    }
-                                    // No allocation
-                                    // Close the connection. Do this first since
-                                    // closing the stream will raise an exception
-                                    close();
-                                    // Close the stream (in app code so need to
-                                    // signal to app stream is closing)
-                                    stream.doWriteTimeout();
-                                }
+                            stream.waitForConnectionAllocation(writeTimeout);
+                            // Has this stream been granted an allocation
+                            // Note: If the stream in not in this Map then the
+                            //       requested write has been fully allocated
+                            BacklogTracker tracker;
+                            // Ensure allocations made in other threads are visible
+                            synchronized (this) {
+                                tracker = backLogStreams.get(stream);
                             }
+                            if (tracker != null && tracker.getUnusedAllocation() == 0) {
+                                if (log.isDebugEnabled()) {
+                                    log.debug(sm.getString("upgradeHandler.noAllocation",
+                                            connectionId, stream.getIdentifier()));
+                                }
+                                // No allocation
+                                // Close the connection. Do this first since
+                                // closing the stream will raise an exception
+                                close();
+                                // Close the stream (in app code so need to
+                                // signal to app stream is closing)
+                                stream.doWriteTimeout();
+                                }
                         } catch (InterruptedException e) {
                             throw new IOException(sm.getString(
                                     "upgradeHandler.windowSizeReservationInterrupted", connectionId,
                                     stream.getIdentifier(), Integer.toString(reservation)), e);
                         }
                     } else {
+                        stream.waitForConnectionAllocationNonBlocking();
                         return 0;
                     }
                 }
@@ -872,29 +866,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
                 if (this == stream) {
                     continue;
                 }
-                Response coyoteResponse = ((Stream) stream).getCoyoteResponse();
-                if (coyoteResponse.getWriteListener() == null) {
-                    if (log.isDebugEnabled()) {
-                        log.debug(sm.getString("upgradeHandler.notify",
-                            connectionId, stream.getIdentifier()));
-                    }
-                    // Blocking, so use notify to release StreamOutputBuffer
-                    Object connectionAllocationLock = ((Stream) stream).getConnectionAllocationLock();
-                    synchronized (connectionAllocationLock) {
-                        connectionAllocationLock.notify();
-                    }
-                } else {
-                    if (log.isDebugEnabled()) {
-                        log.debug(sm.getString("upgradeHandler.dispatchWrite",
-                            connectionId, stream.getIdentifier()));
-                    }
-                    // Non-blocking so dispatch
-                    coyoteResponse.action(ActionCode.DISPATCH_WRITE, null);
-                    // Need to explicitly execute dispatches on the
-                    // StreamProcessor as this thread is being processed by an
-                    // UpgradeProcessor which won't see this dispatch
-                    coyoteResponse.action(ActionCode.DISPATCH_EXECUTE, null);
-                }
+                ((Stream) stream).notifyConnection();
             }
         }
     }
