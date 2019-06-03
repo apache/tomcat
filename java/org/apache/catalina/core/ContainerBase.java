@@ -808,18 +808,22 @@ public abstract class ContainerBase extends LifecycleMBeanBase
             log.error(sm.getString("containerBase.child.stop"), e);
         }
 
+        boolean destroy = false;
         try {
             // child.destroy() may have already been called which would have
             // triggered this call. If that is the case, no need to destroy the
             // child again.
             if (!LifecycleState.DESTROYING.equals(child.getState())) {
                 child.destroy();
+                destroy = true;
             }
         } catch (LifecycleException e) {
             log.error(sm.getString("containerBase.child.destroy"), e);
         }
 
-        fireContainerEvent(REMOVE_CHILD_EVENT, child);
+        if (!destroy) {
+            fireContainerEvent(REMOVE_CHILD_EVENT, child);
+        }
 
         synchronized(children) {
             if (children.get(child.getName()) == null)

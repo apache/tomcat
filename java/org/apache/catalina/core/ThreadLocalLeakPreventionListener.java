@@ -19,7 +19,6 @@ package org.apache.catalina.core;
 
 import java.util.concurrent.Executor;
 
-import org.apache.catalina.Container;
 import org.apache.catalina.ContainerEvent;
 import org.apache.catalina.Context;
 import org.apache.catalina.Engine;
@@ -105,16 +104,6 @@ public class ThreadLocalLeakPreventionListener extends FrameworkListener {
             log.error(msg, e);
         }
 
-    }
-
-    @Override
-    protected void processContainerRemoveChild(Container child) {
-        if (child instanceof Context) {
-            Context context = (Context) child;
-            context.removeLifecycleListener(this);
-        } else {
-            super.processContainerRemoveChild(child);
-        }
     }
 
     /**

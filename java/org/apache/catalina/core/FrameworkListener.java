@@ -17,6 +17,8 @@
 
 package org.apache.catalina.core;
 
+import java.util.concurrent.ConcurrentHashMap;
+
 import org.apache.catalina.Container;
 import org.apache.catalina.ContainerEvent;
 import org.apache.catalina.ContainerListener;
@@ -35,6 +37,9 @@ import org.apache.catalina.Service;
  * adding a Listener in context.xml with more flexibility.
  */
 public abstract class FrameworkListener implements LifecycleListener, ContainerListener {
+
+    protected final ConcurrentHashMap<Context, LifecycleListener> contextListeners =
+            new ConcurrentHashMap<>();
 
     /**
      * Create a lifecycle listener which will then be added to the specified context.
@@ -71,7 +76,6 @@ public abstract class FrameworkListener implements LifecycleListener, ContainerL
                 registerListenersForEngine(engine);
             }
         }
-
     }
 
     protected void registerListenersForEngine(Engine engine) {
@@ -90,7 +94,9 @@ public abstract class FrameworkListener implements LifecycleListener, ContainerL
     }
 
     protected void registerContextListener(Context context) {
-        context.addLifecycleListener(createLifecycleListener(context));
+        LifecycleListener listener = createLifecycleListener(context);
+        contextListeners.put(context, listener);
+        context.addLifecycleListener(listener);
     }
 
     protected void processContainerAddChild(Container child) {
@@ -104,7 +110,12 @@ public abstract class FrameworkListener implements LifecycleListener, ContainerL
     }
 
     protected void processContainerRemoveChild(Container child) {
-        if (child instanceof Host || child instanceof Engine) {
+        if (child instanceof Context) {
+            LifecycleListener listener = contextListeners.remove(child);
+            if (listener != null) {
+                child.removeLifecycleListener(listener);
+            }
+        } else if (child instanceof Host || child instanceof Engine) {
             child.removeContainerListener(this);
         }
     }
