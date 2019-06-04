@@ -39,6 +39,7 @@ import javax.management.ObjectName;
 import javax.servlet.http.HttpUpgradeHandler;
 import javax.servlet.http.WebConnection;
 
+import org.apache.coyote.http11.upgrade.InternalHttpUpgradeHandler;
 import org.apache.juli.logging.Log;
 import org.apache.tomcat.InstanceManager;
 import org.apache.tomcat.util.ExceptionUtils;
@@ -902,6 +903,12 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
                                     httpUpgradeHandler.init((WebConnection) processor);
                                 } finally {
                                     upgradeToken.getContextBind().unbind(false, oldCL);
+                                }
+                            }
+                            if (httpUpgradeHandler instanceof InternalHttpUpgradeHandler) {
+                                if (((InternalHttpUpgradeHandler) httpUpgradeHandler).hasAsyncIO()) {
+                                    // The handler will initiate all further I/O
+                                    state = SocketState.LONG;
                                 }
                             }
                         }

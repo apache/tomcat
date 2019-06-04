@@ -730,11 +730,6 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
     }
 
 
-    boolean hasAsyncIO() {
-        return false;
-    }
-
-
     protected void processWrites() throws IOException {
         synchronized (socketWrapper) {
             if (socketWrapper.flush(false)) {
@@ -822,7 +817,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
                                 // Close the stream (in app code so need to
                                 // signal to app stream is closing)
                                 stream.doWriteTimeout();
-                                }
+                            }
                         } catch (InterruptedException e) {
                             throw new IOException(sm.getString(
                                     "upgradeHandler.windowSizeReservationInterrupted", connectionId,

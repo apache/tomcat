@@ -80,10 +80,12 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
         return new AsyncPingManager();
     }
 
+
     @Override
-    boolean hasAsyncIO() {
+    public boolean hasAsyncIO() {
         return true;
     }
+
 
     @Override
     protected void processConnection(WebConnection webConnection,
