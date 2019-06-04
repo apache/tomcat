@@ -37,8 +37,4 @@ public interface InternalHttpUpgradeHandler extends HttpUpgradeHandler {
     void setSslSupport(SSLSupport sslSupport);
 
     void pause();
-
-    default boolean hasAsyncIO() {
-        return false;
-    }
 }
