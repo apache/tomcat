@@ -593,7 +593,6 @@ public abstract class HttpServlet extends GenericServlet {
         ServletOutputStream out = resp.getOutputStream();
         out.print(buffer.toString());
         out.close();
-        return;
     }
 
 
