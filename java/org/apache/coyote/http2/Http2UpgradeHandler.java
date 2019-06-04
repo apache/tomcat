@@ -826,7 +826,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
                                 // Close the stream (in app code so need to
                                 // signal to app stream is closing)
                                 stream.doWriteTimeout();
-                                }
+                            }
                         } catch (InterruptedException e) {
                             throw new IOException(sm.getString(
                                     "upgradeHandler.windowSizeReservationInterrupted", connectionId,
