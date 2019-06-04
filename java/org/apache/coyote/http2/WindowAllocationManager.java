@@ -121,7 +121,7 @@ class WindowAllocationManager {
 
     private void waitFor(int waitTarget, long timeout) throws InterruptedException {
         synchronized (stream) {
-            if (waitingFor != 0) {
+            if (waitingFor != NONE) {
                 throw new IllegalStateException(sm.getString("windowAllocationManager.waitFor.ise",
                         stream.getConnectionId(), stream.getIdentifier()));
             }
@@ -134,14 +134,14 @@ class WindowAllocationManager {
                 stream.wait(timeout);
             }
 
-            waitingFor = 0;
+            waitingFor = NONE;
         }
     }
 
 
     private void waitForNonBlocking(int waitTarget) {
         synchronized (stream) {
-            if (waitingFor == 0) {
+            if (waitingFor == NONE) {
                 waitingFor = waitTarget;
             } else if (waitingFor == waitTarget) {
                 // NO-OP
@@ -162,7 +162,7 @@ class WindowAllocationManager {
         }
 
         synchronized (stream) {
-            if ((notifyTarget & waitingFor) > 0) {
+            if ((notifyTarget & waitingFor) > NONE) {
                 if (stream.getCoyoteResponse().getWriteListener() == null) {
                     // Blocking, so use notify to release StreamOutputBuffer
                     if (log.isDebugEnabled()) {
@@ -171,7 +171,7 @@ class WindowAllocationManager {
                     }
                     stream.notify();
                 } else {
-                    waitingFor = 0;
+                    waitingFor = NONE;
                     // Non-blocking so dispatch
                     if (log.isDebugEnabled()) {
                         log.debug(sm.getString("windowAllocationManager.dispatched",
