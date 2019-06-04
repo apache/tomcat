@@ -28,6 +28,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.Wrapper;
@@ -46,7 +48,13 @@ import org.apache.catalina.startup.Tomcat;
  *       while the specification allows this to work - it doesn't require that
  *       it does work.
  */
+@RunWith(Parameterized.class)
 public class TestAsyncFlush extends Http2TestBase {
+
+    @Parameterized.Parameters
+    public static Object[][] data() {
+        return new Object[10][0];
+    }
 
     private static final int BLOCK_SIZE = 1024;
 

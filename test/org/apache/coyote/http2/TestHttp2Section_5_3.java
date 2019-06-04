@@ -18,6 +18,8 @@ package org.apache.coyote.http2;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
 /**
  * Unit tests for Section 5.3 of
@@ -29,7 +31,13 @@ import org.junit.Test;
  * Note: Unit tests for the examples described by each of the figures may be
  * found in {@link TestAbstractStream}.
  */
+@RunWith(Parameterized.class)
 public class TestHttp2Section_5_3 extends Http2TestBase {
+
+    @Parameterized.Parameters
+    public static Object[][] data() {
+        return new Object[10][0];
+    }
 
     // Section 5.3.1
 
