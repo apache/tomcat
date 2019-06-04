@@ -146,8 +146,11 @@ class WindowAllocationManager {
             } else if (waitingFor == waitTarget) {
                 // NO-OP
                 // Non-blocking post-processing may attempt to flush
-            } else {
+            } else if ((waitTarget & waitingFor) == NONE) {
                 waitingFor |= waitTarget;
+            } else {
+                throw new IllegalStateException(sm.getString("windowAllocationManager.waitFor.ise",
+                        stream.getConnectionId(), stream.getIdentifier()));
             }
         }
     }
