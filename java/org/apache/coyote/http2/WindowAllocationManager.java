@@ -133,8 +133,6 @@ class WindowAllocationManager {
             } else {
                 stream.wait(timeout);
             }
-
-            waitingFor = NONE;
         }
     }
 
@@ -163,6 +161,12 @@ class WindowAllocationManager {
 
         synchronized (stream) {
             if ((notifyTarget & waitingFor) > NONE) {
+                // Reset this here so multiple notifies (possible with a
+                // backlog containing multiple streams and small window updates)
+                // are handled correctly (only the first should trigger a call
+                // to stream.notify(). Additional notify() calls may trigger
+                // unexpected timeouts.
+                waitingFor = NONE;
                 if (stream.getCoyoteResponse().getWriteListener() == null) {
                     // Blocking, so use notify to release StreamOutputBuffer
                     if (log.isDebugEnabled()) {
@@ -171,7 +175,6 @@ class WindowAllocationManager {
                     }
                     stream.notify();
                 } else {
-                    waitingFor = NONE;
                     // Non-blocking so dispatch
                     if (log.isDebugEnabled()) {
                         log.debug(sm.getString("windowAllocationManager.dispatched",
