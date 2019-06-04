@@ -175,6 +175,11 @@
       <fix>
         Fix HTTP/2 end of stream concurrency with async. (remm)
       </fix>
+      <fix>
+        Correct a bug in the stream flushing code that could lead to multiple
+        threads processing the stream concurrently which in turn could cause
+        errors processing the stream. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">

@@ -887,7 +887,9 @@ class Stream extends AbstractStream implements HeaderEmitter {
                 flushed = true;
             }
 
-            if (!dataInBuffer) {
+            if (dataInBuffer) {
+                dataLeft = true;
+            } else {
                 if (writeBuffer.isEmpty()) {
                     // Both buffer and writeBuffer are empty.
                     if (flushed) {
