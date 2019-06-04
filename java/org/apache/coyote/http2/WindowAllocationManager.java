@@ -146,12 +146,11 @@ class WindowAllocationManager {
             } else if (waitingFor == waitTarget) {
                 // NO-OP
                 // Non-blocking post-processing may attempt to flush
-            } else if ((waitTarget & waitingFor) == NONE) {
-                waitingFor |= waitTarget;
             } else {
                 throw new IllegalStateException(sm.getString("windowAllocationManager.waitFor.ise",
                         stream.getConnectionId(), stream.getIdentifier()));
             }
+
         }
     }
 
@@ -172,19 +171,17 @@ class WindowAllocationManager {
                     }
                     stream.notify();
                 } else {
-                    waitingFor &= ~notifyTarget;
-                    if (waitingFor == NONE) {
-                        // Non-blocking so dispatch
-                        if (log.isDebugEnabled()) {
-                            log.debug(sm.getString("windowAllocationManager.dispatched",
-                                    stream.getConnectionId(), stream.getIdentifier()));
-                        }
-                        stream.getCoyoteResponse().action(ActionCode.DISPATCH_WRITE, null);
-                        // Need to explicitly execute dispatches on the StreamProcessor
-                        // as this thread is being processed by an UpgradeProcessor
-                        // which won't see this dispatch
-                        stream.getCoyoteResponse().action(ActionCode.DISPATCH_EXECUTE, null);
+                    waitingFor = NONE;
+                    // Non-blocking so dispatch
+                    if (log.isDebugEnabled()) {
+                        log.debug(sm.getString("windowAllocationManager.dispatched",
+                                stream.getConnectionId(), stream.getIdentifier()));
                     }
+                    stream.getCoyoteResponse().action(ActionCode.DISPATCH_WRITE, null);
+                    // Need to explicitly execute dispatches on the StreamProcessor
+                    // as this thread is being processed by an UpgradeProcessor
+                    // which won't see this dispatch
+                    stream.getCoyoteResponse().action(ActionCode.DISPATCH_EXECUTE, null);
                 }
             }
         }
