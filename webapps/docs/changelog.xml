@@ -96,6 +96,11 @@
         Add support for same-site cookie attribute. Patch provided by John
         Kelly. (markt)
       </add>
+      <fix>
+        Correct a bug in the stream flushing code that could lead to multiple
+        threads processing the stream concurrently which in turn could cause
+        errors processing the stream. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">
