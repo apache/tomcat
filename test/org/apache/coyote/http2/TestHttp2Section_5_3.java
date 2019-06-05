@@ -18,8 +18,6 @@ package org.apache.coyote.http2;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
 
 /**
  * Unit tests for Section 5.3 of
@@ -31,13 +29,7 @@ import org.junit.runners.Parameterized;
  * Note: Unit tests for the examples described by each of the figures may be
  * found in {@link TestAbstractStream}.
  */
-@RunWith(Parameterized.class)
 public class TestHttp2Section_5_3 extends Http2TestBase {
-
-    @Parameterized.Parameters
-    public static Object[][] data() {
-        return new Object[10][0];
-    }
 
     // Section 5.3.1
 
@@ -172,7 +164,7 @@ public class TestHttp2Section_5_3 extends Http2TestBase {
             // on ci.apache.org so allow a margin and use 20.
             if (data[1] > 20) {
                 // Larger than expected body size
-                Assert.fail("Larger than expected body: [" + output.getTrace() + "]");
+                Assert.fail("Larger than expected body: [" + output.getTrace() + "] " + data[1]);
             }
             output.clearTrace();
         }
