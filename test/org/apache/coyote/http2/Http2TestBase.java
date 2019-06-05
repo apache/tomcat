@@ -57,7 +57,13 @@ import org.apache.tomcat.util.http.MimeHeaders;
  * Tests for compliance with the <a href="https://tools.ietf.org/html/rfc7540">
  * HTTP/2 specification</a>.
  */
+@org.junit.runner.RunWith(org.junit.runners.Parameterized.class)
 public abstract class Http2TestBase extends TomcatBaseTest {
+
+    @org.junit.runners.Parameterized.Parameters
+    public static Object[][] data() {
+        return new Object[Integer.getInteger("tomcat.test.http2.loopCount", 1)][0];
+    }
 
     // Nothing special about this date apart from it being the date I ran the
     // test that demonstrated that most HTTP/2 tests were failing because the

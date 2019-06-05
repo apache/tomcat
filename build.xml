@@ -1607,6 +1607,7 @@
         <sysproperty key="tomcat.test.openssl.unimplemented" value="${test.openssl.unimplemented}" />
         <sysproperty key="tomcat.test.relaxTiming" value="${test.relaxTiming}" />
         <sysproperty key="tomcat.test.sslImplementation" value="${test.sslImplementation}" />
+        <sysproperty key="tomcat.test.http2.loopCount" value="${test.http2.loopCount}" />
         <!-- File for Cobertura to write coverage results to -->
         <sysproperty key="net.sourceforge.cobertura.datafile" file="${cobertura.datafile}" />
 
