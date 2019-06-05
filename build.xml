@@ -689,12 +689,19 @@
       <filterset refid="version.filters"/>
       <fileset dir="java">
         <include name="**/*.properties"/>
+        <exclude name="**/LocalStrings*.properties"/>
+        <exclude name="**/Messages*.properties"/>
         <include name="**/*.dtd"/>
         <include name="**/*.tasks"/>
         <include name="**/*.xsd"/>
         <include name="**/*.xml"/>
       </fileset>
     </copy>
+
+    <!-- Convert the message files from UTF-8 to ASCII. This can be removed
+    after upgrading to Java 9+ as the minimum JRE and specifying the encoding
+    when loading the ResourceBundles -->
+    <native2ascii src="java" dest="${tomcat.classes}" includes="**/LocalStrings*.properties,**/Messages*.properties" encoding="UTF-8"/>
 
   </target>
 
@@ -1126,6 +1133,15 @@
              encoding="ISO-8859-1"
              includeantruntime="false">
     </javac>
+
+    <!-- Convert the message files of the examples webapp from UTF-8 to ASCII.
+    This can be removed after upgrading to Java 9+ as the minimum JRE and
+    specifying the encoding when loading the ResourceBundles -->
+    <native2ascii src="webapps/examples/WEB-INF/classes"
+                  dest="${tomcat.build}/webapps/examples/WEB-INF/classes"
+                  includes="**/LocalStrings*.properties"
+                  encoding="UTF-8"/>
+
   </target>
 
   <target name="build-tomcat-jdbc" depends="package">

@@ -45,6 +45,14 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 8.5.43 (markt)" rtext="in development">
+  <subsection name="Other">
+    <changelog>
+      <scode>
+        Switch i18n message files to use UTF-8 and convert to ASCII at build
+        time. (markt)
+      </scode>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 8.5.42 (markt)" rtext="release in progress">
   <subsection name="Catalina">
