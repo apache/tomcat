@@ -217,6 +217,7 @@ public class File {
      * If perm is APR_OS_DEFAULT and the file is being created,
      * appropriate default permissions will be used.
      * @return The opened file descriptor.
+     * @throws Error An error occurred
      */
     public static native long open(String fname, int flag, int perm, long pool)
         throws Error;
@@ -224,12 +225,14 @@ public class File {
     /**
      * Close the specified file.
      * @param file The file descriptor to close.
+     * @return the operation status
      */
     public static native int close(long file);
 
     /**
      * Flush the file's buffer.
      * @param thefile The file descriptor to flush
+     * @return the operation status
      */
     public static native int flush(long thefile);
 
@@ -247,7 +250,7 @@ public class File {
      * with a string that makes the filename unique. Since it will  be  modified,
      * template must not be a string constant, but should be declared as a character
      * array.
-     *
+     * @throws Error An error occurred
      */
     public static native long mktemp(String templ, int flags, long pool)
         throws Error;
@@ -258,6 +261,7 @@ public class File {
      * @param pool The pool to use.
      * If the file is open, it won't be removed until all
      * instances are closed.
+     * @return the operation status
      */
     public static native int remove(String path, long pool);
 
@@ -269,6 +273,7 @@ public class File {
      * @param fromPath The full path to the original file (using / on all systems)
      * @param toPath The full path to the new file (using / on all systems)
      * @param pool The pool to use.
+     * @return the operation status
      */
     public static native int rename(String fromPath, String toPath, long pool);
 
@@ -283,6 +288,7 @@ public class File {
      *     value APR_FILE_SOURCE_PERMS may be given, in which case the source
      *     file's permissions are copied.
      * @param pool The pool to use.
+     * @return the operation status
      */
     public static native int copy(String fromPath, String toPath, int perms, long pool);
 
@@ -296,6 +302,7 @@ public class File {
      *     value APR_FILE_SOURCE_PERMS may be given, in which case the source
      *     file's permissions are copied.
      * @param pool The pool to use.
+     * @return the operation status
      */
     public static native int append(String fromPath, String toPath, int perms, long pool);
 
@@ -303,6 +310,7 @@ public class File {
      * Write the string into the specified file.
      * @param str The string to write. Must be NUL terminated!
      * @param thefile The file descriptor to write to
+     * @return the operation status
      */
     public static native int puts(byte [] str, long thefile);
 
@@ -317,6 +325,7 @@ public class File {
      * </PRE>
      * @param offset The offset to move the pointer to.
      * @return Offset the pointer was actually moved to.
+     * @throws Error If an error occurs reading the file
      */
     public static native long seek(long thefile, int where, long offset)
         throws Error;
@@ -325,6 +334,7 @@ public class File {
      * Write a character into the specified file.
      * @param ch The character to write.
      * @param thefile The file descriptor to write to
+     * @return the operation status
      */
     public static native int putc(byte ch, long thefile);
 
@@ -332,6 +342,7 @@ public class File {
      * Put a character back onto a specified stream.
      * @param ch The character to write.
      * @param thefile The file descriptor to write to
+     * @return the operation status
      */
     public static native int ungetc(byte ch, long thefile);
 
@@ -535,6 +546,7 @@ public class File {
      * @param buf The buffer to store the string in.
      * @param offset Start offset in buf
      * @param thefile The file descriptor to read from
+     * @return the number of bytes read.
      */
     public static native int gets(byte[] buf,  int offset, long thefile);
 
@@ -543,6 +555,7 @@ public class File {
      * Read a character from the specified file.
      * @param thefile The file descriptor to read from
      * @return The read character
+     * @throws Error If an error occurs reading the file
      */
     public static native int getc(long thefile)
         throws Error;
@@ -555,8 +568,9 @@ public class File {
     public static native int eof(long fptr);
 
     /**
-     * return the file name of the current file.
+     * Return the file name of the current file.
      * @param thefile The currently open file.
+     * @return the name
      */
     public static native String nameGet(long thefile);
 
@@ -590,6 +604,7 @@ public class File {
      * </PRE>
      * @param mask Mask of valid bits in attributes.
      * @param pool the pool to use.
+     * @return the operation status
      */
     public static native int  attrsSet(String fname, int attributes, int mask, long pool);
 
@@ -600,6 +615,7 @@ public class File {
      * @param fname The full path to the file (using / on all systems)
      * @param mtime The mtime to apply to the file in microseconds
      * @param pool The pool to use.
+     * @return the operation status
      */
     public static native int  mtimeSet(String fname, long mtime, long pool);
 
@@ -611,12 +627,14 @@ public class File {
      * block.
      * @param thefile The file to lock.
      * @param type The type of lock to establish on the file.
+     * @return the operation status
      */
     public static native int lock(long thefile, int type);
 
     /**
      * Remove any outstanding locks on the file.
      * @param thefile The file to unlock.
+     * @return the operation status
      */
     public static native int unlock(long thefile);
 
@@ -632,6 +650,7 @@ public class File {
      * Truncate the file's length to the specified offset
      * @param fp The file to truncate
      * @param offset The offset to truncate to.
+     * @return the operation status
      */
     public static native int trunc(long fp, long offset);
 
@@ -640,6 +659,7 @@ public class File {
      * @param io io[0] The file descriptors to use as input to the pipe.
      *           io[1] The file descriptor to use as output from the pipe.
      * @param pool The pool to operate on.
+     * @return the operation status
      */
     public static native int pipeCreate(long [] io, long pool);
 
@@ -647,6 +667,7 @@ public class File {
      * Get the timeout value for a pipe or manipulate the blocking state.
      * @param thepipe The pipe we are getting a timeout for.
      * @return The current timeout value in microseconds.
+     * @throws Error If an error occurs
      */
     public static native long pipeTimeoutGet(long thepipe)
         throws Error;
@@ -656,6 +677,7 @@ public class File {
      * @param thepipe The pipe we are setting a timeout on.
      * @param timeout The timeout value in microseconds.  Values &lt; 0 mean
      *        wait forever, 0 means do not wait at all.
+     * @return the operation status
      */
     public static native int pipeTimeoutSet(long thepipe, long timeout);
 
@@ -666,6 +688,7 @@ public class File {
      * @param oldFile The file to duplicate.
      * @param pool The pool to use for the new file.
      * @return Duplicated file structure.
+     * @throws Error If an error occurs reading the file descriptor
      */
     public static native long dup(long newFile, long oldFile, long pool)
         throws Error;
@@ -676,7 +699,7 @@ public class File {
      * newFile MUST point at a valid apr_file_t. It cannot be NULL.
      * @param oldFile The file to duplicate.
      * @param pool The pool to use for the new file.
-     * @return Status code.
+     * @return the operation status
      */
     public static native int dup2(long newFile, long oldFile, long pool);
 
@@ -688,6 +711,7 @@ public class File {
      * @param fname The name of the file to stat.
      * @param wanted The desired apr_finfo_t fields, as a bit flag of APR_FINFO_ values
      * @param pool the pool to use to allocate the new file.
+     * @return the operation status
      */
     public static native int stat(FileInfo finfo, String fname, int wanted, long pool);
 
@@ -706,6 +730,7 @@ public class File {
      * @param finfo Where to store the information about the file.
      * @param wanted The desired apr_finfo_t fields, as a bit flag of APR_FINFO_ values
      * @param thefile The file to get information about.
+     * @return the operation status
      */
     public static native int infoGet(FileInfo finfo, int wanted, long thefile);
 

@@ -109,6 +109,7 @@ public class Socket {
      * @param protocol The protocol of the socket (e.g., APR_PROTO_TCP).
      * @param cont The parent pool to use
      * @return The new socket that has been set up.
+     * @throws Exception Error creating socket
      */
     public static native long create(int family, int type,
                                      int protocol, long cont)
@@ -127,12 +128,14 @@ public class Socket {
      * APR_SHUTDOWN_WRITE        no longer allow write requests
      * APR_SHUTDOWN_READWRITE    no longer allow read or write requests
      * </PRE>
+     * @return the operation status
      */
     public static native int shutdown(long thesocket, int how);
 
     /**
      * Close a socket.
      * @param thesocket The socket to close
+     * @return the operation status
      */
     public static native int close(long thesocket);
 
@@ -148,6 +151,7 @@ public class Socket {
      * @param sa The socket address to bind to
      * This may be where we will find out if there is any other process
      *      using the selected port.
+     * @return the operation status
      */
     public static native int bind(long sock, long sa);
 
@@ -157,6 +161,7 @@ public class Socket {
      * @param backlog The number of outstanding connections allowed in the sockets
      *                listen queue.  If this value is less than zero, the listen
      *                queue size is set to zero.
+     * @return the operation status
      */
     public static native int listen(long sock, int backlog);
 
@@ -167,6 +172,7 @@ public class Socket {
      * @return  A copy of the socket that is connected to the socket that
      *          made the connection request.  This is the socket which should
      *          be used for all future communication.
+     * @throws Exception Socket accept error
      */
     public static native long acceptx(long sock, long pool)
         throws Exception;
@@ -177,6 +183,7 @@ public class Socket {
      * @return  A copy of the socket that is connected to the socket that
      *          made the connection request.  This is the socket which should
      *          be used for all future communication.
+     * @throws Exception Socket accept error
      */
     public static native long accept(long sock)
         throws Exception;
@@ -187,14 +194,15 @@ public class Socket {
      * @param name The accept filter
      * @param args Any extra args to the accept filter.  Passing NULL here removes
      *             the accept filter.
+     * @return the operation status
      */
     public static native int acceptfilter(long sock, String name, String args);
 
     /**
      * Query the specified socket if at the OOB/Urgent data mark
      * @param sock The socket to query
-     * @return True if socket is at the OOB/urgent mark,
-     *         otherwise return false.
+     * @return <code>true</code> if socket is at the OOB/urgent mark,
+     *         otherwise <code>false</code>.
      */
     public static native boolean atmark(long sock);
 
@@ -203,6 +211,7 @@ public class Socket {
      * or a different one.
      * @param sock The socket we wish to use for our side of the connection
      * @param sa The address of the machine we wish to connect to.
+     * @return the operation status
      */
     public static native int connect(long sock, long sa);
 
@@ -221,8 +230,7 @@ public class Socket {
      * @param buf The buffer which contains the data to be sent.
      * @param offset Offset in the byte buffer.
      * @param len The number of bytes to write; (-1) for full array.
-     * @return The number of bytes send.
-     *
+     * @return The number of bytes sent
      */
     public static native int send(long sock, byte[] buf, int offset, int len);
 
@@ -244,8 +252,7 @@ public class Socket {
      *               and no larger than buf.length
      * @param len The maximum number of buffers to be accessed; must be non-negative
      *            and no larger than buf.length - offset
-     * @return The number of bytes send.
-     *
+     * @return The number of bytes sent
      */
     public static native int sendb(long sock, ByteBuffer buf,
                                    int offset, int len);
@@ -267,14 +274,20 @@ public class Socket {
      *               and no larger than buf.length
      * @param len The maximum number of buffers to be accessed; must be non-negative
      *            and no larger than buf.length - offset
-     * @return The number of bytes send.
-     *
+     * @return The number of bytes sent
      */
     public static native int sendib(long sock, ByteBuffer buf,
                                     int offset, int len);
 
     /**
      * Send data over a network using internally set ByteBuffer
+     * @param sock The socket to send the data over.
+     * @param offset The offset within the buffer array of the first buffer from
+     *               which bytes are to be retrieved; must be non-negative
+     *               and no larger than buf.length
+     * @param len The maximum number of buffers to be accessed; must be non-negative
+     *            and no larger than buf.length - offset
+     * @return The number of bytes sent
      */
     public static native int sendbb(long sock,
                                    int offset, int len);
@@ -282,6 +295,13 @@ public class Socket {
     /**
      * Send data over a network using internally set ByteBuffer
      * without internal retry.
+     * @param sock The socket to send the data over.
+     * @param offset The offset within the buffer array of the first buffer from
+     *               which bytes are to be retrieved; must be non-negative
+     *               and no larger than buf.length
+     * @param len The maximum number of buffers to be accessed; must be non-negative
+     *            and no larger than buf.length - offset
+     * @return The number of bytes sent
      */
     public static native int sendibb(long sock,
                                      int offset, int len);
@@ -300,7 +320,7 @@ public class Socket {
      * </PRE>
      * @param sock The socket to send the data over.
      * @param vec The array from which to get the data to send.
-     *
+     * @return The number of bytes sent
      */
     public static native int sendv(long sock, byte[][] vec);
 
@@ -311,6 +331,7 @@ public class Socket {
      * @param buf  The data to send
      * @param offset Offset in the byte buffer.
      * @param len  The length of the data to send
+     * @return The number of bytes sent
      */
     public static native int sendto(long sock, long where, int flags,
                                     byte[] buf, int offset, int len);
@@ -457,6 +478,7 @@ public class Socket {
      * APR_SO_RCVBUF     --  Set the ReceiveBufferSize
      * </PRE>
      * @param on Value for the option.
+     * @return the operation status
      */
     public static native int optSet(long sock, int opt, int on);
 
@@ -478,6 +500,7 @@ public class Socket {
      *                       (Currently only used on Windows)
      * </PRE>
      * @return Socket option returned on the call.
+     * @throws Exception An error occurred
      */
     public static native int optGet(long sock, int opt)
         throws Exception;
@@ -492,6 +515,7 @@ public class Socket {
      * t == 0 -- read and write calls never block
      * t &lt; 0  -- read and write calls block
      * </PRE>
+     * @return the operation status
      */
     public static native int timeoutSet(long sock, long t);
 
@@ -499,6 +523,7 @@ public class Socket {
      * Query socket timeout for the specified socket
      * @param sock The socket to query
      * @return Socket timeout returned from the query.
+     * @throws Exception An error occurred
      */
     public static native long timeoutGet(long sock)
         throws Exception;
@@ -522,7 +547,6 @@ public class Socket {
      * @param flags APR flags that are mapped to OS specific flags
      * @return Number of bytes actually sent, including headers,
      *         file, and trailers
-     *
      */
     public static native long sendfile(long sock, long file, byte [][] headers,
                                        byte[][] trailers, long offset,
@@ -530,6 +554,12 @@ public class Socket {
 
     /**
      * Send a file without header and trailer arrays.
+     * @param sock The socket to which we're writing
+     * @param file The open file from which to read
+     * @param offset Offset into the file where we should begin writing
+     * @param len Number of bytes to send from the file
+     * @param flags APR flags that are mapped to OS specific flags
+     * @return Number of bytes actually sent
      */
     public static native long sendfilen(long sock, long file, long offset,
                                         long len, int flags);
@@ -537,6 +567,8 @@ public class Socket {
     /**
      * Create a child pool from associated socket pool.
      * @param thesocket The socket to use
+     * @return a pointer to the pool
+     * @throws Exception An error occurred
      */
     public static native long pool(long thesocket)
         throws Exception;
@@ -578,14 +610,16 @@ public class Socket {
      * @param sock The currently open socket.
      * @param data The user data to associate with the socket.
      * @param key The key to associate with the data.
+     * @return the operation status
      */
       public static native int dataSet(long sock, String key, Object data);
 
     /**
      * Return the data associated with the current socket
-     * @param key The key to associate with the user data.
      * @param sock The currently open socket.
+     * @param key The key to associate with the user data.
      * @return Data or null in case of error.
      */
      public static native Object dataGet(long sock, String key);
+
 }

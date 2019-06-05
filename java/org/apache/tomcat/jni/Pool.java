@@ -150,6 +150,7 @@ public class Pool {
      * Return the data associated with the current pool.
      * @param key The key for the data to retrieve
      * @param pool The current pool.
+     * @return the data
      */
      public static native Object dataGet(long pool, String key);
 

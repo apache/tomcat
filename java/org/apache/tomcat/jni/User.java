@@ -28,6 +28,7 @@ public class User {
      * This function is available only if APR_HAS_USER is defined.
      * @param p The pool from which to allocate working space
      * @return Returns the user id
+     * @throws Error If an error occurred
      */
      public static native long uidCurrent(long p)
         throws Error;
@@ -37,6 +38,7 @@ public class User {
      * This function is available only if APR_HAS_USER is defined.
      * @param p The pool from which to allocate working space
      * @return Returns the group id
+     * @throws Error If an error occurred
      */
      public static native long gidCurrent(long p)
         throws Error;
@@ -48,6 +50,7 @@ public class User {
      * @param username The username to lookup
      * @param p The pool from which to allocate working space
      * @return Returns the user id
+     * @throws Error If an error occurred
      */
      public static native long uid(String username, long p)
         throws Error;
@@ -58,6 +61,7 @@ public class User {
      * @param username The username to lookup
      * @param p The pool from which to allocate working space
      * @return  Returns the user's group id
+     * @throws Error If an error occurred
      */
      public static native long usergid(String username, long p)
         throws Error;
@@ -68,6 +72,7 @@ public class User {
      * @param groupname The group name to look up
      * @param p The pool from which to allocate working space
      * @return  Returns the user's group id
+     * @throws Error If an error occurred
      */
      public static native long gid(String groupname, long p)
         throws Error;
@@ -78,6 +83,7 @@ public class User {
      * @param userid The userid
      * @param p The pool from which to allocate the string
      * @return New string containing user name
+     * @throws Error If an error occurred
      */
      public static native String username(long userid, long p)
         throws Error;
@@ -88,6 +94,7 @@ public class User {
      * @param groupid The groupid
      * @param p The pool from which to allocate the string
      * @return New string containing group name
+     * @throws Error If an error occurred
      */
      public static native String groupname(long groupid, long p)
         throws Error;
@@ -118,6 +125,7 @@ public class User {
      * @param username The named user
      * @param p The pool from which to allocate the string
      * @return New string containing directory name
+     * @throws Error If an error occurred
      */
      public static native String homepath(String username, long p)
         throws Error;

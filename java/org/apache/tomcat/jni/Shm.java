@@ -48,7 +48,7 @@ public class Shm {
      * @param pool the pool from which to allocate the shared memory
      *        structure.
      * @return The created shared memory structure.
-     *
+     * @throws Error An error occurred
      */
     public static native long create(long reqsize, String filename, long pool)
         throws Error;
@@ -62,12 +62,14 @@ public class Shm {
      * @param filename The filename associated with shared-memory segment which
      *        needs to be removed
      * @param pool The pool used for file operations
+     * @return the operation status
      */
     public static native int remove(String filename, long pool);
 
     /**
      * Destroy a shared memory segment and associated memory.
      * @param m The shared memory segment structure to destroy.
+     * @return the operation status
      */
     public static native int destroy(long m);
 
@@ -79,6 +81,7 @@ public class Shm {
      * @param pool the pool from which to allocate the shared memory
      *        structure for this process.
      * @return The created shared memory structure.
+     * @throws Error An error occurred
      */
     public static native long attach(String filename, long pool)
         throws Error;
@@ -87,6 +90,7 @@ public class Shm {
      * Detach from a shared memory segment without destroying it.
      * @param m The shared memory structure representing the segment
      *        to detach from.
+     * @return the operation status
      */
     public static native int detach(long m);
 
@@ -105,6 +109,7 @@ public class Shm {
      * Retrieve the length of a shared memory segment in bytes.
      * @param m The shared memory segment from which to retrieve
      *        the segment length.
+     * @return the length of the segment
      */
     public static native long size(long m);
 

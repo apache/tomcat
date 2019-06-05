@@ -14,14 +14,12 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package org.apache.tomcat.jni;
 
 /** Poll
  *
  * @author Mladen Turk
  */
-
 public class Poll {
 
     /**
@@ -68,12 +66,14 @@ public class Poll {
      * @param flags Optional flags to modify the operation of the pollset.
      * @param ttl Maximum time to live for a particular socket.
      * @return  The pointer in which to return the newly created object
+     * @throws Error Pollset creation failed
      */
     public static native long create(int size, long p, int flags, long ttl)
         throws Error;
     /**
      * Destroy a pollset object
      * @param pollset The pollset to destroy
+     * @return the operation status
      */
     public static native int destroy(long pollset);
 
@@ -82,6 +82,7 @@ public class Poll {
      * @param pollset The pollset to which to add the socket
      * @param sock The sockets to add
      * @param reqevents requested events
+     * @return the operation status
      */
     public static native int add(long pollset, long sock,
                                  int reqevents);
@@ -92,6 +93,7 @@ public class Poll {
      * @param sock The sockets to add
      * @param reqevents requested events
      * @param timeout requested timeout in microseconds (-1 for infinite)
+     * @return the operation status
      */
     public static native int addWithTimeout(long pollset, long sock,
                                             int reqevents, long timeout);
@@ -100,6 +102,7 @@ public class Poll {
      * Remove a descriptor from a pollset
      * @param pollset The pollset from which to remove the descriptor
      * @param sock The socket to remove
+     * @return the operation status
      */
     public static native int remove(long pollset, long sock);
 

@@ -28,13 +28,19 @@ public class Time {
     /** number of milliseconds per microsecond */
     public static final long APR_MSEC_PER_USEC = 1000L;
 
-    /** @return apr_time_t as a second */
+    /**
+     * @param t The time
+     * @return apr_time_t as a second
+     */
     public static long sec(long t)
     {
         return t / APR_USEC_PER_SEC;
     }
 
-    /** @return apr_time_t as a msec */
+    /**
+     * @param t The time
+     * @return apr_time_t as a msec
+     */
     public static long msec(long t)
     {
         return t / APR_MSEC_PER_USEC;
@@ -50,6 +56,7 @@ public class Time {
      * Formats dates in the RFC822
      * format in an efficient manner.
      * @param t the time to convert
+     * @return the formatted date
      */
     public static native String rfc822(long t);
 
@@ -59,6 +66,7 @@ public class Time {
      * Unlike ANSI/ISO C ctime(), apr_ctime() does not include
      * a \n at the end of the string.
      * @param t the time to convert
+     * @return the formatted date
      */
     public static native String ctime(long t);
 

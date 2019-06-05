@@ -28,12 +28,14 @@ public class Address {
      * Fill the Sockaddr class from apr_sockaddr_t
      * @param info Sockaddr class to fill
      * @param sa Structure pointer
+     * @return <code>true</code> if the operation was successful
      */
     public static native boolean fill(Sockaddr info, long sa);
 
     /**
      * Create the Sockaddr object from apr_sockaddr_t
      * @param sa Structure pointer
+     * @return the socket address
      */
     public static native Sockaddr getInfo(long sa);
 
@@ -59,6 +61,7 @@ public class Address {
      * </PRE>
      * @param p The pool for the apr_sockaddr_t and associated storage.
      * @return The new apr_sockaddr_t.
+     * @throws Exception Operation failed
      */
     public static native long info(String hostname, int family,
                                    int port, int flags, long p)
@@ -93,6 +96,7 @@ public class Address {
      * @param which Which interface do we want the apr_sockaddr_t for?
      * @param sock The socket to use
      * @return The returned apr_sockaddr_t.
+     * @throws Exception An error occurred
      */
     public static native long get(int which, long sock)
         throws Exception;
@@ -104,8 +108,7 @@ public class Address {
      *
      * @param a One of the APR socket addresses.
      * @param b The other APR socket address.
-     * The return value will be True if the addresses
-     * are equivalent.
+     * @return <code>true</code> if the addresses are equal
      */
     public static native boolean equal(long a, long b);
 

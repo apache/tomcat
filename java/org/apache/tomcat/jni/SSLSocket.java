@@ -28,6 +28,7 @@ public class SSLSocket {
      * @param ctx SSLContext to use.
      * @param sock APR Socket that already did physical connect or accept.
      * @return APR_STATUS code.
+     * @throws Exception An error occurred
      */
     public static native int attach(long ctx, long sock)
         throws Exception;
@@ -35,6 +36,7 @@ public class SSLSocket {
     /**
      * Do a SSL handshake.
      * @param thesocket The socket to use
+     * @return the handshake status
      */
     public static native int handshake(long thesocket);
 
@@ -51,6 +53,7 @@ public class SSLSocket {
      * only), so Apache has no API hook for this step.
      *
      * @param thesocket The socket to use
+     * @return the operation status
      */
     public static native int renegotiate(long thesocket);
 
@@ -74,6 +77,9 @@ public class SSLSocket {
      * <br>
      * @param sock  The socket to change.
      * @param level Type of Client Certificate verification.
+     * @param depth Maximum number of certificates to permit in chain from
+     *              client to trusted CA. Use a value of 0 or less to leave the
+     *              current value unchanged
      */
     public static native void setVerify(long sock, int level, int depth);
 
@@ -83,6 +89,7 @@ public class SSLSocket {
      * @param sock The socket to read the data from.
      * @param id Parameter id.
      * @return Byte array containing info id value.
+     * @throws Exception An error occurred
      */
     public static native byte[] getInfoB(long sock, int id)
         throws Exception;
@@ -93,6 +100,7 @@ public class SSLSocket {
      * @param sock The socket to read the data from.
      * @param id Parameter id.
      * @return String containing info id value.
+     * @throws Exception An error occurred
      */
     public static native String getInfoS(long sock, int id)
         throws Exception;
@@ -103,6 +111,7 @@ public class SSLSocket {
      * @param sock The socket to read the data from.
      * @param id Parameter id.
      * @return Integer containing info id value or -1 on error.
+     * @throws Exception An error occurred
      */
     public static native int getInfoI(long sock, int id)
         throws Exception;
