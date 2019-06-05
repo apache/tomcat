@@ -698,6 +698,8 @@
     when loading the ResourceBundles -->
     <native2ascii src="java" dest="${tomcat.classes}" includes="**/LocalStrings*.properties,**/Messages*.properties" encoding="UTF-8"/>
 
+  </target>
+
   <target name="compile-java7" depends="compile-java6" if="java.7.home" >
     <javac sourcepath="" srcdir="java" destdir="${tomcat.classes}"
            debug="${compile.debug}"
