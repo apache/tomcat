@@ -598,7 +598,6 @@
 
   <target name="validate-eoln" depends="build-prepare,compile-prepare"
     description="Validate that the source files have correct line ends">
-
     <!-- Compile the CheckEol class only. Note that the class depends on
     Ant only. There is no need to download additional dependencies nor
     add them to the class path. The rest should be the same as in "compile"
@@ -678,6 +677,8 @@
       <filterset refid="version.filters"/>
       <fileset dir="java">
         <include name="**/*.properties"/>
+        <exclude name="**/LocalStrings*.properties"/>
+        <exclude name="**/Messages*.properties"/>
         <include name="**/*.dtd"/>
         <include name="**/*.tasks"/>
         <include name="**/*.xsd"/>
@@ -692,7 +693,10 @@
       </fileset>
     </copy>
 
-  </target>
+    <!-- Convert the message files from UTF-8 to ASCII. This can be removed
+    after upgrading to Java 9+ as the minimum JRE and specifying the encoding
+    when loading the ResourceBundles -->
+    <native2ascii src="java" dest="${tomcat.classes}" includes="**/LocalStrings*.properties,**/Messages*.properties" encoding="UTF-8"/>
 
   <target name="compile-java7" depends="compile-java6" if="java.7.home" >
     <javac sourcepath="" srcdir="java" destdir="${tomcat.classes}"
@@ -1128,6 +1132,15 @@
              encoding="ISO-8859-1"
              includeantruntime="false">
     </javac>
+
+    <!-- Convert the message files of the examples webapp from UTF-8 to ASCII.
+    This can be removed after upgrading to Java 9+ as the minimum JRE and
+    specifying the encoding when loading the ResourceBundles -->
+    <native2ascii src="webapps/examples/WEB-INF/classes"
+                  dest="${tomcat.build}/webapps/examples/WEB-INF/classes"
+                  includes="**/LocalStrings*.properties"
+                  encoding="UTF-8"/>
+
   </target>
 
   <target name="build-tomcat-jdbc-src">
