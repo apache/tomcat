@@ -45,6 +45,15 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 9.0.22 (markt)" rtext="in development">
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+        Remove a source of potential deadlocks when using HTTP/2 when the
+        Connector is configured with <code>useAsyncIO</code> as
+        <code>true</code>. (markt)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 9.0.21 (markt)" rtext="release in progress">
   <subsection name="Catalina">
