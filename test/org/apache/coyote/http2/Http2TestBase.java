@@ -62,7 +62,7 @@ public abstract class Http2TestBase extends TomcatBaseTest {
 
     @org.junit.runners.Parameterized.Parameters
     public static Object[][] data() {
-        return new Object[Integer.getInteger("tomcat.test.http2.loopCount", 1)][0];
+        return new Object[Integer.getInteger("tomcat.test.http2.loopCount", 1).intValue()][0];
     }
 
     // Nothing special about this date apart from it being the date I ran the
