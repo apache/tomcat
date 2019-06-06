@@ -25,9 +25,6 @@ Items carried over from the 9.0.x list:
 2.  Reduce instances of setters and getters for the same property existing on an
     object and its parent. This may require new objects to be exposed via JMX.
 
-3.  Consider wrapping the SocketWrapper with a facade to detect / prevent
-    components retaining references longer than they should.
-
 New items for 10.0.x onwards:
 
  1.  Remove APR connector.
