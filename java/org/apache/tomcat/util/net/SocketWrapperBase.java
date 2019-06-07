@@ -104,9 +104,9 @@ public abstract class SocketWrapperBase<E> {
     protected final WriteBuffer nonBlockingWriteBuffer = new WriteBuffer(bufferedWriteSize);
 
     protected final Semaphore readPending;
-    protected OperationState<?> readOperation = null;
+    protected volatile OperationState<?> readOperation = null;
     protected final Semaphore writePending;
-    protected OperationState<?> writeOperation = null;
+    protected volatile OperationState<?> writeOperation = null;
 
     public SocketWrapperBase(E socket, AbstractEndpoint<E,?> endpoint) {
         this.socket = socket;
