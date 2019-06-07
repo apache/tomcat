@@ -240,41 +240,39 @@ class Http2AsyncParser extends Http2Parser {
                         if (streamException) {
                             swallow(streamId, payloadSize, false, payload);
                         } else {
-                            synchronized (socketWrapper) {
-                                switch (frameType) {
-                                case DATA:
-                                    readDataFrame(streamId, flags, payloadSize, payload);
-                                    break;
-                                case HEADERS:
-                                    readHeadersFrame(streamId, flags, payloadSize, payload);
-                                    break;
-                                case PRIORITY:
-                                    readPriorityFrame(streamId, payload);
-                                    break;
-                                case RST:
-                                    readRstFrame(streamId, payload);
-                                    break;
-                                case SETTINGS:
-                                    readSettingsFrame(flags, payloadSize, payload);
-                                    break;
-                                case PUSH_PROMISE:
-                                    readPushPromiseFrame(streamId, payload);
-                                    break;
-                                case PING:
-                                    readPingFrame(flags, payload);
-                                    break;
-                                case GOAWAY:
-                                    readGoawayFrame(payloadSize, payload);
-                                    break;
-                                case WINDOW_UPDATE:
-                                    readWindowUpdateFrame(streamId, payload);
-                                    break;
-                                case CONTINUATION:
-                                    readContinuationFrame(streamId, flags, payloadSize, payload);
-                                    break;
-                                case UNKNOWN:
-                                    readUnknownFrame(streamId, frameType, flags, payloadSize, payload);
-                                }
+                            switch (frameType) {
+                            case DATA:
+                                readDataFrame(streamId, flags, payloadSize, payload);
+                                break;
+                            case HEADERS:
+                                readHeadersFrame(streamId, flags, payloadSize, payload);
+                                break;
+                            case PRIORITY:
+                                readPriorityFrame(streamId, payload);
+                                break;
+                            case RST:
+                                readRstFrame(streamId, payload);
+                                break;
+                            case SETTINGS:
+                                readSettingsFrame(flags, payloadSize, payload);
+                                break;
+                            case PUSH_PROMISE:
+                                readPushPromiseFrame(streamId, payload);
+                                break;
+                            case PING:
+                                readPingFrame(flags, payload);
+                                break;
+                            case GOAWAY:
+                                readGoawayFrame(payloadSize, payload);
+                                break;
+                            case WINDOW_UPDATE:
+                                readWindowUpdateFrame(streamId, payload);
+                                break;
+                            case CONTINUATION:
+                                readContinuationFrame(streamId, flags, payloadSize, payload);
+                                break;
+                            case UNKNOWN:
+                                readUnknownFrame(streamId, frameType, flags, payloadSize, payload);
                             }
                         }
                         // See if there is a new 9 byte header and continue parsing if possible
