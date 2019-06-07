@@ -39,6 +39,10 @@ import org.apache.tomcat.util.net.SocketWrapperBase.BlockingMode;
 public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
 
     private static final ByteBuffer[] BYTEBUFFER_ARRAY = new ByteBuffer[0];
+    // Ensures headers are generated and then written for one thread at a time.
+    // Because of the compression used, headers need to be written to the
+    // network in the same order they are generated.
+    private final Object headerWriteLock = new Object();
     private Throwable error = null;
     private IOException applicationIOE = null;
 
@@ -169,13 +173,15 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
     @Override
     void writeHeaders(Stream stream, int pushedStreamId, MimeHeaders mimeHeaders,
             boolean endOfStream, int payloadSize) throws IOException {
-        AsyncHeaderFrameBuffers headerFrameBuffers = (AsyncHeaderFrameBuffers)
-                doWriteHeaders(stream, pushedStreamId, mimeHeaders, endOfStream, payloadSize);
-        if (headerFrameBuffers != null) {
-            socketWrapper.write(BlockingMode.SEMI_BLOCK, protocol.getWriteTimeout(),
-                    TimeUnit.MILLISECONDS, null, SocketWrapperBase.COMPLETE_WRITE,
-                    applicationErrorCompletion, headerFrameBuffers.bufs.toArray(BYTEBUFFER_ARRAY));
-            handleAsyncException();
+        synchronized (headerWriteLock) {
+            AsyncHeaderFrameBuffers headerFrameBuffers = (AsyncHeaderFrameBuffers)
+                    doWriteHeaders(stream, pushedStreamId, mimeHeaders, endOfStream, payloadSize);
+            if (headerFrameBuffers != null) {
+                socketWrapper.write(BlockingMode.SEMI_BLOCK, protocol.getWriteTimeout(),
+                        TimeUnit.MILLISECONDS, null, SocketWrapperBase.COMPLETE_WRITE,
+                        applicationErrorCompletion, headerFrameBuffers.bufs.toArray(BYTEBUFFER_ARRAY));
+                handleAsyncException();
+            }
         }
         if (endOfStream) {
             stream.sentEndOfStream();
