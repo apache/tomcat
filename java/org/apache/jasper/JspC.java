@@ -1579,7 +1579,7 @@ public class JspC extends Task implements Options {
                 mappingout = null;
             }
             if (webxmlLevel >= ALL_WEBXML) {
-                mapout.write(Localizer.getMessage("jspc.webxml.header"));
+                mapout.write(Localizer.getMessage("jspc.webxml.header", webxmlEncoding));
                 mapout.flush();
             } else if (webxmlLevel >= FRG_WEBXML) {
                     mapout.write(Localizer.getMessage("jspc.webfrg.header", webxmlEncoding));

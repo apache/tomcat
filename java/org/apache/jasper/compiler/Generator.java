@@ -3414,8 +3414,6 @@ class Generator {
             // Cannot access err since this method is static, but at
             // least flag an error.
             throw new JasperException("Unexpected Node Type");
-            // err.getString(
-            // "jsp.error.internal.unexpected_node_type" ) );
         }
 
         if (ci.hasUseBean()) {
