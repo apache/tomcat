@@ -53,6 +53,14 @@
       </scode>
     </changelog>
   </subsection>
+  <subsection name="Jasper">
+    <changelog>
+      <add>
+        Include file names in error messages if SMAP processor is unable to
+        delete or rename a class file during SMAP generation. (markt)
+      </add>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 8.5.42 (markt)" rtext="2019-06-07">
   <subsection name="Catalina">
