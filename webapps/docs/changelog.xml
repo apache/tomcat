@@ -127,6 +127,14 @@
       </scode>
     </changelog>
   </subsection>
+  <subsection name="Jasper">
+    <changelog>
+      <add>
+        Include file names in error messages if SMAP processor is unable to
+        delete or rename a class file during SMAP generation. (markt)
+      </add>
+    </changelog>
+  </subsection>
   <subsection name="Cluster">
     <changelog>
       <fix>

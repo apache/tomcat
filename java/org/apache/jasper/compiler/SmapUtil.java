@@ -198,10 +198,12 @@ public class SmapUtil {
             File tmpFile = new File(classFile.getPath() + "tmp");
             new SDEInstaller(classFile, smap, tmpFile);
             if (!classFile.delete()) {
-                throw new IOException("classFile.delete() failed");
+                throw new IOException(Localizer.getMessage("jsp.error.unable.deleteClassFile",
+                        classFile.getAbsolutePath()));
             }
             if (!tmpFile.renameTo(classFile)) {
-                throw new IOException("tmpFile.renameTo(classFile) failed");
+                throw new IOException(Localizer.getMessage("jsp.error.unable.renameClassFile",
+                        tmpFile.getAbsolutePath(), classFile.getAbsolutePath()));
             }
         }
 
