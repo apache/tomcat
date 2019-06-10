@@ -54,6 +54,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Jasper">
+    <changelog>
+      <add>
+        Include file names if SMAP processor is unable to delete or rename a
+        class file during SMAP generation. (markt)
+      </add>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 9.0.21 (markt)" rtext="2018-06-07">
   <subsection name="Catalina">

@@ -177,10 +177,12 @@ public class SmapUtil {
             SDEInstaller installer = new SDEInstaller(classFile, smap);
             installer.install(tmpFile);
             if (!classFile.delete()) {
-                throw new IOException(Localizer.getMessage("jsp.error.unable.deleteClassFile"));
+                throw new IOException(Localizer.getMessage("jsp.error.unable.deleteClassFile",
+                        classFile.getAbsolutePath()));
             }
             if (!tmpFile.renameTo(classFile)) {
-                throw new IOException(Localizer.getMessage("jsp.error.unable.renameClassFile"));
+                throw new IOException(Localizer.getMessage("jsp.error.unable.renameClassFile",
+                        tmpFile.getAbsolutePath(), classFile.getAbsolutePath()));
             }
         }
 
