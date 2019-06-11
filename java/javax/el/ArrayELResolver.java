@@ -138,7 +138,7 @@ public class ArrayELResolver extends ELResolver {
             return ((Character) property).charValue();
         }
         if (property instanceof Boolean) {
-            return (((Boolean) property).booleanValue() ? 1 : 0);
+            return ((Boolean) property).booleanValue() ? 1 : 0;
         }
         if (property instanceof String) {
             return Integer.parseInt((String) property);

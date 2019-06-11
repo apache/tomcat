@@ -151,9 +151,7 @@ public abstract class ExpressionFactory {
                     writeLock.unlock();
                 }
             } catch (ClassNotFoundException e) {
-                throw new ELException(
-                    "Unable to find ExpressionFactory of type: " + className,
-                    e);
+                throw new ELException(Util.message(null, "expressionFactory.cannotFind", className), e);
             }
         }
 
@@ -177,17 +175,13 @@ public abstract class ExpressionFactory {
                     (ExpressionFactory) constructor.newInstance(properties);
             }
 
-        } catch (InstantiationException | IllegalAccessException | IllegalArgumentException |
-                NoSuchMethodException e) {
-            throw new ELException(
-                    "Unable to create ExpressionFactory of type: " + clazz.getName(),
-                    e);
         } catch (InvocationTargetException e) {
             Throwable cause = e.getCause();
             Util.handleThrowable(cause);
-            throw new ELException(
-                    "Unable to create ExpressionFactory of type: " + clazz.getName(),
-                    e);
+            throw new ELException(Util.message(null, "expressionFactory.cannotCreate", clazz.getName()), e);
+        } catch (InstantiationException | IllegalAccessException | IllegalArgumentException |
+                NoSuchMethodException e) {
+            throw new ELException(Util.message(null, "expressionFactory.cannotCreate", clazz.getName()), e);
         }
 
         return result;
@@ -400,8 +394,7 @@ public abstract class ExpressionFactory {
                 // Should never happen with UTF-8
                 // If it does - ignore & return null
             } catch (IOException e) {
-                throw new ELException("Failed to read " + SERVICE_RESOURCE_NAME,
-                        e);
+                throw new ELException(Util.message(null, "expressionFactory.readFailed", SERVICE_RESOURCE_NAME), e);
             } finally {
                 try {
                     is.close();
@@ -425,7 +418,7 @@ public abstract class ExpressionFactory {
             } catch (FileNotFoundException e) {
                 // Should not happen - ignore it if it does
             } catch (IOException e) {
-                throw new ELException("Failed to read " + PROPERTY_FILE, e);
+                throw new ELException(Util.message(null, "expressionFactory.readFailed", PROPERTY_FILE), e);
             }
         }
         return null;
