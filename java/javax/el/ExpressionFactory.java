@@ -54,8 +54,8 @@ public abstract class ExpressionFactory {
     private static final String PROPERTY_FILE;
 
     private static final CacheValue nullTcclFactory = new CacheValue();
-    private static ConcurrentMap<CacheKey, CacheValue> factoryCache
-        = new ConcurrentHashMap<CacheKey, CacheValue>();
+    private static ConcurrentMap<CacheKey, CacheValue> factoryCache =
+            new ConcurrentHashMap<CacheKey, CacheValue>();
 
     static {
         if (IS_SECURITY_ENABLED) {
@@ -74,64 +74,6 @@ public abstract class ExpressionFactory {
                     File.separator + "el.properties";
         }
     }
-
-    /**
-     * Coerce the supplied object to the requested type.
-     *
-     * @param obj          The object to be coerced
-     * @param expectedType The type to which the object should be coerced
-     *
-     * @return An instance of the requested type.
-     *
-     * @throws ELException
-     *              If the conversion fails
-     */
-    public abstract Object coerceToType(Object obj, Class<?> expectedType)
-            throws ELException;
-
-    /**
-     * Create a new value expression.
-     *
-     * @param context      The EL context for this evaluation
-     * @param expression   The String representation of the value expression
-     * @param expectedType The expected type of the result of evaluating the
-     *                     expression
-     *
-     * @return A new value expression formed from the input parameters
-     *
-     * @throws NullPointerException
-     *              If the expected type is <code>null</code>
-     * @throws ELException
-     *              If there are syntax errors in the provided expression
-     */
-    public abstract ValueExpression createValueExpression(ELContext context,
-            String expression, Class<?> expectedType)
-            throws NullPointerException, ELException;
-
-    public abstract ValueExpression createValueExpression(Object instance,
-            Class<?> expectedType);
-
-    /**
-     * Create a new method expression instance.
-     *
-     * @param context            The EL context for this evaluation
-     * @param expression         The String representation of the method
-     *                           expression
-     * @param expectedReturnType The expected type of the result of invoking the
-     *                           method
-     * @param expectedParamTypes The expected types of the input parameters
-     *
-     * @return A new method expression formed from the input parameters.
-     *
-     * @throws NullPointerException
-     *              If the expected parameters types are <code>null</code>
-     * @throws ELException
-     *              If there are syntax errors in the provided expression
-     */
-    public abstract MethodExpression createMethodExpression(ELContext context,
-            String expression, Class<?> expectedReturnType,
-            Class<?>[] expectedParamTypes) throws ELException,
-            NullPointerException;
 
     /**
      * Create a new {@link ExpressionFactory}. The class to use is determined by
@@ -207,9 +149,7 @@ public abstract class ExpressionFactory {
                     writeLock.unlock();
                 }
             } catch (ClassNotFoundException e) {
-                throw new ELException(
-                    "Unable to find ExpressionFactory of type: " + className,
-                    e);
+                throw new ELException(Util.message(null, "expressionFactory.cannotFind", className), e);
             }
         }
 
@@ -227,42 +167,83 @@ public abstract class ExpressionFactory {
                 }
             }
             if (constructor == null) {
-                result = (ExpressionFactory) clazz.getDeclaredConstructor().newInstance();
+                result = (ExpressionFactory) clazz.getConstructor().newInstance();
             } else {
                 result =
                     (ExpressionFactory) constructor.newInstance(properties);
             }
-        } catch (InstantiationException e) {
-            throw new ELException(
-                    "Unable to create ExpressionFactory of type: " + clazz.getName(),
-                    e);
-        } catch (IllegalAccessException e) {
-            throw new ELException(
-                    "Unable to create ExpressionFactory of type: " + clazz.getName(),
-                    e);
-        } catch (IllegalArgumentException e) {
-            throw new ELException(
-                    "Unable to create ExpressionFactory of type: " + clazz.getName(),
-                    e);
-        } catch (NoSuchMethodException e) {
-            throw new ELException(
-                    "Unable to create ExpressionFactory of type: " + clazz.getName(),
-                    e);
+
         } catch (InvocationTargetException e) {
             Throwable cause = e.getCause();
-            if (cause instanceof ThreadDeath) {
-                throw (ThreadDeath) cause;
-            }
-            if (cause instanceof VirtualMachineError) {
-                throw (VirtualMachineError) cause;
-            }
-            throw new ELException(
-                    "Unable to create ExpressionFactory of type: " + clazz.getName(),
-                    e);
+            Util.handleThrowable(cause);
+            throw new ELException(Util.message(null, "expressionFactory.cannotCreate", clazz.getName()), e);
+        } catch (InstantiationException e) {
+            throw new ELException(Util.message(null, "expressionFactory.cannotCreate", clazz.getName()), e);
+        } catch (IllegalAccessException e) {
+            throw new ELException(Util.message(null, "expressionFactory.cannotCreate", clazz.getName()), e);
+        } catch (IllegalArgumentException e) {
+            throw new ELException(Util.message(null, "expressionFactory.cannotCreate", clazz.getName()), e);
+        } catch (NoSuchMethodException e) {
+            throw new ELException(Util.message(null, "expressionFactory.cannotCreate", clazz.getName()), e);
         }
 
         return result;
     }
+
+    /**
+     * Create a new value expression.
+     *
+     * @param context      The EL context for this evaluation
+     * @param expression   The String representation of the value expression
+     * @param expectedType The expected type of the result of evaluating the
+     *                     expression
+     *
+     * @return A new value expression formed from the input parameters
+     *
+     * @throws NullPointerException
+     *              If the expected type is <code>null</code>
+     * @throws ELException
+     *              If there are syntax errors in the provided expression
+     */
+    public abstract ValueExpression createValueExpression(ELContext context,
+            String expression, Class<?> expectedType);
+
+    public abstract ValueExpression createValueExpression(Object instance,
+            Class<?> expectedType);
+
+    /**
+     * Create a new method expression instance.
+     *
+     * @param context            The EL context for this evaluation
+     * @param expression         The String representation of the method
+     *                           expression
+     * @param expectedReturnType The expected type of the result of invoking the
+     *                           method
+     * @param expectedParamTypes The expected types of the input parameters
+     *
+     * @return A new method expression formed from the input parameters.
+     *
+     * @throws NullPointerException
+     *              If the expected parameters types are <code>null</code>
+     * @throws ELException
+     *              If there are syntax errors in the provided expression
+     */
+    public abstract MethodExpression createMethodExpression(ELContext context,
+            String expression, Class<?> expectedReturnType,
+            Class<?>[] expectedParamTypes);
+
+    /**
+     * Coerce the supplied object to the requested type.
+     *
+     * @param obj          The object to be coerced
+     * @param expectedType The type to which the object should be coerced
+     *
+     * @return An instance of the requested type.
+     *
+     * @throws ELException
+     *              If the conversion fails
+     */
+    public abstract Object coerceToType(Object obj, Class<?> expectedType);
 
     /**
      * Key used to cache ExpressionFactory discovery information per class
@@ -401,8 +382,7 @@ public abstract class ExpressionFactory {
                 // Should never happen with UTF-8
                 // If it does - ignore & return null
             } catch (IOException e) {
-                throw new ELException("Failed to read " + SERVICE_RESOURCE_NAME,
-                        e);
+                throw new ELException(Util.message(null, "expressionFactory.readFailed", SERVICE_RESOURCE_NAME), e);
             } finally {
                 try {
                     if (br != null) {
@@ -438,7 +418,7 @@ public abstract class ExpressionFactory {
             } catch (FileNotFoundException e) {
                 // Should not happen - ignore it if it does
             } catch (IOException e) {
-                throw new ELException("Failed to read " + PROPERTY_FILE, e);
+                throw new ELException(Util.message(null, "expressionFactory.readFailed", PROPERTY_FILE), e);
             } finally {
                 if (is != null) {
                     try {

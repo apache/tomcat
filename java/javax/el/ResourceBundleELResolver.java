@@ -32,10 +32,7 @@ public class ResourceBundleELResolver extends ELResolver {
     }
 
     @Override
-    public Object getValue(ELContext context, Object base, Object property)
-            throws NullPointerException, PropertyNotFoundException,
-            ELException {
-
+    public Object getValue(ELContext context, Object base, Object property) {
         if (context == null) {
             throw new NullPointerException();
         }
@@ -57,8 +54,7 @@ public class ResourceBundleELResolver extends ELResolver {
     }
 
     @Override
-    public Class<?> getType(ELContext context, Object base, Object property)
-            throws NullPointerException, PropertyNotFoundException, ELException {
+    public Class<?> getType(ELContext context, Object base, Object property) {
         if (context == null) {
             throw new NullPointerException();
         }
@@ -72,9 +68,7 @@ public class ResourceBundleELResolver extends ELResolver {
 
     @Override
     public void setValue(ELContext context, Object base, Object property,
-            Object value) throws NullPointerException,
-            PropertyNotFoundException, PropertyNotWritableException,
-            ELException {
+            Object value) {
         if (context == null) {
             throw new NullPointerException();
         }
@@ -82,14 +76,12 @@ public class ResourceBundleELResolver extends ELResolver {
         if (base instanceof ResourceBundle) {
             context.setPropertyResolved(true);
             throw new PropertyNotWritableException(Util.message(context,
-                    "resolverNotWriteable", new Object[] { base.getClass()
-                            .getName() }));
+                    "resolverNotWriteable", base.getClass().getName()));
         }
     }
 
     @Override
-    public boolean isReadOnly(ELContext context, Object base, Object property)
-            throws NullPointerException, PropertyNotFoundException, ELException {
+    public boolean isReadOnly(ELContext context, Object base, Object property) {
         if (context == null) {
             throw new NullPointerException();
         }

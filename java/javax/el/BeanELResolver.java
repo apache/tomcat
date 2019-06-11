@@ -70,8 +70,7 @@ public class BeanELResolver extends ELResolver {
     }
 
     @Override
-    public Class<?> getType(ELContext context, Object base, Object property)
-            throws NullPointerException, PropertyNotFoundException, ELException {
+    public Class<?> getType(ELContext context, Object base, Object property) {
         if (context == null) {
             throw new NullPointerException();
         }
@@ -84,8 +83,7 @@ public class BeanELResolver extends ELResolver {
     }
 
     @Override
-    public Object getValue(ELContext context, Object base, Object property)
-            throws NullPointerException, PropertyNotFoundException, ELException {
+    public Object getValue(ELContext context, Object base, Object property) {
         if (context == null) {
             throw new NullPointerException();
         }
@@ -97,16 +95,9 @@ public class BeanELResolver extends ELResolver {
         Method m = this.property(context, base, property).read(context);
         try {
             return m.invoke(base, (Object[]) null);
-        } catch (IllegalAccessException e) {
-            throw new ELException(e);
         } catch (InvocationTargetException e) {
             Throwable cause = e.getCause();
-            if (cause instanceof ThreadDeath) {
-                throw (ThreadDeath) cause;
-            }
-            if (cause instanceof VirtualMachineError) {
-                throw (VirtualMachineError) cause;
-            }
+            Util.handleThrowable(cause);
             throw new ELException(Util.message(context, "propertyReadError",
                     base.getClass().getName(), property.toString()), cause);
         } catch (Exception e) {
@@ -116,9 +107,7 @@ public class BeanELResolver extends ELResolver {
 
     @Override
     public void setValue(ELContext context, Object base, Object property,
-            Object value) throws NullPointerException,
-            PropertyNotFoundException, PropertyNotWritableException,
-            ELException {
+            Object value) {
         if (context == null) {
             throw new NullPointerException();
         }
@@ -136,16 +125,9 @@ public class BeanELResolver extends ELResolver {
         Method m = this.property(context, base, property).write(context);
         try {
             m.invoke(base, value);
-        } catch (IllegalAccessException e) {
-            throw new ELException(e);
         } catch (InvocationTargetException e) {
             Throwable cause = e.getCause();
-            if (cause instanceof ThreadDeath) {
-                throw (ThreadDeath) cause;
-            }
-            if (cause instanceof VirtualMachineError) {
-                throw (VirtualMachineError) cause;
-            }
+            Util.handleThrowable(cause);
             throw new ELException(Util.message(context, "propertyWriteError",
                     base.getClass().getName(), property.toString()), cause);
         } catch (Exception e) {
@@ -196,8 +178,7 @@ public class BeanELResolver extends ELResolver {
     }
 
     @Override
-    public boolean isReadOnly(ELContext context, Object base, Object property)
-            throws NullPointerException, PropertyNotFoundException, ELException {
+    public boolean isReadOnly(ELContext context, Object base, Object property) {
         if (context == null) {
             throw new NullPointerException();
         }
@@ -206,8 +187,7 @@ public class BeanELResolver extends ELResolver {
         }
 
         context.setPropertyResolved(true);
-        return this.readOnly
-                || this.property(context, base, property).isReadOnly();
+        return this.readOnly || this.property(context, base, property).isReadOnly();
     }
 
     @Override
@@ -240,7 +220,7 @@ public class BeanELResolver extends ELResolver {
         return null;
     }
 
-    protected static final class BeanProperties {
+    static final class BeanProperties {
         private final Map<String, BeanProperty> properties;
 
         private final Class<?> type;
@@ -303,7 +283,7 @@ public class BeanELResolver extends ELResolver {
         }
     }
 
-    protected static final class BeanProperty {
+    static final class BeanProperty {
         private final Class<?> type;
 
         private final Class<?> owner;
@@ -327,8 +307,8 @@ public class BeanELResolver extends ELResolver {
         }
 
         public boolean isReadOnly() {
-            return this.write == null
-                && (null == (this.write = Util.getMethod(this.owner, descriptor.getWriteMethod())));
+            return this.write == null &&
+                    (null == (this.write = Util.getMethod(this.owner, descriptor.getWriteMethod())));
         }
 
         public Method getWriteMethod() {
@@ -343,7 +323,7 @@ public class BeanELResolver extends ELResolver {
             if (this.write == null) {
                 this.write = Util.getMethod(this.owner, descriptor.getWriteMethod());
                 if (this.write == null) {
-                    throw new PropertyNotFoundException(Util.message(ctx,
+                    throw new PropertyNotWritableException(Util.message(ctx,
                             "propertyNotWritable", new Object[] {
                                     owner.getName(), descriptor.getName() }));
                 }

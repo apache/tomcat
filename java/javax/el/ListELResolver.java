@@ -39,28 +39,7 @@ public class ListELResolver extends ELResolver {
     }
 
     @Override
-    public Object getValue(ELContext context, Object base, Object property)
-            throws NullPointerException, PropertyNotFoundException, ELException {
-        if (context == null) {
-            throw new NullPointerException();
-        }
-
-        if (base instanceof List<?>) {
-            context.setPropertyResolved(true);
-            List<?> list = (List<?>) base;
-            int idx = coerce(property);
-            if (idx < 0 || idx >= list.size()) {
-                return null;
-            }
-            return list.get(idx);
-        }
-
-        return null;
-    }
-
-    @Override
-    public Class<?> getType(ELContext context, Object base, Object property)
-            throws NullPointerException, PropertyNotFoundException, ELException {
+    public Class<?> getType(ELContext context, Object base, Object property) {
         if (context == null) {
             throw new NullPointerException();
         }
@@ -80,10 +59,27 @@ public class ListELResolver extends ELResolver {
     }
 
     @Override
+    public Object getValue(ELContext context, Object base, Object property) {
+        if (context == null) {
+            throw new NullPointerException();
+        }
+
+        if (base instanceof List<?>) {
+            context.setPropertyResolved(true);
+            List<?> list = (List<?>) base;
+            int idx = coerce(property);
+            if (idx < 0 || idx >= list.size()) {
+                return null;
+            }
+            return list.get(idx);
+        }
+
+        return null;
+    }
+
+    @Override
     public void setValue(ELContext context, Object base, Object property,
-            Object value) throws NullPointerException,
-            PropertyNotFoundException, PropertyNotWritableException,
-            ELException {
+            Object value) {
         if (context == null) {
             throw new NullPointerException();
         }
@@ -95,8 +91,7 @@ public class ListELResolver extends ELResolver {
 
             if (this.readOnly) {
                 throw new PropertyNotWritableException(Util.message(context,
-                        "resolverNotWriteable", new Object[] { base.getClass()
-                                .getName() }));
+                        "resolverNotWriteable", base.getClass().getName()));
             }
 
             int idx = coerce(property);
@@ -111,8 +106,7 @@ public class ListELResolver extends ELResolver {
     }
 
     @Override
-    public boolean isReadOnly(ELContext context, Object base, Object property)
-            throws NullPointerException, PropertyNotFoundException, ELException {
+    public boolean isReadOnly(ELContext context, Object base, Object property) {
         if (context == null) {
             throw new NullPointerException();
         }
@@ -157,7 +151,7 @@ public class ListELResolver extends ELResolver {
             return ((Character) property).charValue();
         }
         if (property instanceof Boolean) {
-            return (((Boolean) property).booleanValue() ? 1 : 0);
+            return ((Boolean) property).booleanValue() ? 1 : 0;
         }
         if (property instanceof String) {
             return Integer.parseInt((String) property);

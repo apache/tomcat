@@ -14,16 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package javax.el;
 
 import java.lang.reflect.Method;
 
-/**
- *
- */
 public abstract class FunctionMapper {
 
     public abstract Method resolveFunction(String prefix, String localName);
-
 }

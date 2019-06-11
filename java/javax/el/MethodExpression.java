@@ -14,12 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package javax.el;
 
-/**
- *
- */
 public abstract class MethodExpression extends Expression {
 
     private static final long serialVersionUID = 8163925562047324656L;
@@ -39,7 +35,7 @@ public abstract class MethodExpression extends Expression {
      * @throws ELException
      *              Wraps any exception throw whilst resolving the property
      */
-    public abstract MethodInfo getMethodInfo(ELContext context) throws NullPointerException, PropertyNotFoundException, MethodNotFoundException, ELException;
+    public abstract MethodInfo getMethodInfo(ELContext context);
 
     /**
      * @param context The EL context for this evaluation
@@ -58,7 +54,7 @@ public abstract class MethodExpression extends Expression {
      *              Wraps any exception throw whilst resolving the property or
      *              coercion of the result to the expected return type fails
      */
-    public abstract Object invoke(ELContext context, Object[] params) throws NullPointerException, PropertyNotFoundException, MethodNotFoundException, ELException;
+    public abstract Object invoke(ELContext context, Object[] params);
 
     /**
      * @since EL 2.2

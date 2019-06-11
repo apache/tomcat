@@ -14,16 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package javax.el;
 
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
-/**
- *
- */
 public abstract class ELContext {
 
     private Locale locale;
@@ -32,11 +28,39 @@ public abstract class ELContext {
 
     private boolean resolved;
 
-    /**
-     *
-     */
     public ELContext() {
         this.resolved = false;
+    }
+
+    public void setPropertyResolved(boolean resolved) {
+        this.resolved = resolved;
+    }
+
+    public boolean isPropertyResolved() {
+        return this.resolved;
+    }
+
+    // Can't use Class<?> because API needs to match specification
+    /**
+     * Add an object to this EL context under the given key.
+     *
+     * @param key           The key under which to store the object
+     * @param contextObject The object to add
+     *
+     * @throws NullPointerException
+     *              If the supplied key or context is <code>null</code>
+     */
+    public void putContext(@SuppressWarnings("rawtypes") Class key,
+            Object contextObject) {
+        if (key == null || contextObject == null) {
+            throw new NullPointerException();
+        }
+
+        if (this.map == null) {
+            this.map = new HashMap<Class<?>, Object>();
+        }
+
+        this.map.put(key, contextObject);
     }
 
     // Can't use Class<?> because API needs to match specification
@@ -60,42 +84,9 @@ public abstract class ELContext {
         return this.map.get(key);
     }
 
-    // Can't use Class<?> because API needs to match specification
-    /**
-     * Add an object to this EL context under the given key.
-     *
-     * @param key           The key under which to store the object
-     * @param contextObject The object to add
-     *
-     * @throws NullPointerException
-     *              If the supplied key or context is <code>null</code>
-     */
-    public void putContext(@SuppressWarnings("rawtypes") Class key,
-            Object contextObject) throws NullPointerException {
-        if (key == null || contextObject == null) {
-            throw new NullPointerException();
-        }
-
-        if (this.map == null) {
-            this.map = new HashMap<Class<?>, Object>();
-        }
-
-        this.map.put(key, contextObject);
-    }
-
-    public void setPropertyResolved(boolean resolved) {
-        this.resolved = resolved;
-    }
-
-    public boolean isPropertyResolved() {
-        return this.resolved;
-    }
-
     public abstract ELResolver getELResolver();
 
     public abstract FunctionMapper getFunctionMapper();
-
-    public abstract VariableMapper getVariableMapper();
 
     public Locale getLocale() {
         return this.locale;
@@ -104,4 +95,6 @@ public abstract class ELContext {
     public void setLocale(Locale locale) {
         this.locale = locale;
     }
+
+    public abstract VariableMapper getVariableMapper();
 }

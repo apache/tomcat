@@ -14,12 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package javax.el;
 
-/**
- *
- */
 public class MethodInfo {
 
     private final String name;
@@ -28,9 +24,6 @@ public class MethodInfo {
 
     private final Class<?> returnType;
 
-    /**
-     *
-     */
     public MethodInfo(String name, Class<?> returnType, Class<?>[] paramTypes) {
         this.name = name;
         this.returnType = returnType;
@@ -41,12 +34,11 @@ public class MethodInfo {
         return this.name;
     }
 
-    public Class<?>[] getParamTypes() {
-        return this.paramTypes;
-    }
-
     public Class<?> getReturnType() {
         return this.returnType;
     }
 
+    public Class<?>[] getParamTypes() {
+        return this.paramTypes;
+    }
 }
