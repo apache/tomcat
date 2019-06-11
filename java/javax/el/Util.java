@@ -40,6 +40,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 class Util {
 
+    private static final Class<?>[] EMPTY_CLASS_ARRAY = new Class<?>[0];
     private static final Object[] EMPTY_OBJECT_ARRAY = new Object[0];
 
     /**
@@ -217,9 +218,6 @@ class Util {
 
         Wrapper result = findWrapper(clazz, wrappers, methodName, paramTypes, paramValues);
 
-        if (result == null) {
-            return null;
-        }
         return getMethod(clazz, (Method) result.unWrap());
     }
 
@@ -233,12 +231,7 @@ class Util {
 
         Map<Wrapper,MatchResult> candidates = new HashMap<Wrapper,MatchResult>();
 
-        int paramCount;
-        if (paramTypes == null) {
-            paramCount = 0;
-        } else {
-            paramCount = paramTypes.length;
-        }
+        int paramCount = paramTypes.length;
 
         for (Wrapper w : wrappers) {
             Class<?>[] mParamTypes = w.getParameterTypes();
@@ -529,7 +522,7 @@ class Util {
 
     private static Class<?>[] getTypesFromValues(Object[] values) {
         if (values == null) {
-            return null;
+            return EMPTY_CLASS_ARRAY;
         }
 
         Class<?> result[] = new Class<?>[values.length];
@@ -588,7 +581,7 @@ class Util {
 
         if (clazz == null) {
             throw new MethodNotFoundException(
-                    message(null, "util.method.notfound", clazz, methodName,
+                    message(null, "util.method.notfound", null, methodName,
                     paramString(paramTypes)));
         }
 
@@ -602,9 +595,6 @@ class Util {
 
         Wrapper result = findWrapper(clazz, wrappers, methodName, paramTypes, paramValues);
 
-        if (result == null) {
-            return null;
-        }
         return getConstructor(clazz, (Constructor<?>) result.unWrap());
     }
 
