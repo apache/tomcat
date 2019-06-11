@@ -133,6 +133,9 @@
         Include file names in error messages if SMAP processor is unable to
         delete or rename a class file during SMAP generation. (markt)
       </add>
+      <fix>
+        Improvements to varargs handling in the Java UEL implementation. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">
