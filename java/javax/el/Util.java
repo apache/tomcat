@@ -76,8 +76,7 @@ class Util {
             }
             return template;
         } catch (MissingResourceException e) {
-            return "Missing Resource: '" + name + "' for Locale "
-                    + locale.getDisplayName();
+            return "Missing Resource: '" + name + "' for Locale " + locale.getDisplayName();
         }
     }
 
@@ -214,8 +213,7 @@ class Util {
 
         List<Wrapper> wrappers = Wrapper.wrap(methods, methodName);
 
-        Wrapper result = findWrapper(
-                clazz, wrappers, methodName, paramTypes, paramValues);
+        Wrapper result = findWrapper(clazz, wrappers, methodName, paramTypes, paramValues);
 
         if (result == null) {
             return null;
@@ -575,8 +573,7 @@ class Util {
 
         List<Wrapper> wrappers = Wrapper.wrap(constructors);
 
-        Wrapper result = findWrapper(
-                clazz, wrappers, methodName, paramTypes, paramValues);
+        Wrapper result = findWrapper(clazz, wrappers, methodName, paramTypes, paramValues);
 
         if (result == null) {
             return null;
