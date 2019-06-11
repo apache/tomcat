@@ -266,7 +266,7 @@ public class TestBeanELResolver {
      * Tests that an exception will be thrown when the property does not have
      * setter method.
      */
-    @Test(expected = PropertyNotFoundException.class)
+    @Test(expected = PropertyNotWritableException.class)
     public void testSetValue07() {
         BeanELResolver resolver = new BeanELResolver();
         ELContext context = new ELContextImpl();
