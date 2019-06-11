@@ -160,7 +160,7 @@
       <fix>
         Use the <code>test</code> command to check for terminal availability
         rather than the <code>tty</code> command since the <code>tty</code>
-        based test fails on non-Eglish locales. (markt)
+        based test fails on non-English locales. (markt)
       </fix>
     </changelog>
   </subsection>
@@ -173,7 +173,7 @@
         file. Identified by Coverity scan. (markt)
       </fix>
       <fix>
-        Fix a potential concurrency issue in the StringCache identifed by
+        Fix a potential concurrency issue in the StringCache identified by
         Coverity scan. (markt)
       </fix>
       <fix>
