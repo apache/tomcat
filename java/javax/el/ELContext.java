@@ -48,7 +48,7 @@ public abstract class ELContext {
     }
 
     /**
-     * Mark the given property as resolved and notfy any interested listeners.
+     * Mark the given property as resolved and notify any interested listeners.
      *
      * @param base     The base object on which the property was found
      * @param property The property that was resolved
