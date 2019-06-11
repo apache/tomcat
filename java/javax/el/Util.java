@@ -40,6 +40,8 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 class Util {
 
+    private static final Object[] EMPTY_OBJECT_ARRAY = new Object[0];
+
     /**
      * Checks whether the supplied Throwable is one that needs to be
      * rethrown and swallows all others.
@@ -248,9 +250,27 @@ class Util {
             }
 
             // Check the number of parameters
-            if (!(paramCount == mParamCount ||
-                    (w.isVarArgs() && paramCount >= mParamCount))) {
+            // Multiple tests to improve readability
+            if (!w.isVarArgs() && paramCount != mParamCount) {
                 // Method has wrong number of parameters
+                continue;
+            }
+            if (w.isVarArgs() && paramCount < mParamCount -1) {
+                // Method has wrong number of parameters
+                continue;
+            }
+            if (w.isVarArgs() && paramCount == mParamCount && paramValues != null &&
+                    paramValues.length > paramCount && !paramTypes[mParamCount -1].isArray()) {
+                // Method arguments don't match
+                continue;
+            }
+            if (w.isVarArgs() && paramCount > mParamCount && paramValues != null &&
+                    paramValues.length != paramCount) {
+                // Might match a different varargs method
+                continue;
+            }
+            if (!w.isVarArgs() && paramValues != null && paramCount != paramValues.length) {
+                // Might match a different varargs method
                 continue;
             }
 
@@ -261,9 +281,12 @@ class Util {
             boolean noMatch = false;
             for (int i = 0; i < mParamCount; i++) {
                 // Can't be null
-                if (mParamTypes[i].equals(paramTypes[i])) {
-                    exactMatch++;
-                } else if (i == (mParamCount - 1) && w.isVarArgs()) {
+                if (w.isVarArgs() && i == (mParamCount - 1)) {
+                    if (i == paramCount || (paramValues != null && paramValues.length == i)) {
+                        // Nothing is passed as varargs
+                        assignableMatch++;
+                        break;
+                    }
                     Class<?> varType = mParamTypes[i].getComponentType();
                     for (int j = i; j < paramCount; j++) {
                         if (isAssignableFrom(paramTypes[j], varType)) {
@@ -285,18 +308,22 @@ class Util {
                         // lead to a varArgs method matching when the result
                         // should be ambiguous
                     }
-                } else if (isAssignableFrom(paramTypes[i], mParamTypes[i])) {
-                    assignableMatch++;
                 } else {
-                    if (paramValues == null) {
-                        noMatch = true;
-                        break;
+                    if (mParamTypes[i].equals(paramTypes[i])) {
+                        exactMatch++;
+                    } else if (paramTypes[i] != null && isAssignableFrom(paramTypes[i], mParamTypes[i])) {
+                        assignableMatch++;
                     } else {
-                        if (isCoercibleFrom(paramValues[i], mParamTypes[i])) {
-                            coercibleMatch++;
-                        } else {
+                        if (paramValues == null) {
                             noMatch = true;
                             break;
+                        } else {
+                            if (isCoercibleFrom(paramValues[i], mParamTypes[i])) {
+                                coercibleMatch++;
+                            } else {
+                                noMatch = true;
+                                break;
+                            }
                         }
                     }
                 }
@@ -609,7 +636,11 @@ class Util {
         Object[] parameters = null;
         if (parameterTypes.length > 0) {
             parameters = new Object[parameterTypes.length];
-            int paramCount = params.length;
+            int paramCount;
+            if (params == null) {
+                params = EMPTY_OBJECT_ARRAY;
+            }
+            paramCount = params.length;
             if (isVarArgs) {
                 int varArgIndex = parameterTypes.length - 1;
                 // First argCount-1 parameters are standard
