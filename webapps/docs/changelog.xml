@@ -250,8 +250,8 @@
         Switch from FindBugs to SpotBugs. (fschumacher)
       </update>
       <update>
-        Start Graal native image compatibility. Support is initially targeted
-        at the tomcat-maven packaging. (remm)
+        Start Graal native image compatibility, using the tomcat-maven
+        packaging. (remm)
       </update>
       <fix>
         <bug>63403</bug>: Fix TestHttp2InitialConnection test failures when
