@@ -514,11 +514,13 @@ public class PooledConnection implements PooledConnectionMBean {
             try {
                 if (connection.isValid(validationQueryTimeout)) {
                     this.lastValidated = now;
+                    silentlyCommitTransactionIfNeeded();
                     return true;
                 } else {
                     if (getPoolProperties().getLogValidationErrors()) {
                         log.error("isValid() returned false.");
                     }
+                    silentlyRollbackTransactionIfNeeded();
                     return false;
                 }
             } catch (SQLException e) {
@@ -527,6 +529,7 @@ public class PooledConnection implements PooledConnectionMBean {
                 } else if (log.isDebugEnabled()) {
                     log.debug("isValid() failed.", e);
                 }
+                silentlyRollbackTransactionIfNeeded();
                 return false;
             }
         }
@@ -543,6 +546,7 @@ public class PooledConnection implements PooledConnectionMBean {
             stmt.execute(query);
             stmt.close();
             this.lastValidated = now;
+            silentlyCommitTransactionIfNeeded();
             return true;
         } catch (Exception ex) {
             if (getPoolProperties().getLogValidationErrors()) {
@@ -553,24 +557,26 @@ public class PooledConnection implements PooledConnectionMBean {
             if (stmt!=null)
                 try { stmt.close();} catch (Exception ignore2){/*NOOP*/}
 
-            try {
-                if(!connection.getAutoCommit()) {
-                    connection.rollback();
-                }
-            } catch (SQLException e) {
-                // do nothing
-            }
-        } finally {
-            try {
-                if(!connection.getAutoCommit()) {
-                    connection.commit();
-                }
-            } catch (SQLException e) {
-                // do nothing
-            }
+            silentlyRollbackTransactionIfNeeded();
         }
         return false;
     } //validate
+
+    private void silentlyCommitTransactionIfNeeded() {
+        try {
+            if (!connection.getAutoCommit()) {
+                connection.commit();
+            }
+        } catch (SQLException discarded) {/*NOOP*/}
+    }
+
+    private void silentlyRollbackTransactionIfNeeded() {
+        try {
+            if (!connection.getAutoCommit()) {
+                connection.rollback();
+            }
+        } catch (SQLException discarded) {/*NOOP*/}
+    }
 
     /**
      * The time limit for how long the object
