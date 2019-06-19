@@ -509,18 +509,18 @@ public class PooledConnection implements PooledConnectionMBean {
         }
 
         if (query == null) {
+            boolean transactionCommitted = false;
             int validationQueryTimeout = poolProperties.getValidationQueryTimeout();
             if (validationQueryTimeout < 0) validationQueryTimeout = 0;
             try {
                 if (connection.isValid(validationQueryTimeout)) {
                     this.lastValidated = now;
-                    silentlyCommitTransactionIfNeeded();
+                    transactionCommitted = silentlyCommitTransactionIfNeeded();
                     return true;
                 } else {
                     if (getPoolProperties().getLogValidationErrors()) {
                         log.error("isValid() returned false.");
                     }
-                    silentlyRollbackTransactionIfNeeded();
                     return false;
                 }
             } catch (SQLException e) {
@@ -529,11 +529,16 @@ public class PooledConnection implements PooledConnectionMBean {
                 } else if (log.isDebugEnabled()) {
                     log.debug("isValid() failed.", e);
                 }
-                silentlyRollbackTransactionIfNeeded();
                 return false;
+            }
+            finally {
+                if (!transactionCommitted) {
+                    silentlyRollbackTransactionIfNeeded();
+                }
             }
         }
 
+        boolean transactionCommitted = false;
         Statement stmt = null;
         try {
             stmt = connection.createStatement();
@@ -546,7 +551,7 @@ public class PooledConnection implements PooledConnectionMBean {
             stmt.execute(query);
             stmt.close();
             this.lastValidated = now;
-            silentlyCommitTransactionIfNeeded();
+            transactionCommitted = silentlyCommitTransactionIfNeeded();
             return true;
         } catch (Exception ex) {
             if (getPoolProperties().getLogValidationErrors()) {
@@ -557,25 +562,34 @@ public class PooledConnection implements PooledConnectionMBean {
             if (stmt!=null)
                 try { stmt.close();} catch (Exception ignore2){/*NOOP*/}
 
-            silentlyRollbackTransactionIfNeeded();
+        }
+        finally {
+            if (!transactionCommitted) {
+                silentlyRollbackTransactionIfNeeded();
+            }
         }
         return false;
     } //validate
 
-    private void silentlyCommitTransactionIfNeeded() {
+    private boolean silentlyCommitTransactionIfNeeded() {
         try {
             if (!connection.getAutoCommit()) {
                 connection.commit();
             }
-        } catch (SQLException discarded) {/*NOOP*/}
+            return true;
+        }
+        catch (SQLException discarded) {/*NOOP*/}
+        return false;
     }
 
-    private void silentlyRollbackTransactionIfNeeded() {
+    private boolean silentlyRollbackTransactionIfNeeded() {
         try {
             if (!connection.getAutoCommit()) {
                 connection.rollback();
             }
+            return true;
         } catch (SQLException discarded) {/*NOOP*/}
+        return false;
     }
 
     /**
