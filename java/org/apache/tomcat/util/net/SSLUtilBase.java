@@ -485,7 +485,7 @@ public abstract class SSLUtilBase implements SSLUtil {
      * @return The parameters including the CRLs and TrustStore.
      * @throws Exception An error occurred
      */
-    private CertPathParameters getParameters(String crlf, KeyStore trustStore,
+    protected CertPathParameters getParameters(String crlf, KeyStore trustStore,
             boolean revocationEnabled) throws Exception {
 
         PKIXBuilderParameters xparams =
@@ -512,7 +512,7 @@ public abstract class SSLUtilBase implements SSLUtil {
      * @throws CRLException CRL error
      * @throws CertificateException Error processing certificate
      */
-    private Collection<? extends CRL> getCRLs(String crlf)
+    protected Collection<? extends CRL> getCRLs(String crlf)
         throws IOException, CRLException, CertificateException {
 
         Collection<? extends CRL> crls = null;

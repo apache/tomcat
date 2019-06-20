@@ -52,6 +52,10 @@
         Connector is configured with <code>useAsyncIO</code> as
         <code>true</code>. (markt)
       </fix>
+      <fix>
+        <bug>63523</bug>: Restore SSLUtilBase methods as protected to preserve
+        compatibility. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
