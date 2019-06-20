@@ -415,7 +415,7 @@
       </update>
       <fix>
         Expand HTTP/2 timeout handling to include connection window exhaustion
-        on write. (markt)
+        on write. This is the fix for CVE-2019-10072. (markt)
       </fix>
     </changelog>
   </subsection>
