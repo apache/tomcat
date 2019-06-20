@@ -46,6 +46,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
+import java.lang.Override;
 import javax.net.ssl.CertPathTrustManagerParameters;
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.KeyManagerFactory;
@@ -72,15 +73,34 @@ public abstract class SSLUtilBase implements SSLUtil {
     private static final Log log = LogFactory.getLog(SSLUtilBase.class);
     private static final StringManager sm = StringManager.getManager(SSLUtilBase.class);
 
+    /**
+     * Implement this interface to add extra CertificateParameter configuration
+     * to your SSL config
+     */
+    public interface CertPathParameterConfigurer{
+        void configure(CertPathParameters params);
+    }
+
     protected final SSLHostConfig sslHostConfig;
     protected final SSLHostConfigCertificate certificate;
 
     private final String[] enabledProtocols;
     private final String[] enabledCiphers;
 
+    private CertPathParameterConfigurer pathParameterConfigurer = new CertPathParameterConfigurer() {
+        @Override
+        public void configure(CertPathParameters params) {
+            // NOP - your overridden version of this can configure the Params as you need
+        }
+    };
+
 
     protected SSLUtilBase(SSLHostConfigCertificate certificate) {
         this(certificate, true);
+    }
+
+    public void setCertPathParameterConfigurer(CertPathParameterConfigurer pathParameterConfigurer){
+        this.pathParameterConfigurer = pathParameterConfigurer;
     }
 
 
@@ -500,6 +520,7 @@ public abstract class SSLUtilBase implements SSLUtil {
             xparams.setRevocationEnabled(revocationEnabled);
         }
         xparams.setMaxPathLength(sslHostConfig.getCertificateVerificationDepth());
+        pathParameterConfigurer.configure(xparams);
         return xparams;
     }
 
