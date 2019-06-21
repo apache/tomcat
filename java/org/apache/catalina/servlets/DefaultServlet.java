@@ -556,7 +556,7 @@ public class DefaultServlet extends HttpServlet {
     protected void sendNotAllowed(HttpServletRequest req, HttpServletResponse resp)
             throws IOException {
         resp.addHeader("Allow", determineMethodsAllowed(req));
-        resp.sendError(WebdavStatus.SC_METHOD_NOT_ALLOWED);
+        resp.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
     }
 
 
@@ -599,6 +599,8 @@ public class DefaultServlet extends HttpServlet {
 
         WebResource resource = resources.getResource(path);
 
+        // FIXME RFC7231#4.3.4 says we MUST response 400 if a PUT request that contains a Content-Range header.
+        // consider add a method doPatch, and move content range parsing to that method.
         Range range = parseContentRange(req, resp);
 
         InputStream resourceInputStream = null;
@@ -1013,9 +1015,7 @@ public class DefaultServlet extends HttpServlet {
         }
 
         if (resource.isDirectory() ||
-                isError ||
-                ( (ranges == null || ranges.isEmpty())
-                        && request.getHeader("Range") == null ) ||
+                isError || request.getHeader("Range") == null ||
                 ranges == FULL ) {
 
             // Set the appropriate output headers
@@ -1437,12 +1437,17 @@ public class DefaultServlet extends HttpServlet {
      * @param request   The servlet request we are processing
      * @param response  The servlet response we are creating
      * @param resource  The resource
-     * @return a list of ranges
+     * @return a list of ranges. Null if no further processing needed, #FULL if the request
+     * should be handled as if without header Range, a non empty list is returned otherwise.
      * @throws IOException an IO error occurred
      */
     protected ArrayList<Range> parseRange(HttpServletRequest request,
             HttpServletResponse response,
             WebResource resource) throws IOException {
+
+        if (!"GET".equals(request.getMethod())) {
+            return FULL;
+        }
 
         // Checking If-Range
         String headerValue = request.getHeader("If-Range");
@@ -1461,17 +1466,19 @@ public class DefaultServlet extends HttpServlet {
 
             if (headerValueTime == (-1L)) {
 
-                // If the ETag the client gave does not match the entity
-                // etag, then the entire entity is returned.
-                if (!eTag.equals(headerValue.trim()))
+                // https://tools.ietf.org/html/rfc7233#section-3.2
+                // If the ETag given by the client is not strongly equals to the entity etag,
+                // then the entire entity is returned.
+                headerValue = headerValue.trim();
+                if (eTag.startsWith("W/") || headerValue.startsWith("W/") || !eTag.equals(headerValue))
                     return FULL;
 
             } else {
 
-                // If the timestamp of the entity the client got is older than
+                // If the timestamp of the entity the client got is not same as
                 // the last modification date of the entity, the entire entity
                 // is returned.
-                if (lastModified > (headerValueTime + 1000))
+                if (Math.abs(lastModified - headerValueTime) > 1000)
                     return FULL;
 
             }
@@ -1487,14 +1494,11 @@ public class DefaultServlet extends HttpServlet {
         String rangeHeader = request.getHeader("Range");
 
         if (rangeHeader == null)
-            return null;
-        // bytes is the only range unit supported (and I don't see the point
-        // of adding new ones).
+            return FULL;
+        // client can send a request with explicit Range: none, or user defined range units.
         if (!rangeHeader.startsWith("bytes")) {
-            response.addHeader("Content-Range", "bytes */" + fileLength);
-            response.sendError
-                (HttpServletResponse.SC_REQUESTED_RANGE_NOT_SATISFIABLE);
-            return null;
+            // We MUST ignore a Range header field that contains a range unit we do not understand.
+            return FULL;
         }
 
         rangeHeader = rangeHeader.substring(6);
@@ -1505,7 +1509,14 @@ public class DefaultServlet extends HttpServlet {
         StringTokenizer commaTokenizer = new StringTokenizer(rangeHeader, ",");
 
         // Parsing the range list
-        while (commaTokenizer.hasMoreTokens()) {
+        while (true) {
+            if (!commaTokenizer.hasMoreTokens()) {
+                if (result.isEmpty()) {
+                    break;
+                }
+                return result;
+            }
+
             String rangeDefinition = commaTokenizer.nextToken().trim();
 
             Range currentRange = new Range();
@@ -1514,25 +1525,23 @@ public class DefaultServlet extends HttpServlet {
             int dashPos = rangeDefinition.indexOf('-');
 
             if (dashPos == -1) {
-                response.addHeader("Content-Range", "bytes */" + fileLength);
-                response.sendError
-                    (HttpServletResponse.SC_REQUESTED_RANGE_NOT_SATISFIABLE);
-                return null;
+                break;
             }
 
             if (dashPos == 0) {
 
+                // Range header like "Range: -0" will be checked later and won't be added to the range list.
+                // Zero length is treated as satisfiable, maybe client sends such request and
+                // just want to know the infomation abount the entity.
                 try {
                     long offset = Long.parseLong(rangeDefinition);
-                    currentRange.start = fileLength + offset;
+                    // As the rfc specified, we can return a FULL range here if fileLength + offset < 0(return 200 insteadof 206).
+                    // But We'd better responsed a 416 or 206 if the client requests a sigle range.
+                    // So don't return FULL here.
+                    currentRange.start = Math.max(fileLength + offset, 0);
                     currentRange.end = fileLength - 1;
                 } catch (NumberFormatException e) {
-                    response.addHeader("Content-Range",
-                                       "bytes */" + fileLength);
-                    response.sendError
-                        (HttpServletResponse
-                         .SC_REQUESTED_RANGE_NOT_SATISFIABLE);
-                    return null;
+                    break;
                 }
 
             } else {
@@ -1540,34 +1549,34 @@ public class DefaultServlet extends HttpServlet {
                 try {
                     currentRange.start = Long.parseLong
                         (rangeDefinition.substring(0, dashPos));
-                    if (dashPos < rangeDefinition.length() - 1)
-                        currentRange.end = Long.parseLong
+                    if (dashPos < rangeDefinition.length() - 1) {
+                        long end = Long.parseLong
                             (rangeDefinition.substring
                              (dashPos + 1, rangeDefinition.length()));
-                    else
+                        if (end < currentRange.start) {
+                            // invalid range
+                            break;
+                        }
+                        currentRange.end = Math.min(end, fileLength - 1);
+                    } else
                         currentRange.end = fileLength - 1;
                 } catch (NumberFormatException e) {
-                    response.addHeader("Content-Range",
-                                       "bytes */" + fileLength);
-                    response.sendError
-                        (HttpServletResponse
-                         .SC_REQUESTED_RANGE_NOT_SATISFIABLE);
-                    return null;
+                    break;
                 }
 
             }
 
-            if (!currentRange.validate()) {
-                response.addHeader("Content-Range", "bytes */" + fileLength);
-                response.sendError
-                    (HttpServletResponse.SC_REQUESTED_RANGE_NOT_SATISFIABLE);
-                return null;
+            if (currentRange.validate()) {
+                // https://tools.ietf.org/html/rfc7233#section-2.1
+                // rfc7233 says the request is satisfiable if some requested ranges
+                // exceed the size of the entity.
+                result.add(currentRange);
             }
-
-            result.add(currentRange);
         }
 
-        return result;
+        response.addHeader("Content-Range", "bytes */" + fileLength);
+        response.sendError(HttpServletResponse.SC_REQUESTED_RANGE_NOT_SATISFIABLE);
+        return null;
     }
 
 
@@ -2661,9 +2670,7 @@ public class DefaultServlet extends HttpServlet {
          * @return true if the range is valid, otherwise false
          */
         public boolean validate() {
-            if (end >= length)
-                end = length - 1;
-            return (start >= 0) && (end >= 0) && (start <= end) && (length > 0);
+            return 0 <= start && start <= end && end < length;
         }
     }
 
