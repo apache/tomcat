@@ -70,6 +70,9 @@
         when the file encoding is not compatible with the required response
         encoding. (markt)
       </fix>
+      <fix>Fix typo in UTF-32LE charset name. Patch by zhanhb vi Github.
+        (fschumacher)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
