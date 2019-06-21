@@ -117,7 +117,7 @@ public class WsSci implements ServletContainerInitializer {
             }
             // Deploy POJOs
             for (Class<?> clazz : filteredPojoEndpoints) {
-                sc.addEndpoint(clazz);
+                sc.addEndpoint(clazz, true);
             }
         } catch (DeploymentException e) {
             throw new ServletException(e);
