@@ -1214,7 +1214,7 @@ public class DefaultServlet extends HttpServlet {
             return StandardCharsets.UTF_16BE;
         }
         // Delay the UTF_16LE check if there are more that 2 bytes since it
-        // overlaps with UTF32-LE.
+        // overlaps with UTF-32LE.
         if (count == 2 && b0 == 0xFF && b1 == 0xFE) {
             skip(is, 2);
             return StandardCharsets.UTF_16LE;
@@ -1241,10 +1241,10 @@ public class DefaultServlet extends HttpServlet {
         // Look for 4-byte BOMs
         int b3 = bom[3] & 0xFF;
         if (b0 == 0x00 && b1 == 0x00 && b2 == 0xFE && b3 == 0xFF) {
-            return Charset.forName("UTF32-BE");
+            return Charset.forName("UTF-32BE");
         }
         if (b0 == 0xFF && b1 == 0xFE && b2 == 0x00 && b3 == 0x00) {
-            return Charset.forName("UTF32-LE");
+            return Charset.forName("UTF-32LE");
         }
 
         // Now we can check for UTF16-LE. There is an assumption here that we
