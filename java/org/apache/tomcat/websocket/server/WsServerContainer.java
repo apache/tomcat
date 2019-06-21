@@ -81,14 +81,14 @@ public class WsServerContainer extends WsWebSocketContainer
     private final WsWriteTimeout wsWriteTimeout = new WsWriteTimeout();
 
     private final ServletContext servletContext;
-    private final Map<String,ExactPathMatch> configExactMatchMap = new ConcurrentHashMap<>();
+    private final Map<String,ExactPathMatch> configExactMatchMap = new ConcurrentHashMap<String,ExactPathMatch>();
     private final ConcurrentHashMap<Integer,ConcurrentSkipListMap<String,TemplatePathMatch>> configTemplateMatchMap =
-            new ConcurrentHashMap<>();
+            new ConcurrentHashMap<Integer,ConcurrentSkipListMap<String,TemplatePathMatch>>();
     private volatile boolean enforceNoAddAfterHandshake =
             org.apache.tomcat.websocket.Constants.STRICT_SPEC_COMPLIANCE;
     private volatile boolean addAllowed = true;
     private final ConcurrentMap<String,Set<WsSession>> authenticatedSessions =
-            new ConcurrentHashMap<>();
+            new ConcurrentHashMap<String,Set<WsSession>>();
     private final ExecutorService executorService;
     private final ThreadGroup threadGroup;
     private volatile boolean endpointsRegistered = false;
@@ -210,7 +210,7 @@ public class WsServerContainer extends WsWebSocketContainer
                 if (templateMatches == null) {
                     // Ensure that if concurrent threads execute this block they
                     // all end up using the same ConcurrentSkipListMap instance
-                    templateMatches = new ConcurrentSkipListMap<>();
+                    templateMatches = new ConcurrentSkipListMap<String,TemplatePathMatch>();
                     configTemplateMatchMap.putIfAbsent(key, templateMatches);
                     templateMatches = configTemplateMatchMap.get(key);
                 }
