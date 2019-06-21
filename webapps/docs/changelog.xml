@@ -65,6 +65,16 @@
       </add>
     </changelog>
   </subsection>
+  <subsection name="WebSocket">
+    <changelog>
+      <fix>
+        <bug>63521</bug>: As required by the WebSocket specification, if a POJO
+        that is deployed as a result of the SCI scan for annotated POJOs is
+        subsequently deployed via the programmatic API ignore the programmatic
+        deployment. (markt)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 8.5.42 (markt)" rtext="2019-06-07">
   <subsection name="Catalina">
