@@ -1505,7 +1505,14 @@ public class DefaultServlet extends HttpServlet {
         StringTokenizer commaTokenizer = new StringTokenizer(rangeHeader, ",");
 
         // Parsing the range list
-        while (commaTokenizer.hasMoreTokens()) {
+        while (true) {
+            if (!commaTokenizer.hasMoreTokens()) {
+                if (result.isEmpty()) {
+                    break;
+                }
+                return result;
+            }
+
             String rangeDefinition = commaTokenizer.nextToken().trim();
 
             Range currentRange = new Range();
@@ -1514,10 +1521,7 @@ public class DefaultServlet extends HttpServlet {
             int dashPos = rangeDefinition.indexOf('-');
 
             if (dashPos == -1) {
-                response.addHeader("Content-Range", "bytes */" + fileLength);
-                response.sendError
-                    (HttpServletResponse.SC_REQUESTED_RANGE_NOT_SATISFIABLE);
-                return null;
+                break;
             }
 
             if (dashPos == 0) {
@@ -1527,12 +1531,7 @@ public class DefaultServlet extends HttpServlet {
                     currentRange.start = fileLength + offset;
                     currentRange.end = fileLength - 1;
                 } catch (NumberFormatException e) {
-                    response.addHeader("Content-Range",
-                                       "bytes */" + fileLength);
-                    response.sendError
-                        (HttpServletResponse
-                         .SC_REQUESTED_RANGE_NOT_SATISFIABLE);
-                    return null;
+                    break;
                 }
 
             } else {
@@ -1547,27 +1546,21 @@ public class DefaultServlet extends HttpServlet {
                     else
                         currentRange.end = fileLength - 1;
                 } catch (NumberFormatException e) {
-                    response.addHeader("Content-Range",
-                                       "bytes */" + fileLength);
-                    response.sendError
-                        (HttpServletResponse
-                         .SC_REQUESTED_RANGE_NOT_SATISFIABLE);
-                    return null;
+                    break;
                 }
 
             }
 
             if (!currentRange.validate()) {
-                response.addHeader("Content-Range", "bytes */" + fileLength);
-                response.sendError
-                    (HttpServletResponse.SC_REQUESTED_RANGE_NOT_SATISFIABLE);
-                return null;
+                break;
             }
 
             result.add(currentRange);
         }
 
-        return result;
+        response.addHeader("Content-Range", "bytes */" + fileLength);
+        response.sendError(HttpServletResponse.SC_REQUESTED_RANGE_NOT_SATISFIABLE);
+        return null;
     }
 
 
