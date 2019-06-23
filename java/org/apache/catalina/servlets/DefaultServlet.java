@@ -1444,6 +1444,10 @@ public class DefaultServlet extends HttpServlet {
             HttpServletResponse response,
             WebResource resource) throws IOException {
 
+        if (!"GET".equals(request.getMethod())) {
+            return FULL;
+        }
+
         // Checking If-Range
         String headerValue = request.getHeader("If-Range");
 
