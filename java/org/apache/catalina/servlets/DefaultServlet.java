@@ -1488,13 +1488,10 @@ public class DefaultServlet extends HttpServlet {
 
         if (rangeHeader == null)
             return null;
-        // bytes is the only range unit supported (and I don't see the point
-        // of adding new ones).
+        // client can send a request with explicit Range: none, or user defined range units.
         if (!rangeHeader.startsWith("bytes")) {
-            response.addHeader("Content-Range", "bytes */" + fileLength);
-            response.sendError
-                (HttpServletResponse.SC_REQUESTED_RANGE_NOT_SATISFIABLE);
-            return null;
+            // We MUST ignore a Range header field that contains a range unit we do not understand.
+            return FULL;
         }
 
         rangeHeader = rangeHeader.substring(6);
