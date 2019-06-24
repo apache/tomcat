@@ -110,6 +110,11 @@
         <bug>63523</bug>: Restore SSLUtilBase methods as protected to preserve
         compatibility. (remm)
       </fix>
+      <fix>
+        Switch the check for terminal availability to test for stdin as using
+        stdout does not work when output is piped to another process. Patch
+        provided by Radosław Józwik. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
