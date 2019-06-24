@@ -61,18 +61,6 @@
       </fix>
     </changelog>
   </subsection>
-  <subsection name="Other">
-    <changelog>
-      <scode>
-        Switch i18n message files to use UTF-8 and convert to ASCII at build
-        time. (markt)
-      </scode>
-      <fix>
-        <bug>63523</bug>: Restore SSLUtilBase methods as protected to preserve
-        compatibility. (remm)
-      </fix>
-    </changelog>
-  </subsection>
   <subsection name="Jasper">
     <changelog>
       <add>
@@ -88,6 +76,18 @@
         that is deployed as a result of the SCI scan for annotated POJOs is
         subsequently deployed via the programmatic API ignore the programmatic
         deployment. (markt)
+      </fix>
+    </changelog>
+  </subsection>
+  <subsection name="Other">
+    <changelog>
+      <scode>
+        Switch i18n message files to use UTF-8 and convert to ASCII at build
+        time. (markt)
+      </scode>
+      <fix>
+        <bug>63523</bug>: Restore SSLUtilBase methods as protected to preserve
+        compatibility. (remm)
       </fix>
     </changelog>
   </subsection>
