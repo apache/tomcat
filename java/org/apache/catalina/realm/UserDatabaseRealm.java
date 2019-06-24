@@ -29,6 +29,7 @@ import org.apache.catalina.Role;
 import org.apache.catalina.User;
 import org.apache.catalina.UserDatabase;
 import org.apache.catalina.Wrapper;
+import org.apache.catalina.users.MemoryUserDatabase;
 import org.apache.tomcat.util.ExceptionUtils;
 
 /**
@@ -148,6 +149,14 @@ public class UserDatabaseRealm extends RealmBase {
     @Deprecated
     protected String getName() {
         return name;
+    }
+
+
+    @Override
+    public void backgroundProcess() {
+        if (database instanceof MemoryUserDatabase) {
+            ((MemoryUserDatabase) database).backgroundProcess();
+        }
     }
 
 

@@ -25,7 +25,7 @@
     <properties>
       <author email="craigmcc@apache.org">Craig R. McClanahan</author>
       <author email="yoavs@apache.org">Yoav Shapira</author>
-      <title>JNDI Resources HOW-TO</title>
+      <title>JNDI Resources How-To</title>
     </properties>
 
 <body>
@@ -481,6 +481,12 @@ public class MyBean2 {
     written it will inherit the default file permissions for the user Tomcat
     is running as. Ensure that these are appropriate to maintain the security
     of your installation.</p>
+
+    <p>If referenced in a Realm, the MemoryUserDatabse will, by default, monitor
+    <code>pathname</code> for changes and reload the file if a change in the
+    last modified time is observed. This can be disabled by setting the
+    <code>watchSource</code> attribute to <code>false</code>.
+    </p>
 
     <h5>3.  Configure the Realm</h5>
 
