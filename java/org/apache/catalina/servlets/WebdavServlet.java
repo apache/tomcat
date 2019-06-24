@@ -1308,7 +1308,7 @@ public class WebdavServlet extends DefaultServlet {
                 tokenList = toRenew.tokens.elements();
                 while (tokenList.hasMoreElements()) {
                     String token = tokenList.nextElement();
-                    if (ifHeader.indexOf(token) != -1) {
+                    if (ifHeader.contains(token)) {
                         toRenew.expiresAt = lock.expiresAt;
                         lock = toRenew;
                     }
@@ -1326,7 +1326,7 @@ public class WebdavServlet extends DefaultServlet {
                     tokenList = toRenew.tokens.elements();
                     while (tokenList.hasMoreElements()) {
                         String token = tokenList.nextElement();
-                        if (ifHeader.indexOf(token) != -1) {
+                        if (ifHeader.contains(token)) {
                             toRenew.expiresAt = lock.expiresAt;
                             lock = toRenew;
                         }
@@ -1397,7 +1397,7 @@ public class WebdavServlet extends DefaultServlet {
             tokenList = lock.tokens.elements();
             while (tokenList.hasMoreElements()) {
                 String token = tokenList.nextElement();
-                if (lockTokenHeader.indexOf(token) != -1) {
+                if (lockTokenHeader.contains(token)) {
                     lock.tokens.removeElement(token);
                 }
             }
@@ -1420,7 +1420,7 @@ public class WebdavServlet extends DefaultServlet {
                 tokenList = lock.tokens.elements();
                 while (tokenList.hasMoreElements()) {
                     String token = tokenList.nextElement();
-                    if (lockTokenHeader.indexOf(token) != -1) {
+                    if (lockTokenHeader.contains(token)) {
                         lock.tokens.removeElement(token);
                         break;
                     }
@@ -1493,7 +1493,7 @@ public class WebdavServlet extends DefaultServlet {
             boolean tokenMatch = false;
             while (tokenList.hasMoreElements()) {
                 String token = tokenList.nextElement();
-                if (ifHeader.indexOf(token) != -1) {
+                if (ifHeader.contains(token)) {
                     tokenMatch = true;
                     break;
                 }
@@ -1516,7 +1516,7 @@ public class WebdavServlet extends DefaultServlet {
                 boolean tokenMatch = false;
                 while (tokenList.hasMoreElements()) {
                     String token = tokenList.nextElement();
-                    if (ifHeader.indexOf(token) != -1) {
+                    if (ifHeader.contains(token)) {
                         tokenMatch = true;
                         break;
                     }
@@ -1742,18 +1742,15 @@ public class WebdavServlet extends DefaultServlet {
                 }
             }
             try (InputStream is = sourceResource.getInputStream()) {
-                if (!resources.write(dest, is,
-                        false)) {
-                    errorList.put(source,
-                            Integer.valueOf(WebdavStatus.SC_INTERNAL_SERVER_ERROR));
+                if (!resources.write(dest, is, false)) {
+                    errorList.put(source, Integer.valueOf(WebdavStatus.SC_INTERNAL_SERVER_ERROR));
                     return false;
                 }
             } catch (IOException e) {
                 log(sm.getString("webdavservlet.inputstreamclosefail", source), e);
             }
         } else {
-            errorList.put(source,
-                    Integer.valueOf(WebdavStatus.SC_INTERNAL_SERVER_ERROR));
+            errorList.put(source, Integer.valueOf(WebdavStatus.SC_INTERNAL_SERVER_ERROR));
             return false;
         }
         return true;
@@ -2319,6 +2316,7 @@ public class WebdavServlet extends DefaultServlet {
 
     /**
      * Determines the methods normally allowed for the resource.
+     *
      * @param req The Servlet request
      * @return a string builder with the allowed HTTP methods
      */
@@ -2352,8 +2350,8 @@ public class WebdavServlet extends DefaultServlet {
         return methodsAllowed;
     }
 
-    // --------------------------------------------------  LockInfo Inner Class
 
+    // --------------------------------------------------  LockInfo Inner Class
 
     /**
      * Holds a lock information.
@@ -2375,7 +2373,6 @@ public class WebdavServlet extends DefaultServlet {
 
 
         // ----------------------------------------------------- Public Methods
-
 
         /**
          * Get a String representation of this lock token.
@@ -2465,10 +2462,7 @@ public class WebdavServlet extends DefaultServlet {
             generatedXML.writeElement("D", "locktoken", XMLWriter.CLOSING);
 
             generatedXML.writeElement("D", "activelock", XMLWriter.CLOSING);
-
         }
-
-
     }
 
 

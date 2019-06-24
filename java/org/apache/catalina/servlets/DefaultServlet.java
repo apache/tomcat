@@ -266,7 +266,7 @@ public class DefaultServlet extends HttpServlet {
     /**
      * The sorting manager for sorting files and directories.
      */
-    protected SortManager sortManager;
+    protected transient SortManager sortManager;
 
     // --------------------------------------------------------- Public Methods
 
@@ -333,7 +333,7 @@ public class DefaultServlet extends HttpServlet {
                 Globals.RESOURCES_ATTR);
 
         if (resources == null) {
-            throw new UnavailableException("No resources");
+            throw new UnavailableException(sm.getString("defaultServlet.noResources"));
         }
 
         if (getServletConfig().getInitParameter("showServerInfo") != null) {
@@ -1328,7 +1328,7 @@ public class DefaultServlet extends HttpServlet {
 
         rangeHeader = rangeHeader.substring(6);
 
-        // Vector which will contain all the ranges which are successfully
+        // Collection which will contain all the ranges which are successfully
         // parsed.
         ArrayList<Range> result = new ArrayList<>();
         StringTokenizer commaTokenizer = new StringTokenizer(rangeHeader, ",");
@@ -1633,7 +1633,7 @@ public class DefaultServlet extends HttpServlet {
             osWriter.flush();
             return new ByteArrayInputStream(stream.toByteArray());
         } catch (TransformerException e) {
-            throw new ServletException("XSL transformer error", e);
+            throw new ServletException(sm.getString("defaultServlet.xslError"), e);
         } finally {
             if (Globals.IS_SECURITY_ENABLED) {
                 PrivilegedSetTccl pa = new PrivilegedSetTccl(original);
@@ -1922,7 +1922,7 @@ public class DefaultServlet extends HttpServlet {
                     }
                     copyRange(reader, new PrintWriter(buffer));
                 } catch (IOException e) {
-                    log("Failure to close reader", e);
+                    log(sm.getString("defaultServlet.readerCloseFailed"), e);
                 } finally {
                     if (reader != null) {
                         try {
@@ -2866,14 +2866,14 @@ public class DefaultServlet extends HttpServlet {
                 this.ascending = ascending;
             }
 
-            public static Order NAME = new Order('N', false);
-            public static Order NAME_ASC = new Order('N', true);
-            public static Order SIZE = new Order('S', false);
-            public static Order SIZE_ASC = new Order('S', true);
-            public static Order LAST_MODIFIED = new Order('M', false);
-            public static Order LAST_MODIFIED_ASC = new Order('M', true);
+            public static final Order NAME = new Order('N', false);
+            public static final Order NAME_ASC = new Order('N', true);
+            public static final Order SIZE = new Order('S', false);
+            public static final Order SIZE_ASC = new Order('S', true);
+            public static final Order LAST_MODIFIED = new Order('M', false);
+            public static final Order LAST_MODIFIED_ASC = new Order('M', true);
 
-            public static Order DEFAULT = NAME;
+            public static final Order DEFAULT = NAME;
         }
     }
 
