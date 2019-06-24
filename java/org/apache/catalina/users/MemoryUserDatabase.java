@@ -39,20 +39,20 @@ import org.apache.tomcat.util.res.StringManager;
 import org.xml.sax.Attributes;
 
 /**
- * <p>Concrete implementation of {@link UserDatabase} that loads all
- * defined users, groups, and roles into an in-memory data structure,
- * and uses a specified XML file for its persistent storage.</p>
+ * Concrete implementation of {@link UserDatabase} that loads all defined users,
+ * groups, and roles into an in-memory data structure, and uses a specified XML
+ * file for its persistent storage.
  *
  * @author Craig R. McClanahan
  * @since 4.1
  */
 public class MemoryUserDatabase implements UserDatabase {
 
-
     private static final Log log = LogFactory.getLog(MemoryUserDatabase.class);
+    private static final StringManager sm = StringManager.getManager(MemoryUserDatabase.class);
+
 
     // ----------------------------------------------------------- Constructors
-
 
     /**
      * Create a new instance with default values.
@@ -71,29 +71,23 @@ public class MemoryUserDatabase implements UserDatabase {
         this.id = id;
     }
 
-
     // ----------------------------------------------------- Instance Variables
 
-
     /**
-     * The set of {@link Group}s defined in this database, keyed by
-     * group name.
+     * The set of {@link Group}s defined in this database, keyed by group name.
      */
-    protected final HashMap<String,Group> groups = new HashMap<>();
-
+    protected final HashMap<String, Group> groups = new HashMap<>();
 
     /**
      * The unique global identifier of this user database.
      */
     protected final String id;
 
-
     /**
-     * The relative (to <code>catalina.base</code>) or absolute pathname to
-     * the XML file in which we will save our persistent information.
+     * The relative (to <code>catalina.base</code>) or absolute pathname to the
+     * XML file in which we will save our persistent information.
      */
     protected String pathname = "conf/tomcat-users.xml";
-
 
     /**
      * The relative or absolute pathname to the file in which our old
@@ -101,13 +95,11 @@ public class MemoryUserDatabase implements UserDatabase {
      */
     protected String pathnameOld = pathname + ".old";
 
-
     /**
-     * The relative or absolute pathname of the file in which we write
-     * our new information prior to renaming.
+     * The relative or absolute pathname of the file in which we write our new
+     * information prior to renaming.
      */
     protected String pathnameNew = pathname + ".new";
-
 
     /**
      * A flag, indicating if the user database is read only.
@@ -115,28 +107,18 @@ public class MemoryUserDatabase implements UserDatabase {
     protected boolean readonly = true;
 
     /**
-     * The set of {@link Role}s defined in this database, keyed by
-     * role name.
+     * The set of {@link Role}s defined in this database, keyed by role name.
      */
-    protected final HashMap<String,Role> roles = new HashMap<>();
+    protected final HashMap<String, Role> roles = new HashMap<>();
 
 
     /**
-     * The string manager for this package.
-     */
-    private static final StringManager sm =
-        StringManager.getManager(Constants.Package);
-
-
-    /**
-     * The set of {@link User}s defined in this database, keyed by
-     * user name.
+     * The set of {@link User}s defined in this database, keyed by user name.
      */
     protected final HashMap<String,User> users = new HashMap<>();
 
 
     // ------------------------------------------------------------- Properties
-
 
     /**
      * @return the set of {@link Group}s defined in this user database.
@@ -172,11 +154,9 @@ public class MemoryUserDatabase implements UserDatabase {
      * @param pathname The new pathname
      */
     public void setPathname(String pathname) {
-
         this.pathname = pathname;
         this.pathnameOld = pathname + ".old";
         this.pathnameNew = pathname + ".new";
-
     }
 
 
@@ -194,9 +174,7 @@ public class MemoryUserDatabase implements UserDatabase {
      * @param readonly the new status
      */
     public void setReadonly(boolean readonly) {
-
         this.readonly = readonly;
-
     }
 
 
@@ -222,9 +200,7 @@ public class MemoryUserDatabase implements UserDatabase {
     }
 
 
-
     // --------------------------------------------------------- Public Methods
-
 
     /**
      * Finalize access to this user database.
@@ -242,7 +218,6 @@ public class MemoryUserDatabase implements UserDatabase {
                 groups.clear();
             }
         }
-
     }
 
 
@@ -298,8 +273,7 @@ public class MemoryUserDatabase implements UserDatabase {
      * @param fullName The full name of the new user
      */
     @Override
-    public User createUser(String username, String password,
-                           String fullName) {
+    public User createUser(String username, String password, String fullName) {
 
         if (username == null || username.length() == 0) {
             String msg = sm.getString("memoryUserDatabase.nullUser");
@@ -316,18 +290,16 @@ public class MemoryUserDatabase implements UserDatabase {
 
 
     /**
-     * Return the {@link Group} with the specified group name, if any;
-     * otherwise return <code>null</code>.
+     * Return the {@link Group} with the specified group name, if any; otherwise
+     * return <code>null</code>.
      *
      * @param groupname Name of the group to return
      */
     @Override
     public Group findGroup(String groupname) {
-
         synchronized (groups) {
             return groups.get(groupname);
         }
-
     }
 
 
@@ -339,11 +311,9 @@ public class MemoryUserDatabase implements UserDatabase {
      */
     @Override
     public Role findRole(String rolename) {
-
         synchronized (roles) {
             return roles.get(rolename);
         }
-
     }
 
 
@@ -355,11 +325,9 @@ public class MemoryUserDatabase implements UserDatabase {
      */
     @Override
     public User findUser(String username) {
-
         synchronized (users) {
             return users.get(username);
         }
-
     }
 
 
@@ -370,7 +338,6 @@ public class MemoryUserDatabase implements UserDatabase {
      */
     @Override
     public void open() throws Exception {
-
         synchronized (groups) {
             synchronized (users) {
 
@@ -414,7 +381,6 @@ public class MemoryUserDatabase implements UserDatabase {
      */
     @Override
     public void removeGroup(Group group) {
-
         synchronized (groups) {
             Iterator<User> users = getUsers();
             while (users.hasNext()) {
@@ -433,7 +399,6 @@ public class MemoryUserDatabase implements UserDatabase {
      */
     @Override
     public void removeRole(Role role) {
-
         synchronized (roles) {
             Iterator<Group> groups = getGroups();
             while (groups.hasNext()) {
@@ -447,7 +412,6 @@ public class MemoryUserDatabase implements UserDatabase {
             }
             roles.remove(role.getRolename());
         }
-
     }
 
 
@@ -458,25 +422,23 @@ public class MemoryUserDatabase implements UserDatabase {
      */
     @Override
     public void removeUser(User user) {
-
         synchronized (users) {
             users.remove(user.getUsername());
         }
-
     }
 
 
     /**
      * Check for permissions to save this user database to persistent storage
      * location.
+     *
      * @return <code>true</code> if the database is writable
      */
     public boolean isWriteable() {
 
         File file = new File(pathname);
         if (!file.isAbsolute()) {
-            file = new File(System.getProperty(Globals.CATALINA_BASE_PROP),
-                            pathname);
+            file = new File(System.getProperty(Globals.CATALINA_BASE_PROP), pathname);
         }
         File dir = file.getParentFile();
         return dir.exists() && dir.isDirectory() && dir.canWrite();
@@ -484,8 +446,8 @@ public class MemoryUserDatabase implements UserDatabase {
 
 
     /**
-     * Save any updated information to the persistent storage location for
-     * this user database.
+     * Save any updated information to the persistent storage location for this
+     * user database.
      *
      * @exception Exception if any exception is thrown during saving
      */
@@ -505,8 +467,7 @@ public class MemoryUserDatabase implements UserDatabase {
         // Write out contents to a temporary file
         File fileNew = new File(pathnameNew);
         if (!fileNew.isAbsolute()) {
-            fileNew =
-                new File(System.getProperty(Globals.CATALINA_BASE_PROP), pathnameNew);
+            fileNew = new File(System.getProperty(Globals.CATALINA_BASE_PROP), pathnameNew);
         }
         PrintWriter writer = null;
         try {
@@ -564,8 +525,7 @@ public class MemoryUserDatabase implements UserDatabase {
         // Perform the required renames to permanently save this file
         File fileOld = new File(pathnameOld);
         if (!fileOld.isAbsolute()) {
-            fileOld =
-                new File(System.getProperty(Globals.CATALINA_BASE_PROP), pathnameOld);
+            fileOld = new File(System.getProperty(Globals.CATALINA_BASE_PROP), pathnameOld);
         }
         fileOld.delete();
         File fileOrig = new File(pathname);
@@ -615,7 +575,6 @@ public class MemoryUserDatabase implements UserDatabase {
 }
 
 
-
 /**
  * Digester object creation factory for group instances.
  */
@@ -624,6 +583,7 @@ class MemoryGroupCreationFactory extends AbstractObjectCreationFactory {
     public MemoryGroupCreationFactory(MemoryUserDatabase database) {
         this.database = database;
     }
+
 
     @Override
     public Object createObject(Attributes attributes) {
@@ -670,6 +630,7 @@ class MemoryRoleCreationFactory extends AbstractObjectCreationFactory {
         this.database = database;
     }
 
+
     @Override
     public Object createObject(Attributes attributes) {
         String rolename = attributes.getValue("rolename");
@@ -693,6 +654,7 @@ class MemoryUserCreationFactory extends AbstractObjectCreationFactory {
     public MemoryUserCreationFactory(MemoryUserDatabase database) {
         this.database = database;
     }
+
 
     @Override
     public Object createObject(Attributes attributes) {
