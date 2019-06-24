@@ -79,7 +79,7 @@
       </fix>
     </changelog>
   </subsection>
-  <subsection>
+  <subsection name="Other">
     <changelog>
       <fix>
         Switch the check for terminal availability to test for stdin as using
