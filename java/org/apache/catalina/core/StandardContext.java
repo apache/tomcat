@@ -882,7 +882,17 @@ public class StandardContext extends ContainerBase
 
     @Override
     public void setResponseCharacterEncoding(String responseEncoding) {
-        this.responseEncoding = responseEncoding;
+        /*
+         * This ensures that the context response encoding is represented by a
+         * unique String object. This enables the Default Servlet to
+         * differentiate between a Response using this default encoding and one
+         * that has been explicitly configured.
+         */
+        if (responseEncoding == null) {
+            this.responseEncoding = null;
+        } else {
+            this.responseEncoding = new String(responseEncoding);
+        }
     }
 
 

@@ -65,6 +65,11 @@
         rather than fails (with a 500 response). This enables Tomcat to pass two
         additional tests from the Litmus WebDAV test suite. (markt)
       </fix>
+      <fix>
+        <bug>49464</bug>: Improve the Default Servlet's handling of static files
+        when the file encoding is not compatible with the required response
+        encoding. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
