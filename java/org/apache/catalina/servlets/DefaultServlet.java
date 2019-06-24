@@ -1372,7 +1372,7 @@ public class DefaultServlet extends HttpServlet {
     /**
      * Parse the content-range header.
      *
-     * @param request The servlet request we a)re processing
+     * @param request The servlet request we are processing
      * @param response The servlet response we are creating
      * @return the range object
      * @throws IOException an IO error occurred
