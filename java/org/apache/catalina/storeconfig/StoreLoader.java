@@ -29,7 +29,7 @@ import org.apache.tomcat.util.file.ConfigurationSource.Resource;
  *
  * <pre>
  * {@code
- *       <Registry name="" encoding="UTF8" >
+ *       <Registry name="" encoding="UTF-8" >
  *         <Description
  *             tag="Server"
  *             standard="true"
