@@ -172,7 +172,6 @@ public class MemoryUserDatabase implements UserDatabase {
     }
 
 
-
     /**
      * @return the unique global identifier of this user database.
      */
