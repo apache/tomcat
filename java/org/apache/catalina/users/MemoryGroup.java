@@ -21,6 +21,7 @@ package org.apache.catalina.users;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import org.apache.catalina.Role;
 import org.apache.catalina.User;
@@ -104,7 +105,7 @@ public class MemoryGroup extends AbstractGroup {
      */
     @Override
     public Iterator<User> getUsers() {
-        ArrayList<User> results = new ArrayList<>();
+        List<User> results = new ArrayList<>();
         Iterator<User> users = database.getUsers();
         while (users.hasNext()) {
             User user = users.next();
