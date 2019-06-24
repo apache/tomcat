@@ -1630,6 +1630,7 @@ public class DefaultServlet extends HttpServlet {
      *
      * @throws IOException an IO error occurred
      * @throws ServletException rendering error
+     * @deprecated Unused. Will be removed in Tomcat 10
      * @deprecated Use {@link #render(HttpServletRequest, String, WebResource, String)} instead
      */
     @Deprecated
@@ -1785,6 +1786,7 @@ public class DefaultServlet extends HttpServlet {
      *
      * @throws IOException an IO error occurred
      *
+     * @deprecated Unused. Will be removed in Tomcat 10
      * @deprecated Use {@link #renderHtml(HttpServletRequest, String, WebResource, String)} instead
      */
     @Deprecated
