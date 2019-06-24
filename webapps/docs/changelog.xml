@@ -194,7 +194,8 @@
       <fix>
         Use the <code>test</code> command to check for terminal availability
         rather than the <code>tty</code> command since the <code>tty</code>
-        based test fails on non-English locales. (markt)
+        based test fails on non-English locales. Patch provided by Radosław
+        Józwik. (markt)
       </fix>
     </changelog>
   </subsection>
