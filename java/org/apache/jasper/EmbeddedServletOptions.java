@@ -163,7 +163,7 @@ public final class EmbeddedServletOptions implements Options {
      * Java platform encoding to generate the JSP
      * page servlet.
      */
-    private String javaEncoding = "UTF8";
+    private String javaEncoding = "UTF-8";
 
     /**
      * Modification test interval.

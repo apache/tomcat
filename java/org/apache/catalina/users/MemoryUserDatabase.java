@@ -547,7 +547,7 @@ public class MemoryUserDatabase implements UserDatabase {
 
             // Configure our PrintWriter
             FileOutputStream fos = new FileOutputStream(fileNew);
-            OutputStreamWriter osw = new OutputStreamWriter(fos, "UTF8");
+            OutputStreamWriter osw = new OutputStreamWriter(fos, "UTF-8");
             writer = new PrintWriter(osw);
 
             // Print the file prolog

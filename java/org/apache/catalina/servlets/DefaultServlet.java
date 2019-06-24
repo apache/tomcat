@@ -1432,7 +1432,7 @@ public class DefaultServlet extends HttpServlet {
             Transformer transformer = tFactory.newTransformer(xsltSource);
 
             ByteArrayOutputStream stream = new ByteArrayOutputStream();
-            OutputStreamWriter osWriter = new OutputStreamWriter(stream, "UTF8");
+            OutputStreamWriter osWriter = new OutputStreamWriter(stream, "UTF-8");
             StreamResult out = new StreamResult(osWriter);
             transformer.transform(xmlSource, out);
             osWriter.flush();
@@ -1463,7 +1463,7 @@ public class DefaultServlet extends HttpServlet {
 
         // Prepare a writer to a buffered area
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        OutputStreamWriter osWriter = new OutputStreamWriter(stream, "UTF8");
+        OutputStreamWriter osWriter = new OutputStreamWriter(stream, "UTF-8");
         PrintWriter writer = new PrintWriter(osWriter);
 
         StringBuilder sb = new StringBuilder();

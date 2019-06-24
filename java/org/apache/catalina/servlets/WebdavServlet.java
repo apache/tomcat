@@ -1618,7 +1618,7 @@ public class WebdavServlet extends DefaultServlet {
 
         // Remove url encoding from destination
         destinationPath = org.apache.catalina.util.RequestUtil.URLDecode(
-                destinationPath, "UTF8");
+                destinationPath, "UTF-8");
 
         int protocolIndex = destinationPath.indexOf("://");
         if (protocolIndex >= 0) {

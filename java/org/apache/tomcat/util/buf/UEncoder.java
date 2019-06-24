@@ -56,7 +56,7 @@ public final class UEncoder {
     private CharChunk output=null;
     private final boolean readOnlySafeChars;
 
-    private String encoding="UTF8";
+    private String encoding="UTF-8";
 
     public UEncoder() {
         this.safeChars = initialSafeChars();
