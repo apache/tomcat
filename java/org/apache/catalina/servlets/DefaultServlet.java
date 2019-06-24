@@ -16,7 +16,6 @@
  */
 package org.apache.catalina.servlets;
 
-
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -99,7 +98,7 @@ import org.xml.sax.ext.EntityResolver2;
  *   &lt;/servlet-mapping&gt;
  * </pre>
  * <p>It can be mapped to sub-paths, however in all cases resources are served
- * from the web appplication resource root using the full path from the root
+ * from the web application resource root using the full path from the root
  * of the web application context.
  * <br>e.g. given a web application structure:
  *</p>
@@ -127,10 +126,14 @@ import org.xml.sax.ext.EntityResolver2;
  * @author Craig R. McClanahan
  * @author Remy Maucherat
  */
-public class DefaultServlet
-    extends HttpServlet {
+public class DefaultServlet extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
+
+    /**
+     * The string manager for this package.
+     */
+    protected static final StringManager sm = StringManager.getManager(Constants.Package);
 
     private static final DocumentBuilderFactory factory;
 
@@ -144,18 +147,15 @@ public class DefaultServlet
      */
     protected int debug = 0;
 
-
     /**
      * The input buffer size to use when serving resources.
      */
     protected int input = 2048;
 
-
     /**
      * Should we generate directory listings?
      */
     protected boolean listings = false;
-
 
     /**
      * Read only flag. By default, it's set to true.
@@ -180,24 +180,20 @@ public class DefaultServlet
      */
     protected String localXsltFile = null;
 
-
     /**
      * Allow customized directory listing per context.
      */
     protected String contextXsltFile = null;
-
 
     /**
      * Allow customized directory listing per instance.
      */
     protected String globalXsltFile = null;
 
-
     /**
      * Allow a readme file to be included.
      */
     protected String readmeFile = null;
-
 
     /**
      * Proxy directory context.
@@ -272,13 +268,6 @@ public class DefaultServlet
 
 
     /**
-     * The string manager for this package.
-     */
-    protected static final StringManager sm =
-        StringManager.getManager(Constants.Package);
-
-
-    /**
      * Size of file transfer buffer in bytes.
      */
     protected static final int BUFFER_SIZE = 4096;
@@ -286,7 +275,6 @@ public class DefaultServlet
 
 
     // --------------------------------------------------------- Public Methods
-
 
     /**
      * Finalize this servlet.
@@ -381,7 +369,7 @@ public class DefaultServlet
     protected String getRelativePath(HttpServletRequest request, boolean allowEmptyPath) {
         // IMPORTANT: DefaultServlet can be mapped to '/' or '/path/*' but always
         // serves resources from the web app root with context rooted paths.
-        // i.e. it can not be used to mount the web app root under a sub-path
+        // i.e. it cannot be used to mount the web app root under a sub-path
         // This method must construct a complete context rooted path, although
         // subclasses can change this behaviour.
 
@@ -613,6 +601,11 @@ public class DefaultServlet
      * Handle a partial PUT.  New content specified in request is appended to
      * existing content in oldRevisionContent (if present). This code does
      * not support simultaneous partial updates to the same resource.
+     * @param req The Servlet request
+     * @param range The range that will be written
+     * @param path The path
+     * @return the associated file object
+     * @throws IOException an IO error occurred
      */
     protected File executePartialPut(HttpServletRequest req, Range range,
                                      String path)
@@ -696,7 +689,6 @@ public class DefaultServlet
         }
 
         return contentFile;
-
     }
 
 
@@ -774,6 +766,7 @@ public class DefaultServlet
      * URL rewriter.
      *
      * @param path Path which has to be rewritten
+     * @return the rewritten path
      */
     protected String rewriteUrl(String path) {
         return urlEncoder.encode(path, "UTF-8");
@@ -847,9 +840,8 @@ public class DefaultServlet
             } else {
                 // We're included
                 // SRV.9.3 says we must throw a FNFE
-                throw new FileNotFoundException(
-                        sm.getString("defaultServlet.missingResource",
-                    requestUri));
+                throw new FileNotFoundException(sm.getString(
+                        "defaultServlet.missingResource", requestUri));
             }
 
             if (isError) {
@@ -872,7 +864,6 @@ public class DefaultServlet
                     !checkIfHeaders(request, response, cacheEntry.attributes)) {
                 return;
             }
-
         }
 
         // Find content type.
@@ -886,7 +877,6 @@ public class DefaultServlet
         long contentLength = -1L;
 
         if (cacheEntry.context != null) {
-
             if (!path.endsWith("/")) {
                 doDirectoryRedirect(request, response);
                 return;
@@ -900,7 +890,6 @@ public class DefaultServlet
                 return;
             }
             contentType = "text/html;charset=UTF-8";
-
         } else {
             if (!isError) {
                 if (useAcceptRanges) {
@@ -926,16 +915,13 @@ public class DefaultServlet
             if (contentLength == 0L) {
                 serveContent = false;
             }
-
         }
 
         ServletOutputStream ostream = null;
         PrintWriter writer = null;
 
         if (serveContent) {
-
             // Trying to retrieve the servlet output stream
-
             try {
                 ostream = response.getOutputStream();
             } catch (IllegalStateException e) {
@@ -952,10 +938,9 @@ public class DefaultServlet
                     throw e;
                 }
             }
-
         }
 
-        // Check to see if a Filter, Valve of wrapper has written some content.
+        // Check to see if a Filter, Valve or wrapper has written some content.
         // If it has, disable range requests and setting of a content length
         // since neither can be done reliably.
         ServletResponse r = response;
@@ -1072,12 +1057,9 @@ public class DefaultServlet
                         throw new IllegalStateException();
                     }
                 }
-
             } else {
-
                 response.setContentType("multipart/byteranges; boundary="
                                         + mimeSeparation);
-
                 if (serveContent) {
                     try {
                         response.setBufferSize(output);
@@ -1092,11 +1074,8 @@ public class DefaultServlet
                         throw new IllegalStateException();
                     }
                 }
-
             }
-
         }
-
     }
 
     private void doDirectoryRedirect(HttpServletRequest request, HttpServletResponse response)
@@ -1119,7 +1098,8 @@ public class DefaultServlet
      *
      * @param request The servlet request we are processing
      * @param response The servlet response we are creating
-     * @return Range
+     * @return the range object
+     * @throws IOException an IO error occurred
      */
     protected Range parseContentRange(HttpServletRequest request,
                                       HttpServletResponse response)
@@ -1178,9 +1158,11 @@ public class DefaultServlet
     /**
      * Parse the range header.
      *
-     * @param request The servlet request we are processing
-     * @param response The servlet response we are creating
-     * @return Vector of ranges
+     * @param request             The servlet request we are processing
+     * @param response            The servlet response we are creating
+     * @param resourceAttributes  The resource information
+     * @return a list of ranges
+     * @throws IOException an IO error occurred
      */
     protected ArrayList<Range> parseRange(HttpServletRequest request,
             HttpServletResponse response,
@@ -1241,7 +1223,7 @@ public class DefaultServlet
 
         rangeHeader = rangeHeader.substring(6);
 
-        // Vector which will contain all the ranges which are successfully
+        // Collection which will contain all the ranges which are successfully
         // parsed.
         ArrayList<Range> result = new ArrayList<Range>();
         StringTokenizer commaTokenizer = new StringTokenizer(rangeHeader, ",");
@@ -1330,8 +1312,8 @@ public class DefaultServlet
 
 
     /**
-     * Return an InputStream to an HTML representation of the contents
-     * of this directory.
+     * Return an InputStream to an XML representation of the contents this
+     * directory.
      *
      * @param contextPath Context path to which our internal paths are
      *  relative
@@ -1414,7 +1396,6 @@ public class DefaultServlet
             // Something went wrong
             throw new ServletException("Error accessing resource", e);
         }
-
         sb.append("</entries>");
 
         String readme = getReadme(cacheEntry.context);
@@ -1455,7 +1436,7 @@ public class DefaultServlet
             StreamResult out = new StreamResult(osWriter);
             transformer.transform(xmlSource, out);
             osWriter.flush();
-            return (new ByteArrayInputStream(stream.toByteArray()));
+            return new ByteArrayInputStream(stream.toByteArray());
         } catch (TransformerException e) {
             throw new ServletException("XSL transformer error", e);
         } finally {
@@ -1469,8 +1450,8 @@ public class DefaultServlet
     }
 
     /**
-     * Return an InputStream to an HTML representation of the contents
-     * of this directory.
+     * Return an InputStream to an HTML representation of the contents of this
+     * directory.
      *
      * @param contextPath Context path to which our internal paths are
      *  relative
@@ -1634,6 +1615,7 @@ public class DefaultServlet
      * Render the specified file size (in bytes).
      *
      * @param size File size (in bytes)
+     * @return the formatted size
      */
     protected String renderSize(long size) {
 
@@ -1927,7 +1909,6 @@ public class DefaultServlet
             }
         }
         return true;
-
     }
 
 
@@ -1965,7 +1946,6 @@ public class DefaultServlet
             return true;
         }
         return true;
-
     }
 
 
@@ -2023,9 +2003,7 @@ public class DefaultServlet
             }
         }
         return true;
-
     }
-
 
     /**
      * Check if the if-unmodified-since condition is satisfied.
@@ -2056,7 +2034,6 @@ public class DefaultServlet
             return true;
         }
         return true;
-
     }
 
 
@@ -2103,7 +2080,6 @@ public class DefaultServlet
         // Rethrow any exception that has occurred
         if (exception != null)
             throw exception;
-
     }
 
 
@@ -2145,9 +2121,9 @@ public class DefaultServlet
         reader.close();
 
         // Rethrow any exception that has occurred
-        if (exception != null)
+        if (exception != null) {
             throw exception;
-
+        }
     }
 
 

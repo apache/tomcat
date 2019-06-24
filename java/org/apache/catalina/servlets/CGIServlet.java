@@ -626,7 +626,7 @@ public final class CGIServlet extends HttpServlet {
      */
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse res)
-        throws ServletException, IOException {
+            throws ServletException, IOException {
 
         CGIEnvironment cgiEnv = new CGIEnvironment(req, getServletContext());
 
@@ -653,7 +653,7 @@ public final class CGIServlet extends HttpServlet {
 
             printServletEnvironment(req);
         }
-        }
+    }
 
 
     @Override
@@ -1641,9 +1641,9 @@ public final class CGIServlet extends HttpServlet {
                 log.debug("envp: [" + env + "], command: [" + command + "]");
             }
 
-            if ((command.indexOf(File.separator + "." + File.separator) >= 0)
-                || (command.indexOf(File.separator + "..") >= 0)
-                || (command.indexOf(".." + File.separator) >= 0)) {
+            if ((command.contains(File.separator + "." + File.separator))
+                || (command.contains(File.separator + ".."))
+                || (command.contains(".." + File.separator))) {
                 throw new IOException(this.getClass().getName()
                                       + "Illegal Character in CGI command "
                                       + "path ('.' or '..') detected.  Not "
