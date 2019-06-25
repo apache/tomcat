@@ -80,6 +80,7 @@ import org.apache.catalina.util.URLEncoder;
 import org.apache.catalina.webresources.CachedResource;
 import org.apache.tomcat.util.buf.B2CConverter;
 import org.apache.tomcat.util.http.ResponseUtil;
+import org.apache.tomcat.util.http.parser.Ranges;
 import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.util.security.Escape;
 import org.apache.tomcat.util.security.PrivilegedGetTccl;
@@ -1480,87 +1481,51 @@ public class DefaultServlet extends HttpServlet {
 
         long fileLength = resource.getContentLength();
 
-        if (fileLength == 0)
+        if (fileLength == 0) {
             return null;
+        }
 
         // Retrieving the range header (if any is specified
         String rangeHeader = request.getHeader("Range");
 
-        if (rangeHeader == null)
-            return null;
-        // bytes is the only range unit supported (and I don't see the point
-        // of adding new ones).
-        if (!rangeHeader.startsWith("bytes")) {
-            response.addHeader("Content-Range", "bytes */" + fileLength);
-            response.sendError
-                (HttpServletResponse.SC_REQUESTED_RANGE_NOT_SATISFIABLE);
+        if (rangeHeader == null) {
             return null;
         }
 
-        rangeHeader = rangeHeader.substring(6);
+        Ranges ranges = Ranges.parseRanges(new StringReader(rangeHeader));
 
-        // Collection which will contain all the ranges which are successfully
-        // parsed.
+        // bytes is the only range unit supported (and I don't see the point
+        // of adding new ones).
+        if (ranges == null || !ranges.getUnits().equals("bytes")) {
+            response.addHeader("Content-Range", "bytes */" + fileLength);
+            response.sendError(HttpServletResponse.SC_REQUESTED_RANGE_NOT_SATISFIABLE);
+            return null;
+        }
+
+        // TODO: Remove the internal representation and use Ranges
+        // Convert to internal representation
         ArrayList<Range> result = new ArrayList<>();
-        StringTokenizer commaTokenizer = new StringTokenizer(rangeHeader, ",");
 
-        // Parsing the range list
-        while (commaTokenizer.hasMoreTokens()) {
-            String rangeDefinition = commaTokenizer.nextToken().trim();
-
+        for (Ranges.Entry entry : ranges.getEntries()) {
             Range currentRange = new Range();
-            currentRange.length = fileLength;
-
-            int dashPos = rangeDefinition.indexOf('-');
-
-            if (dashPos == -1) {
-                response.addHeader("Content-Range", "bytes */" + fileLength);
-                response.sendError
-                    (HttpServletResponse.SC_REQUESTED_RANGE_NOT_SATISFIABLE);
-                return null;
-            }
-
-            if (dashPos == 0) {
-
-                try {
-                    long offset = Long.parseLong(rangeDefinition);
-                    currentRange.start = fileLength + offset;
-                    currentRange.end = fileLength - 1;
-                } catch (NumberFormatException e) {
-                    response.addHeader("Content-Range",
-                                       "bytes */" + fileLength);
-                    response.sendError
-                        (HttpServletResponse
-                         .SC_REQUESTED_RANGE_NOT_SATISFIABLE);
-                    return null;
+            if (entry.getStart() == -1) {
+                currentRange.start = fileLength - entry.getEnd();
+                if (currentRange.start < 0) {
+                    currentRange.start = 0;
                 }
-
+                currentRange.end = fileLength - 1;
+            } else if (entry.getEnd() == -1) {
+                currentRange.start = entry.getStart();
+                currentRange.end = fileLength - 1;
             } else {
-
-                try {
-                    currentRange.start = Long.parseLong
-                        (rangeDefinition.substring(0, dashPos));
-                    if (dashPos < rangeDefinition.length() - 1)
-                        currentRange.end = Long.parseLong
-                            (rangeDefinition.substring
-                             (dashPos + 1, rangeDefinition.length()));
-                    else
-                        currentRange.end = fileLength - 1;
-                } catch (NumberFormatException e) {
-                    response.addHeader("Content-Range",
-                                       "bytes */" + fileLength);
-                    response.sendError
-                        (HttpServletResponse
-                         .SC_REQUESTED_RANGE_NOT_SATISFIABLE);
-                    return null;
-                }
-
+                currentRange.start = entry.getStart();
+                currentRange.end = entry.getEnd();
             }
+            currentRange.length = fileLength;
 
             if (!currentRange.validate()) {
                 response.addHeader("Content-Range", "bytes */" + fileLength);
-                response.sendError
-                    (HttpServletResponse.SC_REQUESTED_RANGE_NOT_SATISFIABLE);
+                response.sendError(HttpServletResponse.SC_REQUESTED_RANGE_NOT_SATISFIABLE);
                 return null;
             }
 

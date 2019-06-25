@@ -37,22 +37,50 @@ import org.apache.tomcat.util.buf.ByteChunk;
 @RunWith(Parameterized.class)
 public class TestDefaultServletRangeRequests extends TomcatBaseTest {
 
-    @Parameterized.Parameters
+    // TODO: Add a check for response headers
+    @Parameterized.Parameters(name = "{index} rangeHeader [{0}]")
     public static Collection<Object[]> parameters() {
+
+        // Note: The index page used by this test has a content-length of 934 bytes
         List<Object[]> parameterSets = new ArrayList<>();
 
-        parameterSets.add(new Object[] { null, Integer.valueOf(200)});
+        parameterSets.add(new Object[] { "", Integer.valueOf(200), "934", "" });
         // Invalid
-        // Commented out as these tests currently fail
-        //parameterSets.add(new Object[] { buildRangeHeader("bytes"), Integer.valueOf(416)});
-        //parameterSets.add(new Object[] { buildRangeHeader("bytes="), Integer.valueOf(416)});
+        parameterSets.add(new Object[] { "bytes", Integer.valueOf(416), "", "*/934" });
+        parameterSets.add(new Object[] { "bytes=", Integer.valueOf(416), "", "*/934" });
+        // Invalid with unknown type
+        parameterSets.add(new Object[] { "unknown", Integer.valueOf(416), "", "*/934" });
+        parameterSets.add(new Object[] { "unknown=", Integer.valueOf(416), "", "*/934" });
+        // Invalid ranges
+        parameterSets.add(new Object[] { "bytes=-", Integer.valueOf(416), "", "*/934" });
+        parameterSets.add(new Object[] { "bytes=10-b", Integer.valueOf(416), "", "*/934" });
+        parameterSets.add(new Object[] { "bytes=b-10", Integer.valueOf(416), "", "*/934" });
+        // Invalid no equals
+        parameterSets.add(new Object[] { "bytes 1-10", Integer.valueOf(416), "", "*/934" });
+        parameterSets.add(new Object[] { "bytes1-10", Integer.valueOf(416), "", "*/934" });
+        parameterSets.add(new Object[] { "bytes10-", Integer.valueOf(416), "", "*/934" });
+        parameterSets.add(new Object[] { "bytes-10", Integer.valueOf(416), "", "*/934" });
+        // Unknown types
+        parameterSets.add(new Object[] { "unknown=1-2", Integer.valueOf(416), "", "*/934" });
+        parameterSets.add(new Object[] { "bytesX=1-2", Integer.valueOf(416), "", "*/934" });
+        // Valid range
+        parameterSets.add(new Object[] { "bytes=0-9", Integer.valueOf(206), "10", "0-9/934" });
+        parameterSets.add(new Object[] { "bytes=-100", Integer.valueOf(206), "100", "834-933/934" });
+        parameterSets.add(new Object[] { "bytes=100-", Integer.valueOf(206), "834", "100-933/934" });
+        // Valid range (too much)
+        parameterSets.add(new Object[] { "bytes=0-1000", Integer.valueOf(206), "934", "0-933/934" });
+        parameterSets.add(new Object[] { "bytes=-1000", Integer.valueOf(206), "934", "0-933/934" });
         return parameterSets;
     }
 
     @Parameter(0)
-    public Map<String,List<String>> requestHeaders;
+    public String rangeHeader;
     @Parameter(1)
     public int responseCodeExpected;
+    @Parameter(2)
+    public String contentLengthExpected;
+    @Parameter(3)
+    public String responseRangeExpected;
 
     @Test
     public void testRange() throws Exception {
@@ -72,10 +100,20 @@ public class TestDefaultServletRangeRequests extends TomcatBaseTest {
         ByteChunk responseBody = new ByteChunk();
         Map<String,List<String>> responseHeaders = new HashMap<>();
 
-        int rc = getUrl(path, responseBody, requestHeaders, responseHeaders);
+        int rc = getUrl(path, responseBody, buildRangeHeader(rangeHeader), responseHeaders);
 
         // Check the result
         Assert.assertEquals(responseCodeExpected, rc);
+
+        if (contentLengthExpected.length() > 0) {
+            String contentLength = responseHeaders.get("Content-Length").get(0);
+            Assert.assertEquals(contentLengthExpected, contentLength);
+        }
+
+        if (responseRangeExpected.length() > 0) {
+            String responseRange = responseHeaders.get("Content-Range").get(0);
+            Assert.assertEquals("bytes " + responseRangeExpected, responseRange);
+        }
     }
 
 
@@ -83,8 +121,15 @@ public class TestDefaultServletRangeRequests extends TomcatBaseTest {
         Map<String,List<String>> requestHeaders = new HashMap<>();
         List<String> values = new ArrayList<>();
         for (String headerValue : headerValues) {
-            values.add(headerValue);
+            if (headerValue.length() > 0) {
+                values.add(headerValue);
+            }
         }
+
+        if (values.size() == 0) {
+            return null;
+        }
+
         requestHeaders.put("range", values);
 
         return requestHeaders;
