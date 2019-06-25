@@ -70,7 +70,7 @@ public class TestDefaultServletRangeRequests extends TomcatBaseTest {
         parameterSets.add(new Object[] { "bytesX=1-2", Integer.valueOf(416), "", "*/" + len });
         // Valid range
         parameterSets.add(new Object[] { "bytes=0-9", Integer.valueOf(206), "10", "0-9/" + len });
-        parameterSets.add(new Object[] { "bytes=-100", Integer.valueOf(206), "100", "834-" + (len - 1) + "/" + len });
+        parameterSets.add(new Object[] { "bytes=-100", Integer.valueOf(206), "100", (len - 100) + "-" + (len - 1) + "/" + len });
         parameterSets.add(new Object[] { "bytes=100-", Integer.valueOf(206), "" + (len - 100), "100-" + (len - 1) + "/" + len });
         // Valid range (too much)
         parameterSets.add(new Object[] { "bytes=0-1000", Integer.valueOf(206), strLen, "0-" +  (len - 1) + "/" + len });
