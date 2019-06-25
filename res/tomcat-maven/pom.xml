@@ -57,17 +57,21 @@
             <version>${tomcat.version}</version>
         </dependency>
         <!-- Optional: DBCP based pool -->
+        <!--
         <dependency>
             <groupId>org.apache.tomcat</groupId>
             <artifactId>tomcat-dbcp</artifactId>
             <version>${tomcat.version}</version>
         </dependency>
+        -->
         <!-- Optional: Store configuration listener -->
+        <!--
         <dependency>
             <groupId>org.apache.tomcat</groupId>
             <artifactId>tomcat-storeconfig</artifactId>
             <version>${tomcat.version}</version>
         </dependency>
+        -->
     </dependencies>
 
     <build>
