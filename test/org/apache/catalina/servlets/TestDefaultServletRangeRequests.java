@@ -41,35 +41,40 @@ public class TestDefaultServletRangeRequests extends TomcatBaseTest {
     @Parameterized.Parameters(name = "{index} rangeHeader [{0}]")
     public static Collection<Object[]> parameters() {
 
-        // Note: The index page used by this test has a content-length of 934 bytes
+        // Get the length of the file used for this test
+        // It varies by platform due to line-endings
+        File index = new File("test/webapp/index.html");
+        long len = index.length();
+        String strLen = Long.toString(len);
+
         List<Object[]> parameterSets = new ArrayList<>();
 
-        parameterSets.add(new Object[] { "", Integer.valueOf(200), "934", "" });
+        parameterSets.add(new Object[] { "", Integer.valueOf(200), strLen, "" });
         // Invalid
-        parameterSets.add(new Object[] { "bytes", Integer.valueOf(416), "", "*/934" });
-        parameterSets.add(new Object[] { "bytes=", Integer.valueOf(416), "", "*/934" });
+        parameterSets.add(new Object[] { "bytes", Integer.valueOf(416), "", "*/" + len });
+        parameterSets.add(new Object[] { "bytes=", Integer.valueOf(416), "", "*/" + len });
         // Invalid with unknown type
-        parameterSets.add(new Object[] { "unknown", Integer.valueOf(416), "", "*/934" });
-        parameterSets.add(new Object[] { "unknown=", Integer.valueOf(416), "", "*/934" });
+        parameterSets.add(new Object[] { "unknown", Integer.valueOf(416), "", "*/" + len });
+        parameterSets.add(new Object[] { "unknown=", Integer.valueOf(416), "", "*/" + len });
         // Invalid ranges
-        parameterSets.add(new Object[] { "bytes=-", Integer.valueOf(416), "", "*/934" });
-        parameterSets.add(new Object[] { "bytes=10-b", Integer.valueOf(416), "", "*/934" });
-        parameterSets.add(new Object[] { "bytes=b-10", Integer.valueOf(416), "", "*/934" });
+        parameterSets.add(new Object[] { "bytes=-", Integer.valueOf(416), "", "*/" + len });
+        parameterSets.add(new Object[] { "bytes=10-b", Integer.valueOf(416), "", "*/" + len });
+        parameterSets.add(new Object[] { "bytes=b-10", Integer.valueOf(416), "", "*/" + len });
         // Invalid no equals
-        parameterSets.add(new Object[] { "bytes 1-10", Integer.valueOf(416), "", "*/934" });
-        parameterSets.add(new Object[] { "bytes1-10", Integer.valueOf(416), "", "*/934" });
-        parameterSets.add(new Object[] { "bytes10-", Integer.valueOf(416), "", "*/934" });
-        parameterSets.add(new Object[] { "bytes-10", Integer.valueOf(416), "", "*/934" });
+        parameterSets.add(new Object[] { "bytes 1-10", Integer.valueOf(416), "", "*/" + len });
+        parameterSets.add(new Object[] { "bytes1-10", Integer.valueOf(416), "", "*/" + len });
+        parameterSets.add(new Object[] { "bytes10-", Integer.valueOf(416), "", "*/" + len });
+        parameterSets.add(new Object[] { "bytes-10", Integer.valueOf(416), "", "*/" + len });
         // Unknown types
-        parameterSets.add(new Object[] { "unknown=1-2", Integer.valueOf(416), "", "*/934" });
-        parameterSets.add(new Object[] { "bytesX=1-2", Integer.valueOf(416), "", "*/934" });
+        parameterSets.add(new Object[] { "unknown=1-2", Integer.valueOf(416), "", "*/" + len });
+        parameterSets.add(new Object[] { "bytesX=1-2", Integer.valueOf(416), "", "*/" + len });
         // Valid range
-        parameterSets.add(new Object[] { "bytes=0-9", Integer.valueOf(206), "10", "0-9/934" });
-        parameterSets.add(new Object[] { "bytes=-100", Integer.valueOf(206), "100", "834-933/934" });
-        parameterSets.add(new Object[] { "bytes=100-", Integer.valueOf(206), "834", "100-933/934" });
+        parameterSets.add(new Object[] { "bytes=0-9", Integer.valueOf(206), "10", "0-9/" + len });
+        parameterSets.add(new Object[] { "bytes=-100", Integer.valueOf(206), "100", "834-" + (len - 1) + "/" + len });
+        parameterSets.add(new Object[] { "bytes=100-", Integer.valueOf(206), "" + (len - 100), "100-" + (len - 1) + "/" + len });
         // Valid range (too much)
-        parameterSets.add(new Object[] { "bytes=0-1000", Integer.valueOf(206), "934", "0-933/934" });
-        parameterSets.add(new Object[] { "bytes=-1000", Integer.valueOf(206), "934", "0-933/934" });
+        parameterSets.add(new Object[] { "bytes=0-1000", Integer.valueOf(206), strLen, "0-" +  (len - 1) + "/" + len });
+        parameterSets.add(new Object[] { "bytes=-1000", Integer.valueOf(206), strLen, "0-" + (len - 1) + "/" + len });
         return parameterSets;
     }
 
