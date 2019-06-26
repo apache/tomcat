@@ -18,7 +18,6 @@ package org.apache.tomcat.util.net.jsse;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -43,6 +42,7 @@ import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
 
 import org.apache.tomcat.util.codec.binary.Base64;
+import org.apache.tomcat.util.file.ConfigFileLoader;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -74,7 +74,7 @@ public class PEMFile {
         this.filename = filename;
 
         List<Part> parts = new ArrayList<>();
-        try (InputStream inputStream = new FileInputStream(filename)) {
+        try (InputStream inputStream = ConfigFileLoader.getInputStream(filename)) {
             BufferedReader reader =
                     new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.US_ASCII));
             Part part = null;
