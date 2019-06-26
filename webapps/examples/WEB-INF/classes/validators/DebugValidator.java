@@ -76,7 +76,7 @@ public class DebugValidator extends TagLibraryValidator {
         }
         System.out.println();
         System.out.println("-----------------------------------------------");
-        return (null);
+        return null;
 
     }
 

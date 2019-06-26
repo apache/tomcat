@@ -52,7 +52,7 @@ public final class Room {
      * The number (single char) will be prefixed to the string when sending
      * the message.
      */
-    public static enum MessageType {
+    public enum MessageType {
         /**
          * '0': Error: contains error message.
          */
@@ -409,7 +409,7 @@ public final class Room {
      * Note: This means a player object is actually a join between Room and
      * Client.
      */
-    public final class Player {
+    public static final class Player {
 
         /**
          * The room to which this player belongs.
