@@ -18,8 +18,11 @@ package org.apache.tomcat.util.net.jsse;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
-import java.io.FileReader;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 import java.security.InvalidKeyException;
 import java.security.KeyFactory;
@@ -71,10 +74,12 @@ public class PEMFile {
         this.filename = filename;
 
         List<Part> parts = new ArrayList<>();
-        try (BufferedReader in = new BufferedReader(new FileReader(filename))) {
+        try (InputStream inputStream = new FileInputStream(filename)) {
+            BufferedReader reader =
+                    new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.US_ASCII));
             Part part = null;
             String line;
-            while ((line = in.readLine()) != null) {
+            while ((line = reader.readLine()) != null) {
                 if (line.startsWith(Part.BEGIN_BOUNDARY)) {
                     part = new Part();
                     part.type = line.substring(Part.BEGIN_BOUNDARY.length(), line.length() - 5).trim();
