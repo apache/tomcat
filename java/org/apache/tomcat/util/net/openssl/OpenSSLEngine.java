@@ -632,7 +632,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
             throws SSLException {
         // NOTE: Calling a fake read is necessary before calling pendingReadableBytesInSSL because
         // SSL_pending will return 0 if OpenSSL has not started the current TLS record
-        // See https://www.openssl.org/docs/manmaster/ssl/SSL_pending.html
+        // See https://www.openssl.org/docs/manmaster/man3/SSL_pending.html
         clearLastError();
         int lastPrimingReadResult = SSL.readFromSSL(ssl, EMPTY_ADDR, 0); // priming read
         // check if SSL_read returned <= 0. In this case we need to check the error and see if it was something
