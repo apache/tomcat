@@ -24,5 +24,5 @@ enum MessageDigest {
     GOST89MAC,
     SHA256,
     SHA384,
-    AEAD;
+    AEAD
 }

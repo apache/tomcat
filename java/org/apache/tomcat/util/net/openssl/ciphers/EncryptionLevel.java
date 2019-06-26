@@ -24,5 +24,5 @@ enum EncryptionLevel {
     LOW,
     MEDIUM,
     HIGH,
-    FIPS;
+    FIPS
 }

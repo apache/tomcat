@@ -268,7 +268,7 @@ public class SSLHostConfigCertificate implements Serializable {
 
     // Nested types
 
-    public static enum Type {
+    public enum Type {
 
         UNDEFINED,
         RSA(Authentication.RSA),
@@ -291,7 +291,7 @@ public class SSLHostConfigCertificate implements Serializable {
         }
     }
 
-    static enum StoreType {
+    enum StoreType {
         KEYSTORE,
         PEM
     }
