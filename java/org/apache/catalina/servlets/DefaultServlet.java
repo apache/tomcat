@@ -2584,7 +2584,7 @@ public class DefaultServlet extends HttpServlet {
             return e;
         }
         if (skipped < start) {
-            return new IOException(sm.getString("defaultservlet.skipfail",
+            return new IOException(sm.getString("defaultServlet.skipfail",
                     Long.valueOf(skipped), Long.valueOf(start)));
         }
 
