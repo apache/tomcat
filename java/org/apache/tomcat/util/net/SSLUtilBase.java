@@ -202,7 +202,7 @@ public abstract class SSLUtilBase implements SSLUtil {
                 // Unfortunately, some key stores behave differently with null
                 // and "".
                 // JKS key stores treat null and "" interchangeably.
-                // PKCS12 key stores (Java 8 onwards) don't return the cert if
+                // PKCS12 key stores (Java 7 onwards) don't return the cert if
                 // null is used.
                 // Key stores that do not use passwords expect null
                 // Therefore:
