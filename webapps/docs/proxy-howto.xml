@@ -24,7 +24,7 @@
 
     <properties>
         <author email="craigmcc@apache.org">Craig R. McClanahan</author>
-        <title>Proxy Support HOW-TO</title>
+        <title>Proxy Support How-To</title>
     </properties>
 
 <body>
@@ -63,13 +63,14 @@ proxy configurations for several common cases.</p>
 
 </section>
 
-<section name="Apache 1.3 Proxy Support">
+<section name="Apache httpd Proxy Support">
 
-<p>Apache 1.3 supports an optional module (<code>mod_proxy</code>) that
-configures the web server to act as a proxy server.  This can be used to
-forward requests for a particular web application to a Tomcat instance,
-without having to configure a web connector such as <code>mod_jk</code>.
-To accomplish this, you need to perform the following tasks:</p>
+<p>Apache httpd 1.3 and later versions support an optional module
+(<code>mod_proxy</code>) that configures the web server to act as a proxy
+server.  This can be used to forward requests for a particular web application
+to a Tomcat instance, without having to configure a web connector such as
+<code>mod_jk</code>.  To accomplish this, you need to perform the following
+tasks:</p>
 <ol>
 <li><p>Configure your copy of Apache so that it includes the
     <code>mod_proxy</code> module.  If you are building from source,
@@ -80,7 +81,7 @@ To accomplish this, you need to perform the following tasks:</p>
     <code>mod_proxy</code> module at Apache startup time, by using the
     following directives in your <code>httpd.conf</code> file:</p>
 <source><![CDATA[LoadModule proxy_module  {path-to-modules}/mod_proxy.so
-AddModule  mod_proxy.c]]></source></li>
+]]></source></li>
 <li><p>Include two directives in your <code>httpd.conf</code> file for
     each web application that you wish to forward to Tomcat.  For
     example, to forward an application at context path <code>/myapp</code>:</p>
@@ -137,11 +138,6 @@ content that is not processed by filters or security constraints defined
 within the web application's deployment descriptor
 (<code>/WEB-INF/web.xml</code>).</p>
 
-</section>
-
-<section name="Apache 2.0 Proxy Support">
-The same instructions hold true as for 1.3. (Except in Apache 2.0,
-you may omit <code>AddModule  mod_proxy.c</code>)
 </section>
 
 </body>

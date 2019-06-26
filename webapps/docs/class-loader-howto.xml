@@ -25,7 +25,7 @@
     <properties>
         <author email="craigmcc@apache.org">Craig R. McClanahan</author>
         <author email="yoavs@apache.org">Yoav Shapira</author>
-        <title>Class Loader HOW-TO</title>
+        <title>Class Loader How-To</title>
     </properties>
 
 <body>
@@ -253,7 +253,7 @@ is a risk that Tomcat and/or the deployed application will experience errors.</p
 
 <p>When running under a security manager the locations from which classes
 are permitted to be loaded will also depend on the contents of your policy
-file. See <a href="security-manager-howto.html">Security Manager HOW-TO</a>
+file. See <a href="security-manager-howto.html">Security Manager How-To</a>
 for further information.</p>
 
 </section>

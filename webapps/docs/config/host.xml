@@ -141,7 +141,7 @@
         and all its child containers. A host will use background processing to
         perform live web application deployment related tasks. If not
         specified, the default value for this attribute is -1, which means
-        the host will rely on the background processing thread of its parent
+        the host will rely on the background processing setting of its parent
         engine.</p>
       </attribute>
 

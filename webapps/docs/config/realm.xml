@@ -326,7 +326,7 @@
     </attributes>
 
     <p>See the <a href="../realm-howto.html#DataSourceRealm">
-    DataSource Realm HOW-TO</a> for more information on setting up container
+    DataSource Realm How-To</a> for more information on setting up container
     managed security using the DataSource Database Realm component.</p>
 
   </subsection>

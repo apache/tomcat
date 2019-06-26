@@ -94,10 +94,10 @@
             </ul>
             By using <code>/C=...</code> along with <code>/S</code> and
             <code>/D=</code> it is possible to perform fully configured
-            unattended installs of Apache Tomact.
+            unattended installs of Apache Tomcat.
         </li>
         <li>Refer to the
-            <a href="windows-service-howto.html">Windows Service HOW-TO</a>
+            <a href="windows-service-howto.html">Windows Service How-To</a>
             for information on how to manage Tomcat as a Windows service.
             </li>
       </ul>
@@ -153,7 +153,7 @@ cd $CATALINA_HOME
     -Djava.util.logging.config.file=$CATALINA_BASE/conf/logging.properties \
     org.apache.catalina.startup.Bootstrap</source>
 
-    <p>When runnong on Java 9 you will need to additionally specify the
+    <p>When running on Java 9 you will need to additionally specify the
     following when starting jsvc to avoid warnings on shutdown.</p>
 <source>...
 --add-opens=java.base/java.lang=ALL-UNNAMED \

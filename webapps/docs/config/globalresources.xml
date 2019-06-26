@@ -42,7 +42,7 @@
   <p>These resources are listed in the server's global JNDI resource context.
    This context is distinct from the per-web-application JNDI contexts
   described in
-  the <a href="../jndi-resources-howto.html">JNDI Resources HOW-TO</a>.
+  the <a href="../jndi-resources-howto.html">JNDI Resources How-To</a>.
   The resources defined in this element are <strong>not</strong> visible in
   the per-web-application contexts unless you explicitly link them with
   <a href="context.html#Resource_Links">&lt;ResourceLink&gt;</a> elements.
@@ -240,7 +240,7 @@
     per-web-application contexts. Here is an example of making a custom
     factory available to an application, based on the example definition in the
     <a href="../jndi-resources-howto.html#Generic_JavaBean_Resources">
-    JNDI Resource HOW-TO</a>:
+    JNDI Resource How-To</a>:
     </p>
 
     <source><![CDATA[<Context>

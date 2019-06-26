@@ -376,7 +376,7 @@
       context as required.</p>
 
       <p>Any administrative application should be protected by a
-      RemoteAddrValve. (Note that this Valve is also available as a Filter.)
+      RemoteAddrValve (this Valve is also available as a Filter).
       The <strong>allow</strong> attribute should be used to limit access to a
       set of known trusted hosts.</p>
 
@@ -392,7 +392,7 @@
       <p>Modify the values as required. Note that this will also change the version
       number reported in some of the management tools and may make it harder to
       determine the real version installed. The CATALINA_HOME/bin/version.bat|sh
-      script will still report the version number.</p>
+      script will still report the correct version number.</p>
 
       <p>The default ErrorReportValve can display stack traces and/or JSP
       source code to clients when an error occurs. To avoid this, custom error
@@ -500,7 +500,7 @@
     <p>Modify the values as required. Note that this will also change the version
     number reported in some of the management tools and may make it harder to
     determine the real version installed. The CATALINA_HOME/bin/version.bat|sh
-    script will still report the version number.
+    script will still report the correct version number.
     </p>
 
     <p>The CGI Servlet is disabled by default. If enabled, the debug
