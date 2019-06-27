@@ -549,8 +549,8 @@ public abstract class AuthenticatorBase extends ValveBase
                     request.getCoyoteRequest().getMimeHeaders().getValue("authorization") != null;
         }
 
-        if (!authRequired && context.getPreemptiveAuthentication()
-                && HttpServletRequest.CLIENT_CERT_AUTH.equals(getAuthMethod())) {
+        if (!authRequired && context.getPreemptiveAuthentication() &&
+                HttpServletRequest.CLIENT_CERT_AUTH.equals(getAuthMethod())) {
             X509Certificate[] certs = getRequestCertificates(request);
             authRequired = certs != null && certs.length > 0;
         }
@@ -1064,8 +1064,8 @@ public abstract class AuthenticatorBase extends ValveBase
 
             // Configure httpOnly on SSO cookie using same rules as session
             // cookies
-            if (request.getServletContext().getSessionCookieConfig().isHttpOnly()
-                    || request.getContext().getUseHttpOnly()) {
+            if (request.getServletContext().getSessionCookieConfig().isHttpOnly() ||
+                    request.getContext().getUseHttpOnly()) {
                 cookie.setHttpOnly(true);
             }
 
