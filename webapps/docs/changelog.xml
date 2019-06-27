@@ -117,6 +117,12 @@
         <code>RequestDispatcher</code>. The requested target path is logged as a
         warning since this is an application error. (markt)
       </add>
+      <fix>
+        <bug>63531</bug>: Refactor authenticators so that the session last
+        accessed time is not updated if the cache attribute is set to
+        <code>false</code> and <code>FORM</code> authentication is not being
+        used. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

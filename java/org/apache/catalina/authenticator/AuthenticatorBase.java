@@ -431,55 +431,13 @@ public abstract class AuthenticatorBase extends ValveBase
             }
         }
 
-        // Special handling for form-based logins to deal with the case
-        // where the login form (and therefore the "j_security_check" URI
-        // to which it submits) might be outside the secured area
-        String contextPath = this.context.getPath();
-        String requestURI = request.getDecodedRequestURI();
-        if (requestURI.startsWith(contextPath) &&
-            requestURI.endsWith(Constants.FORM_ACTION)) {
-            if (!authenticate(request, response, config)) {
-                if (log.isDebugEnabled())
-                    log.debug(" Failed authenticate() test ??" + requestURI );
-                return;
-            }
-        }
-
-        // Special handling for form-based logins to deal with the case where
-        // a resource is protected for some HTTP methods but not protected for
-        // GET which is used after authentication when redirecting to the
-        // protected resource.
-        // TODO: This is similar to the FormAuthenticator.matchRequest() logic
-        //       Is there a way to remove the duplication?
-        Session session = request.getSessionInternal(false);
-        if (session != null) {
-            SavedRequest savedRequest =
-                    (SavedRequest) session.getNote(Constants.FORM_REQUEST_NOTE);
-            if (savedRequest != null) {
-                String decodedRequestURI = request.getDecodedRequestURI();
-                if (decodedRequestURI != null &&
-                        decodedRequestURI.equals(
-                                savedRequest.getDecodedRequestURI())) {
-                    if (!authenticate(request, response)) {
-                        if (log.isDebugEnabled()) {
-                            log.debug(" Failed authenticate() test");
-                        }
-                        /*
-                         * ASSERT: Authenticator already set the appropriate
-                         * HTTP status code, so we do not have to do anything
-                         * special
-                         */
-                        return;
-                    }
-                }
-            }
-        }
+        boolean authRequired = isContinuationRequired(request);
 
         Realm realm = this.context.getRealm();
         // Is this request URI subject to a security constraint?
         SecurityConstraint[] constraints = realm.findSecurityConstraints(request, this.context);
 
-        if (constraints == null && !context.getPreemptiveAuthentication()) {
+        if (constraints == null && !context.getPreemptiveAuthentication() && !authRequired) {
             if (log.isDebugEnabled()) {
                 log.debug(" Not subject to any constraint");
             }
@@ -520,21 +478,23 @@ public abstract class AuthenticatorBase extends ValveBase
 
         // Since authenticate modifies the response on failure,
         // we have to check for allow-from-all first.
-        boolean authRequired;
-        if (constraints == null) {
-            authRequired = false;
-        } else {
-            authRequired = true;
-            for(int i = 0; i < constraints.length && authRequired; i++) {
-                if(!constraints[i].getAuthConstraint()) {
-                    authRequired = false;
-                } else if(!constraints[i].getAllRoles()) {
-                    String [] roles = constraints[i].findAuthRoles();
-                    if(roles == null || roles.length == 0) {
-                        authRequired = false;
+        boolean hasAuthConstraint = false;
+        if (constraints != null) {
+            hasAuthConstraint = true;
+            for (int i = 0; i < constraints.length && hasAuthConstraint; i++) {
+                if (!constraints[i].getAuthConstraint()) {
+                    hasAuthConstraint = false;
+                } else if (!constraints[i].getAllRoles()) {
+                    String[] roles = constraints[i].findAuthRoles();
+                    if (roles == null || roles.length == 0) {
+                        hasAuthConstraint = false;
                     }
                 }
             }
+        }
+
+        if (!authRequired && hasAuthConstraint) {
+            authRequired = true;
         }
 
         if (!authRequired && context.getPreemptiveAuthentication()) {
@@ -591,6 +551,21 @@ public abstract class AuthenticatorBase extends ValveBase
 
 
     // ------------------------------------------------------ Protected Methods
+
+    /**
+     * Does this authenticator require that {@link #authenticate(Request,
+     * HttpServletResponse)} is called to continue an authentication process
+     * that started in a previous request?
+     *
+     * @param request The request currently being processed
+     *
+     * @return {@code true} if authenticate() must be called, otherwise
+     *         {@code false}
+     */
+    protected boolean isContinuationRequired(Request request) {
+        return false;
+    }
+
 
     /**
      * Look for the X509 certificate chain in the Request under the key
