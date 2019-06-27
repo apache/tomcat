@@ -132,6 +132,7 @@ public class BasicAuthenticator extends AuthenticatorBase {
             }
         }
 
+        // the request could not be authenticated, so reissue the challenge
         StringBuilder value = new StringBuilder(16);
         value.append("Basic realm=\"");
         if (config.getRealmName() == null) {
@@ -146,10 +147,9 @@ public class BasicAuthenticator extends AuthenticatorBase {
         }
         response.setHeader(AUTH_HEADER_NAME, value.toString());
         response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
-        return (false);
+        return false;
 
     }
-
 
     @Override
     protected String getAuthMethod() {

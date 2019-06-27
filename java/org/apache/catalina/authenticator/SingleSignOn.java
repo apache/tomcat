@@ -72,7 +72,7 @@ public class SingleSignOn extends ValveBase {
         }
     }
 
-    private static final StringManager sm = StringManager.getManager(Constants.Package);
+    private static final StringManager sm = StringManager.getManager(SingleSignOn.class);
 
     /* The engine at the top of the container hierarchy in which this SSO Valve
      * has been placed. It is used to get back to a session object from a
@@ -635,7 +635,7 @@ public class SingleSignOn extends ValveBase {
         while (c != null && !(c instanceof Engine)) {
             c = c.getParent();
         }
-        if (c instanceof Engine) {
+        if (c != null) {
             engine = (Engine) c;
         }
         super.startInternal();

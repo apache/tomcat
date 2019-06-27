@@ -14,10 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.catalina.authenticator;
-
 
 import java.io.IOException;
 import java.security.Principal;
@@ -37,13 +34,10 @@ import org.apache.catalina.deploy.LoginConfig;
  *
  * @author Craig R. McClanahan
  */
-
-public class SSLAuthenticator
-    extends AuthenticatorBase {
+public class SSLAuthenticator extends AuthenticatorBase {
 
 
     // ------------------------------------------------------------- Properties
-
 
     /**
      * Descriptive information about this implementation.
@@ -64,7 +58,6 @@ public class SSLAuthenticator
 
 
     // --------------------------------------------------------- Public Methods
-
 
     /**
      * Authenticate the user by checking for the existence of a certificate
@@ -97,14 +90,16 @@ public class SSLAuthenticator
         }
 
         // Retrieve the certificate chain for this client
-        if (containerLog.isDebugEnabled())
+        if (containerLog.isDebugEnabled()) {
             containerLog.debug(" Looking up certificates");
+        }
 
         X509Certificate certs[] = getRequestCertificates(request);
 
         if ((certs == null) || (certs.length < 1)) {
-            if (containerLog.isDebugEnabled())
+            if (containerLog.isDebugEnabled()) {
                 containerLog.debug("  No certificates included with this request");
+            }
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED,
                     sm.getString("authenticator.certificates"));
             return false;
@@ -113,17 +108,18 @@ public class SSLAuthenticator
         // Authenticate the specified certificate chain
         Principal principal = context.getRealm().authenticate(certs);
         if (principal == null) {
-            if (containerLog.isDebugEnabled())
+            if (containerLog.isDebugEnabled()) {
                 containerLog.debug("  Realm.authenticate() returned false");
+            }
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED,
                                sm.getString("authenticator.unauthorized"));
-            return (false);
+            return false;
         }
 
         // Cache the principal (if requested) and record this authentication
         register(request, response, principal,
                 HttpServletRequest.CLIENT_CERT_AUTH, null, null);
-        return (true);
+        return true;
 
     }
 

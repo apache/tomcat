@@ -14,10 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.catalina.authenticator;
-
 
 import java.io.IOException;
 import java.io.StringReader;
@@ -43,7 +40,6 @@ import org.apache.tomcat.util.security.ConcurrentMessageDigest;
 import org.apache.tomcat.util.security.MD5Encoder;
 
 
-
 /**
  * An <b>Authenticator</b> and <b>Valve</b> implementation of HTTP DIGEST
  * Authentication (see RFC 2069).
@@ -51,7 +47,6 @@ import org.apache.tomcat.util.security.MD5Encoder;
  * @author Craig R. McClanahan
  * @author Remy Maucherat
  */
-
 public class DigestAuthenticator extends AuthenticatorBase {
 
     private final Log log = LogFactory.getLog(DigestAuthenticator.class); // must not be static
@@ -80,8 +75,8 @@ public class DigestAuthenticator extends AuthenticatorBase {
      */
     protected static final String QOP = "auth";
 
-    // ----------------------------------------------------------- Constructors
 
+    // ----------------------------------------------------------- Constructors
 
     public DigestAuthenticator() {
         super();
@@ -348,6 +343,10 @@ public class DigestAuthenticator extends AuthenticatorBase {
     /**
      * Removes the quotes on a string. RFC2617 states quotes are optional for
      * all parameters except realm.
+     *
+     * @param quotedString The quoted string
+     * @param quotesRequired <code>true</code> if quotes were required
+     * @return The unquoted string
      */
     protected static String removeQuotes(String quotedString,
                                          boolean quotesRequired) {
@@ -364,6 +363,9 @@ public class DigestAuthenticator extends AuthenticatorBase {
 
     /**
      * Removes the quotes on a string.
+     *
+     * @param quotedString The quoted string
+     * @return The unquoted string
      */
     protected static String removeQuotes(String quotedString) {
         return removeQuotes(quotedString, false);
@@ -375,6 +377,7 @@ public class DigestAuthenticator extends AuthenticatorBase {
      * time-stamp ":" private-key ) ).
      *
      * @param request HTTP Servlet request
+     * @return The generated nonce
      */
     protected String generateNonce(Request request) {
 
@@ -417,7 +420,7 @@ public class DigestAuthenticator extends AuthenticatorBase {
      *
      *      realm               = "realm" "=" realm-value
      *      realm-value         = quoted-string
-     *      domain              = "domain" "=" <"> 1#URI <">
+     *      domain              = "domain" "=" &lt;"&gt; 1#URI &lt;"&gt;
      *      nonce               = "nonce" "=" nonce-value
      *      nonce-value         = quoted-string
      *      opaque              = "opaque" "=" quoted-string
@@ -430,6 +433,7 @@ public class DigestAuthenticator extends AuthenticatorBase {
      * @param config    Login configuration describing how authentication
      *              should be performed
      * @param nonce nonce token
+     * @param isNonceStale <code>true</code> to add a stale parameter
      */
     protected void setAuthenticateHeader(HttpServletRequest request,
                                          HttpServletResponse response,

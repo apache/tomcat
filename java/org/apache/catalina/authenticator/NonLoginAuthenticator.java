@@ -14,10 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.catalina.authenticator;
-
 
 import java.io.IOException;
 
@@ -35,8 +32,7 @@ import org.apache.catalina.deploy.LoginConfig;
  * @author Craig R. McClanahan
  */
 
-public final class NonLoginAuthenticator
-    extends AuthenticatorBase {
+public final class NonLoginAuthenticator extends AuthenticatorBase {
 
 
     // ----------------------------------------------------- Instance Variables
@@ -80,7 +76,7 @@ public final class NonLoginAuthenticator
      * Therefore, it is necessary to always return <code>true</code> to
      * indicate the user has not failed authentication.</p>
      *
-     * <p>There are two cases:
+     * <p>There are two cases:</p>
      * <ul>
      * <li>without SingleSignon: a Session instance does not yet exist
      *     and there is no <code>auth-method</code> to authenticate the
@@ -98,7 +94,7 @@ public final class NonLoginAuthenticator
      *           keep the SSOE "alive", even if all the other properly
      *           authenticated Sessions expire first... until it expires too.
      * </li>
-     * </ul></p>
+     * </ul>
      *
      * @param request  Request we are processing
      * @param response Response we are creating
