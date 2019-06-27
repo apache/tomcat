@@ -367,6 +367,14 @@ public class TesterOpenSSL {
         // Standard command to list the ciphers
         args.add("ciphers");
         args.add("-v");
+        if (VERSION < 10100) {
+            // Need to exclude the GOST ciphers
+            if (specification == null) {
+                specification = "DEFAULT:!aGOST";
+            } else {
+                specification = "!aGOST:" + specification;
+            }
+        }
         if (VERSION >= 10101) {
             // Need to exclude the TLSv1.3 ciphers
             args.add("-ciphersuites");
