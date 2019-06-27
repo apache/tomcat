@@ -24,6 +24,7 @@ import java.io.PrintWriter;
 import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Map;
@@ -169,7 +170,6 @@ public class MemoryUserDatabase implements UserDatabase {
             readLock.unlock();
         }
     }
-
 
 
     /**
@@ -566,7 +566,7 @@ public class MemoryUserDatabase implements UserDatabase {
         writeLock.lock();
         try {
             try (FileOutputStream fos = new FileOutputStream(fileNew);
-                    OutputStreamWriter osw = new OutputStreamWriter(fos, "UTF8");
+                    OutputStreamWriter osw = new OutputStreamWriter(fos, StandardCharsets.UTF_8);
                     PrintWriter writer = new PrintWriter(osw)) {
 
                 // Print the file prolog

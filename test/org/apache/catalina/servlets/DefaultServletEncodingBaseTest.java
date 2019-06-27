@@ -57,8 +57,8 @@ import org.apache.tomcat.util.http.parser.MediaType;
 @RunWith(Parameterized.class)
 public abstract class DefaultServletEncodingBaseTest extends TomcatBaseTest {
 
-    @Parameterized.Parameters(name = "{index}: contextEnc[{0}], fileEnc[{1}], target[{4}]," +
-            " useInclude[{5}], outputEnc[{6}], callSetCharacterEnc[{8}], useWriter[{7}]")
+    @Parameterized.Parameters(name = "{index}: contextEnc[{0}], fileEnc[{1}], target[{2}]," +
+            " useInclude[{3}], outputEnc[{4}], callSetCharacterEnc[{5}], useWriter[{6}]")
     public static Collection<Object[]> parameters() {
 
         String[] encodings = new String[] {

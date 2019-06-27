@@ -191,7 +191,6 @@ public abstract class AbstractJsseEndpoint<S,U> extends AbstractEndpoint<S,U> {
     }
 
 
-
     @Override
     public boolean isAlpnSupported() {
         // ALPN requires TLS so if TLS is not enabled, ALPN cannot be supported

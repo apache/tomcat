@@ -80,6 +80,7 @@ import org.apache.catalina.util.URLEncoder;
 import org.apache.catalina.webresources.CachedResource;
 import org.apache.tomcat.util.buf.B2CConverter;
 import org.apache.tomcat.util.http.ResponseUtil;
+import org.apache.tomcat.util.http.parser.Ranges;
 import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.util.security.Escape;
 import org.apache.tomcat.util.security.PrivilegedGetTccl;
@@ -1372,7 +1373,7 @@ public class DefaultServlet extends HttpServlet {
     /**
      * Parse the content-range header.
      *
-     * @param request The servlet request we a)re processing
+     * @param request The servlet request we are processing
      * @param response The servlet response we are creating
      * @return the range object
      * @throws IOException an IO error occurred
@@ -1484,84 +1485,49 @@ public class DefaultServlet extends HttpServlet {
 
         long fileLength = resource.getContentLength();
 
-        if (fileLength == 0)
+        if (fileLength == 0) {
             return null;
+        }
 
         // Retrieving the range header (if any is specified
         String rangeHeader = request.getHeader("Range");
 
-        if (rangeHeader == null)
+        if (rangeHeader == null) {
             return null;
+        }
+
+        Ranges ranges = Ranges.parseRanges(new StringReader(rangeHeader));
+
         // client can send a request with explicit Range: none, or user defined range units.
-        if (!rangeHeader.startsWith("bytes")) {
+        if (ranges == null || !ranges.getUnits().equals("bytes")) {
             // We MUST ignore a Range header field that contains a range unit we do not understand.
             return FULL;
         }
 
-        rangeHeader = rangeHeader.substring(6);
-
-        // Collection which will contain all the ranges which are successfully
-        // parsed.
+        // TODO: Remove the internal representation and use Ranges
+        // Convert to internal representation
         ArrayList<Range> result = new ArrayList<>();
-        StringTokenizer commaTokenizer = new StringTokenizer(rangeHeader, ",");
 
-        // Parsing the range list
-        while (commaTokenizer.hasMoreTokens()) {
-            String rangeDefinition = commaTokenizer.nextToken().trim();
-
+        for (Ranges.Entry entry : ranges.getEntries()) {
             Range currentRange = new Range();
-            currentRange.length = fileLength;
-
-            int dashPos = rangeDefinition.indexOf('-');
-
-            if (dashPos == -1) {
-                response.addHeader("Content-Range", "bytes */" + fileLength);
-                response.sendError
-                    (HttpServletResponse.SC_REQUESTED_RANGE_NOT_SATISFIABLE);
-                return null;
-            }
-
-            if (dashPos == 0) {
-
-                try {
-                    long offset = Long.parseLong(rangeDefinition);
-                    currentRange.start = fileLength + offset;
-                    currentRange.end = fileLength - 1;
-                } catch (NumberFormatException e) {
-                    response.addHeader("Content-Range",
-                                       "bytes */" + fileLength);
-                    response.sendError
-                        (HttpServletResponse
-                         .SC_REQUESTED_RANGE_NOT_SATISFIABLE);
-                    return null;
+            if (entry.getStart() == -1) {
+                currentRange.start = fileLength - entry.getEnd();
+                if (currentRange.start < 0) {
+                    currentRange.start = 0;
                 }
-
+                currentRange.end = fileLength - 1;
+            } else if (entry.getEnd() == -1) {
+                currentRange.start = entry.getStart();
+                currentRange.end = fileLength - 1;
             } else {
-
-                try {
-                    currentRange.start = Long.parseLong
-                        (rangeDefinition.substring(0, dashPos));
-                    if (dashPos < rangeDefinition.length() - 1)
-                        currentRange.end = Long.parseLong
-                            (rangeDefinition.substring
-                             (dashPos + 1, rangeDefinition.length()));
-                    else
-                        currentRange.end = fileLength - 1;
-                } catch (NumberFormatException e) {
-                    response.addHeader("Content-Range",
-                                       "bytes */" + fileLength);
-                    response.sendError
-                        (HttpServletResponse
-                         .SC_REQUESTED_RANGE_NOT_SATISFIABLE);
-                    return null;
-                }
-
+                currentRange.start = entry.getStart();
+                currentRange.end = entry.getEnd();
             }
+            currentRange.length = fileLength;
 
             if (!currentRange.validate()) {
                 response.addHeader("Content-Range", "bytes */" + fileLength);
-                response.sendError
-                    (HttpServletResponse.SC_REQUESTED_RANGE_NOT_SATISFIABLE);
+                response.sendError(HttpServletResponse.SC_REQUESTED_RANGE_NOT_SATISFIABLE);
                 return null;
             }
 
@@ -1631,6 +1597,7 @@ public class DefaultServlet extends HttpServlet {
      *
      * @throws IOException an IO error occurred
      * @throws ServletException rendering error
+     * @deprecated Unused. Will be removed in Tomcat 10
      * @deprecated Use {@link #render(HttpServletRequest, String, WebResource, String)} instead
      */
     @Deprecated
@@ -1757,7 +1724,7 @@ public class DefaultServlet extends HttpServlet {
             Transformer transformer = tFactory.newTransformer(xsltSource);
 
             ByteArrayOutputStream stream = new ByteArrayOutputStream();
-            OutputStreamWriter osWriter = new OutputStreamWriter(stream, "UTF8");
+            OutputStreamWriter osWriter = new OutputStreamWriter(stream, StandardCharsets.UTF_8);
             StreamResult out = new StreamResult(osWriter);
             transformer.transform(xmlSource, out);
             osWriter.flush();
@@ -1786,6 +1753,7 @@ public class DefaultServlet extends HttpServlet {
      *
      * @throws IOException an IO error occurred
      *
+     * @deprecated Unused. Will be removed in Tomcat 10
      * @deprecated Use {@link #renderHtml(HttpServletRequest, String, WebResource, String)} instead
      */
     @Deprecated
@@ -1812,7 +1780,7 @@ public class DefaultServlet extends HttpServlet {
 
         // Prepare a writer to a buffered area
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        OutputStreamWriter osWriter = new OutputStreamWriter(stream, "UTF8");
+        OutputStreamWriter osWriter = new OutputStreamWriter(stream, StandardCharsets.UTF_8);
         PrintWriter writer = new PrintWriter(osWriter);
 
         StringBuilder sb = new StringBuilder();
@@ -2618,7 +2586,7 @@ public class DefaultServlet extends HttpServlet {
             return e;
         }
         if (skipped < start) {
-            return new IOException(sm.getString("defaultservlet.skipfail",
+            return new IOException(sm.getString("defaultServlet.skipfail",
                     Long.valueOf(skipped), Long.valueOf(start)));
         }
 

@@ -379,7 +379,7 @@ public class SSLHostConfig implements Serializable {
 
     public LinkedHashSet<Cipher> getCipherList() {
         if (cipherList == null) {
-            cipherList = OpenSSLCipherConfigurationParser.parse(ciphers);
+            cipherList = OpenSSLCipherConfigurationParser.parse(getCiphers());
         }
         return cipherList;
     }

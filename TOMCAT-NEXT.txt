@@ -58,3 +58,6 @@ New items for 10.0.x onwards:
  9. BZ 56966. Refactor internal request timing to use System.nanoTime()
 
 10. BZ 63286. Make behaviour of %D and %T consistent with httpd.
+
+11. Refactor DefaultServlet to use Ranges in parseRanges()
+
