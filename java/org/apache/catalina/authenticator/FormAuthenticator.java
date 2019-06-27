@@ -38,7 +38,6 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.buf.ByteChunk;
-import org.apache.tomcat.util.buf.CharChunk;
 import org.apache.tomcat.util.buf.MessageBytes;
 import org.apache.tomcat.util.http.MimeHeaders;
 
@@ -229,9 +228,6 @@ public class FormAuthenticator
         }
 
         // Acquire references to objects we will need to evaluate
-        MessageBytes uriMB = MessageBytes.newInstance();
-        CharChunk uriCC = uriMB.getCharChunk();
-        uriCC.setLimit(-1);
         String contextPath = request.getContextPath();
         String requestURI = request.getDecodedRequestURI();
 
@@ -575,8 +571,6 @@ public class FormAuthenticator
         }
 
         request.getCoyoteRequest().getParameters().recycle();
-        request.getCoyoteRequest().getParameters().setQueryStringEncoding(
-                request.getConnector().getURIEncoding());
 
         ByteChunk body = saved.getBody();
 
@@ -611,11 +605,6 @@ public class FormAuthenticator
         request.getQueryString();
         request.getProtocol();
 
-        request.getCoyoteRequest().queryString().setString
-            (saved.getQueryString());
-
-        request.getCoyoteRequest().requestURI().setString
-            (saved.getRequestURI());
         return true;
     }
 

@@ -78,10 +78,6 @@ public abstract class AuthenticatorBase extends ValveBase
      */
     private static final String DATE_ONE = ConcurrentDateFormat.formatRfc1123(new Date(1));
 
-    public AuthenticatorBase() {
-        super(true);
-    }
-
     /**
      * The string manager for this package.
      */
@@ -96,6 +92,14 @@ public abstract class AuthenticatorBase extends ValveBase
      * Default authentication realm name.
      */
     protected static final String REALM_NAME = "Authentication required";
+
+    // ------------------------------------------------------ Constructor
+
+    public AuthenticatorBase() {
+        super(true);
+    }
+
+    // ----------------------------------------------------- Instance Variables
 
     /**
      * Should a session always be used once a user is authenticated? This may
@@ -497,7 +501,6 @@ public abstract class AuthenticatorBase extends ValveBase
             response.setHeader("Expires", DATE_ONE);
         }
 
-        int i;
         if (constraints != null) {
             // Enforce any user data constraint for this security constraint
             if (log.isDebugEnabled()) {
@@ -522,7 +525,7 @@ public abstract class AuthenticatorBase extends ValveBase
             authRequired = false;
         } else {
             authRequired = true;
-            for(i=0; i < constraints.length && authRequired; i++) {
+            for(int i = 0; i < constraints.length && authRequired; i++) {
                 if(!constraints[i].getAuthConstraint()) {
                     authRequired = false;
                 } else if(!constraints[i].getAllRoles()) {
@@ -545,7 +548,7 @@ public abstract class AuthenticatorBase extends ValveBase
             authRequired = certs != null && certs.length > 0;
         }
 
-        if(authRequired) {
+        if (authRequired) {
             if (log.isDebugEnabled()) {
                 log.debug(" Calling authenticate()");
             }
@@ -817,9 +820,8 @@ public abstract class AuthenticatorBase extends ValveBase
      * @param password
      *            Password used to authenticate (if any)
      */
-    public void register(Request request, HttpServletResponse response,
-                            Principal principal, String authType,
-                            String username, String password) {
+    public void register(Request request, HttpServletResponse response, Principal principal,
+            String authType, String username, String password) {
 
         if (log.isDebugEnabled()) {
             String name = (principal == null) ? "none" : principal.getName();
