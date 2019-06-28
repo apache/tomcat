@@ -14,10 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.catalina.servlets;
-
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -69,18 +66,16 @@ import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
-
-
 /**
  * Servlet which adds support for WebDAV level 2. All the basic HTTP requests
  * are handled by the DefaultServlet. The WebDAVServlet must not be used as the
  * default servlet (ie mapped to '/') as it will not work in this configuration.
- * <p/>
+ * <p>
  * Mapping a subpath (e.g. <code>/webdav/*</code> to this servlet has the effect
  * of re-mounting the entire web application under that sub-path, with WebDAV
- * access to all the resources. This <code>WEB-INF</code> and <code>META-INF</code>
+ * access to all the resources. The <code>WEB-INF</code> and <code>META-INF</code>
  * directories are protected in this re-mounted resource tree.
- * <p/>
+ * <p>
  * To enable WebDAV for a context add the following to web.xml:
  * <pre>
  * &lt;servlet&gt;
@@ -236,7 +231,7 @@ public class WebdavServlet extends DefaultServlet {
      * Key : path <br>
      * Value : LockInfo
      */
-    private Hashtable<String,LockInfo> resourceLocks =
+    private final Hashtable<String,LockInfo> resourceLocks =
         new Hashtable<String,LockInfo>();
 
 
@@ -248,7 +243,7 @@ public class WebdavServlet extends DefaultServlet {
      * collection. Each element of the Vector is the path associated with
      * the lock-null resource.
      */
-    private Hashtable<String,Vector<String>> lockNullResources =
+    private final Hashtable<String,Vector<String>> lockNullResources =
         new Hashtable<String,Vector<String>>();
 
 
@@ -258,7 +253,7 @@ public class WebdavServlet extends DefaultServlet {
      * Key : path <br>
      * Value : LockInfo
      */
-    private Vector<LockInfo> collectionLocks = new Vector<LockInfo>();
+    private final Vector<LockInfo> collectionLocks = new Vector<LockInfo>();
 
 
     /**
@@ -319,6 +314,9 @@ public class WebdavServlet extends DefaultServlet {
 
     /**
      * Return JAXP document builder instance.
+     * @return the document builder
+     * @throws ServletException document builder creation failed
+     *  (wrapped <code>ParserConfigurationException</code> exception)
      */
     protected DocumentBuilder getDocumentBuilder()
         throws ServletException {
@@ -407,17 +405,6 @@ public class WebdavServlet extends DefaultServlet {
     }
 
 
-    /**
-     * Check if the conditions specified in the optional If headers are
-     * satisfied.
-     *
-     * @param request The servlet request we are processing
-     * @param response The servlet response we are creating
-     * @param resourceAttributes The resource information
-     * @return boolean true if the resource meets all the specified conditions,
-     * and false if any of the conditions is not satisfied, in which case
-     * request processing is stopped
-     */
     @Override
     protected boolean checkIfHeaders(HttpServletRequest request,
                                      HttpServletResponse response,
@@ -429,7 +416,6 @@ public class WebdavServlet extends DefaultServlet {
 
         // TODO : Checking the WebDAV If header
         return true;
-
     }
 
 
@@ -498,8 +484,8 @@ public class WebdavServlet extends DefaultServlet {
     /**
      * OPTIONS Method.
      *
-     * @param req The request
-     * @param resp The response
+     * @param req The Servlet request
+     * @param resp The Servlet response
      * @throws ServletException If an error occurs
      * @throws IOException If an IO error occurs
      */
@@ -514,12 +500,15 @@ public class WebdavServlet extends DefaultServlet {
 
         resp.addHeader("Allow", methodsAllowed.toString());
         resp.addHeader("MS-Author-Via", "DAV");
-
     }
 
 
     /**
      * PROPFIND Method.
+     * @param req The Servlet request
+     * @param resp The Servlet response
+     * @throws ServletException If an error occurs
+     * @throws IOException If an IO error occurs
      */
     protected void doPropfind(HttpServletRequest req, HttpServletResponse resp)
         throws ServletException, IOException {
@@ -770,6 +759,9 @@ public class WebdavServlet extends DefaultServlet {
 
     /**
      * PROPPATCH Method.
+     * @param req The Servlet request
+     * @param resp The Servlet response
+     * @throws IOException If an IO error occurs
      */
     protected void doProppatch(HttpServletRequest req, HttpServletResponse resp)
             throws IOException {
@@ -791,19 +783,13 @@ public class WebdavServlet extends DefaultServlet {
 
     /**
      * MKCOL Method.
+     * @param req The Servlet request
+     * @param resp The Servlet response
+     * @throws ServletException If an error occurs
+     * @throws IOException If an IO error occurs
      */
     protected void doMkcol(HttpServletRequest req, HttpServletResponse resp)
         throws ServletException, IOException {
-
-        if (readOnly) {
-            resp.sendError(WebdavStatus.SC_FORBIDDEN);
-            return;
-        }
-
-        if (isLocked(req)) {
-            resp.sendError(WebdavStatus.SC_LOCKED);
-            return;
-        }
 
         String path = getRelativePath(req);
 
@@ -824,6 +810,16 @@ public class WebdavServlet extends DefaultServlet {
             resp.addHeader("Allow", methodsAllowed.toString());
 
             resp.sendError(WebdavStatus.SC_METHOD_NOT_ALLOWED);
+            return;
+        }
+
+        if (readOnly) {
+            resp.sendError(WebdavStatus.SC_FORBIDDEN);
+            return;
+        }
+
+        if (isLocked(req)) {
+            resp.sendError(WebdavStatus.SC_LOCKED);
             return;
         }
 
@@ -859,12 +855,15 @@ public class WebdavServlet extends DefaultServlet {
             // Removing any lock-null resource which would be present
             lockNullResources.remove(path);
         }
-
     }
 
 
     /**
      * DELETE Method.
+     * @param req The Servlet request
+     * @param resp The Servlet response
+     * @throws ServletException If an error occurs
+     * @throws IOException If an IO error occurs
      */
     @Override
     protected void doDelete(HttpServletRequest req, HttpServletResponse resp)
@@ -903,9 +902,9 @@ public class WebdavServlet extends DefaultServlet {
             return;
         }
 
-        super.doPut(req, resp);
-
         String path = getRelativePath(req);
+
+        super.doPut(req, resp);
 
         // Removing any lock-null resource which would be present
         lockNullResources.remove(path);
@@ -914,6 +913,9 @@ public class WebdavServlet extends DefaultServlet {
 
     /**
      * COPY Method.
+     * @param req The Servlet request
+     * @param resp The Servlet response
+     * @throws IOException If an IO error occurs
      */
     protected void doCopy(HttpServletRequest req, HttpServletResponse resp)
             throws IOException {
@@ -930,6 +932,9 @@ public class WebdavServlet extends DefaultServlet {
 
     /**
      * MOVE Method.
+     * @param req The Servlet request
+     * @param resp The Servlet response
+     * @throws IOException If an IO error occurs
      */
     protected void doMove(HttpServletRequest req, HttpServletResponse resp)
             throws IOException {
@@ -955,6 +960,10 @@ public class WebdavServlet extends DefaultServlet {
 
     /**
      * LOCK Method.
+     * @param req The Servlet request
+     * @param resp The Servlet response
+     * @throws ServletException If an error occurs
+     * @throws IOException If an IO error occurs
      */
     protected void doLock(HttpServletRequest req, HttpServletResponse resp)
         throws ServletException, IOException {
@@ -1375,7 +1384,7 @@ public class WebdavServlet extends DefaultServlet {
                 tokenList = toRenew.tokens.elements();
                 while (tokenList.hasMoreElements()) {
                     String token = tokenList.nextElement();
-                    if (ifHeader.indexOf(token) != -1) {
+                    if (ifHeader.contains(token)) {
                         toRenew.expiresAt = lock.expiresAt;
                         lock = toRenew;
                     }
@@ -1393,7 +1402,7 @@ public class WebdavServlet extends DefaultServlet {
                     tokenList = toRenew.tokens.elements();
                     while (tokenList.hasMoreElements()) {
                         String token = tokenList.nextElement();
-                        if (ifHeader.indexOf(token) != -1) {
+                        if (ifHeader.contains(token)) {
                             toRenew.expiresAt = lock.expiresAt;
                             lock = toRenew;
                         }
@@ -1430,6 +1439,9 @@ public class WebdavServlet extends DefaultServlet {
 
     /**
      * UNLOCK Method.
+     * @param req The Servlet request
+     * @param resp The Servlet response
+     * @throws IOException If an IO error occurs
      */
     protected void doUnlock(HttpServletRequest req, HttpServletResponse resp)
             throws IOException {
@@ -1461,7 +1473,7 @@ public class WebdavServlet extends DefaultServlet {
             tokenList = lock.tokens.elements();
             while (tokenList.hasMoreElements()) {
                 String token = tokenList.nextElement();
-                if (lockTokenHeader.indexOf(token) != -1) {
+                if (lockTokenHeader.contains(token)) {
                     lock.tokens.removeElement(token);
                 }
             }
@@ -1484,7 +1496,7 @@ public class WebdavServlet extends DefaultServlet {
                 tokenList = lock.tokens.elements();
                 while (tokenList.hasMoreElements()) {
                     String token = tokenList.nextElement();
-                    if (lockTokenHeader.indexOf(token) != -1) {
+                    if (lockTokenHeader.contains(token)) {
                         lock.tokens.removeElement(token);
                         break;
                     }
@@ -1511,9 +1523,9 @@ public class WebdavServlet extends DefaultServlet {
      * has give the appropriate lock tokens.
      *
      * @param req Servlet request
-     * @return boolean true if the resource is locked (and no appropriate
-     * lock token has been found for at least one of the non-shared locks which
-     * are present on the resource).
+     * @return <code>true</code> if the resource is locked (and no appropriate
+     *  lock token has been found for at least one of
+     *  the non-shared locks which are present on the resource).
      */
     private boolean isLocked(HttpServletRequest req) {
 
@@ -1537,9 +1549,9 @@ public class WebdavServlet extends DefaultServlet {
      *
      * @param path Path of the resource
      * @param ifHeader "If" HTTP header which was included in the request
-     * @return boolean true if the resource is locked (and no appropriate
-     * lock token has been found for at least one of the non-shared locks which
-     * are present on the resource).
+     * @return <code>true</code> if the resource is locked (and no appropriate
+     *  lock token has been found for at least one of
+     *  the non-shared locks which are present on the resource).
      */
     private boolean isLocked(String path, String ifHeader) {
 
@@ -1557,7 +1569,7 @@ public class WebdavServlet extends DefaultServlet {
             boolean tokenMatch = false;
             while (tokenList.hasMoreElements()) {
                 String token = tokenList.nextElement();
-                if (ifHeader.indexOf(token) != -1) {
+                if (ifHeader.contains(token)) {
                     tokenMatch = true;
                     break;
                 }
@@ -1580,7 +1592,7 @@ public class WebdavServlet extends DefaultServlet {
                 boolean tokenMatch = false;
                 while (tokenList.hasMoreElements()) {
                     String token = tokenList.nextElement();
-                    if (ifHeader.indexOf(token) != -1) {
+                    if (ifHeader.contains(token)) {
                         tokenMatch = true;
                         break;
                     }
@@ -1602,6 +1614,7 @@ public class WebdavServlet extends DefaultServlet {
      * @param req Servlet request
      * @param resp Servlet response
      * @return boolean true if the copy is successful
+     * @throws IOException If an IO error occurs
      */
     private boolean copyResource(HttpServletRequest req,
                                  HttpServletResponse resp)
@@ -1711,7 +1724,6 @@ public class WebdavServlet extends DefaultServlet {
         }
 
         if (overwrite) {
-
             // Delete destination resource, if it exists
             if (exists) {
                 if (!deleteResource(destinationPath, req, resp, true)) {
@@ -1720,15 +1732,12 @@ public class WebdavServlet extends DefaultServlet {
             } else {
                 resp.setStatus(WebdavStatus.SC_CREATED);
             }
-
         } else {
-
             // If the destination exists, then it's a conflict
             if (exists) {
                 resp.sendError(WebdavStatus.SC_PRECONDITION_FAILED);
                 return false;
             }
-
         }
 
         // Copying source to destination
@@ -1759,7 +1768,6 @@ public class WebdavServlet extends DefaultServlet {
         lockNullResources.remove(destinationPath);
 
         return true;
-
     }
 
 
@@ -1771,6 +1779,7 @@ public class WebdavServlet extends DefaultServlet {
      * during the copy operation
      * @param source Path of the resource to be copied
      * @param dest Destination path
+     * @return <code>true</code> if the copy was successful
      */
     private boolean copyResource(DirContext dirContext,
             Hashtable<String,Integer> errorList, String source, String dest) {
@@ -1841,9 +1850,7 @@ public class WebdavServlet extends DefaultServlet {
             }
 
         }
-
         return true;
-
     }
 
 
@@ -1852,7 +1859,8 @@ public class WebdavServlet extends DefaultServlet {
      *
      * @param req Servlet request
      * @param resp Servlet response
-     * @return boolean true if the copy is successful
+     * @return <code>true</code> if the delete is successful
+     * @throws IOException If an IO error occurs
      */
     private boolean deleteResource(HttpServletRequest req,
                                    HttpServletResponse resp)
@@ -1873,6 +1881,8 @@ public class WebdavServlet extends DefaultServlet {
      * @param resp Servlet response
      * @param setStatus Should the response status be set on successful
      *                  completion
+     * @return <code>true</code> if the delete is successful
+     * @throws IOException If an IO error occurs
      */
     private boolean deleteResource(String path, HttpServletRequest req,
                                    HttpServletResponse resp, boolean setStatus)
@@ -1927,24 +1937,20 @@ public class WebdavServlet extends DefaultServlet {
             }
 
             if (!errorList.isEmpty()) {
-
                 sendReport(req, resp, errorList);
                 return false;
-
             }
-
         }
         if (setStatus) {
             resp.setStatus(WebdavStatus.SC_NO_CONTENT);
         }
         return true;
-
     }
 
 
     /**
      * Deletes a collection.
-     *
+     * @param req The Servlet request
      * @param dirContext Resources implementation associated with the context
      * @param path Path to the collection to be deleted
      * @param errorList Contains the list of the errors which occurred
@@ -2016,9 +2022,7 @@ public class WebdavServlet extends DefaultServlet {
                             (WebdavStatus.SC_INTERNAL_SERVER_ERROR));
                 }
             }
-
         }
-
     }
 
 
@@ -2029,6 +2033,7 @@ public class WebdavServlet extends DefaultServlet {
      * @param req Servlet request
      * @param resp Servlet response
      * @param errorList List of error to be displayed
+     * @throws IOException If an IO error occurs
      */
     private void sendReport(HttpServletRequest req, HttpServletResponse resp,
                             Hashtable<String,Integer> errorList)
@@ -2591,7 +2596,6 @@ public class WebdavServlet extends DefaultServlet {
         }
 
         generatedXML.writeElement("D", "response", XMLWriter.CLOSING);
-
     }
 
 
@@ -2600,7 +2604,7 @@ public class WebdavServlet extends DefaultServlet {
      *
      * @param path Path
      * @param generatedXML XML data to which the locks info will be appended
-     * @return true if at least one lock was displayed
+     * @return <code>true</code> if at least one lock was displayed
      */
     private boolean generateLockDiscovery
         (String path, XMLWriter generatedXML) {
@@ -2641,6 +2645,7 @@ public class WebdavServlet extends DefaultServlet {
 
     /**
      * Get creation date in ISO format.
+     * @return the formatted creation date
      */
     private String getISOCreationDate(long creationDate) {
         return creationDateFormat.format(new Date(creationDate));
@@ -2649,6 +2654,9 @@ public class WebdavServlet extends DefaultServlet {
     /**
      * Determines the methods normally allowed for the resource.
      *
+     * @param req The Servlet request
+     *
+     * @return The allowed HTTP methods
      */
     private StringBuilder determineMethodsAllowed(DirContext dirContext,
                                                  HttpServletRequest req) {
@@ -2688,8 +2696,8 @@ public class WebdavServlet extends DefaultServlet {
         return methodsAllowed;
     }
 
-    // --------------------------------------------------  LockInfo Inner Class
 
+    // --------------------------------------------------  LockInfo Inner Class
 
     /**
      * Holds a lock information.
@@ -2723,7 +2731,6 @@ public class WebdavServlet extends DefaultServlet {
 
         // ----------------------------------------------------- Public Methods
 
-
         /**
          * Get a String representation of this lock token.
          */
@@ -2751,26 +2758,26 @@ public class WebdavServlet extends DefaultServlet {
 
 
         /**
-         * Return true if the lock has expired.
+         * @return true if the lock has expired.
          */
         public boolean hasExpired() {
-            return (System.currentTimeMillis() > expiresAt);
+            return System.currentTimeMillis() > expiresAt;
         }
 
 
         /**
-         * Return true if the lock is exclusive.
+         * @return true if the lock is exclusive.
          */
         public boolean isExclusive() {
-
-            return (scope.equals("exclusive"));
-
+            return scope.equals("exclusive");
         }
 
 
         /**
-         * Get an XML representation of this lock token. This method will
-         * append an XML fragment to the given XML writer.
+         * Get an XML representation of this lock token.
+         *
+         * @param generatedXML The XML write to which the fragment will be
+         *                     appended
          */
         public void toXML(XMLWriter generatedXML) {
 
@@ -2812,10 +2819,7 @@ public class WebdavServlet extends DefaultServlet {
             generatedXML.writeElement("D", "locktoken", XMLWriter.CLOSING);
 
             generatedXML.writeElement("D", "activelock", XMLWriter.CLOSING);
-
         }
-
-
     }
 
 
@@ -2867,8 +2871,8 @@ class WebdavStatus {
      * status codes to descriptive text.  This is a static
      * variable.
      */
-    private static Hashtable<Integer,String> mapStatusCodes =
-        new Hashtable<Integer,String>();
+    private static final Hashtable<Integer,String> mapStatusCodes =
+            new Hashtable<Integer,String>();
 
 
     // ------------------------------------------------------ HTTP Status Codes
