@@ -604,13 +604,11 @@ public class CoyoteAdapter implements Adapter {
         if (undecodedURI.equals("*")) {
             if (req.method().equalsIgnoreCase("OPTIONS")) {
                 StringBuilder allow = new StringBuilder();
-                allow.append("GET, HEAD, POST, PUT, DELETE");
+                allow.append("GET, HEAD, POST, PUT, DELETE, OPTIONS");
                 // Trace if allowed
                 if (connector.getAllowTrace()) {
                     allow.append(", TRACE");
                 }
-                // Always allow options
-                allow.append(", OPTIONS");
                 res.setHeader("Allow", allow.toString());
                 // Access log entry as processing won't reach AccessLogValve
                 connector.getService().getContainer().logAccess(request, response, 0, true);
