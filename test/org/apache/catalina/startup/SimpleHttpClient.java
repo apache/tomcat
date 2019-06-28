@@ -52,6 +52,7 @@ public abstract class SimpleHttpClient {
     public static final String FAIL_400 = "HTTP/1.1 400 ";
     public static final String FORBIDDEN_403 = "HTTP/1.1 403 ";
     public static final String FAIL_404 = "HTTP/1.1 404 ";
+    public static final String FAIL_405 = "HTTP/1.1 405 ";
     public static final String TIMEOUT_408 = "HTTP/1.1 408 ";
     public static final String FAIL_413 = "HTTP/1.1 413 ";
     public static final String FAIL_417 = "HTTP/1.1 417 ";
@@ -394,52 +395,64 @@ public abstract class SimpleHttpClient {
         responseBody = null;
     }
 
+    public boolean responseLineStartsWith(String expected) {
+        String line = getResponseLine();
+        if (line == null) {
+            return false;
+        }
+        return line.startsWith(expected);
+    }
+
     public boolean isResponse100() {
-        return getResponseLine().startsWith(INFO_100);
+        return responseLineStartsWith(INFO_100);
     }
 
     public boolean isResponse200() {
-        return getResponseLine().startsWith(OK_200);
+        return responseLineStartsWith(OK_200);
     }
 
     public boolean isResponse302() {
-        return getResponseLine().startsWith(REDIRECT_302);
+        return responseLineStartsWith(REDIRECT_302);
     }
 
     public boolean isResponse400() {
-        return getResponseLine().startsWith(FAIL_400);
+        return responseLineStartsWith(FAIL_400);
     }
 
     public boolean isResponse403() {
-        return getResponseLine().startsWith(FORBIDDEN_403);
+        return responseLineStartsWith(FORBIDDEN_403);
     }
 
     public boolean isResponse404() {
-        return getResponseLine().startsWith(FAIL_404);
+        return responseLineStartsWith(FAIL_404);
+    }
+
+    public boolean isResponse405() {
+        return responseLineStartsWith(FAIL_405);
     }
 
     public boolean isResponse408() {
-        return getResponseLine().startsWith(TIMEOUT_408);
+        return responseLineStartsWith(TIMEOUT_408);
     }
 
     public boolean isResponse413() {
-        return getResponseLine().startsWith(FAIL_413);
+        return responseLineStartsWith(FAIL_413);
     }
 
     public boolean isResponse417() {
-        return getResponseLine().startsWith(FAIL_417);
+        return responseLineStartsWith(FAIL_417);
     }
 
     public boolean isResponse50x() {
-        return getResponseLine().startsWith(FAIL_50X);
+        return responseLineStartsWith(FAIL_50X);
     }
 
     public boolean isResponse500() {
-        return getResponseLine().startsWith(FAIL_500);
+        return responseLineStartsWith(FAIL_500);
     }
 
     public boolean isResponse501() {
-        return getResponseLine().startsWith(FAIL_501);
+        return responseLineStartsWith(FAIL_501);
     }
 
     public Socket getSocket() {
