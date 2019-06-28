@@ -609,7 +609,6 @@ public class CoyoteAdapter implements Adapter {
                 if (connector.getAllowTrace()) {
                     allow.append(", TRACE");
                 }
-                // Always allow options
                 res.setHeader("Allow", allow.toString());
                 // Access log entry as processing won't reach AccessLogValve
                 connector.getService().getContainer().logAccess(request, response, 0, true);
