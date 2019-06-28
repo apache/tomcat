@@ -93,6 +93,11 @@
         stdout does not work when output is piped to another process. Patch
         provided by Radosław Józwik. (markt)
       </fix>
+      <add>
+        Add user buildable optional modules for easier CDI 2 and JAX-RS
+        support. Also include a new documentation page describing how
+        to use it. (remm)
+      </add>
     </changelog>
   </subsection>
 </section>
