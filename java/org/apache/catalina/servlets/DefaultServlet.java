@@ -1487,14 +1487,17 @@ public class DefaultServlet extends HttpServlet {
 
         long fileLength = resource.getContentLength();
 
-        if (fileLength == 0)
+        if (fileLength == 0) {
             return null;
+        }
 
         // Retrieving the range header (if any is specified
         String rangeHeader = request.getHeader("Range");
 
-        if (rangeHeader == null)
+        if (rangeHeader == null) {
             return null;
+        }
+
         // bytes is the only range unit supported (and I don't see the point
         // of adding new ones).
         if (!rangeHeader.startsWith("bytes")) {
@@ -1582,7 +1585,7 @@ public class DefaultServlet extends HttpServlet {
      * Decide which way to render. HTML or XML.
      *
      * @param contextPath The path
-     * @param resource The resource
+     * @param resource    The resource
      *
      * @return the input stream with the rendered output
      *
