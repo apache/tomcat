@@ -550,6 +550,21 @@ public abstract class AuthenticatorBase extends ValveBase
     }
 
 
+    @Override
+    public boolean authenticate(Request request, HttpServletResponse httpResponse)
+            throws IOException {
+        if (context == null || context.getLoginConfig() == null) {
+            return true;
+        }
+        return authenticate(request, httpResponse, context.getLoginConfig());
+    }
+
+
+    @Override
+    public abstract boolean authenticate(Request request, HttpServletResponse response,
+            LoginConfig config) throws IOException;
+
+
     // ------------------------------------------------------ Protected Methods
 
     /**
@@ -613,47 +628,6 @@ public abstract class AuthenticatorBase extends ValveBase
         sso.associate(ssoId, session);
 
     }
-
-
-    /**
-     * Authenticate the user making this request, based on the login
-     * configuration of the {@link Context} with which this Authenticator is
-     * associated.  Return <code>true</code> if any specified constraint has
-     * been satisfied, or <code>false</code> if we have created a response
-     * challenge already.
-     *
-     * @param request Request we are processing
-     * @param response Response we are populating
-     *
-     * @exception IOException if an input/output error occurs
-     */
-    @Override
-    public boolean authenticate(Request request, HttpServletResponse response)
-            throws IOException {
-        if (context == null || context.getLoginConfig() == null) {
-            return true;
-        }
-        return authenticate(request, response, context.getLoginConfig());
-    }
-
-    /**
-     * Authenticate the user making this request, based on the specified
-     * login configuration.  Return <code>true</code> if any specified
-     * constraint has been satisfied, or <code>false</code> if we have
-     * created a response challenge already.
-     *
-     * @param request Request we are processing
-     * @param response Response we are populating
-     * @param config    Login configuration describing how authentication
-     *              should be performed
-     *
-     * @exception IOException if an input/output error occurs
-     */
-    @Override
-    public abstract boolean authenticate(Request request,
-                                            HttpServletResponse response,
-                                            LoginConfig config)
-        throws IOException;
 
 
     /**
