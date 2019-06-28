@@ -18,6 +18,7 @@ package org.apache.catalina.servlets;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.Serializable;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
@@ -978,7 +979,7 @@ public class WebdavServlet extends DefaultServlet {
             return;
         }
 
-        LockInfo lock = new LockInfo();
+        LockInfo lock = new LockInfo(maxDepth);
 
         // Parsing lock request
 
@@ -2702,22 +2703,18 @@ public class WebdavServlet extends DefaultServlet {
     /**
      * Holds a lock information.
      */
-    private class LockInfo {
+    private static class LockInfo implements Serializable {
 
+        private static final long serialVersionUID = 1L;
 
-        // -------------------------------------------------------- Constructor
-
-
-        /**
-         * Constructor.
-         */
-        public LockInfo() {
-            // Ignore
+        public LockInfo(int maxDepth) {
+            this.maxDepth = maxDepth;
         }
 
 
         // ------------------------------------------------- Instance Variables
 
+        private final int maxDepth;
 
         String path = "/";
         String type = "write";
