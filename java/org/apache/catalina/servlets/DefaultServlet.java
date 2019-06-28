@@ -139,6 +139,55 @@ public class DefaultServlet extends HttpServlet {
 
     private static final SecureEntityResolver secureEntityResolver;
 
+    /**
+     * Full range marker.
+     */
+    protected static final ArrayList<Range> FULL = new ArrayList<Range>();
+
+    /**
+     * MIME multipart separation string
+     */
+    protected static final String mimeSeparation = "CATALINA_MIME_BOUNDARY";
+
+    /**
+     * JNDI resources name.
+     */
+    protected static final String RESOURCES_JNDI_NAME = "java:/comp/Resources";
+
+
+    /**
+     * Size of file transfer buffer in bytes.
+     */
+    protected static final int BUFFER_SIZE = 4096;
+
+
+    /**
+     * Array containing the safe characters set.
+     */
+    protected static final URLEncoder urlEncoder;
+
+
+    // ----------------------------------------------------- Static Initializer
+
+    static {
+        urlEncoder = new URLEncoder();
+        urlEncoder.addSafeCharacter('-');
+        urlEncoder.addSafeCharacter('_');
+        urlEncoder.addSafeCharacter('.');
+        urlEncoder.addSafeCharacter('*');
+        urlEncoder.addSafeCharacter('/');
+
+        if (Globals.IS_SECURITY_ENABLED) {
+            factory = DocumentBuilderFactory.newInstance();
+            factory.setNamespaceAware(true);
+            factory.setValidating(false);
+            secureEntityResolver = new SecureEntityResolver();
+        } else {
+            factory = null;
+            secureEntityResolver = null;
+        }
+    }
+
 
     // ----------------------------------------------------- Instance Variables
 
@@ -167,13 +216,6 @@ public class DefaultServlet extends HttpServlet {
      * The output buffer size to use when serving resources.
      */
     protected int output = 2048;
-
-
-    /**
-     * Array containing the safe characters set.
-     */
-    protected static final URLEncoder urlEncoder;
-
 
     /**
      * Allow customized directory listing per directory.
@@ -219,59 +261,9 @@ public class DefaultServlet extends HttpServlet {
     protected boolean useAcceptRanges = true;
 
     /**
-     * Full range marker.
-     */
-    protected static final ArrayList<Range> FULL = new ArrayList<Range>();
-
-    /**
      * Flag to determine if server information is presented.
      */
     protected boolean showServerInfo = true;
-
-
-    // ----------------------------------------------------- Static Initializer
-
-
-    /**
-     * GMT timezone - all HTTP dates are on GMT
-     */
-    static {
-        urlEncoder = new URLEncoder();
-        urlEncoder.addSafeCharacter('-');
-        urlEncoder.addSafeCharacter('_');
-        urlEncoder.addSafeCharacter('.');
-        urlEncoder.addSafeCharacter('*');
-        urlEncoder.addSafeCharacter('/');
-
-        if (Globals.IS_SECURITY_ENABLED) {
-            factory = DocumentBuilderFactory.newInstance();
-            factory.setNamespaceAware(true);
-            factory.setValidating(false);
-            secureEntityResolver = new SecureEntityResolver();
-        } else {
-            factory = null;
-            secureEntityResolver = null;
-        }
-    }
-
-
-    /**
-     * MIME multipart separation string
-     */
-    protected static final String mimeSeparation = "CATALINA_MIME_BOUNDARY";
-
-
-    /**
-     * JNDI resources name.
-     */
-    protected static final String RESOURCES_JNDI_NAME = "java:/comp/Resources";
-
-
-    /**
-     * Size of file transfer buffer in bytes.
-     */
-    protected static final int BUFFER_SIZE = 4096;
-
 
 
     // --------------------------------------------------------- Public Methods
@@ -361,6 +353,7 @@ public class DefaultServlet extends HttpServlet {
      * Return the relative path associated with this servlet.
      *
      * @param request The servlet request we are processing
+     * @return the relative path
      */
     protected String getRelativePath(HttpServletRequest request) {
         return getRelativePath(request, false);
@@ -554,25 +547,22 @@ public class DefaultServlet extends HttpServlet {
 
         boolean result = true;
 
-        // Temp. content file used to support partial PUT
-        File contentFile = null;
-
         Range range = parseContentRange(req, resp);
 
         InputStream resourceInputStream = null;
 
-        // Append data specified in ranges to existing content for this
-        // resource - create a temp. file on the local filesystem to
-        // perform this operation
-        // Assume just one range is specified for now
-        if (range != null) {
-            contentFile = executePartialPut(req, range, path);
-            resourceInputStream = new FileInputStream(contentFile);
-        } else {
-            resourceInputStream = req.getInputStream();
-        }
-
         try {
+            // Append data specified in ranges to existing content for this
+            // resource - create a temp. file on the local filesystem to
+            // perform this operation
+            // Assume just one range is specified for now
+            if (range != null) {
+                File contentFile = executePartialPut(req, range, path);
+                resourceInputStream = new FileInputStream(contentFile);
+            } else {
+                resourceInputStream = req.getInputStream();
+            }
+
             Resource newResource = new Resource(resourceInputStream);
             // FIXME: Add attributes
             if (exists) {
@@ -593,7 +583,6 @@ public class DefaultServlet extends HttpServlet {
         } else {
             resp.sendError(HttpServletResponse.SC_CONFLICT);
         }
-
     }
 
 
@@ -742,12 +731,13 @@ public class DefaultServlet extends HttpServlet {
      * Check if the conditions specified in the optional If headers are
      * satisfied.
      *
-     * @param request The servlet request we are processing
-     * @param response The servlet response we are creating
+     * @param request   The servlet request we are processing
+     * @param response  The servlet response we are creating
      * @param resourceAttributes The resource information
-     * @return boolean true if the resource meets all the specified conditions,
-     * and false if any of the conditions is not satisfied, in which case
-     * request processing is stopped
+     * @return <code>true</code> if the resource meets all the specified
+     *  conditions, and <code>false</code> if any of the conditions is not
+     *  satisfied, in which case request processing is stopped
+     * @throws IOException an IO error occurred
      */
     protected boolean checkIfHeaders(HttpServletRequest request,
                                      HttpServletResponse response,
@@ -795,9 +785,9 @@ public class DefaultServlet extends HttpServlet {
     /**
      * Serve the specified resource, optionally including the data content.
      *
-     * @param request The servlet request we are processing
-     * @param response The servlet response we are creating
-     * @param content Should the content be included?
+     * @param request       The servlet request we are processing
+     * @param response      The servlet response we are creating
+     * @param content       Should the content be included?
      *
      * @exception IOException if an input/output error occurs
      * @exception ServletException if a servlet-specified error occurs
@@ -856,7 +846,6 @@ public class DefaultServlet extends HttpServlet {
         // Check if the conditions specified in the optional If headers are
         // satisfied.
         if (cacheEntry.context == null) {
-
             // Checking If headers
             boolean included = (request.getAttribute(
                     RequestDispatcher.INCLUDE_CONTEXT_PATH) != null);
@@ -1204,14 +1193,17 @@ public class DefaultServlet extends HttpServlet {
 
         long fileLength = resourceAttributes.getContentLength();
 
-        if (fileLength == 0)
+        if (fileLength == 0) {
             return null;
+        }
 
         // Retrieving the range header (if any is specified
         String rangeHeader = request.getHeader("Range");
 
-        if (rangeHeader == null)
+        if (rangeHeader == null) {
             return null;
+        }
+
         // bytes is the only range unit supported (and I don't see the point
         // of adding new ones).
         if (!rangeHeader.startsWith("bytes")) {
@@ -1296,7 +1288,15 @@ public class DefaultServlet extends HttpServlet {
 
 
     /**
-     *  Decide which way to render. HTML or XML.
+     * Decide which way to render. HTML or XML.
+     *
+     * @param contextPath The path
+     * @param cacheEntry  The resource
+     *
+     * @return the input stream with the rendered output
+     *
+     * @throws IOException an IO error occurred
+     * @throws ServletException rendering error
      */
     protected InputStream render(String contextPath, CacheEntry cacheEntry)
         throws IOException, ServletException {
@@ -1453,8 +1453,7 @@ public class DefaultServlet extends HttpServlet {
      * Return an InputStream to an HTML representation of the contents of this
      * directory.
      *
-     * @param contextPath Context path to which our internal paths are
-     *  relative
+     * @param contextPath Context path to which our internal paths are relative
      */
     protected InputStream renderHtml(String contextPath, CacheEntry cacheEntry)
         throws IOException, ServletException {
@@ -1606,7 +1605,7 @@ public class DefaultServlet extends HttpServlet {
         // Return an input stream to the underlying bytes
         writer.write(sb.toString());
         writer.flush();
-        return (new ByteArrayInputStream(stream.toByteArray()));
+        return new ByteArrayInputStream(stream.toByteArray());
 
     }
 
@@ -1631,6 +1630,7 @@ public class DefaultServlet extends HttpServlet {
 
     /**
      * Get the readme file as a string.
+     * @param directory The directory to search
      */
     protected String getReadme(DirContext directory)
         throws IOException {
@@ -1682,7 +1682,10 @@ public class DefaultServlet extends HttpServlet {
 
 
     /**
-     * Return a Source for the xsl template (if possible)
+     * Return a Source for the xsl template (if possible).
+     * @param directory The directory to search
+     * @return the source for the specified directory
+     * @throws IOException an IO error occurred
      */
     protected Source findXsltInputStream(DirContext directory)
         throws IOException {
@@ -1726,12 +1729,12 @@ public class DefaultServlet extends HttpServlet {
          */
         if (globalXsltFile != null) {
             File f = validateGlobalXsltFile();
-            if (f != null){
-                FileInputStream fis = null;
+            if (f != null) {
                 long globalXsltFileSize = f.length();
                 if (globalXsltFileSize > Integer.MAX_VALUE) {
                     log("globalXsltFile [" + f.getAbsolutePath() + "] is too big to buffer");
                 } else {
+                    FileInputStream fis = null;
                     try {
                         fis = new FileInputStream(f);
                         byte b[] = new byte[(int)f.length()];
@@ -1842,6 +1845,14 @@ public class DefaultServlet extends HttpServlet {
 
     /**
      * Check if sendfile can be used.
+     * @param request The Servlet request
+     * @param response The Servlet response
+     * @param entry The resource
+     * @param length The length which will be written (will be used only if
+     *  range is null)
+     * @param range The range that will be written
+     * @return <code>true</code> if sendfile should be used (writing is then
+     *  delegated to the endpoint)
      */
     protected boolean checkSendfile(HttpServletRequest request,
                                   HttpServletResponse response,
@@ -1871,17 +1882,17 @@ public class DefaultServlet extends HttpServlet {
     /**
      * Check if the if-match condition is satisfied.
      *
-     * @param request The servlet request we are processing
-     * @param response The servlet response we are creating
+     * @param request   The servlet request we are processing
+     * @param response  The servlet response we are creating
      * @param resourceAttributes File object
-     * @return boolean true if the resource meets the specified condition,
-     * and false if the condition is not satisfied, in which case request
-     * processing is stopped
+     * @return <code>true</code> if the resource meets the specified condition,
+     *  and <code>false</code> if the condition is not satisfied, in which case
+     *  request processing is stopped
+     * @throws IOException an IO error occurred
      */
     protected boolean checkIfMatch(HttpServletRequest request,
-                                 HttpServletResponse response,
-                                 ResourceAttributes resourceAttributes)
-        throws IOException {
+            HttpServletResponse response, ResourceAttributes resourceAttributes)
+            throws IOException {
 
         String eTag = resourceAttributes.getETag();
         String headerValue = request.getHeader("If-Match");
@@ -1915,16 +1926,15 @@ public class DefaultServlet extends HttpServlet {
     /**
      * Check if the if-modified-since condition is satisfied.
      *
-     * @param request The servlet request we are processing
-     * @param response The servlet response we are creating
+     * @param request   The servlet request we are processing
+     * @param response  The servlet response we are creating
      * @param resourceAttributes File object
-     * @return boolean true if the resource meets the specified condition,
-     * and false if the condition is not satisfied, in which case request
-     * processing is stopped
+     * @return <code>true</code> if the resource meets the specified condition,
+     *  and <code>false</code> if the condition is not satisfied, in which case
+     *  request processing is stopped
      */
     protected boolean checkIfModifiedSince(HttpServletRequest request,
-            HttpServletResponse response,
-            ResourceAttributes resourceAttributes) {
+            HttpServletResponse response, ResourceAttributes resourceAttributes) {
         try {
             long headerValue = request.getDateHeader("If-Modified-Since");
             long lastModified = resourceAttributes.getLastModified();
@@ -1952,17 +1962,17 @@ public class DefaultServlet extends HttpServlet {
     /**
      * Check if the if-none-match condition is satisfied.
      *
-     * @param request The servlet request we are processing
-     * @param response The servlet response we are creating
+     * @param request   The servlet request we are processing
+     * @param response  The servlet response we are creating
      * @param resourceAttributes File object
-     * @return boolean true if the resource meets the specified condition,
-     * and false if the condition is not satisfied, in which case request
-     * processing is stopped
+     * @return <code>true</code> if the resource meets the specified condition,
+     *  and <code>false</code> if the condition is not satisfied, in which case
+     *  request processing is stopped
+     * @throws IOException an IO error occurred
      */
     protected boolean checkIfNoneMatch(HttpServletRequest request,
-                                     HttpServletResponse response,
-                                     ResourceAttributes resourceAttributes)
-        throws IOException {
+            HttpServletResponse response, ResourceAttributes resourceAttributes)
+            throws IOException {
 
         String eTag = resourceAttributes.getETag();
         String headerValue = request.getHeader("If-None-Match");
@@ -2008,17 +2018,17 @@ public class DefaultServlet extends HttpServlet {
     /**
      * Check if the if-unmodified-since condition is satisfied.
      *
-     * @param request The servlet request we are processing
-     * @param response The servlet response we are creating
+     * @param request   The servlet request we are processing
+     * @param response  The servlet response we are creating
      * @param resourceAttributes File object
-     * @return boolean true if the resource meets the specified condition,
-     * and false if the condition is not satisfied, in which case request
-     * processing is stopped
+     * @return <code>true</code> if the resource meets the specified condition,
+     *  and <code>false</code> if the condition is not satisfied, in which case
+     *  request processing is stopped
+     * @throws IOException an IO error occurred
      */
     protected boolean checkIfUnmodifiedSince(HttpServletRequest request,
-                                           HttpServletResponse response,
-                                           ResourceAttributes resourceAttributes)
-        throws IOException {
+            HttpServletResponse response, ResourceAttributes resourceAttributes)
+            throws IOException {
         try {
             long lastModified = resourceAttributes.getLastModified();
             long headerValue = request.getDateHeader("If-Unmodified-Since");
@@ -2043,8 +2053,8 @@ public class DefaultServlet extends HttpServlet {
      * (even in the face of an exception).
      *
      * @param cacheEntry The cache entry for the source resource
-     * @param is The input stream to read the source resource from
-     * @param ostream The output stream to write to
+     * @param is         The input stream to read the source resource from
+     * @param ostream    The output stream to write to
      *
      * @exception IOException if an input/output error occurs
      */
@@ -2133,8 +2143,8 @@ public class DefaultServlet extends HttpServlet {
      * (even in the face of an exception).
      *
      * @param cacheEntry The cache entry for the source resource
-     * @param ostream The output stream to write to
-     * @param range Range the client wanted to retrieve
+     * @param ostream   The output stream to write to
+     * @param range     Range the client wanted to retrieve
      * @exception IOException if an input/output error occurs
      */
     protected void copy(CacheEntry cacheEntry, ServletOutputStream ostream,
@@ -2163,10 +2173,11 @@ public class DefaultServlet extends HttpServlet {
      * output stream, and ensure that both streams are closed before returning
      * (even in the face of an exception).
      *
-     * @param cacheEntry The cache entry for the source resource
-     * @param ostream The output stream to write to
-     * @param ranges Enumeration of the ranges the client wanted to retrieve
-     * @param contentType Content type of the resource
+     * @param cacheEntry    The cache entry for the source resource
+     * @param ostream       The output stream to write to
+     * @param ranges        Enumeration of the ranges the client wanted to
+     *                          retrieve
+     * @param contentType   Content type of the resource
      * @exception IOException if an input/output error occurs
      */
     protected void copy(CacheEntry cacheEntry, ServletOutputStream ostream,
