@@ -326,6 +326,7 @@ public class TestCoyoteAdapter extends TomcatBaseTest {
     @Test
     public void testNormalize01() {
         doTestNormalize("/foo/../bar", "/bar");
+        doTestNormalize("..", null);
     }
 
     private void doTestNormalize(String input, String expected) {
@@ -342,6 +343,29 @@ public class TestCoyoteAdapter extends TomcatBaseTest {
             Assert.assertTrue(result);
             Assert.assertEquals(expected, mb.toString());
         }
+    }
+
+    @Test
+    public void testCheckNormalize() {
+        doTestCheckNormalize("/url", true);
+
+        doTestCheckNormalize("", false);
+        doTestCheckNormalize("..", false);
+        doTestCheckNormalize("/.", false);
+        doTestCheckNormalize("/..", false);
+        doTestCheckNormalize("/./", false);
+        doTestCheckNormalize("//", false);
+        doTestCheckNormalize("/../", false);
+        doTestCheckNormalize("\\", false);
+        doTestCheckNormalize("\0", false);
+    }
+
+    private void doTestCheckNormalize(String input, boolean expected) {
+        MessageBytes mb = MessageBytes.newInstance();
+        mb.setChars(input.toCharArray(), 0, input.length());
+
+        boolean result = CoyoteAdapter.checkNormalize(mb);
+        Assert.assertEquals(expected, result);
     }
 
 

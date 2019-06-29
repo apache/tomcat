@@ -1252,6 +1252,11 @@ public class CoyoteAdapter implements Adapter {
 
         int pos = 0;
 
+        // An empty URL is not acceptable
+        if (start == end) {
+            return false;
+        }
+
         // Check for '\' and 0
         for (pos = start; pos < end; pos++) {
             if (c[pos] == '\\') {
@@ -1269,6 +1274,11 @@ public class CoyoteAdapter implements Adapter {
                     return false;
                 }
             }
+        }
+
+        // The URL must start with '/'
+        if (c[start] != '/') {
+            return false;
         }
 
         // Check for ending with "/." or "/.."
