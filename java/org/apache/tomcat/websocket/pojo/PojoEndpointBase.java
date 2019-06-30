@@ -40,8 +40,7 @@ import org.apache.tomcat.util.res.StringManager;
 public abstract class PojoEndpointBase extends Endpoint {
 
     private final Log log = LogFactory.getLog(PojoEndpointBase.class); // must not be static
-    private static final StringManager sm =
-            StringManager.getManager(Constants.PACKAGE_NAME);
+    private static final StringManager sm = StringManager.getManager(PojoEndpointBase.class);
 
     private Object pojo;
     private Map<String,String> pathParameters;
@@ -72,21 +71,18 @@ public abstract class PojoEndpointBase extends Endpoint {
                 log.error(sm.getString(
                         "pojoEndpointBase.onOpenFail",
                         pojo.getClass().getName()), e);
-                handleOnOpenError(session, e);
-                return;
+                handleOnOpenOrCloseError(session, e);
             } catch (InvocationTargetException e) {
                 Throwable cause = e.getCause();
-                handleOnOpenError(session, cause);
-                return;
+                handleOnOpenOrCloseError(session, cause);
             } catch (Throwable t) {
-                handleOnOpenError(session, t);
-                return;
+                handleOnOpenOrCloseError(session, t);
             }
         }
     }
 
 
-    private void handleOnOpenError(Session session, Throwable t) {
+    private void handleOnOpenOrCloseError(Session session, Throwable t) {
         // If really fatal - re-throw
         ExceptionUtils.handleThrowable(t);
 
@@ -107,9 +103,9 @@ public abstract class PojoEndpointBase extends Endpoint {
                 methodMapping.getOnClose().invoke(pojo,
                         methodMapping.getOnCloseArgs(pathParameters, session, closeReason));
             } catch (Throwable t) {
-                ExceptionUtils.handleThrowable(t);
                 log.error(sm.getString("pojoEndpointBase.onCloseFail",
                         pojo.getClass().getName()), t);
+                handleOnOpenOrCloseError(session, t);
             }
         }
 
