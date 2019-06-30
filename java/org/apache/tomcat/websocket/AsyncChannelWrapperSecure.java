@@ -51,7 +51,7 @@ public class AsyncChannelWrapperSecure implements AsyncChannelWrapper {
     private final Log log =
             LogFactory.getLog(AsyncChannelWrapperSecure.class);
     private static final StringManager sm =
-            StringManager.getManager(Constants.PACKAGE_NAME);
+            StringManager.getManager(AsyncChannelWrapperSecure.class);
 
     private static final ByteBuffer DUMMY = ByteBuffer.allocate(16921);
     private final AsynchronousSocketChannel socketChannel;
@@ -268,8 +268,7 @@ public class AsyncChannelWrapperSecure implements AsyncChannelWrapper {
                         Future<Integer> f = socketChannel.read(socketReadBuffer);
                         Integer socketRead = f.get();
                         if (socketRead.intValue() == -1) {
-                            throw new EOFException(sm.getString(
-                                    "asyncChannelWrapperSecure.eof"));
+                            throw new EOFException(sm.getString("asyncChannelWrapperSecure.eof"));
                         }
                     }
 
@@ -277,8 +276,7 @@ public class AsyncChannelWrapperSecure implements AsyncChannelWrapper {
 
                     if (socketReadBuffer.hasRemaining()) {
                         // Decrypt the data in the buffer
-                        SSLEngineResult r =
-                                sslEngine.unwrap(socketReadBuffer, dest);
+                        SSLEngineResult r = sslEngine.unwrap(socketReadBuffer, dest);
                         read += r.bytesProduced();
                         Status s = r.getStatus();
 
@@ -405,17 +403,15 @@ public class AsyncChannelWrapperSecure implements AsyncChannelWrapper {
                             handshaking = false;
                             break;
                         }
-                        default: {
-                            throw new SSLException("TODO");
+                        case NOT_HANDSHAKING: {
+                            throw new SSLException(
+                                    sm.getString("asyncChannelWrapperSecure.notHandshaking"));
                         }
                     }
                 }
-            } catch (SSLException e) {
+            } catch (Exception e) {
                 hFuture.fail(e);
-            } catch (InterruptedException e) {
-                hFuture.fail(e);
-            } catch (ExecutionException e) {
-                hFuture.fail(e);
+                return;
             }
 
             hFuture.complete(null);
@@ -429,13 +425,14 @@ public class AsyncChannelWrapperSecure implements AsyncChannelWrapper {
 
             if (resultStatus != Status.OK &&
                     (wrap || resultStatus != Status.BUFFER_UNDERFLOW)) {
-                throw new SSLException("TODO");
+                throw new SSLException(
+                        sm.getString("asyncChannelWrapperSecure.check.notOk", resultStatus));
             }
             if (wrap && result.bytesConsumed() != 0) {
-                throw new SSLException("TODO");
+                throw new SSLException(sm.getString("asyncChannelWrapperSecure.check.wrap"));
             }
             if (!wrap && result.bytesProduced() != 0) {
-                throw new SSLException("TODO");
+                throw new SSLException(sm.getString("asyncChannelWrapperSecure.check.unwrap"));
             }
         }
     }

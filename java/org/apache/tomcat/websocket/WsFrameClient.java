@@ -31,16 +31,15 @@ import org.apache.tomcat.util.res.StringManager;
 public class WsFrameClient extends WsFrameBase {
 
     private final Log log = LogFactory.getLog(WsFrameClient.class); // must not be static
-    private static final StringManager sm =
-            StringManager.getManager(Constants.PACKAGE_NAME);
+    private static final StringManager sm = StringManager.getManager(WsFrameClient.class);
 
     private final AsyncChannelWrapper channel;
-    private final CompletionHandler<Integer,Void> handler;
+    private final CompletionHandler<Integer, Void> handler;
     // Not final as it may need to be re-sized
-    private ByteBuffer response;
+    private volatile ByteBuffer response;
 
-    public WsFrameClient(ByteBuffer response, AsyncChannelWrapper channel,
-            WsSession wsSession, Transformation transformation) {
+    public WsFrameClient(ByteBuffer response, AsyncChannelWrapper channel, WsSession wsSession,
+            Transformation transformation) {
         super(wsSession, transformation);
         this.response = response;
         this.channel = channel;
@@ -90,8 +89,7 @@ public class WsFrameClient extends WsFrameBase {
         if (t instanceof WsIOException) {
             cr = ((WsIOException) t).getCloseReason();
         } else {
-            cr = new CloseReason(
-                CloseCodes.CLOSED_ABNORMALLY, t.getMessage());
+            cr = new CloseReason(CloseCodes.CLOSED_ABNORMALLY, t.getMessage());
         }
 
         wsSession.doClose(cr, cr, true);
@@ -110,9 +108,7 @@ public class WsFrameClient extends WsFrameBase {
         return log;
     }
 
-
-    private class WsFrameClientCompletionHandler
-            implements CompletionHandler<Integer,Void> {
+    private class WsFrameClientCompletionHandler implements CompletionHandler<Integer, Void> {
 
         @Override
         public void completed(Integer result, Void attachment) {
@@ -146,8 +142,8 @@ public class WsFrameClient extends WsFrameBase {
         public void failed(Throwable exc, Void attachment) {
             if (exc instanceof ReadBufferOverflowException) {
                 // response will be empty if this exception is thrown
-                response = ByteBuffer.allocate(
-                        ((ReadBufferOverflowException) exc).getMinBufferSize());
+                response = ByteBuffer
+                        .allocate(((ReadBufferOverflowException) exc).getMinBufferSize());
                 response.flip();
                 try {
                     processSocketRead();

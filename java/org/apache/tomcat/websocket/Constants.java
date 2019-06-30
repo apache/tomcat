@@ -27,8 +27,12 @@ import javax.websocket.Extension;
  */
 public class Constants {
 
-    protected static final String PACKAGE_NAME =
-            Constants.class.getPackage().getName();
+    /**
+     * @deprecated. Will be removed in 8.5.x onwards.
+     */
+    @Deprecated
+    protected static final String PACKAGE_NAME = Constants.class.getPackage().getName();
+
     // OP Codes
     public static final byte OPCODE_CONTINUATION = 0x00;
     public static final byte OPCODE_TEXT = 0x01;
@@ -67,10 +71,8 @@ public class Constants {
     public static final String WS_VERSION_HEADER_NAME = "Sec-WebSocket-Version";
     public static final String WS_VERSION_HEADER_VALUE = "13";
     public static final String WS_KEY_HEADER_NAME = "Sec-WebSocket-Key";
-    public static final String WS_PROTOCOL_HEADER_NAME =
-            "Sec-WebSocket-Protocol";
-    public static final String WS_EXTENSIONS_HEADER_NAME =
-            "Sec-WebSocket-Extensions";
+    public static final String WS_PROTOCOL_HEADER_NAME = "Sec-WebSocket-Protocol";
+    public static final String WS_EXTENSIONS_HEADER_NAME = "Sec-WebSocket-Extensions";
 
     /// HTTP redirection status codes
     public static final int MULTIPLE_CHOICES = 300;

@@ -418,7 +418,7 @@ public class PerMessageDeflate implements Transformation {
                                     uncompressedIntermediateHandler, uncompressedIntermediateHandler);
                         }
                     } else {
-                        throw new IllegalStateException("Should never happen");
+                        throw new IllegalStateException(sm.getString("perMessageDeflate.invalidState"));
                     }
 
                     // Add the newly created compressed part to the set of parts

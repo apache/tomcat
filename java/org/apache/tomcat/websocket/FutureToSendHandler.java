@@ -34,7 +34,7 @@ import org.apache.tomcat.util.res.StringManager;
  */
 class FutureToSendHandler implements Future<Void>, SendHandler {
 
-    private static final StringManager sm = StringManager.getManager(Constants.PACKAGE_NAME);
+    private static final StringManager sm = StringManager.getManager(FutureToSendHandler.class);
 
     private final CountDownLatch latch = new CountDownLatch(1);
     private final WsSession wsSession;

@@ -34,7 +34,7 @@ public class BackgroundProcessManager {
     private final Log log =
             LogFactory.getLog(BackgroundProcessManager.class);
     private static final StringManager sm =
-            StringManager.getManager(Constants.PACKAGE_NAME);
+            StringManager.getManager(BackgroundProcessManager.class);
     private static final BackgroundProcessManager instance;
 
 
