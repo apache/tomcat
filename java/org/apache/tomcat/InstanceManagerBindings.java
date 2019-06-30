@@ -32,5 +32,4 @@ public final class InstanceManagerBindings {
     public static final InstanceManager get(ClassLoader classLoader) {
         return bindings.get(classLoader);
     }
-
 }
