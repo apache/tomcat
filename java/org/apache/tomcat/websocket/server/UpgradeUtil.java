@@ -50,8 +50,8 @@ import org.apache.tomcat.websocket.pojo.PojoEndpointServer;
 
 public class UpgradeUtil {
 
-    private static final StringManager sm = StringManager
-            .getManager(org.apache.tomcat.websocket.server.Constants.PACKAGE_NAME);
+    private static final StringManager sm =
+            StringManager.getManager(UpgradeUtil.class.getPackage().getName());
     private static final byte[] WS_ACCEPT =
             "258EAFA5-E914-47DA-95CA-C5AB0DC85B11".getBytes(
                     StandardCharsets.ISO_8859_1);
@@ -67,6 +67,11 @@ public class UpgradeUtil {
      * Note: RFC 2616 does not limit HTTP upgrade to GET requests but the Java
      *       WebSocket spec 1.0, section 8.2 implies such a limitation and RFC
      *       6455 section 4.1 requires that a WebSocket Upgrade uses GET.
+     * @param request  The request to check if it is an HTTP upgrade request for
+     *                 a WebSocket connection
+     * @param response The response associated with the request
+     * @return <code>true</code> if the request includes a HTTP Upgrade request
+     *         for the WebSocket protocol, otherwise <code>false</code>
      */
     public static boolean isWebSocketUpgradeRequest(ServletRequest request,
             ServletResponse response) {
@@ -222,7 +227,7 @@ public class UpgradeUtil {
                 ep = new PojoEndpointServer();
                 // Need to make path params available to POJO
                 perSessionServerEndpointConfig.getUserProperties().put(
-                        PojoEndpointServer.POJO_PATH_PARAM_KEY, pathParams);
+                        org.apache.tomcat.websocket.pojo.Constants.POJO_PATH_PARAM_KEY, pathParams);
             }
         } catch (InstantiationException e) {
             throw new ServletException(e);
@@ -278,6 +283,7 @@ public class UpgradeUtil {
         }
         return result;
     }
+
 
     private static void append(StringBuilder sb, Extension extension) {
         if (extension == null || extension.getName() == null || extension.getName().length() == 0) {

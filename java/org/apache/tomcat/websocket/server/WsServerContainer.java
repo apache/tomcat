@@ -53,7 +53,6 @@ import org.apache.tomcat.InstanceManager;
 import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.websocket.WsSession;
 import org.apache.tomcat.websocket.WsWebSocketContainer;
-import org.apache.tomcat.websocket.pojo.PojoEndpointServer;
 import org.apache.tomcat.websocket.pojo.PojoMethodMapping;
 
 /**
@@ -69,8 +68,7 @@ import org.apache.tomcat.websocket.pojo.PojoMethodMapping;
 public class WsServerContainer extends WsWebSocketContainer
         implements ServerContainer {
 
-    private static final StringManager sm =
-            StringManager.getManager(Constants.PACKAGE_NAME);
+    private static final StringManager sm = StringManager.getManager(WsServerContainer.class);
     private final Log log = LogFactory.getLog(WsServerContainer.class); // must not be static
 
     private static final CloseReason AUTHENTICATED_HTTP_SESSION_CLOSED =
@@ -164,7 +162,8 @@ public class WsServerContainer extends WsWebSocketContainer
      * must be called before calling this method.
      *
      * @param sec   The configuration to use when creating endpoint instances
-     * @throws DeploymentException
+     * @throws DeploymentException if the endpoint cannot be published as
+     *         requested
      */
     @Override
     public void addEndpoint(ServerEndpointConfig sec) throws DeploymentException {
@@ -197,8 +196,7 @@ public class WsServerContainer extends WsWebSocketContainer
                     sec.getDecoders(), path);
             if (methodMapping.getOnClose() != null || methodMapping.getOnOpen() != null
                     || methodMapping.getOnError() != null || methodMapping.hasMessageHandlers()) {
-                sec.getUserProperties().put(
-                        PojoEndpointServer.POJO_METHOD_MAPPING_KEY,
+                sec.getUserProperties().put(org.apache.tomcat.websocket.pojo.Constants.POJO_METHOD_MAPPING_KEY,
                         methodMapping);
             }
 
@@ -300,13 +298,8 @@ public class WsServerContainer extends WsWebSocketContainer
             Configurator configurator = null;
             if (!configuratorClazz.equals(Configurator.class)) {
                 try {
-                    configurator = annotation.configurator().newInstance();
-                } catch (InstantiationException e) {
-                    throw new DeploymentException(sm.getString(
-                            "serverContainer.configuratorFail",
-                            annotation.configurator().getName(),
-                            pojo.getClass().getName()), e);
-                } catch (IllegalAccessException e) {
+                    configurator = annotation.configurator().getConstructor().newInstance();
+                } catch (ReflectiveOperationException e) {
                     throw new DeploymentException(sm.getString(
                             "serverContainer.configuratorFail",
                             annotation.configurator().getName(),
@@ -582,11 +575,8 @@ public class WsServerContainer extends WsWebSocketContainer
             @SuppressWarnings("unused")
             Encoder instance;
             try {
-                encoder.newInstance();
-            } catch(InstantiationException e) {
-                throw new DeploymentException(sm.getString(
-                        "serverContainer.encoderFail", encoder.getName()), e);
-            } catch (IllegalAccessException e) {
+                encoder.getConstructor().newInstance();
+            } catch(ReflectiveOperationException e) {
                 throw new DeploymentException(sm.getString(
                         "serverContainer.encoderFail", encoder.getName()), e);
             }

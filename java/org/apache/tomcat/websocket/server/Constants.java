@@ -21,8 +21,11 @@ package org.apache.tomcat.websocket.server;
  */
 public class Constants {
 
-    protected static final String PACKAGE_NAME =
-            Constants.class.getPackage().getName();
+    /**
+     * @deprecated. Will be removed in 8.5.x onwards.
+     */
+    @Deprecated
+    protected static final String PACKAGE_NAME = Constants.class.getPackage().getName();
 
     public static final String BINARY_BUFFER_SIZE_SERVLET_CONTEXT_INIT_PARAM =
             "org.apache.tomcat.websocket.binaryBufferSize";

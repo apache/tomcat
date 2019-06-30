@@ -30,7 +30,7 @@ import org.apache.tomcat.websocket.WsSession;
 public class WsFrameServer extends WsFrameBase {
 
     private final Log log = LogFactory.getLog(WsFrameServer.class); // must not be static
-    private static final StringManager sm = StringManager.getManager(Constants.PACKAGE_NAME);
+    private static final StringManager sm = StringManager.getManager(WsFrameServer.class);
 
     private final AbstractServletInputStream sis;
     private final Object connectionReadLock = new Object();
@@ -45,6 +45,9 @@ public class WsFrameServer extends WsFrameBase {
 
     /**
      * Called when there is data in the ServletInputStream to process.
+     *
+     * @throws IOException if an I/O error occurs while processing the available
+     *                     data
      */
     public void onDataAvailable() throws IOException {
         if (log.isDebugEnabled()) {

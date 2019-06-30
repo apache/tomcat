@@ -83,6 +83,4 @@ public class WsFilter implements Filter {
     public void destroy() {
         // NO-OP
     }
-
-
 }

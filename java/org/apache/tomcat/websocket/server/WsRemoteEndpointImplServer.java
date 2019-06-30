@@ -112,9 +112,9 @@ public class WsRemoteEndpointImplServer extends WsRemoteEndpointImplBase {
             clearHandler(ioe, useDispatch);
             close();
         }
+
         if (!complete) {
             // Async write is in progress
-
             long timeout = getSendTimeout();
             if (timeout > 0) {
                 // Register with timeout thread
@@ -136,7 +136,7 @@ public class WsRemoteEndpointImplServer extends WsRemoteEndpointImplBase {
         }
         try {
             sos.close();
-        } catch (IOException e) {
+        } catch (Exception e) {
             if (log.isInfoEnabled()) {
                 log.info(sm.getString("wsRemoteEndpointServer.closeFailed"), e);
             }
