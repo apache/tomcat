@@ -28,14 +28,14 @@
     <artifactId>tomcat-owb</artifactId>
     <name>Apache Tomcat CDI 2 support</name>
     <description>Apache Tomcat CDI 2 support using Apache OpenWebBeans</description>
-    <version>1.0</version>
+    <!-- This is the Apache OpenWebBeans version -->
+    <version>2.0.10</version>
     <packaging>jar</packaging>
 
     <properties>
         <geronimo-atinject.version>1.0</geronimo-atinject.version>
         <geronimo-interceptor.version>1.0</geronimo-interceptor.version>
         <geronimo-jcdi.version>1.0.1</geronimo-jcdi.version>
-        <owb.version>2.0.10</owb.version>
         <tomcat.version>9.0.21</tomcat.version>
     </properties>
 
@@ -59,17 +59,17 @@
         <dependency>
             <groupId>org.apache.openwebbeans</groupId>
             <artifactId>openwebbeans-spi</artifactId>
-            <version>${owb.version}</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.openwebbeans</groupId>
             <artifactId>openwebbeans-impl</artifactId>
-            <version>${owb.version}</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.openwebbeans</groupId>
             <artifactId>openwebbeans-web</artifactId>
-            <version>${owb.version}</version>
+            <version>${project.version}</version>
         </dependency>
         <!-- Allows building integration code, temporarily located here -->
         <dependency>

@@ -28,11 +28,11 @@
     <artifactId>tomcat-cxf</artifactId>
     <name>Apache CXF for Apache Tomcat CDI</name>
     <description>Apache CXF packaged for Apache Tomcat CDI</description>
-    <version>1.0</version>
+    <!-- This is the Apache CXF version -->
+    <version>3.3.2</version>
     <packaging>jar</packaging>
 
     <properties>
-        <cxf.version>3.3.2</cxf.version>
         <geronimo-jcdi.version>1.0.1</geronimo-jcdi.version>
         <javax.json-api.version>1.1.4</javax.json-api.version>
         <javax.json.bind-api.version>1.0</javax.json.bind-api.version>
@@ -60,27 +60,27 @@
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-integration-cdi</artifactId>
-            <version>${cxf.version}</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-rs-client</artifactId>
-            <version>${cxf.version}</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-frontend-jaxrs</artifactId>
-            <version>${cxf.version}</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-rs-extension-providers</artifactId>
-            <version>${cxf.version}</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-rs-json-basic</artifactId>
-            <version>${cxf.version}</version>
+            <version>${project.version}</version>
         </dependency>
         <!-- Apache Johnzon -->
         <dependency>
