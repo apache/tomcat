@@ -65,6 +65,7 @@ public class WsRemoteEndpointImplServer extends WsRemoteEndpointImplBase {
         return false;
     }
 
+
     @Override
     protected void doWrite(SendHandler handler, long blockingWriteTimeoutExpiry,
             ByteBuffer... buffers) {
