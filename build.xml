@@ -83,6 +83,9 @@
   <!-- Servlet 3.0 spec requires 1.6+ -->
   <property name="compile.source" value="1.6"/>
   <property name="compile.target" value="1.6"/>
+  <!-- WebSocket 1.1 spec requires 1.7+ -->
+  <property name="compile.source.ws" value="1.7"/>
+  <property name="compile.target.ws" value="1.7"/>
 
   <!-- Locations to create the JAR artifacts -->
   <!-- Standard JARs -->
@@ -704,8 +707,8 @@
     <javac sourcepath="" srcdir="java" destdir="${tomcat.classes}"
            debug="${compile.debug}"
            deprecation="${compile.deprecation}"
-           source="${compile.source}"
-           target="${compile.target}"
+           source="${compile.source.ws}"
+           target="${compile.target.ws}"
            excludes="**/.svn/**"
            encoding="ISO-8859-1"
            includeAntRuntime="true"
