@@ -333,7 +333,8 @@ public class AsyncChannelWrapperSecure implements AsyncChannelWrapper {
                     future.fail(new IllegalStateException(sm.getString(
                             "asyncChannelWrapperSecure.wrongStateRead")));
                 }
-            } catch (Exception e) {
+            } catch (RuntimeException | ReadBufferOverflowException | SSLException | EOFException |
+                    ExecutionException | InterruptedException e) {
                 reading.set(false);
                 future.fail(e);
             }
