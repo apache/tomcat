@@ -72,14 +72,11 @@ public abstract class PojoEndpointBase extends Endpoint {
                         "pojoEndpointBase.onOpenFail",
                         pojo.getClass().getName()), e);
                 handleOnOpenOrCloseError(session, e);
-                return;
             } catch (InvocationTargetException e) {
                 Throwable cause = e.getCause();
                 handleOnOpenOrCloseError(session, cause);
-                return;
             } catch (Throwable t) {
                 handleOnOpenOrCloseError(session, t);
-                return;
             }
         }
     }
