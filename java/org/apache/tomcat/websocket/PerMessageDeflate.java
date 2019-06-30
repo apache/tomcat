@@ -421,7 +421,7 @@ public class PerMessageDeflate implements Transformation {
                                     blockingWriteTimeoutExpiry);
                         }
                     } else {
-                        throw new IllegalStateException("Should never happen");
+                        throw new IllegalStateException(sm.getString("perMessageDeflate.invalidState"));
                     }
 
                     // Add the newly created compressed part to the set of parts

@@ -268,8 +268,7 @@ public class AsyncChannelWrapperSecure implements AsyncChannelWrapper {
                         Future<Integer> f = socketChannel.read(socketReadBuffer);
                         Integer socketRead = f.get();
                         if (socketRead.intValue() == -1) {
-                            throw new EOFException(sm.getString(
-                                    "asyncChannelWrapperSecure.eof"));
+                            throw new EOFException(sm.getString("asyncChannelWrapperSecure.eof"));
                         }
                     }
 
@@ -277,8 +276,7 @@ public class AsyncChannelWrapperSecure implements AsyncChannelWrapper {
 
                     if (socketReadBuffer.hasRemaining()) {
                         // Decrypt the data in the buffer
-                        SSLEngineResult r =
-                                sslEngine.unwrap(socketReadBuffer, dest);
+                        SSLEngineResult r = sslEngine.unwrap(socketReadBuffer, dest);
                         read += r.bytesProduced();
                         Status s = r.getStatus();
 

@@ -53,7 +53,7 @@ public class WsRemoteEndpointImplClient extends WsRemoteEndpointImplBase {
             } else {
                 timeout = blockingWriteTimeoutExpiry - System.currentTimeMillis();
                 if (timeout < 0) {
-                    SendResult sr = new SendResult(new IOException("Blocking write timeout"));
+                    SendResult sr = new SendResult(new IOException(sm.getString("wsRemoteEndpoint.writeTimeout")));
                     handler.onResult(sr);
                 }
             }
