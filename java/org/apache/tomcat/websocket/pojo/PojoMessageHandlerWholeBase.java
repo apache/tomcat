@@ -78,7 +78,9 @@ public abstract class PojoMessageHandlerWholeBase<T>
         Object result = null;
         try {
             result = method.invoke(pojo, parameters);
-        } catch (IllegalAccessException | InvocationTargetException e) {
+        } catch (IllegalAccessException e) {
+            handlePojoMethodException(e);
+        } catch (InvocationTargetException e) {
             handlePojoMethodException(e);
         }
         processResult(result);

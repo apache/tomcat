@@ -42,7 +42,7 @@ public class PojoMessageHandlerWholeText
     private static final StringManager sm =
             StringManager.getManager(PojoMessageHandlerWholeText.class);
 
-    private final List<Decoder> decoders = new ArrayList<>();
+    private final List<Decoder> decoders = new ArrayList<Decoder>();
     private final Class<?> primitiveType;
 
     public PojoMessageHandlerWholeText(Object pojo, Method method,

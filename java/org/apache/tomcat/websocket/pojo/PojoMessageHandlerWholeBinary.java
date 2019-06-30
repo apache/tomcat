@@ -41,7 +41,7 @@ public class PojoMessageHandlerWholeBinary
     private static final StringManager sm =
             StringManager.getManager(PojoMessageHandlerWholeBinary.class);
 
-    private final List<Decoder> decoders = new ArrayList<>();
+    private final List<Decoder> decoders = new ArrayList<Decoder>();
 
     private final boolean isForInputStream;
 

@@ -83,8 +83,10 @@ public abstract class PojoMessageHandlerBase<T>
             } else {
                 remoteEndpoint.sendObject(result);
             }
-        } catch (IOException | EncodeException ioe) {
+        } catch (IOException ioe) {
             throw new IllegalStateException(ioe);
+        } catch (EncodeException e) {
+            throw new IllegalStateException(e);
         }
     }
 
