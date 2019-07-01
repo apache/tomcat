@@ -1454,17 +1454,9 @@ public class DefaultServlet extends HttpServlet {
             HttpServletResponse response,
             WebResource resource) throws IOException {
 
-        if (!"GET".equals(request.getMethod())) {
-            // RFC 7233#3.1 clarifies the intention of RFC 2616 was to only
-            // allow Range headers on GET requests. However, many people
-            // incorrectly read RFC 2616#14.35.1 as allowing partial PUT and
-            // implemented. Tomcat was one such implementation. It is optionally
-            // allowed to retain compatibility with clients that use it.
-            if (!allowPartialPut || !"PUT".equals(request.getMethod())) {
-                return FULL;
-            }
-        }
-
+        // Range headers are only valid on GET requests. That implies they are
+        // also valid on HEAD requests. This method is only called by doGet()
+        // and doHead() so no need to check the request method.
 
         // Checking If-Range
         String headerValue = request.getHeader("If-Range");
