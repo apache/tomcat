@@ -1393,8 +1393,9 @@ public class DefaultServlet extends HttpServlet {
         // Retrieving the content-range header (if any is specified
         String rangeHeader = request.getHeader("Content-Range");
 
-        if (rangeHeader == null)
+        if (rangeHeader == null || !allowPartialPut) {
             return null;
+        }
 
         // bytes is the only range unit supported
         if (!rangeHeader.startsWith("bytes")) {
