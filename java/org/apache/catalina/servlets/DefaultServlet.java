@@ -337,7 +337,7 @@ public class DefaultServlet extends HttpServlet {
         }
 
         if (resources == null) {
-            throw new UnavailableException("No resources");
+            throw new UnavailableException(sm.getString("defaultServlet.noResources"));
         }
 
         if (getServletConfig().getInitParameter("showServerInfo") != null) {
@@ -2328,7 +2328,7 @@ public class DefaultServlet extends HttpServlet {
             return e;
         }
         if (skipped < start) {
-            return new IOException(sm.getString("defaultservlet.skipfail",
+            return new IOException(sm.getString("defaultServlet.skipfail",
                     Long.valueOf(skipped), Long.valueOf(start)));
         }
 
