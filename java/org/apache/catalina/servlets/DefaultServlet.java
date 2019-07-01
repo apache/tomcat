@@ -1460,22 +1460,19 @@ public class DefaultServlet extends HttpServlet {
             long lastModified = resource.getLastModified();
 
             if (headerValueTime == (-1L)) {
-
                 // If the ETag the client gave does not match the entity
                 // etag, then the entire entity is returned.
-                if (!eTag.equals(headerValue.trim()))
+                if (!eTag.equals(headerValue.trim())) {
                     return FULL;
-
+                }
             } else {
-
-                // If the timestamp of the entity the client got is older than
+                // If the timestamp of the entity the client got differs from
                 // the last modification date of the entity, the entire entity
                 // is returned.
-                if (lastModified > (headerValueTime + 1000))
+                if (Math.abs(lastModified  -headerValueTime) > 1000) {
                     return FULL;
-
+                }
             }
-
         }
 
         long fileLength = resource.getContentLength();
