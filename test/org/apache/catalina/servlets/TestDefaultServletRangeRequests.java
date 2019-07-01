@@ -66,8 +66,9 @@ public class TestDefaultServletRangeRequests extends TomcatBaseTest {
         parameterSets.add(new Object[] { "bytes10-", Integer.valueOf(416), "", "*/" + len });
         parameterSets.add(new Object[] { "bytes-10", Integer.valueOf(416), "", "*/" + len });
         // Unknown types
-        parameterSets.add(new Object[] { "unknown=1-2", Integer.valueOf(416), "", "*/" + len });
-        parameterSets.add(new Object[] { "bytesX=1-2", Integer.valueOf(416), "", "*/" + len });
+        parameterSets.add(new Object[] { "unknown=1-2", Integer.valueOf(200), strLen, "" });
+        parameterSets.add(new Object[] { "bytesX=1-2", Integer.valueOf(200), strLen, "" });
+        parameterSets.add(new Object[] { "Xbytes=1-2", Integer.valueOf(200), strLen, "" });
         // Valid range
         parameterSets.add(new Object[] { "bytes=0-9", Integer.valueOf(206), "10", "0-9/" + len });
         parameterSets.add(new Object[] { "bytes=-100", Integer.valueOf(206), "100", (len - 100) + "-" + (len - 1) + "/" + len });
@@ -116,7 +117,11 @@ public class TestDefaultServletRangeRequests extends TomcatBaseTest {
         }
 
         if (responseRangeExpected.length() > 0) {
-            String responseRange = responseHeaders.get("Content-Range").get(0);
+            String responseRange = null;
+            List<String> headerValues = responseHeaders.get("Content-Range");
+            if (headerValues != null && headerValues.size() == 1) {
+                responseRange = headerValues.get(0);
+            }
             Assert.assertEquals("bytes " + responseRangeExpected, responseRange);
         }
     }

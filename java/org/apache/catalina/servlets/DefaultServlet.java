@@ -909,7 +909,7 @@ public class DefaultServlet extends HttpServlet {
             }
         }
 
-        ArrayList<Range> ranges = null;
+        ArrayList<Range> ranges = FULL;
         long contentLength = -1L;
 
         if (resource.isDirectory()) {
@@ -935,6 +935,9 @@ public class DefaultServlet extends HttpServlet {
 
                 // Parse range specifier
                 ranges = parseRange(request, response, resource);
+                if (ranges == null) {
+                    return;
+                }
 
                 // ETag header
                 response.setHeader("ETag", eTag);
@@ -1013,12 +1016,7 @@ public class DefaultServlet extends HttpServlet {
             conversionRequired = false;
         }
 
-        if (resource.isDirectory() ||
-                isError ||
-                ( (ranges == null || ranges.isEmpty())
-                        && request.getHeader("Range") == null ) ||
-                ranges == FULL ) {
-
+        if (resource.isDirectory() || isError || ranges == FULL ) {
             // Set the appropriate output headers
             if (contentType != null) {
                 if (debug > 0)
@@ -1438,7 +1436,8 @@ public class DefaultServlet extends HttpServlet {
      * @param request   The servlet request we are processing
      * @param response  The servlet response we are creating
      * @param resource  The resource
-     * @return a list of ranges
+     * @return a list of ranges, {@code null} if the range header was invalid or
+     *         {@code #FULL} if the Range header should be ignored.
      * @throws IOException an IO error occurred
      */
     protected ArrayList<Range> parseRange(HttpServletRequest request,
@@ -1482,24 +1481,37 @@ public class DefaultServlet extends HttpServlet {
         long fileLength = resource.getContentLength();
 
         if (fileLength == 0) {
-            return null;
+            // Range header makes no sense for a zero length resource. Tomcat
+            // therefore opts to ignore it.
+            return FULL;
         }
 
         // Retrieving the range header (if any is specified
         String rangeHeader = request.getHeader("Range");
 
         if (rangeHeader == null) {
-            return null;
+            // No Range header is the same as ignoring any Range header
+            return FULL;
         }
 
         Ranges ranges = Ranges.parseRanges(new StringReader(rangeHeader));
 
-        // bytes is the only range unit supported (and I don't see the point
-        // of adding new ones).
-        if (ranges == null || !ranges.getUnits().equals("bytes")) {
+        if (ranges == null) {
+            // The Range header is present but not formatted correctly.
+            // Could argue for a 400 response but 416 is more specific.
+            // There is also the option to ignore the (invalid) Range header.
+            // RFC7233#4.4 notes that many servers do ignore the Range header in
+            // these circumstances but Tomcat has always returned a 416.
             response.addHeader("Content-Range", "bytes */" + fileLength);
             response.sendError(HttpServletResponse.SC_REQUESTED_RANGE_NOT_SATISFIABLE);
             return null;
+        }
+
+        // bytes is the only range unit supported (and I don't see the point
+        // of adding new ones).
+        if (!ranges.getUnits().equals("bytes")) {
+            // RFC7233#3.1 Servers must ignore range units they don't understand
+            return FULL;
         }
 
         // TODO: Remove the internal representation and use Ranges

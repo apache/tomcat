@@ -50,6 +50,11 @@
       <fix>
         Improve parsing of Range request headers. (markt)
       </fix>
+      <fix>
+        Range headers that specify a range unit Tomcat does not recognise should
+        be ignored rather than triggering a 416 response. Based on a pull
+        request by zhanhb. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
