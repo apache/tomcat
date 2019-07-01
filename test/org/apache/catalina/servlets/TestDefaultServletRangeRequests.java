@@ -37,7 +37,6 @@ import org.apache.tomcat.util.buf.ByteChunk;
 @RunWith(Parameterized.class)
 public class TestDefaultServletRangeRequests extends TomcatBaseTest {
 
-    // TODO: Add a check for response headers
     @Parameterized.Parameters(name = "{index} rangeHeader [{0}]")
     public static Collection<Object[]> parameters() {
 
