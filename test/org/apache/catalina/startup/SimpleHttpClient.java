@@ -50,6 +50,8 @@ public abstract class SimpleHttpClient {
 
     public static final String INFO_100 = "HTTP/1.1 100 ";
     public static final String OK_200 = "HTTP/1.1 200 ";
+    public static final String CREATED_201 = "HTTP/1.1 201 ";
+    public static final String NOCONTENT_204 = "HTTP/1.1 204 ";
     public static final String REDIRECT_302 = "HTTP/1.1 302 ";
     public static final String REDIRECT_303 = "HTTP/1.1 303 ";
     public static final String FAIL_400 = "HTTP/1.1 400 ";
@@ -412,6 +414,14 @@ public abstract class SimpleHttpClient {
 
     public boolean isResponse200() {
         return responseLineStartsWith(OK_200);
+    }
+
+    public boolean isResponse201() {
+        return responseLineStartsWith(CREATED_201);
+    }
+
+    public boolean isResponse204() {
+        return responseLineStartsWith(NOCONTENT_204);
     }
 
     public boolean isResponse302() {

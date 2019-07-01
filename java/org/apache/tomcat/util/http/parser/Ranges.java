@@ -75,7 +75,7 @@ public class Ranges {
      *
      * @throws IOException if there was a problem reading the input
      */
-    public static Ranges parseRanges(StringReader input) throws IOException {
+    public static Ranges parse(StringReader input) throws IOException {
 
         // Units (required)
         String units = HttpParser.readToken(input);

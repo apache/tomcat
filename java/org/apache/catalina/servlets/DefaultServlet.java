@@ -80,6 +80,7 @@ import org.apache.catalina.util.URLEncoder;
 import org.apache.catalina.webresources.CachedResource;
 import org.apache.tomcat.util.buf.B2CConverter;
 import org.apache.tomcat.util.http.ResponseUtil;
+import org.apache.tomcat.util.http.parser.ContentRange;
 import org.apache.tomcat.util.http.parser.Ranges;
 import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.util.security.Escape;
@@ -150,6 +151,8 @@ public class DefaultServlet extends HttpServlet {
      * Full range marker.
      */
     protected static final ArrayList<Range> FULL = new ArrayList<>();
+
+    private static final Range IGNORE = new Range();
 
     /**
      * MIME multipart separation string
@@ -612,6 +615,11 @@ public class DefaultServlet extends HttpServlet {
 
         Range range = parseContentRange(req, resp);
 
+        if (range == null) {
+            // Processing error. parseContentRange() set the error code
+            return;
+        }
+
         InputStream resourceInputStream = null;
 
         try {
@@ -619,11 +627,11 @@ public class DefaultServlet extends HttpServlet {
             // resource - create a temp. file on the local filesystem to
             // perform this operation
             // Assume just one range is specified for now
-            if (range != null) {
+            if (range == IGNORE) {
+                resourceInputStream = req.getInputStream();
+            } else {
                 File contentFile = executePartialPut(req, range, path);
                 resourceInputStream = new FileInputStream(contentFile);
-            } else {
-                resourceInputStream = req.getInputStream();
             }
 
             if (resources.write(path, resourceInputStream, true)) {
@@ -1383,7 +1391,9 @@ public class DefaultServlet extends HttpServlet {
      *
      * @param request The servlet request we are processing
      * @param response The servlet response we are creating
-     * @return the range object
+     * @return the partial content-range, {@code null} if the content-range
+     *         header was invalid or {@code #IGNORE} if there is no header to
+     *         process
      * @throws IOException an IO error occurred
      */
     protected Range parseContentRange(HttpServletRequest request,
@@ -1391,45 +1401,37 @@ public class DefaultServlet extends HttpServlet {
         throws IOException {
 
         // Retrieving the content-range header (if any is specified
-        String rangeHeader = request.getHeader("Content-Range");
+        String contentRangeHeader = request.getHeader("Content-Range");
 
-        if (rangeHeader == null || !allowPartialPut) {
+        if (contentRangeHeader == null) {
+            return IGNORE;
+        }
+
+        if (!allowPartialPut) {
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST);
             return null;
         }
+
+        ContentRange contentRange = ContentRange.parse(new StringReader(contentRangeHeader));
+
+        if (contentRange == null) {
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+            return null;
+        }
+
 
         // bytes is the only range unit supported
-        if (!rangeHeader.startsWith("bytes")) {
+        if (!contentRange.getUnits().equals("bytes")) {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST);
             return null;
         }
 
-        rangeHeader = rangeHeader.substring(6).trim();
-
-        int dashPos = rangeHeader.indexOf('-');
-        int slashPos = rangeHeader.indexOf('/');
-
-        if (dashPos == -1) {
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST);
-            return null;
-        }
-
-        if (slashPos == -1) {
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST);
-            return null;
-        }
-
+        // TODO: Remove the internal representation and use Ranges
+        // Convert to internal representation
         Range range = new Range();
-
-        try {
-            range.start = Long.parseLong(rangeHeader.substring(0, dashPos));
-            range.end =
-                Long.parseLong(rangeHeader.substring(dashPos + 1, slashPos));
-            range.length = Long.parseLong
-                (rangeHeader.substring(slashPos + 1, rangeHeader.length()));
-        } catch (NumberFormatException e) {
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST);
-            return null;
-        }
+        range.start = contentRange.getStart();
+        range.end = contentRange.getEnd();
+        range.length = contentRange.getLength();
 
         if (!range.validate()) {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST);
@@ -1437,7 +1439,6 @@ public class DefaultServlet extends HttpServlet {
         }
 
         return range;
-
     }
 
 
@@ -1506,7 +1507,7 @@ public class DefaultServlet extends HttpServlet {
             return FULL;
         }
 
-        Ranges ranges = Ranges.parseRanges(new StringReader(rangeHeader));
+        Ranges ranges = Ranges.parse(new StringReader(rangeHeader));
 
         if (ranges == null) {
             // The Range header is present but not formatted correctly.

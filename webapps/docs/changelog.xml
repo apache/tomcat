@@ -61,9 +61,12 @@
       </fix>
       <fix>
         Add an option to the default servlet to disable processing of PUT
-        requests with Range headers as partial PUTs. The default behaviour
-        (processing as partial PUT) is unchanged. Based on a pull request by
-        zhanhb. (markt)
+        requests with Content-Range headers as partial PUTs. The default
+        behaviour (processing as partial PUT) is unchanged. Based on a pull
+        request by zhanhb. (markt)
+      </fix>
+      <fix>
+        Improve parsing of Content-Range headers. (markt)
       </fix>
     </changelog>
   </subsection>
