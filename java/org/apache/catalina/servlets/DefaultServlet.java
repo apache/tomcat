@@ -271,6 +271,12 @@ public class DefaultServlet extends HttpServlet {
      */
     protected transient SortManager sortManager;
 
+    /**
+     * Flag that indicates whether partial PUTs are permitted.
+     */
+    private boolean allowPartialPut = true;
+
+
     // --------------------------------------------------------- Public Methods
 
     /**
@@ -370,6 +376,10 @@ public class DefaultServlet extends HttpServlet {
 
                 sortManager = new SortManager(sortDirectoriesFirst);
             }
+        }
+
+        if (getServletConfig().getInitParameter("allowPartialPut") != null) {
+            allowPartialPut = Boolean.parseBoolean(getServletConfig().getInitParameter("allowPartialPut"));
         }
     }
 
@@ -1443,6 +1453,18 @@ public class DefaultServlet extends HttpServlet {
     protected ArrayList<Range> parseRange(HttpServletRequest request,
             HttpServletResponse response,
             WebResource resource) throws IOException {
+
+        if (!"GET".equals(request.getMethod())) {
+            // RFC 7233#3.1 clarifies the intention of RFC 2616 was to only
+            // allow Range headers on GET requests. However, many people
+            // incorrectly read RFC 2616#14.35.1 as allowing partial PUT and
+            // implemented. Tomcat was one such implementation. It is optionally
+            // allowed to retain compatibility with clients that use it.
+            if (!allowPartialPut || !"PUT".equals(request.getMethod())) {
+                return FULL;
+            }
+        }
+
 
         // Checking If-Range
         String headerValue = request.getHeader("If-Range");

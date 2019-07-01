@@ -59,6 +59,12 @@
         When comparing a date from a <code>If-Range</code> header, an exact
         match is required. Based on a pull request by zhanhb. (markt)
       </fix>
+      <fix>
+        Add an option to the default servlet to disable processing of PUT
+        requests with Range headers as partial PUTs. The default behaviour
+        (processing as partial PUT) is unchanged. Based on a pull request by
+        zhanhb. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
