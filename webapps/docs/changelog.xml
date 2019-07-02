@@ -89,6 +89,10 @@
         HTTPS connector configured to use NIO or NIO with OpenSSL 1.1.1 or
         later. (markt)
       </fix>
+      <fix>
+        Once a URI is identified as invalid don't attempt to process it further.
+        Based on a PR by Alex Repert. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">

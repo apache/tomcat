@@ -637,13 +637,14 @@ public class CoyoteAdapter implements Adapter {
                 response.sendError(400, "Invalid URI: " + ioe.getMessage());
             }
             // Normalization
-            if (!normalize(req.decodedURI())) {
-                response.sendError(400, "Invalid URI");
-            }
-            // Character decoding
-            convertURI(decodedURI, request);
-            // Check that the URI is still normalized
-            if (!checkNormalize(req.decodedURI())) {
+            if (normalize(req.decodedURI())) {
+                // Character decoding
+                convertURI(decodedURI, request);
+                // Check that the URI is still normalized
+                if (!checkNormalize(req.decodedURI())) {
+                    response.sendError(400, "Invalid URI");
+                }
+            } else {
                 response.sendError(400, "Invalid URI");
             }
         } else {
