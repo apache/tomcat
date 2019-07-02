@@ -1449,7 +1449,7 @@ public class DefaultServlet extends HttpServlet {
             osWriter.flush();
             return new ByteArrayInputStream(stream.toByteArray());
         } catch (TransformerException e) {
-            throw new ServletException("XSL transformer error", e);
+            throw new ServletException(sm.getString("defaultServlet.xslError"), e);
         } finally {
             if (Globals.IS_SECURITY_ENABLED) {
                 PrivilegedSetTccl pa = new PrivilegedSetTccl(original);
