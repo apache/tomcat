@@ -80,6 +80,27 @@
         that changes to <code>$CATALINA_BASE/conf/tomcat-users.xml</code> will
         now take effect a short time after the file is saved. (markt)
       </add>
+      <fix>
+        Improve parsing of Range request headers. (markt)
+      </fix>
+      <fix>
+        Range headers that specify a range unit Tomcat does not recognise should
+        be ignored rather than triggering a 416 response. Based on a pull
+        request by zhanhb. (markt)
+      </fix>
+      <fix>
+        When comparing a date from a <code>If-Range</code> header, an exact
+        match is required. Based on a pull request by zhanhb. (markt)
+      </fix>
+      <fix>
+        Add an option to the default servlet to disable processing of PUT
+        requests with Content-Range headers as partial PUTs. The default
+        behaviour (processing as partial PUT) is unchanged. Based on a pull
+        request by zhanhb. (markt)
+      </fix>
+      <fix>
+        Improve parsing of Content-Range headers. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
