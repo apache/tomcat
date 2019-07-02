@@ -349,7 +349,6 @@ public class TestCoyoteAdapter extends TomcatBaseTest {
     public void testCheckNormalize() {
         doTestCheckNormalize("/url", true);
 
-        doTestCheckNormalize("", false);
         doTestCheckNormalize("..", false);
         doTestCheckNormalize("/.", false);
         doTestCheckNormalize("/..", false);
