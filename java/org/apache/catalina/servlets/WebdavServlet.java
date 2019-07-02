@@ -1825,6 +1825,11 @@ public class WebdavServlet extends DefaultServlet {
         } else {
 
             if (object instanceof Resource) {
+                // WebDAV Litmus test attempts to copy/move a file over a collection
+                // Need to remove trailing / from destination to enable test to pass
+                if (dest.endsWith("/") && dest.length() > 1) {
+                    dest = dest.substring(0, dest.length() - 1);
+                }
                 try {
                     dirContext.bind(dest, object);
                 } catch (NamingException e) {

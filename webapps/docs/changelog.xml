@@ -135,6 +135,10 @@
         <code>Allow</code> header and a method listed in the <code>Allow</code>
         header will not return a 405 status code. (markt)
       </fix>
+      <fix>
+        Correct two failing tests from the Litmus test suite for WebDAV when
+        copying/moving a file over a collection. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
