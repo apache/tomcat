@@ -106,6 +106,9 @@
         <code>HttpServlet</code> is relied upon to generate the HEAD response
         and the GET response uses chunking. (markt)
       </fix>
+      <update>
+        Update the recommended minimum Tomcat Native version to 1.2.23. (markt)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Coyote">
