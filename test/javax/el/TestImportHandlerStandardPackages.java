@@ -96,8 +96,6 @@ public class TestImportHandlerStandardPackages {
             Enumeration<URL> resources = cl.getResources(path);
             while (resources.hasMoreElements()) {
                 URL resource = resources.nextElement();
-                // Debugging for Gump failure
-                System.out.println("Scanning: [" + resource + "]");
                 URI uri = resource.toURI();
                 // Gump includes some JARs on classpath - skip them
                 if (!"file".equals(uri.getScheme())) {
