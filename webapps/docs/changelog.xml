@@ -101,6 +101,11 @@
       <fix>
         Improve parsing of Content-Range headers. (markt)
       </fix>
+      <fix>
+        Ensure that the HEAD response is consistent with the GET response when
+        <code>HttpServlet</code> is relied upon to generate the HEAD response
+        and the GET response uses chunking. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
