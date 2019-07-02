@@ -68,6 +68,9 @@
       <fix>
         Improve parsing of Content-Range headers. (markt)
       </fix>
+      <update>
+        Update the recommended minimum Tomcat Native version to 1.2.23. (markt)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Coyote">
