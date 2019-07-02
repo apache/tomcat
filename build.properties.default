@@ -129,11 +129,11 @@ wsdl4j-lib.loc=${base-maven.loc}/wsdl4j/wsdl4j/${wsdl4j-lib.version}/wsdl4j-${ws
 # http://download.eclipse.org/eclipse/downloads/drops4/R-4.10-201812060815/
 # http://download.eclipse.org/eclipse/downloads/drops4/R-4.10-201812060815/checksum/eclipse-4.10-SUMSSHA512
 #
-jdt.version=4.10
-jdt.release=R-4.10-201812060815
+jdt.version=4.12
+jdt.release=R-4.12-201906051800/
 jdt.checksum.enabled=true
 jdt.checksum.algorithm=SHA-512
-jdt.checksum.value=6528d1933d752f909e61456f1a3cbb3ae3999d263701a459e6f4fc33f97f793ec0cfbe7a6408b02bd67deb8ec9371659d54e33216d8075f779579df614465753
+jdt.checksum.value=7d38921ae374a5112e7ed5596d85955b608ddf74849373d7a74b199961514807e749d8c8cad89871fa1fdd5e14bc6ec471665546a9f8d313da5c963589c307b0
 jdt.home=${base.path}/ecj-${jdt.version}
 jdt.jar=${jdt.home}/ecj-${jdt.version}.jar
 # The download will be moved to the archive area eventually. We are taking care of that in advance.

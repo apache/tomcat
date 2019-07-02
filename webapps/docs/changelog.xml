@@ -100,6 +100,9 @@
         Include file names if SMAP processor is unable to delete or rename a
         class file during SMAP generation. (markt)
       </add>
+      <update>
+        Update to the Eclipse JDT compiler 4.12. (markt)
+      </update>
     </changelog>
   </subsection>
   <subsection name="WebSocket">

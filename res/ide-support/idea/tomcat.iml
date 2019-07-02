@@ -70,7 +70,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$TOMCAT_BUILD_LIBS$/ecj-4.10/ecj-4.10.jar!/" />
+          <root url="jar://$TOMCAT_BUILD_LIBS$/ecj-4.12/ecj-4.12.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
