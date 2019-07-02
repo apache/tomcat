@@ -139,6 +139,9 @@
         Correct two failing tests from the Litmus test suite for WebDAV when
         copying/moving a file over a collection. (markt)
       </fix>
+      <update>
+        Update the recommended minimum Tomcat Native version to 1.2.23. (markt)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Coyote">
