@@ -85,6 +85,10 @@
         Fix typo in UTF-32LE charset name. Patch by zhanhb vi Github.
         (fschumacher)
       </fix>
+      <fix>
+        Once a URI is identified as invalid don't attempt to process it further.
+        Based on a PR by Alex Repert. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
