@@ -385,7 +385,7 @@ public class TestArrayELResolver {
         Assert.assertFalse(context.isPropertyResolved());
     }
 
-    private static enum MethodUnderTest {
+    private enum MethodUnderTest {
         GET_VALUE, SET_VALUE, GET_TYPE
     }
 

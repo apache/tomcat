@@ -203,11 +203,11 @@ public class TestImportHandler {
     public void testImportStatic01() {
         ImportHandler handler = new ImportHandler();
 
-        handler.importStatic("org.apache.tomcat.util.buf.Constants.Package");
+        handler.importStatic("org.apache.tomcat.util.scan.Constants.Package");
 
         Class<?> result = handler.resolveStatic("Package");
 
-        Assert.assertEquals(org.apache.tomcat.util.buf.Constants.class, result);
+        Assert.assertEquals(org.apache.tomcat.util.scan.Constants.class, result);
     }
 
 
