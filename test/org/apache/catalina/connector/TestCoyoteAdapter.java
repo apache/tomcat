@@ -326,6 +326,10 @@ public class TestCoyoteAdapter extends TomcatBaseTest {
     @Test
     public void testNormalize01() {
         doTestNormalize("/foo/../bar", "/bar");
+    }
+
+    @Test
+    public void testNormalize02() {
         doTestNormalize("..", null);
     }
 
@@ -346,17 +350,13 @@ public class TestCoyoteAdapter extends TomcatBaseTest {
     }
 
     @Test
-    public void testCheckNormalize() {
+    public void testCheckNormalize01() {
         doTestCheckNormalize("/url", true);
+    }
 
+    @Test
+    public void testCheckNormalize02() {
         doTestCheckNormalize("..", false);
-        doTestCheckNormalize("/.", false);
-        doTestCheckNormalize("/..", false);
-        doTestCheckNormalize("/./", false);
-        doTestCheckNormalize("//", false);
-        doTestCheckNormalize("/../", false);
-        doTestCheckNormalize("\\", false);
-        doTestCheckNormalize("\0", false);
     }
 
     private void doTestCheckNormalize(String input, boolean expected) {
