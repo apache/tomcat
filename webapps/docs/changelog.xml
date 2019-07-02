@@ -81,7 +81,8 @@
         <bug>63523</bug>: Restore SSLUtilBase methods as protected to preserve
         compatibility. (remm)
       </fix>
-      <fix>Fix typo in UTF-32LE charset name. Patch by zhanhb vi Github.
+      <fix>
+        Fix typo in UTF-32LE charset name. Patch by zhanhb vi Github.
         (fschumacher)
       </fix>
     </changelog>
