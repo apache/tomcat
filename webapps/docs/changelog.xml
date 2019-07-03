@@ -147,6 +147,10 @@
         Refactor Hostname validation to improve performance. Patch provided by
         Uwe Hees. (markt)
       </scode>
+      <fix>
+        Fix to avoid the possibility of long poll times for individual pollers
+        when using mutliple pollers with APR. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
