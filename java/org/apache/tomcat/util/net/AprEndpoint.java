@@ -1534,6 +1534,8 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
                         boolean reset = false;
 
                         int rv = 0;
+                        // Reset the nextPollerTime
+                        nextPollerTime = pollerTime;
                         // Iterate on each pollers, but no need to poll empty pollers
                         if (pollerSpace[i] < actualPollerSize) {
                             rv = Poll.poll(pollers[i], nextPollerTime, desc, true);
