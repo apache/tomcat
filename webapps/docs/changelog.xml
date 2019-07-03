@@ -92,6 +92,10 @@
         Once a URI is identified as invalid don't attempt to process it further.
         Based on a PR by Alex Repert. (markt)
       </fix>
+      <fix>
+        Fix to avoid the possibility of long poll times for individual pollers
+        when using mutliple pollers with APR. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
