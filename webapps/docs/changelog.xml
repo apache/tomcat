@@ -96,6 +96,11 @@
         Fix to avoid the possibility of long poll times for individual pollers
         when using mutliple pollers with APR. (markt)
       </fix>
+      <fix>
+        Refactor the fix for <bug>63205</bug> so it only applies when using
+        PKCS12 keystores as regressions have been reported with some other
+        keystore types. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">

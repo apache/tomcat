@@ -52,9 +52,7 @@ public class KeyStoreUtil {
      */
     public static void load(KeyStore keystore, InputStream is, char[] storePass)
             throws NoSuchAlgorithmException, CertificateException, IOException {
-        if (is == null) {
-            keystore.load(null, storePass);
-        } else {
+        if (keystore.getType().equals("PKCS12")) {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             byte[] buf = new byte[8192];
             int numRead;
@@ -67,6 +65,8 @@ public class KeyStoreUtil {
             ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
 
             keystore.load(bais, storePass);
+        } else {
+            keystore.load(is, storePass);
         }
     }
 }
