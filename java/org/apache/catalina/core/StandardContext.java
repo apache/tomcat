@@ -116,6 +116,7 @@ import org.apache.tomcat.JarScanner;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.IntrospectionUtils;
 import org.apache.tomcat.util.buf.StringUtils;
+import org.apache.tomcat.util.compat.JreCompat;
 import org.apache.tomcat.util.descriptor.XmlIdentifiers;
 import org.apache.tomcat.util.descriptor.web.ApplicationParameter;
 import org.apache.tomcat.util.descriptor.web.ErrorPage;
@@ -329,8 +330,10 @@ public class StandardContext extends ContainerBase
     /**
      * The "follow standard delegation model" flag that will be used to
      * configure our ClassLoader.
+     * Graal cannot actually load a class from the webapp classloader,
+     * so delegate by default.
      */
-    private boolean delegate = false;
+    private boolean delegate = JreCompat.isGraalAvailable();
 
 
     private boolean denyUncoveredHttpMethods;

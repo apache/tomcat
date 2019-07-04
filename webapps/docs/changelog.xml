@@ -45,6 +45,13 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 9.0.23 (markt)" rtext="in development">
+  <subsection name="Other">
+    <changelog>
+      <fix>
+        Improvements and workarounds for GraalVM native images. (remm)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 9.0.22 (markt)" rtext="release in progress">
   <subsection name="Catalina">

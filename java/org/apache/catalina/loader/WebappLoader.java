@@ -40,6 +40,7 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.buf.UDecoder;
+import org.apache.tomcat.util.compat.JreCompat;
 import org.apache.tomcat.util.modeler.Registry;
 import org.apache.tomcat.util.res.StringManager;
 
@@ -624,7 +625,10 @@ public class WebappLoader extends LifecycleMBeanBase
             }
             return false;
         } else {
-            log.info(sm.getString("webappLoader.unknownClassLoader", loader, loader.getClass()));
+            // Ignore Graal "unknown" classloader
+            if (!JreCompat.isGraalAvailable()) {
+                log.info(sm.getString("webappLoader.unknownClassLoader", loader, loader.getClass()));
+            }
             return false;
         }
         return true;
