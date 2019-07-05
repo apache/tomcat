@@ -94,7 +94,7 @@ in `/WEB-INF/classes` and `/WEB-INF/lib`, must be included as part of the tomcat
 Run Tomcat with the agent in full trace mode.
 ```
 cd $TOMCAT_MAVEN
-$JAVA_HOME/bin/java -agentlib:native-image-agent=trace-output=$TOMCAT_MAVEN/target/trace-file.json -jar target/tomcat-maven-1.0.jar
+$JAVA_HOME/bin/java -agentlib:native-image-agent=trace-output=$TOMCAT_MAVEN/target/trace-file.json -Dcatalina.base=. -Djava.util.logging.config.file=conf/logging.properties -Djava.util.logging.manager=org.apache.juli.ClassLoaderLogManager -jar target/tomcat-maven-1.0.jar
 ```
 Then exercise necessary paths of your service with the Tomcat configuration. Any changes to the Tomcat configuration requires running
 the substrate VM with the agent again.
@@ -102,6 +102,6 @@ the substrate VM with the agent again.
 Generate the final json files using native-image-configuration then use native image using the generated reflection metadata:
 ```
 $JAVA_HOME/bin/native-image-configure generate --trace-input=$TOMCAT_MAVEN/target/trace-file.json --output-dir=$TOMCAT_MAVEN/target
-$JAVA_HOME/bin/native-image --allow-incomplete-classpath -H:+ReportUnsupportedElementsAtRuntime -H:EnableURLProtocols=jar -H:ConfigurationFileDirectories=$TOMCAT_MAVEN/target/ -H:ReflectionConfigurationFiles=$TOMCAT_MAVEN/tomcat-reflection.json -H:ResourceConfigurationFiles=$TOMCAT_MAVEN/tomcat-resource.json -H:ResourceConfigurationFiles=$TOMCAT_MAVEN/tomcat-resource.json -jar $TOMCAT_MAVEN/target/tomcat-maven-1.0.jar
+$JAVA_HOME/bin/native-image --no-server --allow-incomplete-classpath --initialize-at-build-time=org.eclipse.jdt,org.apache.el.parser.SimpleNode,javax.servlet.jsp.JspFactory,org.apache.jasper.servlet.JasperInitializer,org.apache.jasper.runtime.JspFactoryImpl -H:+ReportUnsupportedElementsAtRuntime -H:+ReportExceptionStackTraces -H:EnableURLProtocols=jar -H:ConfigurationFileDirectories=$TOMCAT_MAVEN/target/ -H:ReflectionConfigurationFiles=$TOMCAT_MAVEN/tomcat-reflection.json -H:ResourceConfigurationFiles=$TOMCAT_MAVEN/tomcat-resource.json -H:ResourceConfigurationFiles=$TOMCAT_MAVEN/tomcat-resource.json -jar $TOMCAT_MAVEN/target/tomcat-maven-1.0.jar
 ./tomcat-maven-1.0 -Dcatalina.base=. -Djava.util.logging.config.file=conf/logging.properties -Djava.util.logging.manager=org.apache.juli.ClassLoaderLogManager
 ```
