@@ -298,4 +298,4 @@ cobertura.checksum.value=63a8c5b3f5c1226fcc52cc9c9ea2a812|705d23e5a8815aff3bc4ad
 cobertura.home=${base.path}/cobertura-${cobertura.version}
 cobertura.jar=${cobertura.home}/cobertura-${cobertura.version}.jar
 cobertura.lib=${cobertura.home}/lib
-cobertura.loc=${base-sf.loc}/cobertura/cobertura-2.0.3-bin.tar.gz
+cobertura.loc=${base-sf.loc}/cobertura/cobertura-${cobertura.version}-bin.tar.gz
