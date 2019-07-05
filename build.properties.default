@@ -103,6 +103,9 @@ base-maven.loc=https://repo.maven.apache.org/maven2
 # Mirror, was used when there were problems with the main SF downloads site
 # base-sf.loc=https://sunet.dl.sourceforge.net
 
+# checkstyle-backport-jre6
+base-checkstyle.loc=https://rnveach.github.io/checkstyle-backport-jre6/maven2
+
 # ----- Webservices - JAX RPC -----
 jaxrpc-lib.version=1.1-rc4
 jaxrpc-lib.checksum.enabled=true
@@ -247,14 +250,15 @@ objenesis.jar=${objenesis.home}/objenesis-${objenesis.version}.jar
 objenesis.loc=${base-maven.loc}/org/objenesis/objenesis/${objenesis.version}/objenesis-${objenesis.version}.jar
 
 # ----- Checkstyle, version 6.16 or later -----
-# Checksums are available at https://sourceforge.net/projects/checkstyle/files/OldFiles/6.17/
-checkstyle.version=6.17
+# Checkstyle 7 requires Java 8
+# Therefore, use checkstyle-backport-jre6
+checkstyle.version=8.22
 checkstyle.checksum.enabled=true
 checkstyle.checksum.algorithm=MD5|SHA-1
-checkstyle.checksum.value=9180ab8b8219b262bfe88f26fd95d26d|11a02d7b0374f8a82fbd76361a69756faa6aefa0
-checkstyle.home=${base.path}/checkstyle-${checkstyle.version}
+checkstyle.checksum.value=03cb9ae24d4103134095ccd650b3bbb7|32d2996bedc97ee4e22c50e6ff5a8b571c8d816e
+checkstyle.home=${base.path}/checkstyle-backport-jre6-${checkstyle.version}
 checkstyle.jar=${checkstyle.home}/checkstyle-${checkstyle.version}-all.jar
-checkstyle.loc=${base-sf.loc}/checkstyle/checkstyle/${checkstyle.version}/checkstyle-${checkstyle.version}-all.jar
+checkstyle.loc=${base-checkstyle.loc}/com/puppycrawl/tools/checkstyle-backport-jre6/${checkstyle.version}/checkstyle-backport-jre6-${checkstyle.version}-all.jar
 
 # ----- Cobertura code coverage tool -----
 cobertura.version=2.1.1

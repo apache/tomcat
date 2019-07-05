@@ -45,6 +45,15 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 8.5.44 (markt)" rtext="in development">
+  <subsection name="Other">
+    <changelog>
+      <update>
+        Switch from Checkstyle to the JRE6 backport and update to version 8.22.
+        This allows Tomcat 8.5 to use the newer Checkstyle releases while still
+        building with Java 7. (markt)
+      </update>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 8.5.43 (markt)" rtext="release in progress">
   <subsection name="Catalina">
