@@ -234,6 +234,9 @@
       <update>
         Update JUnit to version 4.12. (markt)
       </update>
+      <update>
+        Update optional WSDL dependency to 1.6.3. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
