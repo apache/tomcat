@@ -253,10 +253,10 @@ hamcrest.loc=${base-maven.loc}/org/hamcrest/hamcrest-core/${hamcrest.version}/ha
 easymock.version=3.2
 easymock.checksum.enabled=true
 easymock.checksum.algorithm=MD5|SHA-1
-easymock.checksum.value=2d914151580d6749ba0921be7eda705a|9794114433b4788b5d6498164311ecb3a25ff262
+easymock.checksum.value=0da4291328e18798621c36fdf8bc4c3a|00c82f7fa3ef377d8954b1db25123944b5af2ba4
 easymock.home=${base.path}/easymock-${easymock.version}
 easymock.jar=${easymock.home}/easymock-${easymock.version}.jar
-easymock.loc=${base-sf.loc}/easymock/easymock-${easymock.version}.zip
+easymock.loc=${base-maven.loc}/org/easymock/easymock/${easymock.version}/easymock-${easymock.version}.jar
 
 # ----- cglib, used by EasyMock, version 2.2 or later -----
 cglib.version=2.2.3
@@ -270,11 +270,11 @@ cglib.loc=${base-sf.loc}/cglib/cglib-nodep-${cglib.version}.jar
 # ----- objenesis, used by EasyMock, version 1.2 or later -----
 objenesis.version=1.2
 objenesis.checksum.enabled=true
-objenesis.checksum.algorithm=SHA-1
-objenesis.checksum.value=2359e04aca6f4f171f92ff77489d1669043dd536
+objenesis.checksum.algorithm=MD5|SHA-1
+objenesis.checksum.value=bee117291d50b41b8e8cf0ac5435df1d|bfcb0539a071a4c5a30690388903ac48c0667f2a
 objenesis.home=${base.path}/objenesis-${objenesis.version}
 objenesis.jar=${objenesis.home}/objenesis-${objenesis.version}.jar
-objenesis.loc=https://bintray.com/easymock/distributions/download_file?file_path=objenesis-${objenesis.version}-bin.zip
+objenesis.loc=${base-maven.loc}/org/objenesis/objenesis/${objenesis.version}/objenesis-${objenesis.version}.jar
 
 # ----- Checkstyle, version 6.0 or later -----
 # Limited to 6.1.1 since that is the latest release that supports Java 6
