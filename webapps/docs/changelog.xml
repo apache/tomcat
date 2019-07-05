@@ -45,6 +45,15 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 9.0.23 (markt)" rtext="in development">
+  <subsection name="Coyote">
+    <changelog>
+      <scode>
+        Refactor the APR poller to always use a single pollset now that the
+        Windows operating systems that required multiple smaller pollsets to be
+        used are no longer supported. (markt)
+      </scode>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <fix>
