@@ -261,7 +261,7 @@ cobertura.checksum.algorithm=MD5|SHA-1
 cobertura.checksum.value=4f46638aa8e4d89565c038092398ea06|99cb44d36555feedcedc46263c23c2f5394ef342
 cobertura.home=${base.path}/cobertura-${cobertura.version}
 cobertura.jar=${cobertura.home}/cobertura-${cobertura.version}.jar
-cobertura.loc=${base-sf.loc}/cobertura/cobertura-2.1.1-bin.tar.gz
+cobertura.loc=${base-sf.loc}/cobertura/cobertura-${cobertura.version}-bin.tar.gz
 
 # ----- Findbugs -----
 findbugs.version=3.1.12
