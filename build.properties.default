@@ -277,7 +277,7 @@ objenesis.jar=${objenesis.home}/objenesis-${objenesis.version}.jar
 objenesis.loc=${base-maven.loc}/org/objenesis/objenesis/${objenesis.version}/objenesis-${objenesis.version}.jar
 
 # ----- Checkstyle, version 6.0 or later -----
-# Limited to 6.1.1 since that is the latest release that supports Java 6
+# Checkstyle 6.1.1 is the last release that supports Java 6
 # Gump uses the latest checkstyle and the configuration format is incompatible
 # between the latest version and 6.1.1
 # Therefore, use checkstyle-backport-jre6
@@ -286,9 +286,8 @@ checkstyle.checksum.enabled=true
 checkstyle.checksum.algorithm=MD5|SHA-1
 checkstyle.checksum.value=e268f16a5cab5b291546fae909e3f9b3|b626c3e518f315faf860b521807c31a03c9e2d8a
 checkstyle.home=${base.path}/checkstyle-backport-jre6-${checkstyle.version}
-checkstyle.loc=${base-checkstyle.loc}/com/puppycrawl/tools/checkstyle-backport-jre6/${checkstyle.version}/checkstyle-backport-jre6-${checkstyle.version}-all.jar
 checkstyle.jar=${checkstyle.home}/checkstyle-${checkstyle.version}-all.jar
-
+checkstyle.loc=${base-checkstyle.loc}/com/puppycrawl/tools/checkstyle-backport-jre6/${checkstyle.version}/checkstyle-backport-jre6-${checkstyle.version}-all.jar
 
 # ----- Cobertura code coverage tool -----
 cobertura.version=2.0.3
