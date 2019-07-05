@@ -281,10 +281,10 @@ objenesis.loc=${base-maven.loc}/org/objenesis/objenesis/${objenesis.version}/obj
 # Gump uses the latest checkstyle and the configuration format is incompatible
 # between the latest version and 6.1.1
 # Therefore, use checkstyle-backport-jre6
-checkstyle.version=8.17
+checkstyle.version=8.22
 checkstyle.checksum.enabled=true
 checkstyle.checksum.algorithm=MD5|SHA-1
-checkstyle.checksum.value=e268f16a5cab5b291546fae909e3f9b3|b626c3e518f315faf860b521807c31a03c9e2d8a
+checkstyle.checksum.value=03cb9ae24d4103134095ccd650b3bbb7|32d2996bedc97ee4e22c50e6ff5a8b571c8d816e
 checkstyle.home=${base.path}/checkstyle-backport-jre6-${checkstyle.version}
 checkstyle.jar=${checkstyle.home}/checkstyle-${checkstyle.version}-all.jar
 checkstyle.loc=${base-checkstyle.loc}/com/puppycrawl/tools/checkstyle-backport-jre6/${checkstyle.version}/checkstyle-backport-jre6-${checkstyle.version}-all.jar

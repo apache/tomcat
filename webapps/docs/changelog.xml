@@ -237,6 +237,9 @@
       <update>
         Update optional WSDL dependency to 1.6.3. (markt)
       </update>
+      <update>
+        Update Checkstyle to version 8.22. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
