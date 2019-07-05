@@ -59,6 +59,9 @@
       <fix>
         Improvements and workarounds for GraalVM native images. (remm)
       </fix>
+      <update>
+        Update Checkstyle to 8.22. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>

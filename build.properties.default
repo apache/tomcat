@@ -97,6 +97,7 @@ base-commons.loc.2=${base-apache.loc.2}/commons
 base-tomcat.loc.1=${base-apache.loc.1}/tomcat
 base-tomcat.loc.2=${base-apache.loc.2}/tomcat
 
+base-gh.loc=https://github.com
 base-sf.loc=https://downloads.sourceforge.net
 # repo.maven.apache.org is the same as repo2.maven.org
 base-maven.loc=https://repo.maven.apache.org/maven2
@@ -245,14 +246,13 @@ objenesis.jar=${objenesis.home}/objenesis-${objenesis.version}.jar
 objenesis.loc=${base-maven.loc}/org/objenesis/objenesis/${objenesis.version}/objenesis-${objenesis.version}.jar
 
 # ----- Checkstyle, version 6.16 or later -----
-# Checksums are available at https://sourceforge.net/projects/checkstyle/files/OldFiles/6.17/
-checkstyle.version=6.17
+checkstyle.version=8.22
 checkstyle.checksum.enabled=true
-checkstyle.checksum.algorithm=MD5|SHA-1
-checkstyle.checksum.value=9180ab8b8219b262bfe88f26fd95d26d|11a02d7b0374f8a82fbd76361a69756faa6aefa0
+checkstyle.checksum.algorithm=SHA-512
+checkstyle.checksum.value=d595e284ec440e20367b93a1835357f1c4c2cf77af4589caafdaa995aa9e8a341716ad59f5222fff484275f23c11beb71ad58792cc6cdbdb261e320724b9418f
 checkstyle.home=${base.path}/checkstyle-${checkstyle.version}
 checkstyle.jar=${checkstyle.home}/checkstyle-${checkstyle.version}-all.jar
-checkstyle.loc=${base-sf.loc}/checkstyle/checkstyle/${checkstyle.version}/checkstyle-${checkstyle.version}-all.jar
+checkstyle.loc=${base-gh.loc}/checkstyle/checkstyle/releases/download/checkstyle-${checkstyle.version}/checkstyle-${checkstyle.version}-all.jar
 
 # ----- Cobertura code coverage tool -----
 cobertura.version=2.1.1
