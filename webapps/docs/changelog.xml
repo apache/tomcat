@@ -228,6 +228,9 @@
         based test fails on non-English locales. Patch provided by Radosław
         Józwik. (markt)
       </fix>
+      <update>
+        Update JUnit to version 4.12. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>

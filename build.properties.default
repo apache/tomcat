@@ -232,10 +232,10 @@ commons-daemon.native.win.loc.1=${base-commons.loc.1}/daemon/binaries/windows/co
 commons-daemon.native.win.loc.2=${base-commons.loc.2}/daemon/binaries/windows/commons-daemon-${commons-daemon.version}-bin-windows.zip
 
 # ----- JUnit Unit Test Suite, version 4.11 or later -----
-junit.version=4.11
+junit.version=4.12
 junit.checksum.enabled=true
 junit.checksum.algorithm=MD5|SHA-1
-junit.checksum.value=3c42be5ea7cbf3635716abbb429cb90d|4e031bb61df09069aeb2bffb4019e7a5034a4ee0
+junit.checksum.value=5b38c40c97fbd0adee29f91e60405584|2973d150c0dc1fefe998f834810d68f278ea58ec
 junit.home=${base.path}/junit-${junit.version}
 junit.jar=${junit.home}/junit-${junit.version}.jar
 junit.loc=${base-maven.loc}/junit/junit/${junit.version}/junit-${junit.version}.jar
