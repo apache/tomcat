@@ -109,8 +109,8 @@ jaxrpc-lib.checksum.enabled=true
 jaxrpc-lib.checksum.algorithm=MD5|SHA-1
 jaxrpc-lib.checksum.value=4bebba22a4cdb9f68e16c45129770333|fe9371d33dc3e1646d4d13bde19614283eb998b1
 jaxrpc-lib.home=${base.path}/jaxrpc-${jaxrpc-lib.version}
-jaxrpc-lib.loc=${base-maven.loc}/geronimo-spec/geronimo-spec-jaxrpc/${jaxrpc-lib.version}/geronimo-spec-jaxrpc-${jaxrpc-lib.version}.jar
 jaxrpc-lib.jar=${jaxrpc-lib.home}/geronimo-spec-jaxrpc-${jaxrpc-lib.version}.jar
+jaxrpc-lib.loc=${base-maven.loc}/geronimo-spec/geronimo-spec-jaxrpc/${jaxrpc-lib.version}/geronimo-spec-jaxrpc-${jaxrpc-lib.version}.jar
 
 # ----- Webservices - WSDL4J -----
 wsdl4j-lib.version=1.6.3
@@ -118,11 +118,11 @@ wsdl4j-lib.checksum.enabled=true
 wsdl4j-lib.checksum.algorithm=MD5|SHA-1
 wsdl4j-lib.checksum.value=cfc28d89625c5e88589aec7a9aee0208|6d106a6845a3d3477a1560008479312888e94f2f
 wsdl4j-lib.home=${base.path}/wsdl4j-${wsdl4j-lib.version}
-wsdl4j-lib.loc=${base-maven.loc}/wsdl4j/wsdl4j/${wsdl4j-lib.version}/wsdl4j-${wsdl4j-lib.version}.jar
 wsdl4j-lib.jar=${wsdl4j-lib.home}/wsdl4j-${wsdl4j-lib.version}.jar
+wsdl4j-lib.loc=${base-maven.loc}/wsdl4j/wsdl4j/${wsdl4j-lib.version}/wsdl4j-${wsdl4j-lib.version}.jar
 
 # ----- Eclipse JDT, version 4.5.1 or later -----#
-# See https://wiki.apache.org/tomcat/JDTCoreBatchCompiler before updating
+# See https://cwiki.apache.org/confluence/display/TOMCAT/Managing+Tomcat%27s+Dependency+on+the+Eclipse+JDT+Core+Batch+Compiler
 #
 # 4.6.3 is the latest release that runs on Java 7
 # Later versions can be used but the official builds need to use 4.6.3
@@ -253,8 +253,8 @@ checkstyle.checksum.enabled=true
 checkstyle.checksum.algorithm=MD5|SHA-1
 checkstyle.checksum.value=9180ab8b8219b262bfe88f26fd95d26d|11a02d7b0374f8a82fbd76361a69756faa6aefa0
 checkstyle.home=${base.path}/checkstyle-${checkstyle.version}
-checkstyle.loc=${base-sf.loc}/checkstyle/checkstyle/${checkstyle.version}/checkstyle-${checkstyle.version}-all.jar
 checkstyle.jar=${checkstyle.home}/checkstyle-${checkstyle.version}-all.jar
+checkstyle.loc=${base-sf.loc}/checkstyle/checkstyle/${checkstyle.version}/checkstyle-${checkstyle.version}-all.jar
 
 # ----- Cobertura code coverage tool -----
 cobertura.version=2.1.1
@@ -263,7 +263,6 @@ cobertura.checksum.algorithm=MD5|SHA-1
 cobertura.checksum.value=4f46638aa8e4d89565c038092398ea06|99cb44d36555feedcedc46263c23c2f5394ef342
 cobertura.home=${base.path}/cobertura-${cobertura.version}
 cobertura.jar=${cobertura.home}/cobertura-${cobertura.version}.jar
-cobertura.lib=${cobertura.home}/lib
 cobertura.loc=${base-sf.loc}/cobertura/cobertura-2.1.1-bin.tar.gz
 
 # ----- Findbugs -----
