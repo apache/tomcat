@@ -681,21 +681,21 @@ public class ApplicationContext implements ServletContext {
         ServletContextAttributeEvent event =
           new ServletContextAttributeEvent(context.getServletContext(),
                                             name, value);
-        for (int i = 0; i < listeners.length; i++) {
-            if (!(listeners[i] instanceof ServletContextAttributeListener))
+        for (Object listener : listeners) {
+            if (!(listener instanceof ServletContextAttributeListener))
                 continue;
-            ServletContextAttributeListener listener =
-                (ServletContextAttributeListener) listeners[i];
+            ServletContextAttributeListener servletContextAttributeListener =
+                (ServletContextAttributeListener) listener;
             try {
                 context.fireContainerEvent("beforeContextAttributeRemoved",
-                                           listener);
-                listener.attributeRemoved(event);
+                        servletContextAttributeListener);
+                servletContextAttributeListener.attributeRemoved(event);
                 context.fireContainerEvent("afterContextAttributeRemoved",
-                                           listener);
+                        servletContextAttributeListener);
             } catch (Throwable t) {
                 ExceptionUtils.handleThrowable(t);
                 context.fireContainerEvent("afterContextAttributeRemoved",
-                                           listener);
+                        servletContextAttributeListener);
                 // FIXME - should we do anything besides log these?
                 log(sm.getString("applicationContext.attributeEvent"), t);
             }
@@ -739,33 +739,33 @@ public class ApplicationContext implements ServletContext {
                 new ServletContextAttributeEvent(context.getServletContext(),
                                                  name, value);
 
-        for (int i = 0; i < listeners.length; i++) {
-            if (!(listeners[i] instanceof ServletContextAttributeListener))
+        for (Object listener : listeners) {
+            if (!(listener instanceof ServletContextAttributeListener))
                 continue;
-            ServletContextAttributeListener listener =
-                (ServletContextAttributeListener) listeners[i];
+            ServletContextAttributeListener servletContextAttributeListener =
+                (ServletContextAttributeListener) listener;
             try {
                 if (replaced) {
                     context.fireContainerEvent
-                        ("beforeContextAttributeReplaced", listener);
-                    listener.attributeReplaced(event);
+                        ("beforeContextAttributeReplaced", servletContextAttributeListener);
+                    servletContextAttributeListener.attributeReplaced(event);
                     context.fireContainerEvent("afterContextAttributeReplaced",
-                                               listener);
+                            servletContextAttributeListener);
                 } else {
                     context.fireContainerEvent("beforeContextAttributeAdded",
-                                               listener);
-                    listener.attributeAdded(event);
+                            servletContextAttributeListener);
+                    servletContextAttributeListener.attributeAdded(event);
                     context.fireContainerEvent("afterContextAttributeAdded",
-                                               listener);
+                            servletContextAttributeListener);
                 }
             } catch (Throwable t) {
                 ExceptionUtils.handleThrowable(t);
                 if (replaced)
                     context.fireContainerEvent("afterContextAttributeReplaced",
-                                               listener);
+                            servletContextAttributeListener);
                 else
                     context.fireContainerEvent("afterContextAttributeAdded",
-                                               listener);
+                            servletContextAttributeListener);
                 // FIXME - should we do anything besides log these?
                 log(sm.getString("applicationContext.attributeEvent"), t);
             }
