@@ -62,6 +62,19 @@
       <update>
         Update Checkstyle to 8.22. (markt)
       </update>
+      <update>
+        Update to Commons Daemon 1.2.0. This changes the user configured by the
+        Windows installer for the Windows service from <code>Local System</code>
+        to the lower privileged <code>Local Service</code>. (markt)
+      </update>
+      <fix>
+        <bug>55969</bug>: Tighten up the security of the Apache Tomcat
+        installation created by the Windows installer. Change the default
+        shutdown port used by the Windows installer from <code>8005</code> to
+        <code>-1</code> (disabled). Limit access to the chosen installation
+        directory to local administrators, Local System and Local Service.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>

@@ -364,6 +364,22 @@ Section -post
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Apache Tomcat @VERSION_MAJOR_MINOR@ $TomcatServiceName" \
                    "UninstallString" "$\"$INSTDIR\Uninstall.exe$\" -ServiceName=$\"$TomcatServiceName$\""
 
+  ; Configure file permissions
+  ; S-1-5-19     LocalService
+  ; S-1-5-32-544 Local Administrators group
+  ; S-1-5-18     Local System
+  nsExec::ExecToStack 'icacls "$INSTDIR" /inheritance:r /grant *S-1-5-19:(OI)(CI)(F) /grant *S-1-5-32-544:(OI)(CI)(F) /grant *S-1-5-18:(OI)(CI)(F)'
+  Pop $0
+  Pop $1
+  StrCmp $0 "0" SetPermissionsOk
+    FileWrite $ServiceInstallLog "Install failed (setting file permissions): $0 $1$\r$\n"
+    MessageBox MB_YESNO|MB_ICONSTOP \
+      "Failed to set file permisisons.$\r$\nCheck your settings and permissions.$\r$\nIgnore and continue anyway (not recommended)?" \
+      /SD IDNO IDYES SetPermissionsOk
+  Quit
+  SetPermissionsOk:
+  ClearErrors
+
 SectionEnd
 
 !define ReadFromConfigIni "!insertmacro ReadFromConfigIni"
@@ -412,7 +428,7 @@ Function .onInit
 
   ;Initialize default values
   StrCpy $JavaHome ""
-  StrCpy $TomcatPortShutdown "8005"
+  StrCpy $TomcatPortShutdown "-1"
   StrCpy $TomcatPortHttp "8080"
   StrCpy $TomcatPortAjp "8009"
   StrCpy $TomcatMenuEntriesEnable "0"
