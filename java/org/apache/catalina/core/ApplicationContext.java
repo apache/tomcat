@@ -261,7 +261,7 @@ public class ApplicationContext implements ServletContext {
                 pathMB.setString(uri);
 
                 MappingData mappingData = new MappingData();
-                ((Engine) host.getParent()).getService().getMapper().map(hostMB, pathMB, null, mappingData);
+                service.getMapper().map(hostMB, pathMB, null, mappingData);
                 child = mappingData.context;
             }
         } catch (Throwable t) {
@@ -1010,8 +1010,7 @@ public class ApplicationContext implements ServletContext {
 
         // SSL not enabled by default as it can only used on its own
         // Context > Host > Engine > Service
-        Service s = ((Engine) context.getParent().getParent()).getService();
-        Connector[] connectors = s.findConnectors();
+        Connector[] connectors = service.findConnectors();
         // Need at least one SSL enabled connector to use the SSL session ID.
         for (Connector connector : connectors) {
             if (Boolean.TRUE.equals(connector.getAttribute("SSLEnabled"))) {
