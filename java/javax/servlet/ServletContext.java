@@ -46,7 +46,6 @@ import javax.servlet.descriptor.JspConfigDescriptor;
  * {@link ServletConfig} object, which the Web server provides the servlet when
  * the servlet is initialized.
  *
- * @author Various
  * @see Servlet#getServletConfig
  * @see ServletConfig#getServletContext
  */
@@ -58,6 +57,15 @@ public interface ServletContext {
      * @since Servlet 3.0
      */
     public static final String ORDERED_LIBS = "javax.servlet.context.orderedLibs";
+
+    /**
+     * Return the main path associated with this context.
+     *
+     * @return The main context path
+     *
+     * @since Servlet 2.5
+     */
+    public String getContextPath();
 
     /**
      * Returns a <code>ServletContext</code> object that corresponds to a
@@ -81,8 +89,6 @@ public interface ServletContext {
      * @see RequestDispatcher
      */
     public ServletContext getContext(String uripath);
-
-    public String getContextPath();
 
     /**
      * Returns the major version of the Java Servlet API that this servlet
@@ -286,46 +292,54 @@ public interface ServletContext {
     public RequestDispatcher getNamedDispatcher(String name);
 
     /**
+     * Do not use. This method was originally defined to retrieve a servlet from
+     * a <code>ServletContext</code>. In this version, this method always
+     * returns <code>null</code> and remains only to preserve binary
+     * compatibility. This method will be permanently removed in a future
+     * version of the Java Servlet API.
+     * <p>
+     * In lieu of this method, servlets can share information using the
+     * <code>ServletContext</code> class and can perform shared business logic
+     * by invoking methods on common non-servlet classes.
+     *
+     * @param name Not used
+     *
+     * @return Always <code>null</code>
+     *
+     * @throws ServletException never
+     *
      * @deprecated As of Java Servlet API 2.1, with no direct replacement.
-     *             <p>
-     *             This method was originally defined to retrieve a servlet from
-     *             a <code>ServletContext</code>. In this version, this method
-     *             always returns <code>null</code> and remains only to preserve
-     *             binary compatibility. This method will be permanently removed
-     *             in a future version of the Java Servlet API.
-     *             <p>
-     *             In lieu of this method, servlets can share information using
-     *             the <code>ServletContext</code> class and can perform shared
-     *             business logic by invoking methods on common non-servlet
-     *             classes.
      */
     @SuppressWarnings("dep-ann")
     // Spec API does not use @Deprecated
     public Servlet getServlet(String name) throws ServletException;
 
     /**
+     * Do not use. This method was originally defined to return an
+     * <code>Enumeration</code> of all the servlets known to this servlet
+     * context. In this version, this method always returns an empty enumeration
+     * and remains only to preserve binary compatibility. This method will be
+     * permanently removed in a future version of the Java Servlet API.
+     *
+     * @return Always and empty Enumeration
+     *
      * @deprecated As of Java Servlet API 2.0, with no replacement.
-     *             <p>
-     *             This method was originally defined to return an
-     *             <code>Enumeration</code> of all the servlets known to this
-     *             servlet context. In this version, this method always returns
-     *             an empty enumeration and remains only to preserve binary
-     *             compatibility. This method will be permanently removed in a
-     *             future version of the Java Servlet API.
      */
     @SuppressWarnings("dep-ann")
     // Spec API does not use @Deprecated
     public Enumeration<Servlet> getServlets();
 
     /**
+     * Do not use. This method was originally defined to return an
+     * <code>Enumeration</code> of all the servlet names known to this context.
+     * In this version, this method always returns an empty
+     * <code>Enumeration</code> and remains only to preserve binary
+     * compatibility. This method will be permanently removed in a future
+     * version of the Java Servlet API.
+     *
+     * @return Always and empty Enumeration
+     *
      * @deprecated As of Java Servlet API 2.1, with no replacement.
-     *             <p>
-     *             This method was originally defined to return an
-     *             <code>Enumeration</code> of all the servlet names known to
-     *             this context. In this version, this method always returns an
-     *             empty <code>Enumeration</code> and remains only to preserve
-     *             binary compatibility. This method will be permanently removed
-     *             in a future version of the Java Servlet API.
      */
     @SuppressWarnings("dep-ann")
     // Spec API does not use @Deprecated
@@ -343,6 +357,9 @@ public interface ServletContext {
     public void log(String msg);
 
     /**
+     * Do not use.
+     * @param exception The exception to log
+     * @param msg       The message to log with the exception
      * @deprecated As of Java Servlet API 2.1, use
      *             {@link #log(String message, Throwable throwable)} instead.
      *             <p>
@@ -437,10 +454,14 @@ public interface ServletContext {
     public Enumeration<String> getInitParameterNames();
 
     /**
-     * @param name
-     * @param value
-     * @return TODO
-     * @throws IllegalStateException
+     * Set the given initialisation parameter to the given value.
+     * @param name  Name of initialisation parameter
+     * @param value Value for initialisation parameter
+     * @return <code>true</code> if the call succeeds or <code>false</code> if
+     *         the call fails because an initialisation parameter with the same
+     *         name has already been set
+     * @throws IllegalStateException If initialisation of this ServletContext
+     *         has already completed
      * @throws UnsupportedOperationException    If called from a
      *    {@link ServletContextListener#contextInitialized(ServletContextEvent)}
      *    method of a {@link ServletContextListener} that was not defined in a
@@ -448,7 +469,7 @@ public interface ServletContext {
      *    {@link javax.servlet.annotation.WebListener}. For example, a
      *    {@link ServletContextListener} defined in a TLD would not be able to
      *    use this method.
-     * @since Servlet 3.0 TODO SERVLET3 - Add comments
+     * @since Servlet 3.0
      */
     public boolean setInitParameter(String name, String value);
 
@@ -531,9 +552,10 @@ public interface ServletContext {
     public String getServletContextName();
 
     /**
-     * @param servletName
-     * @param className
-     * @return TODO
+     * Register a servlet implementation for use in this ServletContext.
+     * @param servletName The name of the servlet to register
+     * @param className   The implementation class for the servlet
+     * @return The registration object that enables further configuration
      * @throws IllegalStateException
      *             If the context has already been initialised
      * @throws UnsupportedOperationException    If called from a
@@ -543,15 +565,15 @@ public interface ServletContext {
      *    {@link javax.servlet.annotation.WebListener}. For example, a
      *    {@link ServletContextListener} defined in a TLD would not be able to
      *    use this method.
-     * @since Servlet 3.0 TODO SERVLET3 - Add comments
+     * @since Servlet 3.0
      */
-    public ServletRegistration.Dynamic addServlet(String servletName,
-            String className);
+    public ServletRegistration.Dynamic addServlet(String servletName, String className);
 
     /**
-     * @param servletName
-     * @param servlet
-     * @return TODO
+     * Register a servlet instance for use in this ServletContext.
+     * @param servletName The name of the servlet to register
+     * @param servlet     The Servlet instance to register
+     * @return The registration object that enables further configuration
      * @throws IllegalStateException
      *             If the context has already been initialised
      * @throws UnsupportedOperationException    If called from a
@@ -561,15 +583,17 @@ public interface ServletContext {
      *    {@link javax.servlet.annotation.WebListener}. For example, a
      *    {@link ServletContextListener} defined in a TLD would not be able to
      *    use this method.
-     * @since Servlet 3.0 TODO SERVLET3 - Add comments
+     * @since Servlet 3.0
      */
-    public ServletRegistration.Dynamic addServlet(String servletName,
-            Servlet servlet);
+    public ServletRegistration.Dynamic addServlet(String servletName, Servlet servlet);
 
     /**
-     * @param servletName
-     * @param servletClass
-     * @return TODO
+     * Add servlet to context.
+     * @param   servletName  Name of servlet to add
+     * @param   servletClass Class of servlet to add
+     * @return  <code>null</code> if the servlet has already been fully defined,
+     *          else a {@link javax.servlet.ServletRegistration.Dynamic} object
+     *          that can be used to further configure the servlet
      * @throws IllegalStateException
      *             If the context has already been initialised
      * @throws UnsupportedOperationException    If called from a
@@ -579,15 +603,17 @@ public interface ServletContext {
      *    {@link javax.servlet.annotation.WebListener}. For example, a
      *    {@link ServletContextListener} defined in a TLD would not be able to
      *    use this method.
-     * @since Servlet 3.0 TODO SERVLET3 - Add comments
+     * @since Servlet 3.0
      */
     public ServletRegistration.Dynamic addServlet(String servletName,
             Class<? extends Servlet> servletClass);
 
     /**
-     * @param c
+     * TODO SERVLET3 - Add comments
+     * @param <T> TODO
+     * @param c   TODO
      * @return TODO
-     * @throws ServletException
+     * @throws ServletException TODO
      * @throws UnsupportedOperationException    If called from a
      *    {@link ServletContextListener#contextInitialized(ServletContextEvent)}
      *    method of a {@link ServletContextListener} that was not defined in a
@@ -595,7 +621,7 @@ public interface ServletContext {
      *    {@link javax.servlet.annotation.WebListener}. For example, a
      *    {@link ServletContextListener} defined in a TLD would not be able to
      *    use this method.
-     * @since Servlet 3.0 TODO SERVLET3 - Add comments
+     * @since Servlet 3.0
      */
     public <T extends Servlet> T createServlet(Class<T> c)
             throws ServletException;
@@ -622,6 +648,7 @@ public interface ServletContext {
     public ServletRegistration getServletRegistration(String servletName);
 
     /**
+     * TODO SERVLET3 - Add comments
      * @return TODO
      * @throws UnsupportedOperationException    If called from a
      *    {@link ServletContextListener#contextInitialized(ServletContextEvent)}
@@ -630,14 +657,17 @@ public interface ServletContext {
      *    {@link javax.servlet.annotation.WebListener}. For example, a
      *    {@link ServletContextListener} defined in a TLD would not be able to
      *    use this method.
-     * @since Servlet 3.0 TODO SERVLET3 - Add comments
+     * @since Servlet 3.0
      */
     public Map<String, ? extends ServletRegistration> getServletRegistrations();
 
     /**
-     * @param filterName
-     * @param className
-     * @return TODO
+     * Add filter to context.
+     * @param   filterName  Name of filter to add
+     * @param   className Name of filter class
+     * @return  <code>null</code> if the filter has already been fully defined,
+     *          else a {@link javax.servlet.FilterRegistration.Dynamic} object
+     *          that can be used to further configure the filter
      * @throws UnsupportedOperationException    If called from a
      *    {@link ServletContextListener#contextInitialized(ServletContextEvent)}
      *    method of a {@link ServletContextListener} that was not defined in a
@@ -647,15 +677,17 @@ public interface ServletContext {
      *    use this method.
      * @throws IllegalStateException
      *             If the context has already been initialised
-     * @since Servlet 3.0 TODO SERVLET3 - Add comments
+     * @since Servlet 3.0
      */
-    public FilterRegistration.Dynamic addFilter(String filterName,
-            String className);
+    public FilterRegistration.Dynamic addFilter(String filterName, String className);
 
     /**
-     * @param filterName
-     * @param filter
-     * @return TODO
+     * Add filter to context.
+     * @param   filterName  Name of filter to add
+     * @param   filter      Filter to add
+     * @return  <code>null</code> if the filter has already been fully defined,
+     *          else a {@link javax.servlet.FilterRegistration.Dynamic} object
+     *          that can be used to further configure the filter
      * @throws UnsupportedOperationException    If called from a
      *    {@link ServletContextListener#contextInitialized(ServletContextEvent)}
      *    method of a {@link ServletContextListener} that was not defined in a
@@ -665,14 +697,17 @@ public interface ServletContext {
      *    use this method.
      * @throws IllegalStateException
      *             If the context has already been initialised
-     * @since Servlet 3.0 TODO SERVLET3 - Add comments
+     * @since Servlet 3.0
      */
     public FilterRegistration.Dynamic addFilter(String filterName, Filter filter);
 
     /**
-     * @param filterName
-     * @param filterClass
-     * @return TODO
+     * Add filter to context.
+     * @param   filterName  Name of filter to add
+     * @param   filterClass Class of filter to add
+     * @return  <code>null</code> if the filter has already been fully defined,
+     *          else a {@link javax.servlet.FilterRegistration.Dynamic} object
+     *          that can be used to further configure the filter
      * @throws UnsupportedOperationException    If called from a
      *    {@link ServletContextListener#contextInitialized(ServletContextEvent)}
      *    method of a {@link ServletContextListener} that was not defined in a
@@ -682,13 +717,15 @@ public interface ServletContext {
      *    use this method.
      * @throws IllegalStateException
      *             If the context has already been initialised
-     * @since Servlet 3.0 TODO SERVLET3 - Add comments
+     * @since Servlet 3.0
      */
     public FilterRegistration.Dynamic addFilter(String filterName,
             Class<? extends Filter> filterClass);
 
     /**
-     * @param c
+     * TODO SERVLET3 - Add comments
+     * @param <T> TODO
+     * @param c   TODO
      * @return TODO
      * @throws UnsupportedOperationException    If called from a
      *    {@link ServletContextListener#contextInitialized(ServletContextEvent)}
@@ -697,14 +734,14 @@ public interface ServletContext {
      *    {@link javax.servlet.annotation.WebListener}. For example, a
      *    {@link ServletContextListener} defined in a TLD would not be able to
      *    use this method.
-     * @throws ServletException
-     * @since Servlet 3.0 TODO SERVLET3 - Add comments
+     * @throws ServletException TODO
+     * @since Servlet 3.
      */
-    public <T extends Filter> T createFilter(Class<T> c)
-            throws ServletException;
+    public <T extends Filter> T createFilter(Class<T> c) throws ServletException;
 
     /**
-     * @param filterName
+     * TODO SERVLET3 - Add comments
+     * @param filterName TODO
      * @return TODO
      * @throws UnsupportedOperationException    If called from a
      *    {@link ServletContextListener#contextInitialized(ServletContextEvent)}
@@ -713,7 +750,7 @@ public interface ServletContext {
      *    {@link javax.servlet.annotation.WebListener}. For example, a
      *    {@link ServletContextListener} defined in a TLD would not be able to
      *    use this method.
-     * @since Servlet 3.0 TODO SERVLET3 - Add comments
+     * @since Servlet 3.0
      */
     public FilterRegistration getFilterRegistration(String filterName);
 
@@ -744,7 +781,9 @@ public interface ServletContext {
     public SessionCookieConfig getSessionCookieConfig();
 
     /**
-     * @param sessionTrackingModes
+     * Configures the available session tracking modes for this web application.
+     * @param sessionTrackingModes The session tracking modes to use for this
+     *        web application
      * @throws IllegalArgumentException
      *             If sessionTrackingModes specifies
      *             {@link SessionTrackingMode#SSL} in combination with any other
@@ -758,14 +797,21 @@ public interface ServletContext {
      *    {@link javax.servlet.annotation.WebListener}. For example, a
      *    {@link ServletContextListener} defined in a TLD would not be able to
      *    use this method.
-     * @since Servlet 3.0 TODO SERVLET3 - Add comments
+     * @since Servlet 3.0
      */
     public void setSessionTrackingModes(
-            Set<SessionTrackingMode> sessionTrackingModes)
-            throws IllegalStateException, IllegalArgumentException;
+            Set<SessionTrackingMode> sessionTrackingModes);
 
     /**
-     * @return TODO
+     * Obtains the default session tracking modes for this web application.
+     * By default {@link SessionTrackingMode#URL} is always supported, {@link
+     * SessionTrackingMode#COOKIE} is supported unless the <code>cookies</code>
+     * attribute has been set to <code>false</code> for the context and {@link
+     * SessionTrackingMode#SSL} is supported if at least one of the connectors
+     * used by this context has the attribute <code>secure</code> set to
+     * <code>true</code>.
+     * @return The set of default session tracking modes for this web
+     *         application
      * @throws UnsupportedOperationException    If called from a
      *    {@link ServletContextListener#contextInitialized(ServletContextEvent)}
      *    method of a {@link ServletContextListener} that was not defined in a
@@ -773,12 +819,15 @@ public interface ServletContext {
      *    {@link javax.servlet.annotation.WebListener}. For example, a
      *    {@link ServletContextListener} defined in a TLD would not be able to
      *    use this method.
-     * @since Servlet 3.0 TODO SERVLET3 - Add comments
+     * @since Servlet 3.0
      */
     public Set<SessionTrackingMode> getDefaultSessionTrackingModes();
 
     /**
-     * @return TODO
+     * Obtains the currently enabled session tracking modes for this web
+     * application.
+     * @return The value supplied via {@link #setSessionTrackingModes(Set)} if
+     *         one was previously set, else return the defaults
      * @throws UnsupportedOperationException    If called from a
      *    {@link ServletContextListener#contextInitialized(ServletContextEvent)}
      *    method of a {@link ServletContextListener} that was not defined in a
@@ -786,12 +835,13 @@ public interface ServletContext {
      *    {@link javax.servlet.annotation.WebListener}. For example, a
      *    {@link ServletContextListener} defined in a TLD would not be able to
      *    use this method.
-     * @since Servlet 3.0 TODO SERVLET3 - Add comments
+     * @since Servlet 3.0
      */
     public Set<SessionTrackingMode> getEffectiveSessionTrackingModes();
 
     /**
-     * @param className
+     * TODO SERVLET3 - Add comments
+     * @param className TODO
      * @throws UnsupportedOperationException    If called from a
      *    {@link ServletContextListener#contextInitialized(ServletContextEvent)}
      *    method of a {@link ServletContextListener} that was not defined in a
@@ -799,13 +849,14 @@ public interface ServletContext {
      *    {@link javax.servlet.annotation.WebListener}. For example, a
      *    {@link ServletContextListener} defined in a TLD would not be able to
      *    use this method.
-     * @since Servlet 3.0 TODO SERVLET3 - Add comments
+     * @since Servlet 3.0
      */
     public void addListener(String className);
 
     /**
-     * @param <T>
-     * @param t
+     * TODO SERVLET3 - Add comments
+     * @param <T> TODO
+     * @param t   TODO
      * @throws UnsupportedOperationException    If called from a
      *    {@link ServletContextListener#contextInitialized(ServletContextEvent)}
      *    method of a {@link ServletContextListener} that was not defined in a
@@ -813,12 +864,13 @@ public interface ServletContext {
      *    {@link javax.servlet.annotation.WebListener}. For example, a
      *    {@link ServletContextListener} defined in a TLD would not be able to
      *    use this method.
-     * @since Servlet 3.0 TODO SERVLET3 - Add comments
+     * @since Servlet 3.0
      */
     public <T extends EventListener> void addListener(T t);
 
     /**
-     * @param listenerClass
+     * TODO SERVLET3 - Add comments
+     * @param listenerClass TODO
      * @throws UnsupportedOperationException    If called from a
      *    {@link ServletContextListener#contextInitialized(ServletContextEvent)}
      *    method of a {@link ServletContextListener} that was not defined in a
@@ -826,15 +878,16 @@ public interface ServletContext {
      *    {@link javax.servlet.annotation.WebListener}. For example, a
      *    {@link ServletContextListener} defined in a TLD would not be able to
      *    use this method.
-     * @since Servlet 3.0 TODO SERVLET3 - Add comments
+     * @since Servlet 3.0
      */
     public void addListener(Class<? extends EventListener> listenerClass);
 
     /**
-     * @param <T>
-     * @param c
+     * TODO SERVLET3 - Add comments
+     * @param <T> TODO
+     * @param c TODO
      * @return TODO
-     * @throws ServletException
+     * @throws ServletException TODO
      * @throws UnsupportedOperationException    If called from a
      *    {@link ServletContextListener#contextInitialized(ServletContextEvent)}
      *    method of a {@link ServletContextListener} that was not defined in a
@@ -842,39 +895,10 @@ public interface ServletContext {
      *    {@link javax.servlet.annotation.WebListener}. For example, a
      *    {@link ServletContextListener} defined in a TLD would not be able to
      *    use this method.
-     * @since Servlet 3.0 TODO SERVLET3 - Add comments
+     * @since Servlet 3.0
      */
     public <T extends EventListener> T createListener(Class<T> c)
             throws ServletException;
-
-    /**
-     * @param roleNames
-     * @throws UnsupportedOperationException    If called from a
-     *    {@link ServletContextListener#contextInitialized(ServletContextEvent)}
-     *    method of a {@link ServletContextListener} that was not defined in a
-     *    web.xml file, a web-fragment.xml file nor annotated with
-     *    {@link javax.servlet.annotation.WebListener}. For example, a
-     *    {@link ServletContextListener} defined in a TLD would not be able to
-     *    use this method.
-     * @throws IllegalArgumentException
-     * @throws IllegalStateException
-     * @since Servlet 3.0 TODO SERVLET3 - Add comments
-     */
-    public void declareRoles(String... roleNames);
-
-    /**
-     * @return TODO
-     * @throws UnsupportedOperationException    If called from a
-     *    {@link ServletContextListener#contextInitialized(ServletContextEvent)}
-     *    method of a {@link ServletContextListener} that was not defined in a
-     *    web.xml file, a web-fragment.xml file nor annotated with
-     *    {@link javax.servlet.annotation.WebListener}. For example, a
-     *    {@link ServletContextListener} defined in a TLD would not be able to
-     *    use this method.
-     * @throws SecurityException
-     * @since Servlet 3.0 TODO SERVLET3 - Add comments
-     */
-    public ClassLoader getClassLoader();
 
     /**
      * @return TODO
@@ -888,4 +912,40 @@ public interface ServletContext {
      * @since Servlet 3.0 TODO SERVLET3 - Add comments
      */
     public JspConfigDescriptor getJspConfigDescriptor();
+
+    /**
+     * Get the web application class loader associated with this ServletContext.
+     *
+     * @return The associated web application class loader
+     *
+     * @throws UnsupportedOperationException    If called from a
+     *    {@link ServletContextListener#contextInitialized(ServletContextEvent)}
+     *    method of a {@link ServletContextListener} that was not defined in a
+     *    web.xml file, a web-fragment.xml file nor annotated with
+     *    {@link javax.servlet.annotation.WebListener}. For example, a
+     *    {@link ServletContextListener} defined in a TLD would not be able to
+     *    use this method.
+     * @throws SecurityException if access to the class loader is prevented by a
+     *         SecurityManager
+     * @since Servlet 3.0
+     */
+    public ClassLoader getClassLoader();
+
+    /**
+     * Add to the declared roles for this ServletContext.
+     * @param roleNames The roles to add
+     * @throws UnsupportedOperationException    If called from a
+     *    {@link ServletContextListener#contextInitialized(ServletContextEvent)}
+     *    method of a {@link ServletContextListener} that was not defined in a
+     *    web.xml file, a web-fragment.xml file nor annotated with
+     *    {@link javax.servlet.annotation.WebListener}. For example, a
+     *    {@link ServletContextListener} defined in a TLD would not be able to
+     *    use this method.
+     * @throws IllegalArgumentException If the list of roleNames is null or
+     *         empty
+     * @throws IllegalStateException If the ServletContext has already been
+     *         initialised
+     * @since Servlet 3.0
+     */
+    public void declareRoles(String... roleNames);
 }
