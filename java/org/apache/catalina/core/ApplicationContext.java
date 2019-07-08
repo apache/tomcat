@@ -681,11 +681,11 @@ public class ApplicationContext implements org.apache.catalina.servlet4preview.S
         }
         ServletContextAttributeEvent event = new ServletContextAttributeEvent(
                 context.getServletContext(), name, value);
-        for (int i = 0; i < listeners.length; i++) {
-            if (!(listeners[i] instanceof ServletContextAttributeListener)) {
+        for (Object obj : listeners) {
+            if (!(obj instanceof ServletContextAttributeListener)) {
                 continue;
             }
-            ServletContextAttributeListener listener = (ServletContextAttributeListener) listeners[i];
+            ServletContextAttributeListener listener = (ServletContextAttributeListener) obj;
             try {
                 context.fireContainerEvent("beforeContextAttributeRemoved", listener);
                 listener.attributeRemoved(event);
@@ -734,11 +734,11 @@ public class ApplicationContext implements org.apache.catalina.servlet4preview.S
             event = new ServletContextAttributeEvent(context.getServletContext(), name, value);
         }
 
-        for (int i = 0; i < listeners.length; i++) {
-            if (!(listeners[i] instanceof ServletContextAttributeListener)) {
+        for (Object obj : listeners) {
+            if (!(obj instanceof ServletContextAttributeListener)) {
                 continue;
             }
-            ServletContextAttributeListener listener = (ServletContextAttributeListener) listeners[i];
+            ServletContextAttributeListener listener = (ServletContextAttributeListener) obj;
             try {
                 if (replaced) {
                     context.fireContainerEvent("beforeContextAttributeReplaced", listener);
