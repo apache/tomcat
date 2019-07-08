@@ -202,21 +202,21 @@ nsis.system.dll=${nsis.home}/Plugins/${nsis.arch.dir}System.dll
 nsis.nsdialogs.dll=${nsis.home}/Plugins/${nsis.arch.dir}nsDialogs.dll
 nsis.loc=${base-sf.loc}/nsis/nsis-${nsis.version}.zip
 
-# ----- Commons Daemon, version 1.1.0 or later -----
-commons-daemon.version=1.1.0
+# ----- Commons Daemon, version 1.2.0 or later -----
+commons-daemon.version=1.2.0
 
-# checksum for commons-daemon-1.1.0-bin.tar.gz
+# checksum for commons-daemon-1.2.0-bin.tar.gz
 commons-daemon.bin.checksum.enabled=true
 commons-daemon.bin.checksum.algorithm=SHA-512
-commons-daemon.bin.checksum.value=43c33e52e0be11e73370083500592ee9df0431c3166dbc7ed95794cabb462ac2a140e3eb4bbe2a0b99882bb93d9244ff534f13e4933c13e7a31a37e58e0c8e1d
+commons-daemon.bin.checksum.value=81fbbd1115d735232bbcc426d958bd8fe149c97bfe96df1549a19332afd4954f3f75c3a693f214bfef065931a1d79c528dfb2cefb1bb3628d211e1761814c23b
 
-# checksums for commons-daemon-1.1.0-native-src.tar.gz, commons-daemon-1.1.0-bin-windows.zip
+# checksums for commons-daemon-1.1.0-native-src.tar.gz, commons-daemon-1.2.0-bin-windows.zip
 commons-daemon.native.src.checksum.enabled=true
 commons-daemon.native.src.checksum.algorithm=SHA-512
-commons-daemon.native.src.checksum.value=3443f1c95a4b267c4387a9ac7c79315422a51e896c0bcea48fbe959bc301094770aa8065b2388a84760a3e07e5d1753c2b351336fb2d3a8c996ee14d32088f6e
+commons-daemon.native.src.checksum.value=c37f506b129b8a0efface6745dcc6d0d9d3e2663d28eca0df9903301f0b9b65fd8306e361935887fb459daf0a29da6fa63ea60f742ce4e497dc53a2a2d86db12
 commons-daemon.native.win.checksum.enabled=true
 commons-daemon.native.win.checksum.algorithm=SHA-512
-commons-daemon.native.win.checksum.value=10cda04d9a44286cb67107fdb9d20958013f075cad4accba048801f3677765c334dc16f6901e1d2e4a9df5a2c702797370de63393568df6fceb9e7902421f9ea
+commons-daemon.native.win.checksum.value=8b6e0bb4172861338e0cb3238f6da715c3cef04a88e8bfab0cbb487ef638aa69fd34de9407b0b2ed54451fbbcbff8a999324289052a581a5d07d6f6ff84a83b6
 
 commons-daemon.home=${base.path}/commons-daemon-${commons-daemon.version}
 commons-daemon.jar=${commons-daemon.home}/commons-daemon-${commons-daemon.version}.jar
