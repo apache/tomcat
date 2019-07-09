@@ -64,6 +64,8 @@ import org.apache.tomcat.util.http.MimeHeaders;
  * <code>protocolHeaderHttpsValue</code> configuration parameter (default <code>https</code>) then <code>request.isSecure = true</code>,
  * <code>request.scheme = https</code> and <code>request.serverPort = 443</code>. Note that 443 can be overwritten with the
  * <code>$httpsServerPort</code> configuration parameter.</li>
+ * <li>Mark the request with the attribute {@link Globals#REQUEST_FORWARDED_ATTRIBUTE} and value {@code Boolean.TRUE} to indicate
+ * that this request has been forwarded by one or more proxies.</li>
  * </ul>
  * <table border="1">
  * <caption>Configuration parameters</caption>
@@ -650,6 +652,8 @@ public class RemoteIpValve extends ValveBase {
                     setPorts(request, httpServerPort);
                 }
             }
+
+            request.setAttribute(Globals.REQUEST_FORWARDED_ATTRIBUTE, Boolean.TRUE);
 
             if (log.isDebugEnabled()) {
                 log.debug("Incoming request " + request.getRequestURI() + " with originalRemoteAddr '" + originalRemoteAddr

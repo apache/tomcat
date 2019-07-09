@@ -42,6 +42,7 @@ import org.junit.Test;
 
 import org.apache.catalina.AccessLog;
 import org.apache.catalina.Context;
+import org.apache.catalina.Globals;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.connector.Connector;
 import org.apache.catalina.connector.Request;
@@ -622,6 +623,28 @@ public class TestRemoteIpFilter extends TomcatBaseTest {
         Assert.assertEquals("org.apache.catalina.AccessLog.RemoteHost",
                 "140.211.11.130",
                 actualRequest.getAttribute(AccessLog.REMOTE_HOST_ATTRIBUTE));
+    }
+
+    @Test
+    public void testRequestForwarded() throws Exception {
+        // PREPARE
+        FilterDef filterDef = new FilterDef();
+        filterDef.addInitParameter("protocolHeader", "x-forwarded-proto");
+        filterDef.addInitParameter("remoteIpHeader", "x-my-forwarded-for");
+        filterDef.addInitParameter("httpServerPort", "8080");
+
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        request.setRemoteAddr("192.168.0.10");
+        request.setHeader("x-my-forwarded-for", "140.211.11.130");
+        request.setHeader("x-forwarded-proto", "http");
+
+        // TEST
+        HttpServletRequest actualRequest = testRemoteIpFilter(filterDef, request).getRequest();
+
+        // VERIFY
+        Assert.assertEquals("org.apache.tomcat.request.forwarded",
+                Boolean.TRUE,
+                actualRequest.getAttribute(Globals.REQUEST_FORWARDED_ATTRIBUTE));
     }
 
     /*
