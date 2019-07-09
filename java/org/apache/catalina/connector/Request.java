@@ -744,7 +744,7 @@ public class Request implements HttpServletRequest {
      * @exception IOException if an input/output error occurs
      */
     public ServletInputStream createInputStream()
-        throws IOException {
+            throws IOException {
         if (inputStream == null) {
             inputStream = new CoyoteInputStream(inputBuffer);
         }
@@ -851,8 +851,6 @@ public class Request implements HttpServletRequest {
 
 
     // ------------------------------------------------- ServletRequest Methods
-
-
 
     /**
      * @return the specified request attribute if it exists; otherwise, return
@@ -1045,8 +1043,7 @@ public class Request implements HttpServletRequest {
     public ServletInputStream getInputStream() throws IOException {
 
         if (usingReader) {
-            throw new IllegalStateException
-                (sm.getString("coyoteRequest.getInputStream.ise"));
+            throw new IllegalStateException(sm.getString("coyoteRequest.getInputStream.ise"));
         }
 
         usingInputStream = true;
@@ -1208,8 +1205,7 @@ public class Request implements HttpServletRequest {
     public BufferedReader getReader() throws IOException {
 
         if (usingInputStream) {
-            throw new IllegalStateException
-                (sm.getString("coyoteRequest.getReader.ise"));
+            throw new IllegalStateException(sm.getString("coyoteRequest.getReader.ise"));
         }
 
         // InputBuffer has no easily accessible reference chain to the Context
@@ -1275,8 +1271,7 @@ public class Request implements HttpServletRequest {
     @Override
     public String getRemoteAddr() {
         if (remoteAddr == null) {
-            coyoteRequest.action
-                (ActionCode.REQ_HOST_ADDR_ATTRIBUTE, coyoteRequest);
+            coyoteRequest.action(ActionCode.REQ_HOST_ADDR_ATTRIBUTE, coyoteRequest);
             remoteAddr = coyoteRequest.remoteAddr().toString();
         }
         return remoteAddr;
@@ -1292,8 +1287,7 @@ public class Request implements HttpServletRequest {
             if (!connector.getEnableLookups()) {
                 remoteHost = getRemoteAddr();
             } else {
-                coyoteRequest.action
-                    (ActionCode.REQ_HOST_ATTRIBUTE, coyoteRequest);
+                coyoteRequest.action(ActionCode.REQ_HOST_ATTRIBUTE, coyoteRequest);
                 remoteHost = coyoteRequest.remoteHost().toString();
             }
         }
@@ -1307,8 +1301,7 @@ public class Request implements HttpServletRequest {
     @Override
     public int getRemotePort(){
         if (remotePort == -1) {
-            coyoteRequest.action
-                (ActionCode.REQ_REMOTEPORT_ATTRIBUTE, coyoteRequest);
+            coyoteRequest.action(ActionCode.REQ_REMOTEPORT_ATTRIBUTE, coyoteRequest);
             remotePort = coyoteRequest.getRemotePort();
         }
         return remotePort;
@@ -1321,8 +1314,7 @@ public class Request implements HttpServletRequest {
     @Override
     public String getLocalName(){
         if (localName == null) {
-            coyoteRequest.action
-                (ActionCode.REQ_LOCAL_NAME_ATTRIBUTE, coyoteRequest);
+            coyoteRequest.action(ActionCode.REQ_LOCAL_NAME_ATTRIBUTE, coyoteRequest);
             localName = coyoteRequest.localName().toString();
         }
         return localName;
@@ -1335,8 +1327,7 @@ public class Request implements HttpServletRequest {
     @Override
     public String getLocalAddr(){
         if (localAddr == null) {
-            coyoteRequest.action
-                (ActionCode.REQ_LOCAL_ADDR_ATTRIBUTE, coyoteRequest);
+            coyoteRequest.action(ActionCode.REQ_LOCAL_ADDR_ATTRIBUTE, coyoteRequest);
             localAddr = coyoteRequest.localAddr().toString();
         }
         return localAddr;
@@ -1350,8 +1341,7 @@ public class Request implements HttpServletRequest {
     @Override
     public int getLocalPort(){
         if (localPort == -1){
-            coyoteRequest.action
-                (ActionCode.REQ_LOCALPORT_ATTRIBUTE, coyoteRequest);
+            coyoteRequest.action(ActionCode.REQ_LOCALPORT_ATTRIBUTE, coyoteRequest);
             localPort = coyoteRequest.getLocalPort();
         }
         return localPort;
@@ -1514,8 +1504,7 @@ public class Request implements HttpServletRequest {
 
         // Name cannot be null
         if (name == null) {
-            throw new IllegalArgumentException
-                (sm.getString("coyoteRequest.setAttribute.namenull"));
+            throw new IllegalArgumentException(sm.getString("coyoteRequest.setAttribute.namenull"));
         }
 
         // Null value is the same as removeAttribute()
@@ -1596,7 +1585,7 @@ public class Request implements HttpServletRequest {
                 continue;
             }
             ServletRequestAttributeListener listener =
-                (ServletRequestAttributeListener) listeners[i];
+                    (ServletRequestAttributeListener) listeners[i];
             try {
                 if (replaced) {
                     listener.attributeReplaced(event);
@@ -1626,14 +1615,14 @@ public class Request implements HttpServletRequest {
             return;
         }
         ServletRequestAttributeEvent event =
-          new ServletRequestAttributeEvent(context.getServletContext(),
-                                           getRequest(), name, value);
+                new ServletRequestAttributeEvent(context.getServletContext(),
+                        getRequest(), name, value);
         for (int i = 0; i < listeners.length; i++) {
             if (!(listeners[i] instanceof ServletRequestAttributeListener)) {
                 continue;
             }
             ServletRequestAttributeListener listener =
-                (ServletRequestAttributeListener) listeners[i];
+                    (ServletRequestAttributeListener) listeners[i];
             try {
                 listener.attributeRemoved(event);
             } catch (Throwable t) {
@@ -2070,6 +2059,7 @@ public class Request implements HttpServletRequest {
     public String getAuthType() {
         return authType;
     }
+
 
     /**
      * Return the portion of the request URI used to select the Context
@@ -2653,20 +2643,20 @@ public class Request implements HttpServletRequest {
         }
 
         Context context = getContext();
-        if (context != null
-                && !context.getServletContext()
+        if (context != null &&
+                !context.getServletContext()
                         .getEffectiveSessionTrackingModes()
                         .contains(SessionTrackingMode.COOKIE)) {
             return;
         }
 
         if (response != null) {
-            Cookie newCookie =
-                ApplicationSessionCookieConfig.createSessionCookie(context,
-                        newSessionId, isSecure());
+            Cookie newCookie = ApplicationSessionCookieConfig.createSessionCookie(context,
+                    newSessionId, isSecure());
             response.addSessionCookieInternal(newCookie);
         }
     }
+
 
     /**
      * Changes the session ID of the session associated with this request.
@@ -2738,7 +2728,7 @@ public class Request implements HttpServletRequest {
      */
     @Override
     public boolean authenticate(HttpServletResponse response)
-    throws IOException, ServletException {
+            throws IOException, ServletException {
         if (response.isCommitted()) {
             throw new IllegalStateException(
                     sm.getString("coyoteRequest.authenticate.ise"));
@@ -2752,7 +2742,7 @@ public class Request implements HttpServletRequest {
      */
     @Override
     public void login(String username, String password)
-    throws ServletException {
+            throws ServletException {
         if (getAuthType() != null || getRemoteUser() != null ||
                 getUserPrincipal() != null) {
             throw new ServletException(
@@ -2804,10 +2794,8 @@ public class Request implements HttpServletRequest {
 
         if (mce == null) {
             if(context.getAllowCasualMultipartParsing()) {
-                mce = new MultipartConfigElement(null,
-                                                 connector.getMaxPostSize(),
-                                                 connector.getMaxPostSize(),
-                                                 connector.getMaxPostSize());
+                mce = new MultipartConfigElement(null, connector.getMaxPostSize(),
+                        connector.getMaxPostSize(), connector.getMaxPostSize());
             } else {
                 if (explicit) {
                     partsParseException = new IllegalStateException(
@@ -2835,9 +2823,8 @@ public class Request implements HttpServletRequest {
                 location = new File(locationStr);
                 if (!location.isAbsolute()) {
                     location = new File(
-                            (File) context.getServletContext().getAttribute(
-                                        ServletContext.TEMPDIR),
-                                        locationStr).getAbsoluteFile();
+                            (File) context.getServletContext().getAttribute(ServletContext.TEMPDIR),
+                            locationStr).getAbsoluteFile();
                 }
             }
 
@@ -3003,8 +2990,7 @@ public class Request implements HttpServletRequest {
         boolean trackModesIncludesCookie =
                 context.getServletContext().getEffectiveSessionTrackingModes().contains(SessionTrackingMode.COOKIE);
         if (trackModesIncludesCookie && response.getResponse().isCommitted()) {
-            throw new IllegalStateException(
-                    sm.getString("coyoteRequest.sessionCreateCommitted"));
+            throw new IllegalStateException(sm.getString("coyoteRequest.sessionCreateCommitted"));
         }
 
         // Re-use session IDs provided by the client in very limited
@@ -3079,8 +3065,7 @@ public class Request implements HttpServletRequest {
             if (c!='\\') {
                 buf.append(c);
             } else {
-                if (++i >= s.length())
-                 {
+                if (++i >= s.length()) {
                     throw new IllegalArgumentException();//invalid escape, hence invalid cookie
                 }
                 c = s.charAt(i);
@@ -3138,9 +3123,7 @@ public class Request implements HttpServletRequest {
         for (int i = 0; i < count; i++) {
             ServerCookie scookie = serverCookies.getCookie(i);
             try {
-                /*
-                we must unescape the '\\' escape character
-                */
+                // We must unescape the '\\' escape character
                 Cookie cookie = new Cookie(scookie.getName().toString(),null);
                 int version = scookie.getVersion();
                 cookie.setVersion(version);
@@ -3148,8 +3131,7 @@ public class Request implements HttpServletRequest {
                 cookie.setValue(unescape(scookie.getValue().toString()));
                 cookie.setPath(unescape(scookie.getPath().toString()));
                 String domain = scookie.getDomain().toString();
-                if (domain!=null)
-                 {
+                if (domain!=null) {
                     cookie.setDomain(unescape(domain));//avoid NPE
                 }
                 String comment = scookie.getComment().toString();
@@ -3259,8 +3241,7 @@ public class Request implements HttpServletRequest {
                     Context context = getContext();
                     if (context != null && context.getLogger().isDebugEnabled()) {
                         context.getLogger().debug(
-                                sm.getString("coyoteRequest.parseParameters"),
-                                e);
+                                sm.getString("coyoteRequest.parseParameters"), e);
                     }
                     parameters.setParseFailedReason(FailReason.CLIENT_DISCONNECT);
                     return;
@@ -3287,8 +3268,7 @@ public class Request implements HttpServletRequest {
                     Context context = getContext();
                     if (context != null && context.getLogger().isDebugEnabled()) {
                         context.getLogger().debug(
-                                sm.getString("coyoteRequest.parseParameters"),
-                                e);
+                                sm.getString("coyoteRequest.parseParameters"), e);
                     }
                     return;
                 }
@@ -3315,7 +3295,7 @@ public class Request implements HttpServletRequest {
      * @throws IOException if an IO exception occurred
      */
     protected int readPostBody(byte[] body, int len)
-        throws IOException {
+            throws IOException {
 
         int offset = 0;
         do {
@@ -3440,8 +3420,7 @@ public class Request implements HttpServletRequest {
         // void remove(Request request, String name);
     }
 
-    private static final Map<String, SpecialAttributeAdapter> specialAttributes
-        = new HashMap<>();
+    private static final Map<String, SpecialAttributeAdapter> specialAttributes = new HashMap<>();
 
     static {
         specialAttributes.put(Globals.DISPATCHER_TYPE_ATTR,
