@@ -1275,6 +1275,7 @@ implements HttpServletRequest {
     @Deprecated
     public String getRealPath(String path) {
 
+        Context context = getContext();
         if (context == null) {
             return null;
         }
@@ -1382,6 +1383,7 @@ implements HttpServletRequest {
     @Override
     public RequestDispatcher getRequestDispatcher(String path) {
 
+        Context context = getContext();
         if (context == null) {
             return null;
         }
@@ -1587,6 +1589,7 @@ implements HttpServletRequest {
      */
     private void notifyAttributeAssigned(String name, Object value,
             Object oldValue) {
+        Context context = getContext();
         if (context == null) {
             return;
         }
@@ -1618,9 +1621,9 @@ implements HttpServletRequest {
                 }
             } catch (Throwable t) {
                 ExceptionUtils.handleThrowable(t);
-                context.getLogger().error(sm.getString("coyoteRequest.attributeEvent"), t);
                 // Error valve will pick this exception up and display it to user
                 attributes.put(RequestDispatcher.ERROR_EXCEPTION, t);
+                context.getLogger().error(sm.getString("coyoteRequest.attributeEvent"), t);
             }
         }
     }
@@ -1633,6 +1636,7 @@ implements HttpServletRequest {
      * @param value Attribute value
      */
     private void notifyAttributeRemoved(String name, Object value) {
+        Context context = getContext();
         Object listeners[] = context.getApplicationEventListeners();
         if ((listeners == null) || (listeners.length == 0)) {
             return;
@@ -1650,9 +1654,9 @@ implements HttpServletRequest {
                 listener.attributeRemoved(event);
             } catch (Throwable t) {
                 ExceptionUtils.handleThrowable(t);
-                context.getLogger().error(sm.getString("coyoteRequest.attributeEvent"), t);
                 // Error valve will pick this exception up and display it to user
                 attributes.put(RequestDispatcher.ERROR_EXCEPTION, t);
+                context.getLogger().error(sm.getString("coyoteRequest.attributeEvent"), t);
             }
         }
     }
@@ -2013,7 +2017,7 @@ implements HttpServletRequest {
      * @param principal The user Principal
      */
     public void setUserPrincipal(final Principal principal) {
-        if (Globals.IS_SECURITY_ENABLED) {
+        if (Globals.IS_SECURITY_ENABLED && principal != null) {
             if (subject == null) {
                 final HttpSession session = getSession(false);
                 if (session == null) {
@@ -2334,6 +2338,7 @@ implements HttpServletRequest {
     @Override
     public String getPathTranslated() {
 
+        Context context = getContext();
         if (context == null) {
             return null;
         }
@@ -2398,22 +2403,6 @@ implements HttpServletRequest {
     }
 
 
-    /**
-     * Reconstructs the URL the client used to make the request.
-     * The returned URL contains a protocol, server name, port
-     * number, and server path, but it does not include query
-     * string parameters.
-     * <p>
-     * Because this method returns a <code>StringBuffer</code>,
-     * not a <code>String</code>, you can modify the URL easily,
-     * for example, to append query parameters.
-     * <p>
-     * This method is useful for creating redirect messages and
-     * for reporting errors.
-     *
-     * @return A <code>StringBuffer</code> object containing the
-     *  reconstructed URL
-     */
     @Override
     public StringBuffer getRequestURL() {
 
@@ -2547,6 +2536,7 @@ implements HttpServletRequest {
             return false;
         }
 
+        Context context = getContext();
         if (context == null) {
             return false;
         }
@@ -2602,6 +2592,7 @@ implements HttpServletRequest {
         }
 
         // Identify the Realm we will use for checking role assignments
+        Context context = getContext();
         if (context == null) {
             return false;
         }
@@ -2682,6 +2673,7 @@ implements HttpServletRequest {
             requestedSessionId = newSessionId;
         }
 
+        Context context = getContext();
         if (context != null &&
                 !context.getServletContext()
                         .getEffectiveSessionTrackingModes()
@@ -2691,7 +2683,7 @@ implements HttpServletRequest {
 
         if (response != null) {
             Cookie newCookie = ApplicationSessionCookieConfig.createSessionCookie(context,
-                    newSessionId, secure);
+                    newSessionId, isSecure());
             response.addSessionCookieInternal(newCookie);
         }
     }
@@ -2855,10 +2847,11 @@ implements HttpServletRequest {
             return;
         }
 
+        Context context = getContext();
         MultipartConfigElement mce = getWrapper().getMultipartConfigElement();
 
         if (mce == null) {
-            if(getContext().getAllowCasualMultipartParsing()) {
+            if(context.getAllowCasualMultipartParsing()) {
                 mce = new MultipartConfigElement(null, connector.getMaxPostSize(),
                         connector.getMaxPostSize(), connector.getMaxPostSize());
             } else {
@@ -3327,7 +3320,8 @@ implements HttpServletRequest {
             if (len > 0) {
                 int maxPostSize = connector.getMaxPostSize();
                 if ((maxPostSize >= 0) && (len > maxPostSize)) {
-                    if (context.getLogger().isDebugEnabled()) {
+                    Context context = getContext();
+                    if (context != null && context.getLogger().isDebugEnabled()) {
                         context.getLogger().debug(
                                 sm.getString("coyoteRequest.postTooLarge"));
                     }
@@ -3351,7 +3345,8 @@ implements HttpServletRequest {
                     }
                 } catch (IOException e) {
                     // Client disconnect
-                    if (context.getLogger().isDebugEnabled()) {
+                    Context context = getContext();
+                    if (context != null && context.getLogger().isDebugEnabled()) {
                         context.getLogger().debug(
                                 sm.getString("coyoteRequest.parseParameters"), e);
                     }
