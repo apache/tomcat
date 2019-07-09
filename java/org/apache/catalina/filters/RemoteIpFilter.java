@@ -67,6 +67,7 @@ import org.apache.juli.logging.LogFactory;
  * <p>
  * If the incoming <code>request.getRemoteAddr()</code> matches the servlet
  * filter's list of internal or trusted proxies:
+ * </p>
  * <ul>
  * <li>Loop on the comma delimited list of IPs and hostnames passed by the preceding load balancer or proxy in the given request's Http
  * header named <code>$remoteIpHeader</code> (default value <code>x-forwarded-for</code>). Values are processed in right-to-left order.</li>
@@ -82,10 +83,8 @@ import org.apache.juli.logging.LogFactory;
  * <code>request.scheme = https</code> and <code>request.serverPort = 443</code>. Note that 443 can be overwritten with the
  * <code>$httpsServerPort</code> configuration parameter.</li>
  * </ul>
- * </p>
- * <p>
- * <strong>Configuration parameters:</strong>
  * <table border="1">
+ * <caption>Configuration parameters</caption>
  * <tr>
  * <th>XForwardedFilter property</th>
  * <th>Description</th>
@@ -164,8 +163,6 @@ import org.apache.juli.logging.LogFactory;
  * <td>443</td>
  * </tr>
  * </table>
- * </p>
- * <p>
  * <p>
  * <strong>Regular expression vs. IP address blocks:</strong> <code>mod_remoteip</code> allows to use address blocks (e.g.
  * <code>192.168/16</code>) to configure <code>RemoteIPInternalProxy</code> and <code>RemoteIPTrustedProxy</code> ; as the JVM doesn't have a
@@ -173,14 +170,14 @@ import org.apache.juli.logging.LogFactory;
  * href="https://apr.apache.org/docs/apr/1.3/group__apr__network__io.html#gb74d21b8898b7c40bf7fd07ad3eb993d">apr_ipsubnet_test</a>, we rely on
  * regular expressions.
  * </p>
- * <hr/>
+ * <hr>
  * <p>
  * <strong>Sample with internal proxies</strong>
  * </p>
  * <p>
  * XForwardedFilter configuration:
  * </p>
- * <code><pre>
+ * <code>
  * &lt;filter&gt;
  *    &lt;filter-name&gt;RemoteIpFilter&lt;/filter-name&gt;
  *    &lt;filter-class&gt;org.apache.catalina.filters.RemoteIpFilter&lt;/filter-class&gt;
@@ -206,10 +203,9 @@ import org.apache.juli.logging.LogFactory;
  *    &lt;filter-name&gt;RemoteIpFilter&lt;/filter-name&gt;
  *    &lt;url-pattern&gt;/*&lt;/url-pattern&gt;
  *    &lt;dispatcher&gt;REQUEST&lt;/dispatcher&gt;
- * &lt;/filter-mapping&gt;</pre></code>
- * <p>
- * Request values:
+ * &lt;/filter-mapping&gt;</code>
  * <table border="1">
+ * <caption>Request Values</caption>
  * <tr>
  * <th>property</th>
  * <th>Value Before RemoteIpFilter</th>
@@ -253,15 +249,14 @@ import org.apache.juli.logging.LogFactory;
  * </table>
  * Note : <code>x-forwarded-by</code> header is null because only internal proxies as been traversed by the request.
  * <code>x-forwarded-by</code> is null because all the proxies are trusted or internal.
- * </p>
- * <hr/>
+ * <hr>
  * <p>
  * <strong>Sample with trusted proxies</strong>
  * </p>
  * <p>
  * RemoteIpFilter configuration:
  * </p>
- * <code><pre>
+ * <code>
  * &lt;filter&gt;
  *    &lt;filter-name&gt;RemoteIpFilter&lt;/filter-name&gt;
  *    &lt;filter-class&gt;org.apache.catalina.filters.RemoteIpFilter&lt;/filter-class&gt;
@@ -287,10 +282,9 @@ import org.apache.juli.logging.LogFactory;
  *    &lt;filter-name&gt;RemoteIpFilter&lt;/filter-name&gt;
  *    &lt;url-pattern&gt;/*&lt;/url-pattern&gt;
  *    &lt;dispatcher&gt;REQUEST&lt;/dispatcher&gt;
- * &lt;/filter-mapping&gt;</pre></code>
- * <p>
- * Request values:
+ * &lt;/filter-mapping&gt;</code>
  * <table border="1">
+ * <caption>Request Values</caption>
  * <tr>
  * <th>property</th>
  * <th>Value Before RemoteIpFilter</th>
@@ -312,17 +306,18 @@ import org.apache.juli.logging.LogFactory;
  * <td>proxy1, proxy2</td>
  * </tr>
  * </table>
+ * <p>
  * Note : <code>proxy1</code> and <code>proxy2</code> are both trusted proxies that come in <code>x-forwarded-for</code> header, they both
  * are migrated in <code>x-forwarded-by</code> header. <code>x-forwarded-by</code> is null because all the proxies are trusted or internal.
  * </p>
- * <hr/>
+ * <hr>
  * <p>
  * <strong>Sample with internal and trusted proxies</strong>
  * </p>
  * <p>
  * RemoteIpFilter configuration:
  * </p>
- * <code><pre>
+ * <code>
  * &lt;filter&gt;
  *    &lt;filter-name&gt;RemoteIpFilter&lt;/filter-name&gt;
  *    &lt;filter-class&gt;org.apache.catalina.filters.RemoteIpFilter&lt;/filter-class&gt;
@@ -348,10 +343,9 @@ import org.apache.juli.logging.LogFactory;
  *    &lt;filter-name&gt;RemoteIpFilter&lt;/filter-name&gt;
  *    &lt;url-pattern&gt;/*&lt;/url-pattern&gt;
  *    &lt;dispatcher&gt;REQUEST&lt;/dispatcher&gt;
- * &lt;/filter-mapping&gt;</pre></code>
- * <p>
- * Request values:
+ * &lt;/filter-mapping&gt;</code>
  * <table border="1">
+ * <caption>Request Values</caption>
  * <tr>
  * <th>property</th>
  * <th>Value Before RemoteIpFilter</th>
@@ -373,18 +367,19 @@ import org.apache.juli.logging.LogFactory;
  * <td>proxy1, proxy2</td>
  * </tr>
  * </table>
+ * <p>
  * Note : <code>proxy1</code> and <code>proxy2</code> are both trusted proxies that come in <code>x-forwarded-for</code> header, they both
  * are migrated in <code>x-forwarded-by</code> header. As <code>192.168.0.10</code> is an internal proxy, it does not appear in
  * <code>x-forwarded-by</code>. <code>x-forwarded-by</code> is null because all the proxies are trusted or internal.
  * </p>
- * <hr/>
+ * <hr>
  * <p>
  * <strong>Sample with an untrusted proxy</strong>
  * </p>
  * <p>
  * RemoteIpFilter configuration:
  * </p>
- * <code><pre>
+ * <code>
  * &lt;filter&gt;
  *    &lt;filter-name&gt;RemoteIpFilter&lt;/filter-name&gt;
  *    &lt;filter-class&gt;org.apache.catalina.filters.RemoteIpFilter&lt;/filter-class&gt;
@@ -410,10 +405,9 @@ import org.apache.juli.logging.LogFactory;
  *    &lt;filter-name&gt;RemoteIpFilter&lt;/filter-name&gt;
  *    &lt;url-pattern&gt;/*&lt;/url-pattern&gt;
  *    &lt;dispatcher&gt;REQUEST&lt;/dispatcher&gt;
- * &lt;/filter-mapping&gt;</pre></code>
- * <p>
- * Request values:
+ * &lt;/filter-mapping&gt;</code>
  * <table border="1">
+ * <caption>Request Values</caption>
  * <tr>
  * <th>property</th>
  * <th>Value Before RemoteIpFilter</th>
@@ -435,14 +429,16 @@ import org.apache.juli.logging.LogFactory;
  * <td>proxy1</td>
  * </tr>
  * </table>
+ * <p>
  * Note : <code>x-forwarded-by</code> holds the trusted proxy <code>proxy1</code>. <code>x-forwarded-by</code> holds
- * <code>140.211.11.130</code> because <code>untrusted-proxy</code> is not trusted and thus, we can not trust that
+ * <code>140.211.11.130</code> because <code>untrusted-proxy</code> is not trusted and thus, we cannot trust that
  * <code>untrusted-proxy</code> is the actual remote ip. <code>request.remoteAddr</code> is <code>untrusted-proxy</code> that is an IP
  * verified by <code>proxy1</code>.
  * </p>
- * <hr/>
+ * <hr>
  */
 public class RemoteIpFilter implements Filter {
+
     public static class XForwardedRequest extends HttpServletRequestWrapper {
 
         static final ThreadLocal<SimpleDateFormat[]> threadLocalDateFormats = new ThreadLocal<SimpleDateFormat[]>() {
@@ -677,6 +673,7 @@ public class RemoteIpFilter implements Filter {
     /**
      * Convert a given comma delimited list of regular expressions into an array of String
      *
+     * @param commaDelimitedStrings The string to split
      * @return array of patterns (non <code>null</code>)
      */
     protected static String[] commaDelimitedListToStringArray(String commaDelimitedStrings) {
@@ -685,7 +682,10 @@ public class RemoteIpFilter implements Filter {
     }
 
     /**
-     * Convert an array of strings in a comma delimited string
+     * Convert a list of strings in a comma delimited string.
+     *
+     * @param stringList List of strings
+     * @return concatenated string
      */
     protected static String listToCommaDelimitedString(List<String> stringList) {
         if (stringList == null) {
@@ -916,6 +916,7 @@ public class RemoteIpFilter implements Filter {
 
     /**
      * Wrap the incoming <code>request</code> in a {@link XForwardedRequest} if the http header <code>x-forwarded-for</code> is not empty.
+     * {@inheritDoc}
      */
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
@@ -1026,12 +1027,13 @@ public class RemoteIpFilter implements Filter {
      * <p>
      * If <code>true</code>, the return values for both {@link
      * ServletRequest#getLocalPort()} and {@link ServletRequest#getServerPort()}
-     * wil be modified by this Filter rather than just
+     * will be modified by this Filter rather than just
      * {@link ServletRequest#getServerPort()}.
      * </p>
      * <p>
      * Default value : <code>false</code>
      * </p>
+     * @param changeLocalPort The new flag value
      */
     public void setChangeLocalPort(boolean changeLocalPort) {
         this.changeLocalPort = changeLocalPort;
@@ -1045,6 +1047,7 @@ public class RemoteIpFilter implements Filter {
      * <p>
      * Default value : 80
      * </p>
+     * @param httpServerPort The server port to use
      */
     public void setHttpServerPort(int httpServerPort) {
         this.httpServerPort = httpServerPort;
@@ -1057,6 +1060,7 @@ public class RemoteIpFilter implements Filter {
      * <p>
      * Default value : 443
      * </p>
+     * @param httpsServerPort The server port to use
      */
     public void setHttpsServerPort(int httpsServerPort) {
         this.httpsServerPort = httpsServerPort;
@@ -1069,6 +1073,7 @@ public class RemoteIpFilter implements Filter {
      * <p>
      * Default value : 10\.\d{1,3}\.\d{1,3}\.\d{1,3}|192\.168\.\d{1,3}\.\d{1,3}|169\.254.\d{1,3}.\d{1,3}|127\.\d{1,3}\.\d{1,3}\.\d{1,3}|0:0:0:0:0:0:0:1
      * </p>
+     * @param internalProxies The regexp
      */
     public void setInternalProxies(String internalProxies) {
         if (internalProxies == null || internalProxies.length() == 0) {
@@ -1080,13 +1085,14 @@ public class RemoteIpFilter implements Filter {
 
     /**
      * <p>
-     * Header that holds the incoming port, usally named
+     * Header that holds the incoming port, usually named
      * <code>X-Forwarded-Port</code>. If <code>null</code>,
      * {@link #httpServerPort} or {@link #httpsServerPort} will be used.
      * </p>
      * <p>
      * Default value : <code>null</code>
      * </p>
+     * @param portHeader The header name
      */
     public void setPortHeader(String portHeader) {
         this.portHeader = portHeader;
@@ -1094,12 +1100,13 @@ public class RemoteIpFilter implements Filter {
 
     /**
      * <p>
-     * Header that holds the incoming protocol, usally named <code>X-Forwarded-Proto</code>. If <code>null</code>, request.scheme and
+     * Header that holds the incoming protocol, usually named <code>X-Forwarded-Proto</code>. If <code>null</code>, request.scheme and
      * request.secure will not be modified.
      * </p>
      * <p>
      * Default value : <code>null</code>
      * </p>
+     * @param protocolHeader The header name
      */
     public void setProtocolHeader(String protocolHeader) {
         this.protocolHeader = protocolHeader;
@@ -1112,6 +1119,7 @@ public class RemoteIpFilter implements Filter {
      * <p>
      * Default value : <code>https</code>
      * </p>
+     * @param protocolHeaderHttpsValue The header value
      */
     public void setProtocolHeaderHttpsValue(String protocolHeaderHttpsValue) {
         this.protocolHeaderHttpsValue = protocolHeaderHttpsValue;
@@ -1132,6 +1140,7 @@ public class RemoteIpFilter implements Filter {
      * <p>
      * Default value : <code>X-Forwarded-By</code>
      * </p>
+     * @param proxiesHeader The header name
      */
     public void setProxiesHeader(String proxiesHeader) {
         this.proxiesHeader = proxiesHeader;
@@ -1147,6 +1156,7 @@ public class RemoteIpFilter implements Filter {
      * <p>
      * Default value : <code>X-Forwarded-For</code>
      * </p>
+     * @param remoteIpHeader The header name
      */
     public void setRemoteIpHeader(String remoteIpHeader) {
         this.remoteIpHeader = remoteIpHeader;
@@ -1183,6 +1193,7 @@ public class RemoteIpFilter implements Filter {
      * <p>
      * Default value : empty list, no external proxy is trusted.
      * </p>
+     * @param trustedProxies The trusted proxies regexp
      */
     public void setTrustedProxies(String trustedProxies) {
         if (trustedProxies == null || trustedProxies.length() == 0) {
