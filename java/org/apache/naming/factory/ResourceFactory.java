@@ -30,7 +30,7 @@ import org.apache.naming.StringManager;
  */
 public class ResourceFactory extends FactoryBase {
 
-    private static final StringManager sm = StringManager.getManager(ResourceLinkFactory.class);
+    private static final StringManager sm = StringManager.getManager(ResourceFactory.class);
 
     @Override
     protected boolean isReferenceTypeSupported(Object obj) {
