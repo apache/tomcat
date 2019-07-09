@@ -442,6 +442,7 @@ import org.apache.juli.logging.LogFactory;
  * <hr>
  */
 public class RemoteIpFilter implements Filter {
+
     public static class XForwardedRequest extends HttpServletRequestWrapper {
 
         static final ThreadLocal<SimpleDateFormat[]> threadLocalDateFormats = new ThreadLocal<SimpleDateFormat[]>() {
