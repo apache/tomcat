@@ -68,7 +68,7 @@
     </changelog>
   </subsection>
 </section>
-<section name="Tomcat 8.5.43 (markt)" rtext="release in progress">
+<section name="Tomcat 8.5.43 (markt)" rtext="2019-07-09">
   <subsection name="Catalina">
     <changelog>
       <update>
