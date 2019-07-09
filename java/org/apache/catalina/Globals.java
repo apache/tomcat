@@ -274,8 +274,14 @@ public final class Globals {
 
 
     /**
-     *
+     * The request attribute that is set to the value of {@code Boolean.TRUE}
+     * by the RemoteIpFilter, RemoteIpValve (and other similar components) that identifies
+     * a request which been forwarded via one or more proxies.
      */
+    public static final String REQUEST_FORWARDED_ATTRIBUTE =
+        "org.apache.tomcat.request.forwarded";
+
+
     public static final String ASYNC_SUPPORTED_ATTR =
         "org.apache.catalina.ASYNC_SUPPORTED";
 
