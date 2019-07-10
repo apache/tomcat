@@ -51,6 +51,11 @@
         <bug>63556</bug>: Mark request as forwarded in RemoteIpValve and
         RemoteIpFilter (michaelo)
       </add>
+      <fix>
+        If an unhandled exception occurs on a asynchronous thread started via
+        <code>AsyncContext.start(Runnable)</code>, process it using the standard
+        error page mechanism. (markt)
+      </fix>
      </changelog>
   </subsection>
   <subsection name="Coyote">
