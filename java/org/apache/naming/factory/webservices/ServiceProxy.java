@@ -101,14 +101,12 @@ public class ServiceProxy implements InvocationHandler {
      * @return Returns the correct Port
      * @throws ServiceException if port's QName is an unknown Port (not defined in WSDL).
      */
-    private Object getProxyPortQNameClass(Object[] args)
-    throws ServiceException {
+    private Object getProxyPortQNameClass(Object[] args) throws ServiceException {
         QName name = (QName) args[0];
         String nameString = name.getLocalPart();
         Class<?> serviceendpointClass = (Class<?>) args[1];
 
-        for (@SuppressWarnings("unchecked")
-        Iterator<QName> ports = service.getPorts(); ports.hasNext();) {
+        for (@SuppressWarnings("unchecked") Iterator<QName> ports = service.getPorts(); ports.hasNext();) {
             QName portName = ports.next();
             String portnameString = portName.getLocalPart();
             if (portnameString.equals(nameString)) {
@@ -132,12 +130,12 @@ public class ServiceProxy implements InvocationHandler {
      * @return Returns the correct Port
      * @throws ServiceException if port's QName is an unknown Port
      */
-    private Remote getProxyPortClass(Object[] args)
-    throws ServiceException {
+    private Remote getProxyPortClass(Object[] args) throws ServiceException {
         Class<?> serviceendpointClass = (Class<?>) args[0];
 
-        if (this.portComponentRef == null)
+        if (this.portComponentRef == null) {
             return service.getPort(serviceendpointClass);
+        }
 
         QName portname = this.portComponentRef.get(serviceendpointClass.getName());
         if (portname != null) {
