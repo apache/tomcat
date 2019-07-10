@@ -39,6 +39,7 @@ import javax.naming.OperationNotSupportedException;
 import javax.naming.Reference;
 import javax.naming.Referenceable;
 import javax.naming.spi.NamingManager;
+import javax.naming.spi.ObjectFactory;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -791,6 +792,21 @@ public class NamingContext implements Context {
     // ------------------------------------------------------ Protected Methods
 
 
+    private static final boolean GRAAL;
+
+    static {
+        boolean result = false;
+        try {
+            Class<?> nativeImageClazz = Class.forName("org.graalvm.nativeimage.ImageInfo");
+            result = Boolean.TRUE.equals(nativeImageClazz.getMethod("inImageCode").invoke(null));
+        } catch (ClassNotFoundException e) {
+            // Must be Graal
+        } catch (ReflectiveOperationException | IllegalArgumentException e) {
+            // Should never happen
+        }
+        GRAAL = result;
+    }
+
     /**
      * Retrieves the named object.
      *
@@ -836,9 +852,19 @@ public class NamingContext implements Context {
                 }
             } else if (entry.type == NamingEntry.REFERENCE) {
                 try {
-                    Object obj = NamingManager.getObjectInstance
-                        (entry.value, name, this, env);
-                    if(entry.value instanceof ResourceRef) {
+                    Object obj = null;
+                    if (!GRAAL) {
+                        obj = NamingManager.getObjectInstance(entry.value, name, this, env);
+                    } else {
+                        // NamingManager.getObjectInstance would simply return the reference here
+                        // Use the configured object factory to resolve it directly if possible
+                        // Note: This may need manual constructor reflection configuration
+                        Reference reference = (Reference) entry.value;
+                        Class<?> factoryClass = getClass().getClassLoader().loadClass(reference.getFactoryClassName());
+                        ObjectFactory factory = (ObjectFactory) factoryClass.newInstance();
+                        obj = factory.getObjectInstance(entry.value, name, this, env);
+                    }
+                    if (entry.value instanceof ResourceRef) {
                         boolean singleton = Boolean.parseBoolean(
                                     (String) ((ResourceRef) entry.value).get(
                                         "singleton").getContent());
