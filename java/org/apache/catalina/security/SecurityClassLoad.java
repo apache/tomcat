@@ -14,13 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.catalina.security;
 
 /**
- * Static class used to preload java classes when using the Java SecurityManager
- * so that the defineClassInPackage RuntimePermission does not trigger an
- * AccessControlException.
+ * Static class used to preload java classes when using the
+ * Java SecurityManager so that the defineClassInPackage
+ * RuntimePermission does not trigger an AccessControlException.
  *
  * @author Glenn L. Nielsen
  */
@@ -29,6 +28,7 @@ public final class SecurityClassLoad {
     public static void securityClassLoad(ClassLoader loader) throws Exception {
         securityClassLoad(loader, true);
     }
+
 
     static void securityClassLoad(ClassLoader loader, boolean requireSecurityManager) throws Exception {
 
@@ -49,6 +49,7 @@ public final class SecurityClassLoad {
         loadTomcatPackage(loader);
     }
 
+
     private static final void loadCorePackage(ClassLoader loader) throws Exception {
         final String basePackage = "org.apache.catalina.core.";
         loader.loadClass(basePackage + "AccessLogAdapter");
@@ -67,16 +68,19 @@ public final class SecurityClassLoad {
         loader.loadClass(basePackage + "ApplicationHttpRequest$AttributeNamesEnumerator");
     }
 
+
     private static final void loadLoaderPackage(ClassLoader loader) throws Exception {
         final String basePackage = "org.apache.catalina.loader.";
         loader.loadClass(basePackage + "WebappClassLoaderBase$PrivilegedFindClassByName");
         loader.loadClass(basePackage + "WebappClassLoaderBase$PrivilegedHasLoggingConfig");
     }
 
+
     private static final void loadRealmPackage(ClassLoader loader) throws Exception {
         final String basePackage = "org.apache.catalina.realm.";
         loader.loadClass(basePackage + "LockOutRealm$LockRecord");
     }
+
 
     private static final void loadServletsPackage(ClassLoader loader) throws Exception {
         final String basePackage = "org.apache.catalina.servlets.";
@@ -88,6 +92,7 @@ public final class SecurityClassLoad {
         loader.loadClass(basePackage + "DefaultServlet");
     }
 
+
     private static final void loadSessionPackage(ClassLoader loader) throws Exception {
         final String basePackage = "org.apache.catalina.session.";
         loader.loadClass(basePackage + "StandardSession");
@@ -95,12 +100,14 @@ public final class SecurityClassLoad {
         loader.loadClass(basePackage + "StandardManager$PrivilegedDoUnload");
     }
 
+
     private static final void loadUtilPackage(ClassLoader loader) throws Exception {
         final String basePackage = "org.apache.catalina.util.";
         loader.loadClass(basePackage + "ParameterMap");
         loader.loadClass(basePackage + "RequestUtil");
         loader.loadClass(basePackage + "TLSUtil");
     }
+
 
     private static final void loadValvesPackage(ClassLoader loader) throws Exception {
         final String basePackage = "org.apache.catalina.valves.";
@@ -116,9 +123,11 @@ public final class SecurityClassLoad {
         loader.loadClass(basePackage + "http2.Stream$PrivilegedPush");
     }
 
+
     private static final void loadJavaxPackage(ClassLoader loader) throws Exception {
         loader.loadClass("javax.servlet.http.Cookie");
     }
+
 
     private static final void loadConnectorPackage(ClassLoader loader) throws Exception {
         final String basePackage = "org.apache.catalina.connector.";
@@ -143,6 +152,7 @@ public final class SecurityClassLoad {
         loadAnonymousInnerClasses(loader, basePackage + "InputBuffer");
         loadAnonymousInnerClasses(loader, basePackage + "Response");
     }
+
 
     private static final void loadTomcatPackage(ClassLoader loader) throws Exception {
         final String basePackage = "org.apache.tomcat.";
