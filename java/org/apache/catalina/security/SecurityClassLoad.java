@@ -14,8 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.catalina.security;
 
 /**
@@ -24,12 +22,11 @@ package org.apache.catalina.security;
  * RuntimePermission does not trigger an AccessControlException.
  *
  * @author Glenn L. Nielsen
- * @author Jean-Francois Arcand
  */
 public final class SecurityClassLoad {
 
-    public static void securityClassLoad(ClassLoader loader)
-        throws Exception {
+    public static void securityClassLoad(ClassLoader loader) throws Exception {
+
 
         if( System.getSecurityManager() == null ){
             return;
@@ -49,16 +46,15 @@ public final class SecurityClassLoad {
     }
 
 
-    private static final void loadCorePackage(ClassLoader loader)
-        throws Exception {
+    private static final void loadCorePackage(ClassLoader loader) throws Exception {
         final String basePackage = "org.apache.catalina.core.";
         loader.loadClass(basePackage + "AccessLogAdapter");
         loadAnonymousInnerClasses(loader, basePackage + "ApplicationContextFacade");
         loader.loadClass(basePackage + "ApplicationDispatcher$PrivilegedForward");
         loader.loadClass(basePackage + "ApplicationDispatcher$PrivilegedInclude");
         loader.loadClass(basePackage + "AsyncContextImpl");
+        loader.loadClass(basePackage + "AsyncContextImpl$AsyncRunnable");
         loader.loadClass(basePackage + "AsyncContextImpl$DebugException");
-        loadAnonymousInnerClasses(loader, basePackage + "AsyncContextImpl");
         loader.loadClass(basePackage + "AsyncListenerWrapper");
         loader.loadClass(basePackage + "ContainerBase$PrivilegedAddChild");
         loadAnonymousInnerClasses(loader, basePackage + "DefaultInstanceManager");
@@ -68,28 +64,20 @@ public final class SecurityClassLoad {
     }
 
 
-    private static final void loadLoaderPackage(ClassLoader loader)
-        throws Exception {
+    private static final void loadLoaderPackage(ClassLoader loader) throws Exception {
         final String basePackage = "org.apache.catalina.loader.";
-        loader.loadClass
-            (basePackage +
-             "ResourceEntry");
-        loader.loadClass
-            (basePackage +
-             "WebappClassLoaderBase$PrivilegedFindResourceByName");
+        loader.loadClass(basePackage + "ResourceEntry");
+        loader.loadClass(basePackage + "WebappClassLoaderBase$PrivilegedFindResourceByName");
     }
 
 
-    private static final void loadRealmPackage(ClassLoader loader)
-            throws Exception {
+    private static final void loadRealmPackage(ClassLoader loader) throws Exception {
         final String basePackage = "org.apache.catalina.realm.";
-        loader.loadClass
-            (basePackage + "LockOutRealm$LockRecord");
+        loader.loadClass(basePackage + "LockOutRealm$LockRecord");
     }
 
 
-    private static final void loadServletsPackage(ClassLoader loader)
-            throws Exception {
+    private static final void loadServletsPackage(ClassLoader loader) throws Exception {
         final String basePackage = "org.apache.catalina.servlets.";
         // Avoid a possible memory leak in the DefaultServlet when running with
         // a security manager. The DefaultServlet needs to load an XML parser
@@ -100,8 +88,7 @@ public final class SecurityClassLoad {
     }
 
 
-    private static final void loadSessionPackage(ClassLoader loader)
-        throws Exception {
+    private static final void loadSessionPackage(ClassLoader loader) throws Exception {
         final String basePackage = "org.apache.catalina.session.";
         loader.loadClass(basePackage + "StandardSession");
         loadAnonymousInnerClasses(loader, basePackage + "StandardSession");
@@ -109,8 +96,7 @@ public final class SecurityClassLoad {
     }
 
 
-    private static final void loadUtilPackage(ClassLoader loader)
-        throws Exception {
+    private static final void loadUtilPackage(ClassLoader loader) throws Exception {
         final String basePackage = "org.apache.catalina.util.";
         loader.loadClass(basePackage + "Enumerator");
         loader.loadClass(basePackage + "ParameterMap");
@@ -118,15 +104,13 @@ public final class SecurityClassLoad {
     }
 
 
-    private static final void loadValvesPackage(ClassLoader loader)
-            throws Exception {
-            final String basePackage = "org.apache.catalina.valves.";
-            loader.loadClass(basePackage + "AccessLogValve$3");
-        }
+    private static final void loadValvesPackage(ClassLoader loader) throws Exception {
+        final String basePackage = "org.apache.catalina.valves.";
+        loader.loadClass(basePackage + "AccessLogValve$3");
+    }
 
 
-    private static final void loadCoyotePackage(ClassLoader loader)
-            throws Exception {
+    private static final void loadCoyotePackage(ClassLoader loader) throws Exception {
         final String basePackage = "org.apache.coyote.";
         // Java 6 compiler creates helper *$1 classes because we use switch with an enum
         loadAnonymousInnerClasses(loader, basePackage + "http11.AbstractHttp11Processor");
@@ -137,18 +121,16 @@ public final class SecurityClassLoad {
         loader.loadClass(basePackage + "http11.Constants");
         // Make sure system property is read at this point
         Class<?> clazz = loader.loadClass(basePackage + "Constants");
-        clazz.newInstance();
+        clazz.getConstructor().newInstance();
     }
 
 
-    private static final void loadJavaxPackage(ClassLoader loader)
-        throws Exception {
+    private static final void loadJavaxPackage(ClassLoader loader) throws Exception {
         loader.loadClass("javax.servlet.http.Cookie");
     }
 
 
-    private static final void loadConnectorPackage(ClassLoader loader)
-        throws Exception {
+    private static final void loadConnectorPackage(ClassLoader loader) throws Exception {
         final String basePackage = "org.apache.catalina.connector.";
         loader.loadClass(basePackage + "RequestFacade$GetAttributePrivilegedAction");
         loader.loadClass(basePackage + "RequestFacade$GetParameterMapPrivilegedAction");
@@ -172,8 +154,8 @@ public final class SecurityClassLoad {
         loadAnonymousInnerClasses(loader, basePackage + "Response");
     }
 
-    private static final void loadTomcatPackage(ClassLoader loader)
-        throws Exception {
+
+    private static final void loadTomcatPackage(ClassLoader loader) throws Exception {
         final String basePackage = "org.apache.tomcat.";
         // buf
         loader.loadClass(basePackage + "util.buf.B2CConverter");
@@ -217,4 +199,3 @@ public final class SecurityClassLoad {
         }
     }
 }
-
