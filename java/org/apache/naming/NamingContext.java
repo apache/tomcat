@@ -72,7 +72,7 @@ public class NamingContext implements Context {
      * @param env The environment to use to construct the naming context
      * @param name The name of the associated Catalina Context
      */
-    public NamingContext(Hashtable<String,Object> env, String name) {
+    public NamingContext(Hashtable<String,Object> env, String name) throws NamingException {
         this(env, name, new HashMap<String,NamingEntry>());
     }
 
@@ -85,9 +85,9 @@ public class NamingContext implements Context {
      * @param bindings The initial bindings for the naming context
      */
     public NamingContext(Hashtable<String,Object> env, String name,
-            HashMap<String,NamingEntry> bindings) {
+            HashMap<String,NamingEntry> bindings) throws NamingException {
 
-        this.env = new Hashtable<>();
+        this.env = new Hashtable<String,Object>();
         this.name = name;
         // Populating the environment hashtable
         if (env != null ) {
