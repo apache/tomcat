@@ -21,6 +21,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -32,7 +33,6 @@ import javax.naming.Context;
 import javax.naming.Name;
 import javax.naming.NamingException;
 import javax.naming.RefAddr;
-import javax.naming.Reference;
 import javax.naming.spi.ObjectFactory;
 import javax.wsdl.Definition;
 import javax.wsdl.Port;
@@ -69,7 +69,7 @@ public class ServiceRefFactory implements ObjectFactory {
     throws Exception {
 
         if (obj instanceof ServiceRef) {
-            Reference ref = (Reference) obj;
+            ServiceRef ref = (ServiceRef) obj;
 
             // ClassLoader
             ClassLoader tcl =
@@ -176,7 +176,7 @@ public class ServiceRefFactory implements ObjectFactory {
                     Definition def = reader.readWSDL((new URL(wsdlRefAddr)).toExternalForm());
 
                     javax.wsdl.Service wsdlservice = def.getService(serviceQname);
-                    @SuppressWarnings("unchecked")
+                    @SuppressWarnings("unchecked") // Can't change the API
                     Map<String,?> ports = wsdlservice.getPorts();
                     Method m = serviceInterfaceClass.getMethod("setEndpointAddress",
                             new Class[] { java.lang.String.class,
@@ -222,15 +222,11 @@ public class ServiceRefFactory implements ObjectFactory {
             proxy.setPortComponentRef(portComponentRef);
 
             // Instantiate service with proxy class
-            Class<?>[] interfaces = null;
             Class<?>[] serviceInterfaces = serviceInterfaceClass.getInterfaces();
 
-            interfaces = new Class[serviceInterfaces.length + 1];
-            for (int i = 0; i < serviceInterfaces.length; i++) {
-                interfaces[i] = serviceInterfaces[i];
-            }
-
+            Class<?>[] interfaces = Arrays.copyOf(serviceInterfaces, serviceInterfaces.length + 1);
             interfaces[interfaces.length - 1] = javax.xml.rpc.Service.class;
+
             Object proxyInstance = null;
             try {
                 proxyInstance = Proxy.newProxyInstance(tcl, interfaces, proxy);
@@ -239,13 +235,13 @@ public class ServiceRefFactory implements ObjectFactory {
             }
 
             // Use handler
-            if (((ServiceRef) ref).getHandlersSize() > 0) {
+            if (ref.getHandlersSize() > 0) {
 
                 HandlerRegistry handlerRegistry = service.getHandlerRegistry();
-                ArrayList<String> soaproles = new ArrayList<>();
+                List<String> soaproles = new ArrayList<>();
 
-                while (((ServiceRef) ref).getHandlersSize() > 0) {
-                    HandlerRef handlerRef = ((ServiceRef) ref).getHandler();
+                while (ref.getHandlersSize() > 0) {
+                    HandlerRef handlerRef = ref.getHandler();
                     HandlerInfo handlerInfo = new HandlerInfo();
 
                     // Loading handler Class
@@ -261,9 +257,9 @@ public class ServiceRefFactory implements ObjectFactory {
 
                     // Load all datas relative to the handler : SOAPHeaders, config init element,
                     // portNames to be set on
-                    ArrayList<QName> headers = new ArrayList<>();
+                    List<QName> headers = new ArrayList<>();
                     Hashtable<String,String> config = new Hashtable<>();
-                    ArrayList<String> portNames = new ArrayList<>();
+                    List<String> portNames = new ArrayList<>();
                     for (int i = 0; i < handlerRef.size(); i++)
                         if (HandlerRef.HANDLER_LOCALPART.equals(handlerRef.get(i).getType())) {
                             String localpart = "";
@@ -327,7 +323,7 @@ public class ServiceRefFactory implements ObjectFactory {
      */
     private String getSOAPLocation(Port port) {
         String endpoint = null;
-        @SuppressWarnings("unchecked")
+        @SuppressWarnings("unchecked") // Can't change the API
         List<ExtensibilityElement> extensions = port.getExtensibilityElements();
         for (ExtensibilityElement ext : extensions) {
             if (ext instanceof SOAPAddress) {
@@ -340,9 +336,9 @@ public class ServiceRefFactory implements ObjectFactory {
 
 
     private void initHandlerChain(QName portName, HandlerRegistry handlerRegistry,
-            HandlerInfo handlerInfo, ArrayList<String> soaprolesToAdd) {
+            HandlerInfo handlerInfo, List<String> soaprolesToAdd) {
         HandlerChain handlerChain = (HandlerChain) handlerRegistry.getHandlerChain(portName);
-        @SuppressWarnings("unchecked")
+        @SuppressWarnings("unchecked") // Can't change the API
         Iterator<Handler> iter = handlerChain.iterator();
         while (iter.hasNext()) {
             Handler handler = iter.next();
