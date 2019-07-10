@@ -80,8 +80,12 @@ public class KubernetesMembershipProvider extends CloudMembershipProvider {
             if (saTokenFile == null) {
                 saTokenFile = "/var/run/secrets/kubernetes.io/serviceaccount/token";
             }
-            byte[] bytes = Files.readAllBytes(FileSystems.getDefault().getPath(saTokenFile));
-            streamProvider = new TokenStreamProvider(new String(bytes, StandardCharsets.US_ASCII), caCertFile);
+            try {
+                byte[] bytes = Files.readAllBytes(FileSystems.getDefault().getPath(saTokenFile));
+                streamProvider = new TokenStreamProvider(new String(bytes, StandardCharsets.US_ASCII), caCertFile);
+            } catch (IOException e) {
+                log.error(sm.getString("kubernetesMembershipProvider.streamError"), e);
+            }
         } else {
             if (protocol == null) {
                 protocol = "http";

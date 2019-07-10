@@ -62,6 +62,16 @@
       </scode>
     </changelog>
   </subsection>
+  <subsection name="Cluster">
+    <changelog>
+      <fix>
+        Avoid failing Kubernetes membership (and preventing startup) if the
+        stream cannot be opened, to get the same behavior as the DNS based
+        membership. The namespace is still a failure on startup but it is easy
+        to provide. (remm)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <fix>
