@@ -456,13 +456,12 @@ public final class Response {
         return contentLanguage;
     }
 
+
     /**
-     * Overrides the name of the character encoding used in the body
-     * of the response. This method must be called prior to writing output
-     * using getWriter().
+     * Overrides the character encoding used in the body of the response. This
+     * method must be called prior to writing output using getWriter().
      *
-     * @param characterEncoding String containing the name of the character
-     *                          encoding.
+     * @param characterEncoding The name of character encoding.
      */
     public void setCharacterEncoding(String characterEncoding) {
         if (isCommitted()) {
@@ -547,8 +546,7 @@ public final class Response {
 
         String ret = contentType;
 
-        if (ret != null
-            && charset != null) {
+        if (ret != null && charset != null) {
             ret = ret + ";charset=" + characterEncoding;
         }
 
