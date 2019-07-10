@@ -103,5 +103,5 @@ Generate the final json files using native-image-configuration then use native i
 ```
 $JAVA_HOME/bin/native-image-configure generate --trace-input=$TOMCAT_MAVEN/target/trace-file.json --output-dir=$TOMCAT_MAVEN/target
 $JAVA_HOME/bin/native-image --no-server --allow-incomplete-classpath --enable-https --initialize-at-build-time=org.eclipse.jdt,org.apache.el.parser.SimpleNode,javax.servlet.jsp.JspFactory,org.apache.jasper.servlet.JasperInitializer,org.apache.jasper.runtime.JspFactoryImpl -H:+JNI -H:+ReportUnsupportedElementsAtRuntime -H:+ReportExceptionStackTraces -H:EnableURLProtocols=jar -H:ConfigurationFileDirectories=$TOMCAT_MAVEN/target/ -H:ReflectionConfigurationFiles=$TOMCAT_MAVEN/tomcat-reflection.json -H:ResourceConfigurationFiles=$TOMCAT_MAVEN/tomcat-resource.json -jar $TOMCAT_MAVEN/target/tomcat-maven-1.0.jar
-./tomcat-maven-1.0 -Dcatalina.base=. -Djava.util.logging.config.file=conf/logging.properties -Djava.util.logging.manager=org.apache.juli.ClassLoaderLogManager
+./tomcat-maven-1.0 -Djava.library.path=$JAVA_HOME/jre/lib/amd64 -Dcatalina.base=. -Djava.util.logging.config.file=conf/logging.properties -Djava.util.logging.manager=org.apache.juli.ClassLoaderLogManager
 ```
