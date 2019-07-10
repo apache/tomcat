@@ -86,7 +86,7 @@ import org.apache.naming.ResourceRef;
  * &lt;/ResourceParams&gt;
  * </pre>
  *
- * @author <a href="mailto:aner at ncstech.com">Aner Perez</a>
+ * @author Aner Perez [aner at ncstech.com]
  */
 public class BeanFactory
     implements ObjectFactory {
@@ -145,7 +145,7 @@ public class BeanFactory
                 BeanInfo bi = Introspector.getBeanInfo(beanClass);
                 PropertyDescriptor[] pda = bi.getPropertyDescriptors();
 
-                Object bean = beanClass.newInstance();
+                Object bean = beanClass.getConstructor().newInstance();
 
                 /* Look for properties with explicitly configured setter */
                 RefAddr ra = ref.get("forceString");
@@ -305,6 +305,18 @@ public class BeanFactory
             } catch (java.lang.InstantiationException ie2) {
                 NamingException ne = new NamingException(ie2.getMessage());
                 ne.setRootCause(ie2);
+                throw ne;
+            } catch (IllegalArgumentException e) {
+                NamingException ne = new NamingException(e.getMessage());
+                ne.setRootCause(e);
+                throw ne;
+            } catch (SecurityException e) {
+                NamingException ne = new NamingException(e.getMessage());
+                ne.setRootCause(e);
+                throw ne;
+            } catch (NoSuchMethodException e) {
+                NamingException ne = new NamingException(e.getMessage());
+                ne.setRootCause(e);
                 throw ne;
             } catch (java.lang.reflect.InvocationTargetException ite) {
                 Throwable cause = ite.getCause();

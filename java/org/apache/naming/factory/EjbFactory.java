@@ -14,15 +14,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.naming.factory;
 
-import java.util.Hashtable;
-
-import javax.naming.Context;
 import javax.naming.InitialContext;
-import javax.naming.Name;
 import javax.naming.NamingException;
 import javax.naming.RefAddr;
 import javax.naming.Reference;
@@ -35,144 +29,50 @@ import org.apache.naming.EjbRef;
  *
  * @author Remy Maucherat
  */
+public class EjbFactory extends FactoryBase {
 
-public class EjbFactory
-    implements ObjectFactory {
-
-
-    // ----------------------------------------------------------- Constructors
-
-
-    // -------------------------------------------------------------- Constants
-
-
-    // ----------------------------------------------------- Instance Variables
-
-
-    // --------------------------------------------------------- Public Methods
-
-
-    // -------------------------------------------------- ObjectFactory Methods
-
-
-    /**
-     * Create a new EJB instance.
-     *
-     * @param obj The reference object describing the DataSource
-     */
     @Override
-    public Object getObjectInstance(Object obj, Name name, Context nameCtx,
-                                    Hashtable<?,?> environment)
-        throws Exception {
-
-        if (obj instanceof EjbRef) {
-            Reference ref = (Reference) obj;
-
-            // If ejb-link has been specified, resolving the link using JNDI
-            RefAddr linkRefAddr = ref.get(EjbRef.LINK);
-            if (linkRefAddr != null) {
-                // Retrieving the EJB link
-                String ejbLink = linkRefAddr.getContent().toString();
-                Object beanObj = (new InitialContext()).lookup(ejbLink);
-                // Load home interface and checking if bean correctly
-                // implements specified home interface
-                /*
-                String homeClassName = ref.getClassName();
-                try {
-                    Class home = Class.forName(homeClassName);
-                    if (home.isInstance(beanObj)) {
-                        System.out.println("Bean of type "
-                                           + beanObj.getClass().getName()
-                                           + " implements home interface "
-                                           + home.getName());
-                    } else {
-                        System.out.println("Bean of type "
-                                           + beanObj.getClass().getName()
-                                           + " doesn't implement home interface "
-                                           + home.getName());
-                        throw new NamingException
-                            ("Bean of type " + beanObj.getClass().getName()
-                             + " doesn't implement home interface "
-                             + home.getName());
-                    }
-                } catch (ClassNotFoundException e) {
-                    System.out.println("Couldn't load home interface "
-                                       + homeClassName);
-                }
-                */
-                return beanObj;
-            }
-
-            ObjectFactory factory = null;
-            RefAddr factoryRefAddr = ref.get(Constants.FACTORY);
-            if (factoryRefAddr != null) {
-                // Using the specified factory
-                String factoryClassName =
-                    factoryRefAddr.getContent().toString();
-                // Loading factory
-                ClassLoader tcl =
-                    Thread.currentThread().getContextClassLoader();
-                Class<?> factoryClass = null;
-                if (tcl != null) {
-                    try {
-                        factoryClass = tcl.loadClass(factoryClassName);
-                    } catch(ClassNotFoundException e) {
-                        NamingException ex = new NamingException
-                            ("Could not load resource factory class");
-                        ex.initCause(e);
-                        throw ex;
-                    }
-                } else {
-                    try {
-                        factoryClass = Class.forName(factoryClassName);
-                    } catch(ClassNotFoundException e) {
-                        NamingException ex = new NamingException
-                            ("Could not load resource factory class");
-                        ex.initCause(e);
-                        throw ex;
-                    }
-                }
-                if (factoryClass != null) {
-                    try {
-                        factory = (ObjectFactory) factoryClass.newInstance();
-                    } catch(Throwable t) {
-                        NamingException ex = new NamingException
-                            ("Could not load resource factory class");
-                        ex.initCause(t);
-                        throw ex;
-                    }
-                }
-            } else {
-                String javaxEjbFactoryClassName =
-                    System.getProperty("javax.ejb.Factory",
-                                       Constants.OPENEJB_EJB_FACTORY);
-                try {
-                    factory = (ObjectFactory)
-                        Class.forName(javaxEjbFactoryClassName).newInstance();
-                } catch(Throwable t) {
-                    if (t instanceof NamingException)
-                        throw (NamingException) t;
-                    NamingException ex = new NamingException
-                        ("Could not create resource factory instance");
-                    ex.initCause(t);
-                    throw ex;
-                }
-            }
-
-            if (factory != null) {
-                return factory.getObjectInstance
-                    (obj, name, nameCtx, environment);
-            } else {
-                throw new NamingException
-                    ("Cannot create resource instance");
-            }
-
-        }
-
-        return null;
-
+    protected boolean isReferenceTypeSupported(Object obj) {
+        return obj instanceof EjbRef;
     }
 
+    @Override
+    protected ObjectFactory getDefaultFactory(Reference ref) throws NamingException {
 
+        ObjectFactory factory;
+        String javaxEjbFactoryClassName = System.getProperty(
+                "javax.ejb.Factory", Constants.OPENEJB_EJB_FACTORY);
+        try {
+            factory = (ObjectFactory)
+                Class.forName(javaxEjbFactoryClassName).getConstructor().newInstance();
+        } catch(Throwable t) {
+            if (t instanceof NamingException) {
+                throw (NamingException) t;
+            }
+            if (t instanceof ThreadDeath) {
+                throw (ThreadDeath) t;
+            }
+            if (t instanceof VirtualMachineError) {
+                throw (VirtualMachineError) t;
+            }
+            NamingException ex = new NamingException
+                ("Could not create resource factory instance");
+            ex.initCause(t);
+            throw ex;
+        }
+        return factory;
+    }
+
+    @Override
+    protected Object getLinked(Reference ref) throws NamingException {
+        // If ejb-link has been specified, resolving the link using JNDI
+        RefAddr linkRefAddr = ref.get(EjbRef.LINK);
+        if (linkRefAddr != null) {
+            // Retrieving the EJB link
+            String ejbLink = linkRefAddr.getContent().toString();
+            Object beanObj = (new InitialContext()).lookup(ejbLink);
+            return beanObj;
+        }
+        return null;
+    }
 }
-
