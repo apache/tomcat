@@ -36,6 +36,8 @@
 { "name":"org.apache.catalina.WebResourceRoot" },
 { "name":"org.apache.catalina.WebResourceSet" },
 { "name":"org.apache.catalina.Wrapper" },
+{ "name":"org.apache.catalina.tribes.Channel" },
+{ "name":"org.apache.catalina.tribes.MembershipService" },
 { "name":"org.apache.coyote.UpgradeProtocol" },
 { "name":"com.sun.org.apache.xerces.internal.jaxp.SAXParserFactoryImpl", "methods" : [{"name": "<init>","parameterTypes":[]}] },
 { "name":"com.sun.org.apache.xerces.internal.jaxp.DocumentBuilderFactoryImpl", "methods" : [{"name": "<init>","parameterTypes":[]}] },
