@@ -70,6 +70,9 @@
         membership. The namespace is still a failure on startup but it is easy
         to provide. (remm)
       </fix>
+      <fix>
+        Avoid non fatal NPEs with Tribes when JMX is not available. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
