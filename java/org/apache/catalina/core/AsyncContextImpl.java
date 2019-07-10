@@ -532,6 +532,13 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
             ClassLoader oldCL = context.bind(Globals.IS_SECURITY_ENABLED, null);
             try {
                 wrapped.run();
+            } catch (Throwable t) {
+                ExceptionUtils.handleThrowable(t);
+                context.getLogger().error(sm.getString("asyncContextImpl.asyncRunnableError"), t);
+                coyoteRequest.setAttribute(RequestDispatcher.ERROR_EXCEPTION, t);
+                org.apache.coyote.Response coyoteResponse = coyoteRequest.getResponse();
+                coyoteResponse.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                coyoteResponse.setError();
             } finally {
                 context.unbind(Globals.IS_SECURITY_ENABLED, oldCL);
             }
