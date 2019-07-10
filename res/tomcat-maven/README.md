@@ -82,7 +82,7 @@ oc policy add-role-to-user view system:serviceaccount:$(oc project -q):default -
 
 Download Graal native-image and tools.
 ```
-export JAVA_HOME=/absolute...path...to/graalvm-ce-19.0.0
+export JAVA_HOME=/absolute...path...to/graalvm-ce-19.1.0
 export TOMCAT_MAVEN=/absolute...path...to/tomcat-maven
 cd $JAVA_HOME/bin
 ./gu install native-image
@@ -102,6 +102,6 @@ the substrate VM with the agent again.
 Generate the final json files using native-image-configuration then use native image using the generated reflection metadata:
 ```
 $JAVA_HOME/bin/native-image-configure generate --trace-input=$TOMCAT_MAVEN/target/trace-file.json --output-dir=$TOMCAT_MAVEN/target
-$JAVA_HOME/bin/native-image --no-server --allow-incomplete-classpath --initialize-at-build-time=org.eclipse.jdt,org.apache.el.parser.SimpleNode,javax.servlet.jsp.JspFactory,org.apache.jasper.servlet.JasperInitializer,org.apache.jasper.runtime.JspFactoryImpl -H:+ReportUnsupportedElementsAtRuntime -H:+ReportExceptionStackTraces -H:EnableURLProtocols=jar -H:ConfigurationFileDirectories=$TOMCAT_MAVEN/target/ -H:ReflectionConfigurationFiles=$TOMCAT_MAVEN/tomcat-reflection.json -H:ResourceConfigurationFiles=$TOMCAT_MAVEN/tomcat-resource.json -H:ResourceConfigurationFiles=$TOMCAT_MAVEN/tomcat-resource.json -jar $TOMCAT_MAVEN/target/tomcat-maven-1.0.jar
+$JAVA_HOME/bin/native-image --no-server --allow-incomplete-classpath --enable-https --initialize-at-build-time=org.eclipse.jdt,org.apache.el.parser.SimpleNode,javax.servlet.jsp.JspFactory,org.apache.jasper.servlet.JasperInitializer,org.apache.jasper.runtime.JspFactoryImpl -H:+JNI -H:+ReportUnsupportedElementsAtRuntime -H:+ReportExceptionStackTraces -H:EnableURLProtocols=jar -H:ConfigurationFileDirectories=$TOMCAT_MAVEN/target/ -H:ReflectionConfigurationFiles=$TOMCAT_MAVEN/tomcat-reflection.json -H:ResourceConfigurationFiles=$TOMCAT_MAVEN/tomcat-resource.json -jar $TOMCAT_MAVEN/target/tomcat-maven-1.0.jar
 ./tomcat-maven-1.0 -Dcatalina.base=. -Djava.util.logging.config.file=conf/logging.properties -Djava.util.logging.manager=org.apache.juli.ClassLoaderLogManager
 ```
