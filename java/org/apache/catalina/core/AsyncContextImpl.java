@@ -266,7 +266,7 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
             logDebug("start      ");
         }
         check();
-        Runnable wrapper = new RunnableWrapper(run, context);
+        Runnable wrapper = new RunnableWrapper(run, context, this.request.getCoyoteRequest());
         this.request.getCoyoteRequest().action(ActionCode.ASYNC_RUN, wrapper);
     }
 
@@ -556,10 +556,13 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
 
         private final Runnable wrapped;
         private final Context context;
+        private final org.apache.coyote.Request coyoteRequest;
 
-        public RunnableWrapper(Runnable wrapped, Context ctxt) {
+        public RunnableWrapper(Runnable wrapped, Context ctxt,
+                org.apache.coyote.Request coyoteRequest) {
             this.wrapped = wrapped;
             this.context = ctxt;
+            this.coyoteRequest = coyoteRequest;
         }
 
         @Override
@@ -582,6 +585,13 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
                             (context.getLoader().getClassLoader());
                 }
                 wrapped.run();
+            } catch (Throwable t) {
+                ExceptionUtils.handleThrowable(t);
+                context.getLogger().error(sm.getString("asyncContextImpl.asyncRunnableError"), t);
+                coyoteRequest.setAttribute(RequestDispatcher.ERROR_EXCEPTION, t);
+                org.apache.coyote.Response coyoteResponse = coyoteRequest.getResponse();
+                coyoteResponse.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                coyoteResponse.setError();
             } finally {
                 if (Globals.IS_SECURITY_ENABLED) {
                     PrivilegedAction<Void> pa = new PrivilegedSetTccl(
