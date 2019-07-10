@@ -30,8 +30,7 @@ public final class SecurityClassLoad {
     }
 
 
-    static void securityClassLoad(ClassLoader loader, boolean requireSecurityManager)
-            throws Exception {
+    static void securityClassLoad(ClassLoader loader, boolean requireSecurityManager) throws Exception {
 
         if (requireSecurityManager && System.getSecurityManager() == null) {
             return;
