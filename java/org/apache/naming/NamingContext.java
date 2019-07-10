@@ -40,6 +40,9 @@ import javax.naming.Reference;
 import javax.naming.Referenceable;
 import javax.naming.spi.NamingManager;
 
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
+
 /**
  * Catalina JNDI Context implementation.
  *
@@ -57,8 +60,7 @@ public class NamingContext implements Context {
     protected static final NameParser nameParser = new NameParserImpl();
 
 
-    private static final org.apache.juli.logging.Log log =
-        org.apache.juli.logging.LogFactory.getLog(NamingContext.class);
+    private static final Log log = LogFactory.getLog(NamingContext.class);
 
 
     // ----------------------------------------------------------- Constructors
@@ -70,19 +72,8 @@ public class NamingContext implements Context {
      * @param env The environment to use to construct the naming context
      * @param name The name of the associated Catalina Context
      */
-    public NamingContext(Hashtable<String,Object> env, String name)
-        throws NamingException {
-        this.bindings = new HashMap<String,NamingEntry>();
-        this.env = new Hashtable<String,Object>();
-        this.name = name;
-        // Populating the environment hashtable
-        if (env != null ) {
-            Enumeration<String> envEntries = env.keys();
-            while (envEntries.hasMoreElements()) {
-                String entryName = envEntries.nextElement();
-                addToEnvironment(entryName, env.get(entryName));
-            }
-        }
+    public NamingContext(Hashtable<String,Object> env, String name) {
+        this(env, name, new HashMap<String,NamingEntry>());
     }
 
 
@@ -94,9 +85,18 @@ public class NamingContext implements Context {
      * @param bindings The initial bindings for the naming context
      */
     public NamingContext(Hashtable<String,Object> env, String name,
-            HashMap<String,NamingEntry> bindings)
-        throws NamingException {
-        this(env, name);
+            HashMap<String,NamingEntry> bindings) {
+
+        this.env = new Hashtable<>();
+        this.name = name;
+        // Populating the environment hashtable
+        if (env != null ) {
+            Enumeration<String> envEntries = env.keys();
+            while (envEntries.hasMoreElements()) {
+                String entryName = envEntries.nextElement();
+                addToEnvironment(entryName, env.get(entryName));
+            }
+        }
         this.bindings = bindings;
     }
 
@@ -113,7 +113,7 @@ public class NamingContext implements Context {
     /**
      * The string manager for this package.
      */
-    protected static final StringManager sm = StringManager.getManager(Constants.Package);
+    protected static final StringManager sm = StringManager.getManager(NamingContext.class);
 
 
     /**
@@ -683,8 +683,7 @@ public class NamingContext implements Context {
      * @exception NamingException if a naming exception is encountered
      */
     @Override
-    public Name composeName(Name name, Name prefix)
-        throws NamingException {
+    public Name composeName(Name name, Name prefix) throws NamingException {
         prefix = (Name) prefix.clone();
         return prefix.addAll(name);
     }
@@ -841,7 +840,7 @@ public class NamingContext implements Context {
                     // Link relative to this context
                     return lookup(link.substring(1));
                 } else {
-                    return (new InitialContext(env)).lookup(link);
+                    return new InitialContext(env).lookup(link);
                 }
             } else if (entry.type == NamingEntry.REFERENCE) {
                 try {
@@ -951,7 +950,7 @@ public class NamingContext implements Context {
 
 
     /**
-     * Returns true if writing is allowed on this context.
+     * @return <code>true</code> if writing is allowed on this context.
      */
     protected boolean isWritable() {
         return ContextAccessController.isWritable(name);
@@ -960,6 +959,9 @@ public class NamingContext implements Context {
 
     /**
      * Throws a naming exception is Context is not writable.
+     * @return <code>true</code> if the Context is writable
+     * @throws NamingException if the Context is not writable and
+     *  <code>exceptionOnFailedWrite</code> is <code>true</code>
      */
     protected boolean checkWritable() throws NamingException {
         if (isWritable()) {
