@@ -28,7 +28,7 @@ import javax.websocket.Extension;
 public class Constants {
 
     /**
-     * @deprecated. Will be removed in 8.5.x onwards.
+     * @deprecated Will be removed in 8.5.x onwards.
      */
     @Deprecated
     protected static final String PACKAGE_NAME = Constants.class.getPackage().getName();

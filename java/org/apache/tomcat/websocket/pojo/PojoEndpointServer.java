@@ -35,13 +35,13 @@ public class PojoEndpointServer extends PojoEndpointBase {
             StringManager.getManager(PojoEndpointServer.class);
 
     /**
-     * @deprecated. Will be removed in 8.5.x onwards.
+     * @deprecated Will be removed in 8.5.x onwards.
      */
     @Deprecated
     public static final String POJO_PATH_PARAM_KEY = Constants.POJO_PATH_PARAM_KEY;
 
     /**
-     * @deprecated. Will be removed in 8.5.x onwards.
+     * @deprecated Will be removed in 8.5.x onwards.
      */
     @Deprecated
     public static final String POJO_METHOD_MAPPING_KEY = Constants.POJO_METHOD_MAPPING_KEY;
