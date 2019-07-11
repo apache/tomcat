@@ -61,6 +61,9 @@ import org.apache.tomcat.util.buf.ByteChunk;
  */
 public abstract class TomcatBaseTest extends LoggingBaseTest {
 
+    // Used by parameterized tests. Defined here to reduce duplication.
+    protected static final Boolean[] booleans = new Boolean[] { Boolean.FALSE, Boolean.TRUE };
+
     protected static final int DEFAULT_CLIENT_TIMEOUT_MS = 300000;
 
     public static final String TEMP_DIR = System.getProperty("java.io.tmpdir");

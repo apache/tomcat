@@ -31,7 +31,6 @@ public class TestWebdavServletOptions extends ServletOptionsBaseTest {
 
     @Parameters
     public static Collection<Object[]> inputs() {
-        Boolean[] booleans = new Boolean[] { Boolean.FALSE, Boolean.TRUE };
         String[] urls = new String[] { COLLECTION_NAME, FILE_NAME, UNKNOWN_NAME };
         String[] methods = new String[] { "GET", "POST", "HEAD", "TRACE", "PUT", "DELETE",
                 "MKCOL", "LOCK", "UNLOCK", "COPY", "MOVE", "PROPFIND", "PROPPATCH" };
