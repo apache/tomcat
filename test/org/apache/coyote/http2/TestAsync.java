@@ -58,7 +58,6 @@ public class TestAsync extends Http2TestBase {
             "connectionUnlimited[{1}], streamUnlimited[{2}], useNonContainerThreadForWrite[{3}]," +
             "largeInitialWindow[{4}]")
     public static Collection<Object[]> parameters() {
-        Boolean[] booleans = new Boolean[] { Boolean.FALSE, Boolean.TRUE };
         List<Object[]> parameterSets = new ArrayList<>();
 
         for (Boolean expandConnectionFirst : booleans) {
