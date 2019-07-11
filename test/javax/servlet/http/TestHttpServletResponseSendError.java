@@ -59,8 +59,6 @@ public class TestHttpServletResponseSendError extends TomcatBaseTest {
      *     - dispatch
      */
 
-    private static final Boolean[] booleans = new Boolean[] { Boolean.FALSE, Boolean.TRUE };
-
     private enum AsyncErrorPoint {
         /*
          * Thread A is the container thread the processes the original request.

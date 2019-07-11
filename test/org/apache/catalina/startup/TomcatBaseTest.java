@@ -83,11 +83,15 @@ public abstract class TomcatBaseTest extends LoggingBaseTest {
     @SuppressWarnings("unused")
     private static final boolean ignored = TesterSupport.OPENSSL_AVAILABLE;
 
-    private Tomcat tomcat;
-    private boolean accessLogEnabled = false;
+    // Used by parameterized tests. Defined here to reduce duplication.
+    protected static final Boolean[] booleans = new Boolean[] { Boolean.FALSE, Boolean.TRUE };
+
     protected static final int DEFAULT_CLIENT_TIMEOUT_MS = 300_000;
 
     public static final String TEMP_DIR = System.getProperty("java.io.tmpdir");
+
+    private Tomcat tomcat;
+    private boolean accessLogEnabled = false;
 
     /**
      * Make the Tomcat instance available to sub-classes.

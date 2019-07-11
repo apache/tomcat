@@ -67,8 +67,6 @@ public abstract class DefaultServletEncodingBaseTest extends TomcatBaseTest {
         String[] targetFiles = new String[] {
                 "cp1252", "ibm850", "iso-8859-1", "utf-8-bom", "utf-8" };
 
-        Boolean[] booleans = new Boolean[] { Boolean.FALSE, Boolean.TRUE };
-
         List<Object[]> parameterSets = new ArrayList<>();
 
         for (String contextResponseEncoding : encodings) {
