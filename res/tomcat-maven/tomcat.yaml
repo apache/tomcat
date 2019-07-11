@@ -18,7 +18,7 @@ spec:
     spec:
       containers:
       - name: tomcat
-        image: apache/tomcat:1.0
+        image: apache/tomcat-maven:1.0
         ports:
         - containerPort: 8080
         - containerPort: 8778
