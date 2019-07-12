@@ -21,6 +21,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 import java.security.InvalidKeyException;
@@ -32,6 +33,7 @@ import java.security.cert.X509Certificate;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.KeySpec;
 import java.security.spec.PKCS8EncodedKeySpec;
+import java.security.spec.RSAPrivateCrtKeySpec;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,6 +43,7 @@ import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
 
+import org.apache.tomcat.util.buf.Asn1Parser;
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.apache.tomcat.util.file.ConfigFileLoader;
 import org.apache.tomcat.util.res.StringManager;
@@ -100,10 +103,13 @@ public class PEMFile {
         for (Part part : parts) {
             switch (part.type) {
                 case "PRIVATE KEY":
-                    privateKey = part.toPrivateKey(null, keyAlgorithm);
+                    privateKey = part.toPrivateKey(null, keyAlgorithm, Format.PKCS8);
                     break;
                 case "ENCRYPTED PRIVATE KEY":
-                    privateKey = part.toPrivateKey(password, keyAlgorithm);
+                    privateKey = part.toPrivateKey(password, keyAlgorithm, Format.PKCS8);
+                    break;
+                case "RSA PRIVATE KEY":
+                    privateKey = part.toPrivateKey(null, keyAlgorithm, Format.PKCS1);
                     break;
                 case "CERTIFICATE":
                 case "X509 CERTIFICATE":
@@ -129,11 +135,21 @@ public class PEMFile {
             return (X509Certificate) factory.generateCertificate(new ByteArrayInputStream(decode()));
         }
 
-        public PrivateKey toPrivateKey(String password, String keyAlgorithm) throws GeneralSecurityException, IOException {
-            KeySpec keySpec;
+        public PrivateKey toPrivateKey(String password, String keyAlgorithm, Format format)
+                throws GeneralSecurityException, IOException {
+            KeySpec keySpec = null;
 
             if (password == null) {
-                keySpec = new PKCS8EncodedKeySpec(decode());
+                switch (format) {
+                    case PKCS1: {
+                        keySpec = parsePKCS1(decode());
+                        break;
+                    }
+                    case PKCS8: {
+                        keySpec = new PKCS8EncodedKeySpec(decode());
+                        break;
+                    }
+                }
             } else {
                 EncryptedPrivateKeyInfo privateKeyInfo = new EncryptedPrivateKeyInfo(decode());
                 SecretKeyFactory secretKeyFactory = SecretKeyFactory.getInstance(privateKeyInfo.getAlgName());
@@ -164,5 +180,33 @@ public class PEMFile {
 
             throw exception;
         }
+
+
+        private RSAPrivateCrtKeySpec parsePKCS1(byte[] source) {
+            Asn1Parser p = new Asn1Parser(source);
+
+            // https://en.wikipedia.org/wiki/X.690#BER_encoding
+            // https://tools.ietf.org/html/rfc8017#page-55
+
+            // Type
+            p.parseTag(0x30);
+            // Length
+            p.parseFullLength();
+
+            BigInteger version = p.parseInt();
+            if (version.intValue() == 1) {
+                // JRE doesn't provide a suitable constructor for multi-prime
+                // keys
+                throw new IllegalArgumentException(sm.getString("pemFile.noMultiPrimes"));
+            }
+            return new RSAPrivateCrtKeySpec(p.parseInt(), p.parseInt(), p.parseInt(), p.parseInt(),
+                    p.parseInt(), p.parseInt(), p.parseInt(), p.parseInt());
+        }
+    }
+
+
+    private enum Format {
+        PKCS1,
+        PKCS8
     }
 }

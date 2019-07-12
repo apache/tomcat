@@ -65,6 +65,13 @@
         Windows operating systems that required multiple smaller pollsets to be
         used are no longer supported. (markt)
       </scode>
+      <fix>
+        <bug>63524</bug>: Improve the handling of PEM file based keys and
+        certificates that do not include a full certificate chain when
+        configuring the internal, in-memory key store. Improve the handling of
+        PKCS#1 formatted private keys when configuring the internal, in-memory
+        key store. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">
