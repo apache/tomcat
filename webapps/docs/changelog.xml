@@ -66,7 +66,8 @@
         building with Java 7. (markt)
       </update>
       <update>
-        Update to Commons Daemon 1.2.0. This changes the user configured by the
+        <bug>63310</bug>: Update to Commons Daemon 1.2.0. This provides improved
+        support for Java 11. This also changes the user configured by the
         Windows installer for the Windows service from <code>Local System</code>
         to the lower privileged <code>Local Service</code>. (markt)
       </update>
