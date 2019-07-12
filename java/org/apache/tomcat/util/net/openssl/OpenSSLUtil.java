@@ -96,16 +96,26 @@ public class OpenSSLUtil extends SSLUtilBase {
     public KeyManager[] getKeyManagers() throws Exception {
         try {
             return super.getKeyManagers();
+        } catch (IllegalArgumentException e) {
+            // No (or invalid?) certificate chain was provided for the cert
+            String msg = sm.getString("openssl.nonJsseChain", certificate.getCertificateChainFile());
+            if (log.isDebugEnabled()) {
+                log.info(msg, e);
+            } else {
+                log.info(msg);
+            }
+            return null;
         } catch (KeyStoreException | IOException e) {
-            // Depending on what is presented, JSSE may throw either of the
-            // above exceptions if it doesn't understand the provided file.
+            // Depending on what is presented, JSSE may also throw
+            // KeyStoreException or IOException if it doesn't understand the
+            // provided file.
             if (certificate.getCertificateFile() != null) {
+                String msg = sm.getString("openssl.nonJsseCertficate",
+                        certificate.getCertificateFile(), certificate.getCertificateKeyFile());
                 if (log.isDebugEnabled()) {
-                    log.info(sm.getString("openssl.nonJsseCertficate",
-                            certificate.getCertificateFile(), certificate.getCertificateKeyFile()), e);
+                    log.info(msg, e);
                 } else {
-                    log.info(sm.getString("openssl.nonJsseCertficate",
-                            certificate.getCertificateFile(), certificate.getCertificateKeyFile()));
+                    log.info(msg);
                 }
                 // Assume JSSE processing of the certificate failed, try again with OpenSSL
                 // without a key manager
