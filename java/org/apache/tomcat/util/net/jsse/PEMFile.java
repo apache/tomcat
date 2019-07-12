@@ -71,6 +71,11 @@ public class PEMFile {
     }
 
     public PEMFile(String filename, String password) throws IOException, GeneralSecurityException {
+        this(filename, password, null);
+    }
+
+    public PEMFile(String filename, String password, String keyAlgorithm)
+            throws IOException, GeneralSecurityException {
         this.filename = filename;
 
         List<Part> parts = new ArrayList<>();
@@ -95,10 +100,10 @@ public class PEMFile {
         for (Part part : parts) {
             switch (part.type) {
                 case "PRIVATE KEY":
-                    privateKey = part.toPrivateKey(null);
+                    privateKey = part.toPrivateKey(null, keyAlgorithm);
                     break;
                 case "ENCRYPTED PRIVATE KEY":
-                    privateKey = part.toPrivateKey(password);
+                    privateKey = part.toPrivateKey(password, keyAlgorithm);
                     break;
                 case "CERTIFICATE":
                 case "X509 CERTIFICATE":
@@ -124,7 +129,7 @@ public class PEMFile {
             return (X509Certificate) factory.generateCertificate(new ByteArrayInputStream(decode()));
         }
 
-        public PrivateKey toPrivateKey(String password) throws GeneralSecurityException, IOException {
+        public PrivateKey toPrivateKey(String password, String keyAlgorithm) throws GeneralSecurityException, IOException {
             KeySpec keySpec;
 
             if (password == null) {
@@ -141,9 +146,17 @@ public class PEMFile {
             }
 
             InvalidKeyException exception = new InvalidKeyException(sm.getString("jsse.pemParseError", filename));
-            for (String algorithm : new String[] {"RSA", "DSA", "EC"}) {
+            if (keyAlgorithm == null) {
+                for (String algorithm : new String[] {"RSA", "DSA", "EC"}) {
+                    try {
+                        return KeyFactory.getInstance(algorithm).generatePrivate(keySpec);
+                    } catch (InvalidKeySpecException e) {
+                        exception.addSuppressed(e);
+                    }
+                }
+            } else {
                 try {
-                    return KeyFactory.getInstance(algorithm).generatePrivate(keySpec);
+                    return KeyFactory.getInstance(keyAlgorithm).generatePrivate(keySpec);
                 } catch (InvalidKeySpecException e) {
                     exception.addSuppressed(e);
                 }
