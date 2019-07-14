@@ -2810,7 +2810,7 @@ skip.installer property in build.properties" />
       <param name="checksum.value" value="${hamcrest.checksum.value}"/>
     </antcall>
 
-    <antcall target="downloadzip">
+    <antcall target="downloadfile">
       <param name="sourcefile" value="${easymock.loc}"/>
       <param name="destfile" value="${easymock.jar}"/>
       <param name="destdir" value="${base.path}"/>
@@ -2828,7 +2828,7 @@ skip.installer property in build.properties" />
       <param name="checksum.value" value="${cglib.checksum.value}"/>
     </antcall>
 
-    <antcall target="downloadzip">
+    <antcall target="downloadfile">
       <param name="sourcefile" value="${objenesis.loc}"/>
       <param name="destfile" value="${objenesis.jar}"/>
       <param name="destdir" value="${base.path}"/>
