@@ -36,6 +36,7 @@ import java.util.Stack;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.logging.Level;
+import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
 import javax.servlet.Servlet;
@@ -72,6 +73,7 @@ import org.apache.catalina.util.ContextName;
 import org.apache.catalina.util.IOTools;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.buf.UriUtil;
+import org.apache.tomcat.util.compat.JreCompat;
 import org.apache.tomcat.util.descriptor.web.LoginConfig;
 import org.apache.tomcat.util.file.ConfigFileLoader;
 import org.apache.tomcat.util.file.ConfigurationSource;
@@ -1384,6 +1386,17 @@ public class Tomcat {
                     sm.getString("tomcat.noContextXml", docBase), e);
         }
         return result;
+    }
+
+    static {
+        // Graal native images don't load any configuration except the VM default
+        if (JreCompat.isGraalAvailable()) {
+            try (InputStream is = new FileInputStream(new File(System.getProperty("java.util.logging.config.file", "conf/logging.properties")))) {
+                LogManager.getLogManager().readConfiguration(is);
+            } catch (SecurityException | IOException e) {
+                // Ignore, the VM default will be used
+            }
+        }
     }
 
     /**

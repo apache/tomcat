@@ -90,7 +90,13 @@
   <subsection name="Other">
     <changelog>
       <fix>
-        Improvements and workarounds for GraalVM native images. (remm)
+        JNDI support for GraalVM native images. (remm)
+      </fix>
+      <fix>
+        JSP runtime library support for GraalVM native images. (remm)
+      </fix>
+      <fix>
+        java.util.logging configuration for GraalVM native images. (remm)
       </fix>
       <update>
         Update Checkstyle to 8.22. (markt)
