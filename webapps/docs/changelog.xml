@@ -72,6 +72,9 @@
         PKCS#1 formatted private keys when configuring the internal, in-memory
         key store. (markt)
       </fix>
+      <update>
+        Add optional notifications when ending the set properties rule. (remm)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Cluster">

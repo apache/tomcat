@@ -30,6 +30,10 @@ import org.xml.sax.Attributes;
 
 public class SetPropertiesRule extends Rule {
 
+    public interface Listener {
+        void endSetPropertiesRule();
+    }
+
     /**
      * Process the beginning of this element.
      *
@@ -76,6 +80,10 @@ public class SetPropertiesRule extends Rule {
                     digester.log.warn(sm.getString("rule.noProperty", digester.match, name, value));
                 }
             }
+        }
+
+        if (top instanceof Listener) {
+            ((Listener) top).endSetPropertiesRule();
         }
 
     }
