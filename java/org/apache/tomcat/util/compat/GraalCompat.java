@@ -46,5 +46,4 @@ class GraalCompat extends JreCompat {
     public void disableCachingForJarUrlConnections() throws IOException {
     }
 
-
 }
