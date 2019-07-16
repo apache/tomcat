@@ -73,7 +73,8 @@
         key store. (markt)
       </fix>
       <update>
-        Add optional notifications when ending the set properties rule. (remm)
+        Add callback when finishing the set properties rule in the digester.
+        (remm)
       </update>
     </changelog>
   </subsection>
