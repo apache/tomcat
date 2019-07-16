@@ -35,12 +35,10 @@ class GraalCompat extends JreCompat {
         GRAAL = result;
     }
 
-
     static boolean isSupported() {
         // This property does not exist for a native image
         return GRAAL;
     }
-
 
     @Override
     public void disableCachingForJarUrlConnections() throws IOException {
