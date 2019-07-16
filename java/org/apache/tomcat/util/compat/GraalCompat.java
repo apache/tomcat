@@ -40,7 +40,6 @@ class GraalCompat extends JreCompat {
         return GRAAL;
     }
 
-
     @Override
     public void disableCachingForJarUrlConnections() throws IOException {
     }
