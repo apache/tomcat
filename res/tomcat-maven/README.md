@@ -91,7 +91,8 @@ As Graal does not support dynamic class loading, all Servlets and support classe
 in `/WEB-INF/classes` and `/WEB-INF/lib`, must be included as part of the tomcat-maven build process, so they are packaged into the
 `target/tomcat-maven-1.0.jar`.
 
-Run Tomcat with the agent in full trace mode.
+Run Tomcat with the agent in full trace mode. The arguments are identical to regular Tomcat with the addition of the trace agent which attempts to
+intercept all relevant reflection calls.
 ```
 cd $TOMCAT_MAVEN
 $JAVA_HOME/bin/java -agentlib:native-image-agent=trace-output=$TOMCAT_MAVEN/target/trace-file.json -Dcatalina.base=. -Djava.util.logging.config.file=conf/logging.properties -Djava.util.logging.manager=org.apache.juli.ClassLoaderLogManager -jar target/tomcat-maven-1.0.jar
@@ -103,7 +104,7 @@ Generate the final json files using native-image-configuration then use native i
 ```
 $JAVA_HOME/bin/native-image-configure generate --trace-input=$TOMCAT_MAVEN/target/trace-file.json --output-dir=$TOMCAT_MAVEN/target
 $JAVA_HOME/bin/native-image --no-server --allow-incomplete-classpath --enable-https --initialize-at-build-time=org.eclipse.jdt,org.apache.el.parser.SimpleNode,javax.servlet.jsp.JspFactory,org.apache.jasper.servlet.JasperInitializer,org.apache.jasper.runtime.JspFactoryImpl -H:+JNI -H:+ReportUnsupportedElementsAtRuntime -H:+ReportExceptionStackTraces -H:EnableURLProtocols=http,https,jar -H:ConfigurationFileDirectories=$TOMCAT_MAVEN/target/ -H:ReflectionConfigurationFiles=$TOMCAT_MAVEN/tomcat-reflection.json -H:ResourceConfigurationFiles=$TOMCAT_MAVEN/tomcat-resource.json -H:JNIConfigurationFiles=$TOMCAT_MAVEN/tomcat-jni.json -jar $TOMCAT_MAVEN/target/tomcat-maven-1.0.jar
-./tomcat-maven-1.0 -Djava.library.path=$JAVA_HOME/jre/lib/amd64 -Dcatalina.base=. -Djava.util.logging.config.file=conf/logging.properties -Djava.util.logging.manager=org.apache.juli.ClassLoaderLogManager
+./tomcat-maven-1.0 -Djava.library.path=$JAVA_HOME/jre/lib/amd64 -Dcatalina.base=. -Djava.util.logging.config.file=conf/logging.properties
 ```
 
 Running in a container is possible, an example `DockerfileGraal` is given. To use a native image in a container that is not identical to the build platform,
