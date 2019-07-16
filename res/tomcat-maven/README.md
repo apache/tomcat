@@ -109,4 +109,5 @@ $JAVA_HOME/bin/native-image --no-server --allow-incomplete-classpath --enable-ht
 
 Running in a container is possible, an example `DockerfileGraal` is given. To use a native image in a container that is not identical to the build platform,
 the `native-image` call will need to use the additional `--static` parameter to statically link libraries (this will then require zlib and glibc
-static libraries).
+static libraries). Due to TLS needing dynamic libraries (SunEC or tomcat-native), TLS support is not available. If TLS support is needed, the native
+image must instead be built on the target platform (see the GraalVM documentation for building a native image in a container).
