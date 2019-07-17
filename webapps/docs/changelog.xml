@@ -56,6 +56,10 @@
         <code>AsyncContext.start(Runnable)</code>, process it using the standard
         error page mechanism. (markt)
       </fix>
+      <fix>
+        Discard large byte buffers allocated using setBufferSize when recycling
+        the request. (remm)
+      </fix>
      </changelog>
   </subsection>
   <subsection name="Coyote">
