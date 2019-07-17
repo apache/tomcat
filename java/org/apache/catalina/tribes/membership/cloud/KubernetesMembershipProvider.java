@@ -42,8 +42,6 @@ import org.apache.tomcat.util.json.JSONParser;
 public class KubernetesMembershipProvider extends CloudMembershipProvider {
     private static final Log log = LogFactory.getLog(KubernetesMembershipProvider.class);
 
-    private static final String CUSTOM_ENV_PREFIX = "OPENSHIFT_KUBE_PING_";
-
     @Override
     public void start(int level) throws Exception {
         if ((level & MembershipService.MBR_RX) == 0) {
@@ -53,10 +51,7 @@ public class KubernetesMembershipProvider extends CloudMembershipProvider {
         super.start(level);
 
         // Set up Kubernetes API parameters
-        String namespace = getEnv("KUBERNETES_NAMESPACE", CUSTOM_ENV_PREFIX + "NAMESPACE");
-        if (namespace == null || namespace.length() == 0) {
-            throw new IllegalArgumentException(sm.getString("kubernetesMembershipProvider.noNamespace"));
-        }
+        String namespace = getNamespace();
 
         if (log.isDebugEnabled()) {
             log.debug(String.format("Namespace [%s] set; clustering enabled", namespace));

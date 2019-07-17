@@ -89,6 +89,11 @@
       <fix>
         Avoid non fatal NPEs with Tribes when JMX is not available. (remm)
       </fix>
+      <fix>
+        Make Kube environment optional for Kube memberships, for easier testing
+        and Graal training. A warn log will occur if the environment is not
+        present. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">

@@ -33,7 +33,6 @@ import org.apache.juli.logging.LogFactory;
 public class DNSMembershipProvider extends CloudMembershipProvider {
     private static final Log log = LogFactory.getLog(DNSMembershipProvider.class);
 
-    private static final String CUSTOM_ENV_PREFIX = "OPENSHIFT_KUBE_PING_";
     private String namespace;
 
     @Override
@@ -45,10 +44,7 @@ public class DNSMembershipProvider extends CloudMembershipProvider {
         super.start(level);
 
         // Set up Kubernetes API parameters
-        namespace = getEnv("KUBERNETES_NAMESPACE", CUSTOM_ENV_PREFIX + "NAMESPACE");
-        if (namespace == null || namespace.length() == 0) {
-            throw new IllegalArgumentException(sm.getString("kubernetesMembershipProvider.noNamespace"));
-        }
+        namespace = getNamespace();
 
         if (log.isDebugEnabled()) {
             log.debug(String.format("Namespace [%s] set; clustering enabled", namespace));
