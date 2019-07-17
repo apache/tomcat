@@ -76,6 +76,10 @@
         Add callback when finishing the set properties rule in the digester.
         (remm)
       </update>
+      <fix>
+        <bug>63570</bug>: Fix regression retrieving local address with
+        the NIO connector. Submitted by Aditya Kadakia. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">

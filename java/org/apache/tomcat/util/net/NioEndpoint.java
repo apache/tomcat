@@ -1352,7 +1352,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
         protected void populateLocalName() {
             SocketChannel sc = getSocket().getIOChannel();
             if (sc != null) {
-                InetAddress inetAddr = sc.socket().getInetAddress();
+                InetAddress inetAddr = sc.socket().getLocalAddress();
                 if (inetAddr != null) {
                     localName = inetAddr.getHostName();
                 }
@@ -1364,7 +1364,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
         protected void populateLocalAddr() {
             SocketChannel sc = getSocket().getIOChannel();
             if (sc != null) {
-                InetAddress inetAddr = sc.socket().getInetAddress();
+                InetAddress inetAddr = sc.socket().getLocalAddress();
                 if (inetAddr != null) {
                     localAddr = inetAddr.getHostAddress();
                 }
