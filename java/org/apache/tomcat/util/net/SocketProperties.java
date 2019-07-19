@@ -200,8 +200,13 @@ public class SocketProperties {
                     soLingerTime.intValue());
         if (soTimeout != null && soTimeout.intValue() >= 0)
             socket.setSoTimeout(soTimeout.intValue());
-        if (tcpNoDelay != null)
-            socket.setTcpNoDelay(tcpNoDelay.booleanValue());
+        if (tcpNoDelay != null) {
+            try {
+                socket.setTcpNoDelay(tcpNoDelay.booleanValue());
+            } catch (SocketException e) {
+                // Some socket types may not support this option which is set by default
+            }
+        }
     }
 
     public void setProperties(ServerSocket socket) throws SocketException{
