@@ -71,6 +71,11 @@
         PKCS#1 formatted private keys when configuring the internal, in-memory
         key store. (markt)
       </fix>
+      <fix>
+        <bug>63568</bug>: Avoid error when trying to set tcpNoDelay on socket
+        types that do not support it, which can occur when using the NIO
+        inherited channel capability. Submitted by František Kučera. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
