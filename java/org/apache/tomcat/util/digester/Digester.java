@@ -138,6 +138,21 @@ public class Digester extends DefaultHandler2 {
     }
 
 
+    public class EnvironmentPropertySource implements IntrospectionUtils.PropertySource {
+        @Override
+        public String getProperty(String key) {
+            ClassLoader cl = getClassLoader();
+            if (cl instanceof PermissionCheck) {
+                Permission p = new RuntimePermission("getenv." + key, null);
+                if (!((PermissionCheck) cl).check(p)) {
+                    return null;
+                }
+            }
+            return System.getenv(key);
+        }
+    }
+
+
     protected IntrospectionUtils.PropertySource source[] = new IntrospectionUtils.PropertySource[] {
             new SystemPropertySource() };
 
