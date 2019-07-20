@@ -43,11 +43,16 @@
       <p>Set this to a fully qualified name of a class that implements
          <code>org.apache.tomcat.util.IntrospectionUtils.PropertySource</code>.
          Required to have a public constructor with no arguments.</p>
-      <p>Use this to add a property source, that will be invoked when <code>${parameter}</code>
-         denoted parameters are found in the XML files that Tomcat parses.</p>
+      <p>Use this to add a property source, that will be invoked when
+         <code>${parameter}</code> denoted parameters are found in the XML files
+         that Tomcat parses.</p>
       <p>Property replacement from the specified property source on the JVM
          system properties can also be done using the
          <code>REPLACE_SYSTEM_PROPERTIES</code> system property.</p>
+      <p><code>org.apache.tomcat.util.digester.Digester$EnvironmentPropertySource</code>
+         can be used to replace parameters from the process' environment
+         variables, e.g. injected ConfigMaps or Secret objects in container
+         based systems like OpenShift or Kubernetes.</p>
     </property>
     <property name="org.apache.tomcat.util.digester. REPLACE_SYSTEM_PROPERTIES">
       <p>Set this boolean system property to <code>true</code> to cause

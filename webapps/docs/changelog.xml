@@ -57,6 +57,12 @@
         Service is embedded directly (i.e. with no Server) in an applciation
         and JNDI is enabled. Patch provided by S. Ali Tokmen. (markt)
       </fix>
+      <add>
+        Add a new <code>PropertySource</code> implementation,
+        <code>EnvironmentPropertySource</code>, that can be used to do property
+        replacement in configuration files with environment variables. Pull
+        request provided by Thomas Meyer. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
