@@ -137,6 +137,10 @@
         directory to local administrators, Local System and Local Service.
         (markt)
       </fix>
+      <add>
+        Expand the coverage and quality of the French translations provided
+        with Apache Tomcat. (remm)
+      </add>
     </changelog>
   </subsection>
 </section>
