@@ -89,6 +89,11 @@
         types that do not support it, which can occur when using the NIO
         inherited channel capability. Submitted by František Kučera. (remm)
       </fix>
+      <fix>
+        Correct parsing of invalid host names that contain bytes in the range
+        128 to 255 and reject them with a 400 response rather than triggering an
+        internal error that results in a 500 response. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">
