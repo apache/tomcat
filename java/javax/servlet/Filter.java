@@ -114,5 +114,4 @@ public interface Filter {
      * state in memory.
      */
     public void destroy();
-
 }
