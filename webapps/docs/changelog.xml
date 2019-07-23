@@ -60,6 +60,15 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 7.0.96 (violetagg)">
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        <bug>63579</bug>: Correct parsing of malformed OPTIONS requests and
+        reject them with a 400 response rather than triggering an internal error
+        that results in a 500 response. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Coyote">
     <changelog>
       <fix>

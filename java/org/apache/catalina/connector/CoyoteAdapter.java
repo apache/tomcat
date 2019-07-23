@@ -1231,11 +1231,6 @@ public class CoyoteAdapter implements Adapter {
             return false;
         }
 
-        // URL * is acceptable
-        if ((end - start == 1) && b[start] == (byte) '*') {
-            return true;
-        }
-
         int pos = 0;
         int index = 0;
 
