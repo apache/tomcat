@@ -1313,7 +1313,7 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
 
         // Check connection header
         MessageBytes connectionValueMB = headers.getValue(Constants.CONNECTION);
-        if (connectionValueMB != null) {
+        if (connectionValueMB != null && !connectionValueMB.isNull()) {
             ByteChunk connectionValueBC = connectionValueMB.getByteChunk();
             if (findBytes(connectionValueBC, Constants.CLOSE_BYTES) != -1) {
                 keepAlive = false;
@@ -1323,17 +1323,16 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
             }
         }
 
-        MessageBytes expectMB = null;
         if (http11) {
-            expectMB = headers.getValue("expect");
-        }
-        if (expectMB != null) {
-            if (expectMB.indexOfIgnoreCase("100-continue", 0) != -1) {
-                getInputBuffer().setSwallowInput(false);
-                expectation = true;
-            } else {
-                response.setStatus(HttpServletResponse.SC_EXPECTATION_FAILED);
-                setErrorState(ErrorState.CLOSE_CLEAN, null);
+            MessageBytes expectMB = headers.getValue("expect");
+            if (expectMB != null && !expectMB.isNull()) {
+                if (expectMB.indexOfIgnoreCase("100-continue", 0) != -1) {
+                    getInputBuffer().setSwallowInput(false);
+                    expectation = true;
+                } else {
+                    response.setStatus(HttpServletResponse.SC_EXPECTATION_FAILED);
+                    setErrorState(ErrorState.CLOSE_CLEAN, null);
+                }
             }
         }
 
@@ -1342,7 +1341,7 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
             MessageBytes userAgentValueMB = headers.getValue("user-agent");
             // Check in the restricted list, and adjust the http11
             // and keepAlive flags accordingly
-            if(userAgentValueMB != null) {
+            if(userAgentValueMB != null && !userAgentValueMB.isNull()) {
                 String userAgentValue = userAgentValueMB.toString();
                 if (restrictedUserAgents.matcher(userAgentValue).matches()) {
                     http11 = false;
@@ -1442,8 +1441,16 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
                 } else {
                     // Not HTTP/1.1 - no Host header so generate one since
                     // Tomcat internals assume it is set
-                    hostValueMB = headers.setValue("host");
-                    hostValueMB.setBytes(uriB, uriBCStart + pos, slashPos - pos);
+                    try {
+                        hostValueMB = headers.setValue("host");
+                        hostValueMB.setBytes(uriB, uriBCStart + pos, slashPos - pos);
+                    } catch (IllegalStateException e) {
+                        // Edge case
+                        // If the request has too many headers it won't be
+                        // possible to create the host header. Ignore this as
+                        // processing won't reach the point where the Tomcat
+                        // internals expect there to be a host header.
+                    }
                 }
             } else {
                 badRequest("http11processor.request.invalidScheme");
@@ -1467,7 +1474,7 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
         if (http11) {
             transferEncodingValueMB = headers.getValue("transfer-encoding");
         }
-        if (transferEncodingValueMB != null) {
+        if (transferEncodingValueMB != null && !transferEncodingValueMB.isNull()) {
             String transferEncodingValue = transferEncodingValueMB.toString();
             // Parse the comma separated list. "identity" codings are ignored
             int startPos = 0;
@@ -1484,7 +1491,14 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
         }
 
         // Parse content-length header
-        long contentLength = request.getContentLengthLong();
+        long contentLength = -1;
+        try {
+            contentLength = request.getContentLengthLong();
+        } catch (NumberFormatException e) {
+            badRequest("http11processor.request.nonNumericContentLength");
+        } catch (IllegalArgumentException e) {
+            badRequest("http11processor.request.multipleContentLength");
+        }
         if (contentLength >= 0) {
             if (contentDelimitation) {
                 // contentDelimitation being true at this point indicates that

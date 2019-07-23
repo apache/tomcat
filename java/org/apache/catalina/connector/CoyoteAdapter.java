@@ -816,7 +816,16 @@ public class CoyoteAdapter implements Adapter {
             }
 
             // Look for session ID in cookies and SSL session
-            parseSessionCookiesId(req, request);
+            try {
+                parseSessionCookiesId(req, request);
+            } catch (IllegalArgumentException e) {
+                // Too many cookies
+                if (!response.isError()) {
+                    response.setError();
+                    response.sendError(400);
+                }
+                return false;
+            }
             parseSessionSslId(request);
 
             sessionID = request.getRequestedSessionId();
