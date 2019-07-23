@@ -99,6 +99,10 @@
         128 to 255 and reject them with a 400 response rather than triggering an
         internal error that results in a 500 response. (markt)
       </fix>
+      <fix>
+        <bug>63578</bug>: Improve handling of invalid requests so that 400
+        responses are returned to the client rather than 500 responses. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">

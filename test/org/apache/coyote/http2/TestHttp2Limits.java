@@ -387,15 +387,14 @@ public class TestHttp2Limits extends Http2TestBase {
             break;
         }
         case 1: {
-            // Check status is 500
+            // Check status is 400
             parser.readFrame(true);
             Assert.assertTrue(output.getTrace(), output.getTrace().startsWith(
-                    "3-HeadersStart\n3-Header-[:status]-[500]"));
+                    "3-HeadersStart\n3-Header-[:status]-[400]"));
             output.clearTrace();
-            // Check EOS followed by reset is next
+            // Check EOS followed by error page body
             parser.readFrame(true);
-            parser.readFrame(true);
-            Assert.assertEquals("3-EndOfStream\n3-RST-[2]\n", output.getTrace());
+            Assert.assertTrue(output.getTrace(), output.getTrace().startsWith("3-EndOfStream\n3-Body-<!doctype"));
             break;
         }
         default: {

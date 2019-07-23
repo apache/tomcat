@@ -27,11 +27,13 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 
+import static org.apache.catalina.startup.SimpleHttpClient.CRLF;
 import org.apache.catalina.Context;
 import org.apache.catalina.servlets.DefaultServlet;
 import org.apache.catalina.startup.SimpleHttpClient;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.tomcat.unittest.TesterData;
 
 /*
  * Various requests, usually originating from fuzzing, that have triggered an
@@ -41,21 +43,61 @@ import org.apache.catalina.startup.TomcatBaseTest;
 @RunWith(Parameterized.class)
 public class TestCoyoteAdapterRequestFuzzing extends TomcatBaseTest {
 
-    @Parameterized.Parameters(name = "{index}: uri[{0}], host[{1}], expected[{2}]")
+    private static final String VALUE_16K = TesterData.string('x', 16 * 1024);
+    // Default max header count is 100
+    private static final String HEADER_150 = TesterData.string("X-Tomcat-Test: a" + CRLF, 150);
+    // Default max header count is 200 (need to keep under maxHeaderCount as well)
+    private static final String COOKIE_250 = TesterData.string("Cookie: a=b;c=d;e=f;g=h" + CRLF, 75);
+
+    @Parameterized.Parameters(name = "{index}: requestline[{0}], expected[{2}]")
     public static Collection<Object[]> parameters() {
         List<Object[]> parameterSets = new ArrayList<>();
 
-        parameterSets.add(new Object[] { "/", "lÿ#", "400" } );
-        parameterSets.add(new Object[] { "*;", "", "400" } );
+        parameterSets.add(new Object[] { "GET /00 HTTP/1.1",
+                                         "Host: lÿ#" + CRLF,
+                                         "400" } );
+        parameterSets.add(new Object[] { "GET *; HTTP/1.1",
+                                         "Host: localhost" + CRLF,
+                                         "400" } );
+        parameterSets.add(new Object[] { "GET /02 HTTP/1.1",
+                                         "Host: localhost" + CRLF +
+                                         "Content-Length: \u00A0" + CRLF,
+                                         "400" } );
+        parameterSets.add(new Object[] { "GET /03 HTTP/1.1",
+                                         "Content-Length: 1" + CRLF +
+                                         "Content-Length: 1" + CRLF,
+                                         "400" } );
+        parameterSets.add(new Object[] { "GET /04 HTTP/1.1",
+                                         "Transfer-Encoding: " + VALUE_16K + CRLF,
+                                         "400" } );
+        parameterSets.add(new Object[] { "GET /05 HTTP/1.1",
+                                         "Expect: " + VALUE_16K + CRLF,
+                                         "400" } );
+        parameterSets.add(new Object[] { "GET /06 HTTP/1.1",
+                                         "Connection: " + VALUE_16K + CRLF,
+                                         "400" } );
+        parameterSets.add(new Object[] { "GET /07 HTTP/1.1",
+                                         "User-Agent: " + VALUE_16K + CRLF,
+                                         "400" } );
+        parameterSets.add(new Object[] { "GET /08 HTTP/1.1",
+                                         HEADER_150,
+                                         "400" } );
+        parameterSets.add(new Object[] { "GET http://host/09 HTTP/1.0",
+                                         HEADER_150,
+                                         "400" } );
+        parameterSets.add(new Object[] { "GET /10 HTTP/1.1",
+                                         "Host: localhost" + CRLF +
+                                         COOKIE_250,
+                                         "400" } );
 
         return parameterSets;
     }
 
     @Parameter(0)
-    public String uri;
+    public String requestLine;
 
     @Parameter(1)
-    public String host;
+    public String headers;
 
     @Parameter(2)
     public String expected;
@@ -64,6 +106,7 @@ public class TestCoyoteAdapterRequestFuzzing extends TomcatBaseTest {
     @Test
     public void doTest() throws Exception {
         Tomcat tomcat = getTomcatInstance();
+        tomcat.getConnector().setAttribute("restrictedUserAgents", "value-not-important");
 
         File appDir = new File("test/webapp");
         Context ctxt = tomcat.addContext("", appDir.getAbsolutePath());
@@ -72,20 +115,15 @@ public class TestCoyoteAdapterRequestFuzzing extends TomcatBaseTest {
 
         tomcat.start();
 
-        String request =
-                "GET " + uri + " HTTP/1.1" + SimpleHttpClient.CRLF +
-                "Host: " + host + SimpleHttpClient.CRLF +
-                 SimpleHttpClient.CRLF;
-
         Client client = new Client(tomcat.getConnector().getLocalPort());
-        client.setRequest(new String[] {request});
+        client.setRequest(new String[] {requestLine + CRLF, headers + CRLF});
 
         client.connect();
         client.processRequest();
 
         // Expected response
         String line = client.getResponseLine();
-        Assert.assertTrue(line, line.startsWith("HTTP/1.1 " + expected + " "));
+        Assert.assertTrue(line + CRLF + client.getResponseBody(), line.startsWith("HTTP/1.1 " + expected + " "));
     }
 
 
@@ -93,6 +131,7 @@ public class TestCoyoteAdapterRequestFuzzing extends TomcatBaseTest {
 
         public Client(int port) {
             setPort(port);
+            setRequestPause(0);
         }
 
         @Override
