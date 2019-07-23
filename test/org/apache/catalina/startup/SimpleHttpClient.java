@@ -28,6 +28,7 @@ import java.io.Writer;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketAddress;
+import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
@@ -307,8 +308,15 @@ public abstract class SimpleHttpClient {
             else {
                 // not using content length, so just read it line by line
                 String line = null;
-                while ((line = readLine()) != null) {
-                    builder.append(line);
+                try {
+                    while ((line = readLine()) != null) {
+                        builder.append(line);
+                    }
+                } catch (SocketException e) {
+                    // Ignore
+                    // May see a SocketException if the request hasn't been
+                    // fully read when the connection is closed as that may
+                    // trigger a TCP reset.
                 }
             }
         }
