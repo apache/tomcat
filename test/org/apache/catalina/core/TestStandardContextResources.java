@@ -67,7 +67,7 @@ public class TestStandardContextResources extends TomcatBaseTest {
     public void testResources() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
-        File appDir = new File("test/webapp-3.0-fragments");
+        File appDir = new File("test/webapp-fragments");
         // app dir is relative to server home
         Context ctx = tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
 
@@ -105,7 +105,7 @@ public class TestStandardContextResources extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         // app dir is relative to server home
-        File appDir = new File("test/webapp-3.0-fragments");
+        File appDir = new File("test/webapp-fragments");
 
         // Need to cast to be able to set StandardContext specific attribute
         StandardContext ctxt = (StandardContext)
@@ -132,7 +132,7 @@ public class TestStandardContextResources extends TomcatBaseTest {
     public void testResourcesAbsoluteOrdering() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
-        File appDir = new File("test/webapp-3.0-fragments");
+        File appDir = new File("test/webapp-fragments");
         // app dir is relative to server home
         StandardContext ctx = (StandardContext) tomcat.addWebapp(null, "/test",
                 appDir.getAbsolutePath());
@@ -202,7 +202,7 @@ public class TestStandardContextResources extends TomcatBaseTest {
     public void testResources2() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
-        File appDir = new File("test/webapp-3.0-fragments");
+        File appDir = new File("test/webapp-fragments");
         // app dir is relative to server home
         StandardContext ctx = (StandardContext) tomcat.addWebapp(null, "/test",
                 appDir.getAbsolutePath());
@@ -231,7 +231,7 @@ public class TestStandardContextResources extends TomcatBaseTest {
     public void testResourceCaching() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
-        File appDir = new File("test/webapp-3.0-fragments");
+        File appDir = new File("test/webapp-fragments");
         // app dir is relative to server home
         StandardContext ctx = (StandardContext) tomcat.addWebapp(
                 null, "/test", appDir.getAbsolutePath());

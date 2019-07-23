@@ -33,7 +33,7 @@ public class TestFileDirContext extends TomcatBaseTest {
     public void testLookupResourceWithTrailingSlash() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
-        File appDir = new File("test/webapp-3.0");
+        File appDir = new File("test/webapp");
         // app dir is relative to server home
         tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
 

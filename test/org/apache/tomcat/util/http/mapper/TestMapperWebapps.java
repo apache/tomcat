@@ -173,7 +173,7 @@ public class TestMapperWebapps extends TomcatBaseTest{
 
         Tomcat tomcat = getTomcatInstance();
 
-        File appDir = new File("test/webapp-3.0");
+        File appDir = new File("test/webapp");
 
         StandardContext ctxt = (StandardContext) tomcat.addWebapp(null, "/test",
                 appDir.getAbsolutePath());
@@ -201,7 +201,7 @@ public class TestMapperWebapps extends TomcatBaseTest{
 
         Tomcat tomcat = getTomcatInstance();
 
-        File appDir = new File("test/webapp-3.0");
+        File appDir = new File("test/webapp");
 
         StandardContext ctxt = (StandardContext) tomcat.addWebapp(null, "/test",
                 appDir.getAbsolutePath());
@@ -231,7 +231,7 @@ public class TestMapperWebapps extends TomcatBaseTest{
         Tomcat tomcat = getTomcatInstance();
 
         // Use standard test webapp as ROOT
-        File rootDir = new File("test/webapp-3.0");
+        File rootDir = new File("test/webapp");
         org.apache.catalina.Context root =
                 tomcat.addWebapp(null, "", rootDir.getAbsolutePath());
 

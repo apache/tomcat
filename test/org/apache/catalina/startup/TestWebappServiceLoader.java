@@ -29,7 +29,7 @@ public class TestWebappServiceLoader extends TomcatBaseTest {
     @Test
     public void testWebapp() throws Exception {
         Tomcat tomcat = getTomcatInstance();
-        File appDir = new File("test/webapp-3.0-fragments-empty-absolute-ordering");
+        File appDir = new File("test/webapp-fragments-empty-absolute-ordering");
         StandardContext ctxt = (StandardContext) tomcat.addContext(null, "/test", appDir.getAbsolutePath());
         ctxt.addLifecycleListener(new ContextConfig());
         tomcat.start();

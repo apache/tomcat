@@ -58,22 +58,22 @@ public class TestVirtualContext extends TomcatBaseTest {
     public void testVirtualClassLoader() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
-        File appDir = new File("test/webapp-3.0-virtual-webapp/src/main/webapp");
+        File appDir = new File("test/webapp-virtual-webapp/src/main/webapp");
         // app dir is relative to server home
         StandardContext ctx = (StandardContext) tomcat.addWebapp(null, "/test",
             appDir.getAbsolutePath());
 
         VirtualWebappLoader loader = new VirtualWebappLoader(ctx.getParentClassLoader());
         loader.setVirtualClasspath(//
-            "test/webapp-3.0-virtual-webapp/target/classes;" + //
-                "test/webapp-3.0-virtual-library/target/classes;" + //
-                "test/webapp-3.0-virtual-webapp/src/main/webapp/WEB-INF/classes;" + //
-                "test/webapp-3.0-virtual-webapp/src/main/webapp2/WEB-INF/classes");
+            "test/webapp-virtual-webapp/target/classes;" + //
+                "test/webapp-virtual-library/target/classes;" + //
+                "test/webapp-virtual-webapp/src/main/webapp/WEB-INF/classes;" + //
+                "test/webapp-virtual-webapp/src/main/webapp2/WEB-INF/classes");
         ctx.setLoader(loader);
 
-        String extraMappings = "/=test/webapp-3.0-virtual-webapp/src/main/webapp2" + //
-            ",/other=test/webapp-3.0-virtual-webapp/src/main/misc" + //
-            ",/WEB-INF/classes=test/webapp-3.0-virtual-webapp/target/classes";
+        String extraMappings = "/=test/webapp-virtual-webapp/src/main/webapp2" + //
+            ",/other=test/webapp-virtual-webapp/src/main/misc" + //
+            ",/WEB-INF/classes=test/webapp-virtual-webapp/target/classes";
         VirtualDirContext resources = new VirtualDirContext();
         resources.setExtraResourcePaths(extraMappings);
         ctx.setResources(resources);
@@ -129,19 +129,19 @@ public class TestVirtualContext extends TomcatBaseTest {
                     "/test/classpathGetResources.jsp?path=rsrc/").toString();
         Assert.assertTrue(
             allUrls,
-            allUrls.indexOf("/test/webapp-3.0-virtual-webapp/src/main/webapp/WEB-INF/classes/rsrc") > 0);
+            allUrls.indexOf("/test/webapp-virtual-webapp/src/main/webapp/WEB-INF/classes/rsrc") > 0);
         Assert.assertTrue(
             allUrls,
-            allUrls.indexOf("/test/webapp-3.0-virtual-webapp/src/main/webapp2/WEB-INF/classes/rsrc") > 0);
+            allUrls.indexOf("/test/webapp-virtual-webapp/src/main/webapp2/WEB-INF/classes/rsrc") > 0);
         Assert.assertTrue(
             allUrls,
-            allUrls.indexOf("/test/webapp-3.0-virtual-webapp/src/main/webapp/WEB-INF/lib/rsrc.jar!/rsrc") > 0);
+            allUrls.indexOf("/test/webapp-virtual-webapp/src/main/webapp/WEB-INF/lib/rsrc.jar!/rsrc") > 0);
         Assert.assertTrue(
             allUrls,
-            allUrls.indexOf("/test/webapp-3.0-virtual-webapp/target/classes/rsrc") > 0);
+            allUrls.indexOf("/test/webapp-virtual-webapp/target/classes/rsrc") > 0);
         Assert.assertTrue(
             allUrls,
-            allUrls.indexOf("/test/webapp-3.0-virtual-library/target/classes/rsrc") > 0);
+            allUrls.indexOf("/test/webapp-virtual-library/target/classes/rsrc") > 0);
 
         // check that there's no duplicate in the URLs
         String[] allUrlsArray = allUrls.split("\\s+");
@@ -154,7 +154,7 @@ public class TestVirtualContext extends TomcatBaseTest {
                     "/test/classpathGetResources.jsp?path=rsrc2/").toString();
         Assert.assertTrue(
             allRsrsc2ClasspathUrls,
-            allRsrsc2ClasspathUrls.indexOf("/test/webapp-3.0-virtual-webapp/src/main/webapp2/WEB-INF/classes/rsrc2") > 0);
+            allRsrsc2ClasspathUrls.indexOf("/test/webapp-virtual-webapp/src/main/webapp2/WEB-INF/classes/rsrc2") > 0);
 
         // tests context.getRealPath
 
@@ -166,7 +166,7 @@ public class TestVirtualContext extends TomcatBaseTest {
         // Real paths depend on the OS and this test has to work on all
         // platforms so use File to convert the path to a platform specific form
         File f = new File(
-            "test/webapp-3.0-virtual-webapp/src/main/webapp/rsrc/resourceF.properties");
+            "test/webapp-virtual-webapp/src/main/webapp/rsrc/resourceF.properties");
         assertPageContains(
             "/test/contextGetRealPath.jsp?path=/rsrc/resourceF.properties",
             f.getPath());
@@ -236,7 +236,7 @@ public class TestVirtualContext extends TomcatBaseTest {
     public void testAdditionalWebInfClassesPaths() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
-        File appDir = new File("test/webapp-3.0-virtual-webapp/src/main/webapp");
+        File appDir = new File("test/webapp-virtual-webapp/src/main/webapp");
         // app dir is relative to server home
         StandardContext ctx = (StandardContext) tomcat.addWebapp(null, "/test",
             appDir.getAbsolutePath());
@@ -274,8 +274,8 @@ public class TestVirtualContext extends TomcatBaseTest {
         }
 
         VirtualWebappLoader loader = new VirtualWebappLoader(ctx.getParentClassLoader());
-        loader.setVirtualClasspath("test/webapp-3.0-virtual-webapp/target/classes;" + //
-            "test/webapp-3.0-virtual-library/target/classes;" + //
+        loader.setVirtualClasspath("test/webapp-virtual-webapp/target/classes;" + //
+            "test/webapp-virtual-library/target/classes;" + //
             additionWebInfClasses.getAbsolutePath());
         ctx.setLoader(loader);
 

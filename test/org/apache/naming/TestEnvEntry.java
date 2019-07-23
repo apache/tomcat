@@ -93,7 +93,7 @@ public class TestEnvEntry extends TomcatBaseTest {
     private void doTestJndiLookup(String jndiName, String expected) throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
-        File appDir = new File("test/webapp-3.0-fragments");
+        File appDir = new File("test/webapp-fragments");
         tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
 
         tomcat.enableNaming();
@@ -114,7 +114,7 @@ public class TestEnvEntry extends TomcatBaseTest {
     private void doTestJndiInjection(String injectionName, String expected) throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
-        File appDir = new File("test/webapp-3.0-fragments");
+        File appDir = new File("test/webapp-fragments");
         Context context = tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
 
         Tomcat.addServlet(context, "InjectionServlet", "org.apache.naming.TesterInjectionServlet");

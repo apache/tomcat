@@ -32,7 +32,7 @@ public class TestWebappClassLoader extends TomcatBaseTest {
     @Test
     public void testGetCodePath() throws Exception {
         Tomcat tomcat = getTomcatInstance();
-        File appDir = new File("test/webapp-3.0");
+        File appDir = new File("test/webapp");
         // Must have a real docBase - just use temp
         tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
 
@@ -45,7 +45,7 @@ public class TestWebappClassLoader extends TomcatBaseTest {
         Assert.assertEquals(HttpServletResponse.SC_OK, rc);
 
         // Build the expected location the same way the webapp base dir is built
-        File f = new File("test/webapp-3.0/WEB-INF/classes");
+        File f = new File("test/webapp/WEB-INF/classes");
         Assert.assertEquals(f.toURI().toURL().toString(), out.toString().trim());
     }
 }

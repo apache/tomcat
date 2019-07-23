@@ -42,7 +42,7 @@ public class TestPageContextImpl extends TomcatBaseTest {
     public void testDoForward() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
-        File appDir = new File("test/webapp-3.0");
+        File appDir = new File("test/webapp");
         tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
 
         tomcat.start();
@@ -63,7 +63,7 @@ public class TestPageContextImpl extends TomcatBaseTest {
     public void testDefaultBufferSize() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
-        File appDir = new File("test/webapp-3.0");
+        File appDir = new File("test/webapp");
         // app dir is relative to server home
         Context ctx = tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
 
@@ -83,7 +83,7 @@ public class TestPageContextImpl extends TomcatBaseTest {
     public void testIncludeThrowsIOException() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
-        File appDir = new File("test/webapp-3.0");
+        File appDir = new File("test/webapp");
         tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
 
         tomcat.start();

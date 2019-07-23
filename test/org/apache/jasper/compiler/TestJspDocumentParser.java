@@ -36,7 +36,7 @@ public class TestJspDocumentParser extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         File appDir =
-            new File("test/webapp-3.0");
+            new File("test/webapp");
         // app dir is relative to server home
         tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
 
@@ -53,7 +53,7 @@ public class TestJspDocumentParser extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         File appDir =
-            new File("test/webapp-3.0");
+            new File("test/webapp");
         // app dir is relative to server home
         tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
 
@@ -74,7 +74,7 @@ public class TestJspDocumentParser extends TomcatBaseTest {
     public void testBug54801() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
-        File appDir = new File("test/webapp-3.0");
+        File appDir = new File("test/webapp");
         // app dir is relative to server home
         tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
 
@@ -95,7 +95,7 @@ public class TestJspDocumentParser extends TomcatBaseTest {
     public void testBug54821() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
-        File appDir = new File("test/webapp-3.0");
+        File appDir = new File("test/webapp");
         // app dir is relative to server home
         tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
 

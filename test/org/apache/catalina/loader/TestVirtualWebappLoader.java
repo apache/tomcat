@@ -38,7 +38,7 @@ public class TestVirtualWebappLoader extends TomcatBaseTest {
     @Test
     public void testStartInternal() throws Exception {
         Tomcat tomcat = getTomcatInstance();
-        File appDir = new File("test/webapp-3.0");
+        File appDir = new File("test/webapp");
         // Must have a real docBase - just use temp
         StandardContext ctx =
             (StandardContext)tomcat.addContext("",  appDir.getAbsolutePath());
@@ -49,7 +49,7 @@ public class TestVirtualWebappLoader extends TomcatBaseTest {
         ctx.setLoader(loader);
         ctx.setResources(new FileDirContext());
         ctx.resourcesStart();
-        File dir = new File("test/webapp-3.0-fragments/WEB-INF/lib");
+        File dir = new File("test/webapp-fragments/WEB-INF/lib");
         loader.setVirtualClasspath(dir.getAbsolutePath() + "/*.jar");
         loader.start();
         String[] repos = loader.getRepositories();

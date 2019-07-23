@@ -36,7 +36,7 @@ public class TestCustomHttpJspPage extends TomcatBaseTest {
     public void testCustomBasePageWhenUsingTagFiles() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
-        File appDir = new File("test/webapp-3.0");
+        File appDir = new File("test/webapp");
         tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
 
         tomcat.start();

@@ -603,7 +603,7 @@ public class TestTomcat extends TomcatBaseTest {
 
         tomcat.getHost().setConfigClass(CustomContextConfig.class.getName());
 
-        File docBase = new File("test/webapp-3.0");
+        File docBase = new File("test/webapp");
         tomcat.addWebapp("/test", docBase.getAbsolutePath());
 
         tomcat.start();

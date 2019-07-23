@@ -568,7 +568,7 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         // Use the normal Tomcat ROOT context
-        File root = new File("test/webapp-3.0");
+        File root = new File("test/webapp");
         tomcat.addWebapp("", root.getAbsolutePath());
 
         tomcat.start();

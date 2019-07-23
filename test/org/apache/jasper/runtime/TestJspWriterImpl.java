@@ -33,7 +33,7 @@ public class TestJspWriterImpl extends TomcatBaseTest {
     public void bug54241a() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
-        File appDir = new File("test/webapp-3.0");
+        File appDir = new File("test/webapp");
         tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
 
         tomcat.start();
@@ -54,7 +54,7 @@ public class TestJspWriterImpl extends TomcatBaseTest {
     public void bug54241b() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
-        File appDir = new File("test/webapp-3.0");
+        File appDir = new File("test/webapp");
         tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
 
         tomcat.start();

@@ -34,7 +34,7 @@ public class TestCompositeELResolver extends TomcatBaseTest {
     public void testBug50408() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
-        File appDir =  new File("test/webapp-3.0");
+        File appDir =  new File("test/webapp");
         // app dir is relative to server home
         StandardContext ctxt = (StandardContext) tomcat.addWebapp(null,
                 "/test", appDir.getAbsolutePath());

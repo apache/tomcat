@@ -37,7 +37,7 @@ public class TestCompiler extends TomcatBaseTest {
     public void testBug49726a() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
-        File appDir = new File("test/webapp-3.0");
+        File appDir = new File("test/webapp");
         tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
         tomcat.start();
 
@@ -59,7 +59,7 @@ public class TestCompiler extends TomcatBaseTest {
     public void testBug49726b() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
-        File appDir = new File("test/webapp-3.0");
+        File appDir = new File("test/webapp");
         tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
         tomcat.start();
 
@@ -81,7 +81,7 @@ public class TestCompiler extends TomcatBaseTest {
     public void testBug53257a() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
-        File appDir = new File("test/webapp-3.0");
+        File appDir = new File("test/webapp");
         tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
         tomcat.start();
 
@@ -98,7 +98,7 @@ public class TestCompiler extends TomcatBaseTest {
     public void testBug53257b() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
-        File appDir = new File("test/webapp-3.0");
+        File appDir = new File("test/webapp");
         tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
         tomcat.start();
 
@@ -114,7 +114,7 @@ public class TestCompiler extends TomcatBaseTest {
     public void testBug53257c() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
-        File appDir = new File("test/webapp-3.0");
+        File appDir = new File("test/webapp");
         tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
         tomcat.start();
 
@@ -131,7 +131,7 @@ public class TestCompiler extends TomcatBaseTest {
     public void testBug53257d() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
-        File appDir = new File("test/webapp-3.0");
+        File appDir = new File("test/webapp");
         tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
         tomcat.start();
 
@@ -148,7 +148,7 @@ public class TestCompiler extends TomcatBaseTest {
     public void testBug53257e() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
-        File appDir = new File("test/webapp-3.0");
+        File appDir = new File("test/webapp");
         tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
         tomcat.start();
 
@@ -164,7 +164,7 @@ public class TestCompiler extends TomcatBaseTest {
     public void testBug53257f() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
-        File appDir = new File("test/webapp-3.0");
+        File appDir = new File("test/webapp");
         tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
         tomcat.start();
 
@@ -180,7 +180,7 @@ public class TestCompiler extends TomcatBaseTest {
     public void testBug53257g() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
-        File appDir = new File("test/webapp-3.0");
+        File appDir = new File("test/webapp");
         tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
         tomcat.start();
 
@@ -196,7 +196,7 @@ public class TestCompiler extends TomcatBaseTest {
     public void testBug53257z() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
-        File appDir = new File("test/webapp-3.0");
+        File appDir = new File("test/webapp");
         tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
         tomcat.start();
 
@@ -211,7 +211,7 @@ public class TestCompiler extends TomcatBaseTest {
     public void testBug51584() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
-        File appDir = new File("test/webapp-3.0-fragments");
+        File appDir = new File("test/webapp-fragments");
         tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
         tomcat.start();
 
@@ -224,7 +224,7 @@ public class TestCompiler extends TomcatBaseTest {
     public void testBug55807() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
-        File appDir = new File("test/webapp-3.0");
+        File appDir = new File("test/webapp");
         Context context = tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
         ((StandardJarScanner) context.getJarScanner()).setScanAllDirectories(true);
         tomcat.start();
@@ -243,7 +243,7 @@ public class TestCompiler extends TomcatBaseTest {
         Assert.assertTrue(result.contains("<p>DependenciesCount: 1</p>"));
 
         // Check the right timestamp was used in the dependency
-        File tld = new File("test/webapp-3.0/WEB-INF/classes/META-INF/bug55807.tld");
+        File tld = new File("test/webapp/WEB-INF/classes/META-INF/bug55807.tld");
         String expected = "/WEB-INF/classes/META-INF/bug55807.tld : " +
                 tld.lastModified() + "</p>";
         Assert.assertTrue(result.contains(expected));

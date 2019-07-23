@@ -69,14 +69,14 @@ output/dist/src/test/org/apache/coyote/http11/filters/bug52121-part2
 test/org/apache/coyote/http11/filters/bug52121-part1
 test/org/apache/coyote/http11/filters/bug52121-part2
 
-output/dist/src/test/webapp-3.0/404.html
-output/dist/src/test/webapp-3.0/bug53257/*.txt
-output/dist/src/test/webapp-3.0/bug53257/foo bar/foobar.txt
-output/dist/src/test/webapp-3.0-fragments/WEB-INF/classes/*.txt
-test/webapp-3.0/404.html
-test/webapp-3.0/bug53257/*.txt
-test/webapp-3.0/bug53257/foo bar/foobar.txt
-test/webapp-3.0-fragments/WEB-INF/classes/*.txt
+output/dist/src/test/webapp/404.html
+output/dist/src/test/webapp/bug53257/*.txt
+output/dist/src/test/webapp/bug53257/foo bar/foobar.txt
+output/dist/src/test/webapp-fragments/WEB-INF/classes/*.txt
+test/webapp/404.html
+test/webapp/bug53257/*.txt
+test/webapp/bug53257/foo bar/foobar.txt
+test/webapp-fragments/WEB-INF/classes/*.txt
 
 build.properties
 

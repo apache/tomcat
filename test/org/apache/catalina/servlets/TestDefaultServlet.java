@@ -164,7 +164,7 @@ public class TestDefaultServlet extends TomcatBaseTest {
 
         Tomcat tomcat = getTomcatInstance();
 
-        File appDir = new File("test/webapp-3.0");
+        File appDir = new File("test/webapp");
 
         // app dir is relative to server home
         Context ctxt = tomcat.addContext("", appDir.getAbsolutePath());
@@ -279,7 +279,7 @@ public class TestDefaultServlet extends TomcatBaseTest {
     public void testBug57601() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
-        File appDir = new File("test/webapp-3.0");
+        File appDir = new File("test/webapp");
         tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
 
         tomcat.start();

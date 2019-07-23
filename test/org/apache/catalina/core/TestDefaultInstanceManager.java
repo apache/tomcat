@@ -74,7 +74,7 @@ public class TestDefaultInstanceManager extends TomcatBaseTest {
 
         // Create the context (don't use addWebapp as we want to modify the
         // JSP Servlet settings).
-        File appDir = new File("test/webapp-3.0");
+        File appDir = new File("test/webapp");
         StandardContext ctxt = (StandardContext) tomcat.addContext(
                 null, "/test", appDir.getAbsolutePath());
 

@@ -46,7 +46,7 @@ public class TestApplicationContext extends TomcatBaseTest {
     public void testBug53257() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
-        File appDir = new File("test/webapp-3.0");
+        File appDir = new File("test/webapp");
         // app dir is relative to server home
         tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
 
@@ -69,7 +69,7 @@ public class TestApplicationContext extends TomcatBaseTest {
     public void testBug53467() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
-        File appDir = new File("test/webapp-3.0");
+        File appDir = new File("test/webapp");
         // app dir is relative to server home
         tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
 
@@ -112,7 +112,7 @@ public class TestApplicationContext extends TomcatBaseTest {
     public void testGetJspConfigDescriptor() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
-        File appDir = new File("test/webapp-3.0");
+        File appDir = new File("test/webapp");
         // app dir is relative to server home
         StandardContext standardContext = (StandardContext) tomcat.addWebapp(
                 null, "/test", appDir.getAbsolutePath());
@@ -130,7 +130,7 @@ public class TestApplicationContext extends TomcatBaseTest {
     private ServletContext getServletContext() {
         Tomcat tomcat = getTomcatInstance();
 
-        File appDir = new File("test/webapp-3.0");
+        File appDir = new File("test/webapp");
         // app dir is relative to server home
         StandardContext standardContext = (StandardContext) tomcat.addWebapp(
                 null, "/test", appDir.getAbsolutePath());
