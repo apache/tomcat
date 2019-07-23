@@ -65,7 +65,7 @@ public class TestCoyoteAdapterRequestFuzzing extends TomcatBaseTest {
     public void doTest() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
-        File appDir = new File("test/webapp");
+        File appDir = new File("test/webapp-3.0");
         Context ctxt = tomcat.addContext("", appDir.getAbsolutePath());
         Tomcat.addServlet(ctxt, "default", DefaultServlet.class.getName());
         ctxt.addServletMapping("/", "default");
