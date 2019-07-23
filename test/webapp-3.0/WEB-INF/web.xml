@@ -20,14 +20,17 @@
   xsi:schemaLocation="http://java.sun.com/xml/ns/javaee
                       http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
   version="3.0"
-  metadata-complete="false">
+  metadata-complete="true">
 
-  <display-name>Tomcat Test Application</display-name>
+  <display-name>Tomcat Servlet 3.0 Tests</display-name>
   <description>
-     Used as part of the Tomcat unit tests when a full web application is
-     required.
+    Provides a web application used by the Tomcat unit tests to ensure that
+    Tomcat meets the requirements of the current JSP and Servlet specification
+    for web applications that declare that they follow version 3.0 of the
+    Servlet specification and version 2.2 of the JSP specification. This
+    typically means ensuring that features introduced in later versions of the
+    specification do not change the behaviour of applications that declared an
+    earlier version of the specification.
   </description>
-
-  <absolute-ordering/>
 
 </web-app>

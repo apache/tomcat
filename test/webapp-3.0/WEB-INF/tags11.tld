@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="ISO-8859-1" ?>
 <!--
   Licensed to the Apache Software Foundation (ASF) under one or more
   contributor license agreements.  See the NOTICE file distributed with
@@ -14,20 +14,24 @@
   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
   See the License for the specific language governing permissions and
   limitations under the License.
--->
-<web-app xmlns="http://java.sun.com/xml/ns/javaee"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://java.sun.com/xml/ns/javaee
-                      http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
-  version="3.0"
-  metadata-complete="false">
+--><!DOCTYPE taglib
+      PUBLIC "-//Sun Microsystems, Inc.//DTD JSP Tag Library 1.1//EN"
+      "http://java.sun.com/dtd/web-jsptaglibrary_1_1.dtd">
+<taglib>
+  <tlibversion>1.0</tlibversion>
+  <jspversion>1.1</jspversion>
+  <shortname>Tags11</shortname>
+  <uri>http://tomcat.apache.org/tags11</uri>
 
-  <display-name>Tomcat Test Application</display-name>
-  <description>
-     Used as part of the Tomcat unit tests when a full web application is
-     required.
-  </description>
+  <tag>
+    <name>Echo</name>
+    <tagclass>org.apache.jasper.compiler.TestValidator$Echo</tagclass>
+    <bodycontent>empty</bodycontent>
+    <attribute>
+      <name>echo</name>
+      <required>yes</required>
+      <rtexprvalue>true</rtexprvalue>
+    </attribute>
+  </tag>
 
-  <absolute-ordering/>
-
-</web-app>
+</taglib>
