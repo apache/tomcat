@@ -78,6 +78,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="WebSocket">
+    <changelog>
+      <fix>
+        Correct a regression that prevented a default Tomcat 7 install from
+        starting on Java 6. (markt)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 7.0.95 (violetagg)">
   <subsection name="Catalina">

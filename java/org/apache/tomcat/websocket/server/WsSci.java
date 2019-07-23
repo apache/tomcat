@@ -16,6 +16,7 @@
  */
 package org.apache.tomcat.websocket.server;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
 import java.util.HashSet;
 import java.util.Set;
@@ -47,8 +48,7 @@ public class WsSci implements ServletContainerInitializer {
     private static boolean logMessageWritten = false;
 
     private final Log log = LogFactory.getLog(WsSci.class); // must not be static
-    private static final StringManager sm =
-            StringManager.getManager(Constants.PACKAGE_NAME);
+    private static final StringManager sm = StringManager.getManager(WsSci.class);
 
     @Override
     public void onStartup(Set<Class<?>> clazzes, ServletContext ctx)
@@ -104,7 +104,17 @@ public class WsSci implements ServletContainerInitializer {
                     scannedPojoEndpoints.add(clazz);
                 }
             }
-        } catch (ReflectiveOperationException e) {
+        } catch (InstantiationException e) {
+            throw new ServletException(e);
+        } catch (IllegalArgumentException e) {
+            throw new ServletException(e);
+        } catch (SecurityException e) {
+            throw new ServletException(e);
+        } catch (IllegalAccessException e) {
+            throw new ServletException(e);
+        } catch (InvocationTargetException e) {
+            throw new ServletException(e);
+        } catch (NoSuchMethodException e) {
             throw new ServletException(e);
         }
 
