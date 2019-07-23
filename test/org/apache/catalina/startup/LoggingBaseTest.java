@@ -97,10 +97,13 @@ public abstract class LoggingBaseTest {
     @BeforeClass
     public static void setUpPerTestClass() throws Exception {
         // Create catalina.base directory
-        tempDir = new File(System.getProperty("tomcat.test.temp", "output/tmp"));
-        if (!tempDir.mkdirs() && !tempDir.isDirectory()) {
-            Assert.fail("Unable to create temporary directory for test");
+        File tempBase = new File(System.getProperty("tomcat.test.temp", "output/tmp"));
+        if (!tempBase.mkdirs() && !tempBase.isDirectory()) {
+            Assert.fail("Unable to create base temporary directory for tests");
         }
+        tempDir = File.createTempFile("test", null, tempBase);
+        Assert.assertTrue(tempDir.delete());
+        Assert.assertTrue(tempDir.mkdirs());
 
         System.setProperty("catalina.base", tempDir.getAbsolutePath());
 

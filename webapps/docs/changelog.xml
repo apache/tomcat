@@ -86,6 +86,13 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Other">
+    <changelog>
+      <add>
+        Enable the unit tests to execute in parallel. (markt)
+      </add>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 7.0.95 (violetagg)" rtext="not released">
   <subsection name="Catalina">

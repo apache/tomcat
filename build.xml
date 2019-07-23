@@ -1470,7 +1470,8 @@
         errorproperty="test.result.error"
         failureproperty="test.result.failure"
         haltonfailure="${test.haltonfailure}"
-        jvm="${java.bin.path}java" >
+        jvm="${java.bin.path}java"
+        threads="${test.threads}">
 
         <jvmarg value="${test.jvmarg.egd}"/>
         <jvmarg value="-Djava.library.path=${test.apr.loc}"/>
@@ -1522,15 +1523,39 @@
     </sequential>
   </macrodef>
 
-  <target name="cobertura-disabled" unless="${test.cobertura}">
+  <target name="cobertura-init">
+    <condition property="cobertura.enabled" value="true">
+      <and>
+        <istrue value="${test.cobertura}"/>
+        <equals arg1="1" arg2="${test.threads}"/>
+      </and>
+    </condition>
+    <condition property="cobertura.disabled" value="true">
+      <and>
+        <istrue value="${test.cobertura}"/>
+        <not>
+          <equals arg1="1" arg2="${test.threads}"/>
+        </not>
+      </and>
+    </condition>
+  </target>
+
+  <target name="cobertura-disabled" unless="${cobertura.enabled}"
+          depends="cobertura-init">
     <!-- Define classpath used to run tests when Cobertura is turned off. -->
     <path id="tomcat.test.run.classpath">
       <path refid="tomcat.test.classpath" />
     </path>
   </target>
 
-  <target name="cobertura-instrument" depends="compile,download-cobertura,cobertura-disabled"
-          if="${test.cobertura}"
+  <target name="cobertura-disabled-log" if="${cobertura.disabled}"
+          depends="cobertura-init">
+    <echo message="Code coverage disabled because test.threads is greater than 1"/>
+  </target>
+
+  <target name="cobertura-instrument"
+          depends="compile,download-cobertura,cobertura-disabled,cobertura-disabled-log"
+          if="${cobertura.enabled}"
           description="Adds Cobertura instrumentation to the compiled bytecode">
 
     <path id="cobertura.classpath">
@@ -1540,6 +1565,7 @@
         <exclude name="lib/**/jetty*.jar" />
         <exclude name="lib/**/servlet-api*.jar" />
       </fileset>
+      <pathelement path="res/cobertura"/>
     </path>
 
     <taskdef classpathref="cobertura.classpath" resource="tasks.properties" />
@@ -1570,7 +1596,7 @@
     </path>
   </target>
 
-  <target name="cobertura-report" if="${test.cobertura}"
+  <target name="cobertura-report" if="${cobertura.enabled}"
           depends="test-bio,test-nio,test-apr"
           description="Creates report from gathered Cobertura results">
 
