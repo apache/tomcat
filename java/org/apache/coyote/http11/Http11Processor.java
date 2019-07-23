@@ -1030,20 +1030,10 @@ public class Http11Processor extends AbstractProcessor {
             hostValueMB = headers.getUniqueValue("host");
         } catch (IllegalArgumentException iae) {
             // Multiple Host headers are not permitted
-            // 400 - Bad request
-            response.setStatus(400);
-            setErrorState(ErrorState.CLOSE_CLEAN, null);
-            if (log.isDebugEnabled()) {
-                log.debug(sm.getString("http11processor.request.multipleHosts"));
-            }
+            badRequest("http11processor.request.multipleHosts");
         }
         if (http11 && hostValueMB == null) {
-            // 400 - Bad request
-            response.setStatus(400);
-            setErrorState(ErrorState.CLOSE_CLEAN, null);
-            if (log.isDebugEnabled()) {
-                log.debug(sm.getString("http11processor.request.noHostHeader"));
-            }
+            badRequest("http11processor.request.noHostHeader");
         }
 
         // Check for an absolute-URI less the query string which has already
@@ -1091,11 +1081,7 @@ public class Http11Processor extends AbstractProcessor {
                             // Strictly there needs to be a check for valid %nn
                             // encoding here but skip it since it will never be
                             // decoded because the userinfo is ignored
-                            response.setStatus(400);
-                            setErrorState(ErrorState.CLOSE_CLEAN, null);
-                            if (log.isDebugEnabled()) {
-                                log.debug(sm.getString("http11processor.request.invalidUserInfo"));
-                            }
+                            badRequest("http11processor.request.invalidUserInfo");
                             break;
                         }
                     }
@@ -1121,11 +1107,7 @@ public class Http11Processor extends AbstractProcessor {
                                 // The requirements of RFC 7230 are being
                                 // applied. If the host header and the request
                                 // line do not agree, trigger a 400 response.
-                                response.setStatus(400);
-                                setErrorState(ErrorState.CLOSE_CLEAN, null);
-                                if (log.isDebugEnabled()) {
-                                    log.debug(sm.getString("http11processor.request.inconsistentHosts"));
-                                }
+                                badRequest("http11processor.request.inconsistentHosts");
                             }
                         }
                     }
@@ -1136,11 +1118,7 @@ public class Http11Processor extends AbstractProcessor {
                     hostValueMB.setBytes(uriB, uriBCStart + pos, slashPos - pos);
                 }
             } else {
-                response.setStatus(400);
-                setErrorState(ErrorState.CLOSE_CLEAN, null);
-                if (log.isDebugEnabled()) {
-                    log.debug(sm.getString("http11processor.request.invalidScheme"));
-                }
+                badRequest("http11processor.request.invalidScheme");
             }
         }
 
@@ -1148,11 +1126,7 @@ public class Http11Processor extends AbstractProcessor {
         // the point of decoding.
         for (int i = uriBC.getStart(); i < uriBC.getEnd(); i++) {
             if (!httpParser.isAbsolutePathRelaxed(uriB[i])) {
-                response.setStatus(400);
-                setErrorState(ErrorState.CLOSE_CLEAN, null);
-                if (log.isDebugEnabled()) {
-                    log.debug(sm.getString("http11processor.request.invalidUri"));
-                }
+                badRequest("http11processor.request.invalidUri");
                 break;
             }
         }
@@ -1210,6 +1184,15 @@ public class Http11Processor extends AbstractProcessor {
 
         if (!getErrorState().isIoAllowed()) {
             getAdapter().log(request, response, 0);
+        }
+    }
+
+
+    private void badRequest(String errorKey) {
+        response.setStatus(400);
+        setErrorState(ErrorState.CLOSE_CLEAN, null);
+        if (log.isDebugEnabled()) {
+            log.debug(sm.getString(errorKey));
         }
     }
 
