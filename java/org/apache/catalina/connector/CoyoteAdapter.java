@@ -279,6 +279,7 @@ public class CoyoteAdapter implements Adapter {
         if (request == null) {
             throw new IllegalStateException(sm.getString("coyoteAdapter.nullRequest"));
         }
+
         boolean comet = false;
         boolean success = true;
         AsyncContextImpl asyncConImpl = request.getAsyncContextInternal();
@@ -427,7 +428,6 @@ public class CoyoteAdapter implements Adapter {
 
             // Set query string encoding
             req.getParameters().setQueryStringEncoding(connector.getURIEncoding());
-
         }
 
         if (connector.getXpoweredBy()) {
@@ -472,8 +472,8 @@ public class CoyoteAdapter implements Adapter {
                         request.setFilterChain(null);
                     }
                 }
-
             }
+
             if (request.isAsync()) {
                 async = true;
                 Throwable throwable =
@@ -686,14 +686,14 @@ public class CoyoteAdapter implements Adapter {
         // If the processor has set the scheme (AJP does this, HTTP does this if
         // SSL is enabled) use this to set the secure flag as well. If the
         // processor hasn't set it, use the settings from the connector
-        if (! req.scheme().isNull()) {
-            // use processor specified scheme to determine secure state
-            request.setSecure(req.scheme().equals("https"));
-        } else {
-            // use connector scheme and secure configuration, (defaults to
+        if (req.scheme().isNull()) {
+            // Use connector scheme and secure configuration, (defaults to
             // "http" and false respectively)
             req.scheme().setString(connector.getScheme());
             request.setSecure(connector.getSecure());
+        } else {
+            // Use processor specified scheme to determine secure state
+            request.setSecure(req.scheme().equals("https"));
         }
 
         // At this point the Host header has been processed.
@@ -1419,8 +1419,6 @@ public class CoyoteAdapter implements Adapter {
      * @param len Length
      */
     protected static void copyBytes(byte[] b, int dest, int src, int len) {
-        for (int pos = 0; pos < len; pos++) {
-            b[pos + dest] = b[pos + src];
-        }
+        System.arraycopy(b, src, b, dest, len);
     }
 }
