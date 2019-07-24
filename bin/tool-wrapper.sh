@@ -37,7 +37,7 @@
 #                   containing some jars in order to allow replacement of APIs
 #                   created outside of the JCP (i.e. DOM and SAX from W3C).
 #                   It can also be used to update the XML parser implementation.
-#                   Note that Java 9 no longer supports this feature.
+#                   This is only supported for Java <= 8.
 #                   Defaults to $CATALINA_HOME/endorsed.
 # -----------------------------------------------------------------------------
 
