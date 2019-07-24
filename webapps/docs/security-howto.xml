@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
   Licensed to the Apache Software Foundation (ASF) under one or more
   contributor license agreements.  See the NOTICE file distributed with
@@ -55,29 +55,34 @@
     the Tomcat process and provide that user with the minimum necessary
     permissions for the operating system. For example, it should not be possible
     to log on remotely using the Tomcat user.</p>
-    <p>File permissions should also be suitably restricted. Taking the Tomcat
-    instances at the ASF as an example (where auto-deployment is disabled and
-    web applications are deployed as exploded directories), the standard
-    configuration is to have all Tomcat files owned by root with group Tomcat
-    and whilst owner has read/write privileges, group only has read and world
-    has no permissions. The exceptions are the logs, temp and work directory
-    that are owned by the Tomcat user rather than root. This means that even if
-    an attacker compromises the Tomcat process, they can&apos;t change the
-    Tomcat configuration, deploy new web applications or modify existing web
-    applications. The Tomcat process runs with a umask of 007 to maintain these
-    permissions.</p>
+    <p>File permissions should also be suitably restricted. In the
+    <code>.tar.gz</code> distribution, files and directories are not world
+    readable and the group does not have write access. On Unix like operating
+    systems, Tomcat runs with a default umask of <code>0027</code> to maintain
+    these permissions for files created while Tomcat is running (e.g. log files,
+    expanded WARs, etc.).</p>
+    <p>Taking the Tomcat instances at the ASF as an example (where
+    auto-deployment is disabled and web applications are deployed as exploded
+    directories), the standard configuration is to have all Tomcat files owned
+    by root with group Tomcat and whilst owner has read/write privileges, group
+    only has read and world has no permissions. The exceptions are the logs,
+    temp and work directory that are owned by the Tomcat user rather than root.
+    This means that even if an attacker compromises the Tomcat process, they
+    can&apos;t change the Tomcat configuration, deploy new web applications or
+    modify existing web applications. The Tomcat process runs with a umask of
+    007 to maintain these permissions.</p>
     <p>At the network level, consider using a firewall to limit both incoming
     and outgoing connections to only those connections you  expect to be
     present.</p>
 
     <subsection name="JMX">
       <p>The security of the JMX connection is dependent on the implementation
-      provided by the JRE and therefore falls outside the control of Tomact.</p>
+      provided by the JRE and therefore falls outside the control of Tomcat.</p>
 
       <p>Typically, access control is very limited (either read-only to
       everything or read-write to everything). Tomcat exposes a large amount
       of internal information and control via JMX to aid debugging, monitoring
-      and management. Give the limited access control available, JMX access
+      and management. Given the limited access control available, JMX access
       should be treated as equivalent to local root/admin access and restricted
       accordingly.</p>
 
@@ -272,14 +277,15 @@
       <p>The <strong>xpoweredBy</strong> attribute controls whether or not the
       X-Powered-By HTTP header is sent with each request. If sent, the value of
       the header contains the Servlet and JSP specification versions, the full
-      Tomcat version (e.g. Apache Tomcat/7.0.0), the name of the JVM vendor and
+      Tomcat version (e.g. Apache Tomcat/<version-major-minor/>), the name of
+      the JVM vendor and
       the version of the JVM. This header is disabled by default. This header
       can provide useful information to both legitimate clients and attackers.
       </p>
 
       <p>The <strong>server</strong> attribute controls the value of the Server
-      HTTP header. The default value of this header for Tomcat 4.1.x, 5.0.x,
-      5.5.x, 6.0.x and 7.0.x is Apache-Coyote/1.1. This header can provide
+      HTTP header. The default value of this header for Tomcat 4.1.x to
+      <version-major-minor/>.x is Apache-Coyote/1.1. This header can provide
       limited information to both legitimate clients and attackers.</p>
 
       <p>The <strong>SSLEnabled</strong>, <strong>scheme</strong> and
@@ -379,7 +385,7 @@
       context as required.</p>
 
       <p>Any administrative application should be protected by a
-      RemoteAddrValve. (Note that this Valve is also available as a Filter.)
+      RemoteAddrValve (this Valve is also available as a Filter).
       The <strong>allow</strong> attribute should be used to limit access to a
       set of known trusted hosts.</p>
 
@@ -391,13 +397,11 @@
       Alternatively, the version number can be changed by creating the file
       CATALINA_BASE/lib/org/apache/catalina/util/ServerInfo.properties with
       content as follows:</p>
-      <source>
-server.info=Apache Tomcat/7.0.x
-      </source>
+      <source>server.info=Apache Tomcat/<version-major-minor/>.x</source>
       <p>Modify the values as required. Note that this will also change the version
       number reported in some of the management tools and may make it harder to
       determine the real version installed. The CATALINA_HOME/bin/version.bat|sh
-      script will still report the version number.</p>
+      script will still report the correct version number.</p>
 
       <p>The default ErrorReportValve can display stack traces and/or JSP
       source code to clients when an error occurs. To avoid this, custom error
@@ -496,7 +500,7 @@ server.info=Apache Tomcat/7.0.x
     <p>Modify the values as required. Note that this will also change the version
     number reported in some of the management tools and may make it harder to
     determine the real version installed. The CATALINA_HOME/bin/version.bat|sh
-    script will still report the version number.
+    script will still report the correct version number.
     </p>
 
     <p>The CGI Servlet is disabled by default. If enabled, the debug

@@ -2521,13 +2521,10 @@ skip.installer property in build.properties" />
 
     <tar longfile="gnu" compression="gzip"
          tarfile="${tomcat.release}/v${version}/bin/${final.name}.tar.gz">
-      <tarfileset dir="${tomcat.dist}" mode="755" prefix="${final.name}">
-        <include name="bin/*.sh"/>
-      </tarfileset>
-      <tarfileset dir="${tomcat.dist}" mode="600" prefix="${final.name}">
+      <tarfileset dir="${tomcat.dist}" dirmode="700" filemode="600" prefix="${final.name}">
         <include name="conf/**" />
       </tarfileset>
-      <tarfileset dir="${tomcat.dist}" prefix="${final.name}">
+      <tarfileset dir="${tomcat.dist}" dirmode="750" filemode="640" prefix="${final.name}">
         <include name="bin/**" />
         <include name="lib/**" />
         <include name="logs/**" />
@@ -2548,6 +2545,11 @@ skip.installer property in build.properties" />
         <exclude name="bin/x64/"/>
         <exclude name="bin/*.exe"/>
         <exclude name="bin/*.dll"/>
+      </tarfileset>
+      <!-- These need to be added after the bin directory is added else the  -->
+      <!-- bin directory will pick up the wrong permissions.                 -->
+      <tarfileset dir="${tomcat.dist}" dirmode="750" filemode="750" prefix="${final.name}">
+        <include name="bin/*.sh" />
       </tarfileset>
     </tar>
 

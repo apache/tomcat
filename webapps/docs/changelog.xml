@@ -79,6 +79,13 @@
         <code>$CATALINA_HOME</code> and/or <code>$CATALINA_BASE</code> contains
         a semi-colon on Windows or a colon on Linux/FreeBSD/etc. (markt)
       </fix>
+      <update>
+        Tighten up the default file permissions for the <code>.tar.gz</code>
+        distribution so no files or directories are world readable by default.
+        Configure Tomcat to run with a default umask of <code>0027</code> which
+        may be overridden by setting <code>UMASK</code> in
+        <code>setenv.sh</code>. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
