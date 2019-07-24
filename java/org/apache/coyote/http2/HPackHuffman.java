@@ -404,6 +404,11 @@ public class HPackHuffman {
                     if ((val & HIGH_TERMINAL_BIT) == 0) {
                         treePos = (val >> 16) & LOW_MASK;
                     } else {
+                        if (eosBitCount != 0) {
+                            // This must be the EOS symbol which MUST be treated
+                            // as an error
+                            throw new HpackException(sm.getString("hpackhuffman.stringLiteralEOS"));
+                        }
                         target.append((char) ((val >> 16) & LOW_MASK));
                         treePos = 0;
                         eosBits = true;

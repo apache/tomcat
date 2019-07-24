@@ -103,6 +103,10 @@
         <bug>63578</bug>: Improve handling of invalid requests so that 400
         responses are returned to the client rather than 500 responses. (markt)
       </fix>
+      <fix>
+        Fix h2spec test suite failure. It is an error if a Huffman encoded
+        string literal contains the EOS symbol. (jfclere)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">
