@@ -81,6 +81,16 @@ public class CoyoteAdapter implements Adapter {
         Boolean.parseBoolean(System.getProperty("org.apache.catalina.connector.CoyoteAdapter.ALLOW_BACKSLASH", "false"));
 
 
+    private static final ThreadLocal<String> THREAD_NAME =
+            new ThreadLocal<String>() {
+
+                @Override
+                protected String initialValue() {
+                    return Thread.currentThread().getName();
+                }
+
+    };
+
     // ----------------------------------------------------------- Constructors
 
 
@@ -273,7 +283,7 @@ public class CoyoteAdapter implements Adapter {
         boolean success = true;
         AsyncContextImpl asyncConImpl = request.getAsyncContextInternal();
 
-        req.getRequestProcessor().setWorkerThreadName(Thread.currentThread().getName());
+        req.getRequestProcessor().setWorkerThreadName(THREAD_NAME.get());
 
         try {
             if (!request.isAsync() && !comet) {
@@ -428,10 +438,11 @@ public class CoyoteAdapter implements Adapter {
         boolean async = false;
         boolean postParseSuccess = false;
 
+        req.getRequestProcessor().setWorkerThreadName(THREAD_NAME.get());
+
         try {
             // Parse and set Catalina and configuration specific
             // request parameters
-            req.getRequestProcessor().setWorkerThreadName(Thread.currentThread().getName());
             postParseSuccess = postParseRequest(req, request, res, response);
             if (postParseSuccess) {
                 //check valves if we support async
