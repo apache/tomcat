@@ -1476,7 +1476,7 @@
         errorproperty="test.result.error"
         failureproperty="test.result.failure"
         haltonfailure="${test.haltonfailure}"
-        threads="${test.threads}" >
+        threads="${test.threads}">
 
         <jvmarg value="${test.jvmarg.egd}"/>
         <jvmarg value="-Dfile.encoding=UTF-8"/>
@@ -1538,12 +1538,12 @@
       </and>
     </condition>
     <condition property="cobertura.disabled" value="true">
-        <and>
-          <istrue value="${test.cobertura}"/>
-          <not>
-            <equals arg1="1" arg2="${test.threads}"/>
-          </not>
-        </and>
+      <and>
+        <istrue value="${test.cobertura}"/>
+        <not>
+          <equals arg1="1" arg2="${test.threads}"/>
+        </not>
+      </and>
     </condition>
   </target>
 
