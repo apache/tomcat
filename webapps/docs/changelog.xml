@@ -168,6 +168,11 @@
         Expand the coverage and quality of the French translations provided
         with Apache Tomcat. (remm)
       </add>
+      <fix>
+        <bug>63567</bug>: Restore the passing of <code>$LOGGING_MANAGER</code>
+        to the jvm in <code>catalina.sh</code> when calling <code>stop</code>.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
