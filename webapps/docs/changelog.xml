@@ -68,6 +68,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Other">
+    <changelog>
+      <add>
+        Limit the default JPDA (remote debugging interface) listen address to
+        <code>localhost:8000</code>. (markt)
+      </add>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 7.0.96 (violetagg)">
   <subsection name="Catalina">
