@@ -28,12 +28,12 @@ while [ -h "$PRG" ]; do
   if expr "$link" : '/.*' > /dev/null; then
     PRG="$link"
   else
-    PRG="`dirname $PRG`/$link"
+    PRG=`dirname "$PRG"`/"$link"
   fi
 done
 
-DIRNAME="`dirname $PRG`"
-PROGRAM="`basename $PRG`"
+DIRNAME="`dirname "$PRG"`"
+PROGRAM="`basename "$PRG"`"
 while [ ".$1" != . ]
 do
   case "$1" in
@@ -102,10 +102,10 @@ if [ -z "$JAVA_HOME" ]; then
         if expr "$link" : '/.*' > /dev/null; then
             JAVA_BIN="$link"
         else
-            JAVA_BIN="`dirname $JAVA_BIN`/$link"
+            JAVA_BIN="`dirname "$JAVA_BIN"`/$link"
         fi
     done
-    test -x "$JAVA_BIN" && JAVA_HOME="`dirname $JAVA_BIN`"
+    test -x "$JAVA_BIN" && JAVA_HOME="`dirname "$JAVA_BIN"`"
     test ".$JAVA_HOME" != . && JAVA_HOME=`cd "$JAVA_HOME/.." >/dev/null; pwd`
 else
     JAVA_BIN="$JAVA_HOME/bin/java"
@@ -136,7 +136,7 @@ elif [ -r "$CATALINA_HOME/bin/setenv.sh" ]; then
 fi
 
 # Add on extra jar files to CLASSPATH
-test ".$CLASSPATH" != . && CLASSPATH="${CLASSPATH}:"
+test ".$CLASSPATH" != . && CLASSPATH="$CLASSPATH:"
 CLASSPATH="$CLASSPATH$CATALINA_HOME/bin/bootstrap.jar:$CATALINA_HOME/bin/commons-daemon.jar"
 
 test ".$CATALINA_OUT" = . && CATALINA_OUT="$CATALINA_BASE/logs/catalina-daemon.out"
