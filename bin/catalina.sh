@@ -158,6 +158,20 @@ if $cygwin; then
   [ -n "$CLASSPATH" ] && CLASSPATH=`cygpath --path --unix "$CLASSPATH"`
 fi
 
+# Ensure that neither CATALINA_HOME nor CATALINA_BASE contains a colon
+# as this is used as the separator in the classpath and Java provides no
+# mechanism for escaping if the same character appears in the path.
+case $CATALINA_HOME in
+  *:*) echo "Using CATALINA_HOME:   $CATALINA_HOME";
+       echo "Unable to start as CATALINA_HOME contains a colon (:) character";
+       exit 1;
+esac
+case $CATALINA_BASE in
+  *:*) echo "Using CATALINA_BASE:   $CATALINA_BASE";
+       echo "Unable to start as CATALINA_BASE contains a colon (:) character";
+       exit 1;
+esac
+
 # For OS400
 if $os400; then
   # Set job priority to standard for interactive (interactive - 6) by using

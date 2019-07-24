@@ -74,6 +74,11 @@
         Limit the default JPDA (remote debugging interface) listen address to
         <code>localhost:8000</code>. (markt)
       </add>
+      <fix>
+        <bug>55620</bug>: Partial fix. Prevent Tomcat from starting when
+        <code>$CATALINA_HOME</code> and/or <code>$CATALINA_BASE</code> contains
+        a semi-colon on Windows or a colon on Linux/FreeBSD/etc. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
