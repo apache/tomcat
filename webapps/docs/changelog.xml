@@ -65,6 +65,9 @@
         reject them with a 400 response rather than triggering an internal error
         that results in a 500 response. (markt)
       </fix>
+      <fix>
+        Correct version information in <code>X-Powered-By</code> header. (markt)
+      </fix>
      </changelog>
   </subsection>
   <subsection name="Coyote">
