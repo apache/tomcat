@@ -129,6 +129,11 @@
         directory to local administrators, Local System and Local Service.
         (markt)
       </fix>
+      <fix>
+        <bug>63567</bug>: Restore the passing of <code>$LOGGING_MANAGER</code>
+        to the jvm in <code>catalina.sh</code> when calling <code>stop</code>.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
