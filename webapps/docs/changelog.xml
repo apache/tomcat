@@ -99,6 +99,15 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Web applications">
+    <changelog>
+      <fix>
+        <bug>63597</bug>: Update the custom 404 error page for the Host Manager
+        to take account of previous refactoring so that the page is used for
+        404 errors rather than falling back to the default error page. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <update>
