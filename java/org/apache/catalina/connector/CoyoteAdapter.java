@@ -109,8 +109,7 @@ public class CoyoteAdapter implements Adapter {
     /**
      * The string manager for this package.
      */
-    protected static final StringManager sm =
-        StringManager.getManager(Constants.Package);
+    protected static final StringManager sm = StringManager.getManager(CoyoteAdapter.class);
 
 
     /**
@@ -268,8 +267,7 @@ public class CoyoteAdapter implements Adapter {
         Response response = (Response) res.getNote(ADAPTER_NOTES);
 
         if (request == null) {
-            throw new IllegalStateException(
-                    "Dispatch may only happen on an existing request.");
+            throw new IllegalStateException(sm.getString("coyoteAdapter.nullRequest"));
         }
         boolean comet = false;
         boolean success = true;
@@ -374,7 +372,7 @@ public class CoyoteAdapter implements Adapter {
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
             success = false;
-            log.error(sm.getString("coyoteAdapter.service"), t);
+            log.error(sm.getString("coyoteAdapter.asyncDispatch"), t);
         } finally {
             req.getRequestProcessor().setWorkerThreadName(null);
             // Recycle the wrapper request and response
