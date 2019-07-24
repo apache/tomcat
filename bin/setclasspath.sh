@@ -22,7 +22,7 @@
 # -----------------------------------------------------------------------------
 
 # Make sure prerequisite environment variables are set
-if [ -z "$JAVA_HOME" -a -z "$JRE_HOME" ]; then
+if [ -z "$JAVA_HOME" ] && [ -z "$JRE_HOME" ]; then
   if $darwin; then
     # Bugzilla 54390
     if [ -x '/usr/libexec/java_home' ] ; then
@@ -44,13 +44,13 @@ if [ -z "$JAVA_HOME" -a -z "$JRE_HOME" ]; then
       fi
     fi
   fi
-  if [ -z "$JAVA_HOME" -a -z "$JRE_HOME" ]; then
+  if [ -z "$JAVA_HOME" ] && [ -z "$JRE_HOME" ]; then
     echo "Neither the JAVA_HOME nor the JRE_HOME environment variable is defined"
     echo "At least one of these environment variable is needed to run this program"
     exit 1
   fi
 fi
-if [ -z "$JAVA_HOME" -a "$1" = "debug" ]; then
+if [ -z "$JAVA_HOME" ] && [ "$1" = "debug" ]; then
   echo "JAVA_HOME should point to a JDK in order to run in debug mode."
   exit 1
 fi
@@ -61,14 +61,14 @@ fi
 # If we're running under jdb, we need a full jdk.
 if [ "$1" = "debug" ] ; then
   if [ "$os400" = "true" ]; then
-    if [ ! -x "$JAVA_HOME"/bin/java -o ! -x "$JAVA_HOME"/bin/javac ]; then
+    if [ ! -x "$JAVA_HOME"/bin/java ] || [ ! -x "$JAVA_HOME"/bin/javac ]; then
       echo "The JAVA_HOME environment variable is not defined correctly"
       echo "This environment variable is needed to run this program"
       echo "NB: JAVA_HOME should point to a JDK not a JRE"
       exit 1
     fi
   else
-    if [ ! -x "$JAVA_HOME"/bin/java -o ! -x "$JAVA_HOME"/bin/jdb -o ! -x "$JAVA_HOME"/bin/javac ]; then
+    if [ ! -x "$JAVA_HOME"/bin/java ] || [ ! -x "$JAVA_HOME"/bin/jdb ] || [ ! -x "$JAVA_HOME"/bin/javac ]; then
       echo "The JAVA_HOME environment variable is not defined correctly"
       echo "This environment variable is needed to run this program"
       echo "NB: JAVA_HOME should point to a JDK not a JRE"
