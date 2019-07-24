@@ -988,6 +988,11 @@ public class CoyoteAdapter implements Adapter {
 
         ByteChunk uriBC = req.decodedURI().getByteChunk();
         int semicolon = uriBC.indexOf(';', 0);
+        // Performance optimisation. Return as soon as it is known there are no
+        // path parameters;
+        if (semicolon == -1) {
+            return;
+        }
 
         // What encoding to use? Some platforms, eg z/os, use a default
         // encoding that doesn't give the expected result so be explicit
