@@ -86,6 +86,10 @@
         may be overridden by setting <code>UMASK</code> in
         <code>setenv.sh</code>. (markt)
       </update>
+      <fix>
+        Allow customization of service.bat, such as heap memory size, service
+        startup mode and JVM args. (isapir)
+      </fix>
     </changelog>
   </subsection>
 </section>
