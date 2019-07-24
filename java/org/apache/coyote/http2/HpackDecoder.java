@@ -155,7 +155,7 @@ public class HpackDecoder {
                     return;
                 }
             } else {
-                throw new RuntimeException("Not yet implemented");
+                throw new RuntimeException(sm.getString("hpackdecoder.notImplemented"));
             }
         }
     }
@@ -171,7 +171,8 @@ public class HpackDecoder {
             return false;
         }
         if (size > maxMemorySizeHard) {
-            throw new HpackException();
+            throw new HpackException(sm.getString("hpackdecoder.maxMemorySizeExceeded",
+                    Integer.valueOf(size), Integer.valueOf(maxMemorySizeHard)));
         }
         maxMemorySizeSoft = size;
         if (currentMemorySize > maxMemorySizeSoft) {
@@ -249,7 +250,7 @@ public class HpackDecoder {
             int adjustedIndex = getRealIndex(index - Hpack.STATIC_TABLE_LENGTH);
             Hpack.HeaderField res = headerTable[adjustedIndex];
             if (res == null) {
-                throw new HpackException();
+                throw new HpackException(sm.getString("hpackdecoder.nullHeader", Integer.valueOf(index)));
             }
             return res.name;
         }
