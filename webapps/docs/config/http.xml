@@ -1314,14 +1314,18 @@
     </attribute>
 
     <attribute name="sessionCacheSize" required="false">
-      <p>The number of SSL sessions to maintain in the session cache. Use 0 to
-      specify an unlimited cache size. If not specified, a default of 0 is
-      used.</p>
+      <p>The number of SSL sessions to maintain in the session cache. Specify
+      <code>-1</code> to use the implementation default. Values of zero and
+      above are passed to the implementation. Zero is used to specify an
+      unlimited cache size and is not recommended. If not specified, a default
+      of <code>-1</code> is used.</p>
     </attribute>
 
     <attribute name="sessionTimeout" required="false">
       <p>The time, in seconds, after the creation of an SSL session that it will
-      timeout. Use 0 to specify an unlimited timeout. If not specified, a
+      timeout. Specify <code>-1</code> to use the implementation default. Values
+      of zero and above are passed to the implementation. Zero is used to
+      specify an unlimited timeout and is not recommended. If not specified, a
       default of 86400 (24 hours) is used.</p>
     </attribute>
 

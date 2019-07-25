@@ -257,10 +257,13 @@ public abstract class SSLUtilBase implements SSLUtil {
 
     @Override
     public void configureSessionContext(SSLSessionContext sslSessionContext) {
-        if (sslHostConfig.getSessionCacheSize() > 0) {
+        // <0 - don't set anything - use the implementation default
+        if (sslHostConfig.getSessionCacheSize() >= 0) {
             sslSessionContext.setSessionCacheSize(sslHostConfig.getSessionCacheSize());
         }
-        if (sslHostConfig.getSessionTimeout() > 0) {
+
+        // <0 - don't set anything - use the implementation default
+        if (sslHostConfig.getSessionTimeout() >= 0) {
             sslSessionContext.setSessionTimeout(sslHostConfig.getSessionTimeout());
         }
     }
