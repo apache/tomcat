@@ -63,6 +63,10 @@
   <subsection name="Coyote">
     <changelog>
       <fix>
+        <bug>63571</bug>: Use the implementation default for JSSE TLS session
+        cache size. (markt)
+      </fix>
+      <fix>
         <bug>63578</bug>: Improve handling of invalid requests so that 400
         responses are returned to the client rather than 500 responses. (markt)
       </fix>

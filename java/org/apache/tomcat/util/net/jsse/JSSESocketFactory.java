@@ -94,7 +94,7 @@ public class JSSESocketFactory implements ServerSocketFactory, SSLUtil {
     private static final String defaultKeystoreType = "JKS";
     private static final String defaultKeystoreFile
         = System.getProperty("user.home") + "/.keystore";
-    private static final int defaultSessionCacheSize = 0;
+    private static final int defaultSessionCacheSize = -1;
     private static final int defaultSessionTimeout = 86400;
     private static final String ALLOW_ALL_SUPPORTED_CIPHERS = "ALL";
     public static final String DEFAULT_KEY_PASS = "changeit";
@@ -622,10 +622,12 @@ public class JSSESocketFactory implements ServerSocketFactory, SSLUtil {
     public void configureSessionContext(SSLSessionContext sslSessionContext) {
         int sessionCacheSize;
         if (endpoint.getSessionCacheSize() != null) {
-            sessionCacheSize = Integer.parseInt(
-                    endpoint.getSessionCacheSize());
+            sessionCacheSize = Integer.parseInt(endpoint.getSessionCacheSize());
         } else {
             sessionCacheSize = defaultSessionCacheSize;
+        }
+        if (sessionCacheSize >= 0) {
+            sslSessionContext.setSessionCacheSize(sessionCacheSize);
         }
 
         int sessionTimeout;
@@ -634,9 +636,9 @@ public class JSSESocketFactory implements ServerSocketFactory, SSLUtil {
         } else {
             sessionTimeout = defaultSessionTimeout;
         }
-
-        sslSessionContext.setSessionCacheSize(sessionCacheSize);
-        sslSessionContext.setSessionTimeout(sessionTimeout);
+        if (sessionTimeout >= 0) {
+            sslSessionContext.setSessionTimeout(sessionTimeout);
+        }
     }
 
     /**
