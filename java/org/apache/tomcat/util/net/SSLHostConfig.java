@@ -99,7 +99,8 @@ public class SSLHostConfig implements Serializable {
     private List<String> jsseCipherNames = null;
     private String honorCipherOrder = null;
     private Set<String> protocols = new HashSet<>();
-    private int sessionCacheSize = 0;
+    // Values <0 mean use the implementation default
+    private int sessionCacheSize = -1;
     private int sessionTimeout = 86400;
     // JSSE
     private String keyManagerAlgorithm = KeyManagerFactory.getDefaultAlgorithm();

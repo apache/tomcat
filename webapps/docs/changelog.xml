@@ -90,6 +90,10 @@
         internal error that results in a 500 response. (markt)
       </fix>
       <fix>
+        <bug>63571</bug>: Allow users to configure infinite TLS session caches
+        and/or timeouts. (markt)
+      </fix>
+      <fix>
         <bug>63578</bug>: Improve handling of invalid requests so that 400
         responses are returned to the client rather than 500 responses. (markt)
       </fix>
