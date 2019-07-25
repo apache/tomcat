@@ -177,6 +177,9 @@
         to the jvm in <code>catalina.sh</code> when calling <code>stop</code>.
         (markt)
       </fix>
+      <fix>
+        Correct broken OSGi data in JAR file manifests. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
