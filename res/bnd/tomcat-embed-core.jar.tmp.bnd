@@ -12,6 +12,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+Automatic-Module-Name: org.apache.tomcat-embed-core
 Bundle-Name: tomcat-embed-core
 Bundle-SymbolicName: org.apache.tomcat-embed-core
 Bundle-Version: @VERSION@

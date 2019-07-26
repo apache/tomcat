@@ -187,6 +187,11 @@
         from the standard WebSocket JAR that does not include the API classes.
         (markt)
       </fix>
+      <fix>
+        <bug>63555</bug>: Add <code>Automatic-Module-Name</code> entries for
+        each of the Tomcat provided JARs included in the Tomcat embedded
+        distribution. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
