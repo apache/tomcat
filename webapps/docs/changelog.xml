@@ -60,6 +60,14 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 7.0.97 (violetagg)">
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        <bug>63550</bug>: Only try the <code>alternateURL</code> in the
+        <code>JNDIRealm</code> if one has been specified. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Coyote">
     <changelog>
       <fix>
