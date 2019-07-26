@@ -25,6 +25,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
 import java.security.KeyStore;
+import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
@@ -119,8 +120,8 @@ public abstract class AbstractStreamProvider implements StreamProvider {
                 KeyStore trustStore = KeyStore.getInstance("JKS");
                 trustStore.load(null);
 
-                Collection c = certFactory.generateCertificates(pemInputStream);
-                Iterator i = c.iterator();
+                Collection<? extends Certificate> c = certFactory.generateCertificates(pemInputStream);
+                Iterator<? extends Certificate> i = c.iterator();
                 while (i.hasNext()) {
                    X509Certificate cert = (X509Certificate)i.next();
                    String alias = cert.getSubjectX500Principal().getName();
