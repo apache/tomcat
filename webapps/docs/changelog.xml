@@ -47,6 +47,10 @@
 <section name="Tomcat 9.0.23 (markt)" rtext="in development">
   <subsection name="Catalina">
     <changelog>
+      <fix>
+        <bug>63550</bug>: Only try the <code>alternateURL</code> in the
+        <code>JNDIRealm</code> if one has been specified. (markt)
+      </fix>
       <add>
         <bug>63556</bug>: Mark request as forwarded in RemoteIpValve and
         RemoteIpFilter (michaelo)

@@ -2389,6 +2389,10 @@ public class JNDIRealm extends RealmBase {
             context = createDirContext(getDirectoryContextEnvironment());
 
         } catch (Exception e) {
+            if (alternateURL == null || alternateURL.length() == 0) {
+                // No alternate URL. Re-throw the exception.
+                throw e;
+            }
 
             connectionAttempt = 1;
 
