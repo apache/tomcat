@@ -28,6 +28,8 @@ import java.security.KeyStore;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.Map;
 
 import javax.net.ssl.HttpsURLConnection;
@@ -113,13 +115,17 @@ public abstract class AbstractStreamProvider implements StreamProvider {
         if (caCertFile != null) {
             try (InputStream pemInputStream = new BufferedInputStream(new FileInputStream(caCertFile))) {
                 CertificateFactory certFactory = CertificateFactory.getInstance("X509");
-                X509Certificate cert = (X509Certificate)certFactory.generateCertificate(pemInputStream);
 
                 KeyStore trustStore = KeyStore.getInstance("JKS");
                 trustStore.load(null);
 
-                String alias = cert.getSubjectX500Principal().getName();
-                trustStore.setCertificateEntry(alias, cert);
+                Collection c = certFactory.generateCertificates(pemInputStream);
+                Iterator i = c.iterator();
+                while (i.hasNext()) {
+                   X509Certificate cert = (X509Certificate)i.next();
+                   String alias = cert.getSubjectX500Principal().getName();
+                   trustStore.setCertificateEntry(alias, cert);
+                }
 
                 TrustManagerFactory trustManagerFactory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
                 trustManagerFactory.init(trustStore);
