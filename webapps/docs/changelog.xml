@@ -192,6 +192,9 @@
         each of the Tomcat provided JARs included in the Tomcat embedded
         distribution. (markt)
       </fix>
+      <update>
+        Update dependency on bnd to 4.2.0. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
