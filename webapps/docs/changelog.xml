@@ -180,6 +180,13 @@
       <fix>
         Correct broken OSGi data in JAR file manifests. (markt)
       </fix>
+      <fix>
+        Add &quot;embed&quot; to the <code>Bundle-Name</code> and
+        <code>Bundle-Symbolic-Name</code> for the Tomact embedded WebSocket JAR
+        to align the naming with the other embedded JARs and to differentiate it
+        from the standard WebSocket JAR that does not include the API classes.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>

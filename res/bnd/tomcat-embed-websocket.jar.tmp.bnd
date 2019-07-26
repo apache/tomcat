@@ -12,8 +12,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-Bundle-Name: tomcat-websocket
-Bundle-SymbolicName: org.apache.tomcat-websocket
+Bundle-Name: tomcat-embed-websocket
+Bundle-SymbolicName: org.apache.tomcat-embed-websocket
 Bundle-Version: @VERSION@
 Export-Package: \
     javax.websocket,\
