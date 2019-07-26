@@ -2463,7 +2463,13 @@ public class JNDIRealm extends RealmBase {
         } catch (Exception e) {
             if (alternateURL == null || alternateURL.length() == 0) {
                 // No alternate URL. Re-throw the exception.
-                throw e;
+                if (e instanceof NamingException) {
+                    throw (NamingException) e;
+                } else if (e instanceof RuntimeException) {
+                    throw (RuntimeException) e;
+                }
+                // Not possible to reach this point and not throw an exception.
+                // Later versions of Java allow us to simply use "throw e" here.
             }
 
             connectionAttempt = 1;
