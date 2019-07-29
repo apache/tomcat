@@ -117,7 +117,10 @@ public final class FastHttpDateFormat {
      * @param threadLocalformat Ignored. The local ConcurrentDateFormat will
      *                          always be used.
      * @return the HTTP date
+     *
+     * @deprecated Unused. This will be removed in Tomcat 10
      */
+    @Deprecated
     public static final String formatDate(long value, DateFormat threadLocalformat) {
         return formatDate(value);
     }
