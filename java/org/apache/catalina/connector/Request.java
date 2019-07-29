@@ -167,6 +167,10 @@ public class Request implements org.apache.catalina.servlet4preview.http.HttpSer
 
     // ----------------------------------------------------- Variables
 
+    /**
+     * @deprecated Unused. This will be removed in Tomcat 10.
+     */
+    @Deprecated
     protected static final TimeZone GMT_ZONE = TimeZone.getTimeZone("GMT");
 
 
@@ -187,9 +191,13 @@ public class Request implements org.apache.catalina.servlet4preview.http.HttpSer
      *
      * Notice that because SimpleDateFormat is not thread-safe, we can't
      * declare formats[] as a static variable.
+     *
+     * @deprecated Unused. This will be removed in Tomcat 10
      */
+    @Deprecated
     protected final SimpleDateFormat formats[];
 
+    @Deprecated
     private static final SimpleDateFormat formatsTemplate[] = {
         new SimpleDateFormat(FastHttpDateFormat.RFC1123_DATE, Locale.US),
         new SimpleDateFormat("EEEEEE, dd-MMM-yy HH:mm:ss zzz", Locale.US),
@@ -2223,7 +2231,7 @@ public class Request implements org.apache.catalina.servlet4preview.http.HttpSer
         }
 
         // Attempt to convert the date header in a variety of formats
-        long result = FastHttpDateFormat.parseDate(value, formats);
+        long result = FastHttpDateFormat.parseDate(value);
         if (result != (-1L)) {
             return result;
         }

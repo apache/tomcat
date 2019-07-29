@@ -41,7 +41,10 @@ public final class FastHttpDateFormat {
 
     /**
      * The only date format permitted when generating HTTP headers.
+     *
+     * @deprecated Unused. This will be removed in Tomcat 10.
      */
+    @Deprecated
     public static final String RFC1123_DATE = "EEE, dd MMM yyyy HH:mm:ss zzz";
 
     // HTTP date formats

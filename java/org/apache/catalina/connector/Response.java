@@ -32,7 +32,6 @@ import java.util.Collection;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Locale;
-import java.util.TimeZone;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.ServletResponse;
@@ -91,7 +90,10 @@ public class Response implements HttpServletResponse {
 
     /**
      * The date format we will use for creating date headers.
+     *
+     * @deprecated Unused. This will be removed in Tomcat 10
      */
+    @Deprecated
     protected SimpleDateFormat format = null;
 
 
@@ -1003,14 +1005,7 @@ public class Response implements HttpServletResponse {
             return;
         }
 
-        if (format == null) {
-            format = new SimpleDateFormat(FastHttpDateFormat.RFC1123_DATE,
-                                          Locale.US);
-            format.setTimeZone(TimeZone.getTimeZone("GMT"));
-        }
-
-        addHeader(name, FastHttpDateFormat.formatDate(value, format));
-
+        addHeader(name, FastHttpDateFormat.formatDate(value));
     }
 
 
@@ -1366,13 +1361,7 @@ public class Response implements HttpServletResponse {
             return;
         }
 
-        if (format == null) {
-            format = new SimpleDateFormat(FastHttpDateFormat.RFC1123_DATE,
-                                          Locale.US);
-            format.setTimeZone(TimeZone.getTimeZone("GMT"));
-        }
-
-        setHeader(name, FastHttpDateFormat.formatDate(value, format));
+        setHeader(name, FastHttpDateFormat.formatDate(value));
     }
 
 
