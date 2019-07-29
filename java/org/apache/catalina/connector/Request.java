@@ -129,7 +129,6 @@ public class Request implements org.apache.catalina.servlet4preview.http.HttpSer
 
     // ----------------------------------------------------------- Constructors
 
-
     public Request() {
         formats = new SimpleDateFormat[formatsTemplate.length];
         for(int i = 0; i < formats.length; i++) {
@@ -167,7 +166,6 @@ public class Request implements org.apache.catalina.servlet4preview.http.HttpSer
 
 
     // ----------------------------------------------------- Variables
-
 
     protected static final TimeZone GMT_ZONE = TimeZone.getTimeZone("GMT");
 
@@ -578,6 +576,7 @@ public class Request implements org.apache.catalina.servlet4preview.http.HttpSer
     public Context getContext() {
         return mappingData.context;
     }
+
 
     /**
      * @param context The newly associated Context

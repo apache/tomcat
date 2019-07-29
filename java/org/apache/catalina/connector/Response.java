@@ -33,7 +33,6 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
-import java.util.Vector;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.ServletResponse;
@@ -782,11 +781,10 @@ public class Response implements HttpServletResponse {
      * of the request. This method must be called prior to reading
      * request parameters or reading input using getReader().
      *
-     * @param characterEncoding String containing the name of the character
-     *                          encoding.
+     * @param charset String containing the name of the character encoding.
      */
     @Override
-    public void setCharacterEncoding(String characterEncoding) {
+    public void setCharacterEncoding(String charset) {
 
         if (isCommitted()) {
             return;
@@ -804,9 +802,9 @@ public class Response implements HttpServletResponse {
         }
 
         try {
-            getCoyoteResponse().setCharacterEncoding(characterEncoding);
+            getCoyoteResponse().setCharacterEncoding(charset);
         } catch (IllegalArgumentException e) {
-            log.warn(sm.getString("coyoteResponse.encoding.invalid", characterEncoding), e);
+            log.warn(sm.getString("coyoteResponse.encoding.invalid", charset), e);
             return;
         }
         isCharacterEncodingSet = true;
@@ -870,7 +868,6 @@ public class Response implements HttpServletResponse {
 
     @Override
     public Collection<String> getHeaderNames() {
-
         MimeHeaders headers = getCoyoteResponse().getMimeHeaders();
         int n = headers.size();
         List<String> result = new ArrayList<>(n);
@@ -884,12 +881,11 @@ public class Response implements HttpServletResponse {
 
     @Override
     public Collection<String> getHeaders(String name) {
-
         Enumeration<String> enumeration =
                 getCoyoteResponse().getMimeHeaders().values(name);
-        Vector<String> result = new Vector<>();
+        List<String> result = new ArrayList<>();
         while (enumeration.hasMoreElements()) {
-            result.addElement(enumeration.nextElement());
+            result.add(enumeration.nextElement());
         }
         return result;
     }
@@ -1404,8 +1400,9 @@ public class Response implements HttpServletResponse {
 
         char cc=name.charAt(0);
         if (cc=='C' || cc=='c') {
-            if (checkSpecialHeader(name, value))
+            if (checkSpecialHeader(name, value)) {
                 return;
+            }
         }
 
         getCoyoteResponse().setHeader(name, value);
@@ -1480,7 +1477,6 @@ public class Response implements HttpServletResponse {
 
 
     // ------------------------------------------------------ Protected Methods
-
 
     /**
      * Return <code>true</code> if the specified URL should be encoded with
@@ -1786,9 +1782,7 @@ public class Response implements HttpServletResponse {
     }
 
     private void copyChars(char[] c, int dest, int src, int len) {
-        for (int pos = 0; pos < len; pos++) {
-            c[pos + dest] = c[pos + src];
-        }
+        System.arraycopy(c, src, c, dest, len);
     }
 
 
