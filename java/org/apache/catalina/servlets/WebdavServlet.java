@@ -43,11 +43,11 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.catalina.WebResource;
 import org.apache.catalina.connector.RequestFacade;
-import org.apache.catalina.util.ConcurrentDateFormat;
 import org.apache.catalina.util.DOMWriter;
 import org.apache.catalina.util.URLEncoder;
 import org.apache.catalina.util.XMLWriter;
 import org.apache.tomcat.util.buf.UDecoder;
+import org.apache.tomcat.util.http.ConcurrentDateFormat;
 import org.apache.tomcat.util.http.FastHttpDateFormat;
 import org.apache.tomcat.util.http.RequestUtil;
 import org.apache.tomcat.util.security.ConcurrentMessageDigest;
