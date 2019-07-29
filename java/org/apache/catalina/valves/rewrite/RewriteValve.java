@@ -136,7 +136,6 @@ public class RewriteValve extends ValveBase {
     protected synchronized void startInternal() throws LifecycleException {
 
         super.startInternal();
-        context = (getContainer() instanceof Context);
 
         InputStream is = null;
 
