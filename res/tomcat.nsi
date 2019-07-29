@@ -374,7 +374,7 @@ Section -post
   StrCmp $0 "0" SetPermissionsOk
     FileWrite $ServiceInstallLog "Install failed (setting file permissions): $0 $1$\r$\n"
     MessageBox MB_YESNO|MB_ICONSTOP \
-      "Failed to set file permisisons.$\r$\nCheck your settings and permissions.$\r$\nIgnore and continue anyway (not recommended)?" \
+      "Failed to set file permissions.$\r$\nCheck your settings and permissions.$\r$\nIgnore and continue anyway (not recommended)?" \
       /SD IDNO IDYES SetPermissionsOk
   Quit
   SetPermissionsOk:
