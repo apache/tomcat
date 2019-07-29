@@ -27,7 +27,11 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  * A thread safe wrapper around {@link SimpleDateFormat} that does not make use
  * of ThreadLocal and - broadly - only creates enough SimpleDateFormat objects
  * to satisfy the concurrency requirements.
+ *
+ * @deprecated Unused. This will be removed in Tomcat 10.
+ *             Use {@link org.apache.tomcat.util.http.ConcurrentDateFormat}
  */
+@Deprecated
 public class ConcurrentDateFormat {
 
     private final String format;

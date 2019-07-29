@@ -49,13 +49,13 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.catalina.connector.RequestFacade;
-import org.apache.catalina.util.ConcurrentDateFormat;
 import org.apache.catalina.util.DOMWriter;
 import org.apache.catalina.util.URLEncoder;
 import org.apache.catalina.util.XMLWriter;
 import org.apache.naming.resources.CacheEntry;
 import org.apache.naming.resources.Resource;
 import org.apache.naming.resources.ResourceAttributes;
+import org.apache.tomcat.util.http.ConcurrentDateFormat;
 import org.apache.tomcat.util.http.FastHttpDateFormat;
 import org.apache.tomcat.util.http.RequestUtil;
 import org.apache.tomcat.util.security.MD5Encoder;
