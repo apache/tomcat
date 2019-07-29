@@ -2152,7 +2152,7 @@ public class WebdavServlet extends DefaultServlet {
                 String property = properties.nextElement();
 
                 if (property.equals("creationdate")) {
-                    generatedXML.writeProperty ("D", "creationdate", getISOCreationDate(created));
+                    generatedXML.writeProperty("D", "creationdate", getISOCreationDate(created));
                 } else if (property.equals("displayname")) {
                     generatedXML.writeElement("D", "displayname", XMLWriter.OPENING);
                     generatedXML.writeData(resourceName);
