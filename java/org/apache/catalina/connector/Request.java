@@ -119,10 +119,10 @@ public class Request implements HttpServletRequest {
     // ----------------------------------------------------------- Constructors
 
     public Request() {
-        formats[0].setTimeZone(GMT_ZONE);
-        formats[1].setTimeZone(GMT_ZONE);
-        formats[2].setTimeZone(GMT_ZONE);
-
+        formats = new SimpleDateFormat[formatsTemplate.length];
+        for(int i = 0; i < formats.length; i++) {
+            formats[i] = (SimpleDateFormat) formatsTemplate[i].clone();
+        }
     }
 
 
@@ -156,6 +156,10 @@ public class Request implements HttpServletRequest {
 
     // ----------------------------------------------------- Variables
 
+    /**
+     * @deprecated Unused. This will be removed in Tomcat 10.
+     */
+    @Deprecated
     protected static final TimeZone GMT_ZONE = TimeZone.getTimeZone("GMT");
 
 
@@ -176,11 +180,17 @@ public class Request implements HttpServletRequest {
      *
      * Notice that because SimpleDateFormat is not thread-safe, we can't
      * declare formats[] as a static variable.
+     *
+     * @deprecated Unused. This will be removed in Tomcat 10
      */
-    protected SimpleDateFormat formats[] = {
-            new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz", Locale.US),
-            new SimpleDateFormat("EEEEEE, dd-MMM-yy HH:mm:ss zzz", Locale.US),
-            new SimpleDateFormat("EEE MMMM d HH:mm:ss yyyy", Locale.US)
+    @Deprecated
+    protected final SimpleDateFormat formats[];
+
+    @Deprecated
+    private static final SimpleDateFormat formatsTemplate[] = {
+        new SimpleDateFormat(FastHttpDateFormat.RFC1123_DATE, Locale.US),
+        new SimpleDateFormat("EEEEEE, dd-MMM-yy HH:mm:ss zzz", Locale.US),
+        new SimpleDateFormat("EEE MMMM d HH:mm:ss yyyy", Locale.US)
     };
 
 
@@ -2231,7 +2241,7 @@ public class Request implements HttpServletRequest {
         }
 
         // Attempt to convert the date header in a variety of formats
-        long result = FastHttpDateFormat.parseDate(value, formats);
+        long result = FastHttpDateFormat.parseDate(value);
         if (result != (-1L)) {
             return result;
         }
@@ -3663,5 +3673,9 @@ public class Request implements HttpServletRequest {
                         // NO-OP
                     }
                 });
+
+        for (SimpleDateFormat sdf : formatsTemplate) {
+            sdf.setTimeZone(GMT_ZONE);
+        }
     }
 }
