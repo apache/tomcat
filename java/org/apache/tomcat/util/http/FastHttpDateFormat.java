@@ -150,7 +150,11 @@ public final class FastHttpDateFormat {
      * @param threadLocalformats Ignored. The local array of
      *                           ConcurrentDateFormat will always be used.
      * @return the date as a long
+     *
+     * @deprecated Unused. This will be removed in Tomcat 10
+     *             Use {@link #parseDate(String)}
      */
+    @Deprecated
     public static final long parseDate(String value, DateFormat[] threadLocalformats) {
         return parseDate(value);
     }
