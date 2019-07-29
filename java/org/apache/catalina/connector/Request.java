@@ -16,7 +16,6 @@
  */
 package org.apache.catalina.connector;
 
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -113,16 +112,13 @@ import org.ietf.jgss.GSSException;
  * @author Remy Maucherat
  * @author Craig R. McClanahan
  */
-public class Request
-implements HttpServletRequest {
+public class Request implements HttpServletRequest {
 
     private static final Log log = LogFactory.getLog(Request.class);
 
     // ----------------------------------------------------------- Constructors
 
-
     public Request() {
-
         formats[0].setTimeZone(GMT_ZONE);
         formats[1].setTimeZone(GMT_ZONE);
         formats[2].setTimeZone(GMT_ZONE);
@@ -159,7 +155,6 @@ implements HttpServletRequest {
 
 
     // ----------------------------------------------------- Variables
-
 
     protected static final TimeZone GMT_ZONE = TimeZone.getTimeZone("GMT");
 
@@ -2775,10 +2770,7 @@ implements HttpServletRequest {
     }
 
     /**
-     * @throws IOException If an I/O error occurs
-     * @throws IllegalStateException If the response has been committed
-     * @throws ServletException If the caller is responsible for handling the
-     *         error and the container has NOT set the HTTP response code etc.
+     * {@inheritDoc}
      */
     @Override
     public boolean authenticate(HttpServletResponse response)
@@ -2949,7 +2941,7 @@ implements HttpServletRequest {
                             try {
                                 value = part.getString(Parameters.DEFAULT_ENCODING);
                             } catch (UnsupportedEncodingException e) {
-                                // Should not be possible
+                                // Not possible
                             }
                         }
                         if (maxPostSize >= 0) {
