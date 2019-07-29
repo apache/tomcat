@@ -17,6 +17,7 @@
 package org.apache.catalina.valves.rewrite;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 
@@ -129,7 +130,7 @@ public class Substitution {
 
     private SubstitutionElement[] parseSubtitution(String sub, Map<String, RewriteMap> maps) {
 
-        ArrayList<SubstitutionElement> elements = new ArrayList<>();
+        List<SubstitutionElement> elements = new ArrayList<>();
         int pos = 0;
         int percentPos = 0;
         int dollarPos = 0;

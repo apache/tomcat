@@ -27,6 +27,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 
@@ -225,8 +226,8 @@ public class RewriteValve extends ValveBase {
     }
 
     protected void parse(BufferedReader reader) throws LifecycleException {
-        ArrayList<RewriteRule> rules = new ArrayList<>();
-        ArrayList<RewriteCond> conditions = new ArrayList<>();
+        List<RewriteRule> rules = new ArrayList<>();
+        List<RewriteCond> conditions = new ArrayList<>();
         while (true) {
             try {
                 String line = reader.readLine();
