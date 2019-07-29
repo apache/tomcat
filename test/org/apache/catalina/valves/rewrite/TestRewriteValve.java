@@ -582,6 +582,30 @@ public class TestRewriteValve extends TomcatBaseTest {
     }
 
 
+    @Test
+    public void testNegativePattern01() throws Exception {
+        doTestRewrite("RewriteRule !^/b/.* /c/", "/b", "/c/");
+    }
+
+
+    @Test
+    public void testNegativePattern02() throws Exception {
+        doTestRewrite("RewriteRule !^/b/.* /c/", "/d/e/f", "/c/");
+    }
+
+
+    @Test
+    public void testNegativePattern03() throws Exception {
+        doTestRewrite("RewriteRule !^/c/.* /b/", "/c/", "/c/");
+    }
+
+
+    @Test
+    public void testNegativePattern04() throws Exception {
+        doTestRewrite("RewriteRule !^/c/.* /b/", "/c/d", "/c/d");
+    }
+
+
     private void doTestRewrite(String config, String request, String expectedURI) throws Exception {
         doTestRewrite(config, request, expectedURI, null);
     }

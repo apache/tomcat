@@ -69,6 +69,11 @@
         reject them with a 400 response rather than triggering an internal error
         that results in a 500 response. (markt)
       </fix>
+      <fix>
+        <bug>63608</bug>: Align the implementation of the negative match feature
+        for patterns used with the <code>RewriteValve</code> with the
+        description in the documentation. (markt)
+      </fix>
      </changelog>
   </subsection>
   <subsection name="Coyote">
