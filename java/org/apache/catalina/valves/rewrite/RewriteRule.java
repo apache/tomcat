@@ -32,6 +32,7 @@ public class RewriteRule {
     protected String patternString = null;
     protected String substitutionString = null;
     protected String flagsString = null;
+    protected boolean positive = true;
 
     public void parse(Map<String, RewriteMap> maps) {
         // Parse the substitution
@@ -42,6 +43,10 @@ public class RewriteRule {
             substitution.setEscapeBackReferences(isEscapeBackReferences());
         }
         // Parse the pattern
+        if (patternString.startsWith("!")) {
+            positive = false;
+            patternString = patternString.substring(1);
+        }
         int flags = 0;
         if (isNocase()) {
             flags |= Pattern.CASE_INSENSITIVE;
@@ -92,7 +97,8 @@ public class RewriteRule {
             this.pattern.set(pattern);
         }
         Matcher matcher = pattern.matcher(url);
-        if (!matcher.matches()) {
+        // Use XOR
+        if (positive ^ matcher.matches()) {
             // Evaluation done
             return null;
         }

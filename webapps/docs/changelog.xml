@@ -72,6 +72,11 @@
       <fix>
         Correct version information in <code>X-Powered-By</code> header. (markt)
       </fix>
+      <fix>
+        <bug>63608</bug>: Align the implementation of the negative match feature
+        for patterns used with the <code>RewriteValve</code> with the
+        description in the documentation. (markt)
+      </fix>
      </changelog>
   </subsection>
   <subsection name="Coyote">
