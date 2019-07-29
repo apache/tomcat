@@ -28,14 +28,14 @@ import javax.websocket.CloseReason.CloseCode;
  * A client for testing Websocket behavior that differs from standard client
  * behavior.
  */
-public class TesterWsCloseClient {
+public class TesterWsClient {
 
     private static final byte[] maskingKey = new byte[] { 0x12, 0x34, 0x56,
             0x78 };
 
     private final Socket socket;
 
-    public TesterWsCloseClient(String host, int port) throws Exception {
+    public TesterWsClient(String host, int port) throws Exception {
         this.socket = new Socket(host, port);
         // Set read timeout in case of failure so test doesn't hang
         socket.setSoTimeout(2000);
@@ -51,8 +51,12 @@ public class TesterWsCloseClient {
         readUpgradeResponse();
     }
 
-    public void sendMessage(String text) throws IOException {
-        write(createFrame(true, 1, text.getBytes(StandardCharsets.UTF_8)));
+    public void sendTextMessage(String text) throws IOException {
+        sendTextMessage(text.getBytes(StandardCharsets.UTF_8));
+    }
+
+    public void sendTextMessage(byte[] utf8Bytes) throws IOException {
+        write(createFrame(true, 1, utf8Bytes));
     }
 
     public void sendCloseFrame(CloseCode closeCode) throws IOException {
