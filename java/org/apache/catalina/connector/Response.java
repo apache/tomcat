@@ -868,7 +868,7 @@ public class Response implements HttpServletResponse {
     public Collection<String> getHeaderNames() {
         MimeHeaders headers = getCoyoteResponse().getMimeHeaders();
         int n = headers.size();
-        ArrayList<String> result = new ArrayList<>(n);
+        List<String> result = new ArrayList<>(n);
         for (int i = 0; i < n; i++) {
             result.add(headers.getName(i).toString());
         }
@@ -881,7 +881,7 @@ public class Response implements HttpServletResponse {
     public Collection<String> getHeaders(String name) {
         Enumeration<String> enumeration =
                 getCoyoteResponse().getMimeHeaders().values(name);
-        ArrayList<String> result = new ArrayList<>();
+        List<String> result = new ArrayList<>();
         while (enumeration.hasMoreElements()) {
             result.add(enumeration.nextElement());
         }
@@ -1393,8 +1393,9 @@ public class Response implements HttpServletResponse {
 
         char cc=name.charAt(0);
         if (cc=='C' || cc=='c') {
-            if (checkSpecialHeader(name, value))
+            if (checkSpecialHeader(name, value)) {
                 return;
+            }
         }
 
         getCoyoteResponse().setHeader(name, value);
