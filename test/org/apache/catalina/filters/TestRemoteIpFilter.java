@@ -648,7 +648,7 @@ public class TestRemoteIpFilter extends TomcatBaseTest {
                 actualRequest.getAttribute(Globals.REQUEST_FORWARDED_ATTRIBUTE));
     }
 
-    /**
+    /*
      * Test {@link RemoteIpFilter} in Tomcat standalone server
      */
     @Test
