@@ -544,7 +544,7 @@ public class ExtendedAccessLogValve extends AccessLogValve {
             tokenizer.getWhiteSpaces();
 
             if (tokenizer.isEnded()) {
-                log.info("pattern was just empty or whitespace");
+                log.info(sm.getString("extendedAccessLogValve.emptyPattern"));
                 return null;
             }
 
@@ -572,7 +572,7 @@ public class ExtendedAccessLogValve extends AccessLogValve {
             }
             return list.toArray(new AccessLogElement[0]);
         } catch (IOException e) {
-            log.error("parse error", e);
+            log.error(sm.getString("extendedAccessLogValve.patternParseError", pattern), e);
             return null;
         }
     }
@@ -630,7 +630,7 @@ public class ExtendedAccessLogValve extends AccessLogValve {
         } else if ("x".equals(token)) {
             return getXParameterElement(tokenizer);
         }
-        log.error("unable to decode with rest of chars starting: " + token);
+        log.error(sm.getString("extendedAccessLogValve.decodeError", token));
         return null;
     }
 
@@ -680,13 +680,12 @@ public class ExtendedAccessLogValve extends AccessLogValve {
         } else if (tokenizer.hasParameter()) {
             String parameter = tokenizer.getParameter();
             if (parameter == null) {
-                log.error("No closing ) found for in decode");
+                log.error(sm.getString("extendedAccessLogValve.noClosing"));
                 return null;
             }
             return new RequestHeaderElement(parameter);
         }
-        log.error("The next characters couldn't be decoded: "
-                + tokenizer.getRemains());
+        log.error(sm.getString("extendedAccessLogValve.decodeError", tokenizer.getRemains()));
         return null;
     }
 
@@ -702,13 +701,12 @@ public class ExtendedAccessLogValve extends AccessLogValve {
         } else if (tokenizer.hasParameter()) {
             String parameter = tokenizer.getParameter();
             if (parameter == null) {
-                log.error("No closing ) found for in decode");
+                log.error(sm.getString("extendedAccessLogValve.noClosing"));
                 return null;
             }
             return new ResponseHeaderElement(parameter);
         }
-        log.error("The next characters couldn't be decoded: "
-                + tokenizer.getRemains());
+        log.error(sm.getString("extendedAccessLogValve.decodeError", tokenizer.getRemains()));
         return null;
     }
 
@@ -722,14 +720,14 @@ public class ExtendedAccessLogValve extends AccessLogValve {
             tokenizer.getParameter();
             return new StringElement("-");
         }
-        log.error("The next characters couldn't be decoded: " + token);
+        log.error(sm.getString("extendedAccessLogValve.decodeError", token));
         return null;
     }
 
     protected AccessLogElement getXParameterElement(PatternTokenizer tokenizer)
             throws IOException {
         if (!tokenizer.hasSubToken()) {
-            log.error("x param in wrong format. Needs to be 'x-#(...)' read the docs!");
+            log.error(sm.getString("extendedAccessLogValve.badXParam"));
             return null;
         }
         String token = tokenizer.getToken();
@@ -738,12 +736,12 @@ public class ExtendedAccessLogValve extends AccessLogValve {
         }
 
         if (!tokenizer.hasParameter()) {
-            log.error("x param in wrong format. Needs to be 'x-#(...)' read the docs!");
+            log.error(sm.getString("extendedAccessLogValve.badXParam"));
             return null;
         }
         String parameter = tokenizer.getParameter();
         if (parameter == null) {
-            log.error("No closing ) found for in decode");
+            log.error(sm.getString("extendedAccessLogValve.noClosing"));
             return null;
         }
         if ("A".equals(token)) {
@@ -761,8 +759,7 @@ public class ExtendedAccessLogValve extends AccessLogValve {
         } else if ("O".equals(token)) {
             return new ResponseAllHeaderElement(parameter);
         }
-        log.error("x param for servlet request, couldn't decode value: "
-                + token);
+        log.error(sm.getString("extendedAccessLogValve.badXParamValue", token));
         return null;
     }
 
@@ -857,8 +854,7 @@ public class ExtendedAccessLogValve extends AccessLogValve {
                 }
             };
         }
-        log.error("x param for servlet request, couldn't decode value: "
-                + parameter);
+        log.error(sm.getString("extendedAccessLogValve.badXParamValue", parameter));
         return null;
     }
 
