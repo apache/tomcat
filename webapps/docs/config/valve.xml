@@ -1003,6 +1003,12 @@
         default of <code>X-Forwarded-Proto</code> is used.</p>
       </attribute>
 
+      <attribute name="hostHeader" required="false">
+        <p>Name of the HTTP Header read by this valve that holds the host
+        used by the client to connect to the proxy. If not specified, the
+        default of <code>null</code> is used.</p>
+      </attribute>
+
       <attribute name="portHeader" required="false">
         <p>Name of the HTTP Header read by this valve that holds the port
         used by the client to connect to the proxy. If not specified, the
@@ -1027,6 +1033,13 @@
          when the <strong>protocolHeader</strong> indicates <code>https</code>
          protocol and no <strong>portHeader</strong> is present. If not
          specified, the default of <code>443</code> is used.</p>
+      </attribute>
+
+      <attribute name="changeLocalHost" required="false">
+        <p>If <code>true</code>, the value returned by
+        <code>ServletRequest.getLocalHost()</code> and
+        <code>ServletRequest.getServerHost()</code> is modified by the this
+        valve. If not specified, the default of <code>false</code> is used.</p>
       </attribute>
 
       <attribute name="changeLocalPort" required="false">

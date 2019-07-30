@@ -97,6 +97,7 @@ public class TestRemoteIpFilter extends TomcatBaseTest {
             writer.println("request.remoteHost=" + request.getRemoteHost());
             writer.println("request.secure=" + request.isSecure());
             writer.println("request.scheme=" + request.getScheme());
+            writer.println("request.serverName=" + request.getServerName());
             writer.println("request.serverPort=" + request.getServerPort());
 
             writer.println();
@@ -546,6 +547,85 @@ public class TestRemoteIpFilter extends TomcatBaseTest {
 
         String actualRemoteHost = actualRequest.getRemoteHost();
         Assert.assertEquals("remoteHost", "untrusted-proxy", actualRemoteHost);
+    }
+
+    @Test
+    public void testInvokeXforwardedHost() throws Exception {
+        // PREPARE
+        FilterDef filterDef = new FilterDef();
+        filterDef.addInitParameter("hostHeader", "x-forwarded-host");
+        filterDef.addInitParameter("portHeader", "x-forwarded-port");
+        filterDef.addInitParameter("protocolHeader", "x-forwarded-proto");
+
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        // client ip
+        request.setRemoteAddr("192.168.0.10");
+        request.setRemoteHost("192.168.0.10");
+        // protocol
+        request.setSecure(false);
+        request.setServerPort(8080);
+        request.setScheme("http");
+        // host and port
+        request.getCoyoteRequest().serverName().setString("10.0.0.1");
+        request.setHeader("x-forwarded-host", "example.com");
+        request.setHeader("x-forwarded-port", "8443");
+        request.setHeader("x-forwarded-proto", "https");
+
+        // TEST
+        HttpServletRequest actualRequest = testRemoteIpFilter(filterDef, request).getRequest();
+
+        // VERIFY
+        // protocol
+        String actualServerName = actualRequest.getServerName();
+        Assert.assertEquals("postInvoke serverName", "example.com", actualServerName);
+
+        String actualScheme = actualRequest.getScheme();
+        Assert.assertEquals("postInvoke scheme", "https", actualScheme);
+
+        int actualServerPort = actualRequest.getServerPort();
+        Assert.assertEquals("postInvoke serverPort", 8443, actualServerPort);
+
+        boolean actualSecure = actualRequest.isSecure();
+        Assert.assertTrue("postInvoke secure", actualSecure);
+    }
+
+    @Test
+    public void testInvokeXforwardedHostAndPort() throws Exception {
+        // PREPARE
+        FilterDef filterDef = new FilterDef();
+        filterDef.addInitParameter("hostHeader", "x-forwarded-host");
+        filterDef.addInitParameter("portHeader", "x-forwarded-port");
+        filterDef.addInitParameter("protocolHeader", "x-forwarded-proto");
+
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        // client ip
+        request.setRemoteAddr("192.168.0.10");
+        request.setRemoteHost("192.168.0.10");
+        // protocol
+        request.setSecure(false);
+        request.setServerPort(8080);
+        request.setScheme("http");
+        // host and port
+        request.getCoyoteRequest().serverName().setString("10.0.0.1");
+        request.setHeader("x-forwarded-host", "example.com:8443");
+        request.setHeader("x-forwarded-proto", "https");
+
+        // TEST
+        HttpServletRequest actualRequest = testRemoteIpFilter(filterDef, request).getRequest();
+
+        // VERIFY
+        // protocol
+        String actualServerName = actualRequest.getServerName();
+        Assert.assertEquals("postInvoke serverName", "example.com", actualServerName);
+
+        String actualScheme = actualRequest.getScheme();
+        Assert.assertEquals("postInvoke scheme", "https", actualScheme);
+
+        int actualServerPort = actualRequest.getServerPort();
+        Assert.assertEquals("postInvoke serverPort", 443, actualServerPort);
+
+        boolean actualSecure = actualRequest.isSecure();
+        Assert.assertTrue("postInvoke secure", actualSecure);
     }
 
     @Test
