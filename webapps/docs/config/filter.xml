@@ -1597,6 +1597,12 @@ FINE: Request "/docs/config/manager.html" with response status "200"
         default of <code>X-Forwarded-Proto</code> is used.</p>
       </attribute>
 
+      <attribute name="hostHeader" required="false">
+        <p>Name of the HTTP Header read by this valve that holds the host
+        used by the client to connect to the proxy. If not specified, the
+        default of <code>null</code> is used.</p>
+      </attribute>
+
       <attribute name="portHeader" required="false">
         <p>Name of the HTTP Header read by this valve that holds the port
         used by the client to connect to the proxy. If not specified, the
@@ -1621,6 +1627,13 @@ FINE: Request "/docs/config/manager.html" with response status "200"
         when the <strong>protocolHeader</strong> indicates <code>https</code>
         protocol and no <strong>portHeader</strong> is present. If not
         specified, the default of <code>443</code> is used.</p>
+      </attribute>
+
+      <attribute name="changeLocalName" required="false">
+        <p>If <code>true</code>, the value returned by
+        <code>ServletRequest.getLocalName()</code> and
+        <code>ServletRequest.getServerName()</code> is modified by the this
+        filter. If not specified, the default of <code>false</code> is used.</p>
       </attribute>
 
       <attribute name="changeLocalPort" required="false">
