@@ -44,7 +44,6 @@ public class TesterAccessLogValve extends ValveBase implements AccessLog {
 
     @Override
     public void log(Request request, Response response, long time) {
-        (new Exception("Do log")).printStackTrace();
         entries.add(new Entry(request.getRequestURI(), response.getStatus(),
                 time));
     }
@@ -76,7 +75,12 @@ public class TesterAccessLogValve extends ValveBase implements AccessLog {
             Thread.sleep(100);
         }
 
-        Assert.assertEquals(count, entries.size());
+        StringBuilder entriesLog = new StringBuilder();
+        for (Entry entry : entries) {
+            entriesLog.append(entry.toString());
+            entriesLog.append(System.getProperty("line.separator"));
+        }
+        Assert.assertEquals(entriesLog.toString(), count, entries.size());
         for (Entry entry : entries) {
             Assert.assertEquals(status, entry.getStatus());
             Assert.assertTrue(entry.toString() + " duration is not >= " + (minTime - ERROR_MARGIN),
