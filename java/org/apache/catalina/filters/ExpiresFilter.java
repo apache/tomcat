@@ -1021,7 +1021,6 @@ public class ExpiresFilter extends FilterBase {
          */
         @Override
         public boolean isReady() {
-            // TODO Auto-generated method stub
             return false;
         }
 
@@ -1030,11 +1029,7 @@ public class ExpiresFilter extends FilterBase {
          */
         @Override
         public void setWriteListener(WriteListener listener) {
-            // TODO Auto-generated method stub
-
         }
-
-
 
     }
 
