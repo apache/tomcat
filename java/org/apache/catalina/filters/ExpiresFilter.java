@@ -1071,9 +1071,8 @@ public class ExpiresFilter extends FilterBase {
             try {
                 ints[i] = Integer.parseInt(intAsString);
             } catch (NumberFormatException e) {
-                throw new RuntimeException("Exception parsing number '" + i +
-                        "' (zero based) of comma delimited list '" +
-                        commaDelimitedInts + "'");
+                throw new RuntimeException(sm.getString("expiresFilter.numberError",
+                        Integer.valueOf(i), commaDelimitedInts));
             }
         }
         return ints;
