@@ -32,6 +32,7 @@ import org.apache.catalina.connector.Response;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.http.MimeHeaders;
+import org.apache.tomcat.util.http.parser.Host;
 
 /**
  * <p>
@@ -398,6 +399,10 @@ public class RemoteIpValve extends ValveBase {
         return result.toString();
     }
 
+    private String hostHeader = null;
+
+    private boolean changeLocalName = false;
+
     /**
      * @see #setHttpServerPort(int)
      */
@@ -407,6 +412,8 @@ public class RemoteIpValve extends ValveBase {
      * @see #setHttpsServerPort(int)
      */
     private int httpsServerPort = 443;
+
+    private String portHeader = null;
 
     private boolean changeLocalPort = false;
 
@@ -429,8 +436,6 @@ public class RemoteIpValve extends ValveBase {
      * @see #setProtocolHeaderHttpsValue(String)
      */
     private String protocolHeaderHttpsValue = "https";
-
-    private String portHeader = null;
 
     /**
      * @see #setProxiesHeader(String)
@@ -462,21 +467,42 @@ public class RemoteIpValve extends ValveBase {
         super(true);
     }
 
+    /**
+     * Obtain the name of the HTTP header used to override the value returned
+     * by {@link Request#getServerName()} and (optionally depending on {link
+     * {@link #isChangeLocalName()} {@link Request#getLocalName()}.
+     *
+     * @return  The HTTP header name
+     */
+    public String getHostHeader() {
+        return hostHeader;
+    }
 
-    public int getHttpsServerPort() {
-        return httpsServerPort;
+    /**
+     * Set the name of the HTTP header used to override the value returned
+     * by {@link Request#getServerName()} and (optionally depending on {link
+     * {@link #isChangeLocalName()} {@link Request#getLocalName()}.
+     *
+     * @param   hostHeader  The HTTP header name
+     */
+    public void setHostHeader(String hostHeader) {
+        this.hostHeader = hostHeader;
+    }
+
+    public boolean isChangeLocalName() {
+        return changeLocalName;
+    }
+
+    public void setChangeLocalName(boolean changeLocalName) {
+        this.changeLocalName = changeLocalName;
     }
 
     public int getHttpServerPort() {
         return httpServerPort;
     }
 
-    public boolean isChangeLocalPort() {
-        return changeLocalPort;
-    }
-
-    public void setChangeLocalPort(boolean changeLocalPort) {
-        this.changeLocalPort = changeLocalPort;
+    public int getHttpsServerPort() {
+        return httpsServerPort;
     }
 
     /**
@@ -499,6 +525,14 @@ public class RemoteIpValve extends ValveBase {
      */
     public void setPortHeader(String portHeader) {
         this.portHeader = portHeader;
+    }
+
+    public boolean isChangeLocalPort() {
+        return changeLocalPort;
+    }
+
+    public void setChangeLocalPort(boolean changeLocalPort) {
+        this.changeLocalPort = changeLocalPort;
     }
 
     /**
@@ -581,7 +615,10 @@ public class RemoteIpValve extends ValveBase {
         final String originalRemoteHost = request.getRemoteHost();
         final String originalScheme = request.getScheme();
         final boolean originalSecure = request.isSecure();
+        final String originalServerName = request.getServerName();
+        final String originalLocalName = request.getLocalName();
         final int originalServerPort = request.getServerPort();
+        final int originalLocalPort = request.getLocalPort();
         final String originalProxiesHeader = request.getHeader(proxiesHeader);
         final String originalRemoteIpHeader = request.getHeader(remoteIpHeader);
         boolean isInternal = internalProxies != null &&
@@ -662,13 +699,38 @@ public class RemoteIpValve extends ValveBase {
                 }
             }
 
+            if (hostHeader != null) {
+                String hostHeaderValue = request.getHeader(hostHeader);
+                if (hostHeaderValue != null) {
+                    try {
+                        int portIndex = Host.parse(hostHeaderValue);
+                        if (portIndex > -1) {
+                            log.debug(sm.getString("remoteIpValve.invalidHostWithPort", hostHeaderValue, hostHeader));
+                            hostHeaderValue = hostHeaderValue.substring(0, portIndex);
+                        }
+
+                        request.getCoyoteRequest().serverName().setString(hostHeaderValue);
+                        if (isChangeLocalName()) {
+                            request.getCoyoteRequest().localName().setString(hostHeaderValue);
+                        }
+
+                    } catch (IllegalArgumentException iae) {
+                        log.debug(sm.getString("remoteIpValve.invalidHostHeader", hostHeaderValue, hostHeader));
+                    }
+                }
+            }
+
             request.setAttribute(Globals.REQUEST_FORWARDED_ATTRIBUTE, Boolean.TRUE);
 
             if (log.isDebugEnabled()) {
-                log.debug("Incoming request " + request.getRequestURI() + " with originalRemoteAddr '" + originalRemoteAddr
-                          + "', originalRemoteHost='" + originalRemoteHost + "', originalSecure='" + originalSecure + "', originalScheme='"
-                          + originalScheme + "' will be seen as newRemoteAddr='" + request.getRemoteAddr() + "', newRemoteHost='"
-                          + request.getRemoteHost() + "', newScheme='" + request.getScheme() + "', newSecure='" + request.isSecure() + "'");
+                log.debug("Incoming request " + request.getRequestURI() + " with originalRemoteAddr [" + originalRemoteAddr +
+                          "], originalRemoteHost=[" + originalRemoteHost + "], originalSecure=[" + originalSecure +
+                          "], originalScheme=[" + originalScheme + "], originalServerName=[" + originalServerName +
+                          "], originalServerPort=[" + originalServerPort +
+                          "] will be seen as newRemoteAddr=[" + request.getRemoteAddr() +
+                          "], newRemoteHost=[" + request.getRemoteHost() + "], newSecure=[" + request.isSecure() +
+                          "], newScheme=[" + request.getScheme() + "], newServerName=[" + request.getServerName() +
+                          "], newServerPort=[" + request.getServerPort() + "]");
             }
         } else {
             if (log.isDebugEnabled()) {
@@ -685,6 +747,8 @@ public class RemoteIpValve extends ValveBase {
                     request.getRemoteHost());
             request.setAttribute(AccessLog.PROTOCOL_ATTRIBUTE,
                     request.getProtocol());
+            request.setAttribute(AccessLog.SERVER_NAME_ATTRIBUTE,
+                    Integer.valueOf(request.getServerName()));
             request.setAttribute(AccessLog.SERVER_PORT_ATTRIBUTE,
                     Integer.valueOf(request.getServerPort()));
         }
@@ -695,7 +759,10 @@ public class RemoteIpValve extends ValveBase {
             request.setRemoteHost(originalRemoteHost);
             request.setSecure(originalSecure);
             request.getCoyoteRequest().scheme().setString(originalScheme);
+            request.getCoyoteRequest().serverName().setString(originalServerName);
+            request.getCoyoteRequest().localName().setString(originalLocalName);
             request.setServerPort(originalServerPort);
+            request.setLocalPort(originalLocalPort);
 
             MimeHeaders headers = request.getCoyoteRequest().getMimeHeaders();
             if (originalProxiesHeader == null || originalProxiesHeader.length() == 0) {

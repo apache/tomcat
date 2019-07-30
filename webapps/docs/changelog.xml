@@ -62,6 +62,11 @@
 <section name="Tomcat 7.0.97 (violetagg)">
   <subsection name="Catalina">
     <changelog>
+      <add>
+        <bug>57665</bug>: Add support for the <code>X-Forwarded-Host</code>
+        header to the <code>RemoteIpFilter</code> and <code>RemotepValve</code>.
+        (markt)
+      </add>
       <fix>
         <bug>63550</bug>: Only try the <code>alternateURL</code> in the
         <code>JNDIRealm</code> if one has been specified. (markt)
