@@ -2093,7 +2093,10 @@
   <subsection name="Introduction">
 
     <p>The <strong>Health Check Valve</strong> responds to
-    cloud orchestrators health checks</p>
+    cloud orchestrators health checks. Note that it checks
+    that a context is mapped (so that an application is deployed),
+    for example if you don't have a ROOT context but demo-1.0
+    you have to check for <code>/demo-1.0/health</code></p>
   </subsection>
 
   <subsection name="Attributes">
