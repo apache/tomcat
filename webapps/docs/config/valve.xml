@@ -181,6 +181,16 @@
         </p>
       </attribute>
 
+      <attribute name="ipv6Canonical" required="false">
+        <p>Flag to determine if IPv6 addresses should be represented in canonical
+           representation format as defined by RFC 5952. If set to <code>true</code>,
+           then IPv6 addresses will be written in canonical format (e.g.
+           <code>2001:db8::1:0:0:1</code>, <code>::1</code>), otherwise it will be
+           represented in full form (e.g. <code>2001:db8:0:0:1:0:0:1</code>,
+           <code>0:0:0:0:0:0:0:1</code>). Default value: <code>false</code>
+        </p>
+      </attribute>
+
       <attribute name="locale" required="false">
         <p>The locale used to format timestamps in the access log
            lines. Any timestamps configured using an

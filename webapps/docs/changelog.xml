@@ -48,6 +48,11 @@
   <subsection name="Catalina">
     <changelog>
       <add>
+        <bug>51497</bug>: Add an option, <code>ipv6Canonical</code>, to the
+        <code>AccessLogValve</code> that causes IPv6 addresses to be output in
+        canonical form defined by RFC 5952. (ognjen/markt)
+      </add>
+      <add>
         <bug>57665</bug>: Add support for the <code>X-Forwarded-Host</code>
         header to the <code>RemoteIpFilter</code> and <code>RemotepValve</code>.
         (markt)

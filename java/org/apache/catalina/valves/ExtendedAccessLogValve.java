@@ -604,7 +604,7 @@ public class ExtendedAccessLogValve extends AccessLogValve {
         } else if ("s".equals(token)) {
             String nextToken = tokenizer.getToken();
             if ("ip".equals(nextToken)) {
-                return new LocalAddrElement();
+                return new LocalAddrElement(getIpv6Canonical());
             } else if ("dns".equals(nextToken)) {
                 return new AccessLogElement() {
                     @Override

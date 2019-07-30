@@ -43,7 +43,6 @@ public final class SecurityClassLoad {
         loadServletsPackage(loader);
         loadSessionPackage(loader);
         loadUtilPackage(loader);
-        loadValvesPackage(loader);
         loadJavaxPackage(loader);
         loadConnectorPackage(loader);
         loadTomcatPackage(loader);
@@ -108,11 +107,6 @@ public final class SecurityClassLoad {
         loader.loadClass(basePackage + "TLSUtil");
     }
 
-
-    private static final void loadValvesPackage(ClassLoader loader) throws Exception {
-        final String basePackage = "org.apache.catalina.valves.";
-        loadAnonymousInnerClasses(loader, basePackage + "AbstractAccessLogValve");
-    }
 
     private static final void loadCoyotePackage(ClassLoader loader) throws Exception {
         final String basePackage = "org.apache.coyote.";

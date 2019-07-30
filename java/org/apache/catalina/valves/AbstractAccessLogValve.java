@@ -28,6 +28,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.TimeZone;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -51,6 +52,7 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.collections.SynchronizedStack;
+import org.apache.tomcat.util.net.IPv6Utils;
 
 
 /**
@@ -172,6 +174,11 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
      * enabled this component
      */
     protected boolean enabled = true;
+
+     /**
+     * Use IPv6 canonical representation format as defined by RFC 5952.
+     */
+    private boolean ipv6Canonical = false;
 
     /**
      * The pattern used to format our access log lines.
@@ -344,7 +351,7 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
         private final Locale cacheDefaultLocale;
         private final DateFormatCache parent;
         protected final Cache cLFCache;
-        private final HashMap<String, Cache> formatCache = new HashMap<>();
+        private final Map<String, Cache> formatCache = new HashMap<>();
 
         protected DateFormatCache(int size, Locale loc, DateFormatCache parent) {
             cacheSize = size;
@@ -489,6 +496,16 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
     }
 
 
+    public boolean getIpv6Canonical() {
+        return ipv6Canonical;
+    }
+
+
+    public void setIpv6Canonical(boolean ipv6Canonical) {
+        this.ipv6Canonical = ipv6Canonical;
+    }
+
+
     /**
      * {@inheritDoc}
      * Default is <code>false</code>.
@@ -497,6 +514,7 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
     public void setRequestAttributesEnabled(boolean requestAttributesEnabled) {
         this.requestAttributesEnabled = requestAttributesEnabled;
     }
+
 
     /**
      * {@inheritDoc}
@@ -803,9 +821,9 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
      */
     protected static class LocalAddrElement implements AccessLogElement {
 
-        private static final String LOCAL_ADDR_VALUE;
+        private final String localAddrValue;
 
-        static {
+        public LocalAddrElement(boolean ipv6Canonical) {
             String init;
             try {
                 init = InetAddress.getLocalHost().getHostAddress();
@@ -813,13 +831,18 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
                 ExceptionUtils.handleThrowable(e);
                 init = "127.0.0.1";
             }
-            LOCAL_ADDR_VALUE = init;
+
+            if (ipv6Canonical) {
+                localAddrValue = IPv6Utils.canonize(init);
+            } else {
+                localAddrValue = init;
+            }
         }
 
         @Override
         public void addElement(CharArrayWriter buf, Date date, Request request,
                 Response response, long time) {
-            buf.append(LOCAL_ADDR_VALUE);
+            buf.append(localAddrValue);
         }
     }
 
@@ -830,16 +853,22 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
         @Override
         public void addElement(CharArrayWriter buf, Date date, Request request,
                 Response response, long time) {
+            String value = null;
             if (requestAttributesEnabled) {
                 Object addr = request.getAttribute(REMOTE_ADDR_ATTRIBUTE);
                 if (addr == null) {
-                    buf.append(request.getRemoteAddr());
+                    value = request.getRemoteAddr();
                 } else {
-                    buf.append(addr.toString());
+                    value = addr.toString();
                 }
             } else {
-                buf.append(request.getRemoteAddr());
+                value = request.getRemoteAddr();
             }
+
+            if (ipv6Canonical) {
+                value = IPv6Utils.canonize(value);
+            }
+            buf.append(value);
         }
     }
 
@@ -862,6 +891,10 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
             }
             if (value == null || value.length() == 0) {
                 value = "-";
+            }
+
+            if (ipv6Canonical) {
+                value = IPv6Utils.canonize(value);
             }
             buf.append(value);
         }
@@ -1046,17 +1079,22 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
             if (usesBegin) {
                 timestamp -= time;
             }
-            switch (type) {
-            case CLF:
+            /*  Implementation note: This is deliberately not implemented using
+             *  switch. If a switch is used the compiler (at least the Oracle
+             *  one) will use a synthetic class to implement the switch. The
+             *  problem is that this class needs to be pre-loaded when using a
+             *  SecurityManager and the name of that class will depend on any
+             *  anonymous inner classes and any other synthetic classes. As such
+             *  the name is not constant and keeping the pre-loading up to date
+             *  as the name changes is error prone.
+             */
+            if (type == FormatType.CLF) {
                 buf.append(localDateCache.get().getFormat(timestamp));
-                break;
-            case SEC:
+            } else if (type == FormatType.SEC) {
                 buf.append(Long.toString(timestamp / 1000));
-                break;
-            case MSEC:
+            } else if (type == FormatType.MSEC) {
                 buf.append(Long.toString(timestamp));
-                break;
-            case MSEC_FRAC:
+            } else if (type == FormatType.MSEC_FRAC) {
                 frac = timestamp % 1000;
                 if (frac < 100) {
                     if (frac < 10) {
@@ -1067,8 +1105,8 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
                     }
                 }
                 buf.append(Long.toString(frac));
-                break;
-            case SDF:
+            } else {
+                // FormatType.SDF
                 String temp = localDateCache.get().getFormat(format, locale, timestamp);
                 if (usesMsecs) {
                     frac = timestamp % 1000;
@@ -1086,7 +1124,6 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
                     temp = temp.replace(msecPattern, Long.toString(frac));
                 }
                 buf.append(temp);
-                break;
             }
         }
     }
@@ -1371,6 +1408,9 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
                 value = "-";
             }
 
+            if (ipv6Canonical) {
+                value = IPv6Utils.canonize(value);
+            }
             buf.append(value);
         }
     }
@@ -1668,7 +1708,7 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
         case 'a':
             return new RemoteAddrElement();
         case 'A':
-            return new LocalAddrElement();
+            return new LocalAddrElement(ipv6Canonical);
         case 'b':
             return new ByteSentElement(true);
         case 'B':
