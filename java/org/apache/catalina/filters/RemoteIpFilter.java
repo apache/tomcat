@@ -17,7 +17,6 @@
 package org.apache.catalina.filters;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -566,7 +565,7 @@ public class RemoteIpFilter implements Filter {
         }
 
         public void setHeader(String name, String value) {
-            List<String> values = Arrays.asList(value);
+            List<String> values = Collections.singletonList(value);
             Map.Entry<String, List<String>> header = getHeaderEntry(name);
             if (header == null) {
                 headers.put(name, values);
