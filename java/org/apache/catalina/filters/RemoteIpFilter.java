@@ -17,18 +17,13 @@
 package org.apache.catalina.filters;
 
 import java.io.IOException;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.regex.Pattern;
 
@@ -46,6 +41,7 @@ import org.apache.catalina.AccessLog;
 import org.apache.catalina.Globals;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.http.FastHttpDateFormat;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -444,18 +440,6 @@ public class RemoteIpFilter implements Filter {
 
     public static class XForwardedRequest extends HttpServletRequestWrapper {
 
-        static final ThreadLocal<SimpleDateFormat[]> threadLocalDateFormats = new ThreadLocal<SimpleDateFormat[]>() {
-            @Override
-            protected SimpleDateFormat[] initialValue() {
-                return new SimpleDateFormat[] {
-                    new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz", Locale.US),
-                    new SimpleDateFormat("EEEEEE, dd-MMM-yy HH:mm:ss zzz", Locale.US),
-                    new SimpleDateFormat("EEE MMMM d HH:mm:ss yyyy", Locale.US)
-                };
-
-            }
-        };
-
         protected Map<String, List<String>> headers;
 
         protected int localPort;
@@ -492,20 +476,11 @@ public class RemoteIpFilter implements Filter {
             if (value == null) {
                 return -1;
             }
-            DateFormat[] dateFormats = threadLocalDateFormats.get();
-            Date date = null;
-            for (int i = 0; ((i < dateFormats.length) && (date == null)); i++) {
-                DateFormat dateFormat = dateFormats[i];
-                try {
-                    date = dateFormat.parse(value);
-                } catch (ParseException ex) {
-                    // Ignore
-                }
-            }
-            if (date == null) {
+            long date = FastHttpDateFormat.parseDate(value);
+            if (date == -1) {
                 throw new IllegalArgumentException(value);
             }
-            return date.getTime();
+            return date;
         }
 
         @Override
