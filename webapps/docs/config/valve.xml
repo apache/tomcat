@@ -2088,6 +2088,37 @@
 
 </section>
 
+<section name="Health Check Valve">
+
+  <subsection name="Introduction">
+
+    <p>The <strong>Health Check Valve</strong> responds to
+    cloud orchestrators health checks</p>
+  </subsection>
+
+  <subsection name="Attributes">
+
+    <p>The <strong>Health Check Valve</strong> supports the
+    following configuration attributes:</p>
+
+    <attributes>
+
+      <attribute name="className" required="true">
+        <p>Java class name of the implementation to use.  This MUST be set to
+        <strong>org.apache.catalina.valves.HealthCheckValve</strong>.</p>
+      </attribute>
+
+      <attribute name="path" required="false">
+        <p>Path by the cloud orchestrators health check logic.
+        The default value is <strong>/health</strong>.</p>
+      </attribute>
+
+    </attributes>
+
+  </subsection>
+
+</section>
+
 </body>
 
 
