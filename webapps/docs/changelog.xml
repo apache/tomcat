@@ -63,6 +63,10 @@
   <subsection name="Catalina">
     <changelog>
       <add>
+        <bug>62496</bug>: Add option to write auth information (remote user/auth type)
+        to response headers. (michaelo)
+      </add>
+      <add>
         <bug>57665</bug>: Add support for the <code>X-Forwarded-Host</code>
         header to the <code>RemoteIpFilter</code> and <code>RemotepValve</code>.
         (markt)
