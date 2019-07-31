@@ -1289,6 +1289,19 @@
         specified, the platform default provider will be used.</p>
       </attribute>
 
+      <attribute name="sendAuthInfoResponseHeaders" required="false">
+        <p>Controls whether the auth information (remote user and auth type)
+        shall be returned as response headers for a forwarded/proxied request.
+        When the <code>RemoteIpValve</code> or <code>RemoteIpFilter</code> mark
+        a forwarded request with the <code>Globals.REQUEST_FORWARDED_ATTRIBUTE</code>
+        this authenticator can return the values of
+        <code>HttpServletRequest.getRemoteUser()</code> and
+        <code>HttpServletRequest.getAuthType()</code> as response headers
+        <code>remote-user</code> and <code>auth-type</code> to a reverse proxy.
+        This is useful, e.g., for access log consistency or other decisions to make.
+        If not specified, the default value is <code>false</code>.</p>
+      </attribute>
+
       <attribute name="trimCredentials" required="false">
         <p>Controls whether leading and/or trailing whitespace is removed from
         the parsed credentials. If not specified, the default value is
@@ -1441,6 +1454,19 @@
         specified, the platform default provider will be used.</p>
       </attribute>
 
+      <attribute name="sendAuthInfoResponseHeaders" required="false">
+        <p>Controls whether the auth information (remote user and auth type)
+        shall be returned as response headers for a forwarded/proxied request.
+        When the <code>RemoteIpValve</code> or <code>RemoteIpFilter</code> mark
+        a forwarded request with the <code>Globals.REQUEST_FORWARDED_ATTRIBUTE</code>
+        this authenticator can return the values of
+        <code>HttpServletRequest.getRemoteUser()</code> and
+        <code>HttpServletRequest.getAuthType()</code> as response headers
+        <code>remote-user</code> and <code>auth-type</code> to a reverse proxy.
+        This is useful, e.g., for access log consistency or other decisions to make.
+        If not specified, the default value is <code>false</code>.</p>
+      </attribute>
+
       <attribute name="validateUri" required="false">
         <p>Should the URI be validated as required by RFC2617? If not specified,
         the default value of <code>true</code> will be used. This should
@@ -1560,6 +1586,19 @@
         session IDs. If an invalid algorithm and/or provider is specified, the
         platform default provider and the default algorithm will be used. If not
         specified, the platform default provider will be used.</p>
+      </attribute>
+
+      <attribute name="sendAuthInfoResponseHeaders" required="false">
+        <p>Controls whether the auth information (remote user and auth type)
+        shall be returned as response headers for a forwarded/proxied request.
+        When the <code>RemoteIpValve</code> or <code>RemoteIpFilter</code> mark
+        a forwarded request with the <code>Globals.REQUEST_FORWARDED_ATTRIBUTE</code>
+        this authenticator can return the values of
+        <code>HttpServletRequest.getRemoteUser()</code> and
+        <code>HttpServletRequest.getAuthType()</code> as response headers
+        <code>remote-user</code> and <code>auth-type</code> to a reverse proxy.
+        This is useful, e.g., for access log consistency or other decisions to make.
+        If not specified, the default value is <code>false</code>.</p>
       </attribute>
 
       <attribute name="jaspicCallbackHandlerClass" required="false">
@@ -1809,6 +1848,19 @@
         session IDs. If an invalid algorithm and/or provider is specified, the
         platform default provider and the default algorithm will be used. If not
         specified, the platform default provider will be used.</p>
+      </attribute>
+
+      <attribute name="sendAuthInfoResponseHeaders" required="false">
+        <p>Controls whether the auth information (remote user and auth type)
+        shall be returned as response headers for a forwarded/proxied request.
+        When the <code>RemoteIpValve</code> or <code>RemoteIpFilter</code> mark
+        a forwarded request with the <code>Globals.REQUEST_FORWARDED_ATTRIBUTE</code>
+        this authenticator can return the values of
+        <code>HttpServletRequest.getRemoteUser()</code> and
+        <code>HttpServletRequest.getAuthType()</code> as response headers
+        <code>remote-user</code> and <code>auth-type</code> to a reverse proxy.
+        This is useful, e.g., for access log consistency or other decisions to make.
+        If not specified, the default value is <code>false</code>.</p>
       </attribute>
 
       <attribute name="storeDelegatedCredential" required="false">
