@@ -53,9 +53,11 @@ import org.apache.catalina.authenticator.jaspic.CallbackHandlerImpl;
 import org.apache.catalina.authenticator.jaspic.MessageInfoImpl;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
+import org.apache.catalina.filters.RemoteIpFilter;
 import org.apache.catalina.realm.GenericPrincipal;
 import org.apache.catalina.util.SessionIdGeneratorBase;
 import org.apache.catalina.util.StandardSessionIdGenerator;
+import org.apache.catalina.valves.RemoteIpValve;
 import org.apache.catalina.valves.ValveBase;
 import org.apache.coyote.ActionCode;
 import org.apache.juli.logging.Log;
@@ -213,6 +215,19 @@ public abstract class AuthenticatorBase extends ValveBase
      * will be used.
      */
     protected String jaspicCallbackHandlerClass = null;
+
+    /**
+     * Should the auth information (remote user and auth type) be returned as response
+     * headers for a forwarded/proxied request? When the {@link RemoteIpValve} or
+     * {@link RemoteIpFilter} mark a forwarded request with the
+     * {@link Globals#REQUEST_FORWARDED_ATTRIBUTE} this authenticator can return the
+     * values of {@link HttpServletRequest#getRemoteUser()} and
+     * {@link HttpServletRequest#getAuthType()} as reponse headers {@code remote-user}
+     * and {@code auth-type} to a reverse proxy. This is useful, e.g., for access log
+     * consistency or other decisions to make.
+     */
+
+    protected boolean sendAuthInfoResponseHeaders = false;
 
     protected SessionIdGeneratorBase sessionIdGenerator = null;
 
@@ -427,6 +442,26 @@ public abstract class AuthenticatorBase extends ValveBase
      */
     public void setJaspicCallbackHandlerClass(String jaspicCallbackHandlerClass) {
         this.jaspicCallbackHandlerClass = jaspicCallbackHandlerClass;
+    }
+
+    /**
+     * Returns the flag whether authentication information will be sent to a reverse
+     * proxy on a forwarded request.
+     *
+     * @return {@code true} if response headers shall be sent,  {@code false} otherwise
+     */
+    public boolean isSendAuthInfoResponseHeaders() {
+        return sendAuthInfoResponseHeaders;
+    }
+
+    /**
+     * Sets the flag whether authentication information will be send to a reverse
+     * proxy on a forwarded request.
+     *
+     * @param {@code true} if response headers shall be sent, {@code false} otherwise
+     */
+    public void setSendAuthInfoResponseHeaders(boolean sendAuthInfoResponseHeaders) {
+        this.sendAuthInfoResponseHeaders = sendAuthInfoResponseHeaders;
     }
 
     // --------------------------------------------------------- Public Methods
@@ -996,6 +1031,12 @@ public abstract class AuthenticatorBase extends ValveBase
         // Cache the authentication information in our request
         request.setAuthType(authType);
         request.setUserPrincipal(principal);
+
+        if (sendAuthInfoResponseHeaders
+            && Boolean.TRUE.equals(request.getAttribute(Globals.REQUEST_FORWARDED_ATTRIBUTE))) {
+            response.setHeader("remote-user", request.getRemoteUser());
+            response.setHeader("auth-type", request.getAuthType());
+        }
 
         Session session = request.getSessionInternal(false);
 
