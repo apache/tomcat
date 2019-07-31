@@ -62,8 +62,10 @@ public abstract class AbstractProcessorLight implements Processor {
             } else if (status == SocketEvent.OPEN_WRITE) {
                 // Extra write event likely after async, ignore
                 state = SocketState.LONG;
-            } else if (status == SocketEvent.OPEN_READ){
+            } else if (status == SocketEvent.OPEN_READ) {
                 state = service(socketWrapper);
+            } else if (status == SocketEvent.CONNECT_FAIL) {
+                logAccess(socketWrapper);
             } else {
                 // Default to closing the socket if the SocketEvent passed in
                 // is not consistent with the current state of the Processor
@@ -126,6 +128,19 @@ public abstract class AbstractProcessorLight implements Processor {
         synchronized (dispatches) {
             dispatches.clear();
         }
+    }
+
+
+    /**
+     * Add an entry to the access log for a failed connection attempt.
+     *
+     * @param socketWrapper The connection to process
+     *
+     * @throws IOException If an I/O error occurs during the processing of the
+     *         request
+     */
+    protected void logAccess(SocketWrapperBase<?> socketWrapper) throws IOException {
+        // NO-OP by default
     }
 
 

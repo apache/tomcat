@@ -178,6 +178,7 @@ public class WsHttpUpgradeHandler implements InternalHttpUpgradeHandler {
                 //$FALL-THROUGH$
             case DISCONNECT:
             case TIMEOUT:
+            case CONNECT_FAIL:
                 return SocketState.CLOSED;
 
         }

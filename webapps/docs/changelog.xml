@@ -124,6 +124,10 @@
         Fix h2spec test suite failure. It is an error if a Huffman encoded
         string literal contains the EOS symbol. (jfclere)
       </fix>
+      <add>
+        Connections that fail the TLS handshake will now appear in the access
+        logs with a 400 status code. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Web applications">

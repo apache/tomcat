@@ -666,8 +666,6 @@ public class Http11Processor extends AbstractProcessor {
 
         // Setting up the I/O
         setSocketWrapper(socketWrapper);
-        inputBuffer.init(socketWrapper);
-        outputBuffer.init(socketWrapper);
 
         // Flags
         keepAlive = true;
@@ -892,6 +890,14 @@ public class Http11Processor extends AbstractProcessor {
                 }
             }
         }
+    }
+
+
+    @Override
+    protected final void setSocketWrapper(SocketWrapperBase<?> socketWrapper) {
+        super.setSocketWrapper(socketWrapper);
+        inputBuffer.init(socketWrapper);
+        outputBuffer.init(socketWrapper);
     }
 
 

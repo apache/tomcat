@@ -2116,6 +2116,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
                                 getConnectionTimeout(), Poll.APR_POLLIN);
                     } else {
                         // Close socket and pool
+                        getHandler().process(socket, SocketEvent.CONNECT_FAIL);
                         closeSocket(socket.getSocket().longValue());
                         socket = null;
                     }
@@ -2123,6 +2124,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
                     // Process the request from this socket
                     if (!setSocketOptions(socket)) {
                         // Close socket and pool
+                        getHandler().process(socket, SocketEvent.CONNECT_FAIL);
                         closeSocket(socket.getSocket().longValue());
                         socket = null;
                         return;

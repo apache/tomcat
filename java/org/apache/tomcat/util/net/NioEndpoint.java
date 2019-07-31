@@ -1501,6 +1501,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
                         close(socket, key);
                     }
                 } else if (handshake == -1 ) {
+                    getHandler().process(socketWrapper, SocketEvent.CONNECT_FAIL);
                     close(socket, key);
                 } else if (handshake == SelectionKey.OP_READ){
                     socketWrapper.registerReadInterest();

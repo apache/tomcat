@@ -1786,6 +1786,7 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
                         launch = true;
                     }
                 } else if (handshake == -1 ) {
+                    getHandler().process(socketWrapper, SocketEvent.CONNECT_FAIL);
                     socketWrapper.close();
                     if (running && !paused) {
                         if (!nioChannels.push(socketWrapper.getSocket())) {
