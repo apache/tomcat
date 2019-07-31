@@ -252,6 +252,7 @@ public class TestUpgradeInternalHandler extends TomcatBaseTest {
             case DISCONNECT:
             case ERROR:
             case TIMEOUT:
+            case CONNECT_FAIL:
                 return SocketState.CLOSED;
             }
             return SocketState.UPGRADED;

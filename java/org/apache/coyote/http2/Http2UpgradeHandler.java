@@ -373,6 +373,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
             case ERROR:
             case TIMEOUT:
             case STOP:
+            case CONNECT_FAIL:
                 close();
                 break;
             }

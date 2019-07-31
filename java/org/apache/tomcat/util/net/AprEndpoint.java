@@ -1982,6 +1982,7 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
                                 getConnectionTimeout(), Poll.APR_POLLIN);
                     } else {
                         // Close socket and pool
+                        getHandler().process(socket, SocketEvent.CONNECT_FAIL);
                         closeSocket(socket.getSocket().longValue());
                         socket = null;
                     }
@@ -1989,6 +1990,7 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
                     // Process the request from this socket
                     if (!setSocketOptions(socket)) {
                         // Close socket and pool
+                        getHandler().process(socket, SocketEvent.CONNECT_FAIL);
                         closeSocket(socket.getSocket().longValue());
                         socket = null;
                         return;
