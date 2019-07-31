@@ -739,7 +739,7 @@ public class RemoteIpValve extends ValveBase {
             request.setAttribute(AccessLog.PROTOCOL_ATTRIBUTE,
                     request.getProtocol());
             request.setAttribute(AccessLog.SERVER_NAME_ATTRIBUTE,
-                    Integer.valueOf(request.getServerName()));
+                    request.getServerName());
             request.setAttribute(AccessLog.SERVER_PORT_ATTRIBUTE,
                     Integer.valueOf(request.getServerPort()));
         }
