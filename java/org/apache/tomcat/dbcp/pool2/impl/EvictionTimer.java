@@ -46,7 +46,7 @@ class EvictionTimer {
     /** Executor instance */
     private static ScheduledThreadPoolExecutor executor; //@GuardedBy("EvictionTimer.class")
 
-    /** Prevent instantiation */
+    /** Prevents instantiation */
     private EvictionTimer() {
         // Hide the default constructor
     }
@@ -64,14 +64,14 @@ class EvictionTimer {
 
 
     /**
-     * Add the specified eviction task to the timer. Tasks that are added with a
+     * Adds the specified eviction task to the timer. Tasks that are added with a
      * call to this method *must* call {@link #cancel(BaseGenericObjectPool.Evictor,long,TimeUnit)}
      * to cancel the task to prevent memory and/or thread leaks in application
      * server environments.
      *
-     * @param task      Task to be scheduled
-     * @param delay     Delay in milliseconds before task is executed
-     * @param period    Time in milliseconds between executions
+     * @param task      Task to be scheduled.
+     * @param delay     Delay in milliseconds before task is executed.
+     * @param period    Time in milliseconds between executions.
      */
     static synchronized void schedule(
             final BaseGenericObjectPool<?>.Evictor task, final long delay, final long period) {
@@ -85,13 +85,13 @@ class EvictionTimer {
     }
 
     /**
-     * Remove the specified eviction task from the timer.
+     * Removes the specified eviction task from the timer.
      *
-     * @param evictor      Task to be cancelled
+     * @param evictor   Task to be cancelled.
      * @param timeout   If the associated executor is no longer required, how
      *                  long should this thread wait for the executor to
      *                  terminate?
-     * @param unit      The units for the specified timeout
+     * @param unit      The units for the specified timeout.
      */
     static synchronized void cancel(
             final BaseGenericObjectPool<?>.Evictor evictor, final long timeout, final TimeUnit unit) {
@@ -119,7 +119,7 @@ class EvictionTimer {
         @Override
         public Thread newThread(final Runnable runnable) {
             final Thread thread = new Thread(null, runnable, "commons-pool-evictor-thread");
-            thread.setDaemon(true); // POOL-363 - Required for applications using Runtime.addShutdownHook(). --joshlandin 03.27.2019
+            thread.setDaemon(true); // POOL-363 - Required for applications using Runtime.addShutdownHook().
             AccessController.doPrivileged(new PrivilegedAction<Void>() {
                 @Override
                 public Void run() {

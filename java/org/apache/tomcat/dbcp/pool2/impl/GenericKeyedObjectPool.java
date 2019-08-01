@@ -382,7 +382,7 @@ public class GenericKeyedObjectPool<K, T> extends BaseGenericObjectPool<T>
                             throw nsee;
                         }
                     }
-                    if (p != null && (getTestOnBorrow() || create && getTestOnCreate())) {
+                    if (p != null && getTestOnBorrow()) {
                         boolean validate = false;
                         Throwable validationThrowable = null;
                         try {
@@ -520,8 +520,8 @@ public class GenericKeyedObjectPool<K, T> extends BaseGenericObjectPool<T>
 
     /**
      * Whether there is at least one thread waiting on this deque, add an pool object.
-     * @param key
-     * @param idleObjects
+     * @param key pool key.
+     * @param idleObjects list of idle pool objects.
      */
     private void whenWaitersAddObject(final K key, final LinkedBlockingDeque<PooledObject<T>> idleObjects) {
         if (idleObjects.hasTakeWaiters()) {
@@ -689,7 +689,7 @@ public class GenericKeyedObjectPool<K, T> extends BaseGenericObjectPool<T>
 
             // Stop the evictor before the pool is closed since evict() calls
             // assertOpen()
-            stopEvitor();
+            stopEvictor();
 
             closed = true;
             // This clear removes any idle objects
@@ -1040,6 +1040,11 @@ public class GenericKeyedObjectPool<K, T> extends BaseGenericObjectPool<T>
         PooledObject<T> p = null;
         try {
             p = factory.makeObject(key);
+            if (getTestOnCreate() && !factory.validateObject(key, p)) {
+                numTotal.decrementAndGet();
+                objectDeque.getCreateCount().decrementAndGet();
+                return null;
+            }
         } catch (final Exception e) {
             numTotal.decrementAndGet();
             objectDeque.getCreateCount().decrementAndGet();
