@@ -111,6 +111,10 @@
         Allow customization of service.bat, such as heap memory size, service
         startup mode and JVM args. (isapir)
       </fix>
+      <update>
+        Update the internal fork of Commons Codec to 3ebef4a (2018-08-01) to
+        pick up the fix for CODEC-134. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>

@@ -418,7 +418,7 @@ public class Base64 extends BaseNCodec {
      * @param inPos
      *            Position to start reading data from.
      * @param inAvail
-     *            Amount of bytes available from input for encoding.
+     *            Amount of bytes available from input for decoding.
      * @param context
      *            the context to be used
      */
@@ -467,10 +467,12 @@ public class Base64 extends BaseNCodec {
                     // TODO not currently tested; perhaps it is impossible?
                     break;
                 case 2 : // 12 bits = 8 + 4
+                    validateCharacter(4, context);
                     context.ibitWorkArea = context.ibitWorkArea >> 4; // dump the extra 4 bits
                     buffer[context.pos++] = (byte) ((context.ibitWorkArea) & MASK_8BITS);
                     break;
                 case 3 : // 18 bits = 8 + 8 + 2
+                    validateCharacter(2, context);
                     context.ibitWorkArea = context.ibitWorkArea >> 2; // dump 2 bits
                     buffer[context.pos++] = (byte) ((context.ibitWorkArea >> 8) & MASK_8BITS);
                     buffer[context.pos++] = (byte) ((context.ibitWorkArea) & MASK_8BITS);
@@ -784,4 +786,22 @@ public class Base64 extends BaseNCodec {
         return octet >= 0 && octet < decodeTable.length && decodeTable[octet] != -1;
     }
 
+
+    /**
+     * <p>
+     * Validates whether the character is possible in the context of the set of possible base 64 values.
+     * </p>
+     *
+     * @param numBitsToDrop number of least significant bits to check
+     * @param context the context to be used
+     *
+     * @throws IllegalArgumentException if the bits being checked contain any non-zero value
+     */
+    private long validateCharacter(final int numBitsToDrop, final Context context) {
+        if ((context.ibitWorkArea & numBitsToDrop) != 0) {
+        throw new IllegalArgumentException(
+            "Last encoded character (before the paddings if any) is a valid base 64 alphabet but not a possible value");
+        }
+        return context.ibitWorkArea >> numBitsToDrop;
+    }
 }
