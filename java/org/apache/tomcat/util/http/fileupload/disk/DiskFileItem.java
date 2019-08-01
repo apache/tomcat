@@ -99,7 +99,7 @@ public class DiskFileItem
     private boolean isFormField;
 
     /**
-     * The original filename in the user's filesystem.
+     * The original file name in the user's file system.
      */
     private final String fileName;
 
@@ -156,7 +156,7 @@ public class DiskFileItem
      *                      <code>null</code> if not specified.
      * @param isFormField   Whether or not this item is a plain form field, as
      *                      opposed to a file upload.
-     * @param fileName      The original filename in the user's filesystem, or
+     * @param fileName      The original file name in the user's file system, or
      *                      <code>null</code> if not specified.
      * @param sizeThreshold The threshold, in bytes, below which items will be
      *                      retained in memory and above which they will be
@@ -228,9 +228,9 @@ public class DiskFileItem
     }
 
     /**
-     * Returns the original filename in the client's filesystem.
+     * Returns the original file name in the client's file system.
      *
-     * @return The original filename in the client's filesystem.
+     * @return The original file name in the client's file system.
      * @throws org.apache.tomcat.util.http.fileupload.InvalidFileNameException
      *   The file name contains a NUL character, which might be an indicator of
      *   a security attack. If you intend to use the file name anyways, catch
