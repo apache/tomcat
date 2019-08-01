@@ -59,12 +59,10 @@ public interface PooledObject<T> extends Comparable<PooledObject<T>> {
     /**
      * Gets the number of times this object has been borrowed.
      *
-     * @return -1 by default for old implementations prior to release 2.7.0.
+     * @return The number of times this object has been borrowed.
      * @since 2.7.0
      */
-    default long getBorrowedCount() {
-        return -1;
-    }
+    long getBorrowedCount();
 
     /**
      * Obtains the time in milliseconds that this object last spend in the
@@ -187,9 +185,7 @@ public interface PooledObject<T> extends Comparable<PooledObject<T>> {
      * @param requireFullStackTrace the new configuration setting for abandoned object logging
      * @since 2.7.0
      */
-    default void setRequireFullStackTrace(boolean requireFullStackTrace) {
-        // noop
-    }
+    void setRequireFullStackTrace(boolean requireFullStackTrace);
 
     /**
      * Record the current stack trace as the last time the object was used.
