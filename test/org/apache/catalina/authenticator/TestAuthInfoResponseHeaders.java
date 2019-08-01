@@ -101,7 +101,7 @@ public class TestAuthInfoResponseHeaders extends TomcatBaseTest {
         Map<String,List<String>> reqHeaders = new HashMap<>();
 
         List<String> auth = new ArrayList<>();
-        auth.add(new BasicCredentials("Basic", USER, PWD).getCredentials());
+        auth.add(new BasicCredentials("Basic", user, pwd).getCredentials());
         reqHeaders.put(CLIENT_AUTH_HEADER, auth);
 
         List<String> forwardedFor = new ArrayList<>();
