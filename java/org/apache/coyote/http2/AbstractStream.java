@@ -69,15 +69,13 @@ abstract class AbstractStream {
 
 
     final boolean isDescendant(AbstractStream stream) {
-        if (childStreams.contains(stream)) {
-            return true;
+        // Is the passed in Stream a descendant of this Stream?
+        // Start at the passed in Stream and work up
+        AbstractStream parent = stream.getParentStream();
+        while (parent != null && parent != this) {
+            parent = parent.getParentStream();
         }
-        for (AbstractStream child : childStreams) {
-            if (child.isDescendant(stream)) {
-                return true;
-            }
-        }
-        return false;
+        return parent != null;
     }
 
 
