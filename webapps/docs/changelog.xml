@@ -221,6 +221,10 @@
         Update the internal fork of Commons Pool2 to 796e32d (2018-08-01) to
         pick up the changes Commons Pool2 2.7.0. (markt)
       </update>
+      <update>
+        Update the internal fork of Commons DBCP2 to 87d9e3a (2018-08-01) to
+        pick up the changes Commons DBCP2 2.7.0 RC1. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>

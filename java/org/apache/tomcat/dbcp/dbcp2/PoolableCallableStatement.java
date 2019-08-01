@@ -21,6 +21,7 @@ import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.tomcat.dbcp.pool2.KeyedObjectPool;
@@ -67,9 +68,7 @@ public class PoolableCallableStatement extends DelegatingCallableStatement {
 
         // Remove from trace now because this statement will be
         // added by the activate method.
-        if (getConnectionInternal() != null) {
-            getConnectionInternal().removeTrace(this);
-        }
+        removeThisTrace(getConnectionInternal());
     }
 
     /**
@@ -115,21 +114,29 @@ public class PoolableCallableStatement extends DelegatingCallableStatement {
     @Override
     public void passivate() throws SQLException {
         setClosedInternal(true);
-        if (getConnectionInternal() != null) {
-            getConnectionInternal().removeTrace(this);
-        }
+        removeThisTrace(getConnectionInternal());
 
         // The JDBC spec requires that a statement close any open
         // ResultSet's when it is closed.
         // FIXME The PreparedStatement we're wrapping should handle this for us.
         // See DBCP-10 for what could happen when ResultSets are closed twice.
-        final List<AbandonedTrace> resultSets = getTrace();
-        if (resultSets != null) {
-            final ResultSet[] set = resultSets.toArray(new ResultSet[resultSets.size()]);
-            for (final ResultSet element : set) {
-                element.close();
+        final List<AbandonedTrace> resultSetList = getTrace();
+        if (resultSetList != null) {
+            final List<Exception> thrown = new ArrayList<>();
+            final ResultSet[] resultSets = resultSetList.toArray(new ResultSet[resultSetList.size()]);
+            for (final ResultSet resultSet : resultSets) {
+                if (resultSet != null) {
+                    try {
+                        resultSet.close();
+                    } catch (Exception e) {
+                        thrown.add(e);
+                    }
+                }
             }
             clearTrace();
+            if (!thrown.isEmpty()) {
+                throw new SQLExceptionList(thrown);
+            }
         }
 
         super.passivate();
