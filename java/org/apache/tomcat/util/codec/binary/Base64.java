@@ -35,7 +35,7 @@ import java.math.BigInteger;
  * <li>Line separator: Default is CRLF ("\r\n")</li>
  * </ul>
  * <p>
- * The URL-safe parameter is only applied to encode operations. Decoding seamlessly handles both modes.
+ * The URL-safe parameter is only applied to encode operations. Decoding only handles standard mode.
  * </p>
  * <p>
  * Since this class operates directly on byte streams, and not character streams, it is hard-coded to only
@@ -104,8 +104,7 @@ public class Base64 extends BaseNCodec {
      * in Table 1 of RFC 2045) into their 6-bit positive integer equivalents. Characters that are not in the Base64
      * alphabet but fall within the bounds of the array are translated to -1.
      *
-     * Note: '+' and '-' both decode to 62. '/' and '_' both decode to 63. This means decoder seamlessly handles both
-     * URL_SAFE and STANDARD base64. (The encoder, on the other hand, needs to know ahead of time what to emit).
+     * Note: The seamless decoding of URL safe values has been disabled because Tomcat doesn't use it.
      *
      * Thanks to "commons" project in ws.apache.org for this code.
      * https://svn.apache.org/repos/asf/webservices/commons/trunk/modules/util/
@@ -114,10 +113,10 @@ public class Base64 extends BaseNCodec {
         //   0   1   2   3   4   5   6   7   8   9   A   B   C   D   E   F
             -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, // 00-0f
             -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, // 10-1f
-            -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 62, -1, 62, -1, 63, // 20-2f + - /
+            -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 62, -1, -1, -1, 63, // 20-2f + /
             52, 53, 54, 55, 56, 57, 58, 59, 60, 61, -1, -1, -1, -1, -1, -1, // 30-3f 0-9
             -1,  0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, // 40-4f A-O
-            15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, -1, -1, -1, -1, 63, // 50-5f P-Z _
+            15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, -1, -1, -1, -1, -1, // 50-5f P-Z
             -1, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, // 60-6f a-o
             41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51                      // 70-7a p-z
     };
@@ -263,7 +262,7 @@ public class Base64 extends BaseNCodec {
      *            Each line of encoded data will end with this sequence of bytes.
      * @param urlSafe
      *            Instead of emitting '+' and '/' we emit '-' and '_' respectively. urlSafe is only applied to encode
-     *            operations. Decoding seamlessly handles both modes.
+     *            operations. Decoding only handles standard mode.
      *            <b>Note: no padding is added when using the URL-safe alphabet.</b>
      * @throws IllegalArgumentException
      *             The provided lineSeparator included some base64 characters. That's not going to work!
@@ -666,7 +665,7 @@ public class Base64 extends BaseNCodec {
     /**
      * Decodes a Base64 String into octets.
      * <p>
-     * <b>Note:</b> this method seamlessly handles data encoded in URL-safe or normal mode.
+     * <b>Note:</b> this method only handles data encoded in standard mode.
      * </p>
      *
      * @param base64String
@@ -681,7 +680,7 @@ public class Base64 extends BaseNCodec {
     /**
      * Decodes Base64 data into octets.
      * <p>
-     * <b>Note:</b> this method seamlessly handles data encoded in URL-safe or normal mode.
+     * <b>Note:</b> this method only handles data encoded in standard mode.
      * </p>
      *
      * @param base64Data
