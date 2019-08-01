@@ -387,18 +387,17 @@ public class TestBasicAuthParser {
     /*
      * "-" is not a legal base64 character. The RFC says it must be
      * ignored by the decoder. This will scramble the decoded string
-     * and eventually result in an authentication Assert.failure.
+     * and eventually result in an IllegalArgumentException.
      */
-    @Test
+    @Test(expected = IllegalArgumentException.class)
     public void testBadBase64Char() throws Exception {
         final String BASE64_CRIB = "dXNlcmlkOnNl-3JldHM=";
         final BasicAuthHeader AUTH_HEADER =
                 new BasicAuthHeader(NICE_METHOD, BASE64_CRIB);
+        @SuppressWarnings("unused")
         BasicAuthenticator.BasicCredentials credentials =
                 new BasicAuthenticator.BasicCredentials(
                     AUTH_HEADER.getHeader(), StandardCharsets.UTF_8, true);
-        Assert.assertEquals(USER_NAME, credentials.getUsername());
-        Assert.assertNotSame(PASSWORD, credentials.getPassword());
     }
 
     /*
