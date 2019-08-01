@@ -20,6 +20,7 @@ package org.apache.tomcat.dbcp.dbcp2;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.tomcat.dbcp.pool2.KeyedObjectPool;
@@ -29,6 +30,7 @@ import org.apache.tomcat.dbcp.pool2.KeyedObjectPool;
  * {@link PreparedStatement}s.
  * <p>
  * My {@link #close} method returns me to my containing pool. (See {@link PoolingConnection}.)
+ * </p>
  *
  * @param <K>
  *            the key type
@@ -37,6 +39,7 @@ import org.apache.tomcat.dbcp.pool2.KeyedObjectPool;
  * @since 2.0
  */
 public class PoolablePreparedStatement<K> extends DelegatingPreparedStatement {
+
     /**
      * The {@link KeyedObjectPool} from which I was obtained.
      */
@@ -50,7 +53,7 @@ public class PoolablePreparedStatement<K> extends DelegatingPreparedStatement {
     private volatile boolean batchAdded = false;
 
     /**
-     * Constructor
+     * Constructor.
      *
      * @param stmt
      *            my underlying {@link PreparedStatement}
@@ -69,9 +72,7 @@ public class PoolablePreparedStatement<K> extends DelegatingPreparedStatement {
 
         // Remove from trace now because this statement will be
         // added by the activate method.
-        if (getConnectionInternal() != null) {
-            getConnectionInternal().removeTrace(this);
-        }
+        removeThisTrace(getConnectionInternal());
     }
 
     /**
@@ -128,21 +129,29 @@ public class PoolablePreparedStatement<K> extends DelegatingPreparedStatement {
             clearBatch();
         }
         setClosedInternal(true);
-        if (getConnectionInternal() != null) {
-            getConnectionInternal().removeTrace(this);
-        }
+        removeThisTrace(getConnectionInternal());
 
         // The JDBC spec requires that a statement closes any open
         // ResultSet's when it is closed.
         // FIXME The PreparedStatement we're wrapping should handle this for us.
         // See bug 17301 for what could happen when ResultSets are closed twice.
-        final List<AbandonedTrace> resultSets = getTrace();
-        if (resultSets != null) {
-            final ResultSet[] set = resultSets.toArray(new ResultSet[resultSets.size()]);
-            for (final ResultSet element : set) {
-                element.close();
+        final List<AbandonedTrace> resultSetList = getTrace();
+        if (resultSetList != null) {
+            final List<Exception> thrown = new ArrayList<>();
+            final ResultSet[] resultSets = resultSetList.toArray(new ResultSet[resultSetList.size()]);
+            for (final ResultSet resultSet : resultSets) {
+                if (resultSet != null) {
+                    try {
+                        resultSet.close();
+                    } catch (Exception e) {
+                        thrown.add(e);
+                    }
+                }
             }
             clearTrace();
+            if (!thrown.isEmpty()) {
+                throw new SQLExceptionList(thrown);
+            }
         }
 
         super.passivate();

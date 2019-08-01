@@ -21,6 +21,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.SQLWarning;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -125,35 +126,53 @@ public class DelegatingStatement extends AbandonedTrace implements Statement {
         if (isClosed()) {
             return;
         }
+        final List<Exception> thrown = new ArrayList<>();
         try {
-            try {
-                if (connection != null) {
-                    connection.removeTrace(this);
-                    connection = null;
-                }
+            if (connection != null) {
+                connection.removeTrace(this);
+                connection = null;
+            }
 
-                // The JDBC spec requires that a statement close any open
-                // ResultSet's when it is closed.
-                // FIXME The PreparedStatement we're wrapping should handle this for us.
-                // See bug 17301 for what could happen when ResultSets are closed twice.
-                final List<AbandonedTrace> resultSets = getTrace();
-                if (resultSets != null) {
-                    final ResultSet[] set = resultSets.toArray(new ResultSet[resultSets.size()]);
-                    for (final ResultSet element : set) {
-                        element.close();
+            // The JDBC spec requires that a statement close any open
+            // ResultSet's when it is closed.
+            // FIXME The PreparedStatement we're wrapping should handle this for us.
+            // See bug 17301 for what could happen when ResultSets are closed twice.
+            final List<AbandonedTrace> resultSetList = getTrace();
+            if (resultSetList != null) {
+                final int size = resultSetList.size();
+                final ResultSet[] resultSets = resultSetList.toArray(new ResultSet[size]);
+                for (final ResultSet resultSet : resultSets) {
+                    if (resultSet != null) {
+                        try {
+                            resultSet.close();
+                        } catch (Exception e) {
+                            if (connection != null) {
+                                // Does not rethrow e.
+                                connection.handleExceptionNoThrow(e);
+                            }
+                            thrown.add(e);
+                        }
                     }
                     clearTrace();
                 }
-
                 if (statement != null) {
-                    statement.close();
+                    try {
+                        statement.close();
+                    } catch (Exception e) {
+                        if (connection != null) {
+                            // Does not rethrow e.
+                            connection.handleExceptionNoThrow(e);
+                        }
+                        thrown.add(e);
+                    }
                 }
-            } catch (final SQLException e) {
-                handleException(e);
             }
         } finally {
             closed = true;
             statement = null;
+            if (!thrown.isEmpty()) {
+                throw new SQLExceptionList(thrown);
+            }
         }
     }
 
@@ -512,7 +531,7 @@ public class DelegatingStatement extends AbandonedTrace implements Statement {
     }
 
     /*
-     * Note was protected prior to JDBC 4
+     * Note: This method was protected prior to JDBC 4.
      */
     @Override
     public boolean isClosed() throws SQLException {

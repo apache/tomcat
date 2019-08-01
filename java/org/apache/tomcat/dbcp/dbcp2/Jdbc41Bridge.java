@@ -304,7 +304,7 @@ public class Jdbc41Bridge {
                 return (T) resultSet.getURL(columnLabel);
             }
             throw new SQLFeatureNotSupportedException(
-                    String.format("resultSet=%s, columnLabel=%,d, type=%s", resultSet, columnLabel, type));
+                    String.format("resultSet=%s, columnLabel=%s, type=%s", resultSet, columnLabel, type));
         }
     }
 

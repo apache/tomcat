@@ -155,7 +155,7 @@ public class AbandonedTrace implements TrackedUse {
             final Iterator<WeakReference<AbandonedTrace>> iter = traceList.iterator();
             while (iter.hasNext()) {
                 final AbandonedTrace traceInList = iter.next().get();
-                if (trace.equals(traceInList)) {
+                if (trace != null && trace.equals(traceInList)) {
                     iter.remove();
                     break;
                 } else if (traceInList == null) {
@@ -163,6 +163,18 @@ public class AbandonedTrace implements TrackedUse {
                     iter.remove();
                 }
             }
+        }
+    }
+
+    /**
+     * Removes this object the source object is tracing.
+     *
+     * @param source The object tracing
+     * @since 2.7.0
+     */
+    protected void removeThisTrace(final Object source) {
+        if (source instanceof AbandonedTrace) {
+            AbandonedTrace.class.cast(source).removeTrace(this);
         }
     }
 }

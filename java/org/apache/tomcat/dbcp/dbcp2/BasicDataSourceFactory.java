@@ -87,6 +87,7 @@ public class BasicDataSourceFactory implements ObjectFactory {
     private static final String PROP_VALIDATION_QUERY = "validationQuery";
     private static final String PROP_VALIDATION_QUERY_TIMEOUT = "validationQueryTimeout";
     private static final String PROP_JMX_NAME = "jmxName";
+    private static final String PROP_CONNECTION_FACTORY_CLASS_NAME = "connectionFactoryClassName";
 
     /**
      * The property name for connectionInitSqls. The associated value String must be of the form [query;]*
@@ -141,7 +142,8 @@ public class BasicDataSourceFactory implements ObjectFactory {
             PROP_REMOVE_ABANDONED_TIMEOUT, PROP_LOG_ABANDONED, PROP_ABANDONED_USAGE_TRACKING, PROP_POOL_PREPARED_STATEMENTS,
             PROP_MAX_OPEN_PREPARED_STATEMENTS, PROP_CONNECTION_PROPERTIES, PROP_MAX_CONN_LIFETIME_MILLIS,
             PROP_LOG_EXPIRED_CONNECTIONS, PROP_ROLLBACK_ON_RETURN, PROP_ENABLE_AUTO_COMMIT_ON_RETURN,
-            PROP_DEFAULT_QUERY_TIMEOUT, PROP_FAST_FAIL_VALIDATION, PROP_DISCONNECTION_SQL_CODES, PROP_JMX_NAME };
+            PROP_DEFAULT_QUERY_TIMEOUT, PROP_FAST_FAIL_VALIDATION, PROP_DISCONNECTION_SQL_CODES, PROP_JMX_NAME,
+            PROP_CONNECTION_FACTORY_CLASS_NAME };
 
     /**
      * Obsolete properties from DBCP 1.x. with warning strings suggesting new properties. LinkedHashMap will guarantee
@@ -546,6 +548,11 @@ public class BasicDataSourceFactory implements ObjectFactory {
         value = properties.getProperty(PROP_DISCONNECTION_SQL_CODES);
         if (value != null) {
             dataSource.setDisconnectionSqlCodes(parseList(value, ','));
+        }
+
+        value = properties.getProperty(PROP_CONNECTION_FACTORY_CLASS_NAME);
+        if (value != null) {
+            dataSource.setConnectionFactoryClassName(value);
         }
 
         // DBCP-215
