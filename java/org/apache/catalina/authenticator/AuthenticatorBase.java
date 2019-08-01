@@ -458,7 +458,8 @@ public abstract class AuthenticatorBase extends ValveBase
      * Sets the flag whether authentication information will be send to a reverse
      * proxy on a forwarded request.
      *
-     * @param {@code true} if response headers shall be sent, {@code false} otherwise
+     * @param sendAuthInfoResponseHeaders {@code true} if response headers shall be
+     *                                    sent, {@code false} otherwise
      */
     public void setSendAuthInfoResponseHeaders(boolean sendAuthInfoResponseHeaders) {
         this.sendAuthInfoResponseHeaders = sendAuthInfoResponseHeaders;
