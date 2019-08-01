@@ -161,6 +161,10 @@
         to the jvm in <code>catalina.sh</code> when calling <code>stop</code>.
         (markt)
       </fix>
+      <update>
+        Update the internal fork of Commons Codec to 3ebef4a (2018-08-01) to
+        pick up the fix for CODEC-134. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
