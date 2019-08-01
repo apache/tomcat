@@ -165,6 +165,10 @@
         Update the internal fork of Commons Codec to 3ebef4a (2018-08-01) to
         pick up the fix for CODEC-134. (markt)
       </update>
+      <update>
+        Update the internal fork of Commons Pool2 to 796e32d (2018-08-01) to
+        pick up the changes Commons Pool2 2.7.0. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>

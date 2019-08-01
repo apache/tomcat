@@ -48,7 +48,7 @@ public class DefaultPooledObject<T> implements PooledObject<T> {
     private volatile long borrowedCount = 0;
 
     /**
-     * Create a new instance that wraps the provided object so that the pool can
+     * Creates a new instance that wraps the provided object so that the pool can
      * track the state of the pooled object.
      *
      * @param object The object to wrap
@@ -99,16 +99,17 @@ public class DefaultPooledObject<T> implements PooledObject<T> {
     }
 
     /**
-     * Get the number of times this object has been borrowed.
+     * Gets the number of times this object has been borrowed.
      * @return The number of times this object has been borrowed.
      * @since 2.1
      */
+    @Override
     public long getBorrowedCount() {
         return borrowedCount;
     }
 
     /**
-     * Return an estimate of the last time this object was used.  If the class
+     * Returns an estimate of the last time this object was used.  If the class
      * of the pooled object implements {@link TrackedUse}, what is returned is
      * the maximum of {@link TrackedUse#getLastUsed()} and
      * {@link #getLastBorrowTime()}; otherwise this method gives the same
@@ -285,8 +286,7 @@ public class DefaultPooledObject<T> implements PooledObject<T> {
      *                              logging
      * @since 2.5
      */
-    // TODO: uncomment below in 3.0
-    // @Override
+    @Override
     public void setRequireFullStackTrace(final boolean requireFullStackTrace) {
         borrowedBy = CallStackUtils.newCallStack("'Pooled object created' " +
             "yyyy-MM-dd HH:mm:ss Z 'by the following code has not been returned to the pool:'",
