@@ -274,6 +274,11 @@ public class DataSourceProxy implements PoolConfiguration {
     @Override
     public void setDriverClassName(String driverClassName) {
         this.poolProperties.setDriverClassName(driverClassName);
+        try {
+            this.pool.reloadDriverIfNeeded();
+        } catch (SQLException e) {
+            throw new IllegalArgumentException(e);
+        }
     }
 
     /**

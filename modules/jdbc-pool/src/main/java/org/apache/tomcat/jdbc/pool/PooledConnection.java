@@ -17,6 +17,7 @@
 package org.apache.tomcat.jdbc.pool;
 
 
+import java.sql.Driver;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -124,8 +125,6 @@ public class PooledConnection implements PooledConnectionMBean {
     private AtomicBoolean released = new AtomicBoolean(false);
 
     private volatile boolean suspect = false;
-
-    private java.sql.Driver driver = null;
 
     /**
      * Constructor
@@ -267,32 +266,6 @@ public class PooledConnection implements PooledConnectionMBean {
         }
     }
     protected void connectUsingDriver() throws SQLException {
-
-        try {
-            if (driver==null) {
-                if (log.isDebugEnabled()) {
-                    log.debug("Instantiating driver using class: "+poolProperties.getDriverClassName()+" [url="+poolProperties.getUrl()+"]");
-                }
-                if (poolProperties.getDriverClassName()==null) {
-                    //rely on DriverManager
-                    log.warn("Not loading a JDBC driver as driverClassName property is null.");
-                } else {
-                    driver = (java.sql.Driver)
-                        ClassLoaderUtil.loadClass(
-                            poolProperties.getDriverClassName(),
-                            PooledConnection.class.getClassLoader(),
-                            Thread.currentThread().getContextClassLoader()
-                        ).getConstructor().newInstance();
-                }
-            }
-        } catch (java.lang.Exception cn) {
-            if (log.isDebugEnabled()) {
-                log.debug("Unable to instantiate JDBC driver.", cn);
-            }
-            SQLException ex = new SQLException(cn.getMessage());
-            ex.initCause(cn);
-            throw ex;
-        }
         String driverURL = poolProperties.getUrl();
         String usr = null;
         String pwd = null;
@@ -313,10 +286,10 @@ public class PooledConnection implements PooledConnectionMBean {
         if (pwd != null) properties.setProperty(PROP_PASSWORD, pwd);
 
         try {
-            if (driver==null) {
+            if (parent.getDriver()==null) {
                 connection = DriverManager.getConnection(driverURL, properties);
             } else {
-                connection = driver.connect(driverURL, properties);
+                connection = parent.getDriver().connect(driverURL, properties);
             }
         } catch (Exception x) {
             if (log.isDebugEnabled()) {
@@ -335,7 +308,7 @@ public class PooledConnection implements PooledConnectionMBean {
             }
         }
         if (connection==null) {
-            throw new SQLException("Driver:"+driver+" returned null for URL:"+driverURL);
+            throw new SQLException("Driver:"+parent.getDriver()+" returned null for URL:"+driverURL);
         }
     }
 

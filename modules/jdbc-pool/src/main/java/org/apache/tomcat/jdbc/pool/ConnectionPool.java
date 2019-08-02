@@ -23,6 +23,7 @@ import java.lang.reflect.Proxy;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.sql.Connection;
+import java.sql.Driver;
 import java.sql.SQLException;
 import java.util.Collections;
 import java.util.ConcurrentModificationException;
@@ -128,6 +129,8 @@ public class ConnectionPool {
 
     private AtomicLong poolVersion = new AtomicLong(Long.MIN_VALUE);
 
+    private Driver driver;
+
     /**
      * The counters for statistics of the pool.
      */
@@ -218,6 +221,14 @@ public class ConnectionPool {
         // check out a connection
         PooledConnection con = borrowConnection(-1, username, password);
         return setupConnection(con);
+    }
+
+    /**
+     * Driver for the pool when not using a pre-instantiated datasource.
+     * @return the driver to use for the connections of this pool.
+     */
+    public Driver getDriver() {
+        return driver;
     }
 
     /**
@@ -476,6 +487,9 @@ public class ConnectionPool {
             }
         }
 
+        // preload driver to avoid to depend on the context later
+        reloadDriverIfNeeded();
+
         //initialize the pool with its initial set of members
         PooledConnection[] initialPool = new PooledConnection[poolProperties.getInitialSize()];
         try {
@@ -500,6 +514,38 @@ public class ConnectionPool {
         } //catch
 
         closed = false;
+    }
+
+    void reloadDriverIfNeeded() throws SQLException {
+        if (poolProperties.getDataSource() != null) {
+            return;
+        }
+        try {
+            if (poolProperties.getDriverClassName()!=null) {
+                if (log.isDebugEnabled()) {
+                    log.debug("Instantiating driver using class: "+poolProperties.getDriverClassName()+" [url="+poolProperties.getUrl()+"]");
+                }
+                if (poolProperties.getDriverClassName() == null) {
+                    //rely on DriverManager
+                    log.warn("Not loading a JDBC driver as driverClassName property is null.");
+                    driver = null;
+                } else {
+                    driver = (java.sql.Driver)
+                            ClassLoaderUtil.loadClass(
+                                    poolProperties.getDriverClassName(),
+                                    PooledConnection.class.getClassLoader(),
+                                    Thread.currentThread().getContextClassLoader()
+                            ).getConstructor().newInstance();
+                }
+            }
+        } catch (java.lang.Exception cn) {
+            if (log.isDebugEnabled()) {
+                log.debug("Unable to instantiate JDBC driver.", cn);
+            }
+            SQLException ex = new SQLException(cn.getMessage());
+            ex.initCause(cn);
+            throw ex;
+        }
     }
 
     public void checkPoolConfiguration(PoolConfiguration properties) {
