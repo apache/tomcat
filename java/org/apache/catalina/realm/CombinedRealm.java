@@ -350,7 +350,7 @@ public class CombinedRealm extends RealmBase {
      * {@inheritDoc}
      */
     @Override
-    public Principal authenticate(GSSContext gssContext, boolean storeCreds) {
+    public Principal authenticate(GSSContext gssContext, boolean storeCred) {
         if (gssContext.isEstablished()) {
             Principal authenticatedUser = null;
             String username = null;
@@ -371,7 +371,7 @@ public class CombinedRealm extends RealmBase {
                             username, realm.getClass().getName()));
                 }
 
-                authenticatedUser = realm.authenticate(gssContext, storeCreds);
+                authenticatedUser = realm.authenticate(gssContext, storeCred);
 
                 if (authenticatedUser == null) {
                     if (log.isDebugEnabled()) {
