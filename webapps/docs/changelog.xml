@@ -47,6 +47,10 @@
 <section name="Tomcat 9.0.23 (markt)" rtext="in development">
   <subsection name="Catalina">
     <changelog>
+      <update>
+        <bug>63627</bug>: Implement more fine-grained handling in
+        <code>RealmBase.authenticate(GSSContext, boolean)</code>. (michaelo)
+      </update>
       <add>
         <bug>62496</bug>: Add option to write auth information (remote user/auth type)
         to response headers. (michaelo)
