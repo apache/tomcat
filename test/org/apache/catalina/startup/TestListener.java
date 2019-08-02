@@ -31,7 +31,7 @@ import org.apache.catalina.Context;
 
 public class TestListener extends TomcatBaseTest {
 
-    /**
+    /*
      * Check that a ServletContainerInitializer can install a
      * {@link ServletContextListener} and that it gets initialized.
      * @throws Exception
@@ -48,9 +48,9 @@ public class TestListener extends TomcatBaseTest {
         Assert.assertTrue(SCL.initialized);
     }
 
-    /**
+    /*
      * Check that a {@link ServletContextListener} cannot install a
-     * {@link javax.servlet.ServletContainerInitializer}.
+     * {@link ServletContainerInitializer}.
      * @throws Exception
      */
     @Test
