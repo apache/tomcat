@@ -34,10 +34,10 @@ public class TesterServletEncodeUrl extends HttpServlet {
 
     /**
      * Almost minimal processing for a servlet.
-     *
-     * @param nextUrl The url the caller would like to go to next. If
-     *                supplied, put an encoded url into the returned
-     *                html page as a hyperlink.
+     * <p>
+     * The request parameter <code>nextUrl</code> specifies the url to which the
+     * caller would like to go next. If supplied, put an encoded url into the
+     * returned html page as a hyperlink.
      */
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
