@@ -95,6 +95,10 @@
   </subsection>
   <subsection name="Other">
     <changelog>
+      <update>
+        <bug>63634</bug>: Align setproxy target in build.xml with
+        8.5/9.0. (michaelo)
+      </update>
       <add>
         Limit the default JPDA (remote debugging interface) listen address to
         <code>localhost:8000</code>. (markt)

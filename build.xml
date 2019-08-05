@@ -2937,14 +2937,7 @@ skip.installer property in build.properties" />
 
   <!-- =============== Utility Targets to support downloads ================ -->
 
-  <target name="proxyflags">
-    <!-- check proxy parameters. -->
-    <condition property="useproxy">
-      <equals arg1="${proxy.use}" arg2="on" />
-    </condition>
-  </target>
-
-  <target name="setproxy" depends="proxyflags" if="useproxy">
+  <target name="setproxy" if="${proxy.use}">
     <setproxy proxyhost="${proxy.host}" proxyport="${proxy.port}"
               proxyuser="${proxy.user}" proxypassword="${proxy.password}" />
     <echo message="Using ${proxy.host}:${proxy.port} to download ${sourcefile}"/>
