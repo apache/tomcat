@@ -101,6 +101,10 @@
         and a request does not map to any of the other deployed Contexts. Patch
         provided by Jop Zinkweg. (markt)
       </fix>
+      <fix>
+        <bug>63636</bug>: <code>Context.findRoleMapping()</code> never called
+        in <code>StandardWrapper.findSecurityReference()</code>. (michaelo)
+      </fix>
      </changelog>
   </subsection>
   <subsection name="Coyote">

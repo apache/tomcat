@@ -18,6 +18,7 @@ package org.apache.catalina.core;
 
 import java.io.File;
 import java.io.IOException;
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -48,6 +49,7 @@ import org.junit.Test;
 import org.apache.catalina.Context;
 import org.apache.catalina.Wrapper;
 import org.apache.catalina.authenticator.BasicAuthenticator;
+import org.apache.catalina.realm.MessageDigestCredentialHandler;
 import org.apache.catalina.startup.TesterMapRealm;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
@@ -233,6 +235,71 @@ public class TestStandardWrapper extends TomcatBaseTest {
 
         Assert.assertEquals(200, rc);
         Assert.assertTrue(bc.toString().contains("00-OK"));
+    }
+
+    @Test
+    public void testRoleMappingInEngine() throws Exception {
+        doTestRoleMapping("engine");
+    }
+
+    @Test
+    public void testRoleMappingInHost() throws Exception {
+        doTestRoleMapping("host");
+    }
+
+    @Test
+    public void testRoleMappingInContext() throws Exception {
+        doTestRoleMapping("context");
+    }
+
+    private void doTestRoleMapping(String realmContainer)
+            throws Exception {
+        // Setup Tomcat instance
+        Tomcat tomcat = getTomcatInstance();
+
+        // No file system docBase required
+        Context ctx = tomcat.addContext("", null);
+        ctx.addRoleMapping("testRole2", "very-complex-role-name");
+        /* We won't map "testRole3" to "another-very-complex-role-name" to make
+         * it fail intentionally.
+         */
+
+        Wrapper wrapper = Tomcat.addServlet(ctx, "servlet", TestServlet.class.getName());
+        ctx.addServletMappingDecoded("/", "servlet");
+
+        TesterMapRealm realm = new TesterMapRealm();
+        MessageDigestCredentialHandler ch = new MessageDigestCredentialHandler();
+        ch.setAlgorithm("SHA");
+        realm.setCredentialHandler(ch);
+
+        /* Attach the realm to the appropriate container, but role mapping must
+         * always succeed because it is evaluated at context level.
+         */
+        if (realmContainer.equals("engine")) {
+            tomcat.getEngine().setRealm(realm);
+        } else if (realmContainer.equals("host")) {
+            tomcat.getHost().setRealm(realm);
+        } else if (realmContainer.equals("context")) {
+            ctx.setRealm(realm);
+        } else {
+            throw new IllegalArgumentException("realmContainer is invalid");
+        }
+
+        realm.addUser("testUser", ch.mutate("testPwd"));
+        realm.addUserRole("testUser", "testRole1");
+        realm.addUserRole("testUser", "very-complex-role-name");
+        realm.addUserRole("testUser", "another-very-complex-role-name");
+
+        tomcat.start();
+
+        Principal p = realm.authenticate("testUser", "testPwd");
+
+        Assert.assertNotNull(p);
+        Assert.assertEquals("testUser", p.getName());
+        Assert.assertTrue(realm.hasRole(wrapper, p, "testRole1"));
+        Assert.assertTrue(realm.hasRole(wrapper, p, "testRole2"));
+        Assert.assertTrue(realm.hasRole(wrapper, p, "very-complex-role-name"));
+        Assert.assertFalse(realm.hasRole(wrapper, p, "testRole3"));
     }
 
     private void doTestSecurityAnnotationsAddServlet(boolean useCreateServlet)
