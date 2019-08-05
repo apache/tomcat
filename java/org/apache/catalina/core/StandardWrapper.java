@@ -920,14 +920,26 @@ public class StandardWrapper extends ContainerBase
      */
     @Override
     public String findSecurityReference(String name) {
+        String reference = null;
 
         referencesLock.readLock().lock();
         try {
-            return references.get(name);
+            reference = references.get(name);
         } finally {
             referencesLock.readLock().unlock();
         }
 
+        // If not specified on the Wrapper, check the Context
+        if (getParent() instanceof Context) {
+            Context context = (Context) getParent();
+            if (reference != null) {
+                reference = context.findRoleMapping(reference);
+            } else {
+                reference = context.findRoleMapping(name);
+            }
+        }
+
+        return reference;
     }
 
 
