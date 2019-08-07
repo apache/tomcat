@@ -132,6 +132,9 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
     private volatile int newStreamsSinceLastPrune = 0;
     private final Map<AbstractStream, BacklogTracker> backLogStreams = new ConcurrentHashMap<>();
     private long backLogSize = 0;
+    // The time at which the connection will timeout unless data arrives before
+    // then. -1 means no timeout.
+    private volatile long connectionTimeout = -1;
 
     // Stream concurrency control
     private AtomicInteger streamConcurrency = null;
@@ -315,8 +318,10 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
             case OPEN_READ:
                 try {
                     // There is data to read so use the read timeout while
-                    // reading frames.
+                    // reading frames ...
                     socketWrapper.setReadTimeout(protocol.getReadTimeout());
+                    // ... and disable the connection timeout
+                    setConnectionTimeout(-1);
                     while (true) {
                         try {
                             if (!parser.readFrame(false)) {
@@ -332,23 +337,22 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
                                 stream.close(se);
                             }
                         }
+                        if (overheadCount.get() > 0) {
+                            throw new ConnectionException(
+                                    sm.getString("upgradeHandler.tooMuchOverhead", connectionId),
+                                    Http2Error.ENHANCE_YOUR_CALM);
+                        }
                     }
 
-                    if (overheadCount.get() > 0) {
-                        throw new ConnectionException(
-                                sm.getString("upgradeHandler.tooMuchOverhead", connectionId),
-                                Http2Error.ENHANCE_YOUR_CALM);
-                    }
+                    // Need to know the correct timeout before starting the read
+                    // but that may not be known at this time if one or more
+                    // requests are currently being processed so don't set a
+                    // timeout for the socket...
+                    socketWrapper.setReadTimeout(-1);
 
-                    if (activeRemoteStreamCount.get() == 0) {
-                        // No streams currently active. Use the keep-alive
-                        // timeout for the connection.
-                        socketWrapper.setReadTimeout(protocol.getKeepAliveTimeout());
-                    } else {
-                        // Streams currently active. Individual streams have
-                        // timeouts so keep the connection open.
-                        socketWrapper.setReadTimeout(-1);
-                    }
+                    // ...set a timeout on the connection
+                    setConnectionTimeoutForStreamCount(activeRemoteStreamCount.get());
+
                 } catch (Http2Exception ce) {
                     // Really ConnectionException
                     if (log.isDebugEnabled()) {
@@ -369,9 +373,12 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
                 result = SocketState.UPGRADED;
                 break;
 
+            case TIMEOUT:
+                closeConnection(null);
+                break;
+
             case DISCONNECT:
             case ERROR:
-            case TIMEOUT:
             case STOP:
             case CONNECT_FAIL:
                 close();
@@ -391,9 +398,41 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
     }
 
 
+    /*
+     * Sets the connection timeout based on the current number of active
+     * streams.
+     */
+    protected void setConnectionTimeoutForStreamCount(int streamCount) {
+        if (streamCount == 0) {
+            // No streams currently active. Use the keep-alive
+            // timeout for the connection.
+            long keepAliveTimeout = protocol.getKeepAliveTimeout();
+            if (keepAliveTimeout == -1) {
+                setConnectionTimeout(-1);
+            } else {
+                setConnectionTimeout(System.currentTimeMillis() + keepAliveTimeout);
+            }
+        } else {
+            // Streams currently active. Individual streams have
+            // timeouts so keep the connection open.
+            setConnectionTimeout(-1);
+        }
+    }
+
+
+    private void setConnectionTimeout(long connectionTimeout) {
+        this.connectionTimeout = connectionTimeout;
+    }
+
+
     @Override
     public void timeoutAsync(long now) {
-        // TODO: Implement improved connection timeouts
+        long connectionTimeout = this.connectionTimeout;
+        if (now == -1 || connectionTimeout > -1 && now > connectionTimeout) {
+            // Have to dispatch as this will be executed from a non-container
+            // thread.
+            socketWrapper.processSocket(SocketEvent.TIMEOUT, true);
+        }
     }
 
 
@@ -502,9 +541,17 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
 
 
     void closeConnection(Http2Exception ce) {
+        long code;
+        byte[] msg;
+        if (ce == null) {
+            code = Http2Error.NO_ERROR.getCode();
+            msg = null;
+        } else {
+            code = ce.getError().getCode();
+            msg = ce.getMessage().getBytes(StandardCharsets.UTF_8);
+        }
         try {
-            writeGoAwayFrame(maxProcessedStreamId, ce.getError().getCode(),
-                    ce.getMessage().getBytes(StandardCharsets.UTF_8));
+            writeGoAwayFrame(maxProcessedStreamId, code, msg);
         } catch (IOException ioe) {
             // Ignore. GOAWAY is sent on a best efforts basis and the original
             // error has already been logged.
@@ -668,7 +715,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
             header[4] = FLAG_END_OF_STREAM;
             stream.sentEndOfStream();
             if (!stream.isActive()) {
-                activeRemoteStreamCount.decrementAndGet();
+                setConnectionTimeoutForStreamCount(activeRemoteStreamCount.decrementAndGet());
             }
         }
         if (writeable) {
@@ -1189,7 +1236,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
         if (localSettings.getMaxConcurrentStreams() < activeRemoteStreamCount.incrementAndGet()) {
             // If there are too many open streams, simply ignore the push
             // request.
-            activeRemoteStreamCount.decrementAndGet();
+            setConnectionTimeoutForStreamCount(activeRemoteStreamCount.decrementAndGet());
             return;
         }
 
@@ -1307,7 +1354,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
         if (stream != null) {
             stream.receivedEndOfStream();
             if (!stream.isActive()) {
-                activeRemoteStreamCount.decrementAndGet();
+                setConnectionTimeoutForStreamCount(activeRemoteStreamCount.decrementAndGet());
             }
         }
     }
@@ -1346,7 +1393,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
             stream.receivedStartOfHeaders(headersEndStream);
             closeIdleStreams(streamId);
             if (localSettings.getMaxConcurrentStreams() < activeRemoteStreamCount.incrementAndGet()) {
-                activeRemoteStreamCount.decrementAndGet();
+                setConnectionTimeoutForStreamCount(activeRemoteStreamCount.decrementAndGet());
                 throw new StreamException(sm.getString("upgradeHandler.tooManyRemoteStreams",
                         Long.toString(localSettings.getMaxConcurrentStreams())),
                         Http2Error.REFUSED_STREAM, streamId);
