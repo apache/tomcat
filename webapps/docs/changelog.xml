@@ -237,6 +237,11 @@
         Update the internal fork of Commons DBCP2 to 87d9e3a (2018-08-01) to
         pick up the changes Commons DBCP2 2.7.0 RC1. (markt)
       </update>
+      <update>
+        <bug>63648</bug>: Update the test TLS keys and certificates used in the
+        test suite to replace the keys and certificates that are about to
+        expire. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
