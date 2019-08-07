@@ -96,9 +96,9 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
             Collections.newSetFromMap(new ConcurrentHashMap<Processor, Boolean>());
 
     /**
-     * Controller for the async timeout scheduling.
+     * Controller for the timeout scheduling.
      */
-    private ScheduledFuture<?> asyncTimeoutFuture = null;
+    private ScheduledFuture<?> timeoutFuture = null;
     private ScheduledFuture<?> monitorFuture;
 
     public AbstractProtocol(AbstractEndpoint<S,?> endpoint) {
@@ -595,17 +595,22 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
     }
 
 
+    /**
+     * Note: The name of this method originated with the Servlet 3.0
+     * asynchronous processing but evolved over time to represent a timeout that
+     * is triggered independently of the socket read/write timeouts.
+     */
     protected void startAsyncTimeout() {
-        if (asyncTimeoutFuture == null || (asyncTimeoutFuture != null && asyncTimeoutFuture.isDone())) {
-            if (asyncTimeoutFuture != null && asyncTimeoutFuture.isDone()) {
+        if (timeoutFuture == null || (timeoutFuture != null && timeoutFuture.isDone())) {
+            if (timeoutFuture != null && timeoutFuture.isDone()) {
                 // There was an error executing the scheduled task, get it and log it
                 try {
-                    asyncTimeoutFuture.get();
+                    timeoutFuture.get();
                 } catch (InterruptedException | ExecutionException e) {
                     getLog().error(sm.getString("abstractProtocolHandler.asyncTimeoutError"), e);
                 }
             }
-            asyncTimeoutFuture = getUtilityExecutor().scheduleAtFixedRate(
+            timeoutFuture = getUtilityExecutor().scheduleAtFixedRate(
                     new Runnable() {
                         @Override
                         public void run() {
@@ -619,9 +624,9 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
     }
 
     protected void stopAsyncTimeout() {
-        if (asyncTimeoutFuture != null) {
-            asyncTimeoutFuture.cancel(false);
-            asyncTimeoutFuture = null;
+        if (timeoutFuture != null) {
+            timeoutFuture.cancel(false);
+            timeoutFuture = null;
         }
     }
 
@@ -664,7 +669,7 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
             monitorFuture = null;
         }
         stopAsyncTimeout();
-        // Timeout any pending async request
+        // Timeout any waiting processor
         for (Processor processor : waitingProcessors) {
             processor.timeoutAsync(-1);
         }
@@ -770,12 +775,14 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
                         processor, socket));
             }
 
-            // Async timeouts are calculated on a dedicated thread and then
+            // Timeouts are calculated on a dedicated thread and then
             // dispatched. Because of delays in the dispatch process, the
             // timeout may no longer be required. Check here and avoid
             // unnecessary processing.
-            if (SocketEvent.TIMEOUT == status && (processor == null ||
-                    !processor.isAsync() || !processor.checkAsyncTimeoutGeneration())) {
+            if (SocketEvent.TIMEOUT == status &&
+                    (processor == null ||
+                    !processor.isAsync() && !processor.isUpgrade() ||
+                    processor.isAsync() && !processor.checkAsyncTimeoutGeneration())) {
                 // This is effectively a NO-OP
                 return SocketState.OPEN;
             }
@@ -942,6 +949,7 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
                     // to the poller if necessary.
                     if (status != SocketEvent.OPEN_WRITE) {
                         longPoll(wrapper, processor);
+                        getProtocol().addWaitingProcessor(processor);
                     }
                 } else if (state == SocketState.SUSPENDED) {
                     // Don't add sockets back to the poller.

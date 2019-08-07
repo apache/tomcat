@@ -39,7 +39,7 @@ import org.apache.tomcat.util.res.StringManager;
 
 /**
  * Provides functionality and attributes common to all supported protocols
- * (currently HTTP and AJP).
+ * (currently HTTP and AJP) for processing a single request/response.
  */
 public abstract class AbstractProcessor extends AbstractProcessorLight implements ActionHook {
 
@@ -628,6 +628,13 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
     }
 
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Sub-classes of this base class represent a single request/response pair.
+     * The timeout to be processed is, therefore, the Servlet asynchronous
+     * processing timeout.
+     */
     @Override
     public void timeoutAsync(long now) {
         if (now < 0) {
