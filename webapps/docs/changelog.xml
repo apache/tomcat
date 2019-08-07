@@ -132,6 +132,10 @@
         Connections that fail the TLS handshake will now appear in the access
         logs with a 400 status code. (markt)
       </add>
+      <fix>
+        Timeouts for HTTP/2 connections were not always correctly handled
+        leaving some connections open for longer than expected. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
