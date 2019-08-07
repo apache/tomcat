@@ -259,6 +259,11 @@ public class TestUpgradeInternalHandler extends TomcatBaseTest {
         }
 
         @Override
+        public void timeoutAsync(long now) {
+            // NO-OP
+        }
+
+        @Override
         public void setSocketWrapper(SocketWrapperBase<?> wrapper) {
             this.wrapper = wrapper;
         }

@@ -191,6 +191,12 @@ public class WsHttpUpgradeHandler implements InternalHttpUpgradeHandler {
 
 
     @Override
+    public void timeoutAsync(long now) {
+        // NO-OP
+    }
+
+
+    @Override
     public void pause() {
         // NO-OP
     }
