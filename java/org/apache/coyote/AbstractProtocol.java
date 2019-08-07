@@ -92,7 +92,7 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
 
 
     /**
-     * The async timeout thread.
+     * The timeout thread.
      */
     private AsyncTimeout asyncTimeout = null;
 
@@ -590,7 +590,7 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
 
         endpoint.start();
 
-        // Start async timeout thread
+        // Start timeout thread
         asyncTimeout = new AsyncTimeout();
         Thread timeoutThread = new Thread(asyncTimeout, getNameInternal() + "-AsyncTimeout");
         int priority = endpoint.getThreadPriority();
@@ -725,12 +725,14 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
                         processor, socket));
             }
 
-            // Async timeouts are calculated on a dedicated thread and then
+            // Timeouts are calculated on a dedicated thread and then
             // dispatched. Because of delays in the dispatch process, the
             // timeout may no longer be required. Check here and avoid
             // unnecessary processing.
-            if (SocketEvent.TIMEOUT == status && (processor == null ||
-                    !processor.isAsync() || !processor.checkAsyncTimeoutGeneration())) {
+            if (SocketEvent.TIMEOUT == status &&
+                    (processor == null ||
+                    !processor.isAsync() && !processor.isUpgrade() ||
+                    processor.isAsync() && !processor.checkAsyncTimeoutGeneration())) {
                 // This is effectively a NO-OP
                 return SocketState.OPEN;
             }
@@ -891,6 +893,7 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
                     // to the poller if necessary.
                     if (status != SocketEvent.OPEN_WRITE) {
                         longPoll(wrapper, processor);
+                        getProtocol().addWaitingProcessor(processor);
                     }
                 } else if (state == SocketState.SUSPENDED) {
                     // Don't add sockets back to the poller.

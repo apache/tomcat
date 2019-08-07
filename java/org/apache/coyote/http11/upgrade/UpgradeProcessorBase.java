@@ -91,13 +91,15 @@ public abstract class UpgradeProcessorBase extends AbstractProcessorLight implem
 
 
     @Override
-    public void timeoutAsync(long now) {
-        // NO-OP
+    public boolean checkAsyncTimeoutGeneration() {
+        return false;
     }
 
 
+    // ----------------- Processor methods that are NO-OP by default for upgrade
+
     @Override
-    public boolean checkAsyncTimeoutGeneration() {
-        return false;
+    public void timeoutAsync(long now) {
+        // NO-OP
     }
 }
