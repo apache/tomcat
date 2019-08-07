@@ -399,6 +399,12 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
     }
 
 
+    @Override
+    public void timeoutAsync(long now) {
+        // TODO: Implement improved connection timeouts
+    }
+
+
     ConnectionSettingsRemote getRemoteSettings() {
         return remoteSettings;
     }

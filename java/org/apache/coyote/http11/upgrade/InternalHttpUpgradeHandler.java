@@ -32,6 +32,8 @@ public interface InternalHttpUpgradeHandler extends HttpUpgradeHandler {
 
     SocketState upgradeDispatch(SocketEvent status);
 
+    void timeoutAsync(long now);
+
     void setSocketWrapper(SocketWrapperBase<?> wrapper);
 
     void setSslSupport(SSLSupport sslSupport);
