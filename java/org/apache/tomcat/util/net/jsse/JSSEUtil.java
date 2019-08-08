@@ -27,7 +27,6 @@ import java.util.Set;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.compat.JreVendor;
-import org.apache.tomcat.util.net.Constants;
 import org.apache.tomcat.util.net.SSLContext;
 import org.apache.tomcat.util.net.SSLHostConfigCertificate;
 import org.apache.tomcat.util.net.SSLUtilBase;
@@ -47,61 +46,10 @@ public class JSSEUtil extends SSLUtilBase {
     private static final Log log = LogFactory.getLog(JSSEUtil.class);
     private static final StringManager sm = StringManager.getManager(JSSEUtil.class);
 
-    private static final Set<String> implementedProtocols;
-    private static final Set<String> implementedCiphers;
+    private volatile boolean initialized = false;
 
-    static {
-        SSLContext context;
-        try {
-            context = new JSSESSLContext(Constants.SSL_PROTO_TLS);
-            context.init(null,  null,  null);
-        } catch (NoSuchAlgorithmException | KeyManagementException e) {
-            // This is fatal for the connector so throw an exception to prevent
-            // it from starting
-            throw new IllegalArgumentException(e);
-        }
-
-        String[] implementedProtocolsArray = context.getSupportedSSLParameters().getProtocols();
-        implementedProtocols = new HashSet<>(implementedProtocolsArray.length);
-
-        // Filter out SSLv2 from the list of implemented protocols (just in case
-        // we are running on a JVM that supports it) since it is no longer
-        // considered secure but allow SSLv2Hello.
-        // Note SSLv3 is allowed despite known insecurities because some users
-        // still have a requirement for it.
-        for (String protocol : implementedProtocolsArray) {
-            String protocolUpper = protocol.toUpperCase(Locale.ENGLISH);
-            if (!"SSLV2HELLO".equals(protocolUpper) && !"SSLV3".equals(protocolUpper)) {
-                if (protocolUpper.contains("SSL")) {
-                    log.debug(sm.getString("jsse.excludeProtocol", protocol));
-                    continue;
-                }
-            }
-            implementedProtocols.add(protocol);
-        }
-
-        if (implementedProtocols.size() == 0) {
-            log.warn(sm.getString("jsse.noDefaultProtocols"));
-        }
-
-        String[] implementedCipherSuiteArray = context.getSupportedSSLParameters().getCipherSuites();
-        // The IBM JRE will accept cipher suites names SSL_xxx or TLS_xxx but
-        // only returns the SSL_xxx form for supported cipher suites. Therefore
-        // need to filter the requested cipher suites using both forms with an
-        // IBM JRE.
-        if (JreVendor.IS_IBM_JVM) {
-            implementedCiphers = new HashSet<>(implementedCipherSuiteArray.length * 2);
-            for (String name : implementedCipherSuiteArray) {
-                implementedCiphers.add(name);
-                if (name.startsWith("SSL")) {
-                    implementedCiphers.add("TLS" + name.substring(3));
-                }
-            }
-        } else {
-            implementedCiphers = new HashSet<>(implementedCipherSuiteArray.length);
-            implementedCiphers.addAll(Arrays.asList(implementedCipherSuiteArray));
-        }
-    }
+    private volatile Set<String> implementedProtocols;
+    private volatile Set<String> implementedCiphers;
 
 
     public JSSEUtil (SSLHostConfigCertificate certificate) {
@@ -122,12 +70,14 @@ public class JSSEUtil extends SSLUtilBase {
 
     @Override
     protected Set<String> getImplementedProtocols() {
+        initialise();
         return implementedProtocols;
     }
 
 
     @Override
     protected Set<String> getImplementedCiphers() {
+        initialise();
         return implementedCiphers;
     }
 
@@ -143,5 +93,66 @@ public class JSSEUtil extends SSLUtilBase {
     public SSLContext createSSLContextInternal(List<String> negotiableProtocols)
             throws NoSuchAlgorithmException {
         return new JSSESSLContext(sslHostConfig.getSslProtocol());
+    }
+
+
+    private void initialise() {
+        if (!initialized) {
+            synchronized (this) {
+                if (!initialized) {
+                    SSLContext context;
+                    try {
+                        context = new JSSESSLContext(sslHostConfig.getSslProtocol());
+                        context.init(null,  null,  null);
+                    } catch (NoSuchAlgorithmException | KeyManagementException e) {
+                        // This is fatal for the connector so throw an exception to prevent
+                        // it from starting
+                        throw new IllegalArgumentException(e);
+                    }
+
+                    String[] implementedProtocolsArray = context.getSupportedSSLParameters().getProtocols();
+                    implementedProtocols = new HashSet<>(implementedProtocolsArray.length);
+
+                    // Filter out SSLv2 from the list of implemented protocols (just in case
+                    // we are running on a JVM that supports it) since it is no longer
+                    // considered secure but allow SSLv2Hello.
+                    // Note SSLv3 is allowed despite known insecurities because some users
+                    // still have a requirement for it.
+                    for (String protocol : implementedProtocolsArray) {
+                        String protocolUpper = protocol.toUpperCase(Locale.ENGLISH);
+                        if (!"SSLV2HELLO".equals(protocolUpper) && !"SSLV3".equals(protocolUpper)) {
+                            if (protocolUpper.contains("SSL")) {
+                                log.debug(sm.getString("jsse.excludeProtocol", protocol));
+                                continue;
+                            }
+                        }
+                        implementedProtocols.add(protocol);
+                    }
+
+                    if (implementedProtocols.size() == 0) {
+                        log.warn(sm.getString("jsse.noDefaultProtocols"));
+                    }
+
+                    String[] implementedCipherSuiteArray = context.getSupportedSSLParameters().getCipherSuites();
+                    // The IBM JRE will accept cipher suites names SSL_xxx or TLS_xxx but
+                    // only returns the SSL_xxx form for supported cipher suites. Therefore
+                    // need to filter the requested cipher suites using both forms with an
+                    // IBM JRE.
+                    if (JreVendor.IS_IBM_JVM) {
+                        implementedCiphers = new HashSet<>(implementedCipherSuiteArray.length * 2);
+                        for (String name : implementedCipherSuiteArray) {
+                            implementedCiphers.add(name);
+                            if (name.startsWith("SSL")) {
+                                implementedCiphers.add("TLS" + name.substring(3));
+                            }
+                        }
+                    } else {
+                        implementedCiphers = new HashSet<>(implementedCipherSuiteArray.length);
+                        implementedCiphers.addAll(Arrays.asList(implementedCipherSuiteArray));
+                    }
+                    initialized = true;
+                }
+            }
+        }
     }
 }

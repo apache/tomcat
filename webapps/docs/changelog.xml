@@ -141,6 +141,11 @@
         Timeouts for HTTP/2 connections were not always correctly handled
         leaving some connections open for longer than expected. (markt)
       </fix>
+      <fix>
+        <bug>63650</bug>: Refactor initialisation for JSSE based TLS connectors
+        to enable custom JSSE providers that provide custom cipher suites to be
+        used. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">
