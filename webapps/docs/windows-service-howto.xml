@@ -346,9 +346,9 @@ script. If necessary, you can use the <code>/user</code> switch to specify
 a user to use for the installation of the service.
 </p>
 <p>
-<strong>NOTE:</strong> On Windows Vista or any later operating system with User
-Account Control (UAC) enabled you will be asked for additional privileges
-when 'Tomcat<version-major/>.exe' is launched by the script.<br/>
+<strong>NOTE:</strong> If User Account Control (UAC) is enabled you will be
+asked for additional privileges when 'Tomcat<version-major/>.exe' is launched by
+the script.<br/>
 If you want to pass additional options to service installer as
 <code>PR_*</code> environment variables, you have to either configure them
 globally in OS, or launch the program that sets them with elevated privileges
@@ -366,6 +366,14 @@ service, as displayed in Windows services.</p>
 
 <source>Install the service named 'MyService'
 C:\> service.bat install MyService</source>
+
+<p>When installing the service with a non-default name,
+tomcat<version-major/>.exe and tomcat<version-major/>w.exe will be renamed to
+match the chosen service name. To prevent this, use the <code>--no-rename</code>
+option.</p>
+
+<source>Install the service named 'MyService' without renaming
+C:\> service.bat install MyService --no-rename</source>
 
 <p>
 If using tomcat<version-major/>.exe, you need to use the <b>//IS//</b> parameter.</p>

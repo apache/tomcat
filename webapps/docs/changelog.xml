@@ -95,6 +95,15 @@
   </subsection>
   <subsection name="Other">
     <changelog>
+      <fix>
+        <bug>63285</bug>: Modify <code>service.bat</code> so that when
+        installing a Windows service, by default, it changes the name of the
+        executables used by the Windows service to match the service name. This
+        makes the installation behaviour consistent with the Windows installer.
+        The original executable names will be restored when the Windows service
+        is removed. The renaming can be disabled by using the new
+        <code>--no-rename</code> option after the service name. (markt)
+      </fix>
       <update>
         <bug>63634</bug>: Align setproxy target in build.xml with
         8.5/9.0. (michaelo)
