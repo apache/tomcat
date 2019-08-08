@@ -17,13 +17,19 @@ rem limitations under the License.
 rem ---------------------------------------------------------------------------
 rem NT Service Install/Uninstall script
 rem
-rem Options
-rem install                Install the service using Tomcat@VERSION_MAJOR@ as service name.
-rem                        Service is installed using default settings.
-rem remove                 Remove the service from the System.
+rem Usage: service.bat install/remove [service_name] [/user username]
 rem
-rem name        (optional) If the second argument is present it is considered
-rem                        to be new service name
+rem Options
+rem install                 Install the service using default settings.
+rem remove                  Remove the service from the system.
+rem
+rem service_name (optional) The name to use for the service. If not specified,
+rem                         Tomcat@VERSION_MAJOR@ is used as the service name.
+rem
+rem username (optional)     The name of the OS user to use to install/remove
+rem                         the service (not the name of the OS user the
+rem                         service will run as). If not specified, the current
+rem                         user is used.
 rem ---------------------------------------------------------------------------
 
 setlocal
