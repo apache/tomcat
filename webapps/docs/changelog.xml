@@ -79,6 +79,12 @@
         <bug>63550</bug>: Only try the <code>alternateURL</code> in the
         <code>JNDIRealm</code> if one has been specified. (markt)
       </fix>
+      <fix>
+        Avoid a <code>NullPointerException</code> in the
+        <code>CrawlerSessionManagerValve</code> if no ROOT Context is deployed
+        and a request does not map to any of the other deployed Contexts. Patch
+        provided by Jop Zinkweg. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
