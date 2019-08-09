@@ -622,7 +622,7 @@ public class DelegatingConnection<C extends Connection> extends AbandonedTrace i
         // DBCP-288. Not all the traced objects will be statements
         final List<AbandonedTrace> traces = getTrace();
         if (traces != null && traces.isEmpty()) {
-            final List<Exception> thrown = new ArrayList<>();
+            final List<Exception> thrownList = new ArrayList<>();
             final Iterator<AbandonedTrace> traceIter = traces.iterator();
             while (traceIter.hasNext()) {
                 final Object trace = traceIter.next();
@@ -630,7 +630,7 @@ public class DelegatingConnection<C extends Connection> extends AbandonedTrace i
                     try {
                         ((Statement) trace).close();
                     } catch (Exception e) {
-                        thrown.add(e);
+                        thrownList.add(e);
                     }
                 } else if (trace instanceof ResultSet) {
                     // DBCP-265: Need to close the result sets that are
@@ -638,13 +638,13 @@ public class DelegatingConnection<C extends Connection> extends AbandonedTrace i
                     try {
                         ((ResultSet) trace).close();
                     } catch (Exception e) {
-                        thrown.add(e);
+                        thrownList.add(e);
                     }
                 }
             }
             clearTrace();
-            if (!thrown.isEmpty()) {
-                throw new SQLExceptionList(thrown);
+            if (!thrownList.isEmpty()) {
+                throw new SQLExceptionList(thrownList);
             }
         }
         setLastUsed(0);

@@ -122,20 +122,20 @@ public class PoolableCallableStatement extends DelegatingCallableStatement {
         // See DBCP-10 for what could happen when ResultSets are closed twice.
         final List<AbandonedTrace> resultSetList = getTrace();
         if (resultSetList != null) {
-            final List<Exception> thrown = new ArrayList<>();
+            final List<Exception> thrownList = new ArrayList<>();
             final ResultSet[] resultSets = resultSetList.toArray(new ResultSet[resultSetList.size()]);
             for (final ResultSet resultSet : resultSets) {
                 if (resultSet != null) {
                     try {
                         resultSet.close();
                     } catch (Exception e) {
-                        thrown.add(e);
+                        thrownList.add(e);
                     }
                 }
             }
             clearTrace();
-            if (!thrown.isEmpty()) {
-                throw new SQLExceptionList(thrown);
+            if (!thrownList.isEmpty()) {
+                throw new SQLExceptionList(thrownList);
             }
         }
 
