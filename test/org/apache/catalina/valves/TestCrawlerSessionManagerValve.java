@@ -98,6 +98,18 @@ public class TestCrawlerSessionManagerValve {
     }
 
     @Test
+    public void testCrawlerMultipleContextsContextAware() throws Exception {
+        CrawlerSessionManagerValve valve = new CrawlerSessionManagerValve();
+        valve.setCrawlerUserAgents(valve.getCrawlerUserAgents());
+        valve.setHostAware(true);
+        valve.setContextAware(true);
+        valve.setNext(EasyMock.createMock(Valve.class));
+
+        verifyCrawlingContext(valve, "/examples");
+        verifyCrawlingContext(valve, null);
+    }
+
+    @Test
     public void testCrawlersSessionIdIsRemovedAfterSessionExpiry() throws IOException, ServletException {
         CrawlerSessionManagerValve valve = new CrawlerSessionManagerValve();
         valve.setCrawlerIps("216\\.58\\.206\\.174");
@@ -127,7 +139,20 @@ public class TestCrawlerSessionManagerValve {
     private void verifyCrawlingLocalhost(CrawlerSessionManagerValve valve, String hostname)
             throws IOException, ServletException {
         HttpSession session = createSessionExpectations(valve, true);
-        Request request = createRequestExpectations("127.0.0.1", session, true, hostname, "tomcatBot 1.0");
+        Request request = createRequestExpectations("127.0.0.1", session, true, hostname, "/examples", "tomcatBot 1.0");
+
+        EasyMock.replay(request, session);
+
+        valve.invoke(request, EasyMock.createMock(Response.class));
+
+        EasyMock.verify(request, session);
+    }
+
+
+    private void verifyCrawlingContext(CrawlerSessionManagerValve valve, String contextPath)
+            throws IOException, ServletException {
+        HttpSession session = createSessionExpectations(valve, true);
+        Request request = createRequestExpectations("127.0.0.1", session, true, "localhost", contextPath, "tomcatBot 1.0");
 
         EasyMock.replay(request, session);
 
@@ -151,14 +176,15 @@ public class TestCrawlerSessionManagerValve {
 
 
     private Request createRequestExpectations(String ip, HttpSession session, boolean isBot) {
-        return createRequestExpectations(ip, session, isBot, "localhost", "something 1.0");
+        return createRequestExpectations(ip, session, isBot, "localhost", "/examples", "something 1.0");
     }
 
-    private Request createRequestExpectations(String ip, HttpSession session, boolean isBot, String hostname, String userAgent) {
+    private Request createRequestExpectations(String ip, HttpSession session, boolean isBot, String hostname,
+            String contextPath, String userAgent) {
         Request request = EasyMock.createMock(Request.class);
         EasyMock.expect(request.getRemoteAddr()).andReturn(ip);
         EasyMock.expect(request.getHost()).andReturn(simpleHostWithName(hostname));
-        EasyMock.expect(request.getContext()).andReturn(simpleContextWithName());
+        EasyMock.expect(request.getContext()).andReturn(simpleContextWithName(contextPath));
         IExpectationSetters<HttpSession> setter = EasyMock.expect(request.getSession(false))
                 .andReturn(null);
         if (isBot) {
@@ -175,9 +201,12 @@ public class TestCrawlerSessionManagerValve {
         return host;
     }
 
-    private Context simpleContextWithName() {
+    private Context simpleContextWithName(String contextPath) {
+        if (contextPath == null) {
+            return null;
+        }
         Context context = EasyMock.createMock(Context.class);
-        EasyMock.expect(context.getName()).andReturn("/examples");
+        EasyMock.expect(context.getName()).andReturn(contextPath);
         EasyMock.replay(context);
         return context;
     }
