@@ -265,7 +265,7 @@ public class CrawlerSessionManagerValve extends ValveBase {
         if (isHostAware) {
             result.append('-').append(host.getName());
         }
-        if (isContextAware) {
+        if (isContextAware && context != null) {
             result.append(context.getName());
         }
         return result.toString();
