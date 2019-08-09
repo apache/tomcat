@@ -87,6 +87,12 @@
         for patterns used with the <code>RewriteValve</code> with the
         description in the documentation. (markt)
       </fix>
+      <fix>
+        Avoid a <code>NullPointerException</code> in the
+        <code>CrawlerSessionManagerValve</code> if no ROOT Context is deployed
+        and a request does not map to any of the other deployed Contexts. Patch
+        provided by Jop Zinkweg. (markt)
+      </fix>
      </changelog>
   </subsection>
   <subsection name="Coyote">
