@@ -40,10 +40,16 @@ public class SQLExceptionList extends SQLException {
      * @param causeList a list of cause exceptions.
      */
     public SQLExceptionList(List<? extends Throwable> causeList) {
-        super(String.format("%,d exceptions: %s", Integer.valueOf(causeList.size()), causeList), causeList.get(0));
+        super(String.format("%,d exceptions: %s", Integer.valueOf(causeList == null ? 0 : causeList.size()), causeList),
+                causeList == null ? null : causeList.get(0));
         this.causeList = causeList;
     }
 
+    /**
+     * Gets the cause list.
+     *
+     * @return The list of causes.
+     */
     public List<? extends Throwable> getCauseList() {
         return causeList;
     }
