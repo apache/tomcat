@@ -17,7 +17,7 @@ rem limitations under the License.
 rem ---------------------------------------------------------------------------
 rem NT Service Install/Uninstall script
 rem
-rem Usage: service.bat install/remove [service_name [--no-rename]] [--user username]
+rem Usage: service.bat install/remove [service_name [--rename]] [--user username]
 rem
 rem Options
 rem install                 Install the service using default settings.
@@ -26,7 +26,7 @@ rem
 rem service_name (optional) The name to use for the service. If not specified,
 rem                         Tomcat@VERSION_MAJOR@ is used as the service name.
 rem
-rem --no-rename  (optional) Don't rename tomcat@VERSION_MAJOR@.exe and tomcat@VERSION_MAJOR@w.exe to match
+rem --rename     (optional) Rename tomcat@VERSION_MAJOR@.exe and tomcat@VERSION_MAJOR@w.exe to match
 rem                         the non-default service name.
 rem
 rem username     (optional) The name of the OS user to use to install/remove
@@ -55,8 +55,8 @@ if "x%1x" == "x--userx" goto runAsUser
 set SERVICE_NAME=%1
 shift
 if "x%1x" == "xx" goto checkEnv
-if "x%1x" == "x--no-renamex" (
-    set NO_RENAME=%1
+if "x%1x" == "x--renamex" (
+    set RENAME=%1
     shift
 )
 if "x%1x" == "xx" goto checkEnv
@@ -153,7 +153,7 @@ if /i %SERVICE_CMD% == uninstall goto doRemove
 echo Unknown parameter "%SERVICE_CMD%"
 :displayUsage
 echo.
-echo Usage: service.bat install/remove [service_name [--no-rename]] [--user username]
+echo Usage: service.bat install/remove [service_name [--rename]] [--user username]
 goto end
 
 :doRemove
@@ -201,7 +201,7 @@ if "%JvmMs%" == "" set JvmMs=128
 if "%JvmMx%" == "" set JvmMx=256
 
 if exist "%CATALINA_HOME%\bin\%DEFAULT_SERVICE_NAME%.exe" (
-    if "x%NO_RENAME%x" == "xx" (
+    if "x%RENAME%x" == "x--renamex" (
         rename "%DEFAULT_SERVICE_NAME%.exe" "%SERVICE_NAME%.exe"
         rename "%DEFAULT_SERVICE_NAME%w.exe" "%SERVICE_NAME%w.exe"
         set "EXECUTABLE=%CATALINA_HOME%\bin\%SERVICE_NAME%.exe"

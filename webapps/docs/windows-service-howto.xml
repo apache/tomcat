@@ -368,12 +368,12 @@ service, as displayed in Windows services.</p>
 C:\> service.bat install MyService</source>
 
 <p>When installing the service with a non-default name,
-tomcat<version-major/>.exe and tomcat<version-major/>w.exe will be renamed to
-match the chosen service name. To prevent this, use the <code>--no-rename</code>
+tomcat<version-major/>.exe and tomcat<version-major/>w.exe may be renamed to
+match the chosen service name. To do this, use the <code>--rename</code>
 option.</p>
 
-<source>Install the service named 'MyService' without renaming
-C:\> service.bat install MyService --no-rename</source>
+<source>Install the service named 'MyService' with renaming
+C:\> service.bat install MyService --rename</source>
 
 <p>
 If using tomcat<version-major/>.exe, you need to use the <b>//IS//</b> parameter.</p>
