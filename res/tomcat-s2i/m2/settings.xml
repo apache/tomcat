@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    Licensed to the Apache Software Foundation (ASF) under one
+    or more contributor license agreements.  See the NOTICE file
+    distributed with this work for additional information
+    regarding copyright ownership.  The ASF licenses this file
+    to you under the Apache License, Version 2.0 (the
+    "License"); you may not use this file except in compliance
+    with the License.  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing,
+    software distributed under the License is distributed on an
+    "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+    KIND, either express or implied.  See the License for the
+    specific language governing permissions and limitations
+    under the License.
+
+-->
+<settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd">
+
+  <mirrors>
+    <!-- ### configured mirrors ### -->
+  </mirrors>
+
+  <proxies>
+    <!-- ### configured http proxy ### -->
+  </proxies>
+
+  <profiles>
+
+    <!-- JBoss EAP Maven repository -->
+    <profile>
+      <id>jboss-eap-repository</id>
+      <activation>
+        <property>
+          <name>com.redhat.xpaas.repo.redhatga</name>
+          <value/>
+        </property>
+      </activation>
+      <repositories>
+        <repository>
+          <id>jboss-eap-repository</id>
+          <url>https://maven.repository.redhat.com/techpreview/all</url>
+          <releases>
+            <enabled>true</enabled>
+          </releases>
+          <snapshots>
+            <enabled>false</enabled>
+          </snapshots>
+        </repository>
+      </repositories>
+      <pluginRepositories>
+        <pluginRepository>
+          <id>jboss-eap-plugin-repository</id>
+          <url>https://maven.repository.redhat.com/techpreview/all</url>
+          <releases>
+            <enabled>true</enabled>
+          </releases>
+          <snapshots>
+            <enabled>false</enabled>
+          </snapshots>
+        </pluginRepository>
+      </pluginRepositories>
+    </profile>
+
+    <!-- JBoss EAP Maven repository (HTTP version, disabled by default) -->
+    <profile>
+      <id>jboss-eap-repository-insecure</id>
+      <repositories>
+        <repository>
+          <id>jboss-eap-repository</id>
+          <url>http://maven.repository.redhat.com/techpreview/all</url>
+          <releases>
+            <enabled>true</enabled>
+          </releases>
+          <snapshots>
+            <enabled>false</enabled>
+          </snapshots>
+        </repository>
+      </repositories>
+      <pluginRepositories>
+        <pluginRepository>
+          <id>jboss-eap-plugin-repository</id>
+          <url>http://maven.repository.redhat.com/techpreview/all</url>
+          <releases>
+            <enabled>true</enabled>
+          </releases>
+          <snapshots>
+            <enabled>false</enabled>
+          </snapshots>
+        </pluginRepository>
+      </pluginRepositories>
+    </profile>
+
+    <!-- JBoss Community Maven repository -->
+    <profile>
+      <id>jboss-community-repository</id>
+      <activation>
+        <property>
+          <name>com.redhat.xpaas.repo.jbossorg</name>
+          <value/>
+        </property>
+      </activation>
+      <repositories>
+        <repository>
+          <id>jboss-community-repository</id>
+          <url>https://repository.jboss.org/nexus/content/groups/public/</url>
+          <releases>
+            <enabled>true</enabled>
+          </releases>
+          <snapshots>
+            <enabled>false</enabled>
+          </snapshots>
+        </repository>
+      </repositories>
+      <pluginRepositories>
+        <pluginRepository>
+          <id>jboss-community-plugin-repository</id>
+          <url>https://repository.jboss.org/nexus/content/groups/public/</url>
+          <releases>
+            <enabled>true</enabled>
+          </releases>
+          <snapshots>
+            <enabled>false</enabled>
+          </snapshots>
+        </pluginRepository>
+      </pluginRepositories>
+    </profile>
+
+    <!-- JBoss Community Maven repository (HTTP version, disabled by default) -->
+    <profile>
+      <id>jboss-community-repository-insecure</id>
+      <repositories>
+        <repository>
+          <id>jboss-community-repository</id>
+          <url>http://repository.jboss.org/nexus/content/groups/public/</url>
+          <releases>
+            <enabled>true</enabled>
+          </releases>
+          <snapshots>
+            <enabled>false</enabled>
+          </snapshots>
+        </repository>
+      </repositories>
+      <pluginRepositories>
+        <pluginRepository>
+          <id>jboss-community-plugin-repository</id>
+          <url>http://repository.jboss.org/nexus/content/groups/public/</url>
+          <releases>
+            <enabled>true</enabled>
+          </releases>
+          <snapshots>
+            <enabled>false</enabled>
+          </snapshots>
+        </pluginRepository>
+      </pluginRepositories>
+    </profile>
+
+    <!-- Override the repository "central" from the Maven Super POM, to set HTTPS by default -->
+    <profile>
+      <id>securecentral</id>
+      <repositories>
+        <repository>
+          <id>central</id>
+          <url>https://repo1.maven.org/maven2</url>
+          <releases>
+            <enabled>true</enabled>
+          </releases>
+        </repository>
+      </repositories>
+      <pluginRepositories>
+        <pluginRepository>
+          <id>central</id>
+          <url>https://repo1.maven.org/maven2</url>
+          <releases>
+            <enabled>true</enabled>
+          </releases>
+        </pluginRepository>
+      </pluginRepositories>
+    </profile>
+
+    <!-- central repositories via HTTP. Disabled by default. -->
+    <profile>
+      <id>insecurecentral</id>
+      <repositories>
+        <repository>
+          <id>central</id>
+          <url>http://repo1.maven.org/maven2</url>
+          <releases>
+            <enabled>true</enabled>
+          </releases>
+        </repository>
+      </repositories>
+      <pluginRepositories>
+        <pluginRepository>
+          <id>central</id>
+          <url>http://repo1.maven.org/maven2</url>
+          <releases>
+            <enabled>true</enabled>
+          </releases>
+        </pluginRepository>
+      </pluginRepositories>
+    </profile>
+
+  </profiles>
+  <activeProfiles>
+    <activeProfile>securecentral</activeProfile>
+  </activeProfiles>
+</settings>
