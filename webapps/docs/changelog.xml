@@ -89,6 +89,10 @@
         <bug>63636</bug>: <code>Context.findRoleMapping()</code> never called
         in <code>StandardWrapper.findSecurityReference()</code>. (michaelo)
       </fix>
+      <fix>
+        Fix a crash on shutdown with the APR/native connector when a blocking
+        I/O operation was still in progress when the connector stopped. (markt)
+      </fix>
      </changelog>
   </subsection>
   <subsection name="Coyote">
