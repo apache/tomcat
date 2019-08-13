@@ -972,7 +972,7 @@ public abstract class Http2TestBase extends TomcatBaseTest {
 
 
         @Override
-        public ByteBuffer startRequestBodyFrame(int streamId, int payloadSize) {
+        public ByteBuffer startRequestBodyFrame(int streamId, int payloadSize, boolean endOfStream) {
             lastStreamId = Integer.toString(streamId);
             bytesRead += payloadSize;
             if (traceBody) {
@@ -1047,6 +1047,12 @@ public abstract class Http2TestBase extends TomcatBaseTest {
         @Override
         public void setHeaderException(StreamException streamException) {
             // NO-OP: Accept anything the server sends for the unit tests
+        }
+
+
+        @Override
+        public void headersContinue(int payloadSize, boolean endOfHeaders) {
+            // NO-OP: Logging occurs per header
         }
 
 

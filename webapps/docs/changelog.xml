@@ -151,6 +151,11 @@
         Timeouts for HTTP/2 connections were not always correctly handled
         leaving some connections open for longer than expected. (markt)
       </fix>
+      <add>
+        Expand the HTTP/2 excessive overhead protection to cover various forms
+        of abusive client behaviour and close the connection if any such
+        behaviour is detected. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Web applications">

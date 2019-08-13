@@ -52,6 +52,10 @@ public class TestHttp2Section_5_3 extends Http2TestBase {
 
         http2Connect();
 
+        // This test uses small window updates that will trigger the excessive
+        // overhead protection so disable it.
+        http2Protocol.setOverheadWindowUpdateThreadhold(0);
+
         // Default connection window size is 64k - 1. Initial request will have
         // used 8k (56k -1). Increase it to 57k
         sendWindowUpdate(0, 1 + 1024);
