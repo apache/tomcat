@@ -47,6 +47,11 @@
 <section name="Tomcat 8.5.44 (markt)" rtext="in development">
   <subsection name="Catalina">
     <changelog>
+      <add>
+        <bug>62258</bug>: Don't trigger the standard error page mechanism when
+        the error has caused the connection to the client to be closed as no-one
+        will ever see the error page. (markt)
+      </add>
       <update>
         <bug>63627</bug>: Implement more fine-grained handling in
         <code>RealmBase.authenticate(GSSContext, boolean)</code>. (michaelo)
