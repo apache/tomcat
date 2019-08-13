@@ -55,6 +55,9 @@ public class Http2Protocol implements UpgradeProtocol {
     static final int DEFAULT_INITIAL_WINDOW_SIZE = (1 << 16) - 1;
 
     static final int DEFAULT_OVERHEAD_COUNT_FACTOR = 1;
+    static final int DEFAULT_OVERHEAD_CONTINUATION_THRESHOLD = 1024;
+    static final int DEFAULT_OVERHEAD_DATA_THRESHOLD = 1024;
+    static final int DEFAULT_OVERHEAD_WINDOW_UPDATE_THRESHOLD = 1024;
 
     private static final String HTTP_UPGRADE_NAME = "h2c";
     private static final String ALPN_NAME = "h2";
@@ -82,6 +85,9 @@ public class Http2Protocol implements UpgradeProtocol {
     private int maxTrailerCount = Constants.DEFAULT_MAX_TRAILER_COUNT;
     private int maxTrailerSize = Constants.DEFAULT_MAX_TRAILER_SIZE;
     private int overheadCountFactor = DEFAULT_OVERHEAD_COUNT_FACTOR;
+    private int overheadContinuationThreshold = DEFAULT_OVERHEAD_CONTINUATION_THRESHOLD;
+    private int overheadDataThreadhold = DEFAULT_OVERHEAD_DATA_THRESHOLD;
+    private int overheadWindowUpdateThreadhold = DEFAULT_OVERHEAD_WINDOW_UPDATE_THRESHOLD;
 
     private boolean initiatePingDisabled = false;
     private boolean useSendfile = true;
@@ -317,6 +323,36 @@ public class Http2Protocol implements UpgradeProtocol {
 
     public void setOverheadCountFactor(int overheadCountFactor) {
         this.overheadCountFactor = overheadCountFactor;
+    }
+
+
+    public int getOverheadContinuationThreshhold() {
+        return overheadContinuationThreshold;
+    }
+
+
+    public void setOverheadContinuationThreshhold(int overheadContinuationThreshold) {
+        this.overheadContinuationThreshold = overheadContinuationThreshold;
+    }
+
+
+    public int getOverheadDataThreadhold() {
+        return overheadDataThreadhold;
+    }
+
+
+    public void setOverheadDataThreadhold(int overheadDataThreadhold) {
+        this.overheadDataThreadhold = overheadDataThreadhold;
+    }
+
+
+    public int getOverheadWindowUpdateThreadhold() {
+        return overheadWindowUpdateThreadhold;
+    }
+
+
+    public void setOverheadWindowUpdateThreadhold(int overheadWindowUpdateThreadhold) {
+        this.overheadWindowUpdateThreadhold = overheadWindowUpdateThreadhold;
     }
 
 

@@ -156,6 +156,11 @@
         to enable custom JSSE providers that provide custom cipher suites to be
         used. (markt)
       </fix>
+      <add>
+        Expand the HTTP/2 excessive overhead protection to cover various forms
+        of abusive client behaviour and close the connection if any such
+        behaviour is detected. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Cluster">

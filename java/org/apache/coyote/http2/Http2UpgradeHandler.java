@@ -1332,8 +1332,25 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
 
 
     @Override
-    public ByteBuffer startRequestBodyFrame(int streamId, int payloadSize) throws Http2Exception {
+    public ByteBuffer startRequestBodyFrame(int streamId, int payloadSize, boolean endOfStream) throws Http2Exception {
+        // DATA frames reduce the overhead count ...
         reduceOverheadCount();
+
+        // .. but lots of small payloads are inefficient so that will increase
+        // the overhead count unless it is the final DATA frame where small
+        // payloads are expected.
+        if (!endOfStream) {
+            int overheadThreshold = protocol.getOverheadDataThreadhold();
+            if (payloadSize < overheadThreshold) {
+                if (payloadSize == 0) {
+                    // Avoid division by zero
+                    overheadCount.addAndGet(overheadThreshold);
+                } else {
+                    overheadCount.addAndGet(overheadThreshold / payloadSize);
+                }
+            }
+        }
+
         Stream stream = getStream(streamId, true);
         stream.checkState(FrameType.DATA);
         stream.receivedData(payloadSize);
@@ -1377,8 +1394,6 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
         // determines if a new stream is created or if this stream is ignored.
         checkPauseState();
 
-        reduceOverheadCount();
-
         if (connectionState.get().isNewStreamAllowed()) {
             Stream stream = getStream(streamId, false);
             if (stream == null) {
@@ -1394,16 +1409,21 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
             closeIdleStreams(streamId);
             if (localSettings.getMaxConcurrentStreams() < activeRemoteStreamCount.incrementAndGet()) {
                 setConnectionTimeoutForStreamCount(activeRemoteStreamCount.decrementAndGet());
+                // Ignoring maxConcurrentStreams increases the overhead count
+                increaseOverheadCount();
                 throw new StreamException(sm.getString("upgradeHandler.tooManyRemoteStreams",
                         Long.toString(localSettings.getMaxConcurrentStreams())),
                         Http2Error.REFUSED_STREAM, streamId);
             }
+            // Valid new stream reduces the overhead count
+            reduceOverheadCount();
             return stream;
         } else {
             if (log.isDebugEnabled()) {
                 log.debug(sm.getString("upgradeHandler.noNewStreams",
                         connectionId, Integer.toString(streamId)));
             }
+            reduceOverheadCount();
             // Stateless so a static can be used to save on GC
             return HEADER_SINK;
         }
@@ -1445,6 +1465,25 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
 
 
     @Override
+    public void headersContinue(int payloadSize, boolean endOfHeaders) {
+        // Generally, continuation frames don't impact the overhead count but if
+        // they are small and the frame isn't the final header frame then that
+        // is indicative of an abusive client
+        if (!endOfHeaders) {
+            int overheadThreshold = getProtocol().getOverheadContinuationThreshhold();
+            if (payloadSize < overheadThreshold) {
+                if (payloadSize == 0) {
+                    // Avoid division by zero
+                    overheadCount.addAndGet(overheadThreshold);
+                } else {
+                    overheadCount.addAndGet(overheadThreshold / payloadSize);
+                }
+            }
+        }
+    }
+
+
+    @Override
     public void headersEnd(int streamId) throws ConnectionException {
         Stream stream = getStream(streamId, connectionState.get().isNewStreamAllowed());
         if (stream != null) {
@@ -1477,6 +1516,11 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
     public void setting(Setting setting, long value) throws ConnectionException {
 
         increaseOverheadCount();
+
+        // Possible with empty settings frame
+        if (setting == null) {
+            return;
+        }
 
         // Special handling required
         if (setting == Setting.INITIAL_WINDOW_SIZE) {
@@ -1538,10 +1582,30 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
 
     @Override
     public void incrementWindowSize(int streamId, int increment) throws Http2Exception {
+        int overheadThreshold = protocol.getOverheadWindowUpdateThreadhold();
+
         if (streamId == 0) {
+            // Check for small increments which are inefficient
+            if (increment < overheadThreshold) {
+                // The smaller the increment, the larger the overhead
+                overheadCount.addAndGet(overheadThreshold / increment);
+            }
+
             incrementWindowSize(increment);
         } else {
             Stream stream = getStream(streamId, true);
+
+            // Check for small increments which are inefficient
+            if (increment < overheadThreshold) {
+                // For Streams, client might only release the minimum so check
+                // against current demand
+                BacklogTracker tracker = backLogStreams.get(stream);
+                if (tracker == null || increment < tracker.getRemainingReservation()) {
+                    // The smaller the increment, the larger the overhead
+                    overheadCount.addAndGet(overheadThreshold / increment);
+                }
+            }
+
             stream.checkState(FrameType.WINDOW_UPDATE);
             stream.incrementWindowSize(increment);
         }
