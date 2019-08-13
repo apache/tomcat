@@ -161,6 +161,10 @@
         of abusive client behaviour and close the connection if any such
         behaviour is detected. (markt)
       </add>
+      <fix>
+        Fix a crash on shutdown with the APR/native connector when a blocking
+        I/O operation was still in progress when the connector stopped. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">
