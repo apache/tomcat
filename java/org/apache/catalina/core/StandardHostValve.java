@@ -14,10 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.catalina.core;
-
 
 import java.io.IOException;
 import java.security.AccessController;
@@ -55,7 +52,6 @@ import org.apache.tomcat.util.security.PrivilegedSetTccl;
  * @author Craig R. McClanahan
  * @author Remy Maucherat
  */
-
 final class StandardHostValve extends ValveBase {
 
     private static final Log log = LogFactory.getLog(StandardHostValve.class);
@@ -80,6 +76,7 @@ final class StandardHostValve extends ValveBase {
     public StandardHostValve() {
         super(true);
     }
+
 
     // ----------------------------------------------------- Instance Variables
 
@@ -113,7 +110,6 @@ final class StandardHostValve extends ValveBase {
 
 
     // --------------------------------------------------------- Public Methods
-
 
     /**
      * Select the appropriate child Context to process this request,
@@ -301,16 +297,18 @@ final class StandardHostValve extends ValveBase {
 
         // Handle a custom error page for this status code
         Context context = request.getContext();
-        if (context == null)
+        if (context == null) {
             return;
+        }
 
         /* Only look for error pages when isError() is set.
          * isError() is set when response.sendError() is invoked. This
          * allows custom error pages without relying on default from
          * web.xml.
          */
-        if (!response.isError())
+        if (!response.isError()) {
             return;
+        }
 
         ErrorPage errorPage = context.findErrorPage(statusCode);
         if (errorPage == null) {
@@ -323,8 +321,9 @@ final class StandardHostValve extends ValveBase {
                               Integer.valueOf(statusCode));
 
             String message = response.getMessage();
-            if (message == null)
+            if (message == null) {
                 message = "";
+            }
             request.setAttribute(RequestDispatcher.ERROR_MESSAGE, message);
             request.setAttribute(Globals.DISPATCHER_REQUEST_PATH_ATTR,
                     errorPage.getLocation());
@@ -333,9 +332,10 @@ final class StandardHostValve extends ValveBase {
 
 
             Wrapper wrapper = request.getWrapper();
-            if (wrapper != null)
+            if (wrapper != null) {
                 request.setAttribute(RequestDispatcher.ERROR_SERVLET_NAME,
                                   wrapper.getName());
+            }
             request.setAttribute(RequestDispatcher.ERROR_REQUEST_URI,
                                  request.getRequestURI());
             if (custom(request, response, errorPage)) {
@@ -366,8 +366,9 @@ final class StandardHostValve extends ValveBase {
     protected void throwable(Request request, Response response,
                              Throwable throwable) {
         Context context = request.getContext();
-        if (context == null)
+        if (context == null) {
             return;
+        }
 
         Throwable realError = throwable;
 
@@ -407,9 +408,10 @@ final class StandardHostValve extends ValveBase {
                 request.setAttribute(RequestDispatcher.ERROR_EXCEPTION,
                                   realError);
                 Wrapper wrapper = request.getWrapper();
-                if (wrapper != null)
+                if (wrapper != null) {
                     request.setAttribute(RequestDispatcher.ERROR_SERVLET_NAME,
                                       wrapper.getName());
+                }
                 request.setAttribute(RequestDispatcher.ERROR_REQUEST_URI,
                                      request.getRequestURI());
                 request.setAttribute(RequestDispatcher.ERROR_EXCEPTION_TYPE,
@@ -451,8 +453,9 @@ final class StandardHostValve extends ValveBase {
     private boolean custom(Request request, Response response,
                              ErrorPage errorPage) {
 
-        if (container.getLogger().isDebugEnabled())
+        if (container.getLogger().isDebugEnabled()) {
             container.getLogger().debug("Processing " + errorPage);
+        }
 
         try {
             // Forward control to the specified location
@@ -483,14 +486,13 @@ final class StandardHostValve extends ValveBase {
             }
 
             // Indicate that we have successfully processed this custom page
-            return (true);
+            return true;
 
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
             // Report our failure to process this custom page
             container.getLogger().error("Exception Processing " + errorPage, t);
-            return (false);
-
+            return false;
         }
     }
 
@@ -507,20 +509,22 @@ final class StandardHostValve extends ValveBase {
     private static ErrorPage findErrorPage
         (Context context, Throwable exception) {
 
-        if (exception == null)
-            return (null);
+        if (exception == null) {
+            return null;
+        }
         Class<?> clazz = exception.getClass();
         String name = clazz.getName();
         while (!Object.class.equals(clazz)) {
             ErrorPage errorPage = context.findErrorPage(name);
-            if (errorPage != null)
-                return (errorPage);
+            if (errorPage != null) {
+                return errorPage;
+            }
             clazz = clazz.getSuperclass();
-            if (clazz == null)
+            if (clazz == null) {
                 break;
+            }
             name = clazz.getName();
         }
-        return (null);
-
+        return null;
     }
 }
