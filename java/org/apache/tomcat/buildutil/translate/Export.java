@@ -17,12 +17,7 @@
 package org.apache.tomcat.buildutil.translate;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
-import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -35,10 +30,11 @@ public class Export {
 
     private static final Map<String,Properties> translations = new HashMap<>();
 
-    public static void main(String... args) {
+    public static void main(String... args) throws IOException {
+        File root = new File(".");
         for (String dir : Constants.SEARCH_DIRS) {
-            File root = new File(dir);
-            Utils.processDirectory(root, translations);
+            File directory = new File(dir);
+            Utils.processDirectory(root, directory, translations);
         }
 
         outputTranslations();
@@ -53,21 +49,7 @@ public class Export {
         }
 
         for (Map.Entry<String,Properties> translationEntry : translations.entrySet()) {
-            Properties translation = translationEntry.getValue();
-
-            String language = translationEntry.getKey();
-
-            File out = new File(storageDir, Constants.L10N_PREFIX + language + Constants.L10N_SUFFIX);
-            try (FileOutputStream fos = new FileOutputStream(out);
-                    Writer w = new OutputStreamWriter(fos, StandardCharsets.UTF_8)) {
-                String[] keys = translation.keySet().toArray(new String[0]);
-                Arrays.sort(keys);
-                for (Object key : keys) {
-                    w.write(key + "=" + Utils.formatValue(translation.getProperty((String) key)) + "\n");
-                }
-            } catch (IOException ioe) {
-                ioe.printStackTrace();
-            }
+             Utils.export(translationEntry.getKey(), translationEntry.getValue(), storageDir);
         }
     }
 }

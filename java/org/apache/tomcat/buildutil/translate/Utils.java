@@ -18,10 +18,14 @@ package org.apache.tomcat.buildutil.translate;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.io.Reader;
+import java.io.Writer;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.Properties;
 import java.util.regex.Pattern;
@@ -73,18 +77,18 @@ public class Utils {
     }
 
 
-    static void processDirectory(File dir, Map<String,Properties> translations) {
+    static void processDirectory(File root, File dir, Map<String,Properties> translations) throws IOException {
         for (File f : dir.listFiles()) {
             if (f.isDirectory()) {
-                processDirectory(f, translations);
+                processDirectory(root, f, translations);
             } else if (f.isFile()) {
-                processFile(f, translations);
+                processFile(root, f, translations);
             }
         }
     }
 
 
-    static void processFile(File f, Map<String,Properties> translations) {
+    static void processFile(File root, File f, Map<String,Properties> translations) throws IOException {
         String name = f.getName();
 
         // non-l10n files
@@ -95,7 +99,7 @@ public class Utils {
         // Determine language
         String language = Utils.getLanguage(name);
 
-        String keyPrefix = getKeyPrefix(f);
+        String keyPrefix = getKeyPrefix(root, f);
         Properties props = Utils.load(f);
 
         // Create a Map for the language if one does not exist.
@@ -116,12 +120,26 @@ public class Utils {
     }
 
 
-    static String getKeyPrefix(File f) {
-        File wd = new File(".");
-        String prefix = f.getParentFile().getAbsolutePath();
-        prefix = prefix.substring(wd.getAbsolutePath().length() - 1);
+    static String getKeyPrefix(File root, File f) throws IOException {
+        String prefix = f.getParentFile().getCanonicalPath();
+        prefix = prefix.substring(root.getCanonicalPath().length() + 1);
         prefix = prefix.replace(File.separatorChar, '.');
         prefix = prefix + Constants.END_PACKAGE_MARKER;
         return prefix;
+    }
+
+
+    static void export(String language, Properties translation, File storageDir) {
+        File out = new File(storageDir, Constants.L10N_PREFIX + language + Constants.L10N_SUFFIX);
+        try (FileOutputStream fos = new FileOutputStream(out);
+                Writer w = new OutputStreamWriter(fos, StandardCharsets.UTF_8)) {
+            String[] keys = translation.keySet().toArray(new String[0]);
+            Arrays.sort(keys);
+            for (Object key : keys) {
+                w.write(key + "=" + Utils.formatValue(translation.getProperty((String) key)) + "\n");
+            }
+        } catch (IOException ioe) {
+            ioe.printStackTrace();
+        }
     }
 }
