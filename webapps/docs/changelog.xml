@@ -45,6 +45,15 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 9.0.24 (markt)" rtext="in development">
+  <subsection name="Coyote">
+    <changelog>
+      <scode>
+        Remove the code in the sendfile poller that ensured smaller pollsets
+        were used with older, no longer supported versions of Windows that
+        could not support larger pollsets. (markt)
+      </scode>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 9.0.23 (markt)" rtext="release in progress">
   <subsection name="Catalina">
