@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
+import java.util.Map;
 import java.util.Properties;
 import java.util.regex.Pattern;
 
@@ -69,5 +70,58 @@ public class Utils {
             result = FIX_SINGLE_QUOTE.matcher(result).replaceAll("''");
         }
         return result;
+    }
+
+
+    static void processDirectory(File dir, Map<String,Properties> translations) {
+        for (File f : dir.listFiles()) {
+            if (f.isDirectory()) {
+                processDirectory(f, translations);
+            } else if (f.isFile()) {
+                processFile(f, translations);
+            }
+        }
+    }
+
+
+    static void processFile(File f, Map<String,Properties> translations) {
+        String name = f.getName();
+
+        // non-l10n files
+        if (!name.startsWith(Constants.L10N_PREFIX)) {
+            return;
+        }
+
+        // Determine language
+        String language = Utils.getLanguage(name);
+
+        String keyPrefix = getKeyPrefix(f);
+        Properties props = Utils.load(f);
+
+        // Create a Map for the language if one does not exist.
+        Properties translation = translations.get(language);
+        if (translation == null) {
+            translation = new Properties();
+            translations.put(language, translation);
+        }
+
+        // Add the properties from this file to the combined file, prefixing the
+        // key with the package name to ensure uniqueness.
+        for (Object obj : props.keySet()) {
+            String key = (String) obj;
+            String value = props.getProperty(key);
+
+            translation.put(keyPrefix + key, value);
+        }
+    }
+
+
+    static String getKeyPrefix(File f) {
+        File wd = new File(".");
+        String prefix = f.getParentFile().getAbsolutePath();
+        prefix = prefix.substring(wd.getAbsolutePath().length() - 1);
+        prefix = prefix.replace(File.separatorChar, '.');
+        prefix = prefix + Constants.END_PACKAGE_MARKER;
+        return prefix;
     }
 }

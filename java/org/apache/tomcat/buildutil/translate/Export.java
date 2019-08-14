@@ -37,76 +37,11 @@ public class Export {
 
     public static void main(String... args) {
         for (String dir : Constants.SEARCH_DIRS) {
-            processRoot(dir);
+            File root = new File(dir);
+            Utils.processDirectory(root, translations);
         }
 
         outputTranslations();
-    }
-
-
-    private static void processRoot(String dir) {
-        // Run from within IDE so working dir is root of project.
-        File root = new File(dir);
-
-        // Assumes no l18n files directly in roots
-        for (File f : root.listFiles()) {
-            if (f.isDirectory()) {
-                processDirectory(f);
-            }
-        }
-    }
-
-
-    private static void processDirectory(File dir) {
-        for (File f : dir.listFiles()) {
-            if (f.isDirectory()) {
-                processDirectory(f);
-            } else if (f.isFile()) {
-                processFile(f);
-            }
-        }
-    }
-
-
-    private static void processFile(File f) {
-        String name = f.getName();
-
-        // non-l10n files
-        if (!name.startsWith(Constants.L10N_PREFIX)) {
-            return;
-        }
-
-        // Determine language
-        String language = Utils.getLanguage(name);
-
-        String keyPrefix = getKeyPrefix(f);
-        Properties props = Utils.load(f);
-
-        // Create a Map for the language if one does not exist.
-        Properties translation = translations.get(language);
-        if (translation == null) {
-            translation = new Properties();
-            translations.put(language, translation);
-        }
-
-        // Add the properties from this file to the combined file, prefixing the
-        // key with the package name to ensure uniqueness.
-        for (Object obj : props.keySet()) {
-            String key = (String) obj;
-            String value = props.getProperty(key);
-
-            translation.put(keyPrefix + key, value);
-        }
-    }
-
-
-    private static String getKeyPrefix(File f) {
-        File wd = new File(".");
-        String prefix = f.getParentFile().getAbsolutePath();
-        prefix = prefix.substring(wd.getAbsolutePath().length() - 1);
-        prefix = prefix.replace(File.separatorChar, '.');
-        prefix = prefix + Constants.END_PACKAGE_MARKER;
-        return prefix;
     }
 
 
