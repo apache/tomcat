@@ -1790,25 +1790,15 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
         private volatile boolean sendfileRunning = true;
 
         /**
-         * Create the sendfile poller. With some versions of APR, the maximum
-         * poller size will be 62 (recompiling APR is necessary to remove this
-         * limitation).
+         * Create the sendfile poller.
          */
         protected void init() {
             pool = Pool.create(serverSockPool);
             int size = sendfileSize;
             if (size <= 0) {
-                size = (OS.IS_WIN32 || OS.IS_WIN64) ? (1 * 1024) : (16 * 1024);
+                size = 16 * 1024;
             }
             sendfilePollset = allocatePoller(size, pool, getConnectionTimeout());
-            if (sendfilePollset == 0 && size > 1024) {
-                size = 1024;
-                sendfilePollset = allocatePoller(size, pool, getConnectionTimeout());
-            }
-            if (sendfilePollset == 0) {
-                size = 62;
-                sendfilePollset = allocatePoller(size, pool, getConnectionTimeout());
-            }
             desc = new long[size * 2];
             sendfileData = new HashMap<>(size);
             addS = new ArrayList<>();
