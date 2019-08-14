@@ -105,6 +105,11 @@
         <bug>63578</bug>: Improve handling of invalid requests so that 400
         responses are returned to the client rather than 500 responses. (markt)
       </fix>
+      <scode>
+        Remove the code in the sendfile poller that ensured smaller pollsets
+        were used with older, no longer supported versions of Windows that
+        could not support larger pollsets. (markt)
+      </scode>
     </changelog>
   </subsection>
   <subsection name="Other">
