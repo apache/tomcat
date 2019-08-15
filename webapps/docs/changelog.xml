@@ -72,6 +72,9 @@
         Back-port various corrections and improvements to the Russian i18n
         messages. (markt)
       </fix>
+      <add>
+        Add Korean translations to the standard Tomcat distribution. (markt)
+      </add>
     </changelog>
   </subsection>
 </section>
