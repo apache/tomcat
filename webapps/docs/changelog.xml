@@ -112,6 +112,14 @@
       </scode>
     </changelog>
   </subsection>
+  <subsection name="Web applications">
+    <changelog>
+      <fix>
+        Correct the source code links on the index page for the ROOT web
+        application to point to Git rather than Subversion. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <add>

@@ -29,6 +29,9 @@ version.build=97
 version.patch=0
 version.suffix=-dev
 
+# ----- Source control flags -----
+git.branch=7.0.x
+
 # ----- Build control flags -----
 # Note enabling validation uses Checkstyle which is LGPL licensed
 execute.validate=false
