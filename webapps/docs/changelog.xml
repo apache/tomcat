@@ -176,6 +176,11 @@
         Back-port various corrections and improvements to the Russian i18n
         messages. (markt)
       </fix>
+      <add>
+        Include the available German translations in the standard Tomcat
+        distribution. Back-port additions and updates to the German i18n
+        messages. (markt)
+      </add>
     </changelog>
   </subsection>
 </section>
