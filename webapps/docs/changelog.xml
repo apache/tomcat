@@ -184,6 +184,10 @@
       <add>
         Add Korean translations to the standard Tomcat distribution. (markt)
       </add>
+      <add>
+        Add simplified Chinese translations to the standard Tomcat distribution.
+        (markt)
+      </add>
     </changelog>
   </subsection>
 </section>
