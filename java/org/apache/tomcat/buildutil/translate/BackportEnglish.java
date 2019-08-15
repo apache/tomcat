@@ -16,11 +16,7 @@
 */
 package org.apache.tomcat.buildutil.translate;
 
-import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Properties;
 
 /**
  * Generates a set of English property files to back-port updates to a previous
@@ -29,42 +25,26 @@ import java.util.Properties;
  * The expectation is that the changes will be manually reviewed before
  * committing them.
  */
-public class BackportEnglish {
-
-    private static final Map<String,Properties> sourceTranslations = new HashMap<>();
-    private static final Map<String,Properties> targetTranslations = new HashMap<>();
+public class BackportEnglish extends BackportBase {
 
     public static void main(String... args) throws IOException {
-        if (args.length != 1) {
-            throw new IllegalArgumentException("Missing back-port target");
-        }
-        File targetRoot = new File(args[0]);
+        BackportEnglish backport = new BackportEnglish(args);
+        backport.execute();
+    }
 
-        if (!targetRoot.isDirectory()) {
-            throw new IllegalArgumentException("Back-port target not a directory");
-        }
 
-        File sourceRoot = new File(".");
-        for (String dir : Constants.SEARCH_DIRS) {
-            File directory = new File(dir);
-            Utils.processDirectory(sourceRoot, directory, sourceTranslations);
-        }
+    protected BackportEnglish(String[] args) throws IOException {
+        super(args);
+    }
 
-        for (String dir : Constants.SEARCH_DIRS) {
-            File directory = new File(targetRoot, dir);
-            Utils.processDirectory(targetRoot, directory, targetTranslations);
-        }
 
-        Properties sourceEnglish = sourceTranslations.get("");
-        Properties targetEnglish = targetTranslations.get("");
-
+    @Override
+    protected void execute() throws IOException {
         for (Object key : sourceEnglish.keySet()) {
             if (targetEnglish.containsKey(key)) {
                 targetEnglish.put(key, sourceEnglish.get(key));
             }
         }
-
-        File storageDir = new File(targetRoot, Constants.STORAGE_DIR);
 
         Utils.export("", targetEnglish, storageDir);
     }
