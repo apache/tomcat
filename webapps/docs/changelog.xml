@@ -156,6 +156,10 @@
         test suite to replace the keys and certificates that are about to
         expire. (markt)
       </update>
+      <fix>
+        Back-port various corrections and improvements to the English versions
+        of the i18n messages. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
