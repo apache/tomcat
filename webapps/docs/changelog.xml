@@ -51,6 +51,11 @@
         Expand the coverage and quality of the French translations provided
         with Apache Tomcat. (remm)
       </add>
+      <add>
+        Expand the coverage and quality of the Simplified Chinese translations
+        provided with Apache Tomcat. Includes contributions by leeyazhou.
+        (markt)
+      </add>
     </changelog>
   </subsection>
 </section>
