@@ -64,6 +64,10 @@
         Back-port various corrections and improvements to the French i18n
         messages. (markt)
       </fix>
+      <fix>
+        Back-port various corrections and improvements to the Japanese i18n
+        messages. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
