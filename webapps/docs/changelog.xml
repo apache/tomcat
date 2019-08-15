@@ -56,6 +56,10 @@
         distribution. Back-port additions and updates to the German i18n
         messages. (markt)
       </add>
+      <fix>
+        Back-port various corrections and improvements to the Spanish i18n
+        messages. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
