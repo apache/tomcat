@@ -29,6 +29,9 @@ version.build=25
 version.patch=0
 version.suffix=-dev
 
+# ----- Source control flags -----
+git.branch=master
+
 # ----- Build control flags -----
 # Note enabling validation uses Checkstyle which is LGPL licensed
 ant.version.required=1.9.8
