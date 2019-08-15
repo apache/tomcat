@@ -181,6 +181,9 @@
         distribution. Back-port additions and updates to the German i18n
         messages. (markt)
       </add>
+      <add>
+        Add Korean translations to the standard Tomcat distribution. (markt)
+      </add>
     </changelog>
   </subsection>
 </section>
