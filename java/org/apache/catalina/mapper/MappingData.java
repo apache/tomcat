@@ -44,7 +44,7 @@ public class MappingData {
 
     public final MessageBytes redirectPath = MessageBytes.newInstance();
 
-    // Fields used by ApplicationMapping to implement javax.servlet.http.Mapping
+    // Fields used by ApplicationMapping to implement javax.servlet.http.HttpServletMapping
     public MappingMatch matchType = MappingMatch.UNKNOWN;
 
     public void recycle() {
