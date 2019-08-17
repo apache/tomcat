@@ -48,6 +48,9 @@
       <p>Property replacement from the specified property source on the JVM
          system properties can also be done using the
          <code>REPLACE_SYSTEM_PROPERTIES</code> system property.</p>
+      <p><code>org.apache.tomcat.util.digester.Digester.EnvironmentPropertySource</code>
+         can be used to replace parameters from the process' environment variables,
+         e.g. injected ConfigMaps or Secret objects in container based systems like OpenShift or Kubernetes.</p>
     </property>
     <property name="org.apache.tomcat.util.digester. REPLACE_SYSTEM_PROPERTIES">
       <p>Set this boolean system property to <code>true</code> to cause
