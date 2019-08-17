@@ -44,9 +44,41 @@
   They eventually become mixed with the numbered issues (i.e., numbered
   issues do not "pop up" wrt. others).
 -->
-<section name="Tomcat 9.0.24 (markt)" rtext="in development">
+<section name="Tomcat 9.0.25 (markt)" rtext="in development">
+  <subsection name="Web applications">
+    <changelog>
+      <fix>
+        Correct the source code links on the index page for the ROOT web
+        application to point to Git rather than Subversion. (markt)
+      </fix>
+    </changelog>
+  </subsection>
+  <subsection name="Other">
+    <changelog>
+      <add>
+        Expand the coverage and quality of the French translations provided
+        with Apache Tomcat. (remm)
+      </add>
+      <add>
+        Expand the coverage and quality of the Simplified Chinese translations
+        provided with Apache Tomcat. Includes contributions by leeyazhou.
+        (markt)
+      </add>
+    </changelog>
+  </subsection>
 </section>
-<section name="Tomcat 9.0.23 (markt)" rtext="release in progress">
+<section name="Tomcat 9.0.24 (markt)" rtext="release in progress">
+  <subsection name="Coyote">
+    <changelog>
+      <scode>
+        Remove the code in the sendfile poller that ensured smaller pollsets
+        were used with older, no longer supported versions of Windows that
+        could not support larger pollsets. (markt)
+      </scode>
+    </changelog>
+  </subsection>
+</section>
+<section name="Tomcat 9.0.23 (markt)" rtext="not released">
   <subsection name="Catalina">
     <changelog>
       <update>

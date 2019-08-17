@@ -239,6 +239,7 @@
     <filter token="VERSION_MAJOR_MINOR" value="${version.major.minor}"/>
     <filter token="VERSION_BUILT" value="${today} ${tstamp} UTC"/>
     <filter token="JDT_VERSION" value="${jdt.version}"/>
+    <filter token="GIT_BRANCH" value="${git.branch}"/>
   </filterset>
 
   <!-- Files to change line endings for depending on target platform -->

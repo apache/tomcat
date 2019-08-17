@@ -25,9 +25,12 @@
 # ----- Version Control Flags -----
 version.major=9
 version.minor=0
-version.build=24
+version.build=25
 version.patch=0
 version.suffix=-dev
+
+# ----- Source control flags -----
+git.branch=master
 
 # ----- Build control flags -----
 # Note enabling validation uses Checkstyle which is LGPL licensed
