@@ -122,6 +122,10 @@
   </subsection>
   <subsection name="Other">
     <changelog>
+      <fix>
+        <bug>62140</bug>: Additional usage documentation in comments for
+        <code>catalina.[bat|sh]</code>. (markt)
+      </fix>
       <add>
         <bug>63285</bug>: Add an option to <code>service.bat</code> so that when
         installing a Windows service, the name of the executables used by the

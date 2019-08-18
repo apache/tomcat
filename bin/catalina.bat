@@ -17,6 +17,9 @@ rem limitations under the License.
 rem ---------------------------------------------------------------------------
 rem Start/Stop Script for the CATALINA Server
 rem
+rem For supported commands call "catalina.bat help" or see the usage section
+rem towards the end of this file.
+rem
 rem Environment Variable Prerequisites
 rem
 rem   Do not set the variables in this script. Instead put them into a script

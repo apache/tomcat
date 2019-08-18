@@ -18,6 +18,9 @@
 # -----------------------------------------------------------------------------
 # Control Script for the CATALINA Server
 #
+# For supported commands call "catalina.sh help" or see the usage section at
+# the end of this file.
+#
 # Environment Variable Prerequisites
 #
 #   Do not set the variables in this script. Instead put them into a script
