@@ -1253,7 +1253,7 @@ public class StandardWrapper extends ContainerBase
             return;
         unloading = true;
 
-        // Loaf a while if the current instance is allocated
+        // Load a while if the current instance is allocated
         // (possibly more than once if non-STM)
         if (countAllocated.get() > 0) {
             int nRetries = 0;
