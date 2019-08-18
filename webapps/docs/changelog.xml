@@ -87,6 +87,10 @@
         Add Simplifed Chinese translations to the standard Tomcat distribution.
         (markt)
       </add>
+      <fix>
+        <bug>62140</bug>: Additional usage documentation in comments for
+        <code>catalina.[bat|sh]</code>. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
