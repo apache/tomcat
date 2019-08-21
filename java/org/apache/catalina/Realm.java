@@ -25,6 +25,8 @@ import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
 import org.apache.tomcat.util.descriptor.web.SecurityConstraint;
 import org.ietf.jgss.GSSContext;
+import org.ietf.jgss.GSSCredential;
+import org.ietf.jgss.GSSName;
 
 /**
  * A <b>Realm</b> is a read-only facade for an underlying security realm
@@ -114,6 +116,22 @@ public interface Realm extends Contained {
      * @return the associated principal, or <code>null</code> if there is none
      */
     public Principal authenticate(GSSContext gssContext, boolean storeCreds);
+
+
+    /**
+     * Try to authenticate using a {@link GSSName}
+     *
+     * Note that this default method will be turned into an abstract one in
+     * Tomcat 10.
+     *
+     * @param gssName The {@link GSSName} of the principal to look up
+     * @param gssCredential The {@link GSSCredential} of the principal, may be
+     *                      {@code null}
+     * @return the associated principal, or {@code null} if there is none
+     */
+    public default Principal authenticate(GSSName gssName, GSSCredential gssCredential) {
+        return null;
+    }
 
 
     /**
