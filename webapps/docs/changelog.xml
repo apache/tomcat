@@ -52,6 +52,10 @@
         CSRF nonce request parameter name to be customized.
         (schultz)
       </add>
+      <add>
+        <bug>63681</bug>: Introduce RealmBase#authenticate(GSSName, GSSCredential)
+        and friends. (michaelo)
+      </add>
       <fix>
         <bug>63964</bug>: Correct a regression in the static resource caching
         changes introduced in 9.0.28. URLs constructed from URLs obtained from
