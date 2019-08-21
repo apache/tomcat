@@ -32,6 +32,7 @@ import org.apache.catalina.Realm;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.ietf.jgss.GSSContext;
+import org.ietf.jgss.GSSCredential;
 import org.ietf.jgss.GSSException;
 import org.ietf.jgss.GSSName;
 
@@ -384,6 +385,38 @@ public class CombinedRealm extends RealmBase {
 
         // Fail in all other cases
         return null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Principal authenticate(GSSName gssName, GSSCredential gssCredential) {
+        Principal authenticatedUser = null;
+        String username = gssName.toString();
+
+        for (Realm realm : realms) {
+            if (log.isDebugEnabled()) {
+                log.debug(sm.getString("combinedRealm.authStart",
+                        username, realm.getClass().getName()));
+            }
+
+            authenticatedUser = realm.authenticate(gssName, gssCredential);
+
+            if (authenticatedUser == null) {
+                if (log.isDebugEnabled()) {
+                    log.debug(sm.getString("combinedRealm.authFail",
+                            username, realm.getClass().getName()));
+                }
+            } else {
+                if (log.isDebugEnabled()) {
+                    log.debug(sm.getString("combinedRealm.authSuccess",
+                            username, realm.getClass().getName()));
+                }
+                break;
+            }
+        }
+        return authenticatedUser;
     }
 
     @Override

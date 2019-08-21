@@ -497,16 +497,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
                     }
                 }
 
-                String name = gssName.toString();
-
-                if (isStripRealmForGss()) {
-                    int i = name.indexOf('@');
-                    if (i > 0) {
-                        // Zero so we don't leave a zero length name
-                        name = name.substring(0, i);
-                    }
-                }
-                return getPrincipal(name, gssCredential);
+                return getPrincipal(gssName, gssCredential);
             }
         } else {
             log.error(sm.getString("realmBase.gssContextNotEstablished"));
@@ -514,6 +505,19 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
 
         // Fail in all other cases
         return null;
+    }
+
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Principal authenticate(GSSName gssName, GSSCredential gssCredential) {
+        if (gssName == null) {
+            return null;
+        }
+
+        return getPrincipal(gssName, gssCredential);
     }
 
 
@@ -1220,6 +1224,11 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
     protected abstract Principal getPrincipal(String username);
 
 
+    /**
+     * @deprecated This will be removed in Tomcat 10 onwards. Use
+     *             {@link #getPrincipal(GSSName, GSSCredential)} instead.
+     */
+    @Deprecated
     protected Principal getPrincipal(String username,
             GSSCredential gssCredential) {
         Principal p = getPrincipal(username);
@@ -1230,6 +1239,35 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
 
         return p;
     }
+
+
+    /**
+     * Get the principal associated with the specified {@link GSSName}.
+     *
+     * @param gssName The GSS name
+     * @param gssCredential the GSS credential of the principal
+     * @return the principal associated with the given user name.
+     */
+    protected Principal getPrincipal(GSSName gssName, GSSCredential gssCredential) {
+        String name = gssName.toString();
+
+        if (isStripRealmForGss()) {
+            int i = name.indexOf('@');
+            if (i > 0) {
+                // Zero so we don't leave a zero length name
+                name = name.substring(0, i);
+            }
+        }
+
+        Principal p = getPrincipal(name);
+
+        if (p instanceof GenericPrincipal) {
+            ((GenericPrincipal) p).setGssCredential(gssCredential);
+        }
+
+        return p;
+    }
+
 
     /**
      * Return the Server object that is the ultimate parent for the container
