@@ -37,7 +37,7 @@ import org.apache.tools.ant.BuildException;
  * </ul>
  * <p>
  * Examples:
- * Set a Mbean Manager attribute maxActiveSessions.
+ * Set an Mbean Manager attribute maxActiveSessions.
  * Set this attribute with fresh jmx connection without save reference
  * </p>
  * <pre>

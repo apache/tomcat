@@ -49,7 +49,7 @@ in order to avoid a "ManagedBean is not found" exception.</p>
 <section name="Adding MBean descriptions">
 
 <p>You may also add MBean descriptions for custom components in
-a mbeans-descriptors.xml file, located in the same package as the class files
+an mbeans-descriptors.xml file, located in the same package as the class files
 it describes.</p>
 
 <p>The permitted syntax for the mbeans-descriptors.xml is defined by
