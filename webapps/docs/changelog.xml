@@ -62,6 +62,10 @@
 <section name="Tomcat 7.0.99 (violetagg)">
   <subsection name="Catalina">
     <changelog>
+      <add>
+        <bug>63681</bug>: Introduce RealmBase#authenticate(GSSName, GSSCredential)
+        and friends. (michaelo)
+      </add>
       <fix>
         <bug>63950</bug>: Fix timing issue in
         <code>TestAsyncContextStateChanges</code> test that caused it
