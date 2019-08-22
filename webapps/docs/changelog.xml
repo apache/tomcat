@@ -51,6 +51,11 @@
         Avoid a possible <code>InvalidPathException</code> when obtaining a URI
         for a configuration file. (markt)
       </fix>
+      <fix>
+        <bug>63684</bug>: <code>Wrapper</code> never passed to
+        <code>RealmBase.hasRole()</code> for given security constraints.
+        (michaelo)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
