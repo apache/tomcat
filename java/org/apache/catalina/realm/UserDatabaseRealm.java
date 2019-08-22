@@ -147,7 +147,9 @@ public class UserDatabaseRealm
             }
         }
         if(! (principal instanceof User) ) {
-            //Play nice with SSO and mixed Realms
+            // Play nice with SSO and mixed Realms
+            // No need to pass the wrapper here because role mapping has been
+            // performed already a few lines above
             return super.hasRole(null, principal, role);
         }
         if("*".equals(role)) {
