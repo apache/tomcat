@@ -94,7 +94,7 @@
     </changelog>
   </subsection>
 </section>
-<section name="Tomcat 8.5.45 (markt)" rtext="release in progress">
+<section name="Tomcat 8.5.45 (markt)" rtext="2019-08-21">
   <subsection name="Coyote">
     <changelog>
       <scode>
