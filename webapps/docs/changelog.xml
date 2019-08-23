@@ -103,7 +103,7 @@
       </add>
       <add>
         <bug>57665</bug>: Add support for the <code>X-Forwarded-Host</code>
-        header to the <code>RemoteIpFilter</code> and <code>RemotepValve</code>.
+        header to the <code>RemoteIpFilter</code> and <code>RemoteIpValve</code>.
         (markt)
       </add>
       <fix>
