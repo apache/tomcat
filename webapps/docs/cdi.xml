@@ -54,7 +54,7 @@
 
   <p>
     The process to build CDI support is the following.
-    <source><![CDATA[cd $TOMCAT_SRC/modules/cdi
+    <source><![CDATA[cd $TOMCAT_SRC/modules/owb
 mvn clean && mvn package]]></source>
     The resulting JAR at
     <code>target/tomcat-owb-x.y.z.jar</code> (where x.y.z depends on the
