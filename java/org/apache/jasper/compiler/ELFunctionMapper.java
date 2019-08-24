@@ -296,7 +296,7 @@ public class ELFunctionMapper {
         }
 
         /*
-         * @return An unique name for a function mapper.
+         * @return A unique name for a function mapper.
          */
         private String getMapName() {
             return "_jspx_fnmap_" + currFunc++;
