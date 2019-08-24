@@ -640,7 +640,6 @@ public class ContextConfig implements LifecycleListener {
                         docBaseAbsolute = ExpandWar.expand(host, war, pathName);
                         docBaseAbsoluteFile = new File(docBaseAbsolute);
                     } else {
-                        docBaseAbsolute = docBaseAbsoluteFileWar.getAbsolutePath();
                         docBaseAbsoluteFile = docBaseAbsoluteFileWar;
                         ExpandWar.validate(host, war, pathName);
                     }
