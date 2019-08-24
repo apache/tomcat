@@ -116,7 +116,7 @@ public interface RegistryMBean {
       *
       * @param domain Namespace
       * @param name  Type of the notification
-      * @return  An unique id for the domain:name combination
+      * @return  A unique id for the domain:name combination
       * @since 1.1
       */
     public int getId( String domain, String name);

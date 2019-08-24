@@ -343,8 +343,8 @@ public class Registry implements RegistryMBean, MBeanRegistration  {
      * and for other operations we want to optimize.
      *
      * @param domain Namespace
-     * @param name  Type of the notification
-     * @return  An unique id for the domain:name combination
+     * @param name Type of the notification
+     * @return A unique id for the domain:name combination
      * @since 1.1
      */
     @Override
