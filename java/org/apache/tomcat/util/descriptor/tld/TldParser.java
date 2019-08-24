@@ -77,7 +77,7 @@ public class TldParser {
             if (!handler.getWarnings().isEmpty() || !handler.getErrors().isEmpty()) {
                 handler.logFindings(log, source.getSystemId());
                 if (!handler.getErrors().isEmpty()) {
-                    // throw the first to indicate there was a error during processing
+                    // throw the first to indicate there was an error during processing
                     throw handler.getErrors().iterator().next();
                 }
             }
