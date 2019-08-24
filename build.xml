@@ -1922,6 +1922,26 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
         <path location="${ant.core.lib}"/>
       </classpath>
     </javadoc>
+    <javadoc packagenames="javax.security.auth.message.*"
+      sourcepath="${tomcat.dist}/src/java"
+      destdir="${tomcat.dist}/webapps/docs/jaspicapi"
+      version="true"
+      windowtitle="JASPIC 1.1 API Documentation - Apache Tomcat ${version}"
+      doctitle="JASPIC 1.1 API - Apache Tomcat ${version}"
+      header="&lt;b&gt;JASPIC 1.1 - Apache Tomcat ${version}&lt;/b&gt;"
+      bottom="Copyright &amp;#169; 2000-${year} Apache Software Foundation. All Rights Reserved."
+      encoding="UTF-8"
+      docencoding="UTF-8"
+      charset="UTF-8"
+      additionalparam="-breakiterator -notimestamp"
+      maxmemory="512m"
+      failonerror="true"
+      failonwarning="true">
+      <classpath>
+        <path refid="compile.classpath"/>
+        <path location="${ant.core.lib}"/>
+      </classpath>
+    </javadoc>
     <javadoc packagenames="org.apache.*"
       destdir="${tomcat.dist}/webapps/docs/api"
       version="true"
