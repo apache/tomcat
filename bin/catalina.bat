@@ -17,6 +17,9 @@ rem limitations under the License.
 rem ---------------------------------------------------------------------------
 rem Start/Stop Script for the CATALINA Server
 rem
+rem For supported commands call "catalina.bat help" or see the usage section
+rem towards the end of this file.
+rem
 rem Environment Variable Prerequisites
 rem
 rem   Do not set the variables in this script. Instead put them into a script
@@ -28,9 +31,8 @@ rem   script will have no effect at all on Windows Services. As such, any
 rem   local customizations made in a CATALINA_BASE/bin/setenv.bat script
 rem   will also have no effect on Tomcat when launched as a Windows Service.
 rem   The configuration that controls Windows Services is stored in the Windows
-rem   Registry, and is most conveniently maintained using the "tomcatXw.exe"
-rem   maintenance utility, where "X" is the major version of Tomcat you are
-rem   running.
+rem   Registry, and is most conveniently maintained using the "tomcat@VERSION_MAJOR@w.exe"
+rem   maintenance utility.
 rem
 rem   CATALINA_HOME   May point at your Catalina "build" directory.
 rem
