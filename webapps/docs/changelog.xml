@@ -373,7 +373,7 @@
         compatibility. (remm)
       </fix>
       <fix>
-        Fix typo in UTF-32LE charset name. Patch by zhanhb vi Github.
+        Fix typo in UTF-32LE charset name. Patch by zhanhb via Github.
         (fschumacher)
       </fix>
       <fix>
