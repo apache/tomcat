@@ -205,6 +205,10 @@
         Add simplified Chinese translations to the standard Tomcat distribution.
         (markt)
       </add>
+      <fix>
+        Fix <code>JSSE_OPTS</code> quoting in <code>catalina.bat</code>.
+        Contributed by Peter Uhnak. (fschumacher)
+      </fix>
     </changelog>
   </subsection>
 </section>
