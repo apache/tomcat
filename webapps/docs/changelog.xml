@@ -100,6 +100,10 @@
         <bug>62140</bug>: Additional usage documentation in comments for
         <code>catalina.[bat|sh]</code>. (markt)
       </fix>
+      <fix>
+        Fix <code>JSSE_OPTS</code> quoting in <code>catalina.bat</code>.
+        Contributed by Peter Uhnak. (fschumacher)
+      </fix>
     </changelog>
   </subsection>
 </section>
