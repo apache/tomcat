@@ -1677,11 +1677,13 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
         public SSLSupport getSslSupport(String clientCertProvider) {
             if (getSocket() instanceof SecureNio2Channel) {
                 SecureNio2Channel ch = (SecureNio2Channel) getSocket();
-                SSLSession session = ch.getSslEngine().getSession();
-                return ((Nio2Endpoint) getEndpoint()).getSslImplementation().getSSLSupport(session);
-            } else {
-                return null;
+                SSLEngine sslEngine = ch.getSslEngine();
+                if (sslEngine != null) {
+                    SSLSession session = sslEngine.getSession();
+                    return ((Nio2Endpoint) getEndpoint()).getSslImplementation().getSSLSupport(session);
+                }
             }
+            return null;
         }
 
 

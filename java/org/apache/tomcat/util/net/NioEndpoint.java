@@ -1412,11 +1412,13 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
         public SSLSupport getSslSupport(String clientCertProvider) {
             if (getSocket() instanceof SecureNioChannel) {
                 SecureNioChannel ch = (SecureNioChannel) getSocket();
-                SSLSession session = ch.getSslEngine().getSession();
-                return ((NioEndpoint) getEndpoint()).getSslImplementation().getSSLSupport(session);
-            } else {
-                return null;
+                SSLEngine sslEngine = ch.getSslEngine();
+                if (sslEngine != null) {
+                    SSLSession session = sslEngine.getSession();
+                    return ((NioEndpoint) getEndpoint()).getSslImplementation().getSSLSupport(session);
+                }
             }
+            return null;
         }
 
 
