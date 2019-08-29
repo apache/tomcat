@@ -29,10 +29,11 @@
   <target name="package">
 
     <!-- Will contain the webapp classes -->
-    <mkdir dir="${basedir}/src/main/java" />
     <delete failonerror="false">
-        <fileset dir="${basedir}/src/main/java"/>
+        <fileset dir="${basedir}/src/main"/>
     </delete>
+    <mkdir dir="${basedir}/src/main/java" />
+    <mkdir dir="${basedir}/src/main/resources" />
 
     <!-- JSP precompilation -->
     <jasper validateXml="false" package="${webapp.name}.org.apache.jsp"
@@ -42,6 +43,9 @@
     <!-- Copy all webapp classes to the mvn compile location -->
     <copy todir="${basedir}/src/main/java">
         <fileset dir="${basedir}/webapps/${webapp.name}/WEB-INF/classes" includes="**/*.java"/>
+    </copy>
+    <copy todir="${basedir}/src/main/resources">
+        <fileset dir="${basedir}/webapps/${webapp.name}/WEB-INF/classes" includes="**/*.properties"/>
     </copy>
 
   </target>
