@@ -352,7 +352,7 @@ public interface HttpServletRequest extends ServletRequest {
      * <td>/xyz
      * </table>
      * <p>
-     * To reconstruct an URL with a scheme and host, use
+     * To reconstruct a URL with a scheme and host, use
      * {@link #getRequestURL}.
      *
      * @return a <code>String</code> containing the part of the URL from the
