@@ -29,7 +29,7 @@ import javax.servlet.http.HttpServletResponseWrapper;
 import org.apache.tomcat.util.http.FastHttpDateFormat;
 
 /**
- * A HttpServletResponseWrapper, used from
+ * An HttpServletResponseWrapper, used from
  * <code>SSIServletExternalResolver</code>
  *
  * @author Bip Thelin

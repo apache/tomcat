@@ -566,7 +566,7 @@
     <xsd:annotation>
       <xsd:documentation>
 
-        A HTTP method type as defined in HTTP 1.1 section 2.2.
+        An HTTP method type as defined in HTTP 1.1 section 2.2.
 
       </xsd:documentation>
     </xsd:annotation>

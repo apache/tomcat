@@ -201,14 +201,14 @@ public class RewriteRule {
 
     /**
      *  This forces the current URL to be forbidden, i.e., it immediately sends
-     *  back a HTTP response of 403 (FORBIDDEN). Use this flag in conjunction
+     *  back an HTTP response of 403 (FORBIDDEN). Use this flag in conjunction
      *  with appropriate RewriteConds to conditionally block some URLs.
      */
     protected boolean forbidden = false;
 
     /**
      *  This forces the current URL to be gone, i.e., it immediately sends
-     *  back a HTTP response of 410 (GONE). Use this flag to mark pages which
+     *  back an HTTP response of 410 (GONE). Use this flag to mark pages which
      *  no longer exist as gone.
      */
     protected boolean gone = false;

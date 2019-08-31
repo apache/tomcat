@@ -25,7 +25,7 @@ public class TestWsWebSocketContainerWithProxy extends TestWsWebSocketContainer 
 
     @BeforeClass
     public static void init() {
-        // Set the system properties for a HTTP proxy on 192.168.0.100:80
+        // Set the system properties for an HTTP proxy on 192.168.0.100:80
         // I used an httpd instance configured as an open forward proxy for this
         // Update the IP/hostname as required
         System.setProperty("http.proxyHost", "192.168.0.100");
