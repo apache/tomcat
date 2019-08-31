@@ -32,7 +32,7 @@ import javax.servlet.http.HttpServletResponseWrapper;
 import org.apache.tomcat.util.ExceptionUtils;
 
 /**
- * A HttpServletResponseWrapper, used from
+ * An HttpServletResponseWrapper, used from
  * <code>SSIServletExternalResolver</code>
  *
  * @author Bip Thelin

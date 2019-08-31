@@ -259,7 +259,7 @@ in the <b>protocol</b> attribute of the <a href="config/http.html">Connector</a>
 
 <p>To define a Java (JSSE) connector, regardless of whether the APR library is
 loaded or not, use one of the following:</p>
-<source><![CDATA[<!-- Define a HTTP/1.1 Connector on port 8443, JSSE NIO implementation -->
+<source><![CDATA[<!-- Define an HTTP/1.1 Connector on port 8443, JSSE NIO implementation -->
 <Connector protocol="org.apache.coyote.http11.Http11NioProtocol"
            port="8443" .../>
 
@@ -267,7 +267,7 @@ loaded or not, use one of the following:</p>
 <Connector protocol="org.apache.coyote.http11.Http11Protocol"
            port="8443" .../>]]></source>
 <p>Alternatively, to specify an APR connector (the APR library must be available) use:</p>
-<source><![CDATA[<!-- Define a HTTP/1.1 Connector on port 8443, APR implementation -->
+<source><![CDATA[<!-- Define an HTTP/1.1 Connector on port 8443, APR implementation -->
 <Connector protocol="org.apache.coyote.http11.Http11AprProtocol"
            port="8443" .../>]]></source>
 
