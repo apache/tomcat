@@ -276,7 +276,7 @@ public class Request implements org.apache.catalina.servlet4preview.http.HttpSer
 
 
     /**
-     * Using writer flag.
+     * Using reader flag.
      */
     protected boolean usingReader = false;
 
