@@ -35,7 +35,7 @@ import org.apache.tomcat.util.buf.ByteChunk;
 /*
  * Implementation note:
  *
- * A number of these tests involve the rewrite valve returning a HTTP Location
+ * A number of these tests involve the rewrite valve returning an HTTP Location
  * header that include un-encoded UTF-8 bytes. How the HTTP client handles these
  * depends on the default character encoding configured for the JVM running the
  * test. The tests expect the client to be configured with UTF-8 as the default

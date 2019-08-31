@@ -68,7 +68,7 @@ public class UpgradeUtil {
      * @param request  The request to check if it is an HTTP upgrade request for
      *                 a WebSocket connection
      * @param response The response associated with the request
-     * @return <code>true</code> if the request includes a HTTP Upgrade request
+     * @return <code>true</code> if the request includes an HTTP Upgrade request
      *         for the WebSocket protocol, otherwise <code>false</code>
      */
     public static boolean isWebSocketUpgradeRequest(ServletRequest request,
