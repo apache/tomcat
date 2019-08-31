@@ -84,7 +84,7 @@ public interface PushBuilder {
     PushBuilder sessionId(String sessionId);
 
     /**
-     * Sets a HTTP header on the request. Any existing headers of the same name
+     * Sets an HTTP header on the request. Any existing headers of the same name
      * are first remove.
      *
      * @param name  The name of the header to set
@@ -95,7 +95,7 @@ public interface PushBuilder {
     PushBuilder setHeader(String name, String value);
 
     /**
-     * Adds a HTTP header to the request.
+     * Adds an HTTP header to the request.
      *
      * @param name  The name of the header to add
      * @param value The value of the header to add

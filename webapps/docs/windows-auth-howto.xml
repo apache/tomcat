@@ -101,7 +101,7 @@ policy had to be relaxed. This is not recommended for production environments.
   &lt;service class&gt;/&lt;host&gt;:&lt;port&gt;/&lt;service name&gt;</code>.
   The SPN used in this how-to is <code>HTTP/win-tc01.dev.local</code>. To
   map the user to the SPN, run the following:
-  <source>setspn -A HTTP/win-tc01.dev.local tc01</source>
+  <source>setspn -An HTTP/win-tc01.dev.local tc01</source>
   </li>
   <li>Generate the keytab file that the Tomcat server will use to authenticate
   itself to the domain controller. This file contains the Tomcat private key for

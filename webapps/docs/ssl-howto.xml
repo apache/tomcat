@@ -259,12 +259,12 @@ in the <b>protocol</b> attribute of the <a href="config/http.html">Connector</a>
 
 <p>To define a Java (JSSE) connector, regardless of whether the APR library is
 loaded or not, use one of the following:</p>
-<source><![CDATA[<!-- Define a HTTP/1.1 Connector on port 8443, JSSE NIO implementation -->
+<source><![CDATA[<!-- Define an HTTP/1.1 Connector on port 8443, JSSE NIO implementation -->
 <Connector protocol="org.apache.coyote.http11.Http11NioProtocol"
            sslImplementationName="org.apache.tomcat.util.net.jsse.JSSEImplementation"
            port="8443" .../>
 
-<!-- Define a HTTP/1.1 Connector on port 8443, JSSE NIO2 implementation -->
+<!-- Define an HTTP/1.1 Connector on port 8443, JSSE NIO2 implementation -->
 <Connector protocol="org.apache.coyote.http11.Http11Nio2Protocol"
            sslImplementationName="org.apache.tomcat.util.net.jsse.JSSEImplementation"
            port="8443" .../>]]></source>
@@ -275,13 +275,13 @@ allows enabling it. When using the OpenSSL JSSE implementation, the configuratio
 either the JSSE attributes or
 the OpenSSL attributes (as used for the APR connector), but must not mix attributes from
 both types in the same SSLHostConfig or Connector element.</p>
-<source><![CDATA[<!-- Define a HTTP/1.1 Connector on port 8443, JSSE NIO implementation and OpenSSL -->
+<source><![CDATA[<!-- Define an HTTP/1.1 Connector on port 8443, JSSE NIO implementation and OpenSSL -->
 <Connector protocol="org.apache.coyote.http11.Http11NioProtocol" port="8443"
            sslImplementationName="org.apache.tomcat.util.net.openssl.OpenSSLImplementation"
            .../>]]></source>
 
 <p>Alternatively, to specify an APR connector (the APR library must be available) use:</p>
-<source><![CDATA[<!-- Define a HTTP/1.1 Connector on port 8443, APR implementation -->
+<source><![CDATA[<!-- Define an HTTP/1.1 Connector on port 8443, APR implementation -->
 <Connector protocol="org.apache.coyote.http11.Http11AprProtocol"
            port="8443" .../>]]></source>
 

@@ -591,7 +591,7 @@ cannot use <code>$N</code> in the substitution string!
         <li>'<strong><code>forbidden|F</code></strong>' (force URL
         to be <strong>f</strong>orbidden)<br />
         This forces the current URL to be forbidden - it immediately
-        sends back a HTTP response of 403 (FORBIDDEN).
+        sends back an HTTP response of 403 (FORBIDDEN).
         Use this flag in conjunction with
         appropriate RewriteConds to conditionally block some
         URLs.</li>
@@ -599,7 +599,7 @@ cannot use <code>$N</code> in the substitution string!
         <li>'<strong><code>gone|G</code></strong>' (force URL to be
         <strong>g</strong>one)<br />
         This forces the current URL to be gone - it
-        immediately sends back a HTTP response of 410 (GONE). Use
+        immediately sends back an HTTP response of 410 (GONE). Use
         this flag to mark pages which no longer exist as gone.</li>
 
         <li>
@@ -691,7 +691,7 @@ cannot use <code>$N</code> in the substitution string!
           Prefix <em>Substitution</em> with
           <code>http://thishost[:thisport]/</code> (which makes the
           new URL a URI) to force a external redirection. If no
-          <em>code</em> is given, a HTTP response of 302 (FOUND, previously MOVED
+          <em>code</em> is given, an HTTP response of 302 (FOUND, previously MOVED
           TEMPORARILY) will be returned. If you want to use other response
           codes in the range 300-399, simply specify the appropriate number
           or use one of the following symbolic names:

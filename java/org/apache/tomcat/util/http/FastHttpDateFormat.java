@@ -145,7 +145,7 @@ public final class FastHttpDateFormat {
 
 
     /**
-     * Try to parse the given date as a HTTP date.
+     * Try to parse the given date as an HTTP date.
      * @param value The HTTP date
      * @param threadLocalformats Ignored. The local array of
      *                           ConcurrentDateFormat will always be used.
@@ -161,7 +161,7 @@ public final class FastHttpDateFormat {
 
 
     /**
-     * Try to parse the given date as a HTTP date.
+     * Try to parse the given date as an HTTP date.
      * @param value The HTTP date
      * @return the date as a long or <code>-1</code> if the value cannot be
      *         parsed

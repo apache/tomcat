@@ -31,7 +31,7 @@ public class Host {
 
 
     /**
-     * Parse the given input as a HTTP Host header value.
+     * Parse the given input as an HTTP Host header value.
      *
      * @param mb The host header value
      *
@@ -47,7 +47,7 @@ public class Host {
 
 
     /**
-     * Parse the given input as a HTTP Host header value.
+     * Parse the given input as an HTTP Host header value.
      *
      * @param string The host header value
      *

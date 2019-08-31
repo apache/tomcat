@@ -124,7 +124,7 @@ public class MediaType {
     }
 
     /**
-     * Parses a MediaType value, either from a HTTP header or from an application.
+     * Parses a MediaType value, either from an HTTP header or from an application.
      *
      * @param input a reader over the header text
      * @return a MediaType parsed from the input, or null if not valid

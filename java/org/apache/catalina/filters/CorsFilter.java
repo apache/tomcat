@@ -1048,7 +1048,7 @@ public class CorsFilter extends GenericFilter {
          */
         SIMPLE,
         /**
-         * A HTTP request that needs to be pre-flighted.
+         * An HTTP request that needs to be pre-flighted.
          */
         ACTUAL,
         /**
