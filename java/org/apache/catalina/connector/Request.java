@@ -284,7 +284,7 @@ public class Request implements HttpServletRequest {
 
 
     /**
-     * Using writer flag.
+     * Using reader flag.
      */
     protected boolean usingReader = false;
 
