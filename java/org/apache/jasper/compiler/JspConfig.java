@@ -457,7 +457,7 @@ public class JspConfig {
     }
 
     /**
-     * To find out if an uri matches an url pattern in jsp config.  If so,
+     * To find out if a uri matches a url pattern in jsp config.  If so,
      * then the uri is a JSP page.  This is used primarily for jspc.
      */
     public boolean isJspPage(String uri) throws JasperException {
