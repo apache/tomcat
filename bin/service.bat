@@ -210,7 +210,7 @@ if exist "%CATALINA_HOME%\bin\%DEFAULT_SERVICE_NAME%.exe" (
 
 "%EXECUTABLE%" //IS//%SERVICE_NAME% ^
     --Description "Apache Tomcat @VERSION@ Server - https://tomcat.apache.org/" ^
-    --DisplayName "%DISPLAYNAME%" ^
+    --DisplayName "Apache Tomcat @VERSION_MAJOR_MINOR@ %SERVICE_NAME%" ^
     --Install "%EXECUTABLE%" ^
     --LogPath "%CATALINA_BASE%\logs" ^
     --StdOutput auto ^
