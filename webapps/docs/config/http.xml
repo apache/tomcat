@@ -232,7 +232,7 @@
       calls to <code>request.isSecure()</code> to return <code>true</code>
       for requests received by this Connector. You would want this on an
       SSL Connector or a non SSL connector that is receiving data from a
-      SSL accelerator, like a crypto card, a SSL appliance or even a webserver.
+      SSL accelerator, like a crypto card, an SSL appliance or even a webserver.
       The default value is <code>false</code>.</p>
     </attribute>
 

@@ -73,7 +73,7 @@ public final class SSLConf {
     public static native int check(long cctx, String name, String value) throws Exception;
 
     /**
-     * Assign an SSL context to a SSL_CONF context.
+     * Assign an SSL context to an SSL_CONF context.
      * All following calls to {@link #apply(long, String, String)} will be
      * applied to this SSL context.
      *
