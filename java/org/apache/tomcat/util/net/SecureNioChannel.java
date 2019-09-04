@@ -514,7 +514,7 @@ public class SecureNioChannel extends NioChannel {
     }
 
     /**
-     * Sends a SSL close message, will not physically close the connection here.
+     * Sends an SSL close message, will not physically close the connection here.
      * <br>To close the connection, you could do something like
      * <pre><code>
      *   close();

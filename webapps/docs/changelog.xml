@@ -3463,7 +3463,7 @@
         mechanism. (markt)
       </fix>
       <fix>
-        <bug>61914</bug>: Possible NPE with Java 9 when creating a SSL engine.
+        <bug>61914</bug>: Possible NPE with Java 9 when creating an SSL engine.
         Patch submitted by Evgenij Ryazanov. (remm)
       </fix>
       <fix>

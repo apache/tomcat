@@ -563,7 +563,7 @@ public class SecureNio2Channel extends Nio2Channel  {
     }
 
     /**
-     * Sends a SSL close message, will not physically close the connection here.<br>
+     * Sends an SSL close message, will not physically close the connection here.<br>
      * To close the connection, you could do something like
      * <pre><code>
      *   close();
