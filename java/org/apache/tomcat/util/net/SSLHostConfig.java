@@ -52,7 +52,7 @@ public class SSLHostConfig implements Serializable {
     protected static final Set<String> SSL_PROTO_ALL_SET = new HashSet<>();
 
     static {
-        /* Default used if protocols is not configured, also used if
+        /* Default used if protocols are not configured, also used if
          * protocols="All"
          */
         SSL_PROTO_ALL_SET.add(Constants.SSL_PROTO_SSLv2Hello);
