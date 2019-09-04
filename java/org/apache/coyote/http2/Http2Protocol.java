@@ -51,8 +51,6 @@ public class Http2Protocol implements UpgradeProtocol {
     // Maximum amount of streams which can be concurrently executed over
     // a single connection
     static final int DEFAULT_MAX_CONCURRENT_STREAM_EXECUTION = 20;
-    // This default is defined by the HTTP/2 specification
-    static final int DEFAULT_INITIAL_WINDOW_SIZE = (1 << 16) - 1;
 
     static final int DEFAULT_OVERHEAD_COUNT_FACTOR = 1;
     static final int DEFAULT_OVERHEAD_CONTINUATION_THRESHOLD = 1024;
@@ -74,9 +72,9 @@ public class Http2Protocol implements UpgradeProtocol {
 
     private long maxConcurrentStreams = DEFAULT_MAX_CONCURRENT_STREAMS;
     private int maxConcurrentStreamExecution = DEFAULT_MAX_CONCURRENT_STREAM_EXECUTION;
-    // If a lower initial value is required, set it here but DO NOT change the
-    // default defined above.
-    private int initialWindowSize = DEFAULT_INITIAL_WINDOW_SIZE;
+    // To advertise a different default to the client specify it here but DO NOT
+    // change the default defined in ConnectionSettingsBase.
+    private int initialWindowSize = ConnectionSettingsBase.DEFAULT_INITIAL_WINDOW_SIZE;
     // Limits
     private Set<String> allowedTrailerHeaders =
             Collections.newSetFromMap(new ConcurrentHashMap<String, Boolean>());
