@@ -32,6 +32,8 @@ import java.util.Map;
  */
 class ConnectionSettingsLocal extends ConnectionSettingsBase<IllegalArgumentException> {
 
+    private static final String ENDPOINT_NAME = "Local(client->server)";
+
     private boolean sendInProgress = false;
 
 
@@ -96,5 +98,11 @@ class ConnectionSettingsLocal extends ConnectionSettingsBase<IllegalArgumentExce
     @Override
     final void throwException(String msg, Http2Error error) throws IllegalArgumentException {
         throw new IllegalArgumentException(msg);
+    }
+
+
+    @Override
+    final String getEndpointName() {
+        return ENDPOINT_NAME;
     }
 }
