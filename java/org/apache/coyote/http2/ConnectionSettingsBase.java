@@ -64,7 +64,7 @@ public abstract class ConnectionSettingsBase<T extends Throwable> {
     public void set(Setting setting, long value) throws T {
         if (log.isDebugEnabled()) {
             log.debug(sm.getString("connectionSettings.debug",
-                    connectionId, setting, Long.toString(value)));
+                    connectionId, getEndpointName(), setting, Long.toString(value)));
         }
 
         switch(setting) {
@@ -215,4 +215,6 @@ public abstract class ConnectionSettingsBase<T extends Throwable> {
 
 
     abstract void throwException(String msg, Http2Error error) throws T;
+
+    abstract String getEndpointName();
 }

@@ -22,6 +22,8 @@ package org.apache.coyote.http2;
  */
 public class ConnectionSettingsRemote extends ConnectionSettingsBase<ConnectionException> {
 
+    private static final String ENDPOINT_NAME = "Remote(server->client)";
+
     public ConnectionSettingsRemote(String connectionId) {
         super(connectionId);
     }
@@ -30,5 +32,11 @@ public class ConnectionSettingsRemote extends ConnectionSettingsBase<ConnectionE
     @Override
     void throwException(String msg, Http2Error error) throws ConnectionException {
         throw new ConnectionException(msg, error);
+    }
+
+
+    @Override
+    final String getEndpointName() {
+        return ENDPOINT_NAME;
     }
 }
