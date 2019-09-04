@@ -126,7 +126,7 @@ public final class SSLContext {
      * <b>mode</b>. SSL objects created from <b>ctx</b> inherit the
      * <b>mode</b> valid at the time and may be 0 or 1.
      * <br>
-     * Normally when a SSL connection is finished, the parties must send out
+     * Normally when an SSL connection is finished, the parties must send out
      * "close notify" alert messages using L&lt;SSL_shutdown(3)|SSL_shutdown(3)&gt;
      * for a clean shutdown.
      * <br>
@@ -150,7 +150,7 @@ public final class SSLContext {
      * is permitted to negotiate in the SSL handshake phase. Notice that this
      * directive can be used both in per-server and per-directory context.
      * In per-server context it applies to the standard SSL handshake when a
-     * connection is established. In per-directory context it forces a SSL
+     * connection is established. In per-directory context it forces an SSL
      * renegotiation with the reconfigured Cipher Suite after the HTTP request
      * was read but before the HTTP response is sent.
      * @param ctx Server or Client context to use.
@@ -368,7 +368,7 @@ public final class SSLContext {
      * Authentication. Notice that this directive can be used both in per-server
      * and per-directory context. In per-server context it applies to the client
      * authentication process used in the standard SSL handshake when a connection
-     * is established. In per-directory context it forces a SSL renegotiation with
+     * is established. In per-directory context it forces an SSL renegotiation with
      * the reconfigured client verification level after the HTTP request was read
      * but before the HTTP response is sent.
      * <br>

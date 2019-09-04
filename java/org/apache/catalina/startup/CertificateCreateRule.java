@@ -23,7 +23,7 @@ import org.apache.tomcat.util.net.SSLHostConfigCertificate.Type;
 import org.xml.sax.Attributes;
 
 /**
- * Rule implementation that creates a SSLHostConfigCertificate.
+ * Rule implementation that creates an SSLHostConfigCertificate.
  */
 public class CertificateCreateRule extends Rule {
 
