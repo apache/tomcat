@@ -301,7 +301,7 @@ file installed with Tomcat.  To configure an SSL connector that uses JSSE, you
 will need to remove the comments and edit it so it looks something like
 this:</p>
 <source>
-&lt;!-- Define a SSL Coyote HTTP/1.1 Connector on port 8443 --&gt;
+&lt;!-- Define an SSL Coyote HTTP/1.1 Connector on port 8443 --&gt;
 &lt;Connector
            protocol="org.apache.coyote.http11.Http11NioProtocol"
            port="8443" maxThreads="200"
@@ -313,7 +313,7 @@ this:</p>
   The APR connector uses different attributes for many SSL settings,
   particularly keys and certificates. An example of an APR configuration is:
 <source>
-&lt;!-- Define a SSL Coyote HTTP/1.1 Connector on port 8443 --&gt;
+&lt;!-- Define an SSL Coyote HTTP/1.1 Connector on port 8443 --&gt;
 &lt;Connector
            protocol="org.apache.coyote.http11.Http11AprProtocol"
            port="8443" maxThreads="200"

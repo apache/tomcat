@@ -130,7 +130,7 @@ public final class SSL {
     /* Set on servers to choose the cipher according to the server's
      * preferences */
     public static final int SSL_OP_CIPHER_SERVER_PREFERENCE         = 0x00400000;
-    /* If set, a server will allow a client to issue a SSLv3.0 version number
+    /* If set, a server will allow a client to issue an SSLv3.0 version number
      * as latest version supported in the premaster secret, even when TLSv1.0
      * (version 3.1) was announced in the client hello. Normally this is
      * forbidden to prevent version rollback attacks. */
