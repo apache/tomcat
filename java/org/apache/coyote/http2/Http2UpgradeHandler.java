@@ -142,6 +142,8 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
 
     // Track 'overhead' frames vs 'request/response' frames
     private final AtomicLong overheadCount = new AtomicLong(-10);
+    private volatile int lastNonFinalDataPayload;
+    private volatile int lastWindowUpdate;
 
 
     Http2UpgradeHandler(Http2Protocol protocol, Adapter adapter, Request coyoteRequest) {
@@ -149,6 +151,9 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
         this.protocol = protocol;
         this.adapter = adapter;
         this.connectionId = Integer.toString(connectionIdGenerator.getAndIncrement());
+
+        lastNonFinalDataPayload = protocol.getOverheadDataThreshold() * 2;
+        lastWindowUpdate = protocol.getOverheadWindowUpdateThreshold() * 2;
 
         remoteSettings = new ConnectionSettingsRemote(connectionId);
         localSettings = new ConnectionSettingsLocal(connectionId);
@@ -1372,15 +1377,21 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
         // .. but lots of small payloads are inefficient so that will increase
         // the overhead count unless it is the final DATA frame where small
         // payloads are expected.
+
+        // See also https://bz.apache.org/bugzilla/show_bug.cgi?id=63690
+        // The buffering behaviour of some clients means that small data frames
+        // are much more frequent (roughly 1 in 20) than expected. Use an
+        // average over two frames to avoid false positives.
         if (!endOfStream) {
             int overheadThreshold = protocol.getOverheadDataThreshold();
-            if (payloadSize < overheadThreshold) {
-                if (payloadSize == 0) {
-                    // Avoid division by zero
-                    overheadCount.addAndGet(overheadThreshold);
-                } else {
-                    overheadCount.addAndGet(overheadThreshold / payloadSize);
-                }
+            int average = (lastNonFinalDataPayload >> 1) + (payloadSize >> 1);
+            lastNonFinalDataPayload = payloadSize;
+            // Avoid division by zero
+            if (average == 0) {
+                average = 1;
+            }
+            if (average < overheadThreshold) {
+                overheadCount.addAndGet(overheadThreshold / average);
             }
         }
 
@@ -1615,13 +1626,25 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
 
     @Override
     public void incrementWindowSize(int streamId, int increment) throws Http2Exception {
+        // See also https://bz.apache.org/bugzilla/show_bug.cgi?id=63690
+        // The buffering behaviour of some clients means that small data frames
+        // are much more frequent (roughly 1 in 20) than expected. Some clients
+        // issue a Window update for every DATA frame so a similar pattern may
+        // be observed. Use an average over two frames to avoid false positives.
+
+        int average = (lastWindowUpdate >> 1) + (increment >> 1);
         int overheadThreshold = protocol.getOverheadWindowUpdateThreshold();
+        lastWindowUpdate = increment;
+        // Avoid division by zero
+        if (average == 0) {
+            average = 1;
+        }
 
         if (streamId == 0) {
             // Check for small increments which are inefficient
-            if (increment < overheadThreshold) {
+            if (average < overheadThreshold) {
                 // The smaller the increment, the larger the overhead
-                overheadCount.addAndGet(overheadThreshold / increment);
+                overheadCount.addAndGet(overheadThreshold / average);
             }
 
             incrementWindowSize(increment);
@@ -1629,13 +1652,13 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
             Stream stream = getStream(streamId, true);
 
             // Check for small increments which are inefficient
-            if (increment < overheadThreshold) {
+            if (average < overheadThreshold) {
                 // For Streams, client might only release the minimum so check
                 // against current demand
                 BacklogTracker tracker = backLogStreams.get(stream);
                 if (tracker == null || increment < tracker.getRemainingReservation()) {
                     // The smaller the increment, the larger the overhead
-                    overheadCount.addAndGet(overheadThreshold / increment);
+                    overheadCount.addAndGet(overheadThreshold / average);
                 }
             }
 

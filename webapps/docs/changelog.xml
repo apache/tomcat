@@ -61,6 +61,13 @@
   <subsection name="Coyote">
     <changelog>
       <fix>
+        <bug>63690</bug>: Use the average of the current and previous sizes when
+        calculating overhead for HTTP/2 <code>DATA</code> and
+        <code>WINDOW_UPDATE</code> frames to avoid false positives as a result
+        of client side buffering behaviour that causes a small percentage of
+        non-final DATA frames to be smaller than expected. (markt)
+      </fix>
+      <fix>
         <bug>63706</bug>: Avoid NPE accessing https port with plaintext. (remm)
       </fix>
       <fix>
