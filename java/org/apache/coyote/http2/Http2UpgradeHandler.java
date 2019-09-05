@@ -235,7 +235,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
         } catch (Http2Exception e) {
             String msg = sm.getString("upgradeHandler.invalidPreface", connectionId);
             if (log.isDebugEnabled()) {
-                log.debug(msg);
+                log.debug(msg, e);
             }
             throw new ProtocolException(msg);
         }
