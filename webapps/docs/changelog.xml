@@ -83,6 +83,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Jasper">
+    <changelog>
+      <fix>
+        <bug>63724</bug>: Correct a regression introduced in 9.0.21 that broke
+        compilation of JSPs in some configurations. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Web applications">
     <changelog>
       <fix>

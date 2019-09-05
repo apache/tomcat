@@ -742,8 +742,8 @@ public class JspUtil {
         String classNameComponents[] = path.split("/");
         StringBuilder legalClassNames = new StringBuilder();
         for (int i = 0; i < classNameComponents.length; i++) {
-            if(0 < classNameComponents[i].length()) {
-                if(0 < i) {
+            if (classNameComponents[i].length() > 0) {
+                if (legalClassNames.length() > 0) {
                     legalClassNames.append('.');
                 }
                 legalClassNames.append(makeJavaIdentifier(classNameComponents[i]));
