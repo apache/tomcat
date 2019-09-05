@@ -86,8 +86,8 @@ public class Http2Protocol implements UpgradeProtocol {
     private int maxTrailerSize = Constants.DEFAULT_MAX_TRAILER_SIZE;
     private int overheadCountFactor = DEFAULT_OVERHEAD_COUNT_FACTOR;
     private int overheadContinuationThreshold = DEFAULT_OVERHEAD_CONTINUATION_THRESHOLD;
-    private int overheadDataThreadhold = DEFAULT_OVERHEAD_DATA_THRESHOLD;
-    private int overheadWindowUpdateThreadhold = DEFAULT_OVERHEAD_WINDOW_UPDATE_THRESHOLD;
+    private int overheadDataThreshold = DEFAULT_OVERHEAD_DATA_THRESHOLD;
+    private int overheadWindowUpdateThreshold = DEFAULT_OVERHEAD_WINDOW_UPDATE_THRESHOLD;
 
     private boolean initiatePingDisabled = false;
     // Compression
@@ -322,33 +322,33 @@ public class Http2Protocol implements UpgradeProtocol {
     }
 
 
-    public int getOverheadContinuationThreshhold() {
+    public int getOverheadContinuationThreshold() {
         return overheadContinuationThreshold;
     }
 
 
-    public void setOverheadContinuationThreshhold(int overheadContinuationThreshold) {
+    public void setOverheadContinuationThreshold(int overheadContinuationThreshold) {
         this.overheadContinuationThreshold = overheadContinuationThreshold;
     }
 
 
-    public int getOverheadDataThreadhold() {
-        return overheadDataThreadhold;
+    public int getOverheadDataThreshold() {
+        return overheadDataThreshold;
     }
 
 
-    public void setOverheadDataThreadhold(int overheadDataThreadhold) {
-        this.overheadDataThreadhold = overheadDataThreadhold;
+    public void setOverheadDataThreshold(int overheadDataThreshold) {
+        this.overheadDataThreshold = overheadDataThreshold;
     }
 
 
-    public int getOverheadWindowUpdateThreadhold() {
-        return overheadWindowUpdateThreadhold;
+    public int getOverheadWindowUpdateThreshold() {
+        return overheadWindowUpdateThreshold;
     }
 
 
-    public void setOverheadWindowUpdateThreadhold(int overheadWindowUpdateThreadhold) {
-        this.overheadWindowUpdateThreadhold = overheadWindowUpdateThreadhold;
+    public void setOverheadWindowUpdateThreshold(int overheadWindowUpdateThreshold) {
+        this.overheadWindowUpdateThreshold = overheadWindowUpdateThreshold;
     }
 
 

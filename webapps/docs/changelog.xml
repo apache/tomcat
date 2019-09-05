@@ -59,6 +59,11 @@
       <fix>
         <bug>63706</bug>: Avoid NPE accessing https port with plaintext. (remm)
       </fix>
+      <fix>
+        Correct typos in the names of the configuration attributes
+        <code>overheadDataThreshold</code> and
+        <code>overheadWindowUpdateThreshold</code>. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">

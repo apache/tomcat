@@ -1460,7 +1460,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
         // the overhead count unless it is the final DATA frame where small
         // payloads are expected.
         if (!endOfStream) {
-            int overheadThreshold = protocol.getOverheadDataThreadhold();
+            int overheadThreshold = protocol.getOverheadDataThreshold();
             if (payloadSize < overheadThreshold) {
                 if (payloadSize == 0) {
                     // Avoid division by zero
@@ -1590,7 +1590,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
         // they are small and the frame isn't the final header frame then that
         // is indicative of an abusive client
         if (!endOfHeaders) {
-            int overheadThreshold = getProtocol().getOverheadContinuationThreshhold();
+            int overheadThreshold = getProtocol().getOverheadContinuationThreshold();
             if (payloadSize < overheadThreshold) {
                 if (payloadSize == 0) {
                     // Avoid division by zero
@@ -1702,7 +1702,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
 
     @Override
     public void incrementWindowSize(int streamId, int increment) throws Http2Exception {
-        int overheadThreshold = protocol.getOverheadWindowUpdateThreadhold();
+        int overheadThreshold = protocol.getOverheadWindowUpdateThreshold();
 
         if (streamId == 0) {
             // Check for small increments which are inefficient
