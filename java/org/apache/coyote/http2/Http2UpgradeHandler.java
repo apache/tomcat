@@ -560,11 +560,21 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
     }
 
 
+    /**
+     * Write the initial settings frame and any necessary supporting frames. If
+     * the initial settings increase the initial window size, it will also be
+     * necessary to send a WINDOW_UPDATE frame to increase the size of the flow
+     * control window for the connection (stream 0).
+     */
     protected void writeSettings() {
         // Send the initial settings frame
         try {
             byte[] settings = localSettings.getSettingsFrameForPending();
             socketWrapper.write(true, settings, 0, settings.length);
+            byte[] windowUpdateFrame = createWindowUpdateForSettings();
+            if (windowUpdateFrame.length > 0) {
+                socketWrapper.write(true,  windowUpdateFrame, 0 , windowUpdateFrame.length);
+            }
             socketWrapper.flush(true);
         } catch (IOException ioe) {
             String msg = sm.getString("upgradeHandler.sendPrefaceFail", connectionId);
@@ -573,6 +583,29 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
             }
             throw new ProtocolException(msg, ioe);
         }
+    }
+
+
+    /**
+     * @return  The WINDOW_UPDATE frame if one is required or an empty array if
+     *          no WINDOW_UPDATE is required.
+     */
+    protected byte[] createWindowUpdateForSettings() {
+        // Build a WINDOW_UPDATE frame if one is required. If not, create an
+        // empty byte array.
+        byte[] windowUpdateFrame;
+        int increment = protocol.getInitialWindowSize() - ConnectionSettingsBase.DEFAULT_INITIAL_WINDOW_SIZE;
+        if (increment > 0) {
+            // Build window update frame for stream 0
+            windowUpdateFrame = new byte[13];
+            ByteUtil.setThreeBytes(windowUpdateFrame, 0,  4);
+            windowUpdateFrame[3] = FrameType.WINDOW_UPDATE.getIdByte();
+            ByteUtil.set31Bits(windowUpdateFrame, 9, increment);
+        } else {
+            windowUpdateFrame = new byte[0];
+        }
+
+        return windowUpdateFrame;
     }
 
 

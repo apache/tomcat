@@ -68,6 +68,12 @@
         <code>overheadDataThreshold</code> and
         <code>overheadWindowUpdateThreshold</code>. (markt)
       </fix>
+      <fix>
+        If the HTTP/2 connection requires an initial window size larger than the
+        default, send a WINDOW_UPDATE to increase the flow control window for the
+        connection so that the initial size of the flow control window for the
+        connection is consistent with the increased value. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
