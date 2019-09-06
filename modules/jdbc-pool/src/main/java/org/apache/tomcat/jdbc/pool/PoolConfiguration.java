@@ -501,7 +501,7 @@ public interface PoolConfiguration {
      * The SQL query that will be used to validate connections from this
      * pool before returning them to the caller or pool.
      * If specified, this query does not have to return any data,
-     * it just can't throw a SQLException.
+     * it just can't throw an SQLException.
      * The default value is null.
      * Example values are SELECT 1(mysql),
      * select 1 from dual(oracle),
@@ -514,7 +514,7 @@ public interface PoolConfiguration {
      * The SQL query that will be used to validate connections from this
      * pool before returning them to the caller or pool.
      * If specified, this query does not have to return any data,
-     * it just can't throw a SQLException.
+     * it just can't throw an SQLException.
      * The default value is null.
      * Example values are SELECT 1(mysql),
      * select 1 from dual(oracle),

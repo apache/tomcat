@@ -21,7 +21,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 /**
- * A SQLException based on a list of Throwable causes.
+ * An SQLException based on a list of Throwable causes.
  * <p>
  * The first exception in the list is used as this exception's cause and is accessible with the usual
  * {@link #getCause()} while the complete list is accessible with {@link #getCauseList()}.
