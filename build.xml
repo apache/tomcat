@@ -197,13 +197,14 @@
 
   <!-- Java 9 -->
   <available classname="java.lang.reflect.InaccessibleObjectException"
-             property="java9.add.modules"
-             value="--add-modules java.xml.ws"/>
-  <property name="java9.add.modules" value=""/>
+             property="java9.javadoc.options"
+             value="-html5"/>
+  <property name="java9.javadoc.options" value=""/>
 
   <!-- Classpaths -->
   <path id="compile.classpath">
     <pathelement location="${jdt.jar}"/>
+    <pathelement location="${saaj-api.jar}"/>
   </path>
 
   <path id="tomcat.classpath">
@@ -1856,7 +1857,8 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       encoding="UTF-8"
       docencoding="UTF-8"
       charset="UTF-8"
-      additionalparam="-breakiterator -notimestamp"
+      additionalparam="-breakiterator -notimestamp ${java9.javadoc.options}"
+      source="${compile.source}"
       maxmemory="512m"
       failonerror="true"
       failonwarning="true">
@@ -1877,7 +1879,8 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       encoding="UTF-8"
       docencoding="UTF-8"
       charset="UTF-8"
-      additionalparam="-breakiterator -notimestamp"
+      additionalparam="-breakiterator -notimestamp ${java9.javadoc.options}"
+      source="${compile.source}"
       maxmemory="512m"
       failonerror="true"
       failonwarning="true">
@@ -1898,7 +1901,8 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       encoding="UTF-8"
       docencoding="UTF-8"
       charset="UTF-8"
-      additionalparam="-breakiterator -notimestamp"
+      additionalparam="-breakiterator -notimestamp ${java9.javadoc.options}"
+      source="${compile.source}"
       maxmemory="512m"
       failonerror="true"
       failonwarning="true">
@@ -1919,7 +1923,8 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       encoding="UTF-8"
       docencoding="UTF-8"
       charset="UTF-8"
-      additionalparam="-breakiterator -notimestamp"
+      additionalparam="-breakiterator -notimestamp ${java9.javadoc.options}"
+      source="${compile.source}"
       maxmemory="512m"
       failonerror="true"
       failonwarning="true">
@@ -1939,7 +1944,8 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       encoding="UTF-8"
       docencoding="UTF-8"
       charset="UTF-8"
-      additionalparam="-breakiterator -notimestamp ${java9.add.modules}"
+      additionalparam="-breakiterator -notimestamp ${java9.javadoc.options} -J-Dhttps.protocols=TLSv1,TLSv1.1,TLSv1.2"
+      source="${compile.source}"
       maxmemory="512m"
       failonerror="true"
       failonwarning="true">
@@ -1952,8 +1958,8 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       <link href="../jspapi"/>
       <link href="../elapi"/>
       <link href="../websocketapi"/>
-      <link href="http://docs.oracle.com/javase/7/docs/api/"/>
-      <link href="http://docs.oracle.com/javaee/7/api/"/>
+      <link href="https://docs.oracle.com/javase/7/docs/api/"/>
+      <link href="https://docs.oracle.com/javaee/7/api/"/>
       <packageset dir="${tomcat.dist}/src/java/">
         <include name="org/**"/>
         <exclude name="org/apache/el/parser/**"/>
@@ -2700,6 +2706,16 @@ skip.installer property in build.properties" />
       <param name="checksum.enabled" value="${jdt.checksum.enabled}"/>
       <param name="checksum.algorithm" value="${jdt.checksum.algorithm}"/>
       <param name="checksum.value" value="${jdt.checksum.value}"/>
+    </antcall>
+
+    <!-- Download SAAJ API -->
+    <antcall target="downloadfile">
+      <param name="sourcefile" value="${saaj-api.loc}"/>
+      <param name="destfile" value="${saaj-api.jar}"/>
+      <param name="destdir" value="${saaj-api.home}"/>
+      <param name="checksum.enabled" value="${saaj-api.checksum.enabled}"/>
+      <param name="checksum.algorithm" value="${saaj-api.checksum.algorithm}"/>
+      <param name="checksum.value" value="${saaj-api.checksum.value}"/>
     </antcall>
 
   </target>

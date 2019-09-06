@@ -621,9 +621,9 @@ public class DriverAdapterCPDS implements ConnectionPoolDataSource, Referenceabl
     /**
      * Sets the number of statements to examine during each run of the idle object evictor thread (if any).
      * <p>
-     * When a negative value is supplied, <tt>ceil({*link #numIdle})/abs({*link #getNumTestsPerEvictionRun})</tt> tests
-     * will be run. I.e., when the value is <i>-n</i>, roughly one <i>n</i>th of the idle objects will be tested per
-     * run.
+     * When a negative value is supplied, <code>ceil({*link #numIdle})/abs({*link #getNumTestsPerEvictionRun})</code>
+     * tests will be run. I.e., when the value is <i>-n</i>, roughly one <i>n</i>th of the idle objects will be tested
+     * per run.
      * </p>
      *
      * @param numTestsPerEvictionRun

@@ -247,7 +247,7 @@ public class FileHandler extends Handler {
 
 
     /**
-     * Format and publish a <tt>LogRecord</tt>.
+     * Format and publish a <code>LogRecord</code>.
      *
      * @param  record  description of the log event
      */

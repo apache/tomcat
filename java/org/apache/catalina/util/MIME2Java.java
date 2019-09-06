@@ -30,7 +30,7 @@ import java.util.Map;
  * as <code>TXDocument#setEncoding</code> and <code>DTD#setEncoding</code>.
  * <p>Java encoding names are used on <var>encoding</var> parameters to
  * methods such as <code>TXDocument#printWithFormat</code> and <code>DTD#printExternal</code>.
- * <TABLE BORDER="0" WIDTH="100%">
+ * <TABLE>
  *  <caption>MIME charset name to Java encoding name mapping</caption>
  *  <TR>
  *      <TD>

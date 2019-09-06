@@ -85,6 +85,11 @@
         Correct the source code links on the index page for the ROOT web
         application to point to Git rather than Subversion. (markt)
       </fix>
+      <fix>
+        Fix various issues with the Javadoc generated for the documentation web
+        application to enable release builds to be built with Java 10 onwards.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">

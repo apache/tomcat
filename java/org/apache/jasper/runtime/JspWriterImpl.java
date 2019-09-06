@@ -335,8 +335,8 @@ public class JspWriterImpl extends JspWriter {
 
     /**
      * Write a line separator.  The line separator string is defined by the
-     * system property <tt>line.separator</tt>, and is not necessarily a single
-     * newline ('\n') character.
+     * system property <code>line.separator</code>, and is not necessarily a
+     * single newline ('\n') character.
      *
      * @exception  IOException  If an I/O error occurs
      */

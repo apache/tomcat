@@ -77,13 +77,13 @@ public class SmapGenerator {
     /**
      * Adds the given SmapStratum object, representing a Stratum with
      * logically associated FileSection and LineSection blocks, to
-     * the current SmapGenerator.  If <tt>default</tt> is true, this
+     * the current SmapGenerator.  If <code>defaultStartum</code> is true, this
      * stratum is made the default stratum, overriding any previously
      * set default.
      *
      * @param stratum the SmapStratum object to add
-     * @param defaultStratum if <tt>true</tt>, this SmapStratum is considered
-     *                to represent the default SMAP stratum unless
+     * @param defaultStratum if <code>true</code>, this SmapStratum is
+     *                considered to represent the default SMAP stratum unless
      *                overwritten
      *
      * @deprecated Use {@link #setStratum(SmapStratum)}
@@ -101,7 +101,7 @@ public class SmapGenerator {
      *
      * @param smap the SMAP to embed
      * @param stratumName the name of the stratum output by the compilation
-     *                    that produced the <tt>smap</tt> to be embedded
+     *                    that produced the <code>smap</code> to be embedded
      *
      * @deprecated Unused. This will be removed in Tomcat 9.0.x
      */
@@ -116,7 +116,7 @@ public class SmapGenerator {
      * Instructs the SmapGenerator whether to actually print any embedded
      * SMAPs or not.  Intended for situations without an SMAP resolver.
      *
-     * @param status If <tt>false</tt>, ignore any embedded SMAPs.
+     * @param status If <code>false</code>, ignore any embedded SMAPs.
      *
      * @deprecated Unused. Will be removed in Tomcat 9.0.x
      */

@@ -114,7 +114,7 @@ public class NioChannel implements ByteChannel {
     /**
      * Tells whether or not this channel is open.
      *
-     * @return <tt>true</tt> if, and only if, this channel is open
+     * @return <code>true</code> if, and only if, this channel is open
      */
     @Override
     public boolean isOpen() {
@@ -138,8 +138,8 @@ public class NioChannel implements ByteChannel {
      * Reads a sequence of bytes from this channel into the given buffer.
      *
      * @param dst The buffer into which bytes are to be transferred
-     * @return The number of bytes read, possibly zero, or <tt>-1</tt> if the
-     *         channel has reached end-of-stream
+     * @return The number of bytes read, possibly zero, or <code>-1</code> if
+     *         the channel has reached end-of-stream
      * @throws IOException If some other I/O error occurs
      */
     @Override
