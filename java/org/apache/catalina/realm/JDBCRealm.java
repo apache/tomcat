@@ -306,7 +306,7 @@ public class JDBCRealm
         // This needs rewritten with better pooling support, the existing code
         // needs signature changes since the Prepared statements needs cached
         // with the connections.
-        // The code below will try twice if there is a SQLException so the
+        // The code below will try twice if there is an SQLException so the
         // connection may try to be opened again. On normal conditions (including
         // invalid login - the above is only used once.
         int numberOfTries = 2;
@@ -509,7 +509,7 @@ public class JDBCRealm
         // This needs rewritten with better pooling support, the existing code
         // needs signature changes since the Prepared statements needs cached
         // with the connections.
-        // The code below will try twice if there is a SQLException so the
+        // The code below will try twice if there is an SQLException so the
         // connection may try to be opened again. On normal conditions (including
         // invalid login - the above is only used once.
         int numberOfTries = 2;
@@ -581,7 +581,7 @@ public class JDBCRealm
         // This needs rewritten wuth better pooling support, the existing code
         // needs signature changes since the Prepared statements needs cached
         // with the connections.
-        // The code below will try twice if there is a SQLException so the
+        // The code below will try twice if there is an SQLException so the
         // connection may try to be opened again. On normal conditions (including
         // invalid login - the above is only used once.
         int numberOfTries = 2;

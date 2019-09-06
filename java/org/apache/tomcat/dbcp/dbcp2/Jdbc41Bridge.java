@@ -415,7 +415,7 @@ public class Jdbc41Bridge {
      * Delegates to {@link Statement#closeOnCompletion()} without throwing a {@link AbstractMethodError}.
      * <p>
      * If the JDBC driver does not implement {@link Statement#closeOnCompletion()}, then just check that the connection
-     * is closed to then throw a SQLException.
+     * is closed to then throw an SQLException.
      * </p>
      *
      * @param statement
@@ -438,7 +438,7 @@ public class Jdbc41Bridge {
      * Delegates to {@link Statement#isCloseOnCompletion()} without throwing a {@link AbstractMethodError}.
      * <p>
      * If the JDBC driver does not implement {@link Statement#isCloseOnCompletion()}, then just check that the
-     * connection is closed to then throw a SQLException.
+     * connection is closed to then throw an SQLException.
      * </p>
      *
      * @param statement

@@ -66,7 +66,7 @@ public class LocalXAConnectionFactory implements XAConnectionFactory {
          * @param flag
          *            ignored
          * @throws XAException
-         *             if connection.commit() throws a SQLException
+         *             if connection.commit() throws an SQLException
          */
         @Override
         public synchronized void commit(final Xid xid, final boolean flag) throws XAException {
@@ -216,7 +216,7 @@ public class LocalXAConnectionFactory implements XAConnectionFactory {
          * @param xid
          *            the id of the transaction branch for this connection
          * @throws XAException
-         *             if connection.rollback() throws a SQLException
+         *             if connection.rollback() throws an SQLException
          */
         @Override
         public synchronized void rollback(final Xid xid) throws XAException {
