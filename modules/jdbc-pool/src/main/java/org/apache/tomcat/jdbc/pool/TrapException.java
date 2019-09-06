@@ -23,7 +23,7 @@ import java.lang.reflect.Method;
 import java.sql.SQLException;
 /**
  * Interceptor that traps any unhandled exception types and throws an exception that has been declared by the method
- * called, or throw a SQLException if it is declared.
+ * called, or throw an SQLException if it is declared.
  * If the caught exception is not declared, and the method doesn't throw SQLException, then this interceptor will
  * throw a RuntimeException
  * @author fhanik
