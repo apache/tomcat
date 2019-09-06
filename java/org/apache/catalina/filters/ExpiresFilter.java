@@ -56,7 +56,7 @@ import org.apache.juli.logging.LogFactory;
  * Following documentation is inspired by <a
  * href="https://httpd.apache.org/docs/2.2/mod/mod_expires.html">mod_expires</a>
  * </p>
- * <h1>Summary</h1>
+ * <h2>Summary</h2>
  * <p>
  * This filter controls the setting of the {@code Expires} HTTP header and the
  * {@code max-age} directive of the {@code Cache-Control} HTTP header in
@@ -77,9 +77,9 @@ import org.apache.juli.logging.LogFactory;
  * href="https://httpd.apache.org/docs/2.2/mod/mod_headers.html" >Apache Httpd
  * mod_headers</a> module.
  * </p>
- * <h1>Filter Configuration</h1><h2>Basic configuration to add
+ * <h2>Filter Configuration</h2><h3>Basic configuration to add
  * '{@code Expires}' and '{@code Cache-Control: max-age=}'
- * headers to images, css and javascript</h2>
+ * headers to images, css and javascript</h3>
  *
  * <pre>
  * {@code
@@ -112,9 +112,9 @@ import org.apache.juli.logging.LogFactory;
  * }
  * </pre>
  *
- * <h2>Configuration Parameters</h2>
+ * <h3>Configuration Parameters</h3>
  *
- * <h3>{@code ExpiresByType <content-type>}</h3>
+ * <h4>{@code ExpiresByType <content-type>}</h4>
  * <p>
  * This directive defines the value of the {@code Expires} header and the
  * {@code max-age} directive of the {@code Cache-Control} header generated for
@@ -171,8 +171,8 @@ import org.apache.juli.logging.LogFactory;
  * You can also specify the expiration time calculation using an alternate
  * syntax, described earlier in this document.
  * </p>
- * <h3>
- * {@code ExpiresExcludedResponseStatusCodes}</h3>
+ * <h4>
+ * {@code ExpiresExcludedResponseStatusCodes}</h4>
  * <p>
  * This directive defines the http response status codes for which the
  * {@code ExpiresFilter} will not generate expiration headers. By default, the
@@ -199,7 +199,7 @@ import org.apache.juli.logging.LogFactory;
  * }
  * </pre>
  *
- * <h3>ExpiresDefault</h3>
+ * <h4>ExpiresDefault</h4>
  * <p>
  * This directive sets the default algorithm for calculating the expiration time
  * for all documents in the affected realm. It can be overridden on a
@@ -207,7 +207,7 @@ import org.apache.juli.logging.LogFactory;
  * description of that directive for details about the syntax of the argument,
  * and the "alternate syntax" description as well.
  * </p>
- * <h1>Alternate Syntax</h1>
+ * <h2>Alternate Syntax</h2>
  * <p>
  * The {@code ExpiresDefault} and {@code ExpiresByType} directives can also be
  * defined in a more readable syntax of the form:
@@ -295,7 +295,7 @@ import org.apache.juli.logging.LogFactory;
  * a file on disk. This is due to the fact that there is no modification time
  * for such content.
  * </p>
- * <h1>Expiration headers generation eligibility</h1>
+ * <h2>Expiration headers generation eligibility</h2>
  * <p>
  * A response is eligible to be enriched by {@code ExpiresFilter} if :
  * </p>
@@ -316,7 +316,7 @@ import org.apache.juli.logging.LogFactory;
  * {@code max-age}, they are concatenated with the {@code max-age} directive
  * that is added by the {@code ExpiresFilter}.</li>
  * </ul>
- * <h1>Expiration configuration selection</h1>
+ * <h2>Expiration configuration selection</h2>
  * <p>
  * The expiration configuration if elected according to the following algorithm:
  * </p>
@@ -333,7 +333,7 @@ import org.apache.juli.logging.LogFactory;
  * &#x27;),</li>
  * <li>{@code ExpiresDefault}</li>
  * </ol>
- * <h1>Implementation Details</h1><h2>When to write the expiration headers ?</h2>
+ * <h2>Implementation Details</h2><h3>When to write the expiration headers ?</h3>
  * <p>
  * The {@code ExpiresFilter} traps the &#x27;on before write response
  * body&#x27; event to decide whether it should generate expiration headers or
@@ -349,7 +349,7 @@ import org.apache.juli.logging.LogFactory;
  * case, the {@code ExpiresFilter}, at the end of its {@code doFilter()}
  * method, manually triggers the {@code onBeforeWriteResponseBody()} method.
  * </p>
- * <h2>Configuration syntax</h2>
+ * <h3>Configuration syntax</h3>
  * <p>
  * The {@code ExpiresFilter} supports the same configuration syntax as Apache
  * Httpd mod_expires.
@@ -365,7 +365,7 @@ import org.apache.juli.logging.LogFactory;
  * The workaround has been to declare the content type in the
  * {@code <param-name>} rather than in the {@code <param-value>}.
  * </p>
- * <h2>Designed for extension : the open/close principle</h2>
+ * <h3>Designed for extension : the open/close principle</h3>
  * <p>
  * The {@code ExpiresFilter} has been designed for extension following the
  * open/close principle.
@@ -380,7 +380,7 @@ import org.apache.juli.logging.LogFactory;
  * <li>
  * {@link #getExpirationDate(XHttpServletResponse)}</li>
  * </ul>
- * <h1>Troubleshooting</h1>
+ * <h2>Troubleshooting</h2>
  * <p>
  * To troubleshoot, enable logging on the
  * {@code org.apache.catalina.filters.ExpiresFilter}.

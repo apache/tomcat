@@ -28,10 +28,10 @@
   <!-- is part of the original project source code.                          -->
   <!-- See "build.properties.default" in the top level directory for some    -->
   <!-- property values you may customize.                                    -->
+  <property environment="env"/>
   <property file="${user.home}/build.properties"/>
   <property file="build.properties"/>
   <property file="build.properties.default"/>
-  <property environment="env"/>
 
   <!-- Project Name -->
   <property name="project"               value="apache-tomcat" />
@@ -83,6 +83,10 @@
   <!-- Servlet 3.0 spec requires 1.6+ -->
   <property name="compile.source" value="1.6"/>
   <property name="compile.target" value="1.6"/>
+
+  <!-- Expose commons-logging defaults so they can be orver-ridden -->
+  <property name="logging.compile.source" value="1.2" />
+  <property name="logging.compile.target" value="1.1" />
 
   <!-- Locations to create the JAR artifacts -->
   <!-- Standard JARs -->
@@ -194,9 +198,16 @@
   <defaultexcludes remove="**/.gitignore" />
   <!--<defaultexcludes echo="true" />-->
 
+  <!-- Java 9 -->
+  <available classname="java.lang.reflect.InaccessibleObjectException"
+             property="java9.javadoc.options"
+             value="-html5"/>
+  <property name="java9.javadoc.options" value=""/>
+
   <!-- Classpaths -->
   <path id="compile.classpath">
     <pathelement location="${jdt.jar}"/>
+    <pathelement location="${saaj-api.jar}"/>
   </path>
 
   <path id="tomcat.classpath">
@@ -573,7 +584,6 @@
         <!-- Exclude simple test files -->
         <exclude name="test/webapp/bug53257/**/*.txt"/>
         <exclude name="test/webapp-fragments/WEB-INF/classes/*.txt"/>
-        <!-- Exclude developer specific local files -->
         <exclude name="build.properties" />
         <exclude name="res/maven/mvn.properties" />
       </fileset>
@@ -581,6 +591,8 @@
         <exclude name=".*/**"/>
         <exclude name="**/MANIFEST.MF"/>
         <patternset refid="text.files" />
+        <!-- Exclude developer specific local files -->
+        <exclude name="build.properties" />
       </fileset>
     </checkstyle>
     <!-- javax package checks -->
@@ -1735,7 +1747,10 @@
 
     <ant antfile="${tomcat.extras}/logging/commons-logging-${commons-logging.version}-src/build2.xml"
          dir="${tomcat.extras}/logging/commons-logging-${commons-logging.version}-src"
-         inheritAll="false" target="compile" />
+         inheritAll="false" target="compile" >
+      <property name="source.version" value="${logging.compile.source}" />
+      <property name="target.version" value="${logging.compile.target}" />
+    </ant>
 
     <jar jarfile="${tomcat-juli-extras.jar}"
          manifest="${tomcat.manifests}/default.manifest">
@@ -2024,7 +2039,8 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       encoding="ISO-8859-1"
       docencoding="ISO-8859-1"
       charset="ISO-8859-1"
-      additionalparam="-breakiterator -notimestamp"
+      additionalparam="-breakiterator -notimestamp ${java9.javadoc.options}"
+      source="${compile.source}"
       maxmemory="512m"
       failonerror="true"
       executable="${java.7.home}/bin/javadoc">
@@ -2045,7 +2061,8 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       encoding="ISO-8859-1"
       docencoding="ISO-8859-1"
       charset="ISO-8859-1"
-      additionalparam="-breakiterator -notimestamp"
+      additionalparam="-breakiterator -notimestamp ${java9.javadoc.options}"
+      source="${compile.source}"
       maxmemory="512m"
       failonerror="true"
       executable="${java.7.home}/bin/javadoc">
@@ -2066,7 +2083,8 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       encoding="ISO-8859-1"
       docencoding="ISO-8859-1"
       charset="ISO-8859-1"
-      additionalparam="-breakiterator -notimestamp"
+      additionalparam="-breakiterator -notimestamp ${java9.javadoc.options}"
+      source="${compile.source}"
       maxmemory="512m"
       failonerror="true"
       executable="${java.7.home}/bin/javadoc">
@@ -2087,7 +2105,8 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       encoding="ISO-8859-1"
       docencoding="ISO-8859-1"
       charset="ISO-8859-1"
-      additionalparam="-breakiterator -notimestamp"
+      additionalparam="-breakiterator -notimestamp ${java9.javadoc.options}"
+      source="${compile.source}"
       maxmemory="512m"
       failonerror="true"
       executable="${java.7.home}/bin/javadoc">
@@ -2107,10 +2126,12 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       encoding="ISO-8859-1"
       docencoding="ISO-8859-1"
       charset="ISO-8859-1"
-      additionalparam="-breakiterator -notimestamp"
+      additionalparam="-breakiterator -notimestamp ${java9.javadoc.options} -J-Dhttps.protocols=TLSv1,TLSv1.1,TLSv1.2"
+      source="${compile.source}"
       maxmemory="512m"
       failonerror="true"
-      executable="${java.7.home}/bin/javadoc">
+      executable="${java.7.home}/bin/javadoc"
+      useexternalfile="true">
       <classpath>
         <path refid="compile.classpath"/>
         <path refid="tomcat.webservices.classpath"/>
@@ -2120,10 +2141,13 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       <link href="../jspapi"/>
       <link href="../elapi"/>
       <link href="../websocketapi"/>
-      <link href="http://docs.oracle.com/javase/7/docs/api/"/>
-      <link href="http://docs.oracle.com/javaee/6/api/"/>
+      <link href="https://docs.oracle.com/javase/7/docs/api/"/>
+      <link href="https://docs.oracle.com/javaee/6/api/"/>
+      <fileset dir="${tomcat.dist}/src/java">
+        <include name="**/*.java"/>
+        <exclude name="org/apache/catalina/util/Base64.java" if="java11.present" />
+      </fileset>
       <sourcepath>
-        <path location="${tomcat.dist}/src/java"/>
         <!--jdbc-pool src files for javadoc-->
         <path location="${tomcat.dist}/src/modules/jdbc-pool/src/main/java"/>
       </sourcepath>
@@ -2838,6 +2862,16 @@ skip.installer property in build.properties" />
       <param name="checksum.enabled" value="${jdt.checksum.enabled}"/>
       <param name="checksum.algorithm" value="${jdt.checksum.algorithm}"/>
       <param name="checksum.value" value="${jdt.checksum.value}"/>
+    </antcall>
+
+    <!-- Download SAAJ API -->
+    <antcall target="downloadfile">
+      <param name="sourcefile" value="${saaj-api.loc}"/>
+      <param name="destfile" value="${saaj-api.jar}"/>
+      <param name="destdir" value="${saaj-api.home}"/>
+      <param name="checksum.enabled" value="${saaj-api.checksum.enabled}"/>
+      <param name="checksum.algorithm" value="${saaj-api.checksum.algorithm}"/>
+      <param name="checksum.value" value="${saaj-api.checksum.value}"/>
     </antcall>
 
   </target>

@@ -89,7 +89,6 @@ public class NioChannel implements ByteChannel{
      * Closes this channel.
      *
      * @throws IOException If an I/O error occurs
-     * TODO Implement this java.nio.channels.Channel method
      */
     @Override
     public void close() throws IOException {
@@ -104,7 +103,6 @@ public class NioChannel implements ByteChannel{
      * Tells whether or not this channel is open.
      *
      * @return <code>true</code> if, and only if, this channel is open
-     * TODO Implement this java.nio.channels.Channel method
      */
     @Override
     public boolean isOpen() {
@@ -117,7 +115,6 @@ public class NioChannel implements ByteChannel{
      * @param src The buffer from which bytes are to be retrieved
      * @return The number of bytes written, possibly zero
      * @throws IOException If some other I/O error occurs
-     * TODO Implement this java.nio.channels.WritableByteChannel method
      */
     @Override
     public int write(ByteBuffer src) throws IOException {
@@ -129,9 +126,9 @@ public class NioChannel implements ByteChannel{
      * Reads a sequence of bytes from this channel into the given buffer.
      *
      * @param dst The buffer into which bytes are to be transferred
-     * @return The number of bytes read, possibly zero, or <code>-1</code> if the channel has reached end-of-stream
+     * @return The number of bytes read, possibly zero, or <code>-1</code> if
+     *         the channel has reached end-of-stream
      * @throws IOException If some other I/O error occurs
-     * TODO Implement this java.nio.channels.ReadableByteChannel method
      */
     @Override
     public int read(ByteBuffer dst) throws IOException {
@@ -149,7 +146,6 @@ public class NioChannel implements ByteChannel{
      * getBufHandler
      *
      * @return ApplicationBufferHandler
-     * TODO Implement this org.apache.tomcat.util.net.SecureNioChannel method
      */
     public ApplicationBufferHandler getBufHandler() {
         return bufHandler;
@@ -162,7 +158,6 @@ public class NioChannel implements ByteChannel{
      * getIOChannel
      *
      * @return SocketChannel
-     * TODO Implement this org.apache.tomcat.util.net.SecureNioChannel method
      */
     public SocketChannel getIOChannel() {
         return sc;
@@ -172,7 +167,6 @@ public class NioChannel implements ByteChannel{
      * isClosing
      *
      * @return boolean
-     * TODO Implement this org.apache.tomcat.util.net.SecureNioChannel method
      */
     public boolean isClosing() {
         return false;
