@@ -117,7 +117,7 @@
              writeable="false"/>
 
     <attribute    name="maxWait"
-           description="The time to wait in milliseconds before a SQLException is thrown when a connection is requested"
+           description="The time to wait in milliseconds before an SQLException is thrown when a connection is requested"
                   type="java.lang.Integer"
              writeable="false"/>
 
@@ -214,7 +214,7 @@
              writeable="false"/>
 
     <attribute    name="initSQL"
-           description="A SQL executed once per connection, when it is established"
+           description="An SQL executed once per connection, when it is established"
                   type="java.lang.String"
              writeable="false"/>
 

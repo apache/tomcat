@@ -119,7 +119,7 @@
   <subsection name="Additional features">
     <p>The Tomcat connection pool offers a few additional features over what most other pools let you do:</p>
     <ul>
-      <li><code>initSQL</code> - the ability to run a SQL statement exactly once, when the connection is created</li>
+      <li><code>initSQL</code> - the ability to run an SQL statement exactly once, when the connection is created</li>
       <li><code>validationInterval</code> - in addition to running validations on connections, avoid running them too frequently.</li>
       <li><code>jdbcInterceptors</code> - flexible and pluggable interceptors to create any customizations around the pool,
           the query execution and the result set handling. More on this in the advanced section.</li>
