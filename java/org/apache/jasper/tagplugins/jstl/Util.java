@@ -91,11 +91,11 @@ public class Util {
     }
 
     /**
-     * Returns <tt>true</tt> if our current URL is absolute,
-     * <tt>false</tt> otherwise.
+     * Returns <code>true</code> if our current URL is absolute,
+     * <code>false</code> otherwise.
      * taken from org.apache.taglibs.standard.tag.common.core.ImportSupport
      * @param url The URL
-     * @return <tt>true</tt> if the URL is absolute
+     * @return <code>true</code> if the URL is absolute
      */
     public static boolean isAbsoluteUrl(String url){
         if(url == null){
@@ -150,7 +150,7 @@ public class Util {
     }
 
     /**
-     * Strips a servlet session ID from <tt>url</tt>.  The session ID
+     * Strips a servlet session ID from <code>url</code>.  The session ID
      * is encoded as a URL "path parameter" beginning with "jsessionid=".
      * We thus remove anything we find between ";jsessionid=" (inclusive)
      * and either EOS or a subsequent ';' (exclusive).

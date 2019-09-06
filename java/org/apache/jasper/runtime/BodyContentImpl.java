@@ -208,8 +208,8 @@ public class BodyContentImpl extends BodyContent {
 
     /**
      * Write a line separator.  The line separator string is defined by the
-     * system property <tt>line.separator</tt>, and is not necessarily a single
-     * newline ('\n') character.
+     * system property <code>line.separator</code>, and is not necessarily a
+     * single newline ('\n') character.
      *
      * @throws IOException Error writing to wrapped writer
      */

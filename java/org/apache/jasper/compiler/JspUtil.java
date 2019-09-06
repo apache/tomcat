@@ -249,14 +249,15 @@ public class JspUtil {
     }
 
     /**
-     * Returns the <tt>Class</tt> object associated with the class or
+     * Returns the <code>Class</code> object associated with the class or
      * interface with the given string name.
      *
      * <p>
-     * The <tt>Class</tt> object is determined by passing the given string
-     * name to the <tt>Class.forName()</tt> method, unless the given string
+     * The <code>Class</code> object is determined by passing the given string
+     * name to the <code>Class.forName()</code> method, unless the given string
      * name represents a primitive type, in which case it is converted to a
-     * <tt>Class</tt> object by appending ".class" to it (e.g., "int.class").
+     * <code>Class</code> object by appending ".class" to it (e.g.,
+     * "int.class").
      * @param type The class name, array or primitive type
      * @param loader The class loader
      * @return the loaded class
