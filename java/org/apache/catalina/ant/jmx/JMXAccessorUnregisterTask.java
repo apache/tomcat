@@ -28,14 +28,14 @@ import org.apache.tools.ant.BuildException;
  * </ul>
  * <p>
  * Examples:
- * <br/>
+ * <br>
  * unregister an existing Mbean at jmx.server connection
+ * </p>
  * <pre>
  *   &lt;jmx:unregister
  *           ref="jmx.server"
  *           name="Catalina:type=MBeanFactory" /&gt;
  * </pre>
- * </p>
  * <p>
  * <b>WARNING</b>Not all Tomcat MBeans can successfully unregister remotely. The mbean
  * unregistration don't remove valves, realm, .. from parent class.
@@ -72,14 +72,6 @@ public class JMXAccessorUnregisterTask extends JMXAccessorTask {
     }
     // ------------------------------------------------------ protected Methods
 
-    /**
-     * Execute the specified command, based on the configured properties. The
-     * input stream will be closed upon completion of this task, whether it was
-     * executed successfully or not.
-     *
-     * @exception Exception
-     *                if an error occurs
-     */
     @Override
     public String jmxExecute(MBeanServerConnection jmxServerConnection)
         throws Exception {
@@ -92,11 +84,12 @@ public class JMXAccessorUnregisterTask extends JMXAccessorTask {
 
 
     /**
-     * Unregister Mbean
-     * @param jmxServerConnection
-     * @param name
-     * @return The value of the given named attribute
-     * @throws Exception
+     * Unregister MBean.
+     *
+     * @param jmxServerConnection Connection to the JMX server
+     * @param name The MBean name
+     * @return null (no error message to report other than exception)
+     * @throws Exception An error occurred
      */
     protected String jmxUuregister(MBeanServerConnection jmxServerConnection,String name) throws Exception {
         String error = null;

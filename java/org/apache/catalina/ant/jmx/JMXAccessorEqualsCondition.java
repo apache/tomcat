@@ -22,16 +22,16 @@ import org.apache.tools.ant.BuildException;
  *
  * Definition
  * <pre>
- *   &lt;path id="catalina_ant">
- *       &lt;fileset dir="${catalina.home}/server/lib">
- *           &lt;include name="catalina-ant.jar"/>
- *       &lt;/fileset>
- *   &lt;/path>
+ *   &lt;path id="catalina_ant"&gt;
+ *       &lt;fileset dir="${catalina.home}/server/lib"&gt;
+ *           &lt;include name="catalina-ant.jar"/&gt;
+ *       &lt;/fileset&gt;
+ *   &lt;/path&gt;
  *
  *   &lt;typedef
  *       name="jmxEquals"
  *       classname="org.apache.catalina.ant.jmx.JMXAccessorEqualsCondition"
- *       classpathref="catalina_ant"/>
+ *       classpathref="catalina_ant"/&gt;
  * </pre>
  *
  * usage: Wait for start backup node

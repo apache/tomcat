@@ -49,7 +49,7 @@ import org.apache.tools.ant.BuildException;
  *           resultproperty="manager" /&gt;
  * </pre>
  * with attribute <em>attributebinding="true"</em> you can get
- * all attributes also from result objects.<br/>
+ * all attributes also from result objects.<br>
  * The property manager.length show the size of the result
  * and with manager.[0..length].name the
  * resulted ObjectNames are saved.
@@ -101,14 +101,6 @@ public class JMXAccessorQueryTask extends JMXAccessorTask {
     // ------------------------------------------------------ protected Methods
 
 
-    /**
-     * Execute the specified command, based on the configured properties. The
-     * input stream will be closed upon completion of this task, whether it was
-     * executed successfully or not.
-     *
-     * @exception Exception
-     *                if an error occurs
-     */
     @Override
     public String jmxExecute(MBeanServerConnection jmxServerConnection)
         throws Exception {
@@ -124,10 +116,10 @@ public class JMXAccessorQueryTask extends JMXAccessorTask {
     /**
      * Call Mbean server for some mbeans with same domain, attributes.
      *  with <em>attributebinding=true</em> you can save all attributes from all found objects
-     * as your ant properties
-     * @param jmxServerConnection
-     * @param qry
-     * @return The query result
+     *
+     * @param jmxServerConnection Connection to the JMX server
+     * @param qry The query
+     * @return null (no error message to report other than exception)
      */
     protected String jmxQuery(MBeanServerConnection jmxServerConnection,
             String qry) {
@@ -153,12 +145,11 @@ public class JMXAccessorQueryTask extends JMXAccessorTask {
                 ObjectName oname = it.next();
                 pname = resultproperty + "." + Integer.toString(oindex) + ".";
                 oindex++;
-                    setProperty(pname + "Name", oname.toString());
-                    if (isAttributebinding()) {
-                        bindAttributes(jmxServerConnection, resultproperty, pname, oname);
-
-                    }
+                setProperty(pname + "Name", oname.toString());
+                if (isAttributebinding()) {
+                    bindAttributes(jmxServerConnection, resultproperty, pname, oname);
                 }
+            }
         }
         return isError;
     }
@@ -171,7 +162,7 @@ public class JMXAccessorQueryTask extends JMXAccessorTask {
      */
     protected void bindAttributes(MBeanServerConnection jmxServerConnection, String resultproperty, String pname, ObjectName oname) {
         if (jmxServerConnection != null  && resultproperty != null
-            && pname != null && oname != null ) {
+                && pname != null && oname != null ) {
             try {
                 MBeanInfo minfo = jmxServerConnection.getMBeanInfo(oname);
                 MBeanAttributeInfo attrs[] = minfo.getAttributes();
