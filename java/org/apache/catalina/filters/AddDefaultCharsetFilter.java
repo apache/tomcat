@@ -38,7 +38,7 @@ import org.apache.juli.logging.LogFactory;
  * defined for media with subtype "text". However, browsers may attempt to
  * auto-detect the character set. This may be exploited by an attacker to
  * perform an XSS attack. Internet Explorer has this behaviour by default. Other
- * browsers have an option to enable it.<br/>
+ * browsers have an option to enable it.<br>
  *
  * This filter prevents the attack by explicitly setting a character set. Unless
  * the provided character set is explicitly overridden by the user - in which
@@ -109,7 +109,7 @@ public class AddDefaultCharsetFilter extends FilterBase {
         public void setContentType(String ct) {
 
             if (ct != null && ct.startsWith("text/")) {
-                if (ct.indexOf("charset=") < 0) {
+                if (!ct.contains("charset=")) {
                     super.setContentType(ct + ";charset=" + encoding);
                 } else {
                     super.setContentType(ct);

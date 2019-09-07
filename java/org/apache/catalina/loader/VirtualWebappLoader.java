@@ -33,11 +33,11 @@ import org.apache.catalina.LifecycleException;
  * WEB-INF/lib.
  *
  * <pre>
- * &lt;Context docBase="\webapps\mydocbase">
+ * &lt;Context docBase="\webapps\mydocbase"&gt;
  *   &lt;Loader className="org.apache.catalina.loader.VirtualWebappLoader"
  *              virtualClasspath="/dir/classes;/somedir/somejar.jar;
- *                /somedir/*.jar"/>
- * &lt;/Context>
+ *                /somedir/*.jar"/&gt;
+ * &lt;/Context&gt;
  * </pre>
  *
  * <p>The <code>*.jar</code> suffix can be used to include all JAR files in a

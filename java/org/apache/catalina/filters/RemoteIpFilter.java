@@ -114,7 +114,6 @@ import org.apache.tomcat.util.res.StringManager;
  *     <br>
  * By default, 10/8, 192.168/16, 169.254/16, 127/8 and 0:0:0:0:0:0:0:1 are allowed.</td>
  * </tr>
- * </tr>
  * <tr>
  * <td>proxiesHeader</td>
  * <td>Name of the http header created by this servlet filter to hold the list of proxies that have been processed in the incoming

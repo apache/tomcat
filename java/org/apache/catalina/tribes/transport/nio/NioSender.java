@@ -38,11 +38,11 @@ import org.apache.juli.logging.LogFactory;
  *
  * This is a state machine, handled by the process method
  * States are:
- * - NOT_CONNECTED -> connect() -> CONNECTED
- * - CONNECTED -> setMessage() -> READY TO WRITE
- * - READY_TO_WRITE -> write() -> READY TO WRITE | READY TO READ
- * - READY_TO_READ -> read() -> READY_TO_READ | TRANSFER_COMPLETE
- * - TRANSFER_COMPLETE -> CONNECTED
+ * - NOT_CONNECTED -&gt; connect() -&gt; CONNECTED
+ * - CONNECTED -&gt; setMessage() -&gt; READY TO WRITE
+ * - READY_TO_WRITE -&gt; write() -&gt; READY TO WRITE | READY TO READ
+ * - READY_TO_READ -&gt; read() -&gt; READY_TO_READ | TRANSFER_COMPLETE
+ * - TRANSFER_COMPLETE -&gt; CONNECTED
  *
  * @author Filip Hanik
  * @version 1.0
@@ -75,10 +75,11 @@ public class NioSender extends AbstractSender {
     }
 
     /**
-     * State machine to send data
-     * @param key SelectionKey
-     * @return boolean
-     * @throws IOException
+     * State machine to send data.
+     * @param key The key to use
+     * @param waitForAck Wait for an ack
+     * @return <code>true</code> if the processing was successful
+     * @throws IOException An IO error occurred
      */
     public boolean process(SelectionKey key, boolean waitForAck) throws IOException {
         int ops = key.readyOps();
@@ -294,7 +295,6 @@ public class NioSender extends AbstractSender {
             if ( log.isDebugEnabled() ) log.debug("Unable to disconnect NioSender. msg="+x.getMessage(),x);
         } finally {
         }
-
     }
 
     public void reset() {
@@ -320,7 +320,7 @@ public class NioSender extends AbstractSender {
     }
 
     private ByteBuffer getBuffer(int size) {
-        return (getDirectBuffer()?ByteBuffer.allocateDirect(size):ByteBuffer.allocate(size));
+        return getDirectBuffer()?ByteBuffer.allocateDirect(size):ByteBuffer.allocate(size);
     }
 
     /**

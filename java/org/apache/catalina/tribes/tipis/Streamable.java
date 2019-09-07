@@ -20,7 +20,7 @@ import java.io.IOException;
 
 /**
  * Example usage:
- * <code><pre>
+ * <pre>
  * byte[] data = new byte[1024];
  * Streamable st = ....;
  * while ( !st.eof() ) {
@@ -28,7 +28,7 @@ import java.io.IOException;
  * &nbsp;&nbsp;String s = new String(data,0,length);
  * &nbsp;&nbsp;System.out.println(s);
  * }
- * </pre></code>
+ * </pre>
  * @author Filip Hanik
  * @version 1.0
  *

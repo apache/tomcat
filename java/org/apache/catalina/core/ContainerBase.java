@@ -16,7 +16,6 @@
  */
 package org.apache.catalina.core;
 
-
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.IOException;
@@ -88,39 +87,40 @@ import org.apache.tomcat.util.res.StringManager;
  * following <code>ContainerEvent</code> events to listeners who register
  * themselves with <code>addContainerListener()</code>:
  * <table border=1>
+ *   <caption>ContainerEvents fired by this implementation</caption>
  *   <tr>
  *     <th>Type</th>
  *     <th>Data</th>
  *     <th>Description</th>
  *   </tr>
  *   <tr>
- *     <td align=center><code>addChild</code></td>
- *     <td align=center><code>Container</code></td>
+ *     <td><code>addChild</code></td>
+ *     <td><code>Container</code></td>
  *     <td>Child container added to this Container.</td>
  *   </tr>
  *   <tr>
- *     <td align=center><code>{@link #getPipeline() pipeline}.addValve</code></td>
- *     <td align=center><code>Valve</code></td>
+ *     <td><code>{@link #getPipeline() pipeline}.addValve</code></td>
+ *     <td><code>Valve</code></td>
  *     <td>Valve added to this Container.</td>
  *   </tr>
  *   <tr>
- *     <td align=center><code>removeChild</code></td>
- *     <td align=center><code>Container</code></td>
+ *     <td><code>removeChild</code></td>
+ *     <td><code>Container</code></td>
  *     <td>Child container removed from this Container.</td>
  *   </tr>
  *   <tr>
- *     <td align=center><code>{@link #getPipeline() pipeline}.removeValve</code></td>
- *     <td align=center><code>Valve</code></td>
+ *     <td><code>{@link #getPipeline() pipeline}.removeValve</code></td>
+ *     <td><code>Valve</code></td>
  *     <td>Valve removed from this Container.</td>
  *   </tr>
  *   <tr>
- *     <td align=center><code>start</code></td>
- *     <td align=center><code>null</code></td>
+ *     <td><code>start</code></td>
+ *     <td><code>null</code></td>
  *     <td>Container was started.</td>
  *   </tr>
  *   <tr>
- *     <td align=center><code>stop</code></td>
- *     <td align=center><code>null</code></td>
+ *     <td><code>stop</code></td>
+ *     <td><code>null</code></td>
  *     <td>Container was stopped.</td>
  *   </tr>
  * </table>
@@ -134,8 +134,7 @@ import org.apache.tomcat.util.res.StringManager;
 public abstract class ContainerBase extends LifecycleMBeanBase
         implements Container {
 
-    private static final org.apache.juli.logging.Log log=
-        org.apache.juli.logging.LogFactory.getLog( ContainerBase.class );
+    private static final Log log = LogFactory.getLog(ContainerBase.class);
 
     /**
      * Perform addChild with the permissions of this class.
@@ -143,10 +142,9 @@ public abstract class ContainerBase extends LifecycleMBeanBase
      * this allows the XML parser to have fewer privileges than
      * Tomcat.
      */
-    protected class PrivilegedAddChild
-        implements PrivilegedAction<Void> {
+    protected class PrivilegedAddChild implements PrivilegedAction<Void> {
 
-        private Container child;
+        private final Container child;
 
         PrivilegedAddChild(Container child) {
             this.child = child;

@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.catalina.ha.deploy;
 
 import java.io.File;
@@ -27,23 +26,19 @@ import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
- * <p>
  * The <b>WarWatcher </b> watches the deployDir for changes made to the
- * directory (adding new WAR files->deploy or remove WAR files->undeploy) And
- * notifies a listener of the changes made
- * </p>
+ * directory (adding new WAR files-&gt;deploy or remove WAR files-&gt;undeploy)
+ * and notifies a listener of the changes made.
  *
  * @author Filip Hanik
  * @author Peter Rossbach
  * @version 1.1
  */
-
 public class WarWatcher {
 
     /*--Static Variables----------------------------------------*/
     private static final Log log = LogFactory.getLog(WarWatcher.class);
-    private static final StringManager sm =
-            StringManager.getManager(Constants.Package);
+    private static final StringManager sm = StringManager.getManager(WarWatcher.class);
 
     /*--Instance Variables--------------------------------------*/
     /**
@@ -122,7 +117,7 @@ public class WarWatcher {
 
     /**
      * add cluster war to the watcher state
-     * @param warfile
+     * @param warfile The WAR to add
      */
     protected void addWarInfo(File warfile) {
         WarInfo info = currentStatus.get(warfile.getAbsolutePath());
