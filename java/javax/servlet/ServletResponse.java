@@ -45,7 +45,6 @@ import java.util.Locale;
  * RFC 2045</a> for more information on MIME. Protocols such as SMTP and HTTP
  * define profiles of MIME, and those standards are still evolving.
  *
- * @author Various
  * @see ServletOutputStream
  */
 public interface ServletResponse {
@@ -243,6 +242,8 @@ public interface ServletResponse {
      * this method automatically commits the response, meaning the status code
      * and headers will be written.
      *
+     * @throws IOException if an I/O occurs during the flushing of the response
+     *
      * @see #setBufferSize
      * @see #getBufferSize
      * @see #isCommitted
@@ -328,8 +329,11 @@ public interface ServletResponse {
     /**
      * Returns the locale specified for this response using the
      * {@link #setLocale} method. Calls made to <code>setLocale</code> after the
-     * response is committed have no effect. If no locale has been specified,
-     * the container's default locale is returned.
+     * response is committed have no effect.
+     *
+     * @return The locale specified for this response using the
+     *          {@link #setLocale} method. If no locale has been specified, the
+     *          container's default locale is returned.
      *
      * @see #setLocale
      */

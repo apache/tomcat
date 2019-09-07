@@ -289,8 +289,9 @@ public interface HttpServletRequest extends ServletRequest {
      * Returns the part of this request's URL from the protocol name up to the
      * query string in the first line of the HTTP request. The web container
      * does not decode this String. For example:
-     * <table summary="Examples of Returned Values">
-     * <tr align=left>
+     * <table>
+     * <caption>Examples of Returned Values</caption>
+     * <tr>
      * <th>First line of HTTP request</th>
      * <th>Returned Value</th>
      * <tr>
@@ -412,6 +413,7 @@ public interface HttpServletRequest extends ServletRequest {
     public boolean isRequestedSessionIdFromURL();
 
     /**
+     * @return {@link #isRequestedSessionIdFromURL()}
      * @deprecated As of Version 2.1 of the Java Servlet API, use
      *             {@link #isRequestedSessionIdFromURL} instead.
      */
@@ -428,6 +430,12 @@ public interface HttpServletRequest extends ServletRequest {
      * @return <code>true</code> if the user is successfully authenticated and
      *         <code>false</code> if not
      *
+     * @throws IOException if the authentication process attempted to read from
+     *         the request or write to the response and an I/O error occurred
+     * @throws IllegalStateException if the authentication process attempted to
+     *         write to the response after it had been committed
+     * @throws ServletException if the authentication failed and the caller is
+     *         expected to handle the failure
      * @since Servlet 3.0
      */
     public boolean authenticate(HttpServletResponse response)
@@ -466,7 +474,8 @@ public interface HttpServletRequest extends ServletRequest {
      * @throws IOException
      *             if an I/O error occurs
      * @throws IllegalStateException
-     *             if size limits are exceeded
+     *             if size limits are exceeded or no multipart configuration is
+     *             provided
      * @throws ServletException
      *             if the request is not multipart/form-data
      * @since Servlet 3.0
@@ -478,7 +487,8 @@ public interface HttpServletRequest extends ServletRequest {
      * Gets the named Part or null if the Part does not exist. Triggers upload
      * of all Parts.
      *
-     * @param name
+     * @param name The name of the Part to obtain
+     *
      * @return The named Part or null if the Part does not exist
      * @throws IOException
      *             if an I/O error occurs

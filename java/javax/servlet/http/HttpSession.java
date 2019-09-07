@@ -135,6 +135,8 @@ public interface HttpSession {
     public int getMaxInactiveInterval();
 
     /**
+     * Do not use.
+     * @return A dummy implementation of HttpSessionContext
      * @deprecated As of Version 2.1, this method is deprecated and has no
      *             replacement. It will be removed in a future version of the
      *             Java Servlet API.

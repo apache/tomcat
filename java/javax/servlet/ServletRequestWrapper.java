@@ -28,7 +28,7 @@ import java.util.Map;
  * class implements the Wrapper or Decorator pattern. Methods default to calling
  * through to the wrapped request object.
  *
- * @since v 2.3
+ * @since Servlet 2.3
  * @see javax.servlet.ServletRequest
  */
 public class ServletRequestWrapper implements ServletRequest {
@@ -36,6 +36,8 @@ public class ServletRequestWrapper implements ServletRequest {
 
     /**
      * Creates a ServletRequest adaptor wrapping the given request object.
+     *
+     * @param request The request to wrap
      *
      * @throws IllegalArgumentException if the request is null
      */
@@ -301,7 +303,7 @@ public class ServletRequestWrapper implements ServletRequest {
      * The default behavior of this method is to return getRemotePort() on the
      * wrapped request object.
      *
-     * @since 2.4
+     * @since Servlet 2.4
      */
     @Override
     public int getRemotePort() {
@@ -312,7 +314,7 @@ public class ServletRequestWrapper implements ServletRequest {
      * The default behavior of this method is to return getLocalName() on the
      * wrapped request object.
      *
-     * @since 2.4
+     * @since Servlet 2.4
      */
     @Override
     public String getLocalName() {
@@ -323,7 +325,7 @@ public class ServletRequestWrapper implements ServletRequest {
      * The default behavior of this method is to return getLocalAddr() on the
      * wrapped request object.
      *
-     * @since 2.4
+     * @since Servlet 2.4
      */
     @Override
     public String getLocalAddr() {
@@ -334,7 +336,7 @@ public class ServletRequestWrapper implements ServletRequest {
      * The default behavior of this method is to return getLocalPort() on the
      * wrapped request object.
      *
-     * @since 2.4
+     * @since Servlet 2.4
      */
     @Override
     public int getLocalPort() {

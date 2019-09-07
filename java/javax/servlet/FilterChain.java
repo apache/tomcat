@@ -41,6 +41,10 @@ public interface FilterChain {
      * @param response
      *            the response to pass along the chain.
      *
+     * @throws IOException if an I/O error occurs during the processing of the
+     *                     request
+     * @throws ServletException if the processing fails for any other reason
+
      * @since 2.3
      */
     public void doFilter(ServletRequest request, ServletResponse response)
