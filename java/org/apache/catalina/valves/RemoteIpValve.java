@@ -99,7 +99,6 @@ import org.apache.tomcat.util.http.parser.Host;
  *     <br>
  * By default, 10/8, 192.168/16, 169.254/16, 127/8 and ::1 are allowed.</td>
  * </tr>
- * </tr>
  * <tr>
  * <td>proxiesHeader</td>
  * <td>Name of the http header created by this valve to hold the list of proxies that have been processed in the incoming

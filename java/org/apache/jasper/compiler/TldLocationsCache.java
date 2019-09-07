@@ -48,12 +48,12 @@ import org.apache.tomcat.util.scan.JarFactory;
  * for the web application.
  *
  * Tag Libraries can be defined globally in one of two ways:
- *   1. Via <taglib> elements in web.xml:
+ *   1. Via &lt;taglib&gt; elements in web.xml:
  *      the uri and location of the tag-library are specified in
- *      the <taglib> element.
+ *      the &lt;taglib&gt; element.
  *   2. Via packaged jar files that contain .tld files
  *      within the META-INF directory, or some subdirectory
- *      of it. The taglib is 'global' if it has the <uri>
+ *      of it. The taglib is 'global' if it has the &lt;uri&gt;
  *      element defined.
  *
  * A mapping between the taglib URI and its associated TaglibraryInfoImpl
