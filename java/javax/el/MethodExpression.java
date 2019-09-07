@@ -62,6 +62,8 @@ public abstract class MethodExpression extends Expression {
      * Note: The spelling mistake is deliberate.
      * isParmetersProvided()  - Specification definition
      * isParametersProvided() - Corrected spelling
+     *
+     * @return Always <code>false</code>
      */
     public boolean isParmetersProvided() {
         // Expected to be over-ridden by implementation
