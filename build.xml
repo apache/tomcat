@@ -196,9 +196,9 @@
 
   <!-- Java 9 -->
   <available classname="java.lang.reflect.InaccessibleObjectException"
-             property="java9.add.modules"
-             value="--add-modules java.xml.ws"/>
-  <property name="java9.add.modules" value=""/>
+             property="java9.javadoc.options"
+             value="-html5"/>
+  <property name="java9.javadoc.options" value=""/>
 
   <!-- Classpaths -->
   <path id="compile.classpath">
@@ -1853,7 +1853,8 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       encoding="UTF-8"
       docencoding="UTF-8"
       charset="UTF-8"
-      additionalparam="-breakiterator -notimestamp"
+      additionalparam="-breakiterator -notimestamp ${java9.javadoc.options}"
+      source="${compile.source}"
       maxmemory="512m"
       failonerror="true"
       failonwarning="true">
@@ -1873,7 +1874,8 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       encoding="UTF-8"
       docencoding="UTF-8"
       charset="UTF-8"
-      additionalparam="-breakiterator -notimestamp"
+      additionalparam="-breakiterator -notimestamp ${java9.javadoc.options}"
+      source="${compile.source}"
       maxmemory="512m"
       failonerror="true"
       failonwarning="true">
@@ -1893,7 +1895,8 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       encoding="UTF-8"
       docencoding="UTF-8"
       charset="UTF-8"
-      additionalparam="-breakiterator -notimestamp"
+      additionalparam="-breakiterator -notimestamp ${java9.javadoc.options}"
+      source="${compile.source}"
       maxmemory="512m"
       failonerror="true"
       failonwarning="true">
@@ -1913,7 +1916,8 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       encoding="UTF-8"
       docencoding="UTF-8"
       charset="UTF-8"
-      additionalparam="-breakiterator -notimestamp"
+      additionalparam="-breakiterator -notimestamp ${java9.javadoc.options}"
+      source="${compile.source}"
       maxmemory="512m"
       failonerror="true"
       failonwarning="true">
@@ -1952,7 +1956,8 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       encoding="UTF-8"
       docencoding="UTF-8"
       charset="UTF-8"
-      additionalparam="-breakiterator -notimestamp ${java9.add.modules}"
+      additionalparam="-breakiterator -notimestamp ${java9.javadoc.options}"
+      source="${compile.source}"
       maxmemory="512m"
       failonerror="true"
       failonwarning="true">
@@ -1964,8 +1969,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       <link href="../jspapi"/>
       <link href="../elapi"/>
       <link href="../websocketapi"/>
-      <link href="http://docs.oracle.com/javase/8/docs/api/"/>
-      <link href="https://commons.apache.org/proper/commons-io/javadocs/api-release/"/>
+      <link href="https://docs.oracle.com/javase/8/docs/api/"/>
       <link href="https://javaee.github.io/javaee-spec/javadocs/"/>
       <packageset dir="${tomcat.dist}/src/java/">
         <include name="org/**"/>

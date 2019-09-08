@@ -91,33 +91,33 @@ import org.apache.tomcat.util.threads.InlineExecutorService;
  *     <th>Description</th>
  *   </tr>
  *   <tr>
- *     <td align=center><code>addChild</code></td>
- *     <td align=center><code>Container</code></td>
+ *     <td><code>addChild</code></td>
+ *     <td><code>Container</code></td>
  *     <td>Child container added to this Container.</td>
  *   </tr>
  *   <tr>
- *     <td align=center><code>{@link #getPipeline() pipeline}.addValve</code></td>
- *     <td align=center><code>Valve</code></td>
+ *     <td><code>{@link #getPipeline() pipeline}.addValve</code></td>
+ *     <td><code>Valve</code></td>
  *     <td>Valve added to this Container.</td>
  *   </tr>
  *   <tr>
- *     <td align=center><code>removeChild</code></td>
- *     <td align=center><code>Container</code></td>
+ *     <td><code>removeChild</code></td>
+ *     <td><code>Container</code></td>
  *     <td>Child container removed from this Container.</td>
  *   </tr>
  *   <tr>
- *     <td align=center><code>{@link #getPipeline() pipeline}.removeValve</code></td>
- *     <td align=center><code>Valve</code></td>
+ *     <td><code>{@link #getPipeline() pipeline}.removeValve</code></td>
+ *     <td><code>Valve</code></td>
  *     <td>Valve removed from this Container.</td>
  *   </tr>
  *   <tr>
- *     <td align=center><code>start</code></td>
- *     <td align=center><code>null</code></td>
+ *     <td><code>start</code></td>
+ *     <td><code>null</code></td>
  *     <td>Container was started.</td>
  *   </tr>
  *   <tr>
- *     <td align=center><code>stop</code></td>
- *     <td align=center><code>null</code></td>
+ *     <td><code>stop</code></td>
+ *     <td><code>null</code></td>
  *     <td>Container was stopped.</td>
  *   </tr>
  * </table>

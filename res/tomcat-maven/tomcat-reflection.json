@@ -46,5 +46,6 @@
 { "name":"org.apache.naming.factory.EjbFactory", "methods" : [{"name": "<init>","parameterTypes":[]}] },
 { "name":"org.apache.naming.factory.ResourceEnvFactory", "methods" : [{"name": "<init>","parameterTypes":[]}] },
 { "name":"org.apache.naming.factory.ResourceFactory", "methods" : [{"name": "<init>","parameterTypes":[]}] },
-{ "name":"org.apache.naming.factory.TransactionFactory", "methods" : [{"name": "<init>","parameterTypes":[]}] }
+{ "name":"org.apache.naming.factory.TransactionFactory", "methods" : [{"name": "<init>","parameterTypes":[]}] },
+{ "name":"org.apache.tomcat.websocket.server.WsHttpUpgradeHandler", "methods" : [{"name": "<init>","parameterTypes":[] }] }
 ]

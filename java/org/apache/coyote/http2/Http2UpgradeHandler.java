@@ -142,6 +142,8 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
 
     // Track 'overhead' frames vs 'request/response' frames
     private final AtomicLong overheadCount = new AtomicLong(-10);
+    private volatile int lastNonFinalDataPayload;
+    private volatile int lastWindowUpdate;
 
 
     Http2UpgradeHandler(Http2Protocol protocol, Adapter adapter, Request coyoteRequest) {
@@ -149,6 +151,9 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
         this.protocol = protocol;
         this.adapter = adapter;
         this.connectionId = Integer.toString(connectionIdGenerator.getAndIncrement());
+
+        lastNonFinalDataPayload = protocol.getOverheadDataThreshold() * 2;
+        lastWindowUpdate = protocol.getOverheadWindowUpdateThreshold() * 2;
 
         remoteSettings = new ConnectionSettingsRemote(connectionId);
         localSettings = new ConnectionSettingsLocal(connectionId);
@@ -235,7 +240,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
         } catch (Http2Exception e) {
             String msg = sm.getString("upgradeHandler.invalidPreface", connectionId);
             if (log.isDebugEnabled()) {
-                log.debug(msg);
+                log.debug(msg, e);
             }
             throw new ProtocolException(msg);
         }
@@ -560,11 +565,21 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
     }
 
 
+    /**
+     * Write the initial settings frame and any necessary supporting frames. If
+     * the initial settings increase the initial window size, it will also be
+     * necessary to send a WINDOW_UPDATE frame to increase the size of the flow
+     * control window for the connection (stream 0).
+     */
     protected void writeSettings() {
         // Send the initial settings frame
         try {
             byte[] settings = localSettings.getSettingsFrameForPending();
             socketWrapper.write(true, settings, 0, settings.length);
+            byte[] windowUpdateFrame = createWindowUpdateForSettings();
+            if (windowUpdateFrame.length > 0) {
+                socketWrapper.write(true,  windowUpdateFrame, 0 , windowUpdateFrame.length);
+            }
             socketWrapper.flush(true);
         } catch (IOException ioe) {
             String msg = sm.getString("upgradeHandler.sendPrefaceFail", connectionId);
@@ -573,6 +588,29 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
             }
             throw new ProtocolException(msg, ioe);
         }
+    }
+
+
+    /**
+     * @return  The WINDOW_UPDATE frame if one is required or an empty array if
+     *          no WINDOW_UPDATE is required.
+     */
+    protected byte[] createWindowUpdateForSettings() {
+        // Build a WINDOW_UPDATE frame if one is required. If not, create an
+        // empty byte array.
+        byte[] windowUpdateFrame;
+        int increment = protocol.getInitialWindowSize() - ConnectionSettingsBase.DEFAULT_INITIAL_WINDOW_SIZE;
+        if (increment > 0) {
+            // Build window update frame for stream 0
+            windowUpdateFrame = new byte[13];
+            ByteUtil.setThreeBytes(windowUpdateFrame, 0,  4);
+            windowUpdateFrame[3] = FrameType.WINDOW_UPDATE.getIdByte();
+            ByteUtil.set31Bits(windowUpdateFrame, 9, increment);
+        } else {
+            windowUpdateFrame = new byte[0];
+        }
+
+        return windowUpdateFrame;
     }
 
 
@@ -1339,15 +1377,21 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
         // .. but lots of small payloads are inefficient so that will increase
         // the overhead count unless it is the final DATA frame where small
         // payloads are expected.
+
+        // See also https://bz.apache.org/bugzilla/show_bug.cgi?id=63690
+        // The buffering behaviour of some clients means that small data frames
+        // are much more frequent (roughly 1 in 20) than expected. Use an
+        // average over two frames to avoid false positives.
         if (!endOfStream) {
-            int overheadThreshold = protocol.getOverheadDataThreadhold();
-            if (payloadSize < overheadThreshold) {
-                if (payloadSize == 0) {
-                    // Avoid division by zero
-                    overheadCount.addAndGet(overheadThreshold);
-                } else {
-                    overheadCount.addAndGet(overheadThreshold / payloadSize);
-                }
+            int overheadThreshold = protocol.getOverheadDataThreshold();
+            int average = (lastNonFinalDataPayload >> 1) + (payloadSize >> 1);
+            lastNonFinalDataPayload = payloadSize;
+            // Avoid division by zero
+            if (average == 0) {
+                average = 1;
+            }
+            if (average < overheadThreshold) {
+                overheadCount.addAndGet(overheadThreshold / average);
             }
         }
 
@@ -1470,7 +1514,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
         // they are small and the frame isn't the final header frame then that
         // is indicative of an abusive client
         if (!endOfHeaders) {
-            int overheadThreshold = getProtocol().getOverheadContinuationThreshhold();
+            int overheadThreshold = getProtocol().getOverheadContinuationThreshold();
             if (payloadSize < overheadThreshold) {
                 if (payloadSize == 0) {
                     // Avoid division by zero
@@ -1582,13 +1626,25 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
 
     @Override
     public void incrementWindowSize(int streamId, int increment) throws Http2Exception {
-        int overheadThreshold = protocol.getOverheadWindowUpdateThreadhold();
+        // See also https://bz.apache.org/bugzilla/show_bug.cgi?id=63690
+        // The buffering behaviour of some clients means that small data frames
+        // are much more frequent (roughly 1 in 20) than expected. Some clients
+        // issue a Window update for every DATA frame so a similar pattern may
+        // be observed. Use an average over two frames to avoid false positives.
+
+        int average = (lastWindowUpdate >> 1) + (increment >> 1);
+        int overheadThreshold = protocol.getOverheadWindowUpdateThreshold();
+        lastWindowUpdate = increment;
+        // Avoid division by zero
+        if (average == 0) {
+            average = 1;
+        }
 
         if (streamId == 0) {
             // Check for small increments which are inefficient
-            if (increment < overheadThreshold) {
+            if (average < overheadThreshold) {
                 // The smaller the increment, the larger the overhead
-                overheadCount.addAndGet(overheadThreshold / increment);
+                overheadCount.addAndGet(overheadThreshold / average);
             }
 
             incrementWindowSize(increment);
@@ -1596,13 +1652,13 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
             Stream stream = getStream(streamId, true);
 
             // Check for small increments which are inefficient
-            if (increment < overheadThreshold) {
+            if (average < overheadThreshold) {
                 // For Streams, client might only release the minimum so check
                 // against current demand
                 BacklogTracker tracker = backLogStreams.get(stream);
                 if (tracker == null || increment < tracker.getRemainingReservation()) {
                     // The smaller the increment, the larger the overhead
-                    overheadCount.addAndGet(overheadThreshold / increment);
+                    overheadCount.addAndGet(overheadThreshold / average);
                 }
             }
 

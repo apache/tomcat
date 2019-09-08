@@ -29,7 +29,7 @@ import org.xml.sax.Attributes;
 import org.xml.sax.helpers.AttributesImpl;
 
 /**
- * An implementation of <tt>javax.servlet.jsp.tagext.PageData</tt> which
+ * An implementation of <code>javax.servlet.jsp.tagext.PageData</code> which
  * builds the XML view of a given page.
  *
  * The XML view is built in two passes:

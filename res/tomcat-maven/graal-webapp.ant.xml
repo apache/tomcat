@@ -22,7 +22,7 @@
   <typedef name="jasper" classname="org.apache.jasper.JspC">
     <classpath>
       <fileset file="${basedir}/target/tomcat-maven-1.0.jar" />
-      <fileset dir="${basedir}/webapps/${webapp.name}/WEB-INF/lib" includes="*.jar" />
+      <fileset dir="${basedir}/webapps/${webapp.name}/WEB-INF/lib" includes="*.jar" erroronmissingdir="false" />
     </classpath>
   </typedef>
 
@@ -30,9 +30,7 @@
 
     <!-- Will contain the webapp classes -->
     <mkdir dir="${basedir}/src/main/java" />
-    <delete failonerror="false">
-        <fileset dir="${basedir}/src/main/java"/>
-    </delete>
+    <mkdir dir="${basedir}/src/main/resources" />
 
     <!-- JSP precompilation -->
     <jasper validateXml="false" package="${webapp.name}.org.apache.jsp"
@@ -41,7 +39,10 @@
             outputDir="${basedir}/src/main/java" />
     <!-- Copy all webapp classes to the mvn compile location -->
     <copy todir="${basedir}/src/main/java">
-        <fileset dir="${basedir}/webapps/${webapp.name}/WEB-INF/classes" includes="**/*.java"/>
+        <fileset dir="${basedir}/webapps/${webapp.name}/WEB-INF/classes" includes="**/*.java" erroronmissingdir="false" />
+    </copy>
+    <copy todir="${basedir}/src/main/resources">
+        <fileset dir="${basedir}/webapps/${webapp.name}/WEB-INF/classes" includes="**/*.properties" erroronmissingdir="false" />
     </copy>
 
   </target>

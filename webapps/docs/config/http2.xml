@@ -213,28 +213,27 @@
       used.</p>
     </attribute>
 
-    <attribute name="overheadDataThreadhold" required="false">
-      <p>The threshold below which the payload size of a non-final
-      <code>DATA</code> frame will trigger an increase in the overhead count
-      (see <strong>overheadCountFactor</strong>). The overhead count will be
-      increased by <code>overheadDataThreadhold/payloadSize</code> so that the
-      smaller the <code>DATA</code> frame, the greater the increase in the
-      overhead count. A value of zero or less disables the checking of non-final
-      <code>DATA</code> frames. If not specified, a default value of
-      <code>1024</code> will be used.</p>
+    <attribute name="overheadDataThreshold" required="false">
+      <p>The threshold below which the average payload size of the current and
+      previous non-final <code>DATA</code> frames will trigger an increase in
+      the overhead count (see <strong>overheadCountFactor</strong>). The
+      overhead count will be increased by
+      <code>overheadDataThreshold/average</code> so that the smaller the
+      average, the greater the increase in the overhead count. A value of zero
+      or less disables the checking of non-final <code>DATA</code> frames. If
+      not specified, a default value of <code>1024</code> will be used.</p>
     </attribute>
 
-    <attribute name="overheadWindowUpdateThreadhold" required="false">
-      <p>The threshold below which the size of a <code>WINDOW_UPDATE</code>
-      frame will trigger an increase in the overhead count (see
-      <strong>overheadCountFactor</strong>). The overhead count will be
-      increased by <code>overheadWindowUpdateThreadhold/updateSize</code> so
-      that the smaller the <code>WINDOW_UPDATE</code>, the greater the increase
-      in the overhead count. A value of zero or less disables the checking of
+    <attribute name="overheadWindowUpdateThreshold" required="false">
+      <p>The threshold below which the average size of current and previous
+      <code>WINDOW_UPDATE</code> frame will trigger an increase in the overhead
+      count (see <strong>overheadCountFactor</strong>). The overhead count will
+      be increased by <code>overheadWindowUpdateThreshold/average</code> so
+      that the smaller the average, the greater the increase in the overhead
+      count. A value of zero or less disables the checking of
       <code>WINDOW_UPDATE</code> frames. If not specified, a default value of
       <code>1024</code> will be used.</p>
     </attribute>
-
 
     <attribute name="readTimeout" required="false">
       <p>The time, in milliseconds, that Tomcat will wait for additional data

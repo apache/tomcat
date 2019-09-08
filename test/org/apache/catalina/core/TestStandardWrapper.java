@@ -259,13 +259,13 @@ public class TestStandardWrapper extends TomcatBaseTest {
 
         // No file system docBase required
         Context ctx = tomcat.addContext("", null);
-        ctx.addRoleMapping("testRole2", "very-complex-role-name");
-        /* We won't map "testRole3" to "another-very-complex-role-name" to make
-         * it fail intentionally.
-         */
+        ctx.addRoleMapping("testRole", "very-complex-role-name");
 
-        Wrapper wrapper = Tomcat.addServlet(ctx, "servlet", TestServlet.class.getName());
+        Wrapper wrapper = Tomcat.addServlet(ctx, "servlet", RoleAllowServlet.class.getName());
         ctx.addServletMappingDecoded("/", "servlet");
+
+        ctx.setLoginConfig(new LoginConfig("BASIC", null, null, null));
+        ctx.getPipeline().addValve(new BasicAuthenticator());
 
         TesterMapRealm realm = new TesterMapRealm();
         MessageDigestCredentialHandler ch = new MessageDigestCredentialHandler();
@@ -296,10 +296,27 @@ public class TestStandardWrapper extends TomcatBaseTest {
 
         Assert.assertNotNull(p);
         Assert.assertEquals("testUser", p.getName());
+        // This one is mapped
+        Assert.assertTrue(realm.hasRole(wrapper, p, "testRole"));
         Assert.assertTrue(realm.hasRole(wrapper, p, "testRole1"));
-        Assert.assertTrue(realm.hasRole(wrapper, p, "testRole2"));
+        Assert.assertFalse(realm.hasRole(wrapper, p, "testRole2"));
         Assert.assertTrue(realm.hasRole(wrapper, p, "very-complex-role-name"));
-        Assert.assertFalse(realm.hasRole(wrapper, p, "testRole3"));
+        Assert.assertTrue(realm.hasRole(wrapper, p, "another-very-complex-role-name"));
+
+        // This now tests RealmBase#hasResourcePermission() because we need a wrapper
+        // to be passed from an authenticator
+        ByteChunk bc = new ByteChunk();
+        Map<String, List<String>> reqHeaders = new HashMap<>();
+        List<String> authHeaders = new ArrayList<>();
+        // testUser, testPwd
+        authHeaders.add("Basic dGVzdFVzZXI6dGVzdFB3ZA==");
+        reqHeaders.put("Authorization", authHeaders);
+
+        int rc = getUrl("http://localhost:" + getPort() + "/", bc, reqHeaders,
+                null);
+
+        Assert.assertEquals("OK", bc.toString());
+        Assert.assertEquals(200, rc);
     }
 
     private void doTestSecurityAnnotationsAddServlet(boolean useCreateServlet)

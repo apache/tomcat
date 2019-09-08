@@ -51,8 +51,6 @@ public class Http2Protocol implements UpgradeProtocol {
     // Maximum amount of streams which can be concurrently executed over
     // a single connection
     static final int DEFAULT_MAX_CONCURRENT_STREAM_EXECUTION = 20;
-    // This default is defined by the HTTP/2 specification
-    static final int DEFAULT_INITIAL_WINDOW_SIZE = (1 << 16) - 1;
 
     static final int DEFAULT_OVERHEAD_COUNT_FACTOR = 1;
     static final int DEFAULT_OVERHEAD_CONTINUATION_THRESHOLD = 1024;
@@ -74,9 +72,9 @@ public class Http2Protocol implements UpgradeProtocol {
 
     private long maxConcurrentStreams = DEFAULT_MAX_CONCURRENT_STREAMS;
     private int maxConcurrentStreamExecution = DEFAULT_MAX_CONCURRENT_STREAM_EXECUTION;
-    // If a lower initial value is required, set it here but DO NOT change the
-    // default defined above.
-    private int initialWindowSize = DEFAULT_INITIAL_WINDOW_SIZE;
+    // To advertise a different default to the client specify it here but DO NOT
+    // change the default defined in ConnectionSettingsBase.
+    private int initialWindowSize = ConnectionSettingsBase.DEFAULT_INITIAL_WINDOW_SIZE;
     // Limits
     private Set<String> allowedTrailerHeaders =
             Collections.newSetFromMap(new ConcurrentHashMap<String, Boolean>());
@@ -86,8 +84,8 @@ public class Http2Protocol implements UpgradeProtocol {
     private int maxTrailerSize = Constants.DEFAULT_MAX_TRAILER_SIZE;
     private int overheadCountFactor = DEFAULT_OVERHEAD_COUNT_FACTOR;
     private int overheadContinuationThreshold = DEFAULT_OVERHEAD_CONTINUATION_THRESHOLD;
-    private int overheadDataThreadhold = DEFAULT_OVERHEAD_DATA_THRESHOLD;
-    private int overheadWindowUpdateThreadhold = DEFAULT_OVERHEAD_WINDOW_UPDATE_THRESHOLD;
+    private int overheadDataThreshold = DEFAULT_OVERHEAD_DATA_THRESHOLD;
+    private int overheadWindowUpdateThreshold = DEFAULT_OVERHEAD_WINDOW_UPDATE_THRESHOLD;
 
     private boolean initiatePingDisabled = false;
     private boolean useSendfile = true;
@@ -326,33 +324,33 @@ public class Http2Protocol implements UpgradeProtocol {
     }
 
 
-    public int getOverheadContinuationThreshhold() {
+    public int getOverheadContinuationThreshold() {
         return overheadContinuationThreshold;
     }
 
 
-    public void setOverheadContinuationThreshhold(int overheadContinuationThreshold) {
+    public void setOverheadContinuationThreshold(int overheadContinuationThreshold) {
         this.overheadContinuationThreshold = overheadContinuationThreshold;
     }
 
 
-    public int getOverheadDataThreadhold() {
-        return overheadDataThreadhold;
+    public int getOverheadDataThreshold() {
+        return overheadDataThreshold;
     }
 
 
-    public void setOverheadDataThreadhold(int overheadDataThreadhold) {
-        this.overheadDataThreadhold = overheadDataThreadhold;
+    public void setOverheadDataThreshold(int overheadDataThreshold) {
+        this.overheadDataThreshold = overheadDataThreshold;
     }
 
 
-    public int getOverheadWindowUpdateThreadhold() {
-        return overheadWindowUpdateThreadhold;
+    public int getOverheadWindowUpdateThreshold() {
+        return overheadWindowUpdateThreshold;
     }
 
 
-    public void setOverheadWindowUpdateThreadhold(int overheadWindowUpdateThreadhold) {
-        this.overheadWindowUpdateThreadhold = overheadWindowUpdateThreadhold;
+    public void setOverheadWindowUpdateThreshold(int overheadWindowUpdateThreshold) {
+        this.overheadWindowUpdateThreshold = overheadWindowUpdateThreshold;
     }
 
 

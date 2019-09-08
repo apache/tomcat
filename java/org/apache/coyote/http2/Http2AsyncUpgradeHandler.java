@@ -105,10 +105,10 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
 
     @Override
     protected void writeSettings() {
-        // Send the initial settings frame
         socketWrapper.write(BlockingMode.SEMI_BLOCK, protocol.getWriteTimeout(),
                 TimeUnit.MILLISECONDS, null, SocketWrapperBase.COMPLETE_WRITE, errorCompletion,
-                ByteBuffer.wrap(localSettings.getSettingsFrameForPending()));
+                ByteBuffer.wrap(localSettings.getSettingsFrameForPending()),
+                ByteBuffer.wrap(createWindowUpdateForSettings()));
         if (error != null) {
             String msg = sm.getString("upgradeHandler.sendPrefaceFail", connectionId);
             if (log.isDebugEnabled()) {

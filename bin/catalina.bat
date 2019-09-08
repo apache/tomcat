@@ -206,7 +206,7 @@ set "CLASSPATH=%CLASSPATH%;%CATALINA_HOME%\bin\tomcat-juli.jar"
 :juliClasspathDone
 
 if not "%JSSE_OPTS%" == "" goto gotJsseOpts
-set JSSE_OPTS="-Djdk.tls.ephemeralDHKeySize=2048"
+set "JSSE_OPTS=-Djdk.tls.ephemeralDHKeySize=2048"
 :gotJsseOpts
 set "JAVA_OPTS=%JAVA_OPTS% %JSSE_OPTS%"
 

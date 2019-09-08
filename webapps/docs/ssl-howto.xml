@@ -102,6 +102,24 @@ client are taking place over a secure connection (because your application
 needs to be able to ask about this), but it does not participate in the
 encryption or decryption itself.</p>
 
+<p>Tomcat is able to use any of the the cryptographic protocols that are
+provided by the underlying environment. Java itself provides cryptographic
+capabilities through <a href="https://docs.oracle.com/javase/9/security/java-cryptography-architecture-jca-reference-guide.htm">JCE/JCA</a>
+and encrypted communications capabilities through <a href="https://docs.oracle.com/javase/9/security/java-secure-socket-extension-jsse-reference-guide.htm">JSSE</a>.
+Any compliant cryptographic "provider" can provide cryptographic algorithms
+to Tomcat. The built-in provider (SunJCE) includes support for various
+SSL/TLS versions like SSLv3, TLSv1, TLSv1.1, and so on. Check the documentation
+for your version of Java for details on protocol and algorithm support.</p>
+
+<p>If you use the optional <code>tcnative</code> library, you can use
+the <a href="https://www.openssl.org/">OpenSSL</a> cryptographic provider
+through JCA/JCE/JSSE which may provide a different selection of cryptographic
+algorithms and/or performance benefits relative to the SunJCE provider.
+You can also use <code>tcnative</code> to enable the <a href="apr.html">APR</a>
+connector which uses OpenSSL for its cryptographic operations. Check the
+documentation for your version of OpenSSL for details on protocol and
+algorithm support.</p>
+
 </section>
 
 <section name="Certificates">

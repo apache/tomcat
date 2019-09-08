@@ -51,6 +51,44 @@
         Avoid a possible <code>InvalidPathException</code> when obtaining a URI
         for a configuration file. (markt)
       </fix>
+      <fix>
+        <bug>63684</bug>: <code>Wrapper</code> never passed to
+        <code>RealmBase.hasRole()</code> for given security constraints.
+        (michaelo)
+      </fix>
+    </changelog>
+  </subsection>
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+        <bug>63690</bug>: Use the average of the current and previous sizes when
+        calculating overhead for HTTP/2 <code>DATA</code> and
+        <code>WINDOW_UPDATE</code> frames to avoid false positives as a result
+        of client side buffering behaviour that causes a small percentage of
+        non-final DATA frames to be smaller than expected. (markt)
+      </fix>
+      <fix>
+        <bug>63706</bug>: Avoid NPE accessing https port with plaintext. (remm)
+      </fix>
+      <fix>
+        Correct typos in the names of the configuration attributes
+        <code>overheadDataThreshold</code> and
+        <code>overheadWindowUpdateThreshold</code>. (markt)
+      </fix>
+      <fix>
+        If the HTTP/2 connection requires an initial window size larger than the
+        default, send a WINDOW_UPDATE to increase the flow control window for the
+        connection so that the initial size of the flow control window for the
+        connection is consistent with the increased value. (markt)
+      </fix>
+    </changelog>
+  </subsection>
+  <subsection name="Jasper">
+    <changelog>
+      <fix>
+        <bug>63724</bug>: Correct a regression introduced in 9.0.21 that broke
+        compilation of JSPs in some configurations. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
@@ -58,6 +96,16 @@
       <fix>
         Correct the source code links on the index page for the ROOT web
         application to point to Git rather than Subversion. (markt)
+      </fix>
+      <fix>
+        Fix various issues with the Javadoc generated for the documentation web
+        application to enable release builds to be built with Java 10 onwards.
+        (markt)
+      </fix>
+      <fix>
+        <bug>63733</bug>: Remove the documentation for the &quot;Additional
+        Components&quot; since they have been remove / merged into the core
+        Tomcat distribution for 9.0.5 onwards. (markt)
       </fix>
     </changelog>
   </subsection>
@@ -75,6 +123,15 @@
       <fix>
         <bug>62140</bug>: Additional usage documentation in comments for
         <code>catalina.[bat|sh]</code>. (markt)
+      </fix>
+      <fix>
+        Fix <code>JSSE_OPTS</code> quoting in <code>catalina.bat</code>.
+        Contributed by Peter Uhnak. (fschumacher)
+      </fix>
+      <fix>
+        <bug>63689</bug>: Correct a regression in the fix for <bug>63285</bug>
+        that meant that when installing a service, the service display name was
+        not set. (markt)
       </fix>
     </changelog>
   </subsection>
@@ -369,7 +426,7 @@
         compatibility. (remm)
       </fix>
       <fix>
-        Fix typo in UTF-32LE charset name. Patch by zhanhb vi Github.
+        Fix typo in UTF-32LE charset name. Patch by zhanhb via Github.
         (fschumacher)
       </fix>
       <fix>

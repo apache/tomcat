@@ -334,8 +334,9 @@ public interface HttpServletRequest extends ServletRequest {
      * Returns the part of this request's URL from the protocol name up to the
      * query string in the first line of the HTTP request. The web container
      * does not decode this String. For example:
-     * <table summary="Examples of Returned Values">
-     * <tr align=left>
+     * <table>
+     * <caption>Examples of Returned Values</caption>
+     * <tr>
      * <th>First line of HTTP request</th>
      * <th>Returned Value</th>
      * <tr>
