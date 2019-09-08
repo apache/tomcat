@@ -72,7 +72,7 @@ import org.apache.tomcat.util.security.KeyStoreUtil;
 /**
  * SSL server socket factory. It <b>requires</b> a valid RSA key and
  * JSSE.<br>
- * keytool -genkey -alias tomcat -keyalg RSA</br>
+ * keytool -genkey -alias tomcat -keyalg RSA<br>
  * Use "changeit" as password (this is the default we use).
  *
  * @author Harish Prabandham

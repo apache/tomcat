@@ -27,13 +27,13 @@ import java.lang.reflect.InvocationTargetException;
  */
 public class ConstructorUtil {
     /**
-     * Returns a {@link Constructor} for the given method signature, or <tt>null</tt>
-     * if no such <tt>Constructor</tt> can be found.
+     * Returns a {@link Constructor} for the given method signature, or <code>null</code>
+     * if no such <code>Constructor</code> can be found.
      *
-     * @param type     the (non-<tt>null</tt>) type of {@link Object} the returned {@link Constructor} should create
-     * @param argTypes a non-<tt>null</tt> array of types describing the parameters to the {@link Constructor}.
-     * @return a {@link Constructor} for the given method signature, or <tt>null</tt>
-     *         if no such <tt>Constructor</tt> can be found.
+     * @param type     the (non-<code>null</code>) type of {@link Object} the returned {@link Constructor} should create
+     * @param argTypes a non-<code>null</code> array of types describing the parameters to the {@link Constructor}.
+     * @return a {@link Constructor} for the given method signature, or <code>null</code>
+     *         if no such <code>Constructor</code> can be found.
      * @see #invokeConstructor
      */
     public static <T> Constructor<T> getConstructor(Class<T> type, Class<?>[] argTypes) {
@@ -76,14 +76,14 @@ public class ConstructorUtil {
     }
 
     /**
-     * Creates a new instance of the specified <tt><i>type</i></tt>
+     * Creates a new instance of the specified <code><i>type</i></code>
      * using a {@link Constructor} described by the given parameter types
      * and values.
      *
      * @param type      the type of {@link Object} to be created
-     * @param argTypes  a non-<tt>null</tt> array of types describing the parameters to the {@link Constructor}.
-     * @param argValues a non-<tt>null</tt> array containing the values of the parameters to the {@link Constructor}.
-     * @return a new instance of the specified <tt><i>type</i></tt>
+     * @param argTypes  a non-<code>null</code> array of types describing the parameters to the {@link Constructor}.
+     * @param argValues a non-<code>null</code> array containing the values of the parameters to the {@link Constructor}.
+     * @return a new instance of the specified <code><i>type</i></code>
      *         using a {@link Constructor} described by the given parameter types
      *         and values.
      * @exception InstantiationException

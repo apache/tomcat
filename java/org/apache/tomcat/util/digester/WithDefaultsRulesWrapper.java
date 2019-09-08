@@ -29,7 +29,7 @@ import java.util.List;
  * existing <code>Rules</code> implementation. These default <code>Rule</code>
  * instances will be returned for any match for which the wrapped
  * implementation does not return any matches.</p>
- * <p> For example,
+ * <p> For example,</p>
  * <pre>
  *   Rule alpha;
  *   ...
@@ -39,6 +39,7 @@ import java.util.List;
  *   digester.setRules(rules);
  *   ...
  * </pre>
+ * <p>
  * when a pattern does not match any other rule, then rule alpha will be called.
  * </p>
  * <p><code>WithDefaultsRulesWrapper</code> follows the <em>Decorator</em> pattern.</p>

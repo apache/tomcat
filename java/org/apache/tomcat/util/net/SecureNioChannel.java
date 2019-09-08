@@ -424,7 +424,7 @@ public class SecureNioChannel extends NioChannel  {
      * Reads a sequence of bytes from this channel into the given buffer.
      *
      * @param dst The buffer into which bytes are to be transferred
-     * @return The number of bytes read, possibly zero, or <tt>-1</tt> if the channel has reached end-of-stream
+     * @return The number of bytes read, possibly zero, or <code>-1</code> if the channel has reached end-of-stream
      * @throws IOException If some other I/O error occurs
      * @throws IllegalArgumentException if the destination buffer is different than bufHandler.getReadBuffer()
      * TODO Implement this java.nio.channels.ReadableByteChannel method

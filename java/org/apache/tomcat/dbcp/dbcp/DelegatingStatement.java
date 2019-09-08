@@ -110,17 +110,17 @@ public class DelegatingStatement extends AbandonedTrace implements Statement {
 
     /**
      * If my underlying {@link Statement} is not a
-     * <tt>DelegatingStatement</tt>, returns it,
+     * <code>DelegatingStatement</code>, returns it,
      * otherwise recursively invokes this method on
      * my delegate.
      * <p>
      * Hence this method will return the first
-     * delegate that is not a <tt>DelegatingStatement</tt>
-     * or <tt>null</tt> when no non-<tt>DelegatingStatement</tt>
+     * delegate that is not a <code>DelegatingStatement</code>
+     * or <code>null</code> when no non-<code>DelegatingStatement</code>
      * delegate can be found by transversing this chain.
      * <p>
      * This method is useful when you may have nested
-     * <tt>DelegatingStatement</tt>s, and you want to make
+     * <code>DelegatingStatement</code>s, and you want to make
      * sure to obtain a "genuine" {@link Statement}.
      * @see #getDelegate
      */

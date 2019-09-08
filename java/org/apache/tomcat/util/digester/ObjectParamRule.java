@@ -14,28 +14,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.tomcat.util.digester;
 
 import org.xml.sax.Attributes;
 
 /**
  * <p>Rule implementation that saves a parameter for use by a surrounding
- * <code>CallMethodRule<code>.</p>
+ * <code>CallMethodRule</code>.</p>
  *
- * <p>This parameter may be:
+ * <p>This parameter may be:</p>
  * <ul>
  * <li>an arbitrary Object defined programatically, assigned when the element pattern associated with the Rule is matched
  * See {@link #ObjectParamRule(int paramIndex, Object param)}
  * <li>an arbitrary Object defined programatically, assigned if the element pattern AND specified attribute name are matched
  * See {@link #ObjectParamRule(int paramIndex, String attributeName, Object param)}
  * </ul>
- * </p>
  *
  * @since 1.4
  */
-
 public class ObjectParamRule extends Rule {
     // ----------------------------------------------------------- Constructors
     /**

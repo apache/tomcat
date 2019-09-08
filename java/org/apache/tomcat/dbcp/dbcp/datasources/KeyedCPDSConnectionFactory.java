@@ -66,11 +66,11 @@ class KeyedCPDSConnectionFactory implements KeyedPoolableObjectFactory<UserPassK
             new ConcurrentHashMap<PooledConnection, PooledConnectionAndInfo>();
 
     /**
-     * Create a new <tt>KeyedPoolableConnectionFactory</tt>.
+     * Create a new <code>KeyedPoolableConnectionFactory</code>.
      * @param cpds the ConnectionPoolDataSource from which to obtain PooledConnection's
      * @param pool the {*link ObjectPool} in which to pool those {*link Connection}s
      * @param validationQuery a query to use to {*link #validateObject validate} {*link Connection}s.
-     * Should return at least one row. May be <tt>null</tt>
+     * Should return at least one row. May be <code>null</code>
      */
     public KeyedCPDSConnectionFactory(ConnectionPoolDataSource cpds,
                                       KeyedObjectPool<UserPassKey, PooledConnectionAndInfo> pool,
@@ -79,13 +79,13 @@ class KeyedCPDSConnectionFactory implements KeyedPoolableObjectFactory<UserPassK
     }
 
     /**
-     * Create a new <tt>KeyedPoolableConnectionFactory</tt>.
+     * Create a new <code>KeyedPoolableConnectionFactory</code>.
      * @param cpds the ConnectionPoolDataSource from which to obtain
      * PooledConnections
      * @param pool the {@link KeyedObjectPool} in which to pool those
      * {@link Connection}s
      * @param validationQuery a query to use to {@link #validateObject validate}
-     * {@link Connection}s.  Should return at least one row. May be <tt>null</tt>
+     * {@link Connection}s.  Should return at least one row. May be <code>null</code>
      * @param rollbackAfterValidation whether a rollback should be issued after
      * {@link #validateObject validating} {@link Connection}s.
      */

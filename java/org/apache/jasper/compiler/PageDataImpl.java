@@ -29,7 +29,7 @@ import org.xml.sax.Attributes;
 import org.xml.sax.helpers.AttributesImpl;
 
 /**
- * An implementation of <tt>javax.servlet.jsp.tagext.PageData</tt> which
+ * An implementation of <code>javax.servlet.jsp.tagext.PageData</code> which
  * builds the XML view of a given page.
  *
  * The XML view is built in two passes:
@@ -59,9 +59,10 @@ class PageDataImpl extends PageData implements TagConstants {
     private StringBuilder buf;
 
     /**
-     * Constructor.
-     *
      * @param page the page nodes from which to generate the XML view
+     * @param compiler The compiler for this page
+     *
+     * @throws JasperException If an error occurs
      */
     public PageDataImpl(Node.Nodes page, Compiler compiler)
                 throws JasperException {

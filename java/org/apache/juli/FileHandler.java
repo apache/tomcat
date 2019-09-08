@@ -87,10 +87,10 @@ import java.util.regex.Pattern;
  *   <li><code>formatter</code> - The <code>java.util.logging.Formatter</code>
  *    implementation class name for this Handler. Default value:
  *    <code>java.util.logging.SimpleFormatter</code></li>
- *   <li><code>maxDays</code> - The maximum number of days to keep the log files.
- *    If the specified value is <code>&lt;=0</code> then the log files will be kept
- *    on the file system forever, otherwise they will be kept the specified maximum
- *    days. Default value: <code>-1</code>.</li>
+ *   <li><code>maxDays</code> - The maximum number of days to keep the log
+ *    files. If the specified value is <code>&lt;=0</code> then the log files
+ *    will be kept on the file system forever, otherwise they will be kept the
+ *    specified maximum days. Default value: <code>-1</code>.</li>
  * </ul>
  */
 public class FileHandler extends Handler {
@@ -232,8 +232,8 @@ public class FileHandler extends Handler {
 
 
     /**
-     * Represents a file name pattern of type {prefix}{date}{suffix}. The date
-     * is YYYY-MM-DD
+     * Represents a file name pattern of type {prefix}{date}{suffix}.
+     * The date is YYYY-MM-DD
      */
     private Pattern pattern;
 
@@ -242,7 +242,7 @@ public class FileHandler extends Handler {
 
 
     /**
-     * Format and publish a <tt>LogRecord</tt>.
+     * Format and publish a <code>LogRecord</code>.
      *
      * @param  record  description of the log event
      */
@@ -300,7 +300,6 @@ public class FileHandler extends Handler {
                 }
             } catch (Exception e) {
                 reportError(null, e, ErrorManager.WRITE_FAILURE);
-                return;
             }
         } finally {
             writerLock.readLock().unlock();
@@ -449,7 +448,6 @@ public class FileHandler extends Handler {
 
         // Set error manager
         setErrorManager(new ErrorManager());
-
     }
 
 

@@ -437,7 +437,7 @@ public abstract class InstanceKeyDataSource
     }
 
     /**
-     * When <tt>true</tt>, objects will be
+     * When <code>true</code>, objects will be
      * {*link PoolableObjectFactory#validateObject validated}
      * before being returned by the {*link #borrowObject}
      * method.  If the object fails to validate,
@@ -451,7 +451,7 @@ public abstract class InstanceKeyDataSource
     }
 
     /**
-     * When <tt>true</tt>, objects will be
+     * When <code>true</code>, objects will be
      * {*link PoolableObjectFactory#validateObject validated}
      * before being returned by the {*link #borrowObject}
      * method.  If the object fails to validate,
@@ -476,7 +476,7 @@ public abstract class InstanceKeyDataSource
     }
 
     /**
-     * When <tt>true</tt>, objects will be
+     * When <code>true</code>, objects will be
      * {*link PoolableObjectFactory#validateObject validated}
      * before being returned to the pool within the
      * {*link #returnObject}.
@@ -488,7 +488,7 @@ public abstract class InstanceKeyDataSource
     }
 
     /**
-     * When <tt>true</tt>, objects will be
+     * When <code>true</code>, objects will be
      * {*link PoolableObjectFactory#validateObject validated}
      * before being returned to the pool within the
      * {*link #returnObject}. For a <code>true</code> value to have any effect,
@@ -544,7 +544,7 @@ public abstract class InstanceKeyDataSource
      * Sets the number of objects to examine during each run of the
      * idle object evictor thread (if any).
      * <p>
-     * When a negative value is supplied, <tt>ceil({*link #numIdle})/abs({*link #getNumTestsPerEvictionRun})</tt>
+     * When a negative value is supplied, <code>ceil({*link #numIdle})/abs({*link #getNumTestsPerEvictionRun})</code>
      * tests will be run.  I.e., when the value is <i>-n</i>, roughly one <i>n</i>th of the
      * idle objects will be tested per run.
      *
@@ -591,7 +591,7 @@ public abstract class InstanceKeyDataSource
     }
 
     /**
-     * When <tt>true</tt>, objects will be
+     * When <code>true</code>, objects will be
      * {*link PoolableObjectFactory#validateObject validated}
      * by the idle object evictor (if any).  If an object
      * fails to validate, it will be dropped from the pool.
@@ -604,7 +604,7 @@ public abstract class InstanceKeyDataSource
     }
 
     /**
-     * When <tt>true</tt>, objects will be
+     * When <code>true</code>, objects will be
      * {*link PoolableObjectFactory#validateObject validated}
      * by the idle object evictor (if any).  If an object
      * fails to validate, it will be dropped from the pool. For a

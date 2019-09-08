@@ -241,8 +241,8 @@ public final class TldConfig  implements LifecycleListener {
      * wonderful arrangements present when Tomcat gets embedded.
      *
      * The set of shared JARs to be scanned for TLDs is narrowed down by
-     * the <tt>noTldJars</tt> class variable, which contains the names of JARs
-     * that are known not to contain any TLDs.
+     * the <code>noTldJars</code> class variable, which contains the names of
+     * JARs that are known not to contain any TLDs.
      */
     @SuppressWarnings("deprecation") // Context.addApplicationListener(ApplicationListener) is deprecated.
     public void execute() {

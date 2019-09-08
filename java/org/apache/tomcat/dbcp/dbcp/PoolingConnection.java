@@ -442,7 +442,7 @@ public class PoolingConnection extends DelegatingConnection
      *
      * @param key ignored
      * @param obj ignored
-     * @return <tt>true</tt>
+     * @return <code>true</code>
      */
     @Override
     public boolean validateObject(PStmtKey key, DelegatingPreparedStatement obj) {

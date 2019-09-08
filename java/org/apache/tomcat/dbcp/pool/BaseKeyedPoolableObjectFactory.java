@@ -59,7 +59,7 @@ public abstract class BaseKeyedPoolableObjectFactory<K, V> implements KeyedPoola
     /**
      * Ensures that the instance is safe to be returned by the pool.
      * <p>
-     * The default implementation always returns <tt>true</tt>.
+     * The default implementation always returns <code>true</code>.
      * </p>
      *
      * @param key the key used when selecting the object

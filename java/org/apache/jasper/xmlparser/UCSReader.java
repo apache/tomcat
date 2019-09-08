@@ -103,7 +103,7 @@ public class UCSReader extends Reader {
      * should override this method.
      *
      * @return     The character read, as an integer in the range 0 to 127
-     *             (<tt>0x00-0x7f</tt>), or -1 if the end of the stream has
+     *             (<code>0x00-0x7f</code>), or -1 if the end of the stream has
      *             been reached
      *
      * @exception  IOException  If an I/O error occurs

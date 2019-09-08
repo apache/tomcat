@@ -66,7 +66,7 @@ class CPDSConnectionFactory
             new WeakHashMap<PooledConnection, PooledConnectionAndInfo>();
 
     /**
-     * Create a new <tt>PoolableConnectionFactory</tt>.
+     * Create a new <code>PoolableConnectionFactory</code>.
      *
      * @param cpds the ConnectionPoolDataSource from which to obtain
      * PooledConnection's
@@ -74,7 +74,7 @@ class CPDSConnectionFactory
      * {@link Connection}s
      * @param validationQuery a query to use to {@link #validateObject validate}
      * {@link Connection}s. Should return at least one row. May be
-     * <tt>null</tt>
+     * <code>null</code>
      * @param username
      * @param password
      */
@@ -87,7 +87,7 @@ class CPDSConnectionFactory
     }
 
     /**
-     * Create a new <tt>PoolableConnectionFactory</tt>.
+     * Create a new <code>PoolableConnectionFactory</code>.
      *
      * @param cpds the ConnectionPoolDataSource from which to obtain
      * PooledConnection's
@@ -95,7 +95,7 @@ class CPDSConnectionFactory
      * Connection}s
      * @param validationQuery a query to use to {@link #validateObject
      * validate} {@link Connection}s. Should return at least one row.
-     * May be <tt>null</tt>
+     * May be <code>null</code>
      * @param rollbackAfterValidation whether a rollback should be issued
      * after {@link #validateObject validating} {@link Connection}s.
      * @param username

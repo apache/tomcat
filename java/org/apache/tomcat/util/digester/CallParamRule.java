@@ -14,19 +14,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.tomcat.util.digester;
-
 
 import org.xml.sax.Attributes;
 
-
 /**
  * <p>Rule implementation that saves a parameter for use by a surrounding
- * <code>CallMethodRule<code>.</p>
+ * <code>CallMethodRule</code>.</p>
  *
- * <p>This parameter may be:
+ * <p>This parameter may be:</p>
  * <ul>
  * <li>from an attribute of the current element
  * See {@link #CallParamRule(int paramIndex, String attributeName)}
@@ -37,9 +33,7 @@ import org.xml.sax.Attributes;
  * <li>the current path being processed (separate <code>Rule</code>).
  * See {@link PathCallParamRule}
  * </ul>
- * </p>
  */
-
 public class CallParamRule extends Rule {
 
     // ----------------------------------------------------------- Constructors
@@ -51,9 +45,7 @@ public class CallParamRule extends Rule {
      * @param paramIndex The zero-relative parameter number
      */
     public CallParamRule(int paramIndex) {
-
         this(paramIndex, null);
-
     }
 
 
@@ -83,7 +75,6 @@ public class CallParamRule extends Rule {
 
         this.paramIndex = paramIndex;
         this.fromStack = fromStack;
-
     }
 
     /**
@@ -225,7 +216,6 @@ public class CallParamRule extends Rule {
      */
     @Override
     public String toString() {
-
         StringBuilder sb = new StringBuilder("CallParamRule[");
         sb.append("paramIndex=");
         sb.append(paramIndex);
@@ -234,8 +224,7 @@ public class CallParamRule extends Rule {
         sb.append(", from stack=");
         sb.append(fromStack);
         sb.append("]");
-        return (sb.toString());
-
+        return sb.toString();
     }
 
 

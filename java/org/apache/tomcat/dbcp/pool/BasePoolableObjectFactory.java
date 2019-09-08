@@ -49,10 +49,10 @@ public abstract class BasePoolableObjectFactory<T> implements PoolableObjectFact
     }
 
     /**
-     * This implementation always returns <tt>true</tt>.
+     * This implementation always returns <code>true</code>.
      *
      * @param obj ignored
-     * @return <tt>true</tt>
+     * @return <code>true</code>
      */
     @Override
     public boolean validateObject(T obj) {

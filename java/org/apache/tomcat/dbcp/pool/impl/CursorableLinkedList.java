@@ -70,7 +70,7 @@ class CursorableLinkedList<E> implements List<E>, Serializable {
      * Appends the specified element to the end of this list.
      *
      * @param o element to be appended to this list.
-     * @return <tt>true</tt>
+     * @return <code>true</code>
      */
     @Override
     public boolean add(E o) {
@@ -116,7 +116,7 @@ class CursorableLinkedList<E> implements List<E>, Serializable {
      * specified collection is this list, and it's nonempty.)
      *
      * @param c collection whose elements are to be added to this list.
-     * @return <tt>true</tt> if this list changed as a result of the call.
+     * @return <code>true</code> if this list changed as a result of the call.
      *
      * @throws ClassCastException if the class of an element in the specified
      *       collection prevents it from being added to this list.
@@ -150,7 +150,7 @@ class CursorableLinkedList<E> implements List<E>, Serializable {
      * @param index index at which to insert first element from the specified
      *              collection.
      * @param c elements to be inserted into this list.
-     * @return <tt>true</tt> if this list changed as a result of the call.
+     * @return <code>true</code> if this list changed as a result of the call.
      *
      * @throws ClassCastException if the class of one of elements of the
      *         specified collection prevents it from being added to this
@@ -180,10 +180,10 @@ class CursorableLinkedList<E> implements List<E>, Serializable {
 
     /**
      * Inserts the specified element at the beginning of this list.
-     * (Equivalent to {@link #add(int,java.lang.Object) <tt>add(0,o)</tt>}).
+     * (Equivalent to {@link #add(int,java.lang.Object) <code>add(0,o)</code>}).
      *
      * @param o element to be prepended to this list.
-     * @return <tt>true</tt>
+     * @return <code>true</code>
      */
     public boolean addFirst(E o) {
         insertListable(null,_head.next(),o);
@@ -195,7 +195,7 @@ class CursorableLinkedList<E> implements List<E>, Serializable {
      * (Equivalent to {@link #add(java.lang.Object)}).
      *
      * @param o element to be appended to this list.
-     * @return <tt>true</tt>
+     * @return <code>true</code>
      */
     public boolean addLast(E o) {
         insertListable(_head.prev(),null,o);
@@ -225,13 +225,13 @@ class CursorableLinkedList<E> implements List<E>, Serializable {
     }
 
     /**
-     * Returns <tt>true</tt> if this list contains the specified element.
-     * More formally, returns <tt>true</tt> if and only if this list contains
-     * at least one element <tt>e</tt> such that
-     * <tt>(o==null&nbsp;?&nbsp;e==null&nbsp;:&nbsp;o.equals(e))</tt>.
+     * Returns <code>true</code> if this list contains the specified element.
+     * More formally, returns <code>true</code> if and only if this list contains
+     * at least one element <code>e</code> such that
+     * <code>(o==null&nbsp;?&nbsp;e==null&nbsp;:&nbsp;o.equals(e))</code>.
      *
      * @param o element whose presence in this list is to be tested.
-     * @return <tt>true</tt> if this list contains the specified element.
+     * @return <code>true</code> if this list contains the specified element.
      */
     @Override
     public boolean contains(Object o) {
@@ -245,11 +245,11 @@ class CursorableLinkedList<E> implements List<E>, Serializable {
     }
 
     /**
-     * Returns <tt>true</tt> if this list contains all of the elements of the
+     * Returns <code>true</code> if this list contains all of the elements of the
      * specified collection.
      *
      * @param c collection to be checked for containment in this list.
-     * @return <tt>true</tt> if this list contains all of the elements of the
+     * @return <code>true</code> if this list contains all of the elements of the
      *         specified collection.
      */
     @Override
@@ -314,17 +314,17 @@ class CursorableLinkedList<E> implements List<E>, Serializable {
 
     /**
      * Compares the specified object with this list for equality.  Returns
-     * <tt>true</tt> if and only if the specified object is also a list, both
+     * <code>true</code> if and only if the specified object is also a list, both
      * lists have the same size, and all corresponding pairs of elements in
-     * the two lists are <i>equal</i>.  (Two elements <tt>e1</tt> and
-     * <tt>e2</tt> are <i>equal</i> if <tt>(e1==null ? e2==null :
-     * e1.equals(e2))</tt>.)  In other words, two lists are defined to be
+     * the two lists are <i>equal</i>.  (Two elements <code>e1</code> and
+     * <code>e2</code> are <i>equal</i> if <code>(e1==null ? e2==null :
+     * e1.equals(e2))</code>.)  In other words, two lists are defined to be
      * equal if they contain the same elements in the same order.  This
      * definition ensures that the equals method works properly across
-     * different implementations of the <tt>List</tt> interface.
+     * different implementations of the <code>List</code> interface.
      *
      * @param o the object to be compared for equality with this list.
-     * @return <tt>true</tt> if the specified object is equal to this list.
+     * @return <code>true</code> if the specified object is equal to this list.
      */
     @Override
     public boolean equals(Object o) {
@@ -389,10 +389,10 @@ class CursorableLinkedList<E> implements List<E>, Serializable {
      *      hashCode = 31*hashCode + (obj==null ? 0 : obj.hashCode());
      *  }
      * </pre>
-     * This ensures that <tt>list1.equals(list2)</tt> implies that
-     * <tt>list1.hashCode()==list2.hashCode()</tt> for any two lists,
-     * <tt>list1</tt> and <tt>list2</tt>, as required by the general
-     * contract of <tt>Object.hashCode</tt>.
+     * This ensures that <code>list1.equals(list2)</code> implies that
+     * <code>list1.hashCode()==list2.hashCode()</code> for any two lists,
+     * <code>list1</code> and <code>list2</code>, as required by the general
+     * contract of <code>Object.hashCode</code>.
      *
      * @return the hash code value for this list.
      * @see Object#hashCode()
@@ -411,8 +411,8 @@ class CursorableLinkedList<E> implements List<E>, Serializable {
     /**
      * Returns the index in this list of the first occurrence of the specified
      * element, or -1 if this list does not contain this element.
-     * More formally, returns the lowest index <tt>i</tt> such that
-     * <tt>(o==null ? get(i)==null : o.equals(get(i)))</tt>,
+     * More formally, returns the lowest index <code>i</code> such that
+     * <code>(o==null ? get(i)==null : o.equals(get(i)))</code>,
      * or -1 if there is no such index.
      *
      * @param o element to search for.
@@ -445,8 +445,8 @@ class CursorableLinkedList<E> implements List<E>, Serializable {
     }
 
     /**
-     * Returns <tt>true</tt> if this list contains no elements.
-     * @return <tt>true</tt> if this list contains no elements.
+     * Returns <code>true</code> if this list contains no elements.
+     * @return <code>true</code> if this list contains no elements.
      */
     @Override
     public boolean isEmpty() {
@@ -465,8 +465,8 @@ class CursorableLinkedList<E> implements List<E>, Serializable {
     /**
      * Returns the index in this list of the last occurrence of the specified
      * element, or -1 if this list does not contain this element.
-     * More formally, returns the highest index <tt>i</tt> such that
-     * <tt>(o==null ? get(i)==null : o.equals(get(i)))</tt>,
+     * More formally, returns the highest index <code>i</code> such that
+     * <code>(o==null ? get(i)==null : o.equals(get(i)))</code>,
      * or -1 if there is no such index.
      *
      * @param o element to search for.
@@ -522,11 +522,11 @@ class CursorableLinkedList<E> implements List<E>, Serializable {
      * Removes the first occurrence in this list of the specified element.
      * If this list does not contain the element, it is
      * unchanged.  More formally, removes the element with the lowest index i
-     * such that <tt>(o==null ? get(i)==null : o.equals(get(i)))</tt> (if
+     * such that <code>(o==null ? get(i)==null : o.equals(get(i)))</code> (if
      * such an element exists).
      *
      * @param o element to be removed from this list, if present.
-     * @return <tt>true</tt> if this list contained the specified element.
+     * @return <code>true</code> if this list contained the specified element.
      */
     @Override
     public boolean remove(Object o) {
@@ -568,7 +568,7 @@ class CursorableLinkedList<E> implements List<E>, Serializable {
      *
      * @param c collection that defines which elements will be removed from
      *          this list.
-     * @return <tt>true</tt> if this list changed as a result of the call.
+     * @return <code>true</code> if this list changed as a result of the call.
      */
     @Override
     public boolean removeAll(Collection<?> c) {
@@ -621,7 +621,7 @@ class CursorableLinkedList<E> implements List<E>, Serializable {
      *
      * @param c collection that defines which elements this set will retain.
      *
-     * @return <tt>true</tt> if this list changed as a result of the call.
+     * @return <code>true</code> if this list changed as a result of the call.
      */
     @Override
     public boolean retainAll(Collection<?> c) {
@@ -968,11 +968,11 @@ class CursorableLinkedList<E> implements List<E>, Serializable {
     /**
      * A sentry node.
      * <p>
-     * <tt>_head.next()</tt> points to the first element in the list,
-     * <tt>_head.prev()</tt> to the last. Note that it is possible for
-     * <tt>_head.next().prev()</tt> and <tt>_head.prev().next()</tt> to be
+     * <code>_head.next()</code> points to the first element in the list,
+     * <code>_head.prev()</code> to the last. Note that it is possible for
+     * <code>_head.next().prev()</code> and <code>_head.prev().next()</code> to be
      * non-null, as when I am a sublist for some larger list.
-     * Use <tt>== _head.next()</tt> and <tt>== _head.prev()</tt> to determine
+     * Use <code>== _head.next()</code> and <code>== _head.prev()</code> to determine
      * if a given
      * {@link org.apache.tomcat.dbcp.pool.impl.CursorableLinkedList.Listable}
      * is the first or last element in the list.
