@@ -29,8 +29,10 @@ import java.security.BasicPermission;
  * resources that start with name.  There are no actions.</p>
  * <p>
  * Example that grants permission to read all JNDI file based resources:
- * <li> permission org.apache.naming.JndiPermission "*";</li>
  * </p>
+ * <ul>
+ * <li> permission org.apache.naming.JndiPermission "*";</li>
+ * </ul>
  *
  * @author Glenn Nielsen
  */

@@ -35,10 +35,10 @@ import org.apache.tomcat.dbcp.pool.impl.GenericKeyedObjectPool.ObjectTimestampPa
  * A configurable {@link ObjectPool} implementation.
  * <p>
  * When coupled with the appropriate {@link PoolableObjectFactory},
- * <tt>GenericObjectPool</tt> provides robust pooling functionality for
+ * <code>GenericObjectPool</code> provides robust pooling functionality for
  * arbitrary objects.
  * <p>
- * A <tt>GenericObjectPool</tt> provides a number of configurable parameters:
+ * A <code>GenericObjectPool</code> provides a number of configurable parameters:
  * <ul>
  *  <li>
  *    {@link #setMaxActive <i>maxActive</i>} controls the maximum number of
@@ -125,7 +125,7 @@ import org.apache.tomcat.dbcp.pool.impl.GenericKeyedObjectPool.ObjectTimestampPa
  *   specifies the minimum amount of time that an object may sit idle in the pool
  *   before it is eligible for eviction due to idle time.  When non-positive, no object
  *   will be dropped from the pool due to idle time alone. This setting has no
- *   effect unless <code>timeBetweenEvictionRunsMillis > 0.</code> The default
+ *   effect unless <code>timeBetweenEvictionRunsMillis &gt; 0.</code> The default
  *   setting for this parameter is 30 minutes.
  *  </li>
  *  <li>
@@ -133,7 +133,7 @@ import org.apache.tomcat.dbcp.pool.impl.GenericKeyedObjectPool.ObjectTimestampPa
  *   objects should be validated using the factory's
  *   {@link PoolableObjectFactory#validateObject} method. Objects that fail to
  *   validate will be dropped from the pool. This setting has no effect unless
- *   <code>timeBetweenEvictionRunsMillis > 0.</code>  The default setting for
+ *   <code>timeBetweenEvictionRunsMillis &gt; 0.</code>  The default setting for
  *   this parameter is <code>false.</code>
  *  </li>
  *  <li>
@@ -143,7 +143,7 @@ import org.apache.tomcat.dbcp.pool.impl.GenericKeyedObjectPool.ObjectTimestampPa
  *   (if any), with the extra condition that at least "minIdle" object instances
  *   remain in the pool.  When non-positive, no objects will be evicted from the pool
  *   due to idle time alone. This setting has no effect unless
- *   <code>timeBetweenEvictionRunsMillis > 0.</code> and it is superceded by
+ *   <code>timeBetweenEvictionRunsMillis &gt; 0.</code> and it is superceded by
  *   {@link #setMinEvictableIdleTimeMillis <i>minEvictableIdleTimeMillis</i>}
  *   (that is, if <code>minEvictableIdleTimeMillis</code> is positive, then
  *   <code>softMinEvictableIdleTimeMillis</code> is ignored). The default setting for
@@ -153,11 +153,10 @@ import org.apache.tomcat.dbcp.pool.impl.GenericKeyedObjectPool.ObjectTimestampPa
  *   {@link #setNumTestsPerEvictionRun <i>numTestsPerEvictionRun</i>}
  *   determines the number of objects examined in each run of the idle object
  *   evictor. This setting has no effect unless
- *   <code>timeBetweenEvictionRunsMillis > 0.</code>  The default setting for
+ *   <code>timeBetweenEvictionRunsMillis &gt; 0.</code>  The default setting for
  *   this parameter is 3.
  *  </li>
  * </ul>
- * <p>
  * <p>
  * The pool can be configured to behave as a LIFO queue with respect to idle
  * objects - always returning the most recently used object from the pool,
@@ -337,7 +336,7 @@ public class GenericObjectPool<T> extends BaseObjectPool<T> {
     //--- constructors -----------------------------------------------
 
     /**
-     * Create a new <tt>GenericObjectPool</tt> with default properties.
+     * Create a new <code>GenericObjectPool</code> with default properties.
      */
     public GenericObjectPool() {
         this(null, DEFAULT_MAX_ACTIVE, DEFAULT_WHEN_EXHAUSTED_ACTION, DEFAULT_MAX_WAIT, DEFAULT_MAX_IDLE,
@@ -346,8 +345,8 @@ public class GenericObjectPool<T> extends BaseObjectPool<T> {
     }
 
     /**
-     * Create a new <tt>GenericObjectPool</tt> using the specified factory.
-     * @param factory the (possibly <tt>null</tt>)PoolableObjectFactory to use to create, validate and destroy objects
+     * Create a new <code>GenericObjectPool</code> using the specified factory.
+     * @param factory the (possibly <code>null</code>)PoolableObjectFactory to use to create, validate and destroy objects
      */
     public GenericObjectPool(PoolableObjectFactory<T> factory) {
         this(factory, DEFAULT_MAX_ACTIVE, DEFAULT_WHEN_EXHAUSTED_ACTION, DEFAULT_MAX_WAIT, DEFAULT_MAX_IDLE,
@@ -356,9 +355,9 @@ public class GenericObjectPool<T> extends BaseObjectPool<T> {
     }
 
     /**
-     * Create a new <tt>GenericObjectPool</tt> using the specified values.
-     * @param factory the (possibly <tt>null</tt>)PoolableObjectFactory to use to create, validate and destroy objects
-     * @param config a non-<tt>null</tt> {@link GenericObjectPool.Config} describing my configuration
+     * Create a new <code>GenericObjectPool</code> using the specified values.
+     * @param factory the (possibly <code>null</code>)PoolableObjectFactory to use to create, validate and destroy objects
+     * @param config a non-<code>null</code> {@link GenericObjectPool.Config} describing my configuration
      */
     public GenericObjectPool(PoolableObjectFactory<T> factory, GenericObjectPool.Config config) {
         this(factory, config.maxActive, config.whenExhaustedAction, config.maxWait, config.maxIdle, config.minIdle,
@@ -368,8 +367,8 @@ public class GenericObjectPool<T> extends BaseObjectPool<T> {
     }
 
     /**
-     * Create a new <tt>GenericObjectPool</tt> using the specified values.
-     * @param factory the (possibly <tt>null</tt>)PoolableObjectFactory to use to create, validate and destroy objects
+     * Create a new <code>GenericObjectPool</code> using the specified values.
+     * @param factory the (possibly <code>null</code>)PoolableObjectFactory to use to create, validate and destroy objects
      * @param maxActive the maximum number of objects that can be borrowed from me at one time (see {@link #setMaxActive})
      */
     public GenericObjectPool(PoolableObjectFactory<T> factory, int maxActive) {
@@ -379,8 +378,8 @@ public class GenericObjectPool<T> extends BaseObjectPool<T> {
     }
 
     /**
-     * Create a new <tt>GenericObjectPool</tt> using the specified values.
-     * @param factory the (possibly <tt>null</tt>)PoolableObjectFactory to use to create, validate and destroy objects
+     * Create a new <code>GenericObjectPool</code> using the specified values.
+     * @param factory the (possibly <code>null</code>)PoolableObjectFactory to use to create, validate and destroy objects
      * @param maxActive the maximum number of objects that can be borrowed from me at one time (see {@link #setMaxActive})
      * @param whenExhaustedAction the action to take when the pool is exhausted (see {@link #getWhenExhaustedAction})
      * @param maxWait the maximum amount of time to wait for an idle object when the pool is exhausted an and
@@ -393,8 +392,8 @@ public class GenericObjectPool<T> extends BaseObjectPool<T> {
     }
 
     /**
-     * Create a new <tt>GenericObjectPool</tt> using the specified values.
-     * @param factory the (possibly <tt>null</tt>)PoolableObjectFactory to use to create, validate and destroy objects
+     * Create a new <code>GenericObjectPool</code> using the specified values.
+     * @param factory the (possibly <code>null</code>)PoolableObjectFactory to use to create, validate and destroy objects
      * @param maxActive the maximum number of objects that can be borrowed at one time (see {@link #setMaxActive})
      * @param whenExhaustedAction the action to take when the pool is exhausted (see {@link #getWhenExhaustedAction})
      * @param maxWait the maximum amount of time to wait for an idle object when the pool is exhausted an and
@@ -412,8 +411,8 @@ public class GenericObjectPool<T> extends BaseObjectPool<T> {
     }
 
     /**
-     * Create a new <tt>GenericObjectPool</tt> using the specified values.
-     * @param factory the (possibly <tt>null</tt>)PoolableObjectFactory to use to create, validate and destroy objects
+     * Create a new <code>GenericObjectPool</code> using the specified values.
+     * @param factory the (possibly <code>null</code>)PoolableObjectFactory to use to create, validate and destroy objects
      * @param maxActive the maximum number of objects that can be borrowed at one time (see {@link #setMaxActive})
      * @param whenExhaustedAction the action to take when the pool is exhausted (see {@link #getWhenExhaustedAction})
      * @param maxWait the maximum amount of time to wait for an idle object when the pool is exhausted and
@@ -427,8 +426,8 @@ public class GenericObjectPool<T> extends BaseObjectPool<T> {
     }
 
     /**
-     * Create a new <tt>GenericObjectPool</tt> using the specified values.
-     * @param factory the (possibly <tt>null</tt>)PoolableObjectFactory to use to create, validate and destroy objects
+     * Create a new <code>GenericObjectPool</code> using the specified values.
+     * @param factory the (possibly <code>null</code>)PoolableObjectFactory to use to create, validate and destroy objects
      * @param maxActive the maximum number of objects that can be borrowed at one time (see {@link #setMaxActive})
      * @param whenExhaustedAction the action to take when the pool is exhausted (see {@link #getWhenExhaustedAction})
      * @param maxWait the maximum amount of time to wait for an idle object when the pool is exhausted and
@@ -447,8 +446,8 @@ public class GenericObjectPool<T> extends BaseObjectPool<T> {
     }
 
     /**
-     * Create a new <tt>GenericObjectPool</tt> using the specified values.
-     * @param factory the (possibly <tt>null</tt>)PoolableObjectFactory to use to create, validate and destroy objects
+     * Create a new <code>GenericObjectPool</code> using the specified values.
+     * @param factory the (possibly <code>null</code>)PoolableObjectFactory to use to create, validate and destroy objects
      * @param maxActive the maximum number of objects that can be borrowed at one time (see {@link #setMaxActive})
      * @param whenExhaustedAction the action to take when the pool is exhausted (see {@link #setWhenExhaustedAction})
      * @param maxWait the maximum amount of time to wait for an idle object when the pool is exhausted and
@@ -475,8 +474,8 @@ public class GenericObjectPool<T> extends BaseObjectPool<T> {
     }
 
     /**
-     * Create a new <tt>GenericObjectPool</tt> using the specified values.
-     * @param factory the (possibly <tt>null</tt>)PoolableObjectFactory to use to create, validate and destroy objects
+     * Create a new <code>GenericObjectPool</code> using the specified values.
+     * @param factory the (possibly <code>null</code>)PoolableObjectFactory to use to create, validate and destroy objects
      * @param maxActive the maximum number of objects that can be borrowed at one time (see {@link #setMaxActive})
      * @param whenExhaustedAction the action to take when the pool is exhausted (see {@link #setWhenExhaustedAction})
      * @param maxWait the maximum amount of time to wait for an idle object when the pool is exhausted and
@@ -505,8 +504,8 @@ public class GenericObjectPool<T> extends BaseObjectPool<T> {
     }
 
     /**
-     * Create a new <tt>GenericObjectPool</tt> using the specified values.
-     * @param factory the (possibly <tt>null</tt>)PoolableObjectFactory to use to create, validate and destroy objects
+     * Create a new <code>GenericObjectPool</code> using the specified values.
+     * @param factory the (possibly <code>null</code>)PoolableObjectFactory to use to create, validate and destroy objects
      * @param maxActive the maximum number of objects that can be borrowed at one time (see {@link #setMaxActive})
      * @param whenExhaustedAction the action to take when the pool is exhausted (see {@link #setWhenExhaustedAction})
      * @param maxWait the maximum amount of time to wait for an idle object when the pool is exhausted and
@@ -540,8 +539,8 @@ public class GenericObjectPool<T> extends BaseObjectPool<T> {
     }
 
     /**
-     * Create a new <tt>GenericObjectPool</tt> using the specified values.
-     * @param factory the (possibly <tt>null</tt>)PoolableObjectFactory to use to create, validate and destroy objects
+     * Create a new <code>GenericObjectPool</code> using the specified values.
+     * @param factory the (possibly <code>null</code>)PoolableObjectFactory to use to create, validate and destroy objects
      * @param maxActive the maximum number of objects that can be borrowed at one time (see {@link #setMaxActive})
      * @param whenExhaustedAction the action to take when the pool is exhausted (see {@link #setWhenExhaustedAction})
      * @param maxWait the maximum amount of time to wait for an idle object when the pool is exhausted and
@@ -784,7 +783,7 @@ public class GenericObjectPool<T> extends BaseObjectPool<T> {
     }
 
     /**
-     * When <tt>true</tt>, objects will be
+     * When <code>true</code>, objects will be
      * {@link PoolableObjectFactory#validateObject validated}
      * before being returned by the {@link #borrowObject}
      * method.  If the object fails to validate,
@@ -799,7 +798,7 @@ public class GenericObjectPool<T> extends BaseObjectPool<T> {
     }
 
     /**
-     * When <tt>true</tt>, objects will be
+     * When <code>true</code>, objects will be
      * {@link PoolableObjectFactory#validateObject validated}
      * before being returned by the {@link #borrowObject}
      * method.  If the object fails to validate,
@@ -814,7 +813,7 @@ public class GenericObjectPool<T> extends BaseObjectPool<T> {
     }
 
     /**
-     * When <tt>true</tt>, objects will be
+     * When <code>true</code>, objects will be
      * {@link PoolableObjectFactory#validateObject validated}
      * before being returned to the pool within the
      * {@link #returnObject}.
@@ -827,7 +826,7 @@ public class GenericObjectPool<T> extends BaseObjectPool<T> {
     }
 
     /**
-     * When <tt>true</tt>, objects will be
+     * When <code>true</code>, objects will be
      * {@link PoolableObjectFactory#validateObject validated}
      * before being returned to the pool within the
      * {@link #returnObject}.
@@ -882,7 +881,7 @@ public class GenericObjectPool<T> extends BaseObjectPool<T> {
      * Sets the max number of objects to examine during each run of the
      * idle object evictor thread (if any).
      * <p>
-     * When a negative value is supplied, <tt>ceil({@link #getNumIdle})/abs({@link #getNumTestsPerEvictionRun})</tt>
+     * When a negative value is supplied, <code>ceil({@link #getNumIdle})/abs({@link #getNumTestsPerEvictionRun})</code>
      * tests will be run.  That is, when the value is <i>-n</i>, roughly one <i>n</i>th of the
      * idle objects will be tested per run. When the value is positive, the number of tests
      * actually performed in each run will be the minimum of this value and the number of instances
@@ -956,7 +955,7 @@ public class GenericObjectPool<T> extends BaseObjectPool<T> {
     }
 
     /**
-     * When <tt>true</tt>, objects will be
+     * When <code>true</code>, objects will be
      * {@link PoolableObjectFactory#validateObject validated}
      * by the idle object evictor (if any).  If an object
      * fails to validate, it will be dropped from the pool.
@@ -970,7 +969,7 @@ public class GenericObjectPool<T> extends BaseObjectPool<T> {
     }
 
     /**
-     * When <tt>true</tt>, objects will be
+     * When <code>true</code>, objects will be
      * {@link PoolableObjectFactory#validateObject validated}
      * by the idle object evictor (if any).  If an object
      * fails to validate, it will be dropped from the pool.
@@ -1991,7 +1990,7 @@ public class GenericObjectPool<T> extends BaseObjectPool<T> {
     private byte _whenExhaustedAction = DEFAULT_WHEN_EXHAUSTED_ACTION;
 
     /**
-     * When <tt>true</tt>, objects will be
+     * When <code>true</code>, objects will be
      * {@link PoolableObjectFactory#validateObject validated}
      * before being returned by the {@link #borrowObject}
      * method.  If the object fails to validate,
@@ -2004,7 +2003,7 @@ public class GenericObjectPool<T> extends BaseObjectPool<T> {
     private volatile boolean _testOnBorrow = DEFAULT_TEST_ON_BORROW;
 
     /**
-     * When <tt>true</tt>, objects will be
+     * When <code>true</code>, objects will be
      * {@link PoolableObjectFactory#validateObject validated}
      * before being returned to the pool within the
      * {@link #returnObject}.
@@ -2015,7 +2014,7 @@ public class GenericObjectPool<T> extends BaseObjectPool<T> {
     private volatile boolean _testOnReturn = DEFAULT_TEST_ON_RETURN;
 
     /**
-     * When <tt>true</tt>, objects will be
+     * When <code>true</code>, objects will be
      * {@link PoolableObjectFactory#validateObject validated}
      * by the idle object evictor (if any).  If an object
      * fails to validate, it will be dropped from the pool.
@@ -2042,7 +2041,7 @@ public class GenericObjectPool<T> extends BaseObjectPool<T> {
      * The max number of objects to examine during each run of the
      * idle object evictor thread (if any).
      * <p>
-     * When a negative value is supplied, <tt>ceil({@link #getNumIdle})/abs({@link #getNumTestsPerEvictionRun})</tt>
+     * When a negative value is supplied, <code>ceil({@link #getNumIdle})/abs({@link #getNumTestsPerEvictionRun})</code>
      * tests will be run.  I.e., when the value is <i>-n</i>, roughly one <i>n</i>th of the
      * idle objects will be tested per run.
      *

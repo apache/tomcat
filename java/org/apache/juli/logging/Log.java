@@ -24,7 +24,7 @@ package org.apache.juli.logging;
  * this interface must have a constructor that takes a single String
  * parameter representing the "name" of this Log.</p>
  *
- * <p> The six logging levels used by <code>Log</code> are (in order):
+ * <p> The six logging levels used by <code>Log</code> are (in order):</p>
  * <ol>
  * <li>trace (the least serious)</li>
  * <li>debug</li>
@@ -33,7 +33,7 @@ package org.apache.juli.logging;
  * <li>error</li>
  * <li>fatal (the most serious)</li>
  * </ol>
- * The mapping of these log levels to the concepts used by the underlying
+ * <p>The mapping of these log levels to the concepts used by the underlying
  * logging system is implementation dependent.
  * The implementation should ensure, though, that this ordering behaves
  * as expected.</p>
@@ -44,12 +44,12 @@ package org.apache.juli.logging;
  * to be logged).</p>
  *
  * <p> For example,
- * <code><pre>
+ * <code>
  *    if (log.isDebugEnabled()) {
  *        ... do something expensive ...
  *        log.debug(theResult);
  *    }
- * </pre></code>
+ * </code>
  * </p>
  *
  * <p>Configuration of the underlying logging system will generally be done
@@ -71,6 +71,9 @@ public interface Log {
      * <p> Call this method to prevent having to perform expensive operations
      * (for example, <code>String</code> concatenation)
      * when the log level is more than debug. </p>
+     *
+     * @return <code>true</code> if debug level logging is enabled, otherwise
+     *         <code>false</code>
      */
     public boolean isDebugEnabled();
 
@@ -81,6 +84,9 @@ public interface Log {
      * <p> Call this method to prevent having to perform expensive operations
      * (for example, <code>String</code> concatenation)
      * when the log level is more than error. </p>
+     *
+     * @return <code>true</code> if error level logging is enabled, otherwise
+     *         <code>false</code>
      */
     public boolean isErrorEnabled();
 
@@ -91,6 +97,9 @@ public interface Log {
      * <p> Call this method to prevent having to perform expensive operations
      * (for example, <code>String</code> concatenation)
      * when the log level is more than fatal. </p>
+     *
+     * @return <code>true</code> if fatal level logging is enabled, otherwise
+     *         <code>false</code>
      */
     public boolean isFatalEnabled();
 
@@ -101,6 +110,9 @@ public interface Log {
      * <p> Call this method to prevent having to perform expensive operations
      * (for example, <code>String</code> concatenation)
      * when the log level is more than info. </p>
+     *
+     * @return <code>true</code> if info level logging is enabled, otherwise
+     *         <code>false</code>
      */
     public boolean isInfoEnabled();
 
@@ -111,6 +123,9 @@ public interface Log {
      * <p> Call this method to prevent having to perform expensive operations
      * (for example, <code>String</code> concatenation)
      * when the log level is more than trace. </p>
+     *
+     * @return <code>true</code> if trace level logging is enabled, otherwise
+     *         <code>false</code>
      */
     public boolean isTraceEnabled();
 
@@ -121,6 +136,9 @@ public interface Log {
      * <p> Call this method to prevent having to perform expensive operations
      * (for example, <code>String</code> concatenation)
      * when the log level is more than warn. </p>
+     *
+     * @return <code>true</code> if warn level logging is enabled, otherwise
+     *         <code>false</code>
      */
     public boolean isWarnEnabled();
 

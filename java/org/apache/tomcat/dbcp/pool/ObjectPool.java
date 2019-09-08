@@ -49,7 +49,6 @@ import java.util.NoSuchElementException;
  * } <code style="color:#00C">catch</code>(Exception e) {
  *       <code style="color:#0C0">// failed to borrow an object</code>
  * }</pre>
- * </p>
  *
  * <p>See {@link BaseObjectPool} for a simple base implementation.</p>
  *

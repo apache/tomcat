@@ -35,7 +35,7 @@ import org.apache.tomcat.dbcp.pool.PoolableObjectFactory;
  * empty, new instances are created to support the new load.
  * Hence this class places no limit on the number of "active"
  * instances created by the pool, but is quite useful for
- * re-using <tt>Object</tt>s without introducing
+ * re-using <code>Object</code>s without introducing
  * artificial limits.
  *
  * @param <T> the type of objects held in this pool
@@ -96,7 +96,7 @@ public class StackObjectPool<T> extends BaseObjectPool<T> {
     }
 
     /**
-     * Create a new <tt>StackObjectPool</tt> using the specified <i>factory</i> to create new instances.
+     * Create a new <code>StackObjectPool</code> using the specified <i>factory</i> to create new instances.
      *
      * @param factory the {@link PoolableObjectFactory} used to populate the pool
      */
@@ -105,7 +105,7 @@ public class StackObjectPool<T> extends BaseObjectPool<T> {
     }
 
     /**
-     * Create a new <tt>SimpleObjectPool</tt> using the specified <i>factory</i> to create new instances,
+     * Create a new <code>SimpleObjectPool</code> using the specified <i>factory</i> to create new instances,
      * capping the number of "sleeping" instances to <i>maxIdle</i>.
      *
      * @param factory the {@link PoolableObjectFactory} used to populate the pool
@@ -116,7 +116,7 @@ public class StackObjectPool<T> extends BaseObjectPool<T> {
     }
 
     /**
-     * <p>Create a new <tt>StackObjectPool</tt> using the specified <code>factory</code> to create new instances,
+     * <p>Create a new <code>StackObjectPool</code> using the specified <code>factory</code> to create new instances,
      * capping the number of "sleeping" instances to <code>maxIdle</code>, and initially allocating a container
      * capable of containing at least <code>initIdleCapacity</code> instances.  The pool is not pre-populated.
      * The <code>initIdleCapacity</code> parameter just determines the initial size of the underlying

@@ -46,19 +46,19 @@ import java.util.ArrayList;
  * JOCL provides an XML syntax for constructing arbitrary Java
  * {@link java.lang.Object} instances.  It does not define a full
  * XML document type (there's no root element), but rather an
- * XML fragment describing the {@link java.lang.Object <tt>Object</tt>s} to be
+ * XML fragment describing the {@link java.lang.Object <code>Object</code>s} to be
  * constructed.
  * <p>
  * In a JOCL fragment, one may define a series of objects using
- * the <tt>object</tt> element.  A trivial example is:
+ * the <code>object</code> element.  A trivial example is:
  * <pre> &lt;object class="java.util.Date"/&gt;</pre>
- * which constructs an instance of <tt>java.util.Date</tt>
+ * which constructs an instance of <code>java.util.Date</code>
  * using the no-argument constructor.
  * <p>
- * After a "root-level" <tt>&lt;object&gt;</tt> element has been processed
+ * After a "root-level" <code>&lt;object&gt;</code> element has been processed
  * (that is, once {@link #endElement(java.lang.String,java.lang.String,java.lang.String)}
- * has been invoked by the {@link XMLReader}), it will be appended to a list of <tt>Object</tt>s
- * maintained by the <tt>JOCLContentHandler</tt>.
+ * has been invoked by the {@link XMLReader}), it will be appended to a list of <code>Object</code>s
+ * maintained by the <code>JOCLContentHandler</code>.
  * <p>
  * (See {@link #size},
  * {@link #clear},
@@ -69,29 +69,29 @@ import java.util.ArrayList;
  * and
  * {@link #getValueArray}.)
  * <p>
- * You can list multiple <tt>object</tt> elements in a fragment.  For example,
+ * You can list multiple <code>object</code> elements in a fragment.  For example,
  * after processing the JOCL fragment:
  * <pre> &lt;object class="java.util.Date"/&gt;
  * &lt;object class="java.util.Date"/&gt;</pre>
  * The {@link #getTypeArray} method
  * will return an array composed
- * of two instances of <tt>java.util.Date</tt>.  The sequence of
- * {@link java.lang.Object <tt>Object</tt>s} in the array
- * will correspond to the sequence of <tt>&lt;object&gt;</tt> elements in the JOCL fragment.
+ * of two instances of <code>java.util.Date</code>.  The sequence of
+ * {@link java.lang.Object <code>Object</code>s} in the array
+ * will correspond to the sequence of <code>&lt;object&gt;</code> elements in the JOCL fragment.
  * <p>
- * As we've seen, when used with no child-elements, the <tt>&lt;object&gt;</tt>
+ * As we've seen, when used with no child-elements, the <code>&lt;object&gt;</code>
  * tag will cause the no-argument constructor of the specified class to be invoked.
- * It is also possible to nest <tt>&lt;object&gt;</tt> tags to provide arguments
+ * It is also possible to nest <code>&lt;object&gt;</code> tags to provide arguments
  * for the constructor.
  * For example, the fragment:
  * <pre> &lt;object class="mypackage.Foo"&gt;
  *   &lt;object class="mypackage.Bar"/&gt;
  * &lt;/object&gt;</pre>
- * will add an instance of <tt>mypackage.Foo</tt> to the object list, constructed via
- * <tt>new mypackage.Foo(new mypackage.Bar())</tt>.
+ * will add an instance of <code>mypackage.Foo</code> to the object list, constructed via
+ * <code>new mypackage.Foo(new mypackage.Bar())</code>.
  * <p>
  * There is a special syntax available creating primitive values and arguments,
- * as well as for constructing {@link java.lang.String <tt>String</tt>}s. Some examples:
+ * as well as for constructing {@link java.lang.String <code>String</code>}s. Some examples:
  * <p>
  * <pre> &lt;byte value="3"/&gt;
  * &lt;boolean value="false"/&gt;
@@ -103,12 +103,12 @@ import java.util.ArrayList;
  * &lt;short value="1"/&gt;
  * &lt;string value="The quick brown fox..."/&gt;</pre>
  * <p>
- * When invoked at the "root" level (that is, with no <tt>&lt;object&gt;</tt> parent),
+ * When invoked at the "root" level (that is, with no <code>&lt;object&gt;</code> parent),
  * this will cause the corresponding "object wrapper" to be added to the list of
- * {@link java.lang.Object <tt>Object</tt>}s.  The {@link #getType type} for these
+ * {@link java.lang.Object <code>Object</code>}s.  The {@link #getType type} for these
  * objects will reflect the proper primitive type, however.  When invoked with an
- * <tt>&lt;object&gt;</tt> parent, these will be treated as primitive arguments to the
- * specified {@link java.lang.Object <tt>Object</tt>}'s constructor.  For example, while:
+ * <code>&lt;object&gt;</code> parent, these will be treated as primitive arguments to the
+ * specified {@link java.lang.Object <code>Object</code>}'s constructor.  For example, while:
  * <p>
  * <pre> &lt;int value="5"/&gt;
  * &lt;int value="26"/&gt;
@@ -124,7 +124,7 @@ import java.util.ArrayList;
  * results in three {@link java.lang.Integer} instances being added to the
  * list of values, with types corresponding to {@link java.lang.Integer#TYPE}.
  * <p>
- * Hence if you want to invoke the <tt>mypackage.Foo(java.lang.Integer,java.lang.Integer,java.lang.Integer)</tt>
+ * Hence if you want to invoke the <code>mypackage.Foo(java.lang.Integer,java.lang.Integer,java.lang.Integer)</code>
  * constructor, use:
  * <pre> &lt;object class="mypackage.Foo"/&gt;
  *   &lt;object class="java.lang.Integer"&gt;&lt;int value="5"/&gt;&lt;/object&gt;
@@ -132,7 +132,7 @@ import java.util.ArrayList;
  *   &lt;object class="java.lang.Integer"&gt;&lt;int value="100"/&gt;&lt;/object&gt;
  * &lt;/object&gt;</pre>
  * <p>
- * If you want to invoke the <tt>mypackage.Foo(int,int,int)</tt>
+ * If you want to invoke the <code>mypackage.Foo(int,int,int)</code>
  * constructor, use:
  * <pre> &lt;object class="mypackage.Foo"/&gt;
  *   &lt;int value="5"/&gt;
@@ -140,7 +140,7 @@ import java.util.ArrayList;
  *   &lt;int value="100"/&gt;
  * &lt;/object&gt;</pre>
  * <p>
- * If you'd like to creat a <tt>null</tt> object, use:
+ * If you'd like to creat a <code>null</code> object, use:
  * <pre> &lt;object class="mypackage.Bar" null="true"/&gt;</pre>
  * <p>
  * Here's a simple but complete example:
@@ -205,7 +205,7 @@ import java.util.ArrayList;
  * {@link #startElement},
  * {@link #characters},
  * and {@link #endElement} methods to handle
- * your tags, and invoke the method of the parent class (i.e., <tt>super.<i>XXX</i></tt> for
+ * your tags, and invoke the method of the parent class (i.e., <code>super.<i>XXX</i></code> for
  * elements and data that you don't handle.
  * <p>
  * A number of static methods are available for simply reading a list of objects from
@@ -221,7 +221,7 @@ public class JOCLContentHandler extends DefaultHandler {
     /**
      * A simple tester method.  Reads a JOCL document from standard in
      * and prints a list of the objects created to standard out.
-     * (Use the <tt>org.xml.sax.driver</tt> system property to specify
+     * (Use the <code>org.xml.sax.driver</code> system property to specify
      * an {@link XMLReader}.
      */
     public static void main(String[] args) throws Exception {
@@ -233,7 +233,7 @@ public class JOCLContentHandler extends DefaultHandler {
 
     /**
      * Parses a JOCL document from the specified file, using the
-     * {@link XMLReader} specified by the <tt>org.xml.sax.driver</tt>
+     * {@link XMLReader} specified by the <code>org.xml.sax.driver</code>
      * property.
      * The returned {@link JOCLContentHandler} will contain the
      * list of objects described by the file.
@@ -246,7 +246,7 @@ public class JOCLContentHandler extends DefaultHandler {
 
     /**
      * Parses a JOCL document from the specified {@link Reader}, using the
-     * {@link XMLReader} specified by the <tt>org.xml.sax.driver</tt>
+     * {@link XMLReader} specified by the <code>org.xml.sax.driver</code>
      * property.
      * The returned {@link JOCLContentHandler} will contain the
      * list of objects described by the file.
@@ -259,7 +259,7 @@ public class JOCLContentHandler extends DefaultHandler {
 
     /**
      * Parses a JOCL document from the specified {@link InputStream}, using the
-     * {@link XMLReader} specified by the <tt>org.xml.sax.driver</tt>
+     * {@link XMLReader} specified by the <code>org.xml.sax.driver</code>
      * property.
      * The returned {@link JOCLContentHandler} will contain the
      * list of objects described by the file.
@@ -272,7 +272,7 @@ public class JOCLContentHandler extends DefaultHandler {
 
     /**
      * Parses a JOCL document from the specified {@link InputSource}, using thethe
-     * {@link XMLReader} specified by the <tt>org.xml.sax.driver</tt>
+     * {@link XMLReader} specified by the <code>org.xml.sax.driver</code>
      * property.
      * The returned {@link JOCLContentHandler} will contain the
      * list of objects described by the file.
@@ -285,7 +285,7 @@ public class JOCLContentHandler extends DefaultHandler {
 
     /**
      * Parses a JOCL document from the specified file, using the
-     * {@link XMLReader} specified by the <tt>org.xml.sax.driver</tt>
+     * {@link XMLReader} specified by the <code>org.xml.sax.driver</code>
      * property.
      * The returned {@link JOCLContentHandler} will contain the
      * list of objects described by the file.
@@ -353,10 +353,10 @@ public class JOCLContentHandler extends DefaultHandler {
 
     /**
      * Construct a JOCLContentHandler.
-     * @param emptyEltNS when <tt>true</tt> I should assume any element with an empty namespace is within the JOCL namespace
-     * @param joclEltPrefix when <tt>true</tt> I should assume any element who's prefix is <tt>jocl:</tt> and who's namespace is empty is within the JOCL namespace
-     * @param emptyAttrNS when <tt>true</tt> I should assume any attribute with an empty namespace is within the JOCL namespace
-     * @param joclAttrPrefix when <tt>true</tt> I should assume any attribute who's prefix is <tt>jocl:</tt> and who's namespace is empty is within the JOCL namespace
+     * @param emptyEltNS when <code>true</code> I should assume any element with an empty namespace is within the JOCL namespace
+     * @param joclEltPrefix when <code>true</code> I should assume any element who's prefix is <code>jocl:</code> and who's namespace is empty is within the JOCL namespace
+     * @param emptyAttrNS when <code>true</code> I should assume any attribute with an empty namespace is within the JOCL namespace
+     * @param joclAttrPrefix when <code>true</code> I should assume any attribute who's prefix is <code>jocl:</code> and who's namespace is empty is within the JOCL namespace
      */
     public JOCLContentHandler(boolean emptyEltNS, boolean joclEltPrefix, boolean emptyAttrNS, boolean joclAttrPrefix) {
         _acceptEmptyNamespaceForElements = emptyEltNS;
@@ -537,7 +537,7 @@ public class JOCLContentHandler extends DefaultHandler {
     //--- Protected Methods ------------------------------------------
 
     /**
-     * Returns <tt>true</tt> if the given attributes define an
+     * Returns <code>true</code> if the given attributes define an
      * element within the JOCL namespace (according to my current
      * configuration.)
      *
@@ -557,7 +557,7 @@ public class JOCLContentHandler extends DefaultHandler {
     }
 
     /**
-     * Equivalent to {@link #getAttributeValue(java.lang.String,org.xml.sax.Attributes,java.lang.String) <tt>getAttributeValue(localname,attr,null)</tt>}.
+     * Equivalent to {@link #getAttributeValue(java.lang.String,org.xml.sax.Attributes,java.lang.String) <code>getAttributeValue(localname,attr,null)</code>}.
      */
     protected String getAttributeValue(String localname, Attributes attr) {
         return getAttributeValue(localname,attr,null);
@@ -565,19 +565,19 @@ public class JOCLContentHandler extends DefaultHandler {
 
     /**
      * Returns the value of attribute with the given
-     * <tt><i>localname</i></tt> within the JOCL
+     * <code><i>localname</i></code> within the JOCL
      * namespace from the given set of {@link Attributes}.
      * If no such attribute can be found, returns
-     * <tt><i>implied</i></tt>.
+     * <code><i>implied</i></code>.
      *
      * @param localname the unqualified name of the attribute to look for
      * @param attr      the Attributes in which to find the value
      * @param implied   the default value for the attribute
      * @return the value of attribute with the given
-     *         <tt><i>localname</i></tt> within the JOCL
+     *         <code><i>localname</i></code> within the JOCL
      *         namespace from the given set of {@link Attributes}.
      *         If no such attribute can be found, returns
-     *         <tt><i>implied</i></tt>.
+     *         <code><i>implied</i></code>.
      */
     protected String getAttributeValue(String localname, Attributes attr, String implied) {
         String val = attr.getValue(JOCL_NAMESPACE_URI,localname);
@@ -606,12 +606,12 @@ public class JOCLContentHandler extends DefaultHandler {
     //--- Protected Attributes ---------------------------------------
 
     /**
-     * The JOCL namespace URI, <tt>http://apache.org/xml/xmlns/jakarta/commons/jocl</tt>.
+     * The JOCL namespace URI, <code>http://apache.org/xml/xmlns/jakarta/commons/jocl</code>.
      */
     public static final String JOCL_NAMESPACE_URI = "http://apache.org/xml/xmlns/jakarta/commons/jocl";
 
     /**
-     * The default JOCL prefix, <tt>jocl:</tt>.
+     * The default JOCL prefix, <code>jocl:</code>.
      */
     public static final String JOCL_PREFIX = "jocl:";
 
@@ -631,7 +631,7 @@ public class JOCLContentHandler extends DefaultHandler {
     protected ConstructorDetails _cur = null;
 
     /**
-     * When <tt>true</tt>, I will treat elements with an
+     * When <code>true</code>, I will treat elements with an
      * empty namespace URI as part of the JOCL namespace.
      *
      * @see #JOCL_NAMESPACE_URI
@@ -639,7 +639,7 @@ public class JOCLContentHandler extends DefaultHandler {
     protected boolean _acceptEmptyNamespaceForElements = true;
 
     /**
-     * When <tt>true</tt>, I will treat elements with the
+     * When <code>true</code>, I will treat elements with the
      * {@link #JOCL_PREFIX} but no namespace URI as being
      * mapped to the jocl namespace.
      *
@@ -649,7 +649,7 @@ public class JOCLContentHandler extends DefaultHandler {
     protected boolean _acceptJoclPrefixForElements = true;
 
     /**
-     * When <tt>true</tt>, I will treat attributes with an
+     * When <code>true</code>, I will treat attributes with an
      * empty namespace URI as part of the JOCL namespace.
      *
      * @see #JOCL_NAMESPACE_URI
@@ -657,7 +657,7 @@ public class JOCLContentHandler extends DefaultHandler {
     protected boolean _acceptEmptyNamespaceForAttributes = true;
 
     /**
-     * When <tt>true</tt>, I will treat attributes with the
+     * When <code>true</code>, I will treat attributes with the
      * {@link #JOCL_PREFIX} but no namespace URI as being
      * mapped to the jocl namespace.
      *

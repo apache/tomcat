@@ -46,7 +46,7 @@ import org.apache.tomcat.util.http.FastHttpDateFormat;
 
 /**
  * Connection to a JNDI directory context.
- * <p/>
+ * <p>
  * Note: All the object attribute names are the WebDAV names, not the HTTP
  * names, so this class overrides some methods from URLConnection to do the
  * queries using the right names. Content handler is also not used; the

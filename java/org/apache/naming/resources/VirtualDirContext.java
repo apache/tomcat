@@ -38,7 +38,7 @@ import org.apache.naming.NamingEntry;
  * This should be used in conjunction with
  * {@link org.apache.catalina.loader.VirtualWebappLoader}.
  *
- * Sample context xml configuration:<br/><br/>
+ * Sample context xml configuration:<br>
  *
  * <pre>{@code
  * <Context path="/mywebapp" docBase="/Users/theuser/mywebapp/src/main/webapp" >

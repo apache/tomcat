@@ -45,7 +45,6 @@ import java.util.NoSuchElementException;
  *         pool.returnObject(key, obj);
  *     }
  * }</pre>
- * </p>
  * <p>
  * {@link KeyedObjectPool} implementations <i>may</i> choose to store at most
  * one instance per key value, or may choose to maintain a pool of instances

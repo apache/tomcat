@@ -144,7 +144,7 @@ import org.apache.tomcat.dbcp.pool.PoolUtils;
  *   pool before it is eligible for eviction due to idle time.  When
  *   non-positive, no object will be dropped from the pool due to idle time
  *   alone.  This setting has no effect unless
- *   <code>timeBetweenEvictionRunsMillis > 0.</code>  The default setting
+ *   <code>timeBetweenEvictionRunsMillis &gt; 0.</code>  The default setting
  *   for this parameter is 30 minutes.
  *  </li>
  *  <li>
@@ -153,14 +153,14 @@ import org.apache.tomcat.dbcp.pool.PoolUtils;
  *   {@link KeyedPoolableObjectFactory#validateObject validateObject} method
  *   during idle object eviction runs.  Objects that fail to validate will be
  *   dropped from the pool. This setting has no effect unless
- *   <code>timeBetweenEvictionRunsMillis > 0.</code>  The default setting
+ *   <code>timeBetweenEvictionRunsMillis &gt; 0.</code>  The default setting
  *   for this parameter is <code>false.</code>
  *  </li>
  *  <li>
  *    {@link #setMinIdle minIdle} sets a target value for the minimum number of
  *    idle objects (per key) that should always be available. If this parameter
  *    is set to a positive number and
- *    <code>timeBetweenEvictionRunsMillis > 0,</code> each time the idle object
+ *    <code>timeBetweenEvictionRunsMillis &gt; 0,</code> each time the idle object
  *    eviction thread runs, it will try to create enough idle instances so that
  *    there will be <code>minIdle</code> idle instances available under each
  *    key. This parameter is also used by {@link #preparePool preparePool}
@@ -193,7 +193,7 @@ import org.apache.tomcat.dbcp.pool.PoolUtils;
  * block. See POOL-125 and DBCP-44 for more information.
  * </p>
  *
- * * @param <K> the type of keys in this pool
+ * @param <K> the type of keys in this pool
  * @param <V> the type of objects held in this pool
  *
  * @see GenericObjectPool
@@ -810,7 +810,7 @@ public class GenericKeyedObjectPool<K, V> extends BaseKeyedObjectPool<K, V> {
     /**
      * Sets the minimum number of idle objects to maintain in each of the keyed
      * pools. This setting has no effect unless
-     * <code>timeBetweenEvictionRunsMillis > 0</code> and attempts to ensure
+     * <code>timeBetweenEvictionRunsMillis &gt; 0</code> and attempts to ensure
      * that each pool has the required minimum number of instances are only
      * made during idle object eviction runs.
      * <p>
@@ -829,7 +829,7 @@ public class GenericKeyedObjectPool<K, V> extends BaseKeyedObjectPool<K, V> {
     /**
      * Returns the minimum number of idle objects to maintain in each of the keyed
      * pools. This setting has no effect unless
-     * <code>timeBetweenEvictionRunsMillis > 0</code> and attempts to ensure
+     * <code>timeBetweenEvictionRunsMillis &gt; 0</code> and attempts to ensure
      * that each pool has the required minimum number of instances are only
      * made during idle object eviction runs.
      * <p>
