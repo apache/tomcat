@@ -106,7 +106,7 @@ public class ChunkedOutputFilter implements OutputFilter {
 
         int pos = calculateChunkHeader(result);
 
-        chunkHeader.position(pos + 1).limit(chunkHeader.position() + 9 - pos);
+        chunkHeader.position(pos + 1).limit(10);
         buffer.doWrite(chunkHeader);
 
         buffer.doWrite(chunk);
