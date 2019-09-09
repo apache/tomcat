@@ -690,11 +690,10 @@ public class Tomcat {
      * @param contextPath The context mapping to use, "" for root context.
      * @param docBase Base directory for the context, for static files.
      *  Must exist, relative to the server home
-     * @param config Custom context configurator helper
+     * @param name Ignored. The contextPath will be used
      * @return the deployed context
      * @see #addWebapp(String, String)
      *
-     * @param name Ignored. The contextPath will be used
      *
      * @deprecated Use {@link #addWebapp(Host, String, String)}
      */

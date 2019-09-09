@@ -53,7 +53,6 @@ import org.apache.juli.logging.LogFactory;
  *</ol>
  * @author Craig R. McClanahan
  * @author Dirk Verbeeck
- * @author Filip Hanik
  */
 public class DataSourceFactory implements ObjectFactory {
     private static final Log log = LogFactory.getLog(DataSourceFactory.class);
@@ -543,6 +542,7 @@ public class DataSourceFactory implements ObjectFactory {
      * given properties.
      *
      * @param properties the datasource configuration properties
+     * @return the datasource
      * @throws Exception if an error occurs creating the data source
      */
     public DataSource createDataSource(Properties properties) throws Exception {
@@ -571,14 +571,14 @@ public class DataSourceFactory implements ObjectFactory {
                 log.warn("dataSourceJNDI property is configured, but local JNDI context is null.");
             }
         } catch (NamingException e) {
-            log.debug("The name \""+poolProperties.getDataSourceJNDI()+"\" can not be found in the local context.");
+            log.debug("The name \""+poolProperties.getDataSourceJNDI()+"\" cannot be found in the local context.");
         }
         if (jndiDS==null) {
             try {
                 context = new InitialContext();
                 jndiDS = context.lookup(poolProperties.getDataSourceJNDI());
             } catch (NamingException e) {
-                log.warn("The name \""+poolProperties.getDataSourceJNDI()+"\" can not be found in the InitialContext.");
+                log.warn("The name \""+poolProperties.getDataSourceJNDI()+"\" cannot be found in the InitialContext.");
             }
         }
         if (jndiDS!=null) {
@@ -587,10 +587,9 @@ public class DataSourceFactory implements ObjectFactory {
     }
 
     /**
-     * <p>Parse properties from the string. Format of the string must be [propertyName=property;]*<p>
-     * @param propText
-     * @return Properties
-     * @throws Exception
+     * Parse properties from the string. Format of the string must be [propertyName=property;]*.
+     * @param propText The properties string
+     * @return the properties
      */
     protected static Properties getProperties(String propText) {
         return PoolProperties.getProperties(propText,null);
