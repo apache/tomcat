@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.catalina.realm;
 
 import java.io.IOException;
@@ -2902,8 +2901,6 @@ public class JNDIRealm extends RealmBase {
         public String getUserRoleId() {
             return userRoleId;
         }
-
-
     }
 }
 

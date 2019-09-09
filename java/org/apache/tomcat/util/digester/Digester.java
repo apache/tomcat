@@ -240,6 +240,7 @@ public class Digester extends DefaultHandler2 {
      */
     protected ArrayStack<Object> params = new ArrayStack<>();
 
+
     /**
      * The SAXParser we will use to parse the input stream.
      */
@@ -1949,6 +1950,4 @@ public class Digester extends DefaultHandler2 {
             return new StringBuilder(out);
         }
     }
-
-
 }

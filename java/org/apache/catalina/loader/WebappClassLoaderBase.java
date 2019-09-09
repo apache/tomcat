@@ -327,7 +327,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
 
     /**
      * The bootstrap class loader used to load the JavaSE classes. In some
-     * implementations this class loader is always <code>null</null> and in
+     * implementations this class loader is always <code>null</code> and in
      * those cases {@link ClassLoader#getParent()} will be called recursively on
      * the system class loader and the last non-null result used.
      */
