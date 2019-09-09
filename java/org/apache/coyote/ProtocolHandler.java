@@ -22,10 +22,8 @@ import org.apache.tomcat.util.net.SSLHostConfig;
 
 /**
  * Abstract the protocol implementation, including threading, etc.
- * Processor is single threaded and specific to stream-based protocols,
- * will not fit Jk protocols like JNI.
  *
- * This is the main interface to be implemented by a coyote connector.
+ * This is the main interface to be implemented by a coyote protocol.
  * Adapter is the main interface to be implemented by a coyote servlet
  * container.
  *
@@ -36,12 +34,18 @@ import org.apache.tomcat.util.net.SSLHostConfig;
 public interface ProtocolHandler {
 
     /**
+     * Return the adapter associated with the protocol handler.
+     * @return the adapter
+     */
+    public Adapter getAdapter();
+
+
+    /**
      * The adapter, used to call the connector.
      *
      * @param adapter The adapter to associate
      */
     public void setAdapter(Adapter adapter);
-    public Adapter getAdapter();
 
 
     /**

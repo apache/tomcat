@@ -795,7 +795,6 @@ public class SimpleTcpCluster extends LifecycleMBeanBase
                 }
             }
         }
-        return;
     }
 
     public int getChannelStartOptions() {

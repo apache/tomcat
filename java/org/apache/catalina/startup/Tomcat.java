@@ -1044,7 +1044,6 @@ public class Tomcat {
                     }
                 }
             } catch (ClassCastException e) {
-                return;
             }
         }
     }
