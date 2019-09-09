@@ -105,14 +105,14 @@ public class ChunkedOutputFilter implements OutputFilter {
         }
 
         // Calculate chunk header
-        int pos = 7;
+        int pos = 8;
         int current = result;
         while (current > 0) {
             int digit = current % 16;
             current = current / 16;
-            chunkLength[pos--] = HexUtils.getHex(digit);
+            chunkLength[--pos] = HexUtils.getHex(digit);
         }
-        chunkHeader.setBytes(chunkLength, pos + 1, 9 - pos);
+        chunkHeader.setBytes(chunkLength, pos, 10 - pos);
         buffer.doWrite(chunkHeader, res);
 
         buffer.doWrite(chunk, res);
