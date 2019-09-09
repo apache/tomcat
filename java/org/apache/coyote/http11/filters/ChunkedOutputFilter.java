@@ -14,7 +14,6 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package org.apache.coyote.http11.filters;
 
 import java.io.IOException;
@@ -93,7 +92,7 @@ public class ChunkedOutputFilter implements OutputFilter {
 
         int pos = calculateChunkHeader(result);
 
-        chunkHeader.position(pos + 1).limit(chunkHeader.position() + 9 - pos);
+        chunkHeader.position(pos).limit(10);
         buffer.doWrite(chunkHeader);
 
         buffer.doWrite(chunk);
@@ -102,7 +101,6 @@ public class ChunkedOutputFilter implements OutputFilter {
         buffer.doWrite(chunkHeader);
 
         return result;
-
     }
 
 
@@ -126,7 +124,6 @@ public class ChunkedOutputFilter implements OutputFilter {
         buffer.doWrite(chunkHeader);
 
         return result;
-
     }
 
 
