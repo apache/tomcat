@@ -241,6 +241,7 @@ public class Digester extends DefaultHandler2 {
      */
     protected ArrayStack<Object> params = new ArrayStack<>();
 
+
     /**
      * The SAXParser we will use to parse the input stream.
      */
@@ -1384,13 +1385,11 @@ public class Digester extends DefaultHandler2 {
      */
     @Override
     public void error(SAXParseException exception) throws SAXException {
-
         log.error("Parse Error at line " + exception.getLineNumber() + " column "
                 + exception.getColumnNumber() + ": " + exception.getMessage(), exception);
         if (errorHandler != null) {
             errorHandler.error(exception);
         }
-
     }
 
 
@@ -1404,13 +1403,11 @@ public class Digester extends DefaultHandler2 {
      */
     @Override
     public void fatalError(SAXParseException exception) throws SAXException {
-
         log.error("Parse Fatal Error at line " + exception.getLineNumber() + " column "
                 + exception.getColumnNumber() + ": " + exception.getMessage(), exception);
         if (errorHandler != null) {
             errorHandler.fatalError(exception);
         }
-
     }
 
 
@@ -1558,7 +1555,6 @@ public class Digester extends DefaultHandler2 {
         setRuleNamespaceURI(newNamespaceURI);
         ruleSet.addRuleInstances(this);
         setRuleNamespaceURI(oldNamespaceURI);
-
     }
 
 
@@ -2001,6 +1997,4 @@ public class Digester extends DefaultHandler2 {
             return new StringBuilder(out);
         }
     }
-
-
 }

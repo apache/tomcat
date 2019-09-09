@@ -71,6 +71,7 @@ public class GroupChannel extends ChannelInterceptorBase
      * If set to true, the channel will start a local thread for the heart beat.
      */
     protected boolean heartbeat = true;
+
     /**
      * If <code>heartbeat == true</code> then how often do we want this
      * heartbeat to run. default is one minute

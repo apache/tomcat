@@ -205,8 +205,8 @@ public final class Request {
         return urlDecoder;
     }
 
-    // -------------------- Request data --------------------
 
+    // -------------------- Request data --------------------
 
     public MessageBytes scheme() {
         return schemeMB;
@@ -283,8 +283,8 @@ public final class Request {
         this.localPort = port;
     }
 
-    // -------------------- encoding/type --------------------
 
+    // -------------------- encoding/type --------------------
 
     /**
      * Get the character encoding used for this request.
