@@ -547,7 +547,6 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
         if (oname != null) {
             Registry.getRegistry(null, null).unregisterComponent(oname);
         }
-    }
 
         if (tpOname != null)
             Registry.getRegistry(null, null).unregisterComponent(tpOname);
