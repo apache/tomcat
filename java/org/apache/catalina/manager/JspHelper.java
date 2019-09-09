@@ -45,8 +45,11 @@ public class JspHelper {
 
     /**
      * Try to get user locale from the session, if possible.
-     * IMPLEMENTATION NOTE: this method has explicit support for Tapestry 3 and Struts 1.x
-     * @param in_session
+     * IMPLEMENTATION NOTE: this method has explicit support for Tapestry 3 and
+     * Struts 1.x
+     *
+     * @param in_session Session from which the locale should be guessed
+     *
      * @return String
      */
     public static String guessDisplayLocaleFromSession(Session in_session) {
@@ -62,8 +65,8 @@ public class JspHelper {
 
     /**
      * Try to get user name from the session, if possible.
-     * @param in_session
-     * @return String
+     * @param in_session The Servlet session
+     * @return the user name
      */
     public static String guessDisplayUserFromSession(Session in_session) {
         Object user = SessionUtils.guessUserFromSession(in_session);
@@ -168,7 +171,8 @@ public class JspHelper {
      */
 
     private static final int HIGHEST_SPECIAL = '>';
-    private static char[][] specialCharactersRepresentation = new char[HIGHEST_SPECIAL + 1][];
+    private static final char[][] specialCharactersRepresentation =
+            new char[HIGHEST_SPECIAL + 1][];
     static {
         specialCharactersRepresentation['&'] = "&amp;".toCharArray();
         specialCharactersRepresentation['<'] = "&lt;".toCharArray();
@@ -191,13 +195,15 @@ public class JspHelper {
      * Performs the following substring replacements
      * (to facilitate output to XML/HTML pages):
      *
-     *    & -> &amp;
-     *    < -> &lt;
-     *    > -> &gt;
-     *    " -> &#034;
-     *    ' -> &#039;
+     *    &amp; -&gt; &amp;amp;
+     *    &lt; -&gt; &amp;lt;
+     *    &gt; -&gt; &amp;gt;
+     *    " -&gt; &amp;#034;
+     *    ' -&gt; &amp;#039;
      *
      * See also OutSupport.writeEscapedXml().
+     * @param buffer The XML to escape
+     * @return the escaped XML
      */
     @SuppressWarnings("null") // escapedBuffer cannot be null
     public static String escapeXml(String buffer) {

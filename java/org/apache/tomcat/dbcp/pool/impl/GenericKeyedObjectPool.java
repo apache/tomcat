@@ -1381,7 +1381,7 @@ public class GenericKeyedObjectPool<K, V> extends BaseKeyedObjectPool<K, V> {
      * returned to the idle instance pool, even during its execution. It locks
      * the pool only during instance removal. Additional instances may be returned
      * while removed items are being destroyed.</li>
-     * <li>Exceptions encountered destroying idle instances are swallowed.</li></ul></p>
+     * <li>Exceptions encountered destroying idle instances are swallowed.</li></ul>
      */
     @Override
     public void clear() {
@@ -1778,7 +1778,7 @@ public class GenericKeyedObjectPool<K, V> extends BaseKeyedObjectPool<K, V> {
      * Registers a key for pool control.
      *
      * If <code>populateImmediately</code> is <code>true</code> and
-     * <code>minIdle > 0,</code> the pool under the given key will be
+     * <code>minIdle &gt; 0,</code> the pool under the given key will be
      * populated immediately with <code>minIdle</code> idle instances.
      *
      * @param key - The key to register for pool control.

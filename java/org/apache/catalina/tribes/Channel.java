@@ -65,7 +65,6 @@ import java.io.Serializable;
  * </code></pre>
  *
  * For example usage @see org.apache.catalina.tribes.group.GroupChannel
- * @author Filip Hanik
  */
 public interface Channel {
 
@@ -247,13 +246,14 @@ public interface Channel {
 
     /**
      * Send a message to one or more members in the cluster
-     * @param destination Member[] - the destinations, can not be null or zero length, the reason for that
+     * @param destination Member[] - the destinations, cannot be null or zero length, the reason for that
      * is that a membership change can occur and at that time the application is uncertain what group the message
      * actually got sent to.
      * @param msg Serializable - the message to send, has to be serializable, or a <code>ByteMessage</code> to
      * send a pure byte array
      * @param options int - sender options, see class documentation for each interceptor that is configured in order to trigger interceptors
      * @return a unique Id that identifies the message that is sent
+     * @throws ChannelException if a serialization error happens.
      * @see ByteMessage
      * @see #SEND_OPTIONS_USE_ACK
      * @see #SEND_OPTIONS_ASYNCHRONOUS
@@ -324,7 +324,7 @@ public interface Channel {
 
     /**
      * Returns true if there are any members in the group,
-     * this call is the same as <code>getMembers().length>0</code>
+     * this call is the same as <code>getMembers().length &gt; 0</code>
      * @return boolean - true if there are any members automatically discovered
      */
     public boolean hasMembers() ;

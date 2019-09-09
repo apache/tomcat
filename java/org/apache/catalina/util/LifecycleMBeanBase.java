@@ -52,7 +52,6 @@ public abstract class LifecycleMBeanBase extends LifecycleBase
      */
     @Override
     protected void initInternal() throws LifecycleException {
-
         // If oname is not null then registration has already happened via
         // preRegister().
         if (oname == null) {
@@ -131,7 +130,7 @@ public abstract class LifecycleMBeanBase extends LifecycleBase
     /**
      * Utility method to enable sub-classes to easily register additional
      * components that don't implement {@link MBeanRegistration} with
-     * an MBean server.<br/>
+     * an MBean server.<br>
      * Note: This method should only be used once {@link #initInternal()} has
      * been called and before {@link #destroyInternal()} has been called.
      *
@@ -154,7 +153,6 @@ public abstract class LifecycleMBeanBase extends LifecycleBase
 
         try {
             on = new ObjectName(name.toString());
-
             Registry.getRegistry(null, null).registerComponent(obj, on, null);
         } catch (MalformedObjectNameException e) {
             log.warn(sm.getString("lifecycleMBeanBase.registerFail", obj, name),
@@ -171,7 +169,7 @@ public abstract class LifecycleMBeanBase extends LifecycleBase
     /**
      * Utility method to enable sub-classes to easily unregister additional
      * components that don't implement {@link MBeanRegistration} with
-     * an MBean server.<br/>
+     * an MBean server.<br>
      * Note: This method should only be used once {@link #initInternal()} has
      * been called and before {@link #destroyInternal()} has been called.
      *

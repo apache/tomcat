@@ -24,8 +24,6 @@ import java.net.SocketException;
  * Properties that can be set in the &lt;Connector&gt; element
  * in server.xml. All properties are prefixed with &quot;socket.&quot;
  * and are currently only working for the Nio connector
- *
- * @author Filip Hanik
  */
 public class SocketProperties {
     /**
@@ -52,7 +50,7 @@ public class SocketProperties {
      * Default is 500
      * -1 is unlimited
      * 0 is disabled
-     * >0 the max number of objects to keep in cache.
+     * &gt;0 the max number of objects to keep in cache.
      */
     protected int eventCache = 500;
 
@@ -195,8 +193,13 @@ public class SocketProperties {
                     soLingerTime.intValue());
         if (soTimeout != null && soTimeout.intValue() >= 0)
             socket.setSoTimeout(soTimeout.intValue());
-        if (tcpNoDelay != null)
-            socket.setTcpNoDelay(tcpNoDelay.booleanValue());
+        if (tcpNoDelay != null) {
+            try {
+                socket.setTcpNoDelay(tcpNoDelay.booleanValue());
+            } catch (SocketException e) {
+                // Some socket types may not support this option which is set by default
+            }
+        }
     }
 
     public void setProperties(ServerSocket socket) throws SocketException{
@@ -399,6 +402,4 @@ public class SocketProperties {
     public void setUnlockTimeout(int unlockTimeout) {
         this.unlockTimeout = unlockTimeout;
     }
-
-
 }

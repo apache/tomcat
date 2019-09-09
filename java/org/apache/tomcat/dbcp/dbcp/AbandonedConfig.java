@@ -77,12 +77,12 @@ public class AbandonedConfig {
      * resets the lastUsed property of the parent connection.</p>
      *
      * <p>Abandoned connection cleanup happens when
-     * <code><ul>
-     * <li><code>{@link #getRemoveAbandoned() removeAbandoned} == true</li>
+     * <ul>
+     * <li>{@link #getRemoveAbandoned() removeAbandoned} == true</li>
      * <li>{@link AbandonedObjectPool#getNumIdle() numIdle} &lt; 2</li>
      * <li>{@link AbandonedObjectPool#getNumActive() numActive} &gt;
      *     {@link AbandonedObjectPool#getMaxActive() maxActive} - 3</li>
-     * </ul></code></p>
+     * </ul></p>
      *
      * <p>The default value is 300 seconds.</p>
      */

@@ -612,7 +612,8 @@ public class PageContextImpl extends PageContext {
     }
 
     /**
-     * Returns the exception associated with this page context, if any. <p/>
+     * Returns the exception associated with this page context, if any.
+     * <p>
      * Added wrapping for Throwables to avoid ClassCastException: see Bugzilla
      * 31171 for details.
      *
@@ -932,6 +933,7 @@ public class PageContextImpl extends PageContext {
      * @param functionMap
      *            Maps prefix and name to Method
      * @return The result of the evaluation
+     * @throws ELException If an error occurs during the evaluation
      */
     public static Object proprietaryEvaluate(final String expression,
             final Class<?> expectedType, final PageContext pageContext,
@@ -957,5 +959,4 @@ public class PageContextImpl extends PageContext {
         }
         return this.elContext;
     }
-
 }

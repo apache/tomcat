@@ -745,9 +745,9 @@ public class GenericObjectPool<T> extends BaseObjectPool<T> {
      * Sets the minimum number of objects allowed in the pool
      * before the evictor thread (if active) spawns new objects.
      * Note that no objects are created when
-     * <code>numActive + numIdle >= maxActive.</code>
+     * <code>numActive + numIdle &gt;= maxActive.</code>
      * This setting has no effect if the idle object evictor is disabled
-     * (i.e. if <code>timeBetweenEvictionRunsMillis <= 0</code>).
+     * (i.e. if <code>timeBetweenEvictionRunsMillis &lt;= 0</code>).
      * <p>
      * If the configured value of minIdle is greater than the configured value
      * for maxIdle then the value of maxIdle will be used instead.
@@ -766,7 +766,7 @@ public class GenericObjectPool<T> extends BaseObjectPool<T> {
     /**
      * Returns the minimum number of objects allowed in the pool
      * before the evictor thread (if active) spawns new objects.
-     * (Note no objects are created when: numActive + numIdle >= maxActive)
+     * (Note no objects are created when: numActive + numIdle &gt;= maxActive)
      * <p>
      * If the configured value of minIdle is greater than the configured value
      * for maxIdle then the value of maxIdle will be used instead.
@@ -1322,7 +1322,7 @@ public class GenericObjectPool<T> extends BaseObjectPool<T> {
      * returned to the idle instance pool, even during its execution. It locks
      * the pool only during instance removal. Additional instances may be returned
      * while removed items are being destroyed.</li>
-     * <li>Exceptions encountered destroying idle instances are swallowed.</li></ul></p>
+     * <li>Exceptions encountered destroying idle instances are swallowed.</li></ul>
      */
     @Override
     public void clear() {

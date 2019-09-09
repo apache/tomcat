@@ -14,10 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.catalina;
-
 
 import java.io.IOException;
 
@@ -26,7 +23,6 @@ import javax.servlet.ServletException;
 import org.apache.catalina.comet.CometEvent;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
-
 
 /**
  * <p>A <b>Valve</b> is a request processing component associated with a
@@ -47,7 +43,6 @@ public interface Valve {
 
     //-------------------------------------------------------------- Properties
 
-
     /**
      * Return descriptive information about this Valve implementation.
      */
@@ -55,7 +50,7 @@ public interface Valve {
 
 
     /**
-     * Return the next Valve in the pipeline containing this Valve, if any.
+     * @return the next Valve in the pipeline containing this Valve, if any.
      */
     public Valve getNext();
 
@@ -146,6 +141,4 @@ public interface Valve {
 
 
     public boolean isAsyncSupported();
-
-
 }

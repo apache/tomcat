@@ -53,14 +53,13 @@ public class JMXQueryTask extends AbstractCatalinaTask {
 
     /**
      * Set method for the JMX query string.
-    * <P>Examples of query format:
+    * <p>Examples of query format:</p>
      * <UL>
      * <LI>*:*</LI>
      * <LI>*:type=RequestProcessor,*</LI>
      * <LI>*:j2eeType=Servlet,*</LI>
      * <LI>Catalina:type=Environment,resourcetype=Global,name=simpleValue</LI>
      * </UL>
-     * </P>
      * @param query JMX Query string
      */
     public void setQuery (String query) {

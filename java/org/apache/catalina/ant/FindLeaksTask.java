@@ -29,6 +29,8 @@ public class FindLeaksTask extends AbstractCatalinaTask {
     /**
      * Sets the statusLine parameter that controls if the response includes a
      * status line or not.
+     *
+     * @param statusLine <code>true</code> if the status line should be included
      */
     public void setStatusLine(boolean statusLine) {
         this.statusLine = statusLine;
@@ -37,10 +39,14 @@ public class FindLeaksTask extends AbstractCatalinaTask {
     /**
      * Returns the statusLine parameter that controls if the response includes a
      * status line or not.
+     *
+     * @return <code>true</code> if the status line should be included,
+     *         otherwise <code>false</code>
      */
     public boolean getStatusLine() {
         return statusLine;
     }
+
 
     /**
      * Execute the requested operation.
@@ -49,9 +55,7 @@ public class FindLeaksTask extends AbstractCatalinaTask {
      */
     @Override
     public void execute() throws BuildException {
-
         super.execute();
         execute("/findleaks?statusLine=" + Boolean.toString(statusLine));
     }
-
 }

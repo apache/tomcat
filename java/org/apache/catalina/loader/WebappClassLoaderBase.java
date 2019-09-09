@@ -14,8 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.catalina.loader;
 
 import java.io.ByteArrayInputStream;
@@ -222,7 +220,6 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
 
     // ------------------------------------------------------- Static Variables
 
-
     /**
      * The set of trigger classes that will cause a proposed repository not
      * to be added if this class is visible to the class loader that loaded
@@ -250,8 +247,8 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
      */
     boolean antiJARLocking = false;
 
-    // ----------------------------------------------------------- Constructors
 
+    // ----------------------------------------------------------- Constructors
 
     /**
      * Construct a new ClassLoader with no defined repositories and no
@@ -319,7 +316,6 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
 
 
     // ----------------------------------------------------- Instance Variables
-
 
     /**
      * Associated directory context giving access to the resources in this
@@ -480,7 +476,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
 
     /**
      * The bootstrap class loader used to load the JavaSE classes. In some
-     * implementations this class loader is always <code>null</null> and in
+     * implementations this class loader is always <code>null</code> and in
      * those cases {@link ClassLoader#getParent()} will be called recursively on
      * the system class loader and the last non-null result used.
      */

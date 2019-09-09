@@ -82,6 +82,8 @@ public abstract class AbstractProcessor<S> implements ActionHook, Processor<S> {
     /**
      * Update the current error state to the new error state if the new error
      * state is more severe than the current error state.
+     * @param errorState The error status details
+     * @param t The error which occurred
      */
     protected void setErrorState(ErrorState errorState, Throwable t) {
         boolean blockIo = this.errorState.isIoAllowed() && !errorState.isIoAllowed();
@@ -158,6 +160,7 @@ public abstract class AbstractProcessor<S> implements ActionHook, Processor<S> {
 
     /**
      * Set the socket wrapper being used.
+     * @param socketWrapper The socket wrapper
      */
     protected final void setSocketWrapper(SocketWrapper<S> socketWrapper) {
         this.socketWrapper = socketWrapper;
@@ -165,7 +168,7 @@ public abstract class AbstractProcessor<S> implements ActionHook, Processor<S> {
 
 
     /**
-     * Get the socket wrapper being used.
+     * @return the socket wrapper being used.
      */
     protected final SocketWrapper<S> getSocketWrapper() {
         return socketWrapper;
@@ -173,7 +176,7 @@ public abstract class AbstractProcessor<S> implements ActionHook, Processor<S> {
 
 
     /**
-     * Obtain the Executor used by the underlying endpoint.
+     * @return the Executor used by the underlying endpoint.
      */
     @Override
     public Executor getExecutor() {
@@ -191,6 +194,7 @@ public abstract class AbstractProcessor<S> implements ActionHook, Processor<S> {
     public SocketState asyncPostProcess() {
         return asyncStateMachine.asyncPostProcess();
     }
+
 
     @Override
     public void errorDispatch() {
@@ -350,5 +354,4 @@ public abstract class AbstractProcessor<S> implements ActionHook, Processor<S> {
     public final AsyncStateMachine<S> getAsyncStateMachine() {
         return asyncStateMachine;
     }
-
 }

@@ -33,19 +33,18 @@ import java.util.logging.LogManager;
  * that corresponds to their logger of choice. This completely avoids any discovery
  * problem, while still allowing the user to switch.
  *
- * Note that this implementation is not just a wrapper around JDK logging ( like
- * the original commons-logging impl ). It adds 2 features - a simpler configuration
- * ( which is in fact a subset of log4j.properties ) and a formatter that is
- * less ugly.
+ * Note that this implementation is not just a wrapper around JDK logging (like
+ * the original commons-logging impl). It adds 2 features - a simpler
+ * configuration  (which is in fact a subset of log4j.properties) and a
+ * formatter that is less ugly.
  *
- * The removal of 'abstract' preserves binary backward compatibility. It is possible
- * to preserve the abstract - and introduce another ( hardcoded ) factory - but I
- * see no benefit.
+ * The removal of 'abstract' preserves binary backward compatibility. It is
+ * possible to preserve the abstract - and introduce another (hardcoded) factory
+ * - but I see no benefit.
  *
- * Since this class is not intended to be extended - and provides
- * no plugin for other LogFactory implementation - all protected methods are removed.
- * This can be changed - but again, there is little value in keeping dead code.
- * Just take a quick look at the removed code ( and it's complexity)
+ * Since this class is not intended to be extended - all protected methods are
+ * removed. This can be changed - but again, there is little value in keeping
+ * dead code. Just take a quick look at the removed code ( and it's complexity).
  *
  * --------------
  *
@@ -93,33 +92,30 @@ public class LogFactory {
      * </p>
      * <p>
      * <strong>Note:</strong> <code>LogFactory</code> will print:
-     * <code><pre>
-     * [ERROR] LogFactory: Load of custom hashtable failed</em>
-     * </code></pre>
+     * <pre>
+     * [ERROR] LogFactory: Load of custom hashtable failed
+     * </pre>
      * to system error and then continue using a standard Hashtable.
-     * </p>
      * <p>
      * <strong>Usage:</strong> Set this property when Java is invoked
      * and <code>LogFactory</code> will attempt to load a new instance
      * of the given implementation class.
      * For example, running the following ant scriptlet:
-     * <code><pre>
+     * <pre>
      *  &lt;java classname="${test.runner}" fork="yes" failonerror="${test.failonerror}"&gt;
      *     ...
      *     &lt;sysproperty
      *        key="org.apache.commons.logging.LogFactory.HashtableImpl"
      *        value="org.apache.commons.logging.AltHashtable"/&gt;
      *  &lt;/java&gt;
-     * </pre></code>
+     * </pre>
      * will mean that <code>LogFactory</code> will load an instance of
      * <code>org.apache.commons.logging.AltHashtable</code>.
-     * </p>
      * <p>
      * A typical use case is to allow a custom
      * Hashtable implementation using weak references to be substituted.
      * This will allow classloaders to be garbage collected without
      * the need to release them (on 1.3+ JVMs only, of course ;)
-     * </p>
      */
     public static final String HASHTABLE_IMPLEMENTATION_PROPERTY =
         "org.apache.commons.logging.LogFactory.HashtableImpl";

@@ -14,7 +14,6 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package org.apache.coyote;
 
 import java.io.IOException;
@@ -67,17 +66,13 @@ public final class Request {
 
     // ----------------------------------------------------------- Constructors
 
-
     public Request() {
-
         parameters.setQuery(queryMB);
         parameters.setURLDecoder(urlDecoder);
-
     }
 
 
     // ----------------------------------------------------- Instance Variables
-
 
     private int serverPort = -1;
     private MessageBytes serverNameMB = MessageBytes.newInstance();
@@ -169,8 +164,8 @@ public final class Request {
         return urlDecoder;
     }
 
-    // -------------------- Request data --------------------
 
+    // -------------------- Request data --------------------
 
     public MessageBytes scheme() {
         return schemeMB;
@@ -201,11 +196,11 @@ public final class Request {
     }
 
     /**
-     * Return the buffer holding the server name, if
-     * any. Use isNull() to check if there is no value
-     * set.
-     * This is the "virtual host", derived from the
-     * Host: header.
+     * Get the "virtual host", derived from the Host: header associated with
+     * this request.
+     *
+     * @return The buffer holding the server name, if any. Use isNull() to check
+     *         if there is no value set.
      */
     public MessageBytes serverName() {
         return serverNameMB;
@@ -251,20 +246,18 @@ public final class Request {
         this.localPort = port;
     }
 
-    // -------------------- encoding/type --------------------
 
+    // -------------------- encoding/type --------------------
 
     /**
      * Get the character encoding used for this request.
      */
     public String getCharacterEncoding() {
-
-        if (charEncoding != null)
+        if (charEncoding != null) {
             return charEncoding;
-
+        }
         charEncoding = ContentType.getCharsetFromContentType(getContentType());
         return charEncoding;
-
     }
 
 
@@ -288,7 +281,9 @@ public final class Request {
     }
 
     public long getContentLengthLong() {
-        if( contentLength > -1 ) return contentLength;
+        if( contentLength > -1 ) {
+            return contentLength;
+        }
 
         MessageBytes clB = headers.getUniqueValue("content-length");
         contentLength = (clB == null || clB.isNull()) ? -1 : clB.getLong();
@@ -298,8 +293,9 @@ public final class Request {
 
     public String getContentType() {
         contentType();
-        if ((contentTypeMB == null) || contentTypeMB.isNull())
+        if ((contentTypeMB == null) || contentTypeMB.isNull()) {
             return null;
+        }
         return contentTypeMB.toString();
     }
 
@@ -310,8 +306,9 @@ public final class Request {
 
 
     public MessageBytes contentType() {
-        if (contentTypeMB == null)
+        if (contentTypeMB == null) {
             contentTypeMB = headers.getValue("content-type");
+        }
         return contentTypeMB;
     }
 
@@ -331,9 +328,9 @@ public final class Request {
         return response;
     }
 
-    public void setResponse( Response response ) {
-        this.response=response;
-        response.setRequest( this );
+    public void setResponse(Response response) {
+        this.response = response;
+        response.setRequest(this);
     }
 
     public void action(ActionCode actionCode, Object param) {
@@ -341,10 +338,11 @@ public final class Request {
             hook=response.getHook();
 
         if (hook != null) {
-            if( param==null )
+            if (param == null) {
                 hook.action(actionCode, this);
-            else
+            } else {
                 hook.action(actionCode, param);
+            }
         }
     }
 
@@ -358,7 +356,6 @@ public final class Request {
 
 
     // -------------------- Parameters --------------------
-
 
     public Parameters getParameters() {
         return parameters;
@@ -427,11 +424,18 @@ public final class Request {
     /**
      * Read data from the input buffer and put it into a byte chunk.
      *
-     * The buffer is owned by the protocol implementation - it will be reused on the next read.
-     * The Adapter must either process the data in place or copy it to a separate buffer if it needs
-     * to hold it. In most cases this is done during byte->char conversions or via InputStream. Unlike
-     * InputStream, this interface allows the app to process data in place, without copy.
+     * The buffer is owned by the protocol implementation - it will be reused on
+     * the next read. The Adapter must either process the data in place or copy
+     * it to a separate buffer if it needs to hold it. In most cases this is
+     * done during byte-&gt;char conversions or via InputStream. Unlike
+     * InputStream, this interface allows the app to process data in place,
+     * without copy.
      *
+     * @param chunk The destination to which to copy the data
+     *
+     * @return The number of bytes copied
+     *
+     * @throws IOException If an I/O error occurs during the copy
      */
     public int doRead(ByteChunk chunk)
         throws IOException {
@@ -467,10 +471,6 @@ public final class Request {
      * be faster than ThreadLocal for very frequent operations.
      *
      *  Example use:
-     *   Jk:
-     *     HandlerRequest.HOSTBUFFER = 10 CharChunk, buffer for Host decoding
-     *     WorkerEnv: SSL_CERT_NOTE=16 - MessageBytes containing the cert
-     *
      *   Catalina CoyoteAdapter:
      *      ADAPTER_NOTES = 1 - stores the HttpServletRequest object ( req/res)
      *
@@ -479,6 +479,9 @@ public final class Request {
      *   for connector use.
      *
      *   17-31 range is not allocated or used.
+     *
+     * @param pos Index to use to store the note
+     * @param value The value to store at that index
      */
     public final void setNote(int pos, Object value) {
         notes[pos] = value;

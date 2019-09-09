@@ -53,7 +53,6 @@ import org.apache.juli.logging.LogFactory;
  * message being sent and received with membership announcements.
  * The channel has an chain of interceptors that can modify the message or perform other logic.<br>
  * It manages a complete group, both membership and replication.
- * @author Filip Hanik
  */
 public class GroupChannel extends ChannelInterceptorBase implements ManagedChannel {
     private static final Log log = LogFactory.getLog(GroupChannel.class);
@@ -63,6 +62,7 @@ public class GroupChannel extends ChannelInterceptorBase implements ManagedChann
      * If set to true, the channel will start a local thread for the heart beat.
      */
     protected boolean heartbeat = true;
+
     /**
      * If <code>heartbeat == true</code> then how often do we want this
      * heartbeat to run. default is one minute
@@ -126,9 +126,9 @@ public class GroupChannel extends ChannelInterceptorBase implements ManagedChann
      * <code>channel.addInterceptor(C);</code><br>
      * <code>channel.addInterceptor(B);</code><br>
      * Will result in a interceptor stack like this:<br>
-     * <code>A -> C -> B</code><br>
+     * <code>A -&gt; C -&gt; B</code><br>
      * The complete stack will look like this:<br>
-     * <code>Channel -> A -> C -> B -> ChannelCoordinator</code><br>
+     * <code>Channel -&gt; A -&gt; C -&gt; B -&gt; ChannelCoordinator</code><br>
      * @param interceptor ChannelInterceptorBase
      */
     @Override
@@ -174,37 +174,44 @@ public class GroupChannel extends ChannelInterceptorBase implements ManagedChann
 
     /**
      * Send a message to the destinations specified
-     * @param destination Member[] - destination.length > 0
+     * @param destination Member[] - destination.length &gt; 0
      * @param msg Serializable - the message to send
-     * @param options int - sender options, options can trigger guarantee levels and different interceptors to
-     * react to the message see class documentation for the <code>Channel</code> object.<br>
+     * @param options sender options, options can trigger guarantee levels and different
+     *                interceptors to react to the message see class documentation for the
+     *                <code>Channel</code> object.<br>
      * @return UniqueId - the unique Id that was assigned to this message
      * @throws ChannelException - if an error occurs processing the message
      * @see org.apache.catalina.tribes.Channel
      */
     @Override
-    public UniqueId send(Member[] destination, Serializable msg, int options) throws ChannelException {
+    public UniqueId send(Member[] destination, Serializable msg, int options)
+            throws ChannelException {
         return send(destination,msg,options,null);
     }
 
     /**
      *
-     * @param destination Member[] - destination.length > 0
+     * @param destination Member[] - destination.length &gt; 0
      * @param msg Serializable - the message to send
-     * @param options int - sender options, options can trigger guarantee levels and different interceptors to
-     * react to the message see class documentation for the <code>Channel</code> object.<br>
-     * @param handler - callback object for error handling and completion notification, used when a message is
-     * sent asynchronously using the <code>Channel.SEND_OPTIONS_ASYNCHRONOUS</code> flag enabled.
+     * @param options sender options, options can trigger guarantee levels and different
+     *                interceptors to react to the message see class documentation for the
+     *                <code>Channel</code> object.<br>
+     * @param handler - callback object for error handling and completion notification,
+     *                  used when a message is sent asynchronously using the
+     *                  <code>Channel.SEND_OPTIONS_ASYNCHRONOUS</code> flag enabled.
      * @return UniqueId - the unique Id that was assigned to this message
      * @throws ChannelException - if an error occurs processing the message
      * @see org.apache.catalina.tribes.Channel
      */
     @Override
-    public UniqueId send(Member[] destination, Serializable msg, int options, ErrorHandler handler) throws ChannelException {
+    public UniqueId send(Member[] destination, Serializable msg, int options, ErrorHandler handler)
+            throws ChannelException {
         if ( msg == null ) throw new ChannelException("Cant send a NULL message");
         XByteBuffer buffer = null;
         try {
-            if ( destination == null || destination.length == 0) throw new ChannelException("No destination given");
+            if (destination == null || destination.length == 0) {
+                throw new ChannelException("No destination given");
+            }
             ChannelData data = new ChannelData(true);//generates a unique Id
             data.setAddress(getLocalMember(false));
             data.setTimestamp(System.currentTimeMillis());
@@ -353,7 +360,7 @@ public class GroupChannel extends ChannelInterceptorBase implements ManagedChann
     /**
      * Sets up the default implementation interceptor stack
      * if no interceptors have been added
-     * @throws ChannelException
+     * @throws ChannelException Cluster error
      */
     protected synchronized void setupDefaultStack() throws ChannelException {
 
@@ -387,7 +394,7 @@ public class GroupChannel extends ChannelInterceptorBase implements ManagedChann
     /**
      * Validates the option flags that each interceptor is using and reports
      * an error if two interceptor share the same flag.
-     * @throws ChannelException
+     * @throws ChannelException Error with option flag
      */
     protected void checkOptionFlags() throws ChannelException {
         StringBuilder conflicts = new StringBuilder();
@@ -419,9 +426,9 @@ public class GroupChannel extends ChannelInterceptorBase implements ManagedChann
     }
 
     /**
-     * Starts the channel
+     * Starts the channel.
      * @param svc int - what service to start
-     * @throws ChannelException
+     * @throws ChannelException Start error
      * @see org.apache.catalina.tribes.Channel#start(int)
      */
     @Override
@@ -436,9 +443,9 @@ public class GroupChannel extends ChannelInterceptorBase implements ManagedChann
     }
 
     /**
-     * Stops the channel
+     * Stops the channel.
      * @param svc int
-     * @throws ChannelException
+     * @throws ChannelException Stop error
      * @see org.apache.catalina.tribes.Channel#stop(int)
      */
     @Override

@@ -256,7 +256,7 @@ public class Base64 extends BaseNCodec {
      *
      * @param lineLength
      *            Each line of encoded data will be at most of the given length (rounded down to nearest multiple of
-     *            4). If lineLength <= 0, then the output will not be divided into lines (chunks). Ignored when
+     *            4). If lineLength &lt;= 0, then the output will not be divided into lines (chunks). Ignored when
      *            decoding.
      * @param lineSeparator
      *            Each line of encoded data will end with this sequence of bytes.

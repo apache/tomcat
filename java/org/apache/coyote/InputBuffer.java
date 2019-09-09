@@ -14,31 +14,33 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package org.apache.coyote;
 
 import java.io.IOException;
 
 import org.apache.tomcat.util.buf.ByteChunk;
 
-
 /**
- * Input buffer.
- *
- * This class is used only in the protocol implementation. All reading from
- * Tomcat ( or adapter ) should be done using Request.doRead().
- *
- *
- * @author Remy Maucherat
+ * This class is only for internal use in the protocol implementation. All
+ * reading from Tomcat (or adapter) should be done using Request.doRead().
  */
 public interface InputBuffer {
 
-
-    /** Return from the input stream.
-        IMPORTANT: the current model assumes that the protocol will 'own' the
-        buffer and return a pointer to it in ByteChunk ( i.e. the param will
-        have chunk.getBytes()==null before call, and the result after the call ).
-    */
+    /**
+     * Read from the input stream into the given buffer.
+     * IMPORTANT: the current model assumes that the protocol will 'own' the
+     * buffer and return a pointer to it in ByteChunk (i.e. the param will
+     * have chunk.getBytes()==null before call, and the result after the call).
+     *
+     * @param chunk   The buffer to read data into.
+     * @param request The associated request
+     *
+     * @return The number of bytes that have been added to the buffer or -1 for
+     *         end of stream
+     *
+     * @throws IOException If an I/O error occurs reading from the input stream
+     *
+     */
     public int doRead(ByteChunk chunk, Request request)
         throws IOException;
 

@@ -48,7 +48,7 @@ public class ResourceCache {
 
     /**
      * Cache.
-     * Path -> Cache entry.
+     * Path -&gt; Cache entry.
      */
     protected CacheEntry[] cache = new CacheEntry[0];
 

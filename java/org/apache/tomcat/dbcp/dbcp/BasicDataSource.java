@@ -432,7 +432,7 @@ public class BasicDataSource implements DataSource {
     /**
      * The maximum number of milliseconds that the pool will wait (when there
      * are no available connections) for a connection to be returned before
-     * throwing an exception, or <= 0 to wait indefinitely.
+     * throwing an exception, or &lt;= 0 to wait indefinitely.
      */
     protected long maxWait = GenericObjectPool.DEFAULT_MAX_WAIT;
 
@@ -1214,8 +1214,8 @@ public class BasicDataSource implements DataSource {
      * <p>Abandoned connections are identified and removed when
      * {@link #getConnection()} is invoked and the following conditions hold
      * <ul><li>{@link #getRemoveAbandoned()} = true </li>
-     *     <li>{@link #getNumActive()} > {@link #getMaxActive()} - 3 </li>
-     *     <li>{@link #getNumIdle()} < 2 </li></ul></p>
+     *     <li>{@link #getNumActive()} &gt; {@link #getMaxActive()} - 3 </li>
+     *     <li>{@link #getNumIdle()} &lt; 2 </li></ul>
      *
      * @see #getRemoveAbandonedTimeout()
      */
@@ -1256,11 +1256,11 @@ public class BasicDataSource implements DataSource {
      * resets the lastUsed property of the parent connection.</p>
      *
      * <p>Abandoned connection cleanup happens when
-     * <code><ul>
-     * <li><code>{@link #getRemoveAbandoned() removeAbandoned} == true</li>
+     * <ul>
+     * <li>{@link #getRemoveAbandoned() removeAbandoned} == true</li>
      * <li>{@link #getNumIdle() numIdle} &lt; 2</li>
      * <li>{@link #getNumActive() numActive} &gt; {@link #getMaxActive() maxActive} - 3</li>
-     * </ul></code></p>
+     * </ul>
      *
      * <p>The default value is 300 seconds.</p>
      */

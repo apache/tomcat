@@ -216,7 +216,7 @@ public class StackObjectPool<T> extends BaseObjectPool<T> {
      * </ul>
      * If adding a validated, passivated returning instance to the stack would cause
      * {@link #getMaxSleeping() maxSleeping} to be exceeded, the oldest (bottom) instance on the stack
-     * is destroyed to make room for the returning instance, which is pushed on top of the stack.</p>
+     * is destroyed to make room for the returning instance, which is pushed on top of the stack.
      *
      * <p>Exceptions passivating or destroying instances are silently swallowed.  Exceptions validating
      * instances are propagated to the client.</p>

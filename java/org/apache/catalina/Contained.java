@@ -14,10 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.catalina;
-
 
 /**
  * <p>Decoupling interface which specifies that an implementing class is
@@ -28,15 +25,13 @@ package org.apache.catalina;
  */
 public interface Contained {
 
-
-    //-------------------------------------------------------------- Properties
-
-
     /**
-     * Return the <code>Container</code> with which this instance is associated
-     * (if any); otherwise return <code>null</code>.
+     * Get the {@link Container} with which this instance is associated.
+     *
+     * @return The Container with which this instance is associated or
+     *         <code>null</code> if not associated with a Container
      */
-    public Container getContainer();
+    Container getContainer();
 
 
     /**
@@ -46,7 +41,5 @@ public interface Contained {
      *  be associated, or <code>null</code> to disassociate this instance
      *  from any Container
      */
-    public void setContainer(Container container);
-
-
+    void setContainer(Container container);
 }

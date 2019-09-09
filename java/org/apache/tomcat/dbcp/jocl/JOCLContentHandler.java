@@ -46,7 +46,7 @@ import java.util.ArrayList;
  * JOCL provides an XML syntax for constructing arbitrary Java
  * {@link java.lang.Object} instances.  It does not define a full
  * XML document type (there's no root element), but rather an
- * XML fragment describing the {@link java.lang.Object <code>Object</code>s} to be
+ * XML fragment describing the {@link java.lang.Object Objects} to be
  * constructed.
  * <p>
  * In a JOCL fragment, one may define a series of objects using
@@ -76,7 +76,7 @@ import java.util.ArrayList;
  * The {@link #getTypeArray} method
  * will return an array composed
  * of two instances of <code>java.util.Date</code>.  The sequence of
- * {@link java.lang.Object <code>Object</code>s} in the array
+ * {@link java.lang.Object Objects} in the array
  * will correspond to the sequence of <code>&lt;object&gt;</code> elements in the JOCL fragment.
  * <p>
  * As we've seen, when used with no child-elements, the <code>&lt;object&gt;</code>
@@ -92,7 +92,6 @@ import java.util.ArrayList;
  * <p>
  * There is a special syntax available creating primitive values and arguments,
  * as well as for constructing {@link java.lang.String <code>String</code>}s. Some examples:
- * <p>
  * <pre> &lt;byte value="3"/&gt;
  * &lt;boolean value="false"/&gt;
  * &lt;char value="c"/&gt;
@@ -105,18 +104,16 @@ import java.util.ArrayList;
  * <p>
  * When invoked at the "root" level (that is, with no <code>&lt;object&gt;</code> parent),
  * this will cause the corresponding "object wrapper" to be added to the list of
- * {@link java.lang.Object <code>Object</code>}s.  The {@link #getType type} for these
+ * {@link java.lang.Object Object}s.  The {@link #getType type} for these
  * objects will reflect the proper primitive type, however.  When invoked with an
  * <code>&lt;object&gt;</code> parent, these will be treated as primitive arguments to the
- * specified {@link java.lang.Object <code>Object</code>}'s constructor.  For example, while:
- * <p>
+ * specified {@link java.lang.Object Object}'s constructor.  For example, while:
  * <pre> &lt;int value="5"/&gt;
  * &lt;int value="26"/&gt;
  * &lt;int value="100"/&gt;</pre>
  * <p>
  * results in three {@link java.lang.Integer} instances being added to the
  * list of values, with types corresponding to {@link java.lang.Integer}, the fragment:
- * <p>
  * <pre> &lt;int value="5"/&gt;
  * &lt;int value="26"/&gt;
  * &lt;int value="100"/&gt;</pre>
@@ -165,7 +162,6 @@ import java.util.ArrayList;
  * &lt;/arbitrary-root&gt;</pre>
  * <p>
  * Formally, a DTD for the JOCL grammar is as follows:
- * <p>
  * <pre>
  * &lt;!ELEMENT object (object|array|collection|list|byte|boolean|char|double|float|int|long|short|string)*&gt;
  * &lt;!ATTLIST object

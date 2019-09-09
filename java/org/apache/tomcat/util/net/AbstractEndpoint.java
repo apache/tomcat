@@ -42,6 +42,7 @@ import org.apache.tomcat.util.threads.ResizableExecutor;
 import org.apache.tomcat.util.threads.TaskQueue;
 import org.apache.tomcat.util.threads.TaskThreadFactory;
 import org.apache.tomcat.util.threads.ThreadPoolExecutor;
+
 /**
  *
  * @author fhanik
@@ -67,6 +68,8 @@ public abstract class AbstractEndpoint<S> {
 
         /**
          * Obtain the GlobalRequestProcessor associated with the handler.
+         *
+         * @return the GlobalRequestProcessor
          */
         public Object getGlobal();
 
@@ -227,7 +230,7 @@ public abstract class AbstractEndpoint<S> {
     private Executor executor = null;
     public void setExecutor(Executor executor) {
         this.executor = executor;
-        this.internalExecutor = (executor==null);
+        this.internalExecutor = (executor == null);
     }
     public Executor getExecutor() { return executor; }
 
@@ -248,8 +251,9 @@ public abstract class AbstractEndpoint<S> {
     public InetAddress getAddress() { return address; }
     public void setAddress(InetAddress address) { this.address = address; }
 
+
     /**
-     * Allows the server developer to specify the backlog that
+     * Allows the server developer to specify the acceptCount (backlog) that
      * should be used for server sockets. By default, this value
      * is 100.
      */
@@ -286,6 +290,9 @@ public abstract class AbstractEndpoint<S> {
 
     /**
      * Socket TCP no delay.
+     *
+     * @return The current TCP no delay setting for sockets created by this
+     *         endpoint
      */
     public boolean getTcpNoDelay() { return socketProperties.getTcpNoDelay();}
     public void setTcpNoDelay(boolean tcpNoDelay) { socketProperties.setTcpNoDelay(tcpNoDelay); }
@@ -293,6 +300,9 @@ public abstract class AbstractEndpoint<S> {
 
     /**
      * Socket linger.
+     *
+     * @return The current socket linger time for sockets created by this
+     *         endpoint
      */
     public int getSoLinger() { return socketProperties.getSoLingerTime(); }
     public void setSoLinger(int soLinger) {
@@ -303,6 +313,8 @@ public abstract class AbstractEndpoint<S> {
 
     /**
      * Socket timeout.
+     *
+     * @return The current socket timeout for sockets created by this endpoint
      */
     public int getSoTimeout() { return socketProperties.getSoTimeout(); }
     public void setSoTimeout(int soTimeout) { socketProperties.setSoTimeout(soTimeout); }
@@ -446,14 +458,16 @@ public abstract class AbstractEndpoint<S> {
      * sub-component is the
      * {@link org.apache.tomcat.util.net.ServerSocketFactory}.
      */
-    protected HashMap<String, Object> attributes =
-        new HashMap<String, Object>();
+    protected HashMap<String, Object> attributes = new HashMap<String, Object>();
     /**
      * Generic property setter called when a property for which a specific
      * setter already exists within the
      * {@link org.apache.coyote.ProtocolHandler} needs to be made available to
      * sub-components. The specific setter will call this method to populate the
      * attributes.
+     *
+     * @param name  Name of property to set
+     * @param value The value to set the property to
      */
     public void setAttribute(String name, Object value) {
         if (getLog().isTraceEnabled()) {
@@ -464,6 +478,11 @@ public abstract class AbstractEndpoint<S> {
     }
     /**
      * Used by sub-components to retrieve configuration information.
+     *
+     * @param key The name of the property for which the value should be
+     *            retrieved
+     *
+     * @return The value of the specified property
      */
     public Object getAttribute(String key) {
         Object value = attributes.get(key);
@@ -500,11 +519,12 @@ public abstract class AbstractEndpoint<S> {
      * @return the amount of threads that are managed by the pool
      */
     public int getCurrentThreadCount() {
-        if (executor!=null) {
+        Executor executor = this.executor;
+        if (executor != null) {
             if (executor instanceof ThreadPoolExecutor) {
-                return ((ThreadPoolExecutor)executor).getPoolSize();
+                return ((ThreadPoolExecutor) executor).getPoolSize();
             } else if (executor instanceof ResizableExecutor) {
-                return ((ResizableExecutor)executor).getPoolSize();
+                return ((ResizableExecutor) executor).getPoolSize();
             } else {
                 return -1;
             }
@@ -519,11 +539,12 @@ public abstract class AbstractEndpoint<S> {
      * @return the amount of threads that are in use
      */
     public int getCurrentThreadsBusy() {
-        if (executor!=null) {
+        Executor executor = this.executor;
+        if (executor != null) {
             if (executor instanceof ThreadPoolExecutor) {
-                return ((ThreadPoolExecutor)executor).getActiveCount();
+                return ((ThreadPoolExecutor) executor).getActiveCount();
             } else if (executor instanceof ResizableExecutor) {
-                return ((ResizableExecutor)executor).getActiveCount();
+                return ((ResizableExecutor) executor).getActiveCount();
             } else {
                 return -1;
             }
@@ -550,8 +571,10 @@ public abstract class AbstractEndpoint<S> {
     }
 
     public void shutdownExecutor() {
-        if ( executor!=null && internalExecutor ) {
-            if ( executor instanceof ThreadPoolExecutor ) {
+        Executor executor = this.executor;
+        if (executor != null && internalExecutor) {
+            this.executor = null;
+            if (executor instanceof ThreadPoolExecutor) {
                 //this is our internal one, so we need to shut it down
                 ThreadPoolExecutor tpe = (ThreadPoolExecutor) executor;
                 tpe.shutdownNow();
@@ -569,7 +592,6 @@ public abstract class AbstractEndpoint<S> {
                 TaskQueue queue = (TaskQueue) tpe.getQueue();
                 queue.setParent(null);
             }
-            executor = null;
         }
     }
 
@@ -1021,8 +1043,8 @@ public abstract class AbstractEndpoint<S> {
      * Configures SSLEngine to honor cipher suites ordering based upon
      * endpoint configuration.
      *
-     * @throws InvalidAlgorithmParameterException If the runtime JVM doesn't
-     *         support this setting.
+     * @throws java.security.InvalidAlgorithmParameterException If the runtime
+     *         JVM doesn't support this setting.
      */
     protected void configureUseServerCipherSuitesOrder(SSLEngine engine) {
         String useServerCipherSuitesOrderStr = this

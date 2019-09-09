@@ -34,7 +34,6 @@ import org.apache.juli.logging.LogFactory;
 
 /**
  * A channel to handle RPC messaging
- * @author Filip Hanik
  */
 public class RpcChannel implements ChannelListener {
     private static final Log log = LogFactory.getLog(RpcChannel.class);
@@ -74,7 +73,7 @@ public class RpcChannel implements ChannelListener {
      * @param channelOptions channel sender options
      * @param timeout long - timeout in milliseconds, if no reply is received within this time null is returned
      * @return Response[] - an array of response objects.
-     * @throws ChannelException
+     * @throws ChannelException Error sending message
      */
     public Response[] send(Member[] destination,
                            Serializable message,
@@ -225,7 +224,6 @@ public class RpcChannel implements ChannelListener {
     /**
      *
      * Class that holds all response.
-     * @author not attributable
      * @version 1.0
      */
     public static class RpcCollector {
@@ -240,8 +238,7 @@ public class RpcChannel implements ChannelListener {
         public long timeout;
 
         /**
-         * @deprecated  Use {@link
-         *              RpcChannel.RpcCollector#RpcChannel.RpcCollector(
+         * @deprecated  Use {@link RpcChannel.RpcCollector#RpcChannel.RpcCollector(
          *              RpcChannel.RpcCollectorKey, int, int)}
          */
         @Deprecated
@@ -268,10 +265,8 @@ public class RpcChannel implements ChannelListener {
                 case ALL_REPLY:
                     return destcnt == responses.size();
                 case MAJORITY_REPLY:
-                {
                     float perc = ((float)responses.size()) / ((float)destcnt);
                     return perc >= 0.50f;
-                }
                 case FIRST_REPLY:
                     return responses.size()>0;
                 default:
@@ -298,7 +293,7 @@ public class RpcChannel implements ChannelListener {
     }
 
     public static class RpcCollectorKey {
-        byte[] id;
+        final byte[] id;
         public RpcCollectorKey(byte[] id) {
             this.id = id;
         }
