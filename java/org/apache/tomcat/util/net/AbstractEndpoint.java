@@ -1043,8 +1043,8 @@ public abstract class AbstractEndpoint<S> {
      * Configures SSLEngine to honor cipher suites ordering based upon
      * endpoint configuration.
      *
-     * @throws java.security.InvalidAlgorithmParameterException If the runtime
-     *         JVM doesn't support this setting.
+     * @throws UnsupportedOperationException If the runtime JVM doesn't support
+     *                                       this setting.
      */
     protected void configureUseServerCipherSuitesOrder(SSLEngine engine) {
         String useServerCipherSuitesOrderStr = this

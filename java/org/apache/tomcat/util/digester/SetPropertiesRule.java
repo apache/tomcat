@@ -83,7 +83,7 @@ public class SetPropertiesRule extends Rule {
     }
 
     /**
-     * <p>Constructor allows attribute->property mapping to be overridden.</p>
+     * <p>Constructor allows attribute-&gt;property mapping to be overridden.</p>
      *
      * <p>Two arrays are passed in.
      * One contains the attribute names and the other the property names.
@@ -94,27 +94,27 @@ public class SetPropertiesRule extends Rule {
      * <p>If a property name is null or the attribute name has no matching
      * property name, then this indicates that the attribute should be ignored.</p>
      *
-     * <h5>Example One</h5>
+     * <h2>Example One</h2>
      * <p> The following constructs a rule that maps the <code>alt-city</code>
      * attribute to the <code>city</code> property and the <code>alt-state</code>
      * to the <code>state</code> property.
      * All other attributes are mapped as usual using exact name matching.
-     * <code><pre>
+     * <pre>
      *      SetPropertiesRule(
      *                new String[] {"alt-city", "alt-state"},
      *                new String[] {"city", "state"});
-     * </pre></code>
+     * </pre>
      *
-     * <h5>Example Two</h5>
+     * <h2>Example Two</h2>
      * <p> The following constructs a rule that maps the <code>class</code>
      * attribute to the <code>className</code> property.
      * The attribute <code>ignore-me</code> is not mapped.
      * All other attributes are mapped as usual using exact name matching.
-     * <code><pre>
+     * <pre>
      *      SetPropertiesRule(
      *                new String[] {"class", "ignore-me"},
      *                new String[] {"className"});
-     * </pre></code>
+     * </pre>
      *
      * @param attributeNames names of attributes to map
      * @param propertyNames names of properties mapped to

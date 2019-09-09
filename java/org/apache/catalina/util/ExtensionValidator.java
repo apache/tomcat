@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.catalina.util;
 
 import java.io.File;
@@ -119,7 +118,7 @@ public final class ExtensionValidator {
      * file in the /META-INF/ directory of the application and all
      * MANIFEST.MF files in each JAR file located in the WEB-INF/lib
      * directory and creates an <code>ArrayList</code> of
-     * <code>ManifestResource<code> objects. These objects are then passed
+     * <code>ManifestResource</code> objects. These objects are then passed
      * to the validateManifestResources method for validation.
      *
      * @param dirContext The JNDI root of the Web Application
@@ -127,6 +126,7 @@ public final class ExtensionValidator {
      *                application
      *
      * @return true if all required extensions satisfied
+     * @throws IOException Error reading resources needed for validation
      */
     public static synchronized boolean validateApplication(
                                            DirContext dirContext,
@@ -222,6 +222,7 @@ public final class ExtensionValidator {
      * it to the container's manifest resources.
      *
      * @param jarFile The system JAR whose manifest to add
+     * @throws IOException Error reading JAR file
      */
     public static void addSystemResource(File jarFile) throws IOException {
         InputStream is = null;
@@ -392,9 +393,7 @@ public final class ExtensionValidator {
      * @param inStream Input stream to a WAR or JAR file
      * @return The WAR's or JAR's manifest
      */
-    private static Manifest getManifest(InputStream inStream)
-            throws IOException {
-
+    private static Manifest getManifest(InputStream inStream) throws IOException {
         Manifest manifest = null;
         JarInputStream jin = null;
 
@@ -412,7 +411,6 @@ public final class ExtensionValidator {
                 }
             }
         }
-
         return manifest;
     }
 

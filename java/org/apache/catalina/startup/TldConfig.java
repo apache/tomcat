@@ -237,7 +237,7 @@ public final class TldConfig  implements LifecycleListener {
      * order defined in the JSP spec. It allows tag libraries packaged as JAR
      * files to be shared by web applications by simply dropping them in a
      * location that all web applications have access to (e.g.,
-     * <CATALINA_HOME>/lib). It also supports some of the weird and
+     * &lt;CATALINA_HOME&gt;/lib). It also supports some of the weird and
      * wonderful arrangements present when Tomcat gets embedded.
      *
      * The set of shared JARs to be scanned for TLDs is narrowed down by

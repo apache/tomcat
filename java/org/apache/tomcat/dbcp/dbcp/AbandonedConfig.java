@@ -82,7 +82,7 @@ public class AbandonedConfig {
      * <li>{@link AbandonedObjectPool#getNumIdle() numIdle} &lt; 2</li>
      * <li>{@link AbandonedObjectPool#getNumActive() numActive} &gt;
      *     {@link AbandonedObjectPool#getMaxActive() maxActive} - 3</li>
-     * </ul></p>
+     * </ul>
      *
      * <p>The default value is 300 seconds.</p>
      */

@@ -93,8 +93,8 @@ import org.apache.tomcat.util.res.StringManager;
  * Requirements:
  * <ul>
  *   <li>all tomcat classes and possibly servlets are in the classpath.
- *      ( for example all is in one big jar, or in eclipse CP, or in
- *        any other combination )</li>
+ *       (for example all is in one big jar, or in eclipse CP, or in
+ *        any other combination)</li>
  *
  *   <li>we need one temporary directory for work files</li>
  *
@@ -111,7 +111,7 @@ import org.apache.tomcat.util.res.StringManager;
  *
  * <p>
  * This class provides a set of convenience methods for configuring webapp
- * contexts, all overloads of the method <pre>addWebapp</pre>. These methods
+ * contexts, all overloads of the method <code>addWebapp</code>. These methods
  * create a webapp context, configure it, and then add it to a {@link Host}.
  * They do not use a global default web.xml; rather, they add a lifecycle
  * listener that adds the standard DefaultServlet, JSP processing, and welcome
@@ -121,7 +121,7 @@ import org.apache.tomcat.util.res.StringManager;
  * In complex cases, you may prefer to use the ordinary Tomcat API to create
  * webapp contexts; for example, you might need to install a custom Loader
  * before the call to {@link Host#addChild(Container)}. To replicate the basic
- * behavior of the <pre>addWebapp</pre> methods, you may want to call two
+ * behavior of the <code>addWebapp</code> methods, you may want to call two
  * methods of this class: {@link #noDefaultWebXmlPath()} and
  * {@link #getDefaultWebXmlListener()}.
  *
@@ -214,6 +214,7 @@ public class Tomcat {
     /**
      * Set the port for the default connector. Must
      * be called before start().
+     * @param port The port number
      */
     public void setPort(int port) {
         this.port = port;
@@ -222,18 +223,24 @@ public class Tomcat {
     /**
      * The the hostname of the default host, default is
      * 'localhost'.
+     * @param s The default host name
      */
     public void setHostname(String s) {
         hostname = s;
     }
 
     /**
-     * This is equivalent to adding a web application to Tomcat&apos;s webapps
+     * This is equivalent to adding a web application to Tomcat's webapps
      * directory. The equivalent of the default web.xml will be applied  to the
      * web application and any WEB-INF/web.xml and META-INF/context.xml packaged
      * with the application will be processed normally. Normal web fragment and
      * {@link javax.servlet.ServletContainerInitializer} processing will be
      * applied.
+     *
+     * @param contextPath The context mapping to use, "" for root context.
+     * @param docBase Base directory for the context, for static files.
+     *  Must exist, relative to the server home
+     * @return the deployed context
      */
     public Context addWebapp(String contextPath, String docBase) {
         return addWebapp(getHost(), contextPath, docBase);
@@ -338,17 +345,17 @@ public class Tomcat {
      * <p>
      * TODO: add the rest
      *
-     *  @param contextPath "" for root context.
-     *  @param docBase base dir for the context, for static files. Must exist,
-     *  relative to the server home
+     * @param contextPath The context mapping to use, "" for root context.
+     * @param docBase Base directory for the context, for static files.
+     *  Must exist, relative to the server home
+     * @return the deployed context
      */
     public Context addContext(String contextPath, String docBase) {
         return addContext(getHost(), contextPath, docBase);
     }
 
     /**
-     * Equivalent with
-     *  <servlet><servlet-name><servlet-class>.
+     * Equivalent to &lt;servlet&gt;&lt;servlet-name&gt;&lt;servlet-class&gt;.
      *
      * <p>
      * In general it is better/faster to use the method that takes a
@@ -427,9 +434,9 @@ public class Tomcat {
 
 
     /**
-     * Initialise the server.
+     * Initialize the server.
      *
-     * @throws LifecycleException
+     * @throws LifecycleException Init error
      */
     public void init() throws LifecycleException {
         getServer();
@@ -441,7 +448,7 @@ public class Tomcat {
     /**
      * Start the server.
      *
-     * @throws LifecycleException
+     * @throws LifecycleException Start error
      */
     public void start() throws LifecycleException {
         getServer();
@@ -452,7 +459,7 @@ public class Tomcat {
     /**
      * Stop the server.
      *
-     * @throws LifecycleException
+     * @throws LifecycleException Stop error
      */
     public void stop() throws LifecycleException {
         getServer();
@@ -463,6 +470,8 @@ public class Tomcat {
     /**
      * Destroy the server. This object cannot be used once this method has been
      * called.
+     *
+     * @throws LifecycleException Destroy error
      */
     public void destroy() throws LifecycleException {
         getServer();
@@ -473,14 +482,18 @@ public class Tomcat {
     /**
      * Add a user for the in-memory realm. All created apps use this
      * by default, can be replaced using setRealm().
-     *
+     * @param user The user name
+     * @param pass The password
      */
     public void addUser(String user, String pass) {
         userPass.put(user, pass);
     }
 
     /**
+     * Add a role to a user.
      * @see #addUser(String, String)
+     * @param user The user name
+     * @param role The role name
      */
     public void addRole(String user, String role) {
         List<String> roles = userRoles.get(user);
@@ -527,6 +540,7 @@ public class Tomcat {
     /**
      * Get the service object. Can be used to add more
      * connectors and few other global settings.
+     * @return The service
      */
     public Service getService() {
         getServer();
@@ -538,7 +552,7 @@ public class Tomcat {
      * be added to this host. When tomcat starts, the
      * host will be the default host.
      *
-     * @param host
+     * @param host The current host
      */
     public void setHost(Host host) {
         this.host = host;
@@ -570,6 +584,7 @@ public class Tomcat {
 
     /**
      * Access to the engine, for further customization.
+     * @return The engine
      */
     public Engine getEngine() {
         if(engine == null ) {
@@ -589,6 +604,7 @@ public class Tomcat {
     /**
      * Get the server object. You can add listeners and few more
      * customizations. JNDI is disabled by default.
+     * @return The Server
      */
     public Server getServer() {
 
@@ -609,10 +625,27 @@ public class Tomcat {
         return server;
     }
 
+    /**
+     * @param host The host in which the context will be deployed
+     * @param contextPath The context mapping to use, "" for root context.
+     * @param dir Base directory for the context, for static files.
+     *  Must exist, relative to the server home
+     * @return the deployed context
+     * @see #addContext(String, String)
+     */
     public Context addContext(Host host, String contextPath, String dir) {
         return addContext(host, contextPath, contextPath, dir);
     }
 
+    /**
+     * @param host The host in which the context will be deployed
+     * @param contextPath The context mapping to use, "" for root context.
+     * @param contextName The context name
+     * @param dir Base directory for the context, for static files.
+     *  Must exist, relative to the server home
+     * @return the deployed context
+     * @see #addContext(String, String)
+     */
     public Context addContext(Host host, String contextPath, String contextName,
             String dir) {
         silence(host, contextName);
@@ -630,6 +663,14 @@ public class Tomcat {
         return ctx;
     }
 
+    /**
+     * @param host The host in which the context will be deployed
+     * @param contextPath The context mapping to use, "" for root context.
+     * @param docBase Base directory for the context, for static files.
+     *  Must exist, relative to the server home
+     * @return the deployed context
+     * @see #addWebapp(String, String)
+     */
     public Context addWebapp(Host host, String contextPath, String docBase) {
         LifecycleListener listener = null;
         try {
@@ -645,6 +686,12 @@ public class Tomcat {
     }
 
     /**
+     * @param host The host in which the context will be deployed
+     * @param contextPath The context mapping to use, "" for root context.
+     * @param docBase Base directory for the context, for static files.
+     *  Must exist, relative to the server home
+     * @param config Custom context configurator helper
+     * @return the deployed context
      * @see #addWebapp(String, String)
      *
      * @param name Ignored. The contextPath will be used
@@ -1043,7 +1090,6 @@ public class Tomcat {
                     }
                 }
             } catch (ClassCastException e) {
-                return;
             }
         }
     }

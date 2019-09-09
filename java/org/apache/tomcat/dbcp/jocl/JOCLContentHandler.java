@@ -91,7 +91,7 @@ import java.util.ArrayList;
  * <code>new mypackage.Foo(new mypackage.Bar())</code>.
  * <p>
  * There is a special syntax available creating primitive values and arguments,
- * as well as for constructing {@link java.lang.String <code>String</code>}s. Some examples:
+ * as well as for constructing {@link java.lang.String String}s. Some examples:
  * <pre> &lt;byte value="3"/&gt;
  * &lt;boolean value="false"/&gt;
  * &lt;char value="c"/&gt;

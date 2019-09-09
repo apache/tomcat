@@ -101,6 +101,12 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
      * more specific setter. That means the property belongs to the Endpoint,
      * the ServerSocketFactory or some other lower level component. This method
      * ensures that it is visible to both.
+     *
+     * @param name  The name of the property to set
+     * @param value The value, in string form, to set for the property
+     *
+     * @return <code>true</code> if the property was set successfully, otherwise
+     *         <code>false</code>
      */
     public boolean setProperty(String name, String value) {
         return endpoint.setProperty(name, value);
@@ -110,6 +116,10 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
     /**
      * Generic property getter used by the digester. Other code should not need
      * to use this.
+     *
+     * @param name The name of the property to get
+     *
+     * @return The value of the property converted to a string
      */
     public String getProperty(String name) {
         return endpoint.getProperty(name);
@@ -318,6 +328,7 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
     /**
      * Concrete implementations need to provide access to their logger to be
      * used by the abstract classes.
+     * @return the logger
      */
     protected abstract Log getLog();
 
@@ -325,12 +336,14 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
     /**
      * Obtain the prefix to be used when construction a name for this protocol
      * handler. The name will be prefix-address-port.
+     * @return the prefix
      */
     protected abstract String getNamePrefix();
 
 
     /**
      * Obtain the name of the protocol, (Http, Ajp, etc.). Used with JMX.
+     * @return the protocol name
      */
     protected abstract String getProtocolName();
 
@@ -415,16 +428,15 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
 
     @Override
     public void init() throws Exception {
-        if (getLog().isInfoEnabled())
-            getLog().info(sm.getString("abstractProtocolHandler.init",
-                    getName()));
+        if (getLog().isInfoEnabled()) {
+            getLog().info(sm.getString("abstractProtocolHandler.init", getName()));
+        }
 
         if (oname == null) {
             // Component not pre-registered so register it
             oname = createObjectName();
             if (oname != null) {
-                Registry.getRegistry(null, null).registerComponent(this, oname,
-                    null);
+                Registry.getRegistry(null, null).registerComponent(this, oname, null);
             }
         }
 
@@ -487,6 +499,7 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
         }
     }
 
+
     @Override
     public void resume() throws Exception {
         if(getLog().isInfoEnabled())
@@ -523,6 +536,7 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
             getLog().info(sm.getString("abstractProtocolHandler.destroy",
                     getName()));
         }
+
         try {
             endpoint.destroy();
         } catch (Exception e) {
@@ -533,6 +547,7 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
         if (oname != null) {
             Registry.getRegistry(null, null).unregisterComponent(oname);
         }
+    }
 
         if (tpOname != null)
             Registry.getRegistry(null, null).unregisterComponent(tpOname);
