@@ -822,22 +822,26 @@ Function checkJava
   IntOp $R3 $R3 << 8
   IntOp $R2 $R2 + $R3
 
-  IntCmp $R2 0x014c +1 +3 +3
+  IntCmp $R2 0x014c +1 +4 +4
   StrCpy "$Arch" "x86"
+  SetRegView 32
   Goto DonePEHeader
 
-  IntCmp $R2 0x8664 +1 +3 +3
+  IntCmp $R2 0x8664 +1 +4 +4
   StrCpy "$Arch" "x64"
+  SetRegView 64
   Goto DonePEHeader
 
-  IntCmp $R2 0x0200 +1 +3 +3
+  IntCmp $R2 0x0200 +1 +4 +4
   StrCpy "$Arch" "i64"
+  SetRegView 64
   Goto DonePEHeader
 
 WrongPEHeader:
   IfSilent +2
   MessageBox MB_OK|MB_ICONEXCLAMATION 'Cannot read PE header from "$JvmDll"$\r$\nWill assume that the architecture is x86.'
   DetailPrint 'Cannot read PE header from "$JvmDll". Assuming the architecture is x86.'
+  SetRegView 32
   StrCpy "$Arch" "x86"
 
 DonePEHeader:
