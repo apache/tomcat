@@ -16,7 +16,10 @@
  */
 package org.apache.coyote;
 
+import java.io.IOException;
+import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.StringTokenizer;
 import java.util.regex.Pattern;
@@ -24,6 +27,7 @@ import java.util.regex.Pattern;
 import org.apache.tomcat.util.buf.MessageBytes;
 import org.apache.tomcat.util.http.MimeHeaders;
 import org.apache.tomcat.util.http.ResponseUtil;
+import org.apache.tomcat.util.http.parser.AcceptEncoding;
 
 public class CompressionConfig {
 
@@ -215,9 +219,29 @@ public class CompressionConfig {
         // Therefore, set the Vary header to keep proxies happy
         ResponseUtil.addVaryFieldName(responseHeaders, "accept-encoding");
 
-        // Check if browser support gzip encoding
-        MessageBytes acceptEncodingMB = request.getMimeHeaders().getValue("accept-encoding");
-        if ((acceptEncodingMB == null) || (acceptEncodingMB.indexOf("gzip") == -1)) {
+        // Check if user-agent supports gzip encoding
+        // Only interested in whether gzip encoding is supported. Other
+        // encodings and weights can be ignored.
+        Enumeration<String> headerValues = request.getMimeHeaders().values("accept-encoding");
+        boolean foundGzip = false;
+        while (!foundGzip && headerValues.hasMoreElements()) {
+            List<AcceptEncoding> acceptEncodings = null;
+            try {
+                acceptEncodings = AcceptEncoding.parse(new StringReader(headerValues.nextElement()));
+            } catch (IOException ioe) {
+                // If there is a problem reading the header, disable compression
+                return false;
+            }
+
+            for (AcceptEncoding acceptEncoding : acceptEncodings) {
+                if ("gzip".equalsIgnoreCase(acceptEncoding.getEncoding())) {
+                    foundGzip = true;
+                    break;
+                }
+            }
+        }
+
+        if (!foundGzip) {
             return false;
         }
 
