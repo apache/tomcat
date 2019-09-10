@@ -86,6 +86,11 @@
         connection so that the initial size of the flow control window for the
         connection is consistent with the increased value. (markt)
       </fix>
+      <fix>
+        <bug>63737</bug>: Correct various issues when parsing the
+        <code>accept-encoding</code> header to determine if gzip encoding is
+        supported including only parsing the first header found. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
