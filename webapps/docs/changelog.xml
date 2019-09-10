@@ -56,6 +56,11 @@
         <code>RealmBase.hasRole()</code> for given security constraints.
         (michaelo)
       </fix>
+      <fix>
+        <bug>63740</bug>: Ensure configuration files are loaded correctly when a
+        <code>Host</code> is configured with an <code>xmlBase</code>. Patch
+        provided by uk4sx. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

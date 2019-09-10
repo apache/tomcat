@@ -319,6 +319,7 @@ public interface Container extends Lifecycle {
         if (host != null && ((Host) host).getXmlBase() != null) {
             result.append(((Host) host).getXmlBase()).append('/');
         } else {
+            result.append("conf/");
             if (engine != null) {
                 result.append(engine.getName()).append('/');
             }

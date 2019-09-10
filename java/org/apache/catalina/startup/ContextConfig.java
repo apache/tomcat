@@ -472,7 +472,7 @@ public class ContextConfig implements LifecycleListener {
 
             String hostContextFile = Container.getConfigPath(context, Constants.HostContextXml);
             try (ConfigurationSource.Resource contextXmlResource =
-                    ConfigFileLoader.getSource().getConfResource(hostContextFile)) {
+                    ConfigFileLoader.getSource().getResource(hostContextFile)) {
                 URL defaultContextUrl = contextXmlResource.getURI().toURL();
                 processContextConfig(digester, defaultContextUrl, contextXmlResource.getInputStream());
             } catch (MalformedURLException e) {
@@ -1898,7 +1898,7 @@ public class ContextConfig implements LifecycleListener {
                 }
             } else {
                 String hostWebXml = Container.getConfigPath(context, Constants.HostWebXml);
-                webXmlResource = ConfigFileLoader.getSource().getConfResource(hostWebXml);
+                webXmlResource = ConfigFileLoader.getSource().getResource(hostWebXml);
             }
         } catch (IOException e) {
             // Ignore if not found
