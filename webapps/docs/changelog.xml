@@ -174,6 +174,11 @@
         pick up the fix for CODEC-134. (markt)
       </update>
       <update>
+        <bug>63625</bug>: Update to Commons Daemon 1.2.1. This corrects several
+        regressions in Commons Daemon 1.2.1, most notably the Windows Service
+        crashing on start when using 32-bit JVMs. (markt)
+      </update>
+      <update>
         <bug>63648</bug>: Update the test TLS keys and certificates used in the
         test suite to replace the keys and certificates that are about to
         expire. (markt)
