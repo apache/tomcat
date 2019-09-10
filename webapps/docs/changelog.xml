@@ -139,6 +139,11 @@
         that meant that when installing a service, the service display name was
         not set. (markt)
       </fix>
+      <fix>
+        When performing a silent install with the Windows Installer, ensure that
+        the registry entires are added to the 64-bit registry when using a
+        64-bit JVM. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
