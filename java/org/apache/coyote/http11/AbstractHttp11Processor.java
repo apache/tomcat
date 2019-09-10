@@ -18,6 +18,9 @@ package org.apache.coyote.http11;
 
 import java.io.IOException;
 import java.io.InterruptedIOException;
+import java.io.StringReader;
+import java.util.Enumeration;
+import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 import java.util.StringTokenizer;
@@ -48,6 +51,7 @@ import org.apache.tomcat.util.buf.MessageBytes;
 import org.apache.tomcat.util.http.FastHttpDateFormat;
 import org.apache.tomcat.util.http.MimeHeaders;
 import org.apache.tomcat.util.http.ResponseUtil;
+import org.apache.tomcat.util.http.parser.AcceptEncoding;
 import org.apache.tomcat.util.http.parser.HttpParser;
 import org.apache.tomcat.util.log.UserDataHelper;
 import org.apache.tomcat.util.net.AbstractEndpoint;
@@ -636,12 +640,29 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
      */
     private boolean useCompression() {
 
-        // Check if browser support gzip encoding
-        MessageBytes acceptEncodingMB =
-            request.getMimeHeaders().getValue("accept-encoding");
+        // Check if user-agent supports gzip encoding
+        // Only interested in whether gzip encoding is supported. Other
+        // encodings and weights can be ignored.
+        Enumeration<String> headerValues = request.getMimeHeaders().values("accept-encoding");
+        boolean foundGzip = false;
+        while (!foundGzip && headerValues.hasMoreElements()) {
+            List<AcceptEncoding> acceptEncodings = null;
+            try {
+                acceptEncodings = AcceptEncoding.parse(new StringReader(headerValues.nextElement()));
+            } catch (IOException ioe) {
+                // If there is a problem reading the header, disable compression
+                return false;
+            }
 
-        if ((acceptEncodingMB == null)
-            || (acceptEncodingMB.indexOf("gzip") == -1)) {
+            for (AcceptEncoding acceptEncoding : acceptEncodings) {
+                if ("gzip".equalsIgnoreCase(acceptEncoding.getEncoding())) {
+                    foundGzip = true;
+                    break;
+                }
+            }
+        }
+
+        if (!foundGzip) {
             return false;
         }
 

@@ -743,6 +743,80 @@ public class HttpParser {
         }
     }
 
+    static double readWeight(Reader input, char delimiter) throws IOException {
+        skipLws(input);
+        int c = input.read();
+        if (c == -1 || c == delimiter) {
+            // No q value just whitespace
+            return 1;
+        } else if (c != 'q') {
+            // Malformed. Use quality of zero so it is dropped.
+            skipUntil(input, c, delimiter);
+            return 0;
+        }
+        // RFC 7231 does not allow whitespace here but be tolerant
+        skipLws(input);
+        c = input.read();
+        if (c != '=') {
+            // Malformed. Use quality of zero so it is dropped.
+            skipUntil(input, c, delimiter);
+            return 0;
+        }
+
+        // RFC 7231 does not allow whitespace here but be tolerant
+        skipLws(input);
+        c = input.read();
+
+        // Should be no more than 3 decimal places
+        StringBuilder value = new StringBuilder(5);
+        int decimalPlacesRead = -1;
+
+        if (c == '0' || c == '1') {
+            value.append((char) c);
+            c = input.read();
+
+            while (true) {
+                if (decimalPlacesRead == -1 && c == '.') {
+                    value.append('.');
+                    decimalPlacesRead = 0;
+                } else if (decimalPlacesRead > -1 && c >= '0' && c <= '9') {
+                    if (decimalPlacesRead < 3) {
+                        value.append((char) c);
+                        decimalPlacesRead++;
+                    }
+                } else {
+                    break;
+                }
+                c = input.read();
+            }
+        } else {
+            // Malformed. Use quality of zero so it is dropped and skip until
+            // EOF or the next delimiter
+            skipUntil(input, c, delimiter);
+            return 0;
+        }
+
+        if (c == 9 || c == 32) {
+            skipLws(input);
+            c = input.read();
+        }
+
+        // Must be at delimiter or EOF
+        if (c != delimiter && c != -1) {
+            // Malformed. Use quality of zero so it is dropped and skip until
+            // EOF or the next delimiter
+            skipUntil(input, c, delimiter);
+            return 0;
+        }
+
+        double result = Double.parseDouble(value.toString());
+        if (result > 1) {
+            return 0;
+        }
+        return result;
+    }
+
+
     static enum SkipResult {
         FOUND,
         NOT_FOUND,
