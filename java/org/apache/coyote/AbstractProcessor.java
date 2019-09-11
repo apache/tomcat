@@ -90,6 +90,7 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
         userDataHelper = new UserDataHelper(getLog());
     }
 
+
     /**
      * Update the current error state to the new error state if the new error
      * state is more severe than the current error state.

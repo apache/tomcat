@@ -179,5 +179,4 @@ public interface ProtocolHandler {
      * @return the protocols
      */
     public UpgradeProtocol[] findUpgradeProtocols();
-
 }

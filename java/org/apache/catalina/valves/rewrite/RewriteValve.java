@@ -154,7 +154,7 @@ public class RewriteValve extends ValveBase {
         } else {
             String resourceName = Container.getConfigPath(getContainer(), resourcePath);
             try {
-                ConfigurationSource.Resource resource = ConfigFileLoader.getSource().getConfResource(resourceName);
+                ConfigurationSource.Resource resource = ConfigFileLoader.getSource().getResource(resourceName);
                 is = resource.getInputStream();
             } catch (IOException e) {
                 if (containerLog.isDebugEnabled()) {

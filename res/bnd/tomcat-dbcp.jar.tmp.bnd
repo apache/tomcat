@@ -12,7 +12,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-Automatic-Module-Name: org.apache.tomcat-dbcp
+Automatic-Module-Name: org.apache.tomcat.dbcp
 Bundle-Name: tomcat-dbcp
 Bundle-SymbolicName: org.apache.tomcat-dbcp
 Bundle-Version: @VERSION@

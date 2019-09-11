@@ -910,5 +910,4 @@ public interface PoolConfiguration {
      * @return <code>true</code> if the statements are wrapped
      */
     public boolean getUseStatementFacade();
-
 }

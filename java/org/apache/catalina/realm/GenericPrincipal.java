@@ -201,7 +201,7 @@ public class GenericPrincipal implements TomcatPrincipal, Serializable {
      *         role, otherwise <code>false</code>
      */
     public boolean hasRole(String role) {
-        if ("*".equals(role)) {// Special 2.4 role meaning everyone
+        if ("*".equals(role)) { // Special 2.4 role meaning everyone
             return true;
         }
         if (role == null) {

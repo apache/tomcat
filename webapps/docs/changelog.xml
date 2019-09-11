@@ -56,6 +56,11 @@
         <code>RealmBase.hasRole()</code> for given security constraints.
         (michaelo)
       </fix>
+      <fix>
+        <bug>63740</bug>: Ensure configuration files are loaded correctly when a
+        <code>Host</code> is configured with an <code>xmlBase</code>. Patch
+        provided by uk4sx. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
@@ -80,6 +85,11 @@
         default, send a WINDOW_UPDATE to increase the flow control window for the
         connection so that the initial size of the flow control window for the
         connection is consistent with the increased value. (markt)
+      </fix>
+      <fix>
+        <bug>63737</bug>: Correct various issues when parsing the
+        <code>accept-encoding</code> header to determine if gzip encoding is
+        supported including only parsing the first header found. (markt)
       </fix>
     </changelog>
   </subsection>
@@ -107,6 +117,15 @@
         Components&quot; since they have been remove / merged into the core
         Tomcat distribution for 9.0.5 onwards. (markt)
       </fix>
+      <fix>
+        <bug>63739</bug>: Correct the invalid <code>Automatic-Module-Name</code>
+        manifest entries for the Tomcat provided JARs included in the Tomcat
+        embedded distribution. (markt)
+      </fix>
+      <fix>
+        Fix a large number of Javadoc and documentation typos. Patch provided by
+        KangZhiDong. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
@@ -117,8 +136,8 @@
       </add>
       <add>
         Expand the coverage and quality of the Simplified Chinese translations
-        provided with Apache Tomcat. Includes contributions by leeyazhou.
-        (markt)
+        provided with Apache Tomcat. Includes contributions by leeyazhou and
+        康智冬. (markt)
       </add>
       <fix>
         <bug>62140</bug>: Additional usage documentation in comments for
@@ -128,11 +147,29 @@
         Fix <code>JSSE_OPTS</code> quoting in <code>catalina.bat</code>.
         Contributed by Peter Uhnak. (fschumacher)
       </fix>
+      <update>
+        <bug>63625</bug>: Update to Commons Daemon 1.2.1. This corrects several
+        regressions in Commons Daemon 1.2.1, most notably the Windows Service
+        crashing on start when using 32-bit JVMs. (markt)
+      </update>
       <fix>
         <bug>63689</bug>: Correct a regression in the fix for <bug>63285</bug>
         that meant that when installing a service, the service display name was
         not set. (markt)
       </fix>
+      <fix>
+        When performing a silent install with the Windows Installer, ensure that
+        the registry entires are added to the 64-bit registry when using a
+        64-bit JVM. (markt)
+      </fix>
+      <fix>
+        Remove unused i18n messages and associated translations. Patch provided
+        by KangZhiDong. (markt)
+      </fix>
+      <add>
+        Expand the coverage and quality of the Korean translations provided
+        with Apache Tomcat. (woonsan)
+      </add>
     </changelog>
   </subsection>
 </section>
