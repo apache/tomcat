@@ -61,6 +61,11 @@
         <code>Host</code> is configured with an <code>xmlBase</code>. Patch
         provided by uk4sx. (markt)
       </fix>
+      <fix>
+        Avoid a potential <code>NullPointerException</code> on Service stop if a
+        Service is embedded directly (i.e. with no Server) in an applciation
+        and JNDI is enabled. Patch provided by S. Ali Tokmen. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
