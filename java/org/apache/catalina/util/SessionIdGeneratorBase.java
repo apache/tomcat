@@ -44,7 +44,7 @@ public abstract class SessionIdGeneratorBase extends LifecycleBase
      * identifiers. If the queue is empty when a random number generator is
      * required, a new random number generator object is created. This is
      * designed this way since random number generators use a sync to make them
-     * thread-safe and the sync makes using a a single object slow(er).
+     * thread-safe and the sync makes using a single object slow(er).
      */
     private final Queue<SecureRandom> randoms = new ConcurrentLinkedQueue<SecureRandom>();
 
