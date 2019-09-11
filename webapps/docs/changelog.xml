@@ -133,6 +133,10 @@
         application to enable release builds to be built with Java 10 onwards.
         (markt)
       </fix>
+      <fix>
+        Fix a large number of Javadoc and documentation typos. Patch provided by
+        KangZhiDong. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
@@ -223,6 +227,10 @@
       <fix>
         Fix <code>JSSE_OPTS</code> quoting in <code>catalina.bat</code>.
         Contributed by Peter Uhnak. (fschumacher)
+      </fix>
+      <fix>
+        Remove unused i18n messages and associated translations. Patch provided
+        by KangZhiDong. (markt)
       </fix>
     </changelog>
   </subsection>
