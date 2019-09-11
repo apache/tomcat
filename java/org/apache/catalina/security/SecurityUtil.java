@@ -93,6 +93,7 @@ public final class SecurityUtil{
      * @param methodName the method to apply the security restriction
      * @param targetObject the <code>Servlet</code> on which the method will
      * be called.
+     * @throws Exception an execution error occurred
      */
     public static void doAsPrivilege(final String methodName,
                                      final Servlet targetObject) throws Exception {
