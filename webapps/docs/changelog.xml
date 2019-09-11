@@ -95,6 +95,10 @@
         application to enable release builds to be built with Java 10 onwards.
         (markt)
       </fix>
+      <fix>
+        Fix a large number of Javadoc and documentation typos. Patch provided by
+        KangZhiDong. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
@@ -153,6 +157,10 @@
         When performing a silent install with the Windows Installer, ensure that
         the registry entires are added to the 64-bit registry when using a
         64-bit JVM. (markt)
+      </fix>
+      <fix>
+        Remove unused i18n messages and associated translations. Patch provided
+        by KangZhiDong. (markt)
       </fix>
     </changelog>
   </subsection>
