@@ -28,7 +28,7 @@ import java.util.ResourceBundle;
 /**
  * An internationalization / localization helper class which reduces
  * the bother of handling ResourceBundles and takes care of the
- * common cases of message formating which otherwise require the
+ * common cases of message formatting which otherwise require the
  * creation of Object arrays and such.
  *
  * <p>The StringManager operates on a package basis. One StringManager
