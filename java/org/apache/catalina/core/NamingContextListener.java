@@ -1113,7 +1113,11 @@ public class NamingContextListener
     private javax.naming.Context getGlobalNamingContext() {
         if (container instanceof Context) {
             Engine e = (Engine) ((Context) container).getParent().getParent();
-            return e.getService().getServer().getGlobalNamingContext();
+            Server s = e.getService().getServer();
+            // When the Service is an embedded Service, there is no Server
+            if (s != null) {
+                return s.getGlobalNamingContext();
+            }
         }
         return null;
     }
