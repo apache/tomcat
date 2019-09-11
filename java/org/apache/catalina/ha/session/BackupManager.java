@@ -53,7 +53,7 @@ public class BackupManager extends ClusterManagerBase
     protected String name;
 
     /**
-     *
+     * Flag for how this map sends messages.
      */
     private int mapSendOptions = Channel.SEND_OPTIONS_SYNCHRONIZED_ACK|Channel.SEND_OPTIONS_USE_ACK;
 
