@@ -142,6 +142,10 @@
         Fix a large number of Javadoc and documentation typos. Patch provided by
         KangZhiDong. (markt)
       </fix>
+      <fix>
+        Spelling and formatting corrections for the cluster how-to. Pull request
+        provided by Bill Mitchell. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
