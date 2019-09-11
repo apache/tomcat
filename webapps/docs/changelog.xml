@@ -52,6 +52,11 @@
         <code>RealmBase.hasRole()</code> for given security constraints.
         (michaelo)
       </fix>
+      <fix>
+        Avoid a potential <code>NullPointerException</code> on Service stop if a
+        Service is embedded directly (i.e. with no Server) in an applciation
+        and JNDI is enabled. Patch provided by S. Ali Tokmen. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
