@@ -166,6 +166,10 @@
         Remove unused i18n messages and associated translations. Patch provided
         by KangZhiDong. (markt)
       </fix>
+      <add>
+        Expand the coverage and quality of the Korean translations provided
+        with Apache Tomcat. (woonsan)
+      </add>
     </changelog>
   </subsection>
 </section>
