@@ -17,6 +17,8 @@
 package org.apache.tomcat.buildutil.translate;
 
 import java.io.IOException;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Properties;
 
 /**
@@ -60,6 +62,14 @@ public class BackportTranslations extends BackportBase {
                 }
             }
 
+            // Remove translated values for keys that have been removed
+            Iterator<Map.Entry<Object,Object>> iter = targetTranslated.entrySet().iterator();
+            while (iter.hasNext()) {
+                Map.Entry<Object,Object> entry = iter.next();
+                if (!targetEnglish.containsKey(entry.getKey())) {
+                    iter.remove();
+                }
+            }
             Utils.export(langauge, targetTranslated, storageDir);
         }
     }
