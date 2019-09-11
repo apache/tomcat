@@ -124,15 +124,18 @@ public class ByteBufferUtils {
                 cleanMethod.invoke(cleanerMethod.invoke(buf));
             } catch (IllegalAccessException | IllegalArgumentException
                     | InvocationTargetException | SecurityException e) {
-                // Ignore
+                if (log.isDebugEnabled()) {
+                    log.debug(sm.getString("byteBufferUtils.cleaner"), e);
+                }
             }
         } else if (invokeCleanerMethod != null) {
             try {
                 invokeCleanerMethod.invoke(unsafe, buf);
             } catch (IllegalAccessException | IllegalArgumentException
                     | InvocationTargetException | SecurityException e) {
-                // Ignore
-                e.printStackTrace();
+                if (log.isDebugEnabled()) {
+                    log.debug(sm.getString("byteBufferUtils.cleaner"), e);
+                }
             }
         }
     }
