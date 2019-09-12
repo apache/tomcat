@@ -69,8 +69,8 @@
       <add>
         Add a new <code>PropertySource</code> implementation,
         <code>EnvironmentPropertySource</code>, that can be used to do property
-        replacement in configuration files with environment variables. Pull
-        request provided by Thomas Meyer. (markt)
+        replacement in configuration files with environment variables. Based on
+        a pull request provided by Thomas Meyer. (markt)
       </add>
     </changelog>
   </subsection>
