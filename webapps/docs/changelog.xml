@@ -83,6 +83,11 @@
         connection is consistent with the increased value. (markt)
       </fix>
       <fix>
+        <bug>63710</bug>: When using HTTP/2, ensure that a
+        <code>content-length</code> header is not set for those responses with
+        status codes that do not permit one. (markt)
+      </fix>
+      <fix>
         <bug>63737</bug>: Correct various issues when parsing the
         <code>accept-encoding</code> header to determine if gzip encoding is
         supported including only parsing the first header found. (markt)

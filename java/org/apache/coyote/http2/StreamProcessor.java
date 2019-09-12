@@ -123,7 +123,7 @@ class StreamProcessor extends AbstractProcessor {
         headers.addValue(":status").setString(Integer.toString(statusCode));
 
         // Check to see if a response body is present
-        if (!(statusCode < 200 || statusCode == 205 || statusCode == 304)) {
+        if (!(statusCode < 200 || statusCode == 204 || statusCode == 205 || statusCode == 304)) {
             String contentType = coyoteResponse.getContentType();
             if (contentType != null) {
                 headers.setValue("content-type").setString(contentType);
@@ -132,13 +132,20 @@ class StreamProcessor extends AbstractProcessor {
             if (contentLanguage != null) {
                 headers.setValue("content-language").setString(contentLanguage);
             }
-        }
-
-        // Add a content-length header if a content length has been set unless
-        // the application has already added one
-        long contentLength = coyoteResponse.getContentLengthLong();
-        if (contentLength != -1 && headers.getValue("content-length") == null) {
-            headers.addValue("content-length").setLong(contentLength);
+            // Add a content-length header if a content length has been set unless
+            // the application has already added one
+            long contentLength = coyoteResponse.getContentLengthLong();
+            if (contentLength != -1 && headers.getValue("content-length") == null) {
+                headers.addValue("content-length").setLong(contentLength);
+            }
+        } else {
+            if (statusCode == 205) {
+                // RFC 7231 requires the server to explicitly signal an empty
+                // response in this case
+                coyoteResponse.setContentLength(0);
+            } else {
+                coyoteResponse.setContentLength(-1);
+            }
         }
 
         // Add date header unless it is an informational response or the
