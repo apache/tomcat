@@ -154,13 +154,19 @@ public class Digester extends DefaultHandler2 {
     // --------------------------------------------------- Instance Variables
 
 
-    private class SystemPropertySource implements IntrospectionUtils.PropertySource {
+    private static class SystemPropertySource implements IntrospectionUtils.SecurePropertySource {
+
         @Override
         public String getProperty(String key) {
-            ClassLoader cl = getClassLoader();
-            if (cl instanceof PermissionCheck) {
+            // For backward compatibility
+            return getProperty(key, null);
+        }
+
+        @Override
+        public String getProperty(String key, ClassLoader classLoader) {
+            if (classLoader instanceof PermissionCheck) {
                 Permission p = new PropertyPermission(key, "read");
-                if (!((PermissionCheck) cl).check(p)) {
+                if (!((PermissionCheck) classLoader).check(p)) {
                     return null;
                 }
             }
@@ -169,13 +175,18 @@ public class Digester extends DefaultHandler2 {
     }
 
 
-    public class EnvironmentPropertySource implements IntrospectionUtils.PropertySource {
+    public static class EnvironmentPropertySource implements IntrospectionUtils.SecurePropertySource {
+
         @Override
         public String getProperty(String key) {
-            ClassLoader cl = getClassLoader();
-            if (cl instanceof PermissionCheck) {
+            return null;
+        }
+
+        @Override
+        public String getProperty(String key, ClassLoader classLoader) {
+            if (classLoader instanceof PermissionCheck) {
                 Permission p = new RuntimePermission("getenv." + key, null);
-                if (!((PermissionCheck) cl).check(p)) {
+                if (!((PermissionCheck) classLoader).check(p)) {
                     return null;
                 }
             }
@@ -367,6 +378,7 @@ public class Digester extends DefaultHandler2 {
     /** Stacks used for interrule communication, indexed by name String */
     private HashMap<String,ArrayStack<Object>> stacksByName =
         new HashMap<String,ArrayStack<Object>>();
+
 
     // ------------------------------------------------------------- Properties
 
@@ -2708,7 +2720,7 @@ public class Digester extends DefaultHandler2 {
         for (int i = 0; i < nAttributes; ++i) {
             String value = newAttrs.getValue(i);
             try {
-                newAttrs.setValue(i, IntrospectionUtils.replaceProperties(value, null, source).intern());
+                newAttrs.setValue(i, IntrospectionUtils.replaceProperties(value, null, source, getClassLoader()).intern());
             } catch (Exception e) {
                 log.warn("Attribute [" + newAttrs.getLocalName(i) + "] failed to update and remains [" + value + "].", e);
             }
@@ -2727,7 +2739,7 @@ public class Digester extends DefaultHandler2 {
         String in = bodyText.toString();
         String out;
         try {
-            out = IntrospectionUtils.replaceProperties(in, null, source);
+            out = IntrospectionUtils.replaceProperties(in, null, source, getClassLoader());
         } catch (Exception e) {
             return bodyText; // return unchanged data
         }

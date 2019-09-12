@@ -30,6 +30,8 @@ import java.util.Hashtable;
 import java.util.StringTokenizer;
 import java.util.Vector;
 
+import org.apache.tomcat.util.security.PermissionCheck;
+
 /**
  * Utils for introspection and reflection
  */
@@ -486,10 +488,32 @@ public final class IntrospectionUtils {
     }
 
     /**
-     * Replace ${NAME} with the property value
+     * Replace ${NAME} with the property value.
+     * @param value The value
+     * @param staticProp Replacement properties
+     * @param dynamicProp Replacement properties
+     * @return the replacement value
+     * @deprecated Use {@link #replaceProperties(String, Hashtable, PropertySource[], ClassLoader)}
      */
+    @Deprecated
     public static String replaceProperties(String value,
             Hashtable<Object,Object> staticProp, PropertySource dynamicProp[]) {
+        return replaceProperties(value, staticProp, dynamicProp, null);
+    }
+
+    /**
+     * Replace ${NAME} with the property value.
+     * @param value The value
+     * @param staticProp Replacement properties
+     * @param dynamicProp Replacement properties
+     * @param classLoader Class loader associated with the code requesting the
+     *                    property
+     * @return the replacement value
+     */
+    public static String replaceProperties(String value,
+            Hashtable<Object,Object> staticProp, PropertySource dynamicProp[],
+            ClassLoader classLoader) {
+
         if (value.indexOf('$') < 0) {
             return value;
         }
@@ -520,8 +544,12 @@ public final class IntrospectionUtils {
                     v = (String) staticProp.get(n);
                 }
                 if (v == null && dynamicProp != null) {
-                    for (int i = 0; i < dynamicProp.length; i++) {
-                        v = dynamicProp[i].getProperty(n);
+                    for (PropertySource propertySource : dynamicProp) {
+                        if (propertySource instanceof SecurePropertySource) {
+                            v = ((SecurePropertySource) propertySource).getProperty(n, classLoader);
+                        } else {
+                            v = propertySource.getProperty(n);
+                        }
                         if (v != null) {
                             break;
                         }
@@ -992,19 +1020,36 @@ public final class IntrospectionUtils {
     // This provides a layer of abstraction
 
     public static interface PropertySource {
-
         public String getProperty(String key);
-
     }
+
+
+    public static interface SecurePropertySource extends PropertySource {
+
+        /**
+         * Obtain a property value, checking that code associated with the
+         * provided class loader has permission to access the property. If the
+         * {@code classLoader} is {@code null} or if {@code classLoader} does
+         * not implement {@link PermissionCheck} then the property value will be
+         * looked up <b>without</b> a call to
+         * {@link PermissionCheck#check(java.security.Permission)}
+         *
+         * @param key           The key of the requested property
+         * @param classLoader   The class loader associated with the code that
+         *                      trigger the property lookup
+         * @return The property value or {@code null} if it could not be found
+         *         or if {@link PermissionCheck#check(java.security.Permission)}
+         *         fails
+         */
+        public String getProperty(String key, ClassLoader classLoader);
+    }
+
 
     /**
      * @deprecated Is used only by deprecated method
      */
     @Deprecated
     public static interface AttributeHolder {
-
         public void setAttribute(String key, Object o);
-
     }
-
 }
