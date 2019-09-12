@@ -503,7 +503,7 @@ should be completed:</p>
 <li><b><code>TomcatA</code> starts up</b>
     <p>
         Tomcat starts up using the standard start up sequence. When the Host object is created, a cluster object is associated with it.
-        When the contexts are parsed, if the distributable element is in place in the web.xml file, 
+        When the contexts are parsed, if the distributable element is in place in the web.xml file,
         Tomcat asks the Cluster class (in this case <code>SimpleTcpCluster</code>) to create a manager
         for the replicated context. So with clustering enabled, distributable set in web.xml
         Tomcat will create a <code>DeltaManager</code> for that context instead of a <code>StandardManager</code>.
@@ -519,22 +519,22 @@ should be completed:</p>
         in this case TomcatA. TomcatA responds to the request, and before TomcatB starts listening
         for HTTP requests, the state has been transferred from TomcatA to TomcatB.
         In case TomcatA doesn't respond, TomcatB will time out after 60 seconds, issue a log
-        entry, and continue starting. The session state gets transferred for each web 
-        application that has distributable in its web.xml. (Note: To use session replication 
+        entry, and continue starting. The session state gets transferred for each web
+        application that has distributable in its web.xml. (Note: To use session replication
         efficiently, all your tomcat instances should be configured the same.)
     </p>
 </li>
 <li><B><code>TomcatA</code> receives a request, a session <code>S1</code> is created.</B>
     <p>
-        The request coming in to TomcatA is handled exactly the same way as without session 
-        replication, until the request is completed, at which time the 
-        <code>ReplicationValve</code> will intercept the request before the response is 
-        returned to the user.  At this point it finds that the session has been modified, 
-        and it uses TCP to replicate the session to TomcatB. Once the serialized data has 
-        been handed off to the operating system's TCP logic, the request returns to the user, 
-        back through the valve pipeline.  For each request the entire session is replicated, 
-        this allows code that modifies attributes in the session without calling setAttribute 
-        or removeAttribute to be replicated.  A useDirtyFlag configuration parameter can 
+        The request coming in to TomcatA is handled exactly the same way as without session
+        replication, until the request is completed, at which time the
+        <code>ReplicationValve</code> will intercept the request before the response is
+        returned to the user.  At this point it finds that the session has been modified,
+        and it uses TCP to replicate the session to TomcatB. Once the serialized data has
+        been handed off to the operating system's TCP logic, the request returns to the user,
+        back through the valve pipeline.  For each request the entire session is replicated,
+        this allows code that modifies attributes in the session without calling setAttribute
+        or removeAttribute to be replicated.  A useDirtyFlag configuration parameter can
         be used to optimize the number of times a session is replicated.
     </p>
 
@@ -542,8 +542,8 @@ should be completed:</p>
 <li><b><code>TomcatA</code> crashes</b>
     <p>
         When TomcatA crashes, TomcatB receives a notification that TomcatA has dropped out
-        of the cluster. TomcatB removes TomcatA from its membership list, and TomcatA will 
-        no longer be notified of any changes that occurs in TomcatB.  The load balancer 
+        of the cluster. TomcatB removes TomcatA from its membership list, and TomcatA will
+        no longer be notified of any changes that occurs in TomcatB.  The load balancer
         will redirect the requests from TomcatA to TomcatB and all the sessions are current.
     </p>
 </li>
