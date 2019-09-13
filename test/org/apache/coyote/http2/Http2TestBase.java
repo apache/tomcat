@@ -50,6 +50,7 @@ import org.apache.coyote.http2.HpackDecoder.HeaderEmitter;
 import org.apache.coyote.http2.Http2Parser.Input;
 import org.apache.coyote.http2.Http2Parser.Output;
 import org.apache.tomcat.util.codec.binary.Base64;
+import org.apache.tomcat.util.http.FastHttpDateFormat;
 import org.apache.tomcat.util.http.MimeHeaders;
 
 /**
@@ -62,6 +63,7 @@ public abstract class Http2TestBase extends TomcatBaseTest {
     // test that demonstrated that most HTTP/2 tests were failing because the
     // response now included a date header
     protected static final String DEFAULT_DATE = "Wed, 11 Nov 2015 19:18:42 GMT";
+    protected static final long DEFAULT_TIME = FastHttpDateFormat.parseDate(DEFAULT_DATE);
 
     private static final String HEADER_IGNORED = "x-ignore";
 
@@ -1025,9 +1027,15 @@ public abstract class Http2TestBase extends TomcatBaseTest {
 
         @Override
         public void emitHeader(String name, String value) {
-            // Date headers will always change so use a hard-coded default
             if ("date".equals(name)) {
+                // Date headers will always change so use a hard-coded default
                 value = DEFAULT_DATE;
+            } else if ("etag".equals(name) && value.startsWith("W/\"")) {
+                // etag headers will vary depending on when the source was
+                // checked out, unpacked, copied etc so use the same default as
+                // for date headers
+                int startOfTime = value.indexOf('-');
+                value = value.substring(0, startOfTime + 1) + DEFAULT_TIME + "\"";
             }
             // Some header values vary so ignore them
             if (HEADER_IGNORED.equals(name)) {
