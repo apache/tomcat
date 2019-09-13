@@ -65,40 +65,40 @@ class WindowAllocationManager {
     }
 
     void waitForStream(long timeout) throws InterruptedException {
-        if (log.isDebugEnabled()) {
-            log.debug(sm.getString("windowAllocationManager.waitFor.stream",
+        //if (log.isDebugEnabled()) {
+            log.info(sm.getString("windowAllocationManager.waitFor.stream",
                     stream.getConnectionId(), stream.getIdentifier(), Long.toString(timeout)));
-        }
+        //}
 
         waitFor(STREAM, timeout);
     }
 
 
     void waitForConnection(long timeout) throws InterruptedException {
-        if (log.isDebugEnabled()) {
-            log.debug(sm.getString("windowAllocationManager.waitFor.connection",
+        //if (log.isDebugEnabled()) {
+            log.info(sm.getString("windowAllocationManager.waitFor.connection",
                     stream.getConnectionId(), stream.getIdentifier(), Long.toString(timeout)));
-        }
+        //}
 
         waitFor(CONNECTION, timeout);
     }
 
 
     void waitForStreamNonBlocking() {
-        if (log.isDebugEnabled()) {
-            log.debug(sm.getString("windowAllocationManager.waitForNonBlocking.stream",
+        //if (log.isDebugEnabled()) {
+            log.info(sm.getString("windowAllocationManager.waitForNonBlocking.stream",
                     stream.getConnectionId(), stream.getIdentifier()));
-        }
+        //}
 
         waitForNonBlocking(STREAM);
     }
 
 
     void waitForConnectionNonBlocking() {
-        if (log.isDebugEnabled()) {
-            log.debug(sm.getString("windowAllocationManager.waitForNonBlocking.connection",
+        //if (log.isDebugEnabled()) {
+            log.info(sm.getString("windowAllocationManager.waitForNonBlocking.connection",
                     stream.getConnectionId(), stream.getIdentifier()));
-        }
+        //}
 
         waitForNonBlocking(CONNECTION);
     }
@@ -116,6 +116,23 @@ class WindowAllocationManager {
 
     void notifyAny() {
         notify(STREAM | CONNECTION);
+    }
+
+
+    boolean isWaitingForStream() {
+        return isWaitingFor(STREAM);
+    }
+
+
+    boolean isWaitingForConnection() {
+        return isWaitingFor(CONNECTION);
+    }
+
+
+    private boolean isWaitingFor(int waitTarget) {
+        synchronized (stream) {
+            return (waitingFor & waitTarget) > 0;
+        }
     }
 
 
@@ -154,10 +171,10 @@ class WindowAllocationManager {
 
 
     private void notify(int notifyTarget) {
-        if (log.isDebugEnabled()) {
-            log.debug(sm.getString("windowAllocationManager.notify", stream.getConnectionId(),
+        //if (log.isDebugEnabled()) {
+            log.info(sm.getString("windowAllocationManager.notify", stream.getConnectionId(),
                     stream.getIdentifier(), Integer.toString(waitingFor), Integer.toString(notifyTarget)));
-        }
+        //}
 
         synchronized (stream) {
             if ((notifyTarget & waitingFor) > NONE) {
@@ -169,17 +186,17 @@ class WindowAllocationManager {
                 waitingFor = NONE;
                 if (stream.getCoyoteResponse().getWriteListener() == null) {
                     // Blocking, so use notify to release StreamOutputBuffer
-                    if (log.isDebugEnabled()) {
-                        log.debug(sm.getString("windowAllocationManager.notified",
+                    //if (log.isDebugEnabled()) {
+                        log.info(sm.getString("windowAllocationManager.notified",
                                 stream.getConnectionId(), stream.getIdentifier()));
-                    }
+                    //}
                     stream.notify();
                 } else {
                     // Non-blocking so dispatch
-                    if (log.isDebugEnabled()) {
-                        log.debug(sm.getString("windowAllocationManager.dispatched",
+                    //if (log.isDebugEnabled()) {
+                        log.info(sm.getString("windowAllocationManager.dispatched",
                                 stream.getConnectionId(), stream.getIdentifier()));
-                    }
+                    //}
                     stream.getCoyoteResponse().action(ActionCode.DISPATCH_WRITE, null);
                     // Need to explicitly execute dispatches on the StreamProcessor
                     // as this thread is being processed by an UpgradeProcessor

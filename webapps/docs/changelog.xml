@@ -77,6 +77,11 @@
   <subsection name="Coyote">
     <changelog>
       <fix>
+        <bug>63682</bug>: Fix a potential hang when using the asynchronous
+        Servlet API to write the response body and the stream and/or connection
+        window reaches 0 bytes in size. (markt)
+      </fix>
+      <fix>
         <bug>63690</bug>: Use the average of the current and previous sizes when
         calculating overhead for HTTP/2 <code>DATA</code> and
         <code>WINDOW_UPDATE</code> frames to avoid false positives as a result
