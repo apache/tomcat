@@ -152,7 +152,7 @@ public class TestStreamProcessor extends Http2TestBase {
 
         Assert.assertEquals("3-HeadersStart\n" +
                 "3-Header-[:status]-[304]\n" +
-                "3-Header-[etag]-[W/\"934-1567674491000\"]\n" +
+                "3-Header-[etag]-[W/\"934-1447269522000\"]\n" +
                 "3-Header-[date]-[Wed, 11 Nov 2015 19:18:42 GMT]\n" +
                 "3-HeadersEnd\n", output.getTrace());
     }
