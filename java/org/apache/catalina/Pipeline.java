@@ -117,7 +117,6 @@ public interface Pipeline extends Contained {
 
 
     /**
-     * Returns true if all the valves in this pipeline support async, false otherwise
      * @return true if all the valves in this pipeline support async, false otherwise
      */
     public boolean isAsyncSupported();
