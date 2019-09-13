@@ -376,7 +376,7 @@ public class Stream extends AbstractStream implements HeaderEmitter {
             headerState = HEADER_STATE_REGULAR;
         }
 
-        switch(name) {
+        switch (name) {
         case ":method": {
             if (coyoteRequest.method().isNull()) {
                 coyoteRequest.method().setString(value);
@@ -777,7 +777,6 @@ public class Stream extends AbstractStream implements HeaderEmitter {
         private volatile boolean closed = false;
         private volatile StreamException reset = null;
         private volatile boolean endOfStreamSent = false;
-        private volatile boolean writeInterest = false;
 
         /* The write methods are synchronized to ensure that only one thread at
          * a time is able to access the buffer. Without this protection, a
@@ -943,20 +942,9 @@ public class Stream extends AbstractStream implements HeaderEmitter {
             if (getWindowSize() > 0 && allocationManager.isWaitingForStream() ||
                     handler.getWindowSize() > 0 && allocationManager.isWaitingForConnection() ||
                     dataLeft) {
-                writeInterest = true;
                 return false;
             } else {
                 return true;
-            }
-
-        }
-
-        synchronized boolean isRegisteredForWrite() {
-            if (writeInterest) {
-                writeInterest = false;
-                return true;
-            } else {
-                return false;
             }
         }
 
