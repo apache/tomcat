@@ -119,6 +119,23 @@ class WindowAllocationManager {
     }
 
 
+    boolean isWaitingForStream() {
+        return isWaitingFor(STREAM);
+    }
+
+
+    boolean isWaitingForConnection() {
+        return isWaitingFor(CONNECTION);
+    }
+
+
+    private boolean isWaitingFor(int waitTarget) {
+        synchronized (stream) {
+            return (waitingFor & waitTarget) > 0;
+        }
+    }
+
+
     private void waitFor(int waitTarget, long timeout) throws InterruptedException {
         synchronized (stream) {
             if (waitingFor != NONE) {

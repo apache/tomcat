@@ -937,12 +937,18 @@ public class Stream extends AbstractStream implements HeaderEmitter {
         }
 
         synchronized boolean isReady() {
-            if (getWindowSize() > 0 && handler.getWindowSize() > 0 && !dataLeft) {
-                return true;
-            } else {
+            // Bug 63682
+            // Only want to return false if the window size is zero AND we are
+            // already waiting for an allocation.
+            if (getWindowSize() > 0 && allocationManager.isWaitingForStream() ||
+                    handler.getWindowSize() > 0 && allocationManager.isWaitingForConnection() ||
+                    dataLeft) {
                 writeInterest = true;
                 return false;
+            } else {
+                return true;
             }
+
         }
 
         synchronized boolean isRegisteredForWrite() {
