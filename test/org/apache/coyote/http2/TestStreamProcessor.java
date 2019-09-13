@@ -35,6 +35,7 @@ import org.junit.Test;
 import org.apache.catalina.Context;
 import org.apache.catalina.Wrapper;
 import org.apache.catalina.startup.Tomcat;
+import org.apache.tomcat.util.compat.JrePlatform;
 import org.apache.tomcat.util.http.FastHttpDateFormat;
 
 public class TestStreamProcessor extends Http2TestBase {
@@ -150,11 +151,19 @@ public class TestStreamProcessor extends Http2TestBase {
 
         parser.readFrame(true);
 
-        Assert.assertEquals("3-HeadersStart\n" +
-                "3-Header-[:status]-[304]\n" +
-                "3-Header-[etag]-[W/\"934-1447269522000\"]\n" +
-                "3-Header-[date]-[Wed, 11 Nov 2015 19:18:42 GMT]\n" +
-                "3-HeadersEnd\n", output.getTrace());
+        StringBuilder expected = new StringBuilder();
+        expected.append("3-HeadersStart\n");
+        expected.append("3-Header-[:status]-[304]\n");
+        // Different line-endings -> different files size -> different weak eTag
+        if (JrePlatform.IS_WINDOWS) {
+            expected.append("3-Header-[etag]-[W/\"957-1447269522000\"]\n");
+        } else {
+            expected.append("3-Header-[etag]-[W/\"934-1447269522000\"]\n");
+        }
+        expected.append("3-Header-[date]-[Wed, 11 Nov 2015 19:18:42 GMT]\n");
+        expected.append("3-HeadersEnd\n");
+
+        Assert.assertEquals(expected.toString(), output.getTrace());
     }
 
 
