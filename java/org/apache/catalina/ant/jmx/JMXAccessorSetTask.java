@@ -72,7 +72,7 @@ public class JMXAccessorSetTask extends JMXAccessorTask {
     // ------------------------------------------------------------- Properties
 
     /**
-     * @return Returns the attribute.
+     * @return the attribute.
      */
     public String getAttribute() {
         return attribute;
@@ -86,11 +86,12 @@ public class JMXAccessorSetTask extends JMXAccessorTask {
     }
 
     /**
-     * @return Returns the value.
+     * @return the value.
      */
     public String getValue() {
         return value;
     }
+
     /**
      * @param value The value to set.
      */
@@ -100,7 +101,7 @@ public class JMXAccessorSetTask extends JMXAccessorTask {
 
 
     /**
-     * @return Returns the type.
+     * @return the type.
      */
     public String getType() {
         return type;
@@ -115,7 +116,7 @@ public class JMXAccessorSetTask extends JMXAccessorTask {
 
 
     /**
-     * @return Returns the convert.
+     * @return the convert.
      */
     public boolean isConvert() {
         return convert;

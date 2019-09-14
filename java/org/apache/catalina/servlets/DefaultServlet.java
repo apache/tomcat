@@ -1207,7 +1207,7 @@ public class DefaultServlet extends HttpServlet {
     }
 
 
-    /*
+    /**
      * Code borrowed heavily from Jasper's EncodingDetector
      */
     private static Charset processBom(InputStream is) throws IOException {

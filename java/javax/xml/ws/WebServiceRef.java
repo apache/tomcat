@@ -25,7 +25,6 @@ import java.lang.annotation.Target;
 
 @Target({ElementType.TYPE, ElementType.METHOD, ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
-
 public @interface WebServiceRef {
     public String name() default "";
     @SuppressWarnings("rawtypes") // Can't use Class<?> because API needs to match specification

@@ -39,7 +39,6 @@ import javax.servlet.ServletResponse;
  * <p>
  * JspFactory objects should not be used by JSP page authors.
  */
-
 public abstract class JspFactory {
 
     private static volatile JspFactory deflt = null;
@@ -60,17 +59,13 @@ public abstract class JspFactory {
      *
      * @param deflt        The default factory implementation
      */
-
     public static void setDefaultFactory(JspFactory deflt) {
         JspFactory.deflt = deflt;
     }
 
     /**
-     * Returns the default factory for this implementation.
-     *
-     * @return the default factory for this implementation
+     * @return the default factory for this implementation.
      */
-
     public static JspFactory getDefaultFactory() {
         return deflt;
     }

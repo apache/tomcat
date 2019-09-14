@@ -403,7 +403,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
     }
 
 
-    /*
+    /**
      * Sets the connection timeout based on the current number of active
      * streams.
      */
@@ -650,7 +650,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
     }
 
 
-    /*
+    /**
      * Separate method to allow Http2AsyncUpgradeHandler to call this code
      * without synchronizing on socketWrapper since it doesn't need to.
      */
@@ -774,7 +774,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
     }
 
 
-    /*
+    /**
      * Handles an I/O error on the socket underlying the HTTP/2 connection when
      * it is triggered by application code (usually reading the request or
      * writing the response). Such I/O errors are fatal so the connection is
@@ -790,7 +790,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
     }
 
 
-    /*
+    /**
      * Needs to know if this was application initiated since that affects the
      * error handling.
      */

@@ -20,7 +20,7 @@ import java.io.PrintWriter;
 
 /**
  * Strategy for obtaining and printing the current call stack. This is primarily useful for
- * {@link org.apache.tomcat.dbcp.pool2.UsageTracking usage tracking} so
+ * {@link org.apache.tomcat.dbcp.pool2.UsageTracking} so
  * that different JVMs and configurations can use more efficient strategies
  * for obtaining the current call stack depending on metadata needs.
  *

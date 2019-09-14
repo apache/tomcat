@@ -586,9 +586,6 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
 
 
     /**
-     * Returns true if the request specifies a JSESSIONID that is valid within
-     * the context of this ApplicationHttpRequest, false otherwise.
-     *
      * @return true if the request specifies a JSESSIONID that is valid within
      * the context of this ApplicationHttpRequest, false otherwise.
      */

@@ -765,7 +765,6 @@ public final class CGIServlet extends HttpServlet {
          *
          * @return true if the request was parsed without error, false if there
          *           was a problem
-
          * @throws UnsupportedEncodingException Unknown encoding
          */
         protected boolean setupFromRequest(HttpServletRequest req)
@@ -978,7 +977,6 @@ public final class CGIServlet extends HttpServlet {
              * "You cannot stop [ugliness], you can only hope to contain [it]"
              * (apologies to Marv Albert regarding MJ)
              */
-
             Hashtable<String,String> envp = new Hashtable<>();
 
             // Add the shell environment variables (if any)

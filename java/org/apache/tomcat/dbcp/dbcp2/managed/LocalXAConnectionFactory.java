@@ -146,8 +146,6 @@ public class LocalXAConnectionFactory implements XAConnectionFactory {
         }
 
         /**
-         * Gets the current xid of the transaction branch associated with this XAResource.
-         *
          * @return the current xid of the transaction branch associated with this XAResource.
          */
         public synchronized Xid getXid() {
@@ -286,7 +284,7 @@ public class LocalXAConnectionFactory implements XAConnectionFactory {
                 try {
                     connection.setAutoCommit(false);
                 } catch (final SQLException e) {
-                    throw (XAException) new XAException("Count not turn off auto commit for a XA transaction")
+                    throw (XAException) new XAException("Count not turn off auto commit for an XA transaction")
                             .initCause(e);
                 }
 
@@ -327,7 +325,7 @@ public class LocalXAConnectionFactory implements XAConnectionFactory {
         // create a new connection
         final Connection connection = connectionFactory.createConnection();
 
-        // create a XAResource to manage the connection during XA transactions
+        // create an XAResource to manage the connection during XA transactions
         final XAResource xaResource = new LocalXAResource(connection);
 
         // register the xa resource for the connection

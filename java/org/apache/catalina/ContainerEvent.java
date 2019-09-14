@@ -64,8 +64,6 @@ public final class ContainerEvent extends EventObject {
 
 
     /**
-     * Return the Container on which this event occurred.
-     *
      * @return The Container on which this event occurred.
      */
     public Container getContainer() {

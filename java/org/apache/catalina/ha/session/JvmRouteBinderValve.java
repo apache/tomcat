@@ -107,7 +107,7 @@ public class JvmRouteBinderValve extends ValveBase implements ClusterValve {
     /**
      * set session id attribute to failed node for request.
      *
-     * @return Returns the sessionIdAttribute.
+     * @return the sessionIdAttribute.
      */
     public String getSessionIdAttribute() {
         return sessionIdAttribute;
@@ -124,14 +124,14 @@ public class JvmRouteBinderValve extends ValveBase implements ClusterValve {
     }
 
     /**
-     * @return Returns the number of migrated sessions.
+     * @return the number of migrated sessions.
      */
     public long getNumberOfSessions() {
         return numberOfSessions;
     }
 
     /**
-     * @return Returns the enabled.
+     * @return the enabled.
      */
     public boolean getEnabled() {
         return enabled;
@@ -212,7 +212,7 @@ public class JvmRouteBinderValve extends ValveBase implements ClusterValve {
      * get jvmroute from engine
      *
      * @param request current request
-     * @return return jvmRoute from ManagerBase or null
+     * @return jvmRoute from ManagerBase or null
      */
     protected String getLocalJvmRoute(Request request) {
         Manager manager = getManager(request);
@@ -241,7 +241,7 @@ public class JvmRouteBinderValve extends ValveBase implements ClusterValve {
     }
 
     /**
-     * @return Returns the cluster.
+     * @return the cluster.
      */
     @Override
     public CatalinaCluster getCluster() {

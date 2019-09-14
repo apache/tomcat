@@ -45,7 +45,6 @@ public class FilterMap extends XmlEncodingBase implements Serializable {
      * The name of this filter to be executed when this mapping matches
      * a particular request.
      */
-
     public static final int ERROR = 1;
     public static final int FORWARD = 2;
     public static final int INCLUDE = 4;

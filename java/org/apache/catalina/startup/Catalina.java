@@ -597,7 +597,7 @@ public class Catalina {
     }
 
 
-    /*
+    /**
      * Load using arguments
      */
     public void load(String args[]) {
@@ -829,7 +829,6 @@ public class Catalina {
  * Rule that sets the parent class loader for the top object on the stack,
  * which must be a <code>Container</code>.
  */
-
 final class SetParentClassLoaderRule extends Rule {
 
     public SetParentClassLoaderRule(ClassLoader parentClassLoader) {

@@ -381,7 +381,7 @@ public final class ApplicationFilterConfig implements FilterConfig, Serializable
     }
 
 
-    /*
+    /**
      * Log objects are not Serializable.
      */
     private void readObject(ObjectInputStream ois) throws ClassNotFoundException, IOException {

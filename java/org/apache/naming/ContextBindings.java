@@ -162,8 +162,6 @@ public class ContextBindings {
 
 
     /**
-     * Retrieves the naming context bound to the current thread.
-     *
      * @return The naming context bound to the current thread.
      *
      * @throws NamingException If no naming context is bound to the current
@@ -249,8 +247,6 @@ public class ContextBindings {
 
 
     /**
-     * Retrieves the naming context bound to a class loader.
-     *
      * @return the naming context bound to current class loader or one of its
      *         parents
      *

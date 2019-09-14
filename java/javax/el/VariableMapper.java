@@ -17,9 +17,6 @@
 
 package javax.el;
 
-/**
- *
- */
 public abstract class VariableMapper {
 
     public abstract ValueExpression resolveVariable(String variable);

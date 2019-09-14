@@ -17,7 +17,8 @@
 
 package org.apache.tomcat.jni;
 
-/** Global
+/**
+ * Global
  *
  * @author Mladen Turk
  */

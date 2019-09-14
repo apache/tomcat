@@ -821,7 +821,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
 
             String roles[];
             if (constraint.getAllRoles()) {
-                // * means all roles defined in web.xml
+                // means all roles defined in web.xml
                 roles = request.getContext().findSecurityRoles();
             } else {
                 roles = constraint.findAuthRoles();
@@ -1198,7 +1198,6 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
 
 
     /**
-     * Get the principal associated with the specified certificate.
      * @param usercert The user certificate
      * @return the Principal associated with the given certificate.
      */

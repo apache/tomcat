@@ -80,8 +80,6 @@ public class SharedPoolDataSource extends InstanceKeyDataSource {
     // Properties
 
     /**
-     * Gets {@link GenericKeyedObjectPool#getMaxTotal()} for this pool.
-     *
      * @return {@link GenericKeyedObjectPool#getMaxTotal()} for this pool.
      */
     public int getMaxTotal() {
@@ -103,8 +101,6 @@ public class SharedPoolDataSource extends InstanceKeyDataSource {
     // Instrumentation Methods
 
     /**
-     * Gets the number of active connections in the pool.
-     *
      * @return The number of active connections in the pool.
      */
     public int getNumActive() {
@@ -112,8 +108,6 @@ public class SharedPoolDataSource extends InstanceKeyDataSource {
     }
 
     /**
-     * Gets the number of idle connections in the pool.
-     *
      * @return The number of idle connections in the pool.
      */
     public int getNumIdle() {

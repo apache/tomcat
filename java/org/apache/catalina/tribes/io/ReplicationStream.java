@@ -97,7 +97,7 @@ public final class ReplicationStream extends ObjectInputStream {
     }
 
     /**
-     * ObjectInputStream.resolveProxyClass has some funky way of using
+     * @see ObjectInputStream#resolveProxyClass(String[]) has some funky way of using
      * the incorrect class loader to resolve proxy classes, let's do it our way instead
      */
     @Override

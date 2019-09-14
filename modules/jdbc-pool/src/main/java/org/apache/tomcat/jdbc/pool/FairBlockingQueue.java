@@ -299,7 +299,6 @@ public class FairBlockingQueue<E> implements BlockingQueue<E> {
      * {@inheritDoc}
      * @throws UnsupportedOperationException - this operation is not supported
      */
-
     @Override
     public int drainTo(Collection<? super E> c) {
         return drainTo(c,Integer.MAX_VALUE);
@@ -349,7 +348,6 @@ public class FairBlockingQueue<E> implements BlockingQueue<E> {
     @Override
     public void clear() {
         throw new UnsupportedOperationException("void clear()");
-
     }
 
     /**

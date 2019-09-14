@@ -33,21 +33,21 @@ import org.apache.tomcat.util.ExceptionUtils;
 
 
 /**
-*
-* Implementation of <b>Realm</b> that works with any JDBC supported database.
-* See the JDBCRealm.howto for more details on how to set up the database and
-* for configuration options.
-*
-* <p>For a <b>Realm</b> implementation that supports connection pooling and
-* doesn't require synchronisation of <code>authenticate()</code>,
-* <code>getPassword()</code>, <code>roles()</code> and
-* <code>getPrincipal()</code> or the ugly connection logic use the
-* <code>DataSourceRealm</code>.</p>
-*
-* @author Craig R. McClanahan
-* @author Carson McDonald
-* @author Ignacio Ortega
-*/
+ *
+ * Implementation of <b>Realm</b> that works with any JDBC supported database.
+ * See the JDBCRealm.howto for more details on how to set up the database and
+ * for configuration options.
+ *
+ * <p>For a <b>Realm</b> implementation that supports connection pooling and
+ * doesn't require synchronisation of <code>authenticate()</code>,
+ * <code>getPassword()</code>, <code>roles()</code> and
+ * <code>getPrincipal()</code> or the ugly connection logic use the
+ * <code>DataSourceRealm</code>.</p>
+ *
+ * @author Craig R. McClanahan
+ * @author Carson McDonald
+ * @author Ignacio Ortega
+ */
 public class JDBCRealm
     extends RealmBase {
 
@@ -358,7 +358,7 @@ public class JDBCRealm
      * @param credentials Password or other credentials to use in authenticating
      *                    this username
      *
-     * @return Return the Principal associated with the specified username and
+     * @return the Principal associated with the specified username and
      *         credentials, if there is one; otherwise return <code>null</code>.
      */
     public synchronized Principal authenticate(Connection dbConnection,

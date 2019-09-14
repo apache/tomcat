@@ -17,7 +17,8 @@
 
 package org.apache.tomcat.jni;
 
-/** Thread
+/**
+ * Thread
  *
  * @author Mladen Turk
  */

@@ -43,6 +43,7 @@ public interface FilterRegistration extends Registration {
     public void addMappingForServletNames(
             EnumSet<DispatcherType> dispatcherTypes,
             boolean isMatchAfter, String... servletNames);
+
     /**
      *
      * @return TODO

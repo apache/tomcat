@@ -138,7 +138,7 @@ public class JMXAccessorTask extends BaseRedirectorHelperTask {
     }
 
     /**
-     * @return Returns the resultproperty.
+     * @return the resultproperty.
      */
     public String getResultproperty() {
         return resultproperty;
@@ -152,7 +152,7 @@ public class JMXAccessorTask extends BaseRedirectorHelperTask {
     }
 
     /**
-     * @return Returns the delimiter.
+     * @return the delimiter.
      */
     public String getDelimiter() {
         return delimiter;
@@ -166,7 +166,7 @@ public class JMXAccessorTask extends BaseRedirectorHelperTask {
     }
 
     /**
-     * @return Returns the echo.
+     * @return the echo.
      */
     public boolean isEcho() {
         return echo;
@@ -181,7 +181,7 @@ public class JMXAccessorTask extends BaseRedirectorHelperTask {
     }
 
     /**
-     * @return Returns the separatearrayresults.
+     * @return the separatearrayresults.
      */
     public boolean isSeparatearrayresults() {
         return separatearrayresults;
@@ -251,14 +251,14 @@ public class JMXAccessorTask extends BaseRedirectorHelperTask {
     }
 
     /**
-     * @return Returns the useRef.
+     * @return the useRef.
      */
     public boolean isUseRef() {
         return ref != null && !"".equals(ref);
     }
 
     /**
-     * @return Returns the ref.
+     * @return the ref.
      */
     public String getRef() {
         return ref;
@@ -272,7 +272,7 @@ public class JMXAccessorTask extends BaseRedirectorHelperTask {
     }
 
     /**
-     * @return Returns the ifCondition.
+     * @return the ifCondition.
      */
     public String getIf() {
         return ifCondition;
@@ -289,7 +289,7 @@ public class JMXAccessorTask extends BaseRedirectorHelperTask {
     }
 
     /**
-     * @return Returns the unlessCondition.
+     * @return the unlessCondition.
      */
     public String getUnless() {
         return unlessCondition;

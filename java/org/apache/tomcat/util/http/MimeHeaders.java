@@ -406,13 +406,14 @@ public class MimeHeaders {
 
 }
 
-/** Enumerate the distinct header names.
-    Each nextElement() is O(n) ( a comparison is
-    done with all previous elements ).
-
-    This is less frequent than add() -
-    we want to keep add O(1).
-*/
+/**
+ * Enumerate the distinct header names.
+ * Each nextElement() is O(n) ( a comparison is
+ * done with all previous elements ).
+ *
+ * This is less frequent than add() -
+ * we want to keep add O(1).
+ */
 class NamesEnumerator implements Enumeration<String> {
     private int pos;
     private final int size;
@@ -460,9 +461,10 @@ class NamesEnumerator implements Enumeration<String> {
     }
 }
 
-/** Enumerate the values for a (possibly ) multiple
-    value element.
-*/
+/**
+ * Enumerate the values for a (possibly ) multiple
+ * value element.
+ */
 class ValuesEnumerator implements Enumeration<String> {
     private int pos;
     private final int size;

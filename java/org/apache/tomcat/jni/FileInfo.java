@@ -17,7 +17,8 @@
 
 package org.apache.tomcat.jni;
 
-/** Fileinfo
+/**
+ * Fileinfo
  *
  * @author Mladen Turk
  */

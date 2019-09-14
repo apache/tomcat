@@ -29,8 +29,8 @@ import org.apache.tomcat.JarScannerCallback;
 import org.xml.sax.InputSource;
 
 /**
-* Callback handling a web-fragment.xml descriptor.
-*/
+ * Callback handling a web-fragment.xml descriptor.
+ */
 public class FragmentJarScannerCallback implements JarScannerCallback {
 
     private static final String FRAGMENT_LOCATION =

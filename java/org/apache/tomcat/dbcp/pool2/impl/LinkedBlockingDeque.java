@@ -995,9 +995,7 @@ class LinkedBlockingDeque<E> extends AbstractQueue<E>
     }
 
     /**
-     * Returns the number of elements in this deque.
-     *
-     * @return the number of elements in this deque
+     * @return the number of elements in this deque.
      */
     @Override
     public int size() {

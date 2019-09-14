@@ -101,7 +101,7 @@ public abstract class BaseGenericObjectPool<T> extends BaseObject {
     final Object evictionLock = new Object();
     private Evictor evictor = null; // @GuardedBy("evictionLock")
     EvictionIterator evictionIterator = null; // @GuardedBy("evictionLock")
-    /*
+    /**
      * Class loader for evictor thread to use since, in a JavaEE or similar
      * environment, the context class loader for the evictor thread may not have
      * visibility of the correct factory. See POOL-161. Uses a weak reference to

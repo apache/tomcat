@@ -28,8 +28,6 @@ package org.apache.catalina;
 public interface ContainerServlet {
 
     /**
-     * Obtain the Wrapper with which this Servlet is associated.
-     *
      * @return The Wrapper with which this Servlet is associated.
      */
     public Wrapper getWrapper();

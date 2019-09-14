@@ -266,7 +266,7 @@ public class RequestDumperFilter extends GenericFilter {
     }
 
 
-    /*
+    /**
      * Log objects are not Serializable but this Filter is because it extends
      * GenericFilter. Tomcat won't serialize a Filter but in case something else
      * does...

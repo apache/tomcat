@@ -539,7 +539,7 @@ public class JspServletWrapper {
     }
 
     /**
-     * @return Returns the lastModificationTest.
+     * @return the lastModificationTest.
      */
     public long getLastModificationTest() {
         return lastModificationTest;

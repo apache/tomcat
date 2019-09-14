@@ -62,7 +62,6 @@ public class JspException extends Exception {
      *                      interfered with the JSP's normal operation,
      *                      making this JSP exception necessary
      */
-
     public JspException(String message, Throwable cause) {
         super(message, cause);
     }
@@ -80,7 +79,6 @@ public class JspException extends Exception {
      *                      interfered with the JSP's normal operation, making
      *                      the JSP exception necessary
      */
-
     public JspException(Throwable cause) {
         super(cause);
     }

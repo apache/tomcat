@@ -47,28 +47,28 @@ public class StoreFileMover {
     private File configSave;
 
     /**
-     * @return Returns the configNew.
+     * @return the configNew.
      */
     public File getConfigNew() {
         return configNew;
     }
 
     /**
-     * @return Returns the configOld.
+     * @return the configOld.
      */
     public File getConfigOld() {
         return configOld;
     }
 
     /**
-     * @return Returns the configSave.
+     * @return the configSave.
      */
     public File getConfigSave() {
         return configSave;
     }
 
     /**
-     * @return Returns the basename.
+     * @return the basename.
      */
     public String getBasename() {
         return basename;

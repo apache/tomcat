@@ -27,7 +27,6 @@ import java.util.Set;
 public interface Session extends Closeable {
 
     /**
-     * Get the container that created this session.
      * @return the container that created this session.
      */
     WebSocketContainer getContainer();

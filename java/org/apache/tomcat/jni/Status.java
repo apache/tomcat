@@ -17,7 +17,8 @@
 
 package org.apache.tomcat.jni;
 
-/** Status
+/**
+ * Status
  *
  * @author Mladen Turk
  */

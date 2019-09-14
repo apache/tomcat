@@ -30,7 +30,7 @@ import org.apache.juli.logging.LogFactory;
 
 /**
  * The object reader object is an object used in conjunction with
- * java.nio TCP messages. This object stores the message bytes in a
+ * java.nio TCP messages. This object stores the message bytes in an
  * <code>XByteBuffer</code> until a full package has been received.
  * This object uses an XByteBuffer which is an extendable object buffer that also allows
  * for message encoding and decoding.

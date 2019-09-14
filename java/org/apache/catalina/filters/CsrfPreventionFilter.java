@@ -169,7 +169,7 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
             return addNonce(super.encodeURL(url));
         }
 
-        /*
+        /**
          * Return the specified URL with the nonce added to the query string.
          */
         private String addNonce(String url) {

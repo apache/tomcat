@@ -230,7 +230,7 @@ public class FileMessageFactory {
      *             if the factory is opened for read or closed
      * @throws IOException -
      *             if a file write error occurs
-     * @return returns true if the file is complete and outputstream is closed,
+     * @return true if the file is complete and outputstream is closed,
      *         false otherwise.
      */
     public boolean writeMessage(FileMessage msg)

@@ -190,7 +190,7 @@ class AsyncStateMachine {
 
     private volatile AsyncState state = AsyncState.DISPATCHED;
     private volatile long lastAsyncStart = 0;
-    /*
+    /**
      * Tracks the current generation of async processing for this state machine.
      * The generation is incremented every time async processing is started. The
      * primary purpose of this is to enable Tomcat to detect and prevent
@@ -271,7 +271,7 @@ class AsyncStateMachine {
         }
     }
 
-    /*
+    /**
      * Async has been processed. Whether or not to enter a long poll depends on
      * current state. For example, as per SRV.2.3.3.3 can now process calls to
      * complete() or dispatch().

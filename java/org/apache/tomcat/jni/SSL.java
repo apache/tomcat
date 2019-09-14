@@ -16,7 +16,8 @@
  */
 package org.apache.tomcat.jni;
 
-/** SSL
+/**
+ * SSL
  *
  * @author Mladen Turk
  */
@@ -38,10 +39,10 @@ public final class SSL {
     public static final int SSL_AIDX_DSA     = 1;
     public static final int SSL_AIDX_ECC     = 3;
     public static final int SSL_AIDX_MAX     = 4;
+
     /*
      * Define IDs for the temporary RSA keys and DH params
      */
-
     public static final int SSL_TMP_KEY_RSA_512  = 0;
     public static final int SSL_TMP_KEY_RSA_1024 = 1;
     public static final int SSL_TMP_KEY_RSA_2048 = 2;
@@ -635,7 +636,7 @@ public final class SSL {
     /**
      * SSL_get_time
      * @param ssl the SSL instance (SSL *)
-     * @return returns the time at which the session ssl was established. The time is given in seconds since the Epoch
+     * @return the time at which the session ssl was established. The time is given in seconds since the Epoch
      */
     public static native long getTime(long ssl);
 

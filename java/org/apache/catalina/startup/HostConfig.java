@@ -1386,7 +1386,7 @@ public class HostConfig implements LifecycleListener {
     }
 
 
-    /*
+    /**
      * Note: If either of fileToRemove and newDocBase are null, both will be
      *       ignored.
      */
@@ -1474,7 +1474,7 @@ public class HostConfig implements LifecycleListener {
     }
 
 
-    /*
+    /**
      * Delete any resource that would trigger the automatic deployment code to
      * re-deploy the application. This means deleting:
      * - any resource located in the appBase
@@ -1869,7 +1869,7 @@ public class HostConfig implements LifecycleListener {
     }
 
 
-    /*
+    /**
      * The purpose of this class is to provide a way for HostConfig to get
      * a Context to delete an expanded WAR after the Context stops. This is to
      * resolve this issue described in Bug 57772. The alternative solutions

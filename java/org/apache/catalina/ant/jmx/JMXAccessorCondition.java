@@ -90,7 +90,7 @@ public class JMXAccessorCondition extends JMXAccessorConditionBase {
     // ----------------------------------------------------- Properties
 
     /**
-     * @return Returns the operation.
+     * @return the operation.
      */
     public String getOperation() {
         return operation;
@@ -103,7 +103,7 @@ public class JMXAccessorCondition extends JMXAccessorConditionBase {
     }
 
     /**
-     * @return Returns the type.
+     * @return the type.
      */
     public String getType() {
         return type;
@@ -116,7 +116,7 @@ public class JMXAccessorCondition extends JMXAccessorConditionBase {
     }
 
     /**
-     * @return Returns the ifCondition.
+     * @return the ifCondition.
      */
     public String getIf() {
         return ifCondition;
@@ -130,7 +130,7 @@ public class JMXAccessorCondition extends JMXAccessorConditionBase {
     }
 
    /**
-     * @return Returns the unlessCondition.
+     * @return the unlessCondition.
      */
     public String getUnless() {
         return unlessCondition;

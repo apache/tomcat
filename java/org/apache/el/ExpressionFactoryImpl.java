@@ -35,9 +35,6 @@ import org.apache.el.util.MessageFactory;
  */
 public class ExpressionFactoryImpl extends ExpressionFactory {
 
-    /**
-     *
-     */
     public ExpressionFactoryImpl() {
         super();
     }

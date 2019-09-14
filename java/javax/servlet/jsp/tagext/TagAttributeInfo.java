@@ -25,13 +25,11 @@ package javax.servlet.jsp.tagext;
  * Only the information needed to generate code is included here. Other
  * information like SCHEMA for validation belongs elsewhere.
  */
-
 public class TagAttributeInfo {
     /**
      * "id" is wired in to be ID. There is no real benefit in having it be
      * something else IDREFs are not handled any differently.
      */
-
     public static final String ID = "id";
 
     /**
@@ -125,11 +123,8 @@ public class TagAttributeInfo {
     }
 
     /**
-     * The name of this attribute.
-     *
-     * @return the name of the attribute
+     * @return the name of the attribute.
      */
-
     public String getName() {
         return name;
     }
@@ -139,7 +134,6 @@ public class TagAttributeInfo {
      *
      * @return the type of the attribute
      */
-
     public String getTypeName() {
         return type;
     }
@@ -149,7 +143,6 @@ public class TagAttributeInfo {
      *
      * @return if the attribute can hold a request-time value.
      */
-
     public boolean canBeRequestTime() {
         return reqTime;
     }

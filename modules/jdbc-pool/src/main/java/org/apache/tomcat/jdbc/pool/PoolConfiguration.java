@@ -26,7 +26,6 @@ import org.apache.tomcat.jdbc.pool.PoolProperties.InterceptorDefinition;
  * an IoC container without having to specify a secondary object with a setter method.
  *
  */
-
 public interface PoolConfiguration {
 
     /**
@@ -669,11 +668,11 @@ public interface PoolConfiguration {
      * Returns true if the pool sweeper is enabled for the connection pool.
      * The pool sweeper is enabled if any settings that require async intervention in the pool are turned on
      * <code>
-        boolean result = getTimeBetweenEvictionRunsMillis()&gt;0;
-        result = result &amp;&amp; (isRemoveAbandoned() &amp;&amp; getRemoveAbandonedTimeout()&gt;0);
-        result = result || (isTestWhileIdle() &amp;&amp; getValidationQuery()!=null);
-        return result;
-       </code>
+     *  boolean result = getTimeBetweenEvictionRunsMillis()&gt;0;
+     *  result = result &amp;&amp; (isRemoveAbandoned() &amp;&amp; getRemoveAbandonedTimeout()&gt;0);
+     *  result = result || (isTestWhileIdle() &amp;&amp; getValidationQuery()!=null);
+     *  return result;
+     * </code>
      *
      * @return true if a background thread is or will be enabled for this pool
      */
@@ -756,7 +755,7 @@ public interface PoolConfiguration {
     /**
      * Returns the time in seconds to pass before a connection is marked an abandoned suspect.
      * Any value lesser than or equal to 0 means the check is disabled.
-     * @return Returns the time in seconds to pass before a connection is marked an abandoned suspect.
+     * @return the time in seconds to pass before a connection is marked an abandoned suspect.
      */
     public int getSuspectTimeout();
 

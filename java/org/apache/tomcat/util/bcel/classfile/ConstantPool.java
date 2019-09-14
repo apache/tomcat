@@ -29,7 +29,7 @@ import org.apache.tomcat.util.bcel.Const;
  * long) entry.  Those interested in generating constant pools
  * programatically should see <a href="../generic/ConstantPoolGen.html">
  * ConstantPoolGen</a>.
-
+ *
  * @see     Constant
  */
 public class ConstantPool {

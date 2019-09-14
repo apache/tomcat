@@ -29,7 +29,7 @@ public class SessionMessageImpl extends ClusterMessageBase implements SessionMes
     private static final long serialVersionUID = 2L;
 
 
-    /*
+    /**
      * Private serializable variables to keep the messages state
      */
     private final int mEvtType;

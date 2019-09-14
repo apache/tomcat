@@ -41,9 +41,7 @@ public class FunctionInfo {
     }
 
     /**
-     * The name of the function.
-     *
-     * @return The name of the function
+     * @return The name of the function.
      */
 
     public String getName() {
@@ -51,9 +49,7 @@ public class FunctionInfo {
     }
 
     /**
-     * The class of the function.
-     *
-     * @return The class of the function
+     * @return The class of the function.
      */
 
     public String getFunctionClass() {
@@ -61,9 +57,7 @@ public class FunctionInfo {
     }
 
     /**
-     * The signature of the function.
-     *
-     * @return The signature of the function
+     * @return The signature of the function.
      */
 
     public String getFunctionSignature() {

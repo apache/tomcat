@@ -393,7 +393,6 @@ public class ConnectionPool extends NotificationBroadcasterSupport
     /**
      * {@inheritDoc}
      */
-
     @Override
     public String getValidatorClassName() {
         return getPoolProperties().getValidatorClassName();
@@ -402,7 +401,6 @@ public class ConnectionPool extends NotificationBroadcasterSupport
     /**
      * {@inheritDoc}
      */
-
     @Override
     public Validator getValidator() {
         return getPoolProperties().getValidator();
@@ -775,7 +773,6 @@ public class ConnectionPool extends NotificationBroadcasterSupport
     /**
      * {@inheritDoc}
      */
-
     @Override
     public void setValidatorClassName(String className) {
         getPoolProperties().setValidatorClassName(className);
@@ -784,7 +781,6 @@ public class ConnectionPool extends NotificationBroadcasterSupport
     /**
      * {@inheritDoc}
      */
-
     @Override
     public int getSuspectTimeout() {
         return getPoolProperties().getSuspectTimeout();
@@ -793,7 +789,6 @@ public class ConnectionPool extends NotificationBroadcasterSupport
     /**
      * {@inheritDoc}
      */
-
     @Override
     public void setSuspectTimeout(int seconds) {
         getPoolProperties().setSuspectTimeout(seconds);

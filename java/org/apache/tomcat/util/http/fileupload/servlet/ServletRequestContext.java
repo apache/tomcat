@@ -54,8 +54,6 @@ public class ServletRequestContext implements UploadContext {
     // --------------------------------------------------------- Public Methods
 
     /**
-     * Retrieve the character encoding for the request.
-     *
      * @return The character encoding for the request.
      */
     @Override
@@ -64,8 +62,6 @@ public class ServletRequestContext implements UploadContext {
     }
 
     /**
-     * Retrieve the content type of the request.
-     *
      * @return The content type of the request.
      */
     @Override
@@ -74,8 +70,6 @@ public class ServletRequestContext implements UploadContext {
     }
 
     /**
-     * Retrieve the content length of the request.
-     *
      * @return The content length of the request.
      * @since 1.3
      */
@@ -91,8 +85,6 @@ public class ServletRequestContext implements UploadContext {
     }
 
     /**
-     * Retrieve the input stream for the request.
-     *
      * @return The input stream for the request.
      *
      * @throws IOException if a problem occurs.
@@ -103,8 +95,6 @@ public class ServletRequestContext implements UploadContext {
     }
 
     /**
-     * Returns a string representation of this object.
-     *
      * @return a string representation of this object.
      */
     @Override

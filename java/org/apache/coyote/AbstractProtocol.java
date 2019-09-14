@@ -296,7 +296,7 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
 
     public int getLocalPort() { return endpoint.getLocalPort(); }
 
-    /*
+    /**
      * When Tomcat expects data from the client, this is the time Tomcat will
      * wait for that data to arrive before closing the connection.
      */
@@ -323,8 +323,6 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
     }
 
     /**
-     * Always returns 1.
-     *
      * @return Always 1.
      *
      * @deprecated Will be removed in Tomcat 10.
@@ -540,12 +538,11 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
 
     // ------------------------------------------------------- Lifecycle methods
 
-    /*
+    /**
      * NOTE: There is no maintenance of state or checking for valid transitions
      * within this class. It is expected that the connector will maintain state
      * and prevent invalid state transitions.
      */
-
     @Override
     public void init() throws Exception {
         if (getLog().isInfoEnabled()) {

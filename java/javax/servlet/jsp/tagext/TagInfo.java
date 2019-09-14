@@ -25,26 +25,22 @@ package javax.servlet.jsp.tagext;
  *
  *
 */
-
 public class TagInfo {
 
     /**
      * Static constant for getBodyContent() when it is JSP.
      */
-
     public static final String BODY_CONTENT_JSP = "JSP";
 
     /**
      * Static constant for getBodyContent() when it is Tag dependent.
      */
-
     public static final String BODY_CONTENT_TAG_DEPENDENT = "tagdependent";
 
 
     /**
      * Static constant for getBodyContent() when it is empty.
      */
-
     public static final String BODY_CONTENT_EMPTY = "empty";
 
     /**
@@ -216,7 +212,6 @@ public class TagInfo {
      *
      * @return The (short) name of the tag.
      */
-
     public String getTagName() {
         return tagName;
     }
@@ -229,7 +224,6 @@ public class TagInfo {
      * @return The array of TagAttributeInfo for this tag, or a
      *         zero-length array if the tag has no attributes.
      */
-
    public TagAttributeInfo[] getAttributes() {
        return attributeInfo;
    }
@@ -309,7 +303,6 @@ public class TagInfo {
      *
      * @return The name of the tag handler class.
      */
-
     public String getTagClassName() {
         return tagClassName;
     }
@@ -322,7 +315,6 @@ public class TagInfo {
      *
      * @return the body content string.
      */
-
     public String getBodyContent() {
         return bodyContent;
     }
@@ -334,7 +326,6 @@ public class TagInfo {
      * @return the info string, or null if
      *         not defined
      */
-
     public String getInfoString() {
         return infoString;
     }
@@ -354,7 +345,6 @@ public class TagInfo {
      *
      * @param tl the TagLibraryInfo to assign
      */
-
     public void setTagLibrary(TagLibraryInfo tl) {
         tagLibrary = tl;
     }
@@ -364,7 +354,6 @@ public class TagInfo {
      *
      * @return the tag library instance we belong to
      */
-
     public TagLibraryInfo getTagLibrary() {
         return tagLibrary;
     }
@@ -379,7 +368,6 @@ public class TagInfo {
      * @return A short name to be displayed by tools,
      *         or null if not defined
      */
-
     public String getDisplayName() {
         return displayName;
     }
@@ -390,7 +378,6 @@ public class TagInfo {
      * @return Path to a small icon to be displayed by tools,
      *         or null if not defined
      */
-
     public String getSmallIcon() {
         return smallIcon;
     }
@@ -401,7 +388,6 @@ public class TagInfo {
      * @return Path to a large icon to be displayed by tools,
      *         or null if not defined
      */
-
     public String getLargeIcon() {
         return largeIcon;
     }
@@ -413,7 +399,6 @@ public class TagInfo {
      *         variables declared by this tag, or a zero length
      *         array if no variables have been declared
      */
-
     public TagVariableInfo[] getTagVariableInfos() {
         return tagVariableInfo;
     }

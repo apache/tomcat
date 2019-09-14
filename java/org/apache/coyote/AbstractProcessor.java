@@ -51,7 +51,7 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
     protected final Adapter adapter;
     protected final AsyncStateMachine asyncStateMachine;
     private volatile long asyncTimeout = -1;
-    /*
+    /**
      * Tracks the current async generation when a timeout is dispatched. In the
      * time it takes for a container thread to be allocated and the timeout
      * processing to start, it is possible that the application completes this
@@ -137,9 +137,7 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
 
 
     /**
-     * Get the associated adapter.
-     *
-     * @return the associated adapter
+     * @return the associated adapter.
      */
     public Adapter getAdapter() {
         return adapter;

@@ -136,9 +136,6 @@ public class DataSource extends DataSourceProxy implements javax.sql.DataSource,
         }
     }
 
-    /**
-     *
-     */
     protected void unregisterJmx() {
         JmxUtil.unregisterJmx(oname);
     }

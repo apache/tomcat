@@ -76,8 +76,6 @@ public interface Manager {
 
 
     /**
-     * Returns the total number of sessions created by this manager.
-     *
      * @return Total number of sessions created by this manager.
      */
     public long getSessionCounter();
@@ -112,17 +110,13 @@ public interface Manager {
 
 
     /**
-     * Gets the number of currently active sessions.
-     *
-     * @return Number of currently active sessions
+     * @return Number of currently active sessions.
      */
     public int getActiveSessions();
 
 
     /**
-     * Gets the number of sessions that have expired.
-     *
-     * @return Number of sessions that have expired
+     * @return Number of sessions that have expired.
      */
     public long getExpiredSessions();
 
@@ -145,9 +139,6 @@ public interface Manager {
 
 
     /**
-     * Gets the longest time (in seconds) that an expired session had been
-     * alive.
-     *
      * @return Longest time (in seconds) that an expired session had been
      * alive.
      */

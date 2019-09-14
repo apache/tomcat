@@ -216,8 +216,6 @@ public class SimpleTcpCluster extends LifecycleMBeanBase
     }
 
     /**
-     * Get the Container associated with our Cluster
-     *
      * @return The Container associated with our Cluster
      */
     @Override
@@ -226,7 +224,7 @@ public class SimpleTcpCluster extends LifecycleMBeanBase
     }
 
     /**
-     * @return Returns the notifyLifecycleListenerOnFailure.
+     * @return the notifyLifecycleListenerOnFailure.
      */
     public boolean isNotifyLifecycleListenerOnFailure() {
         return notifyLifecycleListenerOnFailure;
@@ -378,7 +376,7 @@ public class SimpleTcpCluster extends LifecycleMBeanBase
     // --------------------------------------------------------- Public Methods
 
     /**
-     * @return Returns the managers.
+     * @return the managers.
      */
     @Override
     public Map<String, ClusterManager> getManagers() {

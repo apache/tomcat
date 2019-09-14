@@ -163,9 +163,7 @@ public interface Context extends Container, ContextBind {
 
 
     /**
-     * Return the URL of the XML descriptor for this context.
-     *
-     * @return The URL of the XML descriptor for this context
+     * @return The URL of the XML descriptor for this context.
      */
     public URL getConfigFile();
 
@@ -415,8 +413,6 @@ public interface Context extends Container, ContextBind {
 
 
     /**
-     * Return the URL encoded context path
-     *
      * @return The URL encoded (with UTF-8) context path
      */
     public String getEncodedPath();

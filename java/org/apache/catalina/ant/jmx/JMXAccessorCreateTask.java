@@ -67,7 +67,7 @@ public class JMXAccessorCreateTask extends JMXAccessorTask {
     // ------------------------------------------------------------- Properties
 
     /**
-     * @return Returns the classLoader.
+     * @return the classLoader.
      */
     public String getClassLoader() {
         return classLoader;
@@ -81,7 +81,7 @@ public class JMXAccessorCreateTask extends JMXAccessorTask {
     }
 
     /**
-     * @return Returns the className.
+     * @return the className.
      */
     public String getClassName() {
         return className;
@@ -99,11 +99,12 @@ public class JMXAccessorCreateTask extends JMXAccessorTask {
     }
 
     /**
-     * @return Returns the args.
+     * @return the args.
      */
     public List<Arg> getArgs() {
         return args;
     }
+
     /**
      * @param args The args to set.
      */

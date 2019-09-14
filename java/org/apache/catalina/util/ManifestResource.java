@@ -50,8 +50,6 @@ public class ManifestResource {
     }
 
     /**
-     * Gets the name of the resource
-     *
      * @return The name of the resource
      */
     public String getResourceName() {
@@ -59,8 +57,6 @@ public class ManifestResource {
     }
 
     /**
-     * Gets the list of available extensions
-     *
      * @return List of available extensions
      */
     public ArrayList<Extension> getAvailableExtensions() {
@@ -68,8 +64,6 @@ public class ManifestResource {
     }
 
     /**
-     * Gets the list of required extensions
-     *
      * @return List of required extensions
      */
     public ArrayList<Extension> getRequiredExtensions() {
@@ -79,8 +73,6 @@ public class ManifestResource {
     // --------------------------------------------------------- Public Methods
 
     /**
-     * Gets the number of available extensions
-     *
      * @return The number of available extensions
      */
     public int getAvailableExtensionCount() {
@@ -88,8 +80,6 @@ public class ManifestResource {
     }
 
     /**
-     * Gets the number of required extensions
-     *
      * @return The number of required extensions
      */
     public int getRequiredExtensionCount() {

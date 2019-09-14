@@ -927,7 +927,7 @@ public class PStmtKey {
     }
 
     /**
-     * The schema.
+     * The catalog.
      *
      * @return The catalog.
      */

@@ -25,99 +25,161 @@ package org.apache.tomcat.util.json;
  */
 public interface JSONParserConstants {
 
-  /** End of File. */
-  int EOF = 0;
-  /** RegularExpression Id. */
-  int C_SINGLE_COMMENT = 1;
-  /** RegularExpression Id. */
-  int C_MULTILINE_COMMENT = 2;
-  /** RegularExpression Id. */
-  int SH_SINGLE_COMMENT = 3;
-  /** RegularExpression Id. */
-  int WHITESPACE = 4;
-  /** RegularExpression Id. */
-  int EOL = 5;
-  /** RegularExpression Id. */
-  int COMMA = 6;
-  /** RegularExpression Id. */
-  int BRACE_OPEN = 7;
-  /** RegularExpression Id. */
-  int BRACE_CLOSE = 8;
-  /** RegularExpression Id. */
-  int COLON = 9;
-  /** RegularExpression Id. */
-  int BRACKET_OPEN = 10;
-  /** RegularExpression Id. */
-  int BRACKET_CLOSE = 11;
-  /** RegularExpression Id. */
-  int ZERO = 12;
-  /** RegularExpression Id. */
-  int DIGIT_NONZERO = 13;
-  /** RegularExpression Id. */
-  int DIGIT = 14;
-  /** RegularExpression Id. */
-  int NUMBER_INTEGER = 15;
-  /** RegularExpression Id. */
-  int NUMBER_DECIMAL = 16;
-  /** RegularExpression Id. */
-  int TRUE = 17;
-  /** RegularExpression Id. */
-  int FALSE = 18;
-  /** RegularExpression Id. */
-  int NULL = 19;
-  /** RegularExpression Id. */
-  int QUOTE_DOUBLE = 20;
-  /** RegularExpression Id. */
-  int QUOTE_SINGLE = 21;
-  /** RegularExpression Id. */
-  int STRING_SINGLE_EMPTY = 22;
-  /** RegularExpression Id. */
-  int STRING_DOUBLE_EMPTY = 23;
-  /** RegularExpression Id. */
-  int STRING_SINGLE_BODY = 24;
-  /** RegularExpression Id. */
-  int STRING_DOUBLE_BODY = 25;
-  /** RegularExpression Id. */
-  int STRING_SINGLE_NONEMPTY = 26;
-  /** RegularExpression Id. */
-  int STRING_DOUBLE_NONEMPTY = 27;
-  /** RegularExpression Id. */
-  int SYMBOL = 28;
+    /**
+     * End of File.
+     */
+    int EOF = 0;
+    /**
+     * RegularExpression Id.
+     */
+    int C_SINGLE_COMMENT = 1;
+    /**
+     * RegularExpression Id.
+     */
+    int C_MULTILINE_COMMENT = 2;
+    /**
+     * RegularExpression Id.
+     */
+    int SH_SINGLE_COMMENT = 3;
+    /**
+     * RegularExpression Id.
+     */
+    int WHITESPACE = 4;
+    /**
+     * RegularExpression Id.
+     */
+    int EOL = 5;
+    /**
+     * RegularExpression Id.
+     */
+    int COMMA = 6;
+    /**
+     * RegularExpression Id.
+     */
+    int BRACE_OPEN = 7;
+    /**
+     * RegularExpression Id.
+     */
+    int BRACE_CLOSE = 8;
+    /**
+     * RegularExpression Id.
+     */
+    int COLON = 9;
+    /**
+     * RegularExpression Id.
+     */
+    int BRACKET_OPEN = 10;
+    /**
+     * RegularExpression Id.
+     */
+    int BRACKET_CLOSE = 11;
+    /**
+     * RegularExpression Id.
+     */
+    int ZERO = 12;
+    /**
+     * RegularExpression Id.
+     */
+    int DIGIT_NONZERO = 13;
+    /**
+     * RegularExpression Id.
+     */
+    int DIGIT = 14;
+    /**
+     * RegularExpression Id.
+     */
+    int NUMBER_INTEGER = 15;
+    /**
+     * RegularExpression Id.
+     */
+    int NUMBER_DECIMAL = 16;
+    /**
+     * RegularExpression Id.
+     */
+    int TRUE = 17;
+    /**
+     * RegularExpression Id.
+     */
+    int FALSE = 18;
+    /**
+     * RegularExpression Id.
+     */
+    int NULL = 19;
+    /**
+     * RegularExpression Id.
+     */
+    int QUOTE_DOUBLE = 20;
+    /**
+     * RegularExpression Id.
+     */
+    int QUOTE_SINGLE = 21;
+    /**
+     * RegularExpression Id.
+     */
+    int STRING_SINGLE_EMPTY = 22;
+    /**
+     * RegularExpression Id.
+     */
+    int STRING_DOUBLE_EMPTY = 23;
+    /**
+     * RegularExpression Id.
+     */
+    int STRING_SINGLE_BODY = 24;
+    /**
+     * RegularExpression Id.
+     */
+    int STRING_DOUBLE_BODY = 25;
+    /**
+     * RegularExpression Id.
+     */
+    int STRING_SINGLE_NONEMPTY = 26;
+    /**
+     * RegularExpression Id.
+     */
+    int STRING_DOUBLE_NONEMPTY = 27;
+    /**
+     * RegularExpression Id.
+     */
+    int SYMBOL = 28;
 
-  /** Lexical state. */
-  int DEFAULT = 0;
+    /**
+     * Lexical state.
+     */
+    int DEFAULT = 0;
 
-  /** Literal token values. */
-  String[] tokenImage = {
-    "<EOF>",
-    "<C_SINGLE_COMMENT>",
-    "<C_MULTILINE_COMMENT>",
-    "<SH_SINGLE_COMMENT>",
-    "<WHITESPACE>",
-    "<EOL>",
-    "\",\"",
-    "\"{\"",
-    "\"}\"",
-    "\":\"",
-    "\"[\"",
-    "\"]\"",
-    "\"0\"",
-    "<DIGIT_NONZERO>",
-    "<DIGIT>",
-    "<NUMBER_INTEGER>",
-    "<NUMBER_DECIMAL>",
-    "\"true\"",
-    "\"false\"",
-    "\"null\"",
-    "\"\\\"\"",
-    "\"\\\'\"",
-    "\"\\\'\\\'\"",
-    "\"\\\"\\\"\"",
-    "<STRING_SINGLE_BODY>",
-    "<STRING_DOUBLE_BODY>",
-    "<STRING_SINGLE_NONEMPTY>",
-    "<STRING_DOUBLE_NONEMPTY>",
-    "<SYMBOL>",
-  };
+    /**
+     * Literal token values.
+     */
+    String[] tokenImage = {
+            "<EOF>",
+            "<C_SINGLE_COMMENT>",
+            "<C_MULTILINE_COMMENT>",
+            "<SH_SINGLE_COMMENT>",
+            "<WHITESPACE>",
+            "<EOL>",
+            "\",\"",
+            "\"{\"",
+            "\"}\"",
+            "\":\"",
+            "\"[\"",
+            "\"]\"",
+            "\"0\"",
+            "<DIGIT_NONZERO>",
+            "<DIGIT>",
+            "<NUMBER_INTEGER>",
+            "<NUMBER_DECIMAL>",
+            "\"true\"",
+            "\"false\"",
+            "\"null\"",
+            "\"\\\"\"",
+            "\"\\\'\"",
+            "\"\\\'\\\'\"",
+            "\"\\\"\\\"\"",
+            "<STRING_SINGLE_BODY>",
+            "<STRING_DOUBLE_BODY>",
+            "<STRING_SINGLE_NONEMPTY>",
+            "<STRING_DOUBLE_NONEMPTY>",
+            "<SYMBOL>",
+    };
 
 }

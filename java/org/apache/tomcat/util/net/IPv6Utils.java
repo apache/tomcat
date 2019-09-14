@@ -103,7 +103,6 @@ public class IPv6Utils {
          *  Two consecutive colons, initial expansion.
          *  e.g. 2001:db8:0:0:1::1 -> 2001:db8:0:0:1:0:0:1
          */
-
         StringBuilder expanded = new StringBuilder(ipv6Address);
         int colonsPos = ipv6Address.indexOf("::");
         int length = ipv6AddressLength;

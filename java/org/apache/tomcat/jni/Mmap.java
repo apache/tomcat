@@ -17,7 +17,8 @@
 
 package org.apache.tomcat.jni;
 
-/** Mmap
+/**
+ * Mmap
  *
  * @author Mladen Turk
  */

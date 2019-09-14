@@ -201,7 +201,7 @@ public class LockOutRealm extends CombinedRealm {
     }
 
 
-    /*
+    /**
      * Filters authenticated principals to ensure that <code>null</code> is
      * returned for any user that is currently locked out.
      */
@@ -236,7 +236,7 @@ public class LockOutRealm extends CombinedRealm {
         registerAuthSuccess(username);
     }
 
-    /*
+    /**
      * Checks to see if the current user is locked. If this is associated with
      * a login attempt, then the last access time will be recorded and any
      * attempt to authenticated a locked user will log a warning.
@@ -264,7 +264,7 @@ public class LockOutRealm extends CombinedRealm {
     }
 
 
-    /*
+    /**
      * After successful authentication, any record of previous authentication
      * failure is removed.
      */
@@ -274,7 +274,7 @@ public class LockOutRealm extends CombinedRealm {
     }
 
 
-    /*
+    /**
      * After a failed authentication, add the record of the failed
      * authentication.
      */

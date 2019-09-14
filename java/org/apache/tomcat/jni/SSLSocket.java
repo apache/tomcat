@@ -17,7 +17,8 @@
 
 package org.apache.tomcat.jni;
 
-/** SSL Socket
+/**
+ * SSL Socket
  *
  * @author Mladen Turk
  */

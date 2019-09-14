@@ -20,7 +20,7 @@ package org.apache.catalina.ha.backend;
 
 import java.net.InetAddress;
 
-/*
+/**
  * This class represents a front-end httpd server.
  *
  */

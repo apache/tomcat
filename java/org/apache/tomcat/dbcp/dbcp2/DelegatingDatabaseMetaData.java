@@ -300,8 +300,6 @@ public class DelegatingDatabaseMetaData implements DatabaseMetaData {
     }
 
     /**
-     * Gets the underlying database meta data.
-     *
      * @return The underlying database meta data.
      */
     public DatabaseMetaData getDelegate() {

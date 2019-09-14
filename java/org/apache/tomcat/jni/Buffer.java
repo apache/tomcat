@@ -19,7 +19,8 @@ package org.apache.tomcat.jni;
 
 import java.nio.ByteBuffer;
 
-/** Buffer
+/**
+ * Buffer
  *
  * @author Mladen Turk
  */

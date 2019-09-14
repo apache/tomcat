@@ -34,7 +34,7 @@ public class AnnotationEntry {
 
     private final List<ElementValuePair> element_value_pairs;
 
-    /*
+    /**
      * Creates an AnnotationEntry from a DataInputStream
      *
      * @param input

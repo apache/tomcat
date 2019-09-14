@@ -21,7 +21,7 @@ import java.util.Locale;
 public class JreVendor {
 
     static {
-        /**
+        /*
          * There are a few places where Tomcat either accesses JVM internals
          * (e.g. the memory leak protection) or where feature support varies
          * between JVMs (e.g. SPNEGO). These flags exist to enable Tomcat to

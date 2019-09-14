@@ -19,7 +19,6 @@ package javax.servlet.jsp.tagext;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
-
 import javax.servlet.jsp.JspWriter;
 
 /**
@@ -84,16 +83,12 @@ public abstract class BodyContent extends JspWriter {
     }
 
     /**
-     * Return the value of this BodyContent as a Reader.
-     *
-     * @return the value of this BodyContent as a Reader
+     * @return the value of this BodyContent as a Reader.
      */
     public abstract Reader getReader();
 
     /**
-     * Return the value of the BodyContent as a String.
-     *
-     * @return the value of the BodyContent as a String
+     * @return the value of the BodyContent as a String.
      */
     public abstract String getString();
 

@@ -86,8 +86,6 @@ class UserPassKey implements Serializable {
     }
 
     /**
-     * Gets the value of password.
-     *
      * @return value of password.
      */
     public String getPassword() {
@@ -95,8 +93,6 @@ class UserPassKey implements Serializable {
     }
 
     /**
-     * Gets the value of password.
-     *
      * @return value of password.
      */
     public char[] getPasswordCharArray() {
@@ -104,8 +100,6 @@ class UserPassKey implements Serializable {
     }
 
     /**
-     * Gets the value of user name.
-     *
      * @return value of user name.
      */
     public String getUsername() {

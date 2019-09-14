@@ -79,7 +79,7 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
         this.overridable = overridable;
     }
 
-    /*
+    /**
      * Ideally, fragment names will be unique. If they are not, Tomcat needs
      * to know as the action that the specification requires (see 8.2.2 1.e and
      * 2.c) varies depending on the ordering method used.

@@ -67,11 +67,12 @@ public class JMXAccessorQueryTask extends JMXAccessorTask {
     // ------------------------------------------------------------- Properties
 
     /**
-     * @return Returns the attributebinding.
+     * @return the attributebinding.
      */
     public boolean isAttributebinding() {
         return attributebinding;
     }
+
     /**
      * @param attributeBinding The attributebinding to set.
      */

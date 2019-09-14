@@ -56,7 +56,8 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
     protected static final StringManager sm =
         StringManager.getManager(Constants.Package);
 
-    /* When a request uses a sequence of multiple start(); dispatch() with
+    /**
+     * When a request uses a sequence of multiple start(); dispatch() with
      * non-container threads it is possible for a previous dispatch() to
      * interfere with a following start(). This lock prevents that from
      * happening. It is a dedicated object as user code may lock on the

@@ -130,8 +130,6 @@ public interface Container extends Lifecycle {
 
 
     /**
-     * Obtain the JMX name for this container.
-     *
      * @return the JMX name associated with this container.
      */
     public ObjectName getObjectName();
@@ -237,7 +235,7 @@ public interface Container extends Lifecycle {
     /**
      * Get the parent container.
      *
-     * @return Return the Container for which this Container is a child, if
+     * @return the Container for which this Container is a child, if
      *         there is one. If there is no defined parent, return
      *         <code>null</code>.
      */
@@ -509,16 +507,12 @@ public interface Container extends Lifecycle {
 
 
     /**
-     * Obtain the location of CATALINA_BASE.
-     *
      * @return  The location of CATALINA_BASE.
      */
     public File getCatalinaBase();
 
 
     /**
-     * Obtain the location of CATALINA_HOME.
-     *
      * @return The location of CATALINA_HOME.
      */
     public File getCatalinaHome();

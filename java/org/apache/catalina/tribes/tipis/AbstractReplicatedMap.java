@@ -70,7 +70,7 @@ public abstract class AbstractReplicatedMap<K,V>
 
     /**
      * The load factor used when none specified in constructor.
-     **/
+     */
     public static final float DEFAULT_LOAD_FACTOR = 0.75f;
 
 

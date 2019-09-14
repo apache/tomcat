@@ -338,7 +338,7 @@ public class XByteBuffer implements Serializable {
      * @return - a full package (header,size,data,footer)
      */
     public static byte[] createDataPackage(ChannelData cdata) {
-//        return createDataPackage(cdata.getDataPackage());
+        //return createDataPackage(cdata.getDataPackage());
         //avoid one extra byte array creation
         int dlength = cdata.getDataPackageLength();
         int length = getDataPackageLength(dlength);
@@ -463,7 +463,7 @@ public class XByteBuffer implements Serializable {
     }
 
     /**
-     * Converts an long to eight bytes.
+     * Converts a long to eight bytes.
      * @param n the long
      * @param b the byte buffer in which the integer will be placed
      * @param offset the offset in the byte array

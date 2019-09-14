@@ -17,7 +17,8 @@
 
 package org.apache.tomcat.jni;
 
-/** User
+/**
+ * User
  *
  * @author Mladen Turk
  */
@@ -27,7 +28,7 @@ public class User {
      * Get the userid (and groupid) of the calling process
      * This function is available only if APR_HAS_USER is defined.
      * @param p The pool from which to allocate working space
-     * @return Returns the user id
+     * @return the user id
      * @throws Error If an error occurred
      */
      public static native long uidCurrent(long p)
@@ -37,7 +38,7 @@ public class User {
      * Get the groupid of the calling process
      * This function is available only if APR_HAS_USER is defined.
      * @param p The pool from which to allocate working space
-     * @return Returns the group id
+     * @return the group id
      * @throws Error If an error occurred
      */
      public static native long gidCurrent(long p)
@@ -49,7 +50,7 @@ public class User {
      * This function is available only if APR_HAS_USER is defined.
      * @param username The username to lookup
      * @param p The pool from which to allocate working space
-     * @return Returns the user id
+     * @return the user id
      * @throws Error If an error occurred
      */
      public static native long uid(String username, long p)

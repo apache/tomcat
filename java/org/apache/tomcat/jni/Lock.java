@@ -28,7 +28,6 @@ public class Lock {
      * <br><b>Warning :</b> Check APR_HAS_foo_SERIALIZE defines to see if the platform supports
      *          APR_LOCK_foo.  Only APR_LOCK_DEFAULT is portable.
      */
-
     public static final int APR_LOCK_FCNTL        = 0; /** fcntl() */
     public static final int APR_LOCK_FLOCK        = 1; /** flock() */
     public static final int APR_LOCK_SYSVSEM      = 2; /** System V Semaphores */

@@ -43,7 +43,6 @@ import java.util.concurrent.locks.ReentrantLock;
  *
  * @param <E> Type of element in the queue
  */
-
 public class MultiLockFairBlockingQueue<E> implements BlockingQueue<E> {
 
     final int LOCK_COUNT = Runtime.getRuntime().availableProcessors();

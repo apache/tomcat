@@ -162,8 +162,6 @@ public class TransactionContext {
     }
 
     /**
-     * True if the transaction is active or marked for rollback only.
-     *
      * @return true if the transaction is active or marked for rollback only; false otherwise
      * @throws SQLException
      *             if a problem occurs obtaining the transaction status
@@ -199,8 +197,6 @@ public class TransactionContext {
     }
 
     /**
-     * Gets the transaction complete flag to true.
-     *
      * @return The transaction complete flag.
      *
      * @since 2.4.0

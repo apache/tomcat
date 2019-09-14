@@ -120,8 +120,6 @@ public class DelegatingConnection<C extends Connection> extends AbandonedTrace i
     }
 
     /**
-     * Returns my underlying {@link Connection}.
-     *
      * @return my underlying {@link Connection}.
      */
     public C getDelegate() {
@@ -373,9 +371,7 @@ public class DelegatingConnection<C extends Connection> extends AbandonedTrace i
     }
 
     /**
-     * Returns the state caching flag.
-     *
-     * @return the state caching flag
+     * @return the state caching flag.
      */
     public boolean getCacheState() {
         return cacheState;

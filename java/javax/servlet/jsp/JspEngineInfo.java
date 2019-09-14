@@ -20,7 +20,6 @@ package javax.servlet.jsp;
  * The JspEngineInfo is an abstract class that provides information on the
  * current JSP engine.
  */
-
 public abstract class JspEngineInfo {
 
     /**
@@ -44,6 +43,5 @@ public abstract class JspEngineInfo {
      *
      * @return the specification version, null is returned if it is not known
      */
-
     public abstract String getSpecificationVersion();
 }

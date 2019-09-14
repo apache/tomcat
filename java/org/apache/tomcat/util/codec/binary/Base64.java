@@ -463,7 +463,7 @@ public class Base64 extends BaseNCodec {
             // We have some spare bits remaining
             // Output all whole multiples of 8 bits and ignore the rest
             switch (context.modulus) {
-//              case 0 : // impossible, as excluded above
+                //case 0 : // impossible, as excluded above
                 case 1 : // 6 bits - ignore entirely
                     // TODO not currently tested; perhaps it is impossible?
                     break;

@@ -107,7 +107,6 @@ public final class RemoteCIDRValve extends ValveBase {
      * @param input The list of netmasks, as a comma separated string
      * @throws IllegalArgumentException One or more netmasks are invalid
      */
-
     public void setDeny(final String input) {
         final List<String> messages = fillFromInput(input, deny);
 
@@ -175,7 +174,6 @@ public final class RemoteCIDRValve extends ValveBase {
      * @param target The list to fill
      * @return a string list of processing errors (empty when no errors)
      */
-
     private List<String> fillFromInput(final String input, final List<NetMask> target) {
         target.clear();
         if (input == null || input.isEmpty()) {

@@ -204,7 +204,7 @@ class Stream extends AbstractStream implements HeaderEmitter {
     }
 
 
-    /*
+    /**
      * Used when removing closed streams from the tree and we know there is no
      * need to check for circular references.
      */
@@ -1159,7 +1159,7 @@ class Stream extends AbstractStream implements HeaderEmitter {
         }
 
 
-        /*
+        /**
          * Called after placing some data in the inBuffer.
          */
         final synchronized boolean onDataAvailable() {

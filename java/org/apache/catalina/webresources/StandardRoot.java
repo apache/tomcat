@@ -648,7 +648,7 @@ public class StandardRoot extends LifecycleMBeanBase implements WebResourceRoot 
 
 
 
-    /*
+    /**
      * Returns true if and only if all the resources for this web application
      * are provided via a packed WAR file. It is used to optimise cache
      * validation in this case on the basis that the WAR file will not change.

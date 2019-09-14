@@ -22,7 +22,8 @@ package org.apache.tomcat.util.bcel;
  */
 public final class Const {
 
-    /** One of the access flags for fields, methods, or classes.
+    /**
+     *  One of the access flags for fields, methods, or classes.
      *  @see <a href="http://docs.oracle.com/javase/specs/jvms/se8/html/jvms-4.html#jvms-4.5">
      *  Flag definitions for Fields in the Java Virtual Machine Specification (Java SE 8 Edition).</a>
      *  @see <a href="http://docs.oracle.com/javase/specs/jvms/se8/html/jvms-4.html#jvms-4.6">
@@ -32,15 +33,18 @@ public final class Const {
      */
     public static final short ACC_FINAL      = 0x0010;
 
-    /** One of the access flags for fields, methods, or classes.
+    /**
+     * One of the access flags for fields, methods, or classes.
      */
     public static final short ACC_INTERFACE    = 0x0200;
 
-    /** One of the access flags for fields, methods, or classes.
+    /**
+     * One of the access flags for fields, methods, or classes.
      */
     public static final short ACC_ABSTRACT     = 0x0400;
 
-    /** One of the access flags for fields, methods, or classes.
+    /**
+     * One of the access flags for fields, methods, or classes.
      */
     public static final short ACC_ANNOTATION   = 0x2000;
 

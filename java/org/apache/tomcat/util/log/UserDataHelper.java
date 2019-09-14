@@ -109,7 +109,7 @@ public class UserDataHelper {
     }
 
 
-    /*
+    /**
      * Not completely thread-safe but good enough for this use case. I couldn't
      * see a simple enough way to make it completely thread-safe that was not
      * likely to compromise performance.

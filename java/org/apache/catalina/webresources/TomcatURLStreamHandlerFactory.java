@@ -86,7 +86,6 @@ public class TomcatURLStreamHandlerFactory implements URLStreamHandlerFactory {
      *         successfully disabled as a result of this call.
      *         <code>false</code> if the factory was already registered prior
      *         to this call.
-
      */
     public static boolean disable() {
         return !getInstanceInternal(false).isRegistered();

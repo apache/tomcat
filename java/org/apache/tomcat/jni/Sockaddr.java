@@ -17,13 +17,14 @@
 
 package org.apache.tomcat.jni;
 
-/** Sockaddr
+/**
+ * Sockaddr
  *
  * @author Mladen Turk
  */
 public class Sockaddr {
 
-   /** The pool to use... */
+    /** The pool to use... */
     public long pool;
     /** The hostname */
     public String hostname;

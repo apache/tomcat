@@ -16,13 +16,14 @@
  */
 package org.apache.tomcat.jni;
 
-/** Poll
+/**
+ * Poll
  *
  * @author Mladen Turk
  */
 public class Poll {
 
-    /**
+    /*
      * Poll return values
      */
     /** Can read without blocking */
@@ -38,14 +39,15 @@ public class Poll {
     /** Descriptor invalid */
     public static final int APR_POLLNVAL = 0x040;
 
-    /**
+    /*
      * Pollset Flags
      */
     /** Adding or Removing a Descriptor is thread safe */
     public static final int APR_POLLSET_THREADSAFE = 0x001;
 
 
-    /** Used in apr_pollfd_t to determine what the apr_descriptor is
+    /**
+     * Used in apr_pollfd_t to determine what the apr_descriptor is
      * apr_datatype_e enum
      */
     public static final int APR_NO_DESC       = 0; /** nothing here */

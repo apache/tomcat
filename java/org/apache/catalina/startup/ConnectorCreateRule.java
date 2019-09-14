@@ -35,7 +35,6 @@ import org.xml.sax.Attributes;
 /**
  * Rule implementation that creates a connector.
  */
-
 public class ConnectorCreateRule extends Rule {
 
     private static final Log log = LogFactory.getLog(ConnectorCreateRule.class);

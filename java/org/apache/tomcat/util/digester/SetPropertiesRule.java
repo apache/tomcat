@@ -27,7 +27,6 @@ import org.xml.sax.Attributes;
  * <p>Rule implementation that sets properties on the object at the top of the
  * stack, based on attributes with corresponding names.</p>
  */
-
 public class SetPropertiesRule extends Rule {
 
     public interface Listener {

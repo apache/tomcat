@@ -18,8 +18,6 @@
 
 package org.apache.catalina.ha.backend;
 
-/* for MBean to read ready and busy */
-
 import java.util.Set;
 
 import javax.management.MBeanServer;
@@ -29,12 +27,8 @@ import javax.management.ObjectName;
 import org.apache.tomcat.util.modeler.Registry;
 import org.apache.tomcat.util.res.StringManager;
 
-/*
- * Listener to provider informations to mod_heartbeat.c
- * *msg_format = "v=%u&ready=%u&busy=%u"; (message to send).
- * send the multicast message using the format...
- * what about the bind(IP. port) only IP makes sense (for the moment).
- * BTW:v  = version :-)
+/**
+ * for MBean to read ready and busy.
  */
 public class CollectedInfo {
 

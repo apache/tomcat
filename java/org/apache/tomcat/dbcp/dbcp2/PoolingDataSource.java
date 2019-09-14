@@ -152,8 +152,6 @@ public class PoolingDataSource<C extends Connection> implements DataSource, Auto
     }
 
     /**
-     * Throws {@link UnsupportedOperationException}
-     *
      * @throws UnsupportedOperationException
      *             always thrown
      */
@@ -163,8 +161,6 @@ public class PoolingDataSource<C extends Connection> implements DataSource, Auto
     }
 
     /**
-     * Returns my log writer.
-     *
      * @return my log writer
      * @see DataSource#getLogWriter
      */
@@ -174,8 +170,6 @@ public class PoolingDataSource<C extends Connection> implements DataSource, Auto
     }
 
     /**
-     * Throws {@link UnsupportedOperationException}.
-     *
      * @throws UnsupportedOperationException
      *             As this implementation does not support this feature.
      */
@@ -185,8 +179,6 @@ public class PoolingDataSource<C extends Connection> implements DataSource, Auto
     }
 
     /**
-     * Throws {@link UnsupportedOperationException}.
-     *
      * @throws UnsupportedOperationException
      *             As this implementation does not support this feature.
      */

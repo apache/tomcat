@@ -210,18 +210,14 @@ public class VariableInfo {
     // Accessor methods
 
     /**
-     * Returns the name of the scripting variable.
-     *
-     * @return the name of the scripting variable
+     * @return the name of the scripting variable.
      */
     public String getVarName() {
         return varName;
     }
 
     /**
-     * Returns the type of this variable.
-     *
-     * @return the type of this variable
+     * @return the type of this variable.
      */
     public String getClassName() {
         return className;
@@ -250,7 +246,7 @@ public class VariableInfo {
         return scope;
     }
 
-    // == private data
+    //  private data
     private final String varName;
     private final String className;
     private final boolean declare;

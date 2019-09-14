@@ -51,9 +51,7 @@ public abstract class TagLibraryInfo {
     }
 
     /**
-     * The prefix assigned to this taglib from the taglib directive
-     *
-     * @return the prefix assigned to this taglib from the taglib directive
+     * @return the prefix assigned to this taglib from the taglib directive.
      */
     public String getPrefixString() {
         return prefix;

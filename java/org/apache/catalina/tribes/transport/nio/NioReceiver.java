@@ -270,11 +270,11 @@ public class NioReceiver extends ReceiverBase implements Runnable, NioReceiverMB
                     //selector wakeup().
                     //if that happens, we must ensure that that
                     //thread has enough time to call interestOps
-//                    synchronized (interestOpsMutex) {
+                    //synchronized (interestOpsMutex) {
                         //if we got the lock, means there are no
                         //keys trying to register for the
                         //interestOps method
-//                    }
+                    //}
                     continue; // nothing to do
                 }
                 // get an iterator over the set of selected keys

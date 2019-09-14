@@ -53,36 +53,28 @@ public final class ErrorData {
     }
 
     /**
-     * Returns the Throwable that caused the error.
-     *
-     * @return The Throwable that caused the error
+     * @return The Throwable that caused the error.
      */
     public Throwable getThrowable() {
         return this.throwable;
     }
 
     /**
-     * Returns the status code of the error.
-     *
-     * @return The status code of the error
+     * @return The status code of the error.
      */
     public int getStatusCode() {
         return this.statusCode;
     }
 
     /**
-     * Returns the request URI.
-     *
-     * @return The request URI
+     * @return The request URI.
      */
     public String getRequestURI() {
         return this.uri;
     }
 
     /**
-     * Returns the name of the servlet invoked.
-     *
-     * @return The name of the servlet invoked
+     * @return The name of the servlet invoked.
      */
     public String getServletName() {
         return this.servletName;

@@ -185,7 +185,7 @@ public final class ExtensionValidator {
 
 
     /**
-     * Validates a <code>ArrayList</code> of <code>ManifestResource</code>
+     * Validates an <code>ArrayList</code> of <code>ManifestResource</code>
      * objects. This method requires an application name (which is the
      * context root of the application at runtime).
      *
@@ -271,7 +271,7 @@ public final class ExtensionValidator {
         return passes;
     }
 
-   /*
+   /**
     * Build this list of available extensions so that we do not have to
     * re-build this list every time we iterate through the list of required
     * extensions. All available extensions in all of the

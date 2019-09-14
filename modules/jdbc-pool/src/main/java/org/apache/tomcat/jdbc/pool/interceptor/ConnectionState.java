@@ -38,7 +38,6 @@ import org.apache.tomcat.jdbc.pool.PooledConnection;
  * state, and it also avoids roundtrips to the database asking for it.
  *
  */
-
 public class ConnectionState extends JdbcInterceptor  {
     private static final Log log = LogFactory.getLog(ConnectionState.class);
 

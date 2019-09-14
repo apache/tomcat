@@ -234,7 +234,7 @@ public class OneLineFormatter extends Formatter {
     }
 
 
-    /*
+    /**
      * Minimal implementation to indent the printing of stack traces. This
      * implementation depends on Throwable using WrappedPrintWriter.
      */

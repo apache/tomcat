@@ -64,9 +64,6 @@ public interface FileItemStream extends FileItemHeadersSupport {
     InputStream openStream() throws IOException;
 
     /**
-     * Returns the content type passed by the browser or <code>null</code> if
-     * not defined.
-     *
      * @return The content type passed by the browser or <code>null</code> if
      *         not defined.
      */

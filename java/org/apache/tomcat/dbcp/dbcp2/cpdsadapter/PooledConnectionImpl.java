@@ -80,7 +80,9 @@ class PooledConnectionImpl
      */
     private boolean closed;
 
-    /** My pool of {@link PreparedStatement}s. */
+    /**
+     * My pool of {@link PreparedStatement}s.
+     */
     private KeyedObjectPool<PStmtKey, DelegatingPreparedStatement> pStmtPool;
 
     /**

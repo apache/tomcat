@@ -34,7 +34,7 @@ public class TestGzipOutputFilter {
 
     /*
      * Test the interaction between gzip and flushing. The idea is to: 1. create
-     * a internal output buffer, response, and attach an active gzipoutputfilter
+     * an internal output buffer, response, and attach an active gzipoutputfilter
      * to the output buffer 2. set the output stream of the internal buffer to
      * be a ByteArrayOutputStream so we can inspect the output bytes 3. write a
      * chunk out using the gzipoutputfilter and invoke a flush on the

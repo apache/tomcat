@@ -645,9 +645,6 @@ public class ELSupport {
         return false;
     }
 
-    /**
-     *
-     */
     public ELSupport() {
         super();
     }

@@ -20,7 +20,8 @@ package org.apache.tomcat.jni;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-/** SSL Context
+/**
+ * SSL Context
  *
  * @author Mladen Turk
  */

@@ -283,8 +283,7 @@ public class MessageDispatchInterceptor extends ChannelInterceptorBase
 
     // ---------------------------------------------- stats of the thread pool
     /**
-     * Return the current number of threads that are managed by the pool.
-     * @return the current number of threads that are managed by the pool
+     * @return the current number of threads that are managed by the pool.
      */
     @Override
     public int getPoolSize() {
@@ -296,8 +295,7 @@ public class MessageDispatchInterceptor extends ChannelInterceptorBase
     }
 
     /**
-     * Return the current number of threads that are in use.
-     * @return the current number of threads that are in use
+     * @return the current number of threads that are in use.
      */
     @Override
     public int getActiveCount() {
@@ -309,8 +307,7 @@ public class MessageDispatchInterceptor extends ChannelInterceptorBase
     }
 
     /**
-     * Return the total number of tasks that have ever been scheduled for execution by the pool.
-     * @return the total number of tasks that have ever been scheduled for execution by the pool
+     * @return the total number of tasks that have ever been scheduled for execution by the pool.
      */
     @Override
     public long getTaskCount() {
@@ -322,8 +319,7 @@ public class MessageDispatchInterceptor extends ChannelInterceptorBase
     }
 
     /**
-     * Return the total number of tasks that have completed execution by the pool.
-     * @return the total number of tasks that have completed execution by the pool
+     * @return the total number of tasks that have completed execution by the pool.
      */
     @Override
     public long getCompletedTaskCount() {

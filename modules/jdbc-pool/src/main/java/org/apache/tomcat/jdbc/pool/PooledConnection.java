@@ -74,7 +74,7 @@ public class PooledConnection implements PooledConnectionMBean {
     private volatile java.sql.Connection connection;
 
     /**
-     * If using a XAConnection underneath.
+     * If using an XAConnection underneath.
      */
     protected volatile javax.sql.XAConnection xaConnection;
     /**
@@ -349,9 +349,7 @@ public class PooledConnection implements PooledConnectionMBean {
     }
 
     /**
-     * Returns true if the connection has been connected more than
-     * {@link PoolConfiguration#getMaxAge()} milliseconds. false otherwise.
-     * @return Returns true if the connection has been connected more than
+     * @return true if the connection has been connected more than
      * {@link PoolConfiguration#getMaxAge()} milliseconds. false otherwise.
      */
     @Override
@@ -407,7 +405,6 @@ public class PooledConnection implements PooledConnectionMBean {
 //============================================================================
 
     /**
-     * Returns abandon timeout in milliseconds
      * @return abandon timeout in milliseconds
      */
     public long getAbandonTimeout() {
@@ -682,7 +679,6 @@ public class PooledConnection implements PooledConnectionMBean {
     }
 
     /**
-     * Returns the discarded flag.
      * @return the discarded flag. If the value is true,
      * either {@link #disconnect(boolean)} has been called or it will be called when the connection is returned to the pool.
      */
@@ -692,7 +688,6 @@ public class PooledConnection implements PooledConnectionMBean {
     }
 
     /**
-     * Returns the timestamp of the last successful validation query execution.
      * @return the timestamp of the last successful validation query execution as defined by {@link System#currentTimeMillis()}
      */
     @Override
@@ -701,8 +696,7 @@ public class PooledConnection implements PooledConnectionMBean {
     }
 
     /**
-     * Returns the configuration for this connection and pool
-     * @return the configuration for this connection and pool
+     * @return the configuration for this connection and pool.
      */
     public PoolConfiguration getPoolProperties() {
         return poolProperties;
@@ -733,8 +727,7 @@ public class PooledConnection implements PooledConnectionMBean {
     }
 
     /**
-     * Returns the underlying connection
-     * @return the underlying JDBC connection as it was returned from the JDBC driver
+     * @return the underlying JDBC connection as it was returned from the JDBC driver.
      * @see javax.sql.PooledConnection#getConnection()
      */
     public java.sql.Connection getConnection() {
@@ -742,8 +735,7 @@ public class PooledConnection implements PooledConnectionMBean {
     }
 
     /**
-     * Returns the underlying XA connection
-     * @return the underlying XA connection as it was returned from the Datasource
+     * @return the underlying XA connection as it was returned from the Datasource.
      */
     public javax.sql.XAConnection getXAConnection() {
         return this.xaConnection;

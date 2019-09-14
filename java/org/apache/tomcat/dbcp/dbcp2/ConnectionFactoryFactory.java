@@ -21,7 +21,7 @@ import java.sql.Driver;
 import java.sql.SQLException;
 import java.util.Properties;
 
-/*
+/**
  * Creates {@link ConnectionFactory} instances.
  *
  * @since 2.7.0

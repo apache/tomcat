@@ -1105,8 +1105,6 @@ public abstract class FileUploadBase {
         }
 
         /**
-         * Retrieves the actual size of the request.
-         *
          * @return The actual size of the request.
          * @since 1.3
          */
@@ -1115,8 +1113,6 @@ public abstract class FileUploadBase {
         }
 
         /**
-         * Retrieves the permitted size of the request.
-         *
          * @return The permitted size of the request.
          * @since 1.3
          */
@@ -1230,8 +1226,6 @@ public abstract class FileUploadBase {
     }
 
     /**
-     * Returns the progress listener.
-     *
      * @return The progress listener, if any, or null.
      */
     public ProgressListener getProgressListener() {

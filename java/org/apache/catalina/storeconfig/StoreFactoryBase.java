@@ -56,7 +56,7 @@ public class StoreFactoryBase implements IStoreFactory {
     }
 
     /**
-     * @return Returns the storeAppender.
+     * @return the storeAppender.
      */
     @Override
     public StoreAppender getStoreAppender() {
@@ -176,7 +176,7 @@ public class StoreFactoryBase implements IStoreFactory {
     }
 
     /**
-     * Save a array of elements.
+     * Save an array of elements.
      * @param aWriter Current output writer
      * @param indent Indentation level
      * @param elements Array of elements

@@ -916,8 +916,8 @@ public class Tomcat {
     }
 
 
-    /*
-     * Uses essentially the same logic as {@link ContainerBase#logName()}.
+    /**
+     * Uses essentially the same logic as {@link ContainerBase#getLogName()}.
      */
     private String getLoggerName(Host host, String contextName) {
         if (host == null) {

@@ -1545,7 +1545,7 @@ public final class Mapper {
     }
 
 
-    /*
+    /**
      * To simplify the mapping process, wild card hosts take the form
      * ".apache.org" rather than "*.apache.org" internally. However, for ease
      * of use the external form remains "*.apache.org". Any host name passed

@@ -17,7 +17,8 @@
 
 package org.apache.tomcat.jni;
 
-/** Windows Registry support
+/**
+ * Windows Registry support
  *
  * @author Mladen Turk
  */
@@ -50,7 +51,7 @@ public class Registry {
     public static final int REG_QWORD               = 5;
     public static final int REG_SZ                  = 6;
 
-     /**
+    /**
      * Create or open a Registry Key.
      * @param name Registry Subkey to open
      * @param root Root key, one of HKEY_*
@@ -62,7 +63,7 @@ public class Registry {
     public static native long create(int root, String name, int sam, long pool)
         throws Error;
 
-     /**
+    /**
      * Opens the specified Registry Key.
      * @param name Registry Subkey to open
      * @param root Root key, one of HKEY_*
@@ -147,7 +148,6 @@ public class Registry {
     public static native byte[] getValueB(long key, String name)
         throws Error;
 
-
     /**
      * Set the Registry value for REG_DWORD
      * @param key The Registry key descriptor to use.
@@ -184,7 +184,7 @@ public class Registry {
      */
     public static native int setValueE(long key, String name, String val);
 
-     /**
+    /**
      * Set the Registry value for REG_MULTI_SZ
      * @param key The Registry key descriptor to use.
      * @param name The name of the value to set
@@ -193,7 +193,7 @@ public class Registry {
      */
     public static native int setValueA(long key, String name, String[] val);
 
-     /**
+    /**
      * Set the Registry value for REG_BINARY
      * @param key The Registry key descriptor to use.
      * @param name The name of the value to set
@@ -220,7 +220,7 @@ public class Registry {
     public static native String[] enumValues(long key)
         throws Error;
 
-     /**
+    /**
      * Delete the Registry value
      * @param key The Registry key descriptor to use.
      * @param name The name of the value to delete
@@ -228,7 +228,7 @@ public class Registry {
      */
     public static native int deleteValue(long key, String name);
 
-     /**
+    /**
      * Delete the Registry subkey
      * @param root Root key, one of HKEY_*
      * @param name Subkey to delete

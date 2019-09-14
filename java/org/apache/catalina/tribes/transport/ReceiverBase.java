@@ -166,7 +166,7 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
     }
 
     /**
-     * @return Returns the bind.
+     * @return the bind.
      */
     public InetAddress getBind() {
         if (bind == null) {

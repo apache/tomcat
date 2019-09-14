@@ -118,8 +118,6 @@ public interface Jar extends AutoCloseable {
     String getURL(String entry);
 
     /**
-     * Obtain the manifest for the JAR file.
-     *
      * @return The manifest for this JAR file.
      *
      * @throws IOException If an I/O error occurs trying to obtain the manifest

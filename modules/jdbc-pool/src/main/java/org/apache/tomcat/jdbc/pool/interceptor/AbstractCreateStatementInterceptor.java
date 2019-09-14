@@ -124,7 +124,7 @@ public abstract class  AbstractCreateStatementInterceptor extends JdbcIntercepto
      *
      * @param method the method being invoked on the proxy
      * @param process boolean result used for recursion
-     * @return returns true if the method name matched
+     * @return true if the method name matched
      */
     protected boolean isStatement(Method method, boolean process){
         return process(STATEMENT_TYPES, method, process);
@@ -135,18 +135,18 @@ public abstract class  AbstractCreateStatementInterceptor extends JdbcIntercepto
      *
      * @param method the method being invoked on the proxy
      * @param process boolean result used for recursion
-     * @return returns true if the method name matched
+     * @return true if the method name matched
      */
     protected boolean isExecute(Method method, boolean process){
         return process(EXECUTE_TYPES, method, process);
     }
 
-    /*
+    /**
      * Returns true if the method that is being invoked matches one of the method names passed in
      * @param names list of method names that we want to intercept
      * @param method the method being invoked on the proxy
      * @param process boolean result used for recursion
-     * @return returns true if the method name matched
+     * @return true if the method name matched
      */
     protected boolean process(String[] names, Method method, boolean process) {
         final String name = method.getName();

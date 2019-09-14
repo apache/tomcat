@@ -27,7 +27,6 @@ import java.util.Hashtable;
  * getVariableInfo methods of TagExtraInfo, which are invoked at
  * translation time.
  */
-
 public class TagData implements Cloneable {
 
     /**
@@ -35,7 +34,6 @@ public class TagData implements Cloneable {
      * is a request-time expression (which is not yet available because
      * TagData instances are used at translation-time).
      */
-
     public static final Object REQUEST_TIME_VALUE = new Object();
 
 
@@ -51,7 +49,6 @@ public class TagData implements Cloneable {
      *
      * All values must be Strings except for those holding the
      * distinguished object REQUEST_TIME_VALUE.
-
      * @param atts the static attribute and values.  May be null.
      */
     public TagData(Object[] atts[]) {
@@ -86,7 +83,6 @@ public class TagData implements Cloneable {
      * @return the value of the tag's id attribute, or null if no such
      *     attribute was specified.
      */
-
     public String getId() {
         return getAttributeString(TagAttributeInfo.ID);
     }
@@ -106,7 +102,6 @@ public class TagData implements Cloneable {
      * @param attName the name of the attribute
      * @return the attribute's value
      */
-
     public Object getAttribute(String attName) {
         return attributes.get(attName);
     }
@@ -129,7 +124,6 @@ public class TagData implements Cloneable {
      * @return the attribute value string
      * @throws ClassCastException if attribute value is not a String
      */
-
     public String getAttributeString(String attName) {
         Object o = attributes.get(attName);
         if (o == null) {
@@ -148,6 +142,5 @@ public class TagData implements Cloneable {
     }
 
     // private data
-
     private final Hashtable<String, Object> attributes;        // the tagname/value map
 }

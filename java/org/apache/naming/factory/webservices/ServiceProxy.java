@@ -98,7 +98,7 @@ public class ServiceProxy implements InvocationHandler {
 
     /**
      * @param args Method call arguments
-     * @return Returns the correct Port
+     * @return the correct Port
      * @throws ServiceException if port's QName is an unknown Port (not defined in WSDL).
      */
     private Object getProxyPortQNameClass(Object[] args) throws ServiceException {
@@ -127,7 +127,7 @@ public class ServiceProxy implements InvocationHandler {
 
     /**
      * @param args Method call arguments
-     * @return Returns the correct Port
+     * @return the correct Port
      * @throws ServiceException if port's QName is an unknown Port
      */
     private Remote getProxyPortClass(Object[] args) throws ServiceException {

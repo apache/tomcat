@@ -94,15 +94,11 @@ public interface FileItem extends FileItemHeadersSupport {
     boolean isInMemory();
 
     /**
-     * Returns the size of the file item.
-     *
      * @return The size of the file item, in bytes.
      */
     long getSize();
 
     /**
-     * Returns the contents of the file item as an array of bytes.
-     *
      * @return The contents of the file item as an array of bytes.
      */
     byte[] get();
@@ -191,9 +187,6 @@ public interface FileItem extends FileItemHeadersSupport {
     void setFormField(boolean state);
 
     /**
-     * Returns an {@link java.io.OutputStream OutputStream} that can
-     * be used for storing the contents of the file.
-     *
      * @return An {@link java.io.OutputStream OutputStream} that can be used
      *         for storing the contensts of the file.
      *

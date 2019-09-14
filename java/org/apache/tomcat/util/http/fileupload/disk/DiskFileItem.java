@@ -201,8 +201,6 @@ public class DiskFileItem
     }
 
     /**
-     * Returns the content type passed by the agent or <code>null</code> if
-     * not defined.
      *
      * @return The content type passed by the agent or <code>null</code> if
      *         not defined.
@@ -213,9 +211,6 @@ public class DiskFileItem
     }
 
     /**
-     * Returns the content charset passed by the agent or <code>null</code> if
-     * not defined.
-     *
      * @return The content charset passed by the agent or <code>null</code> if
      *         not defined.
      */
@@ -228,8 +223,6 @@ public class DiskFileItem
     }
 
     /**
-     * Returns the original file name in the client's file system.
-     *
      * @return The original file name in the client's file system.
      * @throws org.apache.tomcat.util.http.fileupload.InvalidFileNameException
      *   The file name contains a NUL character, which might be an indicator of
@@ -260,8 +253,6 @@ public class DiskFileItem
     }
 
     /**
-     * Returns the size of the file.
-     *
      * @return The size of the file, in bytes.
      */
     @Override
@@ -604,8 +595,6 @@ public class DiskFileItem
     }
 
     /**
-     * Returns a string representation of this object.
-     *
      * @return a string representation of this object.
      */
     @Override
@@ -616,7 +605,6 @@ public class DiskFileItem
     }
 
     /**
-     * Returns the file item headers.
      * @return The file items headers.
      */
     @Override

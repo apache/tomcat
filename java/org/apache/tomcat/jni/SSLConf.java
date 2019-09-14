@@ -17,7 +17,8 @@
 
 package org.apache.tomcat.jni;
 
-/** SSL Conf
+/**
+ * SSL Conf
  */
 public final class SSLConf {
 

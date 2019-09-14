@@ -30,7 +30,7 @@ import org.apache.catalina.util.LifecycleBase;
 
 /**
  * A {@link WebResourceSet} implementation that is not backed by a file system
- * and behaves as if it has no resources available. This is  primarily used in
+ * and behaves as if it has no resources available. This is primarily used in
  * embedded mode when the web application is configured entirely
  * programmatically and does not use any static resources from the file system.
  */

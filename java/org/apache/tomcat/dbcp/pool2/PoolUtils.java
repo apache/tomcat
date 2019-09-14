@@ -557,8 +557,6 @@ public final class PoolUtils {
     }
 
     /**
-     * Gets the <code>Timer</code> for checking keyedPool's idle count.
-     *
      * @return the {@link Timer} for checking keyedPool's idle count.
      */
     private static Timer getMinIdleTimer() {
@@ -1667,8 +1665,6 @@ public final class PoolUtils {
         }
 
         /**
-         * Returns the eroding factor for the given key
-         *
          * @param key
          *            key
          * @return eroding factor for the given keyed pool

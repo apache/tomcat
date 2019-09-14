@@ -54,8 +54,6 @@ public abstract class Rule {
     // ------------------------------------------------------------- Properties
 
     /**
-     * Identify the Digester with which this Rule is associated.
-     *
      * @return the Digester with which this Rule is associated.
      */
     public Digester getDigester() {
@@ -75,8 +73,6 @@ public abstract class Rule {
 
 
     /**
-     * Return the namespace URI for which this Rule is relevant, if any.
-     *
      * @return The namespace URI for which this rule is relevant or
      *         <code>null</code> if none.
      */

@@ -46,8 +46,6 @@ public class SQLExceptionList extends SQLException {
     }
 
     /**
-     * Gets the cause list.
-     *
      * @return The list of causes.
      */
     public List<? extends Throwable> getCauseList() {

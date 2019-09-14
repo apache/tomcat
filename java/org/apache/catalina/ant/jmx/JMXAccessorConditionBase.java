@@ -38,106 +38,122 @@ public abstract class JMXAccessorConditionBase extends ProjectComponent implemen
     private String ref = "jmx.server" ;
 
     /**
-     * @return Returns the attribute.
+     * @return the attribute.
      */
     public String getAttribute() {
         return attribute;
     }
+
     /**
      * @param attribute The attribute to set.
      */
     public void setAttribute(String attribute) {
         this.attribute = attribute;
     }
+
     /**
-     * @return Returns the host.
+     * @return the host.
      */
     public String getHost() {
         return host;
     }
+
     /**
      * @param host The host to set.
      */
     public void setHost(String host) {
         this.host = host;
     }
+
     /**
-     * @return Returns the name.
+     * @return the name.
      */
     public String getName() {
         return name;
     }
+
     /**
      * @param objectName The name to set.
      */
     public void setName(String objectName) {
         this.name = objectName;
     }
+
     /**
-     * @return Returns the password.
+     * @return the password.
      */
     public String getPassword() {
         return password;
     }
+
     /**
      * @param password The password to set.
      */
     public void setPassword(String password) {
         this.password = password;
     }
+
     /**
-     * @return Returns the port.
+     * @return the port.
      */
     public String getPort() {
         return port;
     }
+
     /**
      * @param port The port to set.
      */
     public void setPort(String port) {
         this.port = port;
     }
+
     /**
-     * @return Returns the url.
+     * @return the url.
      */
     public String getUrl() {
         return url;
     }
+
     /**
      * @param url The url to set.
      */
     public void setUrl(String url) {
         this.url = url;
     }
+
     /**
-     * @return Returns the username.
+     * @return the username.
      */
     public String getUsername() {
         return username;
     }
+
     /**
      * @param username The username to set.
      */
     public void setUsername(String username) {
         this.username = username;
     }
+
     /**
-     * @return Returns the value.
+     * @return the value.
      */
     public String getValue() {
         return value;
     }
+
     // The setter for the "value" attribute
     public void setValue(String value) {
         this.value = value;
     }
 
     /**
-     * @return Returns the ref.
+     * @return the ref.
      */
     public String getRef() {
         return ref;
     }
+
     /**
      * @param refId The ref to set.
      */

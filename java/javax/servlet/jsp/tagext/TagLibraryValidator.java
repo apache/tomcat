@@ -79,7 +79,6 @@ import java.util.Map;
  * implementation must rely on the uri, not the prefix, of the <code>id</code>
  * attribute.
  */
-
 public abstract class TagLibraryValidator {
 
     /**

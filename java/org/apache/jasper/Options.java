@@ -184,7 +184,7 @@ public interface Options {
     public JspConfig getJspConfig();
 
     /**
-     * @return <code>true</code> to generate a X-Powered-By response header.
+     * @return <code>true</code> to generate an X-Powered-By response header.
      */
     public boolean isXpoweredBy();
 

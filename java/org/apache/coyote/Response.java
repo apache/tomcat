@@ -429,9 +429,10 @@ public final class Response {
     }
 
 
-    /** Signal that we're done with the headers, and body will follow.
-     *  Any implementation needs to notify ContextManager, to allow
-     *  interceptors to fix headers.
+    /**
+     * Signal that we're done with the headers, and body will follow.
+     * Any implementation needs to notify ContextManager, to allow
+     * interceptors to fix headers.
      */
     public void sendHeaders() {
         action(ActionCode.COMMIT, this);
@@ -656,7 +657,7 @@ public final class Response {
         return outputBuffer.getBytesWritten();
     }
 
-    /*
+    /**
      * State for non-blocking output is maintained here as it is the one point
      * easily reachable from the CoyoteOutputStream and the Processor which both
      * need access to state.

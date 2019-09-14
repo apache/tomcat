@@ -42,8 +42,6 @@ public class TooManyActiveSessionsException extends IllegalStateException {
     }
 
     /**
-     * Gets the maximum number of sessions allowed by the session manager.
-     *
      * @return The maximum number of sessions allowed by the session manager.
      */
     public int getMaxActiveSessions() {

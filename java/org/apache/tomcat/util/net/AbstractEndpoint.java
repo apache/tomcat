@@ -417,8 +417,6 @@ public abstract class AbstractEndpoint<S,U> {
     public void setAcceptorThreadCount(int acceptorThreadCount) {}
 
     /**
-     * Always returns 1.
-     *
      * @return Always 1.
      *
      * @deprecated Will be removed in Tomcat 10.
@@ -606,8 +604,6 @@ public abstract class AbstractEndpoint<S,U> {
 
 
     /**
-     * Socket TCP no delay.
-     *
      * @return The current TCP no delay setting for sockets created by this
      *         endpoint
      */
@@ -616,8 +612,6 @@ public abstract class AbstractEndpoint<S,U> {
 
 
     /**
-     * Socket linger.
-     *
      * @return The current socket linger time for sockets created by this
      *         endpoint
      */
@@ -629,8 +623,6 @@ public abstract class AbstractEndpoint<S,U> {
 
 
     /**
-     * Socket timeout.
-     *
      * @return The current socket timeout for sockets created by this endpoint
      */
     public int getConnectionTimeout() { return socketProperties.getSoTimeout(); }
@@ -852,9 +844,7 @@ public abstract class AbstractEndpoint<S,U> {
     }
 
     /**
-     * Return the amount of threads that are managed by the pool.
-     *
-     * @return the amount of threads that are managed by the pool
+     * @return the amount of threads that are managed by the pool.
      */
     public int getCurrentThreadCount() {
         Executor executor = this.executor;
@@ -872,9 +862,7 @@ public abstract class AbstractEndpoint<S,U> {
     }
 
     /**
-     * Return the amount of threads that are in use
-     *
-     * @return the amount of threads that are in use
+     * @return the amount of threads that are in use.
      */
     public int getCurrentThreadsBusy() {
         Executor executor = this.executor;

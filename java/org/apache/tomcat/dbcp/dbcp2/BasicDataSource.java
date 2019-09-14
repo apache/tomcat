@@ -683,8 +683,6 @@ public class BasicDataSource implements DataSource, BasicDataSourceMXBean, MBean
     }
 
     /**
-     * Gets the print writer used by this configuration to log information on abandoned objects.
-     *
      * @return The print writer used by this configuration to log information on abandoned objects.
      */
     public PrintWriter getAbandonedLogWriter() {
@@ -721,8 +719,6 @@ public class BasicDataSource implements DataSource, BasicDataSourceMXBean, MBean
     }
 
     /**
-     * Returns the state caching flag.
-     *
      * @return the state caching flag
      */
     @Override
@@ -771,7 +767,6 @@ public class BasicDataSource implements DataSource, BasicDataSourceMXBean, MBean
     }
 
     /**
-     * Returns the ConnectionFactoryClassName that has been configured for use by this pool.
      * <p>
      * Note: This getter only returns the last value set by a call to {@link #setConnectionFactoryClassName(String)}.
      * </p>
@@ -815,9 +810,7 @@ public class BasicDataSource implements DataSource, BasicDataSourceMXBean, MBean
     }
 
     /**
-     * Returns the default auto-commit property.
-     *
-     * @return true if default auto-commit is enabled
+     * @return true if default auto-commit is enabled.
      */
     @Override
     public Boolean getDefaultAutoCommit() {
@@ -825,9 +818,7 @@ public class BasicDataSource implements DataSource, BasicDataSourceMXBean, MBean
     }
 
     /**
-     * Returns the default catalog.
-     *
-     * @return the default catalog
+     * @return the default catalog.
      */
     @Override
     public String getDefaultCatalog() {
@@ -845,9 +836,7 @@ public class BasicDataSource implements DataSource, BasicDataSourceMXBean, MBean
     }
 
     /**
-     * Returns the default readOnly property.
-     *
-     * @return true if connections are readOnly by default
+     * @return true if connections are readOnly by default.
      */
     @Override
     public Boolean getDefaultReadOnly() {
@@ -855,8 +844,6 @@ public class BasicDataSource implements DataSource, BasicDataSourceMXBean, MBean
     }
 
     /**
-     * Returns the default schema.
-     *
      * @return the default schema.
      * @since 2.5.0
      */
@@ -903,7 +890,6 @@ public class BasicDataSource implements DataSource, BasicDataSourceMXBean, MBean
     }
 
     /**
-     * Returns the JDBC Driver that has been configured for use by this pool.
      * <p>
      * Note: This getter only returns the last value set by a call to {@link #setDriver(Driver)}. It does not return any
      * driver instance that may have been created from the value set via {@link #setDriverClassName(String)}.
@@ -930,7 +916,6 @@ public class BasicDataSource implements DataSource, BasicDataSourceMXBean, MBean
     }
 
     /**
-     * Returns the JDBC driver class name.
      * <p>
      * Note: This getter only returns the last value set by a call to {@link #setDriverClassName(String)}. It does not
      * return the class name of any driver that may have been set via {@link #setDriver(Driver)}.
@@ -957,8 +942,6 @@ public class BasicDataSource implements DataSource, BasicDataSourceMXBean, MBean
     }
 
     /**
-     * Gets the EvictionPolicy implementation in use with this connection pool.
-     *
      * @return The EvictionPolicy implementation in use with this connection pool.
      */
     public synchronized String getEvictionPolicyClassName() {
@@ -1139,8 +1122,6 @@ public class BasicDataSource implements DataSource, BasicDataSourceMXBean, MBean
     }
 
     /**
-     * Returns the {@link #minEvictableIdleTimeMillis} property.
-     *
      * @return the value of the {@link #minEvictableIdleTimeMillis} property
      * @see #minEvictableIdleTimeMillis
      */

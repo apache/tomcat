@@ -129,8 +129,6 @@ public class PoolingDriver implements Driver {
     }
 
     /**
-     * Gets the pool names.
-     *
      * @return the pool names.
      */
     public synchronized String[] getPoolNames() {

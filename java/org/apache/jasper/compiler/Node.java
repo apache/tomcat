@@ -2212,7 +2212,7 @@ abstract class Node implements TagConstants {
 
         /**
          *
-         * @return return true if there's TagAttributeInfo meaning we need to
+         * @return true if there's TagAttributeInfo meaning we need to
          *         assign a ValueExpression
          */
         public boolean isDeferredInput() {
@@ -2221,7 +2221,7 @@ abstract class Node implements TagConstants {
 
         /**
          *
-         * @return return true if there's TagAttributeInfo meaning we need to
+         * @return true if there's TagAttributeInfo meaning we need to
          *         assign a MethodExpression
          */
         public boolean isDeferredMethodInput() {

@@ -290,8 +290,6 @@ public interface Lifecycle {
 
 
     /**
-     * Obtain the current state of the source component.
-     *
      * @return The current state of the source component.
      */
     public LifecycleState getState();

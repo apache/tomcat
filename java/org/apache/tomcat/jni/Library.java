@@ -19,7 +19,8 @@ package org.apache.tomcat.jni;
 
 import java.io.File;
 
-/** Library
+/**
+ * Library
  *
  * @author Mladen Turk
  */

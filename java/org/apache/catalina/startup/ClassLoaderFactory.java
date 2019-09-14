@@ -275,7 +275,7 @@ public final class ClassLoaderFactory {
     }
 
 
-    /*
+    /**
      * These two methods would ideally be in the utility class
      * org.apache.tomcat.util.buf.UriUtil but that class is not visible until
      * after the class loaders have been constructed.

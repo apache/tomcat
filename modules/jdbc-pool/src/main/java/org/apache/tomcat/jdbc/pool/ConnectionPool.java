@@ -221,7 +221,6 @@ public class ConnectionPool {
     }
 
     /**
-     * Returns the name of this pool
      * @return String - the name of the pool
      */
     public String getName() {
@@ -229,7 +228,6 @@ public class ConnectionPool {
     }
 
     /**
-     * Return the number of threads waiting for a connection
      * @return number of threads waiting for a connection
      */
     public int getWaitCount() {
@@ -254,7 +252,6 @@ public class ConnectionPool {
     }
 
     /**
-     * Returns the number of connections that are in use
      * @return int - number of established connections that are being used by the application
      */
     public int getActive() {
@@ -355,7 +352,7 @@ public class ConnectionPool {
     /**
      * Creates and caches a {@link java.lang.reflect.Constructor} used to instantiate the proxy object.
      * We cache this, since the creation of a constructor is fairly slow.
-     * @param xa Use a XA connection
+     * @param xa Use an XA connection
      * @return constructor used to instantiate the wrapper object
      * @throws NoSuchMethodException Failed to get a constructor
      */

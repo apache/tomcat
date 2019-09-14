@@ -58,8 +58,6 @@ import javax.servlet.Servlet;
  *        throws ServletException, IOException;
  * </pre>
  */
-
-
 public interface JspPage extends Servlet {
 
     /**

@@ -795,7 +795,7 @@ public class JDBCStore extends StoreBase {
                 try {
                     // If sessions already exist in DB, remove and insert again.
                     // TODO:
-                    // * Check if ID exists in database and if so use UPDATE.
+                    // Check if ID exists in database and if so use UPDATE.
                     remove(session.getIdInternal(), _conn);
 
                     bos = new ByteArrayOutputStream();

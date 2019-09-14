@@ -736,8 +736,6 @@ public abstract class InstanceKeyDataSource implements DataSource, Referenceable
     }
 
     /**
-     * Gets the value of loginTimeout.
-     *
      * @return value of loginTimeout.
      */
     @Override
@@ -757,8 +755,6 @@ public abstract class InstanceKeyDataSource implements DataSource, Referenceable
     }
 
     /**
-     * Gets the value of logWriter.
-     *
      * @return value of logWriter.
      */
     @Override
@@ -807,8 +803,6 @@ public abstract class InstanceKeyDataSource implements DataSource, Referenceable
     }
 
     /**
-     * Returns the timeout in seconds before the validation query fails.
-     *
      * @return The timeout in seconds before the validation query fails.
      */
     public int getValidationQueryTimeout() {
@@ -849,9 +843,6 @@ public abstract class InstanceKeyDataSource implements DataSource, Referenceable
     }
 
     /**
-     * Returns the maximum permitted lifetime of a connection in milliseconds. A value of zero or less indicates an
-     * infinite lifetime.
-     *
      * @return The maximum permitted lifetime of a connection in milliseconds. A value of zero or less indicates an
      *         infinite lifetime.
      */
@@ -1033,7 +1024,7 @@ public abstract class InstanceKeyDataSource implements DataSource, Referenceable
             }
         }
 
-        // try to get a connection with the supplied userName/password
+        // try to get a connection with the supplied userName/userPassword
         PooledConnection conn = null;
         try {
             if (userName != null) {

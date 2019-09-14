@@ -193,8 +193,6 @@ public class ParameterParser {
     }
 
     /**
-     * Returns {@code true} if parameter names are to be converted to lower
-     * case when name/value pairs are parsed.
      *
      * @return {@code true} if parameter names are to be
      * converted to lower case when name/value pairs are parsed.

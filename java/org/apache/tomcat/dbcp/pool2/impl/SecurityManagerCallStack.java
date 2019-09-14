@@ -96,9 +96,7 @@ public class SecurityManagerCallStack implements CallStack {
      */
     private static class PrivateSecurityManager extends SecurityManager {
         /**
-         * Get the class stack.
-         *
-         * @return class stack
+         * @return class stack.
          */
         private List<WeakReference<Class<?>>> getCallStack() {
             final Class<?>[] classes = getClassContext();

@@ -81,7 +81,7 @@ public class StoreLoader {
     private URL registryResource ;
 
     /**
-     * @return Returns the registry.
+     * @return the registry.
      */
     public StoreRegistry getRegistry() {
         return registry;

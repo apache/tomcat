@@ -1294,8 +1294,7 @@ public class Digester extends DefaultHandler2 {
 
 
     /**
-     * Return the Entity Resolver used by the SAX parser.
-     * @return Return the Entity Resolver used by the SAX parser.
+     * @return the Entity Resolver used by the SAX parser.
      */
     public EntityResolver getEntityResolver() {
         return entityResolver;

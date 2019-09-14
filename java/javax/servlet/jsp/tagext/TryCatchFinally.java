@@ -15,10 +15,7 @@
 * limitations under the License.
 */
 
-
 package javax.servlet.jsp.tagext;
-
-
 
 /**
  * The auxiliary interface of a Tag, IterationTag or BodyTag tag
@@ -52,7 +49,6 @@ package javax.servlet.jsp.tagext;
  * h.release();  // release long-term resources
  * </pre>
  */
-
 public interface TryCatchFinally {
 
     /**
@@ -75,7 +71,6 @@ public interface TryCatchFinally {
      * @throws Throwable if the exception is to be rethrown further up
      *     the nest chain.
      */
-
     void doCatch(Throwable t) throws Throwable;
 
     /**
@@ -94,6 +89,5 @@ public interface TryCatchFinally {
      * <p>This method is intended to maintain per-invocation data
      * integrity and resource management actions.
      */
-
     void doFinally();
 }

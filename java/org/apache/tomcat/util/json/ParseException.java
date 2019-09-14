@@ -69,7 +69,6 @@ public class ParseException extends Exception {
    * relevant information.  The JavaCC generated code does not use
    * these constructors.
    */
-
   public ParseException() {
     super();
   }

@@ -383,7 +383,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
     }
 
 
-    /*
+    /**
      * Provide access to just the cluster component attached to this container.
      */
     protected Cluster getClusterInternal() {

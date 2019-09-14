@@ -607,7 +607,7 @@ class Http2Parser {
     }
 
 
-    /*
+    /**
      * Implementation note:
      * Validation applicable to all incoming frames should be implemented here.
      * Frame type specific validation should be performed in the appropriate

@@ -454,7 +454,7 @@ public class MapperListener extends LifecycleMBeanBase
         }
     }
 
-    /*
+    /**
      * Populate <code>wrappers</code> list with information for registration of
      * mappings for this wrapper in this context.
      */

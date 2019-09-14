@@ -64,7 +64,7 @@ public class JMXAccessorGetTask extends JMXAccessorTask {
     // ------------------------------------------------------------- Properties
 
     /**
-     * @return Returns the attribute.
+     * @return the attribute.
      */
     public String getAttribute() {
         return attribute;

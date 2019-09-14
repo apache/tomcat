@@ -29,8 +29,6 @@ package org.apache.tomcat.util.http.fileupload;
 public interface UploadContext extends RequestContext {
 
     /**
-     * Retrieve the content length of the request.
-     *
      * @return The content length of the request.
      * @since 1.3
      */

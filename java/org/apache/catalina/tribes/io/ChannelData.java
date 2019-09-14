@@ -90,7 +90,7 @@ public class ChannelData implements ChannelMessage {
     }
 
     /**
-     * @return Returns the message byte buffer
+     * @return the message byte buffer
      */
     @Override
     public XByteBuffer getMessage() {
@@ -104,7 +104,7 @@ public class ChannelData implements ChannelMessage {
         this.message = message;
     }
     /**
-     * @return Returns the timestamp.
+     * @return the timestamp.
      */
     @Override
     public long getTimestamp() {
@@ -118,7 +118,7 @@ public class ChannelData implements ChannelMessage {
         this.timestamp = timestamp;
     }
     /**
-     * @return Returns the uniqueId.
+     * @return the uniqueId.
      */
     @Override
     public byte[] getUniqueId() {
@@ -131,8 +131,8 @@ public class ChannelData implements ChannelMessage {
         this.uniqueId = uniqueId;
     }
     /**
-     * @return returns the message options
-     * see org.apache.catalina.tribes.Channel#sendMessage(org.apache.catalina.tribes.Member[], java.io.Serializable, int)
+     * @return the message options
+     * @see org.apache.catalina.tribes.Channel#send(org.apache.catalina.tribes.Member[], java.io.Serializable, int)
      *
      */
     @Override

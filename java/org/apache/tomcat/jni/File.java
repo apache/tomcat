@@ -19,7 +19,8 @@ package org.apache.tomcat.jni;
 /* Import needed classes */
 import java.nio.ByteBuffer;
 
-/** File
+/**
+ * File
  *
  * @author Mladen Turk
  */
@@ -563,7 +564,7 @@ public class File {
     /**
      * Are we at the end of the file
      * @param fptr The apr file we are testing.
-     * @return Returns APR_EOF if we are at the end of file, APR_SUCCESS otherwise.
+     * @return APR_EOF if we are at the end of file, APR_SUCCESS otherwise.
      */
     public static native int eof(long fptr);
 
@@ -726,7 +727,7 @@ public class File {
     public static native FileInfo getStat(String fname, int wanted, long pool);
 
     /**
-     * Get the specified file's stats.
+     * Get the specified file's operation stats.
      * @param finfo Where to store the information about the file.
      * @param wanted The desired apr_finfo_t fields, as a bit flag of APR_FINFO_ values
      * @param thefile The file to get information about.

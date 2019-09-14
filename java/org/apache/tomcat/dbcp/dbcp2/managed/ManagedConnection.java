@@ -165,8 +165,6 @@ public class ManagedConnection<C extends Connection> extends DelegatingConnectio
     }
 
     /**
-     * If false, getDelegate() and getInnermostDelegate() will return null.
-     *
      * @return if false, getDelegate() and getInnermostDelegate() will return null
      */
     public boolean isAccessToUnderlyingConnectionAllowed() {

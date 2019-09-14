@@ -26,10 +26,10 @@ import org.apache.juli.logging.LogFactory;
 public class WrapperListenerSF extends StoreFactoryBase {
     private static Log log = LogFactory.getLog(WrapperListenerSF.class);
 
-    /*
+    /**
      * Store nested Element Value Arrays
      *
-     * @see org.apache.catalina.config.IStoreFactory#store(java.io.PrintWriter,
+     * @see org.apache.catalina.storeconfig.IStoreFactory#store(java.io.PrintWriter,
      *      int, java.lang.Object)
      */
     @Override

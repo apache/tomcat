@@ -2363,9 +2363,7 @@ public class Request implements HttpServletRequest {
 
 
     /**
-     * Get the request path.
-     *
-     * @return the request path
+     * @return the request path.
      */
     public MessageBytes getRequestPathMB() {
         return mappingData.requestPath;

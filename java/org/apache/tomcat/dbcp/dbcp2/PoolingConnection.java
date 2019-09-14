@@ -45,8 +45,6 @@ public class PoolingConnection extends DelegatingConnection<Connection>
 
     /**
      * Statement types.
-     *
-     * @since 2.0 protected enum.
      * @since 2.4.0 public enum.
      */
     public enum StatementType {

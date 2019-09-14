@@ -93,7 +93,7 @@ public class ReplicationValve
      */
     protected boolean doProcessingStats = false;
 
-    /*
+    /**
      * Note: The statistics are volatile to ensure the concurrent updates do not
      *       corrupt them but it is still possible that:
      *       - some updates may be lost;

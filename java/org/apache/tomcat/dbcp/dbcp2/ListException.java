@@ -46,8 +46,6 @@ public class ListException extends Exception {
     }
 
     /**
-     * Gets the list of exceptions.
-     *
      * @return the list of exceptions.
      */
     public List<Throwable> getExceptionList() {

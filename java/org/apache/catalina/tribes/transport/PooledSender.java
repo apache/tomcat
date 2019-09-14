@@ -127,7 +127,7 @@ public abstract class PooledSender extends AbstractSender implements MultiPointS
         }
 
         /**
-         * @return Returns the limit.
+         * @return the limit.
          */
         public int getLimit() {
             return limit;

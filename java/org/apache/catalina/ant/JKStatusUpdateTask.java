@@ -68,7 +68,7 @@ public class JKStatusUpdateTask extends AbstractCatalinaTask {
     }
 
     /**
-     * @return Returns the internalid.
+     * @return the internalid.
      */
     public int getInternalid() {
         return internalid;
@@ -83,7 +83,7 @@ public class JKStatusUpdateTask extends AbstractCatalinaTask {
     }
 
     /**
-     * @return Returns the lbForceSession.
+     * @return the lbForceSession.
      */
     public Boolean getLbForceSession() {
         return lbForceSession;
@@ -98,7 +98,7 @@ public class JKStatusUpdateTask extends AbstractCatalinaTask {
     }
 
     /**
-     * @return Returns the lbRecovertime.
+     * @return the lbRecovertime.
      */
     public Integer getLbRecovertime() {
         return lbRecovertime;
@@ -113,7 +113,7 @@ public class JKStatusUpdateTask extends AbstractCatalinaTask {
     }
 
     /**
-     * @return Returns the lbRetries.
+     * @return the lbRetries.
      */
     public Integer getLbRetries() {
         return lbRetries;
@@ -128,7 +128,7 @@ public class JKStatusUpdateTask extends AbstractCatalinaTask {
     }
 
     /**
-     * @return Returns the lbStickySession.
+     * @return the lbStickySession.
      */
     public Boolean getLbStickySession() {
         return lbStickySession;
@@ -143,7 +143,7 @@ public class JKStatusUpdateTask extends AbstractCatalinaTask {
     }
 
     /**
-     * @return Returns the worker.
+     * @return the worker.
      */
     public String getWorker() {
         return worker;
@@ -158,7 +158,7 @@ public class JKStatusUpdateTask extends AbstractCatalinaTask {
     }
 
     /**
-     * @return Returns the workerType.
+     * @return the workerType.
      */
     public String getWorkerType() {
         return workerType;
@@ -173,7 +173,7 @@ public class JKStatusUpdateTask extends AbstractCatalinaTask {
     }
 
     /**
-     * @return Returns the workerLb.
+     * @return the workerLb.
      */
     public String getWorkerLb() {
         return workerLb;
@@ -188,7 +188,7 @@ public class JKStatusUpdateTask extends AbstractCatalinaTask {
     }
 
     /**
-     * @return Returns the workerClusterDomain.
+     * @return the workerClusterDomain.
      */
     public String getWorkerClusterDomain() {
         return workerClusterDomain;
@@ -203,7 +203,7 @@ public class JKStatusUpdateTask extends AbstractCatalinaTask {
     }
 
     /**
-     * @return Returns the workerDisabled.
+     * @return the workerDisabled.
      */
     public Boolean getWorkerDisabled() {
         return workerDisabled;
@@ -218,7 +218,7 @@ public class JKStatusUpdateTask extends AbstractCatalinaTask {
     }
 
     /**
-     * @return Returns the workerStopped.
+     * @return the workerStopped.
      */
     public Boolean getWorkerStopped() {
         return workerStopped;
@@ -232,7 +232,7 @@ public class JKStatusUpdateTask extends AbstractCatalinaTask {
     }
 
     /**
-     * @return Returns the workerLoadFactor.
+     * @return the workerLoadFactor.
      */
     public Integer getWorkerLoadFactor() {
         return workerLoadFactor;
@@ -247,7 +247,7 @@ public class JKStatusUpdateTask extends AbstractCatalinaTask {
     }
 
     /**
-     * @return Returns the workerRedirect.
+     * @return the workerRedirect.
      */
     public String getWorkerRedirect() {
         return workerRedirect;

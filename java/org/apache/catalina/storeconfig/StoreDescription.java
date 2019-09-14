@@ -90,7 +90,7 @@ public class StoreDescription {
     private boolean storeSeparate = false;
 
     /**
-     * @return Returns the external.
+     * @return the external.
      */
     public boolean isExternalAllowed() {
         return externalAllowed;
@@ -113,7 +113,7 @@ public class StoreDescription {
     }
 
     /**
-     * @return Returns the standard.
+     * @return the standard.
      */
     public boolean isStandard() {
         return standard;
@@ -128,7 +128,7 @@ public class StoreDescription {
     }
 
     /**
-     * @return Returns the backup.
+     * @return the backup.
      */
     public boolean isBackup() {
         return backup;
@@ -143,7 +143,7 @@ public class StoreDescription {
     }
 
     /**
-     * @return Returns the myDefault.
+     * @return the myDefault.
      */
     public boolean isDefault() {
         return myDefault;
@@ -158,7 +158,7 @@ public class StoreDescription {
     }
 
     /**
-     * @return Returns the storeFactory.
+     * @return the storeFactory.
      */
     public String getStoreFactoryClass() {
         return storeFactoryClass;
@@ -173,7 +173,7 @@ public class StoreDescription {
     }
 
     /**
-     * @return Returns the storeFactory.
+     * @return the storeFactory.
      */
     public IStoreFactory getStoreFactory() {
         return storeFactory;
@@ -188,7 +188,7 @@ public class StoreDescription {
     }
 
     /**
-     * @return Returns the storeWriterClass.
+     * @return the storeWriterClass.
      */
     public String getStoreWriterClass() {
         return storeWriterClass;
@@ -203,7 +203,7 @@ public class StoreDescription {
     }
 
     /**
-     * @return Returns the tagClass.
+     * @return the tagClass.
      */
     public String getTag() {
         return tag;
@@ -218,7 +218,7 @@ public class StoreDescription {
     }
 
     /**
-     * @return Returns the tagClass.
+     * @return the tagClass.
      */
     public String getTagClass() {
         return tagClass;
@@ -233,7 +233,7 @@ public class StoreDescription {
     }
 
     /**
-     * @return Returns the transientAttributes.
+     * @return the transientAttributes.
      */
     public List<String> getTransientAttributes() {
         return transientAttributes;
@@ -259,7 +259,7 @@ public class StoreDescription {
     }
 
     /**
-     * @return Returns the transientChildren.
+     * @return the transientChildren.
      */
     public List<String> getTransientChildren() {
         return transientChildren;
@@ -311,7 +311,7 @@ public class StoreDescription {
     /**
      * Return the real id or TagClass
      *
-     * @return Returns the id.
+     * @return the id.
      */
     public String getId() {
         if (id != null)
@@ -329,7 +329,7 @@ public class StoreDescription {
     }
 
     /**
-     * @return Returns the attributes.
+     * @return the attributes.
      */
     public boolean isAttributes() {
         return attributes;
@@ -355,7 +355,7 @@ public class StoreDescription {
     }
 
     /**
-     * @return Returns the children.
+     * @return the children.
      */
     public boolean isChildren() {
         return children;

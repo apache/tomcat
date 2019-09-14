@@ -142,8 +142,6 @@ public class PerUserPoolDataSource extends InstanceKeyDataSource {
     }
 
     /**
-     * Gets the number of active connections in the default pool.
-     *
      * @return The number of active connections in the default pool.
      */
     public int getNumActive() {
@@ -164,8 +162,6 @@ public class PerUserPoolDataSource extends InstanceKeyDataSource {
     }
 
     /**
-     * Gets the number of idle connections in the default pool.
-     *
      * @return The number of idle connections in the default pool.
      */
     public int getNumIdle() {

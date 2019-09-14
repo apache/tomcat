@@ -145,9 +145,7 @@ public class BasicManagedDataSource extends BasicDataSource {
     }
 
     /**
-     * Gets the optional XADataSource class name.
-     *
-     * @return the optional XADataSource class name
+     * @return the optional XADataSource class name.
      */
     public synchronized String getXADataSource() {
         return xaDataSource;

@@ -317,7 +317,7 @@ public class ServiceRefFactory implements ObjectFactory {
 
     /**
      * @param port analyzed port
-     * @return Returns the endpoint URL of the given Port
+     * @return the endpoint URL of the given Port
      */
     private String getSOAPLocation(Port port) {
         String endpoint = null;

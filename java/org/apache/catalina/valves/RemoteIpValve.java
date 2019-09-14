@@ -770,7 +770,7 @@ public class RemoteIpValve extends ValveBase {
         }
     }
 
-    /*
+    /**
      * Considers the value to be secure if it exclusively holds forwards for
      * {@link #protocolHeaderHttpsValue}.
      */

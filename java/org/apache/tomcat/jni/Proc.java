@@ -17,7 +17,8 @@
 
 package org.apache.tomcat.jni;
 
-/** Proc
+/**
+ * Proc
  *
  * @author Mladen Turk
  */
@@ -63,17 +64,20 @@ public class Proc {
     public static final int APR_OC_REASON_DEATH      = 0;
     /** write_fd is unwritable */
     public static final int APR_OC_REASON_UNWRITABLE = 1;
-    /** a restart is occurring, perform any necessary cleanup (including
+    /**
+     * a restart is occurring, perform any necessary cleanup (including
      * sending a special signal to child)
      */
     public static final int APR_OC_REASON_RESTART    = 2;
-    /** unregister has been called, do whatever is necessary (including
+    /**
+     * unregister has been called, do whatever is necessary (including
      * kill the child)
      */
     public static final int APR_OC_REASON_UNREGISTER = 3;
     /** somehow the child exited without us knowing ... buggy os? */
     public static final int APR_OC_REASON_LOST       = 4;
-    /** a health check is occurring, for most maintenance functions
+    /**
+     * a health check is occurring, for most maintenance functions
      * this is a no-op.
      */
     public static final int APR_OC_REASON_RUNNING    = 5;
@@ -193,7 +197,7 @@ public class Proc {
     public static native int waitAllProcs(long proc, int [] exit,
                                           int waithow, long pool);
 
-     /**
+    /**
      * Detach the process from the controlling terminal.
      * @param daemonize set to non-zero if the process should daemonize
      *                  and become a background process, else it will

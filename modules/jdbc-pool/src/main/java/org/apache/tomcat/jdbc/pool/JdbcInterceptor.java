@@ -102,7 +102,6 @@ public abstract class JdbcInterceptor implements InvocationHandler {
      * Gets invoked each time an operation on {@link java.sql.Connection} is invoked.
      * {@inheritDoc}
      */
-
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
         if (getNext()!=null) return getNext().invoke(proxy,method,args);

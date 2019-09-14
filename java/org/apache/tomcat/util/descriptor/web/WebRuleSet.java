@@ -1056,7 +1056,6 @@ final class CallMethodMultiRule extends CallMethodRule {
  * A Rule that check if the annotations have to be loaded.
  *
  */
-
 final class IgnoreAnnotationsRule extends Rule {
 
     public IgnoreAnnotationsRule() {
@@ -1086,7 +1085,6 @@ final class IgnoreAnnotationsRule extends Rule {
  * A Rule that records the spec version of the web.xml being parsed
  *
  */
-
 final class VersionRule extends Rule {
 
     public VersionRule() {

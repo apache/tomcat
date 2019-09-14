@@ -100,11 +100,12 @@ public class JMXAccessorInvokeTask extends JMXAccessorTask {
     // ------------------------------------------------------------- Properties
 
     /**
-     * @return Returns the operation.
+     * @return the operation.
      */
     public String getOperation() {
         return operation;
     }
+
     /**
      * @param operation The operation to set.
      */
@@ -117,7 +118,7 @@ public class JMXAccessorInvokeTask extends JMXAccessorTask {
     }
 
     /**
-     * @return Returns the args.
+     * @return the args.
      */
     public List<Arg> getArgs() {
         return args;

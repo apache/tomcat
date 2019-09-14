@@ -172,7 +172,6 @@ public class BaseNotificationBroadcaster implements NotificationBroadcaster {
 /**
  * Utility class representing a particular registered listener entry.
  */
-
 class BaseNotificationBroadcasterEntry {
 
     public BaseNotificationBroadcasterEntry(NotificationListener listener,

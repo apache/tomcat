@@ -40,7 +40,6 @@ public abstract class ClusterListener implements ChannelListener {
     /**
      * The string manager for this package.
      */
-
     protected CatalinaCluster cluster = null;
 
     //--Constructor---------------------------------------------

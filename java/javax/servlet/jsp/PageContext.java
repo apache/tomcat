@@ -18,7 +18,6 @@
 package javax.servlet.jsp;
 
 import java.io.IOException;
-
 import javax.servlet.RequestDispatcher;
 import javax.servlet.Servlet;
 import javax.servlet.ServletConfig;
@@ -89,7 +88,6 @@ import javax.servlet.jsp.tagext.BodyContent;
  * <code>forward()</code>,  <code>include()</code>,
  * and  <code>handlePageException()</code>.
  */
-
 public abstract class PageContext
     extends JspContext
 {
@@ -107,7 +105,6 @@ public abstract class PageContext
      * in this PageContext until the return from the current Servlet.service()
      * invocation.
      */
-
     public static final int PAGE_SCOPE = 1;
 
     /**
@@ -115,7 +112,6 @@ public abstract class PageContext
      * ServletRequest associated with the Servlet until the current request
      * is completed.
      */
-
     public static final int REQUEST_SCOPE = 2;
 
     /**
@@ -123,68 +119,58 @@ public abstract class PageContext
      * the named reference remains available from the HttpSession (if any)
      * associated with the Servlet until the HttpSession is invalidated.
      */
-
     public static final int SESSION_SCOPE = 3;
 
     /**
      * Application scope: named reference remains available in the
      * ServletContext until it is reclaimed.
      */
-
     public static final int APPLICATION_SCOPE = 4;
 
     /**
      * Name used to store the Servlet in this PageContext's nametables.
      */
-
     public static final String PAGE = "javax.servlet.jsp.jspPage";
 
     /**
      * Name used to store this PageContext in it's own name table.
      */
-
     public static final String PAGECONTEXT = "javax.servlet.jsp.jspPageContext";
 
     /**
      * Name used to store ServletRequest in PageContext name table.
      */
-
     public static final String REQUEST = "javax.servlet.jsp.jspRequest";
 
     /**
      * Name used to store ServletResponse in PageContext name table.
      */
-
     public static final String RESPONSE = "javax.servlet.jsp.jspResponse";
 
     /**
      * Name used to store ServletConfig in PageContext name table.
      */
-
     public static final String CONFIG = "javax.servlet.jsp.jspConfig";
 
     /**
      * Name used to store HttpSession in PageContext name table.
      */
-
     public static final String SESSION = "javax.servlet.jsp.jspSession";
+
     /**
      * Name used to store current JspWriter in PageContext name table.
      */
-
     public static final String OUT = "javax.servlet.jsp.jspOut";
 
     /**
      * Name used to store ServletContext in PageContext name table.
      */
-
     public static final String APPLICATION = "javax.servlet.jsp.jspApplication";
 
     /**
      * Name used to store uncaught exception in ServletRequest attribute
      * list and PageContext name table.
      */
-
     public static final String EXCEPTION = "javax.servlet.jsp.jspException";
 
     /**
@@ -221,7 +207,6 @@ public abstract class PageContext
      * @throws IllegalArgumentException If one of the given parameters
      *     is invalid
      */
-
     public abstract void initialize(Servlet servlet, ServletRequest request,
         ServletResponse response, String errorPageURL, boolean needsSession,
         int bufferSize, boolean autoFlush)
@@ -241,7 +226,6 @@ public abstract class PageContext
      * This method should not be used by page  or tag library authors.
      *
      */
-
     public abstract void release();
 
     /**
@@ -249,7 +233,6 @@ public abstract class PageContext
      *
      * @return the HttpSession for this PageContext or null
      */
-
     public abstract HttpSession getSession();
 
     /**
@@ -259,7 +242,6 @@ public abstract class PageContext
      * @return the Page implementation class instance associated
      *     with this PageContext
      */
-
     public abstract Object getPage();
 
 
@@ -268,7 +250,6 @@ public abstract class PageContext
      *
      * @return The ServletRequest for this PageContext
      */
-
     public abstract ServletRequest getRequest();
 
     /**
@@ -276,7 +257,6 @@ public abstract class PageContext
      *
      * @return the ServletResponse for this PageContext
      */
-
     public abstract ServletResponse getResponse();
 
     /**
@@ -284,7 +264,6 @@ public abstract class PageContext
      *
      * @return any exception passed to this as an errorpage
      */
-
     public abstract Exception getException();
 
     /**
@@ -300,7 +279,6 @@ public abstract class PageContext
      *
      * @return the ServletContext for this PageContext
      */
-
     public abstract ServletContext getServletContext();
 
     /**
@@ -337,7 +315,6 @@ public abstract class PageContext
      *     a ServletException
      * @throws IOException if an I/O error occurred while forwarding
      */
-
     public abstract void forward(String relativeUrlPath)
         throws ServletException, IOException;
 
@@ -444,7 +421,6 @@ public abstract class PageContext
      *
      * @see #handlePageException(Throwable)
      */
-
     public abstract void handlePageException(Exception e)
         throws ServletException, IOException;
 
@@ -483,7 +459,6 @@ public abstract class PageContext
      *
      * @see #handlePageException(Exception)
      */
-
     public abstract void handlePageException(Throwable t)
         throws ServletException, IOException;
 
@@ -494,7 +469,6 @@ public abstract class PageContext
      *
      * @return the new BodyContent
      */
-
     public BodyContent pushBody() {
         return null; // XXX to implement
     }

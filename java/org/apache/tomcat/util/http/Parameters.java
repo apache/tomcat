@@ -167,7 +167,8 @@ public final class Parameters {
         }
     }
     // -------------------- Processing --------------------
-    /** Process the query string into parameters
+    /**
+     * Process the query string into parameters
      */
     public void handleQueryParameters() {
         if (didQueryParameters) {

@@ -1849,7 +1849,6 @@ public class StandardSession implements HttpSession, Session, Serializable {
  * @deprecated As of Java Servlet API 2.1 with no replacement.  The
  *  interface will be removed in a future version of this API.
  */
-
 @Deprecated
 final class StandardSessionContext
         implements javax.servlet.http.HttpSessionContext {

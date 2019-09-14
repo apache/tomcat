@@ -1486,8 +1486,6 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
 
 
     /**
-     * Obtain the current state of the source component.
-     *
      * @return The current state of the source component.
      */
     @Override
@@ -2128,7 +2126,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
         return false;
     }
 
-    /*
+    /**
      * Get the set of current threads as an array.
      */
     private Thread[] getThreads() {

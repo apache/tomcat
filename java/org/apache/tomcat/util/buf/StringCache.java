@@ -63,7 +63,7 @@ public class StringCache {
                     "tomcat.util.buf.StringCache.maxStringSize", "128"));
 
 
-   /**
+    /**
      * Statistics hash map for byte chunk.
      */
     protected static final HashMap<ByteEntry,int[]> bcStats =
@@ -117,7 +117,7 @@ public class StringCache {
 
 
     /**
-     * @return Returns the cacheSize.
+     * @return the cacheSize.
      */
     public int getCacheSize() {
         return cacheSize;
@@ -133,7 +133,7 @@ public class StringCache {
 
 
     /**
-     * @return Returns the enabled.
+     * @return the enabled.
      */
     public boolean getByteEnabled() {
         return byteEnabled;
@@ -149,7 +149,7 @@ public class StringCache {
 
 
     /**
-     * @return Returns the enabled.
+     * @return the enabled.
      */
     public boolean getCharEnabled() {
         return charEnabled;
@@ -165,7 +165,7 @@ public class StringCache {
 
 
     /**
-     * @return Returns the trainThreshold.
+     * @return the trainThreshold.
      */
     public int getTrainThreshold() {
         return trainThreshold;
@@ -181,7 +181,7 @@ public class StringCache {
 
 
     /**
-     * @return Returns the accessCount.
+     * @return the accessCount.
      */
     public int getAccessCount() {
         return accessCount;
@@ -189,7 +189,7 @@ public class StringCache {
 
 
     /**
-     * @return Returns the hitCount.
+     * @return the hitCount.
      */
     public int getHitCount() {
         return hitCount;

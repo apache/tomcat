@@ -912,7 +912,7 @@ public class RemoteIpFilter extends GenericFilter {
 
     }
 
-    /*
+    /**
      * Considers the value to be secure if it exclusively holds forwards for
      * {@link #protocolHeaderHttpsValue}.
      */
@@ -1283,7 +1283,7 @@ public class RemoteIpFilter extends GenericFilter {
     }
 
 
-    /*
+    /**
      * Log objects are not Serializable but this Filter is because it extends
      * GenericFilter. Tomcat won't serialize a Filter but in case something else
      * does...

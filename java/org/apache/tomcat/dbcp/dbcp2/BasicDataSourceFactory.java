@@ -114,7 +114,7 @@ public class BasicDataSourceFactory implements ObjectFactory {
      */
     private static final String PROP_DISCONNECTION_SQL_CODES = "disconnectionSqlCodes";
 
-    /*
+    /**
      * Block with obsolete properties from DBCP 1.x. Warn users that these are ignored and they should use the 2.x
      * properties.
      */
@@ -122,7 +122,7 @@ public class BasicDataSourceFactory implements ObjectFactory {
     private static final String NUPROP_REMOVE_ABANDONED = "removeAbandoned";
     private static final String NUPROP_MAXWAIT = "maxWait";
 
-    /*
+    /**
      * Block with properties expected in a DataSource This props will not be listed as ignored - we know that they may
      * appear in Resource, and not listing them as ignored.
      */

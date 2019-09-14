@@ -43,7 +43,7 @@ public interface XAConnectionFactory extends ConnectionFactory {
      * Create a new {@link java.sql.Connection} in an implementation specific fashion.
      * <p>
      * An implementation can assume that the caller of this will wrap the connection in a proxy that protects access to
-     * the setAutoCommit, commit and rollback when enrolled in a XA transaction.
+     * the setAutoCommit, commit and rollback when enrolled in an XA transaction.
      * </p>
      *
      * @return a new {@link java.sql.Connection}

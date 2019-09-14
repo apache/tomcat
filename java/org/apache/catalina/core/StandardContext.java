@@ -1682,8 +1682,6 @@ public class StandardContext extends ContainerBase
     }
 
     /**
-     * Gets the time (in milliseconds) it took to start this context.
-     *
      * @return Time (in milliseconds) it took to start this context.
      */
     public long getStartupTime() {
@@ -4247,9 +4245,6 @@ public class StandardContext extends ContainerBase
 
 
     /**
-     * Gets the cumulative processing times of all servlets in this
-     * StandardContext.
-     *
      * @return Cumulative processing times of all servlets in this
      * StandardContext
      */
@@ -4268,9 +4263,6 @@ public class StandardContext extends ContainerBase
     }
 
     /**
-     * Gets the maximum processing time of all servlets in this
-     * StandardContext.
-     *
      * @return Maximum processing time of all servlets in this
      * StandardContext
      */
@@ -4292,9 +4284,6 @@ public class StandardContext extends ContainerBase
     }
 
     /**
-     * Gets the minimum processing time of all servlets in this
-     * StandardContext.
-     *
      * @return Minimum processing time of all servlets in this
      * StandardContext
      */
@@ -4316,9 +4305,6 @@ public class StandardContext extends ContainerBase
     }
 
     /**
-     * Gets the cumulative request count of all servlets in this
-     * StandardContext.
-     *
      * @return Cumulative request count of all servlets in this
      * StandardContext
      */
@@ -4337,9 +4323,6 @@ public class StandardContext extends ContainerBase
     }
 
     /**
-     * Gets the cumulative error count of all servlets in this
-     * StandardContext.
-     *
      * @return Cumulative error count of all servlets in this
      * StandardContext
      */
@@ -5471,7 +5454,8 @@ public class StandardContext extends ContainerBase
 
     }
 
-    /** Destroy needs to clean up the context completely.
+    /**
+     * Destroy needs to clean up the context completely.
      *
      * The problem is that undoing all the config in start() and restoring
      * a 'fresh' state is impossible. After stop()/destroy()/init()/start()
@@ -6201,7 +6185,8 @@ public class StandardContext extends ContainerBase
     }
 
 
-    /* Remove a JMX notificationListener
+    /**
+     * Remove a JMX notificationListener
      * @see javax.management.NotificationEmitter#removeNotificationListener(javax.management.NotificationListener, javax.management.NotificationFilter, java.lang.Object)
      */
     @Override
@@ -6212,7 +6197,8 @@ public class StandardContext extends ContainerBase
 
     private MBeanNotificationInfo[] notificationInfo;
 
-    /* Get JMX Broadcaster Info
+    /**
+     * Get JMX Broadcaster Info
      * @TODO use StringManager for international support!
      * @TODO This two events we not send j2ee.state.failed and j2ee.attribute.changed!
      * @see javax.management.NotificationBroadcaster#getNotificationInfo()

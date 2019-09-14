@@ -127,7 +127,7 @@ public class ApplicationPart implements Part {
         return fileItem.getString(encoding);
     }
 
-    /*
+    /**
      * Adapted from FileUploadBase.getFileName()
      */
     @Override

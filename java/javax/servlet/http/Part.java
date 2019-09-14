@@ -48,9 +48,6 @@ public interface Part {
     public String getContentType();
 
     /**
-     * Obtain the name of the field in the multipart form corresponding to this
-     * part.
-     *
      * @return The name of the field in the multipart form corresponding to this
      *         part.
      */
@@ -120,7 +117,6 @@ public interface Part {
     public String getHeader(String name);
 
     /**
-     * Obtain all the values of the specified part header.
      * @param name The name of the header of interest. The header name is case
      *             insensitive.
      * @return All the values of the specified part header. If the part did not

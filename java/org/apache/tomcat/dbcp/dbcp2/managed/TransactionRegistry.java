@@ -69,7 +69,7 @@ public class TransactionRegistry {
     }
 
     /**
-     * Registers the association between a Connection and a XAResource. When a connection is enlisted in a transaction,
+     * Registers the association between a Connection and an XAResource. When a connection is enlisted in a transaction,
      * it is actually the XAResource that is given to the transaction manager.
      *
      * @param connection
@@ -84,8 +84,6 @@ public class TransactionRegistry {
     }
 
     /**
-     * Gets the XAResource registered for the connection.
-     *
      * @param connection
      *            the connection
      * @return The XAResource registered for the connection; never null.
@@ -103,8 +101,6 @@ public class TransactionRegistry {
     }
 
     /**
-     * Gets the active TransactionContext or null if not Transaction is active.
-     *
      * @return The active TransactionContext or null if no Transaction is active.
      * @throws SQLException
      *             Thrown when an error occurs while fetching the transaction.

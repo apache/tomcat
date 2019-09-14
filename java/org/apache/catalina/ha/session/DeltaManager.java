@@ -130,98 +130,98 @@ public class DeltaManager extends ClusterManagerBase{
     }
 
     /**
-     * @return Returns the counterSend_EVT_GET_ALL_SESSIONS.
+     * @return the counterSend_EVT_GET_ALL_SESSIONS.
      */
     public long getCounterSend_EVT_GET_ALL_SESSIONS() {
         return counterSend_EVT_GET_ALL_SESSIONS;
     }
 
     /**
-     * @return Returns the counterSend_EVT_SESSION_ACCESSED.
+     * @return the counterSend_EVT_SESSION_ACCESSED.
      */
     public long getCounterSend_EVT_SESSION_ACCESSED() {
         return counterSend_EVT_SESSION_ACCESSED;
     }
 
     /**
-     * @return Returns the counterSend_EVT_SESSION_CREATED.
+     * @return the counterSend_EVT_SESSION_CREATED.
      */
     public long getCounterSend_EVT_SESSION_CREATED() {
         return counterSend_EVT_SESSION_CREATED;
     }
 
     /**
-     * @return Returns the counterSend_EVT_SESSION_DELTA.
+     * @return the counterSend_EVT_SESSION_DELTA.
      */
     public long getCounterSend_EVT_SESSION_DELTA() {
         return counterSend_EVT_SESSION_DELTA;
     }
 
     /**
-     * @return Returns the counterSend_EVT_SESSION_EXPIRED.
+     * @return the counterSend_EVT_SESSION_EXPIRED.
      */
     public long getCounterSend_EVT_SESSION_EXPIRED() {
         return counterSend_EVT_SESSION_EXPIRED;
     }
 
     /**
-     * @return Returns the counterSend_EVT_ALL_SESSION_DATA.
+     * @return the counterSend_EVT_ALL_SESSION_DATA.
      */
     public long getCounterSend_EVT_ALL_SESSION_DATA() {
         return counterSend_EVT_ALL_SESSION_DATA;
     }
 
     /**
-     * @return Returns the counterSend_EVT_ALL_SESSION_TRANSFERCOMPLETE.
+     * @return the counterSend_EVT_ALL_SESSION_TRANSFERCOMPLETE.
      */
     public int getCounterSend_EVT_ALL_SESSION_TRANSFERCOMPLETE() {
         return counterSend_EVT_ALL_SESSION_TRANSFERCOMPLETE;
     }
 
     /**
-     * @return Returns the counterSend_EVT_CHANGE_SESSION_ID.
+     * @return the counterSend_EVT_CHANGE_SESSION_ID.
      */
     public long getCounterSend_EVT_CHANGE_SESSION_ID() {
         return counterSend_EVT_CHANGE_SESSION_ID;
     }
 
     /**
-     * @return Returns the counterReceive_EVT_ALL_SESSION_DATA.
+     * @return the counterReceive_EVT_ALL_SESSION_DATA.
      */
     public long getCounterReceive_EVT_ALL_SESSION_DATA() {
         return counterReceive_EVT_ALL_SESSION_DATA;
     }
 
     /**
-     * @return Returns the counterReceive_EVT_GET_ALL_SESSIONS.
+     * @return the counterReceive_EVT_GET_ALL_SESSIONS.
      */
     public long getCounterReceive_EVT_GET_ALL_SESSIONS() {
         return counterReceive_EVT_GET_ALL_SESSIONS;
     }
 
     /**
-     * @return Returns the counterReceive_EVT_SESSION_ACCESSED.
+     * @return the counterReceive_EVT_SESSION_ACCESSED.
      */
     public long getCounterReceive_EVT_SESSION_ACCESSED() {
         return counterReceive_EVT_SESSION_ACCESSED;
     }
 
     /**
-     * @return Returns the counterReceive_EVT_SESSION_CREATED.
+     * @return the counterReceive_EVT_SESSION_CREATED.
      */
     public long getCounterReceive_EVT_SESSION_CREATED() {
         return counterReceive_EVT_SESSION_CREATED;
     }
 
     /**
-     * @return Returns the counterReceive_EVT_SESSION_DELTA.
+     * @return the counterReceive_EVT_SESSION_DELTA.
      */
     public long getCounterReceive_EVT_SESSION_DELTA() {
         return counterReceive_EVT_SESSION_DELTA;
     }
 
     /**
-     * @return Returns the counterReceive_EVT_SESSION_EXPIRED.
+     * @return the counterReceive_EVT_SESSION_EXPIRED.
      */
     public long getCounterReceive_EVT_SESSION_EXPIRED() {
         return counterReceive_EVT_SESSION_EXPIRED;
@@ -229,28 +229,28 @@ public class DeltaManager extends ClusterManagerBase{
 
 
     /**
-     * @return Returns the counterReceive_EVT_ALL_SESSION_TRANSFERCOMPLETE.
+     * @return the counterReceive_EVT_ALL_SESSION_TRANSFERCOMPLETE.
      */
     public int getCounterReceive_EVT_ALL_SESSION_TRANSFERCOMPLETE() {
         return counterReceive_EVT_ALL_SESSION_TRANSFERCOMPLETE;
     }
 
     /**
-     * @return Returns the counterReceive_EVT_CHANGE_SESSION_ID.
+     * @return the counterReceive_EVT_CHANGE_SESSION_ID.
      */
     public long getCounterReceive_EVT_CHANGE_SESSION_ID() {
         return counterReceive_EVT_CHANGE_SESSION_ID;
     }
 
     /**
-     * @return Returns the counterReceive_EVT_ALL_SESSION_NOCONTEXTMANAGER.
+     * @return the counterReceive_EVT_ALL_SESSION_NOCONTEXTMANAGER.
      */
     public long getCounterReceive_EVT_ALL_SESSION_NOCONTEXTMANAGER() {
         return counterReceive_EVT_ALL_SESSION_NOCONTEXTMANAGER;
     }
 
     /**
-     * @return Returns the processingTime.
+     * @return the processingTime.
      */
     @Override
     public long getProcessingTime() {
@@ -258,14 +258,14 @@ public class DeltaManager extends ClusterManagerBase{
     }
 
     /**
-     * @return Returns the sessionReplaceCounter.
+     * @return the sessionReplaceCounter.
      */
     public long getSessionReplaceCounter() {
         return sessionReplaceCounter;
     }
 
     /**
-     * @return Returns the counterNoStateTransfered.
+     * @return the counterNoStateTransfered.
      */
     public int getCounterNoStateTransfered() {
         return counterNoStateTransfered;
@@ -276,7 +276,7 @@ public class DeltaManager extends ClusterManagerBase{
     }
 
     /**
-     * @return Returns the stateTransferTimeout.
+     * @return the stateTransferTimeout.
      */
     public int getStateTransferTimeout() {
         return stateTransferTimeout;

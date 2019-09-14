@@ -28,7 +28,6 @@ import java.io.IOException;
  * @see Filter
  * @since Servlet 2.3
  **/
-
 public interface FilterChain {
 
     /**
