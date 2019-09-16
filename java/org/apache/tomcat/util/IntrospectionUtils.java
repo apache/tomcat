@@ -14,7 +14,6 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package org.apache.tomcat.util;
 
 import java.lang.reflect.InvocationTargetException;
@@ -31,7 +30,6 @@ import org.apache.tomcat.util.security.PermissionCheck;
  * Utils for introspection and reflection
  */
 public final class IntrospectionUtils {
-
 
     private static final Log log = LogFactory.getLog(IntrospectionUtils.class);
 
@@ -343,24 +341,19 @@ public final class IntrospectionUtils {
         return methods;
     }
 
-    @SuppressWarnings("null") // Neither params nor methodParams can be null
-                              // when comparing their lengths
+    @SuppressWarnings("null") // params cannot be null when comparing lengths
     public static Method findMethod(Class<?> c, String name,
             Class<?> params[]) {
         Method methods[] = findMethods(c);
-        if (methods == null)
-            return null;
         for (int i = 0; i < methods.length; i++) {
             if (methods[i].getName().equals(name)) {
                 Class<?> methodParams[] = methods[i].getParameterTypes();
-                if (methodParams == null)
-                    if (params == null || params.length == 0)
-                        return methods[i];
-                if (params == null)
-                    if (methodParams == null || methodParams.length == 0)
-                        return methods[i];
-                if (params.length != methodParams.length)
+                if (params == null && methodParams.length == 0) {
+                    return methods[i];
+                }
+                if (params.length != methodParams.length) {
                     continue;
+                }
                 boolean found = true;
                 for (int j = 0; j < params.length; j++) {
                     if (params[j] != methodParams[j]) {
@@ -368,8 +361,9 @@ public final class IntrospectionUtils {
                         break;
                     }
                 }
-                if (found)
+                if (found) {
                     return methods[i];
+                }
             }
         }
         return null;
@@ -476,6 +470,23 @@ public final class IntrospectionUtils {
     }
 
 
+    /**
+     * Checks to see if the specified class is an instance of or assignable from
+     * the specified type. The class <code>clazz</code>, all its superclasses,
+     * interfaces and those superinterfaces are tested for a match against
+     * the type name <code>type</code>.
+     *
+     * This is similar to <code>instanceof</code> or {@link Class#isAssignableFrom}
+     * except that the target type will not be resolved into a Class
+     * object, which provides some security and memory benefits.
+     *
+     * @param clazz The class to test for a match.
+     * @param type The name of the type that <code>clazz</code> must be.
+     *
+     * @return <code>true</code> if the <code>clazz</code> tested is an
+     *         instance of the specified <code>type</code>,
+     *         <code>false</code> otherwise.
+     */
     public static boolean isInstance(Class<?> clazz, String type) {
         if (type.equals(clazz.getName())) {
             return true;
