@@ -44,8 +44,10 @@
   They eventually become mixed with the numbered issues (i.e., numbered
   issues do not "pop up" wrt. others).
 -->
-<section name="Tomcat 9.0.26 (markt)" rtext="in development">
-  <subsection name="Oher">
+<section name="Tomcat 9.0.27 (markt)" rtext="in development">
+</section>
+<section name="Tomcat 9.0.26 (markt)" rtext="release in progress">
+  <subsection name="Other">
     <changelog>
       <fix>
         Re-tagged to ensure that the source file for the changelog did not
