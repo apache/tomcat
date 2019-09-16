@@ -277,8 +277,8 @@ public final class IntrospectionUtils {
                 }
                 if (v == null && dynamicProp != null) {
                     for (PropertySource propertySource : dynamicProp) {
-                        if (propertySource instanceof PropertySourceSecure) {
-                            v = ((PropertySourceSecure) propertySource).getProperty(n, classLoader);
+                        if (propertySource instanceof SecurePropertySource) {
+                            v = ((SecurePropertySource) propertySource).getProperty(n, classLoader);
                         } else {
                             v = propertySource.getProperty(n);
                         }
@@ -503,7 +503,7 @@ public final class IntrospectionUtils {
     }
 
 
-    public static interface PropertySourceSecure extends PropertySource {
+    public static interface SecurePropertySource extends PropertySource {
 
         /**
          * Obtain a property value, checking that code associated with the
@@ -513,7 +513,7 @@ public final class IntrospectionUtils {
          * looked up <b>without</b> a call to
          * {@link PermissionCheck#check(java.security.Permission)}
          *
-         * @param key               The key of the requested property
+         * @param key           The key of the requested property
          * @param classLoader   The class loader associated with the code that
          *                      trigger the property lookup
          * @return The property value or {@code null} if it could not be found

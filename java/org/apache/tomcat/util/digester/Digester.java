@@ -123,7 +123,7 @@ public class Digester extends DefaultHandler2 {
     // --------------------------------------------------- Instance Variables
 
 
-    private static class SystemPropertySource implements IntrospectionUtils.PropertySourceSecure {
+    private static class SystemPropertySource implements IntrospectionUtils.SecurePropertySource {
 
         @Override
         public String getProperty(String key) {
@@ -144,7 +144,7 @@ public class Digester extends DefaultHandler2 {
     }
 
 
-    public static class EnvironmentPropertySource implements IntrospectionUtils.PropertySourceSecure {
+    public static class EnvironmentPropertySource implements IntrospectionUtils.SecurePropertySource {
 
         @Override
         public String getProperty(String key) {
