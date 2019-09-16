@@ -27,7 +27,6 @@ import java.net.URISyntaxException;
 import java.security.Permission;
 import java.util.EmptyStackException;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.PropertyPermission;
@@ -916,8 +915,7 @@ public class Digester extends DefaultHandler2 {
      * @exception SAXException if a parsing error is to be reported
      */
     @Override
-    public void characters(char buffer[], int start, int length)
-            throws SAXException {
+    public void characters(char buffer[], int start, int length) throws SAXException {
 
         if (saxLog.isDebugEnabled()) {
             saxLog.debug("characters(" + new String(buffer, start, length) + ")");
@@ -949,9 +947,7 @@ public class Digester extends DefaultHandler2 {
         }
 
         // Fire "finish" events for all defined rules
-        Iterator<Rule> rules = getRules().rules().iterator();
-        while (rules.hasNext()) {
-            Rule rule = rules.next();
+        for (Rule rule : getRules().rules()) {
             try {
                 rule.finish();
             } catch (Exception e) {
@@ -2076,11 +2072,9 @@ public class Digester extends DefaultHandler2 {
      *  the default Java class name to be created
      * @see ObjectCreateRule
      */
-    public void addObjectCreate(String pattern, String className,
-                                String attributeName) {
+    public void addObjectCreate(String pattern, String className, String attributeName) {
 
-        addRule(pattern,
-                new ObjectCreateRule(className, attributeName));
+        addRule(pattern, new ObjectCreateRule(className, attributeName));
 
     }
 
@@ -2129,11 +2123,9 @@ public class Digester extends DefaultHandler2 {
      *  for a <code>boolean</code> parameter)
      * @see SetNextRule
      */
-    public void addSetNext(String pattern, String methodName,
-                           String paramType) {
+    public void addSetNext(String pattern, String methodName, String paramType) {
 
-        addRule(pattern,
-                new SetNextRule(methodName, paramType));
+        addRule(pattern, new SetNextRule(methodName, paramType));
 
     }
 
@@ -2177,8 +2169,7 @@ public class Digester extends DefaultHandler2 {
      */
     public void addSetProperties(String pattern) {
 
-        addRule(pattern,
-                new SetPropertiesRule());
+        addRule(pattern, new SetPropertiesRule());
 
     }
 
