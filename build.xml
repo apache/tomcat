@@ -594,6 +594,8 @@
         <exclude name=".*/**"/>
         <exclude name="**/MANIFEST.MF"/>
         <patternset refid="text.files" />
+        <!-- Exclude developer specific local files -->
+        <exclude name="build.properties" />
       </fileset>
     </checkstyle>
     <!-- javax package checks -->
