@@ -45,6 +45,14 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 9.0.26 (markt)" rtext="in development">
+  <subsection name="Oher">
+    <changelog>
+      <fix>
+        Re-tagged to ensure that the source file for the changelog did not
+        contain an XML byte order mark. (markt)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 9.0.25 (markt)" rtext="not released">
   <subsection name="Catalina">
