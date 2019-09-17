@@ -214,7 +214,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
                 // Process the initial settings frame
                 stream = getStream(1, true);
                 String base64Settings = stream.getCoyoteRequest().getHeader(HTTP2_SETTINGS_HEADER);
-                byte[] settings = Base64.decodeBase64(base64Settings);
+                byte[] settings = Base64.decodeBase64URLSafe(base64Settings);
 
                 // Settings are only valid on stream 0
                 FrameType.SETTINGS.check(0, settings.length);

@@ -81,7 +81,7 @@ public abstract class Http2TestBase extends TomcatBaseTest {
 
     static {
         byte[] empty = new byte[0];
-        EMPTY_HTTP2_SETTINGS_HEADER = "HTTP2-Settings: " + Base64.encodeBase64String(empty) + "\r\n";
+        EMPTY_HTTP2_SETTINGS_HEADER = "HTTP2-Settings: " + Base64.encodeBase64URLSafeString(empty) + "\r\n";
     }
 
     protected static final String TRAILER_HEADER_NAME = "x-trailertest";

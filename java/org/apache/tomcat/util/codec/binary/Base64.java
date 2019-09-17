@@ -110,17 +110,29 @@ public class Base64 extends BaseNCodec {
      * Thanks to "commons" project in ws.apache.org for this code.
      * https://svn.apache.org/repos/asf/webservices/commons/trunk/modules/util/
      */
-    private static final byte[] DECODE_TABLE = {
+    private static final byte[] STANDARD_DECODE_TABLE = {
         //   0   1   2   3   4   5   6   7   8   9   A   B   C   D   E   F
             -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, // 00-0f
             -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, // 10-1f
-            -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 62, -1, 62, -1, 63, // 20-2f + - /
+            -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 62, -1, -1, -1, 63, // 20-2f + /
             52, 53, 54, 55, 56, 57, 58, 59, 60, 61, -1, -1, -1, -1, -1, -1, // 30-3f 0-9
             -1,  0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, // 40-4f A-O
-            15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, -1, -1, -1, -1, 63, // 50-5f P-Z _
+            15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, -1, -1, -1, -1, -1, // 50-5f P-Z
             -1, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, // 60-6f a-o
             41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51                      // 70-7a p-z
     };
+
+    private static final byte[] URL_SAFE_DECODE_TABLE = {
+            //   0   1   2   3   4   5   6   7   8   9   A   B   C   D   E   F
+                -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, // 00-0f
+                -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, // 10-1f
+                -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 62, -1, -1, // 20-2f -
+                52, 53, 54, 55, 56, 57, 58, 59, 60, 61, -1, -1, -1, -1, -1, -1, // 30-3f 0-9
+                -1,  0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, // 40-4f A-O
+                15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, -1, -1, -1, -1, 63, // 50-5f P-Z _
+                -1, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, // 60-6f a-o
+                41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51                      // 70-7a p-z
+        };
 
     /**
      * Base64 uses 6-bit fields.
@@ -140,7 +152,7 @@ public class Base64 extends BaseNCodec {
     private final byte[] encodeTable;
 
     // Only one decode table currently; keep for consistency with Base32 code
-    private final byte[] decodeTable = DECODE_TABLE;
+    private final byte[] decodeTable;
 
     /**
      * Line separator for encoding. Not used when decoding. Only used if lineLength &gt; 0.
@@ -273,6 +285,8 @@ public class Base64 extends BaseNCodec {
         super(BYTES_PER_UNENCODED_BLOCK, BYTES_PER_ENCODED_BLOCK,
                 lineLength,
                 lineSeparator == null ? 0 : lineSeparator.length);
+        // Needs to be set early to avoid NPE during call to containsAlphabetOrPad() below
+        this.decodeTable = urlSafe ? URL_SAFE_DECODE_TABLE : STANDARD_DECODE_TABLE;
         // TODO could be simplified if there is no requirement to reject invalid line sep when length <=0
         // @see test case Base64Test.testConstructors()
         if (lineSeparator != null) {
@@ -441,8 +455,8 @@ public class Base64 extends BaseNCodec {
                 context.eof = true;
                 break;
             }
-            if (b >= 0 && b < DECODE_TABLE.length) {
-                final int result = DECODE_TABLE[b];
+            if (b >= 0 && b < decodeTable.length) {
+                final int result = decodeTable[b];
                 if (result >= 0) {
                     context.modulus = (context.modulus+1) % BYTES_PER_ENCODED_BLOCK;
                     context.ibitWorkArea = (context.ibitWorkArea << BITS_PER_ENCODED_BYTE) + result;
@@ -495,7 +509,7 @@ public class Base64 extends BaseNCodec {
      * @since 1.4
      */
     public static boolean isBase64(final byte octet) {
-        return octet == PAD_DEFAULT || (octet >= 0 && octet < DECODE_TABLE.length && DECODE_TABLE[octet] != -1);
+        return octet == PAD_DEFAULT || (octet >= 0 && octet < STANDARD_DECODE_TABLE.length && STANDARD_DECODE_TABLE[octet] != -1);
     }
 
     /**
@@ -676,6 +690,10 @@ public class Base64 extends BaseNCodec {
      */
     public static byte[] decodeBase64(final String base64String) {
         return new Base64().decode(base64String);
+    }
+
+    public static byte[] decodeBase64URLSafe(final String base64String) {
+        return new Base64(true).decode(base64String);
     }
 
     /**
