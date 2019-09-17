@@ -82,7 +82,7 @@ oc policy add-role-to-user view system:serviceaccount:$(oc project -q):default -
 
 Download Graal native-image and tools.
 ```
-export JAVA_HOME=/absolute...path...to/graalvm-ce-19.1.0
+export JAVA_HOME=/absolute...path...to/graalvm-ce-19.2.0.1
 export TOMCAT_MAVEN=/absolute...path...to/tomcat-maven
 cd $JAVA_HOME/bin
 ./gu install native-image
