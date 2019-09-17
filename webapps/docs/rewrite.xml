@@ -254,7 +254,7 @@
         value of a header sent in the HTTP request.
         Example: <code>%{HTTP:Proxy-Connection}</code> is
         the value of the HTTP header
-        ``<code>Proxy-Connection:</code>''.</li>
+        '<code>Proxy-Connection:</code>'.</li>
 
       </ol>
 
@@ -366,7 +366,7 @@ RewriteRule ...some special stuff for any of these hosts...</source>
       <p><strong>Example:</strong></p>
 
        <p>To rewrite the Homepage of a site according to the
-        ``<code>User-Agent:</code>'' header of the request, you can
+        '<code>User-Agent:</code>' header of the request, you can
         use the following: </p>
 
 <source>RewriteCond  %{HTTP_USER_AGENT}  ^Mozilla.*
@@ -418,7 +418,7 @@ public interface RewriteMap {
 
       <p>Pattern is a perl compatible regular
       expression, which is applied to the current URL.
-      ``Current'' means the value of the URL when this rule is
+      'Current' means the value of the URL when this rule is
       applied. This may not be the originally requested URL,
       which may already have matched a previous rule, and have been
       altered.</p>
@@ -440,8 +440,8 @@ public interface RewriteMap {
 <pre>
 <strong>Text:</strong>
   <strong><code>.</code></strong>           Any single character
-  <strong><code>[</code></strong>chars<strong><code>]</code></strong>     Character class: Any character of the class ``chars''
-  <strong><code>[^</code></strong>chars<strong><code>]</code></strong>    Character class: Not a character of the class ``chars''
+  <strong><code>[</code></strong>chars<strong><code>]</code></strong>     Character class: Any character of the class 'chars'
+  <strong><code>[^</code></strong>chars<strong><code>]</code></strong>    Character class: Not a character of the class 'chars'
   text1<strong><code>|</code></strong>text2 Alternative: text1 or text2
 
 <strong>Quantifiers:</strong>
@@ -481,8 +481,8 @@ public interface RewriteMap {
       <p>In the rules, the NOT character
        ('<code>!</code>') is also available as a possible pattern
       prefix. This enables you to negate a pattern; to say, for instance:
-      ``<em>if the current URL does <strong>NOT</strong> match this
-      pattern</em>''. This can be used for exceptional cases, where
+      '<em>if the current URL does <strong>NOT</strong> match this
+      pattern</em>'. This can be used for exceptional cases, where
       it is easier to match the negative pattern, or as a last
       default rule.</p>
 
@@ -565,9 +565,9 @@ cannot use <code>$N</code> in the substitution string!
         the flag has no effect. If the rule does
         <strong>not</strong> match, then all following chained
         rules are skipped. For instance, it can be used to remove the
-        ``<code>.www</code>'' part, inside a per-directory rule set,
+        '<code>.www</code>' part, inside a per-directory rule set,
         when you let an external redirect happen (where the
-        ``<code>.www</code>'' part should not occur!).</li>
+        '<code>.www</code>' part should not occur!).</li>
 
         <li>
         '<strong><code>cookie|CO=</code></strong><em>NAME</em>:<em>VAL</em>:<em>domain</em>[:<em>lifetime</em>[:<em>path</em>]]'
@@ -698,8 +698,8 @@ cannot use <code>$N</code> in the substitution string!
           <code>temp</code> (default), <code>permanent</code>,
           <code>seeother</code>. Use this for rules to
           canonicalize the URL and return it to the client - to
-          translate ``<code>/~</code>'' into
-          ``<code>/u/</code>'', or to always append a slash to
+          translate '<code>/~</code>' into
+          '<code>/u/</code>', or to always append a slash to
           <code>/u/</code><em>user</em>, etc.<br />
           <strong>Note:</strong> When you use this flag, make
           sure that the substitution field is a valid URL! Otherwise,
