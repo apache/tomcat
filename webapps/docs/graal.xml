@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one or more
+  contributor license agreements.  See the NOTICE file distributed with
+  this work for additional information regarding copyright ownership.
+  The ASF licenses this file to You under the Apache License, Version 2.0
+  (the "License"); you may not use this file except in compliance with
+  the License.  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+<!DOCTYPE document [
+  <!ENTITY project SYSTEM "project.xml">
+]>
+<document url="graal.html">
+
+    &project;
+
+  <properties>
+    <title>GraalVM support</title>
+  </properties>
+
+<body>
+
+<section name="Table of Contents">
+<toc/>
+</section>
+
+  <section name="Introduction">
+
+  <p>
+    Tomcat supports using the GraalVM Native Image tool to produce a native
+    binary including the container. This documentation page describes the
+    build process of such an image.
+  </p>
+
+  </section>
+
+  <section name="Setup">
+
+  <p>
+    The native image tool is much easier to use with single JARs, as a result
+    the process will use the Maven shade plugin JAR packaging (fat JAR). The
+    idea is to produce a single JAR that contains all necessary classes from
+    Tomcat, the webapps and all additional dependencies. Although Tomcat has
+    received compatibility fixes to support GraalVM native images, any library
+    may not be compatible and may require replacement code (the GraalVM
+    documentation has more details about this).
+  </p>
+
+  <p>
+    Download and install GraalVM. The first step is then to add the
+    native-image tool.
+    <source>export JAVA_HOME=/absolute...path...to/graalvm-ce-x.y.z
+cd $JAVA_HOME/bin
+./gu install native-image</source>
+    Download the Tomcat Maven packaging from
+    https://github.com/apache/tomcat/tree/master/res/tomcat-maven and place
+    all the files in a folder (named tomcat-maven in this documentation.
+    <source>export TOMCAT_MAVEN=/absolute...path...to/tomcat-maven</source>
+    The build process now requires both Ant and Maven.
+  </p>
+
+  </section>
+
+  <section name="Packaging and Building">
+
+  <p>
+    Inside the tomcat-maven folder, the directory structure is the same as for
+    regular Tomcat. The main configuration files are placed in the conf folder,
+    and if using the default server.xml the webapps are placed in the webapps
+    folder. If using the default server.xml file, some Server listeners have
+    to be removed from the configuration as they are not compatible with native
+    images, such as a JMX listener (JMX is unsupported) and leak prevention
+    listeners (not needed here, and using internal code that does not exist).
+  </p>
+
+  <p>
+    The first step is to build the fat Tomcat JAR with all dependencies.
+    Any JSP in the webapp must all be precompiled and packaged.
+    <source>cd $TOMCAT_MAVEN
+mvn package
+ant -Dwebapp.name=somewebapp -f graal-webapp.ant.xml</source>
+    Dependencies for the webapp should now be added to the main pom.xml,
+    following with building the complete fat JAR.
+    <source>mvn package</source>
+  </p>
+
+  </section>
+
+  <section name="Native image configuration">
+
+  <p>
+    Native images do not support any form of dynamic classloading or
+    reflection unless it is defined explicitly in descriptors. Generating
+    them uses a tracing agent from the GraalVM, and needs additional manual
+    configuration in some cases.
+  </p>
+
+  <p>
+    Run the GraalVM substrate VM using the trace agent:
+    <source>$JAVA_HOME/bin/java\
+        -agentlib:native-image-agent=trace-output=$TOMCAT_MAVEN/target/trace-file.json\
+        -Dcatalina.base=. -Djava.util.logging.config.file=conf/logging.properties\
+        -jar target/tomcat-maven-1.0.jar</source>
+  </p>
+
+  <p>
+    Now all paths from the webapp that lead to dynamic classloading
+    (ex: Servlet access, websockets, etc) need to be accessed using a script
+    that will exercise the webapp. Servlets may be loaded on startup
+    instead of needing an actual access. Listeners may also be used to load
+    additional classes on startup.
+  </p>
+
+  <p>
+    Once that is done, the VM may be shut down. The descriptors can now be
+    generated from the trace file.
+    <source>$JAVA_HOME/bin/native-image-configure generate\
+        --trace-input=$TOMCAT_MAVEN/target/trace-file.json\
+        --output-dir=$TOMCAT_MAVEN/target</source>
+    At this point, further configuration must be made to add items that are
+    not traced, including: base interfaces, resource bundles, BeanInfo based
+    reflection, etc. Please refer to the Graal documentation for more
+    information on this process.
+  </p>
+
+  </section>
+
+  <section name="Building the native image">
+
+  <p>
+    If everything has been done properly, the native image can now be built
+    using the native-image tool.
+    <source>$JAVA_HOME/bin/native-image --no-server\
+        --allow-incomplete-classpath --enable-https\
+        --initialize-at-build-time=org.eclipse.jdt,org.apache.el.parser.SimpleNode,javax.servlet.jsp.JspFactory,org.apache.jasper.servlet.JasperInitializer,org.apache.jasper.runtime.JspFactoryImpl\
+        -H:+JNI -H:+ReportUnsupportedElementsAtRuntime\
+        -H:+ReportExceptionStackTraces -H:EnableURLProtocols=http,https,jar\
+        -H:ConfigurationFileDirectories=$TOMCAT_MAVEN/target/\
+        -H:ReflectionConfigurationFiles=$TOMCAT_MAVEN/tomcat-reflection.json\
+        -H:ResourceConfigurationFiles=$TOMCAT_MAVEN/tomcat-resource.json\
+        -H:JNIConfigurationFiles=$TOMCAT_MAVEN/tomcat-jni.json\
+        -jar $TOMCAT_MAVEN/target/tomcat-maven-1.0.jar</source>
+  </p>
+
+  <p>
+    Running the native image is then:
+    <source>./tomcat-maven-1.0 -Djava.library.path=$JAVA_HOME/jre/lib/amd64\
+        -Dcatalina.base=. -Djava.util.logging.config.file=conf/logging.properties</source>
+  </p>
+
+  </section>
+
+  <section name="Compatibility">
+
+  <p>
+    Servlets, JSPs, EL, websockets, the Tomcat container, tomcat-native, HTTP/2\
+    are all supported out of the box in a native image. However, EL uses
+    BeanInfo reflection which needs manual descriptor configuration.
+    At the time of writing this documentation, JULI is not supported as the
+    log manager configuration property is not supported by Graal, in addition
+    to some static initializer problems, and the regular java.util.logging
+    loggers and implementation should be used instead.
+  </p>
+
+  <p>
+    An a descriptor example, the EL expression
+    <source>${pageContext.servletContext.serverInfo}</source> needs full
+    reflection information on the concrete Jasper page context class, as well
+    as the Catalina Servlet context implementation. Graal error messages
+    during runtime generally indicate which classes are missing reflection
+    as the BeanInfo reported for these will be empty.
+  </p>
+
+  </section>
+
+</body>
+</document>
