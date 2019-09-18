@@ -75,10 +75,7 @@ cd $JAVA_HOME/bin
     Inside the tomcat-maven folder, the directory structure is the same as for
     regular Tomcat. The main configuration files are placed in the conf folder,
     and if using the default server.xml the webapps are placed in the webapps
-    folder. If using the default server.xml file, some Server listeners have
-    to be removed from the configuration as they are not compatible with native
-    images, such as a JMX listener (JMX is unsupported) and leak prevention
-    listeners (not needed here, and using internal code that does not exist).
+    folder.
   </p>
 
   <p>
@@ -161,9 +158,18 @@ ant -Dwebapp.name=somewebapp -f graal-webapp.ant.xml</source>
   <section name="Compatibility">
 
   <p>
-    Servlets, JSPs, EL, websockets, the Tomcat container, tomcat-native, HTTP/2\
+    Servlets, JSPs, EL, websockets, the Tomcat container, tomcat-native, HTTP/2
     are all supported out of the box in a native image. However, EL uses
     BeanInfo reflection which needs manual descriptor configuration.
+    To give an example, the EL expression
+    <source>${pageContext.servletContext.serverInfo}</source> needs full
+    reflection information on the concrete Jasper page context class, as well
+    as the Catalina Servlet context implementation. Graal error messages
+    during runtime generally indicate which classes are missing reflection
+    as the BeanInfo reported for these will be empty.
+  </p>
+
+  <p>
     At the time of writing this documentation, JULI is not supported as the
     log manager configuration property is not supported by Graal, in addition
     to some static initializer problems, and the regular java.util.logging
@@ -171,12 +177,10 @@ ant -Dwebapp.name=somewebapp -f graal-webapp.ant.xml</source>
   </p>
 
   <p>
-    An a descriptor example, the EL expression
-    <source>${pageContext.servletContext.serverInfo}</source> needs full
-    reflection information on the concrete Jasper page context class, as well
-    as the Catalina Servlet context implementation. Graal error messages
-    during runtime generally indicate which classes are missing reflection
-    as the BeanInfo reported for these will be empty.
+    If using the default server.xml file, some Server listeners have
+    to be removed from the configuration as they are not compatible with native
+    images, such as a JMX listener (JMX is unsupported) and leak prevention
+    listeners (use of internal code that does not exist in Graal).
   </p>
 
   </section>
