@@ -40,11 +40,18 @@ public interface Processor<S> {
     SocketState asyncPostProcess();
 
     /**
+     * @return  Listener to which data available events are passed once the
+     *          associated connection has completed the proprietary Tomcat HTTP
+     *          upgrade process.
+     *
      * @deprecated  Will be removed in Tomcat 8.0.x.
      */
     @Deprecated
     org.apache.coyote.http11.upgrade.UpgradeInbound getUpgradeInbound();
     /**
+     * @return  The socket state once the upgrade dispatch event has been
+     *          processed.
+     * @throws IOException An IO error occurred
      * @deprecated  Will be removed in Tomcat 8.0.x.
      */
     @Deprecated

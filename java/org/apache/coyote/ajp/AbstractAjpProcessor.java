@@ -710,6 +710,7 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
      * internal buffer.
      *
      * @return true if there is more data, false if not.
+     * @throws IOException An IO error occurred
      */
     protected boolean refillReadBuffer() throws IOException {
         // If the server returns an empty packet, assume that that end of
@@ -1015,6 +1016,7 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
     /**
      * When committing the response, we have to validate the set of headers, as
      * well as setup the response filters.
+     * @throws IOException An IO error occurred
      */
     protected void prepareResponse() throws IOException {
 
@@ -1098,6 +1100,11 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
 
     /**
      * Callback to write data from the buffer.
+     *
+     * @param explicit  If {@code true} a flush message is sent, otherwise this
+     *                  method is a NO-OP
+     *
+     * @throws IOException An IO error occurred
      */
     protected void flush(boolean explicit) throws IOException {
         if (ajpFlush && explicit && !finished) {
@@ -1109,6 +1116,7 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
 
     /**
      * Finish AJP response.
+     * @throws IOException An IO error occurred
      */
     protected void finish() throws IOException {
 

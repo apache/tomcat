@@ -238,6 +238,8 @@ public class AjpMessage {
      * encoded length).  The terminator is for the convenience of the C
      * code, where it saves a round of copying.  A null string is
      * encoded as a string with length 0.
+     *
+     * @param str   The String to append
      */
     public void appendString(String str) {
         if (str == null) {
@@ -406,7 +408,9 @@ public class AjpMessage {
 
 
     /**
-     * Dump the contents of the message, prefixed with the given String.
+     * Dump the contents of the message.
+     *
+     * @param msg   The message to write
      */
     public void dump(String msg) {
         if (log.isDebugEnabled()) {

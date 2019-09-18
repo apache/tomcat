@@ -304,6 +304,11 @@ public class AjpAprProcessor extends AbstractAjpProcessor<Long> {
     /**
      * Read at least the specified amount of bytes, and place them
      * in the input buffer.
+     *
+     * @param n The minimum number of bytes to read before the method returns
+     *
+     * @return Always {@code true}
+     * @throws IOException If an I/O error occurs during the read
      */
     protected boolean read(int n)
         throws IOException {
@@ -334,6 +339,15 @@ public class AjpAprProcessor extends AbstractAjpProcessor<Long> {
     /**
      * Read at least the specified amount of bytes, and place them
      * in the input buffer.
+     *
+     * @param n The minimum number of bytes to read
+     * @param useAvailableData If {@code true}, only proceed with the read if
+     *                         there is at least one byte of data available to
+     *                         read in the input buffer
+     *
+     * @return {@code true} if the number of bytes requested was read,
+     *         {@code false} if no bytes were read
+     * @throws IOException if an I/O error occurs during the read
      */
     protected boolean readt(int n, boolean useAvailableData)
         throws IOException {
@@ -401,8 +415,13 @@ public class AjpAprProcessor extends AbstractAjpProcessor<Long> {
     /**
      * Read an AJP message.
      *
+     * @param message   The message object to be populated
      * @param first is true if the message is the first in the request, which
      *        will cause a short duration blocking read
+     * @param useAvailableData If {@code true} and if {@code first} is
+     *                         {@code true}, only proceed with the read if there
+     *                         is at least one byte of data available to read in
+     *                         the input buffer
      * @return true if the message has been read, false if the short read
      *         didn't return anything
      * @throws IOException any other failure, including incomplete reads

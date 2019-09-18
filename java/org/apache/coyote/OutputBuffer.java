@@ -35,6 +35,9 @@ public interface OutputBuffer {
      * Write the given data to the response. The caller owns the chunks.
      *
      * @param chunk data to write
+     * @param response  The response to which the data should be written.
+     *                  (Should be the response already associated with the
+     *                  OutputBuffer).
      *
      * @return The number of bytes written which may be less than available in
      *         the input chunk

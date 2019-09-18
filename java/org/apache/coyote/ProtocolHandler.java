@@ -105,6 +105,9 @@ public interface ProtocolHandler {
 
     /**
      * Requires APR/native library
+     *
+     * @return <code>true</code> if this Protocol Handler requires the
+     *         APR/native library, otherwise <code>false</code>
      */
     public boolean isAprRequired();
 }

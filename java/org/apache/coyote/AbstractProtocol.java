@@ -296,8 +296,10 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
 
     /**
      * The name will be prefix-address-port if address is non-null and
-     * prefix-port if the address is null. The name will be appropriately quoted
-     * so it can be used directly in an ObjectName.
+     * prefix-port if the address is null.
+     *
+     * @return A name for this protocol instance that is appropriately quoted
+     *         for use in an ObjectName.
      */
     public String getName() {
         StringBuilder name = new StringBuilder(getNamePrefix());
@@ -350,6 +352,7 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
 
     /**
      * Obtain the handler associated with the underlying Endpoint
+     * @return the handler
      */
     protected abstract Handler getHandler();
 
@@ -788,7 +791,16 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
         protected abstract void release(SocketWrapper<S> socket,
                 Processor<S> processor, boolean socketClosing,
                 boolean addToPoller);
+
         /**
+         * Create an instance of an HTTP upgrade processor.
+         *
+         * @param socket    The socket associated with the connection to upgrade
+         * @param inbound   Listener to which data available events should be
+         *                  passed
+         * @return  A Processor instance for the upgraded connection
+         * @throws IOException if an I/O error occurred during the creation of
+         *                     the Processor
          * @deprecated  Will be removed in Tomcat 8.0.x.
          */
         @Deprecated

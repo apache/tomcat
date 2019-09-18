@@ -122,7 +122,8 @@ public abstract class AbstractProcessor<S> implements ActionHook, Processor<S> {
     }
 
     /**
-     * The endpoint receiving connections that are handled by this processor.
+     * @return The endpoint receiving connections that are handled by this
+     *         processor.
      */
     protected AbstractEndpoint<S> getEndpoint() {
         return endpoint;
