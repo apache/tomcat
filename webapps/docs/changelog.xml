@@ -54,6 +54,15 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Web Socket">
+    <changelog>
+      <fix>
+        <bug>63753</bug>: Ensure that the <code>Host</code> header in a Web
+        Socket HTTP upgrade request only contains a port if a non-default port
+        is being used. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <scode>
