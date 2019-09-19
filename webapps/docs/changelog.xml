@@ -247,6 +247,12 @@
         Remove unused i18n messages and associated translations. Patch provided
         by KangZhiDong. (markt)
       </fix>
+      <scode>
+        Deprecate <code>org.apache.tomcat.util.compat.TLS</code>.
+        Its functionality was only used for unit tests in
+        <code>org.apache.tomcat.util.net.TesterSupport</code>
+        and has been moved there. (rjung)
+      </scode>
     </changelog>
   </subsection>
 </section>
