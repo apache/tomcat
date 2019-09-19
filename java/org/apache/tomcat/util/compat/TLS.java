@@ -24,7 +24,10 @@ import org.apache.tomcat.util.net.Constants;
 
 /**
  * This class checks for the availability of TLS features.
+ *
+ * @deprecated Unused. This will be removed in Tomcat 10.
  */
+@Deprecated
 public class TLS {
 
     private static final boolean tlsv13Available;

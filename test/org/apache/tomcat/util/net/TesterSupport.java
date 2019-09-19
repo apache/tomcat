@@ -24,6 +24,7 @@ import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.security.KeyStore;
+import java.security.NoSuchAlgorithmException;
 import java.security.Principal;
 import java.security.PrivateKey;
 import java.security.cert.CertificateException;
@@ -58,7 +59,6 @@ import org.apache.tomcat.jni.Library;
 import org.apache.tomcat.jni.LibraryNotFoundError;
 import org.apache.tomcat.jni.SSL;
 import org.apache.tomcat.util.compat.JreCompat;
-import org.apache.tomcat.util.compat.TLS;
 import org.apache.tomcat.util.descriptor.web.LoginConfig;
 import org.apache.tomcat.util.descriptor.web.SecurityCollection;
 import org.apache.tomcat.util.descriptor.web.SecurityConstraint;
@@ -82,6 +82,7 @@ public final class TesterSupport {
     public static final String LOCALHOST_RSA_KEY_PEM = SSL_DIR + "localhost-rsa-key.pem";
     public static final boolean OPENSSL_AVAILABLE;
     public static final int OPENSSL_VERSION;
+    public static final boolean TLSV13_AVAILABLE;
 
     public static final String ROLE = "testrole";
 
@@ -102,6 +103,14 @@ public final class TesterSupport {
         }
         OPENSSL_AVAILABLE = available;
         OPENSSL_VERSION = version;
+
+        available = false;
+        try {
+            SSLContext.getInstance(Constants.SSL_PROTO_TLSv1_3);
+            available = true;
+        } catch (NoSuchAlgorithmException ex) {
+        }
+        TLSV13_AVAILABLE = available;
     }
 
     public static boolean isOpensslAvailable() {
@@ -110,6 +119,10 @@ public final class TesterSupport {
 
     public static int getOpensslVersion() {
         return OPENSSL_VERSION;
+    }
+
+    public static boolean isTlsv13Available() {
+        return TLSV13_AVAILABLE;
     }
 
     public static void initSsl(Tomcat tomcat) {
@@ -663,7 +676,7 @@ public final class TesterSupport {
      */
     public static String getDefaultTLSProtocolForTesting(Connector connector) {
         // Clients always use JSSE
-        if (!TLS.isTlsv13Available()) {
+        if (!TLSV13_AVAILABLE) {
             // Client doesn't support TLS 1.3 so we have to use TLS 1.2
             return Constants.SSL_PROTO_TLSv1_2;
         }
