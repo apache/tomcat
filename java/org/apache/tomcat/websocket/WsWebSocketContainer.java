@@ -265,7 +265,7 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
         }
 
         // Create the initial HTTP request to open the WebSocket connection
-        Map<String, List<String>> reqHeaders = createRequestHeaders(host, port,
+        Map<String, List<String>> reqHeaders = createRequestHeaders(host, port, secure,
                 clientEndpointConfiguration);
         clientEndpointConfiguration.getConfigurator().beforeRequest(reqHeaders);
         if (Constants.DEFAULT_ORIGIN_HEADER_VALUE != null
@@ -631,7 +631,7 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
     }
 
     private static Map<String, List<String>> createRequestHeaders(String host, int port,
-            ClientEndpointConfig clientEndpointConfiguration) {
+            boolean secure, ClientEndpointConfig clientEndpointConfiguration) {
 
         Map<String, List<String>> headers = new HashMap<>();
         List<Extension> extensions = clientEndpointConfiguration.getExtensions();
@@ -646,7 +646,8 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
 
         // Host header
         List<String> hostValues = new ArrayList<>(1);
-        if (port == -1) {
+        if (port == 80 && !secure || port == 443 && secure) {
+            // Default ports. Do not include port in host header
             hostValues.add(host);
         } else {
             hostValues.add(host + ':' + port);
