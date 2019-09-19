@@ -61,6 +61,16 @@
       </docs>
     </changelog>
   </subsection>
+  <subsection name="Other">
+    <changelog>
+      <scode>
+        Deprecate <code>org.apache.tomcat.util.compat.TLS</code>.
+        Its functionality was only used for unit tests in
+        <code>org.apache.tomcat.util.net.TesterSupport</code>
+        and has been moved there. (rjung)
+      </scode>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 9.0.26 (markt)" rtext="release in progress">
   <subsection name="Other">
