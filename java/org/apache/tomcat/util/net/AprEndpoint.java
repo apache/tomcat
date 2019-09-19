@@ -1248,8 +1248,11 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
             // Close all sockets in the add queue
             info = addList.get();
             while (info != null) {
-                // Make sure the  socket isn't in the poller before we close it
+                // Make sure the socket isn't in the poller before we close it
                 removeFromPoller(info.socket);
+                // Close the SocketWrapper to prevent any still running application
+                // threads from trying to use the socket
+                connections.get(Long.valueOf(info.socket)).close();
                 // Poller isn't running at this point so use destroySocket()
                 // directly
                 destroySocket(info.socket);
