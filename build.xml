@@ -1098,6 +1098,7 @@
       <fileset dir="conf">
         <include name="**/*.policy"/>
         <include name="**/*.xml"/>
+        <include name="**/*.xsd"/>
         <include name="**/*.properties"/>
       </fileset>
     </copy>

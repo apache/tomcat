@@ -109,6 +109,10 @@
         replacement in configuration files with environment variables. Based on
         a pull request provided by Thomas Meyer. (markt)
       </add>
+      <fix>
+        <bug>63758</bug>: Include the XML schema for the tomcat-users.xml file
+        in the binary distributions. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
