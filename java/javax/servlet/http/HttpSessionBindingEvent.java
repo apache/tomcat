@@ -20,7 +20,7 @@ package javax.servlet.http;
 /**
  * Events of this type are either sent to an object that implements
  * {@link HttpSessionBindingListener} when it is bound or unbound from a
- * session, or to a {@link HttpSessionAttributeListener} that has been
+ * session, or to an {@link HttpSessionAttributeListener} that has been
  * configured in the deployment descriptor when any attribute is bound, unbound
  * or replaced in a session.
  * <p>

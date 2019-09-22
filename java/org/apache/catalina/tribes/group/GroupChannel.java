@@ -360,7 +360,7 @@ public class GroupChannel extends ChannelInterceptorBase
 
     /**
      * Sends a <code>NoRpcChannelReply</code> message to a member<br>
-     * This method gets invoked by the channel if a RPC message comes in
+     * This method gets invoked by the channel if an RPC message comes in
      * and no channel listener accepts the message. This avoids timeout
      * @param msg RpcMessage
      * @param destination Member - the destination for the reply
