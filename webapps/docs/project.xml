@@ -82,12 +82,14 @@
         <item name="Release Notes"         href="RELEASE-NOTES.txt"/>
         <item name="Configuration"         href="config/index.html"/>
         <item name="Tomcat Javadocs"       href="api/index.html"/>
-        <item name="Servlet Javadocs"      href="servletapi/index.html"/>
+        <item name="Servlet 4.0 Javadocs"  href="servletapi/index.html"/>
         <item name="JSP 2.3 Javadocs"      href="jspapi/index.html"/>
         <item name="EL 3.0 Javadocs"       href="elapi/index.html"/>
         <item name="WebSocket 1.1 Javadocs"
               href="websocketapi/index.html"/>
         <item name="JASPIC 1.1 Javadocs"   href="jaspicapi/index.html"/>
+        <item name="Common Annotations 1.3 Javadocs"
+              href="annotationapi/index.html"/>
         <item name="JK 1.2 Documentation"
               href="https://tomcat.apache.org/connectors-doc/"/>
     </menu>

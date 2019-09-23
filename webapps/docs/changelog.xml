@@ -63,6 +63,13 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Web Applications">
+    <changelog>
+      <docs>
+        Add Javadoc for the Common Annotations API implementation. (markt)
+      </docs>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <scode>

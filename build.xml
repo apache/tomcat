@@ -1847,6 +1847,27 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
 
   <target name="javadoc" depends="dist-source,extras-webservices-prepare"
     description="Create the Tomcat javadoc" >
+    <javadoc packagenames="javax.annotation.*"
+      sourcepath="${tomcat.dist}/src/java"
+      destdir="${tomcat.dist}/webapps/docs/annotationapi"
+      version="true"
+      windowtitle="Common Annotations 1.2 API Documentation - Apache Tomcat ${version}"
+      doctitle="Common Annotations 1.2 API - Apache Tomcat ${version}"
+      header="&lt;b&gt;Common Annotations 1.2 - Apache Tomcat ${version}&lt;/b&gt;"
+      bottom="Copyright &amp;#169; 2000-${year} Apache Software Foundation. All Rights Reserved."
+      encoding="UTF-8"
+      docencoding="UTF-8"
+      charset="UTF-8"
+      additionalparam="-breakiterator -notimestamp ${java9.javadoc.options}"
+      source="${compile.source}"
+      maxmemory="512m"
+      failonerror="true"
+      failonwarning="true">
+      <classpath>
+        <path refid="compile.classpath"/>
+        <path location="${ant.core.lib}"/>
+      </classpath>
+    </javadoc>
     <javadoc packagenames="javax.servlet.*"
       excludepackagenames="javax.servlet.jsp.*"
       sourcepath="${tomcat.dist}/src/java"
@@ -1976,6 +1997,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
         <path refid="tomcat.webservices.classpath"/>
         <path location="${ant.core.lib}"/>
       </classpath>
+      <link href="../annotationapi"/>
       <link href="../servletapi"/>
       <link href="../jspapi"/>
       <link href="../elapi"/>
