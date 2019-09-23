@@ -76,6 +76,8 @@ public final class Ascii {
 
     /**
      * Returns the upper case equivalent of the specified ASCII character.
+     * @param c The char
+     * @return the upper case equivalent char
      * @deprecated Unused. Will be removed in Tomcat 8.0.x onwards.
      */
     @Deprecated
@@ -85,14 +87,17 @@ public final class Ascii {
 
     /**
      * Returns the lower case equivalent of the specified ASCII character.
+     * @param c The char
+     * @return the lower case equivalent char
      */
-
     public static int toLower(int c) {
         return toLower[c & 0xff] & 0xff;
     }
 
     /**
-     * Returns true if the specified ASCII character is upper or lower case.
+     * @return <code>true</code> if the specified ASCII character is a upper
+     *         or lower case
+     * @param c The char
      * @deprecated Unused. Will be removed in Tomcat 8.0.x onwards.
      */
     @Deprecated
@@ -101,7 +106,9 @@ public final class Ascii {
     }
 
     /**
-     * Returns true if the specified ASCII character is upper case.
+     * @return <code>true</code> if the specified ASCII character is a upper
+     *         case
+     * @param c The char
      * @deprecated Unused. Will be removed in Tomcat 8.0.x onwards.
      */
     @Deprecated
@@ -110,7 +117,9 @@ public final class Ascii {
     }
 
     /**
-     * Returns true if the specified ASCII character is lower case.
+     * @return <code>true</code> if the specified ASCII character is a lower
+     *         case
+     * @param c The char
      * @deprecated Unused. Will be removed in Tomcat 8.0.x onwards.
      */
     @Deprecated
@@ -119,7 +128,9 @@ public final class Ascii {
     }
 
     /**
-     * Returns true if the specified ASCII character is white space.
+     * @return <code>true</code> if the specified ASCII character is a white
+     *         space
+     * @param c The char
      * @deprecated Unused. Will be removed in Tomcat 8.0.x onwards.
      */
     @Deprecated
@@ -128,9 +139,9 @@ public final class Ascii {
     }
 
     /**
-     * Returns true if the specified ASCII character is a digit.
+     * @return <code>true</code> if the specified ASCII character is a digit.
+     * @param c The char
      */
-
     public static boolean isDigit(int c) {
         return isDigit[c & 0xff];
     }
@@ -140,6 +151,7 @@ public final class Ascii {
      * @param b the bytes to parse
      * @param off the start offset of the bytes
      * @param len the length of the bytes
+     * @return the int value
      * @exception NumberFormatException if the integer format was invalid
      * @deprecated Unused. Will be removed in Tomcat 8.0.x onwards.
      */
@@ -166,6 +178,12 @@ public final class Ascii {
     }
 
     /**
+     * Parses an unsigned int from the specified subarray of characters.
+     * @param b the characters to parse
+     * @param off the start offset of the characters
+     * @param len the length of the characters
+     * @return the int value
+     * @exception NumberFormatException if the long format was invalid
      * @deprecated Unused. Will be removed in Tomcat 8.0.x onwards.
      */
     @Deprecated
@@ -195,6 +213,7 @@ public final class Ascii {
      * @param b the bytes to parse
      * @param off the start offset of the bytes
      * @param len the length of the bytes
+     * @return the long value
      * @exception NumberFormatException if the long format was invalid
      */
     public static long parseLong(byte[] b, int off, int len)
@@ -220,6 +239,12 @@ public final class Ascii {
     }
 
     /**
+     * Parses an unsigned long from the specified subarray of characters.
+     * @param b the characters to parse
+     * @param off the start offset of the characters
+     * @param len the length of the characters
+     * @return the long value
+     * @exception NumberFormatException if the long format was invalid
      * @deprecated Unused. Will be removed in Tomcat 8.0.x onwards.
      */
     @Deprecated
