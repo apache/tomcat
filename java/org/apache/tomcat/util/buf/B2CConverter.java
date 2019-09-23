@@ -71,6 +71,13 @@ public class B2CConverter {
 
     /**
      * Only to be used when it is known that the encoding name is in lower case.
+     * @param lowerCaseEnc The name of the encoding for the required charset in
+     *                     lower case
+     *
+     * @return The Charset corresponding to the requested encoding
+     *
+     * @throws UnsupportedEncodingException If the requested Charset is not
+     *                                      available
      */
     public static Charset getCharsetLower(String lowerCaseEnc)
             throws UnsupportedEncodingException {
@@ -84,6 +91,7 @@ public class B2CConverter {
         }
         return charset;
     }
+
 
     private final CharsetDecoder decoder;
     private ByteBuffer bb = null;
@@ -135,6 +143,8 @@ public class B2CConverter {
      * @param bc byte input
      * @param cc char output
      * @param endOfInput    Is this all of the available data
+     *
+     * @throws IOException If the conversion can not be completed
      */
     public void convert(ByteChunk bc, CharChunk cc, boolean endOfInput)
             throws IOException {
