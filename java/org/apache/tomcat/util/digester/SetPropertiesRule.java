@@ -94,7 +94,7 @@ public class SetPropertiesRule extends Rule {
      * <p>If a property name is null or the attribute name has no matching
      * property name, then this indicates that the attribute should be ignored.</p>
      *
-     * <h3>Example One</h3>
+     * <h4>Example One</h4>
      * <p> The following constructs a rule that maps the <code>alt-city</code>
      * attribute to the <code>city</code> property and the <code>alt-state</code>
      * to the <code>state</code> property.
@@ -105,7 +105,7 @@ public class SetPropertiesRule extends Rule {
      *                new String[] {"city", "state"});
      * </pre>
      *
-     * <h3>Example Two</h3>
+     * <h4>Example Two</h4>
      * <p> The following constructs a rule that maps the <code>class</code>
      * attribute to the <code>className</code> property.
      * The attribute <code>ignore-me</code> is not mapped.
@@ -265,12 +265,8 @@ public class SetPropertiesRule extends Rule {
      */
     @Override
     public String toString() {
-
         StringBuilder sb = new StringBuilder("SetPropertiesRule[");
         sb.append("]");
-        return (sb.toString());
-
+        return sb.toString();
     }
-
-
 }
