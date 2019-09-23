@@ -330,7 +330,21 @@ public class AjpNioProcessor extends AbstractAjpProcessor<NioChannel> {
 
 
     /**
-     * Read the specified amount of bytes, and place them in the input buffer.
+     * Read at least the specified amount of bytes, and place them
+     * in the input buffer. Note that if any data is available to read then this
+     * method will always block until at least the specified number of bytes
+     * have been read.
+     *
+     * @param buf   Buffer to read data into
+     * @param pos   Start position
+     * @param n     The minimum number of bytes to read
+     * @param blockFirstRead
+     *              If there is no data available to read when this method is
+     *              called, should this call block until data becomes available?
+     *
+     * @return The number of bytes read
+     *
+     * @throws IOException If an I/O error occurs during the read
      */
     protected int read(byte[] buf, int pos, int n, boolean blockFirstRead)
         throws IOException {
@@ -428,6 +442,11 @@ public class AjpNioProcessor extends AbstractAjpProcessor<NioChannel> {
 
     /**
      * Read an AJP message.
+     *
+     * @param message   The message to populate
+     * @param blockFirstRead
+     *              If there is no data available to read when this method is
+     *              called, should this call block until data becomes available?
      *
      * @return The number of bytes read
      * @throws IOException any other failure, including incomplete reads

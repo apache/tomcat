@@ -302,6 +302,13 @@ public class AjpProcessor extends AbstractAjpProcessor<Socket> {
     /**
      * Read at least the specified amount of bytes, and place them
      * in the input buffer.
+     *
+     * @param buf   Buffer to read data into
+     * @param pos   Start position
+     * @param n     The minimum number of bytes to read
+     * @return  <code>true</code> if the requested number of bytes were read
+     *          else <code>false</code>
+     * @throws IOException If an I/O error occurs during the read
      */
     protected boolean read(byte[] buf, int pos, int n)
         throws IOException {
@@ -353,6 +360,8 @@ public class AjpProcessor extends AbstractAjpProcessor<Socket> {
 
     /**
      * Read an AJP message.
+     *
+     * @param message   The message object to populate
      *
      * @return true if the message has been read, false if the short read
      *         didn't return anything

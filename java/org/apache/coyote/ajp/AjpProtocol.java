@@ -116,8 +116,10 @@ public class AjpProtocol extends AbstractAjpProtocol<Socket> {
          * required.
          *
          * @param socket            Ignored for BIO
-         * @param processor
-         * @param isSocketClosing
+         * @param processor         The process that was processing this
+         *                              connection and is no longer required
+         * @param isSocketClosing   Is the socket associated with this
+         *                              connection in the process of closing
          * @param addToPoller       Ignored for BIO
          */
         @Override
