@@ -165,6 +165,9 @@
         Spelling and formatting corrections for the cluster how-to. Pull request
         provided by Bill Mitchell. (markt)
       </fix>
+      <docs>
+        Add Javadoc for the Common Annotations API implementation. (markt)
+      </docs>
     </changelog>
   </subsection>
   <subsection name="Other">

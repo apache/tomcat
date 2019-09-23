@@ -40,6 +40,8 @@ public @interface Resource {
     public String mappedName() default "";
     /**
      * @since Common Annotations 1.1
+     *
+     * @return The name of the entry, if any, to use for this resource
      */
     public String lookup() default "";
 }

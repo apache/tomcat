@@ -86,6 +86,8 @@
         <item name="EL 2.2 Javadocs"       href="elapi/index.html"/>
         <item name="WebSocket 1.1 Javadocs"
               href="websocketapi/index.html"/>
+        <item name="Common Annotations 1.1 Javadocs"
+              href="annotationapi/index.html"/>
         <item name="JK 1.2 Documentation"
               href="https://tomcat.apache.org/connectors-doc/"/>
     </menu>
