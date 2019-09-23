@@ -34,6 +34,8 @@ public @interface Resource {
     public String name() default "";
     /**
      * Uses generics since Common Annotations 1.2.
+     *
+     * @return The type for instances of this resource
      */
     public Class<?> type() default Object.class;
     public AuthenticationType authenticationType() default AuthenticationType.CONTAINER;
@@ -42,6 +44,8 @@ public @interface Resource {
     public String mappedName() default "";
     /**
      * @since Common Annotations 1.1
+     *
+     * @return The name of the entry, if any, to use for this resource
      */
     public String lookup() default "";
 }

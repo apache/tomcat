@@ -68,6 +68,9 @@
       <docs>
         Add base GraalVM documentation. (remm)
       </docs>
+      <docs>
+        Add Javadoc for the Common Annotations API implementation. (markt)
+      </docs>
     </changelog>
   </subsection>
   <subsection name="Other">
