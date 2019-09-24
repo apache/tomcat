@@ -129,9 +129,9 @@ wsdl4j-lib.loc=${base-maven.loc}/wsdl4j/wsdl4j/${wsdl4j-lib.version}/wsdl4j-${ws
 # ----- Eclipse JDT, version 4.7 or later -----#
 # See https://cwiki.apache.org/confluence/display/TOMCAT/Managing+Tomcat%27s+Dependency+on+the+Eclipse+JDT+Core+Batch+Compiler
 #
-# Checksum is from "SHA512 Checksums for 4.10" link at
-# http://download.eclipse.org/eclipse/downloads/drops4/R-4.10-201812060815/
-# http://download.eclipse.org/eclipse/downloads/drops4/R-4.10-201812060815/checksum/eclipse-4.10-SUMSSHA512
+# Checksum is from "SHA512 Checksums for 4.12" link at
+# http://download.eclipse.org/eclipse/downloads/drops4/R-4.12-201906051800/
+# http://download.eclipse.org/eclipse/downloads/drops4/R-4.12-201906051800/checksum/eclipse-4.12-SUMSSHA512
 #
 jdt.version=4.12
 jdt.release=R-4.12-201906051800/
