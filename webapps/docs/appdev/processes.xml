@@ -126,7 +126,7 @@ the sample <code>build.xml</code> script.  At a minimum, you will generally
 need to define the <code>catalina.home</code> property defining where
 Tomcat is installed, and the manager application username and password.
 You might end up with something like this:</p>
-<source><![CDATA[# Context path to install this application on
+<source># Context path to install this application on
 app.path=/hello
 
 # Tomcat 7 installation directory
@@ -134,7 +134,7 @@ catalina.home=/usr/local/apache-tomcat-7.0
 
 # Manager webapp username and password
 manager.username=myusername
-manager.password=mypassword]]></source>
+manager.password=mypassword</source>
 
 <p>In general, you will <strong>not</strong> want to check the
 <code>build.properties</code> file in to the CVS repository, because it
