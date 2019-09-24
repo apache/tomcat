@@ -88,6 +88,7 @@
   <property name="compile.source" value="7"/>
   <property name="compile.target" value="7"/>
   <property name="compile.release" value="7"/>
+  <property name="min.java.version" value="7"/>
 
   <!-- Locations to create the JAR artifacts -->
   <!-- Standard JARs -->
@@ -247,6 +248,7 @@
     <filter token="VERSION_BUILT" value="${today} ${tstamp} UTC"/>
     <filter token="JDT_VERSION" value="${jdt.version}"/>
     <filter token="GIT_BRANCH" value="${git.branch}"/>
+    <filter token="MIN_JAVA_VERSION" value="${min.java.version}"/>
   </filterset>
 
   <!-- Files to change line endings for depending on target platform -->

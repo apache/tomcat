@@ -38,7 +38,7 @@ CONTENTS:
 ===================
 Dependency Changes:
 ===================
-Tomcat @VERSION_MAJOR_MINOR@ is designed to run on Java SE 7 and later.
+Tomcat @VERSION_MAJOR_MINOR@ is designed to run on Java @MIN_JAVA_VERSION@ and later.
 
 
 ==============
