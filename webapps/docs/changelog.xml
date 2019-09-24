@@ -52,6 +52,10 @@
         generating or parsing the <code>HTTP2-Settings</code> header as part of
         an HTTP upgrade to <code>h2c</code> as required by RFC 7540. (markt)
       </fix>
+      <fix>
+        <bug>63765</bug>: NIO2 should try to unwrap after TLS handshake to
+        avoid edge cases. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web Socket">

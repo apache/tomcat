@@ -66,7 +66,7 @@ public class SecureNio2Channel extends Nio2Channel  {
     private volatile boolean handshakeComplete;
     private volatile HandshakeStatus handshakeStatus; //gets set by handshake
 
-    private volatile boolean unwrapBeforeRead = false;
+    private volatile boolean unwrapBeforeRead;
 
     protected boolean closed;
     protected boolean closing;
@@ -130,6 +130,7 @@ public class SecureNio2Channel extends Nio2Channel  {
         sslEngine = null;
         sniComplete = false;
         handshakeComplete = false;
+        unwrapBeforeRead = true;
         closed = false;
         closing = false;
         netInBuffer.clear();
