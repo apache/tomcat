@@ -215,7 +215,7 @@
       </update>
       <update>
         <bug>63625</bug>: Update to Commons Daemon 1.2.1. This corrects several
-        regressions in Commons Daemon 1.2.1, most notably the Windows Service
+        regressions in Commons Daemon 1.2.0, most notably the Windows Service
         crashing on start when using 32-bit JVMs. (markt)
       </update>
       <update>
@@ -269,6 +269,16 @@
         <code>org.apache.tomcat.util.net.TesterSupport</code>
         and has been moved there. (rjung)
       </scode>
+      <fix>
+        When performing a silent install with the Windows Installer, ensure that
+        the registry entires are added to the 64-bit registry when using a
+        64-bit JVM. (markt)
+      </fix>
+      <fix>
+        <bug>63759</bug>: When installing Tomcat with the Windows installer,
+        grant sufficient privileges to enable the uninstaller to execute when
+        user account control is active. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
@@ -279,11 +289,6 @@
         <bug>63579</bug>: Correct parsing of malformed OPTIONS requests and
         reject them with a 400 response rather than triggering an internal error
         that results in a 500 response. (markt)
-      </fix>
-      <fix>
-        When performing a silent install with the Windows Installer, ensure that
-        the registry entires are added to the 64-bit registry when using a
-        64-bit JVM. (markt)
       </fix>
     </changelog>
   </subsection>
