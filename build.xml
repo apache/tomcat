@@ -42,17 +42,17 @@
   <property name="version.major.minor"   value="${version.major}.${version.minor}" />
 
   <!-- constant to declare a file binary for md5sum -->
-  <property name="md5sum.binary-prefix" value=" *" />
+  <property name="md5sum.binary-prefix"  value=" *" />
 
   <!-- Exact spec versions (for the manifests) -->
-  <property name="servlet.revision" value="FR" />
-  <property name="jsp.revision" value="FR" />
-  <property name="el.revision" value="FR" />
-  <property name="websocket.revision" value="FR" />
+  <property name="servlet.revision"      value="FR" />
+  <property name="jsp.revision"          value="FR" />
+  <property name="el.revision"           value="FR" />
+  <property name="websocket.revision"    value="FR" />
   <!-- MR B but this was first 1.1 release so use FR -->
-  <property name="jaspic.revision" value="FR" />
+  <property name="jaspic.revision"       value="FR" />
   <!-- MR 2 but this was first 1.2 release so use FR -->
-  <property name="annotation.revision" value="FR" />
+  <property name="annotation.revision"   value="FR" />
 
   <!-- Release artifact base names -->
   <property name="final.name"            value="${project}-${version}" />
@@ -624,7 +624,6 @@
            source="${compile.source}"
            target="${compile.target}"
            release="${compile.release}"
-           excludes="**/.svn/**"
            encoding="ISO-8859-1"
            includeAntRuntime="true" >
       <!-- Uncomment this to show unchecked warnings:
@@ -680,7 +679,6 @@
            source="${compile.source}"
            target="${compile.target}"
            release="${compile.release}"
-           excludes="**/.svn/**"
            encoding="ISO-8859-1"
            includeAntRuntime="true" >
       <!-- Uncomment this to show unchecked warnings:
@@ -1151,7 +1149,6 @@
              target="${compile.target}"
              release="${compile.release}"
              classpath="${tomcat.classes}"
-             excludes="**/CVS/**,**/.svn/**"
              encoding="ISO-8859-1"
              includeantruntime="false">
     </javac>
@@ -1164,7 +1161,6 @@
              target="${compile.target}"
              release="${compile.release}"
              classpath="${tomcat.classes}"
-             excludes="**/CVS/**,**/.svn/**"
              encoding="ISO-8859-1"
              includeantruntime="false">
     </javac>
@@ -1405,11 +1401,11 @@
       <include name="util/**" />
     </javac>
     <copy todir="${test.classes}">
-        <fileset dir="test">
-          <include name="META-INF/**"/>
-          <include name="**/service-config.txt"/>
-          <include name="**/logging-non-rotatable.properties"/>
-        </fileset>
+      <fileset dir="test">
+        <include name="META-INF/**"/>
+        <include name="**/service-config.txt"/>
+        <include name="**/logging-non-rotatable.properties"/>
+      </fileset>
     </copy>
   </target>
 
