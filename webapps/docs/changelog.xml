@@ -78,6 +78,11 @@
         <code>org.apache.tomcat.util.net.TesterSupport</code>
         and has been moved there. (rjung)
       </scode>
+      <fix>
+        <bug>63759</bug>: When installing Tomcat with the Windows installer,
+        grant sufficient privileges to enable the uninstaller to execute when
+        user account control is active. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
