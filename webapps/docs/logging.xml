@@ -398,8 +398,8 @@ java.util.logging.ConsoleHandler.formatter = java.util.logging.OneLineFormatter]
           <a href="api/org/apache/juli/package-summary.html"><code>org.apache.juli</code></a>
           package.
         </li>
-        <li>Oracle Java 6 Javadoc for the
-          <a href="http://docs.oracle.com/javase/6/docs/api/java/util/logging/package-summary.html"><code>java.util.logging</code></a>
+        <li>Oracle Java 8 Javadoc for the
+          <a href="https://docs.oracle.com/javase/8/docs/api/java/util/logging/package-summary.html"><code>java.util.logging</code></a>
           package.
         </li>
       </ul>
