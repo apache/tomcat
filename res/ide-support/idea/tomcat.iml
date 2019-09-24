@@ -30,7 +30,7 @@
     <orderEntry type="module-library">
       <library name="junit4">
         <CLASSES>
-          <root url="jar://$APPLICATION_HOME_DIR$/lib/junit-4.12.jar!/" />
+          <root url="jar://$APPLICATION_HOME_DIR$/lib/junit-4.13.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -70,7 +70,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$TOMCAT_BUILD_LIBS$/ecj-4.12/ecj-4.12.jar!/" />
+          <root url="jar://$TOMCAT_BUILD_LIBS$/ecj-4.13/ecj-4.13.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />

@@ -129,15 +129,15 @@ wsdl4j-lib.loc=${base-maven.loc}/wsdl4j/wsdl4j/${wsdl4j-lib.version}/wsdl4j-${ws
 # ----- Eclipse JDT, version 4.7 or later -----#
 # See https://cwiki.apache.org/confluence/display/TOMCAT/Managing+Tomcat%27s+Dependency+on+the+Eclipse+JDT+Core+Batch+Compiler
 #
-# Checksum is from "SHA512 Checksums for 4.12" link at
-# http://download.eclipse.org/eclipse/downloads/drops4/R-4.12-201906051800/
-# http://download.eclipse.org/eclipse/downloads/drops4/R-4.12-201906051800/checksum/eclipse-4.12-SUMSSHA512
+# Checksum is from "SHA512 Checksums for 4.13" link at
+# http://download.eclipse.org/eclipse/downloads/drops4/R-4.13-201909161045/
+# http://download.eclipse.org/eclipse/downloads/drops4/R-4.13-201909161045/checksum/eclipse-4.13-SUMSSHA512
 #
-jdt.version=4.12
-jdt.release=R-4.12-201906051800/
+jdt.version=4.13
+jdt.release=R-4.13-201909161045/
 jdt.checksum.enabled=true
 jdt.checksum.algorithm=SHA-512
-jdt.checksum.value=7d38921ae374a5112e7ed5596d85955b608ddf74849373d7a74b199961514807e749d8c8cad89871fa1fdd5e14bc6ec471665546a9f8d313da5c963589c307b0
+jdt.checksum.value=d608e4b7fc9b061e327ad5c39112c032e310a48c57ddd01c9349f2be8f5ce4d3d0c3862b6b5cc105220a06a6dd62c477de654b9fbe6f4c8a3d3de816e5de19f7
 jdt.home=${base.path}/ecj-${jdt.version}
 jdt.jar=${jdt.home}/ecj-${jdt.version}.jar
 # The download will be moved to the archive area eventually. We are taking care of that in advance.
