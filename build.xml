@@ -42,15 +42,15 @@
   <property name="version.major.minor"   value="${version.major}.${version.minor}" />
 
   <!-- constant to declare a file binary for md5sum -->
-  <property name="md5sum.binary-prefix" value=" *" />
+  <property name="md5sum.binary-prefix"  value=" *" />
 
   <!-- Exact spec versions (for the manifests) -->
-  <property name="servlet.revision" value="FR" />
-  <property name="jsp.revision" value="FR" />
-  <property name="el.revision" value="FR" />
-  <property name="websocket.revision" value="FR" />
+  <property name="servlet.revision"      value="FR" />
+  <property name="jsp.revision"          value="FR" />
+  <property name="el.revision"           value="FR" />
+  <property name="websocket.revision"    value="FR" />
   <!-- MR 1 but this was first 1.1 release so use FR -->
-  <property name="annotation.revision" value="FR" />
+  <property name="annotation.revision"   value="FR" />
 
   <!-- Release artifact base names -->
   <property name="final.name"            value="${project}-${version}" />
@@ -620,7 +620,6 @@
            deprecation="${compile.deprecation}"
            source="${compile.source}"
            target="${compile.target}"
-           excludes="**/.svn/**"
            encoding="ISO-8859-1"
            includeAntRuntime="true" >
       <compilerarg value="-Xlint:unchecked"/>
@@ -674,7 +673,6 @@
            deprecation="${compile.deprecation}"
            source="${compile.source}"
            target="${compile.target}"
-           excludes="**/.svn/**"
            encoding="ISO-8859-1"
            includeAntRuntime="true" >
       <compilerarg value="-Xlint:unchecked"/>
@@ -1162,7 +1160,6 @@
              source="${compile.source}"
              target="${compile.target}"
              classpath="${tomcat.classes}"
-             excludes="**/CVS/**,**/.svn/**"
              encoding="ISO-8859-1"
              includeantruntime="false">
     </javac>
@@ -1174,7 +1171,6 @@
              source="${compile.source}"
              target="${compile.target}"
              classpath="${tomcat.classes}"
-             excludes="**/CVS/**,**/.svn/**"
              encoding="ISO-8859-1"
              includeantruntime="false">
     </javac>
@@ -2923,7 +2919,7 @@ skip.installer property in build.properties" />
     <antcall target="downloadfile">
       <param name="sourcefile" value="${easymock.loc}"/>
       <param name="destfile" value="${easymock.jar}"/>
-      <param name="destdir" value="${base.path}"/>
+      <param name="destdir" value="${easymock.home}"/>
       <param name="checksum.enabled" value="${easymock.checksum.enabled}"/>
       <param name="checksum.algorithm" value="${easymock.checksum.algorithm}"/>
       <param name="checksum.value" value="${easymock.checksum.value}"/>
@@ -2941,7 +2937,7 @@ skip.installer property in build.properties" />
     <antcall target="downloadfile">
       <param name="sourcefile" value="${objenesis.loc}"/>
       <param name="destfile" value="${objenesis.jar}"/>
-      <param name="destdir" value="${base.path}"/>
+      <param name="destdir" value="${objenesis.home}"/>
       <param name="checksum.enabled" value="${objenesis.checksum.enabled}"/>
       <param name="checksum.algorithm" value="${objenesis.checksum.algorithm}"/>
       <param name="checksum.value" value="${objenesis.checksum.value}"/>
@@ -3121,7 +3117,7 @@ skip.installer property in build.properties" />
     </sequential>
   </macrodef>
 
-  <target name="downloadgz" unless="exist" depends="setproxy,testexist">
+  <target name="downloadgz" unless="exist" depends="testexist,setproxy">
     <!-- Download and extract the package -->
     <local name="temp.file"/>
     <mkdir dir="${base.path}"/>
@@ -3138,7 +3134,7 @@ skip.installer property in build.properties" />
     <delete file="${temp.file}.tar.gz"/>
   </target>
 
-  <target name="downloadgz-2" unless="exist" depends="setproxy,testexist">
+  <target name="downloadgz-2" unless="exist" depends="testexist">
     <!-- Download and extract the package from the two alternative locations -->
     <local name="temp.file"/>
     <mkdir dir="${base.path}"/>
@@ -3163,7 +3159,7 @@ skip.installer property in build.properties" />
     <delete file="${temp.file}.tar.gz"/>
   </target>
 
-  <target name="downloadzip" unless="exist" depends="setproxy,testexist">
+  <target name="downloadzip" unless="exist" depends="testexist,setproxy">
     <!-- Download and extract the package -->
     <local name="temp.file"/>
     <mkdir dir="${base.path}"/>
@@ -3203,7 +3199,7 @@ skip.installer property in build.properties" />
     <delete file="${temp.file}"/>
   </target>
 
-  <target name="downloadfile" unless="exist" depends="setproxy,testexist">
+  <target name="downloadfile" unless="exist" depends="testexist,setproxy">
     <!-- Download the file -->
     <local name="temp.file"/>
     <mkdir dir="${base.path}"/>
