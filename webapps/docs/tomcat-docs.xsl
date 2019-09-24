@@ -40,6 +40,7 @@
   <xsl:param    name="version"             select="'9.0.x'"/>
   <xsl:param    name="majorversion"        select="'9'"/>
   <xsl:param    name="majorminorversion"   select="'9.0'"/>
+  <xsl:param    name="minjavaversion"      select="'8'"/>
   <xsl:param    name="build-date"          select="'MMM d yyyy'"/>
   <xsl:param    name="build-date-iso-8601" select="'yyyy-MM-dd'"/>
   <xsl:param    name="year"                select="'yyyy'"/>
@@ -502,6 +503,9 @@
   </xsl:template>
   <xsl:template match="version-major">
     <xsl:value-of select="$majorversion"/>
+  </xsl:template>
+  <xsl:template match="min-java-version">
+    <xsl:value-of select="$minjavaversion"/>
   </xsl:template>
 
   <!-- Process everything else by just passing it through -->

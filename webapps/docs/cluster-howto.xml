@@ -626,7 +626,7 @@ should be completed:</p>
 
 <section name="Monitoring your Cluster with JMX">
 <p>Monitoring is a very important question when you use a cluster. Some of the cluster objects are JMX MBeans </p>
-<p>Add the following parameter to your startup script with Java 5:</p>
+<p>Add the following parameter to your startup script:</p>
 <source>set CATALINA_OPTS=\
 -Dcom.sun.management.jmxremote \
 -Dcom.sun.management.jmxremote.port=%my.jmx.port% \
