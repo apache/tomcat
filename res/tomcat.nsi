@@ -368,16 +368,45 @@ Section -post
   ; S-1-5-19     LocalService
   ; S-1-5-32-544 Local Administrators group
   ; S-1-5-18     Local System
+  ; S-1-5-11     Authenticated users
+  ;
+  ; Grant admins, LocalService and Local System full control full control
   nsExec::ExecToStack 'icacls "$INSTDIR" /inheritance:r /grant *S-1-5-19:(OI)(CI)(F) /grant *S-1-5-32-544:(OI)(CI)(F) /grant *S-1-5-18:(OI)(CI)(F)'
   Pop $0
   Pop $1
-  StrCmp $0 "0" SetPermissionsOk
+  StrCmp $0 "0" SetGroupPermissionsOk
     FileWrite $ServiceInstallLog "Install failed (setting file permissions): $0 $1$\r$\n"
     MessageBox MB_YESNO|MB_ICONSTOP \
       "Failed to set file permissions.$\r$\nCheck your settings and permissions.$\r$\nIgnore and continue anyway (not recommended)?" \
-      /SD IDNO IDYES SetPermissionsOk
-  Quit
-  SetPermissionsOk:
+      /SD IDNO IDYES SetGroupPermissionsOk
+    Quit
+  SetGroupPermissionsOk:
+  ClearErrors
+
+  ; Make the icon readable to all authenticated users so it appears correctly in the uninstall UI
+  nsExec::ExecToStack 'icacls "$INSTDIR\tomcat.ico" /inheritance:e /grant *S-1-5-11:(R)'
+  Pop $0
+  Pop $1
+  StrCmp $0 "0" SetIconPermissionsOk
+    FileWrite $ServiceInstallLog "Install failed (setting file permissions for icon): $0 $1$\r$\n"
+    MessageBox MB_YESNO|MB_ICONSTOP \
+      "Failed to set icon file permissions.$\r$\nCheck your settings and permissions.$\r$\nIgnore and continue anyway (not recommended)?" \
+      /SD IDNO IDYES SetIconPermissionsOk
+    Quit
+  SetIconPermissionsOk:
+  ClearErrors
+
+  ; Make the uninstaller readable and executable to all authenticated users so the user that installed Tomcat can also uninstall it
+  nsExec::ExecToStack 'icacls "$INSTDIR\Uninstall.exe" /inheritance:e /grant *S-1-5-11:(RX)'
+  Pop $0
+  Pop $1
+  StrCmp $0 "0" SetUninstallerPermissionsOk
+    FileWrite $ServiceInstallLog "Install failed (setting file permissions for uninstaller): $0 $1$\r$\n"
+    MessageBox MB_YESNO|MB_ICONSTOP \
+      "Failed to set uninstaller file permissions.$\r$\nCheck your settings and permissions.$\r$\nIgnore and continue anyway (not recommended)?" \
+      /SD IDNO IDYES SetUninstallerPermissionsOk
+    Quit
+  SetUninstallerPermissionsOk:
   ClearErrors
 
 SectionEnd
