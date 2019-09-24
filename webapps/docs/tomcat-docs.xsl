@@ -38,6 +38,7 @@
   <xsl:param    name="version"             select="'7.0.x'"/>
   <xsl:param    name="majorversion"        select="'7'"/>
   <xsl:param    name="majorminorversion"   select="'7.0'"/>
+  <xsl:param    name="minjavaversion"      select="'6'"/>
   <xsl:param    name="build-date"          select="'MMM d yyyy'"/>
   <xsl:param    name="year"                select="'yyyy'"/>
   <xsl:param    name="void-image"          select="'/images/void.gif'"/>
@@ -618,6 +619,9 @@ p.notice {
   </xsl:template>
   <xsl:template match="version-major">
     <xsl:value-of select="$majorversion"/>
+  </xsl:template>
+  <xsl:template match="min-java-version">
+    <xsl:value-of select="$minjavaversion"/>
   </xsl:template>
 
   <!-- specially process td tags ala site.vsl -->

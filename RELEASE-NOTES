@@ -41,7 +41,7 @@ CONTENTS:
 ===================
 Dependency Changes:
 ===================
-Tomcat @VERSION_MAJOR_MINOR@ is designed to run on Java SE 6 and later.
+Tomcat @VERSION_MAJOR_MINOR@ is designed to run on Java @MIN_JAVA_VERSION@ and later.
 
 In addition, Tomcat @VERSION_MAJOR_MINOR@ uses the Eclipse JDT Java compiler for
 compiling JSP pages.  This means you no longer need to have the complete

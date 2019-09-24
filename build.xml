@@ -83,6 +83,7 @@
   <!-- Servlet 3.0 spec requires Java 6+ -->
   <property name="compile.source" value="6"/>
   <property name="compile.target" value="6"/>
+  <property name="min.java.version" value="6"/>
 
   <!-- Expose commons-logging defaults so they can be orver-ridden -->
   <property name="logging.compile.source" value="1.2" />
@@ -249,6 +250,7 @@
     <filter token="VERSION_BUILT" value="${today} ${tstamp} UTC"/>
     <filter token="JDT_VERSION" value="${jdt.version}"/>
     <filter token="GIT_BRANCH" value="${git.branch}"/>
+    <filter token="MIN_JAVA_VERSION" value="${min.java.version}"/>
   </filterset>
 
   <!-- Files to change line endings for depending on target platform -->

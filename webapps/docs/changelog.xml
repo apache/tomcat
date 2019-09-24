@@ -279,6 +279,11 @@
         grant sufficient privileges to enable the uninstaller to execute when
         user account control is active. (markt)
       </fix>
+      <add>
+        Use a build property to define the minimum supported Java version and
+        use that build property to reduce the number of edits required to update
+        the minimum supported Java version. (markt)
+      </add>
     </changelog>
   </subsection>
 </section>

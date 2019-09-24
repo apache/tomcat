@@ -39,7 +39,7 @@ in the following subsections.</p>
 
 <subsection name="JDK">
 
-<p>Tomcat 7.0 was designed to run on Java SE 6.
+<p>Tomcat <version-major-minor/> was designed to run on Java <min-java-version/> or later.
 </p>
 
 <p>Compatible JDKs for many platforms (or links to where they can be found)

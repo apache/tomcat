@@ -172,7 +172,7 @@ create the following script file:
 
 On Windows, %CATALINA_BASE%\bin\setenv.bat:
 
-  set "JRE_HOME=%ProgramFiles%\Java\jre6"
+  set "JRE_HOME=%ProgramFiles%\Java\jre@MIN_JAVA_VERSION@"
   exit /b 0
 
 On *nix, $CATALINA_BASE/bin/setenv.sh:
