@@ -404,6 +404,7 @@ public class TestChunkedInputFilter extends TomcatBaseTest {
         client.connect();
         try {
             client.processRequest();
+            client.disconnect();
         } catch (Exception e) {
             // Socket was probably closed before client had a chance to read
             // response
