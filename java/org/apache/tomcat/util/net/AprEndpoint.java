@@ -2138,10 +2138,6 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
 
 
         private int fillReadBuffer(boolean block, ByteBuffer to) throws IOException {
-            if (isClosed()) {
-                throw new IOException(sm.getString("socket.apr.closed", getSocket()));
-            }
-
             Lock readLock = getBlockingStatusReadLock();
             WriteLock writeLock = getBlockingStatusWriteLock();
 
@@ -2149,6 +2145,7 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
             int result = 0;
             readLock.lock();
             try {
+                checkClosed();
                 if (getBlockingStatus() == block) {
                     if (block) {
                         Socket.timeoutSet(getSocket().longValue(), getReadTimeout() * 1000);
@@ -2164,6 +2161,7 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
             if (!readDone) {
                 writeLock.lock();
                 try {
+                    checkClosed();
                     // Set the current settings for this socket
                     setBlockingStatus(block);
                     if (block) {
@@ -2231,6 +2229,13 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
 
             boolean isReady = socketBufferHandler.getReadBuffer().position() > 0 || read == -1;
             return isReady;
+        }
+
+
+        private void checkClosed() throws IOException {
+            if (isClosed()) {
+                throw new IOException(sm.getString("socket.apr.closed", getSocket()));
+            }
         }
 
 
@@ -2311,15 +2316,12 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
 
         @Override
         protected void doWrite(boolean block, ByteBuffer from) throws IOException {
-            if (isClosed()) {
-                throw new IOException(sm.getString("socket.apr.closed", getSocket()));
-            }
-
             Lock readLock = getBlockingStatusReadLock();
             WriteLock writeLock = getBlockingStatusWriteLock();
 
             readLock.lock();
             try {
+                checkClosed();
                 if (getBlockingStatus() == block) {
                     if (block) {
                         Socket.timeoutSet(getSocket().longValue(), getWriteTimeout() * 1000);
@@ -2333,6 +2335,7 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
 
             writeLock.lock();
             try {
+                checkClosed();
                 // Set the current settings for this socket
                 setBlockingStatus(block);
                 if (block) {
