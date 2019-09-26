@@ -16,7 +16,11 @@
  */
 package org.apache.catalina.util;
 
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
+
 import org.apache.catalina.Lifecycle;
+import org.apache.catalina.LifecycleEvent;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleListener;
 import org.apache.catalina.LifecycleState;
@@ -32,17 +36,15 @@ import org.apache.tomcat.util.res.StringManager;
  */
 public abstract class LifecycleBase implements Lifecycle {
 
-    private static Log log = LogFactory.getLog(LifecycleBase.class);
+    private static final Log log = LogFactory.getLog(LifecycleBase.class);
 
-    private static StringManager sm =
-        StringManager.getManager("org.apache.catalina.util");
+    private static final StringManager sm = StringManager.getManager(LifecycleBase.class);
 
 
     /**
-     * Used to handle firing lifecycle events.
-     * TODO: Consider merging LifecycleSupport into this class.
+     * The list of registered LifecycleListeners for event notifications.
      */
-    private LifecycleSupport lifecycle = new LifecycleSupport(this);
+    private final List<LifecycleListener> lifecycleListeners = new CopyOnWriteArrayList<LifecycleListener>();
 
 
     /**
@@ -56,7 +58,7 @@ public abstract class LifecycleBase implements Lifecycle {
      */
     @Override
     public void addLifecycleListener(LifecycleListener listener) {
-        lifecycle.addLifecycleListener(listener);
+        lifecycleListeners.add(listener);
     }
 
 
@@ -65,7 +67,7 @@ public abstract class LifecycleBase implements Lifecycle {
      */
     @Override
     public LifecycleListener[] findLifecycleListeners() {
-        return lifecycle.findLifecycleListeners();
+        return lifecycleListeners.toArray(new LifecycleListener[0]);
     }
 
 
@@ -74,7 +76,7 @@ public abstract class LifecycleBase implements Lifecycle {
      */
     @Override
     public void removeLifecycleListener(LifecycleListener listener) {
-        lifecycle.removeLifecycleListener(listener);
+        lifecycleListeners.remove(listener);
     }
 
 
@@ -85,7 +87,10 @@ public abstract class LifecycleBase implements Lifecycle {
      * @param data  Data associated with event.
      */
     protected void fireLifecycleEvent(String type, Object data) {
-        lifecycle.fireLifecycleEvent(type, data);
+        LifecycleEvent event = new LifecycleEvent(this, type, data);
+        for (LifecycleListener listener : lifecycleListeners) {
+            listener.lifecycleEvent(event);
+        }
     }
 
 

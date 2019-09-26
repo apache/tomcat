@@ -29,7 +29,10 @@ import org.apache.catalina.LifecycleListener;
  * registered LifecycleListeners.
  *
  * @author Craig R. McClanahan
+ *
+ * @deprecated Unused. This class will be removed in Tomcat 8.5.x.
  */
+@Deprecated
 public final class LifecycleSupport {
 
 
