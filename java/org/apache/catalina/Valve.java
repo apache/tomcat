@@ -44,7 +44,7 @@ public interface Valve {
     //-------------------------------------------------------------- Properties
 
     /**
-     * Return descriptive information about this Valve implementation.
+     * @return descriptive information about this Valve implementation.
      */
     public String getInfo();
 
@@ -130,6 +130,7 @@ public interface Valve {
      *
      * @param request The servlet request to be processed
      * @param response The servlet response to be created
+     * @param event The Comet event to be processed
      *
      * @exception IOException if an input/output error occurs, or is thrown
      *  by a subsequently invoked Valve, Filter, or Servlet
