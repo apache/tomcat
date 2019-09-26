@@ -135,6 +135,11 @@
         <code>accept-encoding</code> header to determine if gzip encoding is
         supported including only parsing the first header found. (markt)
       </fix>
+      <fix>
+        <bug>63766</bug>: Ensure Processor objects are recycled when processing
+        an HTTP upgrade connection that terminates before processing switches to
+        the Processor for the upgraded procotol. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web Socket">
