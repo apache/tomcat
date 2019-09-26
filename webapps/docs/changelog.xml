@@ -56,6 +56,11 @@
         <bug>63765</bug>: NIO2 should try to unwrap after TLS handshake to
         avoid edge cases. (remm)
       </fix>
+      <fix>
+        <bug>63766</bug>: Ensure Processor objects are recycled when processing
+        an HTTP upgrade connection that terminates before processing switches to
+        the Processor for the upgraded procotol. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web Socket">

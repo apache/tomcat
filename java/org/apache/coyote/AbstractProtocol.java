@@ -900,8 +900,9 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
                     // The resumeProcessing() method will add this socket
                     // to the poller.
                 } else {
-                    // Connection closed. OK to recycle the processor. Upgrade
-                    // processors are not recycled.
+                    // Connection closed. OK to recycle the processor.
+                    // Processors handling upgrades require additional clean-up
+                    // before release.
                     connections.remove(socket);
                     if (processor.isUpgrade()) {
                         UpgradeToken upgradeToken = processor.getUpgradeToken();
@@ -923,9 +924,8 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
                                 upgradeToken.getContextBind().unbind(false, oldCL);
                             }
                         }
-                    } else {
-                        release(processor);
                     }
+                    release(processor);
                 }
                 return state;
             } catch(java.net.SocketException e) {
