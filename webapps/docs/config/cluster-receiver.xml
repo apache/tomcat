@@ -103,7 +103,7 @@
       The default value is a very high <code>5000</code> milliseconds.
     </attribute>
     <attribute name="maxThreads" required="false">
-      The maximum number of threads in the receiver thread pool. The default value is <code>6</code>
+      The maximum number of threads in the receiver thread pool. The default value is <code>15</code>
       Adjust this value relative to the number of nodes in the cluster, the number of messages being exchanged and
       the hardware you are running on. A higher value doesn't mean more efficiency, tune this value according to your
       own test results.
