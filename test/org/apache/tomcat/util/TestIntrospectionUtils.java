@@ -62,8 +62,7 @@ public class TestIntrospectionUtils {
 
     @Test
     public void testIsInstanceStandardContext06() {
-        // This interface doesn't exist in 7.0.x
-        Assert.assertFalse(IntrospectionUtils.isInstance(
+        Assert.assertTrue(IntrospectionUtils.isInstance(
                 StandardContext.class, "org.apache.catalina.JmxEnabled"));
     }
 
