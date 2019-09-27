@@ -56,7 +56,7 @@ import org.apache.tomcat.InstanceManager;
  */
 public class JspRuntimeLibrary {
 
-    private static final boolean GRAAL;
+    public static final boolean GRAAL;
 
     static {
         boolean result = false;

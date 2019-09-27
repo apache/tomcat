@@ -76,6 +76,10 @@
       <update>
         Update to the Eclipse JDT compiler 4.13. (markt)
       </update>
+      <fix>
+        Add GraalVM specific ELResolver to avoid BeanInfo use in BeanElResolver
+        if possible, as it needs manual reflection configuration. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web Socket">
