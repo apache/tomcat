@@ -18,7 +18,6 @@
 package org.apache.catalina.util;
 
 import javax.management.InstanceNotFoundException;
-import javax.management.MBeanRegistration;
 import javax.management.MBeanRegistrationException;
 import javax.management.MBeanServer;
 import javax.management.MalformedObjectNameException;
@@ -133,8 +132,8 @@ public abstract class LifecycleMBeanBase extends LifecycleBase
 
     /**
      * Utility method to enable sub-classes to easily register additional
-     * components that don't implement {@link MBeanRegistration} with
-     * an MBean server.<br>
+     * components that don't implement {@link JmxEnabled} with an MBean server.
+     * <br>
      * Note: This method should only be used once {@link #initInternal()} has
      * been called and before {@link #destroyInternal()} has been called.
      *
