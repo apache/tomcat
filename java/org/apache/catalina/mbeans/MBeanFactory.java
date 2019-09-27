@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.catalina.mbeans;
 
 import java.io.File;
@@ -27,6 +26,7 @@ import org.apache.catalina.Container;
 import org.apache.catalina.Context;
 import org.apache.catalina.Engine;
 import org.apache.catalina.Host;
+import org.apache.catalina.JmxEnabled;
 import org.apache.catalina.Server;
 import org.apache.catalina.Service;
 import org.apache.catalina.Valve;
@@ -46,23 +46,19 @@ import org.apache.catalina.realm.UserDatabaseRealm;
 import org.apache.catalina.session.StandardManager;
 import org.apache.catalina.startup.ContextConfig;
 import org.apache.catalina.startup.HostConfig;
-import org.apache.catalina.util.LifecycleMBeanBase;
 import org.apache.catalina.valves.AccessLogValve;
 import org.apache.catalina.valves.RemoteAddrValve;
 import org.apache.catalina.valves.RemoteHostValve;
-import org.apache.catalina.valves.ValveBase;
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 
 
 /**
- * <p>A <strong>ModelMBean</strong> implementation for the
- * <code>org.apache.catalina.core.StandardServer</code> component.</p>
- *
  * @author Amy Roh
  */
 public class MBeanFactory {
 
-    private static final org.apache.juli.logging.Log log =
-        org.apache.juli.logging.LogFactory.getLog(MBeanFactory.class);
+    private static final Log log = LogFactory.getLog(MBeanFactory.class);
 
     /**
      * The <code>MBeanServer</code> for this application.
@@ -99,6 +95,7 @@ public class MBeanFactory {
 
     /**
      * Set the container that this factory was created for.
+     * @param container The associated container
      */
     public void setContainer(Object container) {
         this.container = container;
@@ -263,6 +260,7 @@ public class MBeanFactory {
      * @param parent MBean Name of the associated parent component
      * @param address The IP address on which to bind
      * @param port TCP port number to listen on
+     * @return the object name of the created connector
      *
      * @exception Exception if an MBean cannot be created or registered
      */
@@ -272,11 +270,18 @@ public class MBeanFactory {
         return createConnector(parent, address, port, true, false);
     }
 
+
     /**
      * Create a new DataSource Realm.
      *
      * @param parent MBean Name of the associated parent component
-     *
+     * @param dataSourceName the datasource name
+     * @param roleNameCol the column name for the role names
+     * @param userCredCol the column name for the user credentials
+     * @param userNameCol the column name for the user names
+     * @param userRoleTable the table name for the roles table
+     * @param userTable the table name for the users
+     * @return the object name of the created realm
      * @exception Exception if an MBean cannot be created or registered
      */
     public String createDataSourceRealm(String parent, String dataSourceName,
@@ -304,8 +309,8 @@ public class MBeanFactory {
         } else {
             return null;
         }
-
     }
+
 
     /**
      * Create a new HttpConnector
@@ -313,6 +318,7 @@ public class MBeanFactory {
      * @param parent MBean Name of the associated parent component
      * @param address The IP address on which to bind
      * @param port TCP port number to listen on
+     * @return the object name of the created connector
      *
      * @exception Exception if an MBean cannot be created or registered
      */
@@ -320,6 +326,7 @@ public class MBeanFactory {
             throws Exception {
         return createConnector(parent, address, port, false, false);
     }
+
 
     /**
      * Create a new Connector
@@ -354,7 +361,7 @@ public class MBeanFactory {
         // Return the corresponding MBean name
         ObjectName coname = retobj.getObjectName();
 
-        return (coname.toString());
+        return coname.toString();
     }
 
 
@@ -364,6 +371,7 @@ public class MBeanFactory {
      * @param parent MBean Name of the associated parent component
      * @param address The IP address on which to bind
      * @param port TCP port number to listen on
+     * @return the object name of the created connector
      *
      * @exception Exception if an MBean cannot be created or registered
      */
@@ -372,10 +380,16 @@ public class MBeanFactory {
         return createConnector(parent, address, port, false, true);
     }
 
+
     /**
      * Create a new JDBC Realm.
      *
      * @param parent MBean Name of the associated parent component
+     * @param driverName JDBC driver name
+     * @param connectionName the user name for the connection
+     * @param connectionPassword the password for the connection
+     * @param connectionURL the connection URL to the database
+     * @return the object name of the created realm
      *
      * @exception Exception if an MBean cannot be created or registered
      */
@@ -403,7 +417,6 @@ public class MBeanFactory {
         } else {
             return null;
         }
-
     }
 
 
@@ -411,11 +424,11 @@ public class MBeanFactory {
      * Create a new JNDI Realm.
      *
      * @param parent MBean Name of the associated parent component
+     * @return the object name of the created realm
      *
      * @exception Exception if an MBean cannot be created or registered
      */
-    public String createJNDIRealm(String parent)
-        throws Exception {
+    public String createJNDIRealm(String parent) throws Exception {
 
          // Create a new JNDIRealm instance
         JNDIRealm realm = new JNDIRealm();
@@ -433,8 +446,6 @@ public class MBeanFactory {
         } else {
             return null;
         }
-
-
     }
 
 
@@ -442,11 +453,11 @@ public class MBeanFactory {
      * Create a new Memory Realm.
      *
      * @param parent MBean Name of the associated parent component
+     * @return the object name of the created realm
      *
      * @exception Exception if an MBean cannot be created or registered
      */
-    public String createMemoryRealm(String parent)
-        throws Exception {
+    public String createMemoryRealm(String parent) throws Exception {
 
          // Create a new MemoryRealm instance
         MemoryRealm realm = new MemoryRealm();
@@ -463,7 +474,6 @@ public class MBeanFactory {
         } else {
             return null;
         }
-
     }
 
 
@@ -555,6 +565,7 @@ public class MBeanFactory {
      * @param parent MBean Name of the associated parent component
      * @param path The context path for this Context
      * @param docBase Document base directory (or WAR) for this Context
+     * @return the object name of the created context
      *
      * @exception Exception if an MBean cannot be created or registered
      */
@@ -568,12 +579,15 @@ public class MBeanFactory {
     }
 
 
-   /**
+    /**
      * Create a new StandardContext.
      *
      * @param parent MBean Name of the associated parent component
      * @param path The context path for this Context
      * @param docBase Document base directory (or WAR) for this Context
+     * @param xmlValidation if XML descriptors should be validated
+     * @param xmlNamespaceAware if the XML processor should namespace aware
+     * @return the object name of the created context
      *
      * @exception Exception if an MBean cannot be created or registered
      */
@@ -646,6 +660,7 @@ public class MBeanFactory {
      * @param deployOnStartup Deploy on server startup?
      * @param deployXML Should we deploy Context XML config files property?
      * @param unpackWARs Should we unpack WARs when auto deploying?
+     * @return the object name of the created host
      *
      * @exception Exception if an MBean cannot be created or registered
      */
@@ -688,6 +703,7 @@ public class MBeanFactory {
      * @param domain       Domain name for the container instance
      * @param defaultHost  Name of the default host to be used in the Engine
      * @param baseDir      Base directory value for Engine
+     * @return the object name of the created service
      *
      * @exception Exception if an MBean cannot be created or registered
      */
@@ -718,6 +734,7 @@ public class MBeanFactory {
      * Create a new StandardManager.
      *
      * @param parent MBean Name of the associated parent component
+     * @return the object name of the created manager
      *
      * @exception Exception if an MBean cannot be created or registered
      */
@@ -735,7 +752,7 @@ public class MBeanFactory {
         }
         ObjectName oname = manager.getObjectName();
         if (oname != null) {
-            return (oname.toString());
+            return oname.toString();
         } else {
             return null;
         }
@@ -749,6 +766,7 @@ public class MBeanFactory {
      * @param parent MBean Name of the associated parent component
      * @param resourceName Global JNDI resource name of the associated
      *  UserDatabase
+     * @return the object name of the created realm
      *
      * @exception Exception if an MBean cannot be created or registered
      */
@@ -788,7 +806,8 @@ public class MBeanFactory {
      *
      * @return  The MBean name of the {@link Valve} that was created or
      *          <code>null</code> if the {@link Valve} does not implement
-     *          {@link LifecycleMBeanBase}.
+     *          {@link JmxEnabled}.
+     * @exception Exception if an MBean cannot be created or registered
      */
     public String createValve(String className, String parent)
             throws Exception {
@@ -802,12 +821,12 @@ public class MBeanFactory {
             throw new IllegalArgumentException();
         }
 
-        Valve valve = (Valve) Class.forName(className).newInstance();
+        Valve valve = (Valve) Class.forName(className).getConstructor().newInstance();
 
         container.getPipeline().addValve(valve);
 
-        if (valve instanceof LifecycleMBeanBase) {
-            return ((LifecycleMBeanBase) valve).getObjectName().toString();
+        if (valve instanceof JmxEnabled) {
+            return ((JmxEnabled) valve).getObjectName().toString();
         } else {
             return null;
         }
@@ -818,6 +837,7 @@ public class MBeanFactory {
      * Create a new Web Application Loader.
      *
      * @param parent MBean Name of the associated parent component
+     * @return the object name of the created loader
      *
      * @exception Exception if an MBean cannot be created or registered
      */
@@ -837,7 +857,7 @@ public class MBeanFactory {
         //ObjectName oname = loader.getObjectName();
         ObjectName oname =
             MBeanUtils.createObjectName(pname.getDomain(), loader);
-        return (oname.toString());
+        return oname.toString();
 
     }
 
@@ -974,7 +994,6 @@ public class MBeanFactory {
         // Acquire a reference to the component to be removed
         ContainerBase container = getParentContainerFromChild(oname);
         container.setLoader(null);
-
     }
 
 
@@ -991,7 +1010,6 @@ public class MBeanFactory {
         // Acquire a reference to the component to be removed
         ContainerBase container = getParentContainerFromChild(oname);
         container.setManager(null);
-
     }
 
 
@@ -1045,7 +1063,7 @@ public class MBeanFactory {
         ContainerBase container = getParentContainerFromChild(oname);
         Valve[] valves = container.getPipeline().getValves();
         for (int i = 0; i < valves.length; i++) {
-            ObjectName voname = ((ValveBase) valves[i]).getObjectName();
+            ObjectName voname = ((JmxEnabled) valves[i]).getObjectName();
             if (voname.equals(oname)) {
                 container.getPipeline().removeValve(valves[i]);
             }
