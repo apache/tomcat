@@ -25,6 +25,7 @@ import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 
 import org.apache.catalina.Globals;
+import org.apache.catalina.JmxEnabled;
 import org.apache.catalina.LifecycleException;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -32,11 +33,11 @@ import org.apache.tomcat.util.modeler.Registry;
 import org.apache.tomcat.util.res.StringManager;
 
 public abstract class LifecycleMBeanBase extends LifecycleBase
-        implements MBeanRegistration {
+        implements JmxEnabled {
 
-    private static Log log = LogFactory.getLog(LifecycleMBeanBase.class);
+    private static final Log log = LogFactory.getLog(LifecycleMBeanBase.class);
 
-    private static StringManager sm =
+    private static final StringManager sm =
         StringManager.getManager("org.apache.catalina.util");
 
 
@@ -78,6 +79,7 @@ public abstract class LifecycleMBeanBase extends LifecycleBase
      * with components that cannot (easily) navigate the component hierarchy to
      * determine the correct domain to use.
      */
+    @Override
     public final void setDomain(String domain) {
         this.domain = domain;
     }
@@ -87,6 +89,7 @@ public abstract class LifecycleMBeanBase extends LifecycleBase
      * Obtain the domain under which this component will be / has been
      * registered.
      */
+    @Override
     public final String getDomain() {
         if (domain == null) {
             domain = getDomainInternal();
@@ -112,6 +115,7 @@ public abstract class LifecycleMBeanBase extends LifecycleBase
     /**
      * Obtain the name under which this component has been registered with JMX.
      */
+    @Override
     public final ObjectName getObjectName() {
         return oname;
     }
@@ -168,8 +172,8 @@ public abstract class LifecycleMBeanBase extends LifecycleBase
 
     /**
      * Utility method to enable sub-classes to easily unregister additional
-     * components that don't implement {@link MBeanRegistration} with
-     * an MBean server.<br>
+     * components that don't implement {@link JmxEnabled} with an MBean server.
+     * <br>
      * Note: This method should only be used once {@link #initInternal()} has
      * been called and before {@link #destroyInternal()} has been called.
      *
