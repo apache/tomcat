@@ -844,25 +844,24 @@ public class StandardHost extends ContainerBase implements Host {
 
     // -------------------- JMX  --------------------
     /**
-      * @return the MBean Names of the Valves associated with this Host
-      *
-      * @exception Exception if an MBean cannot be created or registered
-      */
-     public String[] getValveNames() throws Exception {
-         Valve [] valves = this.getPipeline().getValves();
-         String [] mbeanNames = new String[valves.length];
-         for (int i = 0; i < valves.length; i++) {
-             if (valves[i] instanceof JmxEnabled) {
-                 ObjectName oname = ((JmxEnabled) valves[i]).getObjectName();
-                 if (oname != null) {
-                     mbeanNames[i] = oname.toString();
-                 }
-             }
-         }
+     * @return the MBean Names of the Valves associated with this Host
+     *
+     * @exception Exception if an MBean cannot be created or registered
+     */
+    public String[] getValveNames() throws Exception {
+        Valve [] valves = this.getPipeline().getValves();
+        String [] mbeanNames = new String[valves.length];
+        for (int i = 0; i < valves.length; i++) {
+            if (valves[i] instanceof JmxEnabled) {
+                ObjectName oname = ((JmxEnabled) valves[i]).getObjectName();
+                if (oname != null) {
+                    mbeanNames[i] = oname.toString();
+                }
+            }
+        }
 
-         return mbeanNames;
-
-     }
+        return mbeanNames;
+    }
 
     public String[] getAliases() {
         synchronized (aliasesLock) {
