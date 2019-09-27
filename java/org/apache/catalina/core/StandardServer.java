@@ -712,9 +712,7 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
      */
     @Override
     public Service[] findServices() {
-
         return services;
-
     }
 
     /**
@@ -1145,5 +1143,4 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
     public ScheduledExecutorService getUtilityExecutor() {
         return utilityExecutorWrapper;
     }
-
 }
