@@ -14,8 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.catalina;
 
 import java.util.Set;
@@ -40,10 +38,6 @@ import java.util.Set;
  */
 public interface Pipeline {
 
-
-    // ------------------------------------------------------------- Properties
-
-
     /**
      * @return the Valve instance that has been distinguished as the basic
      * Valve for this Pipeline (if any).
@@ -64,9 +58,6 @@ public interface Pipeline {
      * @param valve Valve to be distinguished as the basic Valve
      */
     public void setBasic(Valve valve);
-
-
-    // --------------------------------------------------------- Public Methods
 
 
     /**
@@ -123,6 +114,7 @@ public interface Pipeline {
      * Valve for this Pipeline (if any).
      */
     public Valve getFirst();
+
 
     /**
      * Returns true if all the valves in this pipeline support async, false otherwise
