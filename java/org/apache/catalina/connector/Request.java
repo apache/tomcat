@@ -607,6 +607,12 @@ public class Request implements HttpServletRequest {
 
     /**
      * Return the Context within which this Request is being processed.
+     * <p>
+     * This is available as soon as the appropriate Context is identified.
+     * Note that availability of a Context allows <code>getContextPath()</code>
+     * to return a value, and thus enables parsing of the request URI.
+     *
+     * @return the Context mapped with the request
      */
     public Context getContext() {
         return this.context;
@@ -678,7 +684,7 @@ public class Request implements HttpServletRequest {
             "org.apache.coyote.catalina.CoyoteRequest/1.0";
 
     /**
-     * Return descriptive information about this Request implementation and
+     * @return descriptive information about this Request implementation and
      * the corresponding version number, in the format
      * <code>&lt;description&gt;/&lt;version&gt;</code>.
      */
@@ -842,7 +848,7 @@ public class Request implements HttpServletRequest {
 
 
     /**
-     * Return an Iterator containing the String names of all notes bindings
+     * @return an Iterator containing the String names of all notes bindings
      * that exist for this request.
      */
     @Deprecated
@@ -2213,6 +2219,8 @@ public class Request implements HttpServletRequest {
 
     /**
      * Set the set of cookies received with this Request.
+     *
+     * @param cookies The array of recewived cookies
      */
     @Deprecated
     public void setCookies(Cookie[] cookies) {
@@ -2718,7 +2726,7 @@ public class Request implements HttpServletRequest {
 
 
     /**
-     * Return true if the current request is handling Comet traffic.
+     * @return true if the current request is handling Comet traffic.
      */
     public boolean isComet() {
         return comet;
@@ -2727,6 +2735,9 @@ public class Request implements HttpServletRequest {
 
     /**
      * Set comet state.
+     *
+     * @param comet New value for flag that indicates whether this request is
+     *              handling Comet traffic
      */
     public void setComet(boolean comet) {
         this.comet = comet;
@@ -3027,6 +3038,10 @@ public class Request implements HttpServletRequest {
     // --------------------------------- Tomcat proprietary HTTP upgrade methods
 
     /**
+     * @param inbound The inbound connection to be upgraded
+     *
+     * @throws IOException if an I/O error occurrs during the upgrade process
+     *
      * @deprecated  Will be removed in Tomcat 8.0.x.
      */
     @Deprecated
