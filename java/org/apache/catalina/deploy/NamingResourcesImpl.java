@@ -25,6 +25,7 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.naming.NamingException;
@@ -104,27 +105,27 @@ public class NamingResourcesImpl extends LifecycleMBeanBase
     /**
      * The EJB resource references for this web application, keyed by name.
      */
-    private final HashMap<String, ContextEjb> ejbs = new HashMap<>();
+    private final Map<String, ContextEjb> ejbs = new HashMap<>();
 
 
     /**
      * The environment entries for this web application, keyed by name.
      */
-    private final HashMap<String, ContextEnvironment> envs = new HashMap<>();
+    private final Map<String, ContextEnvironment> envs = new HashMap<>();
 
 
     /**
      * The local  EJB resource references for this web application, keyed by
      * name.
      */
-    private final HashMap<String, ContextLocalEjb> localEjbs = new HashMap<>();
+    private final Map<String, ContextLocalEjb> localEjbs = new HashMap<>();
 
 
     /**
      * The message destination references for this web application,
      * keyed by name.
      */
-    private final HashMap<String, MessageDestinationRef> mdrs = new HashMap<>();
+    private final Map<String, MessageDestinationRef> mdrs = new HashMap<>();
 
 
     /**
