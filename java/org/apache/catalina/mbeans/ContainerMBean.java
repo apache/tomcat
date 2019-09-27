@@ -134,7 +134,7 @@ public class ContainerMBean extends BaseCatalinaMBean<ContainerBase> {
             throw new MBeanException(e);
         }
 
-        if (container != null){
+        if (container != null) {
             Valve[] valves = container.getPipeline().getValves();
             for (int i = 0; i < valves.length; i++) {
                 if (valves[i] instanceof JmxEnabled) {
@@ -153,7 +153,7 @@ public class ContainerMBean extends BaseCatalinaMBean<ContainerBase> {
      *
      * @param type ClassName of the listener to add
      * @throws MBeanException if adding the listener failed
-    */
+     */
     public void addLifecycleListener(String type) throws MBeanException{
         LifecycleListener listener = (LifecycleListener) newInstance(type);
         Container container = doGetManagedResource();
