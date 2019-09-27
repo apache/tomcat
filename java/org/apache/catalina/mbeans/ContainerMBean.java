@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.catalina.mbeans;
 
 import java.util.ArrayList;
@@ -114,14 +113,16 @@ public class ContainerMBean extends BaseModelMBean {
         }
     }
 
+
     /**
      * Remove an existing child Container from association with this parent
      * Container.
      *
      * @param name Name of the existing child Container to be removed
+     * @throws MBeanException if the child cannot be removed
      */
     public void removeChild(String name) throws MBeanException{
-        if(name != null){
+        if (name != null) {
             try {
                 Container container = (Container)getManagedResource();
                 Container contained = container.findChild(name);
@@ -136,12 +137,13 @@ public class ContainerMBean extends BaseModelMBean {
         }
     }
 
+
     /**
      * Adds a valve to this Container instance.
      *
      * @param valveType ClassName of the valve to be added
-     *
-     * @exception MBeanException if a component cannot be removed
+     * @return the MBean name of the new valve
+     * @throws MBeanException if adding the valve failed
      */
     public String addValve(String valveType) throws MBeanException{
         Valve valve = null;
@@ -173,6 +175,7 @@ public class ContainerMBean extends BaseModelMBean {
         return ((LifecycleMBeanBase)valve).getObjectName().toString();
     }
 
+
     /**
      * Remove an existing Valve.
      *
@@ -201,21 +204,25 @@ public class ContainerMBean extends BaseModelMBean {
             throw new MBeanException(e);
         }
 
-        if(container != null){
+        if (container != null) {
             Valve[] valves = container.getPipeline().getValves();
             for (int i = 0; i < valves.length; i++) {
-                ObjectName voname = ((ValveBase) valves[i]).getObjectName();
-                if (voname.equals(oname)) {
-                    container.getPipeline().removeValve(valves[i]);
+                if (valves[i] instanceof JmxEnabled) {
+                    ObjectName voname = ((JmxEnabled) valves[i]).getObjectName();
+                    if (voname.equals(oname)) {
+                        container.getPipeline().removeValve(valves[i]);
+                    }
                 }
             }
         }
     }
 
+
     /**
      * Add a LifecycleEvent listener to this component.
      *
      * @param type ClassName of the listener to add
+     * @throws MBeanException if adding the listener failed
      */
     public void addLifeCycleListener(String type) throws MBeanException{
         LifecycleListener listener = null;
@@ -243,11 +250,13 @@ public class ContainerMBean extends BaseModelMBean {
         }
     }
 
+
     /**
      * Remove a LifecycleEvent listeners from this component.
      *
      * @param type The ClassName of the listeners to be removed.
      * Note that all the listeners having given ClassName will be removed.
+     * @throws MBeanException propagated from the managed resource access
      */
     public void removeLifeCycleListeners(String type) throws MBeanException{
         ContainerBase container=null;
@@ -273,6 +282,8 @@ public class ContainerMBean extends BaseModelMBean {
     /**
      * List the class name of each of the lifecycle listeners added to this
      * container.
+     * @return the lifecycle listeners class names
+     * @throws MBeanException propagated from the managed resource access
      */
     public String[] findLifecycleListenerNames() throws MBeanException {
         ContainerBase container = null;
@@ -300,6 +311,8 @@ public class ContainerMBean extends BaseModelMBean {
     /**
      * List the class name of each of the container listeners added to this
      * container.
+     * @return the container listeners class names
+     * @throws MBeanException propagated from the managed resource access
      */
     public String[] findContainerListenerNames() throws MBeanException {
         ContainerBase container = null;
