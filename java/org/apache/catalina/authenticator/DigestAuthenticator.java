@@ -307,6 +307,7 @@ public class DigestAuthenticator extends AuthenticatorBase {
      *
      * @param authorization Authorization string to be parsed
      *
+     * @return The extracted username or <code>null</code> is none was found
      * @deprecated  Unused. Will be removed in Tomcat 8.0.x
      */
     @Deprecated
