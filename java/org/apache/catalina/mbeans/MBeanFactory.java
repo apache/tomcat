@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.catalina.mbeans;
 
 import java.io.File;
@@ -204,6 +203,7 @@ public class MBeanFactory {
         return createConnector(parent, address, port, true, false);
     }
 
+
     /**
      * Create a new DataSource Realm.
      *
@@ -242,8 +242,8 @@ public class MBeanFactory {
         } else {
             return null;
         }
-
     }
+
 
     /**
      * Create a new HttpConnector
@@ -259,6 +259,7 @@ public class MBeanFactory {
             throws Exception {
         return createConnector(parent, address, port, false, false);
     }
+
 
     /**
      * Create a new Connector
@@ -312,6 +313,7 @@ public class MBeanFactory {
         return createConnector(parent, address, port, false, true);
     }
 
+
     /**
      * Create a new JDBC Realm.
      *
@@ -348,7 +350,6 @@ public class MBeanFactory {
         } else {
             return null;
         }
-
     }
 
 
@@ -360,8 +361,7 @@ public class MBeanFactory {
      *
      * @exception Exception if an MBean cannot be created or registered
      */
-    public String createJNDIRealm(String parent)
-        throws Exception {
+    public String createJNDIRealm(String parent) throws Exception {
 
          // Create a new JNDIRealm instance
         JNDIRealm realm = new JNDIRealm();
@@ -379,8 +379,6 @@ public class MBeanFactory {
         } else {
             return null;
         }
-
-
     }
 
 
@@ -392,8 +390,7 @@ public class MBeanFactory {
      *
      * @exception Exception if an MBean cannot be created or registered
      */
-    public String createMemoryRealm(String parent)
-        throws Exception {
+    public String createMemoryRealm(String parent) throws Exception {
 
          // Create a new MemoryRealm instance
         MemoryRealm realm = new MemoryRealm();
@@ -410,7 +407,6 @@ public class MBeanFactory {
         } else {
             return null;
         }
-
     }
 
 
