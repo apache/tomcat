@@ -16,6 +16,10 @@
  */
 package org.apache.tomcat.util.compat;
 
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.res.StringManager;
+
 import java.io.OutputStream;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -31,6 +35,9 @@ import java.util.concurrent.Executor;
 import java.util.zip.GZIPOutputStream;
 
 class Jre7Compat extends JreCompat {
+
+    private static final Log log = LogFactory.getLog(Jre7Compat.class);
+    private static final StringManager sm = StringManager.getManager(Jre7Compat.class);
 
     private static final int RUNTIME_MAJOR_VERSION = 7;
 
@@ -76,7 +83,7 @@ class Jre7Compat extends JreCompat {
             m6 = Connection.class.getMethod("abort", Executor.class);
             m7 = Connection.class.getMethod("setNetworkTimeout", Executor.class, int.class);
             m8 = Connection.class.getMethod("getNetworkTimeout");
-            m9 = DatabaseMetaData.class.getMethod("getPseudoColumns");
+            m9 = DatabaseMetaData.class.getMethod("getPseudoColumns", String.class, String.class, String.class, String.class);
             m10 = DatabaseMetaData.class.getMethod("generatedKeyAlwaysReturned");
             m11 = ResultSet.class.getMethod("getObject", int.class, Class.class);
             m12 = ResultSet.class.getMethod("getObject", String.class, Class.class);
@@ -84,8 +91,10 @@ class Jre7Compat extends JreCompat {
             m14 = Statement.class.getMethod("isCloseOnCompletion");
         } catch (SecurityException e) {
             // Should never happen
+            log.error(sm.getString("compat.securityException"), e);
         } catch (NoSuchMethodException e) {
             // Expected on Java < 7
+            log.warn(sm.getString("compat.noSuchMethodException", e.getMessage()));
         }
         forLanguageTagMethod = m1;
         gzipOutputStreamConstructor = c;

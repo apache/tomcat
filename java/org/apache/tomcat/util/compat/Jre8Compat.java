@@ -16,6 +16,10 @@
  */
 package org.apache.tomcat.util.compat;
 
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.res.StringManager;
+
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
@@ -24,6 +28,9 @@ import javax.net.ssl.SSLParameters;
 import javax.net.ssl.SSLServerSocket;
 
 class Jre8Compat extends Jre7Compat {
+
+    private static final Log log = LogFactory.getLog(Jre8Compat.class);
+    private static final StringManager sm = StringManager.getManager(Jre8Compat.class);
 
     private static final int RUNTIME_MAJOR_VERSION = 8;
 
@@ -45,10 +52,13 @@ class Jre8Compat extends Jre7Compat {
             m3 = SSLServerSocket.class.getMethod("setSSLParameters", c2);
         } catch (SecurityException e) {
             // Should never happen
+            log.error(sm.getString("compat.securityException"), e);
         } catch (NoSuchMethodException e) {
             // Expected on Java < 8
+            log.warn(sm.getString("compat.noSuchMethodException", e.getMessage()));
         } catch (ClassNotFoundException e) {
             // Expected on Java < 7
+            log.warn(sm.getString("compat.classNotFoundException", e.getMessage()));
         }
         getSSLParametersMethod = m1;
         setUseCipherSuitesOrderMethod = m2;

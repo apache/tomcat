@@ -95,16 +95,22 @@ class Jre9Compat extends Jre8Compat {
 
         } catch (SecurityException e) {
             // Should never happen
+            log.error(sm.getString("compat.securityException"), e);
         } catch (NoSuchMethodException e) {
             // Should never happen
+            log.warn(sm.getString("compat.noSuchMethodException", e.getMessage()));
         } catch (ClassNotFoundException e) {
             // Must be Java 8
+            log.warn(sm.getString("compat.classNotFoundException", e.getMessage()));
         } catch (IllegalArgumentException e) {
             // Should never happen
+            log.error(sm.getString("jre9Compat.illegalArgumentException"), e);
         } catch (IllegalAccessException e) {
             // Should never happen
+            log.error(sm.getString("jre9Compat.illegalAccessException"), e);
         } catch (InvocationTargetException e) {
             // Should never happen
+            log.error(sm.getString("jre9Compat.invocationTargetException"), e);
         }
 
         inaccessibleObjectExceptionClazz = c1;
