@@ -42,7 +42,7 @@ public interface ServletContextListener extends EventListener {
 
     /**
      ** Notification that the servlet context is about to be shut down. All
-     * servlets and filters have been destroy()ed before any
+     * servlets and filters have been destroyed before any
      * ServletContextListeners are notified of context destruction.
      * The default implementation is a NO-OP.
      * @param sce Information about the ServletContext that was destroyed
