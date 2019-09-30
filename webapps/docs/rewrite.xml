@@ -690,7 +690,7 @@ cannot use <code>$N</code> in the substitution string!
           <strong>r</strong>edirect</span>)<br />
           Prefix <em>Substitution</em> with
           <code>http://thishost[:thisport]/</code> (which makes the
-          new URL a URI) to force a external redirection. If no
+          new URL a URI) to force an external redirection. If no
           <em>code</em> is given, an HTTP response of 302 (FOUND, previously MOVED
           TEMPORARILY) will be returned. If you want to use other response
           codes in the range 300-399, simply specify the appropriate number
