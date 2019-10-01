@@ -30,7 +30,14 @@ import java.util.Locale;
 import java.util.concurrent.Executor;
 import java.util.zip.GZIPOutputStream;
 
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.res.StringManager;
+
 class Jre7Compat extends JreCompat {
+
+    private static final Log log = LogFactory.getLog(Jre7Compat.class);
+    private static final StringManager sm = StringManager.getManager(Jre7Compat.class);
 
     private static final int RUNTIME_MAJOR_VERSION = 7;
 
@@ -84,8 +91,10 @@ class Jre7Compat extends JreCompat {
             m14 = Statement.class.getMethod("isCloseOnCompletion");
         } catch (SecurityException e) {
             // Should never happen
+            log.error(sm.getString("jre7Compat.unexpected"), e);
         } catch (NoSuchMethodException e) {
-            // Expected on Java < 7
+            // Must be pre-Java 7
+            log.debug(sm.getString("jre7Compat.javaPre7"), e);
         }
         forLanguageTagMethod = m1;
         gzipOutputStreamConstructor = c;
