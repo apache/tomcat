@@ -104,10 +104,10 @@ class Jre9Compat extends JreCompat {
 
         } catch (ClassNotFoundException e) {
             // Must be pre-Java 9
-            log.debug("jre9Compat.javaPre9", e);
+            log.debug(sm.getString("jre9Compat.javaPre9"), e);
         } catch (ReflectiveOperationException | IllegalArgumentException e) {
             // Should never happen
-            log.error("jre9Compat.unexpected", e);
+            log.error(sm.getString("jre9Compat.unexpected"), e);
         }
 
         inaccessibleObjectExceptionClazz = c1;
