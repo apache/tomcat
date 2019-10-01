@@ -77,6 +77,10 @@ class Jre9Compat extends Jre8Compat {
         Object o15 = null;
 
         try {
+            // Order is important for the error handling below.
+            // Must look up c1 first.
+            c1 = Class.forName("java.lang.reflect.InaccessibleObjectException");
+
             Class<?> moduleLayerClazz = Class.forName("java.lang.ModuleLayer");
             Class<?> configurationClazz = Class.forName("java.lang.module.Configuration");
             Class<?> resolvedModuleClazz = Class.forName("java.lang.module.ResolvedModule");
@@ -86,7 +90,6 @@ class Jre9Compat extends Jre8Compat {
             Method runtimeVersionMethod = JarFile.class.getMethod("runtimeVersion");
             Method majorMethod = versionClazz.getMethod("major");
 
-            c1 = Class.forName("java.lang.reflect.InaccessibleObjectException");
             m2 = SSLParameters.class.getMethod("setApplicationProtocols", String[].class);
             m3 = SSLEngine.class.getMethod("getApplicationProtocol");
             m4 = URLConnection.class.getMethod("setDefaultUseCaches", String.class, boolean.class);
@@ -103,8 +106,13 @@ class Jre9Compat extends Jre8Compat {
             o15 = majorMethod.invoke(o14);
 
         } catch (ClassNotFoundException e) {
-            // Must be pre-Java 9
-            log.debug(sm.getString("jre9Compat.javaPre9"), e);
+            if (c1 == null) {
+                // Must be pre-Java 9
+                log.debug(sm.getString("jre9Compat.javaPre9"), e);
+            } else {
+                // Should never happen - signature error in lookup?
+                log.error(sm.getString("jre9Compat.unexpected"), e);
+            }
         } catch (ReflectiveOperationException | IllegalArgumentException e) {
             // Should never happen
             log.error(sm.getString("jre9Compat.unexpected"), e);
