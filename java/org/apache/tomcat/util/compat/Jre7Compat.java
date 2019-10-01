@@ -74,6 +74,8 @@ class Jre7Compat extends JreCompat {
         Method m14 = null;
         Constructor<GZIPOutputStream> c = null;
         try {
+            // Order is important for the error handling below.
+            // Must look up m1 first.
             m1 = Locale.class.getMethod("forLanguageTag", String.class);
             c = GZIPOutputStream.class.getConstructor(OutputStream.class, boolean.class);
             m2 = CallableStatement.class.getMethod("getObject", int.class, Class.class);
@@ -93,8 +95,13 @@ class Jre7Compat extends JreCompat {
             // Should never happen
             log.error(sm.getString("jre7Compat.unexpected"), e);
         } catch (NoSuchMethodException e) {
-            // Must be pre-Java 7
-            log.debug(sm.getString("jre7Compat.javaPre7"), e);
+            if (m1 == null) {
+                // Must be pre-Java 7
+                log.debug(sm.getString("jre7Compat.javaPre7"), e);
+            } else {
+                // Should never happen - signature error in lookup?
+                log.error(sm.getString("jre7Compat.unexpected"), e);
+            }
         }
         forLanguageTagMethod = m1;
         gzipOutputStreamConstructor = c;
