@@ -113,6 +113,13 @@
         <bug>63758</bug>: Include the XML schema for the tomcat-users.xml file
         in the binary distributions. (markt)
       </fix>
+      <fix>
+        <bug>63778</bug>: When running on Java 7, use the correct signature to
+        look up the <code>DatabaseMetaData.getPseudoColumns()</code> method and
+        avoid the <code>NullPointerException</code>s caused by using the wrong
+        method. Add error logging to detect similar bugs. Based on a pull
+        request by liguoxiong. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

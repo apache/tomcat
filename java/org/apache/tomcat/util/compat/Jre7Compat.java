@@ -85,7 +85,7 @@ class Jre7Compat extends JreCompat {
             m6 = Connection.class.getMethod("abort", Executor.class);
             m7 = Connection.class.getMethod("setNetworkTimeout", Executor.class, int.class);
             m8 = Connection.class.getMethod("getNetworkTimeout");
-            m9 = DatabaseMetaData.class.getMethod("getPseudoColumns");
+            m9 = DatabaseMetaData.class.getMethod("getPseudoColumns", String.class, String.class, String.class, String.class);
             m10 = DatabaseMetaData.class.getMethod("generatedKeyAlwaysReturned");
             m11 = ResultSet.class.getMethod("getObject", int.class, Class.class);
             m12 = ResultSet.class.getMethod("getObject", String.class, Class.class);
