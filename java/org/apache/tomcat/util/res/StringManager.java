@@ -16,6 +16,8 @@
  */
 package org.apache.tomcat.util.res;
 
+import org.apache.tomcat.util.compat.JreCompat;
+
 import java.text.MessageFormat;
 import java.util.Enumeration;
 import java.util.Hashtable;
@@ -130,7 +132,7 @@ public class StringManager {
         try {
             // Avoid NPE if bundle is null and treat it like an MRE
             if (bundle != null) {
-                str = bundle.getString(key);
+                str = JreCompat.getInstance().getUTF8String(bundle, key);
             }
         } catch (MissingResourceException mre) {
             //bad: shouldn't mask an exception the following way:

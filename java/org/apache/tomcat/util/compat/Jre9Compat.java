@@ -26,6 +26,7 @@ import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Deque;
+import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.jar.JarFile;
 import java.util.zip.ZipFile;
@@ -227,5 +228,11 @@ class Jre9Compat extends JreCompat {
     @Override
     public int jarFileRuntimeMajorVersion() {
         return RUNTIME_MAJOR_VERSION;
+    }
+
+
+    @Override
+    public String getUTF8String(ResourceBundle bundle, String key) {
+        return bundle.getString(key);
     }
 }

@@ -20,7 +20,9 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.charset.StandardCharsets;
 import java.util.Deque;
+import java.util.ResourceBundle;
 import java.util.jar.JarFile;
 
 import javax.net.ssl.SSLEngine;
@@ -193,5 +195,19 @@ public class JreCompat {
 
     public int jarFileRuntimeMajorVersion() {
         return RUNTIME_MAJOR_VERSION;
+    }
+
+
+    /**
+     * Get the utf-8 encoded string for the given key from the resource bundle or one of its parents.
+     *
+     * @param bundle The ResourceBundle for StringManager
+     * @param key The key for the desired string
+     * @return The string for the given key
+     */
+    public String getUTF8String(ResourceBundle bundle, String key) {
+        String str = bundle.getString(key);
+        str = new String(str.getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
+        return str;
     }
 }
