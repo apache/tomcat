@@ -103,8 +103,8 @@ class Jre9Compat extends JreCompat {
             o15 = majorMethod.invoke(o14);
 
         } catch (ClassNotFoundException e) {
-            // Must be Java 8
-            log.debug("jre9Compat.java8", e);
+            // Must be pre-Java 9
+            log.debug("jre9Compat.javaPre9", e);
         } catch (ReflectiveOperationException | IllegalArgumentException e) {
             // Should never happen
             log.error("jre9Compat.unexpected", e);
