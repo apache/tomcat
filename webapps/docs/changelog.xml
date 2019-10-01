@@ -101,6 +101,15 @@
       </docs>
     </changelog>
   </subsection>
+  <subsection name="jdbc-pool">
+    <changelog>
+      <fix>
+        When connections are validated without an explicit validation query,
+        ensure that any transactions opened by the validation process are
+        committed. Patch provided by Pascal Davoust. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <scode>
