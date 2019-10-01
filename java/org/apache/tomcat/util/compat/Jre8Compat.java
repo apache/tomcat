@@ -49,9 +49,9 @@ class Jre8Compat extends Jre7Compat {
 
             // The class is Java6+...
             Class<?> c2 = Class.forName("javax.net.ssl.SSLParameters");
-            m1 = SSLServerSocket.class.getMethod("getSSLParameters");
             // ...but this method is Java8+
-            m2 = c2.getMethod("setUseCipherSuitesOrder", boolean.class);
+            m1 = c2.getMethod("setUseCipherSuitesOrder", boolean.class);
+            m2 = SSLServerSocket.class.getMethod("getSSLParameters");
             m3 = SSLServerSocket.class.getMethod("setSSLParameters", c2);
         } catch (SecurityException e) {
             // Should never happen
@@ -68,8 +68,8 @@ class Jre8Compat extends Jre7Compat {
             // Must be pre-Java 7
             log.debug(sm.getString("jre8Compat.javaPre7"), e);
         }
-        getSSLParametersMethod = m1;
-        setUseCipherSuitesOrderMethod = m2;
+        setUseCipherSuitesOrderMethod = m1;
+        getSSLParametersMethod = m2;
         setSSLParametersMethod = m3;
     }
 
