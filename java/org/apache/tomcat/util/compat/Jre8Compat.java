@@ -46,6 +46,9 @@ class Jre8Compat extends JreCompat {
         Method m1 = null;
         Constructor<?> c2 = null;
         try {
+            // Order is important for the error handling below.
+            // Must look up m1 first.
+
             // The class is Java6+...
             Class<?> clazz1 = Class.forName("javax.net.ssl.SSLParameters");
             // ...but this method is Java8+
@@ -56,8 +59,13 @@ class Jre8Compat extends JreCompat {
             // Should never happen
             log.error(sm.getString("jre8Compat.unexpected"), e);
         } catch (NoSuchMethodException e) {
-            // Must be pre-Java 8
-            log.debug(sm.getString("jre8Compat.javaPre8"), e);
+            if (m1 == null) {
+                // Must be pre-Java 8
+                log.debug(sm.getString("jre8Compat.javaPre8"), e);
+            } else {
+                // Should never happen - signature error in lookup?
+                log.error(sm.getString("jre8Compat.unexpected"), e);
+            }
         } catch (ClassNotFoundException e) {
             // Should never happen
             log.error(sm.getString("jre8Compat.unexpected"), e);
