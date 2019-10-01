@@ -27,7 +27,14 @@ import java.util.Map;
 import javax.net.ssl.SSLEngine;
 import javax.net.ssl.SSLParameters;
 
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.res.StringManager;
+
 class Jre8Compat extends JreCompat {
+
+    private static final Log log = LogFactory.getLog(Jre8Compat.class);
+    private static final StringManager sm = StringManager.getManager(Jre8Compat.class);
 
     private static final int RUNTIME_MAJOR_VERSION = 8;
 
@@ -47,10 +54,13 @@ class Jre8Compat extends JreCompat {
             c2 = clazz2.getConstructor(URI.class, Map.class);
         } catch (SecurityException e) {
             // Should never happen
+            log.error(sm.getString("jre8Compat.unexpected"), e);
         } catch (NoSuchMethodException e) {
-            // Expected on Java < 8
+            // Must be pre-Java 8
+            log.debug(sm.getString("jre8Compat.javaPre8"), e);
         } catch (ClassNotFoundException e) {
             // Should never happen
+            log.error(sm.getString("jre8Compat.unexpected"), e);
         }
         setUseCipherSuitesOrderMethod = m1;
         domainLoadStoreParameterConstructor = c2;
