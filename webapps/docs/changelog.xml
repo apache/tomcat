@@ -67,7 +67,7 @@
       <fix>
         <bug>63766</bug>: Ensure Processor objects are recycled when processing
         an HTTP upgrade connection that terminates before processing switches to
-        the Processor for the upgraded procotol. (markt)
+        the Processor for the upgraded protocol. (markt)
       </fix>
     </changelog>
   </subsection>
@@ -160,7 +160,7 @@
       </fix>
       <fix>
         Avoid a potential <code>NullPointerException</code> on Service stop if a
-        Service is embedded directly (i.e. with no Server) in an applciation
+        Service is embedded directly (i.e. with no Server) in an application
         and JNDI is enabled. Patch provided by S. Ali Tokmen. (markt)
       </fix>
       <add>
@@ -511,7 +511,7 @@
       </fix>
       <fix>
         Add &quot;embed&quot; to the <code>Bundle-Name</code> and
-        <code>Bundle-Symbolic-Name</code> for the Tomact embedded WebSocket JAR
+        <code>Bundle-Symbolic-Name</code> for the Tomcat embedded WebSocket JAR
         to align the naming with the other embedded JARs and to differentiate it
         from the standard WebSocket JAR that does not include the API classes.
         (markt)
