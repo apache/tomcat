@@ -412,14 +412,12 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                 if (isSSLEnabled()) {
                     channel = new SecureNioChannel(socket, bufhandler, selectorPool, this);
                 } else {
-                    channel = new NioChannel(socket, bufhandler);
+                    channel = new NioChannel(bufhandler);
                 }
             } else {
-                channel.setIOChannel(socket);
-                channel.reset();
             }
             NioSocketWrapper socketWrapper = new NioSocketWrapper(channel, this);
-            channel.setSocketWrapper(socketWrapper);
+            channel.reset(socket, socketWrapper);
             socketWrapper.setReadTimeout(getConnectionTimeout());
             socketWrapper.setWriteTimeout(getConnectionTimeout());
             socketWrapper.setKeepAliveLeft(NioEndpoint.this.getMaxKeepAliveRequests());

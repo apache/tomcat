@@ -44,23 +44,21 @@ public class NioChannel implements ByteChannel, ScatteringByteChannel, Gathering
     protected SocketChannel sc = null;
     protected NioSocketWrapper socketWrapper = null;
 
-    public NioChannel(SocketChannel channel, SocketBufferHandler bufHandler) {
-        this.sc = channel;
+    public NioChannel(SocketBufferHandler bufHandler) {
         this.bufHandler = bufHandler;
     }
 
     /**
      * Reset the channel
      *
+     * @param channel the socket channel
+     * @param socketWrapper the socket wrapper
      * @throws IOException If a problem was encountered resetting the channel
      */
-    public void reset() throws IOException {
-        bufHandler.reset();
-    }
-
-
-    void setSocketWrapper(NioSocketWrapper socketWrapper) {
+    public void reset(SocketChannel channel, NioSocketWrapper socketWrapper) throws IOException {
+        this.sc = channel;
         this.socketWrapper = socketWrapper;
+        bufHandler.reset();
     }
 
     /**
@@ -205,10 +203,6 @@ public class NioChannel implements ByteChannel, ScatteringByteChannel, Gathering
         return 0;
     }
 
-    public void setIOChannel(SocketChannel sc) {
-        this.sc = sc;
-    }
-
     @Override
     public String toString() {
         return super.toString() + ":" + sc.toString();
@@ -257,7 +251,7 @@ public class NioChannel implements ByteChannel, ScatteringByteChannel, Gathering
     static final NioChannel CLOSED_NIO_CHANNEL = new ClosedNioChannel();
     public static class ClosedNioChannel extends NioChannel {
         public ClosedNioChannel() {
-            super(null, SocketBufferHandler.EMPTY);
+            super(SocketBufferHandler.EMPTY);
         }
         @Override
         public void close() throws IOException {
@@ -267,16 +261,10 @@ public class NioChannel implements ByteChannel, ScatteringByteChannel, Gathering
             return false;
         }
         @Override
-        public void reset() throws IOException {
+        public void reset(SocketChannel channel, NioSocketWrapper socketWrapper) throws IOException {
         }
         @Override
         public void free() {
-        }
-        @Override
-        void setSocketWrapper(NioSocketWrapper socketWrapper) {
-        }
-        @Override
-        public void setIOChannel(SocketChannel sc) {
         }
         @Override
         public void setAppReadBufHandler(ApplicationBufferHandler handler) {
