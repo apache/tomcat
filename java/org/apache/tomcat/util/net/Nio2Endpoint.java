@@ -213,7 +213,7 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
                     // Then close all active connections if any remain
                     try {
                         for (Nio2Channel channel : getHandler().getOpenSockets()) {
-                            channel.getSocket().close();
+                            channel.getSocketWrapper().close();
                         }
                     } catch (Throwable t) {
                         ExceptionUtils.handleThrowable(t);
