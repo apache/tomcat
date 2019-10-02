@@ -309,18 +309,14 @@
 <section name="Tomcat 9.0.23 (markt)" rtext="not released">
   <subsection name="Catalina">
     <changelog>
-      <update>
-        <bug>63627</bug>: Implement more fine-grained handling in
-        <code>RealmBase.authenticate(GSSContext, boolean)</code>. (michaelo)
-      </update>
-      <add>
-        <bug>62496</bug>: Add option to write auth information (remote user/auth type)
-        to response headers. (michaelo)
-      </add>
       <add>
         <bug>57665</bug>: Add support for the <code>X-Forwarded-Host</code>
         header to the <code>RemoteIpFilter</code> and <code>RemoteIpValve</code>.
         (markt)
+      </add>
+      <add>
+        <bug>62496</bug>: Add option to write auth information (remote user/auth type)
+        to response headers. (michaelo)
       </add>
       <fix>
         <bug>63550</bug>: Only try the <code>alternateURL</code> in the
@@ -331,15 +327,6 @@
         RemoteIpFilter (michaelo)
       </add>
       <fix>
-        If an unhandled exception occurs on a asynchronous thread started via
-        <code>AsyncContext.start(Runnable)</code>, process it using the standard
-        error page mechanism. (markt)
-      </fix>
-      <fix>
-        Discard large byte buffers allocated using setBufferSize when recycling
-        the request. (remm)
-      </fix>
-      <fix>
         <bug>63579</bug>: Correct parsing of malformed OPTIONS requests and
         reject them with a 400 response rather than triggering an internal error
         that results in a 500 response. (markt)
@@ -348,6 +335,19 @@
         <bug>63608</bug>: Align the implementation of the negative match feature
         for patterns used with the <code>RewriteValve</code> with the
         description in the documentation. (markt)
+      </fix>
+      <update>
+        <bug>63627</bug>: Implement more fine-grained handling in
+        <code>RealmBase.authenticate(GSSContext, boolean)</code>. (michaelo)
+      </update>
+      <fix>
+        If an unhandled exception occurs on a asynchronous thread started via
+        <code>AsyncContext.start(Runnable)</code>, process it using the standard
+        error page mechanism. (markt)
+      </fix>
+      <fix>
+        Discard large byte buffers allocated using setBufferSize when recycling
+        the request. (remm)
       </fix>
       <fix>
         Avoid a <code>NullPointerException</code> in the
@@ -380,13 +380,13 @@
         (remm)
       </update>
       <fix>
-        <bug>63570</bug>: Fix regression retrieving local address with
-        the NIO connector. Submitted by Aditya Kadakia. (remm)
-      </fix>
-      <fix>
         <bug>63568</bug>: Avoid error when trying to set tcpNoDelay on socket
         types that do not support it, which can occur when using the NIO
         inherited channel capability. Submitted by František Kučera. (remm)
+      </fix>
+      <fix>
+        <bug>63570</bug>: Fix regression retrieving local address with
+        the NIO connector. Submitted by Aditya Kadakia. (remm)
       </fix>
       <fix>
         Correct parsing of invalid host names that contain bytes in the range
@@ -470,16 +470,6 @@
       <update>
         Update Checkstyle to 8.22. (markt)
       </update>
-      <update>
-        <bug>62696</bug>: The digital signature for the Windows installer now
-        uses SHA-256 for hashes. (markt)
-      </update>
-      <update>
-        <bug>63310</bug>: Update to Commons Daemon 1.2.0. This provides improved
-        support for Java 11. This also changes the user configured by the
-        Windows installer for the Windows service from <code>Local System</code>
-        to the lower privileged <code>Local Service</code>. (markt)
-      </update>
       <fix>
         <bug>55969</bug>: Tighten up the security of the Apache Tomcat
         installation created by the Windows installer. Change the default
@@ -488,10 +478,10 @@
         directory to local administrators, Local System and Local Service.
         (markt)
       </fix>
-      <add>
-        Expand the coverage and quality of the French translations provided
-        with Apache Tomcat. (remm)
-      </add>
+      <update>
+        <bug>62696</bug>: The digital signature for the Windows installer now
+        uses SHA-256 for hashes. (markt)
+      </update>
       <add>
         <bug>63285</bug>: Add an option to <code>service.bat</code> so that when
         installing a Windows service, the name of the executables used by the
@@ -501,6 +491,21 @@
         is removed. The renaming can be enabled by using the new
         <code>--rename</code> option after the service name. (markt)
       </add>
+      <update>
+        <bug>63310</bug>: Update to Commons Daemon 1.2.0. This provides improved
+        support for Java 11. This also changes the user configured by the
+        Windows installer for the Windows service from <code>Local System</code>
+        to the lower privileged <code>Local Service</code>. (markt)
+      </update>
+      <add>
+        Expand the coverage and quality of the French translations provided
+        with Apache Tomcat. (remm)
+      </add>
+      <fix>
+        <bug>63555</bug>: Add <code>Automatic-Module-Name</code> entries for
+        each of the Tomcat provided JARs included in the Tomcat embedded
+        distribution. (markt)
+      </fix>
       <fix>
         <bug>63567</bug>: Restore the passing of <code>$LOGGING_MANAGER</code>
         to the jvm in <code>catalina.sh</code> when calling <code>stop</code>.
@@ -515,11 +520,6 @@
         to align the naming with the other embedded JARs and to differentiate it
         from the standard WebSocket JAR that does not include the API classes.
         (markt)
-      </fix>
-      <fix>
-        <bug>63555</bug>: Add <code>Automatic-Module-Name</code> entries for
-        each of the Tomcat provided JARs included in the Tomcat embedded
-        distribution. (markt)
       </fix>
       <update>
         Update dependency on bnd to 4.2.0. (markt)
