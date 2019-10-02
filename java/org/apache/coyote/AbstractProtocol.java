@@ -40,6 +40,7 @@ import javax.servlet.http.HttpUpgradeHandler;
 import javax.servlet.http.WebConnection;
 
 import org.apache.coyote.http11.upgrade.InternalHttpUpgradeHandler;
+import org.apache.coyote.http11.upgrade.UpgradeProcessorInternal;
 import org.apache.juli.logging.Log;
 import org.apache.tomcat.InstanceManager;
 import org.apache.tomcat.util.ExceptionUtils;
@@ -1053,12 +1054,22 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
         private void release(Processor processor) {
             if (processor != null) {
                 processor.recycle();
-                // After recycling, only instances of UpgradeProcessorBase will
-                // return true for isUpgrade().
-                // Instances of UpgradeProcessorBase should not be added to
-                // recycledProcessors since that pool is only for AJP or HTTP
-                // processors
-                if (!processor.isUpgrade()) {
+                if (processor.isUpgrade()) {
+                    // UpgradeProcessorInternal instances can utilise AsyncIO.
+                    // If they do, the processor will not pass through the
+                    // process() method and be removed from waitingProcessors
+                    // so do that here.
+                    if (processor instanceof UpgradeProcessorInternal) {
+                        if (((UpgradeProcessorInternal) processor).hasAsyncIO()) {
+                            getProtocol().removeWaitingProcessor(processor);
+                        }
+                    }
+                } else {
+                    // After recycling, only instances of UpgradeProcessorBase
+                    // will return true for isUpgrade().
+                    // Instances of UpgradeProcessorBase should not be added to
+                    // recycledProcessors since that pool is only for AJP or
+                    // HTTP processors
                     recycledProcessors.push(processor);
                     getLog().debug("Pushed Processor [" + processor + "]");
                 }

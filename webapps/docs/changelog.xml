@@ -69,6 +69,10 @@
         an HTTP upgrade connection that terminates before processing switches to
         the Processor for the upgraded protocol. (markt)
       </fix>
+      <fix>
+        Fix a memory leak introduced by the HTTP/2 timeout refactoring in 9.0.23
+        that could occur when HTTP/2 or WebSocket was used. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">

@@ -79,6 +79,11 @@ public class UpgradeProcessorInternal extends UpgradeProcessorBase {
     }
 
 
+    public boolean hasAsyncIO() {
+        return internalHttpUpgradeHandler.hasAsyncIO();
+    }
+
+
     // --------------------------------------------------- AutoCloseable methods
 
     @Override
