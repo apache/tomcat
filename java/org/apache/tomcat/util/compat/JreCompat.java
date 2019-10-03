@@ -18,6 +18,8 @@ package org.apache.tomcat.util.compat;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.AccessibleObject;
+import java.lang.reflect.Modifier;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Deque;
@@ -193,5 +195,23 @@ public class JreCompat {
 
     public int jarFileRuntimeMajorVersion() {
         return RUNTIME_MAJOR_VERSION;
+    }
+
+
+    /**
+     * Is the accessibleObject of the given type accessible on the provided
+     * instance of that type.
+     *
+     * @param type  The type the accessible object belongs to
+     * @param base  The specific instance of the type to be tested. Unused prior
+     *                  to Java 9.
+     * @param accessibleObject  The method/field/constructor to be tested.
+     *                              Unused prior to Java 9.
+     *
+     * @return {code true} if the AccessibleObject can be accessed otherwise
+     *         {code false}
+     */
+    public boolean canAcccess(Class<?> type, Object base, AccessibleObject accessibleObject) {
+        return Modifier.isPublic(type.getModifiers());
     }
 }

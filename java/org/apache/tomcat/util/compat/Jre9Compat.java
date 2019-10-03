@@ -18,6 +18,7 @@ package org.apache.tomcat.util.compat;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -55,9 +56,9 @@ class Jre9Compat extends JreCompat {
     private static final Method getMethod;
     private static final Constructor<JarFile> jarFileConstructor;
     private static final Method isMultiReleaseMethod;
-
     private static final Object RUNTIME_VERSION;
     private static final int RUNTIME_MAJOR_VERSION;
+    private static final Method canAccessMethod;
 
     static {
         Class<?> c1 = null;
@@ -75,6 +76,7 @@ class Jre9Compat extends JreCompat {
         Method m13 = null;
         Object o14 = null;
         Object o15 = null;
+        Method m16 = null;
 
         try {
             // Order is important for the error handling below.
@@ -104,6 +106,7 @@ class Jre9Compat extends JreCompat {
             m13 = JarFile.class.getMethod("isMultiRelease");
             o14 = runtimeVersionMethod.invoke(null);
             o15 = majorMethod.invoke(o14);
+            m16 = AccessibleObject.class.getMethod("canAccess", new Class<?>[] { Object.class });
 
         } catch (ClassNotFoundException e) {
             if (c1 == null) {
@@ -139,6 +142,8 @@ class Jre9Compat extends JreCompat {
             // Must be Java 8
             RUNTIME_MAJOR_VERSION = 8;
         }
+
+        canAccessMethod = m16;
     }
 
 
@@ -237,5 +242,15 @@ class Jre9Compat extends JreCompat {
     @Override
     public int jarFileRuntimeMajorVersion() {
         return RUNTIME_MAJOR_VERSION;
+    }
+
+
+    @Override
+    public boolean canAcccess(Class<?> type, Object base, AccessibleObject accessibleObject) {
+        try {
+            return ((Boolean) canAccessMethod.invoke(accessibleObject, base)).booleanValue();
+        } catch (ReflectiveOperationException | IllegalArgumentException e) {
+            return false;
+        }
     }
 }
