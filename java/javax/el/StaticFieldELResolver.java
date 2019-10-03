@@ -113,7 +113,7 @@ public class StaticFieldELResolver extends ELResolver {
 
             } else {
                 Method match =
-                        Util.findMethod(clazz, methodName, paramTypes, params);
+                        Util.findMethod(clazz, base, methodName, paramTypes, params);
 
                 int modifiers = match.getModifiers();
                 if (!Modifier.isStatic(modifiers)) {

@@ -89,7 +89,7 @@ public class BeanELResolver extends ELResolver {
         }
 
         context.setPropertyResolved(base, property);
-        Method m = this.property(context, base, property).read(context);
+        Method m = this.property(context, base, property).read(context, base);
         try {
             return m.invoke(base, (Object[]) null);
         } catch (InvocationTargetException e) {
@@ -117,7 +117,7 @@ public class BeanELResolver extends ELResolver {
                     "resolverNotWriteable", base.getClass().getName()));
         }
 
-        Method m = this.property(context, base, property).write(context);
+        Method m = this.property(context, base, property).write(context, base);
         try {
             m.invoke(base, value);
         } catch (InvocationTargetException e) {
@@ -147,7 +147,7 @@ public class BeanELResolver extends ELResolver {
 
         // Find the matching method
         Method matchingMethod =
-                Util.findMethod(base.getClass(), methodName, paramTypes, params);
+                Util.findMethod(base.getClass(), base, methodName, paramTypes, params);
 
         Object[] parameters = Util.buildParameters(
                 matchingMethod.getParameterTypes(), matchingMethod.isVarArgs(),
@@ -176,7 +176,7 @@ public class BeanELResolver extends ELResolver {
         }
 
         context.setPropertyResolved(base, property);
-        return this.readOnly || this.property(context, base, property).isReadOnly();
+        return this.readOnly || this.property(context, base, property).isReadOnly(base);
     }
 
     @Override
@@ -289,14 +289,14 @@ public class BeanELResolver extends ELResolver {
             return this.type;
         }
 
-        public boolean isReadOnly() {
+        public boolean isReadOnly(Object base) {
             return this.write == null &&
-                    (null == (this.write = Util.getMethod(this.owner, descriptor.getWriteMethod())));
+                    (null == (this.write = Util.getMethod(this.owner, base, descriptor.getWriteMethod())));
         }
 
-        private Method write(ELContext ctx) {
+        private Method write(ELContext ctx, Object base) {
             if (this.write == null) {
-                this.write = Util.getMethod(this.owner, descriptor.getWriteMethod());
+                this.write = Util.getMethod(this.owner, base, descriptor.getWriteMethod());
                 if (this.write == null) {
                     throw new PropertyNotWritableException(Util.message(ctx,
                             "propertyNotWritable", new Object[] {
@@ -306,9 +306,9 @@ public class BeanELResolver extends ELResolver {
             return this.write;
         }
 
-        private Method read(ELContext ctx) {
+        private Method read(ELContext ctx, Object base) {
             if (this.read == null) {
-                this.read = Util.getMethod(this.owner, descriptor.getReadMethod());
+                this.read = Util.getMethod(this.owner, base, descriptor.getReadMethod());
                 if (this.read == null) {
                     throw new PropertyNotFoundException(Util.message(ctx,
                             "propertyNotReadable", new Object[] {
