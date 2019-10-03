@@ -593,28 +593,21 @@ class Util {
 
         List<Wrapper> wrappers = Wrapper.wrap(constructors);
 
-        Wrapper result = findWrapper(clazz, wrappers, methodName, paramTypes, paramValues);
+        Wrapper wrapper = findWrapper(clazz, wrappers, methodName, paramTypes, paramValues);
 
-        return getConstructor(clazz, (Constructor<?>) result.unWrap());
+        Constructor<?> constructor = getConstructor(clazz, (Constructor<?>) wrapper.unWrap());
+        if (constructor == null) {
+            throw new MethodNotFoundException(message(
+                    null, "util.method.notfound", clazz, methodName,
+                    paramString(paramTypes)));
+        }
+        return constructor;
     }
 
 
     static Constructor<?> getConstructor(Class<?> type, Constructor<?> c) {
-        if (c == null || Modifier.isPublic(type.getModifiers())) {
+        if (Modifier.isPublic(type.getModifiers())) {
             return c;
-        }
-        Constructor<?> cp = null;
-        Class<?> sup = type.getSuperclass();
-        if (sup != null) {
-            try {
-                cp = sup.getConstructor(c.getParameterTypes());
-                cp = getConstructor(cp.getDeclaringClass(), cp);
-                if (cp != null) {
-                    return cp;
-                }
-            } catch (NoSuchMethodException e) {
-                // Ignore
-            }
         }
         return null;
     }
