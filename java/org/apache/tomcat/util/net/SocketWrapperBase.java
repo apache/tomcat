@@ -391,6 +391,14 @@ public abstract class SocketWrapperBase<E> {
      */
     public void close() {
         if (closed.compareAndSet(false, true)) {
+            try {
+                getEndpoint().getHandler().release(this);
+            } catch (Throwable e) {
+                ExceptionUtils.handleThrowable(e);
+                if (log.isDebugEnabled()) {
+                    log.error(sm.getString("endpoint.debug.handlerRelease"), e);
+                }
+            }
             doClose();
         }
     }

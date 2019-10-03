@@ -1163,14 +1163,6 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                 log.debug("Calling [" + getEndpoint() + "].closeSocket([" + this + "])", new Exception());
             }
             try {
-                getEndpoint().getHandler().release(this);
-            } catch (Throwable e) {
-                ExceptionUtils.handleThrowable(e);
-                if (log.isDebugEnabled()) {
-                    log.error(sm.getString("endpoint.debug.handlerRelease"), e);
-                }
-            }
-            try {
                 synchronized (getSocket()) {
                     getEndpoint().countDownConnection();
                     if (getSocket().isOpen()) {

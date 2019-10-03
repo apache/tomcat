@@ -2244,14 +2244,6 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
             if (log.isDebugEnabled()) {
                 log.debug("Calling [" + getEndpoint() + "].closeSocket([" + this + "])", new Exception());
             }
-            try {
-                getEndpoint().getHandler().release(this);
-            } catch (Throwable e) {
-                ExceptionUtils.handleThrowable(e);
-                if (log.isDebugEnabled()) {
-                    log.error(sm.getString("endpoint.debug.handlerRelease"), e);
-                }
-            }
             socketBufferHandler = SocketBufferHandler.EMPTY;
             nonBlockingWriteBuffer.clear();
             synchronized (closed) {
