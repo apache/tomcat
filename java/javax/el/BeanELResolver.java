@@ -289,9 +289,7 @@ public class BeanELResolver extends ELResolver {
             this.type = descriptor.getPropertyType();
         }
 
-        // Can't use Class<?> because API needs to match specification
-        @SuppressWarnings("rawtypes")
-        public Class getPropertyType() {
+        public Class<?> getPropertyType() {
             return this.type;
         }
 
