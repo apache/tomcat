@@ -199,7 +199,7 @@ class Util {
      * This method duplicates code in org.apache.el.util.ReflectionUtil. When
      * making changes keep the code in sync.
      */
-    static Method findMethod(Class<?> clazz, String methodName,
+    static Method findMethod(Class<?> clazz, Object base, String methodName,
             Class<?>[] paramTypes, Object[] paramValues) {
 
         if (clazz == null || methodName == null) {
@@ -218,7 +218,7 @@ class Util {
 
         Wrapper<Method> result = findWrapper(clazz, wrappers, methodName, paramTypes, paramValues);
 
-        return getMethod(clazz, result.unWrap());
+        return getMethod(clazz, base, result.unWrap());
     }
 
     /*
@@ -541,8 +541,9 @@ class Util {
      * This method duplicates code in org.apache.el.util.ReflectionUtil. When
      * making changes keep the code in sync.
      */
-    static Method getMethod(Class<?> type, Method m) {
-        if (m == null || Modifier.isPublic(type.getModifiers())) {
+    static Method getMethod(Class<?> type, Object base, Method m) {
+        JreCompat jreCompat = JreCompat.getInstance();
+        if (m == null || jreCompat.canAcccess(base, m)) {
             return m;
         }
         Class<?>[] inf = type.getInterfaces();
@@ -550,7 +551,7 @@ class Util {
         for (int i = 0; i < inf.length; i++) {
             try {
                 mp = inf[i].getMethod(m.getName(), m.getParameterTypes());
-                mp = getMethod(mp.getDeclaringClass(), mp);
+                mp = getMethod(mp.getDeclaringClass(), base, mp);
                 if (mp != null) {
                     return mp;
                 }
@@ -562,7 +563,7 @@ class Util {
         if (sup != null) {
             try {
                 mp = sup.getMethod(m.getName(), m.getParameterTypes());
-                mp = getMethod(mp.getDeclaringClass(), mp);
+                mp = getMethod(mp.getDeclaringClass(), base, mp);
                 if (mp != null) {
                     return mp;
                 }
