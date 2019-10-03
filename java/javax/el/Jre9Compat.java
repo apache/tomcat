@@ -29,16 +29,29 @@ import java.lang.reflect.Method;
 class Jre9Compat extends JreCompat {
 
     private static final Method canAccessMethod;
-
+    private static final Method getModuleMethod;
+    private static final Method isExportedMethod;
 
     static {
         Method m1 = null;
+        Method m2 = null;
+        Method m3 = null;
+
         try {
-            m1 = AccessibleObject.class.getMethod("canAccess", new Class<?>[] { Object.class });
+            m1 = AccessibleObject.class.getMethod("canAccess", Object.class);
+            m2 = Class.class.getMethod("getModule");
+            Class<?> moduleClass = Class.forName("java.lang.Module");
+            m3 = moduleClass.getMethod("isExported", String.class);
         } catch (NoSuchMethodException e) {
             // Expected for Java 8
+        } catch (ClassNotFoundException e) {
+            // Can't log this so...
+            throw new RuntimeException(e);
         }
+
         canAccessMethod = m1;
+        getModuleMethod = m2;
+        isExportedMethod = m3;
     }
 
 
@@ -52,6 +65,18 @@ class Jre9Compat extends JreCompat {
         try {
             return ((Boolean) canAccessMethod.invoke(accessibleObject, base)).booleanValue();
         } catch (ReflectiveOperationException | IllegalArgumentException e) {
+            return false;
+        }
+    }
+
+
+    @Override
+    public boolean isExported(Class<?> type) {
+        try {
+            String packageName = type.getPackage().getName();
+            Object module = getModuleMethod.invoke(type);
+            return ((Boolean) isExportedMethod.invoke(module, packageName)).booleanValue();
+        } catch (ReflectiveOperationException e) {
             return false;
         }
     }
