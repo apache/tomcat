@@ -263,10 +263,6 @@ public class BeanELResolver extends ELResolver {
             return property;
         }
 
-        public BeanProperty getBeanProperty(String name) {
-            return get(null, name);
-        }
-
         private Class<?> getType() {
             return type;
         }
@@ -296,14 +292,6 @@ public class BeanELResolver extends ELResolver {
         public boolean isReadOnly() {
             return this.write == null &&
                     (null == (this.write = Util.getMethod(this.owner, descriptor.getWriteMethod())));
-        }
-
-        public Method getWriteMethod() {
-            return write(null);
-        }
-
-        public Method getReadMethod() {
-            return this.read(null);
         }
 
         private Method write(ELContext ctx) {
