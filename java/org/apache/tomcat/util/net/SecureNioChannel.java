@@ -70,8 +70,7 @@ public class SecureNioChannel extends NioChannel {
 
     protected NioSelectorPool pool;
 
-    public SecureNioChannel(SocketChannel channel, SocketBufferHandler bufHandler,
-            NioSelectorPool pool, NioEndpoint endpoint) {
+    public SecureNioChannel(SocketBufferHandler bufHandler, NioSelectorPool pool, NioEndpoint endpoint) {
         super(bufHandler);
 
         // Create the network buffers (these hold the encrypted data).

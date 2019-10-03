@@ -410,7 +410,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                         socketProperties.getAppWriteBufSize(),
                         socketProperties.getDirectBuffer());
                 if (isSSLEnabled()) {
-                    channel = new SecureNioChannel(socket, bufhandler, selectorPool, this);
+                    channel = new SecureNioChannel(bufhandler, selectorPool, this);
                 } else {
                     channel = new NioChannel(bufhandler);
                 }
