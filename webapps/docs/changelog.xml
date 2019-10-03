@@ -133,7 +133,10 @@
         the minimum supported Java version. (markt)
       </add>
       <update>
-        Update to OpenWebBeans 2.0.12. (remm)
+        Update the OWB module to Apache OpenWebBeans 2.0.12. (remm)
+      </update>
+      <update>
+        Update the CXF module to Apache CXF 3.3.3. (remm)
       </update>
     </changelog>
   </subsection>
