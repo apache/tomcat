@@ -594,21 +594,16 @@ class Util {
 
         Wrapper<Constructor<?>> wrapper = findWrapper(clazz, wrappers, methodName, paramTypes, paramValues);
 
-        Constructor<?> constructor = getConstructor(clazz, wrapper.unWrap());
-        if (constructor == null) {
+        Constructor<?> constructor = wrapper.unWrap();
+
+        JreCompat jreCompat = JreCompat.getInstance();
+        if (!Modifier.isPublic(clazz.getModifiers()) || !jreCompat.canAcccess(null, constructor)) {
             throw new MethodNotFoundException(message(
                     null, "util.method.notfound", clazz, methodName,
                     paramString(paramTypes)));
         }
+
         return constructor;
-    }
-
-
-    static Constructor<?> getConstructor(Class<?> type, Constructor<?> c) {
-        if (Modifier.isPublic(type.getModifiers())) {
-            return c;
-        }
-        return null;
     }
 
 
