@@ -25,7 +25,7 @@ import java.lang.reflect.AccessibleObject;
  * This class is duplicated in javax.el
  * When making changes keep the two in sync.
  */
-class JreCompat {
+public class JreCompat {
 
     private static final JreCompat instance;
 

@@ -21,6 +21,7 @@ import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.text.DateFormat;
@@ -47,6 +48,7 @@ import javax.servlet.jsp.tagext.TagInfo;
 import javax.servlet.jsp.tagext.TagVariableInfo;
 import javax.servlet.jsp.tagext.VariableInfo;
 
+import org.apache.el.util.JreCompat;
 import org.apache.jasper.Constants;
 import org.apache.jasper.JasperException;
 import org.apache.jasper.JspCompilationContext;
@@ -1362,15 +1364,19 @@ class Generator {
                     } else {
                         canonicalName = klass;
                     }
+                    // Check that there is a 0 arg constructor
+                    Constructor<?> constructor = bean.getConstructor(new Class[] {});
+                    // Check the bean is public, not an interface, not abstract
+                    // and (for Java 9+) in an exported module
                     int modifiers = bean.getModifiers();
-                    if (!Modifier.isPublic(modifiers)
-                            || Modifier.isInterface(modifiers)
-                            || Modifier.isAbstract(modifiers)) {
+                    JreCompat jreCompat = JreCompat.getInstance();
+                    if (!Modifier.isPublic(modifiers) ||
+                            Modifier.isInterface(modifiers) ||
+                            Modifier.isAbstract(modifiers) ||
+                            !jreCompat.canAcccess(null, constructor) ) {
                         throw new Exception(Localizer.getMessage("jsp.error.invalid.bean",
                                 Integer.valueOf(modifiers)));
                     }
-                    // Check that there is a 0 arg constructor
-                    bean.getConstructor(new Class[] {});
                     // At compile time, we have determined that the bean class
                     // exists, with a public zero constructor, new() can be
                     // used for bean instantiation.
