@@ -14,45 +14,47 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package javax.el;
+package org.apache.el.util;
 
 import java.lang.reflect.AccessibleObject;
-import java.lang.reflect.Method;
 
 /*
- * This is a cut down version of org.apache.tomcat.util.Jre9Compat that provides
+ * This is a cut down version of org.apache.tomcat.util.JreCompat that provides
  * only the methods required by the EL implementation.
  *
- * This class is duplicated in org.apache.el.util
+ * This class is duplicated in javax.el
  * When making changes keep the two in sync.
  */
-class Jre9Compat extends JreCompat {
+class JreCompat {
 
-    private static final Method canAccessMethod;
-
+    private static final JreCompat instance;
 
     static {
-        Method m1 = null;
-        try {
-            m1 = AccessibleObject.class.getMethod("canAccess", new Class<?>[] { Object.class });
-        } catch (NoSuchMethodException e) {
-            // Expected for Java 8
+        if (Jre9Compat.isSupported()) {
+            instance = new Jre9Compat();
+        } else {
+            instance = new JreCompat();
         }
-        canAccessMethod = m1;
     }
 
 
-    public static boolean isSupported() {
-        return canAccessMethod != null;
+    public static JreCompat getInstance() {
+        return instance;
     }
 
 
-    @Override
+    /**
+     * Is the accessibleObject accessible (as a result of appropriate module
+     * exports) on the provided instance?
+     *
+     * @param base  The specific instance to be tested.
+     * @param accessibleObject  The method/field/constructor to be tested.
+     *
+     * @return {code true} if the AccessibleObject can be accessed otherwise
+     *         {code false}
+     */
     public boolean canAcccess(Object base, AccessibleObject accessibleObject) {
-        try {
-            return ((Boolean) canAccessMethod.invoke(accessibleObject, base)).booleanValue();
-        } catch (ReflectiveOperationException | IllegalArgumentException e) {
-            return false;
-        }
+        // Java 8 doesn't support modules so default to true
+        return true;
     }
 }
