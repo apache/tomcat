@@ -14,47 +14,50 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package javax.el;
+package org.apache.el.util;
 
 import java.lang.reflect.AccessibleObject;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
 /*
- * This is cut down version of org.apache.tomcat.util.JreCompat that provides
+ * This is a cut down version of org.apache.tomcat.util.Jre9Compat that provides
  * only the methods required by the EL implementation.
  *
- * This class is duplicated in org.apache.el.util
+ * This class is duplicated in javax.el
  * When making changes keep the two in sync.
  */
-class JreCompat {
+class Jre9Compat extends JreCompat {
 
-    private static final JreCompat instance;
+    private static final Method canAccessMethod;
+
 
     static {
-        if (Jre9Compat.isSupported()) {
-            instance = new Jre9Compat();
-        } else {
-            instance = new JreCompat();
+        Method m1 = null;
+        try {
+            m1 = AccessibleObject.class.getMethod("canAccess", new Class<?>[] { Object.class });
+        } catch (NoSuchMethodException e) {
+            // Expected for Java 8
         }
+        canAccessMethod = m1;
     }
 
 
-    public static JreCompat getInstance() {
-        return instance;
+    public static boolean isSupported() {
+        return canAccessMethod != null;
     }
 
 
-    /**
-     * Is the accessibleObject accessible (as a result of appropriate module
-     * exports) on the provided instance?
-     *
-     * @param base  The specific instance to be tested.
-     * @param accessibleObject  The method/field/constructor to be tested.
-     *
-     * @return {code true} if the AccessibleObject can be accessed otherwise
-     *         {code false}
-     */
+    @Override
     public boolean canAcccess(Object base, AccessibleObject accessibleObject) {
-        // Java 8 doesn't support modules so default to true
-        return true;
+        try {
+            return ((Boolean) canAccessMethod.invoke(accessibleObject, base)).booleanValue();
+        } catch (IllegalArgumentException e) {
+            return false;
+        } catch (IllegalAccessException e) {
+            return false;
+        } catch (InvocationTargetException e) {
+            return false;
+        }
     }
 }

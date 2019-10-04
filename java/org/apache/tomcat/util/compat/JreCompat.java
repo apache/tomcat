@@ -21,7 +21,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.net.URL;
 import java.net.URLConnection;
 import java.sql.CallableStatement;
@@ -350,19 +349,17 @@ public class JreCompat {
 
 
     /**
-     * Is the accessibleObject of the given type accessible on the provided
-     * instance of that type.
+     * Is the accessibleObject accessible (as a result of appropriate module
+     * exports) on the provided instance?
      *
-     * @param type  The type the accessible object belongs to
-     * @param base  The specific instance of the type to be tested. Unused prior
-     *                  to Java 9.
+     * @param base  The specific instance to be tested.
      * @param accessibleObject  The method/field/constructor to be tested.
-     *                              Unused prior to Java 9.
      *
      * @return {code true} if the AccessibleObject can be accessed otherwise
      *         {code false}
      */
-    public boolean canAcccess(Class<?> type, Object base, AccessibleObject accessibleObject) {
-        return Modifier.isPublic(type.getModifiers());
+    public boolean canAcccess(Object base, AccessibleObject accessibleObject) {
+        // Java 8 doesn't support modules so default to true
+        return true;
     }
 }

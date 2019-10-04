@@ -20,6 +20,13 @@ import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
+/*
+ * This is a cut down version of org.apache.tomcat.util.Jre9Compat that provides
+ * only the methods required by the EL implementation.
+ *
+ * This class is duplicated in org.apache.el.util
+ * When making changes keep the two in sync.
+ */
 class Jre9Compat extends JreCompat {
 
     private static final Method canAccessMethod;
@@ -42,7 +49,7 @@ class Jre9Compat extends JreCompat {
 
 
     @Override
-    public boolean canAcccess(Class<?> type, Object base, AccessibleObject accessibleObject) {
+    public boolean canAcccess(Object base, AccessibleObject accessibleObject) {
         try {
             return ((Boolean) canAccessMethod.invoke(accessibleObject, base)).booleanValue();
         } catch (IllegalArgumentException e) {
