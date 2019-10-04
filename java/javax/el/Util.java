@@ -543,7 +543,7 @@ class Util {
      */
     static Method getMethod(Class<?> type, Object base, Method m) {
         JreCompat jreCompat = JreCompat.getInstance();
-        if (m == null || jreCompat.canAcccess(base, m)) {
+        if (m == null || (Modifier.isPublic(type.getModifiers()) && jreCompat.canAcccess(base, m))) {
             return m;
         }
         Class<?>[] inf = type.getInterfaces();
