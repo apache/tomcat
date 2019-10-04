@@ -91,8 +91,7 @@ public class MbeansDescriptorsIntrospectionSource extends ModelerSource
 
     // ------------ Implementation for non-declared introspection classes
 
-    private static final Hashtable<String,String> specialMethods =
-            new Hashtable<>();
+    private static final Hashtable<String,String> specialMethods = new Hashtable<>();
     static {
         specialMethods.put( "preDeregister", "");
         specialMethods.put( "postDeregister", "");
