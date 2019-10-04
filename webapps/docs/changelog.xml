@@ -139,7 +139,7 @@
         Update the CXF module to Apache CXF 3.3.3. (remm)
       </update>
       <update>
-        <bug>63667</bug>: Update to Commons Daemon 1.2.2. This corrects a 
+        <bug>63667</bug>: Update to Commons Daemon 1.2.2. This corrects a
         regression in Commons Daemon 1.2.0 and 1.2.1 that caused the Windows
         Service to crash on start when running on an operating system that had
         not been fully updated. (markt)
