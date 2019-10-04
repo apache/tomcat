@@ -156,7 +156,7 @@ public class MbeansDescriptorsDigesterSource extends ModelerSource
 
         InputStream stream = (InputStream) source;
 
-        ArrayList<ManagedBean> loadedMbeans = new ArrayList<>();
+        List<ManagedBean> loadedMbeans = new ArrayList<>();
         synchronized(dLock) {
             if (digester == null) {
                 digester = createDigester();
@@ -168,7 +168,7 @@ public class MbeansDescriptorsDigesterSource extends ModelerSource
                 digester.push(loadedMbeans);
                 digester.parse(stream);
             } catch (Exception e) {
-                log.error("Error digesting Registry data", e);
+                log.error(sm.getString("modules.digesterParseError"), e);
                 throw e;
             } finally {
                 digester.reset();
