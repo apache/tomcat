@@ -82,8 +82,9 @@ public class WsSci implements ServletContainerInitializer {
             for (Class<?> clazz : clazzes) {
                 int modifiers = clazz.getModifiers();
                 if (!Modifier.isPublic(modifiers) ||
-                        Modifier.isAbstract(modifiers)) {
-                    // Non-public or abstract - skip it.
+                        Modifier.isAbstract(modifiers) ||
+                        Modifier.isInterface(modifiers)) {
+                    // Non-public, abstract or interface - skip it.
                     continue;
                 }
                 // Protect against scanning the WebSocket API JARs
