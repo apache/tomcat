@@ -93,6 +93,10 @@
         Socket HTTP upgrade request only contains a port if a non-default port
         is being used. (markt)
       </fix>
+      <fix>
+        When running on Java 9 and above, don't attempt to instantiate WebSocket
+        Endpoints found in modules that are not exported. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web Applications">

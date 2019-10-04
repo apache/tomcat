@@ -31,6 +31,8 @@ import javax.websocket.server.ServerApplicationConfig;
 import javax.websocket.server.ServerEndpoint;
 import javax.websocket.server.ServerEndpointConfig;
 
+import org.apache.tomcat.util.compat.JreCompat;
+
 /**
  * Registers an interest in any class that is annotated with
  * {@link ServerEndpoint} so that Endpoint can be published via the WebSocket
@@ -60,11 +62,14 @@ public class WsSci implements ServletContainerInitializer {
             String wsPackage = ContainerProvider.class.getName();
             wsPackage = wsPackage.substring(0, wsPackage.lastIndexOf('.') + 1);
             for (Class<?> clazz : clazzes) {
+                JreCompat jreCompat = JreCompat.getInstance();
                 int modifiers = clazz.getModifiers();
                 if (!Modifier.isPublic(modifiers) ||
                         Modifier.isAbstract(modifiers) ||
-                        Modifier.isInterface(modifiers)) {
-                    // Non-public, abstract or interface - skip it.
+                        Modifier.isInterface(modifiers) ||
+                        !jreCompat.isExported(clazz)) {
+                    // Non-public, abstract, interface or not in an exported
+                    // package (Java 9+) - skip it.
                     continue;
                 }
                 // Protect against scanning the WebSocket API JARs
