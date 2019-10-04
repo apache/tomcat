@@ -59,6 +59,8 @@ class Jre9Compat extends Jre8Compat {
     private static final Object RUNTIME_VERSION;
     private static final int RUNTIME_MAJOR_VERSION;
     private static final Method canAccessMethod;
+    private static final Method getModuleMethod;
+    private static final Method isExportedMethod;
 
     static {
         Class<?> c1 = null;
@@ -77,6 +79,8 @@ class Jre9Compat extends Jre8Compat {
         Object o14 = null;
         Object o15 = null;
         Method m16 = null;
+        Method m17 = null;
+        Method m18 = null;
 
         try {
             // Order is important for the error handling below.
@@ -107,6 +111,9 @@ class Jre9Compat extends Jre8Compat {
             o14 = runtimeVersionMethod.invoke(null);
             o15 = majorMethod.invoke(o14);
             m16 = AccessibleObject.class.getMethod("canAccess", new Class<?>[] { Object.class });
+            m17 = Class.class.getMethod("getModule");
+            Class<?> moduleClass = Class.forName("java.lang.Module");
+            m18 = moduleClass.getMethod("isExported", String.class);
 
         } catch (ClassNotFoundException e) {
             if (c1 == null) {
@@ -144,6 +151,8 @@ class Jre9Compat extends Jre8Compat {
         }
 
         canAccessMethod = m16;
+        getModuleMethod = m17;
+        isExportedMethod = m18;
     }
 
 
@@ -250,6 +259,18 @@ class Jre9Compat extends Jre8Compat {
         try {
             return ((Boolean) canAccessMethod.invoke(accessibleObject, base)).booleanValue();
         } catch (ReflectiveOperationException | IllegalArgumentException e) {
+            return false;
+        }
+    }
+
+
+    @Override
+    public boolean isExported(Class<?> type) {
+        try {
+            String packageName = type.getPackage().getName();
+            Object module = getModuleMethod.invoke(type);
+            return ((Boolean) isExportedMethod.invoke(module, packageName)).booleanValue();
+        } catch (ReflectiveOperationException e) {
             return false;
         }
     }

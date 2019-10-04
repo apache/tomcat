@@ -231,4 +231,17 @@ public class JreCompat {
         // Java 8 doesn't support modules so default to true
         return true;
     }
+
+
+    /**
+     * Is the given class in an exported package?
+     *
+     * @param type  The class to test
+     *
+     * @return Always {@code true} for Java 8. {@code true} if the enclosing
+     *         package is exported for Java 9+
+     */
+    public boolean isExported(Class<?> type) {
+        return true;
+    }
 }
