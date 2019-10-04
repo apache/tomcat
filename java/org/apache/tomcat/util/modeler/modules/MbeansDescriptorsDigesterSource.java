@@ -21,7 +21,6 @@ package org.apache.tomcat.util.modeler.modules;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import javax.management.ObjectName;
@@ -38,9 +37,9 @@ public class MbeansDescriptorsDigesterSource extends ModelerSource
             LogFactory.getLog(MbeansDescriptorsDigesterSource.class);
     private static final Object dLock = new Object();
 
-    Registry registry;
+    private Registry registry;
     String type;
-    List<ObjectName> mbeans = new ArrayList<ObjectName>();
+    private final List<ObjectName> mbeans = new ArrayList<ObjectName>();
     protected static volatile Digester digester = null;
 
     protected static Digester createDigester() {
@@ -75,56 +74,6 @@ public class MbeansDescriptorsDigesterSource extends ModelerSource
                 "addAttribute",
             "org.apache.tomcat.util.modeler.AttributeInfo");
 
-        /*digester.addObjectCreate
-            ("mbeans-descriptors/mbean/attribute/descriptor/field",
-            "org.apache.tomcat.util.modeler.FieldInfo");
-        digester.addSetProperties
-            ("mbeans-descriptors/mbean/attribute/descriptor/field");
-        digester.addSetNext
-            ("mbeans-descriptors/mbean/attribute/descriptor/field",
-                "addField",
-            "org.apache.tomcat.util.modeler.FieldInfo");
-
-        digester.addObjectCreate
-            ("mbeans-descriptors/mbean/constructor",
-            "org.apache.tomcat.util.modeler.ConstructorInfo");
-        digester.addSetProperties
-            ("mbeans-descriptors/mbean/constructor");
-        digester.addSetNext
-            ("mbeans-descriptors/mbean/constructor",
-                "addConstructor",
-            "org.apache.tomcat.util.modeler.ConstructorInfo");
-
-        digester.addObjectCreate
-            ("mbeans-descriptors/mbean/constructor/descriptor/field",
-            "org.apache.tomcat.util.modeler.FieldInfo");
-        digester.addSetProperties
-            ("mbeans-descriptors/mbean/constructor/descriptor/field");
-        digester.addSetNext
-            ("mbeans-descriptors/mbean/constructor/descriptor/field",
-                "addField",
-            "org.apache.tomcat.util.modeler.FieldInfo");
-
-        digester.addObjectCreate
-            ("mbeans-descriptors/mbean/constructor/parameter",
-            "org.apache.tomcat.util.modeler.ParameterInfo");
-        digester.addSetProperties
-            ("mbeans-descriptors/mbean/constructor/parameter");
-        digester.addSetNext
-            ("mbeans-descriptors/mbean/constructor/parameter",
-                "addParameter",
-            "org.apache.tomcat.util.modeler.ParameterInfo");
-
-        digester.addObjectCreate
-            ("mbeans-descriptors/mbean/descriptor/field",
-            "org.apache.tomcat.util.modeler.FieldInfo");
-        digester.addSetProperties
-            ("mbeans-descriptors/mbean/descriptor/field");
-        digester.addSetNext
-            ("mbeans-descriptors/mbean/descriptor/field",
-                "addField",
-            "org.apache.tomcat.util.modeler.FieldInfo");
-        */
         digester.addObjectCreate
             ("mbeans-descriptors/mbean/notification",
             "org.apache.tomcat.util.modeler.NotificationInfo");
@@ -225,8 +174,7 @@ public class MbeansDescriptorsDigesterSource extends ModelerSource
 
         InputStream stream = (InputStream) source;
 
-        ArrayList<ManagedBean> loadedMbeans = new ArrayList<ManagedBean>();
-
+        List<ManagedBean> loadedMbeans = new ArrayList<ManagedBean>();
         synchronized(dLock) {
             if (digester == null) {
                 digester = createDigester();
@@ -238,16 +186,15 @@ public class MbeansDescriptorsDigesterSource extends ModelerSource
                 digester.push(loadedMbeans);
                 digester.parse(stream);
             } catch (Exception e) {
-                log.error("Error digesting Registry data", e);
+                log.error(sm.getString("modules.digesterParseError"), e);
                 throw e;
             } finally {
                 digester.reset();
             }
 
         }
-        Iterator<ManagedBean> iter = loadedMbeans.iterator();
-        while (iter.hasNext()) {
-            registry.addManagedBean(iter.next());
+        for (ManagedBean loadedMbean : loadedMbeans) {
+            registry.addManagedBean(loadedMbean);
         }
     }
 }
