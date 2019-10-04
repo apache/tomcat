@@ -17,11 +17,13 @@
 package javax.el;
 
 import java.lang.reflect.AccessibleObject;
-import java.lang.reflect.Modifier;
 
 /*
  * This is cut down version of org.apache.tomcat.util.JreCompat that provides
  * only the methods required by the EL implementation.
+ *
+ * This class is duplicated in org.apache.el.util
+ * When making changes keep the two in sync.
  */
 class JreCompat {
 
@@ -42,19 +44,17 @@ class JreCompat {
 
 
     /**
-     * Is the accessibleObject of the given type accessible on the provided
-     * instance of that type.
+     * Is the accessibleObject accessible (as a result of appropriate module
+     * exports) on the provided instance?
      *
-     * @param type  The type the accessible object belongs to
-     * @param base  The specific instance of the type to be tested. Unused prior
-     *                  to Java 9.
+     * @param base  The specific instance to be tested.
      * @param accessibleObject  The method/field/constructor to be tested.
-     *                              Unused prior to Java 9.
      *
      * @return {code true} if the AccessibleObject can be accessed otherwise
      *         {code false}
      */
-    public boolean canAcccess(Class<?> type, Object base, AccessibleObject accessibleObject) {
-        return Modifier.isPublic(type.getModifiers());
+    public boolean canAcccess(Object base, AccessibleObject accessibleObject) {
+        // Java 8 doesn't support modules so default to true
+        return true;
     }
 }
