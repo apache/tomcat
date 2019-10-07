@@ -463,7 +463,7 @@ public class XByteBuffer implements Serializable {
     }
 
     /**
-     * Converts an long to eight bytes.
+     * Converts a long to eight bytes.
      * @param n the long
      * @param b the byte buffer in which the integer will be placed
      * @param offset the offset in the byte array

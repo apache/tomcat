@@ -49,7 +49,7 @@ import javax.sql.CommonDataSource;
 public class Jdbc41Bridge {
 
     /**
-     * Delegates to {@link Connection#abort(Executor)} without throwing a {@link AbstractMethodError}.
+     * Delegates to {@link Connection#abort(Executor)} without throwing an {@link AbstractMethodError}.
      * <p>
      * If the JDBC driver does not implement {@link Connection#abort(Executor)}, then call {@link Connection#close()}.
      * </p>
@@ -94,7 +94,7 @@ public class Jdbc41Bridge {
     }
 
     /**
-     * Delegates to {@link Connection#getNetworkTimeout()} without throwing a {@link AbstractMethodError}.
+     * Delegates to {@link Connection#getNetworkTimeout()} without throwing an {@link AbstractMethodError}.
      * <p>
      * If the JDBC driver does not implement {@link Connection#getNetworkTimeout()}, then return 0.
      * </p>
@@ -115,7 +115,7 @@ public class Jdbc41Bridge {
     }
 
     /**
-     * Delegates to {@link ResultSet#getObject(int, Class)} without throwing a {@link AbstractMethodError}.
+     * Delegates to {@link ResultSet#getObject(int, Class)} without throwing an {@link AbstractMethodError}.
      * <p>
      * If the JDBC driver does not implement {@link ResultSet#getObject(int, Class)}, then return 0.
      * </p>
@@ -215,7 +215,7 @@ public class Jdbc41Bridge {
     }
 
     /**
-     * Delegates to {@link ResultSet#getObject(String, Class)} without throwing a {@link AbstractMethodError}.
+     * Delegates to {@link ResultSet#getObject(String, Class)} without throwing an {@link AbstractMethodError}.
      *
      * @param <T>
      *            See {@link ResultSet#getObject(String, Class)}
@@ -343,7 +343,7 @@ public class Jdbc41Bridge {
     }
 
     /**
-     * Delegates to {@link Connection#getSchema()} without throwing a {@link AbstractMethodError}.
+     * Delegates to {@link Connection#getSchema()} without throwing an {@link AbstractMethodError}.
      * <p>
      * If the JDBC driver does not implement {@link Connection#getSchema()}, then return null.
      * </p>
@@ -365,7 +365,7 @@ public class Jdbc41Bridge {
     }
 
     /**
-     * Delegates to {@link Connection#setNetworkTimeout(Executor, int)} without throwing a {@link AbstractMethodError}.
+     * Delegates to {@link Connection#setNetworkTimeout(Executor, int)} without throwing an {@link AbstractMethodError}.
      * <p>
      * If the JDBC driver does not implement {@link Connection#setNetworkTimeout(Executor, int)}, then do nothing.
      * </p>
@@ -390,7 +390,7 @@ public class Jdbc41Bridge {
     }
 
     /**
-     * Delegates to {@link Connection#setSchema(String)} without throwing a {@link AbstractMethodError}.
+     * Delegates to {@link Connection#setSchema(String)} without throwing an {@link AbstractMethodError}.
      * <p>
      * If the JDBC driver does not implement {@link Connection#setSchema(String)}, then do nothing.
      * </p>
@@ -412,7 +412,7 @@ public class Jdbc41Bridge {
     }
 
     /**
-     * Delegates to {@link Statement#closeOnCompletion()} without throwing a {@link AbstractMethodError}.
+     * Delegates to {@link Statement#closeOnCompletion()} without throwing an {@link AbstractMethodError}.
      * <p>
      * If the JDBC driver does not implement {@link Statement#closeOnCompletion()}, then just check that the connection
      * is closed to then throw an SQLException.
@@ -435,7 +435,7 @@ public class Jdbc41Bridge {
     }
 
     /**
-     * Delegates to {@link Statement#isCloseOnCompletion()} without throwing a {@link AbstractMethodError}.
+     * Delegates to {@link Statement#isCloseOnCompletion()} without throwing an {@link AbstractMethodError}.
      * <p>
      * If the JDBC driver does not implement {@link Statement#isCloseOnCompletion()}, then just check that the
      * connection is closed to then throw an SQLException.
@@ -460,7 +460,7 @@ public class Jdbc41Bridge {
     }
 
     /**
-     * Delegates to {@link CommonDataSource#getParentLogger()} without throwing a {@link AbstractMethodError}.
+     * Delegates to {@link CommonDataSource#getParentLogger()} without throwing an {@link AbstractMethodError}.
      * <p>
      * If the JDBC driver does not implement {@link CommonDataSource#getParentLogger()}, then return null.
      * </p>

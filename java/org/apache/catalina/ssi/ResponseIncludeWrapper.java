@@ -81,7 +81,7 @@ public class ResponseIncludeWrapper extends HttpServletResponseWrapper {
 
 
     /**
-     * Return a printwriter, throws and exception if a OutputStream already
+     * Return a printwriter, throws and exception if an OutputStream already
      * been returned.
      *
      * @return a PrintWriter object
@@ -104,10 +104,10 @@ public class ResponseIncludeWrapper extends HttpServletResponseWrapper {
 
 
     /**
-     * Return a OutputStream, throws and exception if a printwriter already
+     * Return an OutputStream, throws and exception if a printwriter already
      * been returned.
      *
-     * @return a OutputStream object
+     * @return an OutputStream object
      * @exception java.io.IOException
      *                if the printwriter already been called
      */

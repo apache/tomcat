@@ -341,7 +341,7 @@ public final class Room {
      * Note that if a runnable recursively calls invokeAndWait() with another
      * runnable on this Room, it will not be executed recursively, but instead
      * cached until the original runnable is finished, to keep the behavior of
-     * using a Executor.
+     * using an Executor.
      *
      * @param task The task to be executed
      */

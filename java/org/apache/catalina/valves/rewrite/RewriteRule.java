@@ -299,7 +299,7 @@ public class RewriteRule {
 
     /**
      *  Prefix Substitution with http://thishost[:thisport]/ (which makes the
-     *  new URL a URI) to force a external redirection. If no code is given
+     *  new URL a URI) to force an external redirection. If no code is given
      *  an HTTP response of 302 (FOUND, previously MOVED TEMPORARILY) is used.
      *  If you want to  use other response codes in the range 300-399 just
      *  specify them as a number or use one of the following symbolic names:

@@ -23,7 +23,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * This annotation is used to declare the configuration of an
+ * This annotation is used to declare the configuration of a
  * {@link javax.servlet.Servlet}. <br>
  *
  * If the name attribute is not defined, the fully qualified name of the class

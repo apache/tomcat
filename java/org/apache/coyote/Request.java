@@ -576,7 +576,7 @@ public final class Request {
 
     /**
      * Used to store private data. Thread data could be used instead - but
-     * if you have the req, getting/setting a note is just a array access, may
+     * if you have the req, getting/setting a note is just an array access, may
      * be faster than ThreadLocal for very frequent operations.
      *
      *  Example use:

@@ -40,10 +40,6 @@ import org.apache.catalina.startup.Catalina;
  * specified by the <code>port</code> property.  When a connection is accepted,
  * the first line is read and compared with the specified shutdown command.
  * If the command matches, shutdown of the server is initiated.
- * <p>
- * <strong>NOTE</strong> - The concrete implementation of this class should
- * register the (singleton) instance with the <code>ServerFactory</code>
- * class in its constructor(s).
  *
  * @author Craig R. McClanahan
  */
