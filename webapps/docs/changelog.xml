@@ -106,12 +106,16 @@
   </subsection>
   <subsection name="Web Applications">
     <changelog>
-      <docs>
+      <add>
         Add base GraalVM documentation. (remm)
-      </docs>
-      <docs>
+      </add>
+      <add>
         Add Javadoc for the Common Annotations API implementation. (markt)
-      </docs>
+      </add>
+      <fix>
+        Correct various typos in the comments, error messages and Javadoc. Patch
+        provided by 康智冬. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="jdbc-pool">
