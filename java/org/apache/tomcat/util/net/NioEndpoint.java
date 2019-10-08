@@ -474,7 +474,7 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
         InetSocketAddress addr = (getAddress()!=null?new InetSocketAddress(getAddress(),getPort()):new InetSocketAddress(getPort()));
         serverSock.socket().bind(addr,getBacklog());
         serverSock.configureBlocking(true); //mimic APR behavior
-        if (getSocketProperties().getSoTimeout() > 0) {
+        if (getSocketProperties().getSoTimeout() >= 0) {
             serverSock.socket().setSoTimeout(getSocketProperties().getSoTimeout());
         }
 
