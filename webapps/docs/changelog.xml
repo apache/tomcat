@@ -45,6 +45,14 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 9.0.28 (markt)" rtext="in development">
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        Bad paths for URIs can cause exceptions on Windows due to its
+        path separator, so wrap using an IOException. (remm)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 9.0.27 (markt)" rtext="release in progress">
   <subsection name="Catalina">
