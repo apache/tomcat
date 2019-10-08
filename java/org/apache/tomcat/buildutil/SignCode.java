@@ -51,7 +51,11 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 /**
- * Ant task that submits a file to the Symantec code-signing service.
+ * Ant task that submits a file to the Digicert (formally Symantec) code-signing
+ * service. The service is defined by the published
+ * <a href="https://api.ws.digicert.com/webtrust/SigningService?wsdl">WSDL</a>.
+ * Note that while the service has migrated to a Digicert domain, the namespace
+ * continues to use a Symantec domain.
  */
 public class SignCode extends Task {
 
@@ -64,7 +68,7 @@ public class SignCode extends Task {
     static {
         try {
             SIGNING_SERVICE_URL = new URL(
-                    "https://api-appsec-cws.ws.symantec.com/webtrust/SigningService");
+                    "https://api-appsec.pki.digicert.com/webtrust/SigningService");
         } catch (MalformedURLException e) {
             throw new IllegalArgumentException(e);
         }
