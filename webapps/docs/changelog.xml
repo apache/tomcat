@@ -60,6 +60,14 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 7.0.98 (violetagg)">
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+        <bug>63814</bug>: Do not set server socket timeout with negative
+        values in NIO. (remm)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 7.0.97 (violetagg)">
   <subsection name="Catalina">
