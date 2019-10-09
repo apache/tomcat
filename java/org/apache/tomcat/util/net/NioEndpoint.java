@@ -1327,12 +1327,18 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
 
         @Override
         public void registerReadInterest() {
+            if (log.isDebugEnabled()) {
+                log.debug(sm.getString("endpoint.debug.registerRead", this));
+            }
             getPoller().add(getSocket(), SelectionKey.OP_READ);
         }
 
 
         @Override
         public void registerWriteInterest() {
+            if (log.isDebugEnabled()) {
+                log.debug(sm.getString("endpoint.debug.registerWrite", this));
+            }
             getPoller().add(getSocket(), SelectionKey.OP_WRITE);
         }
 

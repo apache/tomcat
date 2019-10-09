@@ -2555,6 +2555,9 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
                 if (closed) {
                     return;
                 }
+                if (log.isDebugEnabled()) {
+                    log.debug(sm.getString("endpoint.debug.registerRead", this));
+                }
                 Poller p = ((AprEndpoint) getEndpoint()).getPoller();
                 if (p != null) {
                     p.add(getSocket().longValue(), getReadTimeout(), Poll.APR_POLLIN);
@@ -2569,6 +2572,9 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
             synchronized (closedLock) {
                 if (closed) {
                     return;
+                }
+                if (log.isDebugEnabled()) {
+                    log.debug(sm.getString("endpoint.debug.registerWrite", this));
                 }
                 ((AprEndpoint) getEndpoint()).getPoller().add(
                         getSocket().longValue(), getWriteTimeout(), Poll.APR_POLLOUT);
