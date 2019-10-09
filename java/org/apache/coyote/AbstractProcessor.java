@@ -257,15 +257,25 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
 
         rp.setStage(org.apache.coyote.Constants.STAGE_ENDED);
 
+        SocketState state;
+
         if (getErrorState().isError()) {
             request.updateCounters();
-            return SocketState.CLOSED;
+            state = SocketState.CLOSED;
         } else if (isAsync()) {
-            return SocketState.LONG;
+            state = SocketState.LONG;
         } else {
             request.updateCounters();
-            return dispatchEndRequest();
+            state = dispatchEndRequest();
         }
+
+        if (getLog().isDebugEnabled()) {
+            getLog().debug("Socket: [" + socketWrapper +
+                    "], Status in: [" + status +
+                    "], State out: [" + state + "]");
+        }
+
+        return state;
     }
 
 
