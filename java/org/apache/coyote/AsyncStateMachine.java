@@ -119,7 +119,7 @@ import org.apache.tomcat.util.security.PrivilegedSetTccl;
  * |   |      |       |post()         |    |  |      |     timeout()|            |  |  |   error()|
  * |   |      |       |dispatched()   |   \|/\|/    \|/             |  dispatch()|  |  |-»--------|
  * |   |      |       |---«---------- | ---DISPATCHING«-----«------ | ------«----|  |
- * |   |      |                       |     |    ^                  |               |
+ * |   |      |                       |     |   /|\                 |               |
  * |   |      |                       |     |----|                  |               |
  * |   |      |                       |    timeout()                |               |
  * |   |      |                       |                             |               |
