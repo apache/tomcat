@@ -46,6 +46,9 @@ public abstract class AbstractProcessorLight implements Processor {
         do {
             if (dispatches != null) {
                 DispatchType nextDispatch = dispatches.next();
+                if (getLog().isDebugEnabled()) {
+                    getLog().debug("Processing dispatch type: [" + nextDispatch + "]");
+                }
                 state = dispatch(nextDispatch.getSocketStatus());
             } else if (status == SocketEvent.DISCONNECT) {
                 // Do nothing here, just wait for it to get recycled
