@@ -159,14 +159,7 @@ ant -Dwebapp.name=somewebapp -f graal-webapp.ant.xml</source>
 
   <p>
     Servlets, JSPs, EL, websockets, the Tomcat container, tomcat-native, HTTP/2
-    are all supported out of the box in a native image. However, EL uses
-    BeanInfo reflection which needs manual descriptor configuration.
-    To give an example, the EL expression
-    <source>${pageContext.servletContext.serverInfo}</source> needs full
-    reflection information on the concrete Jasper page context class, as well
-    as the Catalina Servlet context implementation. Graal error messages
-    during runtime generally indicate which classes are missing reflection
-    as the BeanInfo reported for these will be empty.
+    are all supported out of the box in a native image.
   </p>
 
   <p>
