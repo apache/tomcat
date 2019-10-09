@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -35,12 +36,14 @@ import javax.servlet.GenericServlet;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.Servlet;
 import javax.servlet.ServletException;
+import javax.servlet.ServletOutputStream;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletRequestEvent;
 import javax.servlet.ServletRequestListener;
 import javax.servlet.ServletRequestWrapper;
 import javax.servlet.ServletResponse;
 import javax.servlet.ServletResponseWrapper;
+import javax.servlet.WriteListener;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -2652,5 +2655,165 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
             }
         }
 
+    }
+
+
+    @Test
+    public void testAsyncIoEnd00() throws Exception {
+        doTestAsyncIoEnd(false, false);
+    }
+
+
+    @Test
+    public void testAsyncIoEnd01() throws Exception {
+        doTestAsyncIoEnd(false, true);
+    }
+
+
+    @Test
+    public void testAsyncIoEnd02() throws Exception {
+        doTestAsyncIoEnd(true, false);
+    }
+
+
+    @Test
+    public void testAsyncIoEnd03() throws Exception {
+        doTestAsyncIoEnd(true, true);
+    }
+
+
+    private void doTestAsyncIoEnd(boolean useThread, boolean useComplete) throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        // No file system docBase required
+        Context ctx = tomcat.addContext("", null);
+
+        AsyncIoEndServlet asyncIoEndServlet = new AsyncIoEndServlet(useThread, useComplete);
+        Wrapper wrapper = Tomcat.addServlet(ctx, "asyncIoEndServlet", asyncIoEndServlet);
+        wrapper.setAsyncSupported(true);
+        ctx.addServletMappingDecoded("/asyncIoEndServlet", "asyncIoEndServlet");
+
+        SimpleServlet simpleServlet = new SimpleServlet();
+        Tomcat.addServlet(ctx, "simpleServlet", simpleServlet);
+        ctx.addServletMappingDecoded("/simpleServlet", "simpleServlet");
+
+        tomcat.start();
+
+        ByteChunk body = new ByteChunk();
+        int rc = getUrl("http://localhost:" + getPort() + "/asyncIoEndServlet", body, null);
+
+        Assert.assertEquals(HttpServletResponse.SC_OK, rc);
+        Assert.assertEquals("OK", body.toString());
+
+        Assert.assertFalse(asyncIoEndServlet.getInvalidStateDetected());
+    }
+
+
+    private static class AsyncIoEndServlet extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        private final boolean useThread;
+        private final boolean useComplete;
+        private AsyncIoEndWriteListener asyncIoEndWriteListener;
+
+        public AsyncIoEndServlet(boolean useThread, boolean useComplete) {
+            this.useThread = useThread;
+            this.useComplete = useComplete;
+        }
+
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+                throws ServletException, IOException {
+
+            if (useComplete) {
+                // Write expected body here
+                resp.setContentType("text/plain");
+                resp.setCharacterEncoding("UTF-8");
+                resp.getOutputStream().write("OK".getBytes(StandardCharsets.UTF_8));
+            }
+            AsyncContext ac = req.startAsync();
+            ServletOutputStream sos = resp.getOutputStream();
+            asyncIoEndWriteListener= new AsyncIoEndWriteListener(ac, useThread, useComplete);
+            sos.setWriteListener(asyncIoEndWriteListener);
+        }
+
+        public boolean getInvalidStateDetected() {
+            if (asyncIoEndWriteListener != null) {
+                return asyncIoEndWriteListener.getInvalidStateDetected();
+            }
+            return false;
+        }
+    }
+
+
+    private static class AsyncIoEndWriteListener implements WriteListener {
+
+        private final AsyncContext ac;
+        private final boolean useThread;
+        private final boolean useComplete;
+        private boolean invalidStateDetected = false;
+
+        public AsyncIoEndWriteListener(AsyncContext ac, boolean useThread,
+                boolean useComplete) {
+            this.ac = ac;
+            this.useThread = useThread;
+            this.useComplete = useComplete;
+        }
+
+
+        @Override
+        public void onWritePossible() throws IOException {
+            if (useThread) {
+                (new Thread() {
+                    @Override
+                    public void run() {
+                        doOnWritePossible();
+                    }
+                }).start();
+            } else {
+                doOnWritePossible();
+            }
+        }
+
+
+        public void doOnWritePossible() {
+            // Hack to avoid ISE if we try gettign the request after complete/dispatch
+            ServletRequest req = ac.getRequest();
+            if (useComplete) {
+                ac.complete();
+            } else {
+                ac.dispatch("/simpleServlet");
+            }
+            if (req.isAsyncStarted()) {
+                invalidStateDetected = true;
+            }
+        }
+
+        @Override
+        public void onError(Throwable throwable) {
+            throw new RuntimeException(throwable);
+        }
+
+
+        public boolean getInvalidStateDetected() {
+            return invalidStateDetected;
+        }
+    }
+
+
+    private static class SimpleServlet extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+                throws ServletException, IOException {
+
+            // Write expected body here
+            resp.setContentType("text/plain");
+            resp.setCharacterEncoding("UTF-8");
+            resp.getOutputStream().write("OK".getBytes(StandardCharsets.UTF_8));
+        }
     }
 }
