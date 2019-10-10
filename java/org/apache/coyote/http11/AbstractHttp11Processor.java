@@ -1803,20 +1803,30 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
 
         rp.setStage(org.apache.coyote.Constants.STAGE_ENDED);
 
+        SocketState state;
+
         if (getErrorState().isError()) {
-            return SocketState.CLOSED;
+            state = SocketState.CLOSED;
         } else if (isAsync()) {
-            return SocketState.LONG;
+            state = SocketState.LONG;
         } else {
             if (!keepAlive) {
-                return SocketState.CLOSED;
+                state = SocketState.CLOSED;
             } else {
                 endRequest();
                 getInputBuffer().nextRequest();
                 getOutputBuffer().nextRequest();
-                return SocketState.OPEN;
+                state = SocketState.OPEN;
             }
         }
+
+        if (getLog().isDebugEnabled()) {
+            getLog().debug("Socket: [" + socketWrapper +
+                    "], Status in: [" + status +
+                    "], State out: [" + state + "]");
+        }
+
+        return state;
     }
 
 

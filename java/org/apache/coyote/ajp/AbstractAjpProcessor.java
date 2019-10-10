@@ -567,22 +567,32 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
 
         rp.setStage(org.apache.coyote.Constants.STAGE_ENDED);
 
+        SocketState state;
+
         if (isAsync()) {
             if (getErrorState().isError()) {
                 request.updateCounters();
-                return SocketState.CLOSED;
+                state = SocketState.CLOSED;
             } else {
-                return SocketState.LONG;
+                state = SocketState.LONG;
             }
         } else {
             request.updateCounters();
             if (getErrorState().isError()) {
-                return SocketState.CLOSED;
+                state = SocketState.CLOSED;
             } else {
                 recycle(false);
-                return SocketState.OPEN;
+                state = SocketState.OPEN;
             }
         }
+
+        if (getLog().isDebugEnabled()) {
+            getLog().debug("Socket: [" + socketWrapper +
+                    "], Status in: [" + status +
+                    "], State out: [" + state + "]");
+        }
+
+        return state;
     }
 
 
