@@ -555,19 +555,25 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
             alv.validateAccessLog(1, 200, timeoutDelay,
                     timeoutDelay + TIMEOUT_MARGIN + REQUEST_TIME);
         }
+
+        Assert.assertTrue(timeout.isAsyncStartedCorrect());
     }
 
     private static class TimeoutServlet extends HttpServlet {
         private static final long serialVersionUID = 1L;
 
         private final Boolean completeOnTimeout;
-        private final String dispatchUrl;
+        private final TrackingListener trackingListener;
 
         public static final long ASYNC_TIMEOUT = 100;
 
         public TimeoutServlet(Boolean completeOnTimeout, String dispatchUrl) {
             this.completeOnTimeout = completeOnTimeout;
-            this.dispatchUrl = dispatchUrl;
+            if (completeOnTimeout == null) {
+                this.trackingListener = null;
+            } else {
+                this.trackingListener = new TrackingListener(false, completeOnTimeout.booleanValue(), dispatchUrl);
+            }
         }
 
         @Override
@@ -579,12 +585,18 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
                 ac.setTimeout(ASYNC_TIMEOUT);
 
                 if (completeOnTimeout != null) {
-                    ac.addListener(new TrackingListener(false,
-                            completeOnTimeout.booleanValue(), dispatchUrl));
+                    ac.addListener(trackingListener);
                 }
             } else {
                 resp.getWriter().print("FAIL: Async unsupported");
             }
+        }
+
+        public boolean isAsyncStartedCorrect() {
+            if (trackingListener == null) {
+                return true;
+            }
+            return trackingListener.isAsyncStartedCorrect();
         }
     }
 
@@ -827,6 +839,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         private final boolean completeOnError;
         private final boolean completeOnTimeout;
         private final String dispatchUrl;
+        private boolean asyncStartedCorrect = true;
 
         public TrackingListener(boolean completeOnError,
                 boolean completeOnTimeout, String dispatchUrl) {
@@ -842,26 +855,43 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
 
         @Override
         public void onTimeout(AsyncEvent event) throws IOException {
+            boolean expectedAsyncStarted = true;
+
             TestAsyncContextImpl.track("onTimeout-");
             if (completeOnTimeout){
                 event.getAsyncContext().complete();
+                expectedAsyncStarted = false;
             }
             if (dispatchUrl != null) {
                 event.getAsyncContext().dispatch(dispatchUrl);
+                expectedAsyncStarted = false;
             }
+
+            ServletRequest req = event.getSuppliedRequest();
+            asyncStartedCorrect = (expectedAsyncStarted == req.isAsyncStarted());
         }
 
         @Override
         public void onError(AsyncEvent event) throws IOException {
+            boolean expectedAsyncStarted = true;
+
             TestAsyncContextImpl.track("onError-");
             if (completeOnError) {
                 event.getAsyncContext().complete();
+                expectedAsyncStarted = false;
             }
+
+            ServletRequest req = event.getSuppliedRequest();
+            asyncStartedCorrect = (expectedAsyncStarted == req.isAsyncStarted());
         }
 
         @Override
         public void onStartAsync(AsyncEvent event) throws IOException {
             TestAsyncContextImpl.track("onStartAsync-");
+        }
+
+        public boolean isAsyncStartedCorrect() {
+            return asyncStartedCorrect;
         }
     }
 
