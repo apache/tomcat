@@ -1031,7 +1031,7 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
                                 ",name=" + getProtocol().getProtocolName() +
                                 "Request" + count);
                         if (getLog().isDebugEnabled()) {
-                            getLog().debug("Register " + rpName);
+                            getLog().debug("Register [" + processor + "] as [" + rpName + "]");
                         }
                         Registry.getRegistry(null, null).registerComponent(rp,
                                 rpName, null);
