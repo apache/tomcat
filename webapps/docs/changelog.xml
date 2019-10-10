@@ -66,6 +66,12 @@
         <bug>63814</bug>: Do not set server socket timeout with negative
         values in NIO. (remm)
       </fix>
+      <fix>
+        Ensure that <code>ServletRequest.isAsyncStarted()</code> returns
+        <code>false</code> once <code>AsyncContext.complete()</code> or
+        <code>AsyncContext.dispatch()</code> has been called during
+        <code>AsyncListener.onTimeout()</code>. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
