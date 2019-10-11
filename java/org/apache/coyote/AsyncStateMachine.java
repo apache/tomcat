@@ -323,17 +323,25 @@ public class AsyncStateMachine {
         boolean triggerDispatch = false;
         if (state == AsyncState.STARTING || state == AsyncState.TIMING_OUT ||
                 state == AsyncState.ERROR) {
+            // Processing is on a container thread so no need to transfer
+            // processing to a new container thread
             state = AsyncState.MUST_COMPLETE;
         } else if (state == AsyncState.STARTED || state == AsyncState.COMPLETE_PENDING) {
             state = AsyncState.COMPLETING;
+            // A dispatch to a container thread is always required.
+            // If on a non-container thread, need to get back onto a container
+            // thread to complete the processing.
+            // If on a container thread the current request/response are not the
+            // request/response associated with the AsyncContext so need a new
+            // container thread to process the different request/response.
             triggerDispatch = true;
         } else if (state == AsyncState.READ_WRITE_OP) {
             // Read/write operations can happen on or off a container thread but
-            // the call to listener that triggers the read/write will always be
-            // on a container thread and the socket will be added to the poller
-            // when the thread exits the AbstractConnectionHandler.process()
-            // method so don't do a dispatch here which would add it to the
-            // poller a second time.
+            // while in this state the call to listener that triggers the
+            // read/write will be in progress on a container thread.
+            // The socket will be added to the poller when the container thread
+            // exits the AbstractConnectionHandler.process() method so don't do
+            // a dispatch here which would add it to the poller a second time.
             state = AsyncState.COMPLETING;
         } else {
             throw new IllegalStateException(
@@ -375,15 +383,14 @@ public class AsyncStateMachine {
     private synchronized boolean doDispatch() {
         clearNonBlockingListeners();
         boolean triggerDispatch = false;
-        if (state == AsyncState.STARTING ||
-                state == AsyncState.TIMING_OUT ||
+        if (state == AsyncState.STARTING || state == AsyncState.TIMING_OUT ||
                 state == AsyncState.ERROR) {
-            // In these three cases processing is on a container thread so no
-            // need to transfer processing to a new container thread
+            // Processing is on a container thread so no need to transfer
+            // processing to a new container thread
             state = AsyncState.MUST_DISPATCH;
         } else if (state == AsyncState.STARTED || state == AsyncState.DISPATCH_PENDING) {
             state = AsyncState.DISPATCHING;
-            // A dispatch is always required.
+            // A dispatch to a container thread is always required.
             // If on a non-container thread, need to get back onto a container
             // thread to complete the processing.
             // If on a container thread the current request/response are not the
@@ -391,14 +398,13 @@ public class AsyncStateMachine {
             // container thread to process the different request/response.
             triggerDispatch = true;
         } else if (state == AsyncState.READ_WRITE_OP) {
+            // Read/write operations can happen on or off a container thread but
+            // while in this state the call to listener that triggers the
+            // read/write will be in progress on a container thread.
+            // The socket will be added to the poller when the container thread
+            // exits the AbstractConnectionHandler.process() method so don't do
+            // a dispatch here which would add it to the poller a second time.
             state = AsyncState.DISPATCHING;
-            // If on a container thread then the socket will be added to the
-            // poller when the thread exits the
-            // AbstractConnectionHandler.process() method so don't do a dispatch
-            // here which would add it to the poller a second time.
-            if (!ContainerThreadMarker.isContainerThread()) {
-                triggerDispatch = true;
-            }
         } else {
             throw new IllegalStateException(
                     sm.getString("asyncStateMachine.invalidAsyncState",
