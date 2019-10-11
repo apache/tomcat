@@ -278,22 +278,28 @@ public class AsyncStateMachine<S> {
 
 
     private synchronized boolean doComplete() {
-        boolean doComplete = false;
-        if (state == AsyncState.STARTING) {
+        boolean triggerDispatch = false;
+        if (state == AsyncState.STARTING || state == AsyncState.TIMING_OUT ||
+                state == AsyncState.ERROR) {
+            // Processing is on a container thread so no need to transfer
+            // processing to a new container thread
             state = AsyncState.MUST_COMPLETE;
         } else if (state == AsyncState.STARTED || state == AsyncState.COMPLETE_PENDING) {
             state = AsyncState.COMPLETING;
-            doComplete = true;
-        } else if (state == AsyncState.TIMING_OUT ||
-                state == AsyncState.ERROR) {
-            state = AsyncState.MUST_COMPLETE;
+            // A dispatch to a container thread is always required.
+            // If on a non-container thread, need to get back onto a container
+            // thread to complete the processing.
+            // If on a container thread the current request/response are not the
+            // request/response associated with the AsyncContext so need a new
+            // container thread to process the different request/response.
+            triggerDispatch = true;
         } else {
             throw new IllegalStateException(
                     sm.getString("asyncStateMachine.invalidAsyncState",
                             "asyncComplete()", state));
 
         }
-        return doComplete;
+        return triggerDispatch;
     }
 
 
@@ -326,28 +332,27 @@ public class AsyncStateMachine<S> {
 
 
     private synchronized boolean doDispatch() {
-        boolean doDispatch = false;
-        if (state == AsyncState.STARTING ||
-                state == AsyncState.TIMING_OUT ||
+        boolean triggerDispatch = false;
+        if (state == AsyncState.STARTING || state == AsyncState.TIMING_OUT ||
                 state == AsyncState.ERROR) {
-            // In these three cases processing is on a container thread so no
-            // need to transfer processing to a new container thread
+            // Processing is on a container thread so no need to transfer
+            // processing to a new container thread
             state = AsyncState.MUST_DISPATCH;
         } else if (state == AsyncState.STARTED || state == AsyncState.DISPATCH_PENDING) {
-            // A dispatch is always required.
+            state = AsyncState.DISPATCHING;
+            // A dispatch to a container thread is always required.
             // If on a non-container thread, need to get back onto a container
             // thread to complete the processing.
             // If on a container thread the current request/response are not the
             // request/response associated with the AsyncContext so need a new
             // container thread to process the different request/response.
-            state = AsyncState.DISPATCHING;
-            doDispatch = true;
+            triggerDispatch = true;
         } else {
             throw new IllegalStateException(
                     sm.getString("asyncStateMachine.invalidAsyncState",
                             "asyncDispatch()", state));
         }
-        return doDispatch;
+        return triggerDispatch;
     }
 
 
