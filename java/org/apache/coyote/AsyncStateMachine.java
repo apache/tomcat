@@ -321,7 +321,7 @@ public class AsyncStateMachine {
     private synchronized boolean doComplete() {
         clearNonBlockingListeners();
         boolean triggerDispatch = false;
-        if (state == AsyncState.STARTING || state == AsyncState.ERROR) {
+        if (state == AsyncState.STARTING) {
             // Processing is on a container thread so no need to transfer
             // processing to a new container thread
             state = AsyncState.MUST_COMPLETE;
@@ -334,13 +334,15 @@ public class AsyncStateMachine {
             // request/response associated with the AsyncContext so need a new
             // container thread to process the different request/response.
             triggerDispatch = true;
-        } else if (state == AsyncState.READ_WRITE_OP || state == AsyncState.TIMING_OUT) {
+        } else if (state == AsyncState.READ_WRITE_OP || state == AsyncState.TIMING_OUT ||
+                state == AsyncState.ERROR) {
             // Read/write operations can happen on or off a container thread but
             // while in this state the call to listener that triggers the
             // read/write will be in progress on a container thread.
-            // Processing of timeouts can happen on or off a container thread
-            // (on is much more likely) but while in this state the call that
-            // triggers the timeout will be in progress on a container thread.
+            // Processing of timeouts and errors can happen on or off a
+            // container thread (on is much more likely) but while in this state
+            // the call that triggers the timeout will be in progress on a
+            // container thread.
             // The socket will be added to the poller when the container thread
             // exits the AbstractConnectionHandler.process() method so don't do
             // a dispatch here which would add it to the poller a second time.
@@ -385,7 +387,7 @@ public class AsyncStateMachine {
     private synchronized boolean doDispatch() {
         clearNonBlockingListeners();
         boolean triggerDispatch = false;
-        if (state == AsyncState.STARTING || state == AsyncState.ERROR) {
+        if (state == AsyncState.STARTING) {
             // Processing is on a container thread so no need to transfer
             // processing to a new container thread
             state = AsyncState.MUST_DISPATCH;
@@ -398,13 +400,15 @@ public class AsyncStateMachine {
             // request/response associated with the AsyncContext so need a new
             // container thread to process the different request/response.
             triggerDispatch = true;
-        } else if (state == AsyncState.READ_WRITE_OP || state == AsyncState.TIMING_OUT) {
+        } else if (state == AsyncState.READ_WRITE_OP || state == AsyncState.TIMING_OUT ||
+                state == AsyncState.ERROR) {
             // Read/write operations can happen on or off a container thread but
             // while in this state the call to listener that triggers the
             // read/write will be in progress on a container thread.
-            // Processing of timeouts can happen on or off a container thread
-            // (on is much more likely) but while in this state the call that
-            // triggers the timeout will be in progress on a container thread.
+            // Processing of timeouts and errors can happen on or off a
+            // container thread (on is much more likely) but while in this state
+            // the call that triggers the timeout will be in progress on a
+            // container thread.
             // The socket will be added to the poller when the container thread
             // exits the AbstractConnectionHandler.process() method so don't do
             // a dispatch here which would add it to the poller a second time.
