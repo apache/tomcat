@@ -679,6 +679,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
             count ++;
         }
         Assert.assertEquals(expectedTrack, getTrack());
+        Assert.assertTrue(dispatch.isAsyncStartedCorrect());
 
         // Check the access log
         alv.validateAccessLog(1, 200, 0, REQUEST_TIME);
@@ -689,13 +690,15 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         private static final long serialVersionUID = 1L;
         private static final String ITER_PARAM = "iter";
         private static final String DISPATCH_CHECK = "check";
-        private boolean addTrackingListener = false;
-        private boolean completeOnError = false;
+        private final TrackingListener trackingListener;
 
         public DispatchingServlet(boolean addTrackingListener,
                 boolean completeOnError) {
-            this.addTrackingListener = addTrackingListener;
-            this.completeOnError = completeOnError;
+            if (addTrackingListener) {
+                trackingListener = new TrackingListener(completeOnError, true, null);
+            } else {
+                trackingListener = null;
+            }
         }
 
         @Override
@@ -710,10 +713,8 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
             track("DispatchingServletGet-");
             final int iter = Integer.parseInt(req.getParameter(ITER_PARAM)) - 1;
             final AsyncContext ctxt = req.startAsync();
-            if (addTrackingListener) {
-                TrackingListener listener =
-                    new TrackingListener(completeOnError, true, null);
-                ctxt.addListener(listener);
+            if (trackingListener != null) {
+                ctxt.addListener(trackingListener);
             }
             Runnable run = new Runnable() {
                 @Override
@@ -731,6 +732,13 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
             } else {
                 run.run();
             }
+        }
+
+        public boolean isAsyncStartedCorrect() {
+            if (trackingListener == null) {
+                return true;
+            }
+            return trackingListener.isAsyncStartedCorrect();
         }
     }
 
@@ -1040,6 +1048,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
             count ++;
         }
         Assert.assertEquals(expectedTrack, getTrack());
+        Assert.assertTrue(dispatch.isAsyncStartedCorrect());
 
         // Check the access log
         alv.validateAccessLog(1, 500, 0, REQUEST_TIME);
@@ -1866,7 +1875,8 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         Context ctx = tomcat.addContext("", null);
-        Wrapper w = tomcat.addServlet("", "async", new Bug59219Servlet());
+        Bug59219Servlet bug59219Servlet = new Bug59219Servlet();
+        Wrapper w = tomcat.addServlet("", "async", bug59219Servlet);
         w.setAsyncSupported(true);
         ctx.addServletMapping("/async", "async");
 
@@ -1882,6 +1892,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         }
 
         Assert.assertEquals(expectedTrack, getTrack());
+        Assert.assertTrue(bug59219Servlet.isAsyncStartedCorrect());
     }
 
 
@@ -1889,6 +1900,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
 
         private static final long serialVersionUID = 1L;
 
+        private final TrackingListener trackingListener = new TrackingListener(true, false, "/async");
         @Override
         protected void doGet(HttpServletRequest req, HttpServletResponse resp)
                 throws ServletException, IOException {
@@ -1896,7 +1908,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
             track("doGet-");
             AsyncContext ctx = req.startAsync();
             ctx.setTimeout(3000);
-            ctx.addListener(new TrackingListener(true, false, "/async"));
+            ctx.addListener(trackingListener);
 
             String loopsParam = req.getParameter("loops");
             Integer loopsAttr = (Integer) req.getAttribute("loops");
@@ -1916,6 +1928,9 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
                 throw new ServletException();
         }
 
+        public boolean isAsyncStartedCorrect() {
+            return trackingListener.isAsyncStartedCorrect();
+        }
     }
 
     @Test

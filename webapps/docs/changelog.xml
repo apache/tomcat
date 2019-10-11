@@ -70,7 +70,8 @@
         Ensure that <code>ServletRequest.isAsyncStarted()</code> returns
         <code>false</code> once <code>AsyncContext.complete()</code> or
         <code>AsyncContext.dispatch()</code> has been called during
-        <code>AsyncListener.onTimeout()</code>. (markt)
+        <code>AsyncListener.onTimeout()</code> or
+        <code>AsyncListener.onError()</code>. (markt)
       </fix>
     </changelog>
   </subsection>
