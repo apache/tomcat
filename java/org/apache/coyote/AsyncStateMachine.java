@@ -132,8 +132,7 @@ public class AsyncStateMachine<S> {
     /**
      * The string manager for this package.
      */
-    private static final StringManager sm =
-        StringManager.getManager(Constants.Package);
+    private static final StringManager sm = StringManager.getManager(AsyncStateMachine.class);
 
     private enum AsyncState {
         DISPATCHED      (false, false, false, false),
@@ -241,11 +240,7 @@ public class AsyncStateMachine<S> {
         } else  if (state == AsyncState.STARTING) {
             state = AsyncState.STARTED;
             return SocketState.LONG;
-        } else if (state == AsyncState.MUST_COMPLETE) {
-            asyncCtxt.fireOnComplete();
-            state = AsyncState.DISPATCHED;
-            return SocketState.ASYNC_END;
-        } else if (state == AsyncState.COMPLETING) {
+        } else if (state == AsyncState.MUST_COMPLETE || state == AsyncState.COMPLETING) {
             asyncCtxt.fireOnComplete();
             state = AsyncState.DISPATCHED;
             return SocketState.ASYNC_END;
@@ -297,7 +292,6 @@ public class AsyncStateMachine<S> {
             throw new IllegalStateException(
                     sm.getString("asyncStateMachine.invalidAsyncState",
                             "asyncComplete()", state));
-
         }
         return triggerDispatch;
     }
