@@ -432,8 +432,8 @@ public abstract class LifecycleBase implements Lifecycle {
 
 
     private void handleSubClassException(Throwable t, String key, Object... args) throws LifecycleException {
-        ExceptionUtils.handleThrowable(t);
         setStateInternal(LifecycleState.FAILED, null, false);
+        ExceptionUtils.handleThrowable(t);
         String msg = sm.getString(key, args);
         if (getThrowOnFailure()) {
             if (!(t instanceof LifecycleException)) {
