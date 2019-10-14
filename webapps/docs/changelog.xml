@@ -62,6 +62,12 @@
         <code>AsyncListener.onTimeout()</code> or
         <code>AsyncListener.onError()</code>. (markt)
       </fix>
+      <fix>
+        <bug>63816</bug>: Correctly handle I/O errors on a non-container thread
+        after asynchronous processing has been started but before the container
+        thread that started asynchronous processing has completed processing the
+        current request/response. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>

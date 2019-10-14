@@ -113,17 +113,10 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
         if (t != null) {
             request.setAttribute(RequestDispatcher.ERROR_EXCEPTION, t);
         }
-        if (blockIo && !ContainerThreadMarker.isContainerThread() && isAsync()) {
-            // The error occurred on a non-container thread during async
-            // processing which means not all of the necessary clean-up will
-            // have been completed. Dispatch to a container thread to do the
-            // clean-up. Need to do it this way to ensure that all the necessary
-            // clean-up is performed.
-            asyncStateMachine.asyncMustError();
-            if (getLog().isDebugEnabled()) {
-                getLog().debug(sm.getString("abstractProcessor.nonContainerThreadError"), t);
+        if (blockIo && isAsync()) {
+            if (asyncStateMachine.asyncError()) {
+                processSocketEvent(SocketEvent.ERROR, true);
             }
-            processSocketEvent(SocketEvent.ERROR, true);
         }
     }
 

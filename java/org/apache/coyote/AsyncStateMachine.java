@@ -154,7 +154,6 @@ public class AsyncStateMachine {
         DISPATCH_PENDING(true,  true,  false, false),
         DISPATCHING     (true,  false, false, true),
         READ_WRITE_OP   (true,  true,  false, false),
-        MUST_ERROR      (true,  true,  false, false),
         ERROR           (true,  true,  false, false);
 
         private final boolean isAsync;
@@ -434,35 +433,12 @@ public class AsyncStateMachine {
     }
 
 
-    public synchronized void asyncMustError() {
-        if (state == AsyncState.STARTED) {
-            clearNonBlockingListeners();
-            state = AsyncState.MUST_ERROR;
-        } else {
-            throw new IllegalStateException(
-                    sm.getString("asyncStateMachine.invalidAsyncState",
-                            "asyncMustError()", state));
-        }
+    public synchronized boolean asyncError() {
+        clearNonBlockingListeners();
+        state = AsyncState.ERROR;
+        return !ContainerThreadMarker.isContainerThread();
     }
 
-
-    public synchronized void asyncError() {
-        if (state == AsyncState.STARTING ||
-                state == AsyncState.STARTED ||
-                state == AsyncState.DISPATCHED ||
-                state == AsyncState.TIMING_OUT ||
-                state == AsyncState.MUST_COMPLETE ||
-                state == AsyncState.READ_WRITE_OP ||
-                state == AsyncState.COMPLETING ||
-                state == AsyncState.MUST_ERROR) {
-            clearNonBlockingListeners();
-            state = AsyncState.ERROR;
-        } else {
-            throw new IllegalStateException(
-                    sm.getString("asyncStateMachine.invalidAsyncState",
-                            "asyncError()", state));
-        }
-    }
 
     public synchronized void asyncRun(Runnable runnable) {
         if (state == AsyncState.STARTING || state ==  AsyncState.STARTED ||
