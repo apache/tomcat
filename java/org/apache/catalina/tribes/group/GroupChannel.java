@@ -154,7 +154,7 @@ public class GroupChannel extends ChannelInterceptorBase
      * <code>channel.addInterceptor(A);</code><br>
      * <code>channel.addInterceptor(C);</code><br>
      * <code>channel.addInterceptor(B);</code><br>
-     * Will result in a interceptor stack like this:<br>
+     * Will result in an interceptor stack like this:<br>
      * <code>A -&gt; C -&gt; B</code><br>
      * The complete stack will look like this:<br>
      * <code>Channel -&gt; A -&gt; C -&gt; B -&gt; ChannelCoordinator</code><br>
