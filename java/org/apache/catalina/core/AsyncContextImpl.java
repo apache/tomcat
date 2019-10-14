@@ -98,6 +98,9 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
 
     @Override
     public void fireOnComplete() {
+        if (log.isDebugEnabled()) {
+            log.debug(sm.getString("asyncContextImpl.fireOnComplete"));
+        }
         List<AsyncListenerWrapper> listenersCopy = new ArrayList<AsyncListenerWrapper>();
         listenersCopy.addAll(listeners);
 
@@ -145,6 +148,9 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
         request.getCoyoteRequest().action(ActionCode.ASYNC_TIMEOUT, result);
 
         if (result.get()) {
+            if (log.isDebugEnabled()) {
+                log.debug(sm.getString("asyncContextImpl.fireOnTimeout"));
+            }
 
             ClassLoader oldCL = Thread.currentThread().getContextClassLoader();
             ClassLoader newCL = request.getContext().getLoader().getClassLoader();
@@ -365,6 +371,9 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
             List<AsyncListenerWrapper> listenersCopy = new ArrayList<AsyncListenerWrapper>();
             listenersCopy.addAll(listeners);
             listeners.clear();
+            if (log.isDebugEnabled()) {
+                log.debug(sm.getString("asyncContextImpl.fireOnStartAsync"));
+            }
             for (AsyncListenerWrapper listener : listenersCopy) {
                 try {
                     listener.fireOnStartAsync(event);
@@ -439,6 +448,9 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
         request.getCoyoteRequest().action(ActionCode.ASYNC_ERROR, null);
 
         if (fireOnError) {
+            if (log.isDebugEnabled()) {
+                log.debug(sm.getString("asyncContextImpl.fireOnError"));
+            }
             AsyncEvent errorEvent = new AsyncEvent(event.getAsyncContext(),
                     event.getSuppliedRequest(), event.getSuppliedResponse(), t);
             List<AsyncListenerWrapper> listenersCopy = new ArrayList<AsyncListenerWrapper>();
