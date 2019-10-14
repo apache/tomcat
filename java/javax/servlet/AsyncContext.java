@@ -100,7 +100,7 @@ public interface AsyncContext {
     void setTimeout(long timeout);
 
     /**
-     * Get the current.
+     * Get the current timeout.
      *
      * @return The timeout in milliseconds. 0 or less indicates no timeout.
      */
