@@ -145,7 +145,6 @@ public class AsyncStateMachine<S> {
         MUST_DISPATCH   (true,  true,  false, true),
         DISPATCH_PENDING(true,  true,  false, false),
         DISPATCHING     (true,  false, false, true),
-        MUST_ERROR      (true,  true,  false, false),
         ERROR           (true,  true,  false, false);
 
         private final boolean isAsync;
@@ -378,34 +377,11 @@ public class AsyncStateMachine<S> {
     }
 
 
-    public synchronized void asyncMustError() {
-        if (state == AsyncState.STARTED) {
-            state = AsyncState.MUST_ERROR;
-        } else {
-            throw new IllegalStateException(
-                    sm.getString("asyncStateMachine.invalidAsyncState",
-                            "asyncMustError()", state));
-        }
-    }
-
-
     public synchronized boolean asyncError() {
-        boolean doDispatch = false;
-        if (state == AsyncState.STARTING ||
-                state == AsyncState.STARTED ||
-                state == AsyncState.DISPATCHED ||
-                state == AsyncState.TIMING_OUT ||
-                state == AsyncState.MUST_COMPLETE ||
-                state == AsyncState.COMPLETING ||
-                state == AsyncState.MUST_ERROR) {
-            state = AsyncState.ERROR;
-        } else {
-            throw new IllegalStateException(
-                    sm.getString("asyncStateMachine.invalidAsyncState",
-                            "asyncError()", state));
-        }
-        return doDispatch;
+        state = AsyncState.ERROR;
+        return !ContainerThreadMarker.isContainerThread();
     }
+
 
     public synchronized void asyncRun(Runnable runnable) {
         if (state == AsyncState.STARTING || state ==  AsyncState.STARTED) {
