@@ -314,13 +314,8 @@ class AsyncStateMachine {
         if (!ContainerThreadMarker.isContainerThread() && state == AsyncState.STARTING) {
             state = AsyncState.COMPLETE_PENDING;
             return false;
-        } else {
-            return doComplete();
         }
-    }
 
-
-    private synchronized boolean doComplete() {
         clearNonBlockingListeners();
         boolean triggerDispatch = false;
         if (state == AsyncState.STARTING || state == AsyncState.MUST_ERROR) {
@@ -380,13 +375,8 @@ class AsyncStateMachine {
         if (!ContainerThreadMarker.isContainerThread() && state == AsyncState.STARTING) {
             state = AsyncState.DISPATCH_PENDING;
             return false;
-        } else {
-            return doDispatch();
         }
-    }
 
-
-    private synchronized boolean doDispatch() {
         clearNonBlockingListeners();
         boolean triggerDispatch = false;
         if (state == AsyncState.STARTING || state == AsyncState.MUST_ERROR) {
