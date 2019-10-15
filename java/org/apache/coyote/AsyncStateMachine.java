@@ -154,6 +154,7 @@ class AsyncStateMachine {
         DISPATCH_PENDING(true,  true,  false, false),
         DISPATCHING     (true,  false, false, true),
         READ_WRITE_OP   (true,  true,  false, false),
+        MUST_ERROR      (true,  true,  false, false),
         ERROR           (true,  true,  false, false);
 
         private final boolean isAsync;
@@ -320,7 +321,7 @@ class AsyncStateMachine {
     private synchronized boolean doComplete() {
         clearNonBlockingListeners();
         boolean triggerDispatch = false;
-        if (state == AsyncState.STARTING) {
+        if (state == AsyncState.STARTING || state == AsyncState.MUST_ERROR) {
             // Processing is on a container thread so no need to transfer
             // processing to a new container thread
             state = AsyncState.MUST_COMPLETE;
@@ -386,7 +387,7 @@ class AsyncStateMachine {
     private synchronized boolean doDispatch() {
         clearNonBlockingListeners();
         boolean triggerDispatch = false;
-        if (state == AsyncState.STARTING) {
+        if (state == AsyncState.STARTING || state == AsyncState.MUST_ERROR) {
             // Processing is on a container thread so no need to transfer
             // processing to a new container thread
             state = AsyncState.MUST_DISPATCH;
@@ -435,7 +436,11 @@ class AsyncStateMachine {
 
     synchronized boolean asyncError() {
         clearNonBlockingListeners();
-        state = AsyncState.ERROR;
+        if (state == AsyncState.STARTING) {
+            state = AsyncState.MUST_ERROR;
+        } else {
+            state = AsyncState.ERROR;
+        }
         return !ContainerThreadMarker.isContainerThread();
     }
 
