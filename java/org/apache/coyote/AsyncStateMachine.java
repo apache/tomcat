@@ -322,7 +322,7 @@ class AsyncStateMachine {
             // Processing is on a container thread so no need to transfer
             // processing to a new container thread
             state = AsyncState.MUST_COMPLETE;
-        } else if (state == AsyncState.STARTED || state == AsyncState.COMPLETE_PENDING) {
+        } else if (state == AsyncState.STARTED) {
             state = AsyncState.COMPLETING;
             // A dispatch to a container thread is always required.
             // If on a non-container thread, need to get back onto a container
@@ -383,7 +383,7 @@ class AsyncStateMachine {
             // Processing is on a container thread so no need to transfer
             // processing to a new container thread
             state = AsyncState.MUST_DISPATCH;
-        } else if (state == AsyncState.STARTED || state == AsyncState.DISPATCH_PENDING) {
+        } else if (state == AsyncState.STARTED) {
             state = AsyncState.DISPATCHING;
             // A dispatch to a container thread is always required.
             // If on a non-container thread, need to get back onto a container
