@@ -196,6 +196,16 @@ public class TestAsyncContextStateChanges extends TomcatBaseTest {
             if (endTiming == EndTiming.THREAD_AFTER_EXIT) {
                 try {
                     threadLatch.await();
+                    /*
+                     * As much as I dislike it, I don't see any easy way around
+                     * this hack. The latch above is released as the Servlet
+                     * exits but we need to wait for the post processing to
+                     * complete for the test to work as intended. In real-world
+                     * applications this does mean that there is a real chance
+                     * of an ISE. We may need to increase this delay for some CI
+                     * systems.
+                     */
+                    Thread.sleep(1000);
                 } catch (InterruptedException e) {
                     // Ignore
                 }
