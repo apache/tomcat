@@ -278,10 +278,12 @@ public class AsyncStateMachine {
      */
     public synchronized SocketState asyncPostProcess() {
         if (state == AsyncState.COMPLETE_PENDING) {
-            doComplete();
+            clearNonBlockingListeners();
+            state = AsyncState.COMPLETING;
             return SocketState.ASYNC_END;
         } else if (state == AsyncState.DISPATCH_PENDING) {
-            doDispatch();
+            clearNonBlockingListeners();
+            state = AsyncState.DISPATCHING;
             return SocketState.ASYNC_END;
         } else  if (state == AsyncState.STARTING || state == AsyncState.READ_WRITE_OP) {
             state = AsyncState.STARTED;
