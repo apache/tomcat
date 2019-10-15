@@ -161,7 +161,11 @@ public class TestAsyncContextStateChanges extends TomcatBaseTest {
             servletRequest = req;
             asyncContext = req.startAsync();
             asyncContext.addListener(new Listener());
-            asyncContext.setTimeout(1000);
+            if (!asyncEnd.isError()) {
+                // Use a short timeout so the test does not pause for too long
+                // waiting for the timeout to be triggered.
+                asyncContext.setTimeout(1000);
+            }
             Thread t = new NonContainerThread();
 
             switch (endTiming) {
@@ -232,34 +236,34 @@ public class TestAsyncContextStateChanges extends TomcatBaseTest {
                 }
             }
 
-            try {
-                switch (asyncEnd) {
-                    case COMPLETE:
-                    case ERROR_COMPLETE: {
-                        asyncContext.complete();
-                        break;
+            if (endTiming != EndTiming.THREAD_AFTER_EXIT) {
+                try {
+                    switch (asyncEnd) {
+                        case COMPLETE:
+                        case ERROR_COMPLETE: {
+                            asyncContext.complete();
+                            break;
+                        }
+                        case DISPATCH:
+                        case ERROR_DISPATCH: {
+                            dispatch = true;
+                            asyncContext.dispatch();
+                            break;
+                        }
+                        case NONE:
+                        case ERROR_NONE: {
+                            break;
+                        }
                     }
-                    case DISPATCH:
-                    case ERROR_DISPATCH: {
-                        dispatch = true;
-                        asyncContext.dispatch();
-                        break;
-                    }
-                    case NONE:
-                    case ERROR_NONE: {
-                        break;
-                    }
-                }
 
-                // The request must stay in async mode until doGet() exists
-                if (servletRequest.isAsyncStarted() != (endTiming == EndTiming.THREAD_AFTER_EXIT && !asyncEnd.isNone())) {
-                    failed.set(false);
-                }
-            } finally {
-                if (endTiming == EndTiming.THREAD_BEFORE_EXIT) {
-                    threadLatch.countDown();
-                } else if (endTiming == EndTiming.THREAD_AFTER_EXIT) {
-                    endLatch.countDown();
+                    // The request must stay in async mode until doGet() exists
+                    if (servletRequest.isAsyncStarted()) {
+                        failed.set(false);
+                    }
+                } finally {
+                    if (endTiming == EndTiming.THREAD_BEFORE_EXIT) {
+                        threadLatch.countDown();
+                    }
                 }
             }
         }
@@ -277,12 +281,52 @@ public class TestAsyncContextStateChanges extends TomcatBaseTest {
 
         @Override
         public void onTimeout(AsyncEvent event) throws IOException {
-            // NO-OP
+            // Need to handle timeouts for THREAD_AFTER_EXIT in the listener to
+            // avoid concurrency issues.
+            if (endTiming == EndTiming.THREAD_AFTER_EXIT) {
+                switch (asyncEnd) {
+                    case COMPLETE: {
+                        asyncContext.complete();
+                        break;
+                    }
+                    case DISPATCH: {
+                        dispatch = true;
+                        asyncContext.dispatch();
+                        break;
+                    }
+                    default:
+                        // NO-OP
+                }
+            }
+            if (servletRequest.isAsyncStarted() == asyncEnd.isNone()) {
+                failed.set(false);
+            }
+            endLatch.countDown();
         }
 
         @Override
         public void onError(AsyncEvent event) throws IOException {
-            // NO-OP
+            // Need to handle errors for THREAD_AFTER_EXIT in the listener to
+            // avoid concurrency issues.
+            if (endTiming == EndTiming.THREAD_AFTER_EXIT) {
+                switch (asyncEnd) {
+                    case ERROR_COMPLETE: {
+                        asyncContext.complete();
+                        break;
+                    }
+                    case ERROR_DISPATCH: {
+                        dispatch = true;
+                        asyncContext.dispatch();
+                        break;
+                    }
+                    default:
+                        // NO-OP
+                }
+                if (servletRequest.isAsyncStarted() == asyncEnd.isNone()) {
+                    failed.set(false);
+                }
+                endLatch.countDown();
+            }
         }
 
         @Override
