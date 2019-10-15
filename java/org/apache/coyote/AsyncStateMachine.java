@@ -145,6 +145,7 @@ public class AsyncStateMachine<S> {
         MUST_DISPATCH   (true,  true,  false, true),
         DISPATCH_PENDING(true,  true,  false, false),
         DISPATCHING     (true,  false, false, true),
+        MUST_ERROR      (true,  true,  false, false),
         ERROR           (true,  true,  false, false);
 
         private final boolean isAsync;
@@ -273,7 +274,7 @@ public class AsyncStateMachine<S> {
 
     private synchronized boolean doComplete() {
         boolean triggerDispatch = false;
-        if (state == AsyncState.STARTING) {
+        if (state == AsyncState.STARTING || state == AsyncState.MUST_ERROR) {
             // Processing is on a container thread so no need to transfer
             // processing to a new container thread
             state = AsyncState.MUST_COMPLETE;
@@ -334,7 +335,7 @@ public class AsyncStateMachine<S> {
 
     private synchronized boolean doDispatch() {
         boolean triggerDispatch = false;
-        if (state == AsyncState.STARTING) {
+        if (state == AsyncState.STARTING || state == AsyncState.MUST_ERROR) {
             // Processing is on a container thread so no need to transfer
             // processing to a new container thread
             state = AsyncState.MUST_DISPATCH;
@@ -378,7 +379,11 @@ public class AsyncStateMachine<S> {
 
 
     public synchronized boolean asyncError() {
-        state = AsyncState.ERROR;
+        if (state == AsyncState.STARTING) {
+            state = AsyncState.MUST_ERROR;
+        } else {
+            state = AsyncState.ERROR;
+        }
         return !ContainerThreadMarker.isContainerThread();
     }
 

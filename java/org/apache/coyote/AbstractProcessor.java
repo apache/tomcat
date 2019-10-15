@@ -86,6 +86,9 @@ public abstract class AbstractProcessor<S> implements ActionHook, Processor<S> {
      * @param t The error which occurred
      */
     protected void setErrorState(ErrorState errorState, Throwable t) {
+        // Use the return value to avoid processing more than one async error
+        // in a single async cycle.
+        boolean setError = response.setError();
         boolean blockIo = this.errorState.isIoAllowed() && !errorState.isIoAllowed();
         this.errorState = this.errorState.getMostSevere(errorState);
         // Don't change the status code for IOException since that is almost
@@ -97,7 +100,7 @@ public abstract class AbstractProcessor<S> implements ActionHook, Processor<S> {
         if (t != null) {
             request.setAttribute(RequestDispatcher.ERROR_EXCEPTION, t);
         }
-        if (blockIo && isAsync()) {
+        if (blockIo && isAsync() && setError) {
             if (asyncStateMachine.asyncError()) {
                 getEndpoint().processSocketAsync(socketWrapper, SocketStatus.ERROR);
             }

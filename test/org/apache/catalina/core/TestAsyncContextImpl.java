@@ -848,6 +848,8 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         private final boolean completeOnError;
         private final boolean completeOnTimeout;
         private final String dispatchUrl;
+        // Assumes listener is fired after container thread that initiated async
+        // has exited.
         private boolean asyncStartedCorrect = true;
 
         public TrackingListener(boolean completeOnError,
@@ -1896,7 +1898,6 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         }
 
         Assert.assertEquals(expectedTrack, getTrack());
-        Assert.assertTrue(bug59219Servlet.isAsyncStartedCorrect());
     }
 
 
@@ -1930,10 +1931,6 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
                 ctx.dispatch();
             } else
                 throw new ServletException();
-        }
-
-        public boolean isAsyncStartedCorrect() {
-            return trackingListener.isAsyncStartedCorrect();
         }
     }
 
