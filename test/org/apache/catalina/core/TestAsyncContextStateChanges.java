@@ -18,7 +18,6 @@ package org.apache.catalina.core;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -58,7 +57,7 @@ public class TestAsyncContextStateChanges extends TomcatBaseTest {
 
     @Parameterized.Parameters(name = "{index}: end [{0}], timing [{1}]")
     public static Collection<Object[]> parameters() {
-        List<Object[]> parameterSets = new ArrayList<>();
+        List<Object[]> parameterSets = new ArrayList<Object[]>();
         for (AsyncEnd asyncEnd : AsyncEnd.values()) {
             for (EndTiming endTiming : EndTiming.values()) {
                 parameterSets.add(new Object[] { asyncEnd, endTiming });
@@ -102,7 +101,7 @@ public class TestAsyncContextStateChanges extends TomcatBaseTest {
         AsyncServlet bug63816Servlet = new AsyncServlet();
         Wrapper wrapper = Tomcat.addServlet(ctx, "bug63816Servlet", bug63816Servlet);
         wrapper.setAsyncSupported(true);
-        ctx.addServletMappingDecoded("/*", "bug63816Servlet");
+        ctx.addServletMapping("/*", "bug63816Servlet");
 
         tomcat.start();
 
@@ -225,7 +224,7 @@ public class TestAsyncContextStateChanges extends TomcatBaseTest {
                     OutputStream os = resp.getOutputStream();
                     resp.setContentType("text/plain");
                     for (int i = 0; i < 16; i++) {
-                        os.write(TestCoyoteAdapter.TEXT_8K.getBytes(StandardCharsets.UTF_8));
+                        os.write(TestCoyoteAdapter.TEXT_8K.getBytes("UTF-8"));
                     }
                 } catch (IOException e) {
                     // Expected
