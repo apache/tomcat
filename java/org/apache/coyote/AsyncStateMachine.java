@@ -232,11 +232,9 @@ public class AsyncStateMachine<S> {
      */
     public synchronized SocketState asyncPostProcess() {
         if (state == AsyncState.COMPLETE_PENDING) {
-            clearNonBlockingListeners();
             state = AsyncState.COMPLETING;
             return SocketState.ASYNC_END;
         } else if (state == AsyncState.DISPATCH_PENDING) {
-            clearNonBlockingListeners();
             state = AsyncState.DISPATCHING;
             return SocketState.ASYNC_END;
         } else  if (state == AsyncState.STARTING) {
@@ -268,13 +266,8 @@ public class AsyncStateMachine<S> {
         if (!ContainerThreadMarker.isContainerThread() && state == AsyncState.STARTING) {
             state = AsyncState.COMPLETE_PENDING;
             return false;
-        } else {
-            return doComplete();
         }
-    }
 
-
-    private synchronized boolean doComplete() {
         boolean triggerDispatch = false;
         if (state == AsyncState.STARTING || state == AsyncState.MUST_ERROR) {
             // Processing is on a container thread so no need to transfer
@@ -329,13 +322,8 @@ public class AsyncStateMachine<S> {
         if (!ContainerThreadMarker.isContainerThread() && state == AsyncState.STARTING) {
             state = AsyncState.DISPATCH_PENDING;
             return false;
-        } else {
-            return doDispatch();
         }
-    }
 
-
-    private synchronized boolean doDispatch() {
         boolean triggerDispatch = false;
         if (state == AsyncState.STARTING || state == AsyncState.MUST_ERROR) {
             // Processing is on a container thread so no need to transfer
