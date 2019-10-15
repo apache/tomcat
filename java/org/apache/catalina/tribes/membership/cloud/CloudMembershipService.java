@@ -147,7 +147,7 @@ public class CloudMembershipService extends MembershipServiceBase
     public void setLocalMemberProperties(String listenHost, int listenPort, int securePort, int udpPort) {
         if (log.isDebugEnabled()) {
             log.debug(String.format("setLocalMemberProperties(%s, %d, %d, %d)", listenHost,
-                    Integer.toString(listenPort), Integer.toString(securePort), Integer.toString(udpPort)));
+                    Integer.valueOf(listenPort), Integer.valueOf(securePort), Integer.valueOf(udpPort)));
         }
         properties.setProperty("tcpListenHost", listenHost);
         properties.setProperty("tcpListenPort", String.valueOf(listenPort));
