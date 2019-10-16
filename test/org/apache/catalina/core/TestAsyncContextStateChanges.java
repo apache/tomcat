@@ -63,7 +63,7 @@ public class TestAsyncContextStateChanges extends TomcatBaseTest {
                 if (endTiming == EndTiming.THREAD_BEFORE_EXIT && asyncEnd.isError()) {
                     // Skip these tests for Tomcat 7 as they deadlock due to
                     // the write on the non-container thread being unable to
-                    // progress until Servlet.service() exists since both
+                    // progress until Servlet.service() exits since both
                     // require a lock on the socket.
                     // Note: Connector refactoring in 8.5.x onwards has removed
                     //       this limitation
