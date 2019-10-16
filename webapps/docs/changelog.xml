@@ -78,6 +78,13 @@
   <subsection name="Other">
     <changelog>
       <fix>
+        <bug>63815</bug>: Quote the use of <code>CATALINA_OPTS</code> and
+        <code>JAVA_OPTS</code> when used in shell scripts to avoid the expansion
+        of <code>*</code>. Note that any newlines present in
+        <code>CATALINA_OPTS</code> and/or <code>JAVA_OPTS</code> will no longer
+        removed. (markt)
+      </fix>
+      <fix>
         <bug>63826</bug>: Remove <code>commons-daemon-native.tar.gz</code> and
         <code>tomcat-native.tar.gz</code> from the binary zip distributions for
         Windows since compiled versions of those components are already
