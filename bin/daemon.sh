@@ -208,7 +208,7 @@ case "$1" in
       -outfile "&1" \
       -errfile "&2" \
       -classpath "$CLASSPATH" \
-      "$LOGGING_CONFIG" $JAVA_OPTS $CATALINA_OPTS \
+      "$LOGGING_CONFIG" "$JAVA_OPTS" "$CATALINA_OPTS" \
       -D$ENDORSED_PROP="$JAVA_ENDORSED_DIRS" \
       -Dcatalina.base="$CATALINA_BASE" \
       -Dcatalina.home="$CATALINA_HOME" \
@@ -225,7 +225,7 @@ case "$1" in
       -outfile "$CATALINA_OUT" \
       -errfile "&1" \
       -classpath "$CLASSPATH" \
-      "$LOGGING_CONFIG" $JAVA_OPTS $CATALINA_OPTS \
+      "$LOGGING_CONFIG" "$JAVA_OPTS" "$CATALINA_OPTS" \
       -D$ENDORSED_PROP="$JAVA_ENDORSED_DIRS" \
       -Dcatalina.base="$CATALINA_BASE" \
       -Dcatalina.home="$CATALINA_HOME" \
