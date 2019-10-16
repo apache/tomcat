@@ -52,7 +52,7 @@
         path separator, so wrap using an IOException. (remm)
       </fix>
       <fix>
-        <bug>63765</bug>: Properly mark container as FAILED when a JVM error
+        <bug>63832</bug>: Properly mark container as FAILED when a JVM error
         occurs on stop. (remm)
       </fix>
     </changelog>
