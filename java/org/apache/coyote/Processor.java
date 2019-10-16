@@ -125,4 +125,6 @@ public interface Processor {
      *         async timeout was triggered
      */
     boolean checkAsyncTimeoutGeneration();
+
+    boolean isTimedout();
 }

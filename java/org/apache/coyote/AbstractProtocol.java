@@ -1169,18 +1169,33 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
 
         @SuppressWarnings("sync-override") // Size may exceed cache size a bit
         @Override
-        public boolean push(Processor processor) {
+        public boolean push(final Processor processor) {
+
+            Processor proc = processor;
+
+            // if a timeout has happened, a running process may still be hanging onto the request or response,
+            // so it it not safe to reuse them. Instead, we unregister them.
+            if (proc.isTimedout()) {
+                handler.unregister(proc);
+                proc = null;
+            }
+
             int cacheSize = handler.getProtocol().getProcessorCache();
             boolean offer = cacheSize == -1 ? true : size.get() < cacheSize;
             //avoid over growing our cache or add after we have stopped
             boolean result = false;
             if (offer) {
-                result = super.push(processor);
+                if (proc == null) {
+                    proc = handler.getProtocol().createProcessor();
+                }
+
+                result = super.push(proc);
                 if (result) {
                     size.incrementAndGet();
                 }
             }
-            if (!result) handler.unregister(processor);
+
+            if (!result) handler.unregister(proc);
             return result;
         }
 

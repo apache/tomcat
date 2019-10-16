@@ -66,6 +66,8 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
     protected volatile SocketWrapperBase<?> socketWrapper = null;
     protected volatile SSLSupport sslSupport;
 
+    private volatile boolean timedout = false;
+
 
     /**
      * Error state for the request/response currently being processed.
@@ -557,6 +559,7 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
         case ASYNC_TIMEOUT: {
             AtomicBoolean result = (AtomicBoolean) param;
             result.set(asyncStateMachine.asyncTimeout());
+            this.timedout = true;
             break;
         }
         case ASYNC_POST_PROCESS: {
@@ -982,5 +985,9 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
         response.setStatus(400);
         response.setError();
         getAdapter().log(request, response, 0);
+    }
+
+    public boolean isTimedout() {
+        return this.timedout;
     }
 }
