@@ -60,6 +60,15 @@ public class TestAsyncContextStateChanges extends TomcatBaseTest {
         List<Object[]> parameterSets = new ArrayList<Object[]>();
         for (AsyncEnd asyncEnd : AsyncEnd.values()) {
             for (EndTiming endTiming : EndTiming.values()) {
+                if (endTiming == EndTiming.THREAD_BEFORE_EXIT && asyncEnd.isError()) {
+                    // Skip these tests for Tomcat 7 as they deadlock due to
+                    // the write on the non-container thread being unable to
+                    // progress until Servlet.service() exists since both
+                    // require a lock on the socket.
+                    // Note: Connector refactoring in 8.5.x onwards has removed
+                    //       this limitation
+                    continue;
+                }
                 parameterSets.add(new Object[] { asyncEnd, endTiming });
             }
         }
