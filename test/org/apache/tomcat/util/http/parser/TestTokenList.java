@@ -25,7 +25,7 @@ import java.util.Set;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class TestVary {
+public class TestTokenList {
 
     @Test
     public void testAll() throws IOException {
@@ -125,10 +125,17 @@ public class TestVary {
     }
 
 
+    @SuppressWarnings("deprecation")
     private void doTestVary(String input, Set<String> expected) throws IOException {
         StringReader reader = new StringReader(input);
         Set<String> result = new HashSet<>();
         Vary.parseVary(reader, result);
+        Assert.assertEquals(expected, result);
+
+        // Can't use reset(). Parser uses marks.
+        reader = new StringReader(input);
+        result.clear();
+        TokenList.parseTokenList(reader, result);
         Assert.assertEquals(expected, result);
     }
 }
