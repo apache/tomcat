@@ -39,25 +39,6 @@ public class TokenList {
      * @throws IOException If an I/O error occurs reading the header
      */
     public static void parseTokenList(Reader input, Collection<String> result) throws IOException {
-        parseTokenList(input, true, result);
-    }
-
-
-    /**
-     * Parses a header of the form 1#token.
-     *
-     * @param input          The header to parse
-     * @param forceLowerCase Should parsed tokens be forced to lower case? This
-     *                           is intended for headers where the values are
-     *                           case-insensitive
-     * @param result         The Collection (usually a list of a set) to which
-     *                           the parsed token should be added
-     *
-     * @throws IOException If an I/O error occurs reading the header
-     */
-    public static void parseTokenList(Reader input, boolean forceLowerCase, Collection<String> result)
-            throws IOException {
-
         do {
             String fieldName = HttpParser.readToken(input);
             if (fieldName == null) {
@@ -74,18 +55,10 @@ public class TokenList {
             SkipResult skipResult = HttpParser.skipConstant(input, ",");
             if (skipResult == SkipResult.EOF) {
                 // EOF
-                if (forceLowerCase) {
-                    result.add(fieldName.toLowerCase(Locale.ENGLISH));
-                } else {
-                    result.add(fieldName);
-                }
+                result.add(fieldName.toLowerCase(Locale.ENGLISH));
                 break;
             } else if (skipResult == SkipResult.FOUND) {
-                if (forceLowerCase) {
-                    result.add(fieldName.toLowerCase(Locale.ENGLISH));
-                } else {
-                    result.add(fieldName);
-                }
+                result.add(fieldName.toLowerCase(Locale.ENGLISH));
                 continue;
             } else {
                 // Not a token - ignore it
