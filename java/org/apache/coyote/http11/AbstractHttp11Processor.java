@@ -1757,7 +1757,7 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
         while (values.hasMoreElements()) {
             String nextHeaderValue = values.nextElement();
             if (nextHeaderValue != null) {
-                TokenList.parseTokenList(new StringReader(values.nextElement()), result);
+                TokenList.parseTokenList(new StringReader(nextHeaderValue), result);
             }
         }
 
