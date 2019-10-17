@@ -1349,7 +1349,7 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
         if (http11) {
             MessageBytes expectMB = headers.getValue("expect");
             if (expectMB != null && !expectMB.isNull()) {
-                if (expectMB.indexOfIgnoreCase("100-continue", 0) != -1) {
+                if (expectMB.toString().trim().equalsIgnoreCase("100-continue")) {
                     getInputBuffer().setSwallowInput(false);
                     expectation = true;
                 } else {
@@ -1666,7 +1666,7 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
         }
 
         long contentLength = response.getContentLengthLong();
-        boolean connectionClosePresent = isConnectionClose(headers);
+        boolean connectionClosePresent = isConnectionToken(headers, Constants.CLOSE);
         if (contentLength != -1) {
             headers.setValue("Content-Length").setLong(contentLength);
             getOutputBuffer().addActiveFilter
@@ -1746,25 +1746,19 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
 
     }
 
-    private boolean isConnectionClose(MimeHeaders headers) throws IOException {
+    private static boolean isConnectionToken(MimeHeaders headers, String token) throws IOException {
         MessageBytes connection = headers.getValue(Constants.CONNECTION);
         if (connection == null) {
             return false;
         }
 
         Enumeration<String> values = headers.values(Constants.CONNECTION);
-        Set<String> result = null;
+        Set<String> result = new HashSet<String>();
         while (values.hasMoreElements()) {
-            if (result == null) {
-                result = new HashSet<String>();
-            }
             TokenList.parseTokenList(new StringReader(values.nextElement()), result);
         }
 
-        if (result == null) {
-            return false;
-        }
-        return result.contains(Constants.CLOSE);
+        return result.contains(token);
     }
 
 
