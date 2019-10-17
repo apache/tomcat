@@ -1755,7 +1755,10 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
         Enumeration<String> values = headers.values(Constants.CONNECTION);
         Set<String> result = new HashSet<String>();
         while (values.hasMoreElements()) {
-            TokenList.parseTokenList(new StringReader(values.nextElement()), result);
+            String nextHeaderValue = values.nextElement();
+            if (nextHeaderValue != null) {
+                TokenList.parseTokenList(new StringReader(values.nextElement()), result);
+            }
         }
 
         return result.contains(token);
