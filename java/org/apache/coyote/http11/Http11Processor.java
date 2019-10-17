@@ -18,8 +18,10 @@ package org.apache.coyote.http11;
 
 import java.io.IOException;
 import java.io.InterruptedIOException;
+import java.io.StringReader;
 import java.nio.ByteBuffer;
 import java.util.Enumeration;
+import java.util.HashSet;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
@@ -53,6 +55,7 @@ import org.apache.tomcat.util.buf.MessageBytes;
 import org.apache.tomcat.util.http.FastHttpDateFormat;
 import org.apache.tomcat.util.http.MimeHeaders;
 import org.apache.tomcat.util.http.parser.HttpParser;
+import org.apache.tomcat.util.http.parser.TokenList;
 import org.apache.tomcat.util.log.UserDataHelper;
 import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
@@ -1298,7 +1301,7 @@ public class Http11Processor extends AbstractProcessor {
         }
 
         long contentLength = response.getContentLengthLong();
-        boolean connectionClosePresent = false;
+        boolean connectionClosePresent = isConnectionClose(headers);
         if (contentLength != -1) {
             headers.setValue("Content-Length").setLong(contentLength);
             outputBuffer.addActiveFilter
@@ -1307,10 +1310,8 @@ public class Http11Processor extends AbstractProcessor {
         } else {
             // If the response code supports an entity body and we're on
             // HTTP 1.1 then we chunk unless we have a Connection: close header
-            connectionClosePresent = isConnectionClose(headers);
-            if (entityBody && http11 && !connectionClosePresent) {
-                outputBuffer.addActiveFilter
-                    (outputFilters[Constants.CHUNKED_FILTER]);
+            if (http11 && entityBody && !connectionClosePresent) {
+                outputBuffer.addActiveFilter(outputFilters[Constants.CHUNKED_FILTER]);
                 contentDelimitation = true;
                 headers.addValue(Constants.TRANSFERENCODING).setString(Constants.CHUNKED);
             } else {
@@ -1403,12 +1404,25 @@ public class Http11Processor extends AbstractProcessor {
         outputBuffer.commit();
     }
 
-    private static boolean isConnectionClose(MimeHeaders headers) {
+    private static boolean isConnectionClose(MimeHeaders headers) throws IOException {
         MessageBytes connection = headers.getValue(Constants.CONNECTION);
         if (connection == null) {
             return false;
         }
-        return connection.equals(Constants.CLOSE);
+
+        Enumeration<String> values = headers.values(Constants.CONNECTION);
+        Set<String> result = null;
+        while (values.hasMoreElements()) {
+            if (result == null) {
+                result = new HashSet<>();
+            }
+            TokenList.parseTokenList(new StringReader(values.nextElement()), result);
+        }
+
+        if (result == null) {
+            return false;
+        }
+        return result.contains(Constants.CLOSE);
     }
 
     private void prepareSendfile(OutputFilter[] outputFilters) {
