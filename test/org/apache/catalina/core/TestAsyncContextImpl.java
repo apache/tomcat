@@ -24,10 +24,8 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.servlet.AsyncContext;
 import javax.servlet.AsyncEvent;
@@ -56,9 +54,7 @@ import org.apache.catalina.Loader;
 import org.apache.catalina.Wrapper;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
-import org.apache.catalina.connector.TestCoyoteAdapter;
 import org.apache.catalina.deploy.ErrorPage;
-import org.apache.catalina.startup.SimpleHttpClient;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.catalina.valves.TesterAccessLogValve;
@@ -2607,149 +2603,5 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
             }
         }
 
-    }
-
-
-    /*
-     * Tests an error on an async thread before the container thread that called
-     * startAsync() has returned to the container.
-     *
-     * Required sequence is:
-     * - enter Servlet's service() method
-     * - startAsync()
-     * - start async thread
-     * - close client connection
-     * - write on async thread -> I/O error
-     * - exit Servlet's service() method
-     *
-     * This test makes extensive use of instance fields in the Servlet that
-     * would normally be considered very poor practice. It is only safe in this
-     * test as the Servlet only processes a single request.
-     */
-    @Test
-    public void testBug63816() throws Exception {
-        CountDownLatch doGetLatch = new CountDownLatch(1);
-        CountDownLatch clientCloseLatch = new CountDownLatch(1);
-        CountDownLatch threadCompleteLatch = new CountDownLatch(1);
-
-        AtomicBoolean ise = new AtomicBoolean(true);
-
-        // Setup Tomcat instance
-        Tomcat tomcat = getTomcatInstance();
-
-        // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
-
-        Bug63816Servlet bug63816Servlet = new Bug63816Servlet(doGetLatch, clientCloseLatch, threadCompleteLatch, ise);
-        Wrapper wrapper = Tomcat.addServlet(ctx, "bug63816Servlet", bug63816Servlet);
-        wrapper.setAsyncSupported(true);
-        ctx.addServletMapping("/*", "bug63816Servlet");
-
-        tomcat.start();
-
-        Bug63816Client client = new Bug63816Client();
-        client.setPort(getPort());
-        client.setRequest(new String[] { "GET / HTTP/1.1" + SimpleHttpClient.CRLF +
-                                         "Host: localhost:" + SimpleHttpClient.CRLF +
-                                         SimpleHttpClient.CRLF});
-        client.connect();
-        client.sendRequest();
-
-        // Wait for async to start
-        doGetLatch.await();
-
-        client.disconnect();
-
-        clientCloseLatch.countDown();
-
-        threadCompleteLatch.await();
-
-        Assert.assertFalse(ise.get());
-    }
-
-
-    private static final class Bug63816Client extends SimpleHttpClient {
-
-        @Override
-        public boolean isResponseBodyOK() {
-            return true;
-        }
-    }
-
-
-    private static final class Bug63816Servlet extends HttpServlet {
-
-        private static final long serialVersionUID = 1L;
-
-        private final CountDownLatch doGetLatch;
-        private final CountDownLatch clientCloseLatch;
-        private final CountDownLatch threadCompleteLatch;
-        private final AtomicBoolean ise;
-
-        public Bug63816Servlet(CountDownLatch doGetLatch, CountDownLatch clientCloseLatch,
-                CountDownLatch threadCompleteLatch, AtomicBoolean ise) {
-            this.doGetLatch = doGetLatch;
-            this.clientCloseLatch = clientCloseLatch;
-            this.threadCompleteLatch = threadCompleteLatch;
-            this.ise = ise;
-        }
-
-        @Override
-        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-                throws ServletException, IOException {
-
-            doGetLatch.countDown();
-
-            AsyncContext ac = req.startAsync();
-            Thread t = new Bug63816Thread(ac, clientCloseLatch, threadCompleteLatch, ise);
-            t.start();
-
-            try {
-                threadCompleteLatch.await();
-            } catch (InterruptedException e) {
-                // Ignore
-            }
-        }
-    }
-
-
-    private static final class Bug63816Thread extends Thread {
-
-        private final AsyncContext ac;
-        private final CountDownLatch clientCloseLatch;
-        private final CountDownLatch threadCompleteLatch;
-        private final AtomicBoolean ise;
-
-        public Bug63816Thread(AsyncContext ac, CountDownLatch clientCloseLatch, CountDownLatch threadCompleteLatch,
-                AtomicBoolean ise) {
-            this.ac = ac;
-            this.clientCloseLatch = clientCloseLatch;
-            this.threadCompleteLatch = threadCompleteLatch;
-            this.ise = ise;
-        }
-
-        @Override
-        public void run() {
-            try {
-                // Wait for client to close connection
-                clientCloseLatch.await();
-
-                try {
-                    ServletResponse resp = ac.getResponse();
-                    resp.setContentType("text/plain");
-                    for (int i = 0; i < 4; i++) {
-                        resp.getWriter().write(TestCoyoteAdapter.TEXT_8K);
-                        resp.flushBuffer();
-                    }
-                } catch (IOException e) {
-                    // Ignore
-                }
-                ise.set(false);
-            } catch (InterruptedException e) {
-                // Ignore
-            } finally {
-                threadCompleteLatch.countDown();
-            }
-        }
     }
 }
