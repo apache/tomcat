@@ -68,6 +68,11 @@
         that started asynchronous processing has completed processing the
         current request/response. (markt)
       </fix>
+      <fix>
+        <bug>63825</bug>: When processing the <code>Expect</code> and
+        <code>Connection</code> HTTP headers looking for a specific token, be
+        stricter in ensuring that the exact token is present. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>

@@ -737,16 +737,7 @@ public class Http11Processor extends AbstractProcessor {
             }
 
             // Has an upgrade been requested?
-            Enumeration<String> connectionValues = request.getMimeHeaders().values("Connection");
-            boolean foundUpgrade = false;
-            while (connectionValues.hasMoreElements() && !foundUpgrade) {
-                String connectionValue = connectionValues.nextElement();
-                if (connectionValue != null) {
-                    foundUpgrade = connectionValue.toLowerCase(Locale.ENGLISH).contains("upgrade");
-                }
-            }
-
-            if (foundUpgrade) {
+            if (isConnectionToken(request.getMimeHeaders(), "upgrade")) {
                 // Check the protocol
                 String requestedProtocol = request.getHeader("Upgrade");
 
@@ -1009,7 +1000,7 @@ public class Http11Processor extends AbstractProcessor {
         if (http11) {
             MessageBytes expectMB = headers.getValue("expect");
             if (expectMB != null && !expectMB.isNull()) {
-                if (expectMB.indexOfIgnoreCase("100-continue", 0) != -1) {
+                if (expectMB.toString().trim().equalsIgnoreCase("100-continue")) {
                     inputBuffer.setSwallowInput(false);
                     request.setExpectation(true);
                 } else {
@@ -1301,7 +1292,7 @@ public class Http11Processor extends AbstractProcessor {
         }
 
         long contentLength = response.getContentLengthLong();
-        boolean connectionClosePresent = isConnectionClose(headers);
+        boolean connectionClosePresent = isConnectionToken(headers, Constants.CLOSE);
         if (contentLength != -1) {
             headers.setValue("Content-Length").setLong(contentLength);
             outputBuffer.addActiveFilter
@@ -1404,25 +1395,19 @@ public class Http11Processor extends AbstractProcessor {
         outputBuffer.commit();
     }
 
-    private static boolean isConnectionClose(MimeHeaders headers) throws IOException {
+    private static boolean isConnectionToken(MimeHeaders headers, String token) throws IOException {
         MessageBytes connection = headers.getValue(Constants.CONNECTION);
         if (connection == null) {
             return false;
         }
 
         Enumeration<String> values = headers.values(Constants.CONNECTION);
-        Set<String> result = null;
+        Set<String> result = new HashSet<>();
         while (values.hasMoreElements()) {
-            if (result == null) {
-                result = new HashSet<>();
-            }
             TokenList.parseTokenList(new StringReader(values.nextElement()), result);
         }
 
-        if (result == null) {
-            return false;
-        }
-        return result.contains(Constants.CLOSE);
+        return result.contains(token);
     }
 
     private void prepareSendfile(OutputFilter[] outputFilters) {
