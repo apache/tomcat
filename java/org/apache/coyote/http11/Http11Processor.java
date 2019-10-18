@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.io.InterruptedIOException;
 import java.io.StringReader;
 import java.nio.ByteBuffer;
+import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Locale;
@@ -49,7 +50,6 @@ import org.apache.coyote.http11.upgrade.InternalHttpUpgradeHandler;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.ExceptionUtils;
-import org.apache.tomcat.util.buf.Ascii;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.MessageBytes;
 import org.apache.tomcat.util.http.FastHttpDateFormat;
@@ -185,39 +185,6 @@ public class Http11Processor extends AbstractProcessor {
         outputBuffer.addFilter(new GzipOutputFilter());
 
         pluggableFilterIndex = inputBuffer.getFilters().length;
-    }
-
-
-    /**
-     * Specialized utility method: find a sequence of lower case bytes inside
-     * a ByteChunk.
-     */
-    private static int findBytes(ByteChunk bc, byte[] b) {
-
-        byte first = b[0];
-        byte[] buff = bc.getBuffer();
-        int start = bc.getStart();
-        int end = bc.getEnd();
-
-        // Look for first char
-        int srcEnd = b.length;
-
-        for (int i = start; i <= (end - srcEnd); i++) {
-            if (Ascii.toLower(buff[i]) != first) {
-                continue;
-            }
-            // found first char, now look for a match
-            int myPos = i+1;
-            for (int srcPos = 1; srcPos < srcEnd;) {
-                if (Ascii.toLower(buff[myPos++]) != b[srcPos++]) {
-                    break;
-                }
-                if (srcPos == srcEnd) {
-                    return i - start; // found it
-                }
-            }
-        }
-        return -1;
     }
 
 
@@ -560,7 +527,7 @@ public class Http11Processor extends AbstractProcessor {
     /**
      * After reading the request headers, we have to setup the request filters.
      */
-    private void prepareRequest() {
+    private void prepareRequest() throws IOException {
 
         http11 = true;
         http09 = false;
@@ -598,11 +565,11 @@ public class Http11Processor extends AbstractProcessor {
         // Check connection header
         MessageBytes connectionValueMB = headers.getValue(Constants.CONNECTION);
         if (connectionValueMB != null && !connectionValueMB.isNull()) {
-            ByteChunk connectionValueBC = connectionValueMB.getByteChunk();
-            if (findBytes(connectionValueBC, Constants.CLOSE_BYTES) != -1) {
+            Set<String> tokens = new HashSet<>();
+            parseConnectionTokens(headers, tokens);
+            if (tokens.contains(Constants.CLOSE)) {
                 keepAlive = false;
-            } else if (findBytes(connectionValueBC,
-                                 Constants.KEEPALIVE_BYTES) != -1) {
+            } else if (tokens.contains(Constants.KEEPALIVE)) {
                 keepAlive = true;
             }
         }
@@ -992,17 +959,22 @@ public class Http11Processor extends AbstractProcessor {
             return false;
         }
 
+        Set<String> tokens = new HashSet<>();
+        parseConnectionTokens(headers, tokens);
+        return tokens.contains(token);
+    }
+
+
+    private static void parseConnectionTokens(MimeHeaders headers, Collection<String> tokens) throws IOException {
         Enumeration<String> values = headers.values(Constants.CONNECTION);
-        Set<String> result = new HashSet<>();
         while (values.hasMoreElements()) {
             String nextHeaderValue = values.nextElement();
             if (nextHeaderValue != null) {
-                TokenList.parseTokenList(new StringReader(nextHeaderValue), result);
+                TokenList.parseTokenList(new StringReader(nextHeaderValue), tokens);
             }
         }
-
-        return result.contains(token);
     }
+
 
     private void prepareSendfile(OutputFilter[] outputFilters) {
         String fileName = (String) request.getAttribute(
