@@ -19,6 +19,7 @@ package org.apache.coyote.http11;
 import java.io.IOException;
 import java.io.InterruptedIOException;
 import java.io.StringReader;
+import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.List;
@@ -693,7 +694,10 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
     /**
      * Specialized utility method: find a sequence of lower case bytes inside
      * a ByteChunk.
+     *
+     * @deprecated Unused. Will be removed in Tomcat 8.5.x.
      */
+    @Deprecated
     protected int findBytes(ByteChunk bc, byte[] b) {
 
         byte first = b[0];
@@ -1288,7 +1292,7 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
     /**
      * After reading the request headers, we have to setup the request filters.
      */
-    protected void prepareRequest() {
+    protected void prepareRequest() throws IOException {
 
         http11 = true;
         http09 = false;
@@ -1337,11 +1341,11 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
         // Check connection header
         MessageBytes connectionValueMB = headers.getValue(Constants.CONNECTION);
         if (connectionValueMB != null && !connectionValueMB.isNull()) {
-            ByteChunk connectionValueBC = connectionValueMB.getByteChunk();
-            if (findBytes(connectionValueBC, Constants.CLOSE_BYTES) != -1) {
+            Set<String> tokens = new HashSet<String>();
+            parseConnectionTokens(headers, tokens);
+            if (tokens.contains(Constants.CLOSE)) {
                 keepAlive = false;
-            } else if (findBytes(connectionValueBC,
-                                 Constants.KEEPALIVE_BYTES) != -1) {
+            } else if (tokens.contains(Constants.KEEPALIVE)) {
                 keepAlive = true;
             }
         }
@@ -1746,22 +1750,27 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
 
     }
 
+
     private static boolean isConnectionToken(MimeHeaders headers, String token) throws IOException {
         MessageBytes connection = headers.getValue(Constants.CONNECTION);
         if (connection == null) {
             return false;
         }
 
+        Set<String> tokens = new HashSet<String>();
+        parseConnectionTokens(headers, tokens);
+        return tokens.contains(token);
+    }
+
+
+    private static void parseConnectionTokens(MimeHeaders headers, Collection<String> tokens) throws IOException {
         Enumeration<String> values = headers.values(Constants.CONNECTION);
-        Set<String> result = new HashSet<String>();
         while (values.hasMoreElements()) {
             String nextHeaderValue = values.nextElement();
             if (nextHeaderValue != null) {
-                TokenList.parseTokenList(new StringReader(nextHeaderValue), result);
+                TokenList.parseTokenList(new StringReader(nextHeaderValue), tokens);
             }
         }
-
-        return result.contains(token);
     }
 
 

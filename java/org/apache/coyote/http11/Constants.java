@@ -123,9 +123,17 @@ public final class Constants {
     /* Various constant "strings" */
     public static final String CONNECTION = "Connection";
     public static final String CLOSE = "close";
+    /**
+     * @deprecated Unused. Will be removed in Tomcat 10.
+     */
+    @Deprecated
     public static final byte[] CLOSE_BYTES =
         ByteChunk.convertToBytes(CLOSE);
     public static final String KEEPALIVE = "keep-alive";
+    /**
+     * @deprecated Unused. Will be removed in Tomcat 10.
+     */
+    @Deprecated
     public static final byte[] KEEPALIVE_BYTES =
         ByteChunk.convertToBytes(KEEPALIVE);
     public static final String CHUNKED = "chunked";
