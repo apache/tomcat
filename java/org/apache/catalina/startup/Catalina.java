@@ -542,6 +542,7 @@ public class Catalina {
         initNaming();
 
         // Create and execute our Digester
+        // 解析 server.xml
         Digester digester = createStartDigester();
 
         InputSource inputSource = null;
@@ -626,8 +627,13 @@ public class Catalina {
             }
         }
 
+        // 设置 Catalina
         getServer().setCatalina(this);
+
+        // 设置服务的安装目录
         getServer().setCatalinaHome(Bootstrap.getCatalinaHomeFile());
+
+        // 设置服务的工作目录
         getServer().setCatalinaBase(Bootstrap.getCatalinaBaseFile());
 
         // Stream redirection

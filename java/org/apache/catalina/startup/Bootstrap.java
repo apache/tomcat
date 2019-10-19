@@ -66,6 +66,7 @@ public final class Bootstrap {
         String userDir = System.getProperty("user.dir");
 
         // Home first
+        // 设置 homeFile，从 catalina.home 取出环境变量
         String home = System.getProperty(Globals.CATALINA_HOME_PROP);
         File homeFile = null;
 
@@ -79,8 +80,10 @@ public final class Bootstrap {
         }
 
         if (homeFile == null) {
+
             // First fall-back. See if current directory is a bin directory
             // in a normal Tomcat install
+            // 判断启动目录下是否有 bootstrap.jar 存在，这里一般是指安装包
             File bootstrapJar = new File(userDir, "bootstrap.jar");
 
             if (bootstrapJar.exists()) {
@@ -94,7 +97,9 @@ public final class Bootstrap {
         }
 
         if (homeFile == null) {
+
             // Second fall-back. Use current directory
+            // 以当前项目的根目录为 homeFile
             File f = new File(userDir);
             try {
                 homeFile = f.getCanonicalFile();
@@ -103,13 +108,20 @@ public final class Bootstrap {
             }
         }
 
+        // 设置 tomcat 安装目录
         catalinaHomeFile = homeFile;
+
+        // 设置到环境变量中
         System.setProperty(
                 Globals.CATALINA_HOME_PROP, catalinaHomeFile.getPath());
 
         // Then base
+
+        // 设置 tomcat 工作目录，从 catalina.base 取出环境变量
         String base = System.getProperty(Globals.CATALINA_BASE_PROP);
         if (base == null) {
+
+            // 如果环境变量未设置，则默认为安装目录
             catalinaBaseFile = catalinaHomeFile;
         } else {
             File baseFile = new File(base);
@@ -120,6 +132,8 @@ public final class Bootstrap {
             }
             catalinaBaseFile = baseFile;
         }
+
+        // 设置到环境变量中
         System.setProperty(
                 Globals.CATALINA_BASE_PROP, catalinaBaseFile.getPath());
     }
@@ -133,6 +147,8 @@ public final class Bootstrap {
     private Object catalinaDaemon = null;
 
 
+    // Tomcat 定义的三个类加载器
+
     ClassLoader commonLoader = null;
     ClassLoader catalinaLoader = null;
     ClassLoader sharedLoader = null;
@@ -143,6 +159,8 @@ public final class Bootstrap {
 
     private void initClassLoaders() {
         try {
+
+            // 在这里传入的 parent 为 null，打破了 jdk 的双亲委派机制
             commonLoader = createClassLoader("common", null);
             if( commonLoader == null ) {
                 // no config file, default to this loader - we might be in a 'single' env.
@@ -254,6 +272,7 @@ public final class Bootstrap {
      */
     public void init() throws Exception {
 
+        // 初始化 classLoader
         initClassLoaders();
 
         Thread.currentThread().setContextClassLoader(catalinaLoader);
@@ -274,6 +293,8 @@ public final class Bootstrap {
         paramTypes[0] = Class.forName("java.lang.ClassLoader");
         Object paramValues[] = new Object[1];
         paramValues[0] = sharedLoader;
+
+        // 通过反射调用 Catalina 的 setParentClassLoader 方法，传入 sharedLoader
         Method method =
             startupInstance.getClass().getMethod(methodName, paramTypes);
         method.invoke(startupInstance, paramValues);
@@ -306,6 +327,8 @@ public final class Bootstrap {
             catalinaDaemon.getClass().getMethod(methodName, paramTypes);
         if (log.isDebugEnabled())
             log.debug("Calling startup class " + method);
+
+        // 通过反射调用 catalina#load() 方法
         method.invoke(catalinaDaemon, param);
 
     }
@@ -488,6 +511,7 @@ public final class Bootstrap {
                 args[args.length - 1] = "stop";
                 daemon.stop();
             } else if (command.equals("start")) {
+                // 让 tomcat 在关闭端口时阻塞监听关闭命令
                 daemon.setAwait(true);
                 daemon.load(args);
                 daemon.start();

@@ -1084,6 +1084,8 @@ public abstract class AbstractEndpoint<S> {
 
     public void init() throws Exception {
         if (bindOnInit) {
+
+            // 调用 NioEndpoint 的 bind 方法
             bind();
             bindState = BindState.BOUND_ON_INIT;
         }
