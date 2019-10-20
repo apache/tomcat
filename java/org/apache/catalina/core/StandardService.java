@@ -419,6 +419,8 @@ public class StandardService extends LifecycleMBeanBase implements Service {
         // Start our defined Container first
         if (engine != null) {
             synchronized (engine) {
+
+                // 启动 StandardEngine
                 engine.start();
             }
         }
@@ -429,6 +431,7 @@ public class StandardService extends LifecycleMBeanBase implements Service {
             }
         }
 
+        // 启动 MapperListener
         mapperListener.start();
 
         // Start our defined Connectors second
@@ -437,6 +440,8 @@ public class StandardService extends LifecycleMBeanBase implements Service {
                 try {
                     // If it has already failed, don't try and start it
                     if (connector.getState() != LifecycleState.FAILED) {
+
+                        // 启动 Connector，启动后就可以接收请求了
                         connector.start();
                     }
                 } catch (Exception e) {
@@ -554,7 +559,7 @@ public class StandardService extends LifecycleMBeanBase implements Service {
             for (Connector connector : connectors) {
                 try {
 
-                    // 初始化连接器
+                    // 初始化 Connector，Connector 会对 ProtocolHandler 进行初始化，开启应用端口的监听
                     connector.init();
                 } catch (Exception e) {
                     String message = sm.getString(

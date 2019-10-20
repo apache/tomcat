@@ -90,7 +90,14 @@ public abstract class LifecycleBase implements Lifecycle {
      */
     protected void fireLifecycleEvent(String type, Object data) {
         LifecycleEvent event = new LifecycleEvent(this, type, data);
+
+        // 在这里有三个监听器
+        // 0 = {ContextConfig@2255}
+        // 1 = {StandardHost$MemoryLeakTrackingListener@5537}
+        // 2 = {NamingContextListener@4722}
         for (LifecycleListener listener : lifecycleListeners) {
+
+            // 在这里循环通知，当为【ContextConfig】时
             listener.lifecycleEvent(event);
         }
     }

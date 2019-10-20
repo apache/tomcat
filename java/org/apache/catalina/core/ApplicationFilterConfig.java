@@ -108,7 +108,11 @@ public final class ApplicationFilterConfig implements FilterConfig, Serializable
             getFilter();
         } else {
             this.filter = filterDef.getFilter();
+
+            // 实例化 filter
             getInstanceManager().newInstance(filter);
+
+            // 初始化 filter，即调用 init() 方法
             initFilter();
         }
     }

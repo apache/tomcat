@@ -1088,6 +1088,7 @@ public class StandardWrapper extends ContainerBase
                 singleThreadModel = true;
             }
 
+            // 初始化 servlet
             initServlet(servlet);
 
             fireContainerEvent("load", this);

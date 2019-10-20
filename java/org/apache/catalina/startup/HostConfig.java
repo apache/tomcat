@@ -315,6 +315,8 @@ public class HostConfig implements LifecycleListener {
         } else if (event.getType().equals(Lifecycle.BEFORE_START_EVENT)) {
             beforeStart();
         } else if (event.getType().equals(Lifecycle.START_EVENT)) {
+
+            // 启动部署服务
             start();
         } else if (event.getType().equals(Lifecycle.STOP_EVENT)) {
             stop();
@@ -434,12 +436,26 @@ public class HostConfig implements LifecycleListener {
 
         File appBase = host.getAppBaseFile();
         File configBase = host.getConfigBaseFile();
+
+        // 过滤出 webapp 要部署应用的目录
         String[] filteredAppPaths = filterAppPaths(appBase.list());
+
         // Deploy XML descriptors from configBase
+        // 部署 xml 描述文件
         deployDescriptors(configBase, configBase.list());
+
         // Deploy WARs
+        // 解压 war 包，但是这里还不会去启动应用
         deployWARs(appBase, filteredAppPaths);
+
         // Deploy expanded folders
+        // 处理已经存在的目录，前面解压的 war 包不会再行处理
+        // 这里默认会传入的文件夹有：
+        // 0 = "docs"
+        // 1 = "examples"
+        // 2 = "host-manager"
+        // 3 = "manager"
+        // 4 = "ROOT"
         deployDirectories(appBase, filteredAppPaths);
 
     }
@@ -1036,6 +1052,7 @@ public class HostConfig implements LifecycleListener {
         ExecutorService es = host.getStartStopExecutor();
         List<Future<?>> results = new ArrayList<>();
 
+        // 这里会对每一个文件夹进行部署
         for (int i = 0; i < files.length; i++) {
 
             if (files[i].equalsIgnoreCase("META-INF"))
@@ -1049,6 +1066,7 @@ public class HostConfig implements LifecycleListener {
                 if (isServiced(cn.getName()) || deploymentExists(cn.getName()))
                     continue;
 
+                // 调用 DeployDirectory 的 run 方法进行
                 results.add(es.submit(new DeployDirectory(this, cn, dir)));
             }
         }
@@ -1080,6 +1098,7 @@ public class HostConfig implements LifecycleListener {
                     dir.getAbsolutePath()));
         }
 
+        // 在这里实例化 StandardContext 对象
         Context context = null;
         File xml = new File(dir, Constants.ApplicationContextXml);
         File xmlCopy =
@@ -1129,6 +1148,7 @@ public class HostConfig implements LifecycleListener {
                 context = (Context) Class.forName(contextClass).getConstructor().newInstance();
             }
 
+            // 设置 StandardContext 的一些属性
             Class<?> clazz = Class.forName(host.getConfigClass());
             LifecycleListener listener = (LifecycleListener) clazz.getConstructor().newInstance();
             context.addLifecycleListener(listener);
@@ -1137,6 +1157,8 @@ public class HostConfig implements LifecycleListener {
             context.setPath(cn.getPath());
             context.setWebappVersion(cn.getVersion());
             context.setDocBase(cn.getBaseName());
+
+            // 实例化 context 后，为 StandardHost 添加子容器
             host.addChild(context);
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
@@ -1580,8 +1602,11 @@ public class HostConfig implements LifecycleListener {
             host.setAutoDeploy(false);
         }
 
-        if (host.getDeployOnStartup())
+        if (host.getDeployOnStartup()){
+
+            // 部署 app 应用
             deployApps();
+        }
 
     }
 
@@ -1872,6 +1897,8 @@ public class HostConfig implements LifecycleListener {
 
         @Override
         public void run() {
+
+            // 调用 HostConfig 的 deployDirectory 方法
             config.deployDirectory(cn, dir);
         }
     }

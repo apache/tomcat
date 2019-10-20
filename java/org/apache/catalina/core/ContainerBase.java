@@ -751,6 +751,8 @@ public abstract class ContainerBase extends LifecycleMBeanBase
             if ((getState().isAvailable() ||
                     LifecycleState.STARTING_PREP.equals(getState())) &&
                     startChildren) {
+
+                // 这里的 child 目前是【StandardContext】，调用其  start 方法
                 child.start();
             }
         } catch (LifecycleException e) {
@@ -929,14 +931,18 @@ public abstract class ContainerBase extends LifecycleMBeanBase
         }
 
         // Start our child containers, if any
+        // 把子容器的启动步骤放在线程中处理，默认情况下线程池只有一个线程处理任务队列
         Container children[] = findChildren();
         List<Future<Void>> results = new ArrayList<>();
         for (int i = 0; i < children.length; i++) {
+
+            // 这里 StartChild 是【StandardEngine[Catalina].StandardHost[localhost]】
             results.add(startStopExecutor.submit(new StartChild(children[i])));
         }
 
         MultiThrowable multiThrowable = null;
 
+        // 阻塞当前线程，直到子容器 start 完成
         for (Future<Void> result : results) {
             try {
                 result.get();
@@ -956,10 +962,12 @@ public abstract class ContainerBase extends LifecycleMBeanBase
 
         // Start the Valves in our pipeline (including the basic), if any
         if (pipeline instanceof Lifecycle) {
+
+            // 启动 Pipeline
             ((Lifecycle) pipeline).start();
         }
 
-
+        // 设置启动状态，通知 HostConfig 启动
         setState(LifecycleState.STARTING);
 
         // Start our thread
@@ -1420,6 +1428,8 @@ public abstract class ContainerBase extends LifecycleMBeanBase
 
         @Override
         public Void call() throws LifecycleException {
+
+            // 启动 StandardHost
             child.start();
             return null;
         }

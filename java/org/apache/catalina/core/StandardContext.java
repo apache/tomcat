@@ -4628,12 +4628,16 @@ public class StandardContext extends ContainerBase
         boolean ok = true;
         synchronized (filterConfigs) {
             filterConfigs.clear();
+
+            // 循环所有的 FilterDef
             for (Entry<String,FilterDef> entry : filterDefs.entrySet()) {
                 String name = entry.getKey();
                 if (getLogger().isDebugEnabled()) {
                     getLogger().debug(" Starting filter '" + name + "'");
                 }
                 try {
+
+                    // 在构造方法中完成 Filter 的实例化，并且调用 Filter 接口的 init 方法，完成 Filter 的初始化
                     ApplicationFilterConfig filterConfig =
                             new ApplicationFilterConfig(this, entry.getValue());
                     filterConfigs.put(name, filterConfig);
@@ -4956,10 +4960,13 @@ public class StandardContext extends ContainerBase
     public boolean loadOnStartup(Container children[]) {
 
         // Collect "load on startup" servlets that need to be initialized
+        // 使用 TreeMap 对 Wrapper 进行排序，loadOnStartup 值越小越靠前，值相同的 Wrapper 放在同一个 List 中
         TreeMap<Integer, ArrayList<Wrapper>> map = new TreeMap<>();
         for (int i = 0; i < children.length; i++) {
             Wrapper wrapper = (Wrapper) children[i];
             int loadOnStartup = wrapper.getLoadOnStartup();
+
+            // 如果 loadOnStartup ＜ 0，直接跳过
             if (loadOnStartup < 0)
                 continue;
             Integer key = Integer.valueOf(loadOnStartup);
@@ -4972,9 +4979,12 @@ public class StandardContext extends ContainerBase
         }
 
         // Load the collected "load on startup" servlets
+        // 根据 loadOnStartup 值有序加载 Wrapper 容器
         for (ArrayList<Wrapper> list : map.values()) {
             for (Wrapper wrapper : list) {
                 try {
+
+                    // 调用 load 方法
                     wrapper.load();
                 } catch (ServletException e) {
                     getLogger().error(sm.getString("standardContext.loadOnStartup.loadException",
@@ -5151,6 +5161,7 @@ public class StandardContext extends ContainerBase
                 }
 
                 // Notify our interested LifecycleListeners
+                // 发布【configure_start】事件
                 fireLifecycleEvent(Lifecycle.CONFIGURE_START_EVENT, null);
 
                 // Start our child containers, if not already started
@@ -5252,6 +5263,7 @@ public class StandardContext extends ContainerBase
             }
 
             // Configure and call application event listeners
+            // 初始化 listener，这里就略过了
             if (ok) {
                 if (!listenerStart()) {
                     log.error(sm.getString("standardContext.listenerFail"));
@@ -5278,6 +5290,7 @@ public class StandardContext extends ContainerBase
             }
 
             // Configure and call application filters
+            // 初始化 filter
             if (ok) {
                 if (!filterStart()) {
                     log.error(sm.getString("standardContext.filterFail"));
@@ -5286,6 +5299,7 @@ public class StandardContext extends ContainerBase
             }
 
             // Load and initialize all "load on startup" servlets
+            // 初始化 StandardWrapper
             if (ok) {
                 if (!loadOnStartup(findChildren())){
                     log.error(sm.getString("standardContext.servletFail"));
