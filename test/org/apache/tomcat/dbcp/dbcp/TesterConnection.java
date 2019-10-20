@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.apache.commons.dbcp;
+package org.apache.tomcat.dbcp.dbcp;
 
 import java.sql.CallableStatement;
 import java.sql.Connection;
