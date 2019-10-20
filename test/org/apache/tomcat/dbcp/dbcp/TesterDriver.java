@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.apache.commons.dbcp;
+package org.apache.tomcat.dbcp.dbcp;
 
 import java.sql.Connection;
 import java.sql.Driver;
@@ -125,7 +125,7 @@ public class TesterDriver implements Driver {
     }
     /* JDBC_4_1_ANT_KEY_END */
 
-    protected static final String CONNECT_STRING = "jdbc:apache:commons:testdriver";
+    protected static final String CONNECT_STRING = "jdbc:apache:tomcat:dbcp:testdriver";
 
     // version numbers
     protected static final int MAJOR_VERSION = 1;

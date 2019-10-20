@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.apache.commons.dbcp;
+package org.apache.tomcat.dbcp.dbcp;
 
 import java.io.IOException;
 import java.sql.Connection;
@@ -27,6 +27,10 @@ import javax.sql.DataSource;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * TestSuite for BasicDataSource
@@ -53,8 +57,8 @@ public class TestBasicDataSource extends TestConnectionPool {
     public void setUp() throws Exception {
         super.setUp();
         ds = createDataSource();
-        ds.setDriverClassName("org.apache.commons.dbcp.TesterDriver");
-        ds.setUrl("jdbc:apache:commons:testdriver");
+        ds.setDriverClassName("org.apache.tomcat.dbcp.dbcp.TesterDriver");
+        ds.setUrl("jdbc:apache:tomcat:dbcp:testdriver");
         ds.setMaxActive(getMaxActive());
         ds.setMaxWait(getMaxWait());
         ds.setDefaultAutoCommit(true);
@@ -479,8 +483,8 @@ public class TestBasicDataSource extends TestConnectionPool {
         ds.close();
         ds = null;
         ds = createDataSource();
-        ds.setDriverClassName("org.apache.commons.dbcp.TesterDriver");
-        ds.setUrl("jdbc:apache:commons:testdriver");
+        ds.setDriverClassName("org.apache.tomcat.dbcp.dbcp.TesterDriver");
+        ds.setUrl("jdbc:apache:tomcat:dbcp:testdriver");
         ds.setMaxActive(getMaxActive());
         ds.setMaxWait(getMaxWait());
         ds.setDefaultAutoCommit(true);
@@ -526,8 +530,8 @@ public class TestBasicDataSource extends TestConnectionPool {
         ds.close();
         ds = null;
         ds = createDataSource();
-        ds.setDriverClassName("org.apache.commons.dbcp.TesterConnRequestCountDriver");
-        ds.setUrl("jdbc:apache:commons:testerConnRequestCountDriver");
+        ds.setDriverClassName("org.apache.tomcat.dbcp.dbcp.TesterConnRequestCountDriver");
+        ds.setUrl("jdbc:apache:tomcat:dbcp:testerConnRequestCountDriver");
         ds.setValidationQuery("SELECT DUMMY FROM DUAL");
         ds.setUsername("username");
 
@@ -568,7 +572,7 @@ public class TestBasicDataSource extends TestConnectionPool {
  * TesterDriver that keeps a static count of connection requests.
  */
 class TesterConnRequestCountDriver extends TesterDriver {
-    protected static final String CONNECT_STRING = "jdbc:apache:commons:testerConnRequestCountDriver";
+    protected static final String CONNECT_STRING = "jdbc:apache:tomcat:dbcp:testerConnRequestCountDriver";
     private static int connectionRequestCount = 0;
 
 	@Override
