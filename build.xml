@@ -2367,6 +2367,8 @@ skip.installer property in build.properties" />
         <include name="BUILDING.txt" />
         <include name="CONTRIBUTING.md"/>
         <exclude name="bin/x64/"/>
+        <exclude name="bin/commons-daemon-native.tar.gz"/>
+        <exclude name="bin/tomcat-native.tar.gz"/>
       </zipfileset>
 
     </zip>
@@ -2392,6 +2394,8 @@ skip.installer property in build.properties" />
         <exclude name="bin/x64/"/>
         <exclude name="bin/*.dll"/>
         <exclude name="bin/tomcat${version.major}.exe"/>
+        <exclude name="bin/commons-daemon-native.tar.gz"/>
+        <exclude name="bin/tomcat-native.tar.gz"/>
       </zipfileset>
       <zipfileset dir="${tomcat.dist}/bin/x64" prefix="${final.name}/bin">
         <include name="*.dll"/>
