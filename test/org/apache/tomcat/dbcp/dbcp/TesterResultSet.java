@@ -28,6 +28,7 @@ import java.sql.SQLException;
 import java.sql.SQLWarning;
 import java.sql.Statement;
 import java.util.Calendar;
+import java.util.Map;
 /* JDBC_4_ANT_KEY_BEGIN */
 import java.io.InputStream;
 import java.io.Reader;
@@ -632,7 +633,7 @@ public class TesterResultSet implements ResultSet {
     }
 
 
-    public Object getObject(int i, java.util.Map map) throws SQLException {
+    public Object getObject(int i, Map<String,Class<?>> map) throws SQLException {
         checkOpen();
         return new Object();
     }
@@ -657,7 +658,7 @@ public class TesterResultSet implements ResultSet {
         return null;
     }
 
-    public Object getObject(String colName, java.util.Map map) throws SQLException {
+    public Object getObject(String colName, Map<String,Class<?>> map) throws SQLException {
         checkOpen();
         return colName;
     }
