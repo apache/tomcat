@@ -50,7 +50,7 @@ public class TesterConnection implements Connection {
     protected int _transactionIsolation = 1;
     protected DatabaseMetaData _metaData = new TesterDatabaseMetaData();
     protected String _catalog = null;
-    protected Map _typeMap = null;
+    protected Map<String,Class<?>> _typeMap = null;
     protected boolean _readOnly = false;
     protected SQLWarning warnings = null;
     protected String username = null;
@@ -117,7 +117,7 @@ public class TesterConnection implements Connection {
         return _transactionIsolation;
     }
 
-    public Map getTypeMap() throws SQLException {
+    public Map<String,Class<?>> getTypeMap() throws SQLException {
         checkOpen();
         return _typeMap;
     }
@@ -199,7 +199,7 @@ public class TesterConnection implements Connection {
         _transactionIsolation = level;
     }
 
-    public void setTypeMap(Map map) throws SQLException {
+    public void setTypeMap(Map<String,Class<?>> map) throws SQLException {
         checkOpen();
         _typeMap = map;
     }

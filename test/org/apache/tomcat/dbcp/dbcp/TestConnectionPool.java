@@ -73,7 +73,7 @@ public abstract class TestConnectionPool extends TestCase {
     }
     
     /** Connections opened during the course of a test */
-    protected Stack connections = new Stack();
+    protected Stack<Connection> connections = new Stack<Connection>();
     
     /** Acquire a connection and push it onto the connections stack */
     protected Connection newConnection() throws Exception {
@@ -520,7 +520,7 @@ public abstract class TestConnectionPool extends TestCase {
      */
     public void testHashing() throws Exception {
         Connection con = getConnection();
-        Hashtable hash = new Hashtable();
+        Hashtable<Connection, String> hash = new Hashtable<Connection, String>();
         hash.put(con, "test");
         assertEquals("test", hash.get(con));
         assertTrue(hash.containsKey(con));

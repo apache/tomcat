@@ -132,7 +132,7 @@ public class TesterCallableStatement extends TesterPreparedStatement implements 
         return null;
     }
 
-    public Object getObject(int i, Map map) throws SQLException {
+    public Object getObject(int i, Map<String,Class<?>> map) throws SQLException {
         return null;
     }
 
@@ -311,7 +311,7 @@ public class TesterCallableStatement extends TesterPreparedStatement implements 
         return null;
     }
 
-    public Object getObject(String parameterName, Map map) throws SQLException {
+    public Object getObject(String parameterName, Map<String,Class<?>> map) throws SQLException {
         return null;
     }
 
