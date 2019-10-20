@@ -42,8 +42,8 @@ import junit.framework.TestCase;
  * @author Dirk Verbeeck
  * @version $Revision$ $Date$
  */
-public abstract class TestConnectionPool extends TestCase {
-    public TestConnectionPool(String testName) {
+public abstract class AbstractConnectionPoolTest extends TestCase {
+    public AbstractConnectionPoolTest(String testName) {
         super(testName);
     }
 
