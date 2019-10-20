@@ -34,7 +34,7 @@ import junit.framework.TestSuite;
  * @author Dirk Verbeeck
  * @version $Revision$ $Date$
  */
-public class TestBasicDataSource extends TestConnectionPool {
+public class TestBasicDataSource extends AbstractConnectionPoolTest {
     public TestBasicDataSource(String testName) {
         super(testName);
     }
