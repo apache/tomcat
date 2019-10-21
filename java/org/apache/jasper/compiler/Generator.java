@@ -3695,8 +3695,8 @@ class Generator {
         String className = tagInfo.getTagClassName();
         int lastIndex = className.lastIndexOf('.');
         if (lastIndex != -1) {
-            String pkgName = className.substring(0, lastIndex);
-            genPreamblePackage(pkgName);
+            String packageName = className.substring(0, lastIndex);
+            genPreamblePackage(packageName);
             className = className.substring(lastIndex + 1);
         }
 

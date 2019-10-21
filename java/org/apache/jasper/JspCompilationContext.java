@@ -454,11 +454,11 @@ public class JspCompilationContext {
         if (isTagFile()) {
             String className = tagInfo.getTagClassName();
             int lastIndex = className.lastIndexOf('.');
-            String pkgName = "";
+            String packageName = "";
             if (lastIndex != -1) {
-                pkgName = className.substring(0, lastIndex);
+                packageName = className.substring(0, lastIndex);
             }
-            return pkgName;
+            return packageName;
         } else {
             String dPackageName = getDerivedPackageName();
             if (dPackageName.length() == 0) {
@@ -767,4 +767,3 @@ public class JspCompilationContext {
         return result.toString();
     }
 }
-
