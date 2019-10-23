@@ -56,6 +56,7 @@ public abstract class SimpleHttpClient {
     public static final String REDIRECT_302 = "HTTP/1.1 302 ";
     public static final String REDIRECT_303 = "HTTP/1.1 303 ";
     public static final String FAIL_400 = "HTTP/1.1 400 ";
+    public static final String FORBIDDEN_403 = "HTTP/1.1 403 ";
     public static final String FAIL_404 = "HTTP/1.1 404 ";
     public static final String FAIL_405 = "HTTP/1.1 405 ";
     public static final String TIMEOUT_408 = "HTTP/1.1 408 ";
@@ -442,6 +443,10 @@ public abstract class SimpleHttpClient {
 
     public boolean isResponse400() {
         return responseLineStartsWith(FAIL_400);
+    }
+
+    public boolean isResponse403() {
+        return responseLineStartsWith(FORBIDDEN_403);
     }
 
     public boolean isResponse404() {
