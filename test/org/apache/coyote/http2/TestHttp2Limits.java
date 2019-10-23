@@ -31,8 +31,11 @@ import org.junit.Test;
 import org.apache.catalina.connector.Connector;
 import org.apache.coyote.http2.HpackEncoder.State;
 import org.apache.tomcat.util.http.MimeHeaders;
+import org.apache.tomcat.util.res.StringManager;
 
 public class TestHttp2Limits extends Http2TestBase {
+
+    private static final StringManager sm = StringManager.getManager(TestHttp2Limits.class);
 
     @Test
     public void testHeaderLimits1x128() throws Exception {
@@ -247,6 +250,12 @@ public class TestHttp2Limits extends Http2TestBase {
             break;
         }
         case CONNECTION_RESET: {
+            // This message uses i18n and needs to be used in a regular
+            // expression (since we don't know the connection ID). Generate the
+            // string as a regular expression and then replace '[' and ']' with
+            // the escaped values.
+            String limitMessage = sm.getString("http2Parser.headerLimitSize", "\\d++", "3");
+            limitMessage = limitMessage.replace("[", "\\[").replace("]", "\\]");
             // Connection reset. Connection ID will vary so use a pattern
             // On some platform / Connector combinations (e.g. Windows / APR),
             // the TCP connection close will be processed before the client gets
@@ -257,7 +266,7 @@ public class TestHttp2Limits extends Http2TestBase {
             try {
                 parser.readFrame(true);
                 Assert.assertThat(output.getTrace(), RegexMatcher.matchesRegex(
-                        "0-Goaway-\\[1\\]-\\[11\\]-\\[Connection \\[\\d++\\], Stream \\[3\\], .*"));
+                        "0-Goaway-\\[1\\]-\\[11\\]-\\[" + limitMessage + "\\]"));
             } catch (IOException se) {
                 // Expected on some platforms
             }
@@ -490,9 +499,14 @@ public class TestHttp2Limits extends Http2TestBase {
             // NIO2 can sometimes send window updates depending timing
             skipWindowSizeFrames();
 
-            // Connection ID will vary so use a pattern
+            // This message uses i18n and needs to be used in a regular
+            // expression (since we don't know the connection ID). Generate the
+            // string as a regular expression and then replace '[' and ']' with
+            // the escaped values.
+            String limitMessage = sm.getString("http2Parser.headerLimitSize", "\\d++", "3");
+            limitMessage = limitMessage.replace("[", "\\[").replace("]", "\\]");
             Assert.assertThat(output.getTrace(), RegexMatcher.matchesRegex(
-                    "0-Goaway-\\[3\\]-\\[11\\]-\\[Connection \\[\\d++\\], Stream \\[3\\], .*"));
+                    "0-Goaway-\\[3\\]-\\[11\\]-\\[" + limitMessage + "\\]"));
             break;
         }
         }
