@@ -1145,8 +1145,26 @@ public class Http11Processor extends AbstractProcessor {
                 headers.addValue(Constants.CONNECTION).setString(
                         Constants.CLOSE);
             }
-        } else if (!http11 && !getErrorState().isError()) {
-            headers.addValue(Constants.CONNECTION).setString(Constants.KEEPALIVE);
+        } else if (!getErrorState().isError()) {
+            if (!http11) {
+                headers.addValue(Constants.CONNECTION).setString(Constants.KEEPALIVE);
+            }
+
+            boolean connectionKeepAlivePresent =
+                isConnectionToken(request.getMimeHeaders(), Constants.KEEPALIVE);
+
+            if (connectionKeepAlivePresent) {
+                int keepAliveTimeout = protocol.getKeepAliveTimeout();
+
+                if (keepAliveTimeout > 0) {
+                    String value = "timeout=" + keepAliveTimeout / 1000L;
+                    headers.setValue(Constants.KEEP_ALIVE).setString(value);
+
+                    if (http11) {
+                        headers.addValue(Constants.CONNECTION).setString(Constants.KEEPALIVE);
+                    }
+                }
+            }
         }
 
         // Add server header

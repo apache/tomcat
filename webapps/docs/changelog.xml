@@ -116,6 +116,9 @@
         Ensure that only a full token is matched and that the match is case
         insensitive. (markt)
       </fix>
+      <add>
+        <bug>63835</bug>: Add support for Keep-Alive header. (michaelo)
+      </add>
       <fix>
         <bug>63864</bug>: Refactor parsing of the <code>transfer-encoding</code>
         request header to use the shared parsing code and reduce duplication.
