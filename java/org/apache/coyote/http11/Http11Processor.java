@@ -21,7 +21,6 @@ import java.io.InterruptedIOException;
 import java.nio.ByteBuffer;
 import java.util.HashSet;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
@@ -71,6 +70,9 @@ public class Http11Processor extends AbstractProcessor {
      * The string manager for this package.
      */
     private static final StringManager sm = StringManager.getManager(Http11Processor.class);
+
+
+    private final AbstractHttp11Protocol<?> protocol;
 
 
     /**
@@ -214,37 +216,30 @@ public class Http11Processor extends AbstractProcessor {
     protected SendfileDataBase sendfileData = null;
 
 
-    /**
-     * UpgradeProtocol information
-     */
-    private final Map<String,UpgradeProtocol> httpUpgradeProtocols;
-
-    private final boolean allowHostHeaderMismatch;
-
-
-    public Http11Processor(int maxHttpHeaderSize, boolean allowHostHeaderMismatch,
-            boolean rejectIllegalHeaderName, AbstractEndpoint<?> endpoint, int maxTrailerSize,
-            Set<String> allowedTrailerHeaders, int maxExtensionSize, int maxSwallowSize,
-            Map<String,UpgradeProtocol> httpUpgradeProtocols, boolean sendReasonPhrase,
-            String relaxedPathChars, String relaxedQueryChars) {
-
+    @SuppressWarnings("deprecation")
+    public Http11Processor(AbstractHttp11Protocol<?> protocol, AbstractEndpoint<?> endpoint) {
         super(endpoint);
+        this.protocol = protocol;
 
-        httpParser = new HttpParser(relaxedPathChars, relaxedQueryChars);
+        httpParser = new HttpParser(protocol.getRelaxedPathChars(),
+                protocol.getRelaxedQueryChars());
 
-        inputBuffer = new Http11InputBuffer(request, maxHttpHeaderSize, rejectIllegalHeaderName, httpParser);
+        inputBuffer = new Http11InputBuffer(request, protocol.getMaxHttpHeaderSize(),
+                protocol.getRejectIllegalHeaderName(), httpParser);
         request.setInputBuffer(inputBuffer);
 
-        outputBuffer = new Http11OutputBuffer(response, maxHttpHeaderSize, sendReasonPhrase);
+        outputBuffer = new Http11OutputBuffer(response, protocol.getMaxHttpHeaderSize(),
+                protocol.getSendReasonPhrase());
         response.setOutputBuffer(outputBuffer);
 
         // Create and add the identity filters.
-        inputBuffer.addFilter(new IdentityInputFilter(maxSwallowSize));
+        inputBuffer.addFilter(new IdentityInputFilter(protocol.getMaxSwallowSize()));
         outputBuffer.addFilter(new IdentityOutputFilter());
 
         // Create and add the chunked filters.
-        inputBuffer.addFilter(new ChunkedInputFilter(maxTrailerSize, allowedTrailerHeaders,
-                maxExtensionSize, maxSwallowSize));
+        inputBuffer.addFilter(new ChunkedInputFilter(protocol.getMaxTrailerSize(),
+                protocol.getAllowedTrailerHeadersInternal(), protocol.getMaxExtensionSize(),
+                protocol.getMaxSwallowSize()));
         outputBuffer.addFilter(new ChunkedOutputFilter());
 
         // Create and add the void filters.
@@ -259,9 +254,6 @@ public class Http11Processor extends AbstractProcessor {
         outputBuffer.addFilter(new GzipOutputFilter());
 
         pluggableFilterIndex = inputBuffer.getFilters().length;
-
-        this.httpUpgradeProtocols = httpUpgradeProtocols;
-        this.allowHostHeaderMismatch = allowHostHeaderMismatch;
     }
 
 
@@ -705,7 +697,7 @@ public class Http11Processor extends AbstractProcessor {
                 // Check the protocol
                 String requestedProtocol = request.getHeader("Upgrade");
 
-                UpgradeProtocol upgradeProtocol = httpUpgradeProtocols.get(requestedProtocol);
+                UpgradeProtocol upgradeProtocol = protocol.getUpgradeProtocol(requestedProtocol);
                 if (upgradeProtocol != null) {
                     if (upgradeProtocol.accept(request)) {
                         // TODO Figure out how to handle request bodies at this
@@ -1062,7 +1054,7 @@ public class Http11Processor extends AbstractProcessor {
                         // the Host header
                         if (!hostValueMB.getByteChunk().equals(
                                 uriB, uriBCStart + pos, slashPos - pos)) {
-                            if (allowHostHeaderMismatch) {
+                            if (protocol.getAllowHostHeaderMismatch()) {
                                 // The requirements of RFC 2616 are being
                                 // applied. If the host header and the request
                                 // line do not agree, the request line takes
