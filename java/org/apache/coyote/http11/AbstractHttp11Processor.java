@@ -19,7 +19,6 @@ package org.apache.coyote.http11;
 import java.io.IOException;
 import java.io.InterruptedIOException;
 import java.io.StringReader;
-import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.List;
@@ -611,10 +610,21 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
         // Check if content is not already compressed
         MessageBytes contentEncodingMB = response.getMimeHeaders().getValue("Content-Encoding");
 
-        if ((contentEncodingMB != null) &&
-                (contentEncodingMB.indexOf("gzip") != -1 ||
-                        contentEncodingMB.indexOf("br") != -1)) {
-            return false;
+        if (contentEncodingMB != null) {
+            // Content-Encoding values are ordered but order is not important
+            // for this check so use a Set rather than a List
+            Set<String> tokens = new HashSet<String>();
+            try {
+                TokenList.parseTokenList(response.getMimeHeaders().values("Content-Encoding"), tokens);
+            } catch (IOException e) {
+                // Because we are using StringReader, any exception here is a
+                // Tomcat bug.
+                getLog().warn(sm.getString("http11Processor.contentEncodingParseFail"), e);
+                return false;
+            }
+            if (tokens.contains("gzip") || tokens.contains("br")) {
+                return false;
+            }
         }
 
         // If force mode, always compress (test purposes only)
@@ -1342,7 +1352,7 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
         MessageBytes connectionValueMB = headers.getValue(Constants.CONNECTION);
         if (connectionValueMB != null && !connectionValueMB.isNull()) {
             Set<String> tokens = new HashSet<String>();
-            parseConnectionTokens(headers, tokens);
+            TokenList.parseTokenList(headers.values(Constants.CONNECTION), tokens);
             if (tokens.contains(Constants.CLOSE)) {
                 keepAlive = false;
             } else if (tokens.contains(Constants.KEEPALIVE)) {
@@ -1758,19 +1768,8 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
         }
 
         Set<String> tokens = new HashSet<String>();
-        parseConnectionTokens(headers, tokens);
+        TokenList.parseTokenList(headers.values(Constants.CONNECTION), tokens);
         return tokens.contains(token);
-    }
-
-
-    private static void parseConnectionTokens(MimeHeaders headers, Collection<String> tokens) throws IOException {
-        Enumeration<String> values = headers.values(Constants.CONNECTION);
-        while (values.hasMoreElements()) {
-            String nextHeaderValue = values.nextElement();
-            if (nextHeaderValue != null) {
-                TokenList.parseTokenList(new StringReader(nextHeaderValue), tokens);
-            }
-        }
     }
 
 
