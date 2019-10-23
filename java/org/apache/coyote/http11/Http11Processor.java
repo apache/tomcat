@@ -18,10 +18,7 @@ package org.apache.coyote.http11;
 
 import java.io.IOException;
 import java.io.InterruptedIOException;
-import java.io.StringReader;
 import java.nio.ByteBuffer;
-import java.util.Collection;
-import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Map;
@@ -956,7 +953,7 @@ public class Http11Processor extends AbstractProcessor {
         MessageBytes connectionValueMB = headers.getValue(Constants.CONNECTION);
         if (connectionValueMB != null && !connectionValueMB.isNull()) {
             Set<String> tokens = new HashSet<>();
-            parseConnectionTokens(headers, tokens);
+            TokenList.parseTokenList(headers.values(Constants.CONNECTION), tokens);
             if (tokens.contains(Constants.CLOSE)) {
                 keepAlive = false;
             } else if (tokens.contains(Constants.KEEPALIVE)) {
@@ -1369,19 +1366,8 @@ public class Http11Processor extends AbstractProcessor {
         }
 
         Set<String> tokens = new HashSet<>();
-        parseConnectionTokens(headers, tokens);
+        TokenList.parseTokenList(headers.values(Constants.CONNECTION), tokens);
         return tokens.contains(token);
-    }
-
-
-    private static void parseConnectionTokens(MimeHeaders headers, Collection<String> tokens) throws IOException {
-        Enumeration<String> values = headers.values(Constants.CONNECTION);
-        while (values.hasMoreElements()) {
-            String nextHeaderValue = values.nextElement();
-            if (nextHeaderValue != null) {
-                TokenList.parseTokenList(new StringReader(nextHeaderValue), tokens);
-            }
-        }
     }
 
 

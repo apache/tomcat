@@ -18,7 +18,9 @@ package org.apache.tomcat.util.http.parser;
 
 import java.io.IOException;
 import java.io.Reader;
+import java.io.StringReader;
 import java.util.Collection;
+import java.util.Enumeration;
 import java.util.Locale;
 
 public class TokenList {
@@ -29,12 +31,32 @@ public class TokenList {
 
 
     /**
+     * Parses an enumeration of header values of the form 1#token, forcing all
+     * parsed values to lower case.
+     *
+     * @param inputs The headers to parse
+     * @param result The Collection (usually a list of a set) to which the
+     *                   parsed tokens should be added
+     *
+     * @throws IOException If an I/O error occurs reading the header
+     */
+    public static void parseTokenList(Enumeration<String> inputs, Collection<String> result) throws IOException {
+        while (inputs.hasMoreElements()) {
+            String nextHeaderValue = inputs.nextElement();
+            if (nextHeaderValue != null) {
+                TokenList.parseTokenList(new StringReader(nextHeaderValue), result);
+            }
+        }
+    }
+
+
+    /**
      * Parses a header of the form 1#token, forcing all parsed values to lower
      * case. This is typically used when header values are case-insensitive.
      *
      * @param input  The header to parse
      * @param result The Collection (usually a list of a set) to which the
-     *                   parsed token should be added
+     *                   parsed tokens should be added
      *
      * @throws IOException If an I/O error occurs reading the header
      */

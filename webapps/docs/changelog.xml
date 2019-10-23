@@ -73,6 +73,12 @@
         <code>Connection</code> HTTP headers looking for a specific token, be
         stricter in ensuring that the exact token is present. (markt)
       </fix>
+      <fix>
+        <bug>63829</bug>: Improve the check of the <code>Content-Encoding</code>
+        header when looking to see if Tomcat is serving pre-compressed content.
+        Ensure that only a full token is matched and that the match is case
+        insensitive. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
