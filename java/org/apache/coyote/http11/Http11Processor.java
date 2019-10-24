@@ -48,6 +48,7 @@ import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.MessageBytes;
+import org.apache.tomcat.util.buf.StringUtils;
 import org.apache.tomcat.util.http.FastHttpDateFormat;
 import org.apache.tomcat.util.http.MimeHeaders;
 import org.apache.tomcat.util.http.parser.HttpParser;
@@ -159,35 +160,9 @@ public class Http11Processor extends AbstractProcessor {
 
 
     /**
-     * Allowed compression level.
-     */
-    protected int compressionLevel = 0;
-
-
-    /**
-     * Minimum content size to make compression.
-     */
-    protected int compressionMinSize = 2048;
-
-
-    /**
      * Max saved post size.
      */
     protected int maxSavePostSize = 4 * 1024;
-
-
-    /**
-     * Regular expression that defines the user agents to not use gzip with
-     */
-    protected Pattern noCompressionUserAgents = null;
-
-
-    /**
-     * List of MIMES for which compression may be enabled.
-     * Note: This is not spelled correctly but can't be changed without breaking
-     *       compatibility
-     */
-    protected String[] compressableMimeTypes;
 
 
     /**
@@ -263,24 +238,12 @@ public class Http11Processor extends AbstractProcessor {
      * @param compression One of <code>on</code>, <code>force</code>,
      *                    <code>off</code> or the minimum compression size in
      *                    bytes which implies <code>on</code>
+     *
+     * @deprecated Use {@link Http11Protocol#setCompression(String)}
      */
+    @Deprecated
     public void setCompression(String compression) {
-        if (compression.equals("on")) {
-            this.compressionLevel = 1;
-        } else if (compression.equals("force")) {
-            this.compressionLevel = 2;
-        } else if (compression.equals("off")) {
-            this.compressionLevel = 0;
-        } else {
-            try {
-                // Try to parse compression as an int, which would give the
-                // minimum compression size
-                compressionMinSize = Integer.parseInt(compression);
-                this.compressionLevel = 1;
-            } catch (Exception e) {
-                this.compressionLevel = 0;
-            }
-        }
+        protocol.setCompression(compression);
     }
 
     /**
@@ -288,9 +251,12 @@ public class Http11Processor extends AbstractProcessor {
      *
      * @param compressionMinSize The minimum content length required for
      *                           compression in bytes
+     *
+     * @deprecated Use {@link Http11Protocol#setCompressionMinSize(int)}
      */
+    @Deprecated
     public void setCompressionMinSize(int compressionMinSize) {
-        this.compressionMinSize = compressionMinSize;
+        protocol.setCompressionMinSize(compressionMinSize);
     }
 
 
@@ -301,22 +267,20 @@ public class Http11Processor extends AbstractProcessor {
      * @param noCompressionUserAgents The regular expression for user agent
      *                                strings for which compression should not
      *                                be applied
+     *
+     * @deprecated Use {@link Http11Protocol#setNoCompressionUserAgents(String)}
      */
+    @Deprecated
     public void setNoCompressionUserAgents(String noCompressionUserAgents) {
-        if (noCompressionUserAgents == null || noCompressionUserAgents.length() == 0) {
-            this.noCompressionUserAgents = null;
-        } else {
-            this.noCompressionUserAgents =
-                Pattern.compile(noCompressionUserAgents);
-        }
+        protocol.setNoCompressionUserAgents(noCompressionUserAgents);
     }
 
 
     /**
      * @param compressibleMimeTypes See
      *        {@link Http11Processor#setCompressibleMimeTypes(String[])}
-     * @deprecated Use
-     *             {@link Http11Processor#setCompressibleMimeTypes(String[])}
+     *
+     * @deprecated Use {@link Http11Protocol#setCompressibleMimeType(String)}
      */
     @Deprecated
     public void setCompressableMimeTypes(String[] compressibleMimeTypes) {
@@ -325,15 +289,20 @@ public class Http11Processor extends AbstractProcessor {
 
 
     /**
-     * Set compressible mime-type list (this method is best when used with
-     * a large number of connectors, where it would be better to have all of
-     * them referenced a single array).
+     * Set compressible mime-type list.
      *
      * @param compressibleMimeTypes MIME types for which compression should be
      *                              enabled
+     *
+     * @deprecated Use {@link Http11Protocol#setCompressibleMimeType(String)}
      */
+    @Deprecated
     public void setCompressibleMimeTypes(String[] compressibleMimeTypes) {
-        this.compressableMimeTypes = compressibleMimeTypes;
+        // Conversion from array to comma separated string and back to array in
+        // CompressionConfig isn't ideal but it is better than adding a direct
+        // setter only to immediately deprecate it as it doesn't exist in 9.0.x
+        // given that Tomcat doesn't call this method in normal usage.
+        protocol.setCompressibleMimeType(StringUtils.join(compressibleMimeTypes));
     }
 
 
@@ -341,36 +310,12 @@ public class Http11Processor extends AbstractProcessor {
      * Return compression level.
      *
      * @return The current compression level in string form (off/on/force)
-     */
-    public String getCompression() {
-        switch (compressionLevel) {
-        case 0:
-            return "off";
-        case 1:
-            return "on";
-        case 2:
-            return "force";
-        }
-        return "off";
-    }
-
-
-    /**
-     * Checks if any entry in the string array starts with the specified value
      *
-     * @param sArray the StringArray
-     * @param value string
+     * @deprecated Use {@link Http11Protocol#getCompression()}
      */
-    private static boolean startsWithStringArray(String sArray[], String value) {
-        if (value == null) {
-            return false;
-        }
-        for (int i = 0; i < sArray.length; i++) {
-            if (value.startsWith(sArray[i])) {
-                return true;
-            }
-        }
-        return false;
+    @Deprecated
+    public String getCompression() {
+        return protocol.getCompression();
     }
 
 
@@ -493,76 +438,6 @@ public class Http11Processor extends AbstractProcessor {
 
     public void setServerRemoveAppProvidedValues(boolean serverRemoveAppProvidedValues) {
         this.serverRemoveAppProvidedValues = serverRemoveAppProvidedValues;
-    }
-
-
-    /**
-     * Check if the resource could be compressed, if the client supports it.
-     */
-    private boolean isCompressible() {
-
-        // Check if content is not already gzipped
-        MessageBytes contentEncodingMB =
-            response.getMimeHeaders().getValue("Content-Encoding");
-
-        if ((contentEncodingMB != null)
-            && (contentEncodingMB.indexOf("gzip") != -1)) {
-            return false;
-        }
-
-        // If force mode, always compress (test purposes only)
-        if (compressionLevel == 2) {
-            return true;
-        }
-
-        // Check if sufficient length to trigger the compression
-        long contentLength = response.getContentLengthLong();
-        if ((contentLength == -1)
-            || (contentLength > compressionMinSize)) {
-            // Check for compatible MIME-TYPE
-            if (compressableMimeTypes != null) {
-                return startsWithStringArray(compressableMimeTypes, response.getContentType());
-            }
-        }
-
-        return false;
-    }
-
-
-    /**
-     * Check if compression should be used for this resource. Already checked
-     * that the resource could be compressed if the client supports it.
-     */
-    private boolean useCompression() {
-
-        // Check if browser support gzip encoding
-        MessageBytes acceptEncodingMB =
-            request.getMimeHeaders().getValue("accept-encoding");
-
-        if ((acceptEncodingMB == null)
-            || (acceptEncodingMB.indexOf("gzip") == -1)) {
-            return false;
-        }
-
-        // If force mode, always compress (test purposes only)
-        if (compressionLevel == 2) {
-            return true;
-        }
-
-        // Check for incompatible Browser
-        if (noCompressionUserAgents != null) {
-            MessageBytes userAgentValueMB =
-                request.getMimeHeaders().getValue("user-agent");
-            if(userAgentValueMB != null) {
-                String userAgentValue = userAgentValueMB.toString();
-
-                if (noCompressionUserAgents.matcher(userAgentValue).matches()) {
-                    return false;
-                }
-            }
-        }
-
-        return true;
     }
 
 
@@ -1220,17 +1095,9 @@ public class Http11Processor extends AbstractProcessor {
         }
 
         // Check for compression
-        boolean isCompressible = false;
         boolean useCompression = false;
-        if (entityBody && (compressionLevel > 0) && sendfileData == null) {
-            isCompressible = isCompressible();
-            if (isCompressible) {
-                useCompression = useCompression();
-            }
-            // Change content-length to -1 to force chunking
-            if (useCompression) {
-                response.setContentLength(-1);
-            }
+        if (entityBody && sendfileData == null) {
+            useCompression = protocol.useCompression(request, response);
         }
 
         MimeHeaders headers = response.getMimeHeaders();
@@ -1251,8 +1118,7 @@ public class Http11Processor extends AbstractProcessor {
         boolean connectionClosePresent = isConnectionToken(headers, Constants.CLOSE);
         if (contentLength != -1) {
             headers.setValue("Content-Length").setLong(contentLength);
-            outputBuffer.addActiveFilter
-                (outputFilters[Constants.IDENTITY_FILTER]);
+            outputBuffer.addActiveFilter(outputFilters[Constants.IDENTITY_FILTER]);
             contentDelimitation = true;
         } else {
             // If the response code supports an entity body and we're on
@@ -1262,29 +1128,12 @@ public class Http11Processor extends AbstractProcessor {
                 contentDelimitation = true;
                 headers.addValue(Constants.TRANSFERENCODING).setString(Constants.CHUNKED);
             } else {
-                outputBuffer.addActiveFilter
-                    (outputFilters[Constants.IDENTITY_FILTER]);
+                outputBuffer.addActiveFilter(outputFilters[Constants.IDENTITY_FILTER]);
             }
         }
 
         if (useCompression) {
             outputBuffer.addActiveFilter(outputFilters[Constants.GZIP_FILTER]);
-            headers.setValue("Content-Encoding").setString("gzip");
-        }
-        // If it might be compressed, set the Vary header
-        if (isCompressible) {
-            // Make Proxies happy via Vary (from mod_deflate)
-            MessageBytes vary = headers.getValue("Vary");
-            if (vary == null) {
-                // Add a new Vary header
-                headers.setValue("Vary").setString("Accept-Encoding");
-            } else if (vary.equals("*")) {
-                // No action required
-            } else {
-                // Merge into current header
-                headers.setValue("Vary").setString(
-                        vary.getString() + ",Accept-Encoding");
-            }
         }
 
         // Add date header unless application has already set one (e.g. in a

@@ -31,6 +31,8 @@ import javax.servlet.http.HttpUpgradeHandler;
 import org.apache.coyote.AbstractProtocol;
 import org.apache.coyote.CompressionConfig;
 import org.apache.coyote.Processor;
+import org.apache.coyote.Request;
+import org.apache.coyote.Response;
 import org.apache.coyote.UpgradeProtocol;
 import org.apache.coyote.UpgradeToken;
 import org.apache.coyote.http11.upgrade.InternalHttpUpgradeHandler;
@@ -251,6 +253,11 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
     }
     public void setCompressionMinSize(int valueI) {
         compressionConfig.setCompressionMinSize(valueI);
+    }
+
+
+    public boolean useCompression(Request request, Response response) {
+        return compressionConfig.useCompression(request, response);
     }
 
 
@@ -880,10 +887,6 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
         processor.setMaxKeepAliveRequests(getMaxKeepAliveRequests());
         processor.setConnectionUploadTimeout(getConnectionUploadTimeout());
         processor.setDisableUploadTimeout(getDisableUploadTimeout());
-        processor.setCompressionMinSize(getCompressionMinSize());
-        processor.setCompression(getCompression());
-        processor.setNoCompressionUserAgents(getNoCompressionUserAgents());
-        processor.setCompressibleMimeTypes(getCompressibleMimeTypes());
         processor.setRestrictedUserAgents(getRestrictedUserAgents());
         processor.setMaxSavePostSize(getMaxSavePostSize());
         processor.setServer(getServer());
