@@ -43,7 +43,7 @@ public abstract class CookieProcessorBase implements CookieProcessor {
         ANCIENT_DATE = COOKIE_DATE_FORMAT.get().format(new Date(10000));
     }
 
-    private SameSiteCookies sameSiteCookies = SameSiteCookies.NONE;
+    private SameSiteCookies sameSiteCookies = SameSiteCookies.UNSET;
 
     public SameSiteCookies getSameSiteCookies() {
         return sameSiteCookies;
