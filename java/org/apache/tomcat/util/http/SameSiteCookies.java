@@ -21,7 +21,12 @@ import org.apache.tomcat.util.res.StringManager;
 public enum SameSiteCookies {
 
     /**
-     * Don't set the SameSite cookie attribute. Cookie is always sent
+     * Don't set the SameSite cookie attribute.
+     */
+    UNSET("Unset"),
+
+    /**
+     * Cookie is always sent in cross-site requests.
      */
     NONE("None"),
 
