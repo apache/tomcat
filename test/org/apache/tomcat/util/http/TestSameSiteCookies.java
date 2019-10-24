@@ -23,12 +23,25 @@ import org.junit.Test;
 public class TestSameSiteCookies {
 
     @Test
+    public void testUnset() {
+        SameSiteCookies attribute = SameSiteCookies.UNSET;
+
+        Assert.assertEquals("Unset", attribute.getValue());
+        Assert.assertEquals(SameSiteCookies.UNSET, attribute);
+
+        Assert.assertNotEquals(SameSiteCookies.NONE, attribute);
+        Assert.assertNotEquals(SameSiteCookies.LAX, attribute);
+        Assert.assertNotEquals(SameSiteCookies.STRICT, attribute);
+    }
+
+    @Test
     public void testNone() {
         SameSiteCookies attribute = SameSiteCookies.NONE;
 
         Assert.assertEquals("None", attribute.getValue());
         Assert.assertEquals(SameSiteCookies.NONE, attribute);
 
+        Assert.assertNotEquals(SameSiteCookies.UNSET, attribute);
         Assert.assertNotEquals(SameSiteCookies.LAX, attribute);
         Assert.assertNotEquals(SameSiteCookies.STRICT, attribute);
     }
@@ -40,6 +53,7 @@ public class TestSameSiteCookies {
         Assert.assertEquals("Lax", attribute.getValue());
         Assert.assertEquals(SameSiteCookies.LAX, attribute);
 
+        Assert.assertNotEquals(SameSiteCookies.UNSET, attribute);
         Assert.assertNotEquals(SameSiteCookies.NONE, attribute);
         Assert.assertNotEquals(SameSiteCookies.STRICT, attribute);
     }
@@ -51,12 +65,17 @@ public class TestSameSiteCookies {
         Assert.assertEquals("Strict", attribute.getValue());
         Assert.assertEquals(SameSiteCookies.STRICT, attribute);
 
+        Assert.assertNotEquals(SameSiteCookies.UNSET, attribute);
         Assert.assertNotEquals(SameSiteCookies.NONE, attribute);
         Assert.assertNotEquals(SameSiteCookies.LAX, attribute);
     }
 
     @Test
     public void testToValidAttribute() {
+        Assert.assertEquals(SameSiteCookies.fromString("unset"), SameSiteCookies.UNSET);
+        Assert.assertEquals(SameSiteCookies.fromString("Unset"), SameSiteCookies.UNSET);
+        Assert.assertEquals(SameSiteCookies.fromString("UNSET"), SameSiteCookies.UNSET);
+
         Assert.assertEquals(SameSiteCookies.fromString("none"), SameSiteCookies.NONE);
         Assert.assertEquals(SameSiteCookies.fromString("None"), SameSiteCookies.NONE);
         Assert.assertEquals(SameSiteCookies.fromString("NONE"), SameSiteCookies.NONE);

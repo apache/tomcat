@@ -102,8 +102,11 @@
       <attribute name="sameSiteCookies" required="false">
         <p>Enables setting same-site cookie attribute.</p>
 
-        <p>If value is <code>none</code> then the same-site cookie attribute
+        <p>If value is <code>unset</code> then the same-site cookie attribute
         won't be set. This is the default value.</p>
+
+        <p>If value is <code>none</code> then the same-site cookie attribute
+        will be set and the cookie will always be sent in cross-site requests.</p>
 
         <p>If value is <code>lax</code> then the browser only sends the cookie
         in same-site requests and cross-site top level GET requests.</p>
@@ -174,8 +177,11 @@
       <attribute name="sameSiteCookies" required="false">
         <p>Enables setting same-site cookie attribute.</p>
 
-        <p>If value is <code>none</code> then the same-site cookie attribute
+        <p>If value is <code>unset</code> then the same-site cookie attribute
         won't be set. This is the default value.</p>
+
+        <p>If value is <code>none</code> then the same-site cookie attribute
+        will be set and the cookie will always be sent in cross-site requests.</p>
 
         <p>If value is <code>lax</code> then the browser only sends the cookie
         in same-site requests and cross-site top level GET requests.</p>
