@@ -166,19 +166,6 @@ public class Http11Processor extends AbstractProcessor {
 
 
     /**
-     * Allow a customized the server header for the tin-foil hat folks.
-     */
-    private String server = null;
-
-
-    /*
-     * Should application provider values for the HTTP Server header be removed.
-     * Note that if {@link #server} is set, any application provided value will
-     * be over-ridden.
-     */
-    private boolean serverRemoveAppProvidedValues = false;
-
-    /**
      * Instance of the new protocol to use after the HTTP connection has been
      * upgraded.
      */
@@ -426,18 +413,18 @@ public class Http11Processor extends AbstractProcessor {
      * Set the server header name.
      *
      * @param server The new value to use for the server header
+     *
+     * @deprecated Use {@link Http11Protocol#setServer(String)}
      */
+    @Deprecated
     public void setServer(String server) {
-        if (server == null || server.equals("")) {
-            this.server = null;
-        } else {
-            this.server = server;
-        }
+        protocol.setServer(server);
     }
 
 
+    @Deprecated
     public void setServerRemoveAppProvidedValues(boolean serverRemoveAppProvidedValues) {
-        this.serverRemoveAppProvidedValues = serverRemoveAppProvidedValues;
+        protocol.setServerRemoveAppProvidedValues(serverRemoveAppProvidedValues);
     }
 
 
@@ -1171,8 +1158,9 @@ public class Http11Processor extends AbstractProcessor {
         }
 
         // Add server header
+        String server = protocol.getServer();
         if (server == null) {
-            if (serverRemoveAppProvidedValues) {
+            if (protocol.getServerRemoveAppProvidedValues()) {
                 headers.removeHeader("server");
             }
         } else {
