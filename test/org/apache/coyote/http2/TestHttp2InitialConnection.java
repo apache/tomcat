@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -85,6 +86,10 @@ public class TestHttp2InitialConnection extends Http2TestBase {
         request.append("\r\n");
         // Settings
         request.append(settings);
+        // Locale - Force the en Locale else the i18n on the error page changes
+        // the size of the response body and that triggers a failure as the test
+        // checks the exact response length
+        request.append("Accept-Language: en\r\n");
         // Request terminator
         request.append("\r\n");
 
@@ -117,7 +122,8 @@ public class TestHttp2InitialConnection extends Http2TestBase {
              * Note: The status header appears twice in the error page.
              */
             int serverInfoLength = ServerInfo.getServerInfo().getBytes().length;
-            StringManager sm = StringManager.getManager(ErrorReportValve.class);
+            StringManager sm = StringManager.getManager(
+                    ErrorReportValve.class.getPackage().getName(), Locale.ENGLISH);
             int statusHeaderLength = sm
                     .getString("errorReportValve.statusHeader", "", "")
                     .getBytes(StandardCharsets.UTF_8).length;
@@ -125,7 +131,7 @@ public class TestHttp2InitialConnection extends Http2TestBase {
             String contentLength = String.valueOf(len);
             return getResponseBodyFrameTrace(streamId,
                     testData.getExpectedStatus(), "text/html;charset=utf-8",
-                    sm.getLocale().getLanguage(), contentLength, contentLength);
+                    "en", contentLength, contentLength);
         } else {
             Assert.fail();
             // To keep the IDE happy
