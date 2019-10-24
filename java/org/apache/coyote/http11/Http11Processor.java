@@ -74,6 +74,7 @@ public class Http11Processor extends AbstractProcessor {
 
     private final AbstractHttp11Protocol<?> protocol;
 
+
     /**
      * Input.
      */
@@ -838,7 +839,6 @@ public class Http11Processor extends AbstractProcessor {
         }
 
         // Check for compression
-
         boolean useCompression = false;
         if (entityBody && sendfileData == null) {
             useCompression = protocol.useCompression(request, response);
