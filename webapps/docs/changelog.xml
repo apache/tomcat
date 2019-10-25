@@ -325,7 +325,7 @@
       </fix>
       <fix>
         <bug>63733</bug>: Remove the documentation for the &quot;Additional
-        Components&quot; since they have been remove / merged into the core
+        Components&quot; since they have been removed / merged into the core
         Tomcat distribution for 9.0.5 onwards. (markt)
       </fix>
       <fix>
