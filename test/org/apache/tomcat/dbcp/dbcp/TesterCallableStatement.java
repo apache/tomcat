@@ -115,6 +115,7 @@ public class TesterCallableStatement extends TesterPreparedStatement implements 
     /**
      * @deprecated
      */
+    @Deprecated
     @Override
     public BigDecimal getBigDecimal(int parameterIndex, int scale) throws SQLException {
         return null;

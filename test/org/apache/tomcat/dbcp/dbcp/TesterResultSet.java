@@ -162,6 +162,7 @@ public class TesterResultSet implements ResultSet {
     }
 
     /** @deprecated */
+    @Deprecated
     @Override
     public BigDecimal getBigDecimal(int columnIndex, int scale) throws SQLException {
         checkOpen();
@@ -199,6 +200,7 @@ public class TesterResultSet implements ResultSet {
     }
 
     /** @deprecated */
+    @Deprecated
     @Override
     public java.io.InputStream getUnicodeStream(int columnIndex) throws SQLException {
         checkOpen();
@@ -260,6 +262,7 @@ public class TesterResultSet implements ResultSet {
     }
 
     /** @deprecated */
+    @Deprecated
     @Override
     public BigDecimal getBigDecimal(String columnName, int scale) throws SQLException {
         checkOpen();
@@ -297,6 +300,7 @@ public class TesterResultSet implements ResultSet {
     }
 
     /** @deprecated */
+    @Deprecated
     @Override
     public java.io.InputStream getUnicodeStream(String columnName) throws SQLException {
         checkOpen();

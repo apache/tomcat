@@ -184,6 +184,7 @@ public class TesterPreparedStatement extends TesterStatement implements Prepared
     }
 
     /** @deprecated */
+    @Deprecated
     @Override
     public void setUnicodeStream(int parameterIndex, java.io.InputStream x, int length) throws SQLException {
         checkOpen();
