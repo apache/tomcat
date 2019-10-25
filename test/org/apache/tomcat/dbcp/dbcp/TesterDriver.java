@@ -65,6 +65,7 @@ public class TesterDriver implements Driver {
         }
     }
 
+    @Override
     public boolean acceptsURL(String url) throws SQLException {
         return CONNECT_STRING.startsWith(url);
     }
@@ -83,6 +84,7 @@ public class TesterDriver implements Driver {
         }
     }
 
+    @Override
     public Connection connect(String url, Properties info) throws SQLException {
         //return (acceptsURL(url) ? new TesterConnection() : null);
         Connection conn = null;
@@ -102,18 +104,22 @@ public class TesterDriver implements Driver {
         return conn;
     }
 
+    @Override
     public int getMajorVersion() {
         return MAJOR_VERSION;
     }
 
+    @Override
     public int getMinorVersion() {
         return MINOR_VERSION;
     }
 
+    @Override
     public boolean jdbcCompliant() {
         return true;
     }
 
+    @Override
     public DriverPropertyInfo[] getPropertyInfo(String url, Properties info) {
         return new DriverPropertyInfo[0];
     }
