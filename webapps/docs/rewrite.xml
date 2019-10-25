@@ -98,7 +98,7 @@
           <strong>RewriteMap expansions</strong>: These are
           expansions of the form <strong><code
           >${mapname:key|default}</code></strong>.
-          See <a href="#mapfunc">the documentation for
+          See <a href="#RewriteMap">the documentation for
           RewriteMap</a> for more details.
         </li>
         <li>
@@ -509,7 +509,7 @@ cannot use <code>$N</code> in the substitution string!
         <li>server-variables as in rule condition test-strings
         (<code>%{VARNAME}</code>)</li>
 
-        <li><a href="#mapfunc">mapping-function</a> calls
+        <li><a href="#RewriteMap">mapping-function</a> calls
         (<code>${mapname:key|default}</code>)</li>
       </ol>
       <p>Back-references are identifiers of the form
