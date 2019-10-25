@@ -17,6 +17,7 @@
 -->
 <!DOCTYPE document [
   <!ENTITY project SYSTEM "project.xml">
+  <!ENTITY ndash  "&#x02013;">
 ]>
 <document url="index.html">
 
@@ -404,6 +405,52 @@ public interface RewriteMap {
     public String lookup(String key);
 }]]></source>
 
+    <p>The referenced implementation of such a class &ndash; in our example <code>rewriteMapClassName</code> &ndash;
+    will be instantiated and initialized with the optional parameter &ndash; <code>optionalParameters</code> from above
+    (be careful with whitespace) &ndash; by calling <code>setParameters(String)</code>. That instance
+    will then be registered under the name given as the first paramter of <code>RewriteMap</code> rule.</p>
+
+    <p>That instance will be given the the lookup value that is configured in the corresponding <code>RewriteRule</code> by
+    calling <code>lookup(String)</code>. Your implementation is free to return <code>null</code> to indicate,
+    that the given default should be used, or to return a replacement value.</p>
+
+    <p>Say, you want to implement a rewrite map function that converts all lookup keys to uppercase. You
+    would start by implementing a class that implements the <code>RewriteMap</code> interface.</p>
+
+<source><![CDATA[package example.maps;
+
+import org.apache.catalina.valves.rewrite.RewriteMap;
+
+public class UpperCaseMap implements RewriteMap {
+
+  @Override
+  public String setParameters(String params) {
+    // nothing to be done here
+    return null;
+  }
+
+  @Override
+  public String lookup(String key) {
+    if (key == null) {
+      return null;
+    }
+    return key.toUpperCase();
+  }
+
+}]]></source>
+
+    <p>Compile this class, put it into a jar and place that jar in <code>${CATALINA_BASE}/lib</code>.</p>
+
+    <p>Having done that, you can now define a map with the <code>RewriteMap</code> directive
+    and further on use that map in a <code>RewriteRule</code>.</p>
+
+<source>RewriteMap uc example.maps.UpperCaseMap
+
+RewriteRule ^/(.*)$ ${uc:$1}
+</source>
+
+    <p>With this setup a request to the url path <code>/index.html</code> would get routed
+    to <code>/INDEX.HTML</code>.</p>
   </subsection>
 
   <subsection name="RewriteRule">

@@ -55,6 +55,10 @@
         <bug>63832</bug>: Properly mark container as FAILED when a JVM error
         occurs on stop. (remm)
       </fix>
+      <add>
+        Add more details on the usage of <code>RewriteMap</code>
+        functionality in the <code>RewriteValve</code>. (fschumacher)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
