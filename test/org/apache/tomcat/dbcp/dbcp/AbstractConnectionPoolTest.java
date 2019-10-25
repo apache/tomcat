@@ -52,7 +52,7 @@ public abstract class AbstractConnectionPoolTest extends TestCase {
         super.tearDown();
         // Close any connections opened by the test
         while (!connections.isEmpty()) {
-            Connection conn = (Connection) connections.pop();
+            Connection conn = connections.pop();
             try {
                 conn.close();
             } catch (Exception ex) {

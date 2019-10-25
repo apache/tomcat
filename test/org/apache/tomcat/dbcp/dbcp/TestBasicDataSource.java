@@ -593,4 +593,4 @@ class TesterConnRequestCountDriver extends TesterDriver {
     public static void initConnRequestCount() {
 	    connectionRequestCount = 0;
     }
-};
+}
