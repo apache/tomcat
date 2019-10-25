@@ -640,7 +640,9 @@ public class PoolableConnectionFactory implements PoolableObjectFactory<Poolable
 
     @Override
     public void destroyObject(PoolableConnection obj) throws Exception {
-        obj.reallyClose();
+        if (obj != null) {
+            obj.reallyClose();
+        }
     }
 
     @Override

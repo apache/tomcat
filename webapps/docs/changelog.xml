@@ -115,6 +115,12 @@
         Windows since compiled versions of those components are already
         included within the zip distriubutions. (markt)
       </fix>
+      <fix>
+        <bug>63833</bug>: Fix an error in the generification of the copied
+        Commons DBCP 1.x code that caused a <code>NullPointerException</code> if
+        a DataSource was configured with a database that did not exist. Patch
+        provided by Guoxiong Li. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
