@@ -298,11 +298,11 @@ public class TesterStatement implements Statement {
 /* JDBC_4_ANT_KEY_END */
 
     /* JDBC_4_1_ANT_KEY_BEGIN */
-    @Override
+    // No @Override else it won't compile with Java 6
     public void closeOnCompletion() throws SQLException {
     }
 
-    @Override
+    // No @Override else it won't compile with Java 6
     public boolean isCloseOnCompletion() throws SQLException {
         return false;
     }

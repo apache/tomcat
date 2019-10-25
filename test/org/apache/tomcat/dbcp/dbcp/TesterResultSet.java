@@ -972,12 +972,12 @@ public class TesterResultSet implements ResultSet {
 /* JDBC_4_ANT_KEY_END */
 
     /* JDBC_4_1_ANT_KEY_BEGIN */
-    @Override
+    // No @Override else it won't compile with Java 6
     public <T> T getObject(int columnIndex, Class<T> type) throws SQLException {
         throw new SQLException("Not implemented.");
     }
 
-    @Override
+    // No @Override else it won't compile with Java 6
     public <T> T getObject(String columnLabel, Class<T> type)
             throws SQLException {
         throw new SQLException("Not implemented.");

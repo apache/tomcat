@@ -119,7 +119,7 @@ public class TesterDriver implements Driver {
     }
 
     /* JDBC_4_1_ANT_KEY_BEGIN */
-    @Override
+    // No @Override else it won't compile with Java 6
     public Logger getParentLogger() throws SQLFeatureNotSupportedException {
         throw new SQLFeatureNotSupportedException();
     }

@@ -762,14 +762,14 @@ public class TesterDatabaseMetaData implements DatabaseMetaData {
     /* JDBC_4_ANT_KEY_END */
 
     /* JDBC_4_1_ANT_KEY_BEGIN */
-    @Override
+    // No @Override else it won't compile with Java 6
     public ResultSet getPseudoColumns(String catalog, String schemaPattern,
             String tableNamePattern, String columnNamePattern)
             throws SQLException {
         return null;
     }
 
-    @Override
+    // No @Override else it won't compile with Java 6
     public boolean generatedKeyAlwaysReturned() throws SQLException {
         return false;
     }
