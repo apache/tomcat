@@ -340,10 +340,22 @@ public class TesterStatement implements Statement {
 /* JDBC_4_ANT_KEY_END */
 
     /* JDBC_4_1_ANT_KEY_BEGIN */
+    /**
+     * NO-OP.
+     *
+     * @throws SQLException Never happens
+     */
     // No @Override else it won't compile with Java 6
     public void closeOnCompletion() throws SQLException {
     }
 
+    /**
+     * Hard-coded to always return false.
+     *
+     * @return Always false
+     *
+     * @throws SQLException Never happens
+     */
     // No @Override else it won't compile with Java 6
     public boolean isCloseOnCompletion() throws SQLException {
         return false;

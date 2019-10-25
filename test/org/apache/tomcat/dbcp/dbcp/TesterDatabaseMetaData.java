@@ -936,6 +936,18 @@ public class TesterDatabaseMetaData implements DatabaseMetaData {
     /* JDBC_4_ANT_KEY_END */
 
     /* JDBC_4_1_ANT_KEY_BEGIN */
+    /**
+     * Hard-coded to return null.
+     *
+     * @param catalog           Unused
+     * @param schemaPattern     Unused
+     * @param tableNamePattern  Unused
+     * @param columnNamePattern Unused
+     *
+     * @return Always false
+     *
+     * @throws SQLException Never happens
+     */
     // No @Override else it won't compile with Java 6
     public ResultSet getPseudoColumns(String catalog, String schemaPattern,
             String tableNamePattern, String columnNamePattern)
@@ -943,6 +955,13 @@ public class TesterDatabaseMetaData implements DatabaseMetaData {
         return null;
     }
 
+    /**
+     * Hard-coded to always return false.
+     *
+     * @return Always false
+     *
+     * @throws SQLException Never happens
+     */
     // No @Override else it won't compile with Java 6
     public boolean generatedKeyAlwaysReturned() throws SQLException {
         return false;

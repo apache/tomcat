@@ -386,21 +386,50 @@ public class TesterConnection implements Connection {
 /* JDBC_4_ANT_KEY_END */
 
     /* JDBC_4_1_ANT_KEY_BEGIN */
+    /**
+     * Not implemented.
+     *
+     * @param schema Unused
+     *
+     * @throws SQLException Always
+     */
     // No @Override else it won't compile with Java 6
     public void setSchema(String schema) throws SQLException {
         throw new SQLException("Not implemented.");
     }
 
+    /**
+     * Not implemented.
+     *
+     * @return Never returns normally
+     *
+     * @throws SQLException Always
+     */
     // No @Override else it won't compile with Java 6
     public String getSchema() throws SQLException {
         throw new SQLException("Not implemented.");
     }
 
+    /**
+     * Not implemented.
+     *
+     * @param executor Unused
+     *
+     * @throws SQLException Always
+     */
     // No @Override else it won't compile with Java 6
     public void abort(Executor executor) throws SQLException {
         throw new SQLException("Not implemented.");
     }
 
+    /**
+     * Not implemented.
+     *
+     * @param executor     Unused
+     * @param milliseconds Unused
+     *
+     * @throws SQLException Always
+     */
     // No @Override else it won't compile with Java 6
     public void setNetworkTimeout(Executor executor, int milliseconds)
             throws SQLException {

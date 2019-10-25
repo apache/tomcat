@@ -1165,11 +1165,33 @@ public SQLWarning getWarnings() throws SQLException {
 /* JDBC_4_ANT_KEY_END */
 
     /* JDBC_4_1_ANT_KEY_BEGIN */
+    /**
+     * Not implemented.
+     *
+     * @param <T>         Unused
+     * @param columnIndex Unused
+     * @param type        Unused
+     *
+     * @return Never returns normally
+     *
+     * @throws SQLException Always
+     */
     // No @Override else it won't compile with Java 6
     public <T> T getObject(int columnIndex, Class<T> type) throws SQLException {
         throw new SQLException("Not implemented.");
     }
 
+    /**
+     * Not implemented.
+     *
+     * @param <T>         unused
+     * @param columnLabel unused
+     * @param type        unused
+     *
+     * @return Never returns normally
+     *
+     * @throws SQLException Always
+     */
     // No @Override else it won't compile with Java 6
     public <T> T getObject(String columnLabel, Class<T> type)
             throws SQLException {
