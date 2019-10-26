@@ -98,6 +98,10 @@
         Ensure that only a full token is matched and that the match is case
         insensitive. (markt)
       </fix>
+      <fix>
+        <bug>63836</bug>: Ensure that the memory reserved for the OOME parachute
+        is released when the NIO endpoint is stopped. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
