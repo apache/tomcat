@@ -201,6 +201,19 @@
              value="-html5"/>
   <property name="java9.javadoc.options" value=""/>
 
+  <available classname="java.lang.reflect.InaccessibleObjectException"
+             property="java9.test.option.1"
+             value="--add-opens=java.base/java.lang=ALL-UNNAMED"/>
+  <property name="java9.test.option.1" value="-Dtest.1=1"/>
+  <available classname="java.lang.reflect.InaccessibleObjectException"
+             property="java9.test.option.2"
+             value="--add-opens=java.base/java.io=ALL-UNNAMED"/>
+  <property name="java9.test.option.2" value="-Dtest.2=2"/>
+  <available classname="java.lang.reflect.InaccessibleObjectException"
+             property="java9.test.option.3"
+             value="--add-opens=java.rmi/sun.rmi.transport=ALL-UNNAMED"/>
+  <property name="java9.test.option.3" value="-Dtest.3=3"/>
+
   <!-- Classpaths -->
   <path id="compile.classpath">
     <pathelement location="${jdt.jar}"/>
@@ -1598,6 +1611,11 @@
         <jvmarg value="${test.formatter}"/>
         <jvmarg value="-Djava.net.preferIPv4Stack=${java.net.preferIPv4Stack}"/>
         <jvmarg value="-Dorg.apache.tomcat.util.net.NioSelectorShared=${org.apache.tomcat.util.net.NioSelectorShared}"/>
+
+        <!-- Java 9 -->
+        <jvmarg value="${java9.test.option.1}"/>
+        <jvmarg value="${java9.test.option.2}"/>
+        <jvmarg value="${java9.test.option.3}"/>
 
         <classpath refid="tomcat.test.run.classpath" />
 
