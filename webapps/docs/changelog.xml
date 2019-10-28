@@ -59,6 +59,10 @@
         Add more details on the usage of <code>RewriteMap</code>
         functionality in the <code>RewriteValve</code>. (fschumacher)
       </add>
+      <fix>
+        <bug>63836</bug> Ensure that references to the Host object are cleared
+        once the Host instance is destroyed. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

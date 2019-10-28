@@ -37,8 +37,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-
 import javax.servlet.MultipartConfigElement;
 import javax.servlet.ServletContainerInitializer;
 import javax.servlet.ServletContext;
@@ -80,6 +78,7 @@ import org.apache.tomcat.util.bcel.classfile.ElementValue;
 import org.apache.tomcat.util.bcel.classfile.ElementValuePair;
 import org.apache.tomcat.util.bcel.classfile.JavaClass;
 import org.apache.tomcat.util.buf.UriUtil;
+import org.apache.tomcat.util.collections.ManagedConcurrentWeakHashMap;
 import org.apache.tomcat.util.descriptor.InputSourceUtil;
 import org.apache.tomcat.util.descriptor.XmlErrorHandler;
 import org.apache.tomcat.util.descriptor.web.ContextEjb;
@@ -163,8 +162,8 @@ public class ContextConfig implements LifecycleListener {
     /**
      * Cache of default web.xml fragments per Host
      */
-    protected static final Map<Host,DefaultWebXmlCacheEntry> hostWebXmlCache =
-            new ConcurrentHashMap<>();
+    protected static final ManagedConcurrentWeakHashMap<Host,DefaultWebXmlCacheEntry> hostWebXmlCache =
+            new ManagedConcurrentWeakHashMap<>();
 
 
     /**
@@ -306,6 +305,8 @@ public class ContextConfig implements LifecycleListener {
             if (originalDocBase != null) {
                 context.setDocBase(originalDocBase);
             }
+        } else if (event.getType().equals(Lifecycle.PERIODIC_EVENT)) {
+            hostWebXmlCache.maintain();
         } else if (event.getType().equals(Lifecycle.CONFIGURE_STOP_EVENT)) {
             configureStop();
         } else if (event.getType().equals(Lifecycle.AFTER_INIT_EVENT)) {
@@ -1599,6 +1600,9 @@ public class ContextConfig implements LifecycleListener {
                 entry = new DefaultWebXmlCacheEntry(webXmlDefaultFragment,
                         globalTimeStamp, hostTimeStamp);
                 hostWebXmlCache.put(host, entry);
+                // Add a Lifecycle listener to the Host that will remove it from
+                // the hostWebXmlCache once the Host is destroyed
+                host.addLifecycleListener(new HostWebXmlCacheCleaner());
             }
 
             return webXmlDefaultFragment;
@@ -2678,6 +2682,18 @@ public class ContextConfig implements LifecycleListener {
 
         public long getHostTimeStamp() {
             return hostTimeStamp;
+        }
+    }
+
+    private static class HostWebXmlCacheCleaner implements LifecycleListener {
+
+        @Override
+        public void lifecycleEvent(LifecycleEvent event) {
+
+            if (event.getType() == Lifecycle.AFTER_DESTROY_EVENT) {
+                Host host = (Host) event.getSource();
+                hostWebXmlCache.remove(host);
+            }
         }
     }
 
