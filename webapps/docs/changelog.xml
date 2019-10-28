@@ -125,6 +125,10 @@
         a DataSource was configured with a database that did not exist. Patch
         provided by Guoxiong Li. (markt)
       </fix>
+      <fix>
+        <bug>63838</bug>: Suppress reflexive access warnings when running the
+        unit tests on the command line. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
