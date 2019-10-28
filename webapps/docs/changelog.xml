@@ -105,6 +105,10 @@
         Windows since compiled versions of those components are already
         included within the zip distriubutions. (markt)
       </fix>
+      <fix>
+        <bug>63838</bug>: Suppress reflexive access warnings when running the
+        unit tests on the command line. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
