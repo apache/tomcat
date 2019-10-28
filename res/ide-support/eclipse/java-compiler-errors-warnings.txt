@@ -18,7 +18,7 @@
 # Java -> Compiler -> Errors/Warnings
 =======================================
 
-The following settings are for Oxygen (Eclipse 4.7)
+The following settings are for Oxygen (Eclipse 4.13)
 W = Warning
 I = Ignore
 E = Error
@@ -55,8 +55,12 @@ Name shadowing and conflicts
 Deprecated and restricted API
  - Deprecated API                       - W
    ([ ] on all additional check boxes)
+ - Deprecated API marked for removal    - W
  - Forbidden references                 - E
  - Discouraged reference                - W
+
+Modules
+ - All                                  - W
 
 Unnecessary code
  - All                                  - W
