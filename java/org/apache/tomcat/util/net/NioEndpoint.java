@@ -592,7 +592,6 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
         nioChannels.clear();
         processorCache.clear();
         shutdownExecutor();
-        oomParachuteData = null;
     }
 
 
