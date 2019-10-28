@@ -51,6 +51,10 @@
         <bug>63832</bug>: Properly mark container as FAILED when a JVM error
         occurs on stop. (remm)
       </fix>
+      <fix>
+        <bug>63836</bug> Ensure that references to the Host object are cleared
+        once the Host instance is destroyed. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

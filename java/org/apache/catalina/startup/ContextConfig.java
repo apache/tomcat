@@ -1555,6 +1555,9 @@ public class ContextConfig implements LifecycleListener {
                 entry = new DefaultWebXmlCacheEntry(webXmlDefaultFragment,
                         globalTimeStamp, hostTimeStamp);
                 hostWebXmlCache.put(host, entry);
+                // Add a Lifecycle listener to the Host that will remove it from
+                // the hostWebXmlCache once the Host is destroyed
+                host.addLifecycleListener(new HostWebXmlCacheCleaner());
             }
 
             return webXmlDefaultFragment;
@@ -2614,6 +2617,18 @@ public class ContextConfig implements LifecycleListener {
 
         public long getHostTimeStamp() {
             return hostTimeStamp;
+        }
+    }
+
+    private static class HostWebXmlCacheCleaner implements LifecycleListener {
+
+        @Override
+        public void lifecycleEvent(LifecycleEvent event) {
+
+            if (event.getType() == Lifecycle.AFTER_DESTROY_EVENT) {
+                Host host = (Host) event.getSource();
+                hostWebXmlCache.remove(host);
+            }
         }
     }
 
