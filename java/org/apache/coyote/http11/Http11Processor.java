@@ -22,7 +22,6 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Locale;
 import java.util.Set;
 import java.util.regex.Pattern;
 
@@ -211,7 +210,6 @@ public class Http11Processor extends AbstractProcessor {
     private void addInputFilter(InputFilter[] inputFilters, String encodingName) {
 
         // Parsing trims and converts to lower case.
-        encodingName = encodingName.trim().toLowerCase(Locale.ENGLISH);
 
         if (encodingName.equals("identity")) {
             // Skip
