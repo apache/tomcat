@@ -84,6 +84,11 @@
         insensitive. (markt)
       </fix>
       <fix>
+        <bug>63864</bug>: Refactor parsing of the <code>transfer-encoding</code>
+        request header to use the shared parsing code and reduce duplication.
+        (markt)
+      </fix>
+      <fix>
         <bug>63865</bug>: Add <code>Unset</code> option to same-site cookies
         and pass through <code>None</code> value if set by user. Patch provided
         by John Kelly. (markt)
