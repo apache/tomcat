@@ -96,6 +96,10 @@
         and pass through <code>None</code> value if set by user. Patch provided
         by John Kelly. (markt)
       </fix>
+      <fix>
+        <bug>63879</bug>: Remove stack trace from debug logging on socket
+        wrapper close. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">

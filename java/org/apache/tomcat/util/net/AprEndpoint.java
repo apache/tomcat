@@ -2242,7 +2242,7 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
         @Override
         protected void doClose() {
             if (log.isDebugEnabled()) {
-                log.debug("Calling [" + getEndpoint() + "].closeSocket([" + this + "])", new Exception());
+                log.debug("Calling [" + getEndpoint() + "].closeSocket([" + this + "])");
             }
             socketBufferHandler = SocketBufferHandler.EMPTY;
             nonBlockingWriteBuffer.clear();
