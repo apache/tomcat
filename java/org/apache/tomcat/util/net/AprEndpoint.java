@@ -684,6 +684,7 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
                 log.debug(sm.getString("endpoint.debug.socket", socket));
             }
             AprSocketWrapper wrapper = new AprSocketWrapper(socket, this);
+            super.connections.put(wrapper, wrapper);
             wrapper.setKeepAliveLeft(getMaxKeepAliveRequests());
             wrapper.setSecure(isSSLEnabled());
             wrapper.setReadTimeout(getConnectionTimeout());
@@ -1992,8 +1993,7 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
                         return;
                     }
                     // Process the request from this socket
-                    Handler.SocketState state = getHandler().process(socket,
-                            SocketEvent.OPEN_READ);
+                    Handler.SocketState state = getHandler().process(socket, SocketEvent.OPEN_READ);
                     if (state == Handler.SocketState.CLOSED) {
                         // Close socket and pool
                         closeSocket(socket.getSocket().longValue());
@@ -2002,6 +2002,7 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
                 }
             }
         }
+
     }
 
 
@@ -2012,7 +2013,7 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
      * This class is the equivalent of the Worker, but will simply use in an
      * external Executor thread pool.
      */
-    protected class SocketProcessor extends  SocketProcessorBase<Long> {
+    protected class SocketProcessor extends SocketProcessorBase<Long> {
 
         public SocketProcessor(SocketWrapperBase<Long> socketWrapper, SocketEvent event) {
             super(socketWrapper, event);

@@ -417,6 +417,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
             } else {
             }
             NioSocketWrapper socketWrapper = new NioSocketWrapper(channel, this);
+            connections.put(socketWrapper, socketWrapper);
             channel.reset(socket, socketWrapper);
             socketWrapper.setReadTimeout(getConnectionTimeout());
             socketWrapper.setWriteTimeout(getConnectionTimeout());

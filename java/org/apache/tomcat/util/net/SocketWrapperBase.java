@@ -108,6 +108,8 @@ public abstract class SocketWrapperBase<E> {
     protected final Semaphore writePending;
     protected volatile OperationState<?> writeOperation = null;
 
+    protected Object currentProcessor = null;
+
     public SocketWrapperBase(E socket, AbstractEndpoint<E,?> endpoint) {
         this.socket = socket;
         this.endpoint = endpoint;
@@ -133,6 +135,14 @@ public abstract class SocketWrapperBase<E> {
 
     protected AbstractEndpoint<E,?> getEndpoint() {
         return endpoint;
+    }
+
+    public Object getCurrentProcessor() {
+        return currentProcessor;
+    }
+
+    public void setCurrentProcessor(Object currentProcessor) {
+        this.currentProcessor = currentProcessor;
     }
 
     /**
@@ -399,6 +409,7 @@ public abstract class SocketWrapperBase<E> {
                     log.error(sm.getString("endpoint.debug.handlerRelease"), e);
                 }
             }
+            getEndpoint().connections.remove(this);
             doClose();
         }
     }

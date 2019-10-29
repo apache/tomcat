@@ -105,6 +105,10 @@
         <bug>63879</bug>: Remove stack trace from debug logging on socket
         wrapper close. (remm)
       </fix>
+      <fix>
+        Move connection tracking to the endpoint, since it requires far fewer
+        operations. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">

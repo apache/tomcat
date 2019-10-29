@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -101,10 +102,10 @@ public abstract class AbstractEndpoint<S,U> {
         /**
          * Obtain the currently open sockets.
          *
-         * @return The sockets for which the handler is tracking a currently
+         * @return The socket wrappers for which the handler is tracking a currently
          *         open connection
          */
-        public Set<S> getOpenSockets();
+        public Set<SocketWrapperBase<S>> getOpenSockets();
 
         /**
          * Release any resources associated with the given SocketWrapper.
@@ -182,6 +183,15 @@ public abstract class AbstractEndpoint<S,U> {
     protected SynchronizedStack<SocketProcessorBase<S>> processorCache;
 
     private ObjectName oname = null;
+
+    /**
+     * Connection structure holding all current connections.
+     */
+    protected Map<SocketWrapperBase<S>, SocketWrapperBase<S>> connections = new ConcurrentHashMap<>();
+
+    public Set<SocketWrapperBase<S>> getConnections() {
+        return connections.keySet();
+    }
 
     // ----------------------------------------------------------------- Properties
 
