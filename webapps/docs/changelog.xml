@@ -102,6 +102,11 @@
         <bug>63836</bug>: Ensure that the memory reserved for the OOME parachute
         is released when the NIO endpoint is stopped. (markt)
       </fix>
+      <fix>
+        <bug>63864</bug>: Refactor parsing of the <code>transfer-encoding</code>
+        request header to use the shared parsing code and reduce duplication.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
