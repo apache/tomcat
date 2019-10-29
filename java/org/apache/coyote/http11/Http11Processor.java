@@ -19,7 +19,9 @@ package org.apache.coyote.http11;
 import java.io.IOException;
 import java.io.InterruptedIOException;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 import java.util.regex.Pattern;
@@ -208,8 +210,7 @@ public class Http11Processor extends AbstractProcessor {
      */
     private void addInputFilter(InputFilter[] inputFilters, String encodingName) {
 
-        // Trim provided encoding name and convert to lower case since transfer
-        // encoding names are case insensitive. (RFC2616, section 3.6)
+        // Parsing trims and converts to lower case.
         encodingName = encodingName.trim().toLowerCase(Locale.ENGLISH);
 
         if (encodingName.equals("identity")) {
@@ -722,20 +723,13 @@ public class Http11Processor extends AbstractProcessor {
         // Parse transfer-encoding header
         if (http11) {
             MessageBytes transferEncodingValueMB = headers.getValue("transfer-encoding");
-            if (transferEncodingValueMB != null && !transferEncodingValueMB.isNull()) {
-                String transferEncodingValue = transferEncodingValueMB.toString();
-                // Parse the comma separated list. "identity" codings are ignored
-                int startPos = 0;
-                int commaPos = transferEncodingValue.indexOf(',');
-                String encodingName = null;
-                while (commaPos != -1) {
-                    encodingName = transferEncodingValue.substring(startPos, commaPos);
+            if (transferEncodingValueMB != null) {
+                List<String> encodingNames = new ArrayList<>();
+                TokenList.parseTokenList(headers.values("transfer-encoding"), encodingNames);
+                for (String encodingName : encodingNames) {
+                    // "identity" codings are ignored
                     addInputFilter(inputFilters, encodingName);
-                    startPos = commaPos + 1;
-                    commaPos = transferEncodingValue.indexOf(',', startPos);
                 }
-                encodingName = transferEncodingValue.substring(startPos);
-                addInputFilter(inputFilters, encodingName);
             }
         }
 
