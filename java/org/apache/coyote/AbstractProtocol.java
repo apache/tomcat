@@ -1037,7 +1037,7 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
                                 rpName, null);
                         rp.setRpName(rpName);
                     } catch (Exception e) {
-                        getLog().warn("Error registering request");
+                        getLog().warn(sm.getString("abstractProtocol.processorRegisterError"), e);
                     }
                 }
             }
@@ -1062,7 +1062,7 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
                                 rpName);
                         rp.setRpName(null);
                     } catch (Exception e) {
-                        getLog().warn("Error unregistering request", e);
+                        getLog().warn(sm.getString("abstractProtocol.processorUnregisterError"), e);
                     }
                 }
             }
