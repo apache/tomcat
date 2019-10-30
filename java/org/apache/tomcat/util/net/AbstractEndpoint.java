@@ -102,10 +102,12 @@ public abstract class AbstractEndpoint<S,U> {
         /**
          * Obtain the currently open sockets.
          *
-         * @return The socket wrappers for which the handler is tracking a currently
+         * @return The sockets for which the handler is tracking a currently
          *         open connection
+         * @deprecated Unused, will be removed in Tomcat 10, replaced
+         *         by AbstractEndpoint.getConnections
          */
-        public Set<SocketWrapperBase<S>> getOpenSockets();
+        public Set<S> getOpenSockets();
 
         /**
          * Release any resources associated with the given SocketWrapper.
