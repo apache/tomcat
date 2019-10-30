@@ -1078,7 +1078,9 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
                     // recycledProcessors since that pool is only for AJP or
                     // HTTP processors
                     recycledProcessors.push(processor);
-                    getLog().debug("Pushed Processor [" + processor + "]");
+                    if (getLog().isDebugEnabled()) {
+                        getLog().debug("Pushed Processor [" + processor + "]");
+                    }
                 }
             }
         }
@@ -1136,7 +1138,7 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
                         rp.setGlobalProcessor(null);
                         ObjectName rpName = rp.getRpName();
                         if (getLog().isDebugEnabled()) {
-                            getLog().debug("Unregister " + rpName);
+                            getLog().debug("Unregister [" + rpName + "]");
                         }
                         Registry.getRegistry(null, null).unregisterComponent(
                                 rpName);
