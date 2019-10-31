@@ -286,8 +286,9 @@
 
       <p>The <strong>server</strong> attribute controls the value of the Server
       HTTP header. The default value of this header for Tomcat 4.1.x to
-      <version-major-minor/>.x is Apache-Coyote/1.1. This header can provide
-      limited information to both legitimate clients and attackers.</p>
+      8.0.x is Apache-Coyote/1.1. From 8.5.x onwards this header is not set by
+      default. This header can provide limited information to both legitimate
+      clients and attackers.</p>
 
       <p>The <strong>SSLEnabled</strong>, <strong>scheme</strong> and
       <strong>secure</strong> attributes may all be independently set. These are
