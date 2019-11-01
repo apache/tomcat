@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
+import java.util.ServiceLoader;
 import java.util.StringTokenizer;
 
 import javax.servlet.ServletException;
@@ -197,7 +198,7 @@ public class RewriteValve extends ValveBase {
         for (String mapConfiguration : mapsConfiguration) {
             buffer.append(mapConfiguration).append("\r\n");
         }
-        if (mapsConfiguration.size() > 0) {
+        if (!mapsConfiguration.isEmpty()) {
             buffer.append("\r\n");
         }
         for (int i = 0; i < rules.length; i++) {
@@ -622,20 +623,19 @@ public class RewriteValve extends ValveBase {
                 }
                 String name = tokenizer.nextToken();
                 String rewriteMapClassName = tokenizer.nextToken();
-                RewriteMap map = null;
-                try {
-                    map = (RewriteMap) (Class.forName(
-                            rewriteMapClassName).getConstructor().newInstance());
-                } catch (Exception e) {
-                    throw new IllegalArgumentException(sm.getString("rewriteValve.invalidMapClassName", line));
-                }
+                RewriteMap map = getMapForName(line, rewriteMapClassName);
                 if (tokenizer.hasMoreTokens()) {
-                    map.setParameters(tokenizer.nextToken());
+                    if (tokenizer.countTokens() == 1) {
+                        map.setParameters(tokenizer.nextToken());
+                    } else {
+                        List<String> params = new ArrayList<>();
+                        while (tokenizer.hasMoreTokens()) {
+                            params.add(tokenizer.nextToken());
+                        }
+                        map.setParameters(params.toArray(new String[0]));
+                    }
                 }
-                Object[] result = new Object[2];
-                result[0] = name;
-                result[1] = map;
-                return result;
+                return new Object[] { name, map };
             } else if (token.startsWith("#")) {
                 // it's a comment, ignore it
             } else {
@@ -643,6 +643,52 @@ public class RewriteValve extends ValveBase {
             }
         }
         return null;
+    }
+
+
+    private static RewriteMap getMapForName(String line, String rewriteMapClassName) {
+        if (rewriteMapClassName.indexOf(':') >= 0) {
+            String[] parts = rewriteMapClassName.split(":", 2);
+            String namespace = parts[0];
+            String name = parts[1];
+            return getMapFromProvider(line, namespace, name);
+        }
+        try {
+            return (RewriteMap) (Class.forName(
+                    rewriteMapClassName).getConstructor().newInstance());
+        } catch (Exception e) {
+            throw new IllegalArgumentException(sm.getString("rewriteValve.invalidMapClassName", line));
+        }
+    }
+
+
+    private static RewriteMap getMapFromProvider(String line, String namespace, String name) {
+        RewriteMap result = null;
+        int currentPrio = Integer.MAX_VALUE;
+        ServiceLoader<RewriteMapsProvider> loader = ServiceLoader.load(RewriteMapsProvider.class);
+        for (RewriteMapsProvider provider : loader) {
+            System.out.println("Trying provider:" + provider.getNamespace() + " => " + provider.getMaps());
+            if (!namespace.equals(provider.getNamespace())) {
+                continue;
+            }
+            if (result == null || provider.getPriority() < currentPrio) {
+                RewriteMap possibleMap = provider.getMaps().get(name);
+                if (possibleMap != null) {
+                    result = possibleMap;
+                    currentPrio = provider.getPriority();
+                }
+            } else if (provider.getPriority() == currentPrio) {
+                RewriteMap possibleDuplicate = provider.getMaps().get(name);
+                if (possibleDuplicate != null) {
+                    throw new IllegalArgumentException("Two RewriteMaps with same priority found: " + result + " and "
+                            + possibleDuplicate);
+                }
+            }
+        }
+        if (result == null) {
+            throw new IllegalArgumentException(sm.getString("rewriteValve.invalidMapClassName", line));
+        }
+        return result;
     }
 
 
