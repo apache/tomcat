@@ -96,6 +96,10 @@
         <bug>58577</bug>: Respect the argument-count when searching for MBean
         operations to invoke via the JMXProxyServlet. (schultz)
       </fix>
+      <update>
+        <bug>64067</bug>: Allow more than one parameter when defining RewriteMaps.
+        (fschumacher)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Coyote">

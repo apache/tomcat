@@ -44,6 +44,24 @@ public interface RewriteMap {
     public String setParameters(String params);
 
     /**
+     * Optional parameters that can be defined through the {@code RewriteMap}
+     * directive in the {@code rewrite.config} file.
+     * <p>
+     * This method will be called, if there are more than one parameters defined.
+     *
+     * @param params the optional parameters
+     */
+    default void setParameters(String... params) {
+        if (params == null) {
+            return;
+        }
+        if (params.length > 1) {
+            throw new IllegalArgumentException("Too many parameters for this map");
+        }
+        setParameters(params[0]);
+    }
+
+    /**
      * Maps a key to a replacement value.<br>
      * The method is free to return {@code null} to indicate, that the default
      * value from the {@code RewriteRule} directive should be used.

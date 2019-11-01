@@ -401,6 +401,7 @@ RewriteRule  ^/$                 /homepage.std.html  [L]</source>
 <source><![CDATA[package org.apache.catalina.valves.rewrite;
 
 public interface RewriteMap {
+    default String setParameters(String params...); // calls setParameters(String) with the first parameter if there is only one
     public String setParameters(String params);
     public String lookup(String key);
 }]]></source>
@@ -410,7 +411,10 @@ public interface RewriteMap {
     (be careful with whitespace) &ndash; by calling <code>setParameters(String)</code>. That instance
     will then be registered under the name given as the first paramter of <code>RewriteMap</code> rule.</p>
 
-    <p>That instance will be given the the lookup value that is configured in the corresponding <code>RewriteRule</code> by
+    <p>Note: Starting with Tomcat 9 you can use more than one parameter. These have to be separated by spaces. Parameters
+    can be quoted with &quot;. This enables space characters inside parameters.</p>
+
+    <p>That map instance will be given the the lookup value that is configured in the corresponding <code>RewriteRule</code> by
     calling <code>lookup(String)</code>. Your implementation is free to return <code>null</code> to indicate,
     that the given default should be used, or to return a replacement value.</p>
 
