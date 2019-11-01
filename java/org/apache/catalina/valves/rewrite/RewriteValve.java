@@ -572,7 +572,7 @@ public class RewriteValve extends ValveBase {
      * @return The condition, rule or map resulting from parsing the line
      */
     public static Object parse(String line) {
-        StringTokenizer tokenizer = new StringTokenizer(line);
+        QuotedStringTokenizer tokenizer = new QuotedStringTokenizer(line);
         if (tokenizer.hasMoreTokens()) {
             String token = tokenizer.nextToken();
             if (token.equals("RewriteCond")) {
