@@ -1718,6 +1718,7 @@ public class ContextConfig implements LifecycleListener {
         }
     }
 
+
     /**
      * Scan JARs that contain web-fragment.xml files that will be used to
      * configure this application to see if they also contain static resources.
@@ -1786,6 +1787,7 @@ public class ContextConfig implements LifecycleListener {
         }
         return getWebXmlSource(defaultWebXml, true);
     }
+
 
     /**
      * Identify the host web.xml to be used and obtain an input source for
@@ -1959,6 +1961,7 @@ public class ContextConfig implements LifecycleListener {
             // validation is not enabled
             parseRequired = false;
         }
+
         FragmentJarScannerCallback callback =
                 new FragmentJarScannerCallback(webXmlParser, delegate, parseRequired);
 
