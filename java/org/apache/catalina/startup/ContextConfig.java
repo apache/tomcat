@@ -113,7 +113,7 @@ import org.xml.sax.SAXParseException;
  */
 public class ContextConfig implements LifecycleListener {
 
-    private static final Log log = LogFactory.getLog( ContextConfig.class );
+    private static final Log log = LogFactory.getLog(ContextConfig.class);
 
 
     /**
@@ -125,7 +125,6 @@ public class ContextConfig implements LifecycleListener {
 
     protected static final LoginConfig DUMMY_LOGIN_CONFIG =
         new LoginConfig("NONE", null, null, null);
-
 
 
     /**
@@ -193,7 +192,7 @@ public class ContextConfig implements LifecycleListener {
      * Cache of default web.xml fragments per Host
      */
     protected static final Map<Host,DefaultWebXmlCacheEntry> hostWebXmlCache =
-        new ConcurrentHashMap<Host,DefaultWebXmlCacheEntry>();
+            new ConcurrentHashMap<Host,DefaultWebXmlCacheEntry>();
 
 
     /**
@@ -298,28 +297,29 @@ public class ContextConfig implements LifecycleListener {
 
 
     // ------------------------------------------------------------- Properties
+
     /**
-     * Return the location of the default deployment descriptor
+     * Obtain the location of the default deployment descriptor.
+     *
+     * @return The path to the default web.xml. If not absolute, it is relative
+     *         to CATALINA_BASE.
      */
     public String getDefaultWebXml() {
-        if( defaultWebXml == null ) {
-            defaultWebXml=Constants.DefaultWebXml;
+        if (defaultWebXml == null) {
+            defaultWebXml = Constants.DefaultWebXml;
         }
-
-        return (this.defaultWebXml);
-
+        return defaultWebXml;
     }
 
 
     /**
-     * Set the location of the default deployment descriptor
+     * Set the location of the default deployment descriptor.
      *
-     * @param path Absolute/relative path to the default web.xml
+     * @param path The path to the default web.xml. If not absolute, it is
+     *             relative to CATALINA_BASE.
      */
     public void setDefaultWebXml(String path) {
-
         this.defaultWebXml = path;
-
     }
 
 
@@ -438,8 +438,9 @@ public class ContextConfig implements LifecycleListener {
         }
 
         // Has an authenticator been configured already?
-        if (context.getAuthenticator() != null)
+        if (context.getAuthenticator() != null) {
             return;
+        }
 
         if (!(context instanceof ContainerBase)) {
             return;     // Cannot install a Valve even if it would be needed
@@ -459,9 +460,9 @@ public class ContextConfig implements LifecycleListener {
          */
         Valve authenticator = null;
         if (customAuthenticators != null) {
-            authenticator = (Valve)
-                customAuthenticators.get(loginConfig.getAuthMethod());
+            authenticator = (Valve) customAuthenticators.get(loginConfig.getAuthMethod());
         }
+
         if (authenticator == null) {
             if (authenticators == null) {
                 log.error(sm.getString("contextConfig.authenticatorResources"));
@@ -470,9 +471,7 @@ public class ContextConfig implements LifecycleListener {
             }
 
             // Identify the class name of the Valve we should configure
-            String authenticatorName = null;
-            authenticatorName =
-                    authenticators.getProperty(loginConfig.getAuthMethod());
+            String authenticatorName = authenticators.getProperty(loginConfig.getAuthMethod());
             if (authenticatorName == null) {
                 log.error(sm.getString("contextConfig.authenticatorMissing",
                                  loginConfig.getAuthMethod()));
@@ -483,7 +482,7 @@ public class ContextConfig implements LifecycleListener {
             // Instantiate and install an Authenticator of the requested class
             try {
                 Class<?> authenticatorClass = Class.forName(authenticatorName);
-                authenticator = (Valve) authenticatorClass.newInstance();
+                authenticator = (Valve) authenticatorClass.getConstructor().newInstance();
             } catch (Throwable t) {
                 ExceptionUtils.handleThrowable(t);
                 log.error(sm.getString(
@@ -505,7 +504,6 @@ public class ContextConfig implements LifecycleListener {
                 }
             }
         }
-
     }
 
 
@@ -533,6 +531,7 @@ public class ContextConfig implements LifecycleListener {
     /**
      * Create (if necessary) and return a Digester configured to process the
      * context configuration descriptor for an application.
+     * @return the digester for context.xml files
      */
     protected Digester createContextDigester() {
         Digester digester = new Digester();
@@ -602,20 +601,24 @@ public class ContextConfig implements LifecycleListener {
                 }
             }
         }
-        if (context.getConfigFile() != null)
+        if (context.getConfigFile() != null) {
             processContextConfig(digester, context.getConfigFile());
+        }
 
     }
 
 
     /**
      * Process a context.xml.
+     * @param digester The digester that will be used for XML parsing
+     * @param contextXml The URL to the context.xml configuration
      */
     protected void processContextConfig(Digester digester, URL contextXml) {
 
-        if (log.isDebugEnabled())
+        if (log.isDebugEnabled()) {
             log.debug("Processing context [" + context.getName()
                     + "] configuration file [" + contextXml + "]");
+        }
 
         InputSource source = null;
         InputStream stream = null;
@@ -630,8 +633,9 @@ public class ContextConfig implements LifecycleListener {
                       contextXml) , e);
         }
 
-        if (source == null)
+        if (source == null) {
             return;
+        }
 
         try {
             source.setByteStream(stream);
@@ -676,9 +680,9 @@ public class ContextConfig implements LifecycleListener {
 
     /**
      * Adjust docBase.
+     * @throws IOException cannot access the context base path
      */
-    protected void fixDocBase()
-        throws IOException {
+    protected void fixDocBase() throws IOException {
 
         Host host = (Host) context.getParent();
         String appBase = host.getAppBase();
@@ -768,7 +772,6 @@ public class ContextConfig implements LifecycleListener {
         }
 
         context.setDocBase(docBase);
-
     }
 
 
@@ -780,8 +783,9 @@ public class ContextConfig implements LifecycleListener {
             Host host = (Host) context.getParent();
             String appBase = host.getAppBase();
             String docBase = context.getDocBase();
-            if (docBase == null)
+            if (docBase == null) {
                 return;
+            }
             originalDocBase = docBase;
 
             File docBaseFile = new File(docBase);
@@ -811,10 +815,11 @@ public class ContextConfig implements LifecycleListener {
             }
             antiLockingDocBase = antiLockingDocBase.getAbsoluteFile();
 
-            if (log.isDebugEnabled())
+            if (log.isDebugEnabled()) {
                 log.debug("Anti locking context[" + context.getName()
                         + "] setting docBase to " +
                         antiLockingDocBase.getPath());
+            }
 
             // Cleanup just in case an old deployment is lying around
             ExpandWar.delete(antiLockingDocBase);
@@ -834,8 +839,9 @@ public class ContextConfig implements LifecycleListener {
         Digester contextDigester = createContextDigester();
         contextDigester.getParser();
 
-        if (log.isDebugEnabled())
+        if (log.isDebugEnabled()) {
             log.debug(sm.getString("contextConfig.init"));
+        }
         context.setConfigured(false);
         ok = true;
 
@@ -868,8 +874,9 @@ public class ContextConfig implements LifecycleListener {
     protected synchronized void configureStart() {
         // Called from StandardContext.start()
 
-        if (log.isDebugEnabled())
+        if (log.isDebugEnabled()) {
             log.debug(sm.getString("contextConfig.start"));
+        }
 
         if (log.isDebugEnabled()) {
             log.debug(sm.getString("contextConfig.xmlSettings",
@@ -888,16 +895,18 @@ public class ContextConfig implements LifecycleListener {
         }
 
         // Configure an authenticator if we need one
-        if (ok)
+        if (ok) {
             authenticatorConfig();
+        }
 
         // Dump the contents of this pipeline if requested
         if ((log.isDebugEnabled()) && (context instanceof ContainerBase)) {
             log.debug("Pipeline Configuration:");
             Pipeline pipeline = ((ContainerBase) context).getPipeline();
             Valve valves[] = null;
-            if (pipeline != null)
+            if (pipeline != null) {
                 valves = pipeline.getValves();
+            }
             if (valves != null) {
                 for (int i = 0; i < valves.length; i++) {
                     log.debug("  " + valves[i].getInfo());
@@ -907,9 +916,9 @@ public class ContextConfig implements LifecycleListener {
         }
 
         // Make our application available if no problems were encountered
-        if (ok)
+        if (ok) {
             context.setConfigured(true);
-        else {
+        } else {
             log.error(sm.getString("contextConfig.unavailable"));
             context.setConfigured(false);
         }
@@ -922,8 +931,9 @@ public class ContextConfig implements LifecycleListener {
      */
     protected synchronized void configureStop() {
 
-        if (log.isDebugEnabled())
+        if (log.isDebugEnabled()) {
             log.debug(sm.getString("contextConfig.stop"));
+        }
 
         int i;
 
@@ -1080,8 +1090,9 @@ public class ContextConfig implements LifecycleListener {
      */
     protected synchronized void destroy() {
         // Called from StandardContext.destroy()
-        if (log.isDebugEnabled())
+        if (log.isDebugEnabled()) {
             log.debug(sm.getString("contextConfig.destroy"));
+        }
 
         // Skip clearing the work directory if Tomcat is being shutdown
         Server s = getServer();
@@ -1549,9 +1560,10 @@ public class ContextConfig implements LifecycleListener {
         String jspFile = servletDef.getJspFile();
         if ((jspFile != null) && !jspFile.startsWith("/")) {
             if (context.isServlet22()) {
-                if(log.isDebugEnabled())
+                if(log.isDebugEnabled()) {
                     log.debug(sm.getString("contextConfig.jspFile.warning",
                                        jspFile));
+                }
                 jspFile = "/" + jspFile;
             } else {
                 throw new IllegalArgumentException
@@ -1637,6 +1649,8 @@ public class ContextConfig implements LifecycleListener {
      * configure this application to see if they also contain static resources.
      * If static resources are found, add them to the context. Resources are
      * added in web-fragment.xml priority order.
+     * @param fragments The set of fragments that will be scanned for
+     *  static resources
      */
     protected void processResourceJARs(Set<WebXml> fragments) {
         for (WebXml fragment : fragments) {
@@ -1687,6 +1701,7 @@ public class ContextConfig implements LifecycleListener {
     /**
      * Identify the default web.xml to be used and obtain an input source for
      * it.
+     * @return an input source to the default web.xml
      */
     protected InputSource getGlobalWebXmlSource() {
         // Is a default web.xml specified for the Context?
@@ -1694,7 +1709,9 @@ public class ContextConfig implements LifecycleListener {
             defaultWebXml = ((StandardContext) context).getDefaultWebXml();
         }
         // Set the default if we don't have any overrides
-        if (defaultWebXml == null) getDefaultWebXml();
+        if (defaultWebXml == null) {
+            getDefaultWebXml();
+        }
 
         // Is it explicitly suppressed, e.g. in embedded environment?
         if (Constants.NoDefaultWebXml.equals(defaultWebXml)) {
@@ -1707,6 +1724,7 @@ public class ContextConfig implements LifecycleListener {
     /**
      * Identify the host web.xml to be used and obtain an input source for
      * it.
+     * @return an input source to the default per host web.xml
      */
     protected InputSource getHostWebXmlSource() {
         File hostConfigBase = getHostConfigBase();
@@ -1719,6 +1737,7 @@ public class ContextConfig implements LifecycleListener {
     /**
      * Identify the application web.xml to be used and obtain an input source
      * for it.
+     * @return an input source to the context web.xml
      */
     protected InputSource getContextWebXmlSource() {
         InputStream stream = null;
@@ -1776,10 +1795,11 @@ public class ContextConfig implements LifecycleListener {
     }
 
     /**
-     *
+     * Utility method to create an input source from the specified XML file.
      * @param filename  Name of the file (possibly with one or more leading path
      *                  segments) to read
      * @param path      Location that filename is relative to
+     * @return the input source
      */
     protected InputSource getWebXmlSource(String filename, String path) {
         File file = new File(filename);
@@ -2154,13 +2174,14 @@ public class ContextConfig implements LifecycleListener {
      * For classes packaged with the web application, the class and each
      * super class needs to be checked for a match with {@link HandlesTypes} or
      * for an annotation that matches {@link HandlesTypes}.
-     * @param javaClass
+     * @param javaClass the class to check
      */
     protected void checkHandlesTypes(JavaClass javaClass) {
 
         // Skip this if we can
-        if (typeInitializerMap.size() == 0)
+        if (typeInitializerMap.size() == 0) {
             return;
+        }
 
         if ((javaClass.getAccessFlags() &
                 org.apache.tomcat.util.bcel.Const.ACC_ANNOTATION) != 0) {
@@ -2474,9 +2495,9 @@ public class ContextConfig implements LifecycleListener {
      * process filter annotation and merge with existing one!
      * FIXME: refactoring method too long and has redundant subroutines with
      *        processAnnotationWebServlet!
-     * @param className
-     * @param ae
-     * @param fragment
+     * @param className The filter class name
+     * @param ae The filter annotation
+     * @param fragment The corresponding fragment
      */
     protected void processAnnotationWebFilter(String className,
             AnnotationEntry ae, WebXml fragment) {
