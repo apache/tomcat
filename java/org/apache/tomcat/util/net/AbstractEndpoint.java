@@ -107,6 +107,7 @@ public abstract class AbstractEndpoint<S,U> {
          * @deprecated Unused, will be removed in Tomcat 10, replaced
          *         by AbstractEndpoint.getConnections
          */
+        @Deprecated
         public Set<S> getOpenSockets();
 
         /**
