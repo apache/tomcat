@@ -165,6 +165,8 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
     private final OpenSSLSessionContext sessionContext;
     private final boolean alpn;
     private final boolean initialized;
+    private final int certificateVerificationDepth;
+    private final boolean certificateVerificationOptionalNoCA;
 
     private String selectedProtocol = null;
 
@@ -183,10 +185,14 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
      * otherwise
      * @param initialized {@code true} if this instance gets its protocol,
      * cipher and client verification from the {@code SSL_CTX} {@code sslCtx}
+     * @param certificateVerificationDepth Certificate verification depth
+     * @param certificateVerificationOptionalNoCA Skip CA verification in
+     *   optional mode
      */
     OpenSSLEngine(long sslCtx, String fallbackApplicationProtocol,
             boolean clientMode, OpenSSLSessionContext sessionContext, boolean alpn,
-            boolean initialized) {
+            boolean initialized, int certificateVerificationDepth,
+            boolean certificateVerificationOptionalNoCA) {
         if (sslCtx == 0) {
             throw new IllegalArgumentException(sm.getString("engine.noSSLContext"));
         }
@@ -200,6 +206,8 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         this.sessionContext = sessionContext;
         this.alpn = alpn;
         this.initialized = initialized;
+        this.certificateVerificationDepth = certificateVerificationDepth;
+        this.certificateVerificationOptionalNoCA = certificateVerificationOptionalNoCA;
     }
 
     @Override
@@ -1092,13 +1100,15 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
             }
             switch (mode) {
                 case NONE:
-                    SSL.setVerify(ssl, SSL.SSL_CVERIFY_NONE, VERIFY_DEPTH);
+                    SSL.setVerify(ssl, SSL.SSL_CVERIFY_NONE, certificateVerificationDepth);
                     break;
                 case REQUIRE:
-                    SSL.setVerify(ssl, SSL.SSL_CVERIFY_REQUIRE, VERIFY_DEPTH);
+                    SSL.setVerify(ssl, SSL.SSL_CVERIFY_REQUIRE, certificateVerificationDepth);
                     break;
                 case OPTIONAL:
-                    SSL.setVerify(ssl, SSL.SSL_CVERIFY_OPTIONAL, VERIFY_DEPTH);
+                    SSL.setVerify(ssl,
+                            certificateVerificationOptionalNoCA ? SSL.SSL_CVERIFY_OPTIONAL_NO_CA : SSL.SSL_CVERIFY_OPTIONAL,
+                            certificateVerificationDepth);
                     break;
             }
             clientAuth = mode;
