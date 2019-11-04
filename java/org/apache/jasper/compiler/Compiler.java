@@ -382,9 +382,9 @@ public abstract class Compiler {
         }
 
         try {
+            final Long jspLastModified = ctxt.getLastModified(ctxt.getJspFile());
             Map<String,SmapStratum> smaps = generateJava();
             File javaFile = new File(ctxt.getServletJavaFileName());
-            Long jspLastModified = ctxt.getLastModified(ctxt.getJspFile());
             if (!javaFile.setLastModified(jspLastModified.longValue())) {
                 throw new JasperException(Localizer.getMessage("jsp.error.setLastModified", javaFile));
             }
