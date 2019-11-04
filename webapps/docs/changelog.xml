@@ -106,6 +106,16 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Jasper">
+    <changelog>
+      <fix>
+        <bug>63897</bug>: Capture the timestamp of a JSP for the purposes of
+        modification tracking before the JSP is compiled to prevent a race
+        condition if the JSP is modified during compilation. Patch provided by
+        Karl von Randow. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Web applications">
     <changelog>
       <fix>
