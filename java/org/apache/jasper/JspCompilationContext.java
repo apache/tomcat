@@ -88,7 +88,7 @@ public class JspCompilationContext {
 
     protected volatile boolean removed = false;
 
-    protected URLClassLoader jspLoader;
+    protected volatile URLClassLoader jspLoader;
     protected URL baseUrl;
     protected Class<?> servletClass;
 
