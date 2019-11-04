@@ -22,13 +22,11 @@ package org.apache.catalina.valves.rewrite;
  * can then be used by a {@code RewriteRule} defined in the same file.
  * <p>
  * An example {@code rewrite.config} file could look like:
- * <code>
  * <pre>
  * RewriteMap uc example.UpperCaseMap
  *
  * RewriteRule ^/(.*)$ ${uc:$1}
  * </pre>
- * </code>
  *
  * One parameter can be optionally appended to the {@code RewriteMap} directive.
  * This could be used &ndash; for example &ndash; to specify a name of a file, that
