@@ -181,25 +181,6 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
      * {@link SSLEngine} belongs to.
      * @param alpn {@code true} if alpn should be used, {@code false}
      * otherwise
-     */
-    OpenSSLEngine(long sslCtx, String fallbackApplicationProtocol,
-            boolean clientMode, OpenSSLSessionContext sessionContext,
-            boolean alpn) {
-        this(sslCtx, fallbackApplicationProtocol, clientMode, sessionContext,
-             alpn, false);
-    }
-
-    /**
-     * Creates a new instance
-     *
-     * @param sslCtx an OpenSSL {@code SSL_CTX} object
-     * @param fallbackApplicationProtocol the fallback application protocol
-     * @param clientMode {@code true} if this is used for clients, {@code false}
-     * otherwise
-     * @param sessionContext the {@link OpenSSLSessionContext} this
-     * {@link SSLEngine} belongs to.
-     * @param alpn {@code true} if alpn should be used, {@code false}
-     * otherwise
      * @param initialized {@code true} if this instance gets its protocol,
      * cipher and client verification from the {@code SSL_CTX} {@code sslCtx}
      */
