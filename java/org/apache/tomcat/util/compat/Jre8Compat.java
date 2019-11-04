@@ -24,7 +24,6 @@ import java.security.KeyStore.LoadStoreParameter;
 import java.util.Collections;
 import java.util.Map;
 
-import javax.net.ssl.SSLEngine;
 import javax.net.ssl.SSLParameters;
 
 import org.apache.juli.logging.Log;
@@ -81,13 +80,11 @@ class Jre8Compat extends JreCompat {
 
 
     @Override
-    public void setUseServerCipherSuitesOrder(SSLEngine engine,
+    public void setUseServerCipherSuitesOrder(SSLParameters sslParameters,
             boolean useCipherSuitesOrder) {
-        SSLParameters sslParameters = engine.getSSLParameters();
         try {
             setUseCipherSuitesOrderMethod.invoke(sslParameters,
                     Boolean.valueOf(useCipherSuitesOrder));
-            engine.setSSLParameters(sslParameters);
         } catch (IllegalArgumentException e) {
             throw new UnsupportedOperationException(e);
         } catch (IllegalAccessException e) {

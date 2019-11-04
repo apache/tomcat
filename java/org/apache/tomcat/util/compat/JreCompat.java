@@ -81,7 +81,7 @@ public class JreCompat {
 
 
     @SuppressWarnings("unused")
-    public void setUseServerCipherSuitesOrder(SSLEngine engine, boolean useCipherSuitesOrder) {
+    public void setUseServerCipherSuitesOrder(SSLParameters engine, boolean useCipherSuitesOrder) {
         throw new UnsupportedOperationException(sm.getString("jreCompat.noServerCipherSuiteOrder"));
     }
 

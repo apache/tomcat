@@ -135,16 +135,16 @@ public abstract class AbstractJsseEndpoint<S> extends AbstractEndpoint<S> {
         engine.setEnabledCipherSuites(sslHostConfig.getEnabledCiphers());
         engine.setEnabledProtocols(sslHostConfig.getEnabledProtocols());
 
+        SSLParameters sslParameters = engine.getSSLParameters();
         String honorCipherOrderStr = sslHostConfig.getHonorCipherOrder();
         if (honorCipherOrderStr != null) {
             boolean honorCipherOrder = Boolean.parseBoolean(honorCipherOrderStr);
-            JreCompat.getInstance().setUseServerCipherSuitesOrder(engine, honorCipherOrder);
+            JreCompat.getInstance().setUseServerCipherSuitesOrder(sslParameters, honorCipherOrder);
         }
 
         if (JreCompat.isJre9Available() && clientRequestedApplicationProtocols != null
                 && clientRequestedApplicationProtocols.size() > 0
                 && negotiableProtocols.size() > 0) {
-            SSLParameters sslParameters = engine.getSSLParameters();
             // Only try to negotiate if both client and server have at least
             // one protocol in common
             // Note: Tomcat does not explicitly negotiate http/1.1
@@ -156,10 +156,9 @@ public abstract class AbstractJsseEndpoint<S> extends AbstractEndpoint<S> {
                 String[] commonProtocolsArray = commonProtocols.toArray(new String[commonProtocols.size()]);
                 JreCompat.getInstance().setApplicationProtocols(sslParameters, commonProtocolsArray);
             }
-
-            // In case the getter returns a defensive copy
-            engine.setSSLParameters(sslParameters);
         }
+        // In case the getter returns a defensive copy
+        engine.setSSLParameters(sslParameters);
 
         return engine;
     }
