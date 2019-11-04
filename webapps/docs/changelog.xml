@@ -109,6 +109,12 @@
         Move connection tracking to the endpoint, since it requires far fewer
         operations. (remm)
       </fix>
+      <fix>
+        <bug>63894</bug>: Ensure that the configured values for
+        <code>certificateVerification</code> and
+        <code>certificateVerificationDepth</code> are correctly based to the
+        OpenSSL based SSLEngine implementation. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
