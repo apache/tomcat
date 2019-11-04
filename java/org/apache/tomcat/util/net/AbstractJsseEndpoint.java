@@ -117,19 +117,6 @@ public abstract class AbstractJsseEndpoint<S,U> extends AbstractEndpoint<S,U> {
         }
 
         SSLEngine engine = sslContext.createSSLEngine();
-        switch (sslHostConfig.getCertificateVerification()) {
-        case NONE:
-            engine.setNeedClientAuth(false);
-            engine.setWantClientAuth(false);
-            break;
-        case OPTIONAL:
-        case OPTIONAL_NO_CA:
-            engine.setWantClientAuth(true);
-            break;
-        case REQUIRED:
-            engine.setNeedClientAuth(true);
-            break;
-        }
         engine.setUseClientMode(false);
         engine.setEnabledCipherSuites(sslHostConfig.getEnabledCiphers());
         engine.setEnabledProtocols(sslHostConfig.getEnabledProtocols());
@@ -151,7 +138,20 @@ public abstract class AbstractJsseEndpoint<S,U> extends AbstractEndpoint<S,U> {
                 JreCompat.getInstance().setApplicationProtocols(sslParameters, commonProtocolsArray);
             }
         }
-        // In case the getter returns a defensive copy
+        switch (sslHostConfig.getCertificateVerification()) {
+        case NONE:
+            sslParameters.setNeedClientAuth(false);
+            sslParameters.setWantClientAuth(false);
+            break;
+        case OPTIONAL:
+        case OPTIONAL_NO_CA:
+            sslParameters.setWantClientAuth(true);
+            break;
+        case REQUIRED:
+            sslParameters.setNeedClientAuth(true);
+            break;
+        }
+        // The getter (at least in OpenJDK and derivatives) returns a defensive copy
         engine.setSSLParameters(sslParameters);
 
         return engine;
