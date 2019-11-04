@@ -82,7 +82,9 @@ public class JspCompilationContext {
 
     private volatile boolean removed = false;
 
-    private URLClassLoader jspLoader;
+    // volatile so changes are visible when multiple threads request a JSP file
+    // that has been modified
+    private volatile URLClassLoader jspLoader;
     private URL baseUrl;
     private Class<?> servletClass;
 

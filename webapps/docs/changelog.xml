@@ -114,6 +114,10 @@
         condition if the JSP is modified during compilation. Patch provided by
         Karl von Randow. (markt)
       </fix>
+      <fix>
+        Fix a race condition that could mean changes to a modified JSP were not
+        visible to end users. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
