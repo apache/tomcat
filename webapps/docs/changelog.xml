@@ -147,6 +147,10 @@
         <bug>63838</bug>: Suppress reflexive access warnings when running the
         unit tests on the command line. (markt)
       </fix>
+      <add>
+        Expand the coverage and quality of the French translations provided
+        with Apache Tomcat. (remm)
+      </add>
     </changelog>
   </subsection>
 </section>
