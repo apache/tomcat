@@ -162,6 +162,10 @@
       <update>
         Update the CXF module to Apache CXF 3.3.4. (remm)
       </update>
+      <add>
+        Expand the coverage and quality of the French translations provided
+        with Apache Tomcat. (remm)
+      </add>
     </changelog>
   </subsection>
 </section>
