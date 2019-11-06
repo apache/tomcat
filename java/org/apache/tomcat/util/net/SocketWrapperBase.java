@@ -410,6 +410,7 @@ public abstract class SocketWrapperBase<E> {
                 }
             } finally {
                 getEndpoint().connections.remove(socket);
+                getEndpoint().countDownConnection();
                 doClose();
             }
         }

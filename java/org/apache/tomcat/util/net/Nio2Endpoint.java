@@ -917,7 +917,6 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
             }
             try {
                 synchronized (getSocket()) {
-                    getEndpoint().countDownConnection();
                     if (getSocket().isOpen()) {
                         getSocket().close(true);
                     }

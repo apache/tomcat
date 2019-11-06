@@ -791,7 +791,6 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
         // are closed when calling stop() followed by start().
         if (socket != 0) {
             Socket.destroy(socket);
-            countDownConnection();
         }
     }
 
