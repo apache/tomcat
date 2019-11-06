@@ -176,6 +176,10 @@
         Shen, leeyazhou, winsonzhao, qingshi huang, Lay and Shucheng Hou.
         (markt)
       </add>
+      <add>
+        Expand the coverage and quality of the Brazilian Portuguese translations
+        provided with Apache Tomcat. Patch provided by Danielamorais. (markt)
+      </add>
     </changelog>
   </subsection>
 </section>
