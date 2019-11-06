@@ -155,6 +155,12 @@
         Expand the coverage and quality of the Korean translations provided
         with Apache Tomcat. (woonsan)
       </add>
+      <add>
+        Expand the coverage and quality of the Simplified Chinese translations
+        provided with Apache Tomcat. Contributions provided by rpo130, Mason
+        Shen, leeyazhou, winsonzhao, qingshi huang, Lay and Shucheng Hou.
+        (markt)
+      </add>
     </changelog>
   </subsection>
 </section>
