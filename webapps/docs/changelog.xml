@@ -159,6 +159,9 @@
         <bug>63838</bug>: Suppress reflexive access warnings when running the
         unit tests on the command line. (markt)
       </fix>
+      <update>
+        Update the CXF module to Apache CXF 3.3.4. (remm)
+      </update>
     </changelog>
   </subsection>
 </section>
