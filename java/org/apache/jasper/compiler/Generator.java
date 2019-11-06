@@ -3273,12 +3273,18 @@ class Generator {
         }
 
         /*
-         * @param c The target class to which to coerce the given string @param
-         * s The string value @param attrName The name of the attribute whose
-         * value is being supplied @param propEditorClass The property editor
-         * for the given attribute @param isNamedAttribute true if the given
-         * attribute is a named attribute (that is, specified using the
-         * jsp:attribute standard action), and false otherwise
+         * @param c
+         *              The target class to which to coerce the given string
+         * @param s
+         *              The string value
+         * @param attrName
+         *              The name of the attribute whose value is being supplied
+         * @param propEditorClass
+         *              The property editor for the given attribute
+         * @param isNamedAttribute
+         *              true if the given attribute is a named attribute (that
+         *              is, specified using the jsp:attribute standard action),
+         *              and false otherwise
          */
         private String convertString(Class<?> c, String s, String attrName,
                 Class<?> propEditorClass, boolean isNamedAttribute) {
