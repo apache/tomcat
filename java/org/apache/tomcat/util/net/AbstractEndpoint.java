@@ -198,7 +198,7 @@ public abstract class AbstractEndpoint<S,U> {
      * @return A set with the open socket wrappers
      */
     public Set<SocketWrapperBase<S>> getConnections() {
-        return new HashSet<SocketWrapperBase<S>>(connections.values());
+        return new HashSet<>(connections.values());
     }
 
     // ----------------------------------------------------------------- Properties
