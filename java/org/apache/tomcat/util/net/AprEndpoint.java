@@ -685,7 +685,6 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
             wrapper.setSecure(isSSLEnabled());
             wrapper.setReadTimeout(getConnectionTimeout());
             wrapper.setWriteTimeout(getConnectionTimeout());
-            connections.put(socket, wrapper);
             getExecutor().execute(new SocketWithOptionsProcessor(wrapper));
             return true;
         } catch (RejectedExecutionException x) {
