@@ -320,7 +320,7 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
                 }
             }
             Nio2SocketWrapper socketWrapper = new Nio2SocketWrapper(channel, this);
-            connections.put(socketWrapper, socketWrapper);
+            connections.put(channel, socketWrapper);
             channel.reset(socket, socketWrapper);
             socketWrapper.setReadTimeout(getConnectionTimeout());
             socketWrapper.setWriteTimeout(getConnectionTimeout());

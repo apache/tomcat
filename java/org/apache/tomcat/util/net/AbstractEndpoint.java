@@ -25,6 +25,7 @@ import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -188,12 +189,16 @@ public abstract class AbstractEndpoint<S,U> {
     private ObjectName oname = null;
 
     /**
-     * Connection structure holding all current connections.
+     * Map holding all current connections keyed with the sockets (for APR).
      */
-    protected Map<SocketWrapperBase<S>, SocketWrapperBase<S>> connections = new ConcurrentHashMap<>();
+    protected Map<S, SocketWrapperBase<S>> connections = new ConcurrentHashMap<>();
 
+    /**
+     * Get a set with the current open connections.
+     * @return A set with the open socket wrappers
+     */
     public Set<SocketWrapperBase<S>> getConnections() {
-        return connections.keySet();
+        return new HashSet<SocketWrapperBase<S>>(connections.values());
     }
 
     // ----------------------------------------------------------------- Properties

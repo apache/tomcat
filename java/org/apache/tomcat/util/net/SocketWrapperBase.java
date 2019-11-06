@@ -408,9 +408,10 @@ public abstract class SocketWrapperBase<E> {
                 if (log.isDebugEnabled()) {
                     log.error(sm.getString("endpoint.debug.handlerRelease"), e);
                 }
+            } finally {
+                getEndpoint().connections.remove(socket);
+                doClose();
             }
-            getEndpoint().connections.remove(this);
-            doClose();
         }
     }
 

@@ -105,10 +105,11 @@
         <bug>63879</bug>: Remove stack trace from debug logging on socket
         wrapper close. (remm)
       </fix>
-      <fix>
-        Move connection tracking to the endpoint, since it requires far fewer
-        operations. (remm)
-      </fix>
+      <update>
+        Add connection tracking on the connector endpoint to remove excessive
+        concurrency in the protocol handler when maintaining an association
+        between the socket wrapper and its current processor. (remm)
+      </update>
       <fix>
         <bug>63894</bug>: Ensure that the configured values for
         <code>certificateVerification</code> and
