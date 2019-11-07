@@ -393,6 +393,8 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
      */
     @Override
     protected boolean setSocketOptions(SocketChannel socket) {
+        NioChannel channel = null;
+        boolean success = false;
         // Process the connection
         try {
             // Disable blocking, polling will be used
@@ -400,7 +402,6 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
             Socket sock = socket.socket();
             socketProperties.setProperties(sock);
 
-            NioChannel channel = null;
             if (nioChannels != null) {
                 channel = nioChannels.pop();
             }
@@ -414,7 +415,6 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                 } else {
                     channel = new NioChannel(bufhandler);
                 }
-            } else {
             }
             NioSocketWrapper socketWrapper = new NioSocketWrapper(channel, this);
             connections.put(channel, socketWrapper);
@@ -424,7 +424,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
             socketWrapper.setKeepAliveLeft(NioEndpoint.this.getMaxKeepAliveRequests());
             socketWrapper.setSecure(isSSLEnabled());
             poller.register(channel, socketWrapper);
-            return true;
+            success = true;
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
             try {
@@ -432,9 +432,14 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
             } catch (Throwable tt) {
                 ExceptionUtils.handleThrowable(tt);
             }
+        } finally {
+            if (!success && channel != null) {
+                connections.remove(channel);
+                channel.free();
+            }
         }
-        // Tell to close the socket
-        return false;
+        // Tell to close the socket if needed
+        return success;
     }
 
 

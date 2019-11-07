@@ -116,6 +116,9 @@
         <code>certificateVerificationDepth</code> are correctly passed to the
         OpenSSL based SSLEngine implementation. (remm/markt)
       </fix>
+      <fix>
+        Improve cleanup after errors when setting socket options. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
