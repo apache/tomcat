@@ -476,7 +476,7 @@ public class CachedResource implements WebResource {
         }
 
         private WebResource getResource() {
-            return root.getResourceInternal(webAppPath, usesClassLoaderResources);
+            return root.getResource(webAppPath, false, usesClassLoaderResources);
         }
     }
 }

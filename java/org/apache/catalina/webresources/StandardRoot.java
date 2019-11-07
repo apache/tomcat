@@ -207,7 +207,7 @@ public class StandardRoot extends LifecycleMBeanBase implements WebResourceRoot 
         return getResource(path, true, false);
     }
 
-    private WebResource getResource(String path, boolean validate,
+    protected WebResource getResource(String path, boolean validate,
             boolean useClassLoaderResources) {
         if (validate) {
             path = validate(path);
