@@ -1900,8 +1900,7 @@
     status codes and/or exception types.</p>
 
     <p><strong>NOTE:</strong> Disabling both showServerInfo and showReport will
-    only return the HTTP status code and remove all CSS from the default
-    response.</p>
+    only return the HTTP status code.</p>
 
   </subsection>
 
@@ -1922,7 +1921,7 @@
         <p>The location of the UTF-8 encoded HTML file to return for the HTTP
         error code represented by <code>nnn</code>. For example,
         <code>errorCode.404</code> specifies the file to return for an HTTP 404
-        error. The location may be relative or absolule. If relative, it must be
+        error. The location may be relative or absolute. If relative, it must be
         relative to <code>$CATALINA_BASE</code>. The special value of
         <code>errorCode.0</code> may be used to define a default error page to
         be used if no error page is defined for a status code. If no matching
