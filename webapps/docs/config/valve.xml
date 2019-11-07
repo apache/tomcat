@@ -1750,7 +1750,7 @@
     for HTTP status codes that will generate and return HTML error pages.</p>
 
     <p><strong>NOTE:</strong> Disabling both showServerInfo and showReport will
-    only return the HTTP status code and remove all CSS.</p>
+    only return the HTTP status code.</p>
 
   </subsection>
 

@@ -1482,14 +1482,18 @@ public class DefaultServlet extends HttpServlet {
         String rewrittenContextPath =  rewriteUrl(contextPath);
 
         // Render the page header
-        sb.append("<html>\r\n");
+        sb.append("<!doctype html><html>\r\n");
+        /* TODO Activate this as soon as we use smClient with the request locales
+        sb.append("<!doctype html><html lang=\"");
+        sb.append(smClient.getLocale().getLanguage()).append("\">\r\n");
+        */
         sb.append("<head>\r\n");
         sb.append("<title>");
         sb.append(sm.getString("directory.title", name));
         sb.append("</title>\r\n");
-        sb.append("<STYLE><!--");
+        sb.append("<style>");
         sb.append(org.apache.catalina.util.TomcatCSS.TOMCAT_CSS);
-        sb.append("--></STYLE> ");
+        sb.append("</style> ");
         sb.append("</head>\r\n");
         sb.append("<body>");
         sb.append("<h1>");
@@ -1519,7 +1523,7 @@ public class DefaultServlet extends HttpServlet {
         }
 
         sb.append("</h1>");
-        sb.append("<HR size=\"1\" noshade=\"noshade\">");
+        sb.append("<hr class=\"line\">");
 
         sb.append("<table width=\"100%\" cellspacing=\"0\"" +
                      " cellpadding=\"5\" align=\"center\">\r\n");
@@ -1599,12 +1603,12 @@ public class DefaultServlet extends HttpServlet {
         // Render the page footer
         sb.append("</table>\r\n");
 
-        sb.append("<HR size=\"1\" noshade=\"noshade\">");
+        sb.append("<hr class=\"line\">");
 
         String readme = getReadme(cacheEntry.context);
         if (readme!=null) {
             sb.append(readme);
-            sb.append("<HR size=\"1\" noshade=\"noshade\">");
+            sb.append("<hr class=\"line\">");
         }
 
         if (showServerInfo) {

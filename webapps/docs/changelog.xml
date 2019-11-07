@@ -70,6 +70,9 @@
         Make a best efforts attempt to clean-up if a request fails during
         processing due to an <code>OutOfMemoryException</code>. (markt)
       </fix>
+      <update>
+        <bug>63905</bug> Clean up Tomcat CSS. (michaelo)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Coyote">
