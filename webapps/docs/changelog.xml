@@ -71,6 +71,9 @@
         to this change it was possible to see an updated last modified time but
         the content would be that prior to the modification. (markt)
       </fix>
+      <update>
+        <bug>63905</bug> Clean up Tomcat CSS. (michaelo)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Coyote">
