@@ -17,13 +17,21 @@
 package org.apache.catalina.webresources;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLConnection;
+import java.net.URLStreamHandler;
+import java.security.Permission;
 import java.security.cert.Certificate;
 import java.util.jar.Manifest;
 
 import org.apache.catalina.WebResource;
 import org.apache.catalina.WebResourceRoot;
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.res.StringManager;
 
 /**
  * This class is designed to wrap a 'raw' WebResource and providing caching for
@@ -31,6 +39,9 @@ import org.apache.catalina.WebResourceRoot;
  * underlying resource.
  */
 public class CachedResource implements WebResource {
+
+    private static final Log log = LogFactory.getLog(CachedResource.class);
+    private static final StringManager sm = StringManager.getManager(CachedResource.class);
 
     // Estimate (on high side to be safe) of average size excluding content
     // based on profiler data.
@@ -314,7 +325,45 @@ public class CachedResource implements WebResource {
 
     @Override
     public URL getURL() {
-        return webResource.getURL();
+        /*
+         * We don't want applications using this URL to access the resource
+         * directly as that could lead to inconsistent results when the resource
+         * is updated on the file system but the cache entry has not yet
+         * expired. We saw this, for example, in JSP compilation.
+         * - last modified time was obtained via
+         *   ServletContext.getResource("path").openConnection().getLastModified()
+         * - JSP content was obtained via
+         *   ServletContext.getResourceAsStream("path")
+         * The result was that the JSP modification was detected but the JSP
+         * content was read from the cache so the non-updated JSP page was
+         * used to generate the .java and .class file
+         *
+         * One option to resolve this issue is to use a custom URL scheme for
+         * resource URLs. This would allow us, via registration of a
+         * URLStreamHandlerFactory, to control how the resources are accessed
+         * and ensure that all access go via the cache We took this approach for
+         * war: URLs so we can use jar:war:file: URLs to reference resources in
+         * unpacked WAR files. However, because URL.setURLStreamHandlerFactory()
+         * may only be caused once, this can cause problems when using other
+         * libraries that also want to use a custom URL scheme.
+         *
+         * The approach below allows us to insert a custom URLStreamHandler
+         * without registering a custom protocol. The only limitation (compared
+         * to registering a custom protocol) is that if the application
+         * constructs the same URL from a String, they will access the resource
+         * directly and not via the cache.
+         */
+        URL resourceURL = webResource.getURL();
+        if (resourceURL == null) {
+            return null;
+        }
+        try {
+            return new URL(null, resourceURL.toExternalForm(),
+                    new CachedResourceURLStreamHandler(resourceURL, root, webAppPath, usesClassLoaderResources));
+        } catch (MalformedURLException e) {
+            log.error(sm.getString("cachedResource.invalidURL", resourceURL.toExternalForm()), e);
+            return null;
+        }
     }
 
     @Override
@@ -354,5 +403,80 @@ public class CachedResource implements WebResource {
             result += getContentLength();
         }
         return result;
+    }
+
+
+    private static class CachedResourceURLStreamHandler extends URLStreamHandler {
+
+        private final URL resourceURL;
+        private final StandardRoot root;
+        private final String webAppPath;
+        private final boolean usesClassLoaderResources;
+
+        public CachedResourceURLStreamHandler(URL resourceURL, StandardRoot root, String webAppPath,
+                boolean usesClassLoaderResources) {
+            this.resourceURL = resourceURL;
+            this.root = root;
+            this.webAppPath = webAppPath;
+            this.usesClassLoaderResources = usesClassLoaderResources;
+        }
+
+        @Override
+        protected URLConnection openConnection(URL u) throws IOException {
+            return new CachedResourceURLConnection(resourceURL, root, webAppPath, usesClassLoaderResources);
+        }
+    }
+
+
+    private static class CachedResourceURLConnection extends URLConnection {
+
+        private final StandardRoot root;
+        private final String webAppPath;
+        private final boolean usesClassLoaderResources;
+        private final URLConnection resourceURLConnection;
+        private boolean connected;
+
+        protected CachedResourceURLConnection(URL resourceURL, StandardRoot root, String webAppPath,
+                boolean usesClassLoaderResources) throws IOException {
+            super(resourceURL);
+            this.root = root;
+            this.webAppPath = webAppPath;
+            this.usesClassLoaderResources = usesClassLoaderResources;
+            this.resourceURLConnection = url.openConnection();
+        }
+
+        @Override
+        public void connect() throws IOException {
+            if (!connected) {
+                resourceURLConnection.connect();
+                connected = true;
+            }
+        }
+
+        @Override
+        public InputStream getInputStream() throws IOException {
+            connect();
+            InputStream is = getResource().getInputStream();
+            return is;
+        }
+
+        @Override
+        public Permission getPermission() throws IOException {
+            return resourceURLConnection.getPermission();
+        }
+
+        @Override
+        public long getLastModified() {
+            return getResource().getLastModified();
+        }
+
+        @Override
+        public long getContentLengthLong() {
+            return getResource().getContentLength();
+        }
+
+        private WebResource getResource() {
+            return root.getResourceInternal(webAppPath, usesClassLoaderResources);
+        }
     }
 }

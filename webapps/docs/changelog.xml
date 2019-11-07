@@ -64,6 +64,13 @@
         Make a best efforts attempt to clean-up if a request fails during
         processing due to an <code>OutOfMemoryException</code>. (markt)
       </fix>
+      <fix>
+        Ensure that, when static resource caching is enabled for a web
+        application, all access to static files (including JSP files) goes via
+        the cache so that a consistent view of the static files is seen. Prior
+        to this change it was possible to see an updated last modified time but
+        the content would be that prior to the modification. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
