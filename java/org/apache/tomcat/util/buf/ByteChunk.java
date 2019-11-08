@@ -78,6 +78,9 @@ public final class ByteChunk extends AbstractChunk {
         /**
          * Read new bytes.
          *
+         * @param cbuf bytes that will be read
+         * @param off offset in the bytes array
+         * @param len length that will be read
          * @return The number of bytes read
          *
          * @throws IOException If an I/O error occurs during reading
@@ -140,6 +143,7 @@ public final class ByteChunk extends AbstractChunk {
 
 
     /**
+     * @return {@link #clone()}
      * @deprecated Unused. Will be removed in Tomcat 8.0.x onwards.
      */
     @Deprecated
@@ -213,6 +217,7 @@ public final class ByteChunk extends AbstractChunk {
 
 
     /**
+     * @param optimizedWrite The new setting
      * @deprecated Unused. Will be removed in Tomcat 8.0.x onwards.
      */
     @Deprecated
@@ -277,8 +282,8 @@ public final class ByteChunk extends AbstractChunk {
     /**
      * Append a char, by casting it to byte. This IS NOT intended for unicode.
      *
-     * @param c
-     * @throws IOException
+     * @param c The character to append
+     * @throws IOException If the buffer is flushed and an I/O error occurs
      * @deprecated Unused. Will be removed in Tomcat 8.0.x onwards.
      */
     @Deprecated
@@ -369,6 +374,10 @@ public final class ByteChunk extends AbstractChunk {
 
 
     /**
+     * @param src To fill
+     * @return Count of bytes transferred
+     * @throws IOException If an I/O occurs obtaining more data to fill the
+     *                     supplied ByteChunk
      * @deprecated Unused. Will be removed in Tomcat 8.0.x onwards.
      */
     @Deprecated
@@ -522,6 +531,7 @@ public final class ByteChunk extends AbstractChunk {
 
 
     /**
+     * @return The content parsed as an int
      * @deprecated Unused. Will be removed in Tomcat 8.0.x onwards.
      */
     @Deprecated
@@ -650,10 +660,9 @@ public final class ByteChunk extends AbstractChunk {
 
 
     /**
-     * Returns true if the buffer starts with the specified string when tested
-     * in a case sensitive manner.
-     *
      * @param s the string
+     * @return true if the buffer starts with the specified string when tested
+     * in a case sensitive manner.
      * @deprecated Unused. Will be removed in Tomcat 8.0.x onwards.
      */
     @Deprecated
@@ -675,7 +684,8 @@ public final class ByteChunk extends AbstractChunk {
 
 
     /**
-     * Returns true if the message bytes start with the specified byte array.
+     * @param b2 The byte array to look for
+     * @return true if the message bytes start with the specified byte array.
      *
      * @deprecated Unused. Will be removed in Tomcat 8.0.x onwards.
      */
@@ -755,6 +765,7 @@ public final class ByteChunk extends AbstractChunk {
 
 
     /**
+     * @return Hash for lower case version of contents
      * @deprecated Unused. Will be removed in Tomcat 8.0.x onwards.
      */
     @Deprecated

@@ -36,16 +36,6 @@ import org.apache.catalina.tribes.util.ExecutorFactory;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
-/**
- * <p>Title: </p>
- *
- * <p>Description: </p>
- *
- * <p>Company: </p>
- *
- * @author not attributable
- * @version 1.0
- */
 public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, RxTaskPool.TaskCreator {
 
     public static final int OPTION_DIRECT_BUFFER = 0x0004;
@@ -224,7 +214,7 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
      * @param portstart     Starting port for bind attempts
      * @param retries       Number of times to attempt to bind (port incremented
      *                      between attempts)
-     * @throws IOException
+     * @throws IOException Socket bind error
      */
     protected void bind(ServerSocket socket, int portstart, int retries) throws IOException {
         synchronized (bindLock) {
@@ -252,11 +242,12 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
 
     /**
      * Same as bind() except it does it for the UDP port
-     * @param socket
-     * @param portstart
-     * @param retries
-     * @return int
-     * @throws IOException
+     * @param socket    The socket to bind
+     * @param portstart Starting port for bind attempts
+     * @param retries   Number of times to attempt to bind (port incremented
+     *                  between attempts)
+     * @return int The retry count
+     * @throws IOException Socket bind error
      */
     protected int bindUdp(DatagramSocket socket, int portstart, int retries) throws IOException {
         InetSocketAddress addr = null;

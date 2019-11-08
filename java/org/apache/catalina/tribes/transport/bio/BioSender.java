@@ -30,23 +30,24 @@ import org.apache.catalina.tribes.transport.AbstractSender;
 import org.apache.catalina.tribes.transport.Constants;
 import org.apache.catalina.tribes.transport.SenderState;
 import org.apache.catalina.tribes.util.StringManager;
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 
 /**
  * Send cluster messages with only one socket. Ack and keep Alive Handling is
  * supported
  *
  * @author Peter Rossbach
- * @author Filip Hanik
  * @since 5.5.16
  */
 public class BioSender extends AbstractSender {
 
-    private static final org.apache.juli.logging.Log log = org.apache.juli.logging.LogFactory.getLog(BioSender.class);
+    private static final Log log = LogFactory.getLog(BioSender.class);
 
     /**
      * The string manager for this package.
      */
-    protected static final StringManager sm = StringManager.getManager(Constants.Package);
+    protected static final StringManager sm = StringManager.getManager(BioSender.class);
 
     // ----------------------------------------------------- Instance Variables
 
@@ -76,7 +77,7 @@ public class BioSender extends AbstractSender {
     // ------------------------------------------------------------- Properties
 
     /**
-     * Return descriptive information about this implementation and the
+     * @return descriptive information about this implementation and the
      * corresponding version number, in the format
      * <code>&lt;description&gt;/&lt;version&gt;</code>.
      */
@@ -147,9 +148,6 @@ public class BioSender extends AbstractSender {
     }
 
 
-    /**
-     * Name of this SockerSender
-     */
     @Override
     public String toString() {
         StringBuilder buf = new StringBuilder("DataSender[(");
@@ -161,8 +159,9 @@ public class BioSender extends AbstractSender {
     // --------------------------------------------------------- Protected Methods
 
     /**
-     * open real socket and set time out when waitForAck is enabled
-     * is socket open return directly
+     * Open real socket and set time out when waitForAck is enabled
+     * is socket open return directly.
+     * @throws IOException Error opening socket
      */
     protected void openSocket() throws IOException {
        if(isConnected()) return ;
@@ -233,8 +232,10 @@ public class BioSender extends AbstractSender {
      * @see #openSocket()
      * @see #sendMessage(byte[], boolean)
      *
-     * @param data
-     *            data to send
+     * @param data Data to send
+     * @param reconnect Do a reconnect (close socket then reopen)
+     * @param waitForAck Wait for an acknowledgement
+     * @throws IOException IO error writing data
      * @since 5.5.10
      */
 
@@ -252,8 +253,7 @@ public class BioSender extends AbstractSender {
     /**
      * Wait for Acknowledgement from other server.
      * FIXME Please, not wait only for three characters, better control that the wait ack message is correct.
-     * @throws java.io.IOException
-     * @throws java.net.SocketTimeoutException
+     * @throws IOException An IO error occurred
      */
     protected void waitForAck() throws java.io.IOException {
         try {
