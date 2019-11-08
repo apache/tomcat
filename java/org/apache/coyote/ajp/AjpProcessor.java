@@ -395,20 +395,24 @@ public class AjpProcessor extends AbstractProcessor {
 
         int soTimeout = endpoint.getConnectionTimeout();
         boolean cping = false;
-
-        boolean keptAlive = false;
+        // Expected to block on the first read as there should be at least one
+        // AJP message to read.
+        boolean firstRead = true;
 
         while (!getErrorState().isError() && !endpoint.isPaused()) {
             // Parsing the request header
             try {
                 // Get first message of the request
-                if (!readMessage(requestHeaderMessage, !keptAlive)) {
+                if (!readMessage(requestHeaderMessage, firstRead)) {
                     break;
                 }
+                firstRead = false;
+
                 // Set back timeout if keep alive timeout is enabled
                 if (keepAliveTimeout > 0) {
                     socketWrapper.setReadTimeout(soTimeout);
                 }
+
                 // Check message type, process right away and break if
                 // not regular request processing
                 int type = requestHeaderMessage.getByte();
@@ -435,7 +439,6 @@ public class AjpProcessor extends AbstractProcessor {
                     setErrorState(ErrorState.CLOSE_CONNECTION_NOW, null);
                     break;
                 }
-                keptAlive = true;
                 request.setStartTime(System.currentTimeMillis());
             } catch (IOException e) {
                 setErrorState(ErrorState.CLOSE_CONNECTION_NOW, e);

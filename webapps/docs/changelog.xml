@@ -115,6 +115,12 @@
         <code>certificateVerificationDepth</code> are correctly passed to the
         OpenSSL based SSLEngine implementation. (remm/markt)
       </fix>
+      <fix>
+        Do not perform a blocking read after a <code>CPING</code> message is
+        received by the AJP connector because, if the JK Connector is configured
+        with <code>ping_mode=&quot;I&quot;</code>, the <code>CPING</code>
+        message will not always be followed by the start of a request. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
