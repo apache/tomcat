@@ -50,6 +50,10 @@ import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.LogRecord;
 import java.util.regex.Pattern;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 
 /**
  * Implementation of <b>Handler</b> that appends log messages to a file
@@ -216,6 +220,12 @@ public class FileHandler extends Handler {
     private Boolean rotatable;
 
 
+	/**
+     * Determines whether the log file should be compressed
+     */
+    private Boolean compress;
+	
+
     /**
      * Maximum number of days to keep the log files
      */
@@ -337,7 +347,11 @@ public class FileHandler extends Handler {
             writer.write(getFormatter().getTail(this));
             writer.flush();
             writer.close();
-            writer = null;
+			if(compress) {
+				compress();
+				deleteRotatedFile();
+			}
+			writer = null;
             date = "";
         } catch (Exception e) {
             reportError(null, e, ErrorManager.CLOSE_FAILURE);
@@ -345,8 +359,41 @@ public class FileHandler extends Handler {
             writerLock.writeLock().unlock();
         }
     }
-
-
+	
+	
+		
+    /**
+     * Compress the file during the rotation.
+     */
+	public synchronized void compress() throws IOException {
+		    File dir = new File(directory);
+		    File currentLogFile = new File(dir.getAbsoluteFile(), prefix
+                    + (rotatable.booleanValue() ? date : "") + suffix);
+			try (GZIPOutputStream out = new GZIPOutputStream(new FileOutputStream(currentLogFile+".gz"))){
+            try (FileInputStream in = new FileInputStream(currentLogFile)){
+                byte[] buffer = new byte[1024];
+                int len;
+                while((len=in.read(buffer)) != -1){
+                    out.write(buffer, 0, len);
+                }
+            }
+        }
+    }
+	
+	/**
+     * delete the file after is bieng compressed.
+     */
+	private void deleteRotatedFile() {
+		File dir = new File(directory);
+		File currentLogFile = new File(dir.getAbsoluteFile(), prefix
+                    + (rotatable.booleanValue() ? date : "") + suffix);
+        if (!currentLogFile.delete()) {
+            reportError("Unable to delete current log files days", null,
+                        ErrorManager.GENERIC_FAILURE);
+        }
+        return;
+    }
+	
     /**
      * Flush the writer.
      */
@@ -393,6 +440,9 @@ public class FileHandler extends Handler {
         if (suffix == null) {
             suffix = getProperty(className + ".suffix", ".log");
         }
+		if (compress == null) {
+			compress = Boolean.valueOf(getProperty(className + ".compress", "true"));
+		}
 
         // https://bz.apache.org/bugzilla/show_bug.cgi?id=61232
         boolean shouldCheckForRedundantSeparator =
