@@ -695,6 +695,8 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
             // the pool and its queue are full
             log.error(sm.getString("endpoint.process.fail"), t);
         }
+        // Note: doing connections.remove is not needed since closeSocket will
+        // be called, which then calls close on the wrapper
         return false;
     }
 
