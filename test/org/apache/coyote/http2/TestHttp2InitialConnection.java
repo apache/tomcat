@@ -127,7 +127,7 @@ public class TestHttp2InitialConnection extends Http2TestBase {
             int statusHeaderLength = sm
                     .getString("errorReportValve.statusHeader", "", "")
                     .getBytes(StandardCharsets.UTF_8).length;
-            int len = 1073 + serverInfoLength + statusHeaderLength * 2;
+            int len = 708 + serverInfoLength + statusHeaderLength * 2;
             String contentLength = String.valueOf(len);
             return getResponseBodyFrameTrace(streamId,
                     testData.getExpectedStatus(), "text/html;charset=utf-8",
