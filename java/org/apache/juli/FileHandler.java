@@ -365,21 +365,27 @@ public class FileHandler extends Handler {
     /**
      * Compress the file during the rotation.
      */
-	public synchronized void compress() throws IOException {
+	public synchronized void compress(){
 		    File dir = new File(directory);
 		    File currentLogFile = new File(dir.getAbsoluteFile(), prefix
                     + (rotatable.booleanValue() ? date : "") + suffix);
-			try (GZIPOutputStream out = new GZIPOutputStream(new FileOutputStream(currentLogFile+".gz"))){
-            try (FileInputStream in = new FileInputStream(currentLogFile)){
-                byte[] buffer = new byte[1024];
-                int len;
-                while((len=in.read(buffer)) != -1){
-                    out.write(buffer, 0, len);
+			byte[] buffer = new byte[1024];
+			try {
+				GZIPOutputStream out = new GZIPOutputStream(new FileOutputStream(currentLogFile+".gz"));
+				FileInputStream in = new FileInputStream(currentLogFile);
+                int lenght;
+                while((lenght=in.read(buffer)) != -1) {
+                    out.write(buffer, 0, lenght);
                 }
+				in.close();
+				out.finish();
+				out.close();
+            } catch (IOException e) {
+                reportError("Unable to rotate log file", null,
+                        ErrorManager.GENERIC_FAILURE);
             }
         }
-    }
-	
+    	
 	/**
      * delete the file after is bieng compressed.
      */
@@ -388,7 +394,7 @@ public class FileHandler extends Handler {
 		File currentLogFile = new File(dir.getAbsoluteFile(), prefix
                     + (rotatable.booleanValue() ? date : "") + suffix);
         if (!currentLogFile.delete()) {
-            reportError("Unable to delete current log files days", null,
+            reportError("Unable to delete current log file", null,
                         ErrorManager.GENERIC_FAILURE);
         }
         return;

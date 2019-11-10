@@ -483,25 +483,34 @@ public class AccessLogValve extends AbstractAccessLogValve {
     }
     
     
-    /** compress the file
-     * 
+    /** Compress the file after being rotated , it
+	 *	Intended to be called inside the close function 
+	 *  of the AccessLogValve class
      */
-    public synchronized void compress() throws IOException {
+    public synchronized void compress(){
 		
-			try (GZIPOutputStream out = new GZIPOutputStream(new FileOutputStream(currentLogFile +".gz"))){
-            try (FileInputStream in = new FileInputStream(currentLogFile)){
+			try {
+				GZIPOutputStream out = new GZIPOutputStream(new FileOutputStream(currentLogFile +".gz"));
+				FileInputStream in = new FileInputStream(currentLogFile);
                 byte[] buffer = new byte[1024];
-                int len;
-                while((len=in.read(buffer)) != -1){
-                    out.write(buffer, 0, len);
-                }
-            }
+                int lenght;
+                while((lenght=in.read(buffer)) != -1) {
+                    out.write(buffer, 0, lenght);
+                } 
+				in.close();
+				out.finish();
+				out.close();
+            } catch (IOException e) {
+				log.error(sm.getString("accessLogValve.RotateFail", currentLogFile), e);
+			}
         }
-    }
-	
-	
-
+    
     // -------------------------------------------------------- Private Methods
+	
+	/** delete the file after being compressed , it
+	  *	Intended to be called inside the close function
+	  *	of the AccessLogValve class
+     */
 	
 	private void deleteRotatedFile() {
         if (!currentLogFile.delete()) {
