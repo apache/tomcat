@@ -20,6 +20,7 @@ package org.apache.catalina.valves;
 import java.io.BufferedWriter;
 import java.io.CharArrayWriter;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
@@ -31,6 +32,10 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
+
+import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
+
 
 import org.apache.catalina.LifecycleException;
 import org.apache.juli.logging.Log;
@@ -432,15 +437,13 @@ public class AccessLogValve extends AbstractAccessLogValve {
                 synchronized(this) {
                     if ((systime - rotationLastChecked) > 1000) {
                         rotationLastChecked = systime;
-
-                        String tsDate;
+						String tsDate;
                         // Check for a change of date
                         tsDate = fileDateFormatter.format(new Date(systime));
-
                         // If the date has changed, switch log files
                         if (!dateStamp.equals(tsDate)) {
                             close(true);
-                            dateStamp = tsDate;
+							dateStamp = tsDate;
                             open();
                         }
                     }
@@ -462,9 +465,9 @@ public class AccessLogValve extends AbstractAccessLogValve {
         if (currentLogFile != null) {
             File holder = currentLogFile;
             close(false);
-            try {
-                holder.renameTo(new File(newFileName));
-            } catch (Throwable e) {
+			try {
+				holder.renameTo(new File(newFileName));
+			} catch (Throwable e) {
                 ExceptionUtils.handleThrowable(e);
                 log.error(sm.getString("accessLogValve.rotateFail"), e);
             }
@@ -474,15 +477,42 @@ public class AccessLogValve extends AbstractAccessLogValve {
                     new Date(System.currentTimeMillis()));
 
             open();
+			
             return true;
         } else {
             return false;
         }
 
     }
+    
+    
+    /** compress the file
+     * 
+     */
+    public synchronized void compress() throws IOException {
+		
+			try (GZIPOutputStream out = new GZIPOutputStream(new FileOutputStream(currentLogFile +".gz"))){
+            try (FileInputStream in = new FileInputStream(currentLogFile)){
+                byte[] buffer = new byte[1024];
+                int len;
+                while((len=in.read(buffer)) != -1){
+                    out.write(buffer, 0, len);
+                }
+            }
+        }
+    }
+	
+	
 
     // -------------------------------------------------------- Private Methods
-
+	
+	private void deleteRotatedFile() {
+        if (!currentLogFile.delete()) {
+            log.error(sm.getString("accessLogValve.DeleteLogFail", currentLogFile));
+        }
+        return;
+    }
+	
 
     private File getDirectoryFile() {
         File dir = new File(directory);
@@ -556,6 +586,7 @@ public class AccessLogValve extends AbstractAccessLogValve {
         }
         writer.flush();
         writer.close();
+
         if (rename && renameOnRotate) {
             File newLogFile = getLogFile(true);
             if (!newLogFile.exists()) {
@@ -571,11 +602,20 @@ public class AccessLogValve extends AbstractAccessLogValve {
                 log.error(sm.getString("accessLogValve.alreadyExists", currentLogFile, newLogFile));
             }
         }
+		
+		try {
+			compress();
+			deleteRotatedFile();
+		} catch (Throwable e) {
+			ExceptionUtils.handleThrowable(e);
+			log.error(sm.getString("accessLogValve.compressFail"), e);
+		}
+
+		
         writer = null;
         dateStamp = "";
         currentLogFile = null;
     }
-
 
     /**
      * Log the specified message to the log file, switching files if the date
@@ -587,7 +627,7 @@ public class AccessLogValve extends AbstractAccessLogValve {
     public void log(CharArrayWriter message) {
 
         rotate();
-
+		
         /* In case something external rotated the file instead */
         if (checkExists) {
             synchronized (this) {
@@ -624,8 +664,8 @@ public class AccessLogValve extends AbstractAccessLogValve {
                     "accessLogValve.writeFail", message.toString()), ioe);
         }
     }
-
-
+    
+    
     /**
      * Open the new log file for the date specified by <code>dateStamp</code>.
      */
