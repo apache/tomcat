@@ -14,10 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.catalina;
-
 
 import java.beans.PropertyChangeListener;
 import java.io.IOException;
@@ -81,7 +78,6 @@ import org.apache.juli.logging.Log;
  * @author Craig R. McClanahan
  * @author Remy Maucherat
  */
-
 public interface Container extends Lifecycle {
 
 
@@ -136,7 +132,6 @@ public interface Container extends Lifecycle {
 
     // ------------------------------------------------------------- Properties
 
-
     /**
      * Return descriptive information about this Container implementation and
      * the corresponding version number, in the format
@@ -162,9 +157,11 @@ public interface Container extends Lifecycle {
 
 
     /**
-     * Return the Logger with which this Container is associated.  If there is
-     * no associated Logger, return the Logger associated with our parent
-     * Container (if any); otherwise return <code>null</code>.
+     * Obtain the log to which events for this container should be logged.
+     *
+     * @return The Logger with which this Container is associated.  If there is
+     *         no associated Logger, return the Logger associated with the
+     *         parent Container (if any); otherwise return <code>null</code>.
      */
     public Log getLogger();
 
@@ -193,21 +190,27 @@ public interface Container extends Lifecycle {
 
 
     /**
-     * Return the JMX name associated with this container.
+     * Obtain the JMX name for this container.
+     *
+     * @return the JMX name associated with this container.
      */
     public ObjectName getObjectName();
 
     /**
      * Return the Pipeline object that manages the Valves associated with
      * this Container.
+     *
+     * @return The Pipeline
      */
     public Pipeline getPipeline();
 
 
     /**
-     * Return the Cluster with which this Container is associated.  If there is
-     * no associated Cluster, return the Cluster associated with our parent
-     * Container (if any); otherwise return <code>null</code>.
+     * Get the Cluster for this container.
+     *
+     * @return The Cluster with which this Container is associated. If there is
+     *         no associated Cluster, return the Cluster associated with our
+     *         parent Container (if any); otherwise return <code>null</code>.
      */
     public Cluster getCluster();
 
@@ -222,12 +225,17 @@ public interface Container extends Lifecycle {
 
     /**
      * Get the delay between the invocation of the backgroundProcess method on
-     * this container and its children. Child containers will not be invoked
-     * if their delay value is not negative (which would mean they are using
-     * their own thread). Setting this to a positive value will cause
-     * a thread to be spawn. After waiting the specified amount of time,
-     * the thread will invoke the executePeriodic method on this container
-     * and all its children.
+     * this container and its children. Child containers will not be invoked if
+     * their delay value is positive (which would mean they are using their own
+     * thread). Setting this to a positive value will cause a thread to be
+     * spawned. After waiting the specified amount of time, the thread will
+     * invoke the {@link #backgroundProcess()} method on this container and all
+     * children with non-positive delay values.
+     *
+     * @return The delay between the invocation of the backgroundProcess method
+     *         on this container and its children. A non-positive value
+     *         indicates that background processing will be managed by the
+     *         parent.
      */
     public int getBackgroundProcessorDelay();
 
@@ -246,6 +254,8 @@ public interface Container extends Lifecycle {
      * Return a name string (suitable for use by humans) that describes this
      * Container.  Within the set of child containers belonging to a particular
      * parent, Container names must be unique.
+     *
+     * @return The human readable name of this container.
      */
     public String getName();
 
@@ -265,8 +275,11 @@ public interface Container extends Lifecycle {
 
 
     /**
-     * Return the Container for which this Container is a child, if there is
-     * one.  If there is no defined parent, return <code>null</code>.
+     * Get the parent container.
+     *
+     * @return Return the Container for which this Container is a child, if
+     *         there is one. If there is no defined parent, return
+     *         <code>null</code>.
      */
     public Container getParent();
 
@@ -286,9 +299,11 @@ public interface Container extends Lifecycle {
 
 
     /**
-     * Return the parent class loader for this component. If not set, return
-     * {@link #getParent()} {@link #getParentClassLoader()}. If no parent has
-     * been set, return the system class loader.
+     * Get the parent class loader.
+     *
+     * @return the parent class loader for this component. If not set, return
+     *         {@link #getParent()}.{@link #getParentClassLoader()}. If no
+     *         parent has been set, return the system class loader.
      */
     public ClassLoader getParentClassLoader();
 
@@ -305,9 +320,11 @@ public interface Container extends Lifecycle {
 
 
     /**
-     * Return the Realm with which this Container is associated.  If there is
-     * no associated Realm, return the Realm associated with our parent
-     * Container (if any); otherwise return <code>null</code>.
+     * Obtain the Realm with which this Container is associated.
+     *
+     * @return The associated Realm; if there is no associated Realm, the
+     *         Realm associated with the parent Container (if any); otherwise
+     *         return <code>null</code>.
      */
     public Realm getRealm();
 
@@ -384,25 +401,31 @@ public interface Container extends Lifecycle {
 
 
     /**
-     * Return the child Container, associated with this Container, with
-     * the specified name (if any); otherwise, return <code>null</code>
+     * Obtain a child Container by name.
      *
      * @param name Name of the child Container to be retrieved
+     *
+     * @return The child Container with the given name or <code>null</code> if
+     *         no such child exists.
      */
     public Container findChild(String name);
 
 
     /**
-     * Return the set of children Containers associated with this Container.
-     * If this Container has no children, a zero-length array is returned.
+     * Obtain the child Containers associated with this Container.
+     *
+     * @return An array containing all children of this container. If this
+     *         Container has no children, a zero-length array is returned.
      */
     public Container[] findChildren();
 
 
     /**
-     * Return the set of container listeners associated with this Container.
-     * If this Container has no registered container listeners, a zero-length
-     * array is returned.
+     * Obtain the container listeners associated with this Container.
+     *
+     * @return An array containing the container listeners associated with this
+     *         Container. If this Container has no registered container
+     *         listeners, a zero-length array is returned.
      */
     public ContainerListener[] findContainerListeners();
 
@@ -478,17 +501,24 @@ public interface Container extends Lifecycle {
 
 
     /**
-     * Identify the AccessLog to use to log a request/response that was destined
-     * for this container but was handled earlier in the processing chain so
-     * that the request/response still appears in the correct access logs.
+     * Obtain the AccessLog to use to log a request/response that is destined
+     * for this container. This is typically used when the request/response was
+     * handled (and rejected) earlier in the processing chain so that the
+     * request/response still appears in the correct access logs.
+     *
+     * @return The AccessLog to use for a request/response destined for this
+     *         container
      */
     public AccessLog getAccessLog();
 
 
     /**
-     * Returns the number of threads available for starting and stopping any
+     * Obtain the number of threads available for starting and stopping any
      * children associated with this container. This allows start/stop calls to
      * children to be processed in parallel.
+     *
+     * @return The currently configured number of threads used to start/stop
+     *         children associated with this container
      */
     public int getStartStopThreads();
 
