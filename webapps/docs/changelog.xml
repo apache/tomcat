@@ -74,6 +74,12 @@
       <update>
         <bug>63905</bug> Clean up Tomcat CSS. (michaelo)
       </update>
+      <fix>
+        <bug>63909</bug>: When the <code>ExpiresFilter</code> is used without a
+        default and the response is served by the Default Servlet, ensure that
+        the filter processes the response if the Default Servlet sets a 304 (Not
+        Found) status code. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

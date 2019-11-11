@@ -40,6 +40,7 @@ import javax.servlet.WriteListener;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletResponseWrapper;
+import javax.servlet.http.MappingMatch;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -379,7 +380,7 @@ import org.apache.juli.logging.LogFactory;
  * {@link #isEligibleToExpirationHeaderGeneration(HttpServletRequest, XHttpServletResponse)}
  * </li>
  * <li>
- * {@link #getExpirationDate(XHttpServletResponse)}</li>
+ * {@link #getExpirationDate(HttpServletRequest, XHttpServletResponse)}</li>
  * </ul>
  * <h2>Troubleshooting</h2>
  * <p>
@@ -1247,22 +1248,57 @@ public class ExpiresFilter extends FilterBase {
         return excludedResponseStatusCodes;
     }
 
+
     /**
-     * <p>
      * Returns the expiration date of the given {@link XHttpServletResponse} or
      * {@code null} if no expiration date has been configured for the
      * declared content type.
-     * </p>
      * <p>
      * {@code protected} for extension.
-     * </p>
      *
-     * @param response The Servlet response
+     * @param response The wrapped HTTP response
+     *
+     * @return the expiration date
+     * @see HttpServletResponse#getContentType()
+     *
+     * @deprecated  Will be removed in Tomcat 10.
+     *              Use {@link #getExpirationDate(HttpServletRequest, XHttpServletResponse)}
+     */
+    @Deprecated
+    protected Date getExpirationDate(XHttpServletResponse response) {
+        return getExpirationDate((HttpServletRequest) null, response);
+    }
+
+
+    /**
+     * Returns the expiration date of the given {@link XHttpServletResponse} or
+     * {@code null} if no expiration date has been configured for the
+     * declared content type.
+     * <p>
+     * {@code protected} for extension.
+     *
+     * @param request  The HTTP request
+     * @param response The wrapped HTTP response
+     *
      * @return the expiration date
      * @see HttpServletResponse#getContentType()
      */
-    protected Date getExpirationDate(XHttpServletResponse response) {
+    protected Date getExpirationDate(HttpServletRequest request, XHttpServletResponse response) {
         String contentType = response.getContentType();
+        if (contentType == null && request != null &&
+                request.getHttpServletMapping().getMappingMatch() == MappingMatch.DEFAULT &&
+                response.getStatus() == HttpServletResponse.SC_NOT_MODIFIED) {
+            // Default servlet normally sets the content type but does not for
+            // 304 responses. Look it up.
+            String servletPath = request.getServletPath();
+            if (servletPath != null) {
+                int lastSlash = servletPath.lastIndexOf('/');
+                if (lastSlash > -1) {
+                    String fileName = servletPath.substring(lastSlash + 1);
+                    contentType = request.getServletContext().getMimeType(fileName);
+                }
+            }
+        }
         if (contentType != null) {
             contentType = contentType.toLowerCase(Locale.ENGLISH);
         }
@@ -1485,7 +1521,7 @@ public class ExpiresFilter extends FilterBase {
             return;
         }
 
-        Date expirationDate = getExpirationDate(response);
+        Date expirationDate = getExpirationDate(request, response);
         if (expirationDate == null) {
             if (log.isDebugEnabled()) {
                 log.debug(sm.getString("expiresFilter.noExpirationConfigured",
