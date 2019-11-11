@@ -19,9 +19,6 @@ package org.apache.jasper.compiler;
 
 import java.io.IOException;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.jsp.JspException;
@@ -183,10 +180,7 @@ public class TestGenerator extends TomcatBaseTest {
         getTomcatInstanceTestWebapp(false, true);
 
         ByteChunk res = new ByteChunk();
-        Map<String,List<String>> headers = new HashMap<>();
-
-        getUrl("http://localhost:" + getPort() + "/test/bug49nnn/bug49799.jsp",
-                res, headers);
+        getUrl("http://localhost:" + getPort() + "/test/bug49nnn/bug49799.jsp", res, null);
 
         // Check request completed
         String result = res.toString();

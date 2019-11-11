@@ -18,7 +18,6 @@
 package org.apache.catalina.filters;
 
 import java.io.IOException;
-import java.net.HttpURLConnection;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
@@ -368,12 +367,13 @@ public class TestExpiresFilter extends TomcatBaseTest {
 
     protected void validate(HttpServlet servlet, Integer expectedMaxAgeInSeconds)
             throws Exception {
-        validate(servlet, expectedMaxAgeInSeconds, HttpURLConnection.HTTP_OK);
+        validate(servlet, expectedMaxAgeInSeconds, HttpServletResponse.SC_OK);
     }
 
     protected void validate(HttpServlet servlet,
             Integer expectedMaxAgeInSeconds, int expectedResponseStatusCode)
             throws Exception {
+
         // SETUP
 
         Tomcat tomcat = getTomcatInstance();
@@ -429,11 +429,7 @@ public class TestExpiresFilter extends TomcatBaseTest {
 
             Integer actualMaxAgeInSeconds;
 
-            String cacheControlHeader = null;
-            List<String> cacheControlHeaders = responseHeaders.get("Cache-Control");
-            if (cacheControlHeaders != null && cacheControlHeaders.size() == 1) {
-                cacheControlHeader = cacheControlHeaders.get(0);
-            }
+            String cacheControlHeader = getSingleHeader("Cache-Control", responseHeaders);
 
             if (cacheControlHeader == null) {
                 actualMaxAgeInSeconds = null;
@@ -465,11 +461,7 @@ public class TestExpiresFilter extends TomcatBaseTest {
 
             Assert.assertNotNull(actualMaxAgeInSeconds);
 
-            String contentType = null;
-            List<String> contentTypeHeaders = responseHeaders.get("Content-Type");
-            if (contentTypeHeaders != null && contentTypeHeaders.size() == 1) {
-                contentType = contentTypeHeaders.get(0);
-            }
+            String contentType = getSingleHeader("Content-Type", responseHeaders);
 
             int deltaInSeconds = Math.abs(actualMaxAgeInSeconds.intValue() -
                     expectedMaxAgeInSeconds.intValue());

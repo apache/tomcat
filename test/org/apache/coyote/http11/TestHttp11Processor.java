@@ -401,10 +401,9 @@ public class TestHttp11Processor extends TomcatBaseTest {
                 responseHeaders);
 
         Assert.assertEquals(HttpServletResponse.SC_OK, rc);
-        Assert.assertTrue(responseHeaders.containsKey("Transfer-Encoding"));
-        List<String> encodings = responseHeaders.get("Transfer-Encoding");
-        Assert.assertEquals(1, encodings.size());
-        Assert.assertEquals("chunked", encodings.get(0));
+
+        String transferEncoding = getSingleHeader("Transfer-Encoding", responseHeaders);
+        Assert.assertEquals("chunked", transferEncoding);
     }
 
     @Test
@@ -430,10 +429,8 @@ public class TestHttp11Processor extends TomcatBaseTest {
 
         Assert.assertEquals(HttpServletResponse.SC_OK, rc);
 
-        Assert.assertTrue(responseHeaders.containsKey("Connection"));
-        List<String> connections = responseHeaders.get("Connection");
-        Assert.assertEquals(1, connections.size());
-        Assert.assertEquals("close", connections.get(0));
+        String connection = getSingleHeader("Connection", responseHeaders);
+        Assert.assertEquals("close", connection);
 
         Assert.assertFalse(responseHeaders.containsKey("Transfer-Encoding"));
 
@@ -463,9 +460,7 @@ public class TestHttp11Processor extends TomcatBaseTest {
         tomcat.start();
 
         ByteChunk responseBody = new ByteChunk();
-        Map<String,List<String>> responseHeaders = new HashMap<>();
-        int rc = getUrl("http://localhost:" + getPort() + "/test", responseBody,
-                responseHeaders);
+        int rc = getUrl("http://localhost:" + getPort() + "/test", responseBody, null);
 
         Assert.assertEquals(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, rc);
         if (responseBody.getLength() > 0) {
@@ -992,8 +987,8 @@ public class TestHttp11Processor extends TomcatBaseTest {
         int rc = getUrl("http://localhost:" + getPort() + "/test", responseBody, responseHeaders);
 
         Assert.assertEquals(HttpServletResponse.SC_RESET_CONTENT, rc);
-        Assert.assertNotNull(responseHeaders.get("Content-Length"));
-        Assert.assertTrue("0".equals(responseHeaders.get("Content-Length").get(0)));
+        String contentLength = getSingleHeader("Content-Length", responseHeaders);
+        Assert.assertEquals("0", contentLength);
         Assert.assertTrue(responseBody.getLength() == 0);
     }
 

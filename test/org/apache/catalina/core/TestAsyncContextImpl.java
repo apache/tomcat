@@ -21,8 +21,6 @@ import java.io.PrintWriter;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
@@ -65,6 +63,7 @@ import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.catalina.valves.TesterAccessLogValve;
 import org.apache.tomcat.unittest.TesterContext;
 import org.apache.tomcat.util.buf.ByteChunk;
+import org.apache.tomcat.util.collections.CaseInsensitiveKeyMap;
 import org.apache.tomcat.util.descriptor.web.ErrorPage;
 import org.easymock.EasyMock;
 
@@ -231,14 +230,12 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
 
         // Call the servlet once
         ByteChunk bc = new ByteChunk();
-        Map<String,List<String>> headers = new HashMap<>();
+        Map<String,List<String>> headers = new CaseInsensitiveKeyMap<>();
         getUrl("http://localhost:" + getPort() + "/", bc, headers);
 
         Assert.assertEquals("OK", bc.toString());
-        List<String> contentLength = headers.get("Content-Length");
-        Assert.assertNotNull(contentLength);
-        Assert.assertEquals(1,  contentLength.size());
-        Assert.assertEquals("2", contentLength.get(0));
+        String contentLength = getSingleHeader("Content-Length", headers);
+        Assert.assertEquals("2", contentLength);
 
         // Check the access log
         alv.validateAccessLog(1, 200, 0, REQUEST_TIME);
@@ -1170,15 +1167,13 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         tomcat.start();
 
         // Call the servlet once
-        Map<String,List<String>> headers = new LinkedHashMap<>();
+        Map<String,List<String>> headers = new CaseInsensitiveKeyMap<>();
         ByteChunk bc = new ByteChunk();
         int rc = getUrl("http://localhost:" + getPort() + "/", bc, headers);
         Assert.assertEquals(200, rc);
         Assert.assertEquals("OK", bc.toString());
-        List<String> testHeader = headers.get("A");
-        Assert.assertNotNull(testHeader);
-        Assert.assertEquals(1, testHeader.size());
-        Assert.assertEquals("xyz",testHeader.get(0));
+        String testHeader = getSingleHeader("A", headers);
+        Assert.assertEquals("xyz",testHeader);
 
         // Check the access log
         alv.validateAccessLog(1, 200, Bug50753Servlet.THREAD_SLEEP_TIME,
