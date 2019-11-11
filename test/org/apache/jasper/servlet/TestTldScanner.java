@@ -84,7 +84,8 @@ public class TestTldScanner extends TomcatBaseTest {
 
 
         // Check content type
-        Assert.assertTrue(headers.get("Content-Type").get(0).startsWith("text/html"));
+        String contentType = getSingleHeader("Content-Type", headers);
+        Assert.assertTrue(contentType.startsWith("text/html"));
     }
 
 

@@ -120,9 +120,7 @@ public class TestAddCharSetFilter extends TomcatBaseTest {
         Map<String, List<String>> headers = new HashMap<>();
         getUrl("http://localhost:" + getPort() + "/", new ByteChunk(), headers);
 
-        List<String> ctHeaders = headers.get("Content-Type");
-        Assert.assertEquals(1, ctHeaders.size());
-        String ct = ctHeaders.get(0).toLowerCase(Locale.ENGLISH);
+        String ct = getSingleHeader("Content-Type", headers).toLowerCase(Locale.ENGLISH);
         Assert.assertEquals("text/plain;charset=" + expected.toLowerCase(Locale.ENGLISH), ct);
     }
 

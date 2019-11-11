@@ -31,6 +31,7 @@ import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.buf.ByteChunk;
+import org.apache.tomcat.util.collections.CaseInsensitiveKeyMap;
 
 public class TestHttpServlet extends TomcatBaseTest {
 
@@ -92,13 +93,13 @@ public class TestHttpServlet extends TomcatBaseTest {
 
         tomcat.start();
 
-        Map<String,List<String>> resHeaders= new HashMap<>();
+        Map<String,List<String>> resHeaders= new CaseInsensitiveKeyMap<>();
         String path = "http://localhost:" + getPort() + "/outer";
         ByteChunk out = new ByteChunk();
 
         int rc = getUrl(path, out, resHeaders);
         Assert.assertEquals(HttpServletResponse.SC_OK, rc);
-        String length = resHeaders.get("Content-Length").get(0);
+        String length = getSingleHeader("Content-Length", resHeaders);
         Assert.assertEquals(Long.parseLong(length), out.getLength());
         out.recycle();
 
@@ -124,7 +125,7 @@ public class TestHttpServlet extends TomcatBaseTest {
 
         tomcat.start();
 
-        Map<String,List<String>> getHeaders = new HashMap<>();
+        Map<String,List<String>> getHeaders = new CaseInsensitiveKeyMap<>();
         String path = "http://localhost:" + getPort() + "/chunking";
         ByteChunk out = new ByteChunk();
 

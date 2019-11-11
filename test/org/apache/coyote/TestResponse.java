@@ -59,10 +59,9 @@ public class TestResponse extends TomcatBaseTest {
                 responseHeaders);
 
         Assert.assertEquals(HttpServletResponse.SC_OK, rc);
-        Assert.assertTrue(responseHeaders.containsKey("Content-Type"));
-        List<String> contentType = responseHeaders.get("Content-Type");
-        Assert.assertEquals(1, contentType.size());
-        Assert.assertEquals("text/plain;charset=uTf-8", contentType.get(0));
+
+        String contentType = getSingleHeader("Content-Type", responseHeaders);
+        Assert.assertEquals("text/plain;charset=uTf-8", contentType);
     }
 
 
@@ -117,15 +116,14 @@ public class TestResponse extends TomcatBaseTest {
         int rc = getUrl(uri.toString(), responseBody, responseHeaders);
 
         Assert.assertEquals(HttpServletResponse.SC_OK, rc);
-        Assert.assertTrue(responseHeaders.containsKey("Content-Type"));
-        List<String> contentType = responseHeaders.get("Content-Type");
-        Assert.assertEquals(1, contentType.size());
+
+        String contentType = getSingleHeader("Content-Type", responseHeaders);
         StringBuilder expected = new StringBuilder("text/plain;");
         if (withSpace) {
             expected.append(" ");
         }
         expected.append("v=1;charset=UTF-8");
-        Assert.assertEquals(expected.toString() , contentType.get(0));
+        Assert.assertEquals(expected.toString() , contentType);
     }
 
 

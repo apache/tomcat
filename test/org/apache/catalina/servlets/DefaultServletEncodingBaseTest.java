@@ -200,9 +200,9 @@ public abstract class DefaultServletEncodingBaseTest extends TomcatBaseTest {
         int rc = getUrl(target, res, headers);
 
         Assert.assertEquals(HttpServletResponse.SC_OK, rc);
-        List<String> values = headers.get("Content-Type");
-        if (values != null && values.size() == 1) {
-            MediaType mediaType = MediaType.parseMediaType(new StringReader(values.get(0)));
+        String contentType = getSingleHeader("Content-Type", headers);
+        if (contentType != null) {
+            MediaType mediaType = MediaType.parseMediaType(new StringReader(contentType));
             String charset = mediaType.getCharset();
             if (charset == null) {
                 res.setCharset(B2CConverter.getCharset(outputEncoding));

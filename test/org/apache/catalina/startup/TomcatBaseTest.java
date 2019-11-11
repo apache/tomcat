@@ -693,8 +693,13 @@ public abstract class TomcatBaseTest extends LoggingBaseTest {
         connection.connect();
         int rc = connection.getResponseCode();
         if (resHead != null) {
-            Map<String, List<String>> head = connection.getHeaderFields();
-            resHead.putAll(head);
+            // Skip the entry with null key that is used for the response line
+            // that some Map implementations may not accept.
+            for (Map.Entry<String, List<String>> entry : connection.getHeaderFields().entrySet()) {
+                if (entry.getKey() != null) {
+                    resHead.put(entry.getKey(), entry.getValue());
+                }
+            }
         }
         InputStream is;
         if (rc < 400) {
@@ -822,6 +827,29 @@ public abstract class TomcatBaseTest extends LoggingBaseTest {
         } else {
             return statusLine.substring(9, 12);
         }
+    }
+
+    protected static String getSingleHeader(String header, Map<String,List<String>> headers) {
+        // Assume headers is never null
+
+        // Assume that either:
+        // a) is correct since HTTP headers are case insensitive but most Map
+        //    implementations are case-sensitive; or
+        // b) CaseInsensitiveKeyMap or similar is used
+        List<String> headerValues = headers.get(header);
+
+        // Looking for a single header. No matches are OK
+        if (headerValues == null) {
+            return null;
+        }
+
+        // Found a single header - return the header value
+        if (headerValues.size() == 1) {
+            return headerValues.get(0);
+        }
+
+        // More than one header value is an error
+        throw new IllegalStateException("Found multiple headers for [" + header + "]");
     }
 
     private static class TomcatWithFastSessionIDs extends Tomcat {
