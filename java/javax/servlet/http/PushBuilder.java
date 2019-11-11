@@ -134,8 +134,8 @@ public interface PushBuilder {
      * fields are set to {@code null}:
      * <ul>
      * <li>{@code path}</li>
-     * <li>{@code etag}</li>
-     * <li>{@code lastModified}</li>
+     * <li>conditional request headers ({@code if-none-match} and
+     *     {@code if-modified-since})</li>
      * </ul>
      *
      * @throws IllegalStateException If this method is called when {@code path}
