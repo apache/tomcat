@@ -165,7 +165,7 @@ public final class CharChunk extends AbstractChunk implements CharSequence {
 
     // -------------------- Adding data to the buffer --------------------
 
-    public void append(char b) throws IOException {
+    public void append(char c) throws IOException {
         makeSpace(1);
         int limit = getLimitInternal();
 
@@ -173,7 +173,7 @@ public final class CharChunk extends AbstractChunk implements CharSequence {
         if (end >= limit) {
             flushBuffer();
         }
-        buff[end++] = b;
+        buff[end++] = c;
     }
 
 

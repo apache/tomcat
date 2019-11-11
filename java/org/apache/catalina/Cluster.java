@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.catalina;
 
 /**
@@ -40,6 +39,7 @@ public interface Cluster {
      * @return The name of the cluster associated with this server
      */
     public String getClusterName();
+
 
     /**
      * Set the name of the cluster to join, if no cluster with
@@ -76,6 +76,7 @@ public interface Cluster {
      * @return The newly created Manager instance
      */
     public Manager createManager(String name);
+
 
     /**
      * Register a manager with the cluster. If the cluster is not responsible
