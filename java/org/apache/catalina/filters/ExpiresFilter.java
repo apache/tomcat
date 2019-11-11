@@ -35,13 +35,14 @@ import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.ServletRequest;
+import javax.servlet.ServletRequestWrapper;
 import javax.servlet.ServletResponse;
 import javax.servlet.WriteListener;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletResponseWrapper;
-import javax.servlet.http.MappingMatch;
 
+import org.apache.catalina.servlet4preview.http.MappingMatch;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
@@ -1285,17 +1286,28 @@ public class ExpiresFilter extends FilterBase {
      */
     protected Date getExpirationDate(HttpServletRequest request, XHttpServletResponse response) {
         String contentType = response.getContentType();
-        if (contentType == null && request != null &&
-                request.getHttpServletMapping().getMappingMatch() == MappingMatch.DEFAULT &&
-                response.getStatus() == HttpServletResponse.SC_NOT_MODIFIED) {
-            // Default servlet normally sets the content type but does not for
-            // 304 responses. Look it up.
-            String servletPath = request.getServletPath();
-            if (servletPath != null) {
-                int lastSlash = servletPath.lastIndexOf('/');
-                if (lastSlash > -1) {
-                    String fileName = servletPath.substring(lastSlash + 1);
-                    contentType = request.getServletContext().getMimeType(fileName);
+        if (contentType == null && request != null) {
+            ServletRequest innerRequest = request;
+            while (innerRequest instanceof ServletRequestWrapper) {
+                innerRequest = ((ServletRequestWrapper) innerRequest).getRequest();
+            }
+
+            if (innerRequest instanceof org.apache.catalina.servlet4preview.http.HttpServletRequest) {
+                org.apache.catalina.servlet4preview.http.HttpServletRequest servlet4Request =
+                        (org.apache.catalina.servlet4preview.http.HttpServletRequest) request;
+
+                if (servlet4Request.getServletMapping().getMappingMatch() == MappingMatch.DEFAULT &&
+                        response.getStatus() == HttpServletResponse.SC_NOT_MODIFIED) {
+                    // Default servlet normally sets the content type but does not for
+                    // 304 responses. Look it up.
+                    String servletPath = request.getServletPath();
+                    if (servletPath != null) {
+                        int lastSlash = servletPath.lastIndexOf('/');
+                        if (lastSlash > -1) {
+                            String fileName = servletPath.substring(lastSlash + 1);
+                            contentType = request.getServletContext().getMimeType(fileName);
+                        }
+                    }
                 }
             }
         }
