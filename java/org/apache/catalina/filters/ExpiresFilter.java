@@ -1296,7 +1296,7 @@ public class ExpiresFilter extends FilterBase {
                 org.apache.catalina.servlet4preview.http.HttpServletRequest servlet4Request =
                         (org.apache.catalina.servlet4preview.http.HttpServletRequest) request;
 
-                if (servlet4Request.getServletMapping().getMappingMatch() == MappingMatch.DEFAULT &&
+                if (servlet4Request.getHttpServletMapping().getMappingMatch() == MappingMatch.DEFAULT &&
                         response.getStatus() == HttpServletResponse.SC_NOT_MODIFIED) {
                     // Default servlet normally sets the content type but does not for
                     // 304 responses. Look it up.

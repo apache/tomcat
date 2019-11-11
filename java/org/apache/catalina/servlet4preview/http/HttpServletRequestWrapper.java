@@ -18,7 +18,7 @@ package org.apache.catalina.servlet4preview.http;
 
 
 /**
- * Provides early access to some parts of the proposed Servlet 4.0 API.
+ * Provides early access to some parts of the Servlet 4.0 API.
  */
 public class HttpServletRequestWrapper extends javax.servlet.http.HttpServletRequestWrapper
         implements HttpServletRequest {
@@ -40,23 +40,23 @@ public class HttpServletRequestWrapper extends javax.servlet.http.HttpServletReq
     }
 
     /**
-     * {@inheritDoc}
-     * <p>
      * The default behavior of this method is to return
-     * {@link HttpServletRequest#getServletMapping()} on the wrapped request object.
+     * {@link HttpServletRequest#getHttpServletMapping()} on the wrapped request
+     * object.
      *
      * @since Servlet 4.0
      */
     @Override
-    public ServletMapping getServletMapping() {
-        return this._getHttpServletRequest().getServletMapping();
+    public HttpServletMapping getHttpServletMapping() {
+        return this._getHttpServletRequest().getHttpServletMapping();
     }
 
     /**
      * {@inheritDoc}
      * <p>
      * The default behavior of this method is to return
-     * {@link HttpServletRequest#newPushBuilder()} on the wrapped request object.
+     * {@link HttpServletRequest#newPushBuilder()} on the wrapped request
+     * object.
      *
      * @since Servlet 4.0
      */

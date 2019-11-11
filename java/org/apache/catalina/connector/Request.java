@@ -81,8 +81,8 @@ import org.apache.catalina.core.ApplicationPushBuilder;
 import org.apache.catalina.core.ApplicationSessionCookieConfig;
 import org.apache.catalina.core.AsyncContextImpl;
 import org.apache.catalina.mapper.MappingData;
+import org.apache.catalina.servlet4preview.http.HttpServletMapping;
 import org.apache.catalina.servlet4preview.http.PushBuilder;
-import org.apache.catalina.servlet4preview.http.ServletMapping;
 import org.apache.catalina.util.ParameterMap;
 import org.apache.catalina.util.TLSUtil;
 import org.apache.catalina.util.URLEncoder;
@@ -2298,8 +2298,8 @@ public class Request implements org.apache.catalina.servlet4preview.http.HttpSer
 
 
     @Override
-    public ServletMapping getServletMapping() {
-        return applicationMapping.getServletMapping();
+    public HttpServletMapping getHttpServletMapping() {
+        return applicationMapping.getHttpServletMapping();
     }
 
 

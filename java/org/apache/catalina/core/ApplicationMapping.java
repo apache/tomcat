@@ -17,30 +17,30 @@
 package org.apache.catalina.core;
 
 import org.apache.catalina.mapper.MappingData;
+import org.apache.catalina.servlet4preview.http.HttpServletMapping;
 import org.apache.catalina.servlet4preview.http.MappingMatch;
-import org.apache.catalina.servlet4preview.http.ServletMapping;
 
 public class ApplicationMapping {
 
     private final MappingData mappingData;
 
-    private volatile ServletMapping mapping = null;
+    private volatile HttpServletMapping mapping = null;
 
     public ApplicationMapping(MappingData mappingData) {
         this.mappingData = mappingData;
     }
 
-    public ServletMapping getServletMapping() {
+    public HttpServletMapping getHttpServletMapping() {
         if (mapping == null) {
-            if (mappingData == null) {
-                mapping = new MappingImpl("", "", MappingMatch.UNKNOWN, "");
+            String servletName;
+            if (mappingData.wrapper == null) {
+                servletName = "";
             } else {
-                String servletName;
-                if (mappingData.wrapper == null) {
-                    servletName = "";
-                } else {
-                    servletName = mappingData.wrapper.getName();
-                }
+                servletName = mappingData.wrapper.getName();
+            }
+            if (mappingData.matchType == null) {
+                mapping = new MappingImpl("", "", null, servletName);
+            } else {
                 switch (mappingData.matchType) {
                     case CONTEXT_ROOT:
                         mapping = new MappingImpl("", "", mappingData.matchType, servletName);
@@ -65,12 +65,8 @@ public class ApplicationMapping {
                         } else {
                             matchValue = mappingData.pathInfo.toString().substring(1);
                         }
-                        mapping = new MappingImpl(matchValue,
-                                mappingData.wrapperPath.toString() + "/*",
+                        mapping = new MappingImpl(matchValue, mappingData.wrapperPath.toString() + "/*",
                                 mappingData.matchType, servletName);
-                        break;
-                    case UNKNOWN:
-                        mapping = new MappingImpl("", "", mappingData.matchType, servletName);
                         break;
                 }
             }
@@ -83,7 +79,7 @@ public class ApplicationMapping {
         mapping = null;
     }
 
-    private static class MappingImpl implements ServletMapping {
+    private static class MappingImpl implements HttpServletMapping {
 
         private final String matchValue;
         private final String pattern;

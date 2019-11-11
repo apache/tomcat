@@ -80,6 +80,11 @@
         the filter processes the response if the Default Servlet sets a 304 (Not
         Found) status code. (markt)
       </fix>
+      <fix>
+        Update the Servlet 4 preview API to reflect changes made to the API in
+        the final release. Note that this preview API has deprecated for over a
+        year and may be removed as soon as the next 8.5.x release. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
