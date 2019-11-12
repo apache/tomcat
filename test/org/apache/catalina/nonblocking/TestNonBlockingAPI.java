@@ -192,11 +192,15 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         int readSinceLastPause = 0;
         while (read != -1) {
             read = is.read(buffer);
+            if (readSinceLastPause == 0) {
+                log.info("Reading data");
+            }
             if (read > 0) {
                 result.append(buffer, 0, read);
             }
             readSinceLastPause += read;
             if (readSinceLastPause > WRITE_SIZE / 16) {
+                log.info("Read " + readSinceLastPause + " bytes, pause 500ms");
                 readSinceLastPause = 0;
                 Thread.sleep(500);
             }
