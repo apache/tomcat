@@ -338,7 +338,12 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
                 intermediateMessageHandler,
                 new EndMessageHandler(this, handler), -1));
 
-        messageParts = transformation.sendMessagePart(messageParts);
+        try {
+            messageParts = transformation.sendMessagePart(messageParts);
+        } catch (IOException ioe) {
+            handler.onResult(new SendResult(ioe));
+            return;
+        }
 
         // Some extensions/transformations may buffer messages so it is possible
         // that no message parts will be returned. If this is the case the
