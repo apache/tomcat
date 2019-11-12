@@ -59,7 +59,7 @@ public final class UDecoder {
     }
 
     /** Unexpected end of data. */
-    private static final IOException EXCEPTION_EOF = new DecodeException("EOF");
+    private static final IOException EXCEPTION_EOF = new DecodeException(sm.getString("uDecoder.eof"));
 
     /** %xx with not-hex digit */
     private static final IOException EXCEPTION_NOT_HEX_DIGIT = new DecodeException(
@@ -129,7 +129,6 @@ public final class UDecoder {
 
         mb.setEnd( idx );
 
-        return;
     }
 
     // -------------------- Additional methods --------------------
@@ -284,7 +283,7 @@ public final class UDecoder {
                 char res = (char) Integer.parseInt(
                         str.substring(strPos + 1, strPos + 3), 16);
                 if (noSlash && (res == '/')) {
-                    throw new IllegalArgumentException("noSlash");
+                    throw new IllegalArgumentException(sm.getString("uDecoder.noSlash"));
                 }
                 dec.append(res);
                 strPos += 3;
