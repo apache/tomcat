@@ -195,6 +195,10 @@
         <bug>63838</bug>: Suppress reflexive access warnings when running the
         unit tests on the command line. (markt)
       </fix>
+      <fix>
+        Add missing charsets from the HPE JVM on HP-UX to pass unit tests in
+        <code>org.apache.tomcat.util.buf.TestCharsetCache</code>. (michaelo)
+      </fix>
       <update>
         Update the CXF module to Apache CXF 3.3.4. (remm)
       </update>
