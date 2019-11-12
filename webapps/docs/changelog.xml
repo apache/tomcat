@@ -151,6 +151,17 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="WebSocket">
+    <changelog>
+      <fix>
+        <bug>63913</bug>: Wrap any <code>NullPointerException</code>s throw by
+        the <code>Inflater</code> or <code>Deflater</code> used by the
+        <code>PerMessageDeflate</code> extension in an <code>IOException</code>
+        so that the error can be caught and handled by the WebSocket error
+        handling mechanism. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Web applications">
     <changelog>
       <fix>
