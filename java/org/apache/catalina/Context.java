@@ -1415,6 +1415,7 @@ public interface Context extends Container, ContextBind {
      */
     public JspConfigDescriptor getJspConfigDescriptor();
 
+
     /**
      * Set the JspConfigDescriptor for this context.
      * A null value indicates there is not JSP configuration.
@@ -1422,6 +1423,7 @@ public interface Context extends Container, ContextBind {
      * @param descriptor the new JSP configuration
      */
     public void setJspConfigDescriptor(JspConfigDescriptor descriptor);
+
 
     /**
      * Add a ServletContainerInitializer instance to this web application.
@@ -1432,6 +1434,7 @@ public interface Context extends Container, ContextBind {
      */
     public void addServletContainerInitializer(
             ServletContainerInitializer sci, Set<Class<?>> classes);
+
 
     /**
      * Is this Context paused whilst it is reloaded?
@@ -1447,6 +1450,7 @@ public interface Context extends Container, ContextBind {
      * @return <code>true</code> for a legacy Servlet 2.2 webapp
      */
     boolean isServlet22();
+
 
     /**
      * Notification that Servlet security has been dynamically set in a
@@ -1503,7 +1507,7 @@ public interface Context extends Container, ContextBind {
     /**
      * @return The version of this web application, used to differentiate
      * different versions of the same web application when using parallel
-     * deployment.
+     * deployment. If not specified, defaults to the empty string.
      */
     public String getWebappVersion();
 

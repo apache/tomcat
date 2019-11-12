@@ -16,7 +16,6 @@
  */
 package org.apache.catalina;
 
-
 import java.util.EventObject;
 
 /**
@@ -91,7 +90,7 @@ public final class ContainerEvent extends EventObject {
      */
     @Override
     public String toString() {
-        return ("ContainerEvent['" + getContainer() + "','" +
-                getType() + "','" + getData() + "']");
+        return "ContainerEvent['" + getContainer() + "','" +
+                getType() + "','" + getData() + "']";
     }
 }
