@@ -149,7 +149,9 @@ public class CharsetCache {
             "29626c", "833", "cp29626c", "ibm-1140", "ibm-1141", "ibm-1142", "ibm-1143", "ibm-1144", "ibm-1145",
             "ibm-1146", "ibm-1147", "ibm-1148", "ibm-1149", "ibm-29626c", "ibm-858", "ibm-eucjp", "ibm1140", "ibm1141",
             "ibm1142", "ibm1143", "ibm1144", "ibm1145", "ibm1146", "ibm1147", "ibm1148", "ibm1149", "ibm29626c",
-            "ibm858", "x-ibm29626c"
+            "ibm858", "x-ibm29626c",
+            // Added from HPE JVM 1.8.0.17-hp-ux
+            "cp1051", "cp1386", "cshproman8", "hp-roman8", "ibm-1051", "r8", "roman8", "roman9"
             };
 
     private static final Charset DUMMY_CHARSET = new DummyCharset("Dummy",  null);
