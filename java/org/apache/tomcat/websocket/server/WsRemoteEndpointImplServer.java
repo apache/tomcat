@@ -51,7 +51,6 @@ public class WsRemoteEndpointImplServer extends WsRemoteEndpointImplBase {
     private volatile ByteBuffer[] buffers = null;
 
     private volatile long timeoutExpiry = -1;
-    private volatile boolean close;
 
     public WsRemoteEndpointImplServer(SocketWrapperBase<?> socketWrapper,
             WsServerContainer serverContainer) {
@@ -103,9 +102,6 @@ public class WsRemoteEndpointImplServer extends WsRemoteEndpointImplBase {
                             } else {
                                 wsWriteTimeout.unregister(WsRemoteEndpointImplServer.this);
                                 clearHandler(null, true);
-                                if (close) {
-                                    close();
-                                }
                             }
                         }
                         @Override
@@ -185,9 +181,6 @@ public class WsRemoteEndpointImplServer extends WsRemoteEndpointImplBase {
                     if (complete) {
                         wsWriteTimeout.unregister(this);
                         clearHandler(null, useDispatch);
-                        if (close) {
-                            close();
-                        }
                     }
                     break;
                 }
