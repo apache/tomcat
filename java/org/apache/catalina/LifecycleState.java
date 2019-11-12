@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.catalina;
 
 /**
@@ -71,14 +70,14 @@ public enum LifecycleState {
      * <li>{@link #STOPPING_PREP}</li>
      * <li>{@link #MUST_STOP}</li>
      * </ul>
+     *
+     * @return <code>true</code> if the component is available for use,
+     *         otherwise <code>false</code>
      */
     public boolean isAvailable() {
         return available;
     }
 
-    /**
-     *
-     */
     public String getLifecycleEvent() {
         return lifecycleEvent;
     }

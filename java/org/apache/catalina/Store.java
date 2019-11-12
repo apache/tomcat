@@ -34,12 +34,10 @@ import java.io.IOException;
  */
 public interface Store {
 
-
     // ------------------------------------------------------------- Properties
 
-
     /**
-     * Return descriptive information about this Store implementation and
+     * @return descriptive information about this Store implementation and
      * the corresponding version number, in the format
      * <code>&lt;description&gt;/&lt;version&gt;</code>.
      */
@@ -47,7 +45,7 @@ public interface Store {
 
 
     /**
-     * Return the Manager instance associated with this Store.
+     * @return the Manager instance associated with this Store.
      */
     public Manager getManager();
 
@@ -61,7 +59,7 @@ public interface Store {
 
 
     /**
-     * Return the number of Sessions present in this Store.
+     * @return the number of Sessions present in this Store.
      *
      * @exception IOException if an input/output error occurs
      */
@@ -80,7 +78,7 @@ public interface Store {
 
 
     /**
-     * Return an array containing the session identifiers of all Sessions
+     * @return an array containing the session identifiers of all Sessions
      * currently saved in this Store.  If there are no such Sessions, a
      * zero-length array is returned.
      *
@@ -98,6 +96,7 @@ public interface Store {
      *
      * @exception ClassNotFoundException if a deserialization error occurs
      * @exception IOException if an input/output error occurs
+     * @return the loaded Session instance
      */
     public Session load(String id)
         throws ClassNotFoundException, IOException;
@@ -117,6 +116,8 @@ public interface Store {
 
     /**
      * Remove all Sessions from this Store.
+     *
+     * @exception IOException if an input/output error occurs
      */
     public void clear() throws IOException;
 

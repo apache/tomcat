@@ -133,7 +133,7 @@ public interface Container extends Lifecycle {
     // ------------------------------------------------------------- Properties
 
     /**
-     * Return descriptive information about this Container implementation and
+     * @return descriptive information about this Container implementation and
      * the corresponding version number, in the format
      * <code>&lt;description&gt;/&lt;version&gt;</code>.
      */
@@ -141,7 +141,7 @@ public interface Container extends Lifecycle {
 
 
     /**
-     * Return the Loader with which this Container is associated.  If there is
+     * @return the Loader with which this Container is associated.  If there is
      * no associated Loader, return the Loader associated with our parent
      * Container (if any); otherwise, return <code>null</code>.
      */
@@ -167,7 +167,7 @@ public interface Container extends Lifecycle {
 
 
     /**
-     * Return the Manager with which this Container is associated.  If there is
+     * @return the Manager with which this Container is associated.  If there is
      * no associated Manager, return the Manager associated with our parent
      * Container (if any); otherwise return <code>null</code>.
      */
@@ -183,7 +183,7 @@ public interface Container extends Lifecycle {
 
 
     /**
-     * Return an object which may be utilized for mapping to this component.
+     * @return an object which may be utilized for mapping to this component.
      */
     @Deprecated
     public Object getMappingObject();
@@ -338,7 +338,7 @@ public interface Container extends Lifecycle {
 
 
     /**
-     * Return the Resources with which this Container is associated.  If there
+     * @return Resources with which this Container is associated.  If there
      * is no associated Resources object, return the Resources associated with
      * our parent Container (if any); otherwise return <code>null</code>.
      */

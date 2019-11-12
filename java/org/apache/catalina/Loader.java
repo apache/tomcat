@@ -14,13 +14,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.catalina;
 
-
 import java.beans.PropertyChangeListener;
-
 
 /**
  * A <b>Loader</b> represents a Java ClassLoader implementation that can
@@ -51,11 +47,7 @@ import java.beans.PropertyChangeListener;
  *
  * @author Craig R. McClanahan
  */
-
 public interface Loader {
-
-
-    // ------------------------------------------------------------- Properties
 
 
     /**
@@ -67,13 +59,13 @@ public interface Loader {
 
 
     /**
-     * Return the Java class loader to be used by this Container.
+     * @return the Java class loader to be used by this Container.
      */
     public ClassLoader getClassLoader();
 
 
     /**
-     * Return the Container with which this Loader has been associated.
+     * @return the Container with which this Loader has been associated.
      */
     public Container getContainer();
 
@@ -87,7 +79,7 @@ public interface Loader {
 
 
     /**
-     * Return the "follow standard delegation model" flag used to configure
+     * @return the "follow standard delegation model" flag used to configure
      * our ClassLoader.
      */
     public boolean getDelegate();
@@ -103,7 +95,7 @@ public interface Loader {
 
 
     /**
-     * Return descriptive information about this Loader implementation and
+     * @return descriptive information about this Loader implementation and
      * the corresponding version number, in the format
      * <code>&lt;description&gt;/&lt;version&gt;</code>.
      */
@@ -111,7 +103,7 @@ public interface Loader {
 
 
     /**
-     * Return the reloadable flag for this Loader.
+     * @return the reloadable flag for this Loader.
      */
     public boolean getReloadable();
 
@@ -122,9 +114,6 @@ public interface Loader {
      * @param reloadable The new reloadable flag
      */
     public void setReloadable(boolean reloadable);
-
-
-    // --------------------------------------------------------- Public Methods
 
 
     /**
@@ -144,7 +133,7 @@ public interface Loader {
 
 
     /**
-     * Return the set of repositories defined for this class loader.
+     * @return the set of repositories defined for this class loader.
      * If none are defined, a zero-length array is returned.
      */
     public String[] findRepositories();
@@ -153,6 +142,9 @@ public interface Loader {
     /**
      * Has the internal repository associated with this Loader been modified,
      * such that the loaded classes should be reloaded?
+     *
+     * @return <code>true</code> when the repository has been modified,
+     *         <code>false</code> otherwise
      */
     public boolean modified();
 
@@ -163,6 +155,4 @@ public interface Loader {
      * @param listener The listener to remove
      */
     public void removePropertyChangeListener(PropertyChangeListener listener);
-
-
 }

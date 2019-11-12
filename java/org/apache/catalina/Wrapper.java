@@ -62,7 +62,7 @@ public interface Wrapper extends Container {
 
 
     /**
-     * Return the available date/time for this servlet, in milliseconds since
+     * @return the available date/time for this servlet, in milliseconds since
      * the epoch.  If this date/time is in the future, any request for this
      * servlet will return an SC_SERVICE_UNAVAILABLE error.  If it is zero,
      * the servlet is currently available.  A value equal to Long.MAX_VALUE
@@ -83,7 +83,7 @@ public interface Wrapper extends Container {
 
 
     /**
-     * Return the load-on-startup order value (negative value means
+     * @return the load-on-startup order value (negative value means
      * load on first call).
      */
     public int getLoadOnStartup();
@@ -99,7 +99,7 @@ public interface Wrapper extends Container {
 
 
     /**
-     * Return the run-as identity for this servlet.
+     * @return the run-as identity for this servlet.
      */
     public String getRunAs();
 
@@ -113,7 +113,7 @@ public interface Wrapper extends Container {
 
 
     /**
-     * Return the fully qualified servlet class name for this servlet.
+     * @return the fully qualified servlet class name for this servlet.
      */
     public String getServletClass();
 
@@ -134,25 +134,29 @@ public interface Wrapper extends Container {
      * servlet.
      *
      * @return Array of names of the methods supported by the underlying
-     * servlet
+     *         servlet
+     *
+     * @throws ServletException If the target servlet cannot be loaded
      */
     public String[] getServletMethods() throws ServletException;
 
 
     /**
-     * Is this servlet currently unavailable?
+     * @return <code>true</code> if this Servlet is currently unavailable.
      */
     public boolean isUnavailable();
 
 
     /**
-     * Return the associated servlet instance.
+     * @return the associated Servlet instance.
      */
     public Servlet getServlet();
 
 
     /**
-     * Set the associated servlet instance
+     * Set the associated Servlet instance
+     *
+     * @param servlet The associated Servlet
      */
     public void setServlet(Servlet servlet);
 
@@ -196,16 +200,17 @@ public interface Wrapper extends Container {
 
     /**
      * Allocate an initialized instance of this Servlet that is ready to have
-     * its <code>service()</code> method called.  If the servlet class does
+     * its <code>service()</code> method called.  If the Servlet class does
      * not implement <code>SingleThreadModel</code>, the (only) initialized
-     * instance may be returned immediately.  If the servlet class implements
+     * instance may be returned immediately.  If the Servlet class implements
      * <code>SingleThreadModel</code>, the Wrapper implementation must ensure
      * that this instance is not allocated again until it is deallocated by a
      * call to <code>deallocate()</code>.
      *
-     * @exception ServletException if the servlet init() method threw
+     * @exception ServletException if the Servlet init() method threw
      *  an exception
      * @exception ServletException if a loading error occurs
+     * @return a new Servlet instance
      */
     public Servlet allocate() throws ServletException;
 
@@ -223,7 +228,7 @@ public interface Wrapper extends Container {
 
 
     /**
-     * Return the value for the specified initialization parameter name,
+     * @return the value for the specified initialization parameter name,
      * if any; otherwise return <code>null</code>.
      *
      * @param name Name of the requested initialization parameter
@@ -232,20 +237,20 @@ public interface Wrapper extends Container {
 
 
     /**
-     * Return the names of all defined initialization parameters for this
+     * @return the names of all defined initialization parameters for this
      * servlet.
      */
     public String[] findInitParameters();
 
 
     /**
-     * Return the mappings associated with this wrapper.
+     * @return the mappings associated with this wrapper.
      */
     public String[] findMappings();
 
 
     /**
-     * Return the security role link for the specified security role
+     * @return the security role link for the specified security role
      * reference name, if any; otherwise return <code>null</code>.
      *
      * @param name Security role reference used within this servlet
@@ -254,7 +259,7 @@ public interface Wrapper extends Container {
 
 
     /**
-     * Return the set of security role reference names associated with
+     * @return the set of security role reference names associated with
      * this servlet, if any; otherwise return a zero-length array.
      */
     public String[] findSecurityReferences();
@@ -267,20 +272,19 @@ public interface Wrapper extends Container {
 
 
     /**
-     * Load and initialize an instance of this servlet, if there is not already
+     * Load and initialize an instance of this Servlet, if there is not already
      * at least one initialized instance.  This can be used, for example, to
-     * load servlets that are marked in the deployment descriptor to be loaded
+     * load Servlets that are marked in the deployment descriptor to be loaded
      * at server startup time.
      *
-     * @exception ServletException if the servlet init() method threw
-     *  an exception
-     * @exception ServletException if some other loading problem occurs
+     * @exception ServletException if the Servlet init() method threw
+     *  an exception or if some other loading problem occurs
      */
     public void load() throws ServletException;
 
 
     /**
-     * Remove the specified initialization parameter from this servlet.
+     * Remove the specified initialization parameter from this Servlet.
      *
      * @param name Name of the initialization parameter to remove
      */
@@ -312,11 +316,11 @@ public interface Wrapper extends Container {
 
 
     /**
-     * Process an UnavailableException, marking this servlet as unavailable
+     * Process an UnavailableException, marking this Servlet as unavailable
      * for the specified amount of time.
      *
      * @param unavailable The exception that occurred, or <code>null</code>
-     *  to mark this servlet as permanently unavailable
+     *  to mark this Servlet as permanently unavailable
      */
     public void unavailable(UnavailableException unavailable);
 
@@ -334,7 +338,7 @@ public interface Wrapper extends Container {
 
 
     /**
-     * Get the multi-part configuration for the associated servlet. If no
+     * @return the multi-part configuration for the associated Servlet. If no
      * multi-part configuration has been defined, then <code>null</code> will be
      * returned.
      */
@@ -342,8 +346,10 @@ public interface Wrapper extends Container {
 
 
     /**
-     * Set the multi-part configuration for the associated servlet. To clear the
+     * Set the multi-part configuration for the associated Servlet. To clear the
      * multi-part configuration specify <code>null</code> as the new value.
+     *
+     * @param multipartConfig The configuration associated with the Servlet
      */
     public void setMultipartConfigElement(
             MultipartConfigElement multipartConfig);
@@ -351,21 +357,29 @@ public interface Wrapper extends Container {
     /**
      * Does the associated Servlet support async processing? Defaults to
      * <code>false</code>.
+     *
+     * @return <code>true</code> if the Servlet supports async
      */
     public boolean isAsyncSupported();
 
     /**
-     * Set the async support for the associated servlet.
+     * Set the async support for the associated Servlet.
+     *
+     * @param asyncSupport the new value
      */
     public void setAsyncSupported(boolean asyncSupport);
 
     /**
      * Is the associated Servlet enabled? Defaults to <code>true</code>.
+     *
+     * @return <code>true</code> if the Servlet is enabled
      */
     public boolean isEnabled();
 
     /**
      * Sets the enabled attribute for the associated servlet.
+     *
+     * @param enabled the new value
      */
     public void setEnabled(boolean enabled);
 
@@ -391,11 +405,15 @@ public interface Wrapper extends Container {
 
     /**
      * Is the Servlet overridable by a ServletContainerInitializer?
+     *
+     * @return <code>true</code> if the Servlet can be overridden in a ServletContainerInitializer
      */
     public boolean isOverridable();
 
     /**
      * Sets the overridable attribute for this Servlet.
+     *
+     * @param overridable the new value
      */
     public void setOverridable(boolean overridable);
 }

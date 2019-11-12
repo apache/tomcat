@@ -43,6 +43,8 @@ public class CatalinaFactory {
     }
 
     /**
+     * @return Name of default Pipeline implementation class
+     *
      * @deprecated Unused. Will be removed in Tomcat 8.0.x.
      */
     @Deprecated
