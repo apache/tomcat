@@ -40,6 +40,10 @@ public final class CharChunk extends AbstractChunk implements CharSequence {
         /**
          * Read new characters.
          *
+         * @param cbuf Buffer to read the characters into
+         * @param off  Offset for target buffer
+         * @param len  length of data to read
+         *
          * @return The number of characters read
          *
          * @throws IOException If an I/O error occurs during reading
@@ -92,6 +96,7 @@ public final class CharChunk extends AbstractChunk implements CharSequence {
     // --------------------
 
     /**
+     * @return {@link #clone()}
      * @deprecated Unused. Will be removed in Tomcat 8.0.x onwards.
      */
     @Deprecated
@@ -359,6 +364,12 @@ public final class CharChunk extends AbstractChunk implements CharSequence {
 
 
     /**
+     * @param src Destination for subtracted data
+     *
+     * @return count of bytes removed
+     *
+     * @throws IOException If an I/O error occurs
+     *
      * @deprecated Unused. Will be removed in Tomcat 8.0.x onwards.
      */
     @Deprecated
@@ -495,6 +506,8 @@ public final class CharChunk extends AbstractChunk implements CharSequence {
 
 
     /**
+     * @return Buffer content parsed into an int
+     *
      * @deprecated Unused. Will be removed in Tomcat 8.0.x onwards.
      */
     @Deprecated
@@ -588,6 +601,13 @@ public final class CharChunk extends AbstractChunk implements CharSequence {
 
 
     /**
+     * @param b2    Byte array to test
+     * @param off2  Offset for byte array
+     * @param len2  Length of byte array
+     *
+     * @return {@code true} if the contents of the provided byte array are
+     *         equal to the contents of this object
+     *
      * @deprecated Unused. Will be removed in Tomcat 8.0.x onwards.
      */
     @Deprecated
@@ -685,6 +705,8 @@ public final class CharChunk extends AbstractChunk implements CharSequence {
 
 
     /**
+     * @return case insensitive (all lower case) hash code
+     *
      * @deprecated Unused. Will be removed in Tomcat 8.0.x onwards.
      */
     @Deprecated

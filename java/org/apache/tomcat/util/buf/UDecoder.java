@@ -53,7 +53,7 @@ public final class UDecoder {
     }
 
     /** Unexpected end of data. */
-    private static final IOException EXCEPTION_EOF = new DecodeException("EOF");
+    private static final IOException EXCEPTION_EOF = new DecodeException(sm.getString("uDecoder.eof"));
 
     /** %xx with not-hex digit */
     private static final IOException EXCEPTION_NOT_HEX_DIGIT = new DecodeException(
@@ -67,8 +67,10 @@ public final class UDecoder {
     {
     }
 
-    /** URLDecode, will modify the source.  Includes converting
-     *  '+' to ' '.
+    /**
+     * URLDecode, will modify the source.
+     * @param mb The URL encoded bytes
+     * @throws IOException Invalid %xx URL encoding
      * @deprecated Unused. Will be removed in Tomcat 8.0.x onwards.
      */
     @Deprecated
@@ -138,8 +140,10 @@ public final class UDecoder {
     // -------------------- Additional methods --------------------
     // XXX What do we do about charset ????
 
-    /** In-buffer processing - the buffer will be modified
-     *  Includes converting  '+' to ' '.
+    /**
+     * In-buffer processing - the buffer will be modified.
+     * @param mb The URL encoded chars
+     * @throws IOException Invalid %xx URL encoding
      * @deprecated Unused. Will be removed in Tomcat 8.0.x onwards.
      */
     @Deprecated
@@ -207,8 +211,10 @@ public final class UDecoder {
         mb.setEnd( idx );
     }
 
-    /** URLDecode, will modify the source
-     *  Includes converting  '+' to ' '.
+    /**
+     * URLDecode, will modify the source Includes converting  '+' to ' '.
+     * @param mb The URL encoded String, bytes or chars
+     * @throws IOException Invalid %xx URL encoding
      * @deprecated Unused. Will be removed in Tomcat 8.0.x onwards.
      */
     @Deprecated
@@ -254,6 +260,9 @@ public final class UDecoder {
     // XXX Old code, needs to be replaced !!!!
     //
     /**
+     * %xx decoding of a query string. FIXME: this is inefficient.
+     * @param str The URL encoded string
+     * @return the decoded string
      * @deprecated Unused. Will be removed in Tomcat 8.0.x onwards.
      */
     @Deprecated
@@ -320,7 +329,7 @@ public final class UDecoder {
                 char res = (char) Integer.parseInt(
                         str.substring(strPos + 1, strPos + 3), 16);
                 if (noSlash && (res == '/')) {
-                    throw new IllegalArgumentException("noSlash");
+                    throw new IllegalArgumentException(sm.getString("uDecoder.noSlash"));
                 }
                 dec.append(res);
                 strPos += 3;

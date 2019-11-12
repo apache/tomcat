@@ -82,6 +82,7 @@ public final class MessageBytes implements Cloneable, Serializable {
     }
 
     /**
+     * @return {@link #clone()}
      * @deprecated Unused. Will be removed in Tomcat 8.0.x onwards.
      */
     @Deprecated
@@ -392,8 +393,10 @@ public final class MessageBytes implements Cloneable, Serializable {
 
 
     /**
-     * Returns true if the message bytes starts with the specified string.
      * @param s the string
+     *
+     * @return true if the message bytes starts with the specified string.
+     *
      * @deprecated Unused. Will be removed in Tomcat 8.0.x onwards.
      */
     @Deprecated
@@ -476,6 +479,10 @@ public final class MessageBytes implements Cloneable, Serializable {
     }
 
     /**
+     * @param c the character
+     *
+     * @return index of the specified character.
+     *
      * @deprecated Unused. Will be removed in Tomcat 8.0.x onwards.
      */
     @Deprecated
@@ -504,9 +511,11 @@ public final class MessageBytes implements Cloneable, Serializable {
     }
 
     /**
-     * Returns true if the message bytes starts with the specified string.
      * @param c the character
      * @param starting The start position
+     *
+     * @return index of the specified character.
+     *
      * @deprecated Unused. Will be removed in Tomcat 8.0.x onwards.
      */
     @Deprecated
@@ -563,6 +572,9 @@ public final class MessageBytes implements Cloneable, Serializable {
 
     /**
      * Set the buffer to the representation of an int
+     *
+     * @param i The int
+     *
      * @deprecated Unused. Will be removed in Tomcat 8.0.x onwards.
      */
     @Deprecated
@@ -606,7 +618,9 @@ public final class MessageBytes implements Cloneable, Serializable {
         type=T_BYTES;
     }
 
-    /** Set the buffer to the representation of an long
+    /**
+     * Set the buffer to the representation of a long.
+     * @param l The long
      */
     public void setLong(long l) {
         byteC.allocate(32, 64);
@@ -651,6 +665,9 @@ public final class MessageBytes implements Cloneable, Serializable {
     // Used for headers conversion
     /**
      * Convert the buffer to an int, cache the value
+     *
+     * @return The contents of the buffer parsed as an int
+     *
      * @deprecated Unused. Will be removed in Tomcat 8.0.x onwards.
      */
     @Deprecated
@@ -699,6 +716,8 @@ public final class MessageBytes implements Cloneable, Serializable {
     private static MessageBytesFactory factory=new MessageBytesFactory();
 
     /**
+     * @param mbf New factory for MessageByte instances
+     *
      * @deprecated Unused. Will be removed in Tomcat 8.0.x onwards.
      */
     @Deprecated
