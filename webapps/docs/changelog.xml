@@ -141,6 +141,12 @@
         with <code>ping_mode=&quot;I&quot;</code>, the <code>CPING</code>
         message will not always be followed by the start of a request. (markt)
       </fix>
+      <fix>
+        Properly calculate all dynamic parts of the ErrorReportValve response
+        on the fly in
+        <code>org.apache.coyote.http2.TestHttp2InitialConnection</code>.
+        (michaelo)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">

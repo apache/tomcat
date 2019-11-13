@@ -115,7 +115,7 @@ public class TestHttp2InitialConnection extends Http2TestBase {
              * This will vary depending on where the test is run due to:
              * - The length of the version string that appears once in the error
              *   page
-             * - The status header uses a UTF-8 EM dash. When running in an IDE
+             * - The status header uses a UTF-8 EN dash. When running in an IDE
              *   the UTF-8 properties files will be used directly rather than
              *   after native2ascii conversion.
              *
@@ -124,10 +124,24 @@ public class TestHttp2InitialConnection extends Http2TestBase {
             int serverInfoLength = ServerInfo.getServerInfo().getBytes().length;
             StringManager sm = StringManager.getManager(
                     ErrorReportValve.class.getPackage().getName(), Locale.ENGLISH);
-            int statusHeaderLength = sm
-                    .getString("errorReportValve.statusHeader", "", "")
+            String reason = sm.getString("http." + testData.getExpectedStatus() + ".reason");
+            int descriptionLength = sm.getString("http." + testData.getExpectedStatus() + ".desc")
                     .getBytes(StandardCharsets.UTF_8).length;
-            int len = 708 + serverInfoLength + statusHeaderLength * 2;
+            int statusHeaderLength = sm
+                    .getString("errorReportValve.statusHeader",
+                            String.valueOf(testData.getExpectedStatus()), reason)
+                    .getBytes(StandardCharsets.UTF_8).length;
+            int typeLabelLength = sm.getString("errorReportValve.type")
+                    .getBytes(StandardCharsets.UTF_8).length;
+            int statusReportLabelLength = sm.getString("errorReportValve.statusReport")
+                    .getBytes(StandardCharsets.UTF_8).length;
+            int descriptionLabelLength = sm.getString("errorReportValve.description")
+                    .getBytes(StandardCharsets.UTF_8).length;
+            // 196 bytes is the static length of the pure HTML code from the ErrorReportValve
+            int len = 196 + org.apache.catalina.util.TomcatCSS.TOMCAT_CSS
+                    .getBytes(StandardCharsets.UTF_8).length +
+                    typeLabelLength + statusReportLabelLength + descriptionLabelLength +
+                    descriptionLength + serverInfoLength + statusHeaderLength * 2;
             String contentLength = String.valueOf(len);
             return getResponseBodyFrameTrace(streamId,
                     testData.getExpectedStatus(), "text/html;charset=utf-8",
