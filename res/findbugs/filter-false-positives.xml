@@ -83,12 +83,7 @@
     <Bug code="REC"/>
   </Match>
   <Match>
-    <Class name="org.apache.catalina.ant.jmx.JMXAccessorCondition"/>
-    <Method name="accessJMXValue"/>
-    <Bug code="REC"/>
-  </Match>
-  <Match>
-    <Class name="org.apache.catalina.ant.jmx.JMXAccessorEqualsCondition"/>
+    <Class name="org.apache.catalina.ant.jmx.JMXAccessorConditionBase"/>
     <Method name="accessJMXValue"/>
     <Bug code="REC"/>
   </Match>
@@ -125,6 +120,12 @@
       <Method name="matchRequest"/>
     </Or>
     <Bug code="RCN"/>
+  </Match>
+  <Match>
+    <!-- False positive. It is lifecycle state that is being protected -->
+    <Class name="org.apache.catalina.authenticator.SingleSignOn" />
+    <Field name="engine" />
+    <Bug pattern="IS2_INCONSISTENT_SYNC" />
   </Match>
   <Match>
     <!-- req.getRemoteUser(), req.getAuthType(), request.getQueryString() can
@@ -173,10 +174,51 @@
     <Bug code="RCN"/>
   </Match>
   <Match>
+    <!-- Exception caught deliberately -->
+    <Class name="org.apache.catalina.core.NamingContextListener" />
+    <Method name="constructEnvEntry" />
+    <Bug pattern="REC_CATCH_EXCEPTION" />
+  </Match>
+  <Match>
+    <!-- Code uses same approach as CopyOnWriteArrayList -->
+    <Class name="org.apache.catalina.core.StandardContext" />
+    <Field name="constraints" />
+    <Bug pattern="VO_VOLATILE_REFERENCE_TO_ARRAY" />
+  </Match>
+  <Match>
+    <!-- Sync is for lifecycle state, not CookieProcessor -->
+    <Class name="org.apache.catalina.core.StandardContext" />
+    <Field name="cookieProcessor" />
+    <Bug pattern="IS2_INCONSISTENT_SYNC" />
+  </Match>
+  <Match>
+    <!-- Calling sleep while holding a lock is deliberate -->
+    <Class name="org.apache.catalina.core.StandardContext" />
+    <Method name="stopInternal" />
+    <Bug pattern="SWL_SLEEP_WITH_LOCK_HELD" />
+  </Match>
+  <Match>
     <!-- Have to trigger GC for leak detection to work. Clearly documented -->
     <Class name="org.apache.catalina.core.StandardHost" />
     <Method name="findReloadedContextMemoryLeaks" />
     <Bug code="Dm" />
+  </Match>
+  <Match>
+    <!-- Sync not targeting these fields -->
+    <Class name="org.apache.catalina.core.StandardWrapper" />
+    <Or>
+      <Field name="multipartConfigElement" />
+      <Field name="servletClass" />
+      <Field name="swallowOutput" />
+      <Field name="unloadDelay" />
+    </Or>
+    <Bug pattern="IS2_INCONSISTENT_SYNC" />
+  </Match>
+  <Match>
+    <!-- There is only a single wait condition -->
+    <Class name="org.apache.catalina.core.StandardWrapper" />
+    <Method name="deallocate" />
+    <Bug pattern="NO_NOTIFY_NOT_NOTIFYALL" />
   </Match>
   <Match>
     <!-- Sleep is of short duration and lock is required -->
@@ -204,6 +246,12 @@
     <Bug code="DE" />
   </Match>
   <Match>
+    <!-- False positive. It is lifecycle state that is being protected -->
+    <Class name="org.apache.catalina.ha.authenticator.ClusterSingleSignOn" />
+    <Field name="cluster" />
+    <Bug pattern="IS2_INCONSISTENT_SYNC" />
+  </Match>
+  <Match>
     <!-- shost will not be null in normal usage -->
     <Class name="org.apache.catalina.ha.backend.CollectedInfo" />
     <Method name="init" />
@@ -225,6 +273,29 @@
     <Bug code="DE" />
   </Match>
   <Match>
+    <!-- False positive caused by additional method syncs -->
+    <Class name="org.apache.catalina.ha.session.DeltaManager" />
+    <Field name="receiverQueue" />
+    <Pattern code="IS2_INCONSISTENT_SYNC" />
+  </Match>
+  <Match>
+    <!-- False positive caused by method syncs -->
+    <Class name="org.apache.catalina.ha.session.JvmRouteBinderValve" />
+    <Field name="cluster" />
+    <Pattern code="IS2_INCONSISTENT_SYNC" />
+  </Match>
+  <Match>
+    <!-- Design choice to reduce need for syncs -->
+    <Class name="org.apache.catalina.ha.tcp.ReplicationValve" />
+    <Or>
+      <Field name="nrOfCrossContextSendRequests" />
+      <Field name="nrOfFilterRequests" />
+      <Field name="nrOfRequests" />
+      <Field name="nrOfSendRequests" />
+    </Or>
+    <Pattern code="VO_VOLATILE_INCREMENT" />
+  </Match>
+  <Match>
     <!-- Field is only modified during Servlet load -->
     <Class name="org.apache.catalina.manager.host.HostManagerServlet" />
     <Bug code="MSF" />
@@ -236,6 +307,19 @@
     <Bug code="REC" />
   </Match>
   <Match>
+    <!-- The fields are only set in setWrapper() which Tomcat calls once during
+         initialisation. All other accesses are reads. -->
+    <Class name="org.apache.catalina.manager.ManagerServlet" />
+    <Or>
+      <Field name="context" />
+      <Field name="host" />
+      <Field name="mBeanServer" />
+      <Field name="oname" />
+      <Field name="wrapper" />
+    </Or>
+    <Bug pattern="MSF_MUTABLE_SERVLET_FIELD" />
+  </Match>
+  <Match>
     <!-- SQL construction is safe since it is from trusted config -->
     <Or>
       <Class name="org.apache.catalina.realm.DataSourceRealm" />
@@ -243,6 +327,8 @@
     </Or>
     <Or>
       <Method name="credentials" />
+      <Method name="getPassword" />
+      <Method name="getRoles" />
       <Method name="roles" />
     </Or>
     <Bug pattern="SQL_PREPARED_STATEMENT_GENERATED_FROM_NONCONSTANT_STRING" />
@@ -253,6 +339,15 @@
     <Bug code="IS" />
   </Match>
   <Match>
+    <!-- Sync is protecting preparedRoles, not these fields -->
+    <Class name="org.apache.catalina.realm.JDBCRealm" />
+    <Or>
+      <Field name="roleNameCol" />
+      <Field name="userRoleTable" />
+    </Or>
+    <Bug pattern="IS2_INCONSISTENT_SYNC " />
+  </Match>
+  <Match>
     <!-- roles will be initialized in addAttributeValues -->
     <Class name="org.apache.catalina.realm.JNDIRealm" />
     <Or>
@@ -260,6 +355,12 @@
       <Method name="getUserBySearch" />
     </Or>
     <Bug code="NP" />
+  </Match>
+  <Match>
+    <!-- Sync is protecting authenticate90, not this field -->
+    <Class name="org.apache.catalina.realm.JNDIRealm" />
+    <Field name="userPatternFormatArray" />
+    <Bug pattern="IS2_INCONSISTENT_SYNC " />
   </Match>
   <Match>
     <!-- request.getRequestPathMB(), request.getQueryString() can be null because
