@@ -62,7 +62,7 @@ public class McastServiceImpl {
      */
     protected volatile boolean doRunSender = false;
     protected volatile boolean doRunReceiver = false;
-    protected int startLevel = 0;
+    protected volatile int startLevel = 0;
     /**
      * Socket that we intend to listen to
      */

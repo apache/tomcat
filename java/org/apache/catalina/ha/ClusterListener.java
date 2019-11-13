@@ -67,16 +67,6 @@ public abstract class ClusterListener implements ChannelListener {
         this.cluster = cluster;
     }
 
-    @Override
-    public boolean equals(Object listener) {
-        return super.equals(listener);
-    }
-
-    @Override
-    public int hashCode() {
-        return super.hashCode();
-    }
-
     //--Logic---------------------------------------------------
 
     @Override

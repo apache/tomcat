@@ -31,13 +31,6 @@ import org.apache.catalina.tribes.util.StringManager;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
-
-
-/**
- *
- *
- * @version 1.0
- */
 public class ThroughputInterceptor extends ChannelInterceptorBase
         implements ThroughputInterceptorMBean {
 
@@ -75,7 +68,7 @@ public class ThroughputInterceptor extends ChannelInterceptorBase
         if ( access.addAndGet(-1) == 0 ) {
             long stop = System.currentTimeMillis();
             timeTx += (stop - txStart) / 1000d;
-            if ((msgTxCnt.get() / interval) >= lastCnt) {
+            if ((msgTxCnt.get() / (double) interval) >= lastCnt) {
                 lastCnt++;
                 report(timeTx);
             }
@@ -98,8 +91,9 @@ public class ThroughputInterceptor extends ChannelInterceptorBase
     public void report(double timeTx) {
         if ( log.isInfoEnabled() )
             log.info(sm.getString("throughputInterceptor.report",
-                    msgTxCnt, df.format(mbTx), df.format(mbAppTx), df.format(timeTx), df.format(mbTx/timeTx),
-                    df.format(mbAppTx/timeTx), msgTxErr, msgRxCnt, df.format(mbRx/((System.currentTimeMillis()-rxStart)/1000)),
+                    msgTxCnt, df.format(mbTx), df.format(mbAppTx), df.format(timeTx),
+                    df.format(mbTx/timeTx), df.format(mbAppTx/timeTx), msgTxErr, msgRxCnt,
+                    df.format(mbRx/((System.currentTimeMillis()-rxStart)/(double)1000)),
                     df.format(mbRx)));
     }
 

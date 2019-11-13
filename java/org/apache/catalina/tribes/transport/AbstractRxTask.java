@@ -66,10 +66,8 @@ public abstract class AbstractRxTask implements Runnable
         return doRun;
     }
 
-    public void close()
-    {
+    public void close() {
         doRun = false;
-        notify();
     }
 
     public void setUseBufferPool(boolean usebufpool) {

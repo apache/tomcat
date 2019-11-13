@@ -699,9 +699,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
         if (this.transformers.remove(transformer)) {
             log.info(sm.getString("webappClassLoader.removeTransformer",
                     transformer, getContextName()));
-            return;
         }
-
     }
 
     protected void copyStateWithoutTransformers(WebappClassLoaderBase base) {
@@ -1741,7 +1739,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
                                 getContextName(), threadName, getStackTrace(thread)));
                     }
 
-                    // Don't try an stop the threads unless explicitly
+                    // Don't try and stop the threads unless explicitly
                     // configured to do so
                     if (!clearReferencesStopThreads) {
                         continue;
@@ -1772,7 +1770,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
                         // so all implementations are similar
                         if (target != null && target.getClass().getCanonicalName() != null &&
                                 target.getClass().getCanonicalName().equals(
-                                "java.util.concurrent.ThreadPoolExecutor.Worker")) {
+                                        "java.util.concurrent.ThreadPoolExecutor.Worker")) {
                             Field executorField = target.getClass().getDeclaredField("this$0");
                             executorField.setAccessible(true);
                             Object executor = executorField.get(target);
@@ -1886,7 +1884,9 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
                 synchronized(queue) {
                     newTasksMayBeScheduledField.setBoolean(thread, false);
                     clearMethod.invoke(queue);
-                    queue.notify();  // In case queue was already empty.
+                    // In case queue was already empty. Should only be one
+                    // thread waiting but use notifyAll() to be safe.
+                    queue.notifyAll();
                 }
 
             }catch (NoSuchFieldException nfe){

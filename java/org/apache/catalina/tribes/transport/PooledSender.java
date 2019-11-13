@@ -199,7 +199,7 @@ public abstract class PooledSender extends AbstractSender implements MultiPointS
                                 "PooledSender.senderDisconnectFail"), e);
                     }
                 }
-            notify();
+            notifyAll();
         }
 
         public synchronized void close() {
@@ -216,14 +216,14 @@ public abstract class PooledSender extends AbstractSender implements MultiPointS
             }//for
             notinuse.clear();
             inuse.clear();
-            notify();
+            notifyAll();
 
 
         }
 
         public synchronized void open() {
             isOpen = true;
-            notify();
+            notifyAll();
         }
     }
 }

@@ -34,7 +34,6 @@ import org.apache.catalina.startup.ClassLoaderFactory.RepositoryType;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
-
 /**
  * Bootstrap loader for Catalina.  This application constructs a class loader
  * for use in loading the Catalina internal classes (by accumulating all of the
@@ -54,7 +53,8 @@ public final class Bootstrap {
     /**
      * Daemon object used by main.
      */
-    private static Bootstrap daemon = null;
+    private static final Object daemonLock = new Object();
+    private static volatile Bootstrap daemon = null;
 
     private static final File catalinaBaseFile;
     private static final File catalinaHomeFile;
@@ -132,7 +132,6 @@ public final class Bootstrap {
      */
     private Object catalinaDaemon = null;
 
-
     ClassLoader commonLoader = null;
     ClassLoader catalinaLoader = null;
     ClassLoader sharedLoader = null;
@@ -144,9 +143,9 @@ public final class Bootstrap {
     private void initClassLoaders() {
         try {
             commonLoader = createClassLoader("common", null);
-            if( commonLoader == null ) {
+            if (commonLoader == null) {
                 // no config file, default to this loader - we might be in a 'single' env.
-                commonLoader=this.getClass().getClassLoader();
+                commonLoader = this.getClass().getClassLoader();
             }
             catalinaLoader = createClassLoader("server", commonLoader);
             sharedLoader = createClassLoader("shared", commonLoader);
@@ -176,8 +175,7 @@ public final class Bootstrap {
             try {
                 @SuppressWarnings("unused")
                 URL url = new URL(repository);
-                repositories.add(
-                        new Repository(repository, RepositoryType.URL));
+                repositories.add(new Repository(repository, RepositoryType.URL));
                 continue;
             } catch (MalformedURLException e) {
                 // Ignore
@@ -187,14 +185,11 @@ public final class Bootstrap {
             if (repository.endsWith("*.jar")) {
                 repository = repository.substring
                     (0, repository.length() - "*.jar".length());
-                repositories.add(
-                        new Repository(repository, RepositoryType.GLOB));
+                repositories.add(new Repository(repository, RepositoryType.GLOB));
             } else if (repository.endsWith(".jar")) {
-                repositories.add(
-                        new Repository(repository, RepositoryType.JAR));
+                repositories.add(new Repository(repository, RepositoryType.JAR));
             } else {
-                repositories.add(
-                        new Repository(repository, RepositoryType.DIR));
+                repositories.add(new Repository(repository, RepositoryType.DIR));
             }
         }
 
@@ -279,15 +274,13 @@ public final class Bootstrap {
         method.invoke(startupInstance, paramValues);
 
         catalinaDaemon = startupInstance;
-
     }
 
 
     /**
      * Load daemon.
      */
-    private void load(String[] arguments)
-        throws Exception {
+    private void load(String[] arguments) throws Exception {
 
         // Call the load() method
         String methodName = "load";
@@ -304,10 +297,10 @@ public final class Bootstrap {
         }
         Method method =
             catalinaDaemon.getClass().getMethod(methodName, paramTypes);
-        if (log.isDebugEnabled())
+        if (log.isDebugEnabled()) {
             log.debug("Calling startup class " + method);
+        }
         method.invoke(catalinaDaemon, param);
-
     }
 
 
@@ -317,10 +310,8 @@ public final class Bootstrap {
     private Object getServer() throws Exception {
 
         String methodName = "getServer";
-        Method method =
-            catalinaDaemon.getClass().getMethod(methodName);
+        Method method = catalinaDaemon.getClass().getMethod(methodName);
         return method.invoke(catalinaDaemon);
-
     }
 
 
@@ -332,12 +323,10 @@ public final class Bootstrap {
      * @param arguments Initialization arguments
      * @throws Exception Fatal initialization error
      */
-    public void init(String[] arguments)
-        throws Exception {
+    public void init(String[] arguments) throws Exception {
 
         init();
         load(arguments);
-
     }
 
 
@@ -345,13 +334,13 @@ public final class Bootstrap {
      * Start the Catalina daemon.
      * @throws Exception Fatal start error
      */
-    public void start()
-        throws Exception {
-        if( catalinaDaemon==null ) init();
+    public void start() throws Exception {
+        if (catalinaDaemon == null) {
+            init();
+        }
 
-        Method method = catalinaDaemon.getClass().getMethod("start", (Class [] )null);
+        Method method = catalinaDaemon.getClass().getMethod("start", (Class [])null);
         method.invoke(catalinaDaemon, (Object [])null);
-
     }
 
 
@@ -359,12 +348,9 @@ public final class Bootstrap {
      * Stop the Catalina Daemon.
      * @throws Exception Fatal stop error
      */
-    public void stop()
-        throws Exception {
-
-        Method method = catalinaDaemon.getClass().getMethod("stop", (Class [] ) null);
-        method.invoke(catalinaDaemon, (Object [] ) null);
-
+    public void stop() throws Exception {
+        Method method = catalinaDaemon.getClass().getMethod("stop", (Class []) null);
+        method.invoke(catalinaDaemon, (Object []) null);
     }
 
 
@@ -372,13 +358,11 @@ public final class Bootstrap {
      * Stop the standalone server.
      * @throws Exception Fatal stop error
      */
-    public void stopServer()
-        throws Exception {
+    public void stopServer() throws Exception {
 
         Method method =
             catalinaDaemon.getClass().getMethod("stopServer", (Class []) null);
         method.invoke(catalinaDaemon, (Object []) null);
-
     }
 
 
@@ -387,12 +371,11 @@ public final class Bootstrap {
      * @param arguments Command line arguments
      * @throws Exception Fatal stop error
      */
-    public void stopServer(String[] arguments)
-        throws Exception {
+    public void stopServer(String[] arguments) throws Exception {
 
         Object param[];
         Class<?> paramTypes[];
-        if (arguments==null || arguments.length==0) {
+        if (arguments == null || arguments.length == 0) {
             paramTypes = null;
             param = null;
         } else {
@@ -404,7 +387,6 @@ public final class Bootstrap {
         Method method =
             catalinaDaemon.getClass().getMethod("stopServer", paramTypes);
         method.invoke(catalinaDaemon, param);
-
     }
 
 
@@ -423,12 +405,9 @@ public final class Bootstrap {
         Method method =
             catalinaDaemon.getClass().getMethod("setAwait", paramTypes);
         method.invoke(catalinaDaemon, paramValues);
-
     }
 
-    public boolean getAwait()
-        throws Exception
-    {
+    public boolean getAwait() throws Exception {
         Class<?> paramTypes[] = new Class[0];
         Object paramValues[] = new Object[0];
         Method method =
@@ -456,22 +435,24 @@ public final class Bootstrap {
      */
     public static void main(String args[]) {
 
-        if (daemon == null) {
-            // Don't set daemon until init() has completed
-            Bootstrap bootstrap = new Bootstrap();
-            try {
-                bootstrap.init();
-            } catch (Throwable t) {
-                handleThrowable(t);
-                t.printStackTrace();
-                return;
+        synchronized (daemonLock) {
+            if (daemon == null) {
+                // Don't set daemon until init() has completed
+                Bootstrap bootstrap = new Bootstrap();
+                try {
+                    bootstrap.init();
+                } catch (Throwable t) {
+                    handleThrowable(t);
+                    t.printStackTrace();
+                    return;
+                }
+                daemon = bootstrap;
+            } else {
+                // When running as a service the call to stop will be on a new
+                // thread so make sure the correct class loader is used to
+                // prevent a range of class not found exceptions.
+                Thread.currentThread().setContextClassLoader(daemon.catalinaLoader);
             }
-            daemon = bootstrap;
-        } else {
-            // When running as a service the call to stop will be on a new
-            // thread so make sure the correct class loader is used to prevent
-            // a range of class not found exceptions.
-            Thread.currentThread().setContextClassLoader(daemon.catalinaLoader);
         }
 
         try {
@@ -515,7 +496,6 @@ public final class Bootstrap {
             t.printStackTrace();
             System.exit(1);
         }
-
     }
 
 

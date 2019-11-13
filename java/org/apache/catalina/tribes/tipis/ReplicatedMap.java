@@ -19,6 +19,7 @@ package org.apache.catalina.tribes.tipis;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import org.apache.catalina.tribes.Channel;
 import org.apache.catalina.tribes.ChannelException;
@@ -56,7 +57,8 @@ public class ReplicatedMap<K,V> extends AbstractReplicatedMap<K,V> {
 
     private static final long serialVersionUID = 1L;
 
-    private final Log log = LogFactory.getLog(ReplicatedMap.class); // must not be static
+    // Lazy init to support serialization
+    private transient volatile Log log;
 
     //--------------------------------------------------------------------------
     //              CONSTRUCTORS / DESTRUCTORS
@@ -151,7 +153,7 @@ public class ReplicatedMap<K,V> extends AbstractReplicatedMap<K,V> {
         } catch (ChannelException e) {
             FaultyMember[] faultyMembers = e.getFaultyMembers();
             if (faultyMembers.length == 0) throw e;
-            ArrayList<Member> faulty = new ArrayList<>();
+            List<Member> faulty = new ArrayList<>();
             for (FaultyMember faultyMember : faultyMembers) {
                 if (!(faultyMember.getCause() instanceof RemoteProcessException)) {
                     faulty.add(faultyMember.getMember());
@@ -163,8 +165,8 @@ public class ReplicatedMap<K,V> extends AbstractReplicatedMap<K,V> {
                 if (backup.length == 0) {
                     throw e;
                 } else {
-                    if (log.isWarnEnabled()) {
-                        log.warn(sm.getString("replicatedMap.unableReplicate.completely", key,
+                    if (getLog().isWarnEnabled()) {
+                        getLog().warn(sm.getString("replicatedMap.unableReplicate.completely", key,
                                 Arrays.toString(backup), Arrays.toString(realFaultyMembers)), e);
                     }
                 }
@@ -176,6 +178,7 @@ public class ReplicatedMap<K,V> extends AbstractReplicatedMap<K,V> {
     @Override
     public void memberDisappeared(Member member) {
         boolean removed = false;
+        Log log = getLog();
         synchronized (mapMembers) {
             removed = (mapMembers.remove(member) != null );
             if (!removed) {
@@ -258,5 +261,17 @@ public class ReplicatedMap<K,V> extends AbstractReplicatedMap<K,V> {
                 }
             }
         }
+    }
+
+
+    private Log getLog() {
+        if (log == null) {
+            synchronized (this) {
+                if (log == null) {
+                    log = LogFactory.getLog(ReplicatedMap.class);
+                }
+            }
+        }
+        return log;
     }
 }

@@ -320,6 +320,18 @@
     <Bug pattern="MSF_MUTABLE_SERVLET_FIELD" />
   </Match>
   <Match>
+    <!-- The array contents is never mutated. -->
+    <Class name="org.apache.catalina.mapper.Mapper" />
+    <Field name="hosts" />
+    <Bug pattern="VO_VOLATILE_REFERENCE_TO_ARRAY" />
+  </Match>
+  <Match>
+    <!-- The array contents is never mutated. -->
+    <Class name="org.apache.catalina.mapper.Mapper$MappedContext" />
+    <Field name="versions" />
+    <Bug pattern="VO_VOLATILE_REFERENCE_TO_ARRAY" />
+  </Match>
+  <Match>
     <!-- SQL construction is safe since it is from trusted config -->
     <Or>
       <Class name="org.apache.catalina.realm.DataSourceRealm" />
@@ -373,11 +385,25 @@
     <Bug code="RCN"/>
   </Match>
   <Match>
-    <!-- If encoding is specified it will be used,
-    otherwise platform default encoding will be used -->
     <Class name="org.apache.catalina.realm.RealmBase"/>
     <Method name="Digest"/>
-    <Bug code="Dm" />
+    <Or>
+      <!-- If encoding is specified it will be used,
+      otherwise platform default encoding will be used -->
+      <Bug code="Dm" />
+      <!-- Method has been deprecated -->
+      <Bug pattern="NM_METHOD_NAMING_CONVENTION" />
+    </Or>
+  </Match>
+  <Match>
+    <!--  Name shadowing is intentional -->
+    <Or>
+      <Class name="org.apache.catalina.servlet4preview.AsyncContext"/>
+      <Class name="org.apache.catalina.servlet4preview.RequestDispatcher"/>
+      <Class name="org.apache.catalina.servlet4preview.ServletContext"/>
+      <Class name="org.apache.catalina.servlet4preview.http.HttpServletRequest"/>
+    </Or>
+    <Bug pattern="NM_SAME_SIMPLE_NAME_AS_INTERFACE"/>
   </Match>
   <Match>
     <!--  Name shadowing is intentional -->
@@ -401,6 +427,12 @@
     <Bug code="Dm" />
   </Match>
   <Match>
+    <!-- The use of != with a String is a deliberate hack  -->
+    <Class name="org.apache.catalina.servlets.DefaultServlet" />
+    <Method name="serveResource" />
+    <Bug pattern="ES_COMPARING_STRINGS_WITH_EQ" />
+  </Match>
+  <Match>
     <!-- Non-constant strings are configuration settings rather than client
          supplied -->
     <Class name="org.apache.catalina.session.JDBCStore" />
@@ -415,10 +447,30 @@
     <Bug pattern="SQL_PREPARED_STATEMENT_GENERATED_FROM_NONCONSTANT_STRING" />
   </Match>
   <Match>
+    <!-- Syncs aren't intended to protect these fields -->
+    <Class name="org.apache.catalina.session.JDBCStore" />
+    <Or>
+      <Field name="dataSourceName" />
+      <Field name="sessionAppCol" />
+      <Field name="sessionIdCol" />
+    </Or>
+    <Bug pattern="IS2_INCONSISTENT_SYNC" />
+  </Match>
+  <Match>
     <!-- We can live with the threading issue. See code comment for details. -->
     <Class name="org.apache.catalina.session.ManagerBase" />
     <Method name="generateSessionId" />
     <Bug code="VO" />
+  </Match>
+  <Match>
+    <!-- These fields should not be serialized with the session -->
+    <Class name="org.apache.catalina.session.StandardSession" />
+    <Or>
+      <Field name="listeners" />
+      <Field name="notes" />
+      <Field name="support" />
+    </Or>
+    <Bug pattern="SE_TRANSIENT_FIELD_NOT_RESTORED" />
   </Match>
   <Match>
     <!-- Use of null is deliberate -->
@@ -439,6 +491,12 @@
     <Class name="org.apache.catalina.ssi.SSIServletExternalResolver"/>
     <Method name="getFileText"/>
     <Bug code="Dm" />
+  </Match>
+  <Match>
+    <!-- Dead store is deliberate to test URL validity -->
+    <Class name="org.apache.catalina.startup.Bootstrap" />
+    <Method name="createClassLoader" />
+    <Bug pattern="DLS_DEAD_LOCAL_STORE" />
   </Match>
   <Match>
     <!-- Failure at this point is fatal -->
@@ -484,9 +542,37 @@
     <Bug code="NP" />
   </Match>
   <Match>
+    <!-- Deployer instance may implement Listener -->
+    <Class name="org.apache.catalina.storeconfig.CatalinaClusterSF" />
+    <Method name="storeChildren" />
+    <Bug pattern="EC_UNRELATED_TYPES_USING_POINTER_EQUALITY" />
+  </Match>
+  <Match>
+    <!-- If old -> save worked, assume save -> old will to -->
+    <Class name="org.apache.catalina.storeconfig.StoreFileMover" />
+    <Method name="move" />
+    <Bug pattern="RV_RETURN_VALUE_IGNORED_BAD_PRACTICE" />
+  </Match>
+  <Match>
+    <!-- Monitor only used for election -->
+    <Class name="org.apache.catalina.tribes.group.interceptors.NonBlockingCoordinator"/>
+    <Method name="startElection"/>
+    <Bug pattern="WA_NOT_IN_LOOP"/>
+  </Match>
+  <Match>
     <Class name="org.apache.catalina.tribes.group.interceptors.TcpFailureDetector"/>
     <Method name="memberAlive"/>
     <Bug code="DE"/>
+  </Match>
+  <Match>
+    <Class name="org.apache.catalina.tribes.group.ChannelCoordinator"/>
+    <Field name="membershipService"/>
+    <Bug pattern="IS2_INCONSISTENT_SYNC"/>
+  </Match>
+  <Match>
+    <Class name="org.apache.catalina.tribes.group.RpcChannel"/>
+    <Method name="send"/>
+    <Bug pattern="WA_NOT_IN_LOOP"/>
   </Match>
   <Match>
     <Class name="org.apache.catalina.tribes.membership.McastServiceImpl"/>
@@ -519,10 +605,70 @@
     <Bug pattern="UG_SYNC_SET_UNSYNC_GET"/>
   </Match>
   <Match>
+    <Class name="org.apache.catalina.tribes.membership.MemberImpl"/>
+    <Field name="dataPkg"/>
+    <Bug pattern="IS2_INCONSISTENT_SYNC"/>
+  </Match>
+  <Match>
+    <!-- Byte arrays contents are not mutated -->
+    <Class name="org.apache.catalina.tribes.membership.MemberImpl"/>
+    <Or>
+      <Field name="command"/>
+      <Field name="domain"/>
+      <Field name="host"/>
+      <Field name="payload"/>
+      <Field name="uniqueId"/>
+    </Or>
+    <Bug pattern="VO_VOLATILE_REFERENCE_TO_ARRAY"/>
+  </Match>
+  <Match>
+    <!-- lock is in clone so this is safe -->
+    <Class name="org.apache.catalina.tribes.membership.Membership" />
+    <Method name="clone" />
+    <Bug pattern="ML_SYNC_ON_FIELD_TO_GUARD_CHANGING_THAT_FIELD" />
+  </Match>
+  <Match>
+    <!-- Byte arrays contents are not mutated -->
+    <Class name="org.apache.catalina.tribes.membership.Membership" />
+    <Field name="members"/>
+    <Bug pattern="VO_VOLATILE_REFERENCE_TO_ARRAY"/>
+  </Match>
+  <Match>
+    <!--  Fields are always recalculated on access -->
+    <Class name="org.apache.catalina.tribes.tipis.AbstractReplicatedMap$MapMessage" />
+    <Or>
+      <Field name="key" />
+      <Field name="value" />
+    </Or>
+    <Bug pattern="SE_TRANSIENT_FIELD_NOT_RESTORED" />
+  </Match>
+  <Match>
+    <!-- Sync is not intended to protect access to this field -->
+    <Class name="org.apache.catalina.tribes.transport.ReplicationTransmitter"/>
+    <Field name="oname"/>
+    <Bug pattern="IS2_INCONSISTENT_SYNC"/>
+  </Match>
+  <Match>
     <!-- Intentional in case thread is waiting -->
     <Class name="org.apache.catalina.tribes.transport.RxTaskPool"/>
     <Method name="returnWorker"/>
     <Bug code="NN"/>
+  </Match>
+  <Match>
+    <!-- Sync is to protect multiple against calls to connect() -->
+    <Class name="org.apache.catalina.tribes.transport.nio.NioSender"/>
+    <Or>
+      <Field name="dataChannel"/>
+      <Field name="socketChannel"/>
+      <Field name="writebuf"/>
+    </Or>
+    <Bug pattern="IS2_INCONSISTENT_SYNC"/>
+  </Match>
+  <Match>
+    <!-- Byte arrays contents are not mutated -->
+    <Class name="org.apache.catalina.tribes.transport.nio.NioSender"/>
+    <Field name="current"/>
+    <Bug pattern="VO_VOLATILE_REFERENCE_TO_ARRAY"/>
   </Match>
   <Match>
     <Class name="org.apache.catalina.util.LifecycleBase" />
@@ -569,6 +715,15 @@
     <Class name="org.apache.catalina.valves.StuckThreadDetectionValve"/>
     <Method name="invoke"/>
     <Bug code="RCN"/>
+  </Match>
+  <Match>
+    <!-- Array contents is not mutated -->
+    <Class name="org.apache.catalina.webresources.CachedResource"/>
+    <Or>
+      <Field name="webResources"/>
+      <Field name="cachedContent"/>
+    </Or>
+    <Bug pattern="VO_VOLATILE_REFERENCE_TO_ARRAY"/>
   </Match>
   <Match>
     <!-- Use of synchronisation is required to make a sequence of calls in   -->

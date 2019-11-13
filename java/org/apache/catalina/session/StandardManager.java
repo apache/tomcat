@@ -29,6 +29,7 @@ import java.security.AccessController;
 import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.servlet.ServletContext;
 
@@ -229,7 +230,9 @@ public class StandardManager extends ManagerBase {
                 } finally {
                     // Delete the persistent storage file
                     if (file.exists()) {
-                        file.delete();
+                        if (!file.delete()) {
+                            log.warn(sm.getString("standardManager.deletePersistedFileFail", file));
+                        }
                     }
                 }
             }
@@ -293,7 +296,7 @@ public class StandardManager extends ManagerBase {
         }
 
         // Keep a note of sessions that are expired
-        ArrayList<StandardSession> list = new ArrayList<>();
+        List<StandardSession> list = new ArrayList<>();
 
         try (FileOutputStream fos = new FileOutputStream(file.getAbsolutePath());
                 BufferedOutputStream bos = new BufferedOutputStream(fos);

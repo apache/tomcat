@@ -218,7 +218,6 @@ public class ChannelData implements ChannelMessage {
         XByteBuffer.toBytes(message.getLength(),data,offset);
         offset += 4; //message.length
         System.arraycopy(message.getBytesDirect(),0,data,offset,message.getLength());
-        offset += message.getLength(); //message data
         return data;
     }
 
@@ -302,15 +301,17 @@ public class ChannelData implements ChannelMessage {
      * @return ClusterData
      */
     @Override
-    public Object clone() {
-//        byte[] d = this.getDataPackage();
-//        return ClusterData.getDataFromPackage(d);
-        ChannelData clone = new ChannelData(false);
-        clone.options = this.options;
-        clone.message = new XByteBuffer(this.message.getBytesDirect(),false);
-        clone.timestamp = this.timestamp;
-        clone.uniqueId = this.uniqueId;
-        clone.address = this.address;
+    public ChannelData clone() {
+        ChannelData clone;
+        try {
+            clone = (ChannelData) super.clone();
+        } catch (CloneNotSupportedException e) {
+            // Cannot happen
+            throw new AssertionError();
+        }
+        if (this.message != null) {
+            clone.message = new XByteBuffer(this.message.getBytesDirect(),false);
+        }
         return clone;
     }
 

@@ -47,7 +47,9 @@ import org.apache.juli.logging.LogFactory;
  * <li><b>END_DATA</b>  - 7 bytes - <i>TLF2003</i></li>
  * </ul>
  */
-public class XByteBuffer {
+public class XByteBuffer implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     private static final Log log = LogFactory.getLog(XByteBuffer.class);
     protected static final StringManager sm = StringManager.getManager(XByteBuffer.class);
@@ -461,7 +463,7 @@ public class XByteBuffer {
     }
 
     /**
-     * Converts an long to eight bytes.
+     * Converts a long to eight bytes.
      * @param n the long
      * @param b the byte buffer in which the integer will be placed
      * @param offset the offset in the byte array

@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.servlet.ServletContext;
 
@@ -128,7 +129,7 @@ public final class FileStore extends StoreBase {
         // Acquire the list of files in our storage directory
         File file = directory();
         if (file == null) {
-            return (0);
+            return 0;
         }
         String files[] = file.list();
 
@@ -184,7 +185,7 @@ public final class FileStore extends StoreBase {
         }
 
         // Build and return the list of session identifiers
-        ArrayList<String> list = new ArrayList<>();
+        List<String> list = new ArrayList<>();
         int n = FILE_EXT.length();
         for (int i = 0; i < files.length; i++) {
             if (files[i].endsWith(FILE_EXT)) {
@@ -263,7 +264,10 @@ public final class FileStore extends StoreBase {
             manager.getContext().getLogger().debug(sm.getString(getStoreName() + ".removing",
                              id, file.getAbsolutePath()));
         }
-        file.delete();
+
+        if (file.exists() && !file.delete()) {
+            throw new IOException(sm.getString("fileStore.deleteSessionFailed", file));
+        }
     }
 
 

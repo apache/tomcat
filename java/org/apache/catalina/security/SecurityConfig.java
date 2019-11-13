@@ -28,7 +28,9 @@ import org.apache.juli.logging.LogFactory;
  * @author the Catalina.java authors
  */
 public final class SecurityConfig{
-    private static SecurityConfig singleton = null;
+
+    private static final Object singletonLock = new Object();
+    private static volatile SecurityConfig singleton = null;
 
     private static final Log log = LogFactory.getLog(SecurityConfig.class);
 
@@ -83,8 +85,12 @@ public final class SecurityConfig{
      * @return an instance of that class.
      */
     public static SecurityConfig newInstance(){
-        if (singleton == null){
-            singleton = new SecurityConfig();
+        if (singleton == null) {
+            synchronized (singletonLock) {
+                if (singleton == null) {
+                    singleton = new SecurityConfig();
+                }
+            }
         }
         return singleton;
     }

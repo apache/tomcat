@@ -779,6 +779,7 @@ public class Tomcat {
         };
     }
 
+
     protected void initBaseDir() {
         String catalinaHome = System.getProperty(Globals.CATALINA_HOME_PROP);
         if (basedir == null) {
@@ -789,12 +790,27 @@ public class Tomcat {
         }
         if (basedir == null) {
             // Create a temp dir.
-            basedir = System.getProperty("user.dir") +
-                "/tomcat." + port;
+            basedir = System.getProperty("user.dir") + "/tomcat." + port;
         }
 
         File baseFile = new File(basedir);
-        baseFile.mkdirs();
+        if (baseFile.exists()) {
+            if (!baseFile.isDirectory()) {
+                throw new IllegalArgumentException(sm.getString("tomcat.baseDirNotDir", baseFile));
+            }
+        } else {
+            if (!baseFile.mkdirs()) {
+                // Failed to create base directory
+                throw new IllegalStateException(sm.getString("tomcat.baseDirMakeFail", baseFile));
+            }
+            /*
+             * If file permissions were going to be set on the newly created
+             * directory, this is the place to do it. However, even simple
+             * calls such as File.setReadable(boolean,boolean) behaves
+             * differently on different platforms. Therefore, setBaseDir
+             * documents that the user needs to do this.
+             */
+        }
         try {
             baseFile = baseFile.getCanonicalFile();
         } catch (IOException e) {
