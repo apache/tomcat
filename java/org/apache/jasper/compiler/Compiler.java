@@ -68,6 +68,7 @@ public abstract class Compiler {
 
     protected Node.Nodes pageNodes;
 
+
     // ------------------------------------------------------------ Constructor
 
     public void init(JspCompilationContext ctxt, JspServletWrapper jsw) {
@@ -75,6 +76,7 @@ public abstract class Compiler {
         this.ctxt = ctxt;
         this.options = ctxt.getOptions();
     }
+
 
     // --------------------------------------------------------- Public Methods
 
@@ -89,11 +91,13 @@ public abstract class Compiler {
         return this.pageNodes;
     }
 
+
     /**
      * Compile the jsp file into equivalent servlet in .java file
      *
      * @return a smap for the current JSP page, if one is generated, null
      *         otherwise
+     * @throws Exception Error generating Java source
      */
     protected String[] generateJava() throws Exception {
 
@@ -263,7 +267,7 @@ public abstract class Compiler {
                         + " generate=" + (t4 - t3) + " validate=" + (t2 - t1));
             }
 
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             if (writer != null) {
                 try {
                     writer.close();
