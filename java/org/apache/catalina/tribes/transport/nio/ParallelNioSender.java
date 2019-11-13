@@ -209,7 +209,6 @@ public class ParallelNioSender extends AbstractSender implements MultiPointSende
             }
         }
         return result;
-
     }
 
     private static class SendResult {
