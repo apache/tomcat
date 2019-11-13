@@ -160,18 +160,6 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
     private volatile int lastWindowUpdate;
 
 
-    /**
-     * @param adapter       The adapter to use to process the upgrade
-     * @param coyoteRequest The request to use to process the upgrade
-     *
-     * @deprecated This will be removed in Tomcat 9 onwards.
-     *             Use {@link #Http2UpgradeHandler(Http2Protocol, Adapter, Request)}
-     */
-    @Deprecated
-    public Http2UpgradeHandler(Adapter adapter, Request coyoteRequest) {
-        this(null, adapter, coyoteRequest);
-    }
-
     public Http2UpgradeHandler(Http2Protocol protocol, Adapter adapter, Request coyoteRequest) {
         super (STREAM_ID_ZERO);
         this.protocol = protocol;

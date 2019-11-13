@@ -823,10 +823,28 @@
     <Bug pattern="NN_NAKED_NOTIFY" />
   </Match>
   <Match>
+    <!-- Monitor is used for a single condition. -->
+    <Class name="org.apache.coyote.http2.WindowAllocationManager" />
+    <Method name="notify" />
+    <Bug pattern="NO_NOTIFY_NOT_NOTIFYALL" />
+  </Match>
+  <Match>
+    <!-- Monitor is used for a single condition. -->
+    <Class name="org.apache.coyote.http2.WindowAllocationManager" />
+    <Method name="waitFor" />
+    <Bug pattern="WA_NOT_IN_LOOP" />
+  </Match>
+  <Match>
     <!-- Returning null is required by the EL specification -->
     <Class name="org.apache.el.lang.ELSupport" />
     <Method name="coerceToBoolean"/>
     <Bug pattern="NP_BOOLEAN_RETURN_NULL"/>
+  </Match>
+  <Match>
+    <!-- Result is negated because arguments have to be swapped -->
+    <Class name="org.apache.el.lang.ELSupport" />
+    <Method name="compare"/>
+    <Bug pattern="RV_NEGATING_RESULT_OF_COMPARETO"/>
   </Match>
   <Match>
     <!-- JspC will not be used under a security manager -->
