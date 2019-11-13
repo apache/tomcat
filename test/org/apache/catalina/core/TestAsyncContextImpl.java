@@ -564,7 +564,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         private static final long serialVersionUID = 1L;
 
         private final Boolean completeOnTimeout;
-        private final TrackingListener trackingListener;
+        private final transient TrackingListener trackingListener;
 
         public static final long ASYNC_TIMEOUT = 100;
 
@@ -694,7 +694,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         private static final long serialVersionUID = 1L;
         private static final String ITER_PARAM = "iter";
         private static final String DISPATCH_CHECK = "check";
-        private final TrackingListener trackingListener;
+        private final transient TrackingListener trackingListener;
 
         public DispatchingServlet(boolean addTrackingListener,
                 boolean completeOnError) {
@@ -1905,7 +1905,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
 
         private static final long serialVersionUID = 1L;
 
-        private final TrackingListener trackingListener = new TrackingListener(true, false, "/async");
+        private final transient TrackingListener trackingListener = new TrackingListener(true, false, "/async");
         @Override
         protected void doGet(HttpServletRequest req, HttpServletResponse resp)
                 throws ServletException, IOException {
@@ -2756,7 +2756,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
 
         private final boolean useThread;
         private final boolean useComplete;
-        private AsyncIoEndWriteListener asyncIoEndWriteListener;
+        private transient AsyncIoEndWriteListener asyncIoEndWriteListener;
 
         public AsyncIoEndServlet(boolean useThread, boolean useComplete) {
             this.useThread = useThread;
@@ -2775,7 +2775,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
             }
             AsyncContext ac = req.startAsync();
             ServletOutputStream sos = resp.getOutputStream();
-            asyncIoEndWriteListener= new AsyncIoEndWriteListener(ac, useThread, useComplete);
+            asyncIoEndWriteListener = new AsyncIoEndWriteListener(ac, useThread, useComplete);
             sos.setWriteListener(asyncIoEndWriteListener);
         }
 
@@ -2930,9 +2930,9 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
 
         private static final long serialVersionUID = 1L;
 
-        private final CountDownLatch doGetLatch;
-        private final CountDownLatch clientCloseLatch;
-        private final CountDownLatch threadCompleteLatch;
+        private final transient CountDownLatch doGetLatch;
+        private final transient CountDownLatch clientCloseLatch;
+        private final transient CountDownLatch threadCompleteLatch;
         private final AtomicBoolean ise;
 
         public Bug63816Servlet(CountDownLatch doGetLatch, CountDownLatch clientCloseLatch,

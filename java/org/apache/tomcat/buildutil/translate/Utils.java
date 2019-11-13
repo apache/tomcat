@@ -78,7 +78,11 @@ public class Utils {
 
 
     static void processDirectory(File root, File dir, Map<String,Properties> translations) throws IOException {
-        for (File f : dir.listFiles()) {
+        File[] files = dir.listFiles();
+        if (files == null) {
+            throw new IllegalArgumentException("Not a directory [" + dir.getAbsolutePath() + "]");
+        }
+        for (File f : files) {
             if (f.isDirectory()) {
                 processDirectory(root, f, translations);
             } else if (f.isFile()) {

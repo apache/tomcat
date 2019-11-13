@@ -2692,7 +2692,7 @@ public class ContextConfig implements LifecycleListener {
         @Override
         public void lifecycleEvent(LifecycleEvent event) {
 
-            if (event.getType() == Lifecycle.AFTER_DESTROY_EVENT) {
+            if (Lifecycle.AFTER_DESTROY_EVENT.equals(event.getType())) {
                 Host host = (Host) event.getSource();
                 hostWebXmlCache.remove(host);
             }
