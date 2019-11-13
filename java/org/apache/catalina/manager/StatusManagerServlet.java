@@ -396,14 +396,7 @@ public class StatusManagerServlet
                         requestProcessors.removeElement(objectName);
                     }
                 }
-                String j2eeType = objectName.getKeyProperty("j2eeType");
-                if (j2eeType != null) {
-
-                }
             }
         }
-
     }
-
-
 }

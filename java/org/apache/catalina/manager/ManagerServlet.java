@@ -14,10 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.catalina.manager;
-
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -257,9 +254,7 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
      */
     @Override
     public Wrapper getWrapper() {
-
-        return (this.wrapper);
-
+        return this.wrapper;
     }
 
 
@@ -541,6 +536,10 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
 
     /**
      * Find potential memory leaks caused by web application reload.
+     *
+     * @param statusLine Print a status line
+     * @param writer The output writer
+     * @param smClient StringManager for the client's locale
      */
     protected void findleaks(boolean statusLine, PrintWriter writer,
             StringManager smClient) {
@@ -571,9 +570,11 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
 
 
     /**
-     * Write some VM info
+     * Write some VM info.
      *
-     * @param writer
+     * @param writer The output writer
+     * @param smClient StringManager for the client's locale
+     * @param requestedLocales the client's locales
      */
     protected void vmInfo(PrintWriter writer, StringManager smClient,
             Enumeration<Locale> requestedLocales) {
@@ -582,9 +583,11 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
     }
 
     /**
-     * Write a JVM thread dump
+     * Write a JVM thread dump.
      *
-     * @param writer
+     * @param writer The output writer
+     * @param smClient StringManager for the client's locale
+     * @param requestedLocales the client's locales
      */
     protected void threadDump(PrintWriter writer, StringManager smClient,
             Enumeration<Locale> requestedLocales) {
@@ -596,10 +599,11 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
     /**
      * Store server configuration.
      *
-     * @param path Optional context path to save
+     * @param writer   Destination for any user message(s) during this operation
+     * @param path     Optional context path to save
+     * @param smClient i18n support for current client's locale
      */
-    protected synchronized void save(PrintWriter writer, String path,
-            StringManager smClient) {
+    protected synchronized void save(PrintWriter writer, String path, StringManager smClient) {
 
         Server server = ((Engine)host.getParent()).getService().getServer();
 
@@ -617,7 +621,6 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
                 log("managerServlet.storeConfig", e);
                 writer.println(smClient.getString("managerServlet.exception",
                         e.toString()));
-                return;
             }
         } else {
             String contextPath = path;
@@ -638,10 +641,8 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
                 log("managerServlet.save[" + path + "]", e);
                 writer.println(smClient.getString("managerServlet.exception",
                         e.toString()));
-                return;
             }
         }
-
     }
 
 
@@ -728,7 +729,11 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
                             return;
                         }
                         // Rename uploaded WAR file
-                        uploadedWar.renameTo(deployedWar);
+                        if (!uploadedWar.renameTo(deployedWar)) {
+                            writer.println(smClient.getString("managerServlet.renameFail",
+                                    uploadedWar, deployedWar));
+                            return;
+                        }
                     }
                     if (tag != null) {
                         // Copy WAR to the host's appBase
