@@ -154,7 +154,10 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         String servletName = NBWriteServlet.class.getName();
         Tomcat.addServlet(ctx, servletName, servlet);
         ctx.addServletMappingDecoded("/", servletName);
-        tomcat.getConnector().setProperty("socket.txBufSize", "1024");
+        // Note: Low values of socket.txBufSize can trigger very poor
+        //       performance. Set it just low enough to ensure that the
+        //       non-blocking write servlet will see isReady() == false
+        tomcat.getConnector().setProperty("socket.txBufSize", "1048576");
         tomcat.start();
 
         SocketFactory factory = SocketFactory.getDefault();
