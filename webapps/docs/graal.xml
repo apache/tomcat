@@ -176,6 +176,19 @@ ant -Dwebapp.name=somewebapp -f graal-webapp.ant.xml</source>
     listeners (use of internal code that does not exist in Graal).
   </p>
 
+  <p>
+    Missing items for better Tomcat functionality:
+    <ul>
+      <li>Java 11: ALPN for TLS, TLS 1.3, etc</li>
+      <li>BeanInfo support: BeanInfo use in JSP taglibs must be configured
+        manually in descriptors</li>
+      <li>Java serialization: Clustering, session persistence</li>
+      <li>Static linking configuration: JSSE elliptic curve support,
+        tomcat-native support when creating an image with static linking</li>
+      <li>JMX: Tomcat monitoring and management</li>
+    </ul>
+  </p>
+
   </section>
 
 </body>
