@@ -42,9 +42,10 @@ import java.util.concurrent.atomic.AtomicInteger;
  * <li><b>DATA</b>      - should be as many bytes as the prev SIZE</li>
  * <li><b>END_DATA</b>  - 7 bytes - <i>TLF2003</i></li>
  * </ul>
- * @author Filip Hanik
  */
-public class XByteBuffer {
+public class XByteBuffer implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     private static final org.apache.juli.logging.Log log =
         org.apache.juli.logging.LogFactory.getLog( XByteBuffer.class );
@@ -467,7 +468,7 @@ public class XByteBuffer {
     }
 
     /**
-     * Converts an long to eight bytes
+     * Converts a long to eight bytes.
      * @param n - the long
      * @return - eight bytes in an array
      * @deprecated use toBytes(long,byte[],int)

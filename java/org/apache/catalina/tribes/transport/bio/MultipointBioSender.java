@@ -30,10 +30,6 @@ import org.apache.catalina.tribes.io.XByteBuffer;
 import org.apache.catalina.tribes.transport.AbstractSender;
 import org.apache.catalina.tribes.transport.MultiPointSender;
 
-/**
- *
- * @author Filip Hanik
- */
 public class MultipointBioSender extends AbstractSender implements MultiPointSender {
     public MultipointBioSender() {
         // NO-OP
@@ -44,8 +40,7 @@ public class MultipointBioSender extends AbstractSender implements MultiPointSen
      */
     @Deprecated
     protected final long selectTimeout = 1000;
-    protected HashMap<Member, BioSender> bioSenders =
-        new HashMap<Member, BioSender>();
+    protected HashMap<Member, BioSender> bioSenders = new HashMap<Member, BioSender>();
 
     @Override
     public synchronized void sendMessage(Member[] destination, ChannelMessage msg) throws ChannelException {
@@ -130,22 +125,29 @@ public class MultipointBioSender extends AbstractSender implements MultiPointSen
 
     @Override
     public synchronized void disconnect() {
-        try {close(); }catch (Exception x){/* Ignore */}
+        try {
+            close();
+        } catch (Exception x) {
+            // Ignore
+        }
         setConnected(false);
     }
 
     @Override
-    public void finalize() throws Throwable {
-        try {disconnect(); }catch ( Exception e){/* Ignore */}
+    protected void finalize() throws Throwable {
+        try {
+            disconnect();
+        } catch (Exception e) {
+            // Ignore
+        }
         super.finalize();
     }
 
 
     @Override
     public boolean keepalive() {
-        //throw new UnsupportedOperationException("Method ParallelBioSender.checkKeepAlive() not implemented");
         boolean result = false;
-        @SuppressWarnings("unchecked") // bioSenders is of type HashMap<Member, BioSender>
+        @SuppressWarnings("unchecked")
         Map.Entry<Member,BioSender>[] entries = bioSenders.entrySet().toArray(new Map.Entry[bioSenders.size()]);
         for ( int i=0; i<entries.length; i++ ) {
             BioSender sender = entries[i].getValue();

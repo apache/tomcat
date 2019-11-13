@@ -2567,7 +2567,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
                                 contextName, thread.getName()));
                     }
 
-                    // Don't try an stop the threads unless explicitly
+                    // Don't try and stop the threads unless explicitly
                     // configured to do so
                     if (!clearReferencesStopThreads) {
                         continue;
@@ -2583,11 +2583,9 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
                         // "runnable" in IBM JDK
                         // "action" in Apache Harmony
                         Object target = null;
-                        for (String fieldName : new String[] { "target",
-                                "runnable", "action" }) {
+                        for (String fieldName : new String[] { "target", "runnable", "action" }) {
                             try {
-                                Field targetField = thread.getClass()
-                                        .getDeclaredField(fieldName);
+                                Field targetField = thread.getClass().getDeclaredField(fieldName);
                                 targetField.setAccessible(true);
                                 target = targetField.get(thread);
                                 break;
@@ -2598,12 +2596,10 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
 
                         // "java.util.concurrent" code is in public domain,
                         // so all implementations are similar
-                        if (target != null &&
-                                target.getClass().getCanonicalName() != null
-                                && target.getClass().getCanonicalName().equals(
-                                "java.util.concurrent.ThreadPoolExecutor.Worker")) {
-                            Field executorField =
-                                target.getClass().getDeclaredField("this$0");
+                        if (target != null && target.getClass().getCanonicalName() != null &&
+                                target.getClass().getCanonicalName().equals(
+                                        "java.util.concurrent.ThreadPoolExecutor.Worker")) {
+                            Field executorField = target.getClass().getDeclaredField("this$0");
                             executorField.setAccessible(true);
                             Object executor = executorField.get(target);
                             if (executor instanceof ThreadPoolExecutor) {
@@ -2728,7 +2724,9 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
                 synchronized(queue) {
                     newTasksMayBeScheduledField.setBoolean(thread, false);
                     clearMethod.invoke(queue);
-                    queue.notify();  // In case queue was already empty.
+                    // In case queue was already empty. Should only be one
+                    // thread waiting but use notifyAll() to be safe.
+                    queue.notifyAll();
                 }
 
             }catch (NoSuchFieldException nfe){

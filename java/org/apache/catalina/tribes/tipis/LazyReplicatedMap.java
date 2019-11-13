@@ -63,13 +63,11 @@ import org.apache.juli.logging.LogFactory;
  *
  * @param <K> The type of Key
  * @param <V> The type of Value
- *
- * @author Filip Hanik
- * @version 1.0
  */
 public class LazyReplicatedMap<K,V> extends AbstractReplicatedMap<K,V> {
     private static final long serialVersionUID = 1L;
-    private final Log log = LogFactory.getLog(LazyReplicatedMap.class); // must not be static
+    // Lazy init to support serialization
+    private transient volatile Log log;
 
 
 //------------------------------------------------------------------------------
@@ -151,6 +149,7 @@ public class LazyReplicatedMap<K,V> extends AbstractReplicatedMap<K,V> {
      */
     @Override
     protected Member[] publishEntryInfo(Object key, Object value) throws ChannelException {
+        Log log = getLog();
         if  (! (key instanceof Serializable && value instanceof Serializable)  ) return new Member[0];
         Member[] members = getMapMembers();
         int firstIdx = getNextBackupIndex();
@@ -187,7 +186,7 @@ public class LazyReplicatedMap<K,V> extends AbstractReplicatedMap<K,V> {
                 success = true;
                 backup = tmpBackup;
             }catch ( ChannelException x ) {
-                log.error("Unable to replicate backup key:"+key+" to backup:"+next+". Reason:"+x.getMessage(),x);
+                log.error(sm.getString("lazyReplicatedMap.unableReplicate.backup", key, next, x.getMessage()), x);
                 continue;
             }
             try {
@@ -204,11 +203,21 @@ public class LazyReplicatedMap<K,V> extends AbstractReplicatedMap<K,V> {
                 //log the error, but proceed, this should only happen if a node went down,
                 //and if the node went down, then it can't receive the message, the others
                 //should still get it.
-                log.error("Unable to replicate proxy key:"+key+" to backup:"+next+". Reason:"+x.getMessage(),x);
+                log.error(sm.getString("lazyReplicatedMap.unableReplicate.proxy", key, next, x.getMessage()), x);
             }
         } while ( !success && (firstIdx!=nextIdx));
         return backup;
     }
 
 
+    private Log getLog() {
+        if (log == null) {
+            synchronized (this) {
+                if (log == null) {
+                    log = LogFactory.getLog(LazyReplicatedMap.class);
+                }
+            }
+        }
+        return log;
+    }
 }

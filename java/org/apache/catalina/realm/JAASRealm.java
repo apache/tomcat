@@ -219,8 +219,7 @@ public class JAASRealm extends RealmBase {
      * @param useContext True means use context ClassLoader
      */
     public void setUseContextClassLoader(boolean useContext) {
-      useContextClassLoader = useContext;
-      log.info("Setting useContextClassLoader = " + useContext);
+        useContextClassLoader = useContext;
     }
 
     /**
@@ -630,6 +629,8 @@ public class JAASRealm extends RealmBase {
      * Load custom JAAS Configuration
      */
     protected Configuration getConfig() {
+        // Local copy to avoid possible NPE due to concurrent change
+        String configFile = this.configFile;
         try {
             if (jaasConfigurationLoaded) {
                 return jaasConfiguration;
@@ -639,12 +640,11 @@ public class JAASRealm extends RealmBase {
                     jaasConfigurationLoaded = true;
                     return null;
                 }
-                URL resource = Thread.currentThread().getContextClassLoader().
-                        getResource(configFile);
+                URL resource = Thread.currentThread().getContextClassLoader().getResource(configFile);
                 URI uri = resource.toURI();
                 @SuppressWarnings("unchecked")
                 Class<Configuration> sunConfigFile = (Class<Configuration>)
-                        Class.forName("com.sun.security.auth.login.ConfigFile");
+                Class.forName("com.sun.security.auth.login.ConfigFile");
                 Constructor<Configuration> constructor =
                         sunConfigFile.getConstructor(URI.class);
                 Configuration config = constructor.newInstance(uri);
@@ -669,6 +669,5 @@ public class JAASRealm extends RealmBase {
         } catch (ClassNotFoundException ex) {
             throw new RuntimeException(ex);
         }
-
     }
 }

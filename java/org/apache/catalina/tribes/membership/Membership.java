@@ -14,9 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.catalina.tribes.membership;
-
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -34,18 +32,17 @@ import org.apache.catalina.tribes.Member;
  * This class is responsible for maintaining a list of active cluster nodes in the cluster.
  * If a node fails to send out a heartbeat, the node will be dismissed.
  *
- * @author Filip Hanik
  * @author Peter Rossbach
  */
 public class Membership implements Cloneable {
 
     protected static final MemberImpl[] EMPTY_MEMBERS = new MemberImpl[0];
 
-    private final Object membersLock = new Object();
+    // Non-final to support clone()
+    private Object membersLock = new Object();
 
     /**
-     * The name of this membership, has to be the same as the name for the local
-     * member
+     * The local member.
      */
     protected MemberImpl local;
 
@@ -65,14 +62,29 @@ public class Membership implements Cloneable {
     protected Comparator<Member> memberComparator = new MemberComparator();
 
     @Override
-    public Object clone() {
+    public Membership clone() {
         synchronized (membersLock) {
-            Membership clone = new Membership(local, memberComparator);
-            @SuppressWarnings("unchecked") // map is correct type already
+            Membership clone;
+            try {
+                clone = (Membership) super.clone();
+            } catch (CloneNotSupportedException e) {
+                // Can't happen
+                throw new AssertionError();
+            }
+
+            // Standard clone() method will copy the map object. Replace that
+            // with a new map but with the same contents.
+            @SuppressWarnings("unchecked")
             final HashMap<MemberImpl, MbrEntry> tmpclone = (HashMap<MemberImpl, MbrEntry>) map.clone();
             clone.map = tmpclone;
-            clone.members = new MemberImpl[members.length];
-            System.arraycopy(members,0,clone.members,0,members.length);
+
+            // Standard clone() method will copy the array object. Replace that
+            // with a new array but with the same contents.
+            clone.members = members.clone();
+
+            // Standard clone() method will copy the lock object. Replace that
+            // with a new object.
+            clone.membersLock = new Object();
             return clone;
         }
     }

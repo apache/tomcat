@@ -46,7 +46,6 @@ import org.apache.catalina.tribes.util.ExecutorFactory;
  * This is the low level implementation that handles the multicasting sockets.
  * Need to fix this, could use java.nio and only need one thread to send and receive, or
  * just use a timeout on the receive
- * @author Filip Hanik
  */
 public class McastServiceImpl
 {
@@ -59,7 +58,7 @@ public class McastServiceImpl
      */
     protected volatile boolean doRunSender = false;
     protected volatile boolean doRunReceiver = false;
-    protected int startLevel = 0;
+    protected volatile int startLevel = 0;
     /**
      * Socket that we intend to listen to
      */

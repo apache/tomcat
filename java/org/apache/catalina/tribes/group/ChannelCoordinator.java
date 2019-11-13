@@ -34,12 +34,10 @@ import org.apache.catalina.tribes.transport.nio.NioReceiver;
 import org.apache.catalina.tribes.util.Arrays;
 import org.apache.catalina.tribes.util.Logs;
 
-
 /**
  * The channel coordinator object coordinates the membership service,
  * the sender and the receiver.
  * This is the last interceptor in the chain.
- * @author Filip Hanik
  */
 public class ChannelCoordinator extends ChannelInterceptorBase implements MessageListener {
     private ChannelReceiver clusterReceiver = new NioReceiver();
@@ -161,7 +159,6 @@ public class ChannelCoordinator extends ChannelInterceptorBase implements Messag
                             getClusterReceiver().getPort(),
                             getClusterReceiver().getSecurePort(),
                             getClusterReceiver().getUdpPort());
-
                 }
                 valid = true;
             }
@@ -247,12 +244,9 @@ public class ChannelCoordinator extends ChannelInterceptorBase implements Messag
 
             startLevel = (startLevel & (~svc));
             setChannel(null);
-        }catch ( Exception x ) {
+        } catch (Exception x) {
             throw new ChannelException(x);
-        } finally {
-
         }
-
     }
 
     @Override

@@ -240,9 +240,8 @@ public class GroupChannel extends ChannelInterceptorBase implements ManagedChann
             }
 
             return new UniqueId(data.getUniqueId());
-        }catch ( Exception x ) {
-            if ( x instanceof ChannelException ) throw (ChannelException)x;
-            throw new ChannelException(x);
+        } catch (Exception e) {
+            throw new ChannelException(e);
         } finally {
             if ( buffer != null ) BufferPool.getBufferPool().returnBuffer(buffer);
         }

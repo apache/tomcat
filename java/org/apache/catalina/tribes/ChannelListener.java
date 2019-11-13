@@ -29,7 +29,6 @@ import java.io.Serializable;
  * was processed by an above application or if it was just received and forgot about, a feature required
  * to support message-response(RPC) calls<br>
  *
- * @author Filip Hanik
  * @version 1.0
  */
 

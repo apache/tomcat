@@ -30,14 +30,6 @@ import org.apache.catalina.tribes.io.XByteBuffer;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
-
-
-/**
- *
- *
- * @author Filip Hanik
- * @version 1.0
- */
 public class ThroughputInterceptor extends ChannelInterceptorBase {
     private static final Log log = LogFactory.getLog(ThroughputInterceptor.class);
 
@@ -72,7 +64,7 @@ public class ThroughputInterceptor extends ChannelInterceptorBase {
         if ( access.addAndGet(-1) == 0 ) {
             long stop = System.currentTimeMillis();
             timeTx += (stop - txStart) / 1000d;
-            if ((msgTxCnt.get() / interval) >= lastCnt) {
+            if ((msgTxCnt.get() / (double) interval) >= lastCnt) {
                 lastCnt++;
                 report(timeTx);
             }

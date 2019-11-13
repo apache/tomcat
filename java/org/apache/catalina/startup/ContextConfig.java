@@ -212,7 +212,7 @@ public class ContextConfig implements LifecycleListener {
     /**
      * The Context we are associated with.
      */
-    protected Context context = null;
+    protected volatile Context context = null;
 
 
     /**
@@ -833,7 +833,7 @@ public class ContextConfig implements LifecycleListener {
     /**
      * Process a "init" event for this Context.
      */
-    protected void init() {
+    protected synchronized void init() {
         // Called from StandardContext.init()
 
         Digester contextDigester = createContextDigester();
@@ -2821,7 +2821,7 @@ public class ContextConfig implements LifecycleListener {
         @Override
         public void lifecycleEvent(LifecycleEvent event) {
 
-            if (event.getType() == Lifecycle.AFTER_DESTROY_EVENT) {
+            if (Lifecycle.AFTER_DESTROY_EVENT.equals(event.getType())) {
                 Host host = (Host) event.getSource();
                 hostWebXmlCache.remove(host);
             }

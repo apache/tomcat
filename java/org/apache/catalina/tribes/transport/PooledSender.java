@@ -24,23 +24,13 @@ import org.apache.catalina.tribes.util.StringManager;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
-/**
- * <p>Title: </p>
- *
- * <p>Description: </p>
- *
- * <p>Company: </p>
- *
- * @author not attributable
- * @version 1.0
- */
 public abstract class PooledSender extends AbstractSender implements MultiPointSender {
 
     private static final Log log = LogFactory.getLog(PooledSender.class);
     protected static final StringManager sm =
         StringManager.getManager(Constants.Package);
 
-    private SenderQueue queue = null;
+    private final SenderQueue queue;
     private int poolSize = 25;
     private long maxWait = 3000;
     public PooledSender() {
@@ -209,7 +199,7 @@ public abstract class PooledSender extends AbstractSender implements MultiPointS
                                 "PooledSender.senderDisconnectFail"), e);
                     }
                 }
-            notify();
+            notifyAll();
         }
 
         public synchronized void close() {
@@ -226,14 +216,14 @@ public abstract class PooledSender extends AbstractSender implements MultiPointS
             }//for
             notinuse.clear();
             inuse.clear();
-            notify();
+            notifyAll();
 
 
         }
 
         public synchronized void open() {
             isOpen = true;
-            notify();
+            notifyAll();
         }
     }
 }

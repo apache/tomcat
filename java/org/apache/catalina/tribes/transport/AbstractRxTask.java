@@ -19,10 +19,6 @@ package org.apache.catalina.tribes.transport;
 
 import org.apache.catalina.tribes.io.ListenCallback;
 
-
-/**
- * @author Filip Hanik
- */
 public abstract class AbstractRxTask implements Runnable
 {
 
@@ -70,10 +66,8 @@ public abstract class AbstractRxTask implements Runnable
         return doRun;
     }
 
-    public void close()
-    {
+    public void close() {
         doRun = false;
-        notify();
     }
 
     public void setUseBufferPool(boolean usebufpool) {

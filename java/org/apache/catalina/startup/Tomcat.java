@@ -813,6 +813,7 @@ public class Tomcat {
         };
     }
 
+
     protected void initBaseDir() {
         String catalinaHome = System.getProperty(Globals.CATALINA_HOME_PROP);
         if (basedir == null) {
@@ -823,8 +824,7 @@ public class Tomcat {
         }
         if (basedir == null) {
             // Create a temp dir.
-            basedir = System.getProperty("user.dir") +
-                "/tomcat." + port;
+            basedir = System.getProperty("user.dir") + "/tomcat." + port;
             File home = new File(basedir);
             home.mkdir();
             if (!home.isAbsolute()) {

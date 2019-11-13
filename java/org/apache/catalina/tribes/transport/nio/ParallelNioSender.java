@@ -16,7 +16,6 @@
  */
 package org.apache.catalina.tribes.transport.nio;
 
-
 import java.io.IOException;
 import java.net.UnknownHostException;
 import java.nio.channels.SelectionKey;
@@ -42,23 +41,12 @@ import org.apache.catalina.tribes.util.Logs;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
-/**
- * <p>Title: </p>
- *
- * <p>Description: </p>
- *
- * <p>Company: </p>
- *
- * @author not attributable
- * @version 1.0
- */
 public class ParallelNioSender extends AbstractSender implements MultiPointSender {
 
     private static final Log log = LogFactory.getLog(ParallelNioSender.class);
     protected long selectTimeout = 5000; //default 5 seconds, same as send timeout
     protected Selector selector;
-    protected HashMap<Member, NioSender> nioSenders =
-        new HashMap<Member, NioSender>();
+    protected HashMap<Member, NioSender> nioSenders = new HashMap<Member, NioSender>();
 
     public ParallelNioSender() throws IOException {
         synchronized (Selector.class) {
@@ -72,7 +60,8 @@ public class ParallelNioSender extends AbstractSender implements MultiPointSende
 
 
     @Override
-    public synchronized void sendMessage(Member[] destination, ChannelMessage msg) throws ChannelException {
+    public synchronized void sendMessage(Member[] destination, ChannelMessage msg)
+            throws ChannelException {
         long start = System.currentTimeMillis();
         this.setUdpBased((msg.getOptions()&Channel.SEND_OPTIONS_UDP) == Channel.SEND_OPTIONS_UDP);
         byte[] data = XByteBuffer.createDataPackage((ChannelData)msg);
@@ -85,7 +74,8 @@ public class ParallelNioSender extends AbstractSender implements MultiPointSende
         try {
             //loop until complete, an error happens, or we timeout
             long delta = System.currentTimeMillis() - start;
-            boolean waitForAck = (Channel.SEND_OPTIONS_USE_ACK & msg.getOptions()) == Channel.SEND_OPTIONS_USE_ACK;
+            boolean waitForAck = (Channel.SEND_OPTIONS_USE_ACK &
+                    msg.getOptions()) == Channel.SEND_OPTIONS_USE_ACK;
             while ( (remaining>0) && (delta<getTimeout()) ) {
                 try {
                     SendResult result = doLoop(selectTimeout, getMaxRetryAttempts(),waitForAck,msg);
@@ -123,14 +113,19 @@ public class ParallelNioSender extends AbstractSender implements MultiPointSende
                 throw cx;
             }
         } catch (Exception x ) {
-            try { this.disconnect(); } catch (Exception e) {/*Ignore*/}
+            try {
+                this.disconnect();
+            } catch (Exception e) {
+                // Ignore
+            }
             if ( x instanceof ChannelException ) throw (ChannelException)x;
             else throw new ChannelException(x);
         }
 
     }
 
-    private SendResult doLoop(long selectTimeOut, int maxAttempts, boolean waitForAck, ChannelMessage msg) throws ChannelException {
+    private SendResult doLoop(long selectTimeOut, int maxAttempts, boolean waitForAck, ChannelMessage msg)
+            throws ChannelException {
         SendResult result = new SendResult();
         int selectedKeys;
         try {
@@ -318,7 +313,11 @@ public class ParallelNioSender extends AbstractSender implements MultiPointSende
     @Override
     public synchronized void disconnect() {
         setConnected(false);
-        try {close(); }catch (Exception x){/*Ignore*/}
+        try {
+            close();
+        } catch (Exception x) {
+            // Ignore
+        }
     }
 
     @Override
@@ -337,7 +336,7 @@ public class ParallelNioSender extends AbstractSender implements MultiPointSende
     @Override
     public boolean keepalive() {
         boolean result = false;
-        for ( Iterator<Entry<Member, NioSender>> i = nioSenders.entrySet().iterator(); i.hasNext();) {
+        for (Iterator<Entry<Member,NioSender>> i = nioSenders.entrySet().iterator(); i.hasNext();) {
             Map.Entry<Member, NioSender> entry = i.next();
             NioSender sender = entry.getValue();
             if ( sender.keepalive() ) {
@@ -362,5 +361,4 @@ public class ParallelNioSender extends AbstractSender implements MultiPointSende
         if ( result ) try { selector.selectNow(); }catch (Exception e){/*Ignore*/}
         return result;
     }
-
 }

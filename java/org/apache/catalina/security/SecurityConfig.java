@@ -19,18 +19,20 @@ package org.apache.catalina.security;
 import java.security.Security;
 
 import org.apache.catalina.startup.CatalinaProperties;
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 
 /**
  * Util class to protect Catalina against package access and insertion.
  * The code are been moved from Catalina.java
  * @author the Catalina.java authors
- * @author Jean-Francois Arcand
  */
 public final class SecurityConfig{
-    private static SecurityConfig singleton = null;
 
-    private static final org.apache.juli.logging.Log log=
-        org.apache.juli.logging.LogFactory.getLog( SecurityConfig.class );
+    private static final Object singletonLock = new Object();
+    private static volatile SecurityConfig singleton = null;
+
+    private static final Log log = LogFactory.getLog(SecurityConfig.class);
 
 
     private static final String PACKAGE_ACCESS =  "sun.,"
@@ -49,26 +51,31 @@ public final class SecurityConfig{
     /**
      * List of protected package from conf/catalina.properties
      */
-    private String packageDefinition;
+    private final String packageDefinition;
 
 
     /**
      * List of protected package from conf/catalina.properties
      */
-    private String packageAccess;
+    private final String packageAccess;
 
 
     /**
      * Create a single instance of this class.
      */
-    private SecurityConfig(){
+    private SecurityConfig() {
+        String definition = null;
+        String access = null;
         try{
-            packageDefinition = CatalinaProperties.getProperty("package.definition");
-            packageAccess = CatalinaProperties.getProperty("package.access");
+            definition = CatalinaProperties.getProperty("package.definition");
+            access = CatalinaProperties.getProperty("package.access");
         } catch (java.lang.Exception ex){
             if (log.isDebugEnabled()){
                 log.debug("Unable to load properties using CatalinaProperties", ex);
             }
+        } finally {
+            packageDefinition = definition;
+            packageAccess = access;
         }
     }
 
@@ -78,8 +85,12 @@ public final class SecurityConfig{
      * @return an instance of that class.
      */
     public static SecurityConfig newInstance(){
-        if (singleton == null){
-            singleton = new SecurityConfig();
+        if (singleton == null) {
+            synchronized (singletonLock) {
+                if (singleton == null) {
+                    singleton = new SecurityConfig();
+                }
+            }
         }
         return singleton;
     }
