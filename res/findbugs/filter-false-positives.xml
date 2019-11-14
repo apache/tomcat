@@ -701,7 +701,9 @@
     <Class name="org.apache.tomcat.util.threads.ThreadPoolExecutor" />
     <Bug code="Nm" />
   </Match>
-  <!--  Generated code -->
+
+
+  <!-- Generated code -->
   <Match>
     <Or>
       <Class name="org.apache.el.parser.AstFloatingPoint" />
