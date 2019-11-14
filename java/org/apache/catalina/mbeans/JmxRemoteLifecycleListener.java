@@ -324,7 +324,13 @@ public class JmxRemoteLifecycleListener implements LifecycleListener {
             Remote jmxServer = server.toStub();
             // Create the RMI registry
             try {
-                new JmxRegistry(theRmiRegistryPort, registryCsf, registrySsf, "jmxrmi", jmxServer);
+                /*
+                 * JmxRegistry is registered as a side-effect of creation.
+                 * This object is here so we can tell the IDE it is OK for it
+                 * not to be used.
+                 */
+                @SuppressWarnings("unused")
+                JmxRegistry unused = new JmxRegistry(theRmiRegistryPort, registryCsf, registrySsf, "jmxrmi", jmxServer);
             } catch (RemoteException e) {
                 log.error(sm.getString(
                         "jmxRemoteLifecycleListener.createRegistryFailed",
@@ -492,6 +498,10 @@ public class JmxRemoteLifecycleListener implements LifecycleListener {
     }
 
 
+    /*
+     * Better to use the internal API than re-invent the wheel.
+     */
+    @SuppressWarnings("restriction")
     private static class JmxRegistry extends sun.rmi.registry.RegistryImpl {
         private static final long serialVersionUID = -3772054804656428217L;
         private final String jmxName;

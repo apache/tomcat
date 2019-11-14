@@ -691,6 +691,7 @@
            encoding="ISO-8859-1"
            includeAntRuntime="true" >
       <compilerarg value="-Xlint:unchecked"/>
+      <compilerarg value="-XDignore.symbol.file"/>
       <classpath refid="compile.classpath" />
       <exclude name="org/apache/naming/factory/webservices/**" />
       <!-- Exclude classes that require Java 7 to compile -->

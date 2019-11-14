@@ -203,6 +203,12 @@
     <Bug code="REC" />
   </Match>
   <Match>
+    <!-- Object is used via side-effect of creation. -->
+    <Class name="org.apache.catalina.mbeans.JmxRemoteLifecycleListener" />
+    <Method name="createServer" />
+    <Bug pattern="DLS_DEAD_LOCAL_STORE" />
+  </Match>
+  <Match>
     <Class name="org.apache.catalina.realm.JDBCRealm" />
     <Field name="containerLog" />
     <Bug code="IS" />
