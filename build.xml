@@ -2165,7 +2165,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       encoding="ISO-8859-1"
       docencoding="ISO-8859-1"
       charset="ISO-8859-1"
-      additionalparam="-breakiterator -notimestamp ${java9.javadoc.options} -J-Dhttps.protocols=TLSv1,TLSv1.1,TLSv1.2"
+      additionalparam="-breakiterator -notimestamp ${java9.javadoc.options} -J-Dhttps.protocols=TLSv1,TLSv1.1,TLSv1.2 -XDignore.symbol.file"
       source="${compile.source}"
       maxmemory="512m"
       failonerror="true"
