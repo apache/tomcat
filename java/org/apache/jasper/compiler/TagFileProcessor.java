@@ -599,7 +599,7 @@ class TagFileProcessor {
                                         entry.getValue());
                             }
                         }
-                    } catch (Exception e) {
+                    } catch (RuntimeException | ReflectiveOperationException e) {
                         // ignore errors
                     }
 

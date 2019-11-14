@@ -19,6 +19,7 @@ package org.apache.jasper.compiler;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FilePermission;
+import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -543,8 +544,8 @@ public final class JspRuntimeContext {
                 // Allow the JSP to access org.apache.jasper.runtime.HttpJspBase
                 permissions.add( new RuntimePermission(
                     "accessClassInPackage.org.apache.jasper.runtime") );
-            } catch(Exception e) {
-                context.log("Security Init for context failed",e);
+            } catch (RuntimeException | IOException e) {
+                context.log(Localizer.getMessage("jsp.error.security"), e);
             }
         }
         return new SecurityHolder(source, permissions);

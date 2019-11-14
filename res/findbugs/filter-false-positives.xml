@@ -869,18 +869,20 @@
     <Bug code="Dm" />
   </Match>
   <Match>
-    <!-- Yes this is a dead store. This is so the IDE warning can be suppressed.
-         The object creation has side-effects so the code is required. -->
-    <Class name="org.apache.jasper.compiler.JspDocumentParser" />
-    <Method name="comment"/>
-    <Bug pattern="DLS_DEAD_LOCAL_STORE"/>
-  </Match>
-  <Match>
     <!-- Node constructors add node to parent. Local variable is used to
          silence an Eclipse warning -->
     <Class name="org.apache.jasper.compiler.ELFunctionMapper"/>
     <Method name="map"/>
-    <Bug code="DLS"/>
+    <Bug pattern="DLS_DEAD_LOCAL_STORE"/>
+  </Match>
+  <Match>
+    <!-- Sync is not protecting these fields -->
+    <Class name="org.apache.jasper.compiler.JspConfig"/>
+    <Or>
+      <Field name="defaultDeferedSyntaxAllowedAsLiteral" />
+      <Field name="defaultIsELIgnored" />
+    </Or>
+    <Bug pattern="IS2_INCONSISTENT_SYNC"/>
   </Match>
   <Match>
     <!-- NPE is not possible -->
@@ -893,6 +895,16 @@
     <Class name="org.apache.jasper.compiler.JspConfig"/>
     <Method name="selectProperty"/>
     <Bug code="NP"/>
+  </Match>
+  <Match>
+    <!-- Yes this is a dead store. This is so the IDE warning can be suppressed.
+         The object creation has side-effects so the code is required. -->
+    <Class name="org.apache.jasper.compiler.JspDocumentParser" />
+    <Or>
+      <Method name="comment"/>
+      <Method name="processChars"/>
+    </Or>
+    <Bug pattern="DLS_DEAD_LOCAL_STORE"/>
   </Match>
   <Match>
     <!-- Returning null is intentional -->
@@ -913,6 +925,12 @@
     <Bug code="ES"/>
   </Match>
   <Match>
+    <!-- Sync is not protecting this field -->
+    <Class name="org.apache.jasper.compiler.SmapGenerator"/>
+    <Field name="doEmbedded" />
+    <Bug pattern="IS2_INCONSISTENT_SYNC"/>
+  </Match>
+  <Match>
     <!-- Only base null is handled by this resolver -->
     <Class name="org.apache.jasper.el.ELResolverImpl"/>
     <Or>
@@ -922,6 +940,12 @@
       <Method name="setValue" />
     </Or>
     <Bug code="NP" />
+  </Match>
+  <Match>
+    <!-- Array contents are not mutated -->
+    <Class name="org.apache.jasper.el.JasperELResolver"/>
+    <Field name="resolvers" />
+    <Bug pattern="VO_VOLATILE_REFERENCE_TO_ARRAY" />
   </Match>
   <Match>
     <!-- base null is handled by this resolver -->
