@@ -19,6 +19,7 @@ package org.apache.jasper.compiler;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FilePermission;
+import java.io.IOException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.security.CodeSource;
@@ -606,8 +607,10 @@ public final class JspRuntimeContext {
                         permissions.add(
                                 new FilePermission(jndiUrl,"read") );
                 }
-            } catch(Exception e) {
-                context.log("Security Init for context failed",e);
+            } catch (IOException e) {
+                context.log(Localizer.getMessage("jsp.error.security"), e);
+            } catch (RuntimeException e) {
+                context.log(Localizer.getMessage("jsp.error.security"), e);
             }
         }
         return new SecurityHolder(source, permissions);

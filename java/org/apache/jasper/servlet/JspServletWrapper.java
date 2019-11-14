@@ -72,7 +72,7 @@ import org.apache.tomcat.InstanceManager;
 public class JspServletWrapper {
 
     private static final Map<String,Long> ALWAYS_OUTDATED_DEPENDENCIES =
-        new HashMap<String,Long>();
+            new HashMap<String,Long>();
 
     static {
         // If this is missing,
@@ -82,13 +82,13 @@ public class JspServletWrapper {
     // Logger
     private final Log log = LogFactory.getLog(JspServletWrapper.class); // must not be static
 
-    private Servlet theServlet;
-    private String jspUri;
-    private Class<?> tagHandlerClass;
-    private JspCompilationContext ctxt;
+    private volatile Servlet theServlet;
+    private final String jspUri;
+    private volatile Class<?> tagHandlerClass;
+    private final JspCompilationContext ctxt;
     private long available = 0L;
-    private ServletConfig config;
-    private Options options;
+    private final ServletConfig config;
+    private final Options options;
     /*
      * The servlet / tag file needs a compilation check on first access. Use a
      * separate flag (rather then theServlet == null / tagHandlerClass == null
@@ -99,7 +99,7 @@ public class JspServletWrapper {
     private volatile boolean mustCompile = true;
     /* Whether the servlet/tag file needs reloading on next access */
     private volatile boolean reload = true;
-    private boolean isTagFile;
+    private final boolean isTagFile;
     private int tripCount;
     private JasperException compileException;
     /* Timestamp of last time servlet resource was modified */
@@ -254,7 +254,9 @@ public class JspServletWrapper {
     }
 
     /**
-     * Compile (if needed) and load a tag file
+     * Compile (if needed) and load a tag file.
+     * @return the loaded class
+     * @throws JasperException Error compiling or loading tag file
      */
     public Class<?> loadTagFile() throws JasperException {
 
@@ -296,6 +298,8 @@ public class JspServletWrapper {
      * when compiling tag files with circular dependencies.  A prototype
      * (skeleton) with no dependencies on other other tag files is
      * generated and compiled.
+     * @return the loaded class
+     * @throws JasperException Error compiling or loading tag file
      */
     public Class<?> loadTagFilePrototype() throws JasperException {
 
@@ -309,6 +313,7 @@ public class JspServletWrapper {
 
     /**
      * Get a list of files that the current page has source dependency on.
+     * @return the map of dependent resources
      */
     public java.util.Map<String,Long> getDependants() {
         try {
@@ -322,11 +327,11 @@ public class JspServletWrapper {
                         }
                     }
                 }
-                target = tagHandlerClass.newInstance();
+                target = tagHandlerClass.getConstructor().newInstance();
             } else {
                 target = getServlet();
             }
-            if (target != null && target instanceof JspSourceDependent) {
+            if (target instanceof JspSourceDependent) {
                 return ((JspSourceDependent) target).getDependants();
             }
         } catch (AbstractMethodError ame) {
@@ -439,7 +444,6 @@ public class JspServletWrapper {
         }
 
         try {
-
             /*
              * (3) Handle limitation of number of loaded Jsps
              */
@@ -459,6 +463,7 @@ public class JspServletWrapper {
                     }
                 }
             }
+
             /*
              * (4) Service request
              */
@@ -630,5 +635,4 @@ public class JspServletWrapper {
             return new JasperException(ex);
         }
     }
-
 }
