@@ -59,12 +59,12 @@ public class TaskQueue extends LinkedBlockingQueue<Runnable> {
     }
 
     public boolean force(Runnable o) {
-        if ( parent==null || parent.isShutdown() ) throw new RejectedExecutionException(sm.getString("taskQueue.notRunning"));
+        if (parent == null || parent.isShutdown()) throw new RejectedExecutionException(sm.getString("taskQueue.notRunning"));
         return super.offer(o); //forces the item onto the queue, to be used if the task is rejected
     }
 
     public boolean force(Runnable o, long timeout, TimeUnit unit) throws InterruptedException {
-        if ( parent==null || parent.isShutdown() ) throw new RejectedExecutionException(sm.getString("taskQueue.notRunning"));
+        if (parent == null || parent.isShutdown()) throw new RejectedExecutionException(sm.getString("taskQueue.notRunning"));
         return super.offer(o,timeout,unit); //forces the item onto the queue, to be used if the task is rejected
     }
 
