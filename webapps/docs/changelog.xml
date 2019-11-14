@@ -52,6 +52,15 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Web applications">
+    <changelog>
+      <add>
+        Add a warning regarding potential poor performance of the HTTP and AJP
+        connectors if <code>socket.txBufSize</code> is configured with an
+        explicit value rather than using the JVM default. (markt)
+      </add>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 9.0.28 (markt)" rtext="release in progress">
   <subsection name="Catalina">

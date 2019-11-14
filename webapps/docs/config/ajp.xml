@@ -505,7 +505,9 @@
       </attribute>
       <attribute name="socket.txBufSize" required="false">
         <p>(int)The socket send buffer (SO_SNDBUF) size in bytes. JVM default
-        used if not set.</p>
+        used if not set. Care should be taken if explicitly setting this value.
+        Very poor performance has been observed on some JVMs with values less
+        than ~8k.</p>
       </attribute>
       <attribute name="socket.tcpNoDelay" required="false">
         <p>(bool)This is equivalent to standard attribute
