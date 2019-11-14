@@ -73,6 +73,9 @@
       <update>
         <bug>63905</bug> Clean up Tomcat CSS. (michaelo)
       </update>
+      <fix>
+       Refactor JMX remote RMI registry creation. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
