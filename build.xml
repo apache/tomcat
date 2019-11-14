@@ -87,7 +87,6 @@
   <!-- Servlet 3.1 spec requires Java 7+ -->
   <property name="compile.source" value="7"/>
   <property name="compile.target" value="7"/>
-  <property name="compile.release" value="7"/>
   <property name="min.java.version" value="7"/>
 
   <!-- Locations to create the JAR artifacts -->
@@ -638,7 +637,6 @@
            deprecation="${compile.deprecation}"
            source="${compile.source}"
            target="${compile.target}"
-           release="${compile.release}"
            encoding="ISO-8859-1"
            includeAntRuntime="true" >
       <!-- Uncomment this to show unchecked warnings:
@@ -693,12 +691,12 @@
            deprecation="${compile.deprecation}"
            source="${compile.source}"
            target="${compile.target}"
-           release="${compile.release}"
            encoding="ISO-8859-1"
            includeAntRuntime="true" >
       <!-- Uncomment this to show unchecked warnings:
       <compilerarg value="-Xlint:unchecked"/>
       -->
+      <compilerarg value="-XDignore.symbol.file"/>
       <classpath refid="compile.classpath" />
       <exclude name="org/apache/naming/factory/webservices/**" />
     </javac>
@@ -1162,7 +1160,6 @@
              debug="${compile.debug}" deprecation="${compile.deprecation}"
              source="${compile.source}"
              target="${compile.target}"
-             release="${compile.release}"
              classpath="${tomcat.classes}"
              encoding="ISO-8859-1"
              includeantruntime="false">
@@ -1174,7 +1171,6 @@
              debug="${compile.debug}" deprecation="${compile.deprecation}"
              source="${compile.source}"
              target="${compile.target}"
-             release="${compile.release}"
              classpath="${tomcat.classes}"
              encoding="ISO-8859-1"
              includeantruntime="false">
@@ -1407,7 +1403,6 @@
            deprecation="${compile.deprecation}"
            source="${compile.source}"
            target="${compile.target}"
-           release="${compile.release}"
            encoding="ISO-8859-1"
            includeantruntime="true">
       <classpath refid="tomcat.test.classpath" />
