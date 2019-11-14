@@ -1011,6 +1011,14 @@
     <Bug code="Nm" />
   </Match>
   <Match>
+    <!-- Utility classes used to import/export l10n strings -->
+    <!-- This code does not need to be robust -->
+    <Or>
+      <Class name="org.apache.tomcat.buildutil.translate.Export"/>
+      <Class name="org.apache.tomcat.buildutil.translate.Import"/>
+    </Or>
+  </Match>
+  <Match>
     <!-- Return value is never used -->
     <Class name="org.apache.tomcat.dbcp.dbcp2.DelegatingConnection" />
     <Method name="prepareStatement" />
@@ -1063,11 +1071,25 @@
     <Bug pattern="NP_EQUALS_SHOULD_HANDLE_NULL_ARGUMENT" />
   </Match>
   <Match>
+    <!-- Natural ordering behaviour is docuemented in Javadoc -->
+    <Class name="org.apache.tomcat.dbcp.pool2.impl.DefaultPooledObject" />
+    <Bug pattern="EQ_COMPARETO_USE_OBJECT_EQUALS" />
+  </Match>
+  <Match>
     <!-- Increment is in sync block so it is safe. Volatile is used so reading
          thread sees latest value.  -->
     <Class name="org.apache.tomcat.dbcp.pool2.impl.DefaultPooledObject" />
     <Method name="allocate" />
     <Bug pattern="VO_VOLATILE_INCREMENT" />
+  </Match>
+  <Match>
+    <!-- Fields do not need to be sync'd for toString() -->
+    <Class name="org.apache.tomcat.dbcp.pool2.impl.SoftReferenceObjectPool" />
+    <Or>
+      <Field name="createCount"/>
+      <Field name="numActive"/>
+    </Or>
+    <Bug pattern="IS2_INCONSISTENT_SYNC" />
   </Match>
   <Match>
     <!-- Return value is ignored but a null result will trigger an exception -->
@@ -1110,6 +1132,15 @@
     <Bug code="VO" />
   </Match>
   <Match>
+    <!-- Fields are used by native code. Tomcat doesn't use them but they are
+         part of the public API. -->
+    <Or>
+      <Class name="org.apache.tomcat.jni.FileInfo" />
+      <Class name="org.apache.tomcat.jni.Sockaddr" />
+    </Or>
+    <Bug pattern="UUF_UNUSED_PUBLIC_OR_PROTECTED_FIELD" />
+  </Match>
+  <Match>
     <Class name="org.apache.tomcat.util.IntrospectionUtils" />
     <Method name="findMethod"/>
     <Bug code="NP" />
@@ -1130,14 +1161,19 @@
     <Bug code="SF" />
   </Match>
   <Match>
-    <!-- Returning null here is fine -->
-    <Class name="org.apache.tomcat.util.buf.ByteChunk"/>
-    <Method name="toString"/>
-    <Bug code="NP" />
+    <!-- Handled by abstract base class -->
+    <Or>
+      <Class name="org.apache.tomcat.util.buf.ByteChunk"/>
+      <Class name="org.apache.tomcat.util.buf.CharChunk"/>
+    </Or>
+    <Bug pattern="HE_EQUALS_NO_HASHCODE" />
   </Match>
   <Match>
     <!-- Returning null here is fine -->
-    <Class name="org.apache.tomcat.util.buf.CharChunk"/>
+    <Or>
+      <Class name="org.apache.tomcat.util.buf.ByteChunk"/>
+      <Class name="org.apache.tomcat.util.buf.CharChunk"/>
+    </Or>
     <Method name="toString"/>
     <Bug code="NP" />
   </Match>
@@ -1152,6 +1188,15 @@
     <!-- server so statics are appropriate -->
     <Class name="org.apache.tomcat.util.buf.StringCache"/>
     <Bug code="ST" />
+  </Match>
+  <Match>
+    <!-- Array is only ever updated as a whole, not element by element -->
+    <Class name="org.apache.tomcat.util.buf.StringCache"/>
+    <Or>
+      <Field name="bcCache"/>
+      <Field name="ccCache"/>
+    </Or>
+    <Bug pattern="VO_VOLATILE_REFERENCE_TO_ARRAY"/>
   </Match>
   <Match>
     <!-- mb.toString() can be null because
@@ -1180,6 +1225,12 @@
       <Method name="updateAttributes"/>
     </Or>
     <Bug code="ES" />
+  </Match>
+  <Match>
+    <!-- Write to static field is intentional -->
+    <Class name="org.apache.tomcat.util.digester.Digester"/>
+    <Method name="&lt;init&gt;"/>
+    <Bug pattern="ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD" />
   </Match>
   <Match>
     <!-- Fall-through expected -->
