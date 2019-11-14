@@ -281,6 +281,7 @@ public class JspServletWrapper {
                 synchronized (this) {
                     if (getReloadInternal() || tagHandlerClass == null) {
                         tagHandlerClass = ctxt.load();
+                        // Volatile 'reload' forces in order write of 'tagHandlerClass'
                         reload = false;
                     }
                 }
@@ -326,7 +327,7 @@ public class JspServletWrapper {
                         }
                     }
                 }
-                target = tagHandlerClass.newInstance();
+                target = tagHandlerClass.getConstructor().newInstance();
             } else {
                 target = getServlet();
             }
