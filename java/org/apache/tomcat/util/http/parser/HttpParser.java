@@ -149,7 +149,7 @@ public class HttpParser {
             // Not valid for request target.
             // Combination of multiple rules from RFC7230 and RFC 3986. Must be
             // ASCII, no controls plus a few additional characters excluded
-            if (IS_CONTROL[i] || i > 127 ||
+            if (IS_CONTROL[i] ||
                     i == ' ' || i == '\"' || i == '#' || i == '<' || i == '>' || i == '\\' ||
                     i == '^' || i == '`'  || i == '{' || i == '|' || i == '}') {
                 if (!REQUEST_TARGET_ALLOW[i]) {
