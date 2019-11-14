@@ -610,8 +610,10 @@ public class AccessLogValve extends AbstractAccessLogValve {
         }
 		
 		try {
-			compress();
-			deleteRotatedFile();
+			if(isRotatable()) {
+				compress();
+				deleteRotatedFile();
+			}
 		} catch (Throwable e) {
 			ExceptionUtils.handleThrowable(e);
 			log.error(sm.getString("accessLogValve.compressFail"), e);

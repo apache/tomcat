@@ -347,7 +347,7 @@ public class FileHandler extends Handler {
             writer.write(getFormatter().getTail(this));
             writer.flush();
             writer.close();
-			if(compress) {
+			if(compress && rotatable) {
 				compress();
 				deleteRotatedFile();
 			}
