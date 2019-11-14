@@ -233,8 +233,8 @@ public class Registry implements RegistryMBean, MBeanRegistration {
      * lifecycle operations.
      *
      * @param mbeans list of ObjectName on which we'll invoke the operations
-     * @param operation Name of the operation ( init, start, stop, etc)
-     * @param failFirst If false, exceptions will be ignored
+     * @param operation  Name of the operation ( init, start, stop, etc)
+     * @param failFirst  If false, exceptions will be ignored
      * @throws Exception Error invoking operation
      * @since 1.1
      */
