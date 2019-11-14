@@ -85,6 +85,9 @@
         the final release. Note that this preview API has deprecated for over a
         year and may be removed as soon as the next 8.5.x release. (markt)
       </fix>
+      <fix>
+       Refactor JMX remote RMI registry creation. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

@@ -25,10 +25,11 @@ import java.net.MalformedURLException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.rmi.AccessException;
 import java.rmi.AlreadyBoundException;
+import java.rmi.NotBoundException;
+import java.rmi.Remote;
 import java.rmi.RemoteException;
-import java.rmi.registry.LocateRegistry;
-import java.rmi.registry.Registry;
 import java.rmi.server.RMIClientSocketFactory;
 import java.rmi.server.RMIServerSocketFactory;
 import java.security.NoSuchAlgorithmException;
@@ -300,18 +301,6 @@ public class JmxRemoteLifecycleListener implements LifecycleListener {
             RMIClientSocketFactory registryCsf, RMIServerSocketFactory registrySsf,
             RMIClientSocketFactory serverCsf, RMIServerSocketFactory serverSsf) {
 
-        // Create the RMI registry
-        Registry registry;
-        try {
-            registry = LocateRegistry.createRegistry(
-                    theRmiRegistryPort, registryCsf, registrySsf);
-        } catch (RemoteException e) {
-            log.error(sm.getString(
-                    "jmxRemoteLifecycleListener.createRegistryFailed",
-                    serverName, Integer.toString(theRmiRegistryPort)), e);
-            return null;
-        }
-
         if (bindAddress == null) {
             bindAddress = "localhost";
         }
@@ -332,11 +321,20 @@ public class JmxRemoteLifecycleListener implements LifecycleListener {
             cs = new RMIConnectorServer(serviceUrl, theEnv, server,
                     ManagementFactory.getPlatformMBeanServer());
             cs.start();
-            registry.bind("jmxrmi", server.toStub());
+            Remote jmxServer = server.toStub();
+            // Create the RMI registry
+            try {
+                new JmxRegistry(theRmiRegistryPort, registryCsf, registrySsf, "jmxrmi", jmxServer);
+            } catch (RemoteException e) {
+                log.error(sm.getString(
+                        "jmxRemoteLifecycleListener.createRegistryFailed",
+                        serverName, Integer.toString(theRmiRegistryPort)), e);
+                return null;
+            }
             log.info(sm.getString("jmxRemoteLifecycleListener.start",
                     Integer.toString(theRmiRegistryPort),
                     Integer.toString(theRmiServerPort), serverName));
-        } catch (IOException | AlreadyBoundException e) {
+        } catch (IOException e) {
             log.error(sm.getString(
                     "jmxRemoteLifecycleListener.createServerFailed",
                     serverName), e);
@@ -492,4 +490,39 @@ public class JmxRemoteLifecycleListener implements LifecycleListener {
             return true;
         }
     }
+
+
+    private static class JmxRegistry extends sun.rmi.registry.RegistryImpl {
+        private static final long serialVersionUID = -3772054804656428217L;
+        private final String jmxName;
+        private final Remote jmxServer;
+        public JmxRegistry(int port, RMIClientSocketFactory csf,
+                RMIServerSocketFactory ssf, String jmxName, Remote jmxServer) throws RemoteException {
+            super(port, csf, ssf);
+            this.jmxName = jmxName;
+            this.jmxServer = jmxServer;
+        }
+        @Override
+        public Remote lookup(String name)
+                throws RemoteException, NotBoundException {
+            return (jmxName.equals(name)) ? jmxServer : null;
+        }
+        @Override
+        public void bind(String name, Remote obj)
+                throws RemoteException, AlreadyBoundException, AccessException {
+        }
+        @Override
+        public void unbind(String name)
+                throws RemoteException, NotBoundException, AccessException {
+        }
+        @Override
+        public void rebind(String name, Remote obj)
+                throws RemoteException, AccessException {
+        }
+        @Override
+        public String[] list() throws RemoteException {
+            return new String[] { jmxName };
+        }
+    }
+
 }
