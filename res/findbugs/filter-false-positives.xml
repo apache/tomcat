@@ -1147,6 +1147,11 @@
     <Bug pattern="UUF_UNUSED_PUBLIC_OR_PROTECTED_FIELD" />
   </Match>
   <Match>
+    <!-- Field is populated by JNI code -->
+    <Class name="org.apache.tomcat.jni.Sockaddr" />
+    <Bug pattern="UWF_UNWRITTEN_PUBLIC_OR_PROTECTED_FIELD"/>
+  </Match>
+  <Match>
     <Class name="org.apache.tomcat.util.IntrospectionUtils" />
     <Method name="findMethod"/>
     <Bug code="NP" />
@@ -1312,6 +1317,25 @@
     <Bug code="NN" />
   </Match>
   <Match>
+    <!-- There is only a single wait in run() when the poller is idle -->
+    <Class name="org.apache.tomcat.util.net.AprEndpoint$Poller"/>
+    <Or>
+      <Method name="add"/>
+      <Method name="close"/>
+      <Method name="destroy"/>
+    </Or>
+    <Bug pattern="NO_NOTIFY_NOT_NOTIFYALL" />
+  </Match>
+  <Match>
+    <!-- Single condition. No interupts. -->
+    <Or>
+      <Class name="org.apache.tomcat.util.net.AprEndpoint$Poller"/>
+      <Class name="org.apache.tomcat.util.net.AprEndpoint$Sendfile"/>
+    </Or>
+    <Method name="destroy"/>
+    <Bug pattern="WA_NOT_IN_LOOP" />
+  </Match>
+  <Match>
     <Class name="org.apache.tomcat.util.net.AprEndpoint$Sendfile"/>
     <Method name="run"/>
     <Or>
@@ -1320,6 +1344,21 @@
       <!-- notify() is called from add() -->
       <Bug code="UW" />
     </Or>
+  </Match>
+  <Match>
+    <!-- There is only a single wait in run() when the poller is idle -->
+    <Class name="org.apache.tomcat.util.net.AprEndpoint$Sendfile"/>
+    <Or>
+      <Method name="add"/>
+      <Method name="destroy"/>
+    </Or>
+    <Bug pattern="NO_NOTIFY_NOT_NOTIFYALL" />
+  </Match>
+  <Match>
+    <!-- Simpler to wait a pollTime than test each Poller thread -->
+    <Class name="org.apache.tomcat.util.net.AprEndpoint$Sendfile"/>
+    <Method name="destroy"/>
+    <Bug pattern="UW_UNCOND_WAIT" />
   </Match>
   <Match>
     <!-- Sync is there to protect referenced object not field -->
@@ -1365,6 +1404,24 @@
     <Bug code="ML"/>
   </Match>
   <Match>
+    <!-- Single condition so no need for wait to be in loop -->
+    <Class name="org.apache.tomcat.util.net.Nio2Endpoint$Nio2SocketWrapper"/>
+    <Or>
+      <Method name="read"/>
+      <Method name="write"/>
+    </Or>
+    <Bug pattern="WA_NOT_IN_LOOP" />
+  </Match>
+  <Match>
+    <!-- Single wait so no need for notifyAll() -->
+    <Class name="org.apache.tomcat.util.net.Nio2Endpoint$Nio2SocketWrapper$VectoredIOCompletionHandler"/>
+    <Or>
+      <Method name="completed"/>
+      <Method name="failed"/>
+    </Or>
+    <Bug pattern="NO_NOTIFY_NOT_NOTIFYALL " />
+  </Match>
+  <Match>
     <Class name="org.apache.tomcat.util.net.SecureNioChannel"/>
     <Method name="rehandshake"/>
     <Bug code="DE" />
@@ -1382,6 +1439,26 @@
     <Bug code="SF" />
   </Match>
   <Match>
+    <!-- Stream will be closed -->
+    <Class name="org.apache.tomcat.util.net.jsse.PEMFile" />
+    <Method name="&lt;init&gt;" />
+    <Pattern name="OS_OPEN_STREAM" />
+  </Match>
+  <Match>
+    <!-- Array elements are not modified after assignment -->
+    <Class name="org.apache.tomcat.util.net.openssl.OpenSSLEngine" />
+    <Or>
+      <Field name="peerCerts"/>
+      <Field name="x509PeerCerts"/>
+    </Or>
+    <Bug pattern="VO_VOLATILE_REFERENCE_TO_ARRAY" />
+  </Match>
+  <Match>
+    <!-- No performance issue as there is no DNS resolution -->
+    <Class name="org.apache.tomcat.util.scan.StandardJarScanner" />
+    <Bug pattern="DMI_COLLECTION_OF_URLS" />
+  </Match>
+  <Match>
     <!-- Yes the simple name is the same as the super class. Accept it. -->
     <Class name="org.apache.tomcat.util.threads.ThreadPoolExecutor" />
     <Bug code="Nm" />
@@ -1397,6 +1474,12 @@
     <Class name="org.apache.tomcat.websocket.server.WsHttpUpgradeHandler" />
     <Method name="upgradeDispatch"/>
     <Bug code="SF" />
+  </Match>
+  <Match>
+    <!-- The array contents is never mutated. -->
+    <Class name="org.apache.tomcat.websocket.server.WsRemoteEndpointImplServer" />
+    <Field name="buffers" />
+    <Bug pattern="VO_VOLATILE_REFERENCE_TO_ARRAY" />
   </Match>
 
   <!-- Example code -->
