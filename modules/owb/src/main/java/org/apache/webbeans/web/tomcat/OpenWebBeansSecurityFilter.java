@@ -33,6 +33,8 @@ import javax.servlet.http.HttpServletRequest;
  * Filter which sets the UserPrincipal into a ThreadLocal
  * to make it injectable via a CDI Producer. This is an alternative
  * to the valve to allow configuration at the webapp level as well.
+ * The filter name should usually be OwbSecurityFilter, mapped on
+ * REQUEST with *.
  */
 public class OpenWebBeansSecurityFilter implements Filter {
 
