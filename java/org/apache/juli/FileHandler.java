@@ -18,7 +18,7 @@
 
 package org.apache.juli;
 
-import org.apache.tomcat.util.file.CompressFileUtils;
+import org.apache.juli.CompressFileUtils;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
