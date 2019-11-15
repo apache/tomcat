@@ -68,6 +68,16 @@
       </add>
     </changelog>
   </subsection>
+  <subsection name="Other">
+    <changelog>
+      <fix>
+        Improve OWB module based using custom shade appender. (remm)
+      </fix>
+      <fix>
+        Add security filter in OWB module in addition to the valve for more flexibility. (remm)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 9.0.28 (markt)" rtext="release in progress">
   <subsection name="Catalina">

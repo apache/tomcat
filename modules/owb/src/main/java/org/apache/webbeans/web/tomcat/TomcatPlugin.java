@@ -47,7 +47,8 @@ public class TomcatPlugin extends AbstractOwbPlugin {
     /**
      * Security service implementation.
      */
-    private final TomcatSecurityService securityService = new TomcatSecurityService(WebBeansContext.getInstance());
+    private final TomcatSecurityService securityService =
+            (TomcatSecurityService) WebBeansContext.getInstance().getSecurityService();
 
     @Override
     public <T> T getSupportedService(Class<T> serviceClass) {

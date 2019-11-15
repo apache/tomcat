@@ -35,8 +35,29 @@ public class OpenWebBeansListener extends FrameworkListener {
     @Override
     protected LifecycleListener createLifecycleListener(Context context) {
         OpenWebBeansContextLifecycleListener listener = new OpenWebBeansContextLifecycleListener();
+        listener.setAddSecurityValve(getAddSecurityValve());
         listener.setStartWithoutBeansXml(getStartWithoutBeansXml());
         return listener;
+    }
+
+    /**
+     * Add security valve.
+     */
+    protected boolean addSecurityValve = true;
+
+    /**
+     * @return true to add the security valve
+     */
+    public boolean getAddSecurityValve() {
+        return addSecurityValve;
+    }
+
+    /**
+     * Configure if a security valve will be added
+     * @param addSecurityValve the addSecurityValve to set
+     */
+    public void setAddSecurityValve(boolean addSecurityValve) {
+        this.addSecurityValve = addSecurityValve;
     }
 
     /**

@@ -36,6 +36,26 @@ import org.apache.webbeans.servlet.WebBeansConfigurationListener;
 public class OpenWebBeansContextLifecycleListener implements LifecycleListener {
 
     /**
+     * Add security valve.
+     */
+    protected boolean addSecurityValve = true;
+
+    /**
+     * @return true to add the security valve
+     */
+    public boolean getAddSecurityValve() {
+        return addSecurityValve;
+    }
+
+    /**
+     * Configure if a security valve will be added
+     * @param addSecurityValve the addSecurityValve to set
+     */
+    public void setAddSecurityValve(boolean addSecurityValve) {
+        this.addSecurityValve = addSecurityValve;
+    }
+
+    /**
      * Start without a beans.xml file.
      */
     protected boolean startWithoutBeansXml = true;
@@ -88,15 +108,17 @@ public class OpenWebBeansContextLifecycleListener implements LifecycleListener {
                             ((Lifecycle) pipeline).addLifecycleListener(this);
                         }
                     }
-                    // Add security valve
-                    boolean securityValveFound = false;
-                    for (Valve valve : pipeline.getValves()) {
-                        if (valve instanceof OpenWebBeansSecurityValve) {
-                            securityValveFound = true;
+                    if (getAddSecurityValve()) {
+                        // Add security valve
+                        boolean securityValveFound = false;
+                        for (Valve valve : pipeline.getValves()) {
+                            if (valve instanceof OpenWebBeansSecurityValve) {
+                                securityValveFound = true;
+                            }
                         }
-                    }
-                    if (!securityValveFound) {
-                        pipeline.addValve(new OpenWebBeansSecurityValve());
+                        if (!securityValveFound) {
+                            pipeline.addValve(new OpenWebBeansSecurityValve());
+                        }
                     }
                 }
             }
