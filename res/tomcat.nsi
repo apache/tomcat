@@ -979,7 +979,9 @@ Function findJavaHome
   ; If nothing found, try environment variable JAVA_HOME
   ${If} $1 == ""
     ExpandEnvStrings $1 "%JAVA_HOME%"
-
+  	${If} $1 == "%JAVA_HOME%"
+      StrCpy $1 ""
+    ${EndIf}
     ClearErrors
   ${EndIf}
 
