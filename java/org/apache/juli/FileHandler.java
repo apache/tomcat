@@ -18,12 +18,12 @@
 
 package org.apache.juli;
 
+import org.apache.tomcat.util.file.CompressFileUtils;
+
 import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.FileNotFoundException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
@@ -52,9 +52,6 @@ import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.LogRecord;
 import java.util.regex.Pattern;
-import java.util.zip.GZIPInputStream;
-import java.util.zip.GZIPOutputStream;
-import java.io.FileOutputStream;
 
 /**
  * Implementation of <b>Handler</b> that appends log messages to a file
@@ -103,11 +100,6 @@ public class FileHandler extends Handler {
 
     public static final int DEFAULT_MAX_DAYS = -1;
     public static final int DEFAULT_BUFFER_SIZE = -1;
-
-    /**
-     * The extension for the compressed rotated log file.
-     */
-    private static final String COMPRESSED_ROTATED_LOG_FILE_EXTENSION = ".gz";
 
 
     private static final ExecutorService DELETE_FILES_SERVICE =
@@ -355,7 +347,7 @@ public class FileHandler extends Handler {
             writer.close();
 
             if(compress && rotatable) {
-                compressAndDelete();
+                compressRotatableLogFile();
             }
 
 			writer = null;
@@ -368,67 +360,28 @@ public class FileHandler extends Handler {
     }
 
     /**
-     * Compresses the rotated log file and deletes it to reduce storage space.
+     * Reduces the storage space for rotated log files, by compressing them and removing uncompressed original
+     * rotated log files. Check: https://bz.apache.org/bugzilla/show_bug.cgi?id=62611 for more details on this feature.
      * <p>
-     * Check: https://bz.apache.org/bugzilla/show_bug.cgi?id=62611
+     * TODO: This method (in future) should selectively decide on when to delete original rotated log files. Maybe the
+     * method should not delete rotated log file until after few days so that these files can be easily accessed.
      */
-    private synchronized void compressAndDelete() {
+    private synchronized void compressRotatableLogFile() {
+
         File currentDirectory = new File(this.directory);
         File currentLogFile = new File(currentDirectory.getAbsoluteFile(), prefix
                 + (rotatable.booleanValue() ? date : "") + suffix);
-        if(currentLogFile.exists()) {
-            boolean compress = compressRotatedLogFile(currentLogFile);
-            if (compress) {
-                // TODO: original rotated file should probably be kept for a few days until deletion.
-                if (!currentLogFile.delete()) {
-                    reportError("Unable to delete current log file", null, ErrorManager.GENERIC_FAILURE);
-                }
-            }
-        }
-    }
 
-    /**
-     *  Compresses the rotated log file.
-     *
-     *  @return true if the compression succeeded, otherwise, it return false.
-     */
-    private boolean compressRotatedLogFile(File logFile){
-
-        // try to get handle of the currentLogFile.
-        FileInputStream currentLogFileInputStream = null;
+        File compressedFile = null;
         try {
-            currentLogFileInputStream = new FileInputStream(logFile);
-        } catch (FileNotFoundException e) {
-            reportError("Unable to read from the current log file", e, ErrorManager.GENERIC_FAILURE);
-            return false;
-        }
-
-        // Create a handle to store the compressed rotated log file.
-        String compressedRotatedLogFilePath = logFile.getAbsolutePath() + COMPRESSED_ROTATED_LOG_FILE_EXTENSION;
-        FileOutputStream compressedRotatedLogFileOutputStream = null;
-        try {
-            compressedRotatedLogFileOutputStream = new FileOutputStream(compressedRotatedLogFilePath);
-        } catch (FileNotFoundException e) {
-            reportError("Unable to construct compressed log file", e, ErrorManager.GENERIC_FAILURE);
-            return false;
-        }
-
-        // Perform compression.
-        try {
-            GZIPOutputStream compressedRotatedLogFileGZIPOutputStream = new GZIPOutputStream(compressedRotatedLogFileOutputStream);
-            byte[] buffer = new byte[1024];
-            int length = 0;
-            while((length = currentLogFileInputStream.read(buffer)) != -1) {
-                compressedRotatedLogFileGZIPOutputStream.write(buffer, 0, length);
-            }
-            currentLogFileInputStream.close();
-            compressedRotatedLogFileGZIPOutputStream.finish();
-            compressedRotatedLogFileGZIPOutputStream.close();
+            compressedFile = CompressFileUtils.gzipCompress(currentLogFile);
         } catch (IOException e) {
-            reportError("Unable to write to the compressed rotated log file", e, ErrorManager.GENERIC_FAILURE);
-            return false;
+            reportError("Unable to compressed rotated log file", e, ErrorManager.GENERIC_FAILURE);
+            return;
         }
-        return true;
+        if (!currentLogFile.delete()) {
+            reportError("Unable to delete current rotated log file", null, ErrorManager.GENERIC_FAILURE);
+        }
     }
 	
     /**
