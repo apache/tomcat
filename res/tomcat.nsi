@@ -963,6 +963,18 @@ Function findJavaHome
       SetRegView 64
     ${EndIf}
   ${EndIf}
+    
+  ; If no 32-bit Java (JRE) found, look for 64-bit Java JDK
+  ${If} $0 != "%PROGRAMW6432%"
+    SetRegView 64
+    ReadRegStr $2 HKLM "SOFTWARE\JavaSoft\JDK" "CurrentVersion"
+    ReadRegStr $1 HKLM "SOFTWARE\JavaSoft\JDK\$2" "JavaHome"
+    ; "RuntimeLib" is not available here
+
+    IfErrors 0 +2
+    StrCpy $1 ""
+    ClearErrors
+  ${EndIf}    
 
   ; Put the result in the stack
   Push $1
@@ -1007,12 +1019,12 @@ Function findJVMPath
   IfFileExists "$2" FoundJvmDll
 
   ClearErrors
-  ;Step three: Read defaults from registry
 
+  ;Step three: Read defaults from registry
   ReadRegStr $1 HKLM "SOFTWARE\JavaSoft\Java Runtime Environment" "CurrentVersion"
   ReadRegStr $2 HKLM "SOFTWARE\JavaSoft\Java Runtime Environment\$1" "RuntimeLib"
-
   IfErrors 0 FoundJvmDll
+  
   StrCpy $2 ""
 
   FoundJvmDll:
