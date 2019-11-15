@@ -624,30 +624,23 @@ public class AccessLogValve extends AbstractAccessLogValve {
                 log.error(sm.getString("accessLogValve.alreadyExists", currentLogFile, newLogFile));
             }
         }
-		
-		try {
-            // Compress rotated file (if rotatable) and delete original rotated file.
-            // Check: https://bz.apache.org/bugzilla/show_bug.cgi?id=62611
-			if(isRotatable()) {
-				boolean compressed = compressRotatedLogFile();
-				if(compressed) {
-				    // TODO: original rotated file should probably be kept for a few days until deletion.
-                    if (!currentLogFile.delete()) {
-                        log.error(sm.getString("accessLogValve.DeleteLogFail", currentLogFile));
-                    }
-                }
-			}
-		} catch (Throwable e) {
-			ExceptionUtils.handleThrowable(e);
-			log.error(sm.getString("accessLogValve.compressFail"), e);
-		}
 
+        // Compress rotated file (if rotatable) and delete original rotated file.
+        // Check: https://bz.apache.org/bugzilla/show_bug.cgi?id=62611
+        if(isRotatable()) {
+            boolean compressed = compressRotatedLogFile();
+            if(compressed) {
+                // TODO: original rotated file should probably be kept for a few days until deletion.
+                if (!currentLogFile.delete()) {
+                    log.error(sm.getString("accessLogValve.DeleteLogFail", currentLogFile));
+                }
+            }
+        }
 		
         writer = null;
         dateStamp = "";
         currentLogFile = null;
     }
-
 
     /**
      * Log the specified message to the log file, switching files if the date
