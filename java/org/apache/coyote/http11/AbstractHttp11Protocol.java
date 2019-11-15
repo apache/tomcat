@@ -95,6 +95,15 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
     // ------------------------------------------------ HTTP specific properties
     // ------------------------------------------ managed in the ProtocolHandler
 
+    private boolean useKeepAliveResponseHeader = true;
+    public boolean getUseKeepAliveResponseHeader() {
+        return useKeepAliveResponseHeader;
+    }
+    public void setUseKeepAliveResponseHeader(boolean useKeepAliveResponseHeader) {
+        this.useKeepAliveResponseHeader = useKeepAliveResponseHeader;
+    }
+
+
     private String relaxedPathChars = null;
     public String getRelaxedPathChars() {
         return relaxedPathChars;

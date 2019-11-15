@@ -566,7 +566,7 @@ public class Http11Processor extends AbstractProcessor {
             TokenList.parseTokenList(headers.values(Constants.CONNECTION), tokens);
             if (tokens.contains(Constants.CLOSE)) {
                 keepAlive = false;
-            } else if (tokens.contains(Constants.KEEPALIVE)) {
+            } else if (tokens.contains(Constants.KEEP_ALIVE_HEADER_VALUE_TOKEN)) {
                 keepAlive = true;
             }
         }
@@ -909,21 +909,31 @@ public class Http11Processor extends AbstractProcessor {
             }
         } else if (!getErrorState().isError()) {
             if (!http11) {
-                headers.addValue(Constants.CONNECTION).setString(Constants.KEEPALIVE);
+                headers.addValue(Constants.CONNECTION).setString(Constants.KEEP_ALIVE_HEADER_VALUE_TOKEN);
             }
 
-            boolean connectionKeepAlivePresent =
-                isConnectionToken(request.getMimeHeaders(), Constants.KEEPALIVE);
+            if (protocol.getUseKeepAliveResponseHeader()) {
+                boolean connectionKeepAlivePresent =
+                    isConnectionToken(request.getMimeHeaders(), Constants.KEEP_ALIVE_HEADER_VALUE_TOKEN);
 
-            if (connectionKeepAlivePresent) {
-                int keepAliveTimeout = protocol.getKeepAliveTimeout();
+                if (connectionKeepAlivePresent) {
+                    int keepAliveTimeout = protocol.getKeepAliveTimeout();
 
-                if (keepAliveTimeout > 0) {
-                    String value = "timeout=" + keepAliveTimeout / 1000L;
-                    headers.setValue(Constants.KEEP_ALIVE).setString(value);
+                    if (keepAliveTimeout > 0) {
+                        String value = "timeout=" + keepAliveTimeout / 1000L;
+                        headers.setValue(Constants.KEEP_ALIVE_HEADER_NAME).setString(value);
 
-                    if (http11) {
-                        headers.addValue(Constants.CONNECTION).setString(Constants.KEEPALIVE);
+                        if (http11) {
+                            // Append if there is already a Connection header,
+                            // else create the header
+                            MessageBytes connectionHeaderValue = headers.getValue(Constants.CONNECTION);
+                            if (connectionHeaderValue == null) {
+                                headers.addValue(Constants.CONNECTION).setString(Constants.KEEP_ALIVE_HEADER_VALUE_TOKEN);
+                            } else {
+                                connectionHeaderValue.setString(
+                                        connectionHeaderValue.getString() + ", " + Constants.KEEP_ALIVE_HEADER_VALUE_TOKEN);
+                            }
+                        }
                     }
                 }
             }
