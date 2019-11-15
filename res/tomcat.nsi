@@ -965,7 +965,8 @@ Function findJavaHome
   ${EndIf}
     
   ; If no 32-bit Java (JRE) found, look for 64-bit Java JDK
-  ${If} $0 != "%PROGRAMW6432%"
+  ${If} $1 == ""
+  ${AndIf} $0 != "%PROGRAMW6432%"
     SetRegView 64
     ReadRegStr $2 HKLM "SOFTWARE\JavaSoft\JDK" "CurrentVersion"
     ReadRegStr $1 HKLM "SOFTWARE\JavaSoft\JDK\$2" "JavaHome"
@@ -974,7 +975,7 @@ Function findJavaHome
     IfErrors 0 +2
     StrCpy $1 ""
     ClearErrors
-  ${EndIf}    
+  ${EndIf}
 
   ; Put the result in the stack
   Push $1
