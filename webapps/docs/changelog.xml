@@ -117,7 +117,7 @@
         insensitive. (markt)
       </fix>
       <add>
-        <bug>63835</bug>: Add support for Keep-Alive header. (michaelo)
+        <bug>63835</bug>: Add support for Keep-Alive response header. (michaelo)
       </add>
       <fix>
         <bug>63864</bug>: Refactor parsing of the <code>transfer-encoding</code>
