@@ -1544,8 +1544,8 @@ public class TestHttp11Processor extends TomcatBaseTest {
             int maxKeepAliveRequests) throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
-        tomcat.getConnector().setAttribute("keepAliveTimeout", keepAliveTimeout);
-        tomcat.getConnector().setAttribute("maxKeepAliveRequests", maxKeepAliveRequests);
+        tomcat.getConnector().setAttribute("keepAliveTimeout", Integer.valueOf(keepAliveTimeout));
+        tomcat.getConnector().setAttribute("maxKeepAliveRequests", Integer.valueOf(maxKeepAliveRequests));
 
         // No file system docBase required
         Context ctx = tomcat.addContext("", null);
