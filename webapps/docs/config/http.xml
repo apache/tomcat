@@ -647,6 +647,14 @@
       recorded correctly but it will be reported (e.g. via JMX) as
       <code>-1</code> to make clear that it is not used.</p>
     </attribute>
+
+    <attribute name="useKeepAliveResponseHeader" required="false">
+      <p>(bool) Use this attribute to enable or disable the addition of the
+      <code>Keep-Alive</code> HTTP response header as described in
+      <a href="https://tools.ietf.org/html/draft-thomson-hybi-http-timeout-03">this
+      Internet-Draft</a>. The default value is <code>true</code>.</p>
+    </attribute>
+
   </attributes>
 
   </subsection>
