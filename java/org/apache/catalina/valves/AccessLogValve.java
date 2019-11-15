@@ -20,9 +20,10 @@ package org.apache.catalina.valves;
 import java.io.BufferedWriter;
 import java.io.CharArrayWriter;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.FileNotFoundException;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
@@ -65,6 +66,11 @@ import org.apache.tomcat.util.buf.B2CConverter;
 public class AccessLogValve extends AbstractAccessLogValve {
 
     private static final Log log = LogFactory.getLog(AccessLogValve.class);
+
+    /**
+     * The extension for the compressed rotated log file.
+     */
+    private static final String COMPRESSED_ROTATED_LOG_FILE_EXTENSION = ".gz";
 
     //------------------------------------------------------ Constructor
     public AccessLogValve() {
@@ -434,13 +440,15 @@ public class AccessLogValve extends AbstractAccessLogValve {
                 synchronized(this) {
                     if ((systime - rotationLastChecked) > 1000) {
                         rotationLastChecked = systime;
-						String tsDate;
+
+                        String tsDate;
                         // Check for a change of date
                         tsDate = fileDateFormatter.format(new Date(systime));
+
                         // If the date has changed, switch log files
                         if (!dateStamp.equals(tsDate)) {
                             close(true);
-							dateStamp = tsDate;
+                            dateStamp = tsDate;
                             open();
                         }
                     }
@@ -462,9 +470,9 @@ public class AccessLogValve extends AbstractAccessLogValve {
         if (currentLogFile != null) {
             File holder = currentLogFile;
             close(false);
-			try {
-				holder.renameTo(new File(newFileName));
-			} catch (Throwable e) {
+            try {
+                holder.renameTo(new File(newFileName));
+            } catch (Throwable e) {
                 ExceptionUtils.handleThrowable(e);
                 log.error(sm.getString("accessLogValve.rotateFail"), e);
             }
@@ -474,7 +482,6 @@ public class AccessLogValve extends AbstractAccessLogValve {
                     new Date(System.currentTimeMillis()));
 
             open();
-			
             return true;
         } else {
             return false;
@@ -483,42 +490,52 @@ public class AccessLogValve extends AbstractAccessLogValve {
     }
     
     
-    /** Compress the file after being rotated , it
-	 *	Intended to be called inside the close function 
-	 *  of the AccessLogValve class
+    /**
+     *  Compresses the rotated log file.
+     *
+     *  @return true if the compression succeeded, otherwise, it return false.
      */
-    public synchronized void compress(){
-		
-			try {
-				GZIPOutputStream out = new GZIPOutputStream(new FileOutputStream(currentLogFile +".gz"));
-				FileInputStream in = new FileInputStream(currentLogFile);
-                byte[] buffer = new byte[1024];
-                int lenght;
-                while((lenght=in.read(buffer)) != -1) {
-                    out.write(buffer, 0, lenght);
-                } 
-				in.close();
-				out.finish();
-				out.close();
-            } catch (IOException e) {
-				log.error(sm.getString("accessLogValve.RotateFail", currentLogFile), e);
-			}
+    public synchronized boolean compressRotatedLogFile(){
+
+        // try to get handle of the currentLogFile.
+        FileInputStream currentLogFileInputStream = null;
+        try {
+            currentLogFileInputStream = new FileInputStream(currentLogFile);
+        } catch (FileNotFoundException e) {
+            log.error(sm.getString("accessLogValve.CannotReadCurrentLogFile", currentLogFile), e);
+            return false;
         }
-    
-    // -------------------------------------------------------- Private Methods
-	
-	/** delete the file after being compressed , it
-	  *	Intended to be called inside the close function
-	  *	of the AccessLogValve class
-     */
-	
-	private void deleteRotatedFile() {
-        if (!currentLogFile.delete()) {
-            log.error(sm.getString("accessLogValve.DeleteLogFail", currentLogFile));
+
+        // Create a handle to store the compressed rotated log file.
+        String compressedRotatedLogFilePath = this.currentLogFile.getAbsolutePath() + COMPRESSED_ROTATED_LOG_FILE_EXTENSION;
+        FileOutputStream compressedRotatedLogFileOutputStream = null;
+        try {
+            compressedRotatedLogFileOutputStream = new FileOutputStream(compressedRotatedLogFilePath);
+        } catch (FileNotFoundException e) {
+            log.error(sm.getString("accessLogValve.CannotConstructCompressedLogFile", compressedRotatedLogFilePath), e);
+            return false;
         }
-        return;
+
+        // Perform compression.
+        try {
+            GZIPOutputStream compressedRotatedLogFileGZIPOutputStream = new GZIPOutputStream(compressedRotatedLogFileOutputStream);
+            byte[] buffer = new byte[1024];
+            int length = 0;
+            while((length = currentLogFileInputStream.read(buffer)) != -1) {
+                compressedRotatedLogFileGZIPOutputStream.write(buffer, 0, length);
+            }
+            currentLogFileInputStream.close();
+            compressedRotatedLogFileGZIPOutputStream.finish();
+            compressedRotatedLogFileGZIPOutputStream.close();
+        } catch (IOException e) {
+            log.error(sm.getString("accessLogValve.RotateFail", currentLogFile), e);
+            return false;
+        }
+        return true;
     }
-	
+
+    // -------------------------------------------------------- Private Methods
+
 
     private File getDirectoryFile() {
         File dir = new File(directory);
@@ -592,7 +609,6 @@ public class AccessLogValve extends AbstractAccessLogValve {
         }
         writer.flush();
         writer.close();
-
         if (rename && renameOnRotate) {
             File newLogFile = getLogFile(true);
             if (!newLogFile.exists()) {
@@ -610,9 +626,16 @@ public class AccessLogValve extends AbstractAccessLogValve {
         }
 		
 		try {
+            // Compress rotated file (if rotatable) and delete original rotated file.
+            // Check: https://bz.apache.org/bugzilla/show_bug.cgi?id=62611
 			if(isRotatable()) {
-				compress();
-				deleteRotatedFile();
+				boolean compressed = compressRotatedLogFile();
+				if(compressed) {
+				    // TODO: original rotated file should probably be kept for a few days until deletion.
+                    if (!currentLogFile.delete()) {
+                        log.error(sm.getString("accessLogValve.DeleteLogFail", currentLogFile));
+                    }
+                }
 			}
 		} catch (Throwable e) {
 			ExceptionUtils.handleThrowable(e);
@@ -625,6 +648,7 @@ public class AccessLogValve extends AbstractAccessLogValve {
         currentLogFile = null;
     }
 
+
     /**
      * Log the specified message to the log file, switching files if the date
      * has changed since the previous log call.
@@ -635,7 +659,7 @@ public class AccessLogValve extends AbstractAccessLogValve {
     public void log(CharArrayWriter message) {
 
         rotate();
-		
+
         /* In case something external rotated the file instead */
         if (checkExists) {
             synchronized (this) {
@@ -672,8 +696,8 @@ public class AccessLogValve extends AbstractAccessLogValve {
                     "accessLogValve.writeFail", message.toString()), ioe);
         }
     }
-    
-    
+
+
     /**
      * Open the new log file for the date specified by <code>dateStamp</code>.
      */
