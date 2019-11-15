@@ -83,6 +83,7 @@
   <!-- Servlet 3.0 spec requires Java 6+ -->
   <property name="compile.source" value="6"/>
   <property name="compile.target" value="6"/>
+  <property name="compile.release" value="6"/>
   <property name="min.java.version" value="6"/>
 
   <!-- Expose commons-logging defaults so they can be orver-ridden -->
@@ -635,6 +636,7 @@
            deprecation="${compile.deprecation}"
            source="${compile.source}"
            target="${compile.target}"
+           release="${compile.release}"
            encoding="ISO-8859-1"
            includeAntRuntime="true" >
       <compilerarg value="-Xlint:unchecked"/>
@@ -1175,6 +1177,7 @@
              debug="${compile.debug}" deprecation="${compile.deprecation}"
              source="${compile.source}"
              target="${compile.target}"
+             release="${compile.release}"
              classpath="${tomcat.classes}"
              encoding="ISO-8859-1"
              includeantruntime="false">
@@ -1186,6 +1189,7 @@
              debug="${compile.debug}" deprecation="${compile.deprecation}"
              source="${compile.source}"
              target="${compile.target}"
+             release="${compile.release}"
              classpath="${tomcat.classes}"
              encoding="ISO-8859-1"
              includeantruntime="false">
@@ -1412,6 +1416,7 @@
            deprecation="${compile.deprecation}"
            source="${compile.source}"
            target="${compile.target}"
+           release="${compile.release}"
            encoding="ISO-8859-1"
            includeantruntime="true">
       <classpath refid="tomcat.test.classpath" />
