@@ -57,6 +57,10 @@
       <add>
         <bug>63835</bug>: Add support for Keep-Alive response header. (michaelo)
       </add>
+      <fix>
+        Correct a logic bug in the <code>NioEndpoint</code> timeout handling
+        that meant a write timeout could be handled as a read timeout. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
