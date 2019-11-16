@@ -78,6 +78,16 @@ public abstract class CsrfPreventionFilterBase extends FilterBase {
         // Set the parameters
         super.init(filterConfig);
 
+        // Put the expected request parameter name into the application scope
+        filterConfig.getServletContext().setAttribute(
+                Constants.CSRF_NONCE_REQUEST_PARAM_NAME_KEY,
+                Constants.CSRF_NONCE_REQUEST_PARAM);
+
+        // Put the expected request header name into the application scope
+        filterConfig.getServletContext().setAttribute(
+                Constants.CSRF_REST_NONCE_HEDAER_NAME_KEY,
+                Constants.CSRF_REST_NONCE_HEADER_NAME);
+
         try {
             Class<?> clazz = Class.forName(randomClass);
             randomSource = (Random) clazz.newInstance();
