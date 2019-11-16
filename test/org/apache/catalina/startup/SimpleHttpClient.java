@@ -188,7 +188,7 @@ public abstract class SimpleHttpClient {
         socket = new Socket();
         socket.setSoTimeout(soTimeout);
         socket.connect(addr,connectTimeout);
-        OutputStream os = socket.getOutputStream();
+        OutputStream os = createOutputStream(socket);
         writer = new OutputStreamWriter(os, encoding);
         InputStream is = socket.getInputStream();
         Reader r = new InputStreamReader(is, encoding);
@@ -196,6 +196,10 @@ public abstract class SimpleHttpClient {
     }
     public void connect() throws UnknownHostException, IOException {
         connect(0,0);
+    }
+
+    protected OutputStream createOutputStream(Socket socket) throws IOException {
+        return socket.getOutputStream();
     }
 
     public void processRequest() throws IOException, InterruptedException {
