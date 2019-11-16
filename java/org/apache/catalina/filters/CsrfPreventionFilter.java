@@ -128,6 +128,11 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
 
             nonceCache.add(newNonce);
 
+            // Take this request's nonce and put it into the request
+            // attributes so pages can make direct use of it, rather than
+            // requiring the use of response.encodeURL.
+            request.setAttribute(Constants.CSRF_NONCE_REQUEST_ATTR_NAME, newNonce);
+
             wResponse = new CsrfResponseWrapper(res, newNonce);
         } else {
             wResponse = response;
