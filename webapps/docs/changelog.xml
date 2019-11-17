@@ -45,8 +45,17 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 8.5.49 (markt)" rtext="in development">
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        Correct a regression introduced in 8.5.48 that could trigger a
+        <code>NullPointerException</code> when using a
+        <code>RequestDispatcher</code>. (markt)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
-<section name="Tomcat 8.5.48 (markt)" rtext="release in progress">
+<section name="Tomcat 8.5.48 (markt)" rtext="not released">
   <subsection name="Catalina">
     <changelog>
       <fix>
