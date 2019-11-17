@@ -1032,8 +1032,9 @@ Function findJVMPath
   ;Step three: Read defaults from registry
   ReadRegStr $1 HKLM "SOFTWARE\JavaSoft\Java Runtime Environment" "CurrentVersion"
   ReadRegStr $2 HKLM "SOFTWARE\JavaSoft\Java Runtime Environment\$1" "RuntimeLib"
-
-  IfErrors 0 FoundJvmDll  
+  IfErrors 0 FoundJvmDll
+  
+  ;not found
   StrCpy $2 ""
 
   FoundJvmDll:
