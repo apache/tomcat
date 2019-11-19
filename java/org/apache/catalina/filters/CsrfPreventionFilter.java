@@ -104,11 +104,6 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
         filterConfig.getServletContext().setAttribute(
                 Constants.CSRF_NONCE_REQUEST_PARAM_NAME_KEY,
                 nonceRequestParameterName);
-
-        // Put the expected request header name into the application scope
-        filterConfig.getServletContext().setAttribute(
-                Constants.CSRF_REST_NONCE_HEADER_NAME_KEY,
-                Constants.CSRF_REST_NONCE_HEADER_NAME);
     }
 
     @Override
