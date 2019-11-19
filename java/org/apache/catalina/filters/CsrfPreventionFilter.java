@@ -53,6 +53,8 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
 
     private int nonceCacheSize = 5;
 
+    private String nonceRequestParameterName = Constants.CSRF_NONCE_REQUEST_PARAM;
+
     /**
      * Entry points are URLs that will not be tested for the presence of a valid
      * nonce. They are used to provide a way to navigate back to a protected
@@ -83,6 +85,16 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
         this.nonceCacheSize = nonceCacheSize;
     }
 
+    /**
+     * Sets the request parameter name to use for CSRF nonces.
+     *
+     * @param parameterName The request parameter name to use
+     *        for CSRF nonces.
+     */
+    public void setNonceRequestParameterName(String parameterName) {
+        this.nonceRequestParameterName = parameterName;
+    }
+
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
         // Set the parameters
@@ -91,7 +103,7 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
         // Put the expected request parameter name into the application scope
         filterConfig.getServletContext().setAttribute(
                 Constants.CSRF_NONCE_REQUEST_PARAM_NAME_KEY,
-                Constants.CSRF_NONCE_REQUEST_PARAM);
+                nonceRequestParameterName);
 
         // Put the expected request header name into the application scope
         filterConfig.getServletContext().setAttribute(
@@ -131,7 +143,7 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
 
             if (!skipNonceCheck) {
                 String previousNonce =
-                    req.getParameter(Constants.CSRF_NONCE_REQUEST_PARAM);
+                    req.getParameter(nonceRequestParameterName);
 
                 if(previousNonce == null) {
                     if(log.isDebugEnabled()) {
@@ -196,7 +208,7 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
             // requiring the use of response.encodeURL.
             request.setAttribute(Constants.CSRF_NONCE_REQUEST_ATTR_NAME, newNonce);
 
-            wResponse = new CsrfResponseWrapper(res, newNonce);
+            wResponse = new CsrfResponseWrapper(res, nonceRequestParameterName, newNonce);
         } else {
             wResponse = response;
         }
@@ -208,10 +220,12 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
     protected static class CsrfResponseWrapper
             extends HttpServletResponseWrapper {
 
+        private final String nonceRequestParameterName;
         private final String nonce;
 
-        public CsrfResponseWrapper(HttpServletResponse response, String nonce) {
+        public CsrfResponseWrapper(HttpServletResponse response, String nonceRequestParameterName, String nonce) {
             super(response);
+            this.nonceRequestParameterName = nonceRequestParameterName;
             this.nonce = nonce;
         }
 
@@ -266,7 +280,7 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
             } else {
                 sb.append('?');
             }
-            sb.append(Constants.CSRF_NONCE_REQUEST_PARAM);
+            sb.append(nonceRequestParameterName);
             sb.append('=');
             sb.append(nonce);
             sb.append(anchor);
