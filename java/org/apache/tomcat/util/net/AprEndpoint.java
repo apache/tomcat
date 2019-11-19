@@ -14,7 +14,6 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package org.apache.tomcat.util.net;
 
 import java.security.AccessController;
@@ -69,9 +68,7 @@ import org.apache.tomcat.util.security.PrivilegedSetTccl;
  */
 public class AprEndpoint extends AbstractEndpoint<Long> {
 
-
     // -------------------------------------------------------------- Constants
-
 
     private static final Log log = LogFactory.getLog(AprEndpoint.class);
 
@@ -102,6 +99,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
 
 
     // ----------------------------------------------------------------- Fields
+
     /**
      * Root APR memory pool.
      */
@@ -424,7 +422,9 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
     // --------------------------------------------------------- Public Methods
 
     /**
-     * Number of keepalive sockets.
+     * Obtain the number of kept alive sockets.
+     *
+     * @return The number of open sockets currently managed by the Poller
      */
     public int getKeepAliveCount() {
         if (poller == null) {
@@ -436,7 +436,9 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
 
 
     /**
-     * Number of sendfile sockets.
+     * Obtain the number of sendfile sockets.
+     *
+     * @return The number of sockets currently managed by the Sendfile poller.
      */
     public int getSendfileCount() {
         if (sendfile == null) {
@@ -473,8 +475,9 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
         int family = Socket.APR_INET;
         if (Library.APR_HAVE_IPV6) {
             if (addressStr == null) {
-                if (!OS.IS_BSD && !OS.IS_WIN32 && !OS.IS_WIN64)
+                if (!OS.IS_BSD && !OS.IS_WIN32 && !OS.IS_WIN64) {
                     family = Socket.APR_UNSPEC;
+                }
             } else if (addressStr.indexOf(':') >= 0) {
                 family = Socket.APR_UNSPEC;
             }
@@ -891,6 +894,10 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
 
     /**
      * Allocate a new poller of the specified size.
+     * @param size The size
+     * @param pool The pool from which the poller will be allocated
+     * @param timeout The timeout
+     * @return the poller pointer
      */
     protected long allocatePoller(int size, long pool, int timeout) {
         try {
@@ -909,6 +916,10 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
     /**
      * Process given socket. This is called when the socket has been
      * accepted.
+     * @param socket The socket
+     * @return <code>true</code> if the socket was correctly configured
+     *  and processing may continue, <code>false</code> if the socket needs to be
+     *  close immediately
      */
     protected boolean processSocketWithOptions(long socket) {
         try {
@@ -1064,7 +1075,6 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
             countDownConnection();
         }
     }
-
 
     @Override
     protected Log getLog() {
@@ -1277,6 +1287,8 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
 
         /**
          * Removes the specified socket from the poller.
+         *
+         * @param socket The socket to remove
          *
          * @return The configured timeout for the socket or zero if the socket
          *         was not in the list of socket timeouts
@@ -1715,6 +1727,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
             return (rv == Status.APR_SUCCESS);
         }
 
+
         /**
          * Timeout checks.
          */
@@ -1765,8 +1778,9 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
         }
 
         /**
-         * The background thread that listens for incoming TCP/IP connections
-         * and hands them off to an appropriate processor.
+         * The background thread that adds sockets to the Poller, checks the
+         * poller for triggered events and hands the associated socket off to an
+         * appropriate processor as events occur.
          */
         @Override
         public void run() {
@@ -2125,7 +2139,6 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
 
     // ----------------------------------------------- SendfileData Inner Class
 
-
     /**
      * SendfileData class.
      */
@@ -2147,7 +2160,6 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
 
 
     // --------------------------------------------------- Sendfile Inner Class
-
 
     public class Sendfile implements Runnable {
 
