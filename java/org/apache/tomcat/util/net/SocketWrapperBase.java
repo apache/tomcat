@@ -409,7 +409,6 @@ public abstract class SocketWrapperBase<E> {
                     log.error(sm.getString("endpoint.debug.handlerRelease"), e);
                 }
             } finally {
-                getEndpoint().connections.remove(socket);
                 getEndpoint().countDownConnection();
                 doClose();
             }

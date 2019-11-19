@@ -302,10 +302,10 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
      */
     @Override
     protected boolean setSocketOptions(AsynchronousSocketChannel socket) {
-        Nio2Channel channel = null;
-        boolean success = false;
+        Nio2SocketWrapper socketWrapper = null;
         try {
-            socketProperties.setProperties(socket);
+            // Allocate channel and wrapper
+            Nio2Channel channel = null;
             if (nioChannels != null) {
                 channel = nioChannels.pop();
             }
@@ -320,31 +320,34 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
                     channel = new Nio2Channel(bufhandler);
                 }
             }
-            Nio2SocketWrapper socketWrapper = new Nio2SocketWrapper(channel, this);
-            connections.put(channel, socketWrapper);
-            channel.reset(socket, socketWrapper);
+            Nio2SocketWrapper newWrapper = new Nio2SocketWrapper(channel, this);
+            channel.reset(socket, newWrapper);
+            connections.put(socket, newWrapper);
+            socketWrapper = newWrapper;
+
+            // Set socket properties
+            socketProperties.setProperties(socket);
+
             socketWrapper.setReadTimeout(getConnectionTimeout());
             socketWrapper.setWriteTimeout(getConnectionTimeout());
             socketWrapper.setKeepAliveLeft(Nio2Endpoint.this.getMaxKeepAliveRequests());
             socketWrapper.setSecure(isSSLEnabled());
             // Continue processing on the same thread as the acceptor is async
-            success = processSocket(socketWrapper, SocketEvent.OPEN_READ, false);
+            return processSocket(socketWrapper, SocketEvent.OPEN_READ, false);
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
             log.error(sm.getString("endpoint.socketOptionsError"), t);
-        } finally {
-            if (!success && channel != null) {
-                connections.remove(channel);
-                channel.free();
+            if (socketWrapper == null) {
+                destroySocket(socket);
             }
         }
         // Tell to close the socket if needed
-        return success;
+        return false;
     }
 
 
     @Override
-    protected void closeSocket(AsynchronousSocketChannel socket) {
+    protected void destroySocket(AsynchronousSocketChannel socket) {
         countDownConnection();
         try {
             socket.close();
@@ -922,6 +925,7 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
                 log.debug("Calling [" + getEndpoint() + "].closeSocket([" + this + "])");
             }
             try {
+                getEndpoint().connections.remove(getSocket().getIOChannel());
                 synchronized (getSocket()) {
                     if (getSocket().isOpen()) {
                         getSocket().close(true);
