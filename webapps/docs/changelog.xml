@@ -51,6 +51,11 @@
         Fix the broken re-try link on the error page for the FORM authentication
         example in the JSP section of the examples web application. (markt)
       </fix>
+      <add>
+        Improvements to CsrfPreventionFilter including additional
+        logging and making the latest nonce available in the request
+        attributes. (schultz)
+      </add>
     </changelog>
   </subsection>
 </section>
