@@ -343,6 +343,9 @@ public class AjpProcessor extends AbstractProcessor {
                         socketWrapper.write(true, pongMessageArray, 0, pongMessageArray.length);
                         socketWrapper.flush(true);
                     } catch (IOException e) {
+                        if (getLog().isDebugEnabled()) {
+                            getLog().debug("Pong message failed", e);
+                        }
                         setErrorState(ErrorState.CLOSE_CONNECTION_NOW, e);
                     }
                     recycle();
