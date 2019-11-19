@@ -1178,7 +1178,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
             while (info != null) {
                 // Make sure we aren't trying add the socket as well as close it
                 addList.remove(info.socket);
-                // Make sure the  socket isn't in the poller before we close it
+                // Make sure the socket isn't in the poller before we close it
                 removeFromPoller(info.socket);
                 // Poller isn't running at this point so use destroySocket()
                 // directly
@@ -1189,7 +1189,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
             // Close all sockets in the add queue
             info = addList.get();
             while (info != null) {
-                // Make sure the  socket isn't in the poller before we close it
+                // Make sure the socket isn't in the poller before we close it
                 removeFromPoller(info.socket);
                 // Poller isn't running at this point so use destroySocket()
                 // directly
