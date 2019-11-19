@@ -48,9 +48,8 @@
   <subsection name="Catalina">
     <changelog>
       <add>
-        Improvements to CsrfPreventionFilter including additional
-        logging, making the latest nonce available in the request attributes,
-        and allowing the CSRF nonce request parameter name to be customized.
+        Improvements to CsrfPreventionFilter: additional logging, allow the
+        CSRF nonce request parameter name to be customized.
         (schultz)
       </add>
     </changgelog>
@@ -86,6 +85,12 @@
         <code>NullPointerException</code> when using a
         <code>RequestDispatcher</code>. (markt)
       </fix>
+      <add>
+        Improvement to CsrfPreventionFilter: expose the latest available nonce
+        as a request attribute; expose the expected nonce request parameter
+        name as a context attribute.
+        (schultz)
+      </add>
     </changelog>
   </subsection>
 </section>
