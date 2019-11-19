@@ -45,6 +45,15 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 8.5.50 (markt)" rtext="in development">
+  <subsection name="Catalina">
+    <changelog>
+      <add>
+        Improvements to CsrfPreventionFilter including additional
+        logging and making the latest nonce available in the request
+        attributes. (schultz)
+      </add>
+    </changgelog>
+  </subsection>
   <subsection name="Coyote">
     <changelog>
       <scode>
