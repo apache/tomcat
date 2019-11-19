@@ -1486,7 +1486,16 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
             // It might not be worth bothering though.
             aprPoller = allocatePoller(pollerSize, pool, -1);
 
-            desc = new long[pollerSize * 2];
+            /*
+             * x2 - One descriptor for the socket, one for the event(s).
+             * x2 - Some APR implementations return multiple events for the
+             *      same socket as different entries. Each socket is registered
+             *      for a maximum of two events (read and write) at any one
+             *      time.
+             *
+             * Therefore size is poller size *4.
+             */
+            desc = new long[pollerSize * 4];
             connectionCount.set(0);
             addList = new SocketList(pollerSize);
             closeList = new SocketList(pollerSize);
@@ -1838,6 +1847,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
 
                     int rv = Poll.poll(aprPoller, pollTime, desc, true);
                     if (rv > 0) {
+                        rv = mergeDescriptors(desc, rv);
                         connectionCount.addAndGet(-rv);
                         for (int n = 0; n < rv; n++) {
                             if (getLog().isDebugEnabled()) {
@@ -2032,6 +2042,39 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
             synchronized (this) {
                 this.notifyAll();
             }
+        }
+
+
+        private int mergeDescriptors(long[] desc, int startCount) {
+            /*
+             * https://bz.apache.org/bugzilla/show_bug.cgi?id=57653#c6 suggests
+             * this merging is only necessary on OSX and BSD.
+             *
+             * https://bz.apache.org/bugzilla/show_bug.cgi?id=56313 suggests the
+             * same, or a similar, issue is happening on Windows.
+             * Notes: Only the first startCount * 2 elements of the array
+             *        are populated.
+             *        The array is event, socket, event, socket etc.
+             */
+            HashMap<Long,Long> merged = new HashMap<Long,Long>(startCount);
+            for (int n = 0; n < startCount; n++) {
+                Long old = merged.put(Long.valueOf(desc[2*n+1]), Long.valueOf(desc[2*n]));
+                if (old != null) {
+                    // This was a replacement. Merge the old and new value
+                    merged.put(Long.valueOf(desc[2*n+1]),
+                            Long.valueOf(desc[2*n] | old.longValue()));
+                    if (log.isDebugEnabled()) {
+                        log.debug(sm.getString("endpoint.apr.pollMergeEvents",
+                                Long.valueOf(desc[2*n+1]), Long.valueOf(desc[2*n]), old));
+                    }
+                }
+            }
+            int i = 0;
+            for (Map.Entry<Long,Long> entry : merged.entrySet()) {
+                desc[i++] = entry.getValue().longValue();
+                desc[i++] = entry.getKey().longValue();
+            }
+            return merged.size();
         }
     }
 
