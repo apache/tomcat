@@ -49,8 +49,9 @@
     <changelog>
       <add>
         Improvements to CsrfPreventionFilter including additional
-        logging and making the latest nonce available in the request
-        attributes. (schultz)
+        logging, making the latest nonce available in the request attributes,
+        and allowing the CSRF nonce request parameter name to be customized.
+        (schultz)
       </add>
     </changgelog>
   </subsection>
