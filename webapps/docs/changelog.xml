@@ -52,9 +52,8 @@
         example in the JSP section of the examples web application. (markt)
       </fix>
       <add>
-        Improvements to CsrfPreventionFilter including additional
-        logging, making the latest nonce available in the request attributes,
-        and allowing the CSRF nonce request parameter name to be customized.
+        Improvements to CsrfPreventionFilter: additional logging, allow the
+        CSRF nonce request parameter name to be customized.
         (schultz)
       </add>
     </changelog>
@@ -66,6 +65,12 @@
       <fix>
        Refactor JMX remote RMI registry creation. (remm)
       </fix>
+      <add>
+        Improvement to CsrfPreventionFilter: expose the latest available nonce
+        as a request attribute; expose the expected nonce request parameter
+        name as a context attribute.
+        (schultz)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
