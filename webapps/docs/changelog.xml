@@ -117,6 +117,11 @@
         request header to use the shared parsing code and reduce duplication.
         (markt)
       </fix>
+      <scode>
+        Refactor the APR poller to always use a single pollset now that the
+        Windows operating systems that required multiple smaller pollsets to be
+        used are no longer supported. (markt)
+      </scode>
     </changelog>
   </subsection>
   <subsection name="Jasper">
