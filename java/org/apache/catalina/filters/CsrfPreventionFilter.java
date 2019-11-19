@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.servlet.FilterChain;
+import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
@@ -80,6 +81,22 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
      */
     public void setNonceCacheSize(int nonceCacheSize) {
         this.nonceCacheSize = nonceCacheSize;
+    }
+
+    @Override
+    public void init(FilterConfig filterConfig) throws ServletException {
+        // Set the parameters
+        super.init(filterConfig);
+
+        // Put the expected request parameter name into the application scope
+        filterConfig.getServletContext().setAttribute(
+                Constants.CSRF_NONCE_REQUEST_PARAM_NAME_KEY,
+                Constants.CSRF_NONCE_REQUEST_PARAM);
+
+        // Put the expected request header name into the application scope
+        filterConfig.getServletContext().setAttribute(
+                Constants.CSRF_REST_NONCE_HEADER_NAME_KEY,
+                Constants.CSRF_REST_NONCE_HEADER_NAME);
     }
 
     @Override

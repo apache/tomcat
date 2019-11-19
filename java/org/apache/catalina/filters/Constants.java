@@ -72,6 +72,6 @@ public final class Constants {
      * The servlet context attribute key under which the
      * CSRF REST header name can be found.
      */
-    public static final String CSRF_REST_NONCE_HEDAER_NAME_KEY =
+    public static final String CSRF_REST_NONCE_HEADER_NAME_KEY =
         "org.apache.catalina.filters.CSRF_REST_NONCE_HEADER_NAME";
 }
