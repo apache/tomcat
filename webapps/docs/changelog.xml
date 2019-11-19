@@ -54,6 +54,14 @@
       </scode>
     </changelog>
   </subsection>
+  <subsection name="Web applications">
+    <changelog>
+      <fix>
+        Fix the broken re-try link on the error page for the FORM authentication
+        example in the JSP section of the examples web application. (markt)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 8.5.49 (markt)" rtext="release in progress">
   <subsection name="Catalina">
