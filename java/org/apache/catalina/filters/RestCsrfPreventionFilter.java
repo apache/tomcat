@@ -25,6 +25,7 @@ import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
 import javax.servlet.FilterChain;
+import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
@@ -87,6 +88,17 @@ public class RestCsrfPreventionFilter extends CsrfPreventionFilterBase {
     private Set<String> pathsAcceptingParams = new HashSet<>();
 
     private String pathsDelimiter = ",";
+
+    @Override
+    public void init(FilterConfig filterConfig) throws ServletException {
+        // Set the parameters
+        super.init(filterConfig);
+
+        // Put the expected request header name into the application scope
+        filterConfig.getServletContext().setAttribute(
+                Constants.CSRF_REST_NONCE_HEADER_NAME_KEY,
+                Constants.CSRF_REST_NONCE_HEADER_NAME);
+    }
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
