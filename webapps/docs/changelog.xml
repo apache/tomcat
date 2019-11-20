@@ -64,6 +64,11 @@
         CSRF nonce request parameter name to be customized.
         (schultz)
       </add>
+      <fix>
+        Correct the documentation for the <code>maxConnections</code> attribute
+        of the <code>Connector</code> in the documentation web application.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>

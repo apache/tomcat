@@ -451,11 +451,8 @@
       based on the <code>acceptCount</code> setting. The default value varies by
       connector type. For NIO and NIO2 the default is <code>10000</code>.
       For APR/native, the default is <code>8192</code>.</p>
-      <p>Note that for APR/native on Windows, the configured value will be
-      reduced to the highest multiple of 1024 that is less than or equal to
-      maxConnections. This is done for performance reasons.<br/>
-      If set to a value of -1, the maxConnections feature is disabled
-      and connections are not counted.</p>
+      <p>For NIO/NIO2 only, setting the value to -1, will disable the
+      maxConnections feature and connections will not be counted.</p>
     </attribute>
 
     <attribute name="maxCookieCount" required="false">
