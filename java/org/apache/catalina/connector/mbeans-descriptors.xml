@@ -83,7 +83,7 @@
 
     <!-- Common -->
     <attribute   name="keepAliveTimeout"
-          description="The number of seconds Tomcat will wait for a subsequent request before closing the connection"
+          description="The number of milliseconds Tomcat will wait for a subsequent request before closing the connection"
                  type="int"/>
 
     <attribute   name="localPort"
