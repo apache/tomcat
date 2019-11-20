@@ -155,6 +155,11 @@
         Correct the description of the default value for the server attribute in
         the security How-To. (markt)
       </fix>
+      <fix>
+        Correct the documentation for the <code>maxConnections</code> attribute
+        of the <code>Connector</code> in the documentation web application.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
