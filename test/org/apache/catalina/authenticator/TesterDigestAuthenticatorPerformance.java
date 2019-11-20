@@ -98,7 +98,7 @@ public class TesterDigestAuthenticatorPerformance {
         System.out.println("Average time per request (wall): " +
                 wallTime/(threadCount * requestCount));
 
-        Assert.assertEquals(requestCount * threadCount, totalSuccess);
+        Assert.assertEquals(((long)requestCount) * threadCount, totalSuccess);
     }
 
     @Before

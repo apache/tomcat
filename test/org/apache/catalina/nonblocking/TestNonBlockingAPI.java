@@ -129,6 +129,9 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         Assert.assertEquals(HttpServletResponse.SC_OK, rc);
         if (async) {
             Assert.assertEquals(2000000 * 8, servlet.listener.body.length());
+            TestAsyncReadListener listener = (TestAsyncReadListener) servlet.listener;
+            Assert.assertTrue(Math.abs(listener.containerThreadCount.get() - listener.notReadyCount.get())  <= 1);
+            Assert.assertEquals(listener.isReadyCount.get(), listener.nonContainerThreadCount.get());
         } else {
             Assert.assertEquals(5 * 8, servlet.listener.body.length());
         }
@@ -174,7 +177,13 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
                     "Host: localhost:" + getPort() + "\r\n" +
                     "\r\n").getBytes(StandardCharsets.ISO_8859_1));
             os.flush();
-            is.read(buffer);
+            // Make sure the entire response has been read.
+            int read = is.read(buffer);
+            // The response should end with CRLFCRLF
+            Assert.assertEquals(buffer[read - 4], '\r');
+            Assert.assertEquals(buffer[read - 3], '\n');
+            Assert.assertEquals(buffer[read - 2], '\r');
+            Assert.assertEquals(buffer[read - 1], '\n');
         }
         os.write(("GET / HTTP/1.1\r\n" +
                 "Host: localhost:" + getPort() + "\r\n" +
@@ -186,11 +195,15 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         int readSinceLastPause = 0;
         while (read != -1) {
             read = is.read(buffer);
+            if (readSinceLastPause == 0) {
+                log.info("Reading data");
+            }
             if (read > 0) {
                 result.append(buffer, 0, read);
             }
             readSinceLastPause += read;
             if (readSinceLastPause > WRITE_SIZE / 16) {
+                log.info("Read " + readSinceLastPause + " bytes, pause 500ms");
                 readSinceLastPause = 0;
                 Thread.sleep(500);
             }
@@ -428,8 +441,8 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         int max = 5;
         int count = 0;
         long delay = 0;
-        byte[] b = "WANTMORE".getBytes();
-        byte[] f = "FINISHED".getBytes();
+        byte[] b = "WANTMORE".getBytes(StandardCharsets.ISO_8859_1);
+        byte[] f = "FINISHED".getBytes(StandardCharsets.ISO_8859_1);
 
         public DataWriter(long delay, int max) {
             this.delay = delay;
@@ -472,7 +485,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
     }
 
     @WebServlet(asyncSupported = true)
-    public class NBReadServlet extends TesterServlet {
+    public static class NBReadServlet extends TesterServlet {
         private static final long serialVersionUID = 1L;
         private final boolean async;
         private final boolean ignoreIsReady;
@@ -526,10 +539,10 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
     }
 
     @WebServlet(asyncSupported = true)
-    public class NBWriteServlet extends TesterServlet {
+    public static class NBWriteServlet extends TesterServlet {
         private static final long serialVersionUID = 1L;
-        public volatile TestWriteListener wlistener;
-        public volatile TestReadListener rlistener;
+        public transient volatile TestWriteListener wlistener;
+        public transient volatile TestReadListener rlistener;
 
         @Override
         protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -572,9 +585,9 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
     }
 
     @WebServlet(asyncSupported = true)
-    public class NBReadWriteServlet extends TesterServlet {
+    public static class NBReadWriteServlet extends TesterServlet {
         private static final long serialVersionUID = 1L;
-        public volatile TestReadWriteListener rwlistener;
+        public transient volatile TestReadWriteListener rwlistener;
 
         @Override
         protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -714,7 +727,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         }
     }
 
-    private class TestWriteListener implements WriteListener {
+    private static class TestWriteListener implements WriteListener {
         AsyncContext ctx;
         int written = 0;
         public volatile boolean onErrorInvoked = false;
@@ -758,7 +771,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
 
     }
 
-    private class TestReadWriteListener implements ReadListener {
+    private static class TestReadWriteListener implements ReadListener {
         AsyncContext ctx;
         private final StringBuilder body = new StringBuilder();
 
@@ -1028,7 +1041,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
 
 
     @WebServlet(asyncSupported = true)
-    private final class NBReadWithDispatchServlet extends TesterServlet {
+    private static final class NBReadWithDispatchServlet extends TesterServlet {
 
         private static final long serialVersionUID = 1L;
 

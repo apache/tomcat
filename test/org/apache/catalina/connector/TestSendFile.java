@@ -80,7 +80,7 @@ public class TestSendFile extends TomcatBaseTest {
                 Assert.assertEquals(HttpServletResponse.SC_OK, rc);
                 System.out.println("Client received " + bc.getLength() + " bytes in "
                         + (System.currentTimeMillis() - start) + " ms.");
-                Assert.assertEquals(EXPECTED_CONTENT_LENGTH * (i + 1), bc.getLength());
+                Assert.assertEquals(EXPECTED_CONTENT_LENGTH * (i + 1L), bc.getLength());
 
                 bc.recycle();
             }

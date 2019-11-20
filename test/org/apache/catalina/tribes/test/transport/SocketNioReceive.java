@@ -53,11 +53,9 @@ public class SocketNioReceive {
         System.out.println("Listening on 9999");
         while (true) {
             try {
-                synchronized (mutex) {
-                    mutex.wait(5000);
-                    if ( start != 0 ) {
-                        System.out.println("Throughput " + df.format(mb / seconds) + " MB/seconds, messages "+count+" accepts "+accept+", total "+mb+" MB.");
-                    }
+                Thread.sleep(5000);
+                if ( start != 0 ) {
+                    System.out.println("Throughput " + df.format(mb / seconds) + " MB/seconds, messages "+count+" accepts "+accept+", total "+mb+" MB.");
                 }
             }catch (Throwable x) {
                 x.printStackTrace();

@@ -129,9 +129,11 @@ public class TestLoadBalancerDrainingValve {
 
         @Override
         public boolean equals(Object o) {
-            if(null == o) return false;
-            MyCookie mc = (MyCookie)o;
+            if(!(o instanceof MyCookie)) {
+                return false;
+            }
 
+            MyCookie mc = (MyCookie)o;
             return mc.getName().equals(this.getName())
                 && mc.getPath().equals(this.getPath())
                 && mc.getValue().equals(this.getValue())

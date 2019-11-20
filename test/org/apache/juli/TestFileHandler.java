@@ -59,8 +59,9 @@ public class TestFileHandler {
         date.add(Calendar.DAY_OF_MONTH, -3);
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH-mm-ss.SSS");
         File file = new File(logsDir, PREFIX_1 + formatter.format(date.getTime()) + SUFIX_1);
-        file.createNewFile();
-
+        if (!file.createNewFile()) {
+            Assert.fail("Unable to create " + file.getAbsolutePath());
+        }
     }
 
     @After
@@ -68,9 +69,9 @@ public class TestFileHandler {
         File[] files = logsDir.listFiles();
         if (files != null) {
             for (File file : files) {
-                file.delete();
+                Assert.assertTrue("Failed to delete [" + file + "]", file.delete());
             }
-            logsDir.delete();
+            Assert.assertTrue("Failed to create [" + logsDir + "]", logsDir.delete());
         }
     }
 
@@ -126,7 +127,9 @@ public class TestFileHandler {
         for (int i = 0; i < amount; i++) {
             cal.add(Calendar.DAY_OF_MONTH, -1);
             File file = new File(dir, prefix + formatter.format(cal.getTime()) + sufix);
-            file.createNewFile();
+            if (!file.createNewFile()) {
+                Assert.fail("Unable to create " + file.getAbsolutePath());
+            }
         }
     }
 }
