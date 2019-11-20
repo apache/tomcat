@@ -202,9 +202,9 @@ public class PooledConnection implements PooledConnectionMBean {
                 log.debug("Unable to disconnect previous connection.", x);
             } //catch
         } //end if
-        if (poolProperties.getDataSource()==null && poolProperties.getDataSourceJNDI()!=null) {
+        //if (poolProperties.getDataSource()==null && poolProperties.getDataSourceJNDI()!=null) {
             //TODO lookup JNDI name
-        }
+        //}
 
         if (poolProperties.getDataSource()!=null) {
             connectUsingDataSource();

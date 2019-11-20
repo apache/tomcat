@@ -49,7 +49,7 @@ public class StatementDecoratorInterceptor extends AbstractCreateStatementInterc
     /**
      * the constructor to create the resultSet proxies
      */
-    protected static Constructor<?> resultSetConstructor = null;
+    protected static volatile Constructor<?> resultSetConstructor = null;
 
     @Override
     public void closeInvoked() {
