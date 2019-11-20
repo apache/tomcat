@@ -107,8 +107,8 @@ public class Bug53367 {
             Thread thread = new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    try {
-                        ds.getConnection();
+                    // Expected to fail
+                    try (Connection c = ds.getConnection()) {
                     } catch (Exception e) {
                         System.err.println("Step 2:"+e.getMessage());
                     }
