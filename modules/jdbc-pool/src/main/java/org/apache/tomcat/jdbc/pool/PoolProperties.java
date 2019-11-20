@@ -16,7 +16,6 @@
  */
 package org.apache.tomcat.jdbc.pool;
 
-
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.Serializable;
@@ -28,14 +27,9 @@ import java.util.Properties;
 import java.util.concurrent.atomic.AtomicInteger;
 
 
-
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
-/**
- * @author Filip Hanik
- *
- */
 public class PoolProperties implements PoolConfiguration, Cloneable, Serializable {
 
     private static final long serialVersionUID = -8519283440854213745L;
@@ -60,7 +54,7 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
     private volatile String validationQuery;
     private volatile int validationQueryTimeout = -1;
     private volatile String validatorClassName;
-    private volatile Validator validator;
+    private transient volatile Validator validator;
     private volatile boolean testOnBorrow = false;
     private volatile boolean testOnReturn = false;
     private volatile boolean testWhileIdle = false;
@@ -488,7 +482,7 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
                     } else {
                         String name = interceptorValues[i].substring(0,propIndex).trim();
                         definitions[i+1] = new InterceptorDefinition(name);
-                        String propsAsString = interceptorValues[i].substring(propIndex+1, interceptorValues[i].length()-1);
+                        String propsAsString = interceptorValues[i].substring(propIndex+1, endIndex);
                         String[] props = propsAsString.split(",");
                         for (int j=0; j<props.length; j++) {
                             int pidx = props[j].indexOf('=');

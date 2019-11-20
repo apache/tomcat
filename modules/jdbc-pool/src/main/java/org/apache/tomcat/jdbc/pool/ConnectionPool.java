@@ -51,10 +51,8 @@ import org.apache.juli.logging.LogFactory;
  * The ConnectionPool uses a {@link PoolProperties} object for storing all the meta information about the connection pool.
  * As the underlying implementation, the connection pool uses {@link java.util.concurrent.BlockingQueue} to store active and idle connections.
  * A custom implementation of a fair {@link FairBlockingQueue} blocking queue is provided with the connection pool itself.
- * @author Filip Hanik
  * @version 1.0
  */
-
 public class ConnectionPool {
 
     /**
@@ -149,7 +147,7 @@ public class ConnectionPool {
      * Instantiate a connection pool. This will create connections if initialSize is larger than 0.
      * The {@link PoolProperties} should not be reused for another connection pool.
      * @param prop PoolProperties - all the properties for this connection pool
-     * @throws SQLException
+     * @throws SQLException Pool initialization error
      */
     public ConnectionPool(PoolConfiguration prop) throws SQLException {
         //setup quick access variables and pools
@@ -163,7 +161,7 @@ public class ConnectionPool {
      * If a connection is not retrieved, the Future must be cancelled in order for the connection to be returned
      * to the pool.
      * @return a Future containing a reference to the connection or the future connection
-     * @throws SQLException
+     * @throws SQLException Cannot use asynchronous connect
      */
     public Future<Connection> getConnectionAsync() throws SQLException {
         try {
@@ -208,7 +206,8 @@ public class ConnectionPool {
      * maxActive} connections a connection is returned immediately. If no
      * connection is available, the pool will attempt to fetch a connection for
      * {@link PoolProperties#maxWait maxWait} milliseconds.
-     *
+     * @param username The user name to use for the connection
+     * @param password The password for the connection
      * @return Connection - a java.sql.Connection/javax.sql.PooledConnection
      *         reflection proxy, wrapping the underlying object.
      * @throws SQLException
@@ -355,8 +354,9 @@ public class ConnectionPool {
     /**
      * Creates and caches a {@link java.lang.reflect.Constructor} used to instantiate the proxy object.
      * We cache this, since the creation of a constructor is fairly slow.
+     * @param xa Use a XA connection
      * @return constructor used to instantiate the wrapper object
-     * @throws NoSuchMethodException
+     * @throws NoSuchMethodException Failed to get a constructor
      */
     public Constructor<?> getProxyConstructor(boolean xa) throws NoSuchMethodException {
         //cache the constructor
@@ -540,6 +540,7 @@ public class ConnectionPool {
         }
     }
 
+
 //===============================================================================
 //         CONNECTION POOLING IMPL LOGIC
 //===============================================================================
@@ -620,7 +621,10 @@ public class ConnectionPool {
         // we could have threads stuck in idle.poll(timeout) that will never be
         // notified
         if (waitcount.get() > 0) {
-            idle.offer(create(true));
+            if (!idle.offer(create(true))) {
+                log.warn("Failed to add a new connection to the pool after releasing a connection " +
+                        "when at least one thread was waiting for a connection.");
+            }
         }
     }
 
@@ -628,8 +632,10 @@ public class ConnectionPool {
      * Thread safe way to retrieve a connection from the pool
      * @param wait - time to wait, overrides the maxWait from the properties,
      * set to -1 if you wish to use maxWait, 0 if you wish no wait time.
-     * @return PooledConnection
-     * @throws SQLException
+     * @param username The user name to use for the connection
+     * @param password The password for the connection
+     * @return a connection
+     * @throws SQLException Failed to get a connection
      */
     private PooledConnection borrowConnection(int wait, String username, String password) throws SQLException {
 
@@ -715,8 +721,10 @@ public class ConnectionPool {
      * Creates a JDBC connection and tries to connect to the database.
      * @param now timestamp of when this was called
      * @param notUsed Argument not used
+     * @param username The user name to use for the connection
+     * @param password The password for the connection
      * @return a PooledConnection that has been connected
-     * @throws SQLException
+     * @throws SQLException Failed to get a connection
      */
     protected PooledConnection createConnection(long now, PooledConnection notUsed, String username, String password) throws SQLException {
         //no connections where available we'll create one
@@ -768,7 +776,9 @@ public class ConnectionPool {
      * Validates and configures a previously idle connection
      * @param now - timestamp
      * @param con - the connection to validate and configure
-     * @return con
+     * @param username The user name to use for the connection
+     * @param password The password for the connection
+     * @return a connection
      * @throws SQLException if a validation error happens
      */
     protected PooledConnection borrowConnection(long now, PooledConnection con, String username, String password) throws SQLException {
@@ -850,7 +860,7 @@ public class ConnectionPool {
     }
     /**
      * Terminate the current transaction for the given connection.
-     * @param con
+     * @param con The connection
      * @return <code>true</code> if the connection TX termination succeeded
      *         otherwise <code>false</code>
      */
@@ -877,7 +887,7 @@ public class ConnectionPool {
      * Determines if a connection should be closed upon return to the pool.
      * @param con - the connection
      * @param action - the validation action that should be performed
-     * @return true if the connection should be closed
+     * @return <code>true</code> if the connection should be closed
      */
     protected boolean shouldClose(PooledConnection con, int action) {
         if (con.getConnectionVersion() < getPoolVersion()) return true;
@@ -954,7 +964,7 @@ public class ConnectionPool {
     /**
      * Determines if a connection should be abandoned based on
      * {@link PoolProperties#abandonWhenPercentageFull} setting.
-     * @return true if the connection should be abandoned
+     * @return <code>true</code> if the connection should be abandoned
      */
     protected boolean shouldAbandon() {
         if (!poolProperties.isRemoveAbandoned()) return false;
@@ -1118,6 +1128,7 @@ public class ConnectionPool {
 
     /**
      * Create a new pooled connection object. Not connected nor validated.
+     * @param incrementCounter <code>true</code> to increment the connection count
      * @return a pooled connection object
      */
     protected PooledConnection create(boolean incrementCounter) {
@@ -1149,7 +1160,7 @@ public class ConnectionPool {
 
     /**
      * Hook to perform final actions on a pooled connection object once it has been disconnected and will be discarded
-     * @param con
+     * @param con The connection
      */
     protected void finalize(PooledConnection con) {
         JdbcInterceptor handler = con.getHandler();
@@ -1161,7 +1172,8 @@ public class ConnectionPool {
 
     /**
      * Hook to perform final actions on a pooled connection object once it has been disconnected and will be discarded
-     * @param con
+     * @param con The connection
+     * @param finalizing <code>true</code> if finalizing the connection
      */
     protected void disconnectEvent(PooledConnection con, boolean finalizing) {
         JdbcInterceptor handler = con.getHandler();
@@ -1265,7 +1277,6 @@ public class ConnectionPool {
      * and performs the initialization according to
      * interceptors and validation rules.
      * This class is thread safe and is cancellable
-     * @author fhanik
      *
      */
     protected class ConnectionFuture implements Future<Connection>, Runnable {
