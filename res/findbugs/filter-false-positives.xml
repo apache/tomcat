@@ -1695,23 +1695,6 @@
     <Bug pattern="MSF_MUTABLE_SERVLET_FIELD"/>
   </Match>
   <Match>
-    <!-- Deliberate hack for the purposes of the test -->
-    <Class name="org.apache.catalina.startup.TesterServletWithAnnotations"/>
-    <Or>
-      <Field name="envEntry2"/>
-      <Field name="envEntry3"/>
-      <Field name="envEntry4"/>
-      <Field name="envEntry6"/>
-    </Or>
-    <Bug pattern="MSF_MUTABLE_SERVLET_FIELD"/>
-  </Match>
-  <Match>
-    <!-- Deliberate hack for the purposes of the test -->
-    <Class name="org.apache.catalina.startup.TesterServletWithLifeCycleMethods"/>
-    <Field name="result"/>
-    <Bug pattern="MSF_MUTABLE_SERVLET_FIELD"/>
-  </Match>
-  <Match>
     <!-- Return value of latch is intentionally ignored -->
     <Class name="org.apache.catalina.nonblocking.TestNonBlockingAPI"/>
     <Method name="testDelayedNBWrite"/>
@@ -1728,6 +1711,23 @@
     <Class name="org.apache.catalina.nonblocking.TestNonBlockingAPI$NBReadWithDispatchServlet$1"/>
     <Method name="onDataAvailable"/>
     <Bug pattern="RR_NOT_CHECKED"/>
+  </Match>
+  <Match>
+    <!-- Deliberate hack for the purposes of the test -->
+    <Class name="org.apache.catalina.startup.TesterServletWithAnnotations"/>
+    <Or>
+      <Field name="envEntry2"/>
+      <Field name="envEntry3"/>
+      <Field name="envEntry4"/>
+      <Field name="envEntry6"/>
+    </Or>
+    <Bug pattern="MSF_MUTABLE_SERVLET_FIELD"/>
+  </Match>
+  <Match>
+    <!-- Deliberate hack for the purposes of the test -->
+    <Class name="org.apache.catalina.startup.TesterServletWithLifeCycleMethods"/>
+    <Field name="result"/>
+    <Bug pattern="MSF_MUTABLE_SERVLET_FIELD"/>
   </Match>
   <Match>
     <Or>
@@ -1843,16 +1843,16 @@
     <Bug code="DE" />
   </Match>
   <Match>
-    <!-- Deliberate hack for the purposes of the test -->
-    <Class name="org.apache.catalina.valves.TestStuckThreadDetectionValve$StickingServlet"/>
-    <Field name="wasInterrupted"/>
-    <Bug pattern="MSF_MUTABLE_SERVLET_FIELD"/>
-  </Match>
-  <Match>
     <!-- Concrete Map type not affected -->
     <Class name="org.apache.catalina.util.TestParameterMap" />
     <Method name="testEntrySetImmutabilityAfterLocked" />
     <Bug pattern="DMI_ENTRY_SETS_MAY_REUSE_ENTRY_OBJECTS" />
+  </Match>
+  <Match>
+    <!-- Deliberate hack for the purposes of the test -->
+    <Class name="org.apache.catalina.valves.TestStuckThreadDetectionValve$StickingServlet"/>
+    <Field name="wasInterrupted"/>
+    <Bug pattern="MSF_MUTABLE_SERVLET_FIELD"/>
   </Match>
   <Match>
     <!-- Code is deliberately unused -->
