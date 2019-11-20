@@ -1708,6 +1708,12 @@
     <Bug pattern="ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD"/>
   </Match>
   <Match>
+    <!-- Test code - array is safe -->
+    <Class name="org.apache.catalina.startup.TomcatBaseTest"/>
+    <Field name="booleans"/>
+    <Bug pattern="MS_MUTABLE_ARRAY"/>
+  </Match>
+  <Match>
     <Class name="org.apache.catalina.tribes.demos.EchoRpcTest" />
     <Method name="run"/>
     <Bug code="REC" />
