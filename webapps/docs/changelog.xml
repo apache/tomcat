@@ -52,7 +52,7 @@
         CSRF nonce request parameter name to be customized.
         (schultz)
       </add>
-    </changgelog>
+    </changelog>
   </subsection>
   <subsection name="Coyote">
     <changelog>
