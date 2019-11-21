@@ -175,7 +175,7 @@
         <bug>63826</bug>: Remove <code>commons-daemon-native.tar.gz</code> and
         <code>tomcat-native.tar.gz</code> from the binary zip distributions for
         Windows since compiled versions of those components are already
-        included within the zip distriubutions. (markt)
+        included within the zip distributions. (markt)
       </fix>
       <fix>
         <bug>63833</bug>: Fix an error in the generification of the copied
@@ -213,7 +213,7 @@
     <changelog>
       <add>
         <bug>57665</bug>: Add support for the <code>X-Forwarded-Host</code>
-        header to the <code>RemoteIpFilter</code> and <code>RemotepValve</code>.
+        header to the <code>RemoteIpFilter</code> and <code>RemoteIpValve</code>.
         (markt)
       </add>
       <add>
@@ -454,7 +454,7 @@
       </scode>
       <fix>
         When performing a silent install with the Windows Installer, ensure that
-        the registry entires are added to the 64-bit registry when using a
+        the registry entries are added to the 64-bit registry when using a
         64-bit JVM. (markt)
       </fix>
       <fix>
