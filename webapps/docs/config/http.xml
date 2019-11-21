@@ -448,9 +448,8 @@
       falls below <strong>maxConnections</strong> at which point the server will
       start accepting and processing new connections again. Note that once the
       limit has been reached, the operating system may still accept connections
-      based on the <code>acceptCount</code> setting. The default value varies by
-      connector type. For NIO and NIO2 the default is <code>10000</code>.
-      For APR/native, the default is <code>8192</code>.</p>
+      based on the <code>acceptCount</code> setting. The default value
+      is <code>8192</code>.</p>
       <p>For NIO/NIO2 only, setting the value to -1, will disable the
       maxConnections feature and connections will not be counted.</p>
     </attribute>

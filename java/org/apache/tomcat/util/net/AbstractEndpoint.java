@@ -455,7 +455,7 @@ public abstract class AbstractEndpoint<S,U> {
     public int getAcceptorThreadPriority() { return acceptorThreadPriority; }
 
 
-    private int maxConnections = 10000;
+    private int maxConnections = 8*1024;
     public void setMaxConnections(int maxCon) {
         this.maxConnections = maxCon;
         LimitLatch latch = this.connectionLimitLatch;
@@ -470,8 +470,7 @@ public abstract class AbstractEndpoint<S,U> {
             initializeConnectionLatch();
         }
     }
-
-    public int  getMaxConnections() { return this.maxConnections; }
+    public int getMaxConnections() { return this.maxConnections; }
 
     /**
      * Return the current count of connections handled by this endpoint, if the

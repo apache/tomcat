@@ -111,9 +111,6 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
     // ------------------------------------------------------------ Constructor
 
     public AprEndpoint() {
-        // Need to override the default for maxConnections to align it with what
-        // was pollerSize (before the two were merged)
-        setMaxConnections(8 * 1024);
         // Asynchronous IO has significantly lower performance with APR:
         // - no IO vectoring
         // - mandatory use of direct buffers forces output buffering

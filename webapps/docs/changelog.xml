@@ -51,6 +51,10 @@
         Fix endpoint closeSocket and destroySocket discrepancies, in particular
         in the APR connector. (remm)
       </fix>
+      <fix>
+        Harmonize maxConnections default value to 8192 across all connectors.
+        (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
