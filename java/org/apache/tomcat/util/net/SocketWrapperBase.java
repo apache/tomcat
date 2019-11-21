@@ -29,9 +29,6 @@ import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -58,6 +55,7 @@ public abstract class SocketWrapperBase<E> {
     private volatile boolean upgraded = false;
     private boolean secure = false;
     private String negotiatedProtocol = null;
+
     /*
      * Following cached for speed / reduced GC
      */
@@ -67,14 +65,8 @@ public abstract class SocketWrapperBase<E> {
     protected String remoteAddr = null;
     protected String remoteHost = null;
     protected int remotePort = -1;
-    /*
-     * Used if block/non-blocking is set at the socket level. The client is
-     * responsible for the thread-safe use of this field via the locks provided.
-     */
-    private volatile boolean blockingStatus = true;
-    private final Lock blockingStatusReadLock;
-    private final WriteLock blockingStatusWriteLock;
-    /*
+
+    /**
      * Used to record the first IOException that occurs during non-blocking
      * read/writes that can't be usefully propagated up the stack since there is
      * no user code or appropriate container code in the stack to handle it.
@@ -103,19 +95,23 @@ public abstract class SocketWrapperBase<E> {
      */
     protected final WriteBuffer nonBlockingWriteBuffer = new WriteBuffer(bufferedWriteSize);
 
+    /*
+     * Asynchronous operations.
+     */
     protected final Semaphore readPending;
     protected volatile OperationState<?> readOperation = null;
     protected final Semaphore writePending;
     protected volatile OperationState<?> writeOperation = null;
 
+    /**
+     * The org.apache.coyote.Processor instance currently associated
+     * with the wrapper.
+     */
     protected Object currentProcessor = null;
 
     public SocketWrapperBase(E socket, AbstractEndpoint<E,?> endpoint) {
         this.socket = socket;
         this.endpoint = endpoint;
-        ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
-        this.blockingStatusReadLock = lock.readLock();
-        this.blockingStatusWriteLock = lock.writeLock();
         if (endpoint.getUseAsyncIO() || needSemaphores()) {
             readPending = new Semaphore(1);
             writePending = new Semaphore(1);
@@ -278,14 +274,6 @@ public abstract class SocketWrapperBase<E> {
     }
     protected abstract void populateLocalPort();
 
-    public boolean getBlockingStatus() { return blockingStatus; }
-    public void setBlockingStatus(boolean blockingStatus) {
-        this.blockingStatus = blockingStatus;
-    }
-    public Lock getBlockingStatusReadLock() { return blockingStatusReadLock; }
-    public WriteLock getBlockingStatusWriteLock() {
-        return blockingStatusWriteLock;
-    }
     public SocketBufferHandler getSocketBufferHandler() { return socketBufferHandler; }
 
     public boolean hasDataToRead() {

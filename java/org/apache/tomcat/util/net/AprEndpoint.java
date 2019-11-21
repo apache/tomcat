@@ -32,6 +32,7 @@ import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 
 import javax.net.ssl.KeyManager;
@@ -2020,8 +2021,20 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
         // This field should only be used by Poller#run()
         private int pollerFlags = 0;
 
+        /*
+         * Used if block/non-blocking is set at the socket level. The client is
+         * responsible for the thread-safe use of this field via the locks provided.
+         */
+        private volatile boolean blockingStatus = true;
+        private final Lock blockingStatusReadLock;
+        private final WriteLock blockingStatusWriteLock;
+
         public AprSocketWrapper(Long socket, AprEndpoint endpoint) {
             super(socket, endpoint);
+
+            ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
+            this.blockingStatusReadLock = lock.readLock();
+            this.blockingStatusWriteLock = lock.writeLock();
 
             // TODO Make the socketWriteBuffer size configurable and align the
             //      SSL and app buffer size settings with NIO & NIO2.
@@ -2035,6 +2048,14 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
             socketBufferHandler = new SocketBufferHandler(6 * 1500, 6 * 1500, true);
         }
 
+        public boolean getBlockingStatus() { return blockingStatus; }
+        public void setBlockingStatus(boolean blockingStatus) {
+            this.blockingStatus = blockingStatus;
+        }
+        public Lock getBlockingStatusReadLock() { return blockingStatusReadLock; }
+        public WriteLock getBlockingStatusWriteLock() {
+            return blockingStatusWriteLock;
+        }
 
         @Override
         public int read(boolean block, byte[] b, int off, int len) throws IOException {
