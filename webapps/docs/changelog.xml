@@ -61,6 +61,12 @@
         Windows operating systems that required multiple smaller pollsets to be
         used are no longer supported. (markt)
       </scode>
+      <update>
+        Add vectoring for NIO in the base and SSL channels. (remm)
+      </update>
+      <add>
+        Add async API to the NIO and APR connector. (remm)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Web applications">

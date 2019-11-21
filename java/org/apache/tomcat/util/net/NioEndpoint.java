@@ -27,6 +27,7 @@ import java.net.SocketTimeoutException;
 import java.nio.ByteBuffer;
 import java.nio.channels.CancelledKeyException;
 import java.nio.channels.Channel;
+import java.nio.channels.CompletionHandler;
 import java.nio.channels.FileChannel;
 import java.nio.channels.NetworkChannel;
 import java.nio.channels.SelectionKey;
@@ -37,6 +38,7 @@ import java.nio.channels.WritableByteChannel;
 import java.util.ConcurrentModificationException;
 import java.util.Iterator;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
@@ -1445,6 +1447,113 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
         public void setAppReadBufHandler(ApplicationBufferHandler handler) {
             getSocket().setAppReadBufHandler(handler);
         }
+
+        @Override
+        protected <A> OperationState<A> newOperationState(boolean read,
+                ByteBuffer[] buffers, int offset, int length,
+                BlockingMode block, long timeout, TimeUnit unit, A attachment,
+                CompletionCheck check, CompletionHandler<Long, ? super A> handler,
+                Semaphore semaphore, VectoredIOCompletionHandler<A> completion) {
+            return new NioOperationState<>(read, buffers, offset, length, block,
+                    timeout, unit, attachment, check, handler, semaphore, completion);
+        }
+
+        private class NioOperationState<A> extends OperationState<A> {
+            private volatile boolean inline = true;
+            private NioOperationState(boolean read, ByteBuffer[] buffers, int offset, int length,
+                    BlockingMode block, long timeout, TimeUnit unit, A attachment, CompletionCheck check,
+                    CompletionHandler<Long, ? super A> handler, Semaphore semaphore,
+                    VectoredIOCompletionHandler<A> completion) {
+                super(read, buffers, offset, length, block,
+                        timeout, unit, attachment, check, handler, semaphore, completion);
+            }
+
+            @Override
+            protected boolean isInline() {
+                return inline;
+            }
+
+            @Override
+            public void run() {
+                // Perform the IO operation
+                // Called from the poller to continue the IO operation
+                long nBytes = 0;
+                if (getError() == null) {
+                    try {
+                        synchronized (this) {
+                            if (!completionDone) {
+                                // This filters out same notification until processing
+                                // of the current one is done
+                                if (log.isDebugEnabled()) {
+                                    log.debug("Skip concurrent " + (read ? "read" : "write") + " notification");
+                                }
+                                return;
+                            }
+                            if (read) {
+                                // Read from main buffer first
+                                if (!socketBufferHandler.isReadBufferEmpty()) {
+                                    // There is still data inside the main read buffer, it needs to be read first
+                                    socketBufferHandler.configureReadBufferForRead();
+                                    for (int i = 0; i < length && !socketBufferHandler.isReadBufferEmpty(); i++) {
+                                        nBytes += transfer(socketBufferHandler.getReadBuffer(), buffers[offset + i]);
+                                    }
+                                }
+                                if (nBytes == 0) {
+                                    nBytes = getSocket().read(buffers, offset, length);
+                                    updateLastRead();
+                                }
+                            } else {
+                                boolean doWrite = true;
+                                // Write from main buffer first
+                                if (!socketBufferHandler.isWriteBufferEmpty()) {
+                                    // There is still data inside the main write buffer, it needs to be written first
+                                    socketBufferHandler.configureWriteBufferForRead();
+                                    do {
+                                        nBytes = getSocket().write(socketBufferHandler.getWriteBuffer());
+                                    } while (!socketBufferHandler.isWriteBufferEmpty() && nBytes > 0);
+                                    if (!socketBufferHandler.isWriteBufferEmpty()) {
+                                        doWrite = false;
+                                    }
+                                    // Preserve a negative value since it is an error
+                                    if (nBytes > 0) {
+                                        nBytes = 0;
+                                    }
+                                }
+                                if (doWrite) {
+                                    nBytes = getSocket().write(buffers, offset, length);
+                                    updateLastWrite();
+                                }
+                            }
+                            if (nBytes != 0) {
+                                completionDone = false;
+                            }
+                        }
+                    } catch (IOException e) {
+                        setError(e);
+                    }
+                }
+                if (nBytes > 0) {
+                    // The bytes processed are only updated in the completion handler
+                    completion.completed(Long.valueOf(nBytes), this);
+                } else if (nBytes < 0 || getError() != null) {
+                    IOException error = getError();
+                    if (error == null) {
+                        error = new EOFException();
+                    }
+                    completion.failed(error, this);
+                } else {
+                    // As soon as the operation uses the poller, it is no longer inline
+                    inline = false;
+                    if (read) {
+                        registerReadInterest();
+                    } else {
+                        registerWriteInterest();
+                    }
+                }
+            }
+
+        }
+
     }
 
 

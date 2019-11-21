@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.SocketTimeoutException;
 import java.nio.ByteBuffer;
+import java.nio.channels.CompletionHandler;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -28,6 +29,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.Semaphore;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
@@ -112,6 +115,11 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
     // ------------------------------------------------------------ Constructor
 
     public AprEndpoint() {
+        // Asynchronous IO has significantly lower performance with APR:
+        // - no IO vectoring
+        // - mandatory use of direct buffers forces output buffering
+        // - needs extra output flushes due to buffering
+        setUseAsyncIO(false);
         // Need to override the default for maxConnections to align it with what
         // was pollerSize (before the two were merged)
         setMaxConnections(8 * 1024);
@@ -1178,7 +1186,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
             while (info != null) {
                 // Make sure we aren't trying add the socket as well as close it
                 addList.remove(info.socket);
-                // Make sure the socket isn't in the poller before we close it
+                // Make sure the  socket isn't in the poller before we close it
                 removeFromPoller(info.socket);
                 // Poller isn't running at this point so use destroySocket()
                 // directly
@@ -1189,7 +1197,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
             // Close all sockets in the add queue
             info = addList.get();
             while (info != null) {
-                // Make sure the socket isn't in the poller before we close it
+                // Make sure the  socket isn't in the poller before we close it
                 removeFromPoller(info.socket);
                 // Poller isn't running at this point so use destroySocket()
                 // directly
@@ -2049,7 +2057,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
      * This class is the equivalent of the Worker, but will simply use in an
      * external Executor thread pool.
      */
-    protected class SocketProcessor extends SocketProcessorBase<Long> {
+    protected class SocketProcessor extends  SocketProcessorBase<Long> {
 
         public SocketProcessor(SocketWrapperBase<Long> socketWrapper, SocketEvent event) {
             super(socketWrapper, event);
@@ -2660,5 +2668,117 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
                 }
             }
         }
+
+        @Override
+        protected <A> OperationState<A> newOperationState(boolean read,
+                ByteBuffer[] buffers, int offset, int length,
+                BlockingMode block, long timeout, TimeUnit unit, A attachment,
+                CompletionCheck check, CompletionHandler<Long, ? super A> handler,
+                Semaphore semaphore, VectoredIOCompletionHandler<A> completion) {
+            return new AprOperationState<>(read, buffers, offset, length, block,
+                    timeout, unit, attachment, check, handler, semaphore, completion);
+        }
+
+        private class AprOperationState<A> extends OperationState<A> {
+            private volatile boolean inline = true;
+            private volatile long flushBytes = 0;
+            private AprOperationState(boolean read, ByteBuffer[] buffers, int offset, int length,
+                    BlockingMode block, long timeout, TimeUnit unit, A attachment, CompletionCheck check,
+                    CompletionHandler<Long, ? super A> handler, Semaphore semaphore,
+                    VectoredIOCompletionHandler<A> completion) {
+                super(read, buffers, offset, length, block,
+                        timeout, unit, attachment, check, handler, semaphore, completion);
+            }
+
+            @Override
+            protected boolean isInline() {
+                return inline;
+            }
+
+            @Override
+            public void run() {
+                // Perform the IO operation
+                // Called from the poller to continue the IO operation
+                long nBytes = 0;
+                if (getError() == null) {
+                    try {
+                        synchronized (this) {
+                            if (!completionDone) {
+                                // This filters out same notification until processing
+                                // of the current one is done
+                                if (log.isDebugEnabled()) {
+                                    log.debug("Skip concurrent " + (read ? "read" : "write") + " notification");
+                                }
+                                return;
+                            }
+                            // Find the buffer on which the operation will be performed (no vectoring with APR)
+                            ByteBuffer buffer = null;
+                            for (int i = 0; i < length; i++) {
+                                if (buffers[i + offset].hasRemaining()) {
+                                    buffer = buffers[i + offset];
+                                    break;
+                                }
+                            }
+                            if (buffer == null && flushBytes == 0) {
+                                // Nothing to do
+                                return;
+                            }
+                            if (read) {
+                                nBytes = read(false, buffer);
+                            } else {
+                                if (!flush(block == BlockingMode.BLOCK)) {
+                                    if (flushBytes > 0) {
+                                        // Flushing was done, continue processing
+                                        nBytes = flushBytes;
+                                        flushBytes = 0;
+                                    } else {
+                                        @SuppressWarnings("null") // Not possible
+                                        int remaining = buffer.remaining();
+                                        write(block == BlockingMode.BLOCK, buffer);
+                                        nBytes = remaining - buffer.remaining();
+                                        if (nBytes > 0 && flush(block == BlockingMode.BLOCK)) {
+                                            // We have to flush and it's incomplete, save the bytes written until done
+                                            inline = false;
+                                            registerWriteInterest();
+                                            flushBytes = nBytes;
+                                            return;
+                                        }
+                                    }
+                                } else {
+                                    // Continue flushing
+                                    inline = false;
+                                    registerWriteInterest();
+                                    return;
+                                }
+                            }
+                            if (nBytes != 0) {
+                                completionDone = false;
+                            }
+                        }
+                    } catch (IOException e) {
+                        setError(e);
+                    }
+                }
+                if (nBytes > 0) {
+                    // The bytes processed are only updated in the completion handler
+                    completion.completed(Long.valueOf(nBytes), this);
+                } else if (nBytes < 0 || getError() != null) {
+                    IOException error = getError();
+                    if (error == null) {
+                        error = new EOFException();
+                    }
+                    completion.failed(error, this);
+                } else {
+                    // As soon as the operation uses the poller, it is no longer inline
+                    inline = false;
+                    if (read) {
+                        registerReadInterest();
+                    } else {
+                        registerWriteInterest();
+                    }
+                }
+            }
+        }
+
     }
 }
