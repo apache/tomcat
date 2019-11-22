@@ -1273,9 +1273,13 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                 // registered for write once as both container and user code can trigger
                 // write registration.
             } else {
-                if (socket.write(from) == -1) {
-                    throw new EOFException();
-                }
+                int n = 0;
+                do {
+                    n = socket.write(from);
+                    if (n == -1) {
+                        throw new EOFException();
+                    }
+                } while (n > 0 && from.hasRemaining());
             }
             updateLastWrite();
         }

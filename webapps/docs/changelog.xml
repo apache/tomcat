@@ -55,6 +55,10 @@
         Harmonize maxConnections default value to 8192 across all connectors.
         (remm)
       </fix>
+      <fix>
+        <bug>63949</bug>: Fix non blocking write problems with NIO due to the
+        need for a write loop. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
