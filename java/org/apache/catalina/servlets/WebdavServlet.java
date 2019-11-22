@@ -124,7 +124,7 @@ import org.xml.sax.SAXException;
  *
  * @author Remy Maucherat
  *
- * @see https://tools.ietf.org/html/rfc4918
+ * @see <a href="https://tools.ietf.org/html/rfc4918">RFC 4918</a>
  */
 public class WebdavServlet extends DefaultServlet {
 
