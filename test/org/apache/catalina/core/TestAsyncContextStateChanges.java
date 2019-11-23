@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.servlet.AsyncContext;
@@ -125,11 +126,10 @@ public class TestAsyncContextStateChanges extends TomcatBaseTest {
         if (asyncEnd.isError()) {
             client.disconnect();
             closeLatch.countDown();
-            try {
-                endLatch.await();
-            } catch (InterruptedException e) {
-                // Ignore
-            }
+
+            Assert.assertTrue(
+                    "Awaiting endLatch did not complete in 10 seconds",
+                    endLatch.await(10, TimeUnit.SECONDS));
         } else {
             client.setUseContentLength(true);
             client.readResponse(true);
