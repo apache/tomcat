@@ -23,6 +23,7 @@ output
 work
 build.properties
 mvn.properties
+.ant-targets-build.xml
 .checkstyle
 .classpath
 .fbprefs
