@@ -59,7 +59,7 @@
   They eventually become mixed with the numbered issues (i.e., numbered
   issues do not "pop up" wrt. others).
 -->
-<section name="Tomcat 7.0.98 (violetagg)">
+<section name="Tomcat 7.0.98 (violetagg)" rtext="not released">
   <subsection name="Catalina">
     <changelog>
       <fix>
