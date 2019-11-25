@@ -85,6 +85,7 @@ public class TestAsyncContextStateChanges extends TomcatBaseTest {
     private ServletRequest servletRequest = null;
     private AsyncContext asyncContext = null;
     private AtomicBoolean failed = new AtomicBoolean();
+    private CountDownLatch servletLatch;
     private CountDownLatch threadLatch;
     private CountDownLatch closeLatch;
     private CountDownLatch endLatch;
@@ -98,6 +99,7 @@ public class TestAsyncContextStateChanges extends TomcatBaseTest {
 
         // Initialise tracking fields
         failed.set(true);
+        servletLatch = new CountDownLatch(1);
         threadLatch = new CountDownLatch(1);
         closeLatch = new CountDownLatch(1);
         endLatch = new CountDownLatch(1);
@@ -122,6 +124,9 @@ public class TestAsyncContextStateChanges extends TomcatBaseTest {
                                          SimpleHttpClient.CRLF});
         client.connect();
         client.sendRequest();
+
+        // Wait for Servlet to start processing request
+        servletLatch.await();
 
         if (asyncEnd.isError()) {
             client.disconnect();
@@ -155,6 +160,8 @@ public class TestAsyncContextStateChanges extends TomcatBaseTest {
         @Override
         protected void doGet(HttpServletRequest req, HttpServletResponse resp)
                 throws ServletException, IOException {
+            servletLatch.countDown();
+
             if (dispatch) {
                 return;
             }
