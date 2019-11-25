@@ -59,6 +59,11 @@
         <bug>63949</bug>: Fix non blocking write problems with NIO due to the
         need for a write loop. (remm)
       </fix>
+      <fix>
+        Simplify regular endpoint writes by removing write(Non)BlockingDirect.
+        All regular writes will now be buffered for a more predictable
+        behavior. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
