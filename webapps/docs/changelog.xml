@@ -59,6 +59,17 @@
   They eventually become mixed with the numbered issues (i.e., numbered
   issues do not "pop up" wrt. others).
 -->
+<section name="Tomcat 7.0.99 (violetagg)">
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        <bug>63950</bug>: Fix timing issue in
+        <code>TestAsyncContextStateChanges</code> test that caused it
+        to hang indefinitely. (markt)
+      </fix>
+    </changelog>
+  </subsection>
+</section>
 <section name="Tomcat 7.0.98 (violetagg)" rtext="not released">
   <subsection name="Catalina">
     <changelog>
