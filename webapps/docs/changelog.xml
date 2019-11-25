@@ -84,6 +84,16 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Other">
+    <changelog>
+      <fix>
+        Revert the fix for <bug>63815</bug> (quoting the use of
+        <code>CATALINA_OPTS</code> and <code>JAVA_OPTS</code> when used in shell
+        scripts to avoid the expansion of <code>*</code>) as it caused various
+        regressions, particularly with <code>daemon.sh</code>. (markt)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 9.0.29 (markt)" rtext="2019-11-21">
   <subsection name="Catalina">
