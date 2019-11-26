@@ -87,7 +87,7 @@
   <subsection name="Other">
     <changelog>
       <fix>
-        Revert the fix for <bug>63815</bug> (quoting the use of
+        Correct the fix for <bug>63815</bug> (quoting the use of
         <code>CATALINA_OPTS</code> and <code>JAVA_OPTS</code> when used in shell
         scripts to avoid the expansion of <code>*</code>) as it caused various
         regressions, particularly with <code>daemon.sh</code>. (markt)
