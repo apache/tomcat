@@ -92,6 +92,9 @@
         scripts to avoid the expansion of <code>*</code>) as it caused various
         regressions, particularly with <code>daemon.sh</code>. (markt)
       </fix>
+      <update>
+        Update the OWB module to Apache OpenWebBeans 2.0.13. (remm)
+      </update>
     </changelog>
   </subsection>
 </section>

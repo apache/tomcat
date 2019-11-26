@@ -29,7 +29,7 @@
     <name>Apache Tomcat CDI 2 support</name>
     <description>Apache Tomcat CDI 2 support using Apache OpenWebBeans</description>
     <!-- This is the Apache OpenWebBeans version -->
-    <version>2.0.12</version>
+    <version>2.0.13</version>
     <packaging>jar</packaging>
 
     <properties>
