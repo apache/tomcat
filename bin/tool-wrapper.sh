@@ -146,8 +146,8 @@ JAVA_OPTS="$JAVA_OPTS -Djava.util.logging.manager=org.apache.juli.ClassLoaderLog
 
 # ----- Execute The Requested Command -----------------------------------------
 
-exec "$_RUNJAVA" $JAVA_OPTS $TOOL_OPTS \
-  -D$ENDORSED_PROP="$JAVA_ENDORSED_DIRS" \
-  -classpath "$CLASSPATH" \
-  -Dcatalina.home="$CATALINA_HOME" \
+eval exec "\"$_RUNJAVA\"" "$JAVA_OPTS" "$TOOL_OPTS" \
+  -D$ENDORSED_PROP="\"$JAVA_ENDORSED_DIRS\"" \
+  -classpath "\"$CLASSPATH\"" \
+  -Dcatalina.home="\"$CATALINA_HOME\"" \
   org.apache.catalina.startup.Tool "$@"
