@@ -423,7 +423,17 @@ public class CachedResource implements WebResource {
 
         @Override
         protected URLConnection openConnection(URL u) throws IOException {
-            return new CachedResourceURLConnection(resourceURL, root, webAppPath, usesClassLoaderResources);
+            // This deliberately uses ==. If u isn't the URL object this
+            // URLStreamHandler was constructed for we do not want to use this
+            // URLStreamHandler to create a connection.
+            if (u == resourceURL) {
+                return new CachedResourceURLConnection(resourceURL, root, webAppPath, usesClassLoaderResources);
+            } else {
+                // The stream handler has been inherited by a URL that was
+                // constructed from a cache URL. We need to break that link.
+                URL constructedURL = new URL(u.toExternalForm());
+                return constructedURL.openConnection();
+            }
         }
     }
 
