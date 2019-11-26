@@ -199,49 +199,51 @@ fi
 case "$1" in
     run     )
       shift
-      "$JSVC" $* \
-      $JSVC_OPTS \
-      -java-home "$JAVA_HOME" \
-      -pidfile "$CATALINA_PID" \
-      -wait "$SERVICE_START_WAIT_TIME" \
+      eval exec "\"$JSVC\"" $* \
+      "$JSVC_OPTS" \
+      -java-home "\"$JAVA_HOME\"" \
+      -pidfile "\"$CATALINA_PID\"" \
+      -wait $SERVICE_START_WAIT_TIME \
       -nodetach \
-      -outfile "&1" \
-      -errfile "&2" \
-      -classpath "$CLASSPATH" \
-      "$LOGGING_CONFIG" $JAVA_OPTS $CATALINA_OPTS \
-      -D$ENDORSED_PROP="$JAVA_ENDORSED_DIRS" \
-      -Dcatalina.base="$CATALINA_BASE" \
-      -Dcatalina.home="$CATALINA_HOME" \
-      -Djava.io.tmpdir="$CATALINA_TMP" \
+      -outfile "\"&1\"" \
+      -errfile "\"&2\"" \
+      -classpath "\"$CLASSPATH\"" \
+      "\"$LOGGING_CONFIG\"" "$JAVA_OPTS" "$CATALINA_OPTS" \
+      -D$ENDORSED_PROP="\"$JAVA_ENDORSED_DIRS\"" \
+      -Dcatalina.base="\"$CATALINA_BASE\"" \
+      -Dcatalina.home="\"$CATALINA_HOME\"" \
+      -Djava.io.tmpdir="\"$CATALINA_TMP\"" \
       $CATALINA_MAIN
       exit $?
     ;;
     start   )
-      "$JSVC" $JSVC_OPTS \
-      -java-home "$JAVA_HOME" \
+      eval "\"$JSVC\"" \
+      "$JSVC_OPTS" \
+      -java-home "\"$JAVA_HOME\"" \
       -user $TOMCAT_USER \
-      -pidfile "$CATALINA_PID" \
-      -wait "$SERVICE_START_WAIT_TIME" \
-      -outfile "$CATALINA_OUT" \
-      -errfile "&1" \
-      -classpath "$CLASSPATH" \
-      "$LOGGING_CONFIG" $JAVA_OPTS $CATALINA_OPTS \
-      -D$ENDORSED_PROP="$JAVA_ENDORSED_DIRS" \
-      -Dcatalina.base="$CATALINA_BASE" \
-      -Dcatalina.home="$CATALINA_HOME" \
-      -Djava.io.tmpdir="$CATALINA_TMP" \
+      -pidfile "\"$CATALINA_PID\"" \
+      -wait $SERVICE_START_WAIT_TIME \
+      -outfile "\"$CATALINA_OUT\"" \
+      -errfile "\"&1\"" \
+      -classpath "\"$CLASSPATH\"" \
+      "\"$LOGGING_CONFIG\"" "$JAVA_OPTS" "$CATALINA_OPTS" \
+      -D$ENDORSED_PROP="\"$JAVA_ENDORSED_DIRS\"" \
+      -Dcatalina.base="\"$CATALINA_BASE"\" \
+      -Dcatalina.home="\"$CATALINA_HOME\"" \
+      -Djava.io.tmpdir="\"$CATALINA_TMP\"" \
       $CATALINA_MAIN
       exit $?
     ;;
     stop    )
-      "$JSVC" $JSVC_OPTS \
+      eval "\"$JSVC\"" \
+      "$JSVC_OPTS" \
       -stop \
-      -pidfile "$CATALINA_PID" \
-      -classpath "$CLASSPATH" \
-      -D$ENDORSED_PROP="$JAVA_ENDORSED_DIRS" \
-      -Dcatalina.base="$CATALINA_BASE" \
-      -Dcatalina.home="$CATALINA_HOME" \
-      -Djava.io.tmpdir="$CATALINA_TMP" \
+      -pidfile "\"$CATALINA_PID\"" \
+      -classpath "\"$CLASSPATH\"" \
+      -D$ENDORSED_PROP="\"$JAVA_ENDORSED_DIRS\"" \
+      -Dcatalina.base="\"$CATALINA_BASE\"" \
+      -Dcatalina.home="\"$CATALINA_HOME\"" \
+      -Djava.io.tmpdir="\"$CATALINA_TMP\"" \
       $CATALINA_MAIN
       exit $?
     ;;
