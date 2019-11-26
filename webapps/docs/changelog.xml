@@ -52,6 +52,11 @@
         CSRF nonce request parameter name to be customized.
         (schultz)
       </add>
+      <fix>
+        <bug>63964</bug>: Correct a regression in the static resource caching
+        changes introduced in 9.0.28. URLs constructed from URLs obtained from
+        the cache could not be used to access resources. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
