@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package javax.annotation;
+package jakarta.annotation;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
@@ -23,11 +23,15 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * @since Common Annotations 1.2
+ * @since Common Annotations 1.0
  */
 @Documented
-@Target(ElementType.TYPE)
-@Retention(RetentionPolicy.RUNTIME)
-public @interface Priority {
-    int value();
+@Target({ElementType.ANNOTATION_TYPE, ElementType.CONSTRUCTOR,
+    ElementType.FIELD, ElementType.LOCAL_VARIABLE, ElementType.METHOD,
+    ElementType.PACKAGE, ElementType.PARAMETER, ElementType.TYPE})
+@Retention(RetentionPolicy.SOURCE)
+public @interface Generated {
+    public String[] value();
+    public String date() default "";
+    public String comments() default "";
 }

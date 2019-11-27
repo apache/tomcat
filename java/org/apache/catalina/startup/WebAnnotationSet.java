@@ -19,12 +19,13 @@ package org.apache.catalina.startup;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
-import javax.annotation.Resource;
-import javax.annotation.Resources;
-import javax.annotation.security.DeclareRoles;
-import javax.annotation.security.RunAs;
 import javax.servlet.ServletSecurityElement;
 import javax.servlet.annotation.ServletSecurity;
+
+import jakarta.annotation.Resource;
+import jakarta.annotation.Resources;
+import jakarta.annotation.security.DeclareRoles;
+import jakarta.annotation.security.RunAs;
 
 import org.apache.catalina.Container;
 import org.apache.catalina.Context;

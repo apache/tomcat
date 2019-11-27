@@ -19,7 +19,7 @@
     "-//Puppy Crawl//DTD Import Control 1.1//EN"
     "http://www.puppycrawl.com/dtds/import_control_1_1.dtd">
 
-<import-control pkg="javax">
+<import-control pkg="jakarta">
   <allow pkg="java"/>
   <subpackage name="annotation">
     <allow pkg="jakarta.annotation"/>

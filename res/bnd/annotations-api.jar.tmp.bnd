@@ -16,6 +16,6 @@ Bundle-Name: tomcat-annotations-api
 Bundle-SymbolicName: org.apache.tomcat-annotations-api
 Bundle-Version: @VERSION@
 Export-Package: \
-    javax.annotation,\
-    javax.annotation.security,\
-    javax.annotation.sql
+    jakarta.annotation,\
+    jakarta.annotation.security,\
+    jakarta.annotation.sql

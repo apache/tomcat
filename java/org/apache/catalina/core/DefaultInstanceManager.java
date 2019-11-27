@@ -35,15 +35,16 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
-import javax.annotation.Resource;
 import javax.ejb.EJB;
 import javax.naming.Context;
 import javax.naming.NamingException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceUnit;
 import javax.xml.ws.WebServiceRef;
+
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
+import jakarta.annotation.Resource;
 
 import org.apache.catalina.ContainerServlet;
 import org.apache.catalina.Globals;

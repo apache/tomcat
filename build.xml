@@ -327,7 +327,7 @@
   <!-- ========= Pattern sets used to control content of JAR files ========= -->
   <!-- Pattern sets for jar files in standard distributions -->
   <patternset id="files.annotations-api">
-    <include name="javax/annotation/**" />
+    <include name="jakarta/annotation/**" />
   </patternset>
 
   <patternset id="files.servlet-api">
@@ -625,6 +625,12 @@
         <patternset refid="text.files" />
         <!-- Exclude developer specific local files -->
         <exclude name="build.properties" />
+      </fileset>
+    </checkstyle>
+    <!-- jakarta package checks -->
+    <checkstyle config="res/checkstyle/jakarta-checkstyle.xml">
+      <fileset dir="java/jakarta" >
+        <include name="**/*.java"/>
       </fileset>
     </checkstyle>
     <!-- javax package checks -->
@@ -1879,7 +1885,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
 
   <target name="javadoc" depends="dist-source"
     description="Create the Tomcat javadoc" >
-    <javadoc packagenames="javax.annotation.*"
+    <javadoc packagenames="jakarta.annotation.*"
       sourcepath="${tomcat.dist}/src/java"
       destdir="${tomcat.dist}/webapps/docs/annotationapi"
       version="true"

@@ -14,18 +14,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package javax.annotation.sql;
+package jakarta.annotation;
 
+import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * @since Common Annotations 1.1
+ * @since Common Annotations 1.0
  */
-@Target(ElementType.TYPE)
+@Documented
+@Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface DataSourceDefinitions {
-    DataSourceDefinition[] value();
+public @interface PreDestroy {
+    // No attributes
 }

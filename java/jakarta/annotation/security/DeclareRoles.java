@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package javax.annotation;
+package jakarta.annotation.security;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
@@ -26,8 +26,8 @@ import java.lang.annotation.Target;
  * @since Common Annotations 1.0
  */
 @Documented
-@Target(ElementType.METHOD)
+@Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface PreDestroy {
-    // No attributes
+public @interface DeclareRoles {
+    public String[] value();
 }

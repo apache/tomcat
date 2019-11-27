@@ -14,20 +14,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package javax.annotation.security;
+package jakarta.annotation.sql;
 
-import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * @since Common Annotations 1.0
+ * @since Common Annotations 1.1
  */
-@Documented
-@Target({ElementType.TYPE, ElementType.METHOD})
+@Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface PermitAll {
-    // No attributes
+public @interface DataSourceDefinition {
+    String className();
+    String name();
+    String description() default "";
+    String url() default "";
+    String user() default "";
+    String password() default "";
+    String databaseName() default "";
+    int portNumber() default -1;
+    String serverName() default "localhost";
+    int isolationLevel() default -1;
+    boolean transactional() default true;
+    int initialPoolSize() default -1;
+    int maxPoolSize() default -1;
+    int minPoolSize() default -1;
+    int maxIdleTime() default -1;
+    int maxStatements() default -1;
+    String[] properties() default {};
+    int loginTimeout() default 0;
 }

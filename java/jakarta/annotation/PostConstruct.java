@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package javax.annotation;
+package jakarta.annotation;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
@@ -26,8 +26,8 @@ import java.lang.annotation.Target;
  * @since Common Annotations 1.0
  */
 @Documented
-@Target(ElementType.TYPE)
+@Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Resources {
-    public Resource[] value();
+public @interface PostConstruct {
+    // No attributes
 }
