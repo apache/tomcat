@@ -2330,57 +2330,6 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
 
 
         @Override
-        protected void writeBlockingDirect(ByteBuffer from) throws IOException {
-            if (from.isDirect()) {
-                super.writeBlockingDirect(from);
-            } else {
-                // The socket write buffer capacity is socket.appWriteBufSize
-                ByteBuffer writeBuffer = socketBufferHandler.getWriteBuffer();
-                int limit = writeBuffer.capacity();
-                while (from.remaining() >= limit) {
-                    socketBufferHandler.configureWriteBufferForWrite();
-                    transfer(from, writeBuffer);
-                    doWrite(true);
-                }
-
-                if (from.remaining() > 0) {
-                    socketBufferHandler.configureWriteBufferForWrite();
-                    transfer(from, writeBuffer);
-                }
-            }
-        }
-
-
-        @Override
-        protected void writeNonBlockingDirect(ByteBuffer from) throws IOException {
-            if (from.isDirect()) {
-                super.writeNonBlockingDirect(from);
-            } else {
-                // The socket write buffer capacity is socket.appWriteBufSize
-                ByteBuffer writeBuffer = socketBufferHandler.getWriteBuffer();
-                int limit = writeBuffer.capacity();
-                while (from.remaining() >= limit) {
-                    socketBufferHandler.configureWriteBufferForWrite();
-                    transfer(from, writeBuffer);
-                    int newPosition = writeBuffer.position() + limit;
-                    doWrite(false);
-                    if (writeBuffer.position() != newPosition) {
-                        // Didn't write the whole amount of data in the last
-                        // non-blocking write.
-                        // Exit the loop.
-                        return;
-                    }
-                }
-
-                if (from.remaining() > 0) {
-                    socketBufferHandler.configureWriteBufferForWrite();
-                    transfer(from, writeBuffer);
-                }
-            }
-        }
-
-
-        @Override
         protected void doWrite(boolean block, ByteBuffer from) throws IOException {
             if (closed) {
                 throw new IOException(sm.getString("socket.apr.closed", getSocket()));

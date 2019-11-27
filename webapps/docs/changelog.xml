@@ -72,6 +72,11 @@
       <add>
         Add async API to the NIO and APR connector. (remm)
       </add>
+      <fix>
+        Simplify regular endpoint writes by removing write(Non)BlockingDirect.
+        All regular writes will now be buffered for a more predictable
+        behavior. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">

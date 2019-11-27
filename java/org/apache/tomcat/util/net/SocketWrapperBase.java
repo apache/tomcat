@@ -403,8 +403,6 @@ public abstract class SocketWrapperBase<E> {
          * - To enable a marginally more efficient implemented for blocking
          *   writes which do not require the additional checks related to the
          *   use of the non-blocking write buffer
-         *   TODO: Explore re-factoring options to remove the split into
-         *         separate methods
          */
         if (block) {
             writeBlocking(buf, off, len);
@@ -452,8 +450,6 @@ public abstract class SocketWrapperBase<E> {
          * - To enable a marginally more efficient implemented for blocking
          *   writes which do not require the additional checks related to the
          *   use of the non-blocking write buffer
-         *   TODO: Explore re-factoring options to remove the split into
-         *         separate methods
          */
         if (block) {
             writeBlocking(from);
@@ -481,7 +477,7 @@ public abstract class SocketWrapperBase<E> {
     protected void writeBlocking(byte[] buf, int off, int len) throws IOException {
         socketBufferHandler.configureWriteBufferForWrite();
         int thisTime = transfer(buf, off, len, socketBufferHandler.getWriteBuffer());
-        while (socketBufferHandler.getWriteBuffer().remaining() == 0) {
+        while (!socketBufferHandler.getWriteBuffer().hasRemaining()) {
             len = len - thisTime;
             off = off + thisTime;
             doWrite(true);
@@ -505,46 +501,10 @@ public abstract class SocketWrapperBase<E> {
      * @throws IOException If an IO error occurs during the write
      */
     protected void writeBlocking(ByteBuffer from) throws IOException {
-        if (socketBufferHandler.isWriteBufferEmpty()) {
-            // Socket write buffer is empty. Write the provided buffer directly
-            // to the network.
-            // TODO Shouldn't smaller writes be buffered anyway?
-            writeBlockingDirect(from);
-        } else {
-            // Socket write buffer has some data.
-            socketBufferHandler.configureWriteBufferForWrite();
-            // Put as much data as possible into the write buffer
-            transfer(from, socketBufferHandler.getWriteBuffer());
-            // If the buffer is now full, write it to the network and then write
-            // the remaining data directly to the network.
-            if (!socketBufferHandler.isWriteBufferWritable()) {
-                doWrite(true);
-                writeBlockingDirect(from);
-            }
-        }
-    }
-
-
-    /**
-     * Writes directly to the network, bypassing the socket write buffer.
-     *
-     * @param from The ByteBuffer containing the data to be written
-     *
-     * @throws IOException If an IO error occurs during the write
-     */
-    protected void writeBlockingDirect(ByteBuffer from) throws IOException {
-        // The socket write buffer capacity is socket.appWriteBufSize
-        // TODO This only matters when using TLS. For non-TLS connections it
-        //      should be possible to write the ByteBuffer in a single write
-        int limit = socketBufferHandler.getWriteBuffer().capacity();
-        int fromLimit = from.limit();
-        while (from.remaining() >= limit) {
-            from.limit(from.position() + limit);
-            doWrite(true, from);
-            from.limit(fromLimit);
-        }
-
-        if (from.remaining() > 0) {
+        socketBufferHandler.configureWriteBufferForWrite();
+        transfer(from, socketBufferHandler.getWriteBuffer());
+        while (from.hasRemaining()) {
+            doWrite(true);
             socketBufferHandler.configureWriteBufferForWrite();
             transfer(from, socketBufferHandler.getWriteBuffer());
         }
@@ -614,11 +574,12 @@ public abstract class SocketWrapperBase<E> {
     protected void writeNonBlocking(ByteBuffer from)
             throws IOException {
 
-        if (nonBlockingWriteBuffer.isEmpty() && socketBufferHandler.isWriteBufferWritable()) {
+        if (from.hasRemaining() && nonBlockingWriteBuffer.isEmpty()
+                && socketBufferHandler.isWriteBufferWritable()) {
             writeNonBlockingInternal(from);
         }
 
-        if (from.remaining() > 0) {
+        if (from.hasRemaining()) {
             // Remaining data must be buffered
             nonBlockingWriteBuffer.add(from);
         }
@@ -634,43 +595,16 @@ public abstract class SocketWrapperBase<E> {
      * @throws IOException If an IO error occurs during the write
      */
     protected void writeNonBlockingInternal(ByteBuffer from) throws IOException {
-        if (socketBufferHandler.isWriteBufferEmpty()) {
-            writeNonBlockingDirect(from);
-        } else {
-            socketBufferHandler.configureWriteBufferForWrite();
-            transfer(from, socketBufferHandler.getWriteBuffer());
-            if (!socketBufferHandler.isWriteBufferWritable()) {
-                doWrite(false);
-                if (socketBufferHandler.isWriteBufferWritable()) {
-                    writeNonBlockingDirect(from);
-                }
+        socketBufferHandler.configureWriteBufferForWrite();
+        transfer(from, socketBufferHandler.getWriteBuffer());
+        while (from.hasRemaining() && !socketBufferHandler.isWriteBufferWritable()) {
+            doWrite(false);
+            if (socketBufferHandler.isWriteBufferWritable()) {
+                socketBufferHandler.configureWriteBufferForWrite();
+                transfer(from, socketBufferHandler.getWriteBuffer());
+            } else {
+                break;
             }
-        }
-    }
-
-
-    protected void writeNonBlockingDirect(ByteBuffer from) throws IOException {
-        // The socket write buffer capacity is socket.appWriteBufSize
-        // TODO This only matters when using TLS. For non-TLS connections it
-        //      should be possible to write the ByteBuffer in a single write
-        int limit = socketBufferHandler.getWriteBuffer().capacity();
-        int fromLimit = from.limit();
-        while (from.remaining() >= limit) {
-            int newLimit = from.position() + limit;
-            from.limit(newLimit);
-            doWrite(false, from);
-            from.limit(fromLimit);
-            if (from.position() != newLimit) {
-                // Didn't write the whole amount of data in the last
-                // non-blocking write.
-                // Exit the loop.
-                return;
-            }
-        }
-
-        if (from.remaining() > 0) {
-            socketBufferHandler.configureWriteBufferForWrite();
-            transfer(from, socketBufferHandler.getWriteBuffer());
         }
     }
 
