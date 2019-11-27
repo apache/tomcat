@@ -18,6 +18,7 @@ package org.apache.catalina.webresources;
 
 import java.io.File;
 import java.io.InputStream;
+import java.net.JarURLConnection;
 import java.net.URL;
 
 import org.junit.Assert;
@@ -49,4 +50,30 @@ public class TestCachedResource extends TomcatBaseTest {
             Assert.assertNotNull(is);
         }
     }
+
+
+    // https://bz.apache.org/bugzilla/show_bug.cgi?id=63970
+    @Test
+    public void testCachedJarUrlConnection() throws Exception {
+
+        Tomcat tomcat = getTomcatInstance();
+        File docBase = new File("test/webresources/war-url-connection.war");
+        Context ctx = tomcat.addWebapp("/test", docBase.getAbsolutePath());
+        tomcat.start();
+
+        WebResourceRoot root = ctx.getResources();
+
+        // WAR contains a resoucres JAR so this should return a JAR URL
+        URL webinf = root.getResource("/index.html").getURL();
+
+        Assert.assertEquals("jar", webinf.getProtocol());
+        JarURLConnection jarConn = null;
+        try {
+            jarConn = (JarURLConnection) webinf.openConnection();
+        } catch (ClassCastException e) {
+            // Ignore
+        }
+        Assert.assertNotNull(jarConn);
+    }
+
 }

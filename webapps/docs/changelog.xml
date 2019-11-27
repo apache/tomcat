@@ -62,6 +62,11 @@
         <code>Expires</code> filter which was a regression in the fix for
         <bug>63909</bug>. (markt)
       </fix>
+      <fix>
+        <bug>63970</bug>: Correct a regression in the static resource caching
+        changes introduced in 9.0.28. Connections to URLs obtained for JAR
+        resources could not be cast to <code>JarURLConnection</code>. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
