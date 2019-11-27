@@ -25,8 +25,8 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
-import javax.el.ELException;
-import javax.el.LambdaExpression;
+import jakarta.el.ELException;
+import jakarta.el.LambdaExpression;
 
 import org.apache.el.lang.ELArithmetic;
 import org.apache.el.lang.ELSupport;

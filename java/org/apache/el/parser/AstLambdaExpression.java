@@ -20,8 +20,8 @@ package org.apache.el.parser;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.el.ELException;
-import javax.el.LambdaExpression;
+import jakarta.el.ELException;
+import jakarta.el.LambdaExpression;
 
 import org.apache.el.ValueExpressionImpl;
 import org.apache.el.lang.EvaluationContext;

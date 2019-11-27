@@ -126,7 +126,7 @@
                                 <excludes>
                                     <!-- Already present in Tomcat or in the CDI bundle -->
                                     <exclude>jakarta.annotation:jakarta.annotation-api</exclude>
-									<exclude>javax.el:*</exclude>
+									<exclude>jakarta.el:*</exclude>
 									<exclude>javax.enterprise:cdi-api</exclude>
 									<exclude>javax.inject:*</exclude>
 									<exclude>javax.interceptor:*</exclude>

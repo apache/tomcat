@@ -252,12 +252,12 @@ public class TldRuleSet implements RuleSet {
                 type = "javax.servlet.jsp.tagext.JspFragment";
                 requestTime = true;
             } else if (deferredValue) {
-                type = "javax.el.ValueExpression";
+                type = "jakarta.el.ValueExpression";
                 if (expectedTypeName == null) {
                     expectedTypeName = "java.lang.Object";
                 }
             } else if (deferredMethod) {
-                type = "javax.el.MethodExpression";
+                type = "jakarta.el.MethodExpression";
                 if (methodSignature == null) {
                     methodSignature = "java.lang.Object method()";
                 }

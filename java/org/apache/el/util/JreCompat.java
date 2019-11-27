@@ -22,7 +22,7 @@ import java.lang.reflect.AccessibleObject;
  * This is a cut down version of org.apache.tomcat.util.JreCompat that provides
  * only the methods required by the EL implementation.
  *
- * This class is duplicated in javax.el
+ * This class is duplicated in jakarta.el
  * When making changes keep the two in sync.
  */
 public class JreCompat {

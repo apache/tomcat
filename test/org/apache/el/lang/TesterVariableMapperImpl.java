@@ -16,12 +16,12 @@
  */
 package org.apache.el.lang;
 
-import javax.el.ELContext;
-import javax.el.ELManager;
-import javax.el.ExpressionFactory;
-import javax.el.TesterELContext;
-import javax.el.ValueExpression;
-import javax.el.VariableMapper;
+import jakarta.el.ELContext;
+import jakarta.el.ELManager;
+import jakarta.el.ExpressionFactory;
+import jakarta.el.TesterELContext;
+import jakarta.el.ValueExpression;
+import jakarta.el.VariableMapper;
 
 import org.junit.Assert;
 import org.junit.Test;

@@ -16,12 +16,13 @@
  */
 package javax.servlet.jsp.el;
 
-import javax.el.ELContext;
-import javax.el.ELManager;
-import javax.el.ELResolver;
-import javax.el.StandardELContext;
 import javax.servlet.jsp.JspContext;
 import javax.servlet.jsp.TesterPageContext;
+
+import jakarta.el.ELContext;
+import jakarta.el.ELManager;
+import jakarta.el.ELResolver;
+import jakarta.el.StandardELContext;
 
 import org.junit.Test;
 

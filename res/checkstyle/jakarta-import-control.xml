@@ -27,5 +27,7 @@
   <subpackage name="ejb">
     <allow pkg="jakarta.ejb"/>
   </subpackage>
-
+  <subpackage name="el">
+    <allow pkg="jakarta.el"/>
+  </subpackage>
 </import-control>

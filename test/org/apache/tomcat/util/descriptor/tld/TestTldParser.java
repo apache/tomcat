@@ -84,12 +84,12 @@ public class TestTldParser {
 
         attributeInfo = tag.getAttributes().get(2);
         Assert.assertEquals("deferredValue", attributeInfo.getName());
-        Assert.assertEquals("javax.el.ValueExpression", attributeInfo.getTypeName());
+        Assert.assertEquals("jakarta.el.ValueExpression", attributeInfo.getTypeName());
         Assert.assertEquals("java.util.Date", attributeInfo.getExpectedTypeName());
 
         attributeInfo = tag.getAttributes().get(3);
         Assert.assertEquals("deferredMethod", attributeInfo.getName());
-        Assert.assertEquals("javax.el.MethodExpression", attributeInfo.getTypeName());
+        Assert.assertEquals("jakarta.el.MethodExpression", attributeInfo.getTypeName());
         Assert.assertEquals("java.util.Date getDate()", attributeInfo.getMethodSignature());
 
         Assert.assertEquals(1, xml.getTagFiles().size());

@@ -16,9 +16,9 @@
  */
 package javax.servlet.jsp;
 
-import javax.el.ELContextListener;
-import javax.el.ELResolver;
-import javax.el.ExpressionFactory;
+import jakarta.el.ELContextListener;
+import jakarta.el.ELResolver;
+import jakarta.el.ExpressionFactory;
 
 /**
  * <p>

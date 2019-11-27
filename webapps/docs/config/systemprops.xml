@@ -80,7 +80,7 @@
   <properties>
 
     <property name="org.apache.el.BeanELResolver. CACHE_SIZE">
-      <p>The number of javax.el.BeanELResolver.BeanProperties objects that will
+      <p>The number of jakarta.el.BeanELResolver.BeanProperties objects that will
       be cached by the EL Parser.</p>
       <p>If not specified, the default of <code>1000</code> will be used.</p>
     </property>

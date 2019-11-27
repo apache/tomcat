@@ -21,9 +21,6 @@
 
 <import-control pkg="javax">
   <allow pkg="java"/>
-  <subpackage name="el">
-    <allow pkg="javax.el"/>
-  </subpackage>
   <subpackage name="mail">
     <allow pkg="javax.mail"/>
   </subpackage>
@@ -55,7 +52,7 @@
     <allow pkg="javax.servlet"/>
     <disallow pkg="javax.servlet.jsp" local-only="true"/>
     <subpackage name="jsp">
-      <allow pkg="javax.el"/>
+      <allow pkg="jakarta.el"/>
       <allow pkg="javax.servlet.jsp"/>
     </subpackage>
   </subpackage>

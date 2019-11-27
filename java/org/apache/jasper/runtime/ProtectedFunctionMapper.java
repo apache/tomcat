@@ -30,7 +30,7 @@ import javax.servlet.jsp.el.FunctionMapper;
  * @author Kin-man Chung
  */
 @SuppressWarnings("deprecation") // Have to support old JSP EL API
-public final class ProtectedFunctionMapper extends javax.el.FunctionMapper
+public final class ProtectedFunctionMapper extends jakarta.el.FunctionMapper
         implements FunctionMapper {
 
     /**

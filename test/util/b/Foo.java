@@ -17,7 +17,7 @@
 package util.b;
 
 /**
- * Tester class used for {@link javax.el.TestImportHandler}.
+ * Tester class used for {@link jakarta.el.TestImportHandler}.
  */
 public class Foo {
 }

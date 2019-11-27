@@ -1,6 +1,6 @@
 {
   "bundles":[
-    {"name":"javax.el.LocalStrings"},
+    {"name":"jakarta.el.LocalStrings"},
     {"name":"javax.servlet.LocalStrings"},
     {"name":"javax.servlet.http.LocalStrings"},
     {"name":"org.apache.catalina.authenticator.LocalStrings"},

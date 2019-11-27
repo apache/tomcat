@@ -21,8 +21,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import javax.el.ELResolver;
 import javax.servlet.jsp.el.ImplicitObjectELResolver;
+
+import jakarta.el.ELResolver;
 
 import org.junit.Assert;
 import org.junit.Test;

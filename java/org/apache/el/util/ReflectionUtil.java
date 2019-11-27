@@ -26,8 +26,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import javax.el.ELException;
-import javax.el.MethodNotFoundException;
+import jakarta.el.ELException;
+import jakarta.el.MethodNotFoundException;
 
 import org.apache.el.lang.ELSupport;
 import org.apache.el.lang.EvaluationContext;
@@ -124,7 +124,7 @@ public class ReflectionUtil {
      *         the given criteria
      */
     /*
-     * This class duplicates code in javax.el.Util. When making changes keep
+     * This class duplicates code in jakarta.el.Util. When making changes keep
      * the code in sync.
      */
     @SuppressWarnings("null")
@@ -297,7 +297,7 @@ public class ReflectionUtil {
     }
 
     /*
-     * This class duplicates code in javax.el.Util. When making changes keep
+     * This class duplicates code in jakarta.el.Util. When making changes keep
      * the code in sync.
      */
     private static Method resolveAmbiguousMethod(Set<Method> candidates,
@@ -365,7 +365,7 @@ public class ReflectionUtil {
 
 
     /*
-     * This class duplicates code in javax.el.Util. When making changes keep
+     * This class duplicates code in jakarta.el.Util. When making changes keep
      * the code in sync.
      */
     private static boolean isAssignableFrom(Class<?> src, Class<?> target) {
@@ -403,7 +403,7 @@ public class ReflectionUtil {
 
 
     /*
-     * This class duplicates code in javax.el.Util. When making changes keep
+     * This class duplicates code in jakarta.el.Util. When making changes keep
      * the code in sync.
      */
     private static boolean isCoercibleFrom(EvaluationContext ctx, Object src, Class<?> target) {
@@ -419,7 +419,7 @@ public class ReflectionUtil {
 
 
     /*
-     * This class duplicates code in javax.el.Util. When making changes keep
+     * This class duplicates code in jakarta.el.Util. When making changes keep
      * the code in sync.
      */
     private static Method getMethod(Class<?> type, Object base, Method m) {
@@ -501,7 +501,7 @@ public class ReflectionUtil {
 
 
     /*
-     * This class duplicates code in javax.el.Util. When making changes keep
+     * This class duplicates code in jakarta.el.Util. When making changes keep
      * the code in sync.
      */
     private static class MatchResult implements Comparable<MatchResult> {

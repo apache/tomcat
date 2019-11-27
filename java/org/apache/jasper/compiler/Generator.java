@@ -41,12 +41,13 @@ import java.util.Set;
 import java.util.TimeZone;
 import java.util.Vector;
 
-import javax.el.MethodExpression;
-import javax.el.ValueExpression;
 import javax.servlet.jsp.tagext.TagAttributeInfo;
 import javax.servlet.jsp.tagext.TagInfo;
 import javax.servlet.jsp.tagext.TagVariableInfo;
 import javax.servlet.jsp.tagext.VariableInfo;
+
+import jakarta.el.MethodExpression;
+import jakarta.el.ValueExpression;
 
 import org.apache.el.util.JreCompat;
 import org.apache.jasper.Constants;
@@ -431,7 +432,7 @@ class Generator {
      * ServletConfig is not readily available.
      */
     private void generateGetters() {
-        out.printil("public javax.el.ExpressionFactory _jsp_getExpressionFactory() {");
+        out.printil("public jakarta.el.ExpressionFactory _jsp_getExpressionFactory() {");
         out.pushIndent();
         if (!ctxt.isTagFile()) {
             out.printin("if (");
@@ -678,7 +679,7 @@ class Generator {
             }
             out.println();
         }
-        out.printin("private volatile javax.el.ExpressionFactory ");
+        out.printin("private volatile jakarta.el.ExpressionFactory ");
         out.print(VAR_EXPRESSIONFACTORY);
         out.println(";");
         out.printin("private volatile org.apache.tomcat.InstanceManager ");
@@ -4043,11 +4044,11 @@ class Generator {
 
                 // we need to scope the modified VariableMapper for consistency and performance
                 if (!variableMapperVar) {
-                    out.printil("javax.el.VariableMapper _el_variablemapper = jspContext.getELContext().getVariableMapper();");
+                    out.printil("jakarta.el.VariableMapper _el_variablemapper = jspContext.getELContext().getVariableMapper();");
                     variableMapperVar = true;
                 }
 
-                out.printin("javax.el.ValueExpression _el_ve");
+                out.printin("jakarta.el.ValueExpression _el_ve");
                 out.print(i);
                 out.print(" = _el_variablemapper.setVariable(");
                 out.print(quote(attrName));
@@ -4055,7 +4056,7 @@ class Generator {
                 if (attrInfos[i].isDeferredMethod()) {
                     out.print("_jsp_getExpressionFactory().createValueExpression(");
                     out.print(toGetterMethod(attrName));
-                    out.print(",javax.el.MethodExpression.class)");
+                    out.print(",jakarta.el.MethodExpression.class)");
                 } else {
                     out.print(toGetterMethod(attrName));
                 }

@@ -18,7 +18,7 @@
   <!--  Considered to be false positives -->
   <Match>
     <!-- Only base null is handled by this resolver -->
-    <Class name="javax.el.BeanNameELResolver"/>
+    <Class name="jakarta.el.BeanNameELResolver"/>
     <Or>
       <Method name="getType" />
       <Method name="getValue" />
@@ -1579,7 +1579,7 @@
   <!-- Test code -->
   <Match>
     <!-- Code is deliberately unused -->
-    <Class name="javax.el.TestImportHandler" />
+    <Class name="jakarta.el.TestImportHandler" />
     <Method name="testImportPackage01_57574"/>
     <Bug pattern="UC_USELESS_OBJECT"/>
   </Match>

@@ -20,8 +20,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import javax.el.ELException;
-import javax.el.ELProcessor;
+import jakarta.el.ELException;
+import jakarta.el.ELProcessor;
 
 import org.junit.Assert;
 import org.junit.Test;

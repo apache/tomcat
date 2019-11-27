@@ -16,7 +16,7 @@
  */
 package org.apache.el.util;
 
-import javax.el.MethodNotFoundException;
+import jakarta.el.MethodNotFoundException;
 
 import org.junit.Test;
 

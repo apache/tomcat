@@ -5610,7 +5610,7 @@
       </update>
       <fix>
         <bug>61065</bug>: Ensure that once the class is resolved by
-        <code>javax.el.ImportHandler#resolveClass</code> it will be cached with
+        <code>jakarta.el.ImportHandler#resolveClass</code> it will be cached with
         the proper name. (violetagg)
       </fix>
     </changelog>

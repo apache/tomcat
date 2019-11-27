@@ -15,4 +15,4 @@
 Bundle-Name: tomcat-el-api
 Bundle-SymbolicName: org.apache.tomcat-el-api
 Bundle-Version: @VERSION@
-Export-Package: javax.el
+Export-Package: jakarta.el

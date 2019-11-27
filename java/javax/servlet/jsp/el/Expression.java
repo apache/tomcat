@@ -30,7 +30,7 @@ package javax.servlet.jsp.el;
  * where ELParseException exceptions are raised. </p>
  *
  * @since 2.0
- * @deprecated As of JSP 2.1, replaced by javax.el.ValueExpression
+ * @deprecated As of JSP 2.1, replaced by jakarta.el.ValueExpression
  */
 @SuppressWarnings("dep-ann") // TCK signature test fails with annotation
 public abstract class Expression {

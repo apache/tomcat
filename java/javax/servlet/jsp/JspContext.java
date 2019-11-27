@@ -18,7 +18,7 @@ package javax.servlet.jsp;
 
 import java.util.Enumeration;
 
-import javax.el.ELContext;
+import jakarta.el.ELContext;
 
 /**
  * <p>
@@ -238,7 +238,7 @@ public abstract class JspContext {
      * @return A valid instance of a VariableResolver.
      * @since 2.0
      * @deprecated As of JSP 2.1,
-     *             replaced by javax.el.ELContext.getELResolver()
+     *             replaced by jakarta.el.ELContext.getELResolver()
      *             which can be obtained by
      *             jspContext.getELContext().getELResolver()
      */

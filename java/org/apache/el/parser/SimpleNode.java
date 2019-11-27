@@ -20,10 +20,10 @@ package org.apache.el.parser;
 
 import java.util.Arrays;
 
-import javax.el.ELException;
-import javax.el.MethodInfo;
-import javax.el.PropertyNotWritableException;
-import javax.el.ValueReference;
+import jakarta.el.ELException;
+import jakarta.el.MethodInfo;
+import jakarta.el.PropertyNotWritableException;
+import jakarta.el.ValueReference;
 
 import org.apache.el.lang.ELSupport;
 import org.apache.el.lang.EvaluationContext;

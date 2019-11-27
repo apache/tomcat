@@ -17,7 +17,7 @@ Bundle-Name: tomcat-embed-jasper-el
 Bundle-SymbolicName: org.apache.tomcat-embed-jasper-el
 Bundle-Version: @VERSION@
 Export-Package: \
-    javax.el,\
+    jakarta.el,\
     org.apache.el,\
     org.apache.el.lang,\
     org.apache.el.parser

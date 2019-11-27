@@ -344,7 +344,7 @@
   </patternset>
 
   <patternset id="files.el-api">
-    <include name="javax/el/**" />
+    <include name="jakarta/el/**" />
   </patternset>
 
   <patternset id="files.websocket-api">
@@ -1493,6 +1493,7 @@
            includeantruntime="true">
       <classpath refid="tomcat.test.classpath" />
       <include name="org/apache/**" />
+      <include name="jakarta/**" />
       <include name="javax/**" />
       <include name="util/**" />
       <!-- Exclude these by default as Gump can't run them because the -->
@@ -1949,7 +1950,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
         <path location="${ant.core.lib}"/>
       </classpath>
     </javadoc>
-    <javadoc packagenames="javax.el.*"
+    <javadoc packagenames="jakarta.el.*"
       sourcepath="${tomcat.dist}/src/java"
       destdir="${tomcat.dist}/webapps/docs/elapi"
       version="true"
