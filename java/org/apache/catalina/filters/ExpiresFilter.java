@@ -1294,7 +1294,7 @@ public class ExpiresFilter extends FilterBase {
 
             if (innerRequest instanceof org.apache.catalina.servlet4preview.http.HttpServletRequest) {
                 org.apache.catalina.servlet4preview.http.HttpServletRequest servlet4Request =
-                        (org.apache.catalina.servlet4preview.http.HttpServletRequest) request;
+                        (org.apache.catalina.servlet4preview.http.HttpServletRequest) innerRequest;
 
                 if (servlet4Request.getHttpServletMapping().getMappingMatch() == MappingMatch.DEFAULT &&
                         response.getStatus() == HttpServletResponse.SC_NOT_MODIFIED) {
