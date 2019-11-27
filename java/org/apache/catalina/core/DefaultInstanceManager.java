@@ -35,7 +35,6 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
-import javax.ejb.EJB;
 import javax.naming.Context;
 import javax.naming.NamingException;
 import javax.persistence.PersistenceContext;
@@ -45,6 +44,7 @@ import javax.xml.ws.WebServiceRef;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import jakarta.annotation.Resource;
+import jakarta.ejb.EJB;
 
 import org.apache.catalina.ContainerServlet;
 import org.apache.catalina.Globals;
@@ -75,7 +75,7 @@ public class DefaultInstanceManager implements InstanceManager {
     static {
         Class<?> clazz = null;
         try {
-            clazz = Class.forName("javax.ejb.EJB");
+            clazz = Class.forName("jakarta.ejb.EJB");
         } catch (ClassNotFoundException cnfe) {
             // Expected
         }

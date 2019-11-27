@@ -37,7 +37,7 @@
   <allow pkg="org.ietf.jgss"/>
   <subpackage name="catalina">
     <allow pkg="jakarta.annotation"/>
-    <allow pkg="javax.ejb"/>
+    <allow pkg="jakarta.ejb"/>
     <allow pkg="javax.persistence"/>
     <allow pkg="javax.servlet"/>
     <allow pkg="org.apache.catalina"/>
@@ -51,7 +51,7 @@
       <allow pkg="org.apache.tools.ant"/>
       <allow class="org.apache.tomcat.util.Base64"/>
       <disallow pkg="jakarta.annotation"/>
-      <disallow pkg="javax.ejb"/>
+      <disallow pkg="jakarta.ejb"/>
       <disallow pkg="javax.persistence"/>
       <disallow pkg="javax.servlet"/>
       <disallow pkg="org.apache.coyote"/>
@@ -60,7 +60,7 @@
     </subpackage>
     <subpackage name="ha">
       <disallow pkg="jakarta.annotation"/>
-      <disallow pkg="javax.ejb"/>
+      <disallow pkg="jakarta.ejb"/>
       <disallow pkg="javax.persistence"/>
       <disallow pkg="org.apache.coyote"/>
       <disallow pkg="org.apache.naming"/>
@@ -73,7 +73,7 @@
     </subpackage>
     <subpackage name="tribes">
       <disallow pkg="jakarta.annotation"/>
-      <disallow pkg="javax.ejb"/>
+      <disallow pkg="jakarta.ejb"/>
       <disallow pkg="javax.persistence"/>
       <disallow pkg="javax.servlet"/>
       <disallow pkg="org\.apache\.catalina(?!\.tribes).*" regex="true"/>

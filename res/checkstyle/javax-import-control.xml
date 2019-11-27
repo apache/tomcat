@@ -21,12 +21,6 @@
 
 <import-control pkg="javax">
   <allow pkg="java"/>
-  <subpackage name="annotation">
-    <allow pkg="jakarta.annotation"/>
-  </subpackage>
-  <subpackage name="ejb">
-    <allow pkg="javax.ejb"/>
-  </subpackage>
   <subpackage name="el">
     <allow pkg="javax.el"/>
   </subpackage>
