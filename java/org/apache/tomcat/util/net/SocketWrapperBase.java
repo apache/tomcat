@@ -597,7 +597,7 @@ public abstract class SocketWrapperBase<E> {
     protected void writeNonBlockingInternal(ByteBuffer from) throws IOException {
         socketBufferHandler.configureWriteBufferForWrite();
         transfer(from, socketBufferHandler.getWriteBuffer());
-        while (from.hasRemaining() && !socketBufferHandler.isWriteBufferWritable()) {
+        while (from.hasRemaining()) {
             doWrite(false);
             if (socketBufferHandler.isWriteBufferWritable()) {
                 socketBufferHandler.configureWriteBufferForWrite();
