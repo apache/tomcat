@@ -23,6 +23,7 @@ import java.util.Collections;
 import javax.servlet.DispatcherType;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import org.apache.catalina.Wrapper;
@@ -394,6 +395,7 @@ public class TestELInJsp extends TomcatBaseTest {
         assertEcho(result, "05-Hello JUnit from Tomcat");
     }
 
+    @Ignore // Jakarta EE / JSTL
     @Test
     public void testBug56029() throws Exception {
         getTomcatInstanceTestWebapp(true, true);
@@ -407,6 +409,7 @@ public class TestELInJsp extends TomcatBaseTest {
     }
 
 
+    @Ignore // Jakarta EE / JSTL
     @Test
     public void testBug56147() throws Exception {
         getTomcatInstanceTestWebapp(true, true);

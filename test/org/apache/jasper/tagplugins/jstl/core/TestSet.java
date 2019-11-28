@@ -19,12 +19,14 @@ package org.apache.jasper.tagplugins.jstl.core;
 import javax.servlet.http.HttpServletResponse;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import org.apache.tomcat.util.buf.ByteChunk;
 
 public class TestSet extends AbstractTestTag {
 
+    @Ignore // Jakarta EE / JSTL
     @Test
     public void testBug54011() throws Exception {
         ByteChunk res = new ByteChunk();
@@ -39,6 +41,7 @@ public class TestSet extends AbstractTestTag {
     }
 
 
+    @Ignore // Jakarta EE / JSTL
     @Test
     public void testBug54338() throws Exception {
         ByteChunk res = new ByteChunk();
