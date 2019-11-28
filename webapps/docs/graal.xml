@@ -57,7 +57,7 @@
   <p>
     Download and install GraalVM. The first step is then to add the
     native-image tool.
-    <source>export JAVA_HOME=/absolute...path...to/graalvm-ce-x.y.z
+    <source>export JAVA_HOME=/absolute...path...to/graalvm-ce-javaX-x.y.z
 cd $JAVA_HOME/bin
 ./gu install native-image</source>
     Download the Tomcat Maven packaging from
@@ -103,7 +103,7 @@ ant -Dwebapp.name=somewebapp -f graal-webapp.ant.xml</source>
   <p>
     Run the GraalVM substrate VM using the trace agent:
     <source>$JAVA_HOME/bin/java\
-        -agentlib:native-image-agent=trace-output=$TOMCAT_MAVEN/target/trace-file.json\
+        -agentlib:native-image-agent=config-output-dir=$TOMCAT_MAVEN/target/\
         -Dcatalina.base=. -Djava.util.logging.config.file=conf/logging.properties\
         -jar target/tomcat-maven-1.0.jar</source>
   </p>
@@ -117,11 +117,7 @@ ant -Dwebapp.name=somewebapp -f graal-webapp.ant.xml</source>
   </p>
 
   <p>
-    Once that is done, the VM may be shut down. The descriptors can now be
-    generated from the trace file.
-    <source>$JAVA_HOME/bin/native-image-configure generate\
-        --trace-input=$TOMCAT_MAVEN/target/trace-file.json\
-        --output-dir=$TOMCAT_MAVEN/target</source>
+    The descriptors have now been generated in the agent output directory.
     At this point, further configuration must be made to add items that are
     not traced, including: base interfaces, resource bundles, BeanInfo based
     reflection, etc. Please refer to the Graal documentation for more
@@ -179,12 +175,11 @@ ant -Dwebapp.name=somewebapp -f graal-webapp.ant.xml</source>
   <p>
     Missing items for better Tomcat functionality:
     <ul>
-      <li>Java 11: ALPN for TLS, TLS 1.3, etc</li>
       <li>BeanInfo support: BeanInfo use in JSP taglibs must be configured
         manually in descriptors</li>
       <li>Java serialization: Clustering, session persistence</li>
-      <li>Static linking configuration: JSSE elliptic curve support,
-        tomcat-native support when creating an image with static linking</li>
+      <li>Static linking configuration: tomcat-native support when creating
+        an image with static linking</li>
       <li>JMX: Tomcat monitoring and management</li>
     </ul>
   </p>
