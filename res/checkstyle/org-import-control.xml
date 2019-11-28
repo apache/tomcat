@@ -30,6 +30,8 @@
   <allow pkg="javax.net"/>
   <allow pkg="javax.rmi"/>
   <allow pkg="javax.security"/>
+  <disallow pkg="javax.security.auth.message"/>
+  <allow pkg="jakarta.security.auth.message"/>
   <allow pkg="javax.sql"/>
   <allow pkg="javax.xml"/>
   <allow pkg="org.w3c.dom"/>

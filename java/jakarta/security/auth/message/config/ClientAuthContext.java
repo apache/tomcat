@@ -14,9 +14,9 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package javax.security.auth.message.config;
+package jakarta.security.auth.message.config;
 
-import javax.security.auth.message.ServerAuth;
+import jakarta.security.auth.message.ClientAuth;
 
-public interface ServerAuthContext extends ServerAuth {
+public interface ClientAuthContext extends ClientAuth {
 }

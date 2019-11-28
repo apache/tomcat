@@ -14,17 +14,19 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package javax.security.auth.message;
+package jakarta.security.auth.message.config;
 
-import javax.security.auth.Subject;
+import jakarta.security.auth.message.MessageInfo;
 
-public interface ClientAuth {
+public interface AuthConfig {
 
-    AuthStatus secureRequest(MessageInfo messageInfo, Subject clientSubject) throws AuthException;
+    String getMessageLayer();
 
-    AuthStatus validateResponse(MessageInfo messageInfo, Subject clientSubject,
-            Subject serviceSubject) throws AuthException;
+    String getAppContext();
 
-    void cleanSubject(MessageInfo messageInfo, Subject subject) throws AuthException;
+    String getAuthContextID(MessageInfo messageInfo);
+
+    void refresh();
+
+    boolean isProtected();
 }
-

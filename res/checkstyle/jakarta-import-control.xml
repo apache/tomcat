@@ -36,4 +36,25 @@
   <subpackage name="persistence">
     <allow pkg="jakarta.persistence"/>
   </subpackage>
+  <subpackage name="security">
+    <subpackage name="auth">
+      <subpackage name="message">
+        <allow pkg="javax.crypto" />
+        <allow class="javax.security.auth.Subject"/>
+        <allow pkg="javax.security.auth.callback"/>
+        <allow pkg="javax.security.auth.login"/>
+        <allow pkg="javax.security.auth.x500"/>
+        <disallow pkg="jakarta.security.auth.message.callback" local-only="true"/>
+        <disallow pkg="jakarta.security.auth.message.config" local-only="true"/>
+        <disallow pkg="jakarta.security.auth.message.module" local-only="true"/>
+        <subpackage name="config">
+        <allow class="javax.security.auth.AuthPermission"/>
+          <allow pkg="jakarta.security.auth.message"/>
+        </subpackage>
+        <subpackage name="module">
+          <allow pkg="jakarta.security.auth.message"/>
+        </subpackage>
+      </subpackage>
+    </subpackage>
+  </subpackage>
 </import-control>

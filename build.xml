@@ -352,7 +352,7 @@
   </patternset>
 
   <patternset id="files.jaspic-api">
-    <include name="javax/security/auth/message/**" />
+    <include name="jakarta/security/auth/message/**" />
   </patternset>
 
   <patternset id="files.tomcat-websocket">
@@ -1992,7 +1992,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
         <path location="${ant.core.lib}"/>
       </classpath>
     </javadoc>
-    <javadoc packagenames="javax.security.auth.message.*"
+    <javadoc packagenames="jakarta.security.auth.message.*"
       sourcepath="${tomcat.dist}/src/java"
       destdir="${tomcat.dist}/webapps/docs/jaspicapi"
       version="true"

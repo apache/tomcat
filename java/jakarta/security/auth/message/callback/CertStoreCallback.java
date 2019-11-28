@@ -14,30 +14,28 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package javax.security.auth.message.callback;
+package jakarta.security.auth.message.callback;
 
-import javax.security.auth.Subject;
+import java.security.cert.CertStore;
+
 import javax.security.auth.callback.Callback;
 
 /**
- * Callback that enables an authentication module to inform the runtime of the
- * groups a user is in.
+ * Callback that enables a runtime to inform authentication modules of the
+ * CertStore to use.
  */
-public class GroupPrincipalCallback implements Callback {
+public class CertStoreCallback implements Callback {
 
-    private final Subject subject;
-    private final String[] groups;
+    private CertStore certStore;
 
-    public GroupPrincipalCallback(Subject subject, String[] groups) {
-        this.subject = subject;
-        this.groups = groups;
+    public CertStoreCallback() {
     }
 
-    public Subject getSubject() {
-        return subject;
+    public void setCertStore(CertStore certStore) {
+        this.certStore = certStore;
     }
 
-    public String[] getGroups() {
-        return groups;
+    public CertStore getCertStore() {
+        return certStore;
     }
 }

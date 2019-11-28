@@ -14,21 +14,24 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package javax.security.auth.message.module;
+package jakarta.security.auth.message;
 
-import java.util.Map;
+public class AuthStatus {
 
-import javax.security.auth.callback.CallbackHandler;
-import javax.security.auth.message.AuthException;
-import javax.security.auth.message.MessagePolicy;
-import javax.security.auth.message.ServerAuth;
+    public static final AuthStatus SUCCESS = new AuthStatus("SUCCESS");
+    public static final AuthStatus FAILURE = new AuthStatus("FAILURE");
+    public static final AuthStatus SEND_SUCCESS = new AuthStatus("SEND_SUCCESS");
+    public static final AuthStatus SEND_FAILURE = new AuthStatus("SEND_FAILURE");
+    public static final AuthStatus SEND_CONTINUE = new AuthStatus("SEND_CONTINUE");
 
-public interface ServerAuthModule extends ServerAuth {
+    private final String name;
 
-    @SuppressWarnings("rawtypes") // JASPIC API uses raw types
-    void initialize(MessagePolicy requestPolicy, MessagePolicy responsePolicy,
-            CallbackHandler handler, Map options) throws AuthException;
+    private AuthStatus(String name) {
+        this.name = name;
+    }
 
-    @SuppressWarnings("rawtypes") // JASPIC API uses raw types
-    Class[] getSupportedMessageTypes();
+    @Override
+    public String toString() {
+        return name;
+    }
 }

@@ -14,25 +14,19 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package javax.security.auth.message.callback;
+package jakarta.security.auth.message.config;
 
-import java.security.KeyStore;
+import javax.security.auth.callback.CallbackHandler;
 
-import javax.security.auth.callback.Callback;
+import jakarta.security.auth.message.AuthException;
 
-/**
- * A Callback enabling an authentication module to request a truststore from the
- * runtime.
- */
-public class TrustStoreCallback implements Callback {
+public interface AuthConfigProvider {
 
-    private KeyStore trustStore;
+    ClientAuthConfig getClientAuthConfig(String layer, String appContext, CallbackHandler handler)
+            throws AuthException;
 
-    public void setTrustStore(KeyStore trustStore) {
-        this.trustStore = trustStore;
-    }
+    ServerAuthConfig getServerAuthConfig(String layer, String appContext, CallbackHandler handler)
+            throws AuthException;
 
-    public KeyStore getTrustStore() {
-        return trustStore;
-    }
+    void refresh();
 }

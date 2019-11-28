@@ -14,7 +14,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package javax.security.auth.message.callback;
+package jakarta.security.auth.message.callback;
 
 import javax.crypto.SecretKey;
 import javax.security.auth.callback.Callback;

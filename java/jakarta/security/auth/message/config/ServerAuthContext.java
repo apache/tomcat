@@ -14,19 +14,9 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package javax.security.auth.message.config;
+package jakarta.security.auth.message.config;
 
-import javax.security.auth.message.MessageInfo;
+import jakarta.security.auth.message.ServerAuth;
 
-public interface AuthConfig {
-
-    String getMessageLayer();
-
-    String getAppContext();
-
-    String getAuthContextID(MessageInfo messageInfo);
-
-    void refresh();
-
-    boolean isProtected();
+public interface ServerAuthContext extends ServerAuth {
 }

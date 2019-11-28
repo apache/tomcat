@@ -14,21 +14,20 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package javax.security.auth.message.module;
+package jakarta.security.auth.message;
 
 import java.util.Map;
 
-import javax.security.auth.callback.CallbackHandler;
-import javax.security.auth.message.AuthException;
-import javax.security.auth.message.ClientAuth;
-import javax.security.auth.message.MessagePolicy;
+public interface MessageInfo {
 
-public interface ClientAuthModule extends ClientAuth {
+    Object getRequestMessage();
+
+    Object getResponseMessage();
+
+    void setRequestMessage(Object request);
+
+    void setResponseMessage(Object response);
 
     @SuppressWarnings("rawtypes") // JASPIC API uses raw types
-    void initialize(MessagePolicy requestPolicy, MessagePolicy responsePolicy,
-            CallbackHandler handler, Map options) throws AuthException;
-
-    @SuppressWarnings("rawtypes") // JASPIC API uses raw types
-    Class[] getSupportedMessageTypes();
+    Map getMap();
 }

@@ -14,24 +14,17 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package javax.security.auth.message;
+package jakarta.security.auth.message;
 
-public class AuthStatus {
+import javax.security.auth.Subject;
 
-    public static final AuthStatus SUCCESS = new AuthStatus("SUCCESS");
-    public static final AuthStatus FAILURE = new AuthStatus("FAILURE");
-    public static final AuthStatus SEND_SUCCESS = new AuthStatus("SEND_SUCCESS");
-    public static final AuthStatus SEND_FAILURE = new AuthStatus("SEND_FAILURE");
-    public static final AuthStatus SEND_CONTINUE = new AuthStatus("SEND_CONTINUE");
+public interface ClientAuth {
 
-    private final String name;
+    AuthStatus secureRequest(MessageInfo messageInfo, Subject clientSubject) throws AuthException;
 
-    private AuthStatus(String name) {
-        this.name = name;
-    }
+    AuthStatus validateResponse(MessageInfo messageInfo, Subject clientSubject,
+            Subject serviceSubject) throws AuthException;
 
-    @Override
-    public String toString() {
-        return name;
-    }
+    void cleanSubject(MessageInfo messageInfo, Subject subject) throws AuthException;
 }
+

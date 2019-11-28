@@ -14,16 +14,25 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package javax.security.auth.message;
+package jakarta.security.auth.message.callback;
 
-import javax.security.auth.Subject;
+import java.security.KeyStore;
 
-public interface ServerAuth {
+import javax.security.auth.callback.Callback;
 
-    AuthStatus validateRequest(MessageInfo messageInfo, Subject clientSubject,
-            Subject serviceSubject) throws AuthException;
+/**
+ * A Callback enabling an authentication module to request a truststore from the
+ * runtime.
+ */
+public class TrustStoreCallback implements Callback {
 
-    AuthStatus secureResponse(MessageInfo messageInfo, Subject serviceSubject) throws AuthException;
+    private KeyStore trustStore;
 
-    void cleanSubject(MessageInfo messageInfo, Subject subject) throws AuthException;
+    public void setTrustStore(KeyStore trustStore) {
+        this.trustStore = trustStore;
+    }
+
+    public KeyStore getTrustStore() {
+        return trustStore;
+    }
 }

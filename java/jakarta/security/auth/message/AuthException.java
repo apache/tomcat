@@ -14,7 +14,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package javax.security.auth.message;
+package jakarta.security.auth.message;
 
 import javax.security.auth.login.LoginException;
 

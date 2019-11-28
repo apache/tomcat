@@ -14,20 +14,17 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package javax.security.auth.message;
+package jakarta.security.auth.message.config;
 
 import java.util.Map;
 
-public interface MessageInfo {
+import javax.security.auth.Subject;
 
-    Object getRequestMessage();
+import jakarta.security.auth.message.AuthException;
 
-    Object getResponseMessage();
-
-    void setRequestMessage(Object request);
-
-    void setResponseMessage(Object response);
+public interface ServerAuthConfig extends AuthConfig {
 
     @SuppressWarnings("rawtypes") // JASPIC API uses raw types
-    Map getMap();
+    ServerAuthContext getAuthContext(String authContextID, Subject serviceSubject, Map properties)
+            throws AuthException;
 }
