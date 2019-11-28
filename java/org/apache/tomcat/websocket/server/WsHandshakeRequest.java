@@ -27,9 +27,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import javax.websocket.server.HandshakeRequest;
-
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.websocket.server.HandshakeRequest;
 
 import org.apache.tomcat.util.collections.CaseInsensitiveKeyMap;
 import org.apache.tomcat.util.res.StringManager;

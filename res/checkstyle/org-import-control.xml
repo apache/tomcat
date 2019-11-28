@@ -172,7 +172,7 @@
       </subpackage>
     </subpackage>
     <subpackage name="websocket">
-      <allow pkg="javax.websocket"/>
+      <allow pkg="jakarta.websocket"/>
       <allow pkg="org.apache.juli"/>
       <allow pkg="org.apache.tomcat"/>
       <allow pkg="org.apache.tomcat.util"/>

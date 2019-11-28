@@ -20,10 +20,10 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 import java.nio.ByteBuffer;
 
-import javax.websocket.EncodeException;
-import javax.websocket.MessageHandler;
-import javax.websocket.RemoteEndpoint;
-import javax.websocket.Session;
+import jakarta.websocket.EncodeException;
+import jakarta.websocket.MessageHandler;
+import jakarta.websocket.RemoteEndpoint;
+import jakarta.websocket.Session;
 
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.websocket.WrappedMessageHandler;

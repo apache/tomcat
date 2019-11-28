@@ -19,9 +19,9 @@ package org.apache.tomcat.websocket;
 import java.util.Collections;
 import java.util.Set;
 
-import javax.websocket.Endpoint;
-import javax.websocket.server.ServerApplicationConfig;
-import javax.websocket.server.ServerEndpointConfig;
+import jakarta.websocket.Endpoint;
+import jakarta.websocket.server.ServerApplicationConfig;
+import jakarta.websocket.server.ServerEndpointConfig;
 
 /**
  * This configuration blocks any endpoints discovered by the SCI from being

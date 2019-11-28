@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import javax.websocket.Extension;
+import jakarta.websocket.Extension;
 
 /**
  * Internal implementation constants.

@@ -22,7 +22,7 @@ import java.io.InputStreamReader;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 
-import javax.websocket.CloseReason.CloseCode;
+import jakarta.websocket.CloseReason.CloseCode;
 
 /**
  * A client for testing Websocket behavior that differs from standard client

@@ -16,7 +16,7 @@
  */
 package org.apache.tomcat.websocket;
 
-import javax.websocket.Decoder;
+import jakarta.websocket.Decoder;
 
 public class DecoderEntry {
 

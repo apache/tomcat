@@ -24,9 +24,9 @@ import java.util.zip.DataFormatException;
 import java.util.zip.Deflater;
 import java.util.zip.Inflater;
 
-import javax.websocket.Extension;
-import javax.websocket.Extension.Parameter;
-import javax.websocket.SendHandler;
+import jakarta.websocket.Extension;
+import jakarta.websocket.Extension.Parameter;
+import jakarta.websocket.SendHandler;
 
 import org.apache.tomcat.util.res.StringManager;
 

@@ -22,11 +22,11 @@ import java.nio.charset.StandardCharsets;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-import javax.websocket.ClientEndpointConfig;
-import javax.websocket.ContainerProvider;
-import javax.websocket.PongMessage;
-import javax.websocket.Session;
-import javax.websocket.WebSocketContainer;
+import jakarta.websocket.ClientEndpointConfig;
+import jakarta.websocket.ContainerProvider;
+import jakarta.websocket.PongMessage;
+import jakarta.websocket.Session;
+import jakarta.websocket.WebSocketContainer;
 
 import org.junit.Assert;
 import org.junit.Test;

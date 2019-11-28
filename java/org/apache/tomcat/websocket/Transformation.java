@@ -20,7 +20,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.List;
 
-import javax.websocket.Extension;
+import jakarta.websocket.Extension;
 
 /**
  * The internal representation of the transformation that a WebSocket extension

@@ -20,17 +20,16 @@ import java.lang.reflect.Modifier;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.websocket.ContainerProvider;
-import javax.websocket.DeploymentException;
-import javax.websocket.Endpoint;
-import javax.websocket.server.ServerApplicationConfig;
-import javax.websocket.server.ServerEndpoint;
-import javax.websocket.server.ServerEndpointConfig;
-
 import jakarta.servlet.ServletContainerInitializer;
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.HandlesTypes;
+import jakarta.websocket.ContainerProvider;
+import jakarta.websocket.DeploymentException;
+import jakarta.websocket.Endpoint;
+import jakarta.websocket.server.ServerApplicationConfig;
+import jakarta.websocket.server.ServerEndpoint;
+import jakarta.websocket.server.ServerEndpointConfig;
 
 import org.apache.tomcat.util.compat.JreCompat;
 
@@ -59,7 +58,7 @@ public class WsSci implements ServletContainerInitializer {
         Set<Class<?>> scannedPojoEndpoints = new HashSet<>();
 
         try {
-            // wsPackage is "javax.websocket."
+            // wsPackage is "jakarta.websocket."
             String wsPackage = ContainerProvider.class.getName();
             wsPackage = wsPackage.substring(0, wsPackage.lastIndexOf('.') + 1);
             for (Class<?> clazz : clazzes) {

@@ -19,12 +19,12 @@ package org.apache.tomcat.websocket;
 import java.nio.ByteBuffer;
 import java.util.concurrent.Semaphore;
 
-import javax.websocket.OnMessage;
-import javax.websocket.RemoteEndpoint.Async;
-import javax.websocket.SendHandler;
-import javax.websocket.SendResult;
-import javax.websocket.Session;
-import javax.websocket.server.ServerEndpoint;
+import jakarta.websocket.OnMessage;
+import jakarta.websocket.RemoteEndpoint.Async;
+import jakarta.websocket.SendHandler;
+import jakarta.websocket.SendResult;
+import jakarta.websocket.Session;
+import jakarta.websocket.server.ServerEndpoint;
 
 import org.apache.tomcat.websocket.server.TesterEndpointConfig;
 

@@ -69,4 +69,7 @@
     <allow pkg="jakarta.transaction"/>
     <allow pkg="javax.transaction.xa"/>
   </subpackage>
+  <subpackage name="websocket">
+    <allow pkg="jakarta.websocket"/>
+  </subpackage>
 </import-control>

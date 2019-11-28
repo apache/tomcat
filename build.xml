@@ -271,8 +271,8 @@
     <include name="**/NOTICE"/>
     <include name="**/RELEASE-NOTES"/>
     <include name="**/jakarta.servlet.ServletContainerInitializer"/>
-    <include name="**/javax.websocket.ContainerProvider"/>
-    <include name="**/javax.websocket.server.ServerEndpointConfig$Configurator"/>
+    <include name="**/jakarta.websocket.ContainerProvider"/>
+    <include name="**/jakarta.websocket.server.ServerEndpointConfig$Configurator"/>
     <include name="**/.gitignore"/>
     <include name="**/*.bnd"/>
     <include name="**/*.classpath"/>
@@ -348,7 +348,7 @@
   </patternset>
 
   <patternset id="files.websocket-api">
-    <include name="javax/websocket/**" />
+    <include name="jakarta/websocket/**" />
   </patternset>
 
   <patternset id="files.jaspic-api">
@@ -1971,7 +1971,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
         <path location="${ant.core.lib}"/>
       </classpath>
     </javadoc>
-    <javadoc packagenames="javax.websocket.*"
+    <javadoc packagenames="jakarta.websocket.*"
       sourcepath="${tomcat.dist}/src/java"
       destdir="${tomcat.dist}/webapps/docs/websocketapi"
       version="true"

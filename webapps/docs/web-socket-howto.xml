@@ -94,14 +94,14 @@
 <p>When using the WebSocket client to connect to server endpoints, the timeout
    for IO operations while establishing the connection is controlled by the
    <code>userProperties</code> of the provided
-   <code>javax.websocket.ClientEndpointConfig</code>. The property is
+   <code>jakarta.websocket.ClientEndpointConfig</code>. The property is
    <code>org.apache.tomcat.websocket.IO_TIMEOUT_MS</code> and is the
    timeout as a <code>String</code> in milliseconds. The default is 5000 (5
    seconds).</p>
 
 <p>When using the WebSocket client to connect to secure server endpoints, the
    client SSL configuration is controlled by the <code>userProperties</code>
-   of the provided <code>javax.websocket.ClientEndpointConfig</code>. The
+   of the provided <code>jakarta.websocket.ClientEndpointConfig</code>. The
    following user properties are supported:</p>
    <ul>
      <li><code>org.apache.tomcat.websocket.SSL_CONTEXT</code></li>
@@ -129,7 +129,7 @@
 <p>When using the WebSocket client to connect to server endpoints, the number of
    HTTP redirects that the client will follow is controlled by the
    <code>userProperties</code> of the provided
-   <code>javax.websocket.ClientEndpointConfig</code>. The property is
+   <code>jakarta.websocket.ClientEndpointConfig</code>. The property is
    <ocde>org.apache.tomcat.websocket.MAX_REDIRECTIONS</ocde>. The default value
    is 20. Redirection support can be disabled by configuring a value of zero.</p>
 

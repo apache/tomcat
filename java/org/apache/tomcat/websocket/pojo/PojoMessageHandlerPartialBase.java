@@ -20,9 +20,9 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.nio.ByteBuffer;
 
-import javax.websocket.DecodeException;
-import javax.websocket.MessageHandler;
-import javax.websocket.Session;
+import jakarta.websocket.DecodeException;
+import jakarta.websocket.MessageHandler;
+import jakarta.websocket.Session;
 
 import org.apache.tomcat.websocket.WsSession;
 

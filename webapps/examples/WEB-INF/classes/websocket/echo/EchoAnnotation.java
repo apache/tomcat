@@ -19,10 +19,10 @@ package websocket.echo;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
-import javax.websocket.OnMessage;
-import javax.websocket.PongMessage;
-import javax.websocket.Session;
-import javax.websocket.server.ServerEndpoint;
+import jakarta.websocket.OnMessage;
+import jakarta.websocket.PongMessage;
+import jakarta.websocket.Session;
+import jakarta.websocket.server.ServerEndpoint;
 
 /**
  * The three annotated echo endpoints can be used to test with Autobahn and

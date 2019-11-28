@@ -16,5 +16,5 @@ Bundle-Name: tomcat-websocket-api
 Bundle-SymbolicName: org.apache.tomcat-websocket-api
 Bundle-Version: @VERSION@
 Export-Package: \
-    javax.websocket,\
-    javax.websocket.server
+    jakarta.websocket,\
+    jakarta.websocket.server

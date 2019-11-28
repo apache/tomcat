@@ -19,8 +19,8 @@ package org.apache.tomcat.websocket;
 import java.nio.ByteBuffer;
 import java.util.concurrent.Future;
 
-import javax.websocket.RemoteEndpoint;
-import javax.websocket.SendHandler;
+import jakarta.websocket.RemoteEndpoint;
+import jakarta.websocket.SendHandler;
 
 public class WsRemoteEndpointAsync extends WsRemoteEndpointBase
         implements RemoteEndpoint.Async {
