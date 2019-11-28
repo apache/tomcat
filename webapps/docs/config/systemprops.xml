@@ -580,9 +580,9 @@
       <a href="https://commons.apache.org/dbcp">Apache Commons DBCP 2</a>.</p>
     </property>
 
-    <property name="javax.mail.Session.Factory">
+    <property name="jakarta.mail.Session.Factory">
       <p>The class name of the factory to use to create resources of type
-      <code>javax.mail.Session</code>. If not specified the default of
+      <code>jakarta.mail.Session</code>. If not specified the default of
       <code>org.apache.naming.factory.MailSessionFactory</code> is used.</p>
     </property>
 

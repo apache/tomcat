@@ -14,9 +14,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package javax.mail.internet;
+package jakarta.mail.internet;
 
-import javax.mail.Session;
+import jakarta.mail.Session;
 
 @SuppressWarnings("unused") // Dummy implementation
 public class MimeMessage implements MimePart {

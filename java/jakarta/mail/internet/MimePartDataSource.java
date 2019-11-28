@@ -14,10 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package javax.mail;
+package jakarta.mail.internet;
 
-public class Authenticator {
-    protected PasswordAuthentication getPasswordAuthentication() {
-        return null;
+@SuppressWarnings("unused") // Dummy implementation
+public class MimePartDataSource {
+    public MimePartDataSource(MimePart part) {
+        // Dummy implementation
     }
 }

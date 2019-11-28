@@ -14,11 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package javax.mail.internet;
+package jakarta.mail;
 
 @SuppressWarnings("unused") // Dummy implementation
-public class InternetAddress {
-    public InternetAddress(String from) {
+public class PasswordAuthentication {
+    public PasswordAuthentication(String user, String password) {
         // Dummy implementation
     }
 }

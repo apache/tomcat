@@ -23,15 +23,16 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Properties;
 
-import javax.mail.Session;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
-import javax.mail.internet.MimePartDataSource;
 import javax.naming.Context;
 import javax.naming.Name;
 import javax.naming.RefAddr;
 import javax.naming.Reference;
 import javax.naming.spi.ObjectFactory;
+
+import jakarta.mail.Session;
+import jakarta.mail.internet.InternetAddress;
+import jakarta.mail.internet.MimeMessage;
+import jakarta.mail.internet.MimePartDataSource;
 
 /**
  * Factory class that creates a JNDI named javamail MimePartDataSource
@@ -43,7 +44,7 @@ import javax.naming.spi.ObjectFactory;
  * Example:
  * <pre>
  * &lt;Resource name="mail/send" auth="CONTAINER"
- *           type="javax.mail.internet.MimePartDataSource"/&gt;
+ *           type="jakarta.mail.internet.MimePartDataSource"/&gt;
  * &lt;ResourceParams name="mail/send"&gt;
  *   &lt;parameter&gt;&lt;name&gt;factory&lt;/name&gt;
  *     &lt;value&gt;org.apache.naming.factory.SendMailFactory&lt;/value&gt;
@@ -76,7 +77,7 @@ public class SendMailFactory implements ObjectFactory
 {
     // The class name for the javamail MimeMessageDataSource
     protected static final String DataSourceClassName =
-        "javax.mail.internet.MimePartDataSource";
+        "jakarta.mail.internet.MimePartDataSource";
 
     @Override
     public Object getObjectInstance(Object refObj, Name name, Context ctx,

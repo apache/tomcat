@@ -30,4 +30,7 @@
   <subpackage name="el">
     <allow pkg="jakarta.el"/>
   </subpackage>
+  <subpackage name="mail">
+    <allow pkg="jakarta.mail"/>
+  </subpackage>
 </import-control>

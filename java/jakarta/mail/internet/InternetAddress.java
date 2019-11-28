@@ -14,16 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package javax.mail;
-
-import java.util.Properties;
+package jakarta.mail.internet;
 
 @SuppressWarnings("unused") // Dummy implementation
-public class Session {
-    public static Session getInstance(Properties props, Authenticator auth) {
-        return null;
-    }
-    public static Session getInstance(Properties props) {
-        return null;
+public class InternetAddress {
+    public InternetAddress(String from) {
+        // Dummy implementation
     }
 }

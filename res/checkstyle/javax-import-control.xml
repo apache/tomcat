@@ -21,9 +21,6 @@
 
 <import-control pkg="javax">
   <allow pkg="java"/>
-  <subpackage name="mail">
-    <allow pkg="javax.mail"/>
-  </subpackage>
   <subpackage name="persistence">
     <allow pkg="javax.persistence"/>
   </subpackage>

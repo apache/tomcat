@@ -360,7 +360,7 @@ public class WebAnnotationSet {
                 type.equals("javax.jms.ConnectionFactory") ||
                 type.equals("javax.jms.QueueConnectionFactory") ||
                 type.equals("javax.jms.TopicConnectionFactory") ||
-                type.equals("javax.mail.Session") ||
+                type.equals("jakarta.mail.Session") ||
                 type.equals("java.net.URL") ||
                 type.equals("javax.resource.cci.ConnectionFactory") ||
                 type.equals("org.omg.CORBA_2_3.ORB") ||

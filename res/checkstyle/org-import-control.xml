@@ -118,7 +118,7 @@
     <allow pkg="org.apache.juli"/>
   </subpackage>
   <subpackage name="naming">
-    <allow pkg="javax.mail"/>
+    <allow pkg="jakarta.mail"/>
     <allow pkg="javax.wsdl"/>
     <allow pkg="org.apache.juli"/>
     <allow pkg="org.apache.naming"/>
