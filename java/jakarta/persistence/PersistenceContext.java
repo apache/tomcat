@@ -14,9 +14,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package javax.persistence;
+package jakarta.persistence;
 
-public enum SynchronizationType {
-    SYNCHRONIZED,
-    UNSYNCHRONIZED
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
+@Target({ElementType.TYPE, ElementType.METHOD, ElementType.FIELD})
+@Retention(RetentionPolicy.RUNTIME)
+
+public @interface PersistenceContext {
+   String name() default "";
+   String unitName() default "";
+   PersistenceContextType type() default PersistenceContextType.TRANSACTION;
+   PersistenceProperty[] properties() default {};
+   SynchronizationType synchronization() default SynchronizationType.SYNCHRONIZED;
 }

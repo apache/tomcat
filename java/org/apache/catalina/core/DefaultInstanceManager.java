@@ -37,14 +37,14 @@ import java.util.Set;
 
 import javax.naming.Context;
 import javax.naming.NamingException;
-import javax.persistence.PersistenceContext;
-import javax.persistence.PersistenceUnit;
 import javax.xml.ws.WebServiceRef;
 
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import jakarta.annotation.Resource;
 import jakarta.ejb.EJB;
+import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.PersistenceUnit;
 
 import org.apache.catalina.ContainerServlet;
 import org.apache.catalina.Globals;
@@ -83,7 +83,7 @@ public class DefaultInstanceManager implements InstanceManager {
 
         clazz = null;
         try {
-            clazz = Class.forName("javax.persistence.PersistenceContext");
+            clazz = Class.forName("jakarta.persistence.PersistenceContext");
         } catch (ClassNotFoundException cnfe) {
             // Expected
         }

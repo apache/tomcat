@@ -21,9 +21,6 @@
 
 <import-control pkg="javax">
   <allow pkg="java"/>
-  <subpackage name="persistence">
-    <allow pkg="javax.persistence"/>
-  </subpackage>
   <subpackage name="security">
     <subpackage name="auth">
       <subpackage name="message">

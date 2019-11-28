@@ -33,4 +33,7 @@
   <subpackage name="mail">
     <allow pkg="jakarta.mail"/>
   </subpackage>
+  <subpackage name="persistence">
+    <allow pkg="jakarta.persistence"/>
+  </subpackage>
 </import-control>

@@ -14,7 +14,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package javax.persistence;
+
+
+package jakarta.persistence;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -24,10 +26,7 @@ import java.lang.annotation.Target;
 @Target({ElementType.TYPE, ElementType.METHOD, ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
 
-public @interface PersistenceContext {
+public @interface PersistenceUnit {
    String name() default "";
    String unitName() default "";
-   PersistenceContextType type() default PersistenceContextType.TRANSACTION;
-   PersistenceProperty[] properties() default {};
-   SynchronizationType synchronization() default SynchronizationType.SYNCHRONIZED;
 }
