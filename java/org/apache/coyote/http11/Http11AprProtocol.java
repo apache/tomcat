@@ -307,10 +307,10 @@ public class Http11AprProtocol extends AbstractHttp11Protocol<Long> {
             processor.setAdapter(proto.adapter);
             processor.setMaxKeepAliveRequests(proto.getMaxKeepAliveRequests());
             processor.setKeepAliveTimeout(proto.getKeepAliveTimeout());
-            processor.setConnectionUploadTimeout(
-                    proto.getConnectionUploadTimeout());
+            processor.setConnectionUploadTimeout(proto.getConnectionUploadTimeout());
             processor.setDisableUploadTimeout(proto.getDisableUploadTimeout());
             processor.setCompressionMinSize(proto.getCompressionMinSize());
+            processor.setNoCompressionStrongETag(proto.getNoCompressionStrongETag());
             processor.setCompression(proto.getCompression());
             processor.setNoCompressionUserAgents(proto.getNoCompressionUserAgents());
             processor.setCompressableMimeTypes(proto.getCompressableMimeTypes());

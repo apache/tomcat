@@ -216,6 +216,12 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
 
 
     /**
+     * Flag to disable compression when the resource has a strong ETag.
+     */
+    protected boolean noCompressionStrongETag = true;
+
+
+    /**
      * Minimum content size to make compression.
      */
     protected int compressionMinSize = 2048;
@@ -331,6 +337,11 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
      */
     public void setCompressionMinSize(int compressionMinSize) {
         this.compressionMinSize = compressionMinSize;
+    }
+
+
+    public void setNoCompressionStrongETag(boolean noCompressionStrongETag) {
+        this.noCompressionStrongETag = noCompressionStrongETag;
     }
 
 
@@ -607,15 +618,17 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
      */
     private boolean isCompressible() {
 
+        MimeHeaders responseHeaders = response.getMimeHeaders();
+
         // Check if content is not already compressed
-        MessageBytes contentEncodingMB = response.getMimeHeaders().getValue("Content-Encoding");
+        MessageBytes contentEncodingMB = responseHeaders.getValue("Content-Encoding");
 
         if (contentEncodingMB != null) {
             // Content-Encoding values are ordered but order is not important
             // for this check so use a Set rather than a List
             Set<String> tokens = new HashSet<String>();
             try {
-                TokenList.parseTokenList(response.getMimeHeaders().values("Content-Encoding"), tokens);
+                TokenList.parseTokenList(responseHeaders.values("Content-Encoding"), tokens);
             } catch (IOException e) {
                 // Because we are using StringReader, any exception here is a
                 // Tomcat bug.
@@ -623,6 +636,16 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
                 return false;
             }
             if (tokens.contains("gzip") || tokens.contains("br")) {
+                return false;
+            }
+        }
+
+        // Check if the resource has a strong ETag
+        if (noCompressionStrongETag) {
+            String eTag = responseHeaders.getHeader("ETag");
+            if (eTag != null && !eTag.trim().startsWith("W/")) {
+                // Has an ETag that doesn't start with "W/..." so it must be a
+                // strong ETag
                 return false;
             }
         }

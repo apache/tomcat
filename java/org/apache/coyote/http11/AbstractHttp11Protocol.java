@@ -203,6 +203,15 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
     }
 
 
+    private boolean noCompressionStrongETag = true;
+    public boolean getNoCompressionStrongETag() {
+        return noCompressionStrongETag;
+    }
+    public void setNoCompressionStrongEtag(boolean noCompressionStrongETag) {
+        this.noCompressionStrongETag = noCompressionStrongETag;
+    }
+
+
     /**
      * Regular expression that defines the User agents which should be
      * restricted to HTTP/1.0 support.
@@ -362,6 +371,7 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
         processor.setConnectionUploadTimeout(getConnectionUploadTimeout());
         processor.setDisableUploadTimeout(getDisableUploadTimeout());
         processor.setCompressionMinSize(getCompressionMinSize());
+        processor.setNoCompressionStrongETag(getNoCompressionStrongETag());
         processor.setCompression(getCompression());
         processor.setNoCompressionUserAgents(getNoCompressionUserAgents());
         processor.setCompressibleMimeTypes(getCompressibleMimeType());
