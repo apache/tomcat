@@ -207,7 +207,7 @@ public class CompressionConfig {
      *             {@code true}
      */
     @Deprecated
-    public void setNoCompressionStrongEtag(boolean noCompressionStrongETag) {
+    public void setNoCompressionStrongETag(boolean noCompressionStrongETag) {
         this.noCompressionStrongETag = noCompressionStrongETag;
     }
 

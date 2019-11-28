@@ -284,8 +284,8 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
         return compressionConfig.getNoCompressionStrongETag();
     }
     @Deprecated
-    public void setNoCompressionStrongEtag(boolean noCompressionStrongETag) {
-        compressionConfig.setNoCompressionStrongEtag(noCompressionStrongETag);
+    public void setNoCompressionStrongETag(boolean noCompressionStrongETag) {
+        compressionConfig.setNoCompressionStrongETag(noCompressionStrongETag);
     }
 
 
