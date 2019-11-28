@@ -67,6 +67,11 @@
         <code>TestAsyncContextStateChanges</code> test that caused it
         to hang indefinitely. (markt)
       </fix>
+      <add>
+        Add the ability to set and display session attributes in the JSP FORM
+        authentication example to demonstrate session persistence across
+        restarts for authenticated sessions. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Other">
