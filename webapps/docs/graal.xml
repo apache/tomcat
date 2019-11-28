@@ -135,7 +135,7 @@ ant -Dwebapp.name=somewebapp -f graal-webapp.ant.xml</source>
         --allow-incomplete-classpath --enable-https\
         --initialize-at-build-time=org.eclipse.jdt,org.apache.el.parser.SimpleNode,javax.servlet.jsp.JspFactory,org.apache.jasper.servlet.JasperInitializer,org.apache.jasper.runtime.JspFactoryImpl\
         -H:+JNI -H:+ReportUnsupportedElementsAtRuntime\
-        -H:+ReportExceptionStackTraces -H:EnableURLProtocols=http,https,jar\
+        -H:+ReportExceptionStackTraces -H:EnableURLProtocols=http,https,jar,jrt\
         -H:ConfigurationFileDirectories=$TOMCAT_MAVEN/target/\
         -H:ReflectionConfigurationFiles=$TOMCAT_MAVEN/tomcat-reflection.json\
         -H:ResourceConfigurationFiles=$TOMCAT_MAVEN/tomcat-resource.json\
