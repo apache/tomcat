@@ -17,8 +17,10 @@
 package org.apache.tomcat.util.compat;
 
 import java.io.IOException;
+import java.net.URL;
+import java.util.Deque;
 
-class GraalCompat extends JreCompat {
+class GraalCompat extends Jre9Compat {
 
     private static final boolean GRAAL;
 
@@ -42,6 +44,17 @@ class GraalCompat extends JreCompat {
 
     @Override
     public void disableCachingForJarUrlConnections() throws IOException {
+    }
+
+    @Override
+    public void addBootModulePath(Deque<URL> classPathUrlsToProcess) {
+        // No support for modules in native images
+    }
+
+    @Override
+    public boolean isExported(Class<?> type) {
+        // No support for modules in native images so return true
+        return true;
     }
 
 }

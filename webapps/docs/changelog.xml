@@ -114,6 +114,9 @@
       <update>
         Update the OWB module to Apache OpenWebBeans 2.0.13. (remm)
       </update>
+      <update>
+        Support Java 11 in Graal Native Images with Graal 19.3+. (remm)
+      </update>
     </changelog>
   </subsection>
 </section>

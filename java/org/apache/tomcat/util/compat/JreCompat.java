@@ -49,7 +49,7 @@ public class JreCompat {
         if (GraalCompat.isSupported()) {
             instance = new GraalCompat();
             graalAvailable = true;
-            jre9Available = false;
+            jre9Available = Jre9Compat.isSupported();
         } else if (Jre9Compat.isSupported()) {
             instance = new Jre9Compat();
             graalAvailable = false;

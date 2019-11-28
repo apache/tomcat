@@ -145,8 +145,7 @@ ant -Dwebapp.name=somewebapp -f graal-webapp.ant.xml</source>
 
   <p>
     Running the native image is then:
-    <source>./tomcat-maven-1.0 -Djava.library.path=$JAVA_HOME/jre/lib/amd64\
-        -Dcatalina.base=. -Djava.util.logging.config.file=conf/logging.properties</source>
+    <source>./tomcat-maven-1.0 -Dcatalina.base=. -Djava.util.logging.config.file=conf/logging.properties</source>
   </p>
 
   </section>
