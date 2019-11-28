@@ -67,7 +67,7 @@ public class TestCompressionConfig {
         CompressionConfig compressionConfig = new CompressionConfig();
         // Skip length and MIME type checks
         compressionConfig.setCompression("force");
-        compressionConfig.setNoCompressionStrongEtag(noCompressionStrongETag.booleanValue());
+        compressionConfig.setNoCompressionStrongETag(noCompressionStrongETag.booleanValue());
 
         Request request = new Request();
         Response response = new Response();
