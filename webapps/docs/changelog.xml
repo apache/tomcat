@@ -70,6 +70,12 @@
         (remm)
       </fix>
       <fix>
+        <bug>63932</bug>: By default, do not compress content that has a strong
+        ETag. This behaviour is configuration for the HTTP/1.1 and HTTP/2
+        connectors via the new Connector attribute
+        <code>noCompressionStrongETag</code>. (markt)
+      </fix>
+      <fix>
         <bug>63949</bug>: Fix non blocking write problems with NIO due to the
         need for a write loop. (remm)
       </fix>
