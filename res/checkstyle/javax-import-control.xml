@@ -21,9 +21,6 @@
 
 <import-control pkg="javax">
   <allow pkg="java"/>
-  <subpackage name="transaction">
-    <allow pkg="javax.transaction"/>
-  </subpackage>
   <subpackage name="websocket">
     <allow pkg="javax.websocket"/>
   </subpackage>

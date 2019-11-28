@@ -14,25 +14,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package javax.transaction;
+package jakarta.transaction;
 
-public class SystemException extends java.lang.Exception {
+public class NotSupportedException extends java.lang.Exception {
 
-    private static final long serialVersionUID = 8615483418828223571L;
+    private static final long serialVersionUID = 56870312332816390L;
 
-    public int errorCode;
-
-    public SystemException() {
+    public NotSupportedException() {
         super();
     }
 
-    public SystemException(String s) {
-        super(s);
+    public NotSupportedException(String msg) {
+        super(msg);
     }
-
-    public SystemException(int errcode) {
-        super();
-        errorCode = errcode;
-    }
-
 }

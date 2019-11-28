@@ -14,17 +14,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package javax.transaction;
+package jakarta.transaction;
 
-public class HeuristicCommitException extends java.lang.Exception {
+public interface UserTransaction {
+    void begin() throws NotSupportedException, SystemException;
 
-    private static final long serialVersionUID = -3977609782149921760L;
+    void commit() throws RollbackException, HeuristicMixedException,
+            HeuristicRollbackException, SecurityException,
+            IllegalStateException, SystemException;
 
-    public HeuristicCommitException() {
-        super();
-    }
+    void rollback()
+            throws IllegalStateException, SecurityException, SystemException;
 
-    public HeuristicCommitException(String msg) {
-        super(msg);
-    }
+    void setRollbackOnly() throws IllegalStateException, SystemException;
+
+    int getStatus() throws SystemException;
+
+    void setTransactionTimeout(int seconds) throws SystemException;
 }

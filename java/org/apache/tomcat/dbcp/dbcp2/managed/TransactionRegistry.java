@@ -23,11 +23,12 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.WeakHashMap;
 
-import javax.transaction.SystemException;
-import javax.transaction.Transaction;
-import javax.transaction.TransactionManager;
-import javax.transaction.TransactionSynchronizationRegistry;
 import javax.transaction.xa.XAResource;
+
+import jakarta.transaction.SystemException;
+import jakarta.transaction.Transaction;
+import jakarta.transaction.TransactionManager;
+import jakarta.transaction.TransactionSynchronizationRegistry;
 
 import org.apache.tomcat.dbcp.dbcp2.DelegatingConnection;
 

@@ -14,17 +14,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package javax.transaction;
+package jakarta.transaction;
 
-public class HeuristicMixedException extends java.lang.Exception {
+public class TransactionRequiredException extends java.rmi.RemoteException {
 
-    private static final long serialVersionUID = 2345014349685956666L;
+    private static final long serialVersionUID = -1898806419937446439L;
 
-    public HeuristicMixedException() {
+    public TransactionRequiredException() {
         super();
     }
 
-    public HeuristicMixedException(String msg) {
+    public TransactionRequiredException(String msg) {
         super(msg);
     }
 }

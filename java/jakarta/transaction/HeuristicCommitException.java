@@ -14,9 +14,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package javax.transaction;
+package jakarta.transaction;
 
-public interface Synchronization {
-    public void beforeCompletion();
-    public void afterCompletion(int status);
+public class HeuristicCommitException extends java.lang.Exception {
+
+    private static final long serialVersionUID = -3977609782149921760L;
+
+    public HeuristicCommitException() {
+        super();
+    }
+
+    public HeuristicCommitException(String msg) {
+        super(msg);
+    }
 }

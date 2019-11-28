@@ -22,13 +22,14 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Objects;
 
-import javax.transaction.RollbackException;
-import javax.transaction.Status;
-import javax.transaction.Synchronization;
-import javax.transaction.SystemException;
-import javax.transaction.Transaction;
-import javax.transaction.TransactionSynchronizationRegistry;
 import javax.transaction.xa.XAResource;
+
+import jakarta.transaction.RollbackException;
+import jakarta.transaction.Status;
+import jakarta.transaction.Synchronization;
+import jakarta.transaction.SystemException;
+import jakarta.transaction.Transaction;
+import jakarta.transaction.TransactionSynchronizationRegistry;
 
 /**
  * TransactionContext represents the association between a single XAConnectionFactory and a Transaction. This context

@@ -14,17 +14,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package javax.transaction;
+package jakarta.transaction;
 
-public class NotSupportedException extends java.lang.Exception {
+public interface TransactionSynchronizationRegistry {
+    Object getTransactionKey();
 
-    private static final long serialVersionUID = 56870312332816390L;
+    void putResource(Object key, Object value);
 
-    public NotSupportedException() {
-        super();
-    }
+    Object getResource(Object key);
 
-    public NotSupportedException(String msg) {
-        super(msg);
-    }
+    void registerInterposedSynchronization(Synchronization sync);
+
+    int getTransactionStatus();
+
+    void setRollbackOnly();
+
+    boolean getRollbackOnly();
 }

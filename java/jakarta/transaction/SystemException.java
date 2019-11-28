@@ -14,17 +14,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package javax.transaction;
+package jakarta.transaction;
 
-public interface Status {
-    public static final int STATUS_ACTIVE = 0;
-    public static final int STATUS_MARKED_ROLLBACK = 1;
-    public static final int STATUS_PREPARED = 2;
-    public static final int STATUS_COMMITTED = 3;
-    public static final int STATUS_ROLLEDBACK = 4;
-    public static final int STATUS_UNKNOWN = 5;
-    public static final int STATUS_NO_TRANSACTION = 6;
-    public static final int STATUS_PREPARING = 7;
-    public static final int STATUS_COMMITTING = 8;
-    public static final int STATUS_ROLLING_BACK = 9;
+public class SystemException extends java.lang.Exception {
+
+    private static final long serialVersionUID = 8615483418828223571L;
+
+    public int errorCode;
+
+    public SystemException() {
+        super();
+    }
+
+    public SystemException(String s) {
+        super(s);
+    }
+
+    public SystemException(int errcode) {
+        super();
+        errorCode = errcode;
+    }
+
 }

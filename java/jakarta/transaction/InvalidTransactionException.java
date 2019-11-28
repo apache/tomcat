@@ -14,17 +14,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package javax.transaction;
+package jakarta.transaction;
 
-public class HeuristicRollbackException extends java.lang.Exception {
+public class InvalidTransactionException extends java.rmi.RemoteException {
 
-    private static final long serialVersionUID = -3483618944556408897L;
+    private static final long serialVersionUID = 3597320220337691496L;
 
-    public HeuristicRollbackException() {
+    public InvalidTransactionException() {
         super();
     }
 
-    public HeuristicRollbackException(String msg) {
+    public InvalidTransactionException(String msg) {
         super(msg);
     }
 }

@@ -402,7 +402,7 @@ public class WebAnnotationSet {
             /*
              * General case. Also used for:
              * - javax.resource.cci.InteractionSpec
-             * - javax.transaction.UserTransaction
+             * - jakarta.transaction.UserTransaction
              */
 
             // resource-env-ref
