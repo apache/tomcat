@@ -35,11 +35,11 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-import javax.servlet.http.Part;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.http.Part;
 
 import org.apache.catalina.Container;
 import org.apache.catalina.Context;
@@ -790,7 +790,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
 
 
     /**
-     * @see javax.servlet.Servlet#getServletInfo()
+     * @see jakarta.servlet.Servlet#getServletInfo()
      */
     @Override
     public String getServletInfo() {
@@ -798,7 +798,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
     }
 
     /**
-     * @see javax.servlet.GenericServlet#init()
+     * @see jakarta.servlet.GenericServlet#init()
      */
     @Override
     public void init() throws ServletException {

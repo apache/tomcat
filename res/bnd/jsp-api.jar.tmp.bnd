@@ -16,7 +16,7 @@ Bundle-Name: tomcat-jsp-api
 Bundle-SymbolicName: org.apache.tomcat-jsp-api
 Bundle-Version: @VERSION@
 Export-Package: \
-    javax.servlet.jsp,\
-    javax.servlet.jsp.el,\
-    javax.servlet.jsp.resources,\
-    javax.servlet.jsp.tagext
+    jakarta.servlet.jsp,\
+    jakarta.servlet.jsp.el,\
+    jakarta.servlet.jsp.resources,\
+    jakarta.servlet.jsp.tagext

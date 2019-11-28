@@ -27,10 +27,11 @@ import java.util.Map;
 
 import javax.management.ObjectName;
 import javax.naming.NamingException;
-import javax.servlet.Filter;
-import javax.servlet.FilterConfig;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
+
+import jakarta.servlet.Filter;
+import jakarta.servlet.FilterConfig;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.ServletException;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.Globals;
@@ -46,7 +47,7 @@ import org.apache.tomcat.util.res.StringManager;
 
 
 /**
- * Implementation of a <code>javax.servlet.FilterConfig</code> useful in
+ * Implementation of a <code>jakarta.servlet.FilterConfig</code> useful in
  * managing the filter instances instantiated when a web application
  * is first started.
  *
@@ -78,7 +79,7 @@ public final class ApplicationFilterConfig implements FilterConfig, Serializable
      *  constructed
      *
      * @exception ClassCastException if the specified class does not implement
-     *  the <code>javax.servlet.Filter</code> interface
+     *  the <code>jakarta.servlet.Filter</code> interface
      * @exception ClassNotFoundException if the filter class cannot be found
      * @exception IllegalAccessException if the filter class cannot be
      *  publicly instantiated
@@ -225,7 +226,7 @@ public final class ApplicationFilterConfig implements FilterConfig, Serializable
      * Return the application Filter we are configured for.
      *
      * @exception ClassCastException if the specified class does not implement
-     *  the <code>javax.servlet.Filter</code> interface
+     *  the <code>jakarta.servlet.Filter</code> interface
      * @exception ClassNotFoundException if the filter class cannot be found
      * @exception IllegalAccessException if the filter class cannot be
      *  publicly instantiated

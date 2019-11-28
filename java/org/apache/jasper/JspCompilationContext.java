@@ -27,8 +27,8 @@ import java.net.URLConnection;
 import java.util.Set;
 import java.util.jar.JarEntry;
 
-import javax.servlet.ServletContext;
-import javax.servlet.jsp.tagext.TagInfo;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.jsp.tagext.TagInfo;
 
 import org.apache.jasper.compiler.Compiler;
 import org.apache.jasper.compiler.JspRuntimeContext;

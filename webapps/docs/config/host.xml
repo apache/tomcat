@@ -309,7 +309,7 @@
         use of the Host workDir configuration.  This directory will be made
         visible to servlets in the web application by a servlet context
         attribute (of type <code>java.io.File</code>) named
-        <code>javax.servlet.context.tempdir</code> as described in the
+        <code>jakarta.servlet.context.tempdir</code> as described in the
         Servlet Specification.  If not specified, a suitable directory
         underneath <code>$CATALINA_BASE/work</code> will be provided.</p>
       </attribute>

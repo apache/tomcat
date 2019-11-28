@@ -21,14 +21,6 @@
 
 <import-control pkg="javax">
   <allow pkg="java"/>
-  <subpackage name="servlet">
-    <allow pkg="javax.servlet"/>
-    <disallow pkg="javax.servlet.jsp" local-only="true"/>
-    <subpackage name="jsp">
-      <allow pkg="jakarta.el"/>
-      <allow pkg="javax.servlet.jsp"/>
-    </subpackage>
-  </subpackage>
   <subpackage name="transaction">
     <allow pkg="javax.transaction"/>
   </subpackage>

@@ -18,15 +18,15 @@ package org.apache.catalina.core;
 
 import java.util.Locale;
 
-import javax.servlet.ServletResponse;
-import javax.servlet.ServletResponseWrapper;
+import jakarta.servlet.ServletResponse;
+import jakarta.servlet.ServletResponseWrapper;
 
 
 /**
- * Wrapper around a <code>javax.servlet.ServletResponse</code>
+ * Wrapper around a <code>jakarta.servlet.ServletResponse</code>
  * that transforms an application response object (which might be the original
  * one passed to a servlet, or might be based on the 2.3
- * <code>javax.servlet.ServletResponseWrapper</code> class)
+ * <code>jakarta.servlet.ServletResponseWrapper</code> class)
  * back into an internal <code>org.apache.catalina.Response</code>.
  * <p>
  * <strong>WARNING</strong>:  Due to Java's lack of support for multiple

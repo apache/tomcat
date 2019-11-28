@@ -21,7 +21,7 @@ import java.nio.ByteBuffer;
 import java.nio.channels.CompletionHandler;
 import java.util.concurrent.TimeUnit;
 
-import javax.servlet.http.WebConnection;
+import jakarta.servlet.http.WebConnection;
 
 import org.apache.coyote.ProtocolException;
 import org.apache.tomcat.util.net.SocketEvent;

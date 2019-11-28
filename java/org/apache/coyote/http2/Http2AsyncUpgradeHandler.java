@@ -26,7 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import javax.servlet.http.WebConnection;
+import jakarta.servlet.http.WebConnection;
 
 import org.apache.coyote.Adapter;
 import org.apache.coyote.ProtocolException;

@@ -16,7 +16,7 @@
  */
 package org.apache.jasper.runtime;
 
-import javax.servlet.ServletConfig;
+import jakarta.servlet.ServletConfig;
 
 import org.apache.jasper.compiler.Localizer;
 import org.apache.tomcat.InstanceManager;

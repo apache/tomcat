@@ -2006,7 +2006,7 @@
 
       <attribute name="exceptionType.fullyQualifiedClassName" required="false">
         <p>The location of the UTF-8 encoded HTML file to return if an error has
-        occurred and the <code>javax.servlet.error.exception</code> request
+        occurred and the <code>jakarta.servlet.error.exception</code> request
         attribute has been set to an instance of
         <code>fullyQualifiedClassName</code> or a sub-class of it. For example,
         <code>errorCode.java.io.IOException</code> specifies the file to return

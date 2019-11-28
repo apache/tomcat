@@ -18,7 +18,7 @@ package org.apache.tomcat.util.http;
 
 import java.nio.charset.Charset;
 
-import javax.servlet.http.Cookie;
+import jakarta.servlet.http.Cookie;
 
 public interface CookieProcessor {
 

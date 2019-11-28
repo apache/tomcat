@@ -26,12 +26,6 @@ import java.util.Set;
 
 import javax.security.auth.Subject;
 import javax.security.auth.callback.CallbackHandler;
-import javax.servlet.DispatcherType;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import jakarta.security.auth.message.AuthException;
 import jakarta.security.auth.message.AuthStatus;
@@ -41,6 +35,12 @@ import jakarta.security.auth.message.config.AuthConfigProvider;
 import jakarta.security.auth.message.config.RegistrationListener;
 import jakarta.security.auth.message.config.ServerAuthConfig;
 import jakarta.security.auth.message.config.ServerAuthContext;
+import jakarta.servlet.DispatcherType;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.apache.catalina.Authenticator;
 import org.apache.catalina.Container;
@@ -851,7 +851,7 @@ public abstract class AuthenticatorBase extends ValveBase
 
     /**
      * Look for the X509 certificate chain in the Request under the key
-     * <code>javax.servlet.request.X509Certificate</code>. If not found, trigger
+     * <code>jakarta.servlet.request.X509Certificate</code>. If not found, trigger
      * extracting the certificate chain from the Coyote request.
      *
      * @param request
@@ -930,7 +930,7 @@ public abstract class AuthenticatorBase extends ValveBase
                 // cached and the Principal did not change.
                 @SuppressWarnings("rawtypes")// JASPIC API uses raw types
                 Map map = state.messageInfo.getMap();
-                if (map != null && map.containsKey("javax.servlet.http.registerSession")) {
+                if (map != null && map.containsKey("jakarta.servlet.http.registerSession")) {
                     register(request, response, principal, "JASPIC", null, null, true, true);
                 } else {
                     register(request, response, principal, "JASPIC", null, null);

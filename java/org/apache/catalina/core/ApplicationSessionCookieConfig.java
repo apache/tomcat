@@ -17,8 +17,8 @@
 
 package org.apache.catalina.core;
 
-import javax.servlet.SessionCookieConfig;
-import javax.servlet.http.Cookie;
+import jakarta.servlet.SessionCookieConfig;
+import jakarta.servlet.http.Cookie;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.LifecycleState;

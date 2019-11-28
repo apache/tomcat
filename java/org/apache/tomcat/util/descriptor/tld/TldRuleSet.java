@@ -18,9 +18,9 @@ package org.apache.tomcat.util.descriptor.tld;
 
 import java.lang.reflect.Method;
 
-import javax.servlet.jsp.tagext.TagAttributeInfo;
-import javax.servlet.jsp.tagext.TagVariableInfo;
-import javax.servlet.jsp.tagext.VariableInfo;
+import jakarta.servlet.jsp.tagext.TagAttributeInfo;
+import jakarta.servlet.jsp.tagext.TagVariableInfo;
+import jakarta.servlet.jsp.tagext.VariableInfo;
 
 import org.apache.tomcat.util.digester.Digester;
 import org.apache.tomcat.util.digester.Rule;
@@ -249,7 +249,7 @@ public class TldRuleSet implements RuleSet {
         public TagAttributeInfo toTagAttributeInfo() {
             if (fragment) {
                 // JSP8.5.2: for a fragment type is fixed and rexprvalue is true
-                type = "javax.servlet.jsp.tagext.JspFragment";
+                type = "jakarta.servlet.jsp.tagext.JspFragment";
                 requestTime = true;
             } else if (deferredValue) {
                 type = "jakarta.el.ValueExpression";

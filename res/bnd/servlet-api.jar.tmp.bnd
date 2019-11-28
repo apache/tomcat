@@ -16,8 +16,8 @@ Bundle-Name: tomcat-servlet-api
 Bundle-SymbolicName: org.apache.tomcat-servlet-api
 Bundle-Version: @VERSION@
 Export-Package: \
-    javax.servlet,\
-    javax.servlet.annotation,\
-    javax.servlet.descriptor,\
-    javax.servlet.http,\
-    javax.servlet.resources
+    jakarta.servlet,\
+    jakarta.servlet.annotation,\
+    jakarta.servlet.descriptor,\
+    jakarta.servlet.http,\
+    jakarta.servlet.resources

@@ -16,9 +16,9 @@
  */
 package org.apache.catalina.core;
 
-import javax.servlet.DispatcherType;
-import javax.servlet.Servlet;
-import javax.servlet.ServletRequest;
+import jakarta.servlet.DispatcherType;
+import jakarta.servlet.Servlet;
+import jakarta.servlet.ServletRequest;
 
 import org.apache.catalina.Globals;
 import org.apache.catalina.Wrapper;

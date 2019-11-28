@@ -16,7 +16,7 @@
  */
 package org.apache.tomcat.util.http;
 
-import javax.servlet.http.Cookie;
+import jakarta.servlet.http.Cookie;
 
 import org.junit.Assert;
 import org.junit.Test;

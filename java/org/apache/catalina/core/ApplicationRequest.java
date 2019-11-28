@@ -23,16 +23,16 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 
-import javax.servlet.RequestDispatcher;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletRequestWrapper;
+import jakarta.servlet.RequestDispatcher;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletRequestWrapper;
 
 
 /**
- * Wrapper around a <code>javax.servlet.ServletRequest</code>
+ * Wrapper around a <code>jakarta.servlet.ServletRequest</code>
  * that transforms an application request object (which might be the original
  * one passed to a servlet, or might be based on the 2.3
- * <code>javax.servlet.ServletRequestWrapper</code> class)
+ * <code>jakarta.servlet.ServletRequestWrapper</code> class)
  * back into an internal <code>org.apache.catalina.Request</code>.
  * <p>
  * <strong>WARNING</strong>:  Due to Java's lack of support for multiple

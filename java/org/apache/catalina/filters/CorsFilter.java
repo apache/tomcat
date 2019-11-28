@@ -28,13 +28,13 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
-import javax.servlet.FilterChain;
-import javax.servlet.GenericFilter;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.GenericFilter;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -44,7 +44,7 @@ import org.apache.tomcat.util.res.StringManager;
 
 /**
  * <p>
- * A {@link javax.servlet.Filter} that enable client-side cross-origin requests
+ * A {@link jakarta.servlet.Filter} that enable client-side cross-origin requests
  * by implementing W3C's CORS (<b>C</b>ross-<b>O</b>rigin <b>R</b>esource
  * <b>S</b>haring) specification for resources. Each {@link HttpServletRequest}
  * request is inspected as per specification, and appropriate response headers
@@ -1071,39 +1071,39 @@ public class CorsFilter extends GenericFilter {
 
     // ----------------------------------------Filter Config Init param-name(s)
     /**
-     * Key to retrieve allowed origins from {@link javax.servlet.FilterConfig}.
+     * Key to retrieve allowed origins from {@link jakarta.servlet.FilterConfig}.
      */
     public static final String PARAM_CORS_ALLOWED_ORIGINS =
             "cors.allowed.origins";
 
     /**
      * Key to retrieve support credentials from
-     * {@link javax.servlet.FilterConfig}.
+     * {@link jakarta.servlet.FilterConfig}.
      */
     public static final String PARAM_CORS_SUPPORT_CREDENTIALS =
             "cors.support.credentials";
 
     /**
-     * Key to retrieve exposed headers from {@link javax.servlet.FilterConfig}.
+     * Key to retrieve exposed headers from {@link jakarta.servlet.FilterConfig}.
      */
     public static final String PARAM_CORS_EXPOSED_HEADERS =
             "cors.exposed.headers";
 
     /**
-     * Key to retrieve allowed headers from {@link javax.servlet.FilterConfig}.
+     * Key to retrieve allowed headers from {@link jakarta.servlet.FilterConfig}.
      */
     public static final String PARAM_CORS_ALLOWED_HEADERS =
             "cors.allowed.headers";
 
     /**
-     * Key to retrieve allowed methods from {@link javax.servlet.FilterConfig}.
+     * Key to retrieve allowed methods from {@link jakarta.servlet.FilterConfig}.
      */
     public static final String PARAM_CORS_ALLOWED_METHODS =
             "cors.allowed.methods";
 
     /**
      * Key to retrieve preflight max age from
-     * {@link javax.servlet.FilterConfig}.
+     * {@link jakarta.servlet.FilterConfig}.
      */
     public static final String PARAM_CORS_PREFLIGHT_MAXAGE =
             "cors.preflight.maxage";

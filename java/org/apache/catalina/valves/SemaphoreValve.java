@@ -19,7 +19,7 @@ package org.apache.catalina.valves;
 import java.io.IOException;
 import java.util.concurrent.Semaphore;
 
-import javax.servlet.ServletException;
+import jakarta.servlet.ServletException;
 
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleState;

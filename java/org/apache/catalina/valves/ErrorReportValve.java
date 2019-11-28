@@ -25,9 +25,9 @@ import java.io.Writer;
 import java.util.Scanner;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import javax.servlet.RequestDispatcher;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.RequestDispatcher;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
@@ -329,7 +329,7 @@ public class ErrorReportValve extends ValveBase {
 
     /**
      * Print out a partial servlet stack trace (truncating at the last
-     * occurrence of javax.servlet.).
+     * occurrence of jakarta.servlet.).
      * @param t The stack trace to process
      * @return the stack trace relative to the application layer
      */

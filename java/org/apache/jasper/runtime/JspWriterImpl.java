@@ -20,8 +20,8 @@ package org.apache.jasper.runtime;
 import java.io.IOException;
 import java.io.Writer;
 
-import javax.servlet.ServletResponse;
-import javax.servlet.jsp.JspWriter;
+import jakarta.servlet.ServletResponse;
+import jakarta.servlet.jsp.JspWriter;
 
 import org.apache.jasper.Constants;
 import org.apache.jasper.compiler.Localizer;

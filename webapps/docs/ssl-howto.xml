@@ -654,10 +654,10 @@ information, at
 
 import java.util.EnumSet;
 
-import javax.servlet.ServletContext;
-import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletContextListener;
-import javax.servlet.SessionTrackingMode;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.ServletContextEvent;
+import jakarta.servlet.ServletContextListener;
+import jakarta.servlet.SessionTrackingMode;
 
 public class SessionTrackingModeListener implements ServletContextListener {
 
@@ -686,7 +686,7 @@ public class SessionTrackingModeListener implements ServletContextListener {
 
 <p>To access the SSL session ID from the request, use:</p>
 
-  <source><![CDATA[String sslID = (String)request.getAttribute("javax.servlet.request.ssl_session_id");]]></source>
+  <source><![CDATA[String sslID = (String)request.getAttribute("jakarta.servlet.request.ssl_session_id");]]></source>
 <p>
 For additional discussion on this area, please see
 <a href="https://bz.apache.org/bugzilla/show_bug.cgi?id=22679">Bugzilla</a>.
@@ -699,7 +699,7 @@ session.invalidate();
 // Invalidate the SSL Session
 org.apache.tomcat.util.net.SSLSessionManager mgr =
     (org.apache.tomcat.util.net.SSLSessionManager)
-    request.getAttribute("javax.servlet.request.ssl_session_mgr");
+    request.getAttribute("jakarta.servlet.request.ssl_session_mgr");
 mgr.invalidateSession();
 
 // Close the connection since the SSL session will be active until the connection

@@ -29,7 +29,7 @@
   </Match>
   <Match>
     <!-- Only base null is handled by this resolver -->
-    <Class name="javax.servlet.jsp.el.ImplicitObjectELResolver"/>
+    <Class name="jakarta.servlet.jsp.el.ImplicitObjectELResolver"/>
     <Or>
       <Method name="getType" />
       <Method name="getValue" />
@@ -39,13 +39,13 @@
     <Bug code="NP" />
   </Match>
   <Match>
-    <Class name="javax.servlet.jsp.el.ImplicitObjectELResolver$ScopeMap$ScopeEntry"/>
+    <Class name="jakarta.servlet.jsp.el.ImplicitObjectELResolver$ScopeMap$ScopeEntry"/>
     <Method name="equals"/>
     <Bug code="Eq" />
   </Match>
   <Match>
     <!-- Only base null is handled by this resolver -->
-    <Class name="javax.servlet.jsp.el.ScopedAttributeELResolver"/>
+    <Class name="jakarta.servlet.jsp.el.ScopedAttributeELResolver"/>
     <Or>
       <Method name="getType" />
       <Method name="getValue" />
@@ -56,7 +56,7 @@
   </Match>
   <Match>
     <!--  Cannot do anything about this. API is fixed by the specification. -->
-    <Class name="javax.servlet.jsp.tagext.TagData"/>
+    <Class name="jakarta.servlet.jsp.tagext.TagData"/>
     <Bug code="CN" />
   </Match>
   <Match>
@@ -1586,14 +1586,14 @@
   <Match>
     <!-- Code is deliberately unused -->
     <Or>
-      <Class name="javax.servlet.http.TestCookie" />
-      <Class name="javax.servlet.http.TestCookieStrict" />
+      <Class name="jakarta.servlet.http.TestCookie" />
+      <Class name="jakarta.servlet.http.TestCookieStrict" />
     </Or>
     <Bug pattern="DLS_DEAD_LOCAL_STORE"/>
   </Match>
   <Match>
     <!-- Name is consistent in context -->
-     <Class name="javax.servlet.http.TestHttpServletResponseSendError$ErrorServletStaticException" />
+     <Class name="jakarta.servlet.http.TestHttpServletResponseSendError$ErrorServletStaticException" />
     <Bug pattern="NM_CLASS_NOT_EXCEPTION"/>
   </Match>
   <Match>

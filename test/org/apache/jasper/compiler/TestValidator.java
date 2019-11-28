@@ -20,9 +20,9 @@ package org.apache.jasper.compiler;
 import java.io.File;
 import java.io.IOException;
 
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.jsp.JspException;
-import javax.servlet.jsp.tagext.TagSupport;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.jsp.JspException;
+import jakarta.servlet.jsp.tagext.TagSupport;
 
 import org.junit.Assert;
 import org.junit.Test;

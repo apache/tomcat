@@ -21,8 +21,8 @@ import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.servlet.ServletSecurityElement;
-import javax.servlet.annotation.ServletSecurity;
+import jakarta.servlet.ServletSecurityElement;
+import jakarta.servlet.annotation.ServletSecurity;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -639,7 +639,7 @@ public class TestRealmBase {
 
     /*
      * This test case covers the special case in section 13.4.1 of the Servlet
-     * 3.1 specification for {@link javax.servlet.annotation.HttpConstraint}.
+     * 3.1 specification for {@link jakarta.servlet.annotation.HttpConstraint}.
      */
     @Test
     public void testHttpConstraint() throws IOException {

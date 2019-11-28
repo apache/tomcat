@@ -19,9 +19,9 @@ package org.apache.tomcat.util.descriptor.tld;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.servlet.jsp.tagext.TagAttributeInfo;
-import javax.servlet.jsp.tagext.TagInfo;
-import javax.servlet.jsp.tagext.TagVariableInfo;
+import jakarta.servlet.jsp.tagext.TagAttributeInfo;
+import jakarta.servlet.jsp.tagext.TagInfo;
+import jakarta.servlet.jsp.tagext.TagVariableInfo;
 
 /**
  * Model of a tag define in a tag library descriptor.

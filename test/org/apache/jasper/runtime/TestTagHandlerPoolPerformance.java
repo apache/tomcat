@@ -19,8 +19,8 @@ package org.apache.jasper.runtime;
 import java.util.function.IntConsumer;
 import java.util.function.Supplier;
 
-import javax.servlet.jsp.JspException;
-import javax.servlet.jsp.tagext.Tag;
+import jakarta.servlet.jsp.JspException;
+import jakarta.servlet.jsp.tagext.Tag;
 
 import org.junit.Test;
 

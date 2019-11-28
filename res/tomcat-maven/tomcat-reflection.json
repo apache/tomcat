@@ -1,6 +1,6 @@
 [
 { "name":"java.lang.Object" },
-{ "name":"javax.servlet.http.HttpServlet" },
+{ "name":"jakarta.servlet.http.HttpServlet" },
 { "name":"org.apache.catalina.AccessLog" },
 { "name":"org.apache.catalina.AsyncDispatcher" },
 { "name":"org.apache.catalina.Authenticator" },

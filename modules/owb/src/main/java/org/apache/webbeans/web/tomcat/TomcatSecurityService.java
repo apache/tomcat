@@ -28,7 +28,7 @@ import java.util.stream.Stream;
 import javax.enterprise.inject.spi.BeanManager;
 import javax.enterprise.inject.spi.CDI;
 import javax.security.auth.Subject;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.apache.webbeans.config.WebBeansContext;
 import org.apache.webbeans.corespi.security.SimpleSecurityService;

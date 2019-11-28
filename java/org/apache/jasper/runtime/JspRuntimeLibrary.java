@@ -24,17 +24,17 @@ import java.io.OutputStreamWriter;
 import java.lang.reflect.Method;
 import java.util.Enumeration;
 
-import javax.servlet.RequestDispatcher;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.jsp.JspException;
-import javax.servlet.jsp.JspWriter;
-import javax.servlet.jsp.PageContext;
-import javax.servlet.jsp.tagext.BodyContent;
-import javax.servlet.jsp.tagext.BodyTag;
-import javax.servlet.jsp.tagext.Tag;
+import jakarta.servlet.RequestDispatcher;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.jsp.JspException;
+import jakarta.servlet.jsp.JspWriter;
+import jakarta.servlet.jsp.PageContext;
+import jakarta.servlet.jsp.tagext.BodyContent;
+import jakarta.servlet.jsp.tagext.BodyTag;
+import jakarta.servlet.jsp.tagext.Tag;
 
 import org.apache.jasper.JasperException;
 import org.apache.jasper.compiler.Localizer;
@@ -73,9 +73,9 @@ public class JspRuntimeLibrary {
     }
 
     /**
-     * Returns the value of the javax.servlet.error.exception request
+     * Returns the value of the jakarta.servlet.error.exception request
      * attribute value, if present, otherwise the value of the
-     * javax.servlet.jsp.jspException request attribute value.
+     * jakarta.servlet.jsp.jspException request attribute value.
      *
      * This method is called at the beginning of the generated servlet code
      * for a JSP error page, when the "exception" implicit scripting language

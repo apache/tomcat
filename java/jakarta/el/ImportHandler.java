@@ -85,7 +85,7 @@ public class ImportHandler {
         // Exceptions
         servletClassNames.add("ServletException");
         servletClassNames.add("UnavailableException");
-        standardPackages.put("javax.servlet", servletClassNames);
+        standardPackages.put("jakarta.servlet", servletClassNames);
 
         // Servlet 4.0
         Set<String> servletHttpClassNames = new HashSet<>();
@@ -115,7 +115,7 @@ public class ImportHandler {
         servletHttpClassNames.add("HttpUtils");
         // Enums
         servletHttpClassNames.add("MappingMatch");
-        standardPackages.put("javax.servlet.http", servletHttpClassNames);
+        standardPackages.put("jakarta.servlet.http", servletHttpClassNames);
 
         // JSP 2.3
         Set<String> servletJspClassNames = new HashSet<>();
@@ -134,7 +134,7 @@ public class ImportHandler {
         servletJspClassNames.add("JspException");
         servletJspClassNames.add("JspTagException");
         servletJspClassNames.add("SkipPageException");
-        standardPackages.put("javax.servlet.jsp", servletJspClassNames);
+        standardPackages.put("jakarta.servlet.jsp", servletJspClassNames);
 
         Set<String> javaLangClassNames = new HashSet<>();
         // Taken from Java 14 EA27 Javadoc

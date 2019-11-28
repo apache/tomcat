@@ -47,7 +47,7 @@ import org.apache.tomcat.util.http.fileupload.FileItemFactory;
  * implementation in an environment with local, untrusted users,
  * {@link #setRepository(File)} MUST be used to configure a repository location
  * that is not publicly writable. In a Servlet container the location identified
- * by the ServletContext attribute <code>javax.servlet.context.tempdir</code>
+ * by the ServletContext attribute <code>jakarta.servlet.context.tempdir</code>
  * may be used.
  * </p>
  *

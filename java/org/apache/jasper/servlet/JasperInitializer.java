@@ -19,10 +19,10 @@ package org.apache.jasper.servlet;
 import java.io.IOException;
 import java.util.Set;
 
-import javax.servlet.ServletContainerInitializer;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import javax.servlet.jsp.JspFactory;
+import jakarta.servlet.ServletContainerInitializer;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.jsp.JspFactory;
 
 import org.apache.jasper.Constants;
 import org.apache.jasper.compiler.Localizer;

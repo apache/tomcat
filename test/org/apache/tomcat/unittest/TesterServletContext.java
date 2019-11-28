@@ -26,17 +26,17 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import javax.servlet.Filter;
-import javax.servlet.FilterRegistration;
-import javax.servlet.RequestDispatcher;
-import javax.servlet.Servlet;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRegistration;
-import javax.servlet.ServletRegistration.Dynamic;
-import javax.servlet.SessionCookieConfig;
-import javax.servlet.SessionTrackingMode;
-import javax.servlet.descriptor.JspConfigDescriptor;
+import jakarta.servlet.Filter;
+import jakarta.servlet.FilterRegistration;
+import jakarta.servlet.RequestDispatcher;
+import jakarta.servlet.Servlet;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletRegistration;
+import jakarta.servlet.ServletRegistration.Dynamic;
+import jakarta.servlet.SessionCookieConfig;
+import jakarta.servlet.SessionTrackingMode;
+import jakarta.servlet.descriptor.JspConfigDescriptor;
 
 import org.apache.catalina.core.ApplicationFilterRegistration;
 import org.apache.tomcat.util.descriptor.web.FilterDef;
@@ -248,20 +248,20 @@ public class TesterServletContext implements ServletContext {
     }
 
     @Override
-    public javax.servlet.FilterRegistration.Dynamic addFilter(
+    public jakarta.servlet.FilterRegistration.Dynamic addFilter(
             String filterName, String className) {
         throw new RuntimeException("Not implemented");
     }
 
     @Override
-    public javax.servlet.FilterRegistration.Dynamic addFilter(
+    public jakarta.servlet.FilterRegistration.Dynamic addFilter(
             String filterName, Filter filter) {
         return new ApplicationFilterRegistration(
                 new FilterDef(), new TesterContext());
     }
 
     @Override
-    public javax.servlet.FilterRegistration.Dynamic addFilter(
+    public jakarta.servlet.FilterRegistration.Dynamic addFilter(
             String filterName, Class<? extends Filter> filterClass) {
         return new ApplicationFilterRegistration(
                 new FilterDef(), new TesterContext());

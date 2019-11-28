@@ -27,7 +27,7 @@ public class CompositeELResolver extends ELResolver {
     static {
         Class<?> clazz = null;
         try {
-            clazz = Class.forName("javax.servlet.jsp.el.ScopedAttributeELResolver");
+            clazz = Class.forName("jakarta.servlet.jsp.el.ScopedAttributeELResolver");
         } catch (ClassNotFoundException e) {
             // Ignore. This is expected if using the EL stand-alone
         }
@@ -94,7 +94,7 @@ public class CompositeELResolver extends ELResolver {
                 if (SCOPED_ATTRIBUTE_EL_RESOLVER != null &&
                         SCOPED_ATTRIBUTE_EL_RESOLVER.isAssignableFrom(resolvers[i].getClass())) {
                     // Special case since
-                    // javax.servlet.jsp.el.ScopedAttributeELResolver will
+                    // jakarta.servlet.jsp.el.ScopedAttributeELResolver will
                     // always return Object.class for type
                     Object value = resolvers[i].getValue(context, base, property);
                     if (value != null) {

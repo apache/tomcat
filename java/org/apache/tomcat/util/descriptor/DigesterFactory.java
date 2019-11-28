@@ -21,7 +21,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.servlet.ServletContext;
+import jakarta.servlet.ServletContext;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -46,7 +46,7 @@ public class DigesterFactory {
         CLASS_SERVLET_CONTEXT = ServletContext.class;
         Class<?> jspContext = null;
         try {
-            jspContext = Class.forName("javax.servlet.jsp.JspContext");
+            jspContext = Class.forName("jakarta.servlet.jsp.JspContext");
         } catch (ClassNotFoundException e) {
             // Ignore - JSP API is not present.
         }

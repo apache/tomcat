@@ -18,8 +18,8 @@ package org.apache.coyote.http11.upgrade;
 
 import java.io.IOException;
 
-import javax.servlet.ServletOutputStream;
-import javax.servlet.WriteListener;
+import jakarta.servlet.ServletOutputStream;
+import jakarta.servlet.WriteListener;
 
 import org.apache.coyote.ContainerThreadMarker;
 import org.apache.juli.logging.Log;

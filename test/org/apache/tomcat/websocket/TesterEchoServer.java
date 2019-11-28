@@ -19,12 +19,13 @@ package org.apache.tomcat.websocket;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
-import javax.servlet.ServletContextEvent;
 import javax.websocket.DeploymentException;
 import javax.websocket.OnMessage;
 import javax.websocket.Session;
 import javax.websocket.server.ServerContainer;
 import javax.websocket.server.ServerEndpoint;
+
+import jakarta.servlet.ServletContextEvent;
 
 import org.apache.tomcat.websocket.server.Constants;
 import org.apache.tomcat.websocket.server.WsContextListener;

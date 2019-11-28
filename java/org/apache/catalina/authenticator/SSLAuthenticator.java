@@ -20,8 +20,8 @@ import java.io.IOException;
 import java.security.Principal;
 import java.security.cert.X509Certificate;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.apache.catalina.connector.Request;
 

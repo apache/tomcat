@@ -18,9 +18,9 @@ package org.apache.catalina.valves;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.servlet.ServletContext;
-import javax.servlet.SessionCookieConfig;
-import javax.servlet.http.Cookie;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.SessionCookieConfig;
+import jakarta.servlet.http.Cookie;
 
 import org.junit.Test;
 

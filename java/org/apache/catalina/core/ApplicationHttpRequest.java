@@ -30,16 +30,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
-import javax.servlet.DispatcherType;
-import javax.servlet.RequestDispatcher;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletRequestWrapper;
-import javax.servlet.http.HttpServletMapping;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletRequestWrapper;
-import javax.servlet.http.HttpSession;
-import javax.servlet.http.PushBuilder;
+import jakarta.servlet.DispatcherType;
+import jakarta.servlet.RequestDispatcher;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletRequestWrapper;
+import jakarta.servlet.http.HttpServletMapping;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequestWrapper;
+import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.http.PushBuilder;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.Globals;
@@ -56,10 +56,10 @@ import org.apache.tomcat.util.res.StringManager;
 
 
 /**
- * Wrapper around a <code>javax.servlet.http.HttpServletRequest</code>
+ * Wrapper around a <code>jakarta.servlet.http.HttpServletRequest</code>
  * that transforms an application request object (which might be the original
  * one passed to a servlet, or might be based on the 2.3
- * <code>javax.servlet.http.HttpServletRequestWrapper</code> class)
+ * <code>jakarta.servlet.http.HttpServletRequestWrapper</code> class)
  * back into an internal <code>org.apache.catalina.HttpRequest</code>.
  * <p>
  * <strong>WARNING</strong>:  Due to Java's lack of support for multiple

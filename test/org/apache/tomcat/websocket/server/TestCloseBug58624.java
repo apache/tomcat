@@ -19,7 +19,6 @@ package org.apache.tomcat.websocket.server;
 import java.net.URI;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import javax.servlet.ServletContextEvent;
 import javax.websocket.ClientEndpoint;
 import javax.websocket.CloseReason;
 import javax.websocket.ContainerProvider;
@@ -32,6 +31,8 @@ import javax.websocket.Session;
 import javax.websocket.WebSocketContainer;
 import javax.websocket.server.ServerContainer;
 import javax.websocket.server.ServerEndpointConfig;
+
+import jakarta.servlet.ServletContextEvent;
 
 import org.junit.Assert;
 import org.junit.Test;

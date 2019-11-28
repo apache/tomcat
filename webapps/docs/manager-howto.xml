@@ -961,8 +961,8 @@ Full thread dump Java HotSpot(TM) Client VM (25.25-b02 mixed mode):
         at org.apache.tomcat.util.Diagnostics.getThreadDump(Diagnostics.java:409)
         at org.apache.catalina.manager.ManagerServlet.threadDump(ManagerServlet.java:557)
         at org.apache.catalina.manager.ManagerServlet.doGet(ManagerServlet.java:371)
-        at javax.servlet.http.HttpServlet.service(HttpServlet.java:618)
-        at javax.servlet.http.HttpServlet.service(HttpServlet.java:725)
+        at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:618)
+        at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:725)
 ...
 ]]></source>
 

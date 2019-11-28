@@ -2553,7 +2553,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
                 }
             } else if (!isClassName && ch == '/') {
                 /* 8 == length("jakarta/") */
-                if (name.startsWith("servlet/jsp/jstl/", 6)) {
+                if (name.startsWith("servlet/jsp/jstl/", 8)) {
                     return false;
                 }
                 if (name.startsWith("el/", 8) ||
@@ -2571,24 +2571,12 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
             ch = name.charAt(5);
             if (isClassName && ch == '.') {
                 /* 6 == length("javax.") */
-                if (name.startsWith("servlet.jsp.jstl.", 6)) {
-                    return false;
-                }
-                if (name.startsWith("el.", 6) ||
-                    name.startsWith("servlet.", 6) ||
-                    name.startsWith("websocket.", 6) ||
-                    name.startsWith("security.auth.message.", 6)) {
+                if (name.startsWith("websocket.", 6)) {
                     return true;
                 }
             } else if (!isClassName && ch == '/') {
                 /* 6 == length("javax/") */
-                if (name.startsWith("servlet/jsp/jstl/", 6)) {
-                    return false;
-                }
-                if (name.startsWith("el/", 6) ||
-                    name.startsWith("servlet/", 6) ||
-                    name.startsWith("websocket/", 6) ||
-                    name.startsWith("security/auth/message/", 6)) {
+                if (name.startsWith("websocket/", 6)) {
                     return true;
                 }
             }

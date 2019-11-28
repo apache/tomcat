@@ -57,4 +57,12 @@
       </subpackage>
     </subpackage>
   </subpackage>
+  <subpackage name="servlet">
+    <allow pkg="jakarta.servlet"/>
+    <disallow pkg="jakarta.servlet.jsp" local-only="true"/>
+    <subpackage name="jsp">
+      <allow pkg="jakarta.el"/>
+      <allow pkg="jakarta.servlet.jsp"/>
+    </subpackage>
+  </subpackage>
 </import-control>

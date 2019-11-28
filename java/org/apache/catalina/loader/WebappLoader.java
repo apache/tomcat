@@ -27,7 +27,8 @@ import java.net.URL;
 import java.net.URLClassLoader;
 
 import javax.management.ObjectName;
-import javax.servlet.ServletContext;
+
+import jakarta.servlet.ServletContext;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.Globals;

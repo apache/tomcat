@@ -20,9 +20,9 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpSession;
-import javax.servlet.http.HttpSessionBindingListener;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpSessionBindingListener;
 
 import org.hamcrest.CoreMatchers;
 import org.hamcrest.MatcherAssert;

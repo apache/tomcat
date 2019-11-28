@@ -37,7 +37,7 @@ public final class Globals {
      * if any.
      */
     public static final String CERTIFICATES_ATTR =
-        "javax.servlet.request.X509Certificate";
+        "jakarta.servlet.request.X509Certificate";
 
 
     /**
@@ -46,7 +46,7 @@ public final class Globals {
      * java.lang.String).
      */
     public static final String CIPHER_SUITE_ATTR =
-        "javax.servlet.request.cipher_suite";
+        "jakarta.servlet.request.cipher_suite";
 
 
     /**
@@ -85,7 +85,7 @@ public final class Globals {
      * this SSL connection (as an object of type java.lang.Integer).
      */
     public static final String KEY_SIZE_ATTR =
-        "javax.servlet.request.key_size";
+        "jakarta.servlet.request.key_size";
 
 
     /**
@@ -93,7 +93,7 @@ public final class Globals {
      * for this SSL connection (as an object of type java.lang.String).
      */
     public static final String SSL_SESSION_ID_ATTR =
-        "javax.servlet.request.ssl_session_id";
+        "jakarta.servlet.request.ssl_session_id";
 
 
     /**
@@ -101,7 +101,7 @@ public final class Globals {
      * This one is a Tomcat extension to the Servlet spec.
      */
     public static final String SSL_SESSION_MGR_ATTR =
-        "javax.servlet.request.ssl_session_mgr";
+        "jakarta.servlet.request.ssl_session_mgr";
 
 
     /**

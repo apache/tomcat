@@ -24,8 +24,8 @@ import java.io.Writer;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 
-import javax.servlet.jsp.JspWriter;
-import javax.servlet.jsp.tagext.BodyContent;
+import jakarta.servlet.jsp.JspWriter;
+import jakarta.servlet.jsp.tagext.BodyContent;
 
 import org.apache.jasper.Constants;
 import org.apache.jasper.compiler.Localizer;

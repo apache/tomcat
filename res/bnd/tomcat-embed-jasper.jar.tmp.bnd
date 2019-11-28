@@ -17,10 +17,10 @@ Bundle-Name: tomcat-embed-jasper
 Bundle-SymbolicName: org.apache.tomcat-embed-jasper
 Bundle-Version: @VERSION@
 Export-Package: \
-    javax.servlet.jsp,\
-    javax.servlet.jsp.el,\
-    javax.servlet.jsp.resources,\
-    javax.servlet.jsp.tagext,\
+    jakarta.servlet.jsp,\
+    jakarta.servlet.jsp.el,\
+    jakarta.servlet.jsp.resources,\
+    jakarta.servlet.jsp.tagext,\
     org.apache.jasper,\
     org.apache.jasper.compiler,\
     org.apache.jasper.compiler.tagplugin,\

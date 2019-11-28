@@ -21,7 +21,7 @@ package org.apache.jasper.tagplugins.jstl.core;
 import java.io.IOException;
 import java.io.Reader;
 
-import javax.servlet.jsp.JspWriter;
+import jakarta.servlet.jsp.JspWriter;
 
 import org.apache.jasper.compiler.tagplugin.TagPlugin;
 import org.apache.jasper.compiler.tagplugin.TagPluginContext;

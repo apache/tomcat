@@ -30,7 +30,7 @@ public interface ELInterpreter {
      * Returns the string representing the code that will be inserted into the
      * servlet generated for JSP. The default implementation creates a call to
      * {@link org.apache.jasper.runtime.PageContextImpl#proprietaryEvaluate(
-     * String, Class, javax.servlet.jsp.PageContext,
+     * String, Class, jakarta.servlet.jsp.PageContext,
      * org.apache.jasper.runtime.ProtectedFunctionMapper)} but other
      * implementations may produce more optimised code.
      * @param context The compilation context

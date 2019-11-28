@@ -31,7 +31,7 @@ import java.security.PrivilegedExceptionAction;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.servlet.ServletContext;
+import jakarta.servlet.ServletContext;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.LifecycleException;
@@ -106,7 +106,7 @@ public class StandardManager extends ManagerBase {
      * A <code>null</code> value indicates that no persistence is desired.
      * If this pathname is relative, it will be resolved against the
      * temporary working directory provided by our context, available via
-     * the <code>javax.servlet.context.tempdir</code> context attribute.
+     * the <code>jakarta.servlet.context.tempdir</code> context attribute.
      */
     protected String pathname = "SESSIONS.ser";
 

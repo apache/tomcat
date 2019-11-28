@@ -41,7 +41,7 @@
     <allow pkg="jakarta.annotation"/>
     <allow pkg="jakarta.ejb"/>
     <allow pkg="jakarta.persistence"/>
-    <allow pkg="javax.servlet"/>
+    <allow pkg="jakarta.servlet"/>
     <allow pkg="org.apache.catalina"/>
     <disallow pkg="org.apache.catalina.ha"/>
     <disallow pkg="org.apache.catalina.tribes"/>
@@ -55,7 +55,7 @@
       <disallow pkg="jakarta.annotation"/>
       <disallow pkg="jakarta.ejb"/>
       <disallow pkg="jakarta.persistence"/>
-      <disallow pkg="javax.servlet"/>
+      <disallow pkg="jakarta.servlet"/>
       <disallow pkg="org.apache.coyote"/>
       <disallow pkg="org.apache.juli"/>
       <disallow pkg="org.apache.naming"/>
@@ -77,7 +77,7 @@
       <disallow pkg="jakarta.annotation"/>
       <disallow pkg="jakarta.ejb"/>
       <disallow pkg="jakarta.persistence"/>
-      <disallow pkg="javax.servlet"/>
+      <disallow pkg="jakarta.servlet"/>
       <disallow pkg="org\.apache\.catalina(?!\.tribes).*" regex="true"/>
       <disallow pkg="org.apache.coyote"/>
       <disallow pkg="org.apache.naming"/>
@@ -92,7 +92,7 @@
     </subpackage>
   </subpackage>
   <subpackage name="coyote">
-    <allow pkg="javax.servlet"/>
+    <allow pkg="jakarta.servlet"/>
     <allow pkg="org.apache.coyote"/>
     <allow pkg="org.apache.juli"/>
     <allow pkg="org.apache.tomcat"/>
@@ -105,7 +105,7 @@
   </subpackage>
   <subpackage name="jasper">
     <allow pkg="jakarta.el"/>
-    <allow pkg="javax.servlet"/>
+    <allow pkg="jakarta.servlet"/>
     <allow pkg="org.apache.el"/>
     <allow pkg="org.apache.jasper"/>
     <allow pkg="org.apache.juli"/>
@@ -132,7 +132,7 @@
     </subpackage>
   </subpackage>
   <subpackage name="tomcat">
-    <allow pkg="javax.servlet"/>
+    <allow pkg="jakarta.servlet"/>
     <subpackage name="buildutil">
       <allow pkg="org.apache.tools.ant"/>
       <allow pkg="org.apache.tomcat.util"/>
@@ -177,12 +177,12 @@
       <allow pkg="org.apache.tomcat.util"/>
       <!-- Ideally want to remove this -->
       <allow pkg="org.apache.tomcat.websocket.pojo"/>
-      <disallow pkg="javax.servlet"/>
+      <disallow pkg="jakarta.servlet"/>
       <subpackage name="pojo">
         <allow pkg="org.apache.tomcat.websocket"/>
       </subpackage>
       <subpackage name="server">
-        <allow pkg="javax.servlet"/>
+        <allow pkg="jakarta.servlet"/>
         <allow pkg="org.apache.coyote.http11.upgrade"/>
         <allow pkg="org.apache.tomcat.websocket"/>
       </subpackage>

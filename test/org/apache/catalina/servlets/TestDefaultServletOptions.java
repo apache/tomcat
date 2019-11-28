@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import javax.servlet.Servlet;
+import jakarta.servlet.Servlet;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;

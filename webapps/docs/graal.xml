@@ -133,7 +133,7 @@ ant -Dwebapp.name=somewebapp -f graal-webapp.ant.xml</source>
     using the native-image tool.
     <source>$JAVA_HOME/bin/native-image --no-server\
         --allow-incomplete-classpath --enable-https\
-        --initialize-at-build-time=org.eclipse.jdt,org.apache.el.parser.SimpleNode,javax.servlet.jsp.JspFactory,org.apache.jasper.servlet.JasperInitializer,org.apache.jasper.runtime.JspFactoryImpl\
+        --initialize-at-build-time=org.eclipse.jdt,org.apache.el.parser.SimpleNode,jakarta.servlet.jsp.JspFactory,org.apache.jasper.servlet.JasperInitializer,org.apache.jasper.runtime.JspFactoryImpl\
         -H:+JNI -H:+ReportUnsupportedElementsAtRuntime\
         -H:+ReportExceptionStackTraces -H:EnableURLProtocols=http,https,jar,jrt\
         -H:ConfigurationFileDirectories=$TOMCAT_MAVEN/target/\

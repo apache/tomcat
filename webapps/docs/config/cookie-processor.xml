@@ -35,9 +35,9 @@
 <section name="Introduction">
 
   <p>The <strong>CookieProcessor</strong> element represents the component that
-  parses received cookie headers into <code>javax.servlet.http.Cookie</code>
+  parses received cookie headers into <code>jakarta.servlet.http.Cookie</code>
   objects accessible through <code>HttpServletRequest.getCookies()</code> and
-  converts <code>javax.servlet.http.Cookie</code> objects added to the response
+  converts <code>jakarta.servlet.http.Cookie</code> objects added to the response
   through <code>HttpServletResponse.addCookie()</code> to the HTTP headers
   returned to the client.</p>
 

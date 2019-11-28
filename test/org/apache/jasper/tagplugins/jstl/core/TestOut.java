@@ -16,15 +16,17 @@
  */
 package org.apache.jasper.tagplugins.jstl.core;
 
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import org.apache.tomcat.util.buf.ByteChunk;
 
 public class TestOut extends AbstractTestTag {
 
+    @Ignore // Jakarta EE / JSTL
     @Test
     public void testBug54011() throws Exception {
         ByteChunk res = new ByteChunk();
@@ -39,6 +41,7 @@ public class TestOut extends AbstractTestTag {
         Assert.assertTrue(body.contains("OK - 2"));
     }
 
+    @Ignore // Jakarta EE / JSTL
     @Test
     public void testBug54144() throws Exception {
         ByteChunk res = new ByteChunk();

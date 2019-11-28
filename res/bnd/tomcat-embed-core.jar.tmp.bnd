@@ -21,11 +21,11 @@ Export-Package: \
     jakarta.security.auth.message.callback,\
     jakarta.security.auth.message.config,\
     jakarta.security.auth.message.module,\
-    javax.servlet,\
-    javax.servlet.annotation,\
-    javax.servlet.descriptor,\
-    javax.servlet.http,\
-    javax.servlet.resources,\
+    jakarta.servlet,\
+    jakarta.servlet.annotation,\
+    jakarta.servlet.descriptor,\
+    jakarta.servlet.http,\
+    jakarta.servlet.resources,\
     org.apache.catalina,\
     org.apache.catalina.authenticator,\
     org.apache.catalina.authenticator.jaspic,\

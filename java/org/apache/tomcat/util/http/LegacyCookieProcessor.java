@@ -22,7 +22,7 @@ import java.text.FieldPosition;
 import java.util.BitSet;
 import java.util.Date;
 
-import javax.servlet.http.Cookie;
+import jakarta.servlet.http.Cookie;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;

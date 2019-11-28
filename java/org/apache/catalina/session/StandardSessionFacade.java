@@ -18,8 +18,8 @@ package org.apache.catalina.session;
 
 import java.util.Enumeration;
 
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpSession;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.http.HttpSession;
 
 /**
  * Facade for the StandardSession object.
@@ -93,7 +93,7 @@ public class StandardSessionFacade implements HttpSession {
      */
     @Override
     @Deprecated
-    public javax.servlet.http.HttpSessionContext getSessionContext() {
+    public jakarta.servlet.http.HttpSessionContext getSessionContext() {
         return session.getSessionContext();
     }
 

@@ -16,7 +16,7 @@
  */
 package org.apache.tomcat.unittest;
 
-import javax.servlet.SessionCookieConfig;
+import jakarta.servlet.SessionCookieConfig;
 
 public class TesterSessionCookieConfig implements SessionCookieConfig {
 

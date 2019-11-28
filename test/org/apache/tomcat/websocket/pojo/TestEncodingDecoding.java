@@ -27,7 +27,6 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import javax.servlet.ServletContextEvent;
 import javax.websocket.ClientEndpoint;
 import javax.websocket.ContainerProvider;
 import javax.websocket.DecodeException;
@@ -46,6 +45,8 @@ import javax.websocket.WebSocketContainer;
 import javax.websocket.server.ServerContainer;
 import javax.websocket.server.ServerEndpoint;
 import javax.websocket.server.ServerEndpointConfig;
+
+import jakarta.servlet.ServletContextEvent;
 
 import org.junit.Assert;
 import org.junit.Ignore;

@@ -25,13 +25,13 @@ import java.security.AccessController;
 import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
 
-import javax.servlet.RequestDispatcher;
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.RequestDispatcher;
+import jakarta.servlet.ServletConfig;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.apache.jasper.Constants;
 import org.apache.jasper.EmbeddedServletOptions;
@@ -294,7 +294,7 @@ public class JspServlet extends HttpServlet implements PeriodicEventListener {
                 /*
                  * Requested JSP has been target of
                  * RequestDispatcher.include(). Its path is assembled from the
-                 * relevant javax.servlet.include.* request attributes
+                 * relevant jakarta.servlet.include.* request attributes
                  */
                 String pathInfo = (String) request.getAttribute(
                         RequestDispatcher.INCLUDE_PATH_INFO);

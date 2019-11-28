@@ -20,10 +20,10 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.net.SocketException;
 
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServlet;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
+import jakarta.servlet.http.HttpServlet;
 
 import org.junit.Assert;
 import org.junit.Test;

@@ -23,12 +23,12 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
-import javax.servlet.ServletContainerInitializer;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletRegistration;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletSecurityElement;
-import javax.servlet.descriptor.JspConfigDescriptor;
+import jakarta.servlet.ServletContainerInitializer;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.ServletRegistration;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletSecurityElement;
+import jakarta.servlet.descriptor.JspConfigDescriptor;
 
 import org.apache.catalina.AccessLog;
 import org.apache.catalina.Authenticator;

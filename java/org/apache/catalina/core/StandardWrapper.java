@@ -36,14 +36,15 @@ import javax.management.NotificationEmitter;
 import javax.management.NotificationFilter;
 import javax.management.NotificationListener;
 import javax.management.ObjectName;
-import javax.servlet.MultipartConfigElement;
-import javax.servlet.Servlet;
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import javax.servlet.SingleThreadModel;
-import javax.servlet.UnavailableException;
-import javax.servlet.annotation.MultipartConfig;
+
+import jakarta.servlet.MultipartConfigElement;
+import jakarta.servlet.Servlet;
+import jakarta.servlet.ServletConfig;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.SingleThreadModel;
+import jakarta.servlet.UnavailableException;
+import jakarta.servlet.annotation.MultipartConfig;
 
 import org.apache.catalina.Container;
 import org.apache.catalina.ContainerServlet;
@@ -550,7 +551,7 @@ public class StandardWrapper extends ContainerBase
         instance = loadServlet();
 
         Class<? extends Servlet> servletClazz = instance.getClass();
-        if (!javax.servlet.http.HttpServlet.class.isAssignableFrom(
+        if (!jakarta.servlet.http.HttpServlet.class.isAssignableFrom(
                                                         servletClazz)) {
             return DEFAULT_SERVLET_METHODS;
         }
@@ -1504,7 +1505,7 @@ public class StandardWrapper extends ContainerBase
 
     protected Method[] getAllDeclaredMethods(Class<?> c) {
 
-        if (c.equals(javax.servlet.http.HttpServlet.class)) {
+        if (c.equals(jakarta.servlet.http.HttpServlet.class)) {
             return null;
         }
 

@@ -17,7 +17,7 @@
 --%>
 <%@page session="false" contentType="text/html; charset=ISO-8859-1" %>
 <%@page import="java.util.Enumeration" %>
-<%@page import="javax.servlet.http.HttpSession" %>
+<%@page import="jakarta.servlet.http.HttpSession" %>
 <%@page import="org.apache.catalina.Session" %>
 <%@page import="org.apache.catalina.manager.JspHelper" %>
 <%@page import="org.apache.catalina.util.ContextName" %>
