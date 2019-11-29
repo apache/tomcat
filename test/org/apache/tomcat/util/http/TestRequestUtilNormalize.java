@@ -31,7 +31,7 @@ public class TestRequestUtilNormalize {
 
     @Parameterized.Parameters(name = "{index}: input[{0}]")
     public static Collection<Object[]> parameters() {
-        List<Object[]> parameterSets = new ArrayList<>();
+        List<Object[]> parameterSets = new ArrayList<Object[]>();
 
         parameterSets.add(new String[] { "//something", "/something" });
         parameterSets.add(new String[] { "some//thing", "/some/thing" });
