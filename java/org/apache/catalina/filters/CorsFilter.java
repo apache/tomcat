@@ -39,6 +39,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.http.RequestUtil;
 import org.apache.tomcat.util.http.ResponseUtil;
 import org.apache.tomcat.util.res.StringManager;
 
@@ -591,7 +592,7 @@ public class CorsFilter extends GenericFilter {
                 requestType = CORSRequestType.INVALID_CORS;
             } else if (!isValidOrigin(originHeader)) {
                 requestType = CORSRequestType.INVALID_CORS;
-            } else if (isLocalOrigin(request, originHeader)) {
+            } else if (RequestUtil.isSameOrigin(request, originHeader)) {
                 return CORSRequestType.NOT_CORS;
             } else {
                 String method = request.getMethod();
@@ -631,36 +632,6 @@ public class CorsFilter extends GenericFilter {
         }
 
         return requestType;
-    }
-
-
-    private boolean isLocalOrigin(HttpServletRequest request, String origin) {
-
-        // Build scheme://host:port from request
-        StringBuilder target = new StringBuilder();
-        String scheme = request.getScheme();
-        if (scheme == null) {
-            return false;
-        } else {
-            scheme = scheme.toLowerCase(Locale.ENGLISH);
-        }
-        target.append(scheme);
-        target.append("://");
-
-        String host = request.getServerName();
-        if (host == null) {
-            return false;
-        }
-        target.append(host);
-
-        int port = request.getServerPort();
-        if ("http".equals(scheme) && port != 80 ||
-                "https".equals(scheme) && port != 443) {
-            target.append(':');
-            target.append(port);
-        }
-
-        return origin.equalsIgnoreCase(target.toString());
     }
 
 
