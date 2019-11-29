@@ -35,9 +35,9 @@
   <section name="Introduction">
 
   <p>
-    Tomcat supports using the GraalVM Native Image tool to produce a native
-    binary including the container. This documentation page describes the
-    build process of such an image.
+    Tomcat supports using the GraalVM 19.3 Native Image tool to produce
+    a native binary including the container. This documentation page
+    describes the build process of such an image.
   </p>
 
   </section>
@@ -141,6 +141,8 @@ ant -Dwebapp.name=somewebapp -f graal-webapp.ant.xml</source>
         -H:ResourceConfigurationFiles=$TOMCAT_MAVEN/tomcat-resource.json\
         -H:JNIConfigurationFiles=$TOMCAT_MAVEN/tomcat-jni.json\
         -jar $TOMCAT_MAVEN/target/tomcat-maven-1.0.jar</source>
+    The additional <code>--static</code> parameter enables static linking of
+    glibc, zlib and libstd++ in the generated binary.
   </p>
 
   <p>
@@ -174,12 +176,14 @@ ant -Dwebapp.name=somewebapp -f graal-webapp.ant.xml</source>
   <p>
     Missing items for better Tomcat functionality:
     <ul>
-      <li>BeanInfo support: BeanInfo use in JSP taglibs must be configured
-        manually in descriptors</li>
-      <li>Java serialization: Clustering, session persistence</li>
-      <li>Static linking configuration: tomcat-native support when creating
-        an image with static linking</li>
-      <li>JMX: Tomcat monitoring and management</li>
+      <li>Java serialization: Clustering and session persistence are not
+        functional</li>
+      <li>JMX: The usual monitoring and management is not usable</li>
+      <li>java.util.logging LogManager: Configuration through a system property
+        is not implemented, so standard java.util.logging must be used instead
+        of JULI</li>
+      <li>Static linking configuration: tomcat-native cannot be statically
+        linked</li>
     </ul>
   </p>
 
