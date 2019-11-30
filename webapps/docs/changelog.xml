@@ -67,11 +67,12 @@
         <code>TestAsyncContextStateChanges</code> test that caused it
         to hang indefinitely. (markt)
       </fix>
-      <add>
-        Add the ability to set and display session attributes in the JSP FORM
-        authentication example to demonstrate session persistence across
-        restarts for authenticated sessions. (markt)
-      </add>
+      <fix>
+        <bug>63939</bug>: Correct the same origin check in the CORS filter. An
+        origin with an explicit default port is now considered to be the same as
+        an origin without a deafult port and origins are now compared in a
+        case-sensitive manner as required by the CORS specification. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
@@ -82,6 +83,15 @@
         the new Connector attribute <code>noCompressionStrongETag</code>.
         (markt)
       </fix>
+    </changelog>
+  </subsection>
+  <subsection name="Web applications">
+    <changelog>
+      <add>
+        Add the ability to set and display session attributes in the JSP FORM
+        authentication example to demonstrate session persistence across
+        restarts for authenticated sessions. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Other">
