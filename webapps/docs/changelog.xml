@@ -57,6 +57,12 @@
         changes introduced in 9.0.28. Connections to URLs obtained for JAR
         resources could not be cast to <code>JarURLConnection</code>. (markt)
       </fix>
+      <fix>
+        <bug>63939</bug>: Correct the same origin check in the CORS filter. An
+        origin with an explicit default port is now considered to be the same as
+        an origin without a deafult port and origins are now compared in a
+        case-sensitive manner as required by the CORS specification. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
