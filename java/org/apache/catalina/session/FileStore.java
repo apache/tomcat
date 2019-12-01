@@ -127,17 +127,17 @@ public final class FileStore extends StoreBase {
     @Override
     public int getSize() throws IOException {
         // Acquire the list of files in our storage directory
-        File file = directory();
-        if (file == null) {
+        File dir = directory();
+        if (dir == null) {
             return 0;
         }
-        String files[] = file.list();
+        String files[] = dir.list();
 
         // Figure out which files are sessions
         int keycount = 0;
         if (files != null) {
-            for (int i = 0; i < files.length; i++) {
-                if (files[i].endsWith(FILE_EXT)) {
+            for (String file : files) {
+                if (file.endsWith(FILE_EXT)) {
                     keycount++;
                 }
             }
@@ -172,12 +172,12 @@ public final class FileStore extends StoreBase {
     @Override
     public String[] keys() throws IOException {
         // Acquire the list of files in our storage directory
-        File file = directory();
-        if (file == null) {
+        File dir = directory();
+        if (dir == null) {
             return new String[0];
         }
 
-        String files[] = file.list();
+        String files[] = dir.list();
 
         // Bugzilla 32130
         if((files == null) || (files.length < 1)) {
@@ -187,9 +187,9 @@ public final class FileStore extends StoreBase {
         // Build and return the list of session identifiers
         List<String> list = new ArrayList<>();
         int n = FILE_EXT.length();
-        for (int i = 0; i < files.length; i++) {
-            if (files[i].endsWith(FILE_EXT)) {
-                list.add(files[i].substring(0, files[i].length() - n));
+        for (String file : files) {
+            if (file.endsWith(FILE_EXT)) {
+                list.add (file.substring(0, file.length() - n));
             }
         }
         return list.toArray(new String[list.size()]);
@@ -210,11 +210,7 @@ public final class FileStore extends StoreBase {
     public Session load(String id) throws ClassNotFoundException, IOException {
         // Open an input stream to the specified pathname, if any
         File file = file(id);
-        if (file == null) {
-            return null;
-        }
-
-        if (!file.exists()) {
+        if (file == null || !file.exists()) {
             return null;
         }
 
