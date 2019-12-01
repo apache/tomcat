@@ -136,8 +136,8 @@ public final class FileStore extends StoreBase {
         // Figure out which files are sessions
         int keycount = 0;
         if (files != null) {
-            for (int i = 0; i < files.length; i++) {
-                if (files[i].endsWith(FILE_EXT)) {
+            for (String file1 : files) {
+                if (file1.endsWith (FILE_EXT)) {
                     keycount++;
                 }
             }
@@ -187,9 +187,9 @@ public final class FileStore extends StoreBase {
         // Build and return the list of session identifiers
         List<String> list = new ArrayList<>();
         int n = FILE_EXT.length();
-        for (int i = 0; i < files.length; i++) {
-            if (files[i].endsWith(FILE_EXT)) {
-                list.add(files[i].substring(0, files[i].length() - n));
+        for (String file1 : files) {
+            if (file1.endsWith (FILE_EXT)) {
+                list.add (file1.substring (0, file1.length () - n));
             }
         }
         return list.toArray(new String[list.size()]);
@@ -228,7 +228,7 @@ public final class FileStore extends StoreBase {
         ClassLoader oldThreadContextCL = context.bind(Globals.IS_SECURITY_ENABLED, null);
 
         try (FileInputStream fis = new FileInputStream(file.getAbsolutePath());
-                ObjectInputStream ois = getObjectInputStream(fis)) {
+                    ObjectInputStream ois = getObjectInputStream(fis)) {
 
             StandardSession session = (StandardSession) manager.createEmptySession();
             session.readObjectData(ois);
