@@ -475,14 +475,17 @@ public abstract class SocketWrapperBase<E> {
      * @throws IOException If an IO error occurs during the write
      */
     protected void writeBlocking(byte[] buf, int off, int len) throws IOException {
-        socketBufferHandler.configureWriteBufferForWrite();
-        int thisTime = transfer(buf, off, len, socketBufferHandler.getWriteBuffer());
-        while (!socketBufferHandler.getWriteBuffer().hasRemaining()) {
-            len = len - thisTime;
-            off = off + thisTime;
-            doWrite(true);
+        if (len > 0) {
             socketBufferHandler.configureWriteBufferForWrite();
-            thisTime = transfer(buf, off, len, socketBufferHandler.getWriteBuffer());
+            int thisTime = transfer(buf, off, len, socketBufferHandler.getWriteBuffer());
+            len -= thisTime;
+            while (len > 0) {
+                off += thisTime;
+                doWrite(true);
+                socketBufferHandler.configureWriteBufferForWrite();
+                thisTime = transfer(buf, off, len, socketBufferHandler.getWriteBuffer());
+                len -= thisTime;
+            }
         }
     }
 
@@ -501,12 +504,14 @@ public abstract class SocketWrapperBase<E> {
      * @throws IOException If an IO error occurs during the write
      */
     protected void writeBlocking(ByteBuffer from) throws IOException {
-        socketBufferHandler.configureWriteBufferForWrite();
-        transfer(from, socketBufferHandler.getWriteBuffer());
-        while (from.hasRemaining()) {
-            doWrite(true);
+        if (from.hasRemaining()) {
             socketBufferHandler.configureWriteBufferForWrite();
             transfer(from, socketBufferHandler.getWriteBuffer());
+            while (from.hasRemaining()) {
+                doWrite(true);
+                socketBufferHandler.configureWriteBufferForWrite();
+                transfer(from, socketBufferHandler.getWriteBuffer());
+            }
         }
     }
 
@@ -529,11 +534,12 @@ public abstract class SocketWrapperBase<E> {
      * @throws IOException If an IO error occurs during the write
      */
     protected void writeNonBlocking(byte[] buf, int off, int len) throws IOException {
-        if (nonBlockingWriteBuffer.isEmpty() && socketBufferHandler.isWriteBufferWritable()) {
+        if (len > 0 && nonBlockingWriteBuffer.isEmpty()
+                && socketBufferHandler.isWriteBufferWritable()) {
             socketBufferHandler.configureWriteBufferForWrite();
             int thisTime = transfer(buf, off, len, socketBufferHandler.getWriteBuffer());
-            len = len - thisTime;
-            while (!socketBufferHandler.isWriteBufferWritable()) {
+            len -= thisTime;
+            while (len > 0) {
                 off = off + thisTime;
                 doWrite(false);
                 if (len > 0 && socketBufferHandler.isWriteBufferWritable()) {
@@ -545,7 +551,7 @@ public abstract class SocketWrapperBase<E> {
                     // else to do here. Exit the loop.
                     break;
                 }
-                len = len - thisTime;
+                len -= thisTime;
             }
         }
 
