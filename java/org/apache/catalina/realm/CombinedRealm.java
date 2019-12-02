@@ -407,7 +407,7 @@ public class CombinedRealm extends RealmBase {
             if (!(realm instanceof GSSRealm)) {
                 if (log.isDebugEnabled()) {
                     log.debug(sm.getString("combinedRealm.authFail",
-                            username, realm.getClass().getName()));
+                            gssName, realm.getClass().getName()));
                 }
 
                 continue;
