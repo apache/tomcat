@@ -16,7 +16,6 @@
  */
 package org.apache.catalina.realm;
 
-
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.IOException;
@@ -38,7 +37,6 @@ import org.apache.catalina.Container;
 import org.apache.catalina.Context;
 import org.apache.catalina.CredentialHandler;
 import org.apache.catalina.Engine;
-import org.apache.catalina.GSSRealm;
 import org.apache.catalina.Host;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleState;
@@ -71,7 +69,8 @@ import org.ietf.jgss.GSSName;
  *
  * @author Craig R. McClanahan
  */
-public abstract class RealmBase extends LifecycleMBeanBase implements GSSRealm {
+@SuppressWarnings("deprecation")
+public abstract class RealmBase extends LifecycleMBeanBase implements org.apache.catalina.GSSRealm {
 
     private static final Log log = LogFactory.getLog(RealmBase.class);
 

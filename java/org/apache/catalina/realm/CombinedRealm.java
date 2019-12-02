@@ -26,7 +26,6 @@ import java.util.List;
 import javax.management.ObjectName;
 
 import org.apache.catalina.Container;
-import org.apache.catalina.GSSRealm;
 import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.Realm;
@@ -394,6 +393,7 @@ public class CombinedRealm extends RealmBase {
     /**
      * {@inheritDoc}
      */
+    @SuppressWarnings("deprecation")
     @Override
     public Principal authenticate(GSSName gssName, GSSCredential gssCredential) {
         Principal authenticatedUser = null;
@@ -404,7 +404,7 @@ public class CombinedRealm extends RealmBase {
                         gssName, realm.getClass().getName()));
             }
 
-            if (!(realm instanceof GSSRealm)) {
+            if (!(realm instanceof org.apache.catalina.GSSRealm)) {
                 if (log.isDebugEnabled()) {
                     log.debug(sm.getString("combinedRealm.authFail",
                             gssName, realm.getClass().getName()));
@@ -413,7 +413,7 @@ public class CombinedRealm extends RealmBase {
                 continue;
             }
 
-            authenticatedUser = ((GSSRealm) realm).authenticate(gssName, gssCredential);
+            authenticatedUser = ((org.apache.catalina.GSSRealm) realm).authenticate(gssName, gssCredential);
 
             if (authenticatedUser == null) {
                 if (log.isDebugEnabled()) {
