@@ -66,16 +66,24 @@
         <bug>63681</bug>: Introduce RealmBase#authenticate(GSSName, GSSCredential)
         and friends. (michaelo)
       </add>
-      <fix>
-        <bug>63950</bug>: Fix timing issue in
-        <code>TestAsyncContextStateChanges</code> test that caused it
-        to hang indefinitely. (markt)
-      </fix>
+      <add>
+        <bug>63937</bug>: Add a new attribute to the standard
+        <code>Authenticator</code> implementations,
+        <code>allowCorsPreflight</code>, that allows the
+        <code>Authenticator</code>s to be configured to allow CORS preflight
+        requests to bypass authentication as required by the CORS specification.
+        (markt)
+      </add>
       <fix>
         <bug>63939</bug>: Correct the same origin check in the CORS filter. An
         origin with an explicit default port is now considered to be the same as
         an origin without a deafult port and origins are now compared in a
         case-sensitive manner as required by the CORS specification. (markt)
+      </fix>
+      <fix>
+        <bug>63950</bug>: Fix timing issue in
+        <code>TestAsyncContextStateChanges</code> test that caused it
+        to hang indefinitely. (markt)
       </fix>
     </changelog>
   </subsection>
