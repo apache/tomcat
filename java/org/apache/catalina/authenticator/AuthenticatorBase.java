@@ -537,7 +537,7 @@ public abstract class AuthenticatorBase extends ValveBase
 
         if (constraints == null && !context.getPreemptiveAuthentication() && !authRequired) {
             if (log.isDebugEnabled()) {
-                log.debug(" Not subject to any constraint");
+                log.debug("Not subject to any constraint");
             }
             getNext().invoke(request, response);
             return;
@@ -560,11 +560,11 @@ public abstract class AuthenticatorBase extends ValveBase
         if (constraints != null) {
             // Enforce any user data constraint for this security constraint
             if (log.isDebugEnabled()) {
-                log.debug(" Calling hasUserDataPermission()");
+                log.debug("Calling hasUserDataPermission()");
             }
             if (!realm.hasUserDataPermission(request, response, constraints)) {
                 if (log.isDebugEnabled()) {
-                    log.debug(" Failed hasUserDataPermission() test");
+                    log.debug("Failed hasUserDataPermission() test");
                 }
                 /*
                  * ASSERT: Authenticator already set the appropriate HTTP status
@@ -611,7 +611,7 @@ public abstract class AuthenticatorBase extends ValveBase
 
         if ((authRequired || constraints != null) && allowCorsPreflightBypass(request)) {
             if (log.isDebugEnabled()) {
-                log.debug(" CORS Preflight request bypassing authentication");
+                log.debug("CORS Preflight request bypassing authentication");
             }
             getNext().invoke(request, response);
             return;
@@ -619,7 +619,7 @@ public abstract class AuthenticatorBase extends ValveBase
 
         if (authRequired) {
             if (log.isDebugEnabled()) {
-                log.debug(" Calling authenticate()");
+                log.debug("Calling authenticate()");
             }
 
             if (jaspicProvider != null) {
@@ -633,7 +633,7 @@ public abstract class AuthenticatorBase extends ValveBase
                     jaspicProvider != null &&
                             !authenticateJaspic(request, response, jaspicState, false)) {
                 if (log.isDebugEnabled()) {
-                    log.debug(" Failed authenticate() test");
+                    log.debug("Failed authenticate() test");
                 }
                 /*
                  * ASSERT: Authenticator already set the appropriate HTTP status
@@ -646,11 +646,11 @@ public abstract class AuthenticatorBase extends ValveBase
 
         if (constraints != null) {
             if (log.isDebugEnabled()) {
-                log.debug(" Calling accessControl()");
+                log.debug("Calling accessControl()");
             }
             if (!realm.hasResourcePermission(request, response, constraints, this.context)) {
                 if (log.isDebugEnabled()) {
-                    log.debug(" Failed accessControl() test");
+                    log.debug("Failed accessControl() test");
                 }
                 /*
                  * ASSERT: AccessControl method has already set the appropriate
@@ -662,7 +662,7 @@ public abstract class AuthenticatorBase extends ValveBase
 
         // Any and all specified constraints have been satisfied
         if (log.isDebugEnabled()) {
-            log.debug(" Successfully passed all security constraints");
+            log.debug("Successfully passed all security constraints");
         }
         getNext().invoke(request, response);
 
@@ -1068,7 +1068,7 @@ public abstract class AuthenticatorBase extends ValveBase
             associate(ssoId, request.getSessionInternal(true));
 
             if (log.isDebugEnabled()) {
-                log.debug(" Reauthenticated cached principal '" +
+                log.debug("Reauthenticated cached principal '" +
                         request.getUserPrincipal().getName() +
                         "' with auth type '" + request.getAuthType() + "'");
             }
