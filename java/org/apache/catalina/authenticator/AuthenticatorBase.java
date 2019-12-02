@@ -19,6 +19,7 @@ package org.apache.catalina.authenticator;
 import java.io.IOException;
 import java.security.Principal;
 import java.security.cert.X509Certificate;
+import java.util.Locale;
 
 import javax.servlet.DispatcherType;
 import javax.servlet.ServletException;
@@ -211,11 +212,11 @@ public abstract class AuthenticatorBase extends ValveBase
     // ------------------------------------------------------------- Properties
 
     public String getAllowCorsPreflight() {
-        return allowCorsPreflight.name().toLowerCase();
+        return allowCorsPreflight.name().toLowerCase(Locale.ENGLISH);
     }
 
     public void setAllowCorsPreflight(String allowCorsPreflight) {
-        this.allowCorsPreflight = AllowCorsPreflight.valueOf(allowCorsPreflight.trim().toUpperCase());
+        this.allowCorsPreflight = AllowCorsPreflight.valueOf(allowCorsPreflight.trim().toUpperCase(Locale.ENGLISH));
     }
 
     public boolean getAlwaysUseSession() {
