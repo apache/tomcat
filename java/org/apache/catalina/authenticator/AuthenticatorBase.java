@@ -33,6 +33,7 @@ import javax.security.auth.message.config.AuthConfigProvider;
 import javax.security.auth.message.config.RegistrationListener;
 import javax.security.auth.message.config.ServerAuthConfig;
 import javax.security.auth.message.config.ServerAuthContext;
+import javax.servlet.DispatcherType;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
@@ -53,6 +54,7 @@ import org.apache.catalina.authenticator.jaspic.CallbackHandlerImpl;
 import org.apache.catalina.authenticator.jaspic.MessageInfoImpl;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
+import org.apache.catalina.filters.CorsFilter;
 import org.apache.catalina.filters.RemoteIpFilter;
 import org.apache.catalina.realm.GenericPrincipal;
 import org.apache.catalina.util.SessionIdGeneratorBase;
@@ -63,9 +65,12 @@ import org.apache.coyote.ActionCode;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.ExceptionUtils;
+import org.apache.tomcat.util.descriptor.web.FilterDef;
+import org.apache.tomcat.util.descriptor.web.FilterMap;
 import org.apache.tomcat.util.descriptor.web.LoginConfig;
 import org.apache.tomcat.util.descriptor.web.SecurityConstraint;
 import org.apache.tomcat.util.http.FastHttpDateFormat;
+import org.apache.tomcat.util.http.RequestUtil;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -237,11 +242,21 @@ public abstract class AuthenticatorBase extends ValveBase
      */
     protected SingleSignOn sso = null;
 
+    private AllowCorsPreflight allowCorsPreflight = AllowCorsPreflight.NEVER;
+
     private volatile String jaspicAppContextID = null;
     private volatile Optional<AuthConfigProvider> jaspicProvider = null;
 
 
     // ------------------------------------------------------------- Properties
+
+    public String getAllowCorsPreflight() {
+        return allowCorsPreflight.name().toLowerCase();
+    }
+
+    public void setAllowCorsPreflight(String allowCorsPreflight) {
+        this.allowCorsPreflight = AllowCorsPreflight.valueOf(allowCorsPreflight.trim().toUpperCase());
+    }
 
     public boolean getAlwaysUseSession() {
         return alwaysUseSession;
@@ -593,6 +608,14 @@ public abstract class AuthenticatorBase extends ValveBase
 
         JaspicState jaspicState = null;
 
+        if ((authRequired || constraints != null) && allowCorsPreflightBypass(request)) {
+            if (log.isDebugEnabled()) {
+                log.debug(" CORS Preflight request bypassing authentication");
+            }
+            getNext().invoke(request, response);
+            return;
+        }
+
         if (authRequired) {
             if (log.isDebugEnabled()) {
                 log.debug(" Calling authenticate()");
@@ -645,6 +668,64 @@ public abstract class AuthenticatorBase extends ValveBase
         if (jaspicProvider != null) {
             secureResponseJspic(request, response, jaspicState);
         }
+    }
+
+
+    protected boolean allowCorsPreflightBypass(Request request) {
+        boolean allowBypass = false;
+
+        if (allowCorsPreflight != AllowCorsPreflight.NEVER) {
+            // First check to see if this is a CORS Preflight request
+            // This is a subset of the tests in CorsFilter.checkRequestType
+            if ("OPTIONS".equals(request.getMethod())) {
+                String originHeader = request.getHeader(CorsFilter.REQUEST_HEADER_ORIGIN);
+                if (originHeader != null &&
+                        !originHeader.isEmpty() &&
+                        RequestUtil.isValidOrigin(originHeader) &&
+                        !RequestUtil.isSameOrigin(request, originHeader)) {
+                    String accessControlRequestMethodHeader =
+                            request.getHeader(CorsFilter.REQUEST_HEADER_ACCESS_CONTROL_REQUEST_METHOD);
+                    if (accessControlRequestMethodHeader != null &&
+                            !accessControlRequestMethodHeader.isEmpty()) {
+                        // This appears to be a CORS Preflight request
+                        if (allowCorsPreflight == AllowCorsPreflight.ALWAYS) {
+                            allowBypass = true;
+                        } else if (allowCorsPreflight == AllowCorsPreflight.FILTER) {
+                            if (DispatcherType.REQUEST == request.getDispatcherType()) {
+                                // Look at Filter configuration for the Context
+                                // Can't cache this unless we add a listener to
+                                // the Context to clear the cache on reload
+                                for (FilterDef filterDef : request.getContext().findFilterDefs()) {
+                                    if (CorsFilter.class.getName().equals(filterDef.getFilterClass())) {
+                                        for (FilterMap filterMap : context.findFilterMaps()) {
+                                            if (filterMap.getFilterName().equals(filterDef.getFilterName())) {
+                                                if ((filterMap.getDispatcherMapping() & FilterMap.REQUEST) > 0) {
+                                                    for (String urlPattern : filterMap.getURLPatterns()) {
+                                                        if ("/*".equals(urlPattern)) {
+                                                            allowBypass = true;
+                                                            // No need to check other patterns
+                                                            break;
+                                                        }
+                                                    }
+                                                }
+                                                // Found mappings for CORS filter.
+                                                // No need to look further
+                                                break;
+                                            }
+                                        }
+                                        // Found the CORS filter. No need to look further.
+                                        break;
+                                    }
+                                }
+                            }
+                        } else {
+                            // Unexpected enum type
+                        }
+                    }
+                }
+            }
+        }
+        return allowBypass;
     }
 
 
@@ -1300,5 +1381,12 @@ public abstract class AuthenticatorBase extends ValveBase
     private static class JaspicState {
         public MessageInfo messageInfo = null;
         public ServerAuthContext serverAuthContext = null;
+    }
+
+
+    protected enum AllowCorsPreflight {
+        NEVER,
+        FILTER,
+        ALWAYS
     }
 }

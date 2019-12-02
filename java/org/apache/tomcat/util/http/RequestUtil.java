@@ -16,6 +16,8 @@
  */
 package org.apache.tomcat.util.http;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Locale;
 
 import javax.servlet.http.HttpServletRequest;
@@ -164,4 +166,45 @@ public class RequestUtil {
         return origin.equals(target.toString());
     }
 
+
+    /**
+     * Checks if a given origin is valid or not. Criteria:
+     * <ul>
+     * <li>If an encoded character is present in origin, it's not valid.</li>
+     * <li>If origin is "null", it's valid.</li>
+     * <li>Origin should be a valid {@link URI}</li>
+     * </ul>
+     *
+     * @param origin The origin URI
+     * @return <code>true</code> if the origin was valid
+     * @see <a href="http://tools.ietf.org/html/rfc952">RFC952</a>
+     */
+    public static boolean isValidOrigin(String origin) {
+        // Checks for encoded characters. Helps prevent CRLF injection.
+        if (origin.contains("%")) {
+            return false;
+        }
+
+        // "null" is a valid origin
+        if ("null".equals(origin)) {
+            return true;
+        }
+
+        // RFC6454, section 4. "If uri-scheme is file, the implementation MAY
+        // return an implementation-defined value.". No limits are placed on
+        // that value so treat all file URIs as valid origins.
+        if (origin.startsWith("file://")) {
+            return true;
+        }
+
+        URI originURI;
+        try {
+            originURI = new URI(origin);
+        } catch (URISyntaxException e) {
+            return false;
+        }
+        // If scheme for URI is null, return false. Return true otherwise.
+        return originURI.getScheme() != null;
+
+    }
 }

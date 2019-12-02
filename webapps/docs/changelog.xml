@@ -61,6 +61,14 @@
         changes introduced in 9.0.28. Connections to URLs obtained for JAR
         resources could not be cast to <code>JarURLConnection</code>. (markt)
       </fix>
+      <add>
+        <bug>63937</bug>: Add a new attribute to the standard
+        <code>Authenticator</code> implementations,
+        <code>allowCorsPreflight</code>, that allows the
+        <code>Authenticator</code>s to be configured to allow CORS preflight
+        requests to bypass authentication as required by the CORS specification.
+        (markt)
+      </add>
       <fix>
         <bug>63939</bug>: Correct the same origin check in the CORS filter. An
         origin with an explicit default port is now considered to be the same as

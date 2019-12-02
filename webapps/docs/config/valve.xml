@@ -1201,6 +1201,21 @@
 
     <attributes>
 
+      <attribute name="allowCorsPreflight" required="false">
+        <p>Are requests that appear to be CORS preflight requests allowed to
+        bypass the authenticator as required by the CORS specification. The
+        allowed values are <code>never</code>, <code>filter</code> and
+        <code>always</code>. <code>never</code> means that a request will never
+        bypass authentication even if it appears to be a CORS preflight request.
+        <code>filter</code> means that a request will bypass authentication if
+        it appears to be a CORS preflight request and the web application the
+        request maps to has the <a href="filter.html#CORS_Filter">CORS
+        Filter</a> enabled and mapped to <code>/*</code>. <code>always</code>
+        means that all requests that appear to be CORS preflight requests will
+        bypass authentication. If not set, the default value is
+        <code>never</code>.</p>
+      </attribute>
+
       <attribute name="alwaysUseSession" required="false">
         <p>Should a session always be used once a user is authenticated? This
         may offer some performance benefits since the session can then be used
@@ -1343,6 +1358,21 @@
     configuration attributes:</p>
 
     <attributes>
+
+      <attribute name="allowCorsPreflight" required="false">
+        <p>Are requests that appear to be CORS preflight requests allowed to
+        bypass the authenticator as required by the CORS specification. The
+        allowed values are <code>never</code>, <code>filter</code> and
+        <code>always</code>. <code>never</code> means that a request will never
+        bypass authentication even if it appears to be a CORS preflight request.
+        <code>filter</code> means that a request will bypass authentication if
+        it appears to be a CORS preflight request and the web application the
+        request maps to has the <a href="filter.html#CORS_Filter">CORS
+        Filter</a> enabled and mapped to <code>/*</code>. <code>always</code>
+        means that all requests that appear to be CORS preflight requests will
+        bypass authentication. If not set, the default value is
+        <code>never</code>.</p>
+      </attribute>
 
       <attribute name="alwaysUseSession" required="false">
         <p>Should a session always be used once a user is authenticated? This
@@ -1511,6 +1541,21 @@
 
     <attributes>
 
+      <attribute name="allowCorsPreflight" required="false">
+        <p>Are requests that appear to be CORS preflight requests allowed to
+        bypass the authenticator as required by the CORS specification. The
+        allowed values are <code>never</code>, <code>filter</code> and
+        <code>always</code>. <code>never</code> means that a request will never
+        bypass authentication even if it appears to be a CORS preflight request.
+        <code>filter</code> means that a request will bypass authentication if
+        it appears to be a CORS preflight request and the web application the
+        request maps to has the <a href="filter.html#CORS_Filter">CORS
+        Filter</a> enabled and mapped to <code>/*</code>. <code>always</code>
+        means that all requests that appear to be CORS preflight requests will
+        bypass authentication. If not set, the default value is
+        <code>never</code>.</p>
+      </attribute>
+
       <attribute name="changeSessionIdOnAuthentication" required="false">
         <p>Controls if the session ID is changed if a session exists at the
         point where users are authenticated. This is to prevent session fixation
@@ -1637,6 +1682,21 @@
 
     <attributes>
 
+      <attribute name="allowCorsPreflight" required="false">
+        <p>Are requests that appear to be CORS preflight requests allowed to
+        bypass the authenticator as required by the CORS specification. The
+        allowed values are <code>never</code>, <code>filter</code> and
+        <code>always</code>. <code>never</code> means that a request will never
+        bypass authentication even if it appears to be a CORS preflight request.
+        <code>filter</code> means that a request will bypass authentication if
+        it appears to be a CORS preflight request and the web application the
+        request maps to has the <a href="filter.html#CORS_Filter">CORS
+        Filter</a> enabled and mapped to <code>/*</code>. <code>always</code>
+        means that all requests that appear to be CORS preflight requests will
+        bypass authentication. If not set, the default value is
+        <code>never</code>.</p>
+      </attribute>
+
       <attribute name="cache" required="false">
         <p>Should we cache authenticated Principals if the request is part of an
         HTTP session? If not specified, the default value of <code>true</code>
@@ -1737,15 +1797,19 @@
 
     <attributes>
 
-      <attribute name="applyJava8u40Fix" required="false">
-        <p>A fix introduced in Java 8 update 40 (
-        <a href="https://bugs.openjdk.java.net/browse/JDK-8048194">JDK-8048194</a>)
-        onwards broke SPNEGO authentication for IE with Tomcat running on
-        Windows 2008 R2 servers. This option enables a work-around that allows
-        SPNEGO authentication to continue working. The work-around should not
-        impact other configurations so it is enabled by default. If necessary,
-        the workaround can be disabled by setting this attribute to
-        <code>false</code>.</p>
+      <attribute name="allowCorsPreflight" required="false">
+        <p>Are requests that appear to be CORS preflight requests allowed to
+        bypass the authenticator as required by the CORS specification. The
+        allowed values are <code>never</code>, <code>filter</code> and
+        <code>always</code>. <code>never</code> means that a request will never
+        bypass authentication even if it appears to be a CORS preflight request.
+        <code>filter</code> means that a request will bypass authentication if
+        it appears to be a CORS preflight request and the web application the
+        request maps to has the <a href="filter.html#CORS_Filter">CORS
+        Filter</a> enabled and mapped to <code>/*</code>. <code>always</code>
+        means that all requests that appear to be CORS preflight requests will
+        bypass authentication. If not set, the default value is
+        <code>never</code>.</p>
       </attribute>
 
       <attribute name="alwaysUseSession" required="false">
@@ -1758,6 +1822,17 @@
         session. For an alternative solution see
         <code>noKeepAliveUserAgents</code>. If not set, the default value of
         <code>false</code> will be used.</p>
+      </attribute>
+
+      <attribute name="applyJava8u40Fix" required="false">
+        <p>A fix introduced in Java 8 update 40 (
+        <a href="https://bugs.openjdk.java.net/browse/JDK-8048194">JDK-8048194</a>)
+        onwards broke SPNEGO authentication for IE with Tomcat running on
+        Windows 2008 R2 servers. This option enables a work-around that allows
+        SPNEGO authentication to continue working. The work-around should not
+        impact other configurations so it is enabled by default. If necessary,
+        the workaround can be disabled by setting this attribute to
+        <code>false</code>.</p>
       </attribute>
 
       <attribute name="cache" required="false">
