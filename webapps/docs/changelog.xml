@@ -75,6 +75,12 @@
         an origin without a deafult port and origins are now compared in a
         case-sensitive manner as required by the CORS specification. (markt)
       </fix>
+      <fix>
+        <bug>63981</bug>: Allow multiple calls to
+        <code>Registry.disableRegistry()</code> without the second and
+        subsequent calls triggering the logging of a warning. Based on a patch
+        by Andy Wilkinson. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
