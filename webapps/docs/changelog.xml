@@ -81,6 +81,12 @@
         subsequent calls triggering the logging of a warning. Based on a patch
         by Andy Wilkinson. (markt)
       </fix>
+      <fix>
+        <bug>63983</bug>: Correct a regression in the static resource caching
+        changes introduced in 9.0.28. A large number of file descriptors were
+        opened that could reach the OS limit before being released by GC.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

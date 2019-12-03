@@ -461,36 +461,31 @@ public class CachedResource implements WebResource {
         private final StandardRoot root;
         private final String webAppPath;
         private final boolean usesClassLoaderResources;
-        private final URLConnection resourceURLConnection;
-        private boolean connected;
+        private final URL resourceURL;
 
         protected CachedResourceURLConnection(URL resourceURL, StandardRoot root, String webAppPath,
-                boolean usesClassLoaderResources) throws IOException {
+                boolean usesClassLoaderResources) {
             super(resourceURL);
             this.root = root;
             this.webAppPath = webAppPath;
             this.usesClassLoaderResources = usesClassLoaderResources;
-            this.resourceURLConnection = url.openConnection();
+            this.resourceURL = resourceURL;
         }
 
         @Override
         public void connect() throws IOException {
-            if (!connected) {
-                resourceURLConnection.connect();
-                connected = true;
-            }
+            // NO-OP
         }
 
         @Override
         public InputStream getInputStream() throws IOException {
-            connect();
-            InputStream is = getResource().getInputStream();
-            return is;
+            return getResource().getInputStream();
         }
 
         @Override
         public Permission getPermission() throws IOException {
-            return resourceURLConnection.getPermission();
+            // Doesn't trigger a call to connect for file:// URLs
+            return resourceURL.openConnection().getPermission();
         }
 
         @Override
@@ -517,8 +512,7 @@ public class CachedResource implements WebResource {
         private final StandardRoot root;
         private final String webAppPath;
         private final boolean usesClassLoaderResources;
-        private final JarURLConnection resourceURLConnection;
-        private boolean connected;
+        private final URL resourceURL;
 
         protected CachedResourceJarURLConnection(URL resourceURL, StandardRoot root, String webAppPath,
                 boolean usesClassLoaderResources) throws IOException {
@@ -526,27 +520,23 @@ public class CachedResource implements WebResource {
             this.root = root;
             this.webAppPath = webAppPath;
             this.usesClassLoaderResources = usesClassLoaderResources;
-            this.resourceURLConnection = (JarURLConnection) url.openConnection();
+            this.resourceURL = resourceURL;
         }
 
         @Override
         public void connect() throws IOException {
-            if (!connected) {
-                resourceURLConnection.connect();
-                connected = true;
-            }
+            // NO-OP
         }
 
         @Override
         public InputStream getInputStream() throws IOException {
-            connect();
-            InputStream is = getResource().getInputStream();
-            return is;
+            return getResource().getInputStream();
         }
 
         @Override
         public Permission getPermission() throws IOException {
-            return resourceURLConnection.getPermission();
+            // Doesn't trigger a call to connect for jar:// URLs
+            return resourceURL.openConnection().getPermission();
         }
 
         @Override
@@ -565,7 +555,7 @@ public class CachedResource implements WebResource {
 
         @Override
         public JarFile getJarFile() throws IOException {
-            return resourceURLConnection.getJarFile();
+            return ((JarURLConnection) resourceURL.openConnection()).getJarFile();
         }
     }
 }
