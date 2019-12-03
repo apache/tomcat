@@ -85,6 +85,12 @@
         an origin without a deafult port and origins are now compared in a
         case-sensitive manner as required by the CORS specification. (markt)
       </fix>
+      <fix>
+        <bug>63983</bug>: Correct a regression in the static resource caching
+        changes introduced in 9.0.28. A large number of file descriptors were
+        opened that could reach the OS limit before being released by GC.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
