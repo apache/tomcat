@@ -550,6 +550,9 @@ public class Http11Processor extends AbstractProcessor {
                 }
                 // 400 - Bad Request
                 response.setStatus(400);
+                if (t instanceof HeadersTooLargeException) {
+                    response.setStatus(414);
+                }
                 setErrorState(ErrorState.CLOSE_CLEAN, t);
             }
 
