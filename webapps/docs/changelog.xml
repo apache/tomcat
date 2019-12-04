@@ -102,7 +102,7 @@
       <fix>
         <bug>63931</bug>: Improve timeout handling for asyncIO to ensure that
         blocking operations see a <code>SocketTimeoutException</code> if one
-        occurs. (remmm/markt)
+        occurs. (remm/markt)
       </fix>
       <fix>
         <bug>63932</bug>: By default, do not compress content that has a strong
