@@ -56,6 +56,11 @@
         <code>HTTP_HOST</code> variable rather than extracting it from the
         <code>Host</code> header as this allows HTTP/2 to be supported. (markt)
       </fix>
+      <fix>
+        Switch Tomcat embedded to loading MIME type mappings from a property
+        file generated from the default <code>web.xml</code> so the MIME type
+        mappings are consistent regardless of how Tomcat is started. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
