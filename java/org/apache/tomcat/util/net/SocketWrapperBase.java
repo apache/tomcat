@@ -960,6 +960,7 @@ public abstract class SocketWrapperBase<E> {
         protected final CompletionHandler<Long, ? super A> handler;
         protected final Semaphore semaphore;
         protected final VectoredIOCompletionHandler<A> completion;
+        protected final AtomicBoolean callHandler;
         protected OperationState(boolean read, ByteBuffer[] buffers, int offset, int length,
                 BlockingMode block, long timeout, TimeUnit unit, A attachment,
                 CompletionCheck check, CompletionHandler<Long, ? super A> handler,
@@ -976,6 +977,7 @@ public abstract class SocketWrapperBase<E> {
             this.handler = handler;
             this.semaphore = semaphore;
             this.completion = completion;
+            callHandler = (handler != null) ? new AtomicBoolean(true) : null;
         }
         protected volatile long nBytes = 0;
         protected volatile CompletionState state = CompletionState.PENDING;
@@ -1058,7 +1060,7 @@ public abstract class SocketWrapperBase<E> {
                         state.state = currentState;
                     }
                     state.end();
-                    if (completion && state.handler != null) {
+                    if (completion && state.handler != null && state.callHandler.compareAndSet(true, false)) {
                         state.handler.completed(Long.valueOf(state.nBytes), state.attachment);
                     }
                     synchronized (state) {
@@ -1099,7 +1101,7 @@ public abstract class SocketWrapperBase<E> {
                 state.state = state.isInline() ? CompletionState.ERROR : CompletionState.DONE;
             }
             state.end();
-            if (state.handler != null) {
+            if (state.handler != null && state.callHandler.compareAndSet(true, false)) {
                 state.handler.failed(exc, state.attachment);
             }
             synchronized (state) {
@@ -1429,10 +1431,15 @@ public abstract class SocketWrapperBase<E> {
                     try {
                         state.wait(unit.toMillis(timeout));
                         if (state.state == CompletionState.PENDING) {
+                            if (handler != null && state.callHandler.compareAndSet(true, false)) {
+                                handler.failed(new SocketTimeoutException(), attachment);
+                            }
                             return CompletionState.ERROR;
                         }
                     } catch (InterruptedException e) {
-                        completion.failed(new SocketTimeoutException(), state);
+                        if (handler != null && state.callHandler.compareAndSet(true, false)) {
+                            handler.failed(new SocketTimeoutException(), attachment);
+                        }
                         return CompletionState.ERROR;
                     }
                 }

@@ -114,6 +114,11 @@
         All regular writes will now be buffered for a more predictable
         behavior. (remm)
       </fix>
+      <fix>
+        Send an exception directly to the completion handler when a timeout
+        exception occurs for the operation, and add a boolean to make sure the
+        completion handler is called only once. (remm/markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="WebSocket">
