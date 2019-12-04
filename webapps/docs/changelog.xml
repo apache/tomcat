@@ -62,6 +62,11 @@
         Tomcat 9.0.x. If upgrade is not possible, application code should cast
         to the internal Tomcat implementation classes. (markt)
       </scode>
+      <fix>
+        Switch Tomcat embedded to loading MIME type mappings from a property
+        file generated from the default <code>web.xml</code> so the MIME type
+        mappings are consistent regardless of how Tomcat is started. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
