@@ -1520,7 +1520,15 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
                                     }
                                 }
                                 if (doWrite) {
-                                    nBytes = getSocket().write(buffers, offset, length);
+                                    long n = 0;
+                                    do {
+                                        n = getSocket().write(buffers, offset, length);
+                                        if (n == -1) {
+                                            nBytes = n;
+                                        } else {
+                                            nBytes += n;
+                                        }
+                                    } while (n > 0);
                                     updateLastWrite();
                                 }
                             }
