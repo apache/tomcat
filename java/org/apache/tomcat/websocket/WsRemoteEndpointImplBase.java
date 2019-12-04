@@ -841,7 +841,7 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
         private final ByteBuffer outputBuffer;
         private final boolean flushRequired;
         private final WsRemoteEndpointImplBase endpoint;
-        private int maskIndex = 0;
+        private volatile int maskIndex = 0;
 
         public OutputBufferSendHandler(SendHandler completion,
                 long blockingWriteTimeoutExpiry,
@@ -1258,7 +1258,7 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
 
     private static class BlockingSendHandler implements SendHandler {
 
-        private SendResult sendResult = null;
+        private volatile SendResult sendResult = null;
 
         @Override
         public void onResult(SendResult result) {
