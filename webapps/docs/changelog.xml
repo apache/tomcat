@@ -97,6 +97,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="WebSocket">
+    <changelog>
+      <fix>
+        Ensure a very unlikely concurrency issue is avoided when writing
+        WebSocket messages. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Web applications">
     <changelog>
       <add>
