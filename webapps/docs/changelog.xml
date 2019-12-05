@@ -166,6 +166,12 @@
         scripts to avoid the expansion of <code>*</code>) as it caused various
         regressions, particularly with <code>daemon.sh</code>. (markt)
       </fix>
+      <add>
+        Expand the search made by the Windows installer for a suitable Java
+        installation to include the 64-bit JDK registry entries and the
+        <code>JAVA_HOME</code> environment variable. Pull request provided by
+        Alexander Norz. (markt)
+      </add>
     </changelog>
   </subsection>
 </section>
