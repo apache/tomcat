@@ -1135,10 +1135,11 @@ public abstract class AuthenticatorBase extends ValveBase
         }
 
         // Cache the authentication information in our session, if any
-        if (cache) {
-            if (session != null) {
+        if (session != null) {
+            if (cache) {
                 session.setAuthType(authType);
                 session.setPrincipal(principal);
+            } else {
                 if (username != null) {
                     session.setNote(Constants.SESS_USERNAME_NOTE, username);
                 } else {
