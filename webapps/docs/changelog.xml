@@ -87,6 +87,9 @@
         opened that could reach the OS limit before being released by GC.
         (markt)
       </fix>
+      <update>
+        <bug>63987</bug>: Deprecate <code>Realm.getRoles(Principal)</code>. (michaelo)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Coyote">

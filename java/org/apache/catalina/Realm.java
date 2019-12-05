@@ -229,7 +229,9 @@ public interface Realm extends Contained {
      * Return roles associated with given principal
      * @param principal the {@link Principal} to get the roles for.
      * @return principal roles
+     * @deprecated This will be removed in Tomcat 10.
      */
+    @Deprecated
     public String[] getRoles(Principal principal);
 
 
