@@ -253,6 +253,14 @@ public class FormAuthenticator
         if (session == null) {
             session = request.getSessionInternal(false);
         }
+        if (session != null && getChangeSessionIdOnAuthentication()) {
+            // Does session id match?
+            String expectedSessionId = (String) session.getNote(Constants.SESSION_ID_NOTE);
+            if (expectedSessionId == null || !expectedSessionId.equals(request.getRequestedSessionId())) {
+                session.expire();
+                session = null;
+            }
+        }
         if (session == null) {
             if (containerLog.isDebugEnabled()) {
                 containerLog.debug("User took so long to log on the session expired");
@@ -382,7 +390,8 @@ public class FormAuthenticator
         if (getChangeSessionIdOnAuthentication()) {
             Session session = request.getSessionInternal(false);
             if (session != null) {
-                changeSessionID(request, session);
+                String newSessionId = changeSessionID(request, session);
+                session.setNote(Constants.SESSION_ID_NOTE, newSessionId);
             }
         }
 
@@ -479,6 +488,14 @@ public class FormAuthenticator
             return false;
         }
 
+        // Does session id match?
+        if (getChangeSessionIdOnAuthentication()) {
+            String expectedSessionId = (String) session.getNote(Constants.SESSION_ID_NOTE);
+            if (expectedSessionId == null || !expectedSessionId.equals(request.getRequestedSessionId())) {
+                return false;
+            }
+        }
+
         // Does the request URI match?
         String decodedRequestURI = request.getDecodedRequestURI();
         if (decodedRequestURI == null) {
@@ -505,6 +522,7 @@ public class FormAuthenticator
         // Retrieve and remove the SavedRequest object from our session
         SavedRequest saved = (SavedRequest) session.getNote(Constants.FORM_REQUEST_NOTE);
         session.removeNote(Constants.FORM_REQUEST_NOTE);
+        session.removeNote(Constants.SESSION_ID_NOTE);
         if (saved == null) {
             return false;
         }
