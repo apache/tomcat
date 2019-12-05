@@ -46,7 +46,6 @@ import org.apache.catalina.Container;
 import org.apache.catalina.Context;
 import org.apache.catalina.Globals;
 import org.apache.catalina.LifecycleException;
-import org.apache.catalina.Manager;
 import org.apache.catalina.Realm;
 import org.apache.catalina.Session;
 import org.apache.catalina.TomcatPrincipal;
@@ -1128,18 +1127,8 @@ public abstract class AuthenticatorBase extends ValveBase
         if (session != null) {
             // If the principal is null then this is a logout. No need to change
             // the session ID. See BZ 59043.
-            if (changeSessionIdOnAuthentication && principal != null) {
-                String oldId = null;
-                if (log.isDebugEnabled()) {
-                    oldId = session.getId();
-                }
-                Manager manager = request.getContext().getManager();
-                manager.changeSessionId(session);
-                request.changeSessionId(session.getId());
-                if (log.isDebugEnabled()) {
-                    log.debug(sm.getString("authenticator.changeSessionId",
-                            oldId, session.getId()));
-                }
+            if (getChangeSessionIdOnAuthentication() && principal != null) {
+                changeSessionID(request, session);
             }
         } else if (alwaysUseSession) {
             session = request.getSessionInternal(true);
@@ -1225,6 +1214,20 @@ public abstract class AuthenticatorBase extends ValveBase
         sso.associate(ssoId, session);
 
     }
+
+
+    protected String changeSessionID(Request request, Session session) {
+        String oldId = null;
+        if (log.isDebugEnabled()) {
+            oldId = session.getId();
+        }
+        String newId = request.changeSessionId();
+        if (log.isDebugEnabled()) {
+            log.debug(sm.getString("authenticator.changeSessionId", oldId, newId));
+        }
+        return newId;
+    }
+
 
     @Override
     public void login(String username, String password, Request request) throws ServletException {
