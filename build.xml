@@ -110,6 +110,7 @@
   <property name="tomcat-websocket.jar" value="${tomcat.build}/lib/tomcat-websocket.jar"/>
   <property name="catalina.jar" value="${tomcat.build}/lib/catalina.jar"/>
   <property name="catalina-tribes.jar" value="${tomcat.build}/lib/catalina-tribes.jar"/>
+  <property name="catalina-ssi.jar" value="${tomcat.build}/lib/catalina-ssi.jar"/>
   <property name="catalina-ha.jar" value="${tomcat.build}/lib/catalina-ha.jar"/>
   <property name="catalina-ant.jar" value="${tomcat.build}/lib/catalina-ant.jar"/>
   <property name="catalina-storeconfig.jar" value="${tomcat.build}/lib/catalina-storeconfig.jar"/>
@@ -136,6 +137,7 @@
   <property name="tomcat-websocket-src.jar" value="${tomcat.src.jars}/tomcat-websocket-src.jar"/>
   <property name="catalina-src.jar" value="${tomcat.src.jars}/catalina-src.jar"/>
   <property name="catalina-tribes-src.jar" value="${tomcat.src.jars}/catalina-tribes-src.jar"/>
+  <property name="catalina-ssi-src.jar" value="${tomcat.src.jars}/catalina-ssi-src.jar"/>
   <property name="catalina-ha-src.jar" value="${tomcat.src.jars}/catalina-ha-src.jar"/>
   <property name="catalina-ant-src.jar" value="${tomcat.src.jars}/catalina-ant-src.jar"/>
   <property name="catalina-storeconfig-src.jar" value="${tomcat.src.jars}/catalina-storeconfig-src.jar"/>
@@ -420,10 +422,15 @@
     <exclude name="org/apache/catalina/ha/**" />
     <exclude name="org/apache/catalina/tribes/**" />
     <exclude name="org/apache/catalina/storeconfig/**" />
+    <exclude name="org/apache/catalina/ssi/**" />
   </patternset>
 
   <patternset id="files.catalina-tribes">
     <include name="org/apache/catalina/tribes/**" />
+  </patternset>
+
+  <patternset id="files.catalina-ssi">
+    <include name="org/apache/catalina/ssi/**" />
   </patternset>
 
   <patternset id="files.catalina-ha">
@@ -832,6 +839,12 @@
     <jarIt jarfile="${catalina-tribes.jar}"
       filesDir="${tomcat.classes}"
       filesId="files.catalina-tribes"
+      addOSGi="true" />
+
+    <!-- Server-Side Includes (SSI) -->
+    <jarIt jarfile="${catalina-ssi.jar}"
+      filesDir="${tomcat.classes}"
+      filesId="files.catalina-ssi"
       addOSGi="true" />
 
     <!-- Catalina Cluster/HA JAR File -->
@@ -2643,6 +2656,11 @@ skip.installer property in build.properties" />
     <jarIt jarfile="${catalina-tribes-src.jar}"
       filesDir="java"
       filesId="files.catalina-tribes" />
+
+    <!-- Catalina SSI JAR File -->
+    <jarIt jarfile="${catalina-ssi-src.jar}"
+      filesDir="java"
+      filesId="files.catalina-ssi" />
 
     <!-- Catalina Cluster/HA JAR File -->
     <jarIt jarfile="${catalina-ha-src.jar}"
