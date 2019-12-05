@@ -58,6 +58,12 @@ public class Constants {
     // ---------------------------------------------------------- Session Notes
 
     /**
+     * The session id used as a CSRF marker when redirecting a user's request.
+     */
+    public static final String SESSION_ID_NOTE = "org.apache.catalina.authenticator.SESSION_ID";
+
+
+    /**
      * If the <code>cache</code> property of our authenticator is set, and
      * the current request is part of a session, authentication information
      * will be cached to avoid the need for repeated calls to
