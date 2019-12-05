@@ -90,6 +90,11 @@
       <update>
         <bug>63987</bug>: Deprecate <code>Realm.getRoles(Principal)</code>. (michaelo)
       </update>
+      <scode>
+        Add a unit test for the session <code>FileStore</code> implementation
+        and refactor loops in <code>FileStore</code> to use the ForEach style.
+        Pull request provided by Govinda Sakhare. (markt)
+      </scode>
     </changelog>
   </subsection>
   <subsection name="Coyote">

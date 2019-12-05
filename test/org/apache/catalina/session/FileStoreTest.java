@@ -19,17 +19,17 @@ package org.apache.catalina.session;
 import java.io.File;
 import java.io.IOException;
 
+import org.junit.AfterClass;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
+
 import org.apache.catalina.Manager;
 import org.apache.tomcat.unittest.TesterContext;
 import org.apache.tomcat.unittest.TesterServletContext;
 import org.apache.tomcat.util.http.fileupload.FileUtils;
-import org.junit.*;
 
-/**
- * Test utility methods of FileStore class
- *
- * @author Govinda Sakhare
- */
 public class FileStoreTest {
 
     private static final String SESS_TEMPPATH = "SESS_TEMP";
@@ -41,7 +41,7 @@ public class FileStoreTest {
 
 
     @BeforeClass
-    public static void setup() throws IOException {
+    public static void setup() {
         TesterContext testerContext = new TesterContext();
         testerContext.setServletContext(new TesterServletContext());
         manager.setContext(testerContext);
