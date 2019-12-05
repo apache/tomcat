@@ -907,7 +907,11 @@ public abstract class AuthenticatorBase extends ValveBase
             // If the principal is null then this is a logout. No need to change
             // the session ID. See BZ 59043.
             if (getChangeSessionIdOnAuthentication() && principal != null) {
-                changeSessionID(request, session);
+                String newSessionId = changeSessionID(request, session);
+                // If the current session ID is being tracked, update it.
+                if (session.getNote(Constants.SESSION_ID_NOTE) != null) {
+                    session.setNote(Constants.SESSION_ID_NOTE, newSessionId);
+                }
             }
         } else if (alwaysUseSession) {
             session = request.getSessionInternal(true);
