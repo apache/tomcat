@@ -193,6 +193,10 @@
         Expand the coverage of the French translations provided with Apache
         Tomcat. (remm)
       </add>
+      <add>
+        Expand the coverage of the Chinese translations provided with Apache
+        Tomcat. Contributions provided by lins and 磊. (markt)
+      </add>
     </changelog>
   </subsection>
 </section>
