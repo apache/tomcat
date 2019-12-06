@@ -165,6 +165,10 @@
         Update the internal fork of Apache Commons Codec to 9637dd4 (2019-12-06,
         1.14-SNAPSHOT). Code clean-up and a fix for CODEC-265. (markt)
       </add>
+      <add>
+        Update the internal fork of Apache Commons FileUpload to 2317552
+        (2019-12-06, 2.0-SNAPSHOT). Refactoring. (markt)
+      </add>
     </changelog>
   </subsection>
 </section>

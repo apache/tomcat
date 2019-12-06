@@ -22,7 +22,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 
-import org.apache.tomcat.util.http.fileupload.FileUploadBase.FileUploadIOException;
+import org.apache.tomcat.util.http.fileupload.impl.FileUploadIOException;
 import org.apache.tomcat.util.http.fileupload.util.Closeable;
 import org.apache.tomcat.util.http.fileupload.util.Streams;
 
@@ -115,7 +115,7 @@ public class MultipartStream {
          * @param pListener The listener to invoke.
          * @param pContentLength The expected content length.
          */
-        ProgressNotifier(ProgressListener pListener, long pContentLength) {
+        public ProgressNotifier(ProgressListener pListener, long pContentLength) {
             listener = pListener;
             contentLength = pContentLength;
         }
@@ -136,7 +136,7 @@ public class MultipartStream {
         /**
          * Called to indicate, that a new file item has been detected.
          */
-        void noteItem() {
+        public void noteItem() {
             ++items;
             notifyListener();
         }
@@ -332,7 +332,7 @@ public class MultipartStream {
      *
      * @see #MultipartStream(InputStream, byte[], int, ProgressNotifier)
      */
-    MultipartStream(InputStream input,
+    public MultipartStream(InputStream input,
             byte[] boundary,
             ProgressNotifier pNotifier) {
         this(input, boundary, DEFAULT_BUFSIZE, pNotifier);
@@ -576,7 +576,7 @@ public class MultipartStream {
      * Creates a new {@link ItemInputStream}.
      * @return A new instance of {@link ItemInputStream}.
      */
-    ItemInputStream newInputStream() {
+    public ItemInputStream newInputStream() {
         return new ItemInputStream();
     }
 
