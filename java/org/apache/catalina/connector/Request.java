@@ -2697,9 +2697,8 @@ public class Request implements org.apache.catalina.servlet4preview.http.HttpSer
         }
 
         Manager manager = this.getContext().getManager();
-        manager.changeSessionId(session);
 
-        String newSessionId = session.getId();
+        String newSessionId = manager.rotateSessionId(session);
         this.changeSessionId(newSessionId);
 
         return newSessionId;
