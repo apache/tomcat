@@ -185,6 +185,10 @@
         <code>JAVA_HOME</code> environment variable. Pull request provided by
         Alexander Norz. (markt)
       </add>
+      <add>
+        Expand the coverage of the Korean translations provided with Apache
+        Tomcat. (woonsan)
+      </add>
     </changelog>
   </subsection>
 </section>
