@@ -58,15 +58,15 @@ Note: Tomcat's copy of fileupload also includes classes copied manually from
 
 DBCP
 ----
+Pool2
+Sub-tree
+src/main/java/org/apache/commons/pool2
+The SHA1 ID for the most recent commit to be merged to Tomcat is:
+6092f924b36061353ff92b18c88400ab3bc05327 (2019-12-06)
+
 DBCP2
 Sub-tree
 src/main/java/org/apache/commons/dbcp2
 src/main/resources/org/apache/commons/dbcp2
 The SHA1 ID for the most recent commit to be merged to Tomcat is:
 4813b7f5456c1f4fecc4f701ac731a71f57db249 (2019-08-09)
-
-Pool2
-Sub-tree
-src/main/java/org/apache/commons/pool2
-The SHA1 ID for the most recent commit to be merged to Tomcat is:
-796e32d53cc0d870ba0db3a7faf4c5b24ff76f3f (2019-08-01)

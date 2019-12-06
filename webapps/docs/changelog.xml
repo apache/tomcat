@@ -216,6 +216,10 @@
         Update the internal fork of Apache Commons FileUpload to 2317552
         (2019-12-06, 2.0-SNAPSHOT). Refactoring. (markt)
       </add>
+      <add>
+        Update the internal fork of Apache Commons Pool 2 to 6092f92 (2019-12-06,
+        2.8.0-SNAPSHOT). Clean-up and minor refactoring. (markt)
+      </add>
     </changelog>
   </subsection>
 </section>

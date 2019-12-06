@@ -38,7 +38,8 @@ import org.apache.tomcat.dbcp.pool2.UsageTracking;
  * <p>
  * When coupled with the appropriate {@link PooledObjectFactory},
  * <code>GenericObjectPool</code> provides robust pooling functionality for
- * arbitrary objects.</p>
+ * arbitrary objects.
+ * </p>
  * <p>
  * Optionally, one may configure the pool to examine and possibly evict objects
  * as they sit idle in the pool and to ensure that a minimum number of idle
@@ -46,7 +47,8 @@ import org.apache.tomcat.dbcp.pool2.UsageTracking;
  * which runs asynchronously. Caution should be used when configuring this
  * optional feature. Eviction runs contend with client threads for access to
  * objects in the pool, so if they run too frequently performance issues may
- * result.</p>
+ * result.
+ * </p>
  * <p>
  * The pool can also be configured to detect and remove "abandoned" objects,
  * i.e. objects that have been checked out of the pool but neither used nor
@@ -59,13 +61,16 @@ import org.apache.tomcat.dbcp.pool2.UsageTracking;
  * their last use will be queried
  * using the <code>getLastUsed</code> method on that interface; otherwise
  * abandonment is determined by how long an object has been checked out from
- * the pool.</p>
+ * the pool.
+ * </p>
  * <p>
  * Implementation note: To prevent possible deadlocks, care has been taken to
  * ensure that no call to a factory method will occur within a synchronization
- * block. See POOL-125 and DBCP-44 for more information.</p>
+ * block. See POOL-125 and DBCP-44 for more information.
+ * </p>
  * <p>
- * This class is intended to be thread-safe.</p>
+ * This class is intended to be thread-safe.
+ * </p>
  *
  * @see GenericKeyedObjectPool
  *
@@ -576,6 +581,11 @@ public class GenericObjectPool<T> extends BaseGenericObjectPool<T>
             } catch (final Exception e) {
                 swallowException(e);
             }
+            try {
+                ensureIdle(1, false);
+            } catch (final Exception e) {
+                swallowException(e);
+            }
         } else {
             if (getLifo()) {
                 idleObjects.addFirst(p);
@@ -930,15 +940,6 @@ public class GenericObjectPool<T> extends BaseGenericObjectPool<T>
         } finally {
             destroyedCount.incrementAndGet();
             createCount.decrementAndGet();
-        }
-
-        if (idleObjects.isEmpty() && idleObjects.hasTakeWaiters()) {
-            // POOL-356.
-            // In case there are already threads waiting on something in the pool
-            // (e.g. idleObjects.takeFirst(); then we need to provide them a fresh instance.
-            // Otherwise they will be stuck forever (or until timeout)
-            final PooledObject<T> freshPooled = create();
-            idleObjects.put(freshPooled);
         }
     }
 

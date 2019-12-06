@@ -50,10 +50,12 @@ import org.apache.tomcat.dbcp.pool2.PooledObjectState;
  * {@link #borrowObject borrowObject} methods. Each time a new key value is
  * provided to one of these methods, a sub-new pool is created under the given
  * key to be managed by the containing <code>GenericKeyedObjectPool.</code>
+ * </p>
  * <p>
  * Note that the current implementation uses a ConcurrentHashMap which uses
  * equals() to compare keys.
  * This means that distinct instance keys must be distinguishable using equals.
+ * </p>
  * <p>
  * Optionally, one may configure the pool to examine and possibly evict objects
  * as they sit idle in the pool and to ensure that a minimum number of idle
@@ -62,12 +64,15 @@ import org.apache.tomcat.dbcp.pool2.PooledObjectState;
  * configuring this optional feature. Eviction runs contend with client threads
  * for access to objects in the pool, so if they run too frequently performance
  * issues may result.
+ * </p>
  * <p>
  * Implementation note: To prevent possible deadlocks, care has been taken to
  * ensure that no call to a factory method will occur within a synchronization
  * block. See POOL-125 and DBCP-44 for more information.
+ * </p>
  * <p>
  * This class is intended to be thread-safe.
+ * </p>
  *
  * @see GenericObjectPool
  *
@@ -446,6 +451,11 @@ public class GenericKeyedObjectPool<K, T> extends BaseGenericObjectPool<T>
     public void returnObject(final K key, final T obj) {
 
         final ObjectDeque<T> objectDeque = poolMap.get(key);
+
+        if (objectDeque == null) {
+            throw new IllegalStateException(
+                    "No keyed pool found under the given key.");
+        }
 
         final PooledObject<T> p = objectDeque.getAllObjects().get(new IdentityWrapper<>(obj));
 
@@ -1077,8 +1087,16 @@ public class GenericKeyedObjectPool<K, T> extends BaseGenericObjectPool<T>
         final ObjectDeque<T> objectDeque = register(key);
 
         try {
-            final boolean isIdle = objectDeque.getIdleObjects().remove(toDestroy);
-
+            boolean isIdle;
+            synchronized(toDestroy) {
+                // Check idle state directly
+                isIdle = toDestroy.getState().equals(PooledObjectState.IDLE);
+                // If idle, not under eviction test, or always is true, remove instance,
+                // updating isIdle if instance is found in idle objects
+                if (isIdle || always) {
+                    isIdle = objectDeque.getIdleObjects().remove(toDestroy);
+                }
+            }
             if (isIdle || always) {
                 objectDeque.getAllObjects().remove(new IdentityWrapper<>(toDestroy.getObject()));
                 toDestroy.invalidate();
@@ -1151,10 +1169,9 @@ public class GenericKeyedObjectPool<K, T> extends BaseGenericObjectPool<T>
      */
     private void deregister(final K k) {
         Lock lock = keyLock.readLock();
-        ObjectDeque<T> objectDeque;
         try {
             lock.lock();
-            objectDeque = poolMap.get(k);
+            final ObjectDeque<T> objectDeque = poolMap.get(k);
             final long numInterested = objectDeque.getNumInterested().decrementAndGet();
             if (numInterested == 0 && objectDeque.getCreateCount().get() == 0) {
                 // Potential to remove key

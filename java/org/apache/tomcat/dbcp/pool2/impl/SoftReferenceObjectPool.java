@@ -32,6 +32,7 @@ import org.apache.tomcat.dbcp.pool2.PooledObjectFactory;
  * {@link org.apache.tomcat.dbcp.pool2.ObjectPool}.
  * <p>
  * This class is intended to be thread-safe.
+ * </p>
  *
  * @param <T>
  *            Type of element pooled in this pool.
@@ -185,6 +186,8 @@ public class SoftReferenceObjectPool<T> extends BaseObjectPool<T> {
      *
      * @param obj
      *            instance to return to the pool
+     * @throws IllegalArgumentException
+     *            if obj is not currently part of this pool
      */
     @Override
     public synchronized void returnObject(final T obj) throws Exception {
