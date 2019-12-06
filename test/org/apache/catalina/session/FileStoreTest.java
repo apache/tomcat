@@ -60,9 +60,15 @@ public class FileStoreTest {
     @Before
     public void beforeEachTest() throws IOException {
         fileStore.setDirectory(SESS_TEMPPATH);
-        dir.mkdir();
-        file1.createNewFile();
-        file2.createNewFile();
+        if (!dir.mkdir()) {
+            Assert.fail();
+        }
+        if (!file1.createNewFile()) {
+            Assert.fail();
+        }
+        if (!file2.createNewFile()) {
+            Assert.fail();
+        }
     }
 
 
