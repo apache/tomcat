@@ -103,6 +103,11 @@
         and refactor loops in <code>FileStore</code> to use the ForEach style.
         Pull request provided by Govinda Sakhare. (markt)
       </scode>
+      <fix>
+        Refactor FORM authentication to reduce duplicate code and to ensure that
+        the authenticated Principal is not cached in the session when caching is
+        disabled. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
