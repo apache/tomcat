@@ -362,26 +362,23 @@ public class TestBasicAuthParser {
     /*
      * invalid base64 string tests
      *
-     * Refer to RFC2045 section 6.8.
+     * Refer to
+     *  - RFC 7617 (Basic Auth)
+     *  - RFC 4648 (base 64)
      */
 
     /*
-     * non-trailing "=" should trigger premature termination of the
-     * decoder, returning a truncated string that will eventually
-     * result in an authentication Assert.failure.
+     * non-trailing "=" is illegal and will be rejected by the parser
      */
-    @Test
+    @Test(expected = IllegalArgumentException.class)
     public void testBadBase64InlineEquals() throws Exception {
         final String BASE64_CRIB = "dXNlcmlkOnNlY3J=dAo=";
-        final String TRUNCATED_PWD = "secr";
         final BasicAuthHeader AUTH_HEADER =
                 new BasicAuthHeader(NICE_METHOD, BASE64_CRIB);
+        @SuppressWarnings("unused") // Exception will be thrown.
         BasicAuthenticator.BasicCredentials credentials =
                 new BasicAuthenticator.BasicCredentials(
                     AUTH_HEADER.getHeader(), StandardCharsets.UTF_8, true);
-        Assert.assertEquals(USER_NAME, credentials.getUsername());
-        Assert.assertNotSame(PASSWORD, credentials.getPassword());
-        Assert.assertEquals(TRUNCATED_PWD, credentials.getPassword());
     }
 
     /*
