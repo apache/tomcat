@@ -851,9 +851,20 @@ public abstract class ManagerBase extends LifecycleMBeanBase implements Manager 
 
     @Override
     public void changeSessionId(Session session) {
+        rotateSessionId(session);
+    }
+
+
+    public String rotateSessionId(Session session) {
+        String newId = generateSessionId();
+        changeSessionId(session, newId);
+        return newId;
+    }
+
+
+    public void changeSessionId(Session session, String newId) {
         String oldId = session.getIdInternal();
-        session.setId(generateSessionId(), false);
-        String newId = session.getIdInternal();
+        session.setId(newId, false);
         container.fireContainerEvent(Context.CHANGE_SESSION_ID_EVENT,
                 new String[] {oldId, newId});
     }

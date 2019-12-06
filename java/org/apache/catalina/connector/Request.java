@@ -74,6 +74,7 @@ import org.apache.catalina.core.ApplicationPart;
 import org.apache.catalina.core.ApplicationSessionCookieConfig;
 import org.apache.catalina.core.AsyncContextImpl;
 import org.apache.catalina.realm.GenericPrincipal;
+import org.apache.catalina.session.ManagerBase;
 import org.apache.catalina.util.ParameterMap;
 import org.apache.catalina.util.RequestUtil;
 import org.apache.catalina.util.StringParser;
@@ -2701,6 +2702,32 @@ public class Request implements HttpServletRequest {
         }
     }
 
+
+    public String changeSessionId() {
+
+        Session session = this.getSessionInternal(false);
+        if (session == null) {
+            throw new IllegalStateException(
+                sm.getString("coyoteRequest.changeSessionId"));
+        }
+
+        Manager manager = this.getContext().getManager();
+
+        String newSessionId = rotateSessionId(manager, session);
+        this.changeSessionId(newSessionId);
+
+        return newSessionId;
+    }
+
+    private String rotateSessionId(Manager manager, Session session) {
+        if (manager instanceof ManagerBase) {
+            return ((ManagerBase) manager).rotateSessionId(session);
+        } else {
+            // Best we do with the current interface
+            manager.changeSessionId(session);
+            return session.getId();
+        }
+    }
 
     /**
      * @return the session associated with this Request, creating one
