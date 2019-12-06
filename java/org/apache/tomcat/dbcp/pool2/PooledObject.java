@@ -24,6 +24,7 @@ import java.util.Deque;
  * state, for the pooled objects.
  * <p>
  * Implementations of this class are required to be thread-safe.
+ * </p>
  *
  * @param <T> the type of object in the pool
  *
@@ -185,7 +186,7 @@ public interface PooledObject<T> extends Comparable<PooledObject<T>> {
      * @param requireFullStackTrace the new configuration setting for abandoned object logging
      * @since 2.7.0
      */
-    void setRequireFullStackTrace(boolean requireFullStackTrace);
+    void setRequireFullStackTrace(final boolean requireFullStackTrace);
 
     /**
      * Record the current stack trace as the last time the object was used.

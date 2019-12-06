@@ -34,6 +34,7 @@ import java.util.concurrent.locks.Condition;
  * is equal to {@link Integer#MAX_VALUE}.  Linked nodes are
  * dynamically created upon each insertion unless this would bring the
  * deque above capacity.
+ * </p>
  *
  * <p>Most operations run in constant time (ignoring time spent
  * blocking).  Exceptions include {@link #remove(Object) remove},
@@ -41,14 +42,17 @@ import java.util.concurrent.locks.Condition;
  * #removeLastOccurrence removeLastOccurrence}, {@link #contains
  * contains}, {@link #iterator iterator.remove()}, and the bulk
  * operations, all of which run in linear time.
+ * </p>
  *
  * <p>This class and its iterator implement all of the
  * <em>optional</em> methods of the {@link Collection} and {@link
  * Iterator} interfaces.
+ * </p>
  *
  * <p>This class is a member of the
  * <a href="{@docRoot}/../technotes/guides/collections/index.html">
  * Java Collections Framework</a>.
+ * </p>
  *
  * @param <E> the type of elements held in this collection
  *

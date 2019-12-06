@@ -22,6 +22,7 @@ package org.apache.tomcat.dbcp.pool2;
  * indicating it is unsupported or throw {@link UnsupportedOperationException}.
  * <p>
  * This class is intended to be thread-safe.
+ * </p>
  *
  * @param <T> Type of element pooled in this pool.
  *
@@ -79,6 +80,23 @@ public abstract class BaseObjectPool<T> extends BaseObject implements ObjectPool
     @Override
     public void addObject() throws Exception, UnsupportedOperationException {
         throw new UnsupportedOperationException();
+    }
+
+    /**
+     * Calls {@link ObjectPool#addObject()} <code>count</code>
+     * number of times.
+     *
+     * @param count
+     *            the number of idle objects to add.
+     * @throws Exception
+     *             when {@link ObjectPool#addObject()} fails.
+     * @since 2.8.0
+     */
+    @Override
+    public void addObjects(final int count) throws Exception {
+        for (int i = 0; i < count; i++) {
+            addObject();
+        }
     }
 
     /**
