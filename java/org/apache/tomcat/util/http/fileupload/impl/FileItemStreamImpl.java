@@ -61,11 +61,6 @@ public class FileItemStreamImpl implements FileItemStream {
     private final InputStream stream;
 
     /**
-     * Whether the file item was already opened.
-     */
-    private boolean opened;
-
-    /**
      * The headers, if any.
      */
     private FileItemHeaders headers;
@@ -180,10 +175,6 @@ public class FileItemStreamImpl implements FileItemStream {
      */
     @Override
     public InputStream openStream() throws IOException {
-        if (opened) {
-            throw new IllegalStateException(
-                    "The stream was already opened.");
-        }
         if (((Closeable) stream).isClosed()) {
             throw new FileItemStream.ItemSkippedException();
         }
