@@ -201,6 +201,10 @@
         Expand the coverage of the Chinese translations provided with Apache
         Tomcat. Contributions provided by lins and 磊. (markt)
       </add>
+      <add>
+        Update the internal fork of Apache Commons BCEL to ff6941e (2019-12-06,
+        6.4.2-dev). Code clean-up only. (markt)
+      </add>
     </changelog>
   </subsection>
 </section>
