@@ -48,7 +48,7 @@ public final class ConstantClass extends Constant {
     /**
      * @return Name index in constant pool of class name.
      */
-    public final int getNameIndex() {
+    public int getNameIndex() {
         return name_index;
     }
 }

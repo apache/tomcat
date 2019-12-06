@@ -48,7 +48,7 @@ public final class ConstantInteger extends Constant {
     /**
      * @return data, i.e., 4 bytes.
      */
-    public final int getBytes() {
+    public int getBytes() {
         return bytes;
     }
 }
