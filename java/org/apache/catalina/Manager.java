@@ -215,8 +215,41 @@ public interface Manager {
      * session ID.
      *
      * @param session   The session to change the session ID for
+     *
+     * @deprecated Use {@link #rotateSessionId(Session)}.
+     *             Will be removed in Tomcat 10
      */
+    @Deprecated
     public void changeSessionId(Session session);
+
+
+    /**
+     * Change the session ID of the current session to a new randomly generated
+     * session ID.
+     *
+     * @param session   The session to change the session ID for
+     *
+     * @return  The new session ID
+     */
+    public default String rotateSessionId(Session session) {
+        String newSessionId = null;
+        // Assume there new Id is a duplicate until we prove it isn't. The
+        // chances of a duplicate are extremely low but the current ManagerBase
+        // code protects against duplicates so this default method does too.
+        boolean duplicate = true;
+        do {
+            newSessionId = getSessionIdGenerator().generateSessionId();
+            try {
+                if (findSession(newSessionId) == null) {
+                    duplicate = false;
+                }
+            } catch (IOException ioe) {
+                // Swallow. An IOE means the ID was known so continue looping
+            }
+        } while (duplicate);
+        changeSessionId(session, newSessionId);
+        return newSessionId;
+    }
 
 
     /**

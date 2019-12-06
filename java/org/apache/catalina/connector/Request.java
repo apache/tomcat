@@ -2675,9 +2675,8 @@ public class Request implements HttpServletRequest {
         }
 
         Manager manager = this.getContext().getManager();
-        manager.changeSessionId(session);
 
-        String newSessionId = session.getId();
+        String newSessionId = manager.rotateSessionId(session);
         this.changeSessionId(newSessionId);
 
         return newSessionId;

@@ -753,8 +753,15 @@ public abstract class ManagerBase extends LifecycleMBeanBase implements Manager 
 
     @Override
     public void changeSessionId(Session session) {
+        rotateSessionId(session);
+    }
+
+
+    @Override
+    public String rotateSessionId(Session session) {
         String newId = generateSessionId();
         changeSessionId(session, newId, true, true);
+        return newId;
     }
 
 
