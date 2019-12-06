@@ -22,7 +22,7 @@ import org.apache.tomcat.util.http.fileupload.FileUploadException;
  * This exception is thrown, if a requests permitted size
  * is exceeded.
  */
-abstract class SizeException extends FileUploadException {
+public abstract class SizeException extends FileUploadException {
 
     /**
      * Serial version UID, being used, if serialized.
