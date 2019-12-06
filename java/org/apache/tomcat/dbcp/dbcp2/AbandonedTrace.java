@@ -58,45 +58,6 @@ public class AbandonedTrace implements TrackedUse {
     }
 
     /**
-     * Initializes abandoned tracing for this object.
-     *
-     * @param parent
-     *            AbandonedTrace parent object.
-     */
-    private void init(final AbandonedTrace parent) {
-        if (parent != null) {
-            parent.addTrace(this);
-        }
-    }
-
-    /**
-     * Gets the last time this object was used in milliseconds.
-     *
-     * @return long time in milliseconds.
-     */
-    @Override
-    public long getLastUsed() {
-        return lastUsedMillis;
-    }
-
-    /**
-     * Sets the time this object was last used to the current time in milliseconds.
-     */
-    protected void setLastUsed() {
-        lastUsedMillis = System.currentTimeMillis();
-    }
-
-    /**
-     * Sets the time in milliseconds this object was last used.
-     *
-     * @param lastUsedMillis
-     *            time in milliseconds.
-     */
-    protected void setLastUsed(final long lastUsedMillis) {
-        this.lastUsedMillis = lastUsedMillis;
-    }
-
-    /**
      * Adds an object to the list of objects being traced.
      *
      * @param trace
@@ -116,6 +77,16 @@ public class AbandonedTrace implements TrackedUse {
         synchronized (this.traceList) {
             this.traceList.clear();
         }
+    }
+
+    /**
+     * Gets the last time this object was used in milliseconds.
+     *
+     * @return long time in milliseconds.
+     */
+    @Override
+    public long getLastUsed() {
+        return lastUsedMillis;
     }
 
     /**
@@ -145,6 +116,30 @@ public class AbandonedTrace implements TrackedUse {
     }
 
     /**
+     * Initializes abandoned tracing for this object.
+     *
+     * @param parent
+     *            AbandonedTrace parent object.
+     */
+    private void init(final AbandonedTrace parent) {
+        if (parent != null) {
+            parent.addTrace(this);
+        }
+    }
+
+    /**
+     * Removes this object the source object is tracing.
+     *
+     * @param source The object tracing
+     * @since 2.7.0
+     */
+    protected void removeThisTrace(final Object source) {
+        if (source instanceof AbandonedTrace) {
+            AbandonedTrace.class.cast(source).removeTrace(this);
+        }
+    }
+
+    /**
      * Removes a child object this object is tracing.
      *
      * @param trace
@@ -167,14 +162,19 @@ public class AbandonedTrace implements TrackedUse {
     }
 
     /**
-     * Removes this object the source object is tracing.
-     *
-     * @param source The object tracing
-     * @since 2.7.0
+     * Sets the time this object was last used to the current time in milliseconds.
      */
-    protected void removeThisTrace(final Object source) {
-        if (source instanceof AbandonedTrace) {
-            AbandonedTrace.class.cast(source).removeTrace(this);
-        }
+    protected void setLastUsed() {
+        lastUsedMillis = System.currentTimeMillis();
+    }
+
+    /**
+     * Sets the time in milliseconds this object was last used.
+     *
+     * @param lastUsedMillis
+     *            time in milliseconds.
+     */
+    protected void setLastUsed(final long lastUsedMillis) {
+        this.lastUsedMillis = lastUsedMillis;
     }
 }
