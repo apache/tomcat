@@ -102,6 +102,11 @@
       <update>
         Moved server-side include (SSI) module into a separate JAR library. (schultz)
       </update>
+      <fix>
+        Refactor FORM authentication to reduce duplicate code and to ensure that
+        the authenticated Principal is not cached in the session when caching is
+        disabled. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
