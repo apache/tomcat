@@ -30,6 +30,7 @@ import org.apache.catalina.GSSRealm;
 import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.Realm;
+import org.apache.catalina.Wrapper;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.ietf.jgss.GSSContext;
@@ -410,6 +411,19 @@ public class CombinedRealm extends RealmBase {
             }
         }
         return authenticatedUser;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean hasRole(Wrapper wrapper, Principal principal, String role) {
+        for (Realm realm : realms) {
+            if (realm.hasRole(wrapper, principal, role)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
