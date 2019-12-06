@@ -97,7 +97,7 @@ import org.apache.tomcat.util.http.fileupload.FileItem;
 import org.apache.tomcat.util.http.fileupload.FileUploadException;
 import org.apache.tomcat.util.http.fileupload.disk.DiskFileItemFactory;
 import org.apache.tomcat.util.http.fileupload.impl.InvalidContentTypeException;
-import org.apache.tomcat.util.http.fileupload.impl.SizeLimitExceededException;
+import org.apache.tomcat.util.http.fileupload.impl.SizeException;
 import org.apache.tomcat.util.http.fileupload.servlet.ServletFileUpload;
 import org.apache.tomcat.util.http.fileupload.servlet.ServletRequestContext;
 import org.apache.tomcat.util.http.mapper.MappingData;
@@ -2996,7 +2996,7 @@ public class Request implements HttpServletRequest {
             } catch (InvalidContentTypeException e) {
                 parameters.setParseFailedReason(FailReason.INVALID_CONTENT_TYPE);
                 partsParseException = new ServletException(e);
-            } catch (SizeLimitExceededException e) {
+            } catch (SizeException e) {
                 parameters.setParseFailedReason(FailReason.POST_TOO_LARGE);
                 checkSwallowInput();
                 partsParseException = new IllegalStateException(e);
