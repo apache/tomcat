@@ -139,6 +139,10 @@ public class Base64 extends BaseNCodec {
      */
     /** Mask used to extract 6 bits, used when encoding */
     private static final int MASK_6BITS = 0x3f;
+    /** Mask used to extract 4 bits, used when decoding final trailing character. */
+    private static final int MASK_4BITS = 0xf;
+    /** Mask used to extract 2 bits, used when decoding final trailing character. */
+    private static final int MASK_2BITS = 0x3;
 
     // The static final fields above are used for the original static byte[] methods on Base64.
     // The private member fields below are used with the new streaming approach, which requires
@@ -483,12 +487,12 @@ public class Base64 extends BaseNCodec {
                     // TODO not currently tested; perhaps it is impossible?
                     break;
                 case 2 : // 12 bits = 8 + 4
-                    validateCharacter(4, context);
+                    validateCharacter(MASK_4BITS, context);
                     context.ibitWorkArea = context.ibitWorkArea >> 4; // dump the extra 4 bits
                     buffer[context.pos++] = (byte) ((context.ibitWorkArea) & MASK_8BITS);
                     break;
                 case 3 : // 18 bits = 8 + 8 + 2
-                    validateCharacter(2, context);
+                    validateCharacter(MASK_2BITS, context);
                     context.ibitWorkArea = context.ibitWorkArea >> 2; // dump 2 bits
                     buffer[context.pos++] = (byte) ((context.ibitWorkArea >> 8) & MASK_8BITS);
                     buffer[context.pos++] = (byte) ((context.ibitWorkArea) & MASK_8BITS);
@@ -792,20 +796,22 @@ public class Base64 extends BaseNCodec {
 
 
     /**
-     * <p>
-     * Validates whether the character is possible in the context of the set of possible base 64 values.
-     * </p>
+     * Validates whether decoding the final trailing character is possible in the context
+     * of the set of possible base 64 values.
      *
-     * @param numBitsToDrop number of least significant bits to check
+     * <p>The character is valid if the lower bits within the provided mask are zero. This
+     * is used to test the final trailing base-64 digit is zero in the bits that will be discarded.
+     *
+     * @param emptyBitsMask The mask of the lower bits that should be empty
      * @param context the context to be used
      *
      * @throws IllegalArgumentException if the bits being checked contain any non-zero value
      */
-    private long validateCharacter(final int numBitsToDrop, final Context context) {
-        if ((context.ibitWorkArea & numBitsToDrop) != 0) {
-        throw new IllegalArgumentException(
-            "Last encoded character (before the paddings if any) is a valid base 64 alphabet but not a possible value");
+    private static void validateCharacter(final int emptyBitsMask, final Context context) {
+        if ((context.ibitWorkArea & emptyBitsMask) != 0) {
+            throw new IllegalArgumentException(
+                "Last encoded character (before the paddings if any) is a valid base 64 alphabet but not a possible value. " +
+                "Expected the discarded bits to be zero.");
         }
-        return context.ibitWorkArea >> numBitsToDrop;
     }
 }
