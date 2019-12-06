@@ -145,6 +145,10 @@
         Expand the coverage of the Japanese translations provided with Apache
         Tomcat. (markt)
       </add>
+      <add>
+        Expand the coverage of the Korean translations provided with Apache
+        Tomcat. (woonsan)
+      </add>
     </changelog>
   </subsection>
 </section>
