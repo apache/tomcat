@@ -83,6 +83,7 @@ import org.apache.catalina.core.AsyncContextImpl;
 import org.apache.catalina.mapper.MappingData;
 import org.apache.catalina.servlet4preview.http.HttpServletMapping;
 import org.apache.catalina.servlet4preview.http.PushBuilder;
+import org.apache.catalina.session.ManagerBase;
 import org.apache.catalina.util.ParameterMap;
 import org.apache.catalina.util.TLSUtil;
 import org.apache.catalina.util.URLEncoder;
@@ -2698,10 +2699,34 @@ public class Request implements org.apache.catalina.servlet4preview.http.HttpSer
 
         Manager manager = this.getContext().getManager();
 
-        String newSessionId = manager.rotateSessionId(session);
+        String newSessionId = rotateSessionId(manager, session);
         this.changeSessionId(newSessionId);
 
         return newSessionId;
+    }
+
+    private String rotateSessionId(Manager manager, Session sessiom) {
+        if (manager instanceof ManagerBase) {
+            return ((ManagerBase) manager).rotateSessionId(sessiom);
+        } else {
+            String newSessionId = null;
+            // Assume there new Id is a duplicate until we prove it isn't. The
+            // chances of a duplicate are extremely low but the current ManagerBase
+            // code protects against duplicates so this method does too.
+            boolean duplicate = true;
+            do {
+                newSessionId = manager.getSessionIdGenerator().generateSessionId();
+                try {
+                    if (manager.findSession(newSessionId) == null) {
+                        duplicate = false;
+                    }
+                } catch (IOException ioe) {
+                    // Swallow. An IOE means the ID was known so continue looping
+                }
+            } while (duplicate);
+            manager.changeSessionId(session, newSessionId);
+            return newSessionId;
+        }
     }
 
     /**
