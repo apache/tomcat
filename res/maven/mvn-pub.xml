@@ -291,6 +291,10 @@
                    jarFileName="catalina-tribes.jar"
                 srcJarFileName="catalina-tribes-src.jar"/>
 
+     <doMavenInstall artifactId="tomcat-ssi"
+                   jarFileName="catalina-ssi.jar"
+                srcJarFileName="catalina-ssi-src.jar"/>
+
      <doMavenInstall artifactId="tomcat-storeconfig"
                    jarFileName="catalina-storeconfig.jar"
                 srcJarFileName="catalina-storeconfig-src.jar"/>
@@ -384,6 +388,10 @@
     <doMavenDeploy artifactId="tomcat-tribes"
                   jarFileName="catalina-tribes.jar"
                srcJarFileName="catalina-tribes-src.jar"/>
+
+    <doMavenDeploy artifactId="tomcat-ssi"
+                  jarFileName="catalina-ssi.jar"
+               srcJarFileName="catalina-ssi-src.jar"/>
 
     <doMavenDeploy artifactId="tomcat-storeconfig"
                   jarFileName="catalina-storeconfig.jar"
