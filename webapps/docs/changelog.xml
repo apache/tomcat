@@ -133,6 +133,10 @@
         <code>JAVA_HOME</code> environment variable. Pull request provided by
         Alexander Norz. (markt)
       </add>
+      <add>
+        Expand the coverage of the German translations provided with Apache
+        Tomcat. Contribution provided by Jens. (markt)
+      </add>
     </changelog>
   </subsection>
 </section>
