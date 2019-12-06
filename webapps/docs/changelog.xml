@@ -181,6 +181,10 @@
         Expand the coverage of the German translations provided with Apache
         Tomcat. Contribution provided by Jens. (markt)
       </add>
+      <add>
+        Expand the coverage of the French translations provided with Apache
+        Tomcat. (remm)
+      </add>
     </changelog>
   </subsection>
 </section>
