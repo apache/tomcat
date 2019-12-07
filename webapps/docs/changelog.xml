@@ -447,7 +447,7 @@
     <changelog>
       <fix>
         <bug>63781</bug>: When performing various checks related to the
-        visibility of classes, fields an methods in the EL implementation, also
+        visibility of classes, fields and methods in the EL implementation, also
         check that the containing module has been exported. (markt)
       </fix>
     </changelog>
