@@ -2681,13 +2681,6 @@ public class Request implements org.apache.catalina.servlet4preview.http.HttpSer
     }
 
 
-    /**
-     * Changes the session ID of the session associated with this request.
-     *
-     * @return the old session ID before it was changed
-     * @see javax.servlet.http.HttpSessionIdListener
-     * @since Servlet 3.1
-     */
     @Override
     public String changeSessionId() {
 
