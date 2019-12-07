@@ -2698,9 +2698,9 @@ public class Request implements org.apache.catalina.servlet4preview.http.HttpSer
         return newSessionId;
     }
 
-    private String rotateSessionId(Manager manager, Session sessiom) {
+    private String rotateSessionId(Manager manager, Session session) {
         if (manager instanceof ManagerBase) {
-            return ((ManagerBase) manager).rotateSessionId(sessiom);
+            return ((ManagerBase) manager).rotateSessionId(session);
         } else {
             String newSessionId = null;
             // Assume there new Id is a duplicate until we prove it isn't. The
