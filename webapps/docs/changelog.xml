@@ -284,7 +284,7 @@
       </fix>
       <fix>
         Update the Servlet 4 preview API to reflect changes made to the API in
-        the final release. Note that this preview API has deprecated for over a
+        the final release. Note that this preview API has been deprecated for over a
         year and may be removed as soon as the next 8.5.x release. (markt)
       </fix>
       <fix>
