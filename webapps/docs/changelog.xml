@@ -263,7 +263,7 @@
         being constructed as expected. (markt)
       </fix>
       <fix>
-        Make a best efforts attempt to clean-up if a request fails during
+        Make a best effort attempt to clean-up if a request fails during
         processing due to an <code>OutOfMemoryException</code>. (markt)
       </fix>
       <fix>
