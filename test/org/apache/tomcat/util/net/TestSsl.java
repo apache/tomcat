@@ -140,8 +140,8 @@ public class TestSsl extends TomcatBaseTest {
         // Handshake complete appears to be called asynchronously
         int wait = 0;
         while (wait < 5000 && !listener.isComplete()) {
-        	wait += 50;
-        	Thread.sleep(50);
+            wait += 50;
+            Thread.sleep(50);
         }
         Assert.assertTrue("Checking no client issuer has been requested",
                 TesterSupport.getLastClientAuthRequestedIssuerCount() == 0);
