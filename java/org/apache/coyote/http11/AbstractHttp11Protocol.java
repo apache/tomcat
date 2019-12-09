@@ -38,6 +38,7 @@ import org.apache.coyote.UpgradeToken;
 import org.apache.coyote.http11.upgrade.InternalHttpUpgradeHandler;
 import org.apache.coyote.http11.upgrade.UpgradeProcessorExternal;
 import org.apache.coyote.http11.upgrade.UpgradeProcessorInternal;
+import org.apache.coyote.http2.Http2Protocol;
 import org.apache.tomcat.util.buf.StringUtils;
 import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.SSLHostConfig;
@@ -449,6 +450,10 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
                             upgradeProtocol.getClass().getName(), alpnName, getName()));
                 }
             }
+        }
+
+        if (upgradeProtocol instanceof Http2Protocol) {
+            ((Http2Protocol) upgradeProtocol).setHttp11Protocol(this);
         }
     }
     @Override

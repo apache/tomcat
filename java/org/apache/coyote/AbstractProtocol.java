@@ -398,11 +398,17 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
 
 
     public void addWaitingProcessor(Processor processor) {
+        if (getLog().isDebugEnabled()) {
+            getLog().debug(sm.getString("abstractProcotol.waitingProcerssor.add", processor));
+        }
         waitingProcessors.add(processor);
     }
 
 
     public void removeWaitingProcessor(Processor processor) {
+        if (getLog().isDebugEnabled()) {
+            getLog().debug(sm.getString("abstractProcotol.waitingProcerssor.remove", processor));
+        }
         waitingProcessors.remove(processor);
     }
 
@@ -754,11 +760,12 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
                     // OpenSSL typically returns null whereas JSSE typically
                     // returns "" when no protocol is negotiated
                     if (negotiatedProtocol != null && negotiatedProtocol.length() > 0) {
-                        UpgradeProtocol upgradeProtocol =
-                                getProtocol().getNegotiatedProtocol(negotiatedProtocol);
+                        UpgradeProtocol upgradeProtocol = getProtocol().getNegotiatedProtocol(negotiatedProtocol);
                         if (upgradeProtocol != null) {
-                            processor = upgradeProtocol.getProcessor(
-                                    wrapper, getProtocol().getAdapter());
+                            processor = upgradeProtocol.getProcessor(wrapper, getProtocol().getAdapter());
+                            if (getLog().isDebugEnabled()) {
+                                getLog().debug(sm.getString("abstractConnectionHandler.processorCreate", processor));
+                            }
                         } else if (negotiatedProtocol.equals("http/1.1")) {
                             // Explicitly negotiated the default protocol.
                             // Obtain a processor below.
@@ -771,9 +778,8 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
                             // replace the code below with the commented out
                             // block.
                             if (getLog().isDebugEnabled()) {
-                                getLog().debug(sm.getString(
-                                    "abstractConnectionHandler.negotiatedProcessor.fail",
-                                    negotiatedProtocol));
+                                getLog().debug(sm.getString("abstractConnectionHandler.negotiatedProcessor.fail",
+                                        negotiatedProtocol));
                             }
                             return SocketState.CLOSED;
                             /*
@@ -790,13 +796,15 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
                 if (processor == null) {
                     processor = recycledProcessors.pop();
                     if (getLog().isDebugEnabled()) {
-                        getLog().debug(sm.getString("abstractConnectionHandler.processorPop",
-                                processor));
+                        getLog().debug(sm.getString("abstractConnectionHandler.processorPop", processor));
                     }
                 }
                 if (processor == null) {
                     processor = getProtocol().createProcessor();
                     register(processor);
+                    if (getLog().isDebugEnabled()) {
+                        getLog().debug(sm.getString("abstractConnectionHandler.processorCreate", processor));
+                    }
                 }
 
                 processor.setSslSupport(

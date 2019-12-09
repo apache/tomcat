@@ -34,6 +34,7 @@ import org.apache.coyote.Request;
 import org.apache.coyote.Response;
 import org.apache.coyote.UpgradeProtocol;
 import org.apache.coyote.UpgradeToken;
+import org.apache.coyote.http11.AbstractHttp11Protocol;
 import org.apache.coyote.http11.upgrade.InternalHttpUpgradeHandler;
 import org.apache.coyote.http11.upgrade.UpgradeProcessorInternal;
 import org.apache.tomcat.util.buf.StringUtils;
@@ -90,6 +91,8 @@ public class Http2Protocol implements UpgradeProtocol {
     private boolean initiatePingDisabled = false;
     // Compression
     private final CompressionConfig compressionConfig = new CompressionConfig();
+    // Reference to HTTP/1.1 protocol that this instance is configured under
+    private AbstractHttp11Protocol<?> http11Protocol = null;
 
     @Override
     public String getHttpUpgradeName(boolean isSSLEnabled) {
@@ -408,5 +411,13 @@ public class Http2Protocol implements UpgradeProtocol {
 
     public boolean useCompression(Request request, Response response) {
         return compressionConfig.useCompression(request, response);
+    }
+
+
+    public AbstractHttp11Protocol<?> getHttp11Protocol() {
+        return this.http11Protocol;
+    }
+    public void setHttp11Protocol(AbstractHttp11Protocol<?> http11Protocol) {
+        this.http11Protocol = http11Protocol;
     }
 }
