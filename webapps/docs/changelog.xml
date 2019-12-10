@@ -76,7 +76,7 @@
       </add>
       <fix>
         <bug>63964</bug>: Correct a regression in the static resource caching
-        changes introduced in 9.0.28. URLs constructed from URLs obtained from
+        changes introduced in 8.5.48. URLs constructed from URLs obtained from
         the cache could not be used to access resources. (markt)
       </fix>
       <fix>
@@ -86,7 +86,7 @@
       </fix>
       <fix>
         <bug>63970</bug>: Correct a regression in the static resource caching
-        changes introduced in 9.0.28. Connections to URLs obtained for JAR
+        changes introduced in 8.5.48. Connections to URLs obtained for JAR
         resources could not be cast to <code>JarURLConnection</code>. (markt)
       </fix>
       <add>
@@ -109,7 +109,7 @@
       </fix>
       <fix>
         <bug>63983</bug>: Correct a regression in the static resource caching
-        changes introduced in 9.0.28. A large number of file descriptors were
+        changes introduced in 8.5.48. A large number of file descriptors were
         opened that could reach the OS limit before being released by GC.
         (markt)
       </fix>
