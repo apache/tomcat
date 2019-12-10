@@ -153,7 +153,6 @@ public class DelegatingStatement extends AbandonedTrace implements Statement {
                             thrownList.add(e);
                         }
                     }
-                    clearTrace();
                 }
                 clearTrace();
             }
