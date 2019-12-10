@@ -51,7 +51,7 @@
         Remove part of the deprecated Servlet 4 Preview API. Users still
         depending on this feature should ideally upgrade to Tomcat 9.0.x. If
         upgrade is not possible, application code should cast to the internal
-        Tomcat implemenation classes. (markt)
+        Tomcat implementation classes. (markt)
       </scode>
     </changelog>
   </subsection>
@@ -110,7 +110,7 @@
       <fix>
         <bug>63939</bug>: Correct the same origin check in the CORS filter. An
         origin with an explicit default port is now considered to be the same as
-        an origin without a deafult port and origins are now compared in a
+        an origin without a default port and origins are now compared in a
         case-sensitive manner as required by the CORS specification. (markt)
       </fix>
       <fix>
