@@ -53,6 +53,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Other">
+    <changelog>
+      <fix>
+        <bug>63995</bug>: Ensure statements are closed when a pooled JDBC
+        connection is passivated in Tomcat's fork of Commons DBCP2. (markt)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 8.5.50 (markt)">
   <subsection name="Catalina">
