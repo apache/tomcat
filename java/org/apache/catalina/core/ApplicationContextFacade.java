@@ -57,8 +57,7 @@ import org.apache.tomcat.util.ExceptionUtils;
  *
  * @author Remy Maucherat
  */
-@SuppressWarnings("deprecation")
-public class ApplicationContextFacade implements org.apache.catalina.servlet4preview.ServletContext {
+public class ApplicationContextFacade implements ServletContext {
 
     // ---------------------------------------------------------- Attributes
     /**
@@ -539,7 +538,6 @@ public class ApplicationContextFacade implements org.apache.catalina.servlet4pre
     }
 
 
-    @Override
     public Dynamic addJspFile(String jspName, String jspFile) {
         if (SecurityUtil.isPackageProtectionEnabled()) {
             return (ServletRegistration.Dynamic) doPrivileged("addJspFile",
@@ -782,7 +780,6 @@ public class ApplicationContextFacade implements org.apache.catalina.servlet4pre
     }
 
 
-    @Override
     public int getSessionTimeout() {
         if (SecurityUtil.isPackageProtectionEnabled()) {
             return ((Integer) doPrivileged("getSessionTimeout", null)).intValue();
@@ -792,7 +789,6 @@ public class ApplicationContextFacade implements org.apache.catalina.servlet4pre
     }
 
 
-    @Override
     public void setSessionTimeout(int sessionTimeout) {
         if (SecurityUtil.isPackageProtectionEnabled()) {
             doPrivileged("setSessionTimeout", new Object[] { Integer.valueOf(sessionTimeout) });
@@ -802,7 +798,6 @@ public class ApplicationContextFacade implements org.apache.catalina.servlet4pre
     }
 
 
-    @Override
     public String getRequestCharacterEncoding() {
         if (SecurityUtil.isPackageProtectionEnabled()) {
             return (String) doPrivileged("getRequestCharacterEncoding", null);
@@ -812,7 +807,6 @@ public class ApplicationContextFacade implements org.apache.catalina.servlet4pre
     }
 
 
-    @Override
     public void setRequestCharacterEncoding(String encoding) {
         if (SecurityUtil.isPackageProtectionEnabled()) {
             doPrivileged("setRequestCharacterEncoding", new Object[] { encoding });
@@ -822,7 +816,6 @@ public class ApplicationContextFacade implements org.apache.catalina.servlet4pre
     }
 
 
-    @Override
     public String getResponseCharacterEncoding() {
         if (SecurityUtil.isPackageProtectionEnabled()) {
             return (String) doPrivileged("getResponseCharacterEncoding", null);
@@ -832,7 +825,6 @@ public class ApplicationContextFacade implements org.apache.catalina.servlet4pre
     }
 
 
-    @Override
     public void setResponseCharacterEncoding(String encoding) {
         if (SecurityUtil.isPackageProtectionEnabled()) {
             doPrivileged("setResponseCharacterEncoding", new Object[] { encoding });

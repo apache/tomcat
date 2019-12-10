@@ -88,8 +88,7 @@ import org.apache.tomcat.util.res.StringManager;
  * @author Craig R. McClanahan
  * @author Remy Maucherat
  */
-@SuppressWarnings("deprecation")
-public class ApplicationContext implements org.apache.catalina.servlet4preview.ServletContext {
+public class ApplicationContext implements ServletContext {
 
     protected static final boolean STRICT_SERVLET_COMPLIANCE;
 
@@ -867,7 +866,6 @@ public class ApplicationContext implements org.apache.catalina.servlet4preview.S
     }
 
 
-    @Override
     public Dynamic addJspFile(String jspName, String jspFile) {
 
         // jspName is validated in addServlet()
@@ -1301,13 +1299,11 @@ public class ApplicationContext implements org.apache.catalina.servlet4preview.S
     }
 
 
-    @Override
     public int getSessionTimeout() {
         return context.getSessionTimeout();
     }
 
 
-    @Override
     public void setSessionTimeout(int sessionTimeout) {
         if (!context.getState().equals(LifecycleState.STARTING_PREP)) {
             throw new IllegalStateException(
@@ -1319,13 +1315,11 @@ public class ApplicationContext implements org.apache.catalina.servlet4preview.S
     }
 
 
-    @Override
     public String getRequestCharacterEncoding() {
         return context.getRequestCharacterEncoding();
     }
 
 
-    @Override
     public void setRequestCharacterEncoding(String encoding) {
         if (!context.getState().equals(LifecycleState.STARTING_PREP)) {
             throw new IllegalStateException(
@@ -1337,13 +1331,11 @@ public class ApplicationContext implements org.apache.catalina.servlet4preview.S
     }
 
 
-    @Override
     public String getResponseCharacterEncoding() {
         return context.getResponseCharacterEncoding();
     }
 
 
-    @Override
     public void setResponseCharacterEncoding(String encoding) {
         if (!context.getState().equals(LifecycleState.STARTING_PREP)) {
             throw new IllegalStateException(

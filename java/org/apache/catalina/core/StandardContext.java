@@ -6389,9 +6389,7 @@ public class StandardContext extends ContainerBase
     }
 
 
-    @SuppressWarnings("deprecation")
-    private static class NoPluggabilityServletContext
-            implements org.apache.catalina.servlet4preview.ServletContext {
+    private static class NoPluggabilityServletContext implements ServletContext {
 
         private final ServletContext sc;
 
@@ -6566,12 +6564,6 @@ public class StandardContext extends ContainerBase
         }
 
         @Override
-        public Dynamic addJspFile(String jspName, String jspFile) {
-            throw new UnsupportedOperationException(
-                    sm.getString("noPluggabilityServletContext.notAllowed"));
-        }
-
-        @Override
         public <T extends Servlet> T createServlet(Class<T> c)
                 throws ServletException {
             throw new UnsupportedOperationException(
@@ -6701,42 +6693,6 @@ public class StandardContext extends ContainerBase
         @Override
         public String getVirtualServerName() {
             return sc.getVirtualServerName();
-        }
-
-        @Override
-        public int getSessionTimeout() {
-            throw new UnsupportedOperationException(
-                    sm.getString("noPluggabilityServletContext.notAllowed"));
-        }
-
-        @Override
-        public void setSessionTimeout(int sessionTimeout) {
-            throw new UnsupportedOperationException(
-                    sm.getString("noPluggabilityServletContext.notAllowed"));
-        }
-
-        @Override
-        public String getRequestCharacterEncoding() {
-            throw new UnsupportedOperationException(
-                    sm.getString("noPluggabilityServletContext.notAllowed"));
-        }
-
-        @Override
-        public void setRequestCharacterEncoding(String encoding) {
-            throw new UnsupportedOperationException(
-                    sm.getString("noPluggabilityServletContext.notAllowed"));
-        }
-
-        @Override
-        public String getResponseCharacterEncoding() {
-            throw new UnsupportedOperationException(
-                    sm.getString("noPluggabilityServletContext.notAllowed"));
-        }
-
-        @Override
-        public void setResponseCharacterEncoding(String encoding) {
-            throw new UnsupportedOperationException(
-                    sm.getString("noPluggabilityServletContext.notAllowed"));
         }
     }
 }
