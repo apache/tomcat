@@ -228,7 +228,7 @@ case "$1" in
       -classpath "\"$CLASSPATH\"" \
       "\"$LOGGING_CONFIG\"" "$JAVA_OPTS" "$CATALINA_OPTS" \
       -D$ENDORSED_PROP="\"$JAVA_ENDORSED_DIRS\"" \
-      -Dcatalina.base="\"$CATALINA_BASE"\" \
+      -Dcatalina.base="\"$CATALINA_BASE\"" \
       -Dcatalina.home="\"$CATALINA_HOME\"" \
       -Djava.io.tmpdir="\"$CATALINA_TMP\"" \
       $CATALINA_MAIN
