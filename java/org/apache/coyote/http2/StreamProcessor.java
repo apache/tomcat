@@ -71,7 +71,10 @@ class StreamProcessor extends AbstractProcessor {
                 try {
                     state = process(socketWrapper, event);
 
-                    if (state == SocketState.CLOSED) {
+                    if (state == SocketState.LONG) {
+                        handler.getProtocol().getHttp11Protocol().addWaitingProcessor(this);
+                    } else if (state == SocketState.CLOSED) {
+                        handler.getProtocol().getHttp11Protocol().removeWaitingProcessor(this);
                         if (!getErrorState().isConnectionIoAllowed()) {
                             ConnectionException ce = new ConnectionException(sm.getString(
                                     "streamProcessor.error.connection", stream.getConnectionId(),

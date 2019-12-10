@@ -50,6 +50,10 @@
       <update>
         Simplify NIO blocking read and write. (remm)
       </update>
+      <fix>
+        Ensure that Servlet Asynchronous processing timeouts fire when requests
+        are made using HTTP/2. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
