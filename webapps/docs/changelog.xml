@@ -77,7 +77,7 @@
       <fix>
         <bug>63939</bug>: Correct the same origin check in the CORS filter. An
         origin with an explicit default port is now considered to be the same as
-        an origin without a deafult port and origins are now compared in a
+        an origin without a default port and origins are now compared in a
         case-sensitive manner as required by the CORS specification. (markt)
       </fix>
       <fix>
