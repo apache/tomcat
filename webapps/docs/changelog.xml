@@ -64,6 +64,13 @@
         Parameterize JSP version and API class names in localization messages to
         allow simpler re-use between major versions. (markt)
       </scode>
+      <fix>
+        Ensure that TLD files listed in the <code>jsp-config</code> section of
+        <code>web.xml</code> that are registered in the
+        <code>uriTldResourcePathMap</code> with the URI specified in
+        <code>web.xml</code> are also registered with the URI in the TLD file if
+        it is different. Patch provided by Markus Lottmann. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
