@@ -1101,7 +1101,31 @@ public abstract class AuthenticatorBase extends ValveBase
     }
 
 
-    private void register(Request request, HttpServletResponse response, Principal principal,
+    /**
+     * Register an authenticated Principal and authentication type in our
+     * request, in the current session (if there is one), and with our
+     * SingleSignOn valve, if there is one. Set the appropriate cookie to be
+     * returned.
+     *
+     * @param request
+     *            The servlet request we are processing
+     * @param response
+     *            The servlet response we are generating
+     * @param principal
+     *            The authenticated Principal to be registered
+     * @param authType
+     *            The authentication type to be registered
+     * @param username
+     *            Username used to authenticate (if any)
+     * @param password
+     *            Password used to authenticate (if any)
+     * @param alwaysUseSession
+     *            Should a session always be used once a user is authenticated?
+     * @param cache
+     *            Should we cache authenticated Principals if the request is part of an
+     *            HTTP session?
+     */
+    protected void register(Request request, HttpServletResponse response, Principal principal,
             String authType, String username, String password, boolean alwaysUseSession,
             boolean cache) {
 
@@ -1137,22 +1161,9 @@ public abstract class AuthenticatorBase extends ValveBase
         }
 
         // Cache the authentication information in our session, if any
-        if (session != null) {
-            if (cache) {
-                session.setAuthType(authType);
-                session.setPrincipal(principal);
-            } else {
-                if (username != null) {
-                    session.setNote(Constants.SESS_USERNAME_NOTE, username);
-                } else {
-                    session.removeNote(Constants.SESS_USERNAME_NOTE);
-                }
-                if (password != null) {
-                    session.setNote(Constants.SESS_PASSWORD_NOTE, password);
-                } else {
-                    session.removeNote(Constants.SESS_PASSWORD_NOTE);
-                }
-            }
+        if (session != null && cache) {
+            session.setAuthType(authType);
+            session.setPrincipal(principal);
         }
 
         // Construct a cookie to be returned to the client
