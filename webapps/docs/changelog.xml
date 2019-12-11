@@ -99,6 +99,10 @@
         the authenticated Principal is not cached in the session when caching is
         disabled. (markt)
       </fix>
+      <update>
+        Do not store username and password as session notes during
+        authentication if they are not needed. (kkolinko)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Coyote">

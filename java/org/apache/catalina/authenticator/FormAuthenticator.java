@@ -369,6 +369,33 @@ public class FormAuthenticator
     }
 
 
+    @Override
+    public void register(Request request, HttpServletResponse response,
+            Principal principal, String authType, String username,
+            String password) {
+
+        super.register(request, response, principal, authType, username, password);
+
+        // If caching an authenticated Principal is turned off,
+        // store username and password as session notes to use them for re-authentication.
+        if (!cache) {
+            Session session = request.getSessionInternal(false);
+            if (session != null) {
+                if (username != null) {
+                    session.setNote(Constants.SESS_USERNAME_NOTE, username);
+                } else {
+                    session.removeNote(Constants.SESS_USERNAME_NOTE);
+                }
+                if (password != null) {
+                    session.setNote(Constants.SESS_PASSWORD_NOTE, password);
+                } else {
+                    session.removeNote(Constants.SESS_PASSWORD_NOTE);
+                }
+            }
+        }
+    }
+
+
     /**
      * Called to forward to the login page
      *

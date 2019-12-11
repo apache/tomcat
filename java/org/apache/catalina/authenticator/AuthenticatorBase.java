@@ -918,22 +918,9 @@ public abstract class AuthenticatorBase extends ValveBase
         }
 
         // Cache the authentication information in our session, if any
-        if (session != null) {
-            if (cache) {
-                session.setAuthType(authType);
-                session.setPrincipal(principal);
-            } else {
-                if (username != null) {
-                    session.setNote(Constants.SESS_USERNAME_NOTE, username);
-                } else {
-                    session.removeNote(Constants.SESS_USERNAME_NOTE);
-                }
-                if (password != null) {
-                    session.setNote(Constants.SESS_PASSWORD_NOTE, password);
-                } else {
-                    session.removeNote(Constants.SESS_PASSWORD_NOTE);
-                }
-            }
+        if (session != null && cache) {
+            session.setAuthType(authType);
+            session.setPrincipal(principal);
         }
 
         // Construct a cookie to be returned to the client
