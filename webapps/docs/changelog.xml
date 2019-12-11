@@ -53,6 +53,10 @@
         upgrade is not possible, application code should cast to the internal
         Tomcat implementation classes. (markt)
       </scode>
+      <update>
+        Do not store username and password as session notes during
+        authentication if they are not needed. (kkolinko)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Coyote">
