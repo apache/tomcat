@@ -306,4 +306,3 @@ bnd.loc=${base-maven.loc}/biz/aQute/bnd/biz.aQute.bnd/${bnd.version}/biz.aQute.b
 bndlib.home=${base.path}/bndlib-${bnd.version}
 bndlib.jar=${bndlib.home}/biz.aQute.bndlib-${bnd.version}.jar
 bndlib.loc=${base-maven.loc}/biz/aQute/bnd/biz.aQute.bndlib/${bnd.version}/biz.aQute.bndlib-${bnd.version}.jar
-test.entry=org.apache.jasper.TestJspC
