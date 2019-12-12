@@ -36,7 +36,7 @@
         <geronimo-atinject.version>1.0</geronimo-atinject.version>
         <geronimo-interceptor.version>1.0</geronimo-interceptor.version>
         <geronimo-jcdi.version>1.0.1</geronimo-jcdi.version>
-        <tomcat.version>9.0.27</tomcat.version>
+        <tomcat.version>9.0.30</tomcat.version>
     </properties>
 
     <dependencies>
