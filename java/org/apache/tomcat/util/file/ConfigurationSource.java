@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URI;
+import java.net.URL;
 
 /**
  * Abstracts configuration file storage. Allows Tomcat embedding using the regular
@@ -44,7 +45,17 @@ public interface ConfigurationSource {
             }
             if (f.isFile()) {
                 return new Resource(new FileInputStream(f), f.toURI());
-            } else {
+            }
+            URI uri = null;
+            try {
+                uri = getURI(name);
+            } catch (IllegalArgumentException e) {
+                throw new FileNotFoundException(name);
+            }
+            try {
+                URL url = uri.toURL();
+                return new Resource(url.openConnection().getInputStream(), uri);
+            } catch (MalformedURLException e) {
                 throw new FileNotFoundException(name);
             }
         }

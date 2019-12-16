@@ -53,7 +53,7 @@ public class MemoryUserDatabaseTests {
         }
 
         db = new MemoryUserDatabase();
-        db.setPathname(TEST_FILE.getAbsolutePath());
+        db.setPathname(TEST_FILE.toURI().toURL().toString());
         db.open();
     }
 
