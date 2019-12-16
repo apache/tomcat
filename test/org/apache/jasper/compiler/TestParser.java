@@ -17,7 +17,6 @@
 package org.apache.jasper.compiler;
 
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import org.apache.catalina.startup.TomcatBaseTest;
@@ -234,7 +233,6 @@ public class TestParser extends TomcatBaseTest {
              || result.contains("&#034;5&apos;5&#034;"));
     }
 
-    @Ignore // Jakarta EE / JSTL
     @Test
     public void testBug56265() throws Exception {
         getTomcatInstanceTestWebapp(true, true);
@@ -254,7 +252,6 @@ public class TestParser extends TomcatBaseTest {
                 result.contains("[4: [data-test]: [window.alert('Hello 'World <&>'!')]]"));
     }
 
-    @Ignore // Jakarta EE / JSTL
     @Test
     public void testBug56334And56561() throws Exception {
         getTomcatInstanceTestWebapp(true, true);

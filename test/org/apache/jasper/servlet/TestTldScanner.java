@@ -107,9 +107,9 @@ public class TestTldScanner extends TomcatBaseTest {
 
         File webappDir = new File("webapps/examples");
         Assert.assertFalse(callback.scanFoundNoTLDs());
-        scan(callback, webappDir, "WEB-INF/lib/taglibs-standard-spec-1.2.5.jar");
+        scan(callback, webappDir, "WEB-INF/lib/taglibs-standard-spec-1.2.5-migrated-0.0.1.jar");
         Assert.assertTrue(callback.scanFoundNoTLDs());
-        scan(callback, webappDir, "WEB-INF/lib/taglibs-standard-impl-1.2.5.jar");
+        scan(callback, webappDir, "WEB-INF/lib/taglibs-standard-impl-1.2.5-migrated-0.0.1.jar");
         Assert.assertTrue(callback.scanFoundNoTLDs());
     }
 

@@ -19,7 +19,6 @@ package jakarta.el;
 import jakarta.servlet.http.HttpServletResponse;
 
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import org.apache.catalina.startup.TomcatBaseTest;
@@ -27,7 +26,6 @@ import org.apache.tomcat.util.buf.ByteChunk;
 
 public class TestCompositeELResolver extends TomcatBaseTest {
 
-    @Ignore // Jakarta EE / JSTL
     @Test
     public void testBug50408() throws Exception {
         getTomcatInstanceTestWebapp(true, true);

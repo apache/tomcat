@@ -88,12 +88,12 @@ public class TestStandardContextAliases extends TomcatBaseTest {
             ServletContext context = getServletContext();
 
             // Check resources individually
-            URL url = context.getResource("/WEB-INF/lib/taglibs-standard-spec-1.2.5.jar");
+            URL url = context.getResource("/WEB-INF/lib/taglibs-standard-spec-1.2.5-migrated-0.0.1.jar");
             if (url != null) {
                 resp.getWriter().write("00-PASS\n");
             }
 
-            url = context.getResource("/WEB-INF/lib/taglibs-standard-impl-1.2.5.jar");
+            url = context.getResource("/WEB-INF/lib/taglibs-standard-impl-1.2.5-migrated-0.0.1.jar");
             if (url != null) {
                 resp.getWriter().write("01-PASS\n");
             }
@@ -104,10 +104,10 @@ public class TestStandardContextAliases extends TomcatBaseTest {
                 return;
             }
 
-            if (!libs.contains("/WEB-INF/lib/taglibs-standard-spec-1.2.5.jar")) {
+            if (!libs.contains("/WEB-INF/lib/taglibs-standard-spec-1.2.5-migrated-0.0.1.jar")) {
                 return;
             }
-            if (!libs.contains("/WEB-INF/lib/taglibs-standard-impl-1.2.5.jar")) {
+            if (!libs.contains("/WEB-INF/lib/taglibs-standard-impl-1.2.5-migrated-0.0.1.jar")) {
                 return;
             }
 
