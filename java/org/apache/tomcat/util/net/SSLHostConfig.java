@@ -212,9 +212,10 @@ public class SSLHostConfig implements Serializable {
 
     private void registerDefaultCertificate() {
         if (defaultCertificate == null) {
-            defaultCertificate = new SSLHostConfigCertificate(
+            SSLHostConfigCertificate defaultCertificate = new SSLHostConfigCertificate(
                     this, SSLHostConfigCertificate.Type.UNDEFINED);
-            certificates.add(defaultCertificate);
+            addCertificate(defaultCertificate);
+            this.defaultCertificate = defaultCertificate;
         }
     }
 
@@ -273,8 +274,11 @@ public class SSLHostConfig implements Serializable {
     // necessary to support the old configuration attributes (Tomcat 10?).
 
     public String getCertificateKeyPassword() {
-        registerDefaultCertificate();
-        return defaultCertificate.getCertificateKeyPassword();
+        if (defaultCertificate == null) {
+            return null;
+        } else {
+            return defaultCertificate.getCertificateKeyPassword();
+        }
     }
     public void setCertificateKeyPassword(String certificateKeyPassword) {
         registerDefaultCertificate();
@@ -523,8 +527,11 @@ public class SSLHostConfig implements Serializable {
     // necessary to support the old configuration attributes (Tomcat 10?).
 
     public String getCertificateKeyAlias() {
-        registerDefaultCertificate();
-        return defaultCertificate.getCertificateKeyAlias();
+        if (defaultCertificate == null) {
+            return null;
+        } else {
+            return defaultCertificate.getCertificateKeyAlias();
+        }
     }
     public void setCertificateKeyAlias(String certificateKeyAlias) {
         registerDefaultCertificate();
@@ -533,8 +540,11 @@ public class SSLHostConfig implements Serializable {
 
 
     public String getCertificateKeystoreFile() {
-        registerDefaultCertificate();
-        return defaultCertificate.getCertificateKeystoreFile();
+        if (defaultCertificate == null) {
+            return null;
+        } else {
+            return defaultCertificate.getCertificateKeystoreFile();
+        }
     }
     public void setCertificateKeystoreFile(String certificateKeystoreFile) {
         registerDefaultCertificate();
@@ -543,8 +553,11 @@ public class SSLHostConfig implements Serializable {
 
 
     public String getCertificateKeystorePassword() {
-        registerDefaultCertificate();
-        return defaultCertificate.getCertificateKeystorePassword();
+        if (defaultCertificate == null) {
+            return null;
+        } else {
+            return defaultCertificate.getCertificateKeystorePassword();
+        }
     }
     public void setCertificateKeystorePassword(String certificateKeystorePassword) {
         registerDefaultCertificate();
@@ -553,8 +566,11 @@ public class SSLHostConfig implements Serializable {
 
 
     public String getCertificateKeystoreProvider() {
-        registerDefaultCertificate();
-        return defaultCertificate.getCertificateKeystoreProvider();
+        if (defaultCertificate == null) {
+            return null;
+        } else {
+            return defaultCertificate.getCertificateKeystoreProvider();
+        }
     }
     public void setCertificateKeystoreProvider(String certificateKeystoreProvider) {
         registerDefaultCertificate();
@@ -563,8 +579,11 @@ public class SSLHostConfig implements Serializable {
 
 
     public String getCertificateKeystoreType() {
-        registerDefaultCertificate();
-        return defaultCertificate.getCertificateKeystoreType();
+        if (defaultCertificate == null) {
+            return null;
+        } else {
+            return defaultCertificate.getCertificateKeystoreType();
+        }
     }
     public void setCertificateKeystoreType(String certificateKeystoreType) {
         registerDefaultCertificate();
@@ -730,8 +749,11 @@ public class SSLHostConfig implements Serializable {
     // necessary to support the old configuration attributes (Tomcat 10?).
 
     public String getCertificateChainFile() {
-        registerDefaultCertificate();
-        return defaultCertificate.getCertificateChainFile();
+        if (defaultCertificate == null) {
+            return null;
+        } else {
+            return defaultCertificate.getCertificateChainFile();
+        }
     }
     public void setCertificateChainFile(String certificateChainFile) {
         registerDefaultCertificate();
@@ -740,8 +762,11 @@ public class SSLHostConfig implements Serializable {
 
 
     public String getCertificateFile() {
-        registerDefaultCertificate();
-        return defaultCertificate.getCertificateFile();
+        if (defaultCertificate == null) {
+            return null;
+        } else {
+            return defaultCertificate.getCertificateFile();
+        }
     }
     public void setCertificateFile(String certificateFile) {
         registerDefaultCertificate();
@@ -750,8 +775,11 @@ public class SSLHostConfig implements Serializable {
 
 
     public String getCertificateKeyFile() {
-        registerDefaultCertificate();
-        return defaultCertificate.getCertificateKeyFile();
+        if (defaultCertificate == null) {
+            return null;
+        } else {
+            return defaultCertificate.getCertificateKeyFile();
+        }
     }
     public void setCertificateKeyFile(String certificateKeyFile) {
         registerDefaultCertificate();

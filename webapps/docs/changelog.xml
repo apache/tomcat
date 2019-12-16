@@ -69,6 +69,12 @@
         Ensure that Servlet Asynchronous processing timeouts fire when requests
         are made using HTTP/2. (markt)
       </fix>
+      <fix>
+        Fix the corrupton of the TLS configuration when using the deprecated TLS
+        attributes on the Connector if the configuration has already been set
+        via the new <code>SSLHostConfig</code> and
+        <code>SSLHostConfigCertificate</code> elements. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
