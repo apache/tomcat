@@ -59,5 +59,8 @@ New items for 10.0.x onwards:
 
 10. BZ 63286. Make behaviour of %D and %T consistent with httpd.
 
-11. Refactor DefaultServlet to use Ranges in parseRanges()
+11. Refactor DefaultServlet to use Ranges in parseRanges().
 
+12. Consider disabling the AJP connector by default.
+
+13. Remove GenericPrincipal.getPassword().
