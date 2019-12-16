@@ -1590,7 +1590,6 @@ public class JNDIRealm extends RealmBase {
                 containerLog.debug("Found user by search [" + user + "]");
             }
         }
-
         if (userPassword == null && credentials != null && user != null) {
             // The password is available. Insert it since it may be required for
             // role searches.
@@ -2291,7 +2290,7 @@ public class JNDIRealm extends RealmBase {
 
         try {
             User user = getUser(open(), username, null);
-             if (user == null) {
+            if (user == null) {
                 // User should be found...
                 return null;
             } else {
@@ -2425,12 +2424,14 @@ public class JNDIRealm extends RealmBase {
                 roles = getRoles(context, user);
             }
         } finally {
-            restoreEnvironmentParameter(context,
-                    Context.SECURITY_AUTHENTICATION, preservedEnvironment);
-            restoreEnvironmentParameter(context,
-                    "javax.security.sasl.server.authentication", preservedEnvironment);
-            restoreEnvironmentParameter(context, "javax.security.sasl.qop",
-                    preservedEnvironment);
+            if (gssCredential != null && isUseDelegatedCredential()) {
+                restoreEnvironmentParameter(context,
+                        Context.SECURITY_AUTHENTICATION, preservedEnvironment);
+                restoreEnvironmentParameter(context,
+                        "javax.security.sasl.server.authentication", preservedEnvironment);
+                restoreEnvironmentParameter(context, "javax.security.sasl.qop",
+                        preservedEnvironment);
+            }
         }
 
         if (user != null) {
