@@ -55,6 +55,11 @@
         Avoid useless environment restore when not using GSSCredential
         in JNDIRealm. (remm)
       </fix>
+      <fix>
+        <bug>64006</bug>: Provide default configuration source based on the
+        current directory if none has been set, for full compatibility with
+        existing code. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

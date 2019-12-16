@@ -16,6 +16,9 @@
  */
 package org.apache.tomcat.util.file;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
@@ -29,6 +32,34 @@ import java.net.URI;
  * embedding, as well as resource writing.
  */
 public interface ConfigurationSource {
+
+    public static final ConfigurationSource DEFAULT = new ConfigurationSource() {
+        protected final File userDir = new File(System.getProperty("user.dir"));
+        protected final URI userDirUri = userDir.toURI();
+        @Override
+        public Resource getResource(String name) throws IOException {
+            File f = new File(name);
+            if (!f.isAbsolute()) {
+                f = new File(userDir, name);
+            }
+            if (f.isFile()) {
+                return new Resource(new FileInputStream(f), f.toURI());
+            } else {
+                throw new FileNotFoundException(name);
+            }
+        }
+        @Override
+        public URI getURI(String name) {
+            File f = new File(name);
+            if (!f.isAbsolute()) {
+                f = new File(userDir, name);
+            }
+            if (f.isFile()) {
+                return f.toURI();
+            }
+            return userDirUri.resolve(name);
+        }
+    };
 
     /**
      * Represents a resource: a stream to the resource associated with

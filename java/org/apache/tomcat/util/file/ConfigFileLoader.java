@@ -21,8 +21,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 
-import org.apache.tomcat.util.res.StringManager;
-
 /**
  * This class is used to obtain {@link InputStream}s for configuration files
  * from a given location String. This allows greater flexibility than these
@@ -30,14 +28,12 @@ import org.apache.tomcat.util.res.StringManager;
  */
 public class ConfigFileLoader {
 
-    private static final StringManager sm = StringManager.getManager(ConfigFileLoader.class
-            .getPackage().getName());
-
     private static ConfigurationSource source;
 
     public static final ConfigurationSource getSource() {
         if (ConfigFileLoader.source == null) {
-            throw new IllegalStateException(sm.getString("configFileLoader.noConfigurationSource"));
+            // TODO: Add logging in Tomcat 10 when the default is silently used, or remove the default
+            return ConfigurationSource.DEFAULT;
         }
         return source;
     }

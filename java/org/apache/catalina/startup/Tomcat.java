@@ -18,13 +18,11 @@ package org.apache.catalina.startup;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
 import java.security.Principal;
@@ -1415,33 +1413,8 @@ public class Tomcat {
         org.apache.catalina.startup.Tomcat tomcat = new org.apache.catalina.startup.Tomcat();
         // Create a Catalina instance and let it parse the configuration files
         // It will also set a shutdown hook to stop the Server when needed
-        tomcat.init(new ConfigurationSource() {
-            protected final File userDir = new File(System.getProperty("user.dir"));
-            protected final URI userDirUri = userDir.toURI();
-            @Override
-            public Resource getResource(String name) throws IOException {
-                File f = new File(name);
-                if (!f.isAbsolute()) {
-                    f = new File(userDir, name);
-                }
-                if (f.isFile()) {
-                    return new Resource(new FileInputStream(f), f.toURI());
-                } else {
-                    throw new FileNotFoundException(name);
-                }
-            }
-            @Override
-            public URI getURI(String name) {
-                File f = new File(name);
-                if (!f.isAbsolute()) {
-                    f = new File(userDir, name);
-                }
-                if (f.isFile()) {
-                    return f.toURI();
-                }
-                return userDirUri.resolve(name);
-            }
-        });
+        // Use the default configuration source
+        tomcat.init(null);
         boolean await = false;
         String path = "";
         // Process command line parameters
