@@ -57,6 +57,10 @@
         Do not store username and password as session notes during
         authentication if they are not needed. (kkolinko)
       </update>
+      <fix>
+        Avoid useless environment restore when not using GSSCredential
+        in JNDIRealm. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
