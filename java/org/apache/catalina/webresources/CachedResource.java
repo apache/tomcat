@@ -26,6 +26,7 @@ import java.net.URLConnection;
 import java.net.URLStreamHandler;
 import java.security.Permission;
 import java.security.cert.Certificate;
+import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 
@@ -556,6 +557,15 @@ public class CachedResource implements WebResource {
         @Override
         public JarFile getJarFile() throws IOException {
             return ((JarURLConnection) resourceURL.openConnection()).getJarFile();
+        }
+
+        @Override
+        public JarEntry getJarEntry() throws IOException {
+            if (getEntryName() == null) {
+                return null;
+            } else {
+                return super.getJarEntry();
+            }
         }
     }
 }

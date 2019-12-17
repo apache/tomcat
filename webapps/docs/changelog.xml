@@ -56,6 +56,11 @@
         in JNDIRealm. (remm)
       </fix>
       <fix>
+        <bug>64005</bug>: Correct a regression in the static resource caching
+        changes introduced in 9.0.28. Avoid a <code>NullPointerException</code>
+        when working with the URL provided for the root of a packed WAR. (markt)
+      </fix>
+      <fix>
         <bug>64006</bug>: Provide default configuration source based on the
         current directory if none has been set, for full compatibility with
         existing code. (remm)
