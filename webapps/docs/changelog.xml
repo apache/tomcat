@@ -61,6 +61,17 @@
         Avoid useless environment restore when not using GSSCredential
         in JNDIRealm. (remm)
       </fix>
+      <add>
+        <bug>62755</bug>: Add ability to opt out of adding the default web.xml
+        config when embedding Tomcat and adding a context via
+        <code>addWebapp()</code>. Call
+        <code>setAddDefaultWebXmlToWebapp(false)</code> to prevent the automatic
+        config. (isapir/markt)
+      </add>
+      <fix>
+        <bug>64008</bug>: Clarify/expand the Javadoc for the
+        <code>Tomcat#addWebapp()</code> and related methods. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
