@@ -60,6 +60,10 @@
         current directory if none has been set, for full compatibility with
         existing code. (remm)
       </fix>
+      <fix>
+        <bug>64008</bug>: Clarify/expand the Javadoc for the
+        <code>Tomcat#addWebapp()</code> and related methods. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

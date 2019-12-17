@@ -117,12 +117,17 @@ import org.apache.tomcat.util.res.StringManager;
  * this class.
  *
  * <p>
- * This class provides a set of convenience methods for configuring webapp
- * contexts, all overloads of the method <code>addWebapp</code>. These methods
- * create a webapp context, configure it, and then add it to a {@link Host}.
- * They do not use a global default web.xml; rather, they add a lifecycle
- * listener that adds the standard DefaultServlet, JSP processing, and welcome
- * files.
+ * This class provides a set of convenience methods for configuring web
+ * application contexts; all overloads of the method <code>addWebapp()</code>.
+ * These methods are equivalent to adding a web application to the Host's
+ * appBase (normally the webapps directory). These methods create a Context,
+ * configure it with the equivalent of the defaults provided by
+ * <code>conf/web.xml</code> (see {@link #initWebappDefaults(String)} for
+ * details) and add the Context to a Host. These methods do not use a global
+ * default web.xml; rather, they add a {@link LifecycleListener} to configure
+ * the defaults. Any WEB-INF/web.xml and META-INF/context.xml packaged with the
+ * application will be processed normally. Normal web fragment and
+ * {@link javax.servlet.ServletContainerInitializer} processing will be applied.
  *
  * <p>
  * In complex cases, you may prefer to use the ordinary Tomcat API to create
@@ -221,17 +226,22 @@ public class Tomcat {
         hostname = s;
     }
 
+
     /**
-     * This is equivalent to adding a web application to Tomcat's webapps
-     * directory. The equivalent of the default web.xml will be applied  to the
-     * web application and any WEB-INF/web.xml and META-INF/context.xml packaged
-     * with the application will be processed normally. Normal web fragment and
-     * {@link javax.servlet.ServletContainerInitializer} processing will be
-     * applied.
+     * This is equivalent to adding a web application to a Host's appBase
+     * (usually Tomcat's webapps directory). By default, the equivalent of the
+     * default web.xml will be applied to the web application (see
+     * {@link #initWebappDefaults(String)}). This may be prevented by calling
+     * {@link #setAddDefaultWebXmlToWebapp(boolean)} with {@code false}. Any
+     * <code>WEB-INF/web.xml</code> and <code>META-INF/context.xml</code>
+     * packaged with the application will always be processed and normal web
+     * fragment and {@link javax.servlet.ServletContainerInitializer} processing
+     * will always be applied.
      *
      * @param contextPath The context mapping to use, "" for root context.
-     * @param docBase Base directory for the context, for static files.
-     *  Must exist, relative to the server home
+     * @param docBase     Base directory for the context, for static files. Must
+     *                        exist, relative to the server home
+     *
      * @return the deployed context
      */
     public Context addWebapp(String contextPath, String docBase) {
@@ -674,13 +684,24 @@ public class Tomcat {
         return ctx;
     }
 
+
     /**
-     * @param host The host in which the context will be deployed
+     * This is equivalent to adding a web application to a Host's appBase
+     * (usually Tomcat's webapps directory). By default, the equivalent of the
+     * default web.xml will be applied to the web application (see
+     * {@link #initWebappDefaults(String)}). This may be prevented by calling
+     * {@link #setAddDefaultWebXmlToWebapp(boolean)} with {@code false}. Any
+     * <code>WEB-INF/web.xml</code> and <code>META-INF/context.xml</code>
+     * packaged with the application will always be processed and normal web
+     * fragment and {@link javax.servlet.ServletContainerInitializer} processing
+     * will always be applied.
+     *
+     * @param host        The host in which the context will be deployed
      * @param contextPath The context mapping to use, "" for root context.
-     * @param docBase Base directory for the context, for static files.
-     *  Must exist, relative to the server home
+     * @param docBase     Base directory for the context, for static files. Must
+     *                        exist, relative to the server home
+     *
      * @return the deployed context
-     * @see #addWebapp(String, String)
      */
     public Context addWebapp(Host host, String contextPath, String docBase) {
         LifecycleListener listener = null;
@@ -696,14 +717,27 @@ public class Tomcat {
         return addWebapp(host, contextPath, docBase, listener);
     }
 
+
     /**
-     * @param host The host in which the context will be deployed
+     * This is equivalent to adding a web application to a Host's appBase
+     * (usually Tomcat's webapps directory). By default, the equivalent of the
+     * default web.xml will be applied to the web application (see
+     * {@link #initWebappDefaults(String)}). This may be prevented by calling
+     * {@link #setAddDefaultWebXmlToWebapp(boolean)} with {@code false}. Any
+     * <code>WEB-INF/web.xml</code> and <code>META-INF/context.xml</code>
+     * packaged with the application will always be processed and normal web
+     * fragment and {@link javax.servlet.ServletContainerInitializer} processing
+     * will always be applied.
+     *
+     * @param host        The host in which the context will be deployed
      * @param contextPath The context mapping to use, "" for root context.
-     * @param docBase Base directory for the context, for static files.
-     *  Must exist, relative to the server home
-     * @param config Custom context configurator helper
+     * @param docBase     Base directory for the context, for static files. Must
+     *                        exist, relative to the server home
+     * @param config      Custom context configuration helper. Any configuration
+     *                        will be in addition to equivalent of the default
+     *                        web.xml configuration described above.
+     *
      * @return the deployed context
-     * @see #addWebapp(String, String)
      */
     public Context addWebapp(Host host, String contextPath, String docBase,
             LifecycleListener config) {
@@ -1005,22 +1039,32 @@ public class Tomcat {
         }
     }
 
+
     /**
-     * Provide default configuration for a context. This is the programmatic
-     * equivalent of the default web.xml.
+     * Provide default configuration for a context. This is broadly the
+     * programmatic equivalent of the default web.xml and provides the following
+     * features:
+     * <ul>
+     * <li>Default servlet mapped to "/"</li>
+     * <li>JSP servlet mapped to "*.jsp" and ""*.jspx"</li>
+     * <li>Session timeout of 30 minutes</li>
+     * <li>MIME mappings (subset of those in conf/web.xml)</li>
+     * <li>Welcome files</li>
+     * </ul>
+     * TODO: Align the MIME mappings with conf/web.xml - possibly via a common
+     *       file.
      *
-     *  TODO: in normal Tomcat, if default-web.xml is not found, use this
-     *  method
-     *
-     * @param contextPath   The context to set the defaults for
+     * @param contextPath   The path of the context to set the defaults for
      */
     public void initWebappDefaults(String contextPath) {
         Container ctx = getHost().findChild(contextPath);
         initWebappDefaults((Context) ctx);
     }
 
+
     /**
-     * Static version of {@link #initWebappDefaults(String)}
+     * Static version of {@link #initWebappDefaults(String)}.
+     *
      * @param ctx   The context to set the defaults for
      */
     public static void initWebappDefaults(Context ctx) {
