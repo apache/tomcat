@@ -164,6 +164,11 @@
         Add support for RFC 5915 formatted, unencrypted EC key files when using
         a JSSE based TLS connector. (markt)
       </add>
+      <fix>
+        Correct a regression introduced in 9.0.28 that meant invalid tokens in
+        the <code>Transfer-Encoding</code> header were ignored rather than
+        treated as an error. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">

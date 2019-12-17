@@ -723,10 +723,14 @@ public class Http11Processor extends AbstractProcessor {
             MessageBytes transferEncodingValueMB = headers.getValue("transfer-encoding");
             if (transferEncodingValueMB != null) {
                 List<String> encodingNames = new ArrayList<>();
-                TokenList.parseTokenList(headers.values("transfer-encoding"), encodingNames);
-                for (String encodingName : encodingNames) {
-                    // "identity" codings are ignored
-                    addInputFilter(inputFilters, encodingName);
+                if (TokenList.parseTokenList(headers.values("transfer-encoding"), encodingNames)) {
+                    for (String encodingName : encodingNames) {
+                        // "identity" codings are ignored
+                        addInputFilter(inputFilters, encodingName);
+                    }
+                } else {
+                    // Invalid transfer encoding
+                    badRequest("http11processor.request.invalidTransferEncoding");
                 }
             }
         }
