@@ -31,7 +31,7 @@ public class TestTokenList {
     public void testAll() throws IOException {
         Set<String> expected = new HashSet<String>();
         expected.add("*");
-        doTestVary("*", expected);
+        doTestVary("*", expected, true);
     }
 
 
@@ -39,7 +39,7 @@ public class TestTokenList {
     public void testSingle() throws IOException {
         Set<String> expected = new HashSet<String>();
         expected.add("host");
-        doTestVary("Host", expected);
+        doTestVary("Host", expected, true);
     }
 
 
@@ -49,21 +49,21 @@ public class TestTokenList {
         expected.add("bar");
         expected.add("foo");
         expected.add("host");
-        doTestVary("Host, Foo, Bar", expected);
+        doTestVary("Host, Foo, Bar", expected, true);
     }
 
 
     @Test
     public void testEmptyString() throws IOException {
         Set<String> s = Collections.emptySet();
-        doTestVary("", s);
+        doTestVary("", s, false);
     }
 
 
     @Test
     public void testSingleInvalid() throws IOException {
         Set<String> s = Collections.emptySet();
-        doTestVary("{{{", s);
+        doTestVary("{{{", s, false);
     }
 
 
@@ -73,7 +73,7 @@ public class TestTokenList {
         expected.add("bar");
         expected.add("foo");
         expected.add("host");
-        doTestVary("{{{, Host, Foo, Bar", expected);
+        doTestVary("{{{, Host, Foo, Bar", expected, false);
     }
 
 
@@ -83,7 +83,7 @@ public class TestTokenList {
         expected.add("bar");
         expected.add("foo");
         expected.add("host");
-        doTestVary("Host, {{{, Foo, Bar", expected);
+        doTestVary("Host, {{{, Foo, Bar", expected, false);
     }
 
 
@@ -93,7 +93,7 @@ public class TestTokenList {
         expected.add("bar");
         expected.add("foo");
         expected.add("host");
-        doTestVary("Host, Foo, Bar, {{{", expected);
+        doTestVary("Host, Foo, Bar, {{{", expected, false);
     }
 
 
@@ -103,7 +103,7 @@ public class TestTokenList {
         expected.add("bar");
         expected.add("foo");
         expected.add("host");
-        doTestVary("OK {{{, Host, Foo, Bar", expected);
+        doTestVary("OK {{{, Host, Foo, Bar", expected, false);
     }
 
 
@@ -113,7 +113,7 @@ public class TestTokenList {
         expected.add("bar");
         expected.add("foo");
         expected.add("host");
-        doTestVary("Host, OK {{{, Foo, Bar", expected);
+        doTestVary("Host, OK {{{, Foo, Bar", expected, false);
     }
 
 
@@ -123,21 +123,80 @@ public class TestTokenList {
         expected.add("bar");
         expected.add("foo");
         expected.add("host");
-        doTestVary("Host, Foo, Bar, OK {{{", expected);
+        doTestVary("Host, Foo, Bar, OK {{{", expected, false);
     }
 
 
     @SuppressWarnings("deprecation")
-    private void doTestVary(String input, Set<String> expected) throws IOException {
+    private void doTestVary(String input, Set<String> expectedTokens, boolean expectedResult) throws IOException {
         StringReader reader = new StringReader(input);
-        Set<String> result = new HashSet<String>();
-        Vary.parseVary(reader, result);
-        Assert.assertEquals(expected, result);
+        Set<String> tokens = new HashSet<String>();
+        Vary.parseVary(reader, tokens);
+        Assert.assertEquals(expectedTokens, tokens);
 
         // Can't use reset(). Parser uses marks.
         reader = new StringReader(input);
-        result.clear();
-        TokenList.parseTokenList(reader, result);
-        Assert.assertEquals(expected, result);
+        tokens.clear();
+        boolean result = TokenList.parseTokenList(reader, tokens);
+        Assert.assertEquals(expectedTokens, tokens);
+        Assert.assertEquals(Boolean.valueOf(expectedResult), Boolean.valueOf(result));
     }
+
+
+    @Test
+    public void testMultipleHeadersValidWithoutNull() throws IOException {
+        doTestMultipleHeadersValid(false);
+    }
+
+
+    @Test
+    public void testMultipleHeadersValidWithNull() throws IOException {
+        doTestMultipleHeadersValid(true);
+    }
+
+
+    private void doTestMultipleHeadersValid(boolean withNull) throws IOException {
+        Set<String> expectedTokens = new HashSet<String>();
+        expectedTokens.add("bar");
+        expectedTokens.add("foo");
+        expectedTokens.add("foo2");
+
+        Set<String> inputs = new HashSet<String>();
+        inputs.add("foo");
+        if (withNull) {
+            inputs.add(null);
+        }
+        inputs.add("bar, foo2");
+
+        Set<String> tokens = new HashSet<String>();
+
+
+        boolean result = TokenList.parseTokenList(Collections.enumeration(inputs), tokens);
+        Assert.assertEquals(expectedTokens, tokens);
+        Assert.assertTrue(result);
+    }
+
+
+    @Test
+    public void doTestMultipleHeadersInvalid() throws IOException {
+        Set<String> expectedTokens = new HashSet<String>();
+        expectedTokens.add("bar");
+        expectedTokens.add("bar2");
+        expectedTokens.add("foo");
+        expectedTokens.add("foo2");
+        expectedTokens.add("foo3");
+
+        Set<String> inputs = new HashSet<String>();
+        inputs.add("foo");
+        inputs.add("bar2, }}}, foo3");
+        inputs.add("bar, foo2");
+
+        Set<String> tokens = new HashSet<String>();
+
+
+        boolean result = TokenList.parseTokenList(Collections.enumeration(inputs), tokens);
+        Assert.assertEquals(expectedTokens, tokens);
+        Assert.assertFalse(result);
+    }
+
 }
