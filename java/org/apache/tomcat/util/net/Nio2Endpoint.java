@@ -926,14 +926,12 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
             }
             try {
                 getEndpoint().connections.remove(getSocket().getIOChannel());
-                synchronized (getSocket()) {
-                    if (getSocket().isOpen()) {
-                        getSocket().close(true);
-                    }
-                    if (getEndpoint().running && !getEndpoint().paused) {
-                        if (nioChannels == null || !nioChannels.push(getSocket())) {
-                            getSocket().free();
-                        }
+                if (getSocket().isOpen()) {
+                    getSocket().close(true);
+                }
+                if (getEndpoint().running && !getEndpoint().paused) {
+                    if (nioChannels == null || !nioChannels.push(getSocket())) {
+                        getSocket().free();
                     }
                 }
             } catch (Throwable e) {
