@@ -131,8 +131,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements GSSRealm {
     /**
      * The string manager for this package.
      */
-    protected static final StringManager sm =
-        StringManager.getManager(Constants.Package);
+    protected static final StringManager sm = StringManager.getManager(RealmBase.class);
 
 
     /**
@@ -202,9 +201,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements GSSRealm {
      */
     @Override
     public Container getContainer() {
-
-        return (container);
-
+        return container;
     }
 
 
@@ -224,21 +221,19 @@ public abstract class RealmBase extends LifecycleMBeanBase implements GSSRealm {
 
     /**
      * Return the all roles mode.
+     * @return A string representation of the current all roles mode
      */
     public String getAllRolesMode() {
-
         return allRolesMode.toString();
-
     }
 
 
     /**
      * Set the all roles mode.
+     * @param allRolesMode A string representation of the new all roles mode
      */
     public void setAllRolesMode(String allRolesMode) {
-
         this.allRolesMode = AllRolesMode.toMode(allRolesMode);
-
     }
 
     /**
@@ -303,11 +298,10 @@ public abstract class RealmBase extends LifecycleMBeanBase implements GSSRealm {
 
     /**
      * Return the "validate certificate chains" flag.
+     * @return The value of the validate certificate chains flag
      */
     public boolean getValidate() {
-
-        return (this.validate);
-
+        return validate;
     }
 
 
@@ -335,10 +329,11 @@ public abstract class RealmBase extends LifecycleMBeanBase implements GSSRealm {
     /**
      * Sets the name of the class that will be used to extract user names
      * from X509 client certificates. The class must implement
-     * (@link X509UsernameRetriever}.
+     * X509UsernameRetriever.
      *
      * @param className The name of the class that will be used to extract user names
      *                  from X509 client certificates.
+     * @see X509UsernameRetriever
      */
     public void setX509UsernameRetrieverClassName(String className) {
         this.x509UsernameRetrieverClassName = className;
@@ -398,6 +393,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements GSSRealm {
      * @param username Username of the Principal to look up
      * @param credentials Password or other credentials to use in
      *  authenticating this username
+     * @return the associated principal, or <code>null</code> if there is none.
      */
     @Override
     public Principal authenticate(String username, String credentials) {
@@ -445,17 +441,22 @@ public abstract class RealmBase extends LifecycleMBeanBase implements GSSRealm {
 
 
     /**
-     * Return the Principal associated with the specified username, which
+     * Try to authenticate with the specified username, which
      * matches the digest calculated using the given parameters using the
-     * method described in RFC 2069; otherwise return <code>null</code>.
+     * method described in RFC 2617 (which is a superset of RFC 2069).
      *
      * @param username Username of the Principal to look up
      * @param clientDigest Digest which has been submitted by the client
      * @param nonce Unique (or supposedly unique) token which has been used
      * for this request
+     * @param nc the nonce counter
+     * @param cnonce the client chosen nonce
+     * @param qop the "quality of protection" (<code>nc</code> and <code>cnonce</code>
+     *        will only be used, if <code>qop</code> is not <code>null</code>).
      * @param realm Realm name
      * @param md5a2 Second MD5 digest used to calculate the digest :
      * MD5(Method + ":" + uri)
+     * @return the associated principal, or <code>null</code> if there is none.
      */
     @Override
     public Principal authenticate(String username, String clientDigest,
@@ -517,7 +518,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements GSSRealm {
     public Principal authenticate(X509Certificate certs[]) {
 
         if ((certs == null) || (certs.length < 1))
-            return (null);
+            return null;
 
         // Check the validity of each certificate in the chain
         if (log.isDebugEnabled())
@@ -532,14 +533,13 @@ public abstract class RealmBase extends LifecycleMBeanBase implements GSSRealm {
                 } catch (Exception e) {
                     if (log.isDebugEnabled())
                         log.debug("  Validity exception", e);
-                    return (null);
+                    return null;
                 }
             }
         }
 
         // Check the existence of the client Principal in our database
-        return (getPrincipal(certs[0]));
-
+        return getPrincipal(certs[0]);
     }
 
 
@@ -692,7 +692,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements GSSRealm {
         if ((constraints == null) || (constraints.length == 0)) {
             if (log.isDebugEnabled())
                 log.debug("  No applicable constraints defined");
-            return (null);
+            return null;
         }
 
         // Check each defined security constraint
@@ -957,7 +957,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements GSSRealm {
         throws IOException {
 
         if (constraints == null || constraints.length == 0)
-            return (true);
+            return true;
 
         // Which user principal have we already authenticated?
         Principal principal = request.getPrincipal();
@@ -1085,8 +1085,8 @@ public abstract class RealmBase extends LifecycleMBeanBase implements GSSRealm {
             else
                 log.debug(sm.getString("realmBase.hasRoleFailure", name, role));
         }
-        return (result);
 
+        return result;
     }
 
 
@@ -1112,7 +1112,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements GSSRealm {
         if (constraints == null || constraints.length == 0) {
             if (log.isDebugEnabled())
                 log.debug("  No applicable security constraint defined");
-            return (true);
+            return true;
         }
         for(int i=0; i < constraints.length; i++) {
             SecurityConstraint constraint = constraints[i];
@@ -1120,12 +1120,12 @@ public abstract class RealmBase extends LifecycleMBeanBase implements GSSRealm {
             if (userConstraint == null) {
                 if (log.isDebugEnabled())
                     log.debug("  No applicable user data constraint defined");
-                return (true);
+                return true;
             }
             if (userConstraint.equals(Constants.NONE_TRANSPORT)) {
                 if (log.isDebugEnabled())
                     log.debug("  User data constraint has no restrictions");
-                return (true);
+                return true;
             }
 
         }
@@ -1133,7 +1133,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements GSSRealm {
         if (request.getRequest().isSecure()) {
             if (log.isDebugEnabled())
                 log.debug("  User data constraint already satisfied");
-            return (true);
+            return true;
         }
         // Initialize variables we need to determine the appropriate action
         int redirectPort = request.getConnector().getRedirectPort();
@@ -1145,7 +1145,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements GSSRealm {
             response.sendError
                 (HttpServletResponse.SC_FORBIDDEN,
                  request.getRequestURI());
-            return (false);
+            return false;
         }
 
         // Redirect to the corresponding SSL port
@@ -1309,6 +1309,9 @@ public abstract class RealmBase extends LifecycleMBeanBase implements GSSRealm {
 
     /**
      * Return the digest associated with given principal's user name.
+     * @param username the user name
+     * @param realmName the realm name
+     * @return the digest for the specified user
      */
     protected String getDigest(String username, String realmName) {
         if (md5Helper == null) {
@@ -1379,7 +1382,12 @@ public abstract class RealmBase extends LifecycleMBeanBase implements GSSRealm {
 
 
     /**
-     * @deprecated This will be removed in Tomcat 10. Use
+     * Get the principal associated with the specified user name.
+     *
+     * @param username The user name
+     * @param gssCredential the GSS credential of the principal
+     * @return the principal associated with the given user name.
+     * @deprecated This will be removed in Tomcat 10 onwards. Use
      *             {@link #getPrincipal(GSSName, GSSCredential)} instead.
      */
     @Deprecated
@@ -1548,7 +1556,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements GSSRealm {
 
     protected static class AllRolesMode {
 
-        private String name;
+        private final String name;
         /** Use the strict servlet spec interpretation which requires that the user
          * have one of the web-app/security-role/role-name
          */
@@ -1560,44 +1568,41 @@ public abstract class RealmBase extends LifecycleMBeanBase implements GSSRealm {
          */
         public static final AllRolesMode STRICT_AUTH_ONLY_MODE = new AllRolesMode("strictAuthOnly");
 
-        static AllRolesMode toMode(String name)
-        {
+        static AllRolesMode toMode(String name) {
             AllRolesMode mode;
-            if( name.equalsIgnoreCase(STRICT_MODE.name) )
+            if (name.equalsIgnoreCase(STRICT_MODE.name)) {
                 mode = STRICT_MODE;
-            else if( name.equalsIgnoreCase(AUTH_ONLY_MODE.name) )
+            } else if (name.equalsIgnoreCase(AUTH_ONLY_MODE.name)) {
                 mode = AUTH_ONLY_MODE;
-            else if( name.equalsIgnoreCase(STRICT_AUTH_ONLY_MODE.name) )
+            } else if (name.equalsIgnoreCase(STRICT_AUTH_ONLY_MODE.name)) {
                 mode = STRICT_AUTH_ONLY_MODE;
-            else
+            } else {
                 throw new IllegalStateException("Unknown mode, must be one of: strict, authOnly, strictAuthOnly");
+            }
             return mode;
         }
 
-        private AllRolesMode(String name)
-        {
+        private AllRolesMode(String name) {
             this.name = name;
         }
 
         @Override
-        public boolean equals(Object o)
-        {
+        public boolean equals(Object o) {
             boolean equals = false;
-            if( o instanceof AllRolesMode )
-            {
+            if (o instanceof AllRolesMode) {
                 AllRolesMode mode = (AllRolesMode) o;
                 equals = name.equals(mode.name);
             }
             return equals;
         }
+
         @Override
-        public int hashCode()
-        {
+        public int hashCode() {
             return name.hashCode();
         }
+
         @Override
-        public String toString()
-        {
+        public String toString() {
             return name;
         }
     }
