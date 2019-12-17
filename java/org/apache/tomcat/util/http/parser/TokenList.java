@@ -34,19 +34,26 @@ public class TokenList {
      * Parses an enumeration of header values of the form 1#token, forcing all
      * parsed values to lower case.
      *
-     * @param inputs The headers to parse
-     * @param result The Collection (usually a list of a set) to which the
-     *                   parsed tokens should be added
+     * @param inputs     The headers to parse
+     * @param collection The Collection (usually a list of a set) to which the
+     *                       parsed tokens should be added
+     *
+     * @return {@code} true if the header values were parsed cleanly, otherwise
+     *         {@code false} (e.g. if a non-token value was encountered)
      *
      * @throws IOException If an I/O error occurs reading the header
      */
-    public static void parseTokenList(Enumeration<String> inputs, Collection<String> result) throws IOException {
+    public static boolean parseTokenList(Enumeration<String> inputs, Collection<String> collection) throws IOException {
+        boolean result = true;
         while (inputs.hasMoreElements()) {
             String nextHeaderValue = inputs.nextElement();
             if (nextHeaderValue != null) {
-                TokenList.parseTokenList(new StringReader(nextHeaderValue), result);
+                if (!TokenList.parseTokenList(new StringReader(nextHeaderValue), collection)) {
+                    result = false;
+                }
             }
         }
+        return result;
     }
 
 
@@ -54,17 +61,24 @@ public class TokenList {
      * Parses a header of the form 1#token, forcing all parsed values to lower
      * case. This is typically used when header values are case-insensitive.
      *
-     * @param input  The header to parse
-     * @param result The Collection (usually a list of a set) to which the
-     *                   parsed tokens should be added
+     * @param input      The header to parse
+     * @param collection The Collection (usually a list of a set) to which the
+     *                       parsed tokens should be added
+     *
+     * @return {@code} true if the header was parsed cleanly, otherwise
+     *         {@code false} (e.g. if a non-token value was encountered)
      *
      * @throws IOException If an I/O error occurs reading the header
      */
-    public static void parseTokenList(Reader input, Collection<String> result) throws IOException {
+    public static boolean parseTokenList(Reader input, Collection<String> collection) throws IOException {
+        boolean invalid = false;
+        boolean valid = false;
+
         do {
             String fieldName = HttpParser.readToken(input);
             if (fieldName == null) {
                 // Invalid field-name, skip to the next one
+                invalid = true;
                 HttpParser.skipUntil(input, 0, ',');
                 continue;
             }
@@ -77,16 +91,23 @@ public class TokenList {
             SkipResult skipResult = HttpParser.skipConstant(input, ",");
             if (skipResult == SkipResult.EOF) {
                 // EOF
-                result.add(fieldName.toLowerCase(Locale.ENGLISH));
+                valid = true;
+                collection.add(fieldName.toLowerCase(Locale.ENGLISH));
                 break;
             } else if (skipResult == SkipResult.FOUND) {
-                result.add(fieldName.toLowerCase(Locale.ENGLISH));
+                valid = true;
+                collection.add(fieldName.toLowerCase(Locale.ENGLISH));
                 continue;
             } else {
                 // Not a token - ignore it
+                invalid = true;
                 HttpParser.skipUntil(input, 0, ',');
                 continue;
             }
         } while (true);
+
+        // Only return true if at least one valid token was read and no invalid
+        // entries were found
+        return valid && !invalid;
     }
 }
