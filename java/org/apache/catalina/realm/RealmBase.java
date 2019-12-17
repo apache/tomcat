@@ -149,7 +149,6 @@ public abstract class RealmBase extends LifecycleMBeanBase implements org.apache
 
     // ------------------------------------------------------------- Properties
 
-
     /**
      * @return The HTTP status code used when the container needs to issue an
      *         HTTP redirect to meet the requirements of a configured transport
@@ -367,6 +366,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements org.apache
             return null;
         }
     }
+
 
     /**
      * Try to authenticate with the specified username, which
@@ -1246,7 +1246,12 @@ public abstract class RealmBase extends LifecycleMBeanBase implements org.apache
 
 
     /**
-     * @deprecated This will be removed in Tomcat 10. Use
+     * Get the principal associated with the specified user name.
+     *
+     * @param username The user name
+     * @param gssCredential the GSS credential of the principal
+     * @return the principal associated with the given user name.
+     * @deprecated This will be removed in Tomcat 10 onwards. Use
      *             {@link #getPrincipal(GSSName, GSSCredential)} instead.
      */
     @Deprecated
@@ -1561,44 +1566,41 @@ public abstract class RealmBase extends LifecycleMBeanBase implements org.apache
          */
         public static final AllRolesMode STRICT_AUTH_ONLY_MODE = new AllRolesMode("strictAuthOnly");
 
-        static AllRolesMode toMode(String name)
-        {
+        static AllRolesMode toMode(String name) {
             AllRolesMode mode;
-            if( name.equalsIgnoreCase(STRICT_MODE.name) )
+            if (name.equalsIgnoreCase(STRICT_MODE.name)) {
                 mode = STRICT_MODE;
-            else if( name.equalsIgnoreCase(AUTH_ONLY_MODE.name) )
+            } else if (name.equalsIgnoreCase(AUTH_ONLY_MODE.name)) {
                 mode = AUTH_ONLY_MODE;
-            else if( name.equalsIgnoreCase(STRICT_AUTH_ONLY_MODE.name) )
+            } else if (name.equalsIgnoreCase(STRICT_AUTH_ONLY_MODE.name)) {
                 mode = STRICT_AUTH_ONLY_MODE;
-            else
+            } else {
                 throw new IllegalStateException("Unknown mode, must be one of: strict, authOnly, strictAuthOnly");
+            }
             return mode;
         }
 
-        private AllRolesMode(String name)
-        {
+        private AllRolesMode(String name) {
             this.name = name;
         }
 
         @Override
-        public boolean equals(Object o)
-        {
+        public boolean equals(Object o) {
             boolean equals = false;
-            if( o instanceof AllRolesMode )
-            {
+            if (o instanceof AllRolesMode) {
                 AllRolesMode mode = (AllRolesMode) o;
                 equals = name.equals(mode.name);
             }
             return equals;
         }
+
         @Override
-        public int hashCode()
-        {
+        public int hashCode() {
             return name.hashCode();
         }
+
         @Override
-        public String toString()
-        {
+        public String toString() {
             return name;
         }
     }
