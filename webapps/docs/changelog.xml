@@ -69,6 +69,11 @@
         config. (isapir/markt)
       </add>
       <fix>
+        <bug>64005</bug>: Correct a regression in the static resource caching
+        changes introduced in 8.5.28. Avoid a <code>NullPointerException</code>
+        when working with the URL provided for the root of a packed WAR. (markt)
+      </fix>
+      <fix>
         <bug>64008</bug>: Clarify/expand the Javadoc for the
         <code>Tomcat#addWebapp()</code> and related methods. (markt)
       </fix>
