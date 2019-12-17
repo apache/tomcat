@@ -16,7 +16,6 @@
  */
 package org.apache.catalina.realm;
 
-
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.IOException;
@@ -148,7 +147,6 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
 
 
     // ------------------------------------------------------------- Properties
-
 
     /**
      * @return The HTTP status code used when the container needs to issue an
@@ -367,6 +365,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
             return null;
         }
     }
+
 
     /**
      * Try to authenticate with the specified username, which
