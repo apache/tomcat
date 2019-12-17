@@ -748,8 +748,9 @@ public class Tomcat {
         ctx.setPath(contextPath);
         ctx.setDocBase(docBase);
 
-        if (addDefaultWebXmlToWebapp)
+        if (addDefaultWebXmlToWebapp) {
             ctx.addLifecycleListener(getDefaultWebXmlListener());
+        }
 
         ctx.setConfigFile(getWebappConfigFile(docBase, contextPath));
 
