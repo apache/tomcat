@@ -81,6 +81,10 @@
         via the new <code>SSLHostConfig</code> and
         <code>SSLHostConfigCertificate</code> elements. (markt)
       </fix>
+      <fix>
+        <bug>64007</bug>: Cancel selection key in poller before wrapper close to
+        avoid possible deadlock. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">

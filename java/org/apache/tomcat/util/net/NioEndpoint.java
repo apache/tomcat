@@ -666,24 +666,22 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
 
         public void cancelledKey(SelectionKey sk, SocketWrapperBase<NioChannel> socketWrapper) {
             try {
-                if (socketWrapper != null) {
-                    socketWrapper.close();
-                }
+                // If is important to cancel the key first, otherwise a deadlock may occur between the
+                // poller select and the socket channel close which would cancel the key
                 if (sk != null) {
                     sk.attach(null);
                     if (sk.isValid()) {
                         sk.cancel();
-                    }
-                    // The SocketChannel is also available via the SelectionKey. If
-                    // it hasn't been closed in the block above, close it now.
-                    if (sk.channel().isOpen()) {
-                        sk.channel().close();
                     }
                 }
             } catch (Throwable e) {
                 ExceptionUtils.handleThrowable(e);
                 if (log.isDebugEnabled()) {
                     log.error(sm.getString("endpoint.debug.channelCloseFail"), e);
+                }
+            } finally {
+                if (socketWrapper != null) {
+                    socketWrapper.close();
                 }
             }
         }
