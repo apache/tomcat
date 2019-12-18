@@ -69,6 +69,12 @@
         <bug>64008</bug>: Clarify/expand the Javadoc for the
         <code>Tomcat#addWebapp()</code> and related methods. (markt)
       </fix>
+      <scode>
+        Deprecate the <code>JmxRemoteLifecycleListener</code> as the features it
+        provides are now available in the remote JMX capability included with
+        the JRE. This listener will be removed in Tomcat 10 and may be removed
+        from Tomcat 9.0.x some time after 2020-12-31. (markt)
+      </scode>
     </changelog>
   </subsection>
   <subsection name="Coyote">
