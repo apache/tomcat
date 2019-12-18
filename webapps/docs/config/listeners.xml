@@ -556,7 +556,7 @@
     <p><strong>This listener is now deprecated as the features it provides are
     now available in the remote JMX capability included with the JRE. This
     listener will be removed in Tomcat 10 and may be removed from Tomcat 9 some
-    time after 2019-12-31.</strong></p>
+    time after 2020-12-31.</strong></p>
 
     <p>The <strong>JMX Remote Lifecycle Listener</strong> fixes the ports used by
     the JMX/RMI Server making things much simpler if you need to connect
