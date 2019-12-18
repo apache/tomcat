@@ -511,7 +511,25 @@
 
 <section name="Additional Implementations">
 
+  <subsection name="System property replacement - org.apache.catalina.util.SystemPropertyReplacerListener">
+
+    <p>This listener performs system property replacement using the property
+     source configured on the digester. When <code>${parameter}</code>
+     denoted parameters are found in the values of system properties,
+     the property source will be invoked to attempt to replace it.</p>
+
+  </subsection>
+
+</section>
+
+<section name="Deprecated Implementations">
+
   <subsection name="JMX Remote Lifecycle Listener - org.apache.catalina.mbeans.JmxRemoteLifecycleListener">
+
+    <p><strong>This listener is now deprecated as the features it provides are
+    now available in the remote JMX capability included with the JRE. This
+    listener will be removed in Tomcat 10 and may be removed from Tomcat 7 some
+    time after 2020-12-31.</strong></p>
 
     <p>This listener requires <code>catalina-jmx-remote.jar</code> to be placed
     in <code>$CATALINA_HOME/lib</code>. This jar may be found in the extras
