@@ -61,7 +61,13 @@ import org.apache.tomcat.util.res.StringManager;
  * instance that is running behind a firewall. Only the ports are configured via
  * the listener. The remainder of the configuration is via the standard system
  * properties for configuring JMX.
+ *
+ * @deprecated The features provided by this listener are now available in the
+ *             remote JMX capability included with the JRE.
+ *             This listener will be removed in Tomcat 10 and may be removed
+ *             from Tomcat 8.5.x some time after 2020-12-31.
  */
+@Deprecated
 public class JmxRemoteLifecycleListener implements LifecycleListener {
 
     private static final Log log = LogFactory.getLog(JmxRemoteLifecycleListener.class);
@@ -203,9 +209,12 @@ public class JmxRemoteLifecycleListener implements LifecycleListener {
 
     @Override
     public void lifecycleEvent(LifecycleEvent event) {
-        // When the server starts, configure JMX/RMI
-        if (Lifecycle.START_EVENT.equals(event.getType())) {
-            // Configure using standard jmx system properties
+        if (Lifecycle.BEFORE_INIT_EVENT.equals(event.getType())) {
+            log.warn(sm.getString("jmxRemoteLifecycleListener.deprecated"));
+        } else  if (Lifecycle.START_EVENT.equals(event.getType())) {
+            // When the server starts, configure JMX/RMI
+
+            // Configure using standard JMX system properties
             init();
 
             // Prevent an attacker guessing the RMI object ID
