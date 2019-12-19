@@ -69,9 +69,11 @@ the places it is used.</li>
 <li>Tomcat must run as the domain account with which the SPN has been associated
 or as domain admin. It is <strong>NOT</strong> recommended to run Tomcat under a
 domain admin user.</li>
-<li>The domain name (<code>DEV.LOCAL</code>) is not case sensitive when used in
-the ktpass command, nor when used in jaas.conf</li>
-<li>The domain must be specified when using the ktpass command</li>
+<li>Convention is that the domain name (<code>dev.local</code>) is always used in
+lower case. The domain name is typically not case sensitive.</li>
+<li>Convention is that the Kerberos realm name (<code>DEV.LOCAL</code>) is always
+used in upper case. The realm name <strong>is</strong> case sensitive.</li>
+<li>The domain must be specified when using the ktpass command.</li>
 </ul>
 <p>There are four components to the configuration of the built-in Tomcat
 support for Windows authentication. The domain controller, the server hosting
@@ -80,8 +82,8 @@ machine. The following sections describe the configuration required for each
 component.</p>
 <p>The names of the three machines used in the configuration examples below are
 win-dc01.dev.local (the domain controller), win-tc01.dev.local (the Tomcat
-instance) and win-pc01.dev.local (client). All are members of the DEV.LOCAL
-domain.</p>
+instance) and win-pc01.dev.local (client). All are members of the
+<code>dev.local</code> domain.</p>
 <p>Note: In order to use the passwords in the steps below, the domain password
 policy had to be relaxed. This is not recommended for production environments.
 </p>
@@ -114,14 +116,14 @@ policy had to be relaxed. This is not recommended for production environments.
   user is <code>test</code> with a password of <code>testpass</code>.</li>
   </ul>
   <p>The above steps have been tested on a domain controller running Windows
-  Server 2008 R2 64-bit Standard using the Windows Server 2003 functional level
+  Server 2019 Standard using the Windows Server 2016 functional level
   for both the forest and the domain.
   </p>
   </subsection>
 
   <subsection name="Tomcat instance (Windows server)">
-  <p>These steps assume that Tomcat and a Java 6 JDK/JRE have already been
-  installed and configured and that Tomcat is running as the tc01@DEV.LOCAL
+  <p>These steps assume that Tomcat and a Java 8 JDK/JRE have already been
+  installed and configured and that Tomcat is running as the tc01@dev.local
   user. The steps to configure the Tomcat instance for Windows authentication
   are as follows:
   </p>
@@ -180,7 +182,7 @@ com.sun.security.jgss.krb5.accept {
   may be used that will simply return a Principal based on the authenticated
   user name that does not have any roles.</p>
   <p>The above steps have been tested on a Tomcat server running Windows Server
-  2008 R2 64-bit Standard with an Oracle 1.6.0_24 64-bit JDK.</p>
+  2019 Standard with AdoptOpenJDK 8u232-b09 (64-bit).</p>
   </subsection>
 
   <subsection name="Tomcat instance (Linux server)">
