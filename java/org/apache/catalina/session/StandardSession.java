@@ -1628,7 +1628,9 @@ public class StandardSession implements HttpSession, Session, Serializable {
             if (exclude(name, value)) {
                 continue;
             }
-            attributes.put(name, value);
+            // ConcurrentHashMap does not allow null keys or values
+            if(null != value)
+                attributes.put(name, value);
         }
         isValid = isValidSave;
 

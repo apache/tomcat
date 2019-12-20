@@ -83,6 +83,10 @@
         the JRE. This listener will be removed in Tomcat 10 and may be removed
         from Tomcat 7.0.x some time after 2020-12-31. (markt)
       </scode>
+      <fix>
+        <bug>64023</bug>: Skip null-valued session attributes when deserializing
+        sessions. (schultz)
+      </fix>
     </changelog>
   </subsection>
 </section>
