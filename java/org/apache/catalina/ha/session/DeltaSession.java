@@ -846,7 +846,9 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
             if (exclude(name, value)) {
                 continue;
             }
-            attributes.put(name, value);
+            // ConcurrentHashMap does not allow null keys or values
+            if(null != value)
+                attributes.put(name, value);
         }
         isValid = isValidSave;
 
