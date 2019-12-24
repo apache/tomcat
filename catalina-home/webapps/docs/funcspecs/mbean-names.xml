@@ -1,0 +1,698 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one or more
+  contributor license agreements.  See the NOTICE file distributed with
+  this work for additional information regarding copyright ownership.
+  The ASF licenses this file to You under the Apache License, Version 2.0
+  (the "License"); you may not use this file except in compliance with
+  the License.  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+<!DOCTYPE document [
+  <!ENTITY project SYSTEM "project.xml">
+]>
+<document url="mbean-names.html">
+
+  &project;
+
+  <properties>
+    <author email="craigmcc@apache.org">Craig McClanahan</author>
+    <author email="amyroh@apache.org">Amy Roh</author>
+    <title>Tomcat MBean Names</title>
+  </properties>
+
+<body>
+
+<section name="Table of Contents">
+<toc/>
+</section>
+
+<section name="Background">
+
+    <p>We will be using <em>JMX MBeans</em> as the technology for
+    implementing manageability of Tomcat.</p>
+
+    <p>One of the key concepts of JMX is that each management bean has a unique
+    name in the MBeanServer's registry, and that management applications can
+    utilize these names to retrieve the MBean of interest to them for a
+    particular management operation. This document proposes a naming convention
+    for MBeans that allows easy calculation of the name for a particular MBean.
+    For background information on JMX MBean names, see the <em>Java Management
+    Extensions Instrumentation and Agent Specification</em>, version 1.0,
+    section 6. In particular, we will be discussing the String Representation of
+    <code>ObjectName</code> instances.</p>
+
+</section>
+
+<section name="Catalina Object Hierarchy">
+
+<p>Tomcat's servlet container implementation, called Catalina, can be
+represented as a hierarchy of objects that contain references to each other.
+The object hierarchy can be represented as a tree, or (isomorphically) based
+on the nesting of configuration elements in the <code>conf/server.xml</code>
+file that is traditionally used to configure Tomcat stand-alone.</p>
+
+<p>The valid component nestings for Catalina are depicted in the following
+table, with columns that contain the following values:</p>
+<ul>
+<li><em>Pattern</em> - Nesting pattern of XML elements (in the
+    <code>conf/server.xml</code> file) used to configure this component.</li>
+<li><em>Cardinality</em> - Minimum and maximum number of occurrences of
+    this element at this nesting position, which also corresponds to the
+    minimum and maximum number of Catalina components.</li>
+<li><em>Identifier</em> - Name of the JavaBeans property of this component
+    that represents the unique identifier (within the nested hierarchy),
+    if any.</li>
+<li><em>MBean ObjectName</em> - The portion of the MBean object name that
+    appears <strong>after</strong> the domain name.  For now, it should be
+    assumed that all of these MBeans appear in the default JMX domain.</li>
+</ul>
+
+<p>In the <em>MBean ObjectName</em> descriptions, several types of symbolic
+expressions are utilized to define variable text that is replaced by
+corresponding values:</p>
+<ul>
+<li><em>${GROUP}</em> - One of the standard MBean names of the specified
+    "group" category.  For example, the expression <code>${REALM}</code>
+    represents the values like <code>JDBCRealm</code> and <code>JAASRealm</code>
+    that identify the various MBeans for possible <code>Realm</code> components.</li>
+<li><em>${name}</em> - Replaced by the value of property <code>name</code>
+    from the current component.</li>
+<li><em>${parent.name}</em> - Replaced by the value of property
+    <code>name</code> from a parent of the current component, with the
+    parent's type identified by <em>parent</em>.</li>
+<li><em>${###}</em> - An arbitrary numeric identifier that preserves
+    order but has no other particular meaning.  In general, the server will
+    assign numeric values to existing instances with large gaps into which
+    new items can be configured if desired.</li>
+</ul>
+
+<table class="defaultTable">
+
+  <tr>
+    <th>Pattern</th>
+    <th>Cardinality</th>
+    <th>Identifier</th>
+    <th>MBean ObjectName</th>
+  </tr>
+
+  <tr>
+    <td>Server</td>
+    <td style="text-align: center;">1..1</td>
+    <td style="text-align: center;">(none)</td>
+    <td><code class="noHighlight">type=${SERVER}</code></td>
+  </tr>
+
+  <tr>
+    <td>Server / Listener</td>
+    <td style="text-align: center;">0..n</td>
+    <td style="text-align: center;">(none)</td>
+    <td><code class="noHighlight">type=${LISTENER}, sequence=${###}</code></td>
+  </tr>
+
+  <tr>
+    <td>Server / Service</td>
+    <td style="text-align: center;">1..n</td>
+    <td style="text-align: center;"><code class="noHighlight">name</code></td>
+    <td><code class="noHighlight">type=${SERVICE}, name=${name}</code></td>
+  </tr>
+
+  <tr>
+    <td>Server / Service / Connector</td>
+    <td style="text-align: center;">1..n</td>
+    <td style="text-align: center;"><code class="noHighlight">address, port</code></td>
+    <td><code class="noHighlight">type=${CONNECTOR}, service=${service}, port=${port},
+        address=${address}</code></td>
+  </tr>
+
+  <tr>
+    <td>Server / Service / Connector / Factory</td>
+    <td style="text-align: center;">0..1</td>
+    <td style="text-align: center;">(none)</td>
+    <td>(Only defined explicitly for an SSL connector, but can be treated
+        as part of the connector component)</td>
+  </tr>
+
+  <tr>
+    <td>Server / Service / Connector / Listener</td>
+    <td style="text-align: center;">0..n</td>
+    <td style="text-align: center;">(none)</td>
+    <td><code class="noHighlight">type=${LISTENER}, sequence=${###}, service=${service},
+        port=${connector.port}, address=${connector.address}</code></td>
+  </tr>
+
+  <tr>
+    <td>Server / Service / Engine</td>
+    <td style="text-align: center;">1..1</td>
+    <td style="text-align: center;">(none)</td>
+    <td><code class="noHighlight">type=${ENGINE}, service=${service.name}</code></td>
+  </tr>
+
+  <tr>
+    <td>Server / Service / Engine / Host</td>
+    <td style="text-align: center;">1..n</td>
+    <td style="text-align: center;"><code class="noHighlight">name</code></td>
+    <td><code class="noHighlight">type=${HOST}, host=${name},
+        service=${service.name}</code></td>
+  </tr>
+
+  <tr>
+    <td>Server / Service / Engine / Host / Context</td>
+    <td style="text-align: center;">1..n</td>
+    <td style="text-align: center;"><code class="noHighlight">path</code></td>
+    <td><code class="noHighlight">type=${CONTEXT}, context=${name}, host=${host.name},
+        service=${service.name}</code></td>
+  </tr>
+
+  <tr>
+    <td>Server / Service / Engine / Host / Context / Listener</td>
+    <td style="text-align: center;">0..n</td>
+    <td style="text-align: center;">(none)</td>
+    <td><code class="noHighlight">type=${LISTENER}, sequence=${###}, context=${context.name},
+        host=${host.name}, service=${service.name}</code></td>
+  </tr>
+
+  <tr>
+    <td>Server / Service / Engine / Host / Context / Loader</td>
+    <td style="text-align: center;">0..1</td>
+    <td style="text-align: center;">(none)</td>
+    <td><code class="noHighlight">type=${LOADER}, context=${context.name}, host=${host.name},
+        service=${service.name}</code></td>
+  </tr>
+
+  <tr>
+    <td>Server / Service / Engine / Host / Context / Manager</td>
+    <td style="text-align: center;">0..1</td>
+    <td style="text-align: center;">(none)</td>
+    <td><code class="noHighlight">type=${MANAGER}, context=${context.name}, host=${host.name},
+        service=${service.name}</code></td>
+  </tr>
+
+  <tr>
+    <td>Server / Service / Engine / Host / Context / Realm</td>
+    <td style="text-align: center;">0..1</td>
+    <td style="text-align: center;">(none)</td>
+    <td><code class="noHighlight">type=${REALM}, context=${context.name}, host=${host.name},
+        service=${service.name}</code></td>
+  </tr>
+
+  <tr>
+    <td>Server / Service / Engine / Host / Context / Resources</td>
+    <td style="text-align: center;">0..1</td>
+    <td style="text-align: center;">(none)</td>
+    <td><code class="noHighlight">type=${RESOURCES}, context=${context.name}, host=${host.name},
+        service=${service.name}</code></td>
+  </tr>
+
+  <tr>
+    <td>Server / Service / Engine / Host / Context / Valve</td>
+    <td style="text-align: center;">0..n</td>
+    <td style="text-align: center;">(none)</td>
+    <td><code class="noHighlight">type=${VALVE}, sequence=${###}, context=${context.name},
+        host=${host.name}, service=${service.name}</code></td>
+  </tr>
+
+  <tr>
+    <td>Server / Service / Engine / Host / Context / Wrapper</td>
+    <td style="text-align: center;">0..n</td>
+    <td style="text-align: center;">(none)</td>
+    <td><code class="noHighlight">j2eeType=Servlet,name=${name},
+        WebModule=//${host.name}/${context.name},
+        J2EEApplication=${context.J2EEApplication},
+        J2EEServer=${context.J2EEServer}</code></td>
+  </tr>
+
+  <tr>
+    <td>Server / Service / Engine / Host / Context / WrapperLifecycle</td>
+    <td style="text-align: center;">0..n</td>
+    <td style="text-align: center;">(none)</td>
+    <td><code class="noHighlight">type=${WRAPPER-LIFECYCLE}, sequence=${###},
+        context=${context.name}, host=${host.name},
+        service=${service.name}</code></td>
+  </tr>
+
+  <tr>
+    <td>Server / Service / Engine / Host / Context / WrapperListener</td>
+    <td style="text-align: center;">0..n</td>
+    <td style="text-align: center;">(none)</td>
+    <td><code class="noHighlight">type=${WRAPPER-LISTENER}, sequence=${###},
+        context=${context.name}, host=${host.name},
+        service=${service.name}</code></td>
+  </tr>
+
+  <tr>
+    <td>Server / Service / Engine / Host / Listener</td>
+    <td style="text-align: center;">0..n</td>
+    <td style="text-align: center;">(none)</td>
+    <td><code class="noHighlight">type=${LISTENER}, sequence=${###}, host=${host.name},
+        service=${service.name}</code></td>
+  </tr>
+
+  <tr>
+    <td>Server / Service / Engine / Host / Realm</td>
+    <td style="text-align: center;">0..1</td>
+    <td style="text-align: center;">(none)</td>
+    <td><code class="noHighlight">type=${REALM}, host=${host.name},
+        service=${service.name}</code></td>
+  </tr>
+
+  <tr>
+    <td>Server / Service / Engine / Host / Valve</td>
+    <td style="text-align: center;">0..n</td>
+    <td style="text-align: center;">(none)</td>
+    <td><code class="noHighlight">type=${VALVE}, sequence=${###},
+        host=${host.name}, service=${service.name}</code></td>
+  </tr>
+
+  <tr>
+    <td>Server / Service / Engine / Listener</td>
+    <td style="text-align: center;">0..n</td>
+    <td style="text-align: center;">(none)</td>
+    <td><code class="noHighlight">type=${LISTENER}, sequence=${###}</code>
+        (<strong>FIXME</strong> - disambiguate from Server / Service /
+        Listener)</td>
+  </tr>
+
+  <tr>
+    <td>Server / Service / Engine / Realm</td>
+    <td style="text-align: center;">0..1</td>
+    <td style="text-align: center;">(none)</td>
+    <td><code class="noHighlight">type=${REALM}, service=${service.name}</code></td>
+  </tr>
+
+  <tr>
+    <td>Server / Service / Engine / Valve</td>
+    <td style="text-align: center;">0..n</td>
+    <td style="text-align: center;">(none)</td>
+    <td><code class="noHighlight">type=${VALVE}, sequence=${###},
+        service=${service.name}</code></td>
+  </tr>
+
+  <tr>
+    <td>Server / Service / Listener</td>
+    <td style="text-align: center;">0..n</td>
+    <td style="text-align: center;">(none)</td>
+    <td><code class="noHighlight">type=${LISTENER}, sequence=${###}</code>
+        (<strong>FIXME</strong> - disambiguate from Server / Service /
+        Engine / Listener)</td>
+  </tr>
+
+</table>
+
+</section>
+
+<section name="MBean Groups and Names">
+
+<p>The following MBean names shall be defined in the resource file
+<code>/org/apache/catalina/mbeans/mbeans-descriptors.xml</code> (and
+therefore available for use within the Administration/Configuration
+web application for Tomcat):</p>
+
+<table class="defaultTable">
+
+  <tr>
+    <th>MBean Name</th>
+    <th>Group Name</th>
+    <th>Catalina Interface</th>
+    <th>Implementation Class</th>
+  </tr>
+
+  <tr>
+    <td><code class="noHighlight">AccessLogValve</code></td>
+    <td style="text-align: center;"><code class="noHighlight">VALVE</code></td>
+    <td><code class="noHighlight">org.apache.catalina.Valve</code></td>
+    <td><code class="noHighlight">org.apache.catalina.valves.AccessLogValve</code></td>
+  </tr>
+
+  <tr>
+    <td><code class="noHighlight">BasicAuthenticator</code></td>
+    <td style="text-align: center;"><code class="noHighlight">VALVE</code></td>
+    <td><code class="noHighlight">org.apache.catalina.Valve</code></td>
+    <td><code class="noHighlight">org.apache.catalina.authenticator.BasicAuthenticator</code></td>
+  </tr>
+
+  <tr>
+    <td><code class="noHighlight">CertificatesValve</code></td>
+    <td style="text-align: center;"><code class="noHighlight">VALVE</code></td>
+    <td><code class="noHighlight">org.apache.catalina.Valve</code></td>
+    <td><code class="noHighlight">org.apache.catalina.valves.CertificatesValve</code></td>
+  </tr>
+
+  <tr>
+    <td><code class="noHighlight">ContextConfig</code></td>
+    <td style="text-align: center;"><code class="noHighlight">LISTENER</code></td>
+    <td><code class="noHighlight">org.apache.catalina.LifecycleListener</code></td>
+    <td><code class="noHighlight">org.apache.catalina.startup.ContextConfig</code></td>
+  </tr>
+
+  <tr>
+    <td><code class="noHighlight">ContextEnvironment</code></td>
+    <td style="text-align: center;"><code class="noHighlight">RESOURCES</code></td>
+    <td><code class="noHighlight">org.apache.catalina.deploy.ContextEnvironment</code></td>
+    <td><code class="noHighlight">org.apache.catalina.deploy.ContextEnvironment</code></td>
+  </tr>
+
+  <tr>
+    <td><code class="noHighlight">ContextResource</code></td>
+    <td style="text-align: center;"><code class="noHighlight">RESOURCES</code></td>
+    <td><code class="noHighlight">org.apache.catalina.deploy.ContextResource</code></td>
+    <td><code class="noHighlight">org.apache.catalina.deploy.ContextResource</code></td>
+  </tr>
+
+  <tr>
+    <td><code class="noHighlight">ContextResourceLink</code></td>
+    <td style="text-align: center;"><code class="noHighlight">RESOURCES</code></td>
+    <td><code class="noHighlight">org.apache.catalina.deploy.ContextResourceLink</code></td>
+    <td><code class="noHighlight">org.apache.catalina.deploy.ContextResourceLink</code></td>
+  </tr>
+
+  <tr>
+    <td><code class="noHighlight">CoyoteConnector</code></td>
+    <td style="text-align: center;"><code class="noHighlight">CONNECTOR</code></td>
+    <td><code class="noHighlight">org.apache.catalina.Connector</code></td>
+    <td><code class="noHighlight">org.apache.coyote.tomcat4.CoyoteConnector</code></td>
+  </tr>
+
+  <tr>
+    <td><code class="noHighlight">DigestAuthenticator</code></td>
+    <td style="text-align: center;"><code class="noHighlight">VALVE</code></td>
+    <td><code class="noHighlight">org.apache.catalina.Valve</code></td>
+    <td><code class="noHighlight">org.apache.catalina.authenticator.DigestAuthenticator</code></td>
+  </tr>
+
+  <tr>
+    <td><code class="noHighlight">EngineConfig</code></td>
+    <td style="text-align: center;"><code class="noHighlight">LISTENER</code></td>
+    <td><code class="noHighlight">org.apache.catalina.LifecycleListener</code></td>
+    <td><code class="noHighlight">org.apache.catalina.startup.EngineConfig</code></td>
+  </tr>
+
+  <tr>
+    <td><code class="noHighlight">ErrorReportValve</code></td>
+    <td style="text-align: center;"><code class="noHighlight">VALVE</code></td>
+    <td><code class="noHighlight">org.apache.catalina.Valve</code></td>
+    <td><code class="noHighlight">org.apache.catalina.valves.ErrorReportValve</code></td>
+  </tr>
+
+  <tr>
+    <td><code class="noHighlight">ErrorDispatcherValve</code></td>
+    <td style="text-align: center;"><code class="noHighlight">VALVE</code></td>
+    <td><code class="noHighlight">org.apache.catalina.Valve</code></td>
+    <td><code class="noHighlight">org.apache.catalina.valves.ErrorDispatcherValve</code></td>
+  </tr>
+
+  <tr>
+    <td><code class="noHighlight">FormAuthenticator</code></td>
+    <td style="text-align: center;"><code class="noHighlight">VALVE</code></td>
+    <td><code class="noHighlight">org.apache.catalina.Valve</code></td>
+    <td><code class="noHighlight">org.apache.catalina.authenticator.FormAuthenticator</code></td>
+  </tr>
+
+  <tr>
+    <td><code class="noHighlight">Group</code></td>
+    <td style="text-align: center;"><code class="noHighlight">GROUP</code></td>
+    <td><code class="noHighlight">org.apache.catalina.Group</code></td>
+    <td><code class="noHighlight">org.apache.catalina.Group</code></td>
+  </tr>
+
+  <tr>
+    <td><code class="noHighlight">HostConfig</code></td>
+    <td style="text-align: center;"><code class="noHighlight">LISTENER</code></td>
+    <td><code class="noHighlight">org.apache.catalina.LifecycleListener</code></td>
+    <td><code class="noHighlight">org.apache.catalina.startup.HostConfig</code></td>
+  </tr>
+
+  <tr>
+    <td><code class="noHighlight">HttpConnector10</code></td>
+    <td style="text-align: center;"><code class="noHighlight">CONNECTOR</code></td>
+    <td><code class="noHighlight">org.apache.catalina.Connector</code></td>
+    <td><code class="noHighlight">org.apache.catalina.connector.http10.HttpConnector</code></td>
+  </tr>
+
+  <tr>
+    <td><code class="noHighlight">HttpConnector11</code></td>
+    <td style="text-align: center;"><code class="noHighlight">CONNECTOR</code></td>
+    <td><code class="noHighlight">org.apache.catalina.Connector</code></td>
+    <td><code class="noHighlight">org.apache.catalina.connector.http.HttpConnector</code></td>
+  </tr>
+
+  <tr>
+    <td><code class="noHighlight">JAASRealm</code></td>
+    <td style="text-align: center;"><code class="noHighlight">REALM</code></td>
+    <td><code class="noHighlight">org.apache.catalina.Realm</code></td>
+    <td><code class="noHighlight">org.apache.catalina.realm.JAASRealm</code></td>
+  </tr>
+
+  <tr>
+    <td><code class="noHighlight">JDBCRealm</code></td>
+    <td style="text-align: center;"><code class="noHighlight">REALM</code></td>
+    <td><code class="noHighlight">org.apache.catalina.Realm</code></td>
+    <td><code class="noHighlight">org.apache.catalina.realm.JDBCRealm</code></td>
+  </tr>
+
+  <tr>
+    <td><code class="noHighlight">JDBCUserDatabase</code></td>
+    <td style="text-align: center;"><code class="noHighlight">USERDATABASE</code></td>
+    <td><code class="noHighlight">org.apache.catalina.users.JDBCUserDatabase</code></td>
+    <td><code class="noHighlight">org.apache.catalina.users.JDBCUserDatabase</code></td>
+  </tr>
+
+  <tr>
+    <td><code class="noHighlight">JNDIRealm</code></td>
+    <td style="text-align: center;"><code class="noHighlight">REALM</code></td>
+    <td><code class="noHighlight">org.apache.catalina.Realm</code></td>
+    <td><code class="noHighlight">org.apache.catalina.realm.JNDIRealm</code></td>
+  </tr>
+
+  <tr>
+    <td><code class="noHighlight">MBeanFactory</code></td>
+    <td style="text-align: center;"><code class="noHighlight"></code></td>
+    <td><code class="noHighlight"></code></td>
+    <td><code class="noHighlight">org.apache.catalina.mbeans.MBeanFactory</code></td>
+  </tr>
+
+  <tr>
+    <td><code class="noHighlight">MemoryRealm</code></td>
+    <td style="text-align: center;"><code class="noHighlight">REALM</code></td>
+    <td><code class="noHighlight">org.apache.catalina.Realm</code></td>
+    <td><code class="noHighlight">org.apache.catalina.realm.MemoryRealm</code></td>
+  </tr>
+
+  <tr>
+    <td><code class="noHighlight">MemoryUserDatabase</code></td>
+    <td style="text-align: center;"><code class="noHighlight">USERDATABASE</code></td>
+    <td><code class="noHighlight">org.apache.catalina.users.MemoryUserDatabase</code></td>
+    <td><code class="noHighlight">org.apache.catalina.users.MemoryUserDatabase</code></td>
+  </tr>
+
+  <tr>
+    <td><code class="noHighlight">NamingContextListener</code></td>
+    <td style="text-align: center;"><code class="noHighlight">LISTENER</code></td>
+    <td><code class="noHighlight">org.apache.catalina.LifecycleListener</code></td>
+    <td><code class="noHighlight">org.apache.catalina.core.NamingContextListener</code></td>
+  </tr>
+
+  <tr>
+    <td><code class="noHighlight">NamingResources</code></td>
+    <td style="text-align: center;"><code class="noHighlight">RESOURCES</code></td>
+    <td><code class="noHighlight">org.apache.catalina.deploy.NamingResources</code></td>
+    <td><code class="noHighlight">org.apache.catalina.deploy.NamingResources</code></td>
+  </tr>
+
+  <tr>
+    <td><code class="noHighlight">NonLoginAuthenticator</code></td>
+    <td style="text-align: center;"><code class="noHighlight">VALVE</code></td>
+    <td><code class="noHighlight">org.apache.catalina.Valve</code></td>
+    <td><code class="noHighlight">org.apache.catalina.authenticator.NonLoginAuthenticator</code></td>
+  </tr>
+
+  <tr>
+    <td><code class="noHighlight">PersistentManager</code></td>
+    <td style="text-align: center;"><code class="noHighlight">MANAGER</code></td>
+    <td><code class="noHighlight">org.apache.catalina.Manager</code></td>
+    <td><code class="noHighlight">org.apache.catalina.session.PersistentManager</code></td>
+  </tr>
+
+  <tr>
+    <td><code class="noHighlight">RemoteAddrValve</code></td>
+    <td style="text-align: center;"><code class="noHighlight">VALVE</code></td>
+    <td><code class="noHighlight">org.apache.catalina.Valve</code></td>
+    <td><code class="noHighlight">org.apache.catalina.valves.RemoteAddrValve</code></td>
+  </tr>
+
+  <tr>
+    <td><code class="noHighlight">RemoteHostValve</code></td>
+    <td style="text-align: center;"><code class="noHighlight">VALVE</code></td>
+    <td><code class="noHighlight">org.apache.catalina.Valve</code></td>
+    <td><code class="noHighlight">org.apache.catalina.valves.RemoteHostValve</code></td>
+  </tr>
+
+  <tr>
+    <td><code class="noHighlight">RequestDumperValve</code></td>
+    <td style="text-align: center;"><code class="noHighlight">VALVE</code></td>
+    <td><code class="noHighlight">org.apache.catalina.Valve</code></td>
+    <td><code class="noHighlight">org.apache.catalina.valves.RequestDumperValve</code></td>
+  </tr>
+
+  <tr>
+    <td><code class="noHighlight">Role</code></td>
+    <td style="text-align: center;"><code class="noHighlight">ROLE</code></td>
+    <td><code class="noHighlight">org.apache.catalina.Role</code></td>
+    <td><code class="noHighlight">org.apache.catalina.Role</code></td>
+  </tr>
+
+  <tr>
+    <td><code class="noHighlight">SingleSignOn</code></td>
+    <td style="text-align: center;"><code class="noHighlight">VALVE</code></td>
+    <td><code class="noHighlight">org.apache.catalina.Valve</code></td>
+    <td><code class="noHighlight">org.apache.catalina.valves.SingleSignOn</code></td>
+  </tr>
+
+  <tr>
+    <td><code class="noHighlight">SSLAuthenticator</code></td>
+    <td style="text-align: center;"><code class="noHighlight">VALVE</code></td>
+    <td><code class="noHighlight">org.apache.catalina.Valve</code></td>
+    <td><code class="noHighlight">org.apache.catalina.authenticator.SSLAuthenticator</code></td>
+  </tr>
+
+  <tr>
+    <td><code class="noHighlight">StandardContext</code></td>
+    <td style="text-align: center;"><code class="noHighlight">CONTEXT</code></td>
+    <td><code class="noHighlight">org.apache.catalina.Context</code></td>
+    <td><code class="noHighlight">org.apache.catalina.core.StandardContext</code></td>
+  </tr>
+
+  <tr>
+    <td><code class="noHighlight">StandardContextValve</code></td>
+    <td style="text-align: center;"><code class="noHighlight">VALVE</code></td>
+    <td><code class="noHighlight">org.apache.catalina.Valve</code></td>
+    <td><code class="noHighlight">org.apache.catalina.core.StandardContextValve</code></td>
+  </tr>
+
+  <tr>
+    <td><code class="noHighlight">StandardEngine</code></td>
+    <td style="text-align: center;"><code class="noHighlight">ENGINE</code></td>
+    <td><code class="noHighlight">org.apache.catalina.Engine</code></td>
+    <td><code class="noHighlight">org.apache.catalina.core.StandardEngine</code></td>
+  </tr>
+
+  <tr>
+    <td><code class="noHighlight">StandardEngineValve</code></td>
+    <td style="text-align: center;"><code class="noHighlight">VALVE</code></td>
+    <td><code class="noHighlight">org.apache.catalina.Valve</code></td>
+    <td><code class="noHighlight">org.apache.catalina.core.StandardEngineValve</code></td>
+  </tr>
+
+  <tr>
+    <td><code class="noHighlight">StandardHost</code></td>
+    <td style="text-align: center;"><code class="noHighlight">HOST</code></td>
+    <td><code class="noHighlight">org.apache.catalina.Host</code></td>
+    <td><code class="noHighlight">org.apache.catalina.core.StandardHost</code></td>
+  </tr>
+
+  <tr>
+    <td><code class="noHighlight">StandardHostValve</code></td>
+    <td style="text-align: center;"><code class="noHighlight">VALVE</code></td>
+    <td><code class="noHighlight">org.apache.catalina.Valve</code></td>
+    <td><code class="noHighlight">org.apache.catalina.core.StandardHostValve</code></td>
+  </tr>
+
+  <tr>
+    <td><code class="noHighlight">StandardManager</code></td>
+    <td style="text-align: center;"><code class="noHighlight">MANAGER</code></td>
+    <td><code class="noHighlight">org.apache.catalina.Manager</code></td>
+    <td><code class="noHighlight">org.apache.catalina.session.StandardManager</code></td>
+  </tr>
+
+  <tr>
+    <td><code class="noHighlight">StandardServer</code></td>
+    <td style="text-align: center;"><code class="noHighlight">SERVER</code></td>
+    <td><code class="noHighlight">org.apache.catalina.Server</code></td>
+    <td><code class="noHighlight">org.apache.catalina.core.StandardServer</code></td>
+  </tr>
+
+  <tr>
+    <td><code class="noHighlight">StandardService</code></td>
+    <td style="text-align: center;"><code class="noHighlight">SERVICE</code></td>
+    <td><code class="noHighlight">org.apache.catalina.Service</code></td>
+    <td><code class="noHighlight">org.apache.catalina.core.StandardService</code></td>
+  </tr>
+
+  <tr>
+    <td><code class="noHighlight">StandardWrapper</code></td>
+    <td style="text-align: center;"><code class="noHighlight">WRAPPER</code></td>
+    <td><code class="noHighlight">org.apache.catalina.Wrapper</code></td>
+    <td><code class="noHighlight">org.apache.catalina.core.StandardWrapper</code></td>
+  </tr>
+
+  <tr>
+    <td><code class="noHighlight">StandardWrapperValve</code></td>
+    <td style="text-align: center;"><code class="noHighlight">VALVE</code></td>
+    <td><code class="noHighlight">org.apache.catalina.Valve</code></td>
+    <td><code class="noHighlight">org.apache.catalina.core.StandardWrapperValve</code></td>
+  </tr>
+
+  <tr>
+    <td><code class="noHighlight">User</code></td>
+    <td style="text-align: center;"><code class="noHighlight">USER</code></td>
+    <td><code class="noHighlight">org.apache.catalina.User</code></td>
+    <td><code class="noHighlight">org.apache.catalina.User</code></td>
+  </tr>
+
+  <tr>
+    <td><code class="noHighlight">UserDatabaseRealm</code></td>
+    <td style="text-align: center;"><code class="noHighlight">REALM</code></td>
+    <td><code class="noHighlight">org.apache.catalina.Realm</code></td>
+    <td><code class="noHighlight">org.apache.catalina.realm.UserDatabaseRealm</code></td>
+  </tr>
+
+  <tr>
+    <td><code class="noHighlight">WebappLoader</code></td>
+    <td style="text-align: center;"><code class="noHighlight">LOADER</code></td>
+    <td><code class="noHighlight">org.apache.catalina.Loader</code></td>
+    <td><code class="noHighlight">org.apache.catalina.loader.WebappLoader</code></td>
+  </tr>
+
+</table>
+
+</section>
+
+<section name="JSR-88 Cross Reference">
+
+<p>The deployment objects in the JSR-88 API object hierarchy correspond
+to the specified MBean names or groups as follows:</p>
+
+<table class="defaultTable">
+
+  <tr>
+    <th>JSR-88 API Object</th>
+    <th>MBean Name or Group</th>
+    <th>Comments</th>
+  </tr>
+
+  <tr>
+    <td><code class="noHighlight">DeployableObject</code></td>
+    <td><code class="noHighlight">${CONTEXT}</code></td>
+    <td>Context deployment info plus the corresponding WAR file</td>
+  </tr>
+
+  <tr>
+    <td><code class="noHighlight">Target</code></td>
+    <td><code class="noHighlight">${HOST}</code></td>
+    <td></td>
+  </tr>
+
+</table>
+
+</section>
+
+</body>
+
+</document>

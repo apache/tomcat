@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one or more
+  contributor license agreements.  See the NOTICE file distributed with
+  this work for additional information regarding copyright ownership.
+  The ASF licenses this file to You under the Apache License, Version 2.0
+  (the "License"); you may not use this file except in compliance with
+  the License.  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+<!DOCTYPE document [
+  <!ENTITY project SYSTEM "project.xml">
+]>
+<document url="jaspic.html">
+
+  &project;
+
+  <properties>
+    <title>JASPIC</title>
+  </properties>
+
+<body>
+
+<section name="Table of Contents">
+<toc />
+</section>
+
+<section name="Introduction">
+
+  <p>Tomcat implements JASPIC 1.1 Maintenance Release B
+  (<a href="https://www.jcp.org/en/jsr/detail?id=196">JSR 196</a>). The
+  implementation is primarily intended to enable the integration of 3rd party
+  JASPIC authentication implementations with Tomcat.</p>
+
+  <p>JASPIC may be configured dynamically by an application or statically via
+  the <code>$CATALINA_BASE/conf/jaspic-providers.xml</code> configuration file.
+  If present, a JASPIC configuration will over-ride any
+  <code>&lt;login-config&gt;</code> present in <code>web.xml</code>.</p>
+
+</section>
+
+<section name="Static configuration">
+
+  <subsection name="AuthConfigProvider">
+
+    <p>If the 3rd party implementation includes an
+    <code>AuthConfigProvider</code> then a web application can be configured to
+    use it by nesting the following inside the
+    <code>&lt;jaspic-providers&gt;</code> element in
+    <code>$CATALINA_BASE/conf/jaspic-providers.xml</code>.</p>
+<source><![CDATA[<provider name="any"
+          className="fully.qualified.implementation.class.Name"
+          layer="HttpServlet"
+          appContext="Catalina/localhost /contextPath"
+          description="any">
+  <property name="see-provider-documentation"
+            value="see-provider-documentation" />
+</provider>]]></source>
+
+    <p>The <code>name</code> and <code>description</code> attributes are not
+    used by Tomcat.</p>
+
+    <p>The <code>className</code> attribute must be the fully qualified class
+    name of the <code>AuthConfigProvider</code>. The implementation may be
+    packaged with the web application or in Tomcat&apos;s
+    <code>$CATALINA_BASE/lib</code> directory.</p>
+
+    <p>The <code>layer</code> attribute must be <code>HttpServlet</code>.</p>
+
+    <p>The <code>appContext</code> attribute must be exactly the concatenation
+    of:</p>
+    <ul>
+      <li>The engine name</li>
+      <li>The forward slash character</li>
+      <li>The host name</li>
+      <li>A single space</li>
+      <li>The context path</li>
+    </ul>
+
+    <p>If the <code>AuthConfigProvider</code> supports configuration via
+    properties these may be specified via <code>&lt;property&gt;</code> elements
+    nesting inside the <code>&lt;provide&gt;</code> element.</p>
+
+  </subsection>
+
+  <subsection name="ServerAuthModule">
+
+    <p>If the 3rd party implementation only provides an
+    <code>ServerAuthModule</code> then it will be necessary to provide a number
+    of supporting classes. These may be a custom implementation or,
+    alternatively, Tomcat provides a simple wrapper implementation for
+    <code>ServerAuthModule</code>s.
+    </p>
+
+    <p>Tomcat&apos;s wrapper for <code>ServerAuthModule</code> can be configured
+    by nesting the following inside the
+    <code>&lt;jaspic-providers&gt;</code> element in
+    <code>$CATALINA_BASE/conf/jaspic-providers.xml</code>.</p>
+<source><![CDATA[<provider name="any"
+          className="org.apache.catalina.authenticator.jaspic.SimpleAuthConfigProvider"
+          layer="HttpServlet"
+          appContext="Catalina/localhost /contextPath"
+          description="any">
+  <property name="org.apache.catalina.authenticator.jaspic.ServerAuthModule.1"
+            value="fully.qualified.implementation.class.Name" />
+  <property name="see-provider-documentation"
+            value="see-provider-documentation" />
+</provider>]]></source>
+
+    <p>The configuration is similar to the <code>AuthConfigProvider</code> in
+    the previous section but with some key differences.</p>
+
+    <p>The <code>className</code> attribute must be
+    <code>org.apache.catalina.authenticator.jaspic.SimpleAuthConfigProvider</code>.</p>
+
+    <p>The <code>ServerAuthModule</code>(s) are specified via properties. The
+    property name must be
+    <code>org.apache.catalina.authenticator.jaspic.ServerAuthModule.n</code>
+    where <code>n</code> is the index of the module. The index must start at 1
+    an increment in steps of 1 until all modules are defined. The value of the
+    property must be the fully qualified class name of the module.</p>
+  </subsection>
+
+</section>
+
+<section name="Dynamic configuration">
+
+  <p>JASPIC modules and configuration can be packaged within a WAR file with the
+  web application. The web application can then register the required JASPIC
+  configuration when it starts using the standard JASPIC APIs.</p>
+
+  <p>If parallel deployment is being used then dynamic configuration should not
+  be used. The JASPIC API assumes that a context path is unique for any given
+  host which is not the case when using parallel deployment. When using parallel
+  deployment, static JASPIC configuration should be used. This will require that
+  all versions of the application use the same JASPIC configuration.</p>
+
+</section>
+
+<section name="3rd party modules">
+
+  <p>This is not an exhaustive list. The Tomcat community welcomes contributions
+  that add to this section.</p>
+
+  <subsection name="Philip Green II&apos;s module for Google OAuth 2">
+
+    <p>The source code for this module along with the
+    <a href="https://github.com/phillipgreenii/google-oauth-2.0-serverauthmodule">documentation</a>
+    which includes details of the necessary Google API configuration is
+    available on GitHub.</p>
+
+    <p>A sample configuration for using this module with Tomcat would look like
+    this:</p>
+<source><![CDATA[<jaspic-providers xmlns="https://tomcat.apache.org/xml"
+                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  xsi:schemaLocation="https://tomcat.apache.org/xml jaspic-providers.xsd"
+                  version="1.0">
+  <provider name="google-oauth"
+            className="org.apache.catalina.authenticator.jaspic.SimpleAuthConfigProvider"
+            layer="HttpServlet"
+            appContext="Catalina/localhost /contextPath"
+            description="Google OAuth test">
+    <property name="org.apache.catalina.authenticator.jaspic.ServerAuthModule.1"
+              value="com.idmworks.security.google.GoogleOAuthServerAuthModule" />
+    <property name="oauth.clientid"
+              value="obtained-from-Google-console" />
+    <property name="oauth.clientsecret"
+              value="obtained-from-Google-console" />
+    <property name="ignore_missing_login_context"
+              value="true" />
+  </provider>
+</jaspic-providers>]]></source>
+  </subsection>
+
+</section>
+
+</body>
+
+</document>
