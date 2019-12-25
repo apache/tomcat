@@ -80,8 +80,8 @@
         sessions. (schultz)
       </fix>
       <update>
-        <bug>63691</bug>: Skip all jars and directories scanning when a wildcard
-        pattern <code>*</code> or <code>*.jar</code> is set or added to
+        <bug>63691</bug>: Skip all jar and directory scanning when the wildcard
+        pattern &quot;*&quot; or &quot;*.jar&quot; is set or added to
         <code>tomcat.util.scan.StandardJarScanFilter.jarsToSkip</code>. (isapir)
       </update>
     </changelog>
