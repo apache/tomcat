@@ -79,6 +79,11 @@
         <bug>64023</bug>: Skip null-valued session attributes when deserializing
         sessions. (schultz)
       </fix>
+      <update>
+        <bug>63691</bug>: Skip all jars and directories scanning when a wildcard
+        pattern <code>*</code> or <code>*.jar</code> is set or added to
+        <code>tomcat.util.scan.StandardJarScanFilter.jarsToSkip</code>. (isapir)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Coyote">
