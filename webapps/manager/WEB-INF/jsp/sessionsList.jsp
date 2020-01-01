@@ -43,7 +43,7 @@
     <meta http-equiv="expires" content="0"/><!-- 0 is an invalid value and should be treated as 'now' -->
     <meta http-equiv="content-language" content="en"/>
     <meta name="author" content="Cedrik LIME"/>
-    <meta name="copyright" content="copyright 2005-2019 the Apache Software Foundation"/>
+    <meta name="copyright" content="copyright 2005-2020 the Apache Software Foundation"/>
     <meta name="robots" content="noindex,nofollow,noarchive"/>
     <title>Sessions Administration for <%= JspHelper.escapeXml(cn.getDisplayName()) %></title>
 </head>
