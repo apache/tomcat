@@ -63,6 +63,7 @@ import javax.net.ssl.SSLSocketFactory;
 
 import org.apache.catalina.LifecycleException;
 import org.ietf.jgss.GSSCredential;
+import org.ietf.jgss.GSSName;
 
 /**
  * <p>Implementation of <strong>Realm</strong> that works with a directory
@@ -2311,6 +2312,22 @@ public class JNDIRealm extends RealmBase {
     @Override
     protected Principal getPrincipal(String username) {
         return getPrincipal(username, null);
+    }
+
+    @Override
+    protected Principal getPrincipal(GSSName gssName,
+            GSSCredential gssCredential) {
+        String name = gssName.toString();
+
+        if (isStripRealmForGss()) {
+            int i = name.indexOf('@');
+            if (i > 0) {
+                // Zero so we don't leave a zero length name
+                name = name.substring(0, i);
+            }
+        }
+
+        return getPrincipal(name, gssCredential);
     }
 
     @Override

@@ -84,6 +84,10 @@
         from Tomcat 7.0.x some time after 2020-12-31. (markt)
       </scode>
       <fix>
+        <bug>64011</bug>: <code>JNDIRealm</code> no longer authenticates to LDAP.
+        (michaelo)
+      </fix>
+      <fix>
         <bug>64023</bug>: Skip null-valued session attributes when deserializing
         sessions. (schultz)
       </fix>
