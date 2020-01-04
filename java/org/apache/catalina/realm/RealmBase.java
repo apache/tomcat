@@ -1274,7 +1274,8 @@ public abstract class RealmBase extends LifecycleMBeanBase implements org.apache
      * @param gssCredential the GSS credential of the principal
      * @return the principal associated with the given user name.
      */
-    protected Principal getPrincipal(GSSName gssName, GSSCredential gssCredential) {
+    protected Principal getPrincipal(GSSName gssName,
+            GSSCredential gssCredential) {
         String name = gssName.toString();
 
         if (isStripRealmForGss()) {
