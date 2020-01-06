@@ -66,7 +66,7 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
     private final MimeHeaders headers;
 
 
-    private final boolean rejectIllegalHeaderName;
+    private final boolean rejectIllegalHeader;
 
     /**
      * State.
@@ -152,13 +152,13 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
     // ----------------------------------------------------------- Constructors
 
     public Http11InputBuffer(Request request, int headerBufferSize,
-            boolean rejectIllegalHeaderName, HttpParser httpParser) {
+            boolean rejectIllegalHeader, HttpParser httpParser) {
 
         this.request = request;
         headers = request.getMimeHeaders();
 
         this.headerBufferSize = headerBufferSize;
-        this.rejectIllegalHeaderName = rejectIllegalHeaderName;
+        this.rejectIllegalHeader = rejectIllegalHeader;
         this.httpParser = httpParser;
 
         filterLibrary = new InputFilter[0];
@@ -762,6 +762,8 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
         //
 
         byte chr = 0;
+        byte prevChr = 0;
+
         while (headerParsePos == HeaderParsePosition.HEADER_START) {
 
             // Read new bytes if needed
@@ -772,17 +774,23 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
                 }
             }
 
+            prevChr = chr;
             chr = byteBuffer.get();
 
-            if (chr == Constants.CR) {
-                // Skip
-            } else if (chr == Constants.LF) {
+            if (chr == Constants.CR && prevChr != Constants.CR) {
+                // Possible start of CRLF - process the next byte.
+            } else if (prevChr == Constants.CR && chr == Constants.LF) {
                 return HeaderParseStatus.DONE;
             } else {
-                byteBuffer.position(byteBuffer.position() - 1);
+                if (prevChr == 0) {
+                    // Must have only read one byte
+                    byteBuffer.position(byteBuffer.position() - 1);
+                } else {
+                    // Must have read two bytes (first was CR, second was not LF)
+                    byteBuffer.position(byteBuffer.position() - 2);
+                }
                 break;
             }
-
         }
 
         if (headerParsePos == HeaderParsePosition.HEADER_START) {
@@ -879,11 +887,22 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
                         }
                     }
 
+                    prevChr = chr;
                     chr = byteBuffer.get();
                     if (chr == Constants.CR) {
-                        // Skip
-                    } else if (chr == Constants.LF) {
+                        // Possible start of CRLF - process the next byte.
+                    } else if (prevChr == Constants.CR && chr == Constants.LF) {
                         eol = true;
+                    } else if (prevChr == Constants.CR) {
+                        // Invalid value
+                        // Delete the header (it will be the most recent one)
+                        headers.removeHeader(headers.size() - 1);
+                        return skipLine();
+                    } else if (chr != Constants.HT && HttpParser.isControl(chr)) {
+                        // Invalid value
+                        // Delete the header (it will be the most recent one)
+                        headers.removeHeader(headers.size() - 1);
+                        return skipLine();
                     } else if (chr == Constants.SP || chr == Constants.HT) {
                         byteBuffer.put(headerData.realPos, chr);
                         headerData.realPos++;
@@ -935,6 +954,9 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
         headerParsePos = HeaderParsePosition.HEADER_SKIPLINE;
         boolean eol = false;
 
+        byte chr = 0;
+        byte prevChr = 0;
+
         // Reading bytes until the end of the line
         while (!eol) {
 
@@ -946,20 +968,21 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
             }
 
             int pos = byteBuffer.position();
-            byte chr = byteBuffer.get();
+            prevChr = chr;
+            chr = byteBuffer.get();
             if (chr == Constants.CR) {
                 // Skip
-            } else if (chr == Constants.LF) {
+            } else if (prevChr == Constants.CR && chr == Constants.LF) {
                 eol = true;
             } else {
                 headerData.lastSignificantChar = pos;
             }
         }
-        if (rejectIllegalHeaderName || log.isDebugEnabled()) {
+        if (rejectIllegalHeader || log.isDebugEnabled()) {
             String message = sm.getString("iib.invalidheader",
                     HeaderUtil.toPrintableString(byteBuffer.array(), headerData.lineStart,
                             headerData.lastSignificantChar - headerData.lineStart + 1));
-            if (rejectIllegalHeaderName) {
+            if (rejectIllegalHeader) {
                 throw new IllegalArgumentException(message);
             }
             log.debug(message);

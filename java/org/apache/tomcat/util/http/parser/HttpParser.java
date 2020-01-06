@@ -317,6 +317,17 @@ public class HttpParser {
     }
 
 
+    public static boolean isControl(int c) {
+        // Fast for valid control characters, slower for some incorrect
+        // ones
+        try {
+            return IS_CONTROL[c];
+        } catch (ArrayIndexOutOfBoundsException ex) {
+            return false;
+        }
+    }
+
+
     // Skip any LWS and position to read the next character. The next character
     // is returned as being able to 'peek()' it allows a small optimisation in
     // some cases.

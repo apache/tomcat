@@ -145,27 +145,56 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
     }
 
 
-    private boolean rejectIllegalHeaderName = true;
+    private boolean rejectIllegalHeader = true;
     /**
-     * If an HTTP request is received that contains an illegal header name (i.e.
-     * the header name is not a token) will the request be rejected (with a 400
-     * response) or will the illegal header be ignored.
+     * If an HTTP request is received that contains an illegal header name or
+     * value (e.g. the header name is not a token) will the request be rejected
+     * (with a 400 response) or will the illegal header be ignored?
      *
      * @return {@code true} if the request will be rejected or {@code false} if
      *         the header will be ignored
      */
-    public boolean getRejectIllegalHeaderName() { return rejectIllegalHeaderName; }
+    public boolean getRejectIllegalHeader() { return rejectIllegalHeader; }
     /**
-     * If an HTTP request is received that contains an illegal header name (i.e.
-     * the header name is not a token) should the request be rejected (with a
-     * 400 response) or should the illegal header be ignored.
+     * If an HTTP request is received that contains an illegal header name or
+     * value (e.g. the header name is not a token) should the request be
+     * rejected (with a 400 response) or should the illegal header be ignored?
+     *
+     * @param rejectIllegalHeader   {@code true} to reject requests with illegal
+     *                              header names or values, {@code false} to
+     *                              ignore the header
+     */
+    public void setRejectIllegalHeader(boolean rejectIllegalHeader) {
+        this.rejectIllegalHeader = rejectIllegalHeader;
+    }
+    /**
+     * If an HTTP request is received that contains an illegal header name or
+     * value (e.g. the header name is not a token) will the request be rejected
+     * (with a 400 response) or will the illegal header be ignored?
+     *
+     * @return {@code true} if the request will be rejected or {@code false} if
+     *         the header will be ignored
+     *
+     * @deprecated Now an alias for {@link #getRejectIllegalHeader()}. Will be
+     *             removed in Tomcat 10 onwards.
+     */
+    @Deprecated
+    public boolean getRejectIllegalHeaderName() { return rejectIllegalHeader; }
+    /**
+     * If an HTTP request is received that contains an illegal header name or
+     * value (e.g. the header name is not a token) should the request be
+     * rejected (with a 400 response) or should the illegal header be ignored?
      *
      * @param rejectIllegalHeaderName   {@code true} to reject requests with
-     *                                  illegal header names, {@code false} to
-     *                                  ignore the header
+     *                                  illegal header names or values,
+     *                                  {@code false} to ignore the header
+     *
+     * @deprecated Now an alias for {@link #setRejectIllegalHeader(boolean)}.
+     *             Will be removed in Tomcat 10 onwards.
      */
+    @Deprecated
     public void setRejectIllegalHeaderName(boolean rejectIllegalHeaderName) {
-        this.rejectIllegalHeaderName = rejectIllegalHeaderName;
+        this.rejectIllegalHeader = rejectIllegalHeaderName;
     }
 
 
