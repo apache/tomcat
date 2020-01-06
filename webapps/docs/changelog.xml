@@ -132,7 +132,7 @@
       <fix>
         Refactor FORM authentication to reduce duplicate code and to ensure that
         the authenticated Principal is not cached in the session when caching is
-        disabled. (markt)
+        disabled. This is the fix for CVE-2019-17563. (markt/kkolinko)
       </fix>
       <update>
         Do not store username and password as session notes during
@@ -231,7 +231,8 @@
         <bug>63905</bug> Clean up Tomcat CSS. (michaelo)
       </update>
       <fix>
-       Refactor JMX remote RMI registry creation. (remm)
+       Refactor JMX remote RMI registry creation. This is the fix for
+       CVE-2019-12418. (remm)
       </fix>
     </changelog>
   </subsection>
