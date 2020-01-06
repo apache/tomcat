@@ -395,7 +395,7 @@ public class MimeHeaders {
      * reset and swap with last header
      * @param idx the index of the header to remove.
      */
-    private void removeHeader(int idx) {
+    public void removeHeader(int idx) {
         MimeHeaderField mh = headers[idx];
 
         mh.recycle();
