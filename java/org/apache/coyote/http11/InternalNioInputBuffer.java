@@ -100,13 +100,13 @@ public class InternalNioInputBuffer extends AbstractInputBuffer<NioChannel> {
      * Alternate constructor.
      */
     public InternalNioInputBuffer(Request request, int headerBufferSize,
-            boolean rejectIllegalHeaderName, HttpParser httpParser) {
+            boolean rejectIllegalHeader, HttpParser httpParser) {
 
         this.request = request;
         headers = request.getMimeHeaders();
 
         this.headerBufferSize = headerBufferSize;
-        this.rejectIllegalHeaderName = rejectIllegalHeaderName;
+        this.rejectIllegalHeaderName = rejectIllegalHeader;
         this.httpParser = httpParser;
 
         inputStreamInputBuffer = new SocketInputBuffer();
@@ -515,6 +515,8 @@ public class InternalNioInputBuffer extends AbstractInputBuffer<NioChannel> {
         //
 
         byte chr = 0;
+        byte prevChr = 0;
+
         while (headerParsePos == HeaderParsePosition.HEADER_START) {
 
             // Read new bytes if needed
@@ -525,19 +527,23 @@ public class InternalNioInputBuffer extends AbstractInputBuffer<NioChannel> {
                 }
             }
 
+            prevChr = chr;
             chr = buf[pos];
 
-            if (chr == Constants.CR) {
-                // Skip
-            } else if (chr == Constants.LF) {
+            if (chr == Constants.CR && prevChr != Constants.CR) {
+                // Possible start of CRLF - process the next byte.
+            } else if (prevChr == Constants.CR && chr == Constants.LF) {
                 pos++;
                 return HeaderParseStatus.DONE;
             } else {
+                if (prevChr == Constants.CR) {
+                    // Must have read two bytes (first was CR, second was not LF)
+                    pos--;
+                }
                 break;
             }
 
             pos++;
-
         }
 
         if ( headerParsePos == HeaderParsePosition.HEADER_START ) {
@@ -633,11 +639,22 @@ public class InternalNioInputBuffer extends AbstractInputBuffer<NioChannel> {
                         }
                     }
 
+                    prevChr = chr;
                     chr = buf[pos];
                     if (chr == Constants.CR) {
-                        // Skip
-                    } else if (chr == Constants.LF) {
+                        // Possible start of CRLF - process the next byte.
+                    } else if (prevChr == Constants.CR && chr == Constants.LF) {
                         eol = true;
+                    } else if (prevChr == Constants.CR) {
+                        // Invalid value
+                        // Delete the header (it will be the most recent one)
+                        headers.removeHeader(headers.size() - 1);
+                        return skipLine();
+                    } else if (chr != Constants.HT && HttpParser.isControl(chr)) {
+                        // Invalid value
+                        // Delete the header (it will be the most recent one)
+                        headers.removeHeader(headers.size() - 1);
+                        return skipLine();
                     } else if (chr == Constants.SP || chr == Constants.HT) {
                         buf[headerData.realPos] = chr;
                         headerData.realPos++;
@@ -695,6 +712,9 @@ public class InternalNioInputBuffer extends AbstractInputBuffer<NioChannel> {
         headerParsePos = HeaderParsePosition.HEADER_SKIPLINE;
         boolean eol = false;
 
+        byte chr = 0;
+        byte prevChr = 0;
+
         // Reading bytes until the end of the line
         while (!eol) {
 
@@ -705,9 +725,12 @@ public class InternalNioInputBuffer extends AbstractInputBuffer<NioChannel> {
                 }
             }
 
-            if (buf[pos] == Constants.CR) {
+            prevChr = chr;
+            chr = buf[pos];
+
+            if (chr == Constants.CR) {
                 // Skip
-            } else if (buf[pos] == Constants.LF) {
+            } else if (prevChr == Constants.CR && chr == Constants.LF) {
                 eol = true;
             } else {
                 headerData.lastSignificantChar = pos;

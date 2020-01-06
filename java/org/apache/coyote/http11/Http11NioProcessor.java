@@ -66,7 +66,7 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
     // ----------------------------------------------------------- Constructors
 
 
-    public Http11NioProcessor(int maxHttpHeaderSize, boolean rejectIllegalHeaderName,
+    public Http11NioProcessor(int maxHttpHeaderSize, boolean rejectIllegalHeader,
             NioEndpoint endpoint, int maxTrailerSize, Set<String> allowedTrailerHeaders,
             int maxExtensionSize, int maxSwallowSize, String relaxedPathChars,
             String relaxedQueryChars) {
@@ -76,7 +76,7 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
         httpParser = new HttpParser(relaxedPathChars, relaxedQueryChars);
 
         inputBuffer = new InternalNioInputBuffer(request, maxHttpHeaderSize,
-                rejectIllegalHeaderName, httpParser);
+                rejectIllegalHeader, httpParser);
         request.setInputBuffer(inputBuffer);
 
         outputBuffer = new InternalNioOutputBuffer(response, maxHttpHeaderSize);

@@ -52,7 +52,7 @@ public class InternalAprInputBuffer extends AbstractInputBuffer<Long> {
      * Alternate constructor.
      */
     public InternalAprInputBuffer(Request request, int headerBufferSize,
-            boolean rejectIllegalHeaderName, HttpParser httpParser) {
+            boolean rejectIllegalHeader, HttpParser httpParser) {
 
         this.request = request;
         headers = request.getMimeHeaders();
@@ -64,7 +64,7 @@ public class InternalAprInputBuffer extends AbstractInputBuffer<Long> {
             bbuf = ByteBuffer.allocateDirect((headerBufferSize / 1500 + 1) * 1500);
         }
 
-        this.rejectIllegalHeaderName = rejectIllegalHeaderName;
+        this.rejectIllegalHeaderName = rejectIllegalHeader;
         this.httpParser = httpParser;
 
         inputStreamInputBuffer = new SocketInputBuffer();
@@ -351,6 +351,8 @@ public class InternalAprInputBuffer extends AbstractInputBuffer<Long> {
         //
 
         byte chr = 0;
+        byte prevChr = 0;
+
         while (true) {
 
             // Read new bytes if needed
@@ -359,19 +361,23 @@ public class InternalAprInputBuffer extends AbstractInputBuffer<Long> {
                     throw new EOFException(sm.getString("iib.eof.error"));
             }
 
+            prevChr = chr;
             chr = buf[pos];
 
-            if (chr == Constants.CR) {
-                // Skip
-            } else if (chr == Constants.LF) {
-                pos++;
+            if (chr == Constants.CR && prevChr != Constants.CR) {
+                // Possible start of CRLF - process the next byte.
+            } else if (prevChr == Constants.CR && chr == Constants.LF) {
+                    pos++;
                 return false;
             } else {
+                if (prevChr == Constants.CR) {
+                    // Must have read two bytes (first was CR, second was not LF)
+                    pos--;
+                }
                 break;
             }
 
             pos++;
-
         }
 
         // Mark the current buffer position
@@ -456,10 +462,24 @@ public class InternalAprInputBuffer extends AbstractInputBuffer<Long> {
                         throw new EOFException(sm.getString("iib.eof.error"));
                 }
 
-                if (buf[pos] == Constants.CR) {
-                    // Skip
-                } else if (buf[pos] == Constants.LF) {
+                prevChr = chr;
+                chr = buf[pos];
+                if (chr == Constants.CR) {
+                    // Possible start of CRLF - process the next byte.
+                } else if (prevChr == Constants.CR && chr == Constants.LF) {
                     eol = true;
+                } else if (prevChr == Constants.CR) {
+                    // Invalid value
+                    // Delete the header (it will be the most recent one)
+                    headers.removeHeader(headers.size() - 1);
+                    skipLine(lineStart, start);
+                    return true;
+                } else if (chr != Constants.HT && HttpParser.isControl(chr)) {
+                    // Invalid value
+                    // Delete the header (it will be the most recent one)
+                    headers.removeHeader(headers.size() - 1);
+                    skipLine(lineStart, start);
+                    return true;
                 } else if (buf[pos] == Constants.SP) {
                     buf[realPos] = buf[pos];
                     realPos++;
@@ -512,6 +532,9 @@ public class InternalAprInputBuffer extends AbstractInputBuffer<Long> {
             lastRealByte = pos - 1;
         }
 
+        byte chr = 0;
+        byte prevChr = 0;
+
         while (!eol) {
 
             // Read new bytes if needed
@@ -520,9 +543,12 @@ public class InternalAprInputBuffer extends AbstractInputBuffer<Long> {
                     throw new EOFException(sm.getString("iib.eof.error"));
             }
 
-            if (buf[pos] == Constants.CR) {
+            prevChr = chr;
+            chr = buf[pos];
+
+            if (chr == Constants.CR) {
                 // Skip
-            } else if (buf[pos] == Constants.LF) {
+            } else if (prevChr == Constants.CR && chr == Constants.LF) {
                 eol = true;
             } else {
                 lastRealByte = pos;

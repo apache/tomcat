@@ -61,7 +61,7 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
     // ----------------------------------------------------------- Constructors
 
 
-    public Http11AprProcessor(int headerBufferSize, boolean rejectIllegalHeaderName,
+    public Http11AprProcessor(int headerBufferSize, boolean rejectIllegalHeader,
             AprEndpoint endpoint, int maxTrailerSize, Set<String> allowedTrailerHeaders,
             int maxExtensionSize, int maxSwallowSize, String relaxedPathChars,
             String relaxedQueryChars) {
@@ -70,7 +70,7 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
 
         httpParser = new HttpParser(relaxedPathChars, relaxedQueryChars);
 
-        inputBuffer = new InternalAprInputBuffer(request, headerBufferSize, rejectIllegalHeaderName,
+        inputBuffer = new InternalAprInputBuffer(request, headerBufferSize, rejectIllegalHeader,
                 httpParser);
         request.setInputBuffer(inputBuffer);
 

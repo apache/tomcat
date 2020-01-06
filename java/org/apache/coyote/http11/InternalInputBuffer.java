@@ -53,14 +53,14 @@ public class InternalInputBuffer extends AbstractInputBuffer<Socket> {
      * Default constructor.
      */
     public InternalInputBuffer(Request request, int headerBufferSize,
-            boolean rejectIllegalHeaderName, HttpParser httpParser) {
+            boolean rejectIllegalHeader, HttpParser httpParser) {
 
         this.request = request;
         headers = request.getMimeHeaders();
 
         buf = new byte[headerBufferSize];
 
-        this.rejectIllegalHeaderName = rejectIllegalHeaderName;
+        this.rejectIllegalHeaderName = rejectIllegalHeader;
         this.httpParser = httpParser;
 
         inputStreamInputBuffer = new InputStreamInputBuffer();
@@ -303,6 +303,8 @@ public class InternalInputBuffer extends AbstractInputBuffer<Socket> {
         //
 
         byte chr = 0;
+        byte prevChr = 0;
+
         while (true) {
 
             // Read new bytes if needed
@@ -311,19 +313,23 @@ public class InternalInputBuffer extends AbstractInputBuffer<Socket> {
                     throw new EOFException(sm.getString("iib.eof.error"));
             }
 
+            prevChr = chr;
             chr = buf[pos];
 
-            if (chr == Constants.CR) {
-                // Skip
-            } else if (chr == Constants.LF) {
+            if (chr == Constants.CR && prevChr != Constants.CR) {
+                // Possible start of CRLF - process the next byte.
+            } else if (prevChr == Constants.CR && chr == Constants.LF) {
                 pos++;
                 return false;
             } else {
+                if (prevChr == Constants.CR) {
+                    // Must have read two bytes (first was CR, second was not LF)
+                    pos--;
+                }
                 break;
             }
 
             pos++;
-
         }
 
         // Mark the current buffer position
@@ -409,15 +415,29 @@ public class InternalInputBuffer extends AbstractInputBuffer<Socket> {
                         throw new EOFException(sm.getString("iib.eof.error"));
                 }
 
-                if (buf[pos] == Constants.CR) {
-                    // Skip
-                } else if (buf[pos] == Constants.LF) {
+                prevChr = chr;
+                chr = buf[pos];
+                if (chr == Constants.CR) {
+                    // Possible start of CRLF - process the next byte.
+                } else if (prevChr == Constants.CR && chr == Constants.LF) {
                     eol = true;
-                } else if (buf[pos] == Constants.SP) {
-                    buf[realPos] = buf[pos];
+                } else if (prevChr == Constants.CR) {
+                    // Invalid value
+                    // Delete the header (it will be the most recent one)
+                    headers.removeHeader(headers.size() - 1);
+                    skipLine(lineStart, start);
+                    return true;
+                } else if (chr != Constants.HT && HttpParser.isControl(chr)) {
+                    // Invalid value
+                    // Delete the header (it will be the most recent one)
+                    headers.removeHeader(headers.size() - 1);
+                    skipLine(lineStart, start);
+                    return true;
+                } else if (chr == Constants.SP) {
+                    buf[realPos] = chr;
                     realPos++;
                 } else {
-                    buf[realPos] = buf[pos];
+                    buf[realPos] = chr;
                     realPos++;
                     lastSignificantChar = realPos;
                 }
@@ -483,6 +503,9 @@ public class InternalInputBuffer extends AbstractInputBuffer<Socket> {
             lastRealByte = pos - 1;
         }
 
+        byte chr = 0;
+        byte prevChr = 0;
+
         while (!eol) {
 
             // Read new bytes if needed
@@ -491,9 +514,12 @@ public class InternalInputBuffer extends AbstractInputBuffer<Socket> {
                     throw new EOFException(sm.getString("iib.eof.error"));
             }
 
-            if (buf[pos] == Constants.CR) {
+            prevChr = chr;
+            chr = buf[pos];
+
+            if (chr == Constants.CR) {
                 // Skip
-            } else if (buf[pos] == Constants.LF) {
+            } else if (prevChr == Constants.CR && chr == Constants.LF) {
                 eol = true;
             } else {
                 lastRealByte = pos;

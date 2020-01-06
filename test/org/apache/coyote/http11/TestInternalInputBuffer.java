@@ -163,13 +163,13 @@ public class TestInternalInputBuffer extends TomcatBaseTest {
 
 
     @Test
-    public void testBug51557Separators() throws Exception {
+    public void testBug51557SeparatorsInName() throws Exception {
         char httpSeparators[] = new char[] {
                 '\t', ' ', '\"', '(', ')', ',', '/', ':', ';', '<',
                 '=', '>', '?', '@', '[', '\\', ']', '{', '}' };
 
         for (char s : httpSeparators) {
-            doTestBug51557Char(s);
+            doTestBug51557CharInName(s);
             tearDown();
             setUp();
         }
@@ -177,13 +177,38 @@ public class TestInternalInputBuffer extends TomcatBaseTest {
 
 
     @Test
-    public void testBug51557Ctl() throws Exception {
+    public void testBug51557CtlInName() throws Exception {
         for (int i = 0; i < 31; i++) {
-            doTestBug51557Char((char) i);
+            doTestBug51557CharInName((char) i);
             tearDown();
             setUp();
         }
-        doTestBug51557Char((char) 127);
+        doTestBug51557CharInName((char) 127);
+    }
+
+
+    @Test
+    public void testBug51557CtlInValue() throws Exception {
+        for (int i = 0; i < 31; i++) {
+            if (i == '\t') {
+                // TAB is allowed
+                continue;
+            }
+            doTestBug51557InvalidCharInValue((char) i);
+            tearDown();
+            setUp();
+        }
+        doTestBug51557InvalidCharInValue((char) 127);
+    }
+
+
+    @Test
+    public void testBug51557ObsTextInValue() throws Exception {
+        for (int i = 128; i < 255; i++) {
+            doTestBug51557ValidCharInValue((char) i);
+            tearDown();
+            setUp();
+        }
     }
 
 
@@ -226,7 +251,33 @@ public class TestInternalInputBuffer extends TomcatBaseTest {
     }
 
 
-    private void doTestBug51557Char(char s) {
+    @Test
+    public void testBug51557CRStartName() {
+
+        Bug51557Client client = new Bug51557Client("\rName=",
+                "invalid");
+
+        client.doRequest();
+        Assert.assertTrue(client.isResponse200());
+        Assert.assertEquals("abcd", client.getResponseBody());
+        Assert.assertTrue(client.isResponseBodyOK());
+    }
+
+
+    @Test
+    public void testBug51557CR2StartName() {
+
+        Bug51557Client client = new Bug51557Client("\r\rName=",
+                "invalid");
+
+        client.doRequest();
+        Assert.assertTrue(client.isResponse200());
+        Assert.assertEquals("abcd", client.getResponseBody());
+        Assert.assertTrue(client.isResponseBodyOK());
+    }
+
+
+    private void doTestBug51557CharInName(char s) {
         Bug51557Client client =
             new Bug51557Client("X-Bug" + s + "51557", "invalid");
 
@@ -236,6 +287,29 @@ public class TestInternalInputBuffer extends TomcatBaseTest {
         Assert.assertTrue(client.isResponseBodyOK());
     }
 
+
+    private void doTestBug51557InvalidCharInValue(char s) {
+        Bug51557Client client =
+            new Bug51557Client("X-Bug51557-Invalid", "invalid" + s + "invalid");
+
+        client.doRequest();
+        Assert.assertTrue("Testing [" + (int) s + "]", client.isResponse200());
+        Assert.assertEquals("Testing [" + (int) s + "]", "abcd", client.getResponseBody());
+        Assert.assertTrue(client.isResponseBodyOK());
+    }
+
+
+    private void doTestBug51557ValidCharInValue(char s) {
+        Bug51557Client client =
+            new Bug51557Client("X-Bug51557-Valid", "valid" + s + "valid");
+
+        client.doRequest();
+        Assert.assertTrue("Testing [" + (int) s + "]", client.isResponse200());
+        Assert.assertEquals("Testing [" + (int) s + "]", "valid" + s + "validabcd", client.getResponseBody());
+        Assert.assertTrue(client.isResponseBodyOK());
+    }
+
+
     /**
      * Bug 51557 test client.
      */
@@ -243,12 +317,12 @@ public class TestInternalInputBuffer extends TomcatBaseTest {
 
         private final String headerName;
         private final String headerLine;
-        private final boolean rejectIllegalHeaderName;
+        private final boolean rejectIllegalHeader;
 
         public Bug51557Client(String headerName) {
             this.headerName = headerName;
             this.headerLine = headerName;
-            this.rejectIllegalHeaderName = false;
+            this.rejectIllegalHeader = false;
         }
 
         public Bug51557Client(String headerName, String headerValue) {
@@ -256,10 +330,10 @@ public class TestInternalInputBuffer extends TomcatBaseTest {
         }
 
         public Bug51557Client(String headerName, String headerValue,
-                boolean rejectIllegalHeaderName) {
+                boolean rejectIllegalHeader) {
             this.headerName = headerName;
             this.headerLine = headerName + ": " + headerValue;
-            this.rejectIllegalHeaderName = rejectIllegalHeaderName;
+            this.rejectIllegalHeader = rejectIllegalHeader;
         }
 
         private Exception doRequest() {
@@ -273,8 +347,8 @@ public class TestInternalInputBuffer extends TomcatBaseTest {
 
             try {
                 Connector connector = tomcat.getConnector();
-                connector.setProperty("rejectIllegalHeaderName",
-                        Boolean.toString(rejectIllegalHeaderName));
+                Assert.assertTrue(connector.setProperty(
+                        "rejectIllegalHeader", Boolean.toString(rejectIllegalHeader)));
                 tomcat.start();
                 setPort(connector.getLocalPort());
 
@@ -512,6 +586,75 @@ public class TestInternalInputBuffer extends TomcatBaseTest {
             return true;
         }
 
+    }
+
+
+    /**
+     * Test case for https://bz.apache.org/bugzilla/show_bug.cgi?id=59089
+     */
+    @Test
+    public void testBug59089() {
+
+        Bug59089Client client = new Bug59089Client();
+
+        client.doRequest();
+        Assert.assertTrue(client.isResponse200());
+        Assert.assertTrue(client.isResponseBodyOK());
+    }
+
+
+    /**
+     * Bug 59089 test client.
+     */
+    private class Bug59089Client extends SimpleHttpClient {
+
+        private Exception doRequest() {
+
+            // Ensure body is read correctly
+            setUseContentLength(true);
+
+            Tomcat tomcat = getTomcatInstance();
+
+            Context root = tomcat.addContext("", TEMP_DIR);
+            Tomcat.addServlet(root, "Bug59089", new TesterServlet());
+            root.addServletMapping("/test", "Bug59089");
+
+            try {
+                Connector connector = tomcat.getConnector();
+                Assert.assertTrue(connector.setProperty("rejectIllegalHeader", "false"));
+                tomcat.start();
+                setPort(connector.getLocalPort());
+
+                // Open connection
+                connect();
+
+                String[] request = new String[1];
+                request[0] = "GET http://localhost:8080/test HTTP/1.1" + CRLF +
+                        "Host: localhost:8080" + CRLF +
+                        "X-Header: Ignore" + CRLF +
+                        "X-Header" + (char) 130 + ": Broken" + CRLF + CRLF;
+
+                setRequest(request);
+                processRequest(); // blocks until response has been read
+
+                // Close the connection
+                disconnect();
+            } catch (Exception e) {
+                return e;
+            }
+            return null;
+        }
+
+        @Override
+        public boolean isResponseBodyOK() {
+            if (getResponseBody() == null) {
+                return false;
+            }
+            if (!getResponseBody().contains("OK")) {
+                return false;
+            }
+            return true;
+        }
     }
 
 
