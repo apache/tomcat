@@ -193,7 +193,7 @@
       <fix>
         Refactor FORM authentication to reduce duplicate code and to ensure that
         the authenticated Principal is not cached in the session when caching is
-        disabled. (markt)
+        disabled. This is the fix for CVE-2019-17563. (markt/kkolinko)
       </fix>
     </changelog>
   </subsection>
@@ -375,7 +375,8 @@
         year and may be removed as soon as the next 8.5.x release. (markt)
       </fix>
       <fix>
-       Refactor JMX remote RMI registry creation. (remm)
+       Refactor JMX remote RMI registry creation. This is the fix for
+       CVE-2019-12418. (remm)
       </fix>
     </changelog>
   </subsection>
