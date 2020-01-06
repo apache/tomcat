@@ -106,6 +106,10 @@
         <code>SSLHostConfigCertificate</code> elements. (markt)
       </fix>
       <fix>
+        <bug>63966</bug>: Switch the message shown when using HTTP to connect to
+        an HTTPS port from ISO-8859-1 to UTF-8. (markt)
+      </fix>
+      <fix>
         <bug>64007</bug>: Cancel selection key in poller before wrapper close to
         avoid possible deadlock. (remm)
       </fix>
