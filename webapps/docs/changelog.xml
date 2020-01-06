@@ -110,6 +110,10 @@
         via the new <code>SSLHostConfig</code> and
         <code>SSLHostConfigCertificate</code> elements. (markt)
       </fix>
+      <fix>
+        <bug>63966</bug>: Switch the message shown when using HTTP to connect to
+        an HTTPS port from ISO-8859-1 to UTF-8. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
