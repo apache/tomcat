@@ -107,8 +107,7 @@ public class StaticFieldELResolver extends ELResolver {
                     Throwable cause = e.getCause();
                     Util.handleThrowable(cause);
                     throw new ELException(cause);
-                } catch (IllegalArgumentException | IllegalAccessException |
-                        InstantiationException e) {
+                } catch (ReflectiveOperationException e) {
                     throw new ELException(e);
                 }
                 return result;
