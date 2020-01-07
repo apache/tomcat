@@ -23,7 +23,7 @@
   <groupId>org.apache.tomcat</groupId>
   <artifactId>tomcat-ssi</artifactId>
   <version>@MAVEN.DEPLOY.VERSION@</version>
-  <description>Tomcat Group Communication Package</description>
+  <description>Server-side Includes module</description>
   <url>https://tomcat.apache.org/</url>
   <licenses>
     <license>
