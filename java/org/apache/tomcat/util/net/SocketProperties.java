@@ -39,6 +39,7 @@ public class SocketProperties {
      * Default is 500
      * -1 is unlimited
      * 0 is disabled
+     * TODO: The default will be changed to 0 in Tomcat 10
      */
     protected int processorCache = 500;
 
@@ -49,6 +50,7 @@ public class SocketProperties {
      * -1 is unlimited
      * 0 is disabled
      * &gt;0 the max number of objects to keep in cache.
+     * TODO: The default will be changed to 0 in Tomcat 10
      */
     protected int eventCache = 500;
 
@@ -93,6 +95,11 @@ public class SocketProperties {
      * this value is how many channels
      * -1 means unlimited cached, 0 means no cache
      * Default value is 500
+     * TODO: The default should be changed in Tomcat 10, actually it should be
+     *   bufferPoolSize / (appReadBufSize + appWriteBufSize), assuming the SSL
+     *   buffers are ignored (that would be logical), and the value would be 6400.
+     *   So the default value will be changed to a new default value like -2 to
+     *   set a dynamic value based on bufferPoolSize in that case.
      */
     protected int bufferPool = 500;
 
@@ -100,6 +107,13 @@ public class SocketProperties {
      * Buffer pool size in bytes to be cached
      * -1 means unlimited, 0 means no cache
      * Default value is 100MB (1024*1024*100 bytes)
+     * TODO: The default value to be used could rather be based on the
+     *   JVM max heap, otherwise it could be a problem in some
+     *   environments. Big servers also need to use a much higher default,
+     *   while small cloud based ones should use 0 instead.
+     *   Possible default value strategy:
+     *     heap < 1GB: 0
+     *     heap >= 1GB: heap / 16
      */
     protected int bufferPoolSize = 1024*1024*100;
 

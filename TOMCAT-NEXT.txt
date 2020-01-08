@@ -67,6 +67,6 @@ New items for 10.0.x onwards:
 
 14. Remove unused NIO blocking code.
 
-15. Remove caches in Endpoint for trivial object (SocketProcessorBase, PollerEvent).
+15. Change SocketProperties cache sizes default values.
 
 16. Share configuration between HTTP/1.1 and nested HTTP/2 rather than duplicating.
