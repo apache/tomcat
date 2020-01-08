@@ -22,6 +22,7 @@ import java.util.Set;
 
 import javax.management.Attribute;
 import javax.management.MBeanException;
+import javax.management.MBeanInfo;
 import javax.management.MBeanOperationInfo;
 import javax.management.MBeanParameterInfo;
 import javax.management.MBeanServer;
@@ -35,6 +36,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.catalina.mbeans.MBeanDumper;
+import org.apache.catalina.tribes.util.StringManager;
 import org.apache.tomcat.util.modeler.Registry;
 
 /**
@@ -50,6 +52,8 @@ public class JMXProxyServlet extends HttpServlet {
     // Constant for "no parameters" when invoking a JMX operation
     // without any parameters.
     private static final String[] NO_PARAMETERS = new String[0];
+
+    private static final StringManager sm = StringManager.getManager(JMXProxyServlet.class);
 
     // ----------------------------------------------------- Instance Variables
     /**
@@ -261,6 +265,18 @@ public class JMXProxyServlet extends HttpServlet {
             throws OperationsException, MBeanException, ReflectionException {
         ObjectName oname = new ObjectName(onameStr);
         MBeanOperationInfo methodInfo = registry.getMethodInfo(oname, operation);
+        if(null == methodInfo) {
+            // getMethodInfo returns null for both "object not found" and "operation not found"
+            MBeanInfo info = null;
+            try {
+                info = registry.getMBeanServer().getMBeanInfo(oname);
+
+                throw new IllegalArgumentException(sm.getString("jmxProxyServlet.noOperationOnBean", operation, onameStr, info.getClassName()));
+            } catch (Exception e) {
+                throw new IllegalArgumentException(sm.getString("jmxProxyServlet.noBeanFound", onameStr));
+            }
+        }
+
         MBeanParameterInfo[] signature = methodInfo.getSignature();
         String[] signatureTypes = new String[signature.length];
         Object[] values = new Object[signature.length];
