@@ -97,7 +97,7 @@
       </fix>
       <fix>
         <bug>58577</bug>: Respect the argument-count when searching for MBean
-        operations to invoke via the JMXProxyServlet.
+        operations to invoke via the JMXProxyServlet. (schultz)
       </fix>
     </changelog>
   </subsection>
