@@ -91,6 +91,10 @@
         <bug>64023</bug>: Skip null-valued session attributes when deserializing
         sessions. (schultz)
       </fix>
+      <fix>
+        Do not throw a NullPointerException when an MBean or operation cannot
+        be found by the JMXProxyServlet. (schultz)
+      </fix>
     </changelog>
   </subsection>
 </section>
