@@ -26,6 +26,7 @@ import java.util.Hashtable;
 import java.util.List;
 
 import javax.management.DynamicMBean;
+import javax.management.InstanceNotFoundException;
 import javax.management.MBeanAttributeInfo;
 import javax.management.MBeanInfo;
 import javax.management.MBeanOperationInfo;
@@ -242,7 +243,6 @@ public class Registry implements RegistryMBean, MBeanRegistration {
         }
     }
 
-
     // -------------------- ID registry --------------------
 
     /**
@@ -376,6 +376,36 @@ public class Registry implements RegistryMBean, MBeanRegistration {
         return null;
     }
 
+    /**
+     * Find the operation info for a method.
+     *
+     * @param oname The bean name
+     * @param opName The operation name
+     * @param argCount The number of arguments to the method
+     * @return the operation info for the specified operation
+     * @throws InstanceNotFoundException If the object name is not bound to an MBean
+     */
+    public MBeanOperationInfo getMethodInfo(ObjectName oname, String opName, int argCount)
+        throws InstanceNotFoundException
+    {
+        MBeanInfo info = null;
+        try {
+            info = getMBeanServer().getMBeanInfo(oname);
+        } catch (InstanceNotFoundException infe) {
+            throw infe;
+        } catch (Exception e) {
+            log.warn(sm.getString("registry.noMetadata", oname), e);
+            return null;
+        }
+        MBeanOperationInfo attInfo[] = info.getOperations();
+        for (int i = 0; i < attInfo.length; i++) {
+            if (opName.equals(attInfo[i].getName())
+                && argCount == attInfo[i].getSignature().length) {
+                return attInfo[i];
+            }
+        }
+        return null;
+    }
 
     /**
      * Unregister a component. This is just a helper that avoids exceptions by

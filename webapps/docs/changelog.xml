@@ -100,6 +100,10 @@
         Do not throw a NullPointerException when an MBean or operation cannot
         be found by the JMXProxyServlet. (schultz)
       </fix>
+      <fix>
+        <bug>58577</bug>: Respect the argument-count when searching for MBean
+        operations to invoke via the JMXProxyServlet.
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
