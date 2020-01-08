@@ -88,6 +88,10 @@
         pattern &quot;*&quot; or &quot;*.jar&quot; is set or added to
         <code>tomcat.util.scan.StandardJarScanFilter.jarsToSkip</code>. (isapir)
       </update>
+      <fix>
+        Do not throw a NullPointerException when an MBean or operation cannot
+        be found by the JMXProxyServlet. (schultz)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
