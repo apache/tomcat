@@ -112,8 +112,8 @@ public class SocketProperties {
      *   environments. Big servers also need to use a much higher default,
      *   while small cloud based ones should use 0 instead.
      *   Possible default value strategy:
-     *     heap < 1GB: 0
-     *     heap >= 1GB: heap / 16
+     *     heap inf 1GB: 0
+     *     heap sup 1GB: heap / 32
      */
     protected int bufferPoolSize = 1024*1024*100;
 
