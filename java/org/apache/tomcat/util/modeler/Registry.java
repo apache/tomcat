@@ -41,6 +41,7 @@ import javax.management.ObjectName;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.modeler.modules.ModelerSource;
+import org.apache.tomcat.util.res.StringManager;
 
 /*
    Issues:
@@ -72,6 +73,7 @@ public class Registry implements RegistryMBean, MBeanRegistration {
      * The Log instance to which we will write our log messages.
      */
     private static final Log log = LogFactory.getLog(Registry.class);
+    private static final StringManager sm = StringManager.getManager(Registry.class);
 
     // Support for the factory methods
 
