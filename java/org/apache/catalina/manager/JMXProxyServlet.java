@@ -21,6 +21,7 @@ import java.io.PrintWriter;
 import java.util.Set;
 
 import javax.management.Attribute;
+import javax.management.InstanceNotFoundException;
 import javax.management.MBeanException;
 import javax.management.MBeanInfo;
 import javax.management.MBeanOperationInfo;
@@ -264,17 +265,18 @@ public class JMXProxyServlet extends HttpServlet {
     private Object invokeOperationInternal(String onameStr, String operation, String[] parameters)
             throws OperationsException, MBeanException, ReflectionException {
         ObjectName oname = new ObjectName(onameStr);
-        MBeanOperationInfo methodInfo = registry.getMethodInfo(oname, operation);
+        MBeanOperationInfo methodInfo = registry.getMethodInfo(oname, operation, (null == parameters ? 0 : parameters.length));
         if(null == methodInfo) {
             // getMethodInfo returns null for both "object not found" and "operation not found"
             MBeanInfo info = null;
             try {
                 info = registry.getMBeanServer().getMBeanInfo(oname);
-
-                throw new IllegalArgumentException(sm.getString("jmxProxyServlet.noOperationOnBean", operation, onameStr, info.getClassName()));
+            } catch (InstanceNotFoundException infe) {
+                throw infe;
             } catch (Exception e) {
-                throw new IllegalArgumentException(sm.getString("jmxProxyServlet.noBeanFound", onameStr));
+                throw new IllegalArgumentException(sm.getString("jmxProxyServlet.noBeanFound", onameStr), e);
             }
+            throw new IllegalArgumentException(sm.getString("jmxProxyServlet.noOperationOnBean", operation, (null == parameters ? 0 : parameters.length), onameStr, info.getClassName()));
         }
 
         MBeanParameterInfo[] signature = methodInfo.getSignature();
