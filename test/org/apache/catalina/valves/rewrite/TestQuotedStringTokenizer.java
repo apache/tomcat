@@ -16,15 +16,15 @@
  */
 package org.apache.catalina.valves.rewrite;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import org.hamcrest.CoreMatchers;
+
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -60,12 +60,12 @@ public class TestQuotedStringTokenizer {
         List<String> result = new ArrayList<>();
         int count = tokens.size();
         while (tokenizer.hasMoreTokens()) {
-            assertThat(tokenizer.countTokens(), is(count));
+            Assert.assertThat(Integer.valueOf(tokenizer.countTokens()), CoreMatchers.is(Integer.valueOf(count)));
             result.add(tokenizer.nextToken());
             count--;
         }
-        assertThat(tokenizer.countTokens(), is(0));
-        assertThat(tokens, is(result));
+        Assert.assertThat(Integer.valueOf(tokenizer.countTokens()), CoreMatchers.is(Integer.valueOf(0)));
+        Assert.assertThat(tokens, CoreMatchers.is(result));
     }
 
 }
