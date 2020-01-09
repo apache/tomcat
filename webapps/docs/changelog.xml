@@ -122,6 +122,10 @@
         <bug>63966</bug>: Switch the message shown when using HTTP to connect to
         an HTTPS port from ISO-8859-1 to UTF-8. (markt)
       </fix>
+      <add>
+        Add support for RFC 5915 formatted, unencrypted EC key files when using
+        a JSSE based TLS connector. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Jasper">

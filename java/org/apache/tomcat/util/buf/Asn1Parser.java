@@ -83,6 +83,12 @@ public class Asn1Parser {
     }
 
 
+    public void parseBytes(byte[] dest) {
+        System.arraycopy(source, pos, dest, 0, dest.length);
+        pos += dest.length;
+    }
+
+
     private int next() {
         return source[pos++] & 0xFF;
     }
