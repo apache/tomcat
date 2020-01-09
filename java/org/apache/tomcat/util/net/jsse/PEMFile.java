@@ -44,6 +44,7 @@ import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
 
 import org.apache.tomcat.util.buf.Asn1Parser;
+import org.apache.tomcat.util.buf.Asn1Writer;
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.apache.tomcat.util.file.ConfigFileLoader;
 import org.apache.tomcat.util.res.StringManager;
@@ -56,6 +57,9 @@ import org.apache.tomcat.util.res.StringManager;
 public class PEMFile {
 
     private static final StringManager sm = StringManager.getManager(PEMFile.class);
+
+    private static final byte[] OID_EC_PUBLIC_KEY =
+            new byte[] { 0x06, 0x07, 0x2A, (byte) 0x86, 0x48, (byte) 0xCE, 0x3D, 0x02, 0x01 };
 
     private String filename;
     private List<X509Certificate> certificates = new ArrayList<>();
@@ -105,6 +109,9 @@ public class PEMFile {
                 case "PRIVATE KEY":
                     privateKey = part.toPrivateKey(null, keyAlgorithm, Format.PKCS8);
                     break;
+                case "EC PRIVATE KEY":
+                    privateKey = part.toPrivateKey(null, "EC", Format.RFC5915);
+                    break;
                 case "ENCRYPTED PRIVATE KEY":
                     privateKey = part.toPrivateKey(password, keyAlgorithm, Format.PKCS8);
                     break;
@@ -149,6 +156,10 @@ public class PEMFile {
                         keySpec = new PKCS8EncodedKeySpec(decode());
                         break;
                     }
+                    case RFC5915: {
+                        keySpec = new PKCS8EncodedKeySpec(rfc5915ToPkcs8(decode()));
+                        break;
+                    }
                 }
             } else {
                 EncryptedPrivateKeyInfo privateKeyInfo = new EncryptedPrivateKeyInfo(decode());
@@ -182,13 +193,91 @@ public class PEMFile {
         }
 
 
+        /*
+         * RFC5915: SEQ
+         *           INT               value = 1
+         *           OCTET STRING      len = 32 bytes
+         *           [0]
+         *             OID             named EC
+         *           [1]
+         *             BIT STRING      len = 520 bits
+         *
+         * PKCS8:   SEQ
+         *           INT               value = 0
+         *           SEQ
+         *             OID             1.2.840.10045.2.1 (EC public key)
+         *             OID             named EC
+         *           OCTET STRING
+         *             SEQ
+         *               INT           value = 1
+         *               OCTET STRING  len = 32 bytes
+         *               [1]
+         *                 BIT STRING  len = 520 bits
+         *
+         */
+        private byte[] rfc5915ToPkcs8(byte[] source) {
+            // Parse RFC 5915 format EC private key
+            Asn1Parser p = new Asn1Parser(source);
+
+            // Type (sequence)
+            p.parseTag(0x30);
+            // Length
+            p.parseFullLength();
+
+            // Version
+            BigInteger version = p.parseInt();
+            if (version.intValue() != 1) {
+                throw new IllegalArgumentException(sm.getString("pemFile.notValidRFC5915"));
+            }
+
+            // Private key
+            p.parseTag(0x04);
+            int privateKeyLen = p.parseLength();
+            byte[] privateKey = new byte[privateKeyLen];
+            p.parseBytes(privateKey);
+
+            // [0] OID
+            p.parseTag(0xA0);
+            int oidLen = p.parseLength();
+            byte[] oid = new byte[oidLen];
+            p.parseBytes(oid);
+            if (oid[0] != 0x06) {
+                throw new IllegalArgumentException(sm.getString("pemFile.notValidRFC5915"));
+            }
+
+            // [1] Public key
+            p.parseTag(0xA1);
+            int publicKeyLen = p.parseLength();
+            byte[] publicKey = new byte[publicKeyLen];
+            p.parseBytes(publicKey);
+            if (publicKey[0] != 0x03) {
+                throw new IllegalArgumentException(sm.getString("pemFile.notValidRFC5915"));
+            }
+
+
+            // Write out PKCS#8 format
+            return Asn1Writer.writeSequence(
+                    Asn1Writer.writeInteger(0),
+                    Asn1Writer.writeSequence(
+                            OID_EC_PUBLIC_KEY,
+                            oid),
+                    Asn1Writer.writeOctetString(
+                            Asn1Writer.writeSequence(
+                                    Asn1Writer.writeInteger(1),
+                                    Asn1Writer.writeOctetString(privateKey),
+                                    Asn1Writer.writeTag((byte) 0xA1, publicKey))
+                            )
+                    );
+        }
+
+
         private RSAPrivateCrtKeySpec parsePKCS1(byte[] source) {
             Asn1Parser p = new Asn1Parser(source);
 
             // https://en.wikipedia.org/wiki/X.690#BER_encoding
             // https://tools.ietf.org/html/rfc8017#page-55
 
-            // Type
+            // Type (sequence)
             p.parseTag(0x30);
             // Length
             p.parseFullLength();
@@ -207,6 +296,7 @@ public class PEMFile {
 
     private enum Format {
         PKCS1,
-        PKCS8
+        PKCS8,
+        RFC5915
     }
 }

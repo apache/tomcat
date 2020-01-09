@@ -125,6 +125,10 @@
         <bug>64007</bug>: Cancel selection key in poller before wrapper close to
         avoid possible deadlock. (remm)
       </fix>
+      <add>
+        Add support for RFC 5915 formatted, unencrypted EC key files when using
+        a JSSE based TLS connector. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Jasper">
