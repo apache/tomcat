@@ -366,9 +366,6 @@ public class TestApplicationHttpRequest extends TomcatBaseTest {
     }
 
     private static boolean objectsEqual(String object1, String object2) {
-        if (object1 == null && object2 == null) {
-            return true;
-        }
-        return object1.equals(object2);
+        return object1 != null ? object1.equals(object2) : object2 == null;
     }
 }
