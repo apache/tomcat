@@ -80,7 +80,7 @@ public class TestApplicationHttpRequest extends TomcatBaseTest {
         // Parameters with no value are assigned a value of the empty string
         Map<String,String[]> expected = new HashMap<>();
         expected.put("a", new String[] { "b", "e" });
-        expected.put("c", new String[] { "" });
+        expected.put("c", new String[] { null });
         doQueryStringTest(null, "a=b&c&a=e", expected);
     }
 
@@ -124,7 +124,7 @@ public class TestApplicationHttpRequest extends TomcatBaseTest {
         // Parameters with no value are assigned a value of the empty string
         Map<String,String[]> expected = new HashMap<>();
         expected.put("a", new String[] { "b", "e" });
-        expected.put("c", new String[] { "" });
+        expected.put("c", new String[] { null });
         doQueryStringTest("a=b&c&a=e", null, expected);
     }
 
@@ -141,7 +141,7 @@ public class TestApplicationHttpRequest extends TomcatBaseTest {
     public void testMergeQueryString02() throws Exception {
         Map<String,String[]> expected = new HashMap<>();
         expected.put("a", new String[] { "z", "b", "e" });
-        expected.put("c", new String[] { "" });
+        expected.put("c", new String[] { null });
         doQueryStringTest("a=b&c&a=e", "a=z", expected);
     }
 
@@ -150,7 +150,7 @@ public class TestApplicationHttpRequest extends TomcatBaseTest {
     public void testMergeQueryString03() throws Exception {
         Map<String,String[]> expected = new HashMap<>();
         expected.put("a", new String[] { "b", "e" });
-        expected.put("c", new String[] { "z", "" });
+        expected.put("c", new String[] { "z", null });
         doQueryStringTest("a=b&c&a=e", "c=z", expected);
     }
 
@@ -158,13 +158,23 @@ public class TestApplicationHttpRequest extends TomcatBaseTest {
     @Test
     public void testMergeQueryString04() throws Exception {
         Map<String,String[]> expected = new HashMap<>();
-        expected.put("a", new String[] { "", "b", "e" });
-        expected.put("c", new String[] { "" });
+        expected.put("a", new String[] { null, "b", "e" });
+        expected.put("c", new String[] { null });
         doQueryStringTest("a=b&c&a=e", "a", expected);
     }
 
+
     @Test
     public void testMergeQueryString05() throws Exception {
+        Map<String,String[]> expected = new HashMap<>();
+        expected.put("a", new String[] { null, "b", "e" });
+        expected.put("c", new String[] { "" });
+        doQueryStringTest("a=b&c=&a=e", "a", expected);
+    }
+
+
+    @Test
+    public void testMergeQueryString06() throws Exception {
         // https://ru.wikipedia.org/wiki/%D0%A2%D0%B5%D1%81%D1%82
         // "Test" = "Test"
         String test = "\u0422\u0435\u0441\u0442";
@@ -284,7 +294,7 @@ public class TestApplicationHttpRequest extends TomcatBaseTest {
                     break;
                 }
                 for (int i = 0; i < expectedValue.length; i++) {
-                    if (!expectedValue[i].equals(entry.getValue()[i])) {
+                    if (!objectsEqual(expectedValue[i], entry.getValue()[i])) {
                         ok = false;
                         break;
                     }
@@ -353,5 +363,12 @@ public class TestApplicationHttpRequest extends TomcatBaseTest {
                 pw.print("OK");
             }
         }
+    }
+
+    private static boolean objectsEqual(String object1, String object2) {
+        if (object1 == null && object2 == null) {
+            return true;
+        }
+        return object1.equals(object2);
     }
 }

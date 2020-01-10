@@ -263,6 +263,7 @@ public final class Parameters {
             do {
                 switch(bytes[pos]) {
                     case '=':
+                        valueStart = pos+1;
                         if (parsingName) {
                             // Name finished. Value starts from next character
                             nameEnd = pos;
@@ -393,7 +394,7 @@ public final class Parameters {
                     tmpValue.setCharset(charset);
                     value = tmpValue.toString();
                 } else {
-                    value = "";
+                    value = null;
                 }
 
                 try {

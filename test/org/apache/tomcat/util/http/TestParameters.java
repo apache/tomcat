@@ -21,6 +21,7 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Enumeration;
 
+import org.apache.tomcat.util.buf.MessageBytes;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -31,11 +32,15 @@ public class TestParameters {
     private static final Parameter SIMPLE_MULTIPLE =
         new Parameter("foo2", "bar1", "bar2", "hello world", "?%@");
     private static final Parameter NO_VALUE =
-        new Parameter("foo3");
+        new Parameter("foo3", (String) null); // a variable that shows up once as undefined
     private static final Parameter EMPTY_VALUE =
         new Parameter("foo4", "");
     private static final Parameter EMPTY =
         new Parameter("");
+    private static final Parameter EMPTY2 =
+        new Parameter("foo5"); // a variable that never shows up
+    private static final Parameter MIXED_VALUE_AND_NO_VALUE =
+            new Parameter("foo6", null, "bar", "baz", null, "", "null"); // a variable that never shows up
     private static final Parameter UTF8 =
             new Parameter("\ufb6b\ufb6a\ufb72", "\uffee\uffeb\uffe2");
 
@@ -47,6 +52,11 @@ public class TestParameters {
         doTestProcessParametersByteArrayIntInt(-1, EMPTY_VALUE);
         doTestProcessParametersByteArrayIntInt(-1, EMPTY);
         doTestProcessParametersByteArrayIntInt(-1, UTF8);
+
+        doTestProcessParametersByteArrayIntInt(-1,
+                SIMPLE, EMPTY_VALUE, NO_VALUE);
+        doTestProcessParametersByteArrayIntInt(-1,
+                SIMPLE, SIMPLE_MULTIPLE, EMPTY_VALUE, NO_VALUE, EMPTY, UTF8);
         doTestProcessParametersByteArrayIntInt(-1,
                 SIMPLE, SIMPLE_MULTIPLE, NO_VALUE, EMPTY_VALUE, EMPTY, UTF8);
         doTestProcessParametersByteArrayIntInt(-1,
@@ -80,6 +90,9 @@ public class TestParameters {
                 SIMPLE_MULTIPLE.toString());
         Assert.assertEquals("foo3", NO_VALUE.toString());
         Assert.assertEquals("foo4=", EMPTY_VALUE.toString());
+        Assert.assertEquals("", EMPTY.toString());
+        Assert.assertEquals("", EMPTY2.toString());
+        Assert.assertEquals("foo6&foo6=bar&foo6=baz&foo6&foo6=&foo6=null", MIXED_VALUE_AND_NO_VALUE.toString());
     }
 
     private long doTestProcessParametersByteArrayIntInt(int limit,
@@ -131,6 +144,17 @@ public class TestParameters {
         Assert.assertNull(values);
     }
 
+    @Test
+    public void testNoValueHandling() {
+        Parameters p = new Parameters();
+        p.addParameter("foo", "value");
+        p.addParameter("bar", "");
+        p.addParameter("baz", null);
+
+        Assert.assertEquals("value", p.getParameter("foo"));
+        Assert.assertEquals("", p.getParameter("bar"));
+        Assert.assertNull(p.getParameter("baz"));
+    }
 
     @Test
     public void testAddParameters() {
@@ -259,7 +283,7 @@ public class TestParameters {
                     match = true;
                     if (parameter.values.length == 0) {
                         // Special case
-                        Assert.assertArrayEquals(new String[] {""}, values);
+                        Assert.assertArrayEquals(new String[] {null}, values);
                     } else {
                         Assert.assertArrayEquals(parameter.getValues(), values);
                     }
@@ -290,11 +314,12 @@ public class TestParameters {
         @Override
         public String toString() {
             try {
+                if (values == null || values.length == 0) {
+                    return "";
+                }
+
                 StringBuilder result = new StringBuilder();
                 boolean first = true;
-                if (values.length == 0) {
-                    return URLEncoder.encode(name, "UTF-8");
-                }
                 for (String value : values) {
                     if (first) {
                         first = false;
