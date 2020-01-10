@@ -71,7 +71,7 @@ public class QuotedStringTokenizer {
                 break;
             default:
                 throw new IllegalStateException(
-                        "Couldn't tokenize text " + inputText + " after position " + pos + "from mode " + currentMode);
+                        "Couldn't tokenize text '" + inputText + "' after position " + pos + " from mode " + currentMode);
             }
             pos++;
         }
