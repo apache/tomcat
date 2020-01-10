@@ -17,13 +17,18 @@
 package org.apache.catalina.connector;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.SocketTimeoutException;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.servlet.Servlet;
 
+import org.apache.tomcat.util.descriptor.web.ErrorPage;
+import org.hamcrest.CoreMatchers;
+import org.hamcrest.MatcherAssert;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -215,6 +220,42 @@ public class TestConnector extends TomcatBaseTest {
             Assert.assertTrue(foundTrace);
         } else {
             Assert.assertFalse(foundTrace);
+        }
+
+        // test TRACE method
+        doTraceRequest(allowTrace);
+
+        // test TRACE method with error page
+        if (servlet instanceof TesterServlet) {
+            ErrorPage errorPage = new ErrorPage();
+            errorPage.setLocation("/error");
+            root.addErrorPage(errorPage);
+            doTraceRequest(allowTrace);
+        }
+    }
+
+    private void doTraceRequest(boolean allowTrace) throws IOException {
+        ByteChunk bc = new ByteChunk();
+        Map<String,List<String>> respHeaders = new HashMap<>();
+        int rc = methodUrl("http://localhost:" + getPort() + "/",
+                bc, 30000, null, respHeaders, "TRACE");
+
+        if (allowTrace) {
+            Assert.assertEquals(200, rc);
+            Assert.assertEquals(Collections.singletonList("message/http"),
+                    respHeaders.get("Content-Type"));
+            MatcherAssert.assertThat(bc.toString(), CoreMatchers.startsWith("TRACE / HTTP/"));
+        } else {
+            Assert.assertEquals(405, rc);
+            List<String> allowHeaders = respHeaders.get("Allow");
+            Assert.assertNotNull("Allow header not returned", allowHeaders);
+            MatcherAssert.assertThat(allowHeaders, CoreMatchers.hasItem(CoreMatchers.containsString("GET")));
+            MatcherAssert.assertThat(allowHeaders,
+                    CoreMatchers.not(CoreMatchers.hasItem(CoreMatchers.containsString("TRACE"))));
+
+            MatcherAssert.assertThat(respHeaders.get("Content-Type"),
+                    CoreMatchers.hasItem(CoreMatchers.startsWith("text/html")));
+            MatcherAssert.assertThat(bc.toString(), CoreMatchers.containsString("<html"));
         }
     }
 }

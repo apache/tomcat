@@ -222,6 +222,13 @@ final class StandardHostValve extends ValveBase {
             return;
         }
 
+        /* Do not look for error pages if TRACE request and it's not allowed */
+        if (statusCode == HttpServletResponse.SC_METHOD_NOT_ALLOWED
+                && "TRACE".equals(request.getMethod())
+                && !request.getConnector().getAllowTrace()) {
+            return;
+        }
+
         ErrorPage errorPage = context.findErrorPage(statusCode);
         if (errorPage == null) {
             // Look for a default error page
