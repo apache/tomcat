@@ -118,7 +118,7 @@ public class TestParameters {
     }
 
     @Test
-    public void testNonExistantParameter() {
+    public void testNonExistentParameter() {
         Parameters p = new Parameters();
 
         String value = p.getParameter("foo");
