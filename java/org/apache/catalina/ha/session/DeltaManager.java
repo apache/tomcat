@@ -506,7 +506,38 @@ public class DeltaManager extends ClusterManagerBase{
 
     @Override
     public void changeSessionId(Session session) {
-        changeSessionId(session, true);
+    	rotateSessionId(session);
+    }
+
+    @Override
+    public String rotateSessionId(Session session) {
+        return rotateSessionId(session, true);
+    }
+
+    public String rotateSessionId(Session session, boolean notify) {
+        // original sessionID
+        String orgSessionID = session.getId();
+        String newId = super.rotateSessionId(session);
+        if (notify && cluster.getMembers().length > 0) {
+            // changed sessionID
+            String newSessionID = session.getId();
+            try {
+                // serialize sessionID
+                byte[] data = serializeSessionId(newSessionID);
+                // notify change sessionID
+                SessionMessage msg = new SessionMessageImpl(getName(),
+                        SessionMessage.EVT_CHANGE_SESSION_ID, data,
+                        orgSessionID, orgSessionID + "-"
+                                + System.currentTimeMillis());
+                msg.setTimestamp(System.currentTimeMillis());
+                counterSend_EVT_CHANGE_SESSION_ID++;
+                send(msg);
+            } catch (IOException e) {
+                log.error(sm.getString("deltaManager.unableSerializeSessionID",
+                        newSessionID), e);
+            }
+        }
+        return newId;
     }
 
     public void changeSessionId(Session session, boolean notify) {
