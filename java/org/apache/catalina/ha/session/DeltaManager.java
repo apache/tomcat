@@ -490,7 +490,12 @@ public class DeltaManager extends ClusterManagerBase{
 
     @Override
     public void changeSessionId(Session session) {
-        changeSessionId(session, true);
+    	rotateSessionId(session, true);
+    }
+
+    @Override
+    public String rotateSessionId(Session session) {
+        return rotateSessionId(session, true);
     }
 
     @Override
@@ -502,6 +507,13 @@ public class DeltaManager extends ClusterManagerBase{
         String orgSessionID = session.getId();
         super.changeSessionId(session);
         if (notify) sendChangeSessionId(session.getId(), orgSessionID);
+    }
+
+    protected String rotateSessionId(Session session, boolean notify) {
+        String orgSessionID = session.getId();
+        String newId = super.rotateSessionId(session);
+        if (notify) sendChangeSessionId(session.getId(), orgSessionID);
+        return newId;
     }
 
     protected void changeSessionId(Session session, String newId, boolean notify) {
