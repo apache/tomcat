@@ -499,6 +499,8 @@ public class DeltaManager extends ClusterManagerBase{
     }
 
     /**
+     * @param session The session
+     * @param notify Notify change
      * @deprecated Will be removed in Tomcat 10
      */
     @Deprecated
