@@ -23,9 +23,9 @@
 # -----------------------------------------------------------------------------
 
 # ----- Version Control Flags -----
-version.major=9
+version.major=10
 version.minor=0
-version.build=31
+version.build=0
 version.patch=0
 version.suffix=-dev
 
