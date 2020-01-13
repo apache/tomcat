@@ -50,11 +50,6 @@ public class GenericPrincipal implements TomcatPrincipal, Serializable {
         this(name, roles, null);
     }
 
-    @Deprecated
-    public GenericPrincipal(String name, String password, List<String> roles) {
-        this(name, roles, null);
-    }
-
     /**
      * Construct a new Principal, associated with the specified Realm, for the
      * specified username, with the specified role names (as Strings).
@@ -65,12 +60,6 @@ public class GenericPrincipal implements TomcatPrincipal, Serializable {
      *        getUserPrincipal call if not null; if null, this will be returned
      */
     public GenericPrincipal(String name, List<String> roles,
-            Principal userPrincipal) {
-        this(name, roles, userPrincipal, null);
-    }
-
-    @Deprecated
-    public GenericPrincipal(String name, String password, List<String> roles,
             Principal userPrincipal) {
         this(name, roles, userPrincipal, null);
     }
@@ -87,12 +76,6 @@ public class GenericPrincipal implements TomcatPrincipal, Serializable {
      *        at the appropriate time
      */
     public GenericPrincipal(String name, List<String> roles,
-            Principal userPrincipal, LoginContext loginContext) {
-        this(name, roles, userPrincipal, loginContext, null);
-    }
-
-    @Deprecated
-    public GenericPrincipal(String name, String password, List<String> roles,
             Principal userPrincipal, LoginContext loginContext) {
         this(name, roles, userPrincipal, loginContext, null);
     }
@@ -125,14 +108,6 @@ public class GenericPrincipal implements TomcatPrincipal, Serializable {
         }
         this.loginContext = loginContext;
         this.gssCredential = gssCredential;
-    }
-
-
-    @Deprecated
-    public GenericPrincipal(String name, String password, List<String> roles,
-            Principal userPrincipal, LoginContext loginContext,
-            GSSCredential gssCredential) {
-        this(name, roles, userPrincipal, loginContext, gssCredential);
     }
 
 
