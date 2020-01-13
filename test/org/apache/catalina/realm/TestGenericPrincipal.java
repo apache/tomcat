@@ -63,7 +63,6 @@ public class TestGenericPrincipal {
 
         Assert.assertNull(gpOut.getGssCredential());
         Assert.assertEquals(gpIn.getName(), gpOut.getName());
-        Assert.assertEquals(gpIn.getPassword(), gpOut.getPassword());
         Assert.assertArrayEquals(gpIn.getRoles(), gpOut.getRoles());
         if (gpIn == gpIn.getUserPrincipal()) {
             Assert.assertEquals(gpOut, gpOut.getUserPrincipal());

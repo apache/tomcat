@@ -105,7 +105,6 @@ public class GenericPrincipal implements TomcatPrincipal, Serializable {
             GSSCredential gssCredential) {
         super();
         this.name = name;
-        this.password = password;
         this.userPrincipal = userPrincipal;
         if (roles == null) {
             this.roles = new String[0];
@@ -132,25 +131,24 @@ public class GenericPrincipal implements TomcatPrincipal, Serializable {
         return this.name;
     }
 
-
     /**
-     * The authentication credentials for the user represented by
-     * this Principal.
+     * @deprecated Will be removed in Tomcat 10, the password should be accessed
+     *  using RealmBase.getPassword
+     * @return null
      */
-    protected final String password;
-
+    @Deprecated
     public String getPassword() {
-        return this.password;
+        return null;
     }
 
 
     /**
      * The set of roles associated with this user.
      */
-    protected final String roles[];
+    protected final String[] roles;
 
     public String[] getRoles() {
-        return this.roles;
+        return this.roles.clone();
     }
 
 
@@ -242,21 +240,19 @@ public class GenericPrincipal implements TomcatPrincipal, Serializable {
     // ----------------------------------------------------------- Serialization
 
     private Object writeReplace() {
-        return new SerializablePrincipal(name, password, roles, userPrincipal);
+        return new SerializablePrincipal(name, roles, userPrincipal);
     }
 
     private static class SerializablePrincipal implements Serializable {
         private static final long serialVersionUID = 1L;
 
         private final String name;
-        private final String password;
         private final String[] roles;
         private final Principal principal;
 
-        public SerializablePrincipal(String name, String password, String[] roles,
+        public SerializablePrincipal(String name, String[] roles,
                 Principal principal) {
             this.name = name;
-            this.password = password;
             this.roles = roles;
             if (principal instanceof Serializable) {
                 this.principal = principal;
@@ -266,7 +262,7 @@ public class GenericPrincipal implements TomcatPrincipal, Serializable {
         }
 
         private Object readResolve() {
-            return new GenericPrincipal(name, password, Arrays.asList(roles), principal);
+            return new GenericPrincipal(name, null, Arrays.asList(roles), principal);
         }
     }
 }

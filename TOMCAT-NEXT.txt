@@ -63,8 +63,6 @@ New items for 10.0.x onwards:
 
 12. Consider disabling the AJP connector by default.
 
-13. Remove GenericPrincipal.getPassword().
-
 14. Remove unused NIO blocking code.
 
 15. Change SocketProperties cache sizes default values.
