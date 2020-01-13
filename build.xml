@@ -53,17 +53,17 @@
 
   <!-- Exact spec versions (for the manifests etc.) -->
   <property name="servlet.spec.version"    value="5.0" />
-  <property name="servlet.revision"        value="M1" />
+  <property name="servlet.revision"        value="0-M1" />
   <property name="jsp.spec.version"        value="3.0" />
-  <property name="jsp.revision"            value="M1" />
+  <property name="jsp.revision"            value="0-M1" />
   <property name="el.spec.version"         value="4.0" />
-  <property name="el.revision"             value="M1" />
+  <property name="el.revision"             value="0-M1" />
   <property name="websocket.spec.version"  value="2.0" />
-  <property name="websocket.revision"      value="M1" />
+  <property name="websocket.revision"      value="0-M1" />
   <property name="jaspic.spec.version"     value="2.0" />
-  <property name="jaspic.revision"         value="M1" />
+  <property name="jaspic.revision"         value="0-M1" />
   <property name="annotation.spec.version" value="2.0" />
-  <property name="annotation.revision"     value="M1" />
+  <property name="annotation.revision"     value="0-M1" />
 
   <!-- Release artifact base names -->
   <property name="final.name"            value="${project}-${version}" />
@@ -747,11 +747,17 @@
     <!-- Filtering tokens for JAR manifests-->
     <filter token="source.jdk" value="${compile.source}"/>
     <filter token="target.jdk" value="${compile.target}"/>
+    <filter token="servlet.spec.version" value="${servlet.spec.version}"/>
     <filter token="servlet.revision" value="${servlet.revision}"/>
+    <filter token="jsp.spec.version" value="${jsp.spec.version}"/>
     <filter token="jsp.revision" value="${jsp.revision}"/>
+    <filter token="el.spec.version" value="${el.spec.version}"/>
     <filter token="el.revision" value="${el.revision}"/>
+    <filter token="websocket.spec.version" value="${websocket.spec.version}"/>
     <filter token="websocket.revision" value="${websocket.revision}"/>
+    <filter token="jaspic.spec.version" value="${jaspic.spec.version}"/>
     <filter token="jaspic.revision" value="${jaspic.revision}"/>
+    <filter token="annotation.spec.version" value="${annotation.spec.version}"/>
     <filter token="annotation.revision" value="${annotation.revision}"/>
 
     <mkdir dir="${tomcat.manifests}" />

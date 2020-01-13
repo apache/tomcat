@@ -4,8 +4,8 @@ X-Compile-Target-JDK: @target.jdk@
 
 Name: jakarta/security/auth/message
 Specification-Title: Jakarta Authentication SPI for Containers
-Specification-Version: 1.1
-Specification-Vendor: Sun Microsystems, Inc.
+Specification-Version: @jaspic.spec.version@
+Specification-Vendor: Eclipse Foundation
 Implementation-Title: jakarta.security.auth.message
-Implementation-Version: 1.1.@jaspic.revision@
+Implementation-Version: @jaspic.spec.version@.@jaspic.revision@
 Implementation-Vendor: Apache Software Foundation
