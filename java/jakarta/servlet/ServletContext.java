@@ -92,8 +92,8 @@ public interface ServletContext {
 
     /**
      * Returns the major version of the Java Servlet API that this servlet
-     * container supports. All implementations that comply with Version 4.0 must
-     * have this method return the integer 4.
+     * container supports. All implementations that comply with Version 5.0 must
+     * have this method return the integer 5.
      *
      * @return 4
      */
@@ -101,7 +101,7 @@ public interface ServletContext {
 
     /**
      * Returns the minor version of the Servlet API that this servlet container
-     * supports. All implementations that comply with Version 4.0 must have this
+     * supports. All implementations that comply with Version 5.0 must have this
      * method return the integer 0.
      *
      * @return 0
