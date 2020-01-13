@@ -26,7 +26,6 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -90,15 +89,6 @@ public class Response implements HttpServletResponse {
 
 
     // ----------------------------------------------------- Instance Variables
-
-    /**
-     * The date format we will use for creating date headers.
-     *
-     * @deprecated Unused. This will be removed in Tomcat 10
-     */
-    @Deprecated
-    protected SimpleDateFormat format = null;
-
 
     public Response() {
         this(OutputBuffer.DEFAULT_BUFFER_SIZE);
