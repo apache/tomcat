@@ -82,14 +82,6 @@ public class Constants {
      */
 
     /**
-     * The previously authenticated principal (if caching is disabled).
-     *
-     * @deprecated Unused. Will be removed in Tomcat 10.
-     */
-    @Deprecated
-    public static final String FORM_PRINCIPAL_NOTE = "org.apache.catalina.authenticator.PRINCIPAL";
-
-    /**
      * The original request information, to which the user will be
      * redirected if authentication succeeds.
      */
