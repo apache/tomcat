@@ -185,7 +185,7 @@ public class UserDatabaseRealm extends RealmBase {
                 roles.add(role.getName());
             }
         }
-        return new GenericPrincipal(username, user.getPassword(), roles,
+        return new GenericPrincipal(username, roles,
                 new UserDatabasePrincipal(username));
     }
 

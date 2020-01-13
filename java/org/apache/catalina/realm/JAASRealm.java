@@ -573,7 +573,7 @@ public class JAASRealm extends RealmBase {
         }
 
         // Return the resulting Principal for our authenticated user
-        return new GenericPrincipal(username, null, roles, userPrincipal,
+        return new GenericPrincipal(username, roles, userPrincipal,
                 loginContext);
     }
 

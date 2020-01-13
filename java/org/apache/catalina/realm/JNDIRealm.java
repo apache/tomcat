@@ -1396,7 +1396,7 @@ public class JNDIRealm extends RealmBase {
                             if (containerLog.isDebugEnabled()) {
                                 containerLog.debug("Found roles: " + roles.toString());
                             }
-                            return new GenericPrincipal(username, credentials, roles);
+                            return new GenericPrincipal(username, roles);
                         }
                     } catch (InvalidNameException ine) {
                         // Log the problem for posterity
@@ -1426,7 +1426,7 @@ public class JNDIRealm extends RealmBase {
             }
 
             // Create and return a suitable Principal for this user
-            return new GenericPrincipal(username, credentials, roles);
+            return new GenericPrincipal(username, roles);
         }
     }
 
@@ -2368,7 +2368,7 @@ public class JNDIRealm extends RealmBase {
         }
 
         if (user != null) {
-            return new GenericPrincipal(user.getUserName(), user.getPassword(),
+            return new GenericPrincipal(user.getUserName(),
                     roles, null, null, gssCredential);
         }
 

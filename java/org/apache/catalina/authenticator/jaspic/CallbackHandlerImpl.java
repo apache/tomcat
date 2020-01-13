@@ -117,6 +117,6 @@ public class CallbackHandlerImpl implements CallbackHandler {
             roles = Arrays.asList(groups);
         }
 
-        return new GenericPrincipal(name, null, roles, principal);
+        return new GenericPrincipal(name, roles, principal);
     }
 }

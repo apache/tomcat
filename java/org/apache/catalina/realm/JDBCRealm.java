@@ -404,7 +404,7 @@ public class JDBCRealm
         ArrayList<String> roles = getRoles(username);
 
         // Create and return a suitable Principal for this user
-        return new GenericPrincipal(username, credentials, roles);
+        return new GenericPrincipal(username, roles);
     }
 
 
@@ -556,9 +556,7 @@ public class JDBCRealm
     @Override
     protected synchronized Principal getPrincipal(String username) {
 
-        return new GenericPrincipal(username,
-                                     getPassword(username),
-                                     getRoles(username));
+        return new GenericPrincipal(username, getRoles(username));
 
     }
 
