@@ -48,6 +48,11 @@
   <subsection name="Catalina">
     <changelog>
       <update>
+        Update to Jakarta Servlet 5.0, Jakarta Server Pages 3.0. Jakarta
+        Expression Language 4.0, Jakarta WebSocket 2.0, Jakarta Authentication
+        2.0 and Jakarta Annotations 2.0. (markt)
+      </update>
+      <update>
         Remove GenericPrincipal.getPassword. The credentials should remain
         managed by the realm. (remm)
       </update>
