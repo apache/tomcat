@@ -46,7 +46,7 @@ import org.apache.tomcat.util.modeler.Registry;
  *
  * @author Costin Manolache
  */
-public class JMXProxyServlet extends HttpServlet  {
+public class JMXProxyServlet extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
 
@@ -62,6 +62,7 @@ public class JMXProxyServlet extends HttpServlet  {
      */
     protected transient MBeanServer mBeanServer = null;
     protected transient Registry registry;
+
 
     // --------------------------------------------------------- Public Methods
     /**
@@ -130,6 +131,7 @@ public class JMXProxyServlet extends HttpServlet  {
         listBeans( writer, qry );
     }
 
+
     public void getAttribute(PrintWriter writer, String onameStr, String att, String key) {
         try {
             ObjectName oname = new ObjectName(onameStr);
@@ -195,6 +197,7 @@ public class JMXProxyServlet extends HttpServlet  {
         writer.print(dump);
     }
 
+
     /**
      * Determines if a type is supported by the {@link JMXProxyServlet}.
      *
@@ -225,6 +228,7 @@ public class JMXProxyServlet extends HttpServlet  {
 
     /**
      * Parses parameter values from a parameter string.
+     *
      * @param paramString The string containing comma-separated
      *                    operation-invocation parameters, or
      *                    <code>null</code> if there are no parameters.
@@ -237,6 +241,7 @@ public class JMXProxyServlet extends HttpServlet  {
         else
             return paramString.split(",");
     }
+
 
     /**
      * Sets an MBean attribute's value.
@@ -251,21 +256,23 @@ public class JMXProxyServlet extends HttpServlet  {
         mBeanServer.setAttribute( oname, new Attribute(attributeName, valueObj));
     }
 
+
     /**
      * Invokes an operation on an MBean.
+     *
      * @param onameStr The name of the MBean.
      * @param operation The name of the operation to invoke.
      * @param parameters An array of Strings containing the parameters to the
-     *                   operation. They will be converted to the appropriate
-     *                   types to call the requested operation.
+     *            operation. They will be converted to the appropriate types to
+     *            call the requested operation.
      * @return The value returned by the requested operation.
      */
-    private Object invokeOperationInternal(String onameStr,
-                                           String operation,
-                                           String[] parameters)
-        throws OperationsException, MBeanException, ReflectionException {
-        ObjectName oname=new ObjectName( onameStr );
-        MBeanOperationInfo methodInfo = registry.getMethodInfo(oname,operation);
+    @SuppressWarnings("null") // parameters can't be null if signature.length > 0
+    private Object invokeOperationInternal(String onameStr, String operation, String[] parameters)
+            throws OperationsException, MBeanException, ReflectionException {
+        ObjectName oname = new ObjectName(onameStr);
+        int paramCount = null == parameters ? 0 : parameters.length;
+        MBeanOperationInfo methodInfo = registry.getMethodInfo(oname, operation, paramCount);
         if(null == methodInfo) {
             // getMethodInfo returns null for both "object not found" and "operation not found"
             MBeanInfo info = null;
@@ -276,20 +283,23 @@ public class JMXProxyServlet extends HttpServlet  {
             } catch (Exception e) {
                 throw new IllegalArgumentException(sm.getString("jmxProxyServlet.noBeanFound", onameStr), e);
             }
-            throw new IllegalArgumentException(sm.getString("jmxProxyServlet.noOperationOnBean", operation, (null == parameters ? 0 : parameters.length), onameStr, info.getClassName()));
+            throw new IllegalArgumentException(
+                    sm.getString("jmxProxyServlet.noOperationOnBean",
+                            operation, Integer.valueOf(paramCount), onameStr, info.getClassName()));
         }
 
         MBeanParameterInfo[] signature = methodInfo.getSignature();
         String[] signatureTypes = new String[signature.length];
         Object[] values = new Object[signature.length];
         for (int i = 0; i < signature.length; i++) {
-           MBeanParameterInfo pi = signature[i];
-           signatureTypes[i] = pi.getType();
-           values[i] = registry.convertValue(pi.getType(), parameters[i] );
-         }
+            MBeanParameterInfo pi = signature[i];
+            signatureTypes[i] = pi.getType();
+            values[i] = registry.convertValue(pi.getType(), parameters[i]);
+        }
 
-        return mBeanServer.invoke(oname,operation,values,signatureTypes);
+        return mBeanServer.invoke(oname, operation, values, signatureTypes);
     }
+
 
     private void output(String indent, PrintWriter writer, Object result) {
         if (result instanceof Object[]) {
