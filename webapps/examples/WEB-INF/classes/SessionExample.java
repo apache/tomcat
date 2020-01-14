@@ -39,20 +39,23 @@ public class SessionExample extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
 
-    private static final ResourceBundle RB = ResourceBundle.getBundle("LocalStrings");
-
     @Override
     public void doGet(HttpServletRequest request,
                       HttpServletResponse response)
         throws IOException, ServletException
     {
+        ResourceBundle rb = ResourceBundle.getBundle("LocalStrings",request.getLocale());
+
         response.setContentType("text/html");
+        response.setCharacterEncoding("UTF-8");
 
         PrintWriter out = response.getWriter();
-        out.println("<html>");
+        out.println("<!DOCTYPE html><html>");
         out.println("<head>");
+        out.println("<meta charset=\"UTF-8\" />");
 
-        String title = RB.getString("sessions.title");
+
+        String title = rb.getString("sessions.title");
         out.println("<title>" + title + "</title>");
         out.println("</head>");
         out.println("<body bgcolor=\"white\">");
@@ -74,11 +77,11 @@ public class SessionExample extends HttpServlet {
         out.println("<h3>" + title + "</h3>");
 
         HttpSession session = request.getSession(true);
-        out.println(RB.getString("sessions.id") + " " + session.getId());
+        out.println(rb.getString("sessions.id") + " " + session.getId());
         out.println("<br>");
-        out.println(RB.getString("sessions.created") + " ");
+        out.println(rb.getString("sessions.created") + " ");
         out.println(new Date(session.getCreationTime()) + "<br>");
-        out.println(RB.getString("sessions.lastaccessed") + " ");
+        out.println(rb.getString("sessions.lastaccessed") + " ");
         out.println(new Date(session.getLastAccessedTime()));
 
         String dataName = request.getParameter("dataname");
@@ -88,7 +91,7 @@ public class SessionExample extends HttpServlet {
         }
 
         out.println("<P>");
-        out.println(RB.getString("sessions.data") + "<br>");
+        out.println(rb.getString("sessions.data") + "<br>");
         Enumeration<String> names = session.getAttributeNames();
         while (names.hasMoreElements()) {
             String name = names.nextElement();
@@ -102,10 +105,10 @@ public class SessionExample extends HttpServlet {
         out.print(response.encodeURL("SessionExample"));
         out.print("\" ");
         out.println("method=POST>");
-        out.println(RB.getString("sessions.dataname"));
+        out.println(rb.getString("sessions.dataname"));
         out.println("<input type=text size=20 name=dataname>");
         out.println("<br>");
-        out.println(RB.getString("sessions.datavalue"));
+        out.println(rb.getString("sessions.datavalue"));
         out.println("<input type=text size=20 name=datavalue>");
         out.println("<br>");
         out.println("<input type=submit>");
@@ -116,10 +119,10 @@ public class SessionExample extends HttpServlet {
         out.print(response.encodeURL("SessionExample"));
         out.print("\" ");
         out.println("method=GET>");
-        out.println(RB.getString("sessions.dataname"));
+        out.println(rb.getString("sessions.dataname"));
         out.println("<input type=text size=20 name=dataname>");
         out.println("<br>");
-        out.println(RB.getString("sessions.datavalue"));
+        out.println(rb.getString("sessions.datavalue"));
         out.println("<input type=text size=20 name=datavalue>");
         out.println("<br>");
         out.println("<input type=submit>");

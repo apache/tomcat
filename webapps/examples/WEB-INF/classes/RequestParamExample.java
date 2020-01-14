@@ -36,20 +36,22 @@ public class RequestParamExample extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
 
-    private static final ResourceBundle RB = ResourceBundle.getBundle("LocalStrings");
-
     @Override
     public void doGet(HttpServletRequest request,
                       HttpServletResponse response)
         throws IOException, ServletException
     {
+        ResourceBundle rb = ResourceBundle.getBundle("LocalStrings",request.getLocale());
+
         response.setContentType("text/html");
+        response.setCharacterEncoding("UTF-8");
 
         PrintWriter out = response.getWriter();
-        out.println("<html>");
+        out.println("<!DOCTYPE html><html>");
         out.println("<head>");
+        out.println("<meta charset=\"UTF-8\" />");
 
-        String title = RB.getString("requestparams.title");
+        String title = rb.getString("requestparams.title");
         out.println("<title>" + title + "</title>");
         out.println("</head>");
         out.println("<body bgcolor=\"white\">");
@@ -72,23 +74,23 @@ public class RequestParamExample extends HttpServlet {
         out.println("<h3>" + title + "</h3>");
         String firstName = request.getParameter("firstname");
         String lastName = request.getParameter("lastname");
-        out.println(RB.getString("requestparams.params-in-req") + "<br>");
+        out.println(rb.getString("requestparams.params-in-req") + "<br>");
         if (firstName != null || lastName != null) {
-            out.println(RB.getString("requestparams.firstname"));
+            out.println(rb.getString("requestparams.firstname"));
             out.println(" = " + HTMLFilter.filter(firstName) + "<br>");
-            out.println(RB.getString("requestparams.lastname"));
+            out.println(rb.getString("requestparams.lastname"));
             out.println(" = " + HTMLFilter.filter(lastName));
         } else {
-            out.println(RB.getString("requestparams.no-params"));
+            out.println(rb.getString("requestparams.no-params"));
         }
         out.println("<P>");
         out.print("<form action=\"");
         out.print("RequestParamExample\" ");
         out.println("method=POST>");
-        out.println(RB.getString("requestparams.firstname"));
+        out.println(rb.getString("requestparams.firstname"));
         out.println("<input type=text size=20 name=firstname>");
         out.println("<br>");
-        out.println(RB.getString("requestparams.lastname"));
+        out.println(rb.getString("requestparams.lastname"));
         out.println("<input type=text size=20 name=lastname>");
         out.println("<br>");
         out.println("<input type=submit>");

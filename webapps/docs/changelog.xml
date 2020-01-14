@@ -109,6 +109,15 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Web applications">
+    <changelog>
+      <fix>
+        <bug>64000</bug>: In the examples web application, where a Servlet
+        example includes ii18n support, the Locale used should be based on the
+        request locale and not the server locale. (markt)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 7.0.99 (violetagg)" rtext="released 2019-12-17">
   <subsection name="Catalina">
