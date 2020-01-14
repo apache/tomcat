@@ -24,8 +24,12 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLStreamHandler;
+import java.nio.charset.Charset;
 import java.security.Permission;
 import java.security.cert.Certificate;
+import java.text.Collator;
+import java.util.Arrays;
+import java.util.Locale;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
@@ -412,6 +416,22 @@ public class CachedResource implements WebResource {
     }
 
 
+    /*
+     * Mimics the behaviour of FileURLConnection.getInputStream for a directory.
+     * Deliberately uses default locale.
+     */
+    private static InputStream buildInputStream(String[] files) {
+        Arrays.sort(files, Collator.getInstance(Locale.getDefault()));
+        StringBuilder result = new StringBuilder();
+        for (String file : files) {
+            result.append(file);
+            // Every entry is followed by \n including the last
+            result.append('\n');
+        }
+        return new ByteArrayInputStream(result.toString().getBytes(Charset.defaultCharset()));
+    }
+
+
     private static class CachedResourceURLStreamHandler extends URLStreamHandler {
 
         private final URL resourceURL;
@@ -480,7 +500,12 @@ public class CachedResource implements WebResource {
 
         @Override
         public InputStream getInputStream() throws IOException {
-            return getResource().getInputStream();
+            WebResource resource = getResource();
+            if (resource.isDirectory()) {
+                return buildInputStream(resource.getWebResourceRoot().list(webAppPath));
+            } else {
+                return getResource().getInputStream();
+            }
         }
 
         @Override
@@ -531,7 +556,12 @@ public class CachedResource implements WebResource {
 
         @Override
         public InputStream getInputStream() throws IOException {
-            return getResource().getInputStream();
+            WebResource resource = getResource();
+            if (resource.isDirectory()) {
+                return buildInputStream(resource.getWebResourceRoot().list(webAppPath));
+            } else {
+                return getResource().getInputStream();
+            }
         }
 
         @Override

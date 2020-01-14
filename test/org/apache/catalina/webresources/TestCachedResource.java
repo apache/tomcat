@@ -26,6 +26,7 @@ import org.junit.Test;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.WebResourceRoot;
+import org.apache.catalina.core.StandardHost;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 
@@ -63,7 +64,7 @@ public class TestCachedResource extends TomcatBaseTest {
 
         WebResourceRoot root = ctx.getResources();
 
-        // WAR contains a resoucres JAR so this should return a JAR URL
+        // WAR contains a resources JAR so this should return a JAR URL
         URL webinf = root.getResource("/index.html").getURL();
 
         Assert.assertEquals("jar", webinf.getProtocol());
@@ -76,4 +77,58 @@ public class TestCachedResource extends TomcatBaseTest {
         Assert.assertNotNull(jarConn);
     }
 
+
+    @Test
+    public void testDirectoryListingsPackedWar() throws Exception {
+
+        Tomcat tomcat = getTomcatInstance();
+        File docBase = new File("test/webresources/war-url-connection.war");
+        Context ctx = tomcat.addWebapp("/test", docBase.getAbsolutePath());
+        ((StandardHost) tomcat.getHost()).setUnpackWARs(false);
+        tomcat.start();
+
+        WebResourceRoot root = ctx.getResources();
+
+        URL d1 = root.getResource("/").getURL();
+
+        try (InputStream is = d1.openStream()) {
+            Assert.assertNotNull(is);
+        }
+    }
+
+
+    @Test
+    public void testDirectoryListingsWar() throws Exception {
+
+        Tomcat tomcat = getTomcatInstance();
+        File docBase = new File("test/webresources/war-url-connection.war");
+        Context ctx = tomcat.addWebapp("/test", docBase.getAbsolutePath());
+        tomcat.start();
+
+        WebResourceRoot root = ctx.getResources();
+
+        URL d1 = root.getResource("/").getURL();
+
+        try (InputStream is = d1.openStream()) {
+            Assert.assertNotNull(is);
+        }
+    }
+
+
+    @Test
+    public void testDirectoryListingsDir() throws Exception {
+
+        Tomcat tomcat = getTomcatInstance();
+        File docBase = new File("test/webresources/dir1");
+        Context ctx = tomcat.addWebapp("/test", docBase.getAbsolutePath());
+        tomcat.start();
+
+        WebResourceRoot root = ctx.getResources();
+
+        URL d1 = root.getResource("/d1").getURL();
+
+        try (InputStream is = d1.openStream()) {
+            Assert.assertNotNull(is);
+        }
+    }
 }
