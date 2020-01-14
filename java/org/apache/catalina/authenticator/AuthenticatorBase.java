@@ -1024,7 +1024,7 @@ public abstract class AuthenticatorBase extends ValveBase
                     if (log.isDebugEnabled()) {
                         log.debug(sm.getString("authenticator.check.authorizeFail", username));
                     }
-                    authorized = new GenericPrincipal(username, null, null);
+                    authorized = new GenericPrincipal(username);
                 }
                 String authType = request.getAuthType();
                 if (authType == null || authType.length() == 0) {
