@@ -53,6 +53,13 @@
       </update>
     </changelog>
   </subsection>
+  <subsection name="Coyote">
+    <changelog>
+      <update>
+        Update endpoint cache sizes defaults. (remm)
+      </update>
+    </changelog>
+  </subsection>
 </section>
 </body>
 </document>

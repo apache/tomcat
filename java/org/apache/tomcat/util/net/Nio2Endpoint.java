@@ -158,11 +158,12 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
                 processorCache = new SynchronizedStack<>(SynchronizedStack.DEFAULT_SIZE,
                         socketProperties.getProcessorCache());
             }
-            if (socketProperties.getBufferPool() != 0) {
+            int actualBufferPool =
+                    socketProperties.getActualBufferPool(isSSLEnabled() ? getSniParseLimit() * 2 : 0);
+            if (actualBufferPool != 0) {
                 nioChannels = new SynchronizedStack<>(SynchronizedStack.DEFAULT_SIZE,
-                        socketProperties.getBufferPool());
+                        actualBufferPool);
             }
-
             // Create worker collection
             if (getExecutor() == null) {
                 createExecutor();

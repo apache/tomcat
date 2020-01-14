@@ -813,70 +813,43 @@
       </attribute>
 
       <attribute name="socket.bufferPool" required="false">
-        <p>(int)The NIO connector uses a class called NioChannel that holds
-        elements linked to a socket. To reduce garbage collection, the NIO
+        <p>(int)The NIOx connector uses a class called NioXChannel that holds
+        elements linked to a socket. To reduce garbage collection, the NIOx
         connector caches these channel objects. This value specifies the size of
-        this cache. The default value is <code>500</code>, and represents that
-        the cache will hold 500 NioChannel objects. Other values are
-        <code>-1</code> for unlimited cache and <code>0</code> for no cache.</p>
+        this cache. The default value is <code>-2</code>. Special values are
+        <code>-1</code> for unlimited cache, <code>0</code> for no cache,
+        and <code>-2</code> for a value computed using the bufferPoolSize
+        attribute.</p>
       </attribute>
 
       <attribute name="socket.bufferPoolSize" required="false">
-        <p>(int)The NioChannel pool can also be size based, not used object
-        based. The size is calculated as follows:<br/>
-        NioChannel
+        <p>(int)The NioXChannel pool can also be size based, not used object
+        based. If bufferPool is not -2, then this value will not be used.<br/>
+        The value is in bytes except for special values. Special values are
+        <code>-1</code> for unlimited cache, <code>0</code> for no cache,
+        and <code>-2</code> for a value computed as follows:<br/>
+        NioXChannel
         <code>buffer size = read buffer size + write buffer size</code><br/>
-        SecureNioChannel <code>buffer size = application read buffer size +
-        application write buffer size + network read buffer size +
-        network write buffer size</code><br/>
-        The value is in bytes, the default value is <code>1024*1024*100</code>
-        (100MB).</p>
+        SecureNioXChannel <code>buffer size = application read buffer size +
+        application write buffer size + twice the max SNI parse size</code>.
+        If the maximum memory as reported by the runtime is greater than
+        1GB, then the pool size value is the memory divided by the buffer
+        size. Otherwise, it will be 0.
+        </p>
       </attribute>
 
       <attribute name="socket.processorCache" required="false">
         <p>(int)Tomcat will cache SocketProcessor objects to reduce garbage
         collection. The integer value specifies how many objects to keep in the
-        cache at most. The default is <code>500</code>. Other values are
-        <code>-1</code> for unlimited cache and <code>0</code> for no cache.</p>
-      </attribute>
-
-      <attribute name="socket.keyCache" required="false">
-        <p>(int)Tomcat will cache KeyAttachment objects to reduce garbage
-        collection. The integer value specifies how many objects to keep in the
-        cache at most. The default is <code>500</code>. Other values are
+        cache at most. The default is <code>0</code>. Special values are
         <code>-1</code> for unlimited cache and <code>0</code> for no cache.</p>
       </attribute>
 
       <attribute name="socket.eventCache" required="false">
         <p>(int)Tomcat will cache PollerEvent objects to reduce garbage
         collection. The integer value specifies how many objects to keep in the
-        cache at most. The default is <code>500</code>. Other values are
+        cache at most. The default is <code>0</code>. Special values are
         <code>-1</code> for unlimited cache and <code>0</code> for no cache.</p>
-      </attribute>
-
-      <attribute name="selectorPool.maxSelectors" required="false">
-        <p>(int)The max selectors to be used in the pool, to reduce selector
-        contention. Use this option when the command line
-        <code>org.apache.tomcat.util.net.NioSelectorShared</code> value is set
-        to false. Default value is <code>200</code>.</p>
-      </attribute>
-
-      <attribute name="selectorPool.maxSpareSelectors" required="false">
-        <p>(int)The max spare selectors to be used in the pool, to reduce
-        selector contention. When a selector is returned to the pool, the system
-        can decide to keep it or let it be GC'd. Use this option when the
-        command line <code>org.apache.tomcat.util.net.NioSelectorShared</code>
-        value is set to false. Default value is <code>-1</code> (unlimited).</p>
-      </attribute>
-
-      <attribute name="selectorPool.shared" required="false">
-        <p>(bool)Set this value to <code>false</code> if you wish to
-        use a selector for each thread. When you set it to <code>false</code>, you can
-        control the size of the pool of selectors by using the
-        <strong>selectorPool.maxSelectors</strong> attribute.
-        Default is <code>true</code> or the value of the
-        <code>org.apache.tomcat.util.net.NioSelectorShared</code> system
-        property if present.</p>
       </attribute>
 
       <attribute name="useInheritedChannel" required="false">

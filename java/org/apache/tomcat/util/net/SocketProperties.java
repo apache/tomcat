@@ -39,9 +39,8 @@ public class SocketProperties {
      * Default is 500
      * -1 is unlimited
      * 0 is disabled
-     * TODO: The default will be changed to 0 in Tomcat 10
      */
-    protected int processorCache = 500;
+    protected int processorCache = 0;
 
     /**
      * Enable/disable poller event cache, this bounded cache stores
@@ -50,9 +49,8 @@ public class SocketProperties {
      * -1 is unlimited
      * 0 is disabled
      * &gt;0 the max number of objects to keep in cache.
-     * TODO: The default will be changed to 0 in Tomcat 10
      */
-    protected int eventCache = 500;
+    protected int eventCache = 0;
 
     /**
      * Enable/disable direct buffers for the network buffers
@@ -93,29 +91,20 @@ public class SocketProperties {
     /**
      * NioChannel pool size for the endpoint,
      * this value is how many channels
-     * -1 means unlimited cached, 0 means no cache
-     * Default value is 500
-     * TODO: The default should be changed in Tomcat 10, actually it should be
-     *   bufferPoolSize / (appReadBufSize + appWriteBufSize), assuming the SSL
-     *   buffers are ignored (that would be logical), and the value would be 6400.
-     *   So the default value will be changed to a new default value like -2 to
-     *   set a dynamic value based on bufferPoolSize in that case.
+     * -1 means unlimited cached, 0 means no cache,
+     * -2 means bufferPoolSize will be used
+     * Default value is -2
      */
-    protected int bufferPool = 500;
+    protected int bufferPool = -2;
 
     /**
      * Buffer pool size in bytes to be cached
      * -1 means unlimited, 0 means no cache
-     * Default value is 100MB (1024*1024*100 bytes)
-     * TODO: The default value to be used could rather be based on the
-     *   JVM max heap, otherwise it could be a problem in some
-     *   environments. Big servers also need to use a much higher default,
-     *   while small cloud based ones should use 0 instead.
-     *   Possible default value strategy:
-     *     heap inf 1GB: 0
-     *     heap sup 1GB: heap / 32
+     * Default value is based on the max memory reported by the JVM,
+     * if less than 1GB, then 0, else the value divided by 32. This value
+     * will then be used to compute bufferPool if its value is -2
      */
-    protected int bufferPoolSize = 1024*1024*100;
+    protected int bufferPoolSize = -2;
 
     /**
      * TCP_NO_DELAY option. JVM default used if not set.
@@ -443,6 +432,45 @@ public class SocketProperties {
 
     public void setUnlockTimeout(int unlockTimeout) {
         this.unlockTimeout = unlockTimeout;
+    }
+
+    /**
+     * Get the actual buffer pool size to use.
+     * @param bufferOverhead When TLS is enabled, additional network buffers
+     *   are needed and will be added to the application buffer size
+     * @return the actual buffer pool size that will be used
+     */
+    public int getActualBufferPool(int bufferOverhead) {
+        if (bufferPool != -2) {
+            return bufferPool;
+        } else {
+            if (bufferPoolSize == -1) {
+                return -1;
+            } else if (bufferPoolSize == 0) {
+                return 0;
+            } else {
+                long actualBufferPoolSize = bufferPoolSize;
+                long poolSize = 0;
+                if (actualBufferPoolSize == -2) {
+                    long maxMemory = Runtime.getRuntime().maxMemory();
+                    if (maxMemory > 1024 * 1024 * 1024) {
+                        actualBufferPoolSize = maxMemory / 32;
+                    } else {
+                        return 0;
+                    }
+                }
+                int bufSize = appReadBufSize + appWriteBufSize + bufferOverhead;
+                if (bufSize == 0) {
+                    return 0;
+                }
+                poolSize = actualBufferPoolSize / (bufSize);
+                if (poolSize > Integer.MAX_VALUE) {
+                    return Integer.MAX_VALUE;
+                } else {
+                    return (int) poolSize;
+                }
+            }
+        }
     }
 
     void setObjectName(ObjectName oname) {
