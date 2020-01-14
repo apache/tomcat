@@ -127,7 +127,6 @@ import org.apache.tomcat.util.descriptor.web.Injectable;
 import org.apache.tomcat.util.descriptor.web.InjectionTarget;
 import org.apache.tomcat.util.descriptor.web.LoginConfig;
 import org.apache.tomcat.util.descriptor.web.MessageDestination;
-import org.apache.tomcat.util.descriptor.web.MessageDestinationRef;
 import org.apache.tomcat.util.descriptor.web.SecurityCollection;
 import org.apache.tomcat.util.descriptor.web.SecurityConstraint;
 import org.apache.tomcat.util.http.CookieProcessor;
@@ -3058,20 +3057,6 @@ public class StandardContext extends ContainerBase
 
 
     /**
-     * Add a message destination reference for this web application.
-     *
-     * @param mdr New message destination reference
-     *
-     * @deprecated This will be removed in Tomcat 10.
-     *             Use {@link #getNamingResources()} instead
-     */
-    @Deprecated
-    public void addMessageDestinationRef(MessageDestinationRef mdr) {
-        getNamingResources().addMessageDestinationRef(mdr);
-    }
-
-
-    /**
      * Add a new MIME mapping, replacing any existing mapping for
      * the specified extension.
      *
@@ -3458,35 +3443,6 @@ public class StandardContext extends ContainerBase
                 new MessageDestination[messageDestinations.size()];
             return messageDestinations.values().toArray(results);
         }
-    }
-
-
-    /**
-     * @param name Name of the desired message destination ref
-     *
-     * @return the message destination ref with the specified name, if any;
-     * otherwise, return <code>null</code>.
-     *
-     * @deprecated This will be removed in Tomcat 10.
-     *             Use {@link #getNamingResources()} instead
-     */
-    @Deprecated
-    public MessageDestinationRef findMessageDestinationRef(String name) {
-        return getNamingResources().findMessageDestinationRef(name);
-    }
-
-
-    /**
-     * @return the set of defined message destination refs for this web
-     * application.  If none have been defined, a zero-length array
-     * is returned.
-     *
-     * @deprecated This will be removed in Tomcat 10.
-     *             Use {@link #getNamingResources()} instead
-     */
-    @Deprecated
-    public MessageDestinationRef[] findMessageDestinationRefs() {
-        return getNamingResources().findMessageDestinationRefs();
     }
 
 
@@ -3967,20 +3923,6 @@ public class StandardContext extends ContainerBase
         }
         fireContainerEvent("removeMessageDestination", name);
 
-    }
-
-
-    /**
-     * Remove any message destination ref with the specified name.
-     *
-     * @param name Name of the message destination ref to remove
-     *
-     * @deprecated This will be removed in Tomcat 10.
-     *             Use {@link #getNamingResources()} instead
-     */
-    @Deprecated
-    public void removeMessageDestinationRef(String name) {
-        getNamingResources().removeMessageDestinationRef(name);
     }
 
 
