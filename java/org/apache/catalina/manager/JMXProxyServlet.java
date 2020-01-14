@@ -262,10 +262,12 @@ public class JMXProxyServlet extends HttpServlet {
      *            call the requested operation.
      * @return The value returned by the requested operation.
      */
+    @SuppressWarnings("null") // parameters can't be null if signature.length > 0
     private Object invokeOperationInternal(String onameStr, String operation, String[] parameters)
             throws OperationsException, MBeanException, ReflectionException {
         ObjectName oname = new ObjectName(onameStr);
-        MBeanOperationInfo methodInfo = registry.getMethodInfo(oname, operation, (null == parameters ? 0 : parameters.length));
+        int paramCount = null == parameters ? 0 : parameters.length;
+        MBeanOperationInfo methodInfo = registry.getMethodInfo(oname, operation, paramCount);
         if(null == methodInfo) {
             // getMethodInfo returns null for both "object not found" and "operation not found"
             MBeanInfo info = null;
@@ -276,7 +278,9 @@ public class JMXProxyServlet extends HttpServlet {
             } catch (Exception e) {
                 throw new IllegalArgumentException(sm.getString("jmxProxyServlet.noBeanFound", onameStr), e);
             }
-            throw new IllegalArgumentException(sm.getString("jmxProxyServlet.noOperationOnBean", operation, (null == parameters ? 0 : parameters.length), onameStr, info.getClassName()));
+            throw new IllegalArgumentException(
+                    sm.getString("jmxProxyServlet.noOperationOnBean",
+                            operation, Integer.valueOf(paramCount), onameStr, info.getClassName()));
         }
 
         MBeanParameterInfo[] signature = methodInfo.getSignature();
