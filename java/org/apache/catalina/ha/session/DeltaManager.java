@@ -506,7 +506,7 @@ public class DeltaManager extends ClusterManagerBase{
 
     @Override
     public void changeSessionId(Session session) {
-    	rotateSessionId(session);
+        rotateSessionId(session);
     }
 
     @Override
