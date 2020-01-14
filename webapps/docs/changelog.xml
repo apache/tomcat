@@ -104,6 +104,14 @@
         <bug>58577</bug>: Respect the argument-count when searching for MBean
         operations to invoke via the JMXProxyServlet. (schultz)
       </fix>
+      <fix>
+        <bug>64074</bug>: <code>InputStream</code>s for directories obtained
+        from resource URLs now return a directory listing consistent with the
+        behaviour of <code>FileURLConnection</code>. In addition to restoring
+        the behaviour that was lost as a result of the introduction of
+        <code>CachedResourceURLConnection</code>, it expands the feature to
+        include packedWARs and to take account of resource JARs. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
