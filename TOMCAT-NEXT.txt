@@ -63,6 +63,4 @@ New items for 10.0.x onwards:
 
 12. Consider disabling the AJP connector by default.
 
-14. Remove unused NIO blocking code.
-
-16. Share configuration between HTTP/1.1 and nested HTTP/2 rather than duplicating.
+13. Share configuration between HTTP/1.1 and nested HTTP/2 rather than duplicating.

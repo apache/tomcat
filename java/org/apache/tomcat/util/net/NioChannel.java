@@ -21,7 +21,6 @@ import java.nio.ByteBuffer;
 import java.nio.channels.ByteChannel;
 import java.nio.channels.GatheringByteChannel;
 import java.nio.channels.ScatteringByteChannel;
-import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
 
 import org.apache.tomcat.util.net.NioEndpoint.NioSocketWrapper;
@@ -74,23 +73,6 @@ public class NioChannel implements ByteChannel, ScatteringByteChannel, Gathering
     public void free() {
         bufHandler.free();
     }
-
-    /**
-     * Returns true if the network buffer has been flushed out and is empty.
-     *
-     * @param block     Unused. May be used when overridden
-     * @param s         Unused. May be used when overridden
-     * @param timeout   Unused. May be used when overridden
-     * @return Always returns <code>true</code> since there is no network buffer
-     *         in the regular channel
-     *
-     * @throws IOException Never for non-secure channel
-     */
-    public boolean flush(boolean block, Selector s, long timeout)
-            throws IOException {
-        return true;
-    }
-
 
     /**
      * Closes this channel.

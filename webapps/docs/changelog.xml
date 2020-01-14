@@ -58,6 +58,9 @@
       <update>
         Update endpoint cache sizes defaults. (remm)
       </update>
+      <update>
+        Remove unused NIO blocking selector. (remm)
+      </update>
     </changelog>
   </subsection>
 </section>
