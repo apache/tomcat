@@ -45,6 +45,12 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 10.0.0.0-M1 (markt)" rtext="in development">
+  <subsection name="General">
+    <scode>
+      This release contains all of the changes to and including those in
+      Apache Tomcat 9.0.31 plus the additional changes listed below. (markt)
+    </scode>
+  </subsection>
   <subsection name="Catalina">
     <changelog>
       <update>
