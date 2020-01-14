@@ -243,6 +243,7 @@ public class UserDatabaseRealm extends RealmBase {
         private UserDatabasePrincipal(String name) {
             this.name = name;
         }
+        @Override
         public String getName() {
             return name;
         }
