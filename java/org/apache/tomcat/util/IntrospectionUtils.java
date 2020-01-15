@@ -223,20 +223,6 @@ public final class IntrospectionUtils {
      * @param value The value
      * @param staticProp Replacement properties
      * @param dynamicProp Replacement properties
-     * @return the replacement value
-     * @deprecated Use {@link #replaceProperties(String, Hashtable, PropertySource[], ClassLoader)}
-     */
-    @Deprecated
-    public static String replaceProperties(String value,
-            Hashtable<Object,Object> staticProp, PropertySource dynamicProp[]) {
-        return replaceProperties(value, staticProp, dynamicProp, null);
-    }
-
-    /**
-     * Replace ${NAME} with the property value.
-     * @param value The value
-     * @param staticProp Replacement properties
-     * @param dynamicProp Replacement properties
      * @param classLoader Class loader associated with the code requesting the
      *                    property
      * @return the replacement value
