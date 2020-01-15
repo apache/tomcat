@@ -32,6 +32,7 @@ import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.coyote.ProtocolHandler;
 import org.apache.coyote.http11.AbstractHttp11JsseProtocol;
 import org.apache.tomcat.util.buf.ByteChunk;
+import org.apache.tomcat.util.net.SSLHostConfigCertificate.Type;
 import org.apache.tomcat.util.net.jsse.TesterBug50640SslImpl;
 import org.apache.tomcat.websocket.server.WsContextListener;
 
@@ -59,20 +60,22 @@ public class TestCustomSsl extends TomcatBaseTest {
         Assume.assumeFalse("This test is only for JSSE based SSL connectors",
                 connector.getProtocolHandlerClassName().contains("Apr"));
 
+        SSLHostConfig sslHostConfig = new SSLHostConfig();
+        SSLHostConfigCertificate certificate = new SSLHostConfigCertificate(sslHostConfig, Type.UNDEFINED);
+        sslHostConfig.addCertificate(certificate);
+        connector.addSslHostConfig(sslHostConfig);
+
         Assert.assertTrue(connector.setProperty(
                 "sslImplementationName", "org.apache.tomcat.util.net.jsse.TesterBug50640SslImpl"));
 
         // This setting will break ssl configuration unless the custom
         // implementation is used.
-        Assert.assertTrue(connector.setProperty(
-                TesterBug50640SslImpl.PROPERTY_NAME, TesterBug50640SslImpl.PROPERTY_VALUE));
+        sslHostConfig.setProtocols(TesterBug50640SslImpl.PROPERTY_VALUE);
 
-        Assert.assertTrue(connector.setProperty("sslProtocol", "tls"));
+        sslHostConfig.setSslProtocol("tls");
 
-        File keystoreFile =
-            new File(TesterSupport.LOCALHOST_RSA_JKS);
-        connector.setAttribute(
-                "keystoreFile", keystoreFile.getAbsolutePath());
+        File keystoreFile = new File(TesterSupport.LOCALHOST_RSA_JKS);
+        certificate.setCertificateKeystoreFile(keystoreFile.getAbsolutePath());
 
         connector.setSecure(true);
         Assert.assertTrue(connector.setProperty("SSLEnabled", "true"));
@@ -109,23 +112,25 @@ public class TestCustomSsl extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         Assume.assumeTrue("SSL renegotiation has to be supported for this test",
-                TesterSupport.isRenegotiationSupported(getTomcatInstance()));
+                TesterSupport.isRenegotiationSupported(tomcat));
 
         TesterSupport.configureClientCertContext(tomcat);
 
+        Connector connector = tomcat.getConnector();
+
         // Override the defaults
-        ProtocolHandler handler = tomcat.getConnector().getProtocolHandler();
+        ProtocolHandler handler = connector.getProtocolHandler();
         if (handler instanceof AbstractHttp11JsseProtocol) {
-            ((AbstractHttp11JsseProtocol<?>) handler).setTruststoreFile(null);
+            connector.findSslHostConfigs()[0].setTruststoreFile(null);
         } else {
             // Unexpected
             Assert.fail("Unexpected handler type");
         }
         if (trustType.equals(TrustType.ALL)) {
-            tomcat.getConnector().setAttribute("trustManagerClassName",
+            connector.findSslHostConfigs()[0].setTrustManagerClassName(
                     "org.apache.tomcat.util.net.TesterSupport$TrustAllCerts");
         } else if (trustType.equals(TrustType.CA)) {
-            tomcat.getConnector().setAttribute("trustManagerClassName",
+            connector.findSslHostConfigs()[0].setTrustManagerClassName(
                     "org.apache.tomcat.util.net.TesterSupport$SequentialTrustManager");
         }
 
@@ -135,16 +140,14 @@ public class TestCustomSsl extends TomcatBaseTest {
         TesterSupport.configureClientSsl();
 
         // Unprotected resource
-        ByteChunk res =
-                getUrl("https://localhost:" + getPort() + "/unprotected");
+        ByteChunk res = getUrl("https://localhost:" + getPort() + "/unprotected");
         Assert.assertEquals("OK", res.toString());
 
         // Protected resource
         res.recycle();
         int rc = -1;
         try {
-            rc = getUrl("https://localhost:" + getPort() + "/protected", res,
-                null, null);
+            rc = getUrl("https://localhost:" + getPort() + "/protected", res, null, null);
         } catch (SocketException se) {
             if (!trustType.equals(TrustType.NONE)) {
                 Assert.fail(se.getMessage());

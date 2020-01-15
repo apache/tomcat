@@ -64,6 +64,7 @@ import org.apache.tomcat.util.compat.JrePlatform;
 import org.apache.tomcat.util.descriptor.web.LoginConfig;
 import org.apache.tomcat.util.descriptor.web.SecurityCollection;
 import org.apache.tomcat.util.descriptor.web.SecurityConstraint;
+import org.apache.tomcat.util.net.SSLHostConfigCertificate.Type;
 
 public final class TesterSupport {
 
@@ -137,47 +138,39 @@ public final class TesterSupport {
     protected static void initSsl(Tomcat tomcat, String keystore,
             String keystorePass, String keyPass) {
 
+        Connector connector = tomcat.getConnector();
+        connector.setSecure(true);
+        Assert.assertTrue(connector.setProperty("SSLEnabled", "true"));
+
+        SSLHostConfig sslHostConfig = new SSLHostConfig();
+        SSLHostConfigCertificate certificate = new SSLHostConfigCertificate(sslHostConfig, Type.UNDEFINED);
+        sslHostConfig.addCertificate(certificate);
+        connector.addSslHostConfig(sslHostConfig);
+
         String protocol = tomcat.getConnector().getProtocolHandlerClassName();
         if (!protocol.contains("Apr")) {
-            Connector connector = tomcat.getConnector();
             String sslImplementation = System.getProperty("tomcat.test.sslImplementation");
             if (sslImplementation != null && !"${test.sslImplementation}".equals(sslImplementation)) {
                 StandardServer server = (StandardServer) tomcat.getServer();
                 AprLifecycleListener listener = new AprLifecycleListener();
                 listener.setSSLRandomSeed("/dev/urandom");
                 server.addLifecycleListener(listener);
-                tomcat.getConnector().setAttribute("sslImplementationName", sslImplementation);
+                connector.setAttribute("sslImplementationName", sslImplementation);
             }
-            Assert.assertTrue(connector.setProperty("sslProtocol", "tls"));
-            File keystoreFile =
-                new File(keystore);
-            connector.setAttribute("keystoreFile",
-                    keystoreFile.getAbsolutePath());
-            File truststoreFile = new File(CA_JKS);
-            connector.setAttribute("truststoreFile",
-                    truststoreFile.getAbsolutePath());
+            sslHostConfig.setSslProtocol("tls");
+            certificate.setCertificateKeystoreFile(new File(keystore).getAbsolutePath());
+            sslHostConfig.setTruststoreFile(new File(CA_JKS).getAbsolutePath());
             if (keystorePass != null) {
-                connector.setAttribute("keystorePass", keystorePass);
+                certificate.setCertificateKeystorePassword(keystorePass);
             }
             if (keyPass != null) {
-                connector.setAttribute("keyPass", keyPass);
+                certificate.setCertificateKeyPassword(keyPass);
             }
         } else {
-            File keystoreFile = new File(
-                    LOCALHOST_RSA_CERT_PEM);
-            tomcat.getConnector().setAttribute("SSLCertificateFile",
-                    keystoreFile.getAbsolutePath());
-            keystoreFile = new File(
-                    LOCALHOST_RSA_KEY_PEM);
-            tomcat.getConnector().setAttribute("SSLCertificateKeyFile",
-                    keystoreFile.getAbsolutePath());
-            keystoreFile = new File(
-                    CA_CERT_PEM);
-            tomcat.getConnector().setAttribute("SSLCACertificateFile",
-                    keystoreFile.getAbsolutePath());
+            certificate.setCertificateFile(new File(LOCALHOST_RSA_CERT_PEM).getAbsolutePath());
+            certificate.setCertificateKeyFile(new File(LOCALHOST_RSA_KEY_PEM).getAbsolutePath());
+            sslHostConfig.setCaCertificateFile(new File(CA_CERT_PEM).getAbsolutePath());
         }
-        tomcat.getConnector().setSecure(true);
-        Assert.assertTrue(tomcat.getConnector().setProperty("SSLEnabled", "true"));
     }
 
     protected static KeyManager[] getUser1KeyManagers() throws Exception {
@@ -266,7 +259,7 @@ public final class TesterSupport {
          * depend. Therefore, force these tests to use TLSv1.2 so that they pass
          * when running on TLSv1.3.
          */
-        Assert.assertTrue(tomcat.getConnector().setProperty("sslEnabledProtocols", Constants.SSL_PROTO_TLSv1_2));
+        tomcat.getConnector().findSslHostConfigs()[0].setProtocols(Constants.SSL_PROTO_TLSv1_2);
 
         // Need a web application with a protected and unprotected URL
         // No file system docBase required
