@@ -837,13 +837,12 @@ public class CoyoteAdapter implements Adapter {
                     }
                 }
             }
-            res.setStatus(405);
             if (header != null) {
                 res.addHeader("Allow", header);
             }
-            res.setMessage("TRACE method is not allowed");
-            request.getContext().logAccess(request, response, 0, true);
-            return false;
+            response.sendError(405, "TRACE method is not allowed");
+            // Safe to skip the remainder of this method.
+            return true;
         }
 
         doConnectorAuthenticationAuthorization(req, request);
