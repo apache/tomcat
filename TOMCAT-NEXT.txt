@@ -25,7 +25,7 @@ Items carried over from the 9.0.x list:
 2.  Reduce instances of setters and getters for the same property existing on an
     object and its parent. This may require new objects to be exposed via JMX.
 
-New items for 10.0.x onwards:
+New items for 10.0.0.x onwards:
 
  1.  Remove APR connector.
 
@@ -34,33 +34,37 @@ New items for 10.0.x onwards:
      We might want to park this one until we see what is available direct from
      the JRE with project Panama.
 
- 3.  Remove the ExtensionValidator and associated classes (assuming that the
-     minimum Java version is Java 9 or later).
-
- 4.  Clean-up content-type header processing. Remove the optional space after
+ 3.  Clean-up content-type header processing. Remove the optional space after
      the ';' character (if any). Don't mutate the header if there is no charset
      parameter. See BZ 62912 for some discussion and additional references.
 
- 5.  Consider applying the delayed log file opening (until there is something to
+ 4.  Consider applying the delayed log file opening (until there is something to
      log). See BZ 53620.
 
- 6. Consider including
+ 5. Consider including
     <request-character-encoding>UTF-8</request-character-encoding>
     in conf/web.xml
 
- 7. Consider including
+ 6. Consider including
     <response-character-encoding>UTF-8</response-character-encoding>
     in conf/web.xml
 
- 8. RFC 3986 states (section 2.2) that a %nn encoded delimiter is NOT equivalent
+ 7. RFC 3986 states (section 2.2) that a %nn encoded delimiter is NOT equivalent
     to the decoded form. Provide an option not to decode delimiters in %nn form.
 
- 9. BZ 56966. Refactor internal request timing to use System.nanoTime()
+ 8. BZ 56966. Refactor internal request timing to use System.nanoTime()
 
-10. BZ 63286. Make behaviour of %D and %T consistent with httpd.
+ 9. BZ 63286. Make behaviour of %D and %T consistent with httpd.
 
-11. Refactor DefaultServlet to use Ranges in parseRanges().
+10. Refactor DefaultServlet to use Ranges in parseRanges().
 
-12. Consider disabling the AJP connector by default.
+11. Consider disabling the AJP connector by default.
 
-13. Share configuration between HTTP/1.1 and nested HTTP/2 rather than duplicating.
+12. Share configuration between HTTP/1.1 and nested HTTP/2 rather than duplicating.
+
+
+Deferred until 10.0.x:
+
+ 1.  Remove the ExtensionValidator and associated classes (assuming that the
+     minimum Java version is Java 9 or later).
+
