@@ -1565,27 +1565,6 @@ public class DefaultServlet extends HttpServlet {
     /**
      * Decide which way to render. HTML or XML.
      *
-     * @param contextPath The path
-     * @param resource    The resource
-     * @param encoding    The encoding to use to process the readme (if any)
-     *
-     * @return the input stream with the rendered output
-     *
-     * @throws IOException an IO error occurred
-     * @throws ServletException rendering error
-     *
-     * @deprecated Use {@link #render(HttpServletRequest, String, WebResource, String)} instead
-     */
-    @Deprecated
-    protected InputStream render(String contextPath, WebResource resource, String encoding)
-        throws IOException, ServletException {
-
-        return render(null, contextPath, resource, encoding);
-    }
-
-    /**
-     * Decide which way to render. HTML or XML.
-     *
      * @param request     The HttpServletRequest being served
      * @param contextPath The path
      * @param resource    The resource
