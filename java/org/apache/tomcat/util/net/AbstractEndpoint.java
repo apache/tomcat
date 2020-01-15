@@ -101,17 +101,6 @@ public abstract class AbstractEndpoint<S,U> {
 
 
         /**
-         * Obtain the currently open sockets.
-         *
-         * @return The sockets for which the handler is tracking a currently
-         *         open connection
-         * @deprecated Unused, will be removed in Tomcat 10, replaced
-         *         by AbstractEndpoint.getConnections
-         */
-        @Deprecated
-        public Set<S> getOpenSockets();
-
-        /**
          * Release any resources associated with the given SocketWrapper.
          *
          * @param socketWrapper The socketWrapper to release resources for
@@ -423,26 +412,6 @@ public abstract class AbstractEndpoint<S,U> {
      * Acceptor thread count.
      */
     protected int acceptorThreadCount = 1;
-
-    /**
-     * NO-OP.
-     *
-     * @param acceptorThreadCount Unused
-     *
-     * @deprecated Will be removed in Tomcat 10.
-     */
-    @Deprecated
-    public void setAcceptorThreadCount(int acceptorThreadCount) {}
-
-    /**
-     * Always returns 1.
-     *
-     * @return Always 1.
-     *
-     * @deprecated Will be removed in Tomcat 10.
-     */
-    @Deprecated
-    public int getAcceptorThreadCount() { return 1; }
 
 
     /**

@@ -46,13 +46,6 @@ public class OS {
     private static native boolean is(int type);
 
     public static final boolean IS_UNIX    = is(UNIX);
-    /**
-     * @deprecated Hard-coded to false since there has not been a supported
-     *             Netware platform for many years.
-     *             This will be removed in Tomcat 10 onwards
-     */
-    @Deprecated
-    public static final boolean IS_NETWARE = false;
     public static final boolean IS_WIN32   = is(WIN32);
     public static final boolean IS_WIN64   = is(WIN64);
     public static final boolean IS_LINUX   = is(LINUX);

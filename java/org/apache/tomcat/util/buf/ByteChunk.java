@@ -389,29 +389,11 @@ public final class ByteChunk extends AbstractChunk {
 
     // -------------------- Removing data from the buffer --------------------
 
-    /*
-     * @deprecated Use {@link #subtract()}.
-     *             This method will be removed in Tomcat 10
-     */
-    @Deprecated
-    public int substract() throws IOException {
-        return subtract();
-    }
-
     public int subtract() throws IOException {
         if (checkEof()) {
             return -1;
         }
         return buff[start++] & 0xFF;
-    }
-
-    /*
-     * @deprecated Use {@link #subtractB()}.
-     *             This method will be removed in Tomcat 10
-     */
-    @Deprecated
-    public byte substractB() throws IOException {
-        return subtractB();
     }
 
     public byte subtractB() throws IOException {
@@ -421,15 +403,6 @@ public final class ByteChunk extends AbstractChunk {
         return buff[start++];
     }
 
-
-    /*
-     * @deprecated Use {@link #subtract(byte[],int,int)}.
-     *             This method will be removed in Tomcat 10
-     */
-    @Deprecated
-    public int substract(byte dest[], int off, int len) throws IOException {
-        return subtract(dest, off, len);
-    }
 
     public int subtract(byte dest[], int off, int len) throws IOException {
         if (checkEof()) {
@@ -442,26 +415,6 @@ public final class ByteChunk extends AbstractChunk {
         System.arraycopy(buff, start, dest, off, n);
         start += n;
         return n;
-    }
-
-
-    /**
-     * Transfers bytes from the buffer to the specified ByteBuffer. After the
-     * operation the position of the ByteBuffer will be returned to the one
-     * before the operation, the limit will be the position incremented by the
-     * number of the transfered bytes.
-     *
-     * @param to the ByteBuffer into which bytes are to be written.
-     * @return an integer specifying the actual number of bytes read, or -1 if
-     *         the end of the stream is reached
-     * @throws IOException if an input or output exception has occurred
-     *
-     * @deprecated Use {@link #subtract(ByteBuffer)}.
-     *             This method will be removed in Tomcat 10
-     */
-    @Deprecated
-    public int substract(ByteBuffer to) throws IOException {
-        return subtract(to);
     }
 
 

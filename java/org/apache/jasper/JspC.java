@@ -1036,18 +1036,6 @@ public class JspC extends Task implements Options {
     }
 
     /**
-     * File where we generate a web.xml fragment with the class definitions.
-     * @param s New value
-     * @deprecated Will be removed in Tomcat 10.
-     *             Use {@link #setWebXmlInclude(String)}
-     */
-    @Deprecated
-    public void setWebXmlFragment( String s ) {
-        webxmlFile=resolveFile(s).getAbsolutePath();
-        webxmlLevel=INC_WEBXML;
-    }
-
-    /**
      * File where we generate configuration with the class definitions to be
      * included in a web.xml file.
      * @param s New value
@@ -1391,18 +1379,6 @@ public class JspC extends Task implements Options {
                 Thread.currentThread().setContextClassLoader(originalClassLoader);
             }
         }
-    }
-
-    /**
-     * Locate all jsp files in the webapp. Used if no explicit
-     * jsps are specified.
-     * @param base Base path
-     *
-     * @deprecated This will be removed in Tomcat 10. Use {@link #scanFiles()}
-     */
-    @Deprecated
-    public void scanFiles(File base) {
-        scanFiles();
     }
 
 
