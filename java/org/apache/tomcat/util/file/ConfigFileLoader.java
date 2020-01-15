@@ -32,7 +32,6 @@ public class ConfigFileLoader {
 
     public static final ConfigurationSource getSource() {
         if (ConfigFileLoader.source == null) {
-            // TODO: Add logging in Tomcat 10 when the default is silently used, or remove the default
             return ConfigurationSource.DEFAULT;
         }
         return source;
