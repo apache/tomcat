@@ -76,7 +76,7 @@ public class TestMaxConnections extends TomcatBaseTest {
         root.addServletMappingDecoded("/test", "Simple");
         Assert.assertTrue(tomcat.getConnector().setProperty("maxKeepAliveRequests", "1"));
         Assert.assertTrue(tomcat.getConnector().setProperty("maxThreads", "10"));
-        Assert.assertTrue(tomcat.getConnector().setProperty("soTimeout", "20000"));
+        Assert.assertTrue(tomcat.getConnector().setProperty("connectionTimeout", "20000"));
         Assert.assertTrue(tomcat.getConnector().setProperty("keepAliveTimeout", "50000"));
         Assert.assertTrue(tomcat.getConnector().setProperty("maxConnections", Integer.toString(MAX_CONNECTIONS)));
         Assert.assertTrue(tomcat.getConnector().setProperty("acceptCount", "1"));
