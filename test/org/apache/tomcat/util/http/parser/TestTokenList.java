@@ -125,16 +125,9 @@ public class TestTokenList {
     }
 
 
-    @SuppressWarnings("deprecation")
     private void doTestVary(String input, Set<String> expected) throws IOException {
         StringReader reader = new StringReader(input);
         Set<String> result = new HashSet<>();
-        Vary.parseVary(reader, result);
-        Assert.assertEquals(expected, result);
-
-        // Can't use reset(). Parser uses marks.
-        reader = new StringReader(input);
-        result.clear();
         TokenList.parseTokenList(reader, result);
         Assert.assertEquals(expected, result);
     }
