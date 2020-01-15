@@ -812,11 +812,6 @@ public class TesterContext implements Context {
     }
 
     @Override
-    public ErrorPage findErrorPage(String exceptionType) {
-        return null;
-    }
-
-    @Override
     public ErrorPage findErrorPage(Throwable exceptionType) {
         return null;
     }
@@ -873,16 +868,6 @@ public class TesterContext implements Context {
 
     @Override
     public String[] findServletMappings() {
-        return null;
-    }
-
-    @Override
-    public String findStatusPage(int status) {
-        return null;
-    }
-
-    @Override
-    public int[] findStatusPages() {
         return null;
     }
 

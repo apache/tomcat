@@ -979,19 +979,6 @@ public interface Context extends Container, ContextBind {
 
 
     /**
-     * @param exceptionType Exception type to look up
-     *
-     * @return the error page entry for the specified Java exception type,
-     *         if any; otherwise return {@code null}.
-     *
-     * @deprecated Unused. Will be removed in Tomcat 10.
-     *             Use {@link #findErrorPage(Throwable)} instead.
-     */
-    @Deprecated
-    public ErrorPage findErrorPage(String exceptionType);
-
-
-    /**
      * Find and return the ErrorPage instance for the specified exception's
      * class, or an ErrorPage instance for the closest superclass for which
      * there is such a definition.  If no associated ErrorPage instance is
@@ -1107,31 +1094,6 @@ public interface Context extends Container, ContextBind {
      * Context.  If no mappings are defined, a zero-length array is returned.
      */
     public String[] findServletMappings();
-
-
-    /**
-     * @return the context-relative URI of the error page for the specified
-     * HTTP status code, if any; otherwise return <code>null</code>.
-     *
-     * @param status HTTP status code to look up
-     *
-     * @deprecated Unused. Will be removed in Tomcat 10.
-     *             Use {@link #findErrorPage(int)} instead.
-     */
-    @Deprecated
-    public String findStatusPage(int status);
-
-
-    /**
-     * @return the set of HTTP status codes for which error pages have
-     * been specified.  If none are specified, a zero-length array
-     * is returned.
-     *
-     * @deprecated Unused. Will be removed in Tomcat 10.
-     *             Use {@link #findErrorPages()} instead.
-     */
-    @Deprecated
-    public int[] findStatusPages();
 
 
     /**

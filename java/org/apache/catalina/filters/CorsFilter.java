@@ -18,7 +18,6 @@ package org.apache.catalina.filters;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.net.URI;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -772,27 +771,6 @@ public class CorsFilter extends GenericFilter {
 
 
     /**
-     * Checks if a given origin is valid or not. Criteria:
-     * <ul>
-     * <li>If an encoded character is present in origin, it's not valid.</li>
-     * <li>If origin is "null", it's valid.</li>
-     * <li>Origin should be a valid {@link URI}</li>
-     * </ul>
-     *
-     * @param origin The origin URI
-     * @return <code>true</code> if the origin was valid
-     * @see <a href="http://tools.ietf.org/html/rfc952">RFC952</a>
-     *
-     * @deprecated This will be removed in Tomcat 10
-     *             Use {@link RequestUtil#isValidOrigin(String)}
-     */
-    @Deprecated
-    protected static boolean isValidOrigin(String origin) {
-        return RequestUtil.isValidOrigin(origin);
-    }
-
-
-    /**
      * Determines if any origin is allowed to make CORS request.
      *
      * @return <code>true</code> if it's enabled; false otherwise.
@@ -925,15 +903,6 @@ public class CorsFilter extends GenericFilter {
             "Access-Control-Allow-Headers";
 
     // -------------------------------------------------- CORS Request Headers
-
-    /**
-     * The Vary header indicates allows disabling proxy caching by indicating
-     * the the response depends on the origin.
-     *
-     * @deprecated Unused. Will be removed in Tomcat 10
-     */
-    @Deprecated
-    public static final String REQUEST_HEADER_VARY = "Vary";
 
     /**
      * The Origin header indicates where the cross-origin request or preflight

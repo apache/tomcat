@@ -1172,29 +1172,6 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
 
     /**
      * List the resources of the given context.
-     *
-     * @param writer Writer to render to
-     * @param prefix Path for recursion
-     * @param namingContext The naming context for lookups
-     * @param type Fully qualified class name of the resource type of interest,
-     *  or <code>null</code> to list resources of all types
-     * @param clazz Unused
-     * @param smClient i18n support for current client's locale
-     *
-     * @deprecated Use {@link #printResources(PrintWriter, String,
-     *             javax.naming.Context, String, StringManager)}
-     *             This method will be removed in Tomcat 10.x onwards
-     */
-    @Deprecated
-    protected void printResources(PrintWriter writer, String prefix,
-            javax.naming.Context namingContext,
-            String type, Class<?> clazz, StringManager smClient) {
-        printResources(writer, prefix, namingContext, type, smClient);
-    }
-
-
-    /**
-     * List the resources of the given context.
      * @param writer Writer to render to
      * @param prefix Path for recursion
      * @param namingContext The naming context for lookups

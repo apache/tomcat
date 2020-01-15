@@ -113,21 +113,6 @@ public final class Globals {
 
 
     /**
-     * The servlet context attribute under which we store a flag used
-     * to mark this request as having been processed by the SSIServlet.
-     * We do this because of the pathInfo mangling happening when using
-     * the CGIServlet in conjunction with the SSI servlet. (value stored
-     * as an object of type String)
-     *
-     * @deprecated Unused. This is no longer used as the CGIO servlet now has
-     *             generic handling for when it is used as an include.
-     *             This will be removed in Tomcat 10
-     */
-    @Deprecated
-    public static final String SSI_FLAG_ATTR = "org.apache.catalina.ssi.SSIServlet";
-
-
-    /**
      * The subject under which the AccessControlContext is running.
      */
     public static final String SUBJECT_ATTR =

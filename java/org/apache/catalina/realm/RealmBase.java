@@ -1559,15 +1559,4 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
             throw new LifecycleException(sm.getString("realmBase.createUsernameRetriever.ClassCastException", className), e);
         }
     }
-
-
-    @Override
-    public String[] getRoles(Principal principal) {
-        if (principal instanceof GenericPrincipal) {
-            return ((GenericPrincipal) principal).getRoles();
-        }
-
-        String className = principal.getClass().getSimpleName();
-        throw new IllegalStateException(sm.getString("realmBase.cannotGetRoles", className));
-    }
 }

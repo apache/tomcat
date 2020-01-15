@@ -1612,30 +1612,6 @@ public class DefaultServlet extends HttpServlet {
      * Return an InputStream to an XML representation of the contents this
      * directory.
      *
-     * @param contextPath Context path to which our internal paths are relative
-     * @param resource    The associated resource
-     * @param xsltSource  The XSL stylesheet
-     * @param encoding    The encoding to use to process the readme (if any)
-     *
-     * @return the XML data
-     *
-     * @throws IOException an IO error occurred
-     * @throws ServletException rendering error
-     * @deprecated Unused. Will be removed in Tomcat 10
-     * @deprecated Use {@link #render(HttpServletRequest, String, WebResource, String)} instead
-     */
-    @Deprecated
-    protected InputStream renderXml(String contextPath, WebResource resource, Source xsltSource,
-            String encoding)
-        throws ServletException, IOException
-    {
-        return renderXml(null, contextPath, resource, xsltSource, encoding);
-    }
-
-    /**
-     * Return an InputStream to an XML representation of the contents this
-     * directory.
-     *
      * @param request     The HttpServletRequest being served
      * @param contextPath Context path to which our internal paths are relative
      * @param resource    The associated resource
@@ -1763,27 +1739,6 @@ public class DefaultServlet extends HttpServlet {
                 Thread.currentThread().setContextClassLoader(original);
             }
         }
-    }
-
-    /**
-     * Return an InputStream to an HTML representation of the contents of this
-     * directory.
-     *
-     * @param contextPath Context path to which our internal paths are relative
-     * @param resource    The associated resource
-     * @param encoding    The encoding to use to process the readme (if any)
-     *
-     * @return the HTML data
-     *
-     * @throws IOException an IO error occurred
-     *
-     * @deprecated Unused. Will be removed in Tomcat 10
-     * @deprecated Use {@link #renderHtml(HttpServletRequest, String, WebResource, String)} instead
-     */
-    @Deprecated
-    protected InputStream renderHtml(String contextPath, WebResource resource, String encoding)
-        throws IOException {
-        return renderHtml(null, contextPath, resource, encoding);
     }
 
     /**

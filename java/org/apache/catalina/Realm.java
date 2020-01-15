@@ -121,17 +121,12 @@ public interface Realm extends Contained {
     /**
      * Try to authenticate using a {@link GSSName}
      *
-     * Note that this default method will be turned into an abstract one in
-     * Tomcat 10.
-     *
      * @param gssName The {@link GSSName} of the principal to look up
      * @param gssCredential The {@link GSSCredential} of the principal, may be
      *                      {@code null}
      * @return the associated principal, or {@code null} if there is none
      */
-    public default Principal authenticate(GSSName gssName, GSSCredential gssCredential) {
-        return null;
-    }
+    public Principal authenticate(GSSName gssName, GSSCredential gssCredential);
 
 
     /**
@@ -223,16 +218,6 @@ public interface Realm extends Contained {
      * @param listener The listener to remove
      */
     public void removePropertyChangeListener(PropertyChangeListener listener);
-
-
-    /**
-     * Return roles associated with given principal
-     * @param principal the {@link Principal} to get the roles for.
-     * @return principal roles
-     * @deprecated This will be removed in Tomcat 10.
-     */
-    @Deprecated
-    public String[] getRoles(Principal principal);
 
 
     /**

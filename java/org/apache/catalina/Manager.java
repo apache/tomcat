@@ -216,19 +216,6 @@ public interface Manager {
      *
      * @param session   The session to change the session ID for
      *
-     * @deprecated Use {@link #rotateSessionId(Session)}.
-     *             Will be removed in Tomcat 10
-     */
-    @Deprecated
-    public void changeSessionId(Session session);
-
-
-    /**
-     * Change the session ID of the current session to a new randomly generated
-     * session ID.
-     *
-     * @param session   The session to change the session ID for
-     *
      * @return  The new session ID
      */
     public default String rotateSessionId(Session session) {

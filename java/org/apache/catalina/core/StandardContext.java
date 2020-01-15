@@ -3362,13 +3362,6 @@ public class StandardContext extends ContainerBase
 
 
     @Override
-    @Deprecated
-    public ErrorPage findErrorPage(String exceptionType) {
-        return errorPageSupport.find(exceptionType);
-    }
-
-
-    @Override
     public ErrorPage findErrorPage(Throwable exceptionType) {
         return errorPageSupport.find(exceptionType);
     }
@@ -3573,36 +3566,6 @@ public class StandardContext extends ContainerBase
             String results[] = new String[servletMappings.size()];
             return servletMappings.keySet().toArray(results);
         }
-    }
-
-
-    @Override
-    @Deprecated
-    public String findStatusPage(int status) {
-
-        ErrorPage errorPage = findErrorPage(status);
-        if (errorPage != null) {
-            return errorPage.getLocation();
-        }
-        return null;
-    }
-
-
-    @Override
-    @Deprecated
-    public int[] findStatusPages() {
-        ErrorPage[] errorPages = findErrorPages();
-        int size = errorPages.length;
-        int temp[] = new int[size];
-        int count = 0;
-        for (int i = 0; i < size; i++) {
-            if (errorPages[i].getExceptionType() == null) {
-                temp[count++] = errorPages[i].getErrorCode();
-            }
-        }
-        int result[] = new int[count];
-        System.arraycopy(temp, 0, result, 0, count);
-        return result;
     }
 
 

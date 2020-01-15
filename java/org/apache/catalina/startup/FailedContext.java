@@ -508,8 +508,6 @@ public class FailedContext extends LifecycleMBeanBase implements Context {
     @Override
     public ErrorPage findErrorPage(int errorCode) { return null; }
     @Override
-    public ErrorPage findErrorPage(String exceptionType) { return null; }
-    @Override
     public ErrorPage findErrorPage(Throwable throwable) { return null; }
     @Override
     public ErrorPage[] findErrorPages() { return null; }
@@ -609,11 +607,6 @@ public class FailedContext extends LifecycleMBeanBase implements Context {
 
     @Override
     public Wrapper createWrapper() { return null; }
-
-    @Override
-    public String findStatusPage(int status) { return null; }
-    @Override
-    public int[] findStatusPages() { return null; }
 
     @Override
     public boolean fireRequestInitEvent(ServletRequest request) { return false; }

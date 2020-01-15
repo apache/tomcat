@@ -1256,27 +1256,6 @@ public class ExpiresFilter extends FilterBase {
      * <p>
      * {@code protected} for extension.
      *
-     * @param response The wrapped HTTP response
-     *
-     * @return the expiration date
-     * @see HttpServletResponse#getContentType()
-     *
-     * @deprecated  Will be removed in Tomcat 10.
-     *              Use {@link #getExpirationDate(HttpServletRequest, XHttpServletResponse)}
-     */
-    @Deprecated
-    protected Date getExpirationDate(XHttpServletResponse response) {
-        return getExpirationDate((HttpServletRequest) null, response);
-    }
-
-
-    /**
-     * Returns the expiration date of the given {@link XHttpServletResponse} or
-     * {@code null} if no expiration date has been configured for the
-     * declared content type.
-     * <p>
-     * {@code protected} for extension.
-     *
      * @param request  The HTTP request
      * @param response The wrapped HTTP response
      *
