@@ -25,6 +25,7 @@ import javax.websocket.ContainerProvider;
 import javax.websocket.DeploymentException;
 import javax.websocket.WebSocketContainer;
 
+import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -50,7 +51,7 @@ public class TestConnectionLimit extends TomcatBaseTest {
         Tomcat.addServlet(ctx, "default", new DefaultServlet());
         ctx.addServletMappingDecoded("/", "default");
 
-        tomcat.getConnector().setAttribute("maxConnections", "-1");
+        Assert.assertTrue(tomcat.getConnector().setProperty("maxConnections", "-1"));
 
         tomcat.start();
 

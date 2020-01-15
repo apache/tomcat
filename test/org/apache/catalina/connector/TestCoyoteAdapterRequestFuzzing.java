@@ -110,7 +110,7 @@ public class TestCoyoteAdapterRequestFuzzing extends TomcatBaseTest {
     @Test
     public void doTest() throws Exception {
         Tomcat tomcat = getTomcatInstance();
-        tomcat.getConnector().setAttribute("restrictedUserAgents", "value-not-important");
+        Assert.assertTrue(tomcat.getConnector().setProperty("restrictedUserAgents", "value-not-important"));
 
         File appDir = new File("test/webapp");
         Context ctxt = tomcat.addContext("", appDir.getAbsolutePath());
