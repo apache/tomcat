@@ -330,40 +330,52 @@ sources like "/dev/urandom" that will allow quicker starts of Tomcat.
 <code>$CATALINA_BASE</code> represents the base directory for the
 Tomcat instance.  An example <code>&lt;Connector&gt;</code> element
 for an SSL connector is included in the default <code>server.xml</code>
-file installed with Tomcat. To configure an SSL connector that uses JSSE, you
-will need to remove the comments and edit it so it looks something like
-this:</p>
+file installed with Tomcat. To configure an SSL connector that uses JSSE with
+the JSSE configuration style, you will need to remove the comments and edit it
+so it looks something like this:</p>
 <source><![CDATA[<!-- Define an SSL Coyote HTTP/1.1 Connector on port 8443 -->
 <Connector
-           protocol="org.apache.coyote.http11.Http11NioProtocol"
-           port="8443" maxThreads="200"
-           scheme="https" secure="true" SSLEnabled="true"
-           keystoreFile="${user.home}/.keystore" keystorePass="changeit"
-           clientAuth="false" sslProtocol="TLS"/>]]></source>
+    protocol="org.apache.coyote.http11.Http11NioProtocol"
+    port="8443"
+    maxThreads="150"
+    SSLEnabled="true">
+  <SSLHostConfig>
+    <Certificate
+      certificateKeystoreFile="${user.home}/.keystore"
+      certificateKeystorePassword="changeit"
+      type="RSA"
+      />
+    </SSLHostConfig>
+</Connector>]]></source>
 <p>
   Note: If tomcat-native is installed, the configuration will use JSSE with
-  an OpenSSL implementation, which supports either this configuration or the APR
-  configuration example given below.</p>
+  an OpenSSL implementation.</p>
 <p>
-  The APR connector uses different attributes for many SSL settings,
-  particularly keys and certificates. An example of an APR configuration is:</p>
+  The APR configuration style uses different attributes for many SSL settings,
+  particularly keys and certificates. An example of an APR configuration style
+  is:</p>
 <source><![CDATA[<!-- Define an SSL Coyote HTTP/1.1 Connector on port 8443 -->
 <Connector
-           protocol="org.apache.coyote.http11.Http11AprProtocol"
-           port="8443" maxThreads="200"
-           scheme="https" secure="true" SSLEnabled="true"
-           SSLCertificateFile="/usr/local/ssl/server.crt"
-           SSLCertificateKeyFile="/usr/local/ssl/server.pem"
-           SSLVerifyClient="optional" SSLProtocol="TLSv1+TLSv1.1+TLSv1.2"/>]]></source>
+    protocol="org.apache.coyote.http11.Http11AprProtocol"
+    port="8443"
+    maxThreads="150"
+    SSLEnabled="true" >
+  <SSLHostConfig>
+    <Certificate
+        certificateKeyFile="conf/localhost-rsa-key.pem"
+        certificateFile="conf/localhost-rsa-cert.pem"
+        certificateChainFile="conf/localhost-rsa-chain.pem"
+        type="RSA"
+        />
+  </SSLHostConfig>
+</Connector>]]></source>
 
 
 <p>The configuration options and information on which attributes
 are mandatory, are documented in the SSL Support section of the
 <a href="config/http.html#SSL_Support">HTTP connector</a> configuration
-reference. Make sure that you use the correct attributes for the connector you
-are using. The NIO and NIO2 connectors use JSSE unless the JSSE OpenSSL implementation is
-installed (in which case it supports either the JSSE or OpenSSL configuration styles),
-whereas the APR/native connector uses APR.</p>
+reference. Tomcat supports either configuration style (JSSE or OpenSSL) with all
+TLS connectors.</p>
 
 <p>The <code>port</code> attribute is the TCP/IP
 port number on which Tomcat will listen for secure connections.  You can
@@ -568,7 +580,8 @@ SSL communications, and what to do about them.</p>
     be named <code>.keystore</code> in the user home directory under which
     Tomcat is running (which may or may not be the same as yours :-).  If
     the keystore file is anywhere else, you will need to add a
-    <code>keystoreFile</code> attribute to the <code>&lt;Connector&gt;</code>
+    <code>certificateKeystoreFile</code> attribute to the
+    <code>&lt;Certificate&gt;</code>
     element in the <a href="#Edit_the_Tomcat_Configuration_File">Tomcat
     configuration file</a>.</p>
     </li>
@@ -595,8 +608,8 @@ SSL communications, and what to do about them.</p>
 
     <p>A likely explanation is that Tomcat cannot find the alias for the server
     key within the specified keystore. Check that the correct
-    <code>keystoreFile</code> and <code>keyAlias</code> are specified in the
-    <code>&lt;Connector&gt;</code> element in the
+    <code>certificateKeystoreFile</code> and <code>certificateKeyAlias</code>
+    are specified in the <code>&lt;Certificate&gt;</code> element in the
     <a href="#Edit_the_Tomcat_Configuration_File">Tomcat configuration file</a>.
     <strong>REMINDER</strong> - <code>keyAlias</code> values may be case
     sensitive!</p>

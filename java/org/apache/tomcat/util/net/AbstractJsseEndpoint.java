@@ -214,7 +214,7 @@ public abstract class AbstractJsseEndpoint<S,U> extends AbstractEndpoint<S,U> {
     @Override
     public void unbind() throws Exception {
         for (SSLHostConfig sslHostConfig : sslHostConfigs.values()) {
-            for (SSLHostConfigCertificate certificate : sslHostConfig.getCertificates(true)) {
+            for (SSLHostConfigCertificate certificate : sslHostConfig.getCertificates()) {
                 certificate.setSslContext(null);
             }
         }

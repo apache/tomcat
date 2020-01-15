@@ -340,7 +340,7 @@ public abstract class AbstractEndpoint<S,U> {
      *                      released
      */
     protected void releaseSSLContext(SSLHostConfig sslHostConfig) {
-        for (SSLHostConfigCertificate certificate : sslHostConfig.getCertificates(true)) {
+        for (SSLHostConfigCertificate certificate : sslHostConfig.getCertificates()) {
             if (certificate.getSslContext() != null) {
                 SSLContext sslContext = certificate.getSslContext();
                 if (sslContext != null) {
