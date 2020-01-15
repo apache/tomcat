@@ -273,8 +273,8 @@ public class TestHttp11InputBuffer extends TomcatBaseTest {
 
             try {
                 Connector connector = tomcat.getConnector();
-                connector.setProperty("rejectIllegalHeaderName",
-                        Boolean.toString(rejectIllegalHeaderName));
+                Assert.assertTrue(connector.setProperty(
+                        "rejectIllegalHeaderName", Boolean.toString(rejectIllegalHeaderName)));
                 tomcat.start();
                 setPort(connector.getLocalPort());
 
@@ -548,7 +548,7 @@ public class TestHttp11InputBuffer extends TomcatBaseTest {
 
             try {
                 Connector connector = tomcat.getConnector();
-                connector.setProperty("rejectIllegalHeaderName", "false");
+                Assert.assertTrue(connector.setProperty("rejectIllegalHeaderName", "false"));
                 tomcat.start();
                 setPort(connector.getLocalPort());
 

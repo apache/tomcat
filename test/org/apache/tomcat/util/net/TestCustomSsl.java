@@ -59,15 +59,15 @@ public class TestCustomSsl extends TomcatBaseTest {
         Assume.assumeFalse("This test is only for JSSE based SSL connectors",
                 connector.getProtocolHandlerClassName().contains("Apr"));
 
-        connector.setProperty("sslImplementationName",
-                "org.apache.tomcat.util.net.jsse.TesterBug50640SslImpl");
+        Assert.assertTrue(connector.setProperty(
+                "sslImplementationName", "org.apache.tomcat.util.net.jsse.TesterBug50640SslImpl"));
 
         // This setting will break ssl configuration unless the custom
         // implementation is used.
-        connector.setProperty(TesterBug50640SslImpl.PROPERTY_NAME,
-                TesterBug50640SslImpl.PROPERTY_VALUE);
+        Assert.assertTrue(connector.setProperty(
+                TesterBug50640SslImpl.PROPERTY_NAME, TesterBug50640SslImpl.PROPERTY_VALUE));
 
-        connector.setProperty("sslProtocol", "tls");
+        Assert.assertTrue(connector.setProperty("sslProtocol", "tls"));
 
         File keystoreFile =
             new File(TesterSupport.LOCALHOST_RSA_JKS);
@@ -75,7 +75,7 @@ public class TestCustomSsl extends TomcatBaseTest {
                 "keystoreFile", keystoreFile.getAbsolutePath());
 
         connector.setSecure(true);
-        connector.setProperty("SSLEnabled", "true");
+        Assert.assertTrue(connector.setProperty("SSLEnabled", "true"));
 
         File appDir = new File(getBuildDirectory(), "webapps/examples");
         Context ctxt  = tomcat.addWebapp(

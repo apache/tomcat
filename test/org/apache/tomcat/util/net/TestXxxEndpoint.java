@@ -155,7 +155,7 @@ public class TestXxxEndpoint extends TomcatBaseTest {
     public void testStartStopBindOnStart() throws Exception {
         Tomcat tomcat = getTomcatInstance();
         Connector c = tomcat.getConnector();
-        c.setProperty("bindOnInit", "false");
+        Assert.assertTrue(c.setProperty("bindOnInit", "false"));
 
         File appDir = new File(getBuildDirectory(), "webapps/examples");
         tomcat.addWebapp(null, "/examples", appDir.getAbsolutePath());
