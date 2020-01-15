@@ -64,11 +64,15 @@ public class Connector extends LifecycleMBeanBase  {
         Boolean.parseBoolean(System.getProperty("org.apache.catalina.connector.RECYCLE_FACADES", "false"));
 
 
+    public static final String INTERNAL_EXECUTOR_NAME = "Internal";
+
+
     // ------------------------------------------------------------ Constructor
 
     public Connector() {
         this(null);
     }
+
 
     public Connector(String protocol) {
         setProtocol(protocol);
@@ -774,7 +778,7 @@ public class Connector extends LifecycleMBeanBase  {
         try {
             uriCharset = B2CConverter.getCharset(URIEncoding);
         } catch (UnsupportedEncodingException e) {
-            log.warn(sm.getString("coyoteConnector.invalidEncoding",
+            log.error(sm.getString("coyoteConnector.invalidEncoding",
                     URIEncoding, uriCharset.name()), e);
         }
         setProperty("uRIEncoding", URIEncoding);
@@ -852,7 +856,7 @@ public class Connector extends LifecycleMBeanBase  {
         if (obj instanceof org.apache.catalina.Executor) {
             return ((org.apache.catalina.Executor) obj).getName();
         }
-        return "Internal";
+        return INTERNAL_EXECUTOR_NAME;
     }
 
 

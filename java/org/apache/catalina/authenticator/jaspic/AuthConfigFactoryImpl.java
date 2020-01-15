@@ -18,7 +18,6 @@ package org.apache.catalina.authenticator.jaspic;
 
 import java.io.File;
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -135,8 +134,7 @@ public class AuthConfigFactoryImpl extends AuthConfigFactory {
             }
             Constructor<?> constructor = clazz.getConstructor(Map.class, AuthConfigFactory.class);
             provider = (AuthConfigProvider) constructor.newInstance(properties, null);
-        } catch (ClassNotFoundException | NoSuchMethodException | InstantiationException |
-                IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+        } catch (ReflectiveOperationException | IllegalArgumentException e) {
             throw new SecurityException(e);
         }
         return provider;
