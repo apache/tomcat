@@ -312,29 +312,6 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
         return endpoint.getConnectionCount();
     }
 
-    /**
-     * NO-OP.
-     *
-     * @param threadCount Unused
-     *
-     * @deprecated Will be removed in Tomcat 10.
-     */
-    @Deprecated
-    public void setAcceptorThreadCount(int threadCount) {
-    }
-
-    /**
-     * Always returns 1.
-     *
-     * @return Always 1.
-     *
-     * @deprecated Will be removed in Tomcat 10.
-     */
-    @Deprecated
-    public int getAcceptorThreadCount() {
-      return 1;
-    }
-
     public void setAcceptorThreadPriority(int threadPriority) {
         endpoint.setAcceptorThreadPriority(threadPriority);
     }
