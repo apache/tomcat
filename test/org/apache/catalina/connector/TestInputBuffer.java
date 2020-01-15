@@ -48,7 +48,6 @@ public class TestInputBuffer extends TomcatBaseTest {
         Tomcat.addServlet(root, "Echo", new Utf8Echo());
         root.addServletMappingDecoded("/test", "Echo");
 
-        Assert.assertTrue(tomcat.getConnector().setProperty("soTimeout", "300000"));
         tomcat.start();
 
         for (Utf8TestCase testCase : TestUtf8.TEST_CASES) {
