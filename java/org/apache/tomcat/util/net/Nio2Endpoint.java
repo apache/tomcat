@@ -1333,44 +1333,6 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
 
 
         @Override
-        public boolean awaitReadComplete(long timeout, TimeUnit unit) {
-            synchronized (readCompletionHandler) {
-                try {
-                    if (readNotify) {
-                        return true;
-                    } else if (readPending.tryAcquire(timeout, unit)) {
-                        readPending.release();
-                        return true;
-                    } else {
-                        return false;
-                    }
-                } catch (InterruptedException e) {
-                    return false;
-                }
-            }
-        }
-
-
-        @Override
-        public boolean awaitWriteComplete(long timeout, TimeUnit unit) {
-            synchronized (writeCompletionHandler) {
-                try {
-                    if (writeNotify) {
-                        return true;
-                    } else if (writePending.tryAcquire(timeout, unit)) {
-                        writePending.release();
-                        return true;
-                    } else {
-                        return false;
-                    }
-                } catch (InterruptedException e) {
-                    return false;
-                }
-            }
-        }
-
-
-        @Override
         public void registerReadInterest() {
             synchronized (readCompletionHandler) {
                 // A notification is already being sent

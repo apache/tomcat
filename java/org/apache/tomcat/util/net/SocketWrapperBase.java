@@ -1161,36 +1161,6 @@ public abstract class SocketWrapperBase<E> {
     }
 
     /**
-     * If an asynchronous read operation is pending, this method will block
-     * until the operation completes, or the specified amount of time
-     * has passed.
-     * @param timeout The maximum amount of time to wait
-     * @param unit The unit for the timeout
-     * @return <code>true</code> if the read operation is complete,
-     *  <code>false</code> if the operation is still pending and
-     *  the specified timeout has passed
-     */
-    @Deprecated
-    public boolean awaitReadComplete(long timeout, TimeUnit unit) {
-        return true;
-    }
-
-    /**
-     * If an asynchronous write operation is pending, this method will block
-     * until the operation completes, or the specified amount of time
-     * has passed.
-     * @param timeout The maximum amount of time to wait
-     * @param unit The unit for the timeout
-     * @return <code>true</code> if the read operation is complete,
-     *  <code>false</code> if the operation is still pending and
-     *  the specified timeout has passed
-     */
-    @Deprecated
-    public boolean awaitWriteComplete(long timeout, TimeUnit unit) {
-        return true;
-    }
-
-    /**
      * Scatter read. The completion handler will be called once some
      * data has been read or an error occurred. The default NIO2
      * behavior is used: the completion handler will be called as soon
