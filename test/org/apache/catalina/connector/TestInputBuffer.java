@@ -48,7 +48,7 @@ public class TestInputBuffer extends TomcatBaseTest {
         Tomcat.addServlet(root, "Echo", new Utf8Echo());
         root.addServletMappingDecoded("/test", "Echo");
 
-        tomcat.getConnector().setProperty("soTimeout", "300000");
+        Assert.assertTrue(tomcat.getConnector().setProperty("soTimeout", "300000"));
         tomcat.start();
 
         for (Utf8TestCase testCase : TestUtf8.TEST_CASES) {
@@ -68,7 +68,7 @@ public class TestInputBuffer extends TomcatBaseTest {
         Tomcat.addServlet(root, "Bug60400Servlet", new Bug60400Servlet());
         root.addServletMappingDecoded("/", "Bug60400Servlet");
 
-        tomcat.getConnector().setProperty("appReadBufSize", "9000");
+        Assert.assertTrue(tomcat.getConnector().setProperty("appReadBufSize", "9000"));
         tomcat.start();
 
         ByteChunk bc = new ByteChunk();

@@ -16,6 +16,7 @@
  */
 package org.apache.tomcat.websocket;
 
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
@@ -38,7 +39,7 @@ public class TestWsWebSocketContainerWithProxy extends TestWsWebSocketContainer 
         // With httpd 2.2, AllowCONNECT requires fixed ports. From 2.4, a range
         // can be used.
         getTomcatInstance().getConnector().setPort(8080);
-        getTomcatInstance().getConnector().setProperty("address","0.0.0.0");
+        Assert.assertTrue(getTomcatInstance().getConnector().setProperty("address","0.0.0.0"));
     }
 
     @Override

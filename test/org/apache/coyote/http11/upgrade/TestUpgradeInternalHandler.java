@@ -87,7 +87,7 @@ public class TestUpgradeInternalHandler extends TomcatBaseTest {
             Class<? extends HttpUpgradeHandler> upgradeHandlerClass) throws Exception {
         // Setup Tomcat instance
         Tomcat tomcat = getTomcatInstance();
-        tomcat.getConnector().setProperty("useAsyncIO", "true");
+        Assert.assertTrue(tomcat.getConnector().setProperty("useAsyncIO", "true"));
 
         // No file system docBase required
         Context ctx = tomcat.addContext("", null);

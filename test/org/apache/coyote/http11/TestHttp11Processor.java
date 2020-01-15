@@ -480,8 +480,8 @@ public class TestHttp11Processor extends TomcatBaseTest {
     @Test
     public void testBug55772() throws Exception {
         Tomcat tomcat = getTomcatInstance();
-        tomcat.getConnector().setProperty("processorCache", "1");
-        tomcat.getConnector().setProperty("maxThreads", "1");
+        Assert.assertTrue(tomcat.getConnector().setProperty("processorCache", "1"));
+        Assert.assertTrue(tomcat.getConnector().setProperty("maxThreads", "1"));
 
         // No file system docBase required
         Context ctx = tomcat.addContext("", null);

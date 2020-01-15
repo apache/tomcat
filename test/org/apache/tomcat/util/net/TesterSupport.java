@@ -47,6 +47,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.junit.Assert;
+
 import org.apache.catalina.Context;
 import org.apache.catalina.authenticator.SSLAuthenticator;
 import org.apache.catalina.connector.Connector;
@@ -145,7 +147,7 @@ public final class TesterSupport {
                 server.addLifecycleListener(listener);
                 tomcat.getConnector().setAttribute("sslImplementationName", sslImplementation);
             }
-            connector.setProperty("sslProtocol", "tls");
+            Assert.assertTrue(connector.setProperty("sslProtocol", "tls"));
             File keystoreFile =
                 new File(keystore);
             connector.setAttribute("keystoreFile",
@@ -174,7 +176,7 @@ public final class TesterSupport {
                     keystoreFile.getAbsolutePath());
         }
         tomcat.getConnector().setSecure(true);
-        tomcat.getConnector().setProperty("SSLEnabled", "true");
+        Assert.assertTrue(tomcat.getConnector().setProperty("SSLEnabled", "true"));
     }
 
     protected static KeyManager[] getUser1KeyManagers() throws Exception {
@@ -263,7 +265,7 @@ public final class TesterSupport {
          * depend. Therefore, force these tests to use TLSv1.2 so that they pass
          * when running on TLSv1.3.
          */
-        tomcat.getConnector().setProperty("sslEnabledProtocols", Constants.SSL_PROTO_TLSv1_2);
+        Assert.assertTrue(tomcat.getConnector().setProperty("sslEnabledProtocols", Constants.SSL_PROTO_TLSv1_2));
 
         // Need a web application with a protected and unprotected URL
         // No file system docBase required
