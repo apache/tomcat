@@ -184,7 +184,6 @@ public abstract class TomcatBaseTest extends LoggingBaseTest {
             AprLifecycleListener listener = new AprLifecycleListener();
             listener.setSSLRandomSeed("/dev/urandom");
             server.addLifecycleListener(listener);
-            Assert.assertTrue(connector.setProperty("pollerThreadCount", "1"));
         }
 
         File catalinaBase = getTemporaryDirectory();
