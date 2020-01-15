@@ -1224,28 +1224,6 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
 
 
     /**
-     * Get the principal associated with the specified user name.
-     *
-     * @param username The user name
-     * @param gssCredential the GSS credential of the principal
-     * @return the principal associated with the given user name.
-     * @deprecated This will be removed in Tomcat 10 onwards. Use
-     *             {@link #getPrincipal(GSSName, GSSCredential)} instead.
-     */
-    @Deprecated
-    protected Principal getPrincipal(String username,
-            GSSCredential gssCredential) {
-        Principal p = getPrincipal(username);
-
-        if (p instanceof GenericPrincipal) {
-            ((GenericPrincipal) p).setGssCredential(gssCredential);
-        }
-
-        return p;
-    }
-
-
-    /**
      * Get the principal associated with the specified {@link GSSName}.
      *
      * @param gssName The GSS name

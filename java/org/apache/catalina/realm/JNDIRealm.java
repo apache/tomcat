@@ -2261,7 +2261,6 @@ public class JNDIRealm extends RealmBase {
         return getPrincipal(name, gssCredential);
     }
 
-    @Override
     protected Principal getPrincipal(String username,
             GSSCredential gssCredential) {
 
