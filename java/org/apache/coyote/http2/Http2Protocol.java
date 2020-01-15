@@ -408,16 +408,6 @@ public class Http2Protocol implements UpgradeProtocol {
     }
 
 
-    @Deprecated
-    public boolean getNoCompressionStrongETag() {
-        return compressionConfig.getNoCompressionStrongETag();
-    }
-    @Deprecated
-    public void setNoCompressionStrongETag(boolean noCompressionStrongETag) {
-        compressionConfig.setNoCompressionStrongETag(noCompressionStrongETag);
-    }
-
-
     public boolean useCompression(Request request, Response response) {
         return compressionConfig.useCompression(request, response);
     }

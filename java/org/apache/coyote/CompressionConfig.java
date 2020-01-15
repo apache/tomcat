@@ -46,7 +46,6 @@ public class CompressionConfig {
             "text/javascript,application/javascript,application/json,application/xml";
     private String[] compressibleMimeTypes = null;
     private int compressionMinSize = 2048;
-    private boolean noCompressionStrongETag = true;
 
 
     /**
@@ -184,35 +183,6 @@ public class CompressionConfig {
 
 
     /**
-     * Determine if compression is disabled if the resource has a strong ETag.
-     *
-     * @return {@code true} if compression is disabled, otherwise {@code false}
-     *
-     * @deprecated Will be removed in Tomcat 10 where it will be hard-coded to
-     *             {@code true}
-     */
-    @Deprecated
-    public boolean getNoCompressionStrongETag() {
-        return noCompressionStrongETag;
-    }
-
-
-    /**
-     * Set whether compression is disabled for resources with a strong ETag.
-     *
-     * @param noCompressionStrongETag {@code true} if compression is disabled,
-     *                                otherwise {@code false}
-     *
-     * @deprecated Will be removed in Tomcat 10 where it will be hard-coded to
-     *             {@code true}
-     */
-    @Deprecated
-    public void setNoCompressionStrongETag(boolean noCompressionStrongETag) {
-        this.noCompressionStrongETag = noCompressionStrongETag;
-    }
-
-
-    /**
      * Determines if compression should be enabled for the given response and if
      * it is, sets any necessary headers to mark it as such.
      *
@@ -266,13 +236,11 @@ public class CompressionConfig {
         }
 
         // Check if the resource has a strong ETag
-        if (noCompressionStrongETag) {
-            String eTag = responseHeaders.getHeader("ETag");
-            if (eTag != null && !eTag.trim().startsWith("W/")) {
-                // Has an ETag that doesn't start with "W/..." so it must be a
-                // strong ETag
-                return false;
-            }
+        String eTag = responseHeaders.getHeader("ETag");
+        if (eTag != null && !eTag.trim().startsWith("W/")) {
+            // Has an ETag that doesn't start with "W/..." so it must be a
+            // strong ETag
+            return false;
         }
 
         // If processing reaches this far, the response might be compressed.
