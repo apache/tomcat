@@ -142,10 +142,10 @@ public class AprLifecycleListener
                 }
                 // Failure to initialize FIPS mode is fatal
                 if (!(null == FIPSMode || "off".equalsIgnoreCase(FIPSMode)) && !isFIPSModeActive()) {
-                    Error e = new Error(
-                            sm.getString("aprListener.initializeFIPSFailed"));
+                    String errorMessage = sm.getString("aprListener.initializeFIPSFailed");
+                    Error e = new Error(errorMessage);
                     // Log here, because thrown error might be not logged
-                    log.fatal(e.getMessage(), e);
+                    log.fatal(errorMessage, e);
                     throw e;
                 }
             }
@@ -419,6 +419,10 @@ public class AprLifecycleListener
 
     public static boolean getUseOpenSSL() {
         return useOpenSSL;
+    }
+
+    public static boolean isInstanceCreated() {
+        return instanceCreated;
     }
 
 }
