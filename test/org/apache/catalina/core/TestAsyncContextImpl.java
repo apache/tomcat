@@ -171,8 +171,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         // Minimise pauses during test
-        tomcat.getConnector().setAttribute(
-                "connectionTimeout", Integer.valueOf(3000));
+        Assert.assertTrue(tomcat.getConnector().setProperty("connectionTimeout", "3000"));
 
         // No file system docBase required
         Context ctx = tomcat.addContext("", null);

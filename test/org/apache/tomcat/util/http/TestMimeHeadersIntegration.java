@@ -105,8 +105,7 @@ public class TestMimeHeadersIntegration extends TomcatBaseTest {
         if (maxHeaderCount > 0) {
             Assert.assertEquals(maxHeaderCount, alv.arraySize);
         } else if (maxHeaderCount < 0) {
-            int maxHttpHeaderSize = ((Integer) tomcat.getConnector()
-                    .getAttribute("maxHttpHeaderSize")).intValue();
+            int maxHttpHeaderSize = ((Integer) tomcat.getConnector().getProperty("maxHttpHeaderSize")).intValue();
             int headerCount = Math.min(count,
                     maxHttpHeaderSize / header.length() + 1);
             int arraySize = 1;

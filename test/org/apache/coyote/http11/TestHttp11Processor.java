@@ -68,7 +68,7 @@ public class TestHttp11Processor extends TomcatBaseTest {
 
         // This setting means the connection will be closed at the end of the
         // request
-        tomcat.getConnector().setAttribute("maxKeepAliveRequests", "1");
+        Assert.assertTrue(tomcat.getConnector().setProperty("maxKeepAliveRequests", "1"));
 
         // No file system docBase required
         Context ctx = tomcat.addContext("", null);
@@ -1020,7 +1020,7 @@ public class TestHttp11Processor extends TomcatBaseTest {
 
         // This setting means the connection will be closed at the end of the
         // request
-        tomcat.getConnector().setAttribute("maxKeepAliveRequests", "1");
+        Assert.assertTrue(tomcat.getConnector().setProperty("maxKeepAliveRequests", "1"));
 
         // No file system docBase required
         Context ctx = tomcat.addContext("", null);
@@ -1056,7 +1056,7 @@ public class TestHttp11Processor extends TomcatBaseTest {
 
         // This setting means the connection will be closed at the end of the
         // request
-        tomcat.getConnector().setAttribute("maxKeepAliveRequests", "1");
+        Assert.assertTrue(tomcat.getConnector().setProperty("maxKeepAliveRequests", "1"));
 
         // No file system docBase required
         Context ctx = tomcat.addContext("", null);
@@ -1089,7 +1089,7 @@ public class TestHttp11Processor extends TomcatBaseTest {
 
         // This setting means the connection will be closed at the end of the
         // request
-        tomcat.getConnector().setAttribute("maxKeepAliveRequests", "1");
+        Assert.assertTrue(tomcat.getConnector().setProperty("maxKeepAliveRequests", "1"));
 
         // No file system docBase required
         Context ctx = tomcat.addContext("", null);
@@ -1120,7 +1120,7 @@ public class TestHttp11Processor extends TomcatBaseTest {
 
         // This setting means the connection will be closed at the end of the
         // request
-        tomcat.getConnector().setAttribute("maxKeepAliveRequests", "1");
+        Assert.assertTrue(tomcat.getConnector().setProperty("maxKeepAliveRequests", "1"));
 
         // No file system docBase required
         Context ctx = tomcat.addContext("", null);
@@ -1152,7 +1152,7 @@ public class TestHttp11Processor extends TomcatBaseTest {
 
         // This setting means the connection will be closed at the end of the
         // request
-        tomcat.getConnector().setAttribute("maxKeepAliveRequests", "1");
+        Assert.assertTrue(tomcat.getConnector().setProperty("maxKeepAliveRequests", "1"));
 
         // No file system docBase required
         Context ctx = tomcat.addContext("", null);
@@ -1184,7 +1184,7 @@ public class TestHttp11Processor extends TomcatBaseTest {
 
         // This setting means the connection will be closed at the end of the
         // request
-        tomcat.getConnector().setAttribute("maxKeepAliveRequests", "1");
+        Assert.assertTrue(tomcat.getConnector().setProperty("maxKeepAliveRequests", "1"));
 
         // No file system docBase required
         Context ctx = tomcat.addContext("", null);
@@ -1221,7 +1221,7 @@ public class TestHttp11Processor extends TomcatBaseTest {
 
         // This setting means the connection will be closed at the end of the
         // request
-        tomcat.getConnector().setAttribute("maxKeepAliveRequests", "1");
+        Assert.assertTrue(tomcat.getConnector().setProperty("maxKeepAliveRequests", "1"));
 
         // No file system docBase required
         Context ctx = tomcat.addContext("", null);
@@ -1258,7 +1258,7 @@ public class TestHttp11Processor extends TomcatBaseTest {
 
         // This setting means the connection will be closed at the end of the
         // request
-        tomcat.getConnector().setAttribute("maxKeepAliveRequests", "1");
+        Assert.assertTrue(tomcat.getConnector().setProperty("maxKeepAliveRequests", "1"));
 
         // No file system docBase required
         Context ctx = tomcat.addContext("", null);
@@ -1295,7 +1295,7 @@ public class TestHttp11Processor extends TomcatBaseTest {
 
         // This setting means the connection will be closed at the end of the
         // request
-        tomcat.getConnector().setAttribute("maxKeepAliveRequests", "1");
+        Assert.assertTrue(tomcat.getConnector().setProperty("maxKeepAliveRequests", "1"));
 
         // No file system docBase required
         Context ctx = tomcat.addContext("", null);
@@ -1331,7 +1331,7 @@ public class TestHttp11Processor extends TomcatBaseTest {
 
         // This setting means the connection will be closed at the end of the
         // request
-        tomcat.getConnector().setAttribute("maxKeepAliveRequests", "1");
+        Assert.assertTrue(tomcat.getConnector().setProperty("maxKeepAliveRequests", "1"));
 
         // No file system docBase required
         Context ctx = tomcat.addContext("", null);
@@ -1367,7 +1367,7 @@ public class TestHttp11Processor extends TomcatBaseTest {
 
         // This setting means the connection will be closed at the end of the
         // request
-        tomcat.getConnector().setAttribute("maxKeepAliveRequests", "1");
+        Assert.assertTrue(tomcat.getConnector().setProperty("maxKeepAliveRequests", "1"));
 
         // No file system docBase required
         Context ctx = tomcat.addContext("", null);
@@ -1405,7 +1405,7 @@ public class TestHttp11Processor extends TomcatBaseTest {
 
         // This setting means the connection will be closed at the end of the
         // request
-        tomcat.getConnector().setAttribute("maxKeepAliveRequests", "1");
+        Assert.assertTrue(tomcat.getConnector().setProperty("maxKeepAliveRequests", "1"));
 
         // No file system docBase required
         Context ctx = tomcat.addContext("", null);
@@ -1443,7 +1443,7 @@ public class TestHttp11Processor extends TomcatBaseTest {
 
         // This setting means the connection will be closed at the end of the
         // request
-        tomcat.getConnector().setAttribute("maxKeepAliveRequests", "1");
+        Assert.assertTrue(tomcat.getConnector().setProperty("maxKeepAliveRequests", "1"));
 
         // No file system docBase required
         Context ctx = tomcat.addContext("", null);
@@ -1482,7 +1482,7 @@ public class TestHttp11Processor extends TomcatBaseTest {
 
         // This setting means the connection will be closed at the end of the
         // request
-        tomcat.getConnector().setAttribute("maxKeepAliveRequests", "1");
+        Assert.assertTrue(tomcat.getConnector().setProperty("maxKeepAliveRequests", "1"));
 
         // No file system docBase required
         Context ctx = tomcat.addContext("", null);
@@ -1544,8 +1544,8 @@ public class TestHttp11Processor extends TomcatBaseTest {
             int maxKeepAliveRequests) throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
-        tomcat.getConnector().setAttribute("keepAliveTimeout", Integer.valueOf(keepAliveTimeout));
-        tomcat.getConnector().setAttribute("maxKeepAliveRequests", Integer.valueOf(maxKeepAliveRequests));
+        tomcat.getConnector().setProperty("keepAliveTimeout", Integer.toString(keepAliveTimeout));
+        tomcat.getConnector().setProperty("maxKeepAliveRequests", Integer.toString(maxKeepAliveRequests));
 
         // No file system docBase required
         Context ctx = tomcat.addContext("", null);

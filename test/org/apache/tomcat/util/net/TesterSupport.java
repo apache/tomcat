@@ -155,7 +155,7 @@ public final class TesterSupport {
                 AprLifecycleListener listener = new AprLifecycleListener();
                 listener.setSSLRandomSeed("/dev/urandom");
                 server.addLifecycleListener(listener);
-                connector.setAttribute("sslImplementationName", sslImplementation);
+                Assert.assertTrue(connector.setProperty("sslImplementationName", sslImplementation));
             }
             sslHostConfig.setSslProtocol("tls");
             certificate.setCertificateKeystoreFile(new File(keystore).getAbsolutePath());
