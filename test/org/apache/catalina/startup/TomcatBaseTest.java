@@ -112,12 +112,11 @@ public abstract class TomcatBaseTest extends LoggingBaseTest {
         String protocol = getProtocol();
         Connector connector = new Connector(protocol);
         // Listen only on localhost
-        connector.setAttribute("address",
-                InetAddress.getByName("localhost").getHostAddress());
+        Assert.assertTrue(connector.setProperty("address", InetAddress.getByName("localhost").getHostAddress()));
         // Use random free port
         connector.setPort(0);
         // Mainly set to reduce timeouts during async tests
-        connector.setAttribute("connectionTimeout", "3000");
+        Assert.assertTrue(connector.setProperty("connectionTimeout", "3000"));
         tomcat.getService().addConnector(connector);
         tomcat.setConnector(connector);
 
@@ -127,7 +126,7 @@ public abstract class TomcatBaseTest extends LoggingBaseTest {
             AprLifecycleListener listener = new AprLifecycleListener();
             listener.setSSLRandomSeed("/dev/urandom");
             server.addLifecycleListener(listener);
-            connector.setAttribute("pollerThreadCount", Integer.valueOf(1));
+            Assert.assertTrue(connector.setProperty("pollerThreadCount", "1"));
         }
 
         File catalinaBase = getTemporaryDirectory();

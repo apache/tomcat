@@ -430,7 +430,7 @@ public class TestSwallowAbortedUploads extends TomcatBaseTest {
         // No need for target to exist.
 
         if (!limit) {
-            tomcat.getConnector().setAttribute("maxSwallowSize", "-1");
+            Assert.assertTrue(tomcat.getConnector().setProperty("maxSwallowSize", "-1"));
         }
 
         tomcat.start();

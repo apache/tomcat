@@ -60,8 +60,7 @@ public class TestCustomSsl extends TomcatBaseTest {
 
         File keystoreFile =
             new File("test/" + TesterSupport.LOCALHOST_JKS);
-        connector.setAttribute(
-                "keystoreFile", keystoreFile.getAbsolutePath());
+        Assert.assertTrue(connector.setProperty("keystoreFile", keystoreFile.getAbsolutePath()));
 
         connector.setSecure(true);
         connector.setProperty("SSLEnabled", "true");
@@ -110,8 +109,8 @@ public class TestCustomSsl extends TomcatBaseTest {
             Assert.fail("Unexpected handler type");
         }
         if (serverTrustAll) {
-            tomcat.getConnector().setAttribute("trustManagerClassName",
-                    "org.apache.tomcat.util.net.TesterSupport$TrustAllCerts");
+            Assert.assertTrue(tomcat.getConnector().setProperty("trustManagerClassName",
+                    "org.apache.tomcat.util.net.TesterSupport$TrustAllCerts"));
         }
 
         // Start Tomcat
