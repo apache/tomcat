@@ -18,6 +18,7 @@ package org.apache.catalina.core;
 
 import java.net.InetAddress;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 import org.apache.catalina.connector.Connector;
@@ -49,7 +50,7 @@ public class TestStandardService extends TomcatBaseTest {
         Connector c2 = new Connector("HTTP/1.1");
         c2.setThrowOnFailure(throwOnFailure);
 
-        c2.setAttribute("address", ((InetAddress) connector.getAttribute("address")).getHostAddress());
+        Assert.assertTrue(c2.setProperty("address", ((InetAddress) connector.getProperty("address")).getHostAddress()));
         c2.setPort(connector.getLocalPort());
 
         tomcat.getService().addConnector(c2);
