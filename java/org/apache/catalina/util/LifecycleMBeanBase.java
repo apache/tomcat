@@ -41,8 +41,6 @@ public abstract class LifecycleMBeanBase extends LifecycleBase
     /* Cache components of the MBean registration. */
     private String domain = null;
     private ObjectName oname = null;
-    @Deprecated
-    protected MBeanServer mserver = null;
 
     /**
      * Sub-classes wishing to perform additional initialization should override
@@ -54,8 +52,6 @@ public abstract class LifecycleMBeanBase extends LifecycleBase
         // If oname is not null then registration has already happened via
         // preRegister().
         if (oname == null) {
-            mserver = Registry.getRegistry(null, null).getMBeanServer();
-
             oname = register(this, getObjectNameKeyProperties());
         }
     }
@@ -237,7 +233,6 @@ public abstract class LifecycleMBeanBase extends LifecycleBase
     public final ObjectName preRegister(MBeanServer server, ObjectName name)
             throws Exception {
 
-        this.mserver = server;
         this.oname = name;
         this.domain = name.getDomain().intern();
 
