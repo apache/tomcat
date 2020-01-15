@@ -67,7 +67,7 @@ public class TestInputBuffer extends TomcatBaseTest {
         Tomcat.addServlet(root, "Bug60400Servlet", new Bug60400Servlet());
         root.addServletMappingDecoded("/", "Bug60400Servlet");
 
-        Assert.assertTrue(tomcat.getConnector().setProperty("appReadBufSize", "9000"));
+        Assert.assertTrue(tomcat.getConnector().setProperty("socket.appReadBufSize", "9000"));
         tomcat.start();
 
         ByteChunk bc = new ByteChunk();
