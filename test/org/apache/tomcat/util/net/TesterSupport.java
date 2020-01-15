@@ -48,6 +48,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.junit.Assert;
+
 import org.apache.catalina.Context;
 import org.apache.catalina.authenticator.SSLAuthenticator;
 import org.apache.catalina.connector.Connector;
@@ -143,7 +145,7 @@ public final class TesterSupport {
                 server.addLifecycleListener(listener);
                 tomcat.getConnector().setAttribute("sslImplementationName", sslImplementation);
             }
-            connector.setProperty("sslProtocol", "tls");
+            Assert.assertTrue(connector.setProperty("sslProtocol", "tls"));
             File keystoreFile =
                 new File(keystore);
             connector.setAttribute("keystoreFile",
@@ -172,7 +174,7 @@ public final class TesterSupport {
                     keystoreFile.getAbsolutePath());
         }
         tomcat.getConnector().setSecure(true);
-        tomcat.getConnector().setProperty("SSLEnabled", "true");
+        Assert.assertTrue(tomcat.getConnector().setProperty("SSLEnabled", "true"));
     }
 
     protected static KeyManager[] getUser1KeyManagers() throws Exception {
@@ -268,9 +270,9 @@ public final class TesterSupport {
          * Ensure these tests pass with all JREs from Java 7 onwards.
          */
         if (JreCompat.isJre8Available()) {
-            tomcat.getConnector().setProperty("sslEnabledProtocols", Constants.SSL_PROTO_TLSv1_2);
+            Assert.assertTrue(tomcat.getConnector().setProperty("sslEnabledProtocols", Constants.SSL_PROTO_TLSv1_2));
         } else {
-            tomcat.getConnector().setProperty("sslEnabledProtocols", Constants.SSL_PROTO_TLSv1);
+            Assert.assertTrue(tomcat.getConnector().setProperty("sslEnabledProtocols", Constants.SSL_PROTO_TLSv1));
         }
 
         // Need a web application with a protected and unprotected URL

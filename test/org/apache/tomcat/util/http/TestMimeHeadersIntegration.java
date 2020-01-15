@@ -122,7 +122,7 @@ public class TestMimeHeadersIntegration extends TomcatBaseTest {
         // Bumping into maxHttpHeaderSize
         Tomcat tomcat = getTomcatInstance();
         setupHeadersTest(tomcat);
-        tomcat.getConnector().setProperty("maxHeaderCount", "-1");
+        Assert.assertTrue(tomcat.getConnector().setProperty("maxHeaderCount", "-1"));
         runHeadersTest(false, tomcat, 8 * 1024, -1);
     }
 
@@ -147,7 +147,7 @@ public class TestMimeHeadersIntegration extends TomcatBaseTest {
         // Can change maxHeaderCount
         Tomcat tomcat = getTomcatInstance();
         setupHeadersTest(tomcat);
-        tomcat.getConnector().setProperty("maxHeaderCount", "-1");
+        Assert.assertTrue(tomcat.getConnector().setProperty("maxHeaderCount", "-1"));
         runHeadersTest(true, tomcat, 300, -1);
     }
 

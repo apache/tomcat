@@ -100,7 +100,7 @@ public class TestChunkedInputFilter extends TomcatBaseTest {
         Context ctx = tomcat.addContext("", null);
 
         // Configure allowed trailer headers
-        tomcat.getConnector().setProperty("allowedTrailerHeaders", "X-Trailer1,X-Trailer2");
+        Assert.assertTrue(tomcat.getConnector().setProperty("allowedTrailerHeaders", "x-trailer1,x-trailer2"));
 
         EchoHeaderServlet servlet = new EchoHeaderServlet(expectPass);
         Tomcat.addServlet(ctx, "servlet", servlet);
@@ -169,7 +169,7 @@ public class TestChunkedInputFilter extends TomcatBaseTest {
         ctx.addServletMappingDecoded("/", "servlet");
 
         // Limit the size of the trailing header
-        tomcat.getConnector().setProperty("maxTrailerSize", "10");
+        Assert.assertTrue(tomcat.getConnector().setProperty("maxTrailerSize", "10"));
         tomcat.start();
 
         String[] request = new String[]{
@@ -222,8 +222,8 @@ public class TestChunkedInputFilter extends TomcatBaseTest {
         // Setup Tomcat instance
         Tomcat tomcat = getTomcatInstance();
 
-        tomcat.getConnector().setProperty(
-                "maxExtensionSize", Integer.toString(EXT_SIZE_LIMIT));
+        Assert.assertTrue(tomcat.getConnector().setProperty(
+                "maxExtensionSize", Integer.toString(EXT_SIZE_LIMIT)));
 
         // No file system docBase required
         Context ctx = tomcat.addContext("", null);
