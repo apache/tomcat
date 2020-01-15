@@ -54,7 +54,6 @@ public class TestCompressionConfig {
     @Parameter(2)
     public Boolean compress;
 
-    @SuppressWarnings("deprecation")
     @Test
     public void testUseCompression() throws Exception {
 
