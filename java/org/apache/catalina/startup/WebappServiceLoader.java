@@ -96,8 +96,6 @@ public class WebappServiceLoader<T> {
         LinkedHashSet<String> applicationServicesFound = new LinkedHashSet<>();
         LinkedHashSet<String> containerServicesFound = new LinkedHashSet<>();
 
-        ClassLoader loader = servletContext.getClassLoader();
-
         // if the ServletContext has ORDERED_LIBS, then use that to specify the
         // set of JARs from WEB-INF/lib that should be used for loading services
         @SuppressWarnings("unchecked")
@@ -141,7 +139,7 @@ public class WebappServiceLoader<T> {
         }
 
         // and use the parent ClassLoader for all other SCIs
-        loader = context.getParentClassLoader();
+        ClassLoader loader = context.getParentClassLoader();
 
         Enumeration<URL> resources;
         if (loader == null) {
