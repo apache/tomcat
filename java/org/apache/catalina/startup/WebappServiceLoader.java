@@ -114,7 +114,9 @@ public class WebappServiceLoader<T> {
             // Ordered libs so only use services defined in those libs and any
             // in WEB-INF/classes
             URL unpacked = servletContext.getResource(CLASSES + configFile);
-            parseConfigFile(applicationServicesFound, unpacked);
+            if (unpacked != null) {
+                parseConfigFile(applicationServicesFound, unpacked);
+            }
 
             for (String lib : orderedLibs) {
                 URL jarUrl = servletContext.getResource(LIB + lib);
