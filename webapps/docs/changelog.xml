@@ -313,6 +313,16 @@
       </add>
     </changelog>
   </subsection>
+  <subsection name="jdbc-pool">
+    <changelog>
+      <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
+      <fix>
+        <bug>64083</bug>: If the underlying connection has been closed, don't
+        add it to the pool when it is returned. Pull request <pr>235</pr> by
+        Alex Panchenko. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <update>
