@@ -34,6 +34,7 @@ import java.util.regex.Pattern;
 import jakarta.servlet.ServletContext;
 
 import org.apache.catalina.Context;
+import org.apache.catalina.WebResource;
 import org.apache.tomcat.util.scan.JarFactory;
 
 /**
@@ -58,6 +59,7 @@ import org.apache.tomcat.util.scan.JarFactory;
  * @see java.util.ServiceLoader
  */
 public class WebappServiceLoader<T> {
+    private static final String CLASSES = "/WEB-INF/classes/";
     private static final String LIB = "/WEB-INF/lib/";
     private static final String SERVICES = "META-INF/services/";
 
@@ -99,10 +101,23 @@ public class WebappServiceLoader<T> {
         // if the ServletContext has ORDERED_LIBS, then use that to specify the
         // set of JARs from WEB-INF/lib that should be used for loading services
         @SuppressWarnings("unchecked")
-        List<String> orderedLibs =
-                (List<String>) servletContext.getAttribute(ServletContext.ORDERED_LIBS);
-        if (orderedLibs != null) {
-            // handle ordered libs directly, ...
+        List<String> orderedLibs = (List<String>) servletContext.getAttribute(ServletContext.ORDERED_LIBS);
+
+        // Handle application SCIs directly...
+        if (orderedLibs == null) {
+            // No ordered libs, so use every service definition we can find
+            WebResource[] resources = context.getResources().getClassLoaderResources("/" + configFile);
+            for (WebResource resource : resources) {
+                if (resource.isFile()) {
+                    parseConfigFile(applicationServicesFound, resource.getURL());
+                }
+            }
+        } else {
+            // Ordered libs so only use services defined in those libs and any
+            // in WEB-INF/classes
+            URL unpacked = servletContext.getResource(CLASSES + configFile);
+            parseConfigFile(applicationServicesFound, unpacked);
+
             for (String lib : orderedLibs) {
                 URL jarUrl = servletContext.getResource(LIB + lib);
                 if (jarUrl == null) {
@@ -123,10 +138,10 @@ public class WebappServiceLoader<T> {
                     // no provider file found, this is OK
                 }
             }
-
-            // and the parent ClassLoader for all others
-            loader = context.getParentClassLoader();
         }
+
+        // and use the parent ClassLoader for all other SCIs
+        loader = context.getParentClassLoader();
 
         Enumeration<URL> resources;
         if (loader == null) {
