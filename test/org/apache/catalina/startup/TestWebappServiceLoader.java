@@ -32,6 +32,9 @@ import org.junit.Before;
 import org.junit.Test;
 
 import org.apache.catalina.Context;
+import org.apache.catalina.LifecycleException;
+import org.apache.catalina.WebResourceRoot;
+import org.apache.catalina.webresources.StandardRoot;
 import org.apache.tomcat.unittest.TesterContext;
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
@@ -101,6 +104,8 @@ public class TestWebappServiceLoader {
         List<String> jars = Arrays.asList("jar1.jar", "dir/");
         EasyMock.expect(servletContext.getAttribute(ServletContext.ORDERED_LIBS))
                 .andReturn(jars);
+        EasyMock.expect(servletContext.getResource("/WEB-INF/classes/" + CONFIG_FILE))
+                .andReturn(null);
         EasyMock.expect(servletContext.getResource("/WEB-INF/lib/jar1.jar"))
                 .andReturn(url1);
         loader.parseConfigFile(EasyMock.isA(LinkedHashSet.class), EasyMock.eq(sci1));
@@ -181,10 +186,19 @@ public class TestWebappServiceLoader {
     private static class ExtendedTesterContext extends TesterContext {
         private final ServletContext servletContext;
         private final ClassLoader parent;
+        private final WebResourceRoot resources;
 
         public ExtendedTesterContext(ServletContext servletContext, ClassLoader parent) {
             this.servletContext = servletContext;
             this.parent = parent;
+            // Empty resources - any non-null returns will be mocked on the
+            // ServletContext
+            this.resources = new StandardRoot(this);
+            try {
+                this.resources.start();
+            } catch (LifecycleException e) {
+                throw new IllegalStateException(e);
+            }
         }
 
         @Override
@@ -202,5 +216,9 @@ public class TestWebappServiceLoader {
             return parent;
         }
 
+        @Override
+        public WebResourceRoot getResources() {
+            return resources;
+        }
     }
 }
