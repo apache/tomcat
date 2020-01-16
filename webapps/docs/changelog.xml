@@ -61,6 +61,10 @@
         Avoid useless environment restore when not using GSSCredential
         in JNDIRealm. (remm)
       </fix>
+      <fix>
+        <bug>58577</bug>: Respect the argument-count when searching for MBean
+        operations to invoke via the JMXProxyServlet. (schultz)
+      </fix>
       <add>
         <bug>62755</bug>: Add ability to opt out of adding the default web.xml
         config when embedding Tomcat and adding a context via
@@ -68,6 +72,11 @@
         <code>setAddDefaultWebXmlToWebapp(false)</code> to prevent the automatic
         config. (isapir/markt)
       </add>
+      <update>
+        <bug>63691</bug>: Skip all jar and directory scanning when the wildcard
+        pattern &quot;*&quot; or &quot;*.jar&quot; is set or added to
+        <code>tomcat.util.scan.StandardJarScanFilter.jarsToSkip</code>. (isapir)
+      </update>
       <fix>
         <bug>64005</bug>: Correct a regression in the static resource caching
         changes introduced in 8.5.28. Avoid a <code>NullPointerException</code>
@@ -102,19 +111,14 @@
         <bug>64023</bug>: Skip null-valued session attributes when deserializing
         sessions. (schultz)
       </fix>
-      <update>
-        <bug>63691</bug>: Skip all jar and directory scanning when the wildcard
-        pattern &quot;*&quot; or &quot;*.jar&quot; is set or added to
-        <code>tomcat.util.scan.StandardJarScanFilter.jarsToSkip</code>. (isapir)
-      </update>
       <fix>
         Do not throw a NullPointerException when an MBean or operation cannot
         be found by the JMXProxyServlet. (schultz)
       </fix>
-      <fix>
-        <bug>58577</bug>: Respect the argument-count when searching for MBean
-        operations to invoke via the JMXProxyServlet. (schultz)
-      </fix>
+      <update>
+        <bug>64067</bug>: Allow more than one parameter when defining RewriteMaps.
+        (fschumacher)
+      </update>
       <fix>
         <bug>64074</bug>: <code>InputStream</code>s for directories obtained
         from resource URLs now return a directory listing consistent with the
