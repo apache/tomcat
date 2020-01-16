@@ -74,6 +74,14 @@
       </update>
     </changelog>
   </subsection>
+  <subsection name="Other">
+    <changelog>
+      <fix>
+        <bug>53620</bug>: JULI now only creates logging files when there is a
+        log entry to write. Based on a patch by Karol Bucek. (markt)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 </body>
 </document>

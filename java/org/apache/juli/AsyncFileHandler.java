@@ -80,7 +80,6 @@ public class AsyncFileHandler extends FileHandler {
 
     public AsyncFileHandler(String directory, String prefix, String suffix, Integer maxDays) {
         super(directory, prefix, suffix, maxDays);
-        open();
     }
 
     @Override
@@ -93,7 +92,7 @@ public class AsyncFileHandler extends FileHandler {
     }
 
     @Override
-    protected void open() {
+    public void open() {
         if (!closed) {
             return;
         }
