@@ -163,7 +163,7 @@ public class WebappServiceLoader<T> {
             throws IOException {
         try (InputStream is = url.openStream();
             InputStreamReader in = new InputStreamReader(is, StandardCharsets.UTF_8);
-            BufferedReader reader = new BufferedReader(in);) {
+            BufferedReader reader = new BufferedReader(in)) {
             String line;
             while ((line = reader.readLine()) != null) {
                 int i = line.indexOf('#');
