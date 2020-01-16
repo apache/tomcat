@@ -95,14 +95,15 @@ import java.util.regex.Pattern;
  * </ul>
  */
 public class FileHandler extends Handler {
+
     public static final int DEFAULT_MAX_DAYS = -1;
 
     private static final ExecutorService DELETE_FILES_SERVICE =
             Executors.newSingleThreadExecutor(new ThreadFactory() {
+                private static final String NAME_PREFIX = "FileHandlerLogFilesCleaner-";
                 private final boolean isSecurityEnabled;
                 private final ThreadGroup group;
                 private final AtomicInteger threadNumber = new AtomicInteger(1);
-                private final String namePrefix = "FileHandlerLogFilesCleaner-";
 
                 {
                     SecurityManager s = System.getSecurityManager();
@@ -135,7 +136,7 @@ public class FileHandler extends Handler {
                                     .setContextClassLoader(getClass().getClassLoader());
                         }
                         Thread t = new Thread(group, r,
-                                namePrefix + threadNumber.getAndIncrement());
+                                NAME_PREFIX + threadNumber.getAndIncrement());
                         t.setDaemon(true);
                         return t;
                     } finally {
@@ -370,8 +371,7 @@ public class FileHandler extends Handler {
     private void configure() {
 
         Timestamp ts = new Timestamp(System.currentTimeMillis());
-        String tsString = ts.toString().substring(0, 19);
-        date = tsString.substring(0, 10);
+        date = ts.toString().substring(0, 10);
 
         String className = this.getClass().getName(); //allow classes to override
 
@@ -415,6 +415,7 @@ public class FileHandler extends Handler {
         } catch (NumberFormatException ignore) {
             //no op
         }
+
         // Get encoding for the logging file
         String encoding = getProperty(className + ".encoding", null);
         if (encoding != null && encoding.length() > 0) {
