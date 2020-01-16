@@ -19,6 +19,7 @@ package org.apache.tomcat.jdbc.test;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.DriverPropertyInfo;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.SQLFeatureNotSupportedException;
 import java.sql.Savepoint;
@@ -139,6 +140,29 @@ public class TestValidation extends DefaultTestCase {
         datasource.getPoolProperties().setValidationQuery("SELECT 1");
         PooledConnection cxn = getPooledConnection();
         Assert.assertFalse("No transaction must be running after connection is obtained", getMock(cxn).isRunningTransaction());
+    }
+
+    @Test
+    public void returnClosedConnection() throws SQLException {
+        datasource.setDriverClassName("org.h2.Driver");
+        datasource.setUrl("jdbc:h2:~/.h2/test;QUERY_TIMEOUT=0;DB_CLOSE_ON_EXIT=FALSE");
+        Assert.assertFalse(datasource.getPoolProperties().isTestOnBorrow());
+        Assert.assertFalse(datasource.getPoolProperties().isTestOnReturn());
+        Assert.assertFalse(datasource.getPoolProperties().isTestWhileIdle());
+        try (Connection connection = datasource.getConnection()) {
+            // this gets the real connection and closes it to simulate close by driver because of I/O error
+            final Connection realConnection = connection.getMetaData().getConnection();
+            Assert.assertNotSame(connection, realConnection);
+            realConnection.close();
+        }
+        try (Connection connection = datasource.getConnection()) {
+            try (Statement statement = connection.createStatement()) {
+                try (ResultSet resultSet = statement.executeQuery("select 1")) {
+                    Assert.assertTrue(resultSet.next());
+                    Assert.assertEquals(1, resultSet.getInt(1));
+                }
+            }
+        }
     }
 
     @Test

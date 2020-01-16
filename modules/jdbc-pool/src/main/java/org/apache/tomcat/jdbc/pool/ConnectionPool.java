@@ -911,6 +911,12 @@ public class ConnectionPool {
     protected boolean shouldClose(PooledConnection con, int action) {
         if (con.getConnectionVersion() < getPoolVersion()) return true;
         if (con.isDiscarded()) return true;
+        try {
+            if (con.isClosed()) return true;
+        } catch (SQLException e) {
+            log.warn("Unable to check if connection is closed", e);
+            return true;
+        }
         if (isClosed()) return true;
         if (!con.validate(action)) return true;
         if (!terminateTransaction(con)) return true;
