@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.juli;
 
 import java.io.File;
@@ -328,7 +327,6 @@ public class ClassLoaderLogManager extends LogManager {
         return result;
     }
 
-
     @Override
     public void readConfiguration()
         throws IOException, SecurityException {
@@ -411,6 +409,7 @@ public class ClassLoaderLogManager extends LogManager {
      *
      * @param classLoader The classloader for which we will retrieve or build the
      *                    configuration
+     * @return the log configuration
      */
     protected synchronized ClassLoaderLogInfo getClassLoaderInfo(ClassLoader classLoader) {
 
@@ -440,8 +439,8 @@ public class ClassLoaderLogManager extends LogManager {
     /**
      * Read configuration for the specified classloader.
      *
-     * @param classLoader
-     * @throws IOException Error
+     * @param classLoader The classloader
+     * @throws IOException Error reading configuration
      */
     protected synchronized void readConfiguration(ClassLoader classLoader)
         throws IOException {
@@ -591,8 +590,8 @@ public class ClassLoaderLogManager extends LogManager {
                 }
                 try {
                     this.prefix.set(prefix);
-                    Handler handler =
-                        (Handler) classLoader.loadClass(handlerClassName).newInstance();
+                    Handler handler = (Handler) classLoader.loadClass(
+                            handlerClassName).getConstructor().newInstance();
                     // The specification strongly implies all configuration should be done
                     // during the creation of the handler object.
                     // This includes setting level, filter, formatter and encoding.
@@ -616,8 +615,8 @@ public class ClassLoaderLogManager extends LogManager {
     /**
      * Set parent child relationship between the two specified loggers.
      *
-     * @param logger
-     * @param parent
+     * @param logger The logger
+     * @param parent The parent logger
      */
     protected static void doSetParentLogger(final Logger logger,
             final Logger parent) {

@@ -94,20 +94,25 @@ import java.util.regex.Pattern;
  * </ul>
  */
 public class FileHandler extends Handler {
+
     public static final int DEFAULT_MAX_DAYS = -1;
 
     private static final ExecutorService DELETE_FILES_SERVICE =
             Executors.newSingleThreadExecutor(new ThreadFactory() {
+                private static final String NAME_PREFIX = "FileHandlerLogFilesCleaner-";
                 private final boolean isSecurityEnabled;
                 private final ThreadGroup group;
                 private final AtomicInteger threadNumber = new AtomicInteger(1);
-                private final String namePrefix = "FileHandlerLogFilesCleaner-";
 
                 {
                     SecurityManager s = System.getSecurityManager();
-                    this.isSecurityEnabled = s != null;
-                    this.group = isSecurityEnabled ? s.getThreadGroup()
-                            : Thread.currentThread().getThreadGroup();
+                    if (s == null) {
+                        this.isSecurityEnabled = false;
+                        this.group = Thread.currentThread().getThreadGroup();
+                    } else {
+                        this.isSecurityEnabled = true;
+                        this.group = s.getThreadGroup();
+                    }
                 }
 
                 @Override
@@ -130,7 +135,7 @@ public class FileHandler extends Handler {
                                     .setContextClassLoader(getClass().getClassLoader());
                         }
                         Thread t = new Thread(group, r,
-                                namePrefix + threadNumber.getAndIncrement());
+                                NAME_PREFIX + threadNumber.getAndIncrement());
                         t.setDaemon(true);
                         return t;
                     } finally {
@@ -365,8 +370,7 @@ public class FileHandler extends Handler {
     private void configure() {
 
         Timestamp ts = new Timestamp(System.currentTimeMillis());
-        String tsString = ts.toString().substring(0, 19);
-        date = tsString.substring(0, 10);
+        date = ts.toString().substring(0, 10);
 
         String className = this.getClass().getName(); //allow classes to override
 
@@ -410,6 +414,7 @@ public class FileHandler extends Handler {
         } catch (NumberFormatException ignore) {
             //no op
         }
+
         // Get encoding for the logging file
         String encoding = getProperty(className + ".encoding", null);
         if (encoding != null && encoding.length() > 0) {
@@ -427,7 +432,7 @@ public class FileHandler extends Handler {
         String filterName = getProperty(className + ".filter", null);
         if (filterName != null) {
             try {
-                setFilter((Filter) cl.loadClass(filterName).newInstance());
+                setFilter((Filter) cl.loadClass(filterName).getConstructor().newInstance());
             } catch (Exception e) {
                 // Ignore
             }
@@ -437,7 +442,8 @@ public class FileHandler extends Handler {
         String formatterName = getProperty(className + ".formatter", null);
         if (formatterName != null) {
             try {
-                setFormatter((Formatter) cl.loadClass(formatterName).newInstance());
+                setFormatter((Formatter) cl.loadClass(
+                        formatterName).getConstructor().newInstance());
             } catch (Exception e) {
                 // Ignore and fallback to defaults
                 setFormatter(new SimpleFormatter());

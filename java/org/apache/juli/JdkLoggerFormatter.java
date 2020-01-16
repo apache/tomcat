@@ -14,13 +14,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.juli;
 
 import java.util.logging.Formatter;
 import java.util.logging.LogRecord;
-
-
 
 /**
  * A more compact formatter.
@@ -109,5 +106,4 @@ public class JdkLoggerFormatter extends Formatter {
         // Print to the appropriate destination
         return buf.toString();
     }
-
 }
