@@ -88,6 +88,17 @@
         (michaelo)
       </fix>
       <fix>
+        <bug>64021</bug>: Ensure that container provided SCIs are always loaded
+        before application provided SCIs. Note that where both the container and
+        the application provide the same SCI, it is the application provided SCI
+        that will be used. (markt)
+      </fix>
+      <fix>
+        SCI definitions from JARs unpacked into <code>WEB-INF/classes</code> are
+        now handled consistently and will always be found irrespective of
+        whether the web application defines a JAR ordering or not. (markt)
+      </fix>
+      <fix>
         <bug>64023</bug>: Skip null-valued session attributes when deserializing
         sessions. (schultz)
       </fix>

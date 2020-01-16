@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.net.URLClassLoader;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -58,6 +59,7 @@ import org.apache.tomcat.util.buf.UriUtil;
  * @see java.util.ServiceLoader
  */
 public class WebappServiceLoader<T> {
+    private static final String CLASSES = "/WEB-INF/classes/";
     private static final String LIB = "/WEB-INF/lib/";
     private static final String SERVICES = "META-INF/services/";
     private static final Charset UTF8 = Charset.forName("UTF-8");
@@ -100,10 +102,26 @@ public class WebappServiceLoader<T> {
         // if the ServletContext has ORDERED_LIBS, then use that to specify the
         // set of JARs from WEB-INF/lib that should be used for loading services
         @SuppressWarnings("unchecked")
-        List<String> orderedLibs =
-                (List<String>) servletContext.getAttribute(ServletContext.ORDERED_LIBS);
-        if (orderedLibs != null) {
-            // handle ordered libs directly, ...
+        List<String> orderedLibs = (List<String>) servletContext.getAttribute(ServletContext.ORDERED_LIBS);
+
+        // Handle application SCIs directly...
+        if (orderedLibs == null) {
+            // No ordered libs, so use every service definition we can find
+            if (loader instanceof URLClassLoader) {
+                Enumeration<URL> resources = ((URLClassLoader) loader).findResources("/" + configFile);
+                while (resources.hasMoreElements()) {
+                    URL resource = resources.nextElement();
+                    parseConfigFile(applicationServicesFound, resource);
+                }
+            }
+        } else {
+            // Ordered libs so only use services defined in those libs and any
+            // in WEB-INF/classes
+            URL unpacked = servletContext.getResource(CLASSES + configFile);
+            if (unpacked != null) {
+                parseConfigFile(applicationServicesFound, unpacked);
+            }
+
             for (String lib : orderedLibs) {
                 URL jarUrl = servletContext.getResource(LIB + lib);
                 if (jarUrl == null) {
@@ -124,10 +142,10 @@ public class WebappServiceLoader<T> {
                     // no provider file found, this is OK
                 }
             }
-
-            // and the parent ClassLoader for all others
-            loader = context.getParentClassLoader();
         }
+
+        // and use the parent ClassLoader for all other SCIs
+        loader = context.getParentClassLoader();
 
         Enumeration<URL> resources;
         if (loader == null) {
