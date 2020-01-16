@@ -56,6 +56,15 @@
         in JNDIRealm. (remm)
       </fix>
       <fix>
+        <bug>58577</bug>: Respect the argument-count when searching for MBean
+        operations to invoke via the JMXProxyServlet. (schultz)
+      </fix>
+      <update>
+        <bug>63691</bug>: Skip all jar and directory scanning when the wildcard
+        pattern &quot;*&quot; or &quot;*.jar&quot; is set or added to
+        <code>tomcat.util.scan.StandardJarScanFilter.jarsToSkip</code>. (isapir)
+      </update>
+      <fix>
         <bug>64005</bug>: Correct a regression in the static resource caching
         changes introduced in 9.0.28. Avoid a <code>NullPointerException</code>
         when working with the URL provided for the root of a packed WAR. (markt)
@@ -94,18 +103,9 @@
         <bug>64023</bug>: Skip null-valued session attributes when deserializing
         sessions. (schultz)
       </fix>
-      <update>
-        <bug>63691</bug>: Skip all jar and directory scanning when the wildcard
-        pattern &quot;*&quot; or &quot;*.jar&quot; is set or added to
-        <code>tomcat.util.scan.StandardJarScanFilter.jarsToSkip</code>. (isapir)
-      </update>
       <fix>
         Do not throw a NullPointerException when an MBean or operation cannot
         be found by the JMXProxyServlet. (schultz)
-      </fix>
-      <fix>
-        <bug>58577</bug>: Respect the argument-count when searching for MBean
-        operations to invoke via the JMXProxyServlet. (schultz)
       </fix>
       <update>
         <bug>64067</bug>: Allow more than one parameter when defining RewriteMaps.
