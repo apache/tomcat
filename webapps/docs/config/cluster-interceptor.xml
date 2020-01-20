@@ -205,7 +205,7 @@
    <p>
      If using the <code>TcpFailureDetector</code>, the <code>EncryptInterceptor</code>
      <i>must</i> be inserted into the interceptor chain <i>before</i> the
-     <code>TcpFailureDetector</code>. This is becuase when validating cluster
+     <code>TcpFailureDetector</code>. This is because when validating cluster
      members, <code>TcpFailureDetector</code> writes channel data directly
      to the other members without using the remainder of the interceptor chain,
      but on the receiving side, the message still goes through the chain (in reverse).
