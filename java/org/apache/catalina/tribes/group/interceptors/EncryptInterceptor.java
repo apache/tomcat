@@ -349,9 +349,6 @@ public class EncryptInterceptor extends ChannelInterceptorBase implements Encryp
             return new BaseEncryptionManager(algorithm,
                     new SecretKeySpec(encryptionKey, algorithmName),
                     providerName);
-//        else if("ECB".equalsIgnoreCase(algorithmMode)) {
-            // Note: ECB is not an appropriate mode for secure communications.
-//            return new ECBEncryptionManager(algorithm, new SecretKeySpec(encryptionKey, algorithmName), providerName);
         else
             throw new IllegalArgumentException(sm.getString("encryptInterceptor.algorithm.unsupported-mode", algorithmMode));
     }
@@ -598,32 +595,6 @@ public class EncryptInterceptor extends ChannelInterceptorBase implements Encryp
         protected AlgorithmParameterSpec generateIV(byte[] bytes, int offset, int length) {
             // See class javadoc for explanation of this magic number (128)
             return new GCMParameterSpec(128, bytes, offset, length);
-        }
-    }
-
-    @SuppressWarnings("unused")
-    private static class ECBEncryptionManager extends BaseEncryptionManager
-    {
-        public ECBEncryptionManager(String algorithm, SecretKeySpec secretKey, String providerName)
-                throws NoSuchAlgorithmException, NoSuchPaddingException, NoSuchProviderException {
-            super(algorithm, secretKey, providerName);
-        }
-
-        private static final byte[] EMPTY_IV = new byte[0];
-
-        @Override
-        protected int getIVSize() {
-            return 0;
-        }
-
-        @Override
-        protected byte[] generateIVBytes() {
-            return EMPTY_IV;
-        }
-
-        @Override
-        protected AlgorithmParameterSpec generateIV(byte[] bytes, int offset, int length) {
-            return null;
         }
     }
 
