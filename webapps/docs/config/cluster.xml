@@ -52,6 +52,7 @@ to run a cluster on a insecure, untrusted network.</p>
 <p>There are many options for providing a secure, trusted network for use by a
 Tomcat cluster. These include:</p>
 <ul>
+  <li><a href="cluster-interceptor.html#org.apache.catalina.tribes.group.interceptors.EncryptInterceptor_Attributes">EncryptInterceptor</a></li>
   <li>private LAN</li>
   <li>a Virtual Private Network (VPN)</li>
   <li>IPSEC</li>
