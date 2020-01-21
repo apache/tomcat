@@ -76,6 +76,10 @@
         When using an AJP Connector, convert Java Servlet specific request
         attributes to the Jakarta Servlet equivalent. (markt)
       </add>
+      <add>
+        When reporting / logging invalid HTTP headers encode any non-printing
+        characters using the 0xNN form. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Other">
