@@ -358,75 +358,59 @@ public final class InstanceEvent extends EventObject {
 
 
     /**
-     * Return the exception that occurred during the processing
+     * @return the exception that occurred during the processing
      * that was reported by this event.
      */
     public Throwable getException() {
-
-        return (this.exception);
-
+        return this.exception;
     }
 
 
     /**
-     * Return the filter instance for which this event occurred.
+     * @return the filter instance for which this event occurred.
      */
     public Filter getFilter() {
-
-        return (this.filter);
-
+        return this.filter;
     }
 
 
     /**
-     * Return the servlet request for which this event occurred.
+     * @return the servlet request for which this event occurred.
      */
     public ServletRequest getRequest() {
-
-        return (this.request);
-
+        return this.request;
     }
 
 
     /**
-     * Return the servlet response for which this event occurred.
+     * @return the servlet response for which this event occurred.
      */
     public ServletResponse getResponse() {
-
-        return (this.response);
-
+        return this.response;
     }
 
 
     /**
-     * Return the servlet instance for which this event occurred.
+     * @return the servlet instance for which this event occurred.
      */
     public Servlet getServlet() {
-
-        return (this.servlet);
-
+        return this.servlet;
     }
 
 
     /**
-     * Return the event type of this event.
+     * @return the event type of this event.
      */
     public String getType() {
-
-        return (this.type);
-
+        return this.type;
     }
 
 
     /**
-     * Return the Wrapper managing the servlet instance for which this
+     * @return the Wrapper managing the servlet instance for which this
      * event occurred.
      */
     public Wrapper getWrapper() {
-
         return (Wrapper) getSource();
-
     }
-
-
 }

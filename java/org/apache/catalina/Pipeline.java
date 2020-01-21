@@ -123,7 +123,7 @@ public interface Pipeline {
 
 
     /**
-     * Return the Container with which this Pipeline is associated.
+     * @return the Container with which this Pipeline is associated.
      */
     public Container getContainer();
 

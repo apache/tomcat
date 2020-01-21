@@ -39,6 +39,8 @@ import org.apache.catalina.Server;
 import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.security.SecurityConfig;
 import org.apache.juli.ClassLoaderLogManager;
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.digester.Digester;
 import org.apache.tomcat.util.digester.Rule;
@@ -159,6 +161,7 @@ public class Catalina {
     // ------------------------------------------------------------- Properties
 
     /**
+     * @param file The configuration file
      * @deprecated  Use {@link #setConfigFile(String)}
      */
     @Deprecated
@@ -198,7 +201,7 @@ public class Catalina {
 
     public ClassLoader getParentClassLoader() {
         if (parentClassLoader != null) {
-            return (parentClassLoader);
+            return parentClassLoader;
         }
         return ClassLoader.getSystemClassLoader();
     }
@@ -214,10 +217,10 @@ public class Catalina {
 
 
     /**
-     * Return true if naming is enabled.
+     * @return <code>true</code> if naming is enabled.
      */
     public boolean isUseNaming() {
-        return (this.useNaming);
+        return this.useNaming;
     }
 
 
@@ -242,11 +245,10 @@ public class Catalina {
 
 
     /**
-     * Process the specified command line arguments, and return
-     * <code>true</code> if we should continue processing; otherwise
-     * return <code>false</code>.
+     * Process the specified command line arguments.
      *
      * @param args Command line arguments to process
+     * @return <code>true</code> if we should continue processing
      */
     protected boolean arguments(String args[]) {
 
@@ -254,7 +256,7 @@ public class Catalina {
 
         if (args.length < 1) {
             usage();
-            return (false);
+            return false;
         }
 
         for (int i = 0; i < args.length; i++) {
@@ -264,10 +266,10 @@ public class Catalina {
             } else if (args[i].equals("-config")) {
                 isConfig = true;
             } else if (args[i].equals("-nonaming")) {
-                setUseNaming( false );
+                setUseNaming(false);
             } else if (args[i].equals("-help")) {
                 usage();
-                return (false);
+                return false;
             } else if (args[i].equals("start")) {
                 starting = true;
                 stopping = false;
@@ -279,17 +281,17 @@ public class Catalina {
                 stopping = true;
             } else {
                 usage();
-                return (false);
+                return false;
             }
         }
 
-        return (true);
-
+        return true;
     }
 
 
     /**
      * Return a File object representing our configuration file.
+     * @return the main configuration file
      */
     protected File configFile() {
 
@@ -297,13 +299,14 @@ public class Catalina {
         if (!file.isAbsolute()) {
             file = new File(System.getProperty(Globals.CATALINA_BASE_PROP), configFile);
         }
-        return (file);
+        return file;
 
     }
 
 
     /**
      * Create and configure the Digester we will be using for startup.
+     * @return the main digester to parse server.xml
      */
     protected Digester createStartDigester() {
         long t1=System.currentTimeMillis();
@@ -407,7 +410,7 @@ public class Catalina {
         if (log.isDebugEnabled()) {
             log.debug("Digester for server.xml created " + ( t2-t1 ));
         }
-        return (digester);
+        return digester;
 
     }
 
@@ -435,6 +438,7 @@ public class Catalina {
 
     /**
      * Create and configure the Digester we will be using for shutdown.
+     * @return the digester to process the stop operation
      */
     protected Digester createStopDigester() {
 
@@ -451,7 +455,7 @@ public class Catalina {
                             "setServer",
                             "org.apache.catalina.Server");
 
-        return (digester);
+        return digester;
 
     }
 
@@ -467,7 +471,7 @@ public class Catalina {
         }
 
         Server s = getServer();
-        if( s == null ) {
+        if (s == null) {
             // Create and execute our Digester
             Digester digester = createStopDigester();
             File file = configFile();
@@ -562,7 +566,6 @@ public class Catalina {
         initDirs();
 
         // Before digester - it may be needed
-
         initNaming();
 
         // Create and execute our Digester
@@ -664,14 +667,12 @@ public class Catalina {
             } else {
                 log.error("Catalina.start", e);
             }
-
         }
 
         long t2 = System.nanoTime();
         if(log.isInfoEnabled()) {
             log.info("Initialization processed in " + ((t2 - t1) / 1000000) + " ms");
         }
-
     }
 
 
@@ -860,11 +861,9 @@ public class Catalina {
         }
 
         String temp = System.getProperty("java.io.tmpdir");
-        if (temp == null || (!(new File(temp)).exists())
-                || (!(new File(temp)).isDirectory())) {
+        if (temp == null || (!(new File(temp)).isDirectory())) {
             log.error(sm.getString("embedded.notmp", temp));
         }
-
     }
 
 
@@ -944,8 +943,7 @@ public class Catalina {
     }
 
 
-    private static final org.apache.juli.logging.Log log=
-        org.apache.juli.logging.LogFactory.getLog( Catalina.class );
+    private static final Log log = LogFactory.getLog(Catalina.class);
 
 }
 

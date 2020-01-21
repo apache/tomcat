@@ -66,7 +66,7 @@ public interface Session {
 
 
     /**
-     * Return the authentication type used to authenticate our cached
+     * @return the authentication type used to authenticate our cached
      * Principal, if any.
      */
     public String getAuthType();
@@ -82,13 +82,13 @@ public interface Session {
 
 
     /**
-     * Return the creation time for this session.
+     * @return the creation time for this session.
      */
     public long getCreationTime();
 
 
     /**
-     * Return the creation time for this session, bypassing the session validity
+     * @return the creation time for this session, bypassing the session validity
      * checks.
      */
     public long getCreationTimeInternal();
@@ -104,13 +104,13 @@ public interface Session {
 
 
     /**
-     * Return the session identifier for this session.
+     * @return the session identifier for this session.
      */
     public String getId();
 
 
     /**
-     * Return the session identifier for this session.
+     * @return the session identifier for this session.
      */
     public String getIdInternal();
 
@@ -136,7 +136,7 @@ public interface Session {
 
 
     /**
-     * Return descriptive information about this Session implementation and
+     * @return descriptive information about this Session implementation and
      * the corresponding version number, in the format
      * <code>&lt;description&gt;/&lt;version&gt;</code>.
      */
@@ -144,7 +144,7 @@ public interface Session {
 
 
     /**
-     * Return the last time the client sent a request associated with this
+     * @return the last time the client sent a request associated with this
      * session, as the number of milliseconds since midnight, January 1, 1970
      * GMT.  Actions that your application takes, such as getting or setting
      * a value associated with the session, do not affect the access time.
@@ -153,13 +153,13 @@ public interface Session {
     public long getThisAccessedTime();
 
     /**
-     * Return the last client access time without invalidation check
+     * @return the last client access time without invalidation check
      * @see #getThisAccessedTime()
      */
     public long getThisAccessedTimeInternal();
 
     /**
-     * Return the last time the client sent a request associated with this
+     * @return the last time the client sent a request associated with this
      * session, as the number of milliseconds since midnight, January 1, 1970
      * GMT.  Actions that your application takes, such as getting or setting
      * a value associated with the session, do not affect the access time.
@@ -168,13 +168,13 @@ public interface Session {
     public long getLastAccessedTime();
 
     /**
-     * Return the last client access time without invalidation check
+     * @return the last client access time without invalidation check
      * @see #getLastAccessedTime()
      */
     public long getLastAccessedTimeInternal();
 
     /**
-     * Return the Manager within which this Session is valid.
+     * @return the Manager within which this Session is valid.
      */
     public Manager getManager();
 
@@ -188,7 +188,7 @@ public interface Session {
 
 
     /**
-     * Return the maximum time interval, in seconds, between client requests
+     * @return the maximum time interval, in seconds, between client requests
      * before the servlet container will invalidate the session.  A negative
      * time indicates that the session should never time out.
      */
@@ -214,7 +214,7 @@ public interface Session {
 
 
     /**
-     * Return the authenticated Principal that is associated with this Session.
+     * @return the authenticated Principal that is associated with this Session.
      * This provides an <code>Authenticator</code> with a means to cache a
      * previously authenticated Principal, and avoid potentially expensive
      * <code>Realm.authenticate()</code> calls on every request.  If there
@@ -235,7 +235,7 @@ public interface Session {
 
 
     /**
-     * Return the <code>HttpSession</code> for which this object
+     * @return the <code>HttpSession</code> for which this object
      * is the facade.
      */
     public HttpSession getSession();
@@ -250,7 +250,7 @@ public interface Session {
 
 
     /**
-     * Return the <code>isValid</code> flag for this session.
+     * @return <code>true</code> if the session is still valid
      */
     public boolean isValid();
 
@@ -268,6 +268,9 @@ public interface Session {
 
     /**
      * Add a session event listener to this component.
+     *
+     * @param listener the SessionListener instance that should be notified
+     *   for session events
      */
     public void addSessionListener(SessionListener listener);
 
@@ -286,7 +289,7 @@ public interface Session {
 
 
     /**
-     * Return the object bound with the specified name to the internal notes
+     * @return the object bound with the specified name to the internal notes
      * for this session, or <code>null</code> if no such binding exists.
      *
      * @param name Name of the note to be returned
@@ -295,7 +298,7 @@ public interface Session {
 
 
     /**
-     * Return an Iterator containing the String names of all notes bindings
+     * @return an Iterator containing the String names of all notes bindings
      * that exist for this session.
      */
     public Iterator<String> getNoteNames();
@@ -319,6 +322,9 @@ public interface Session {
 
     /**
      * Remove a session event listener from this component.
+     *
+     * @param listener remove the session listener, which will no longer be
+     *     notified
      */
     public void removeSessionListener(SessionListener listener);
 
