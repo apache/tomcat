@@ -8987,6 +8987,10 @@
       <add>
         Add support for HTTP/2 including server push. (markt)
       </add>
+      <add>
+        When reporting / logging invalid HTTP headers encode any non-printing
+        characters using the 0xNN form. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Tribes">
