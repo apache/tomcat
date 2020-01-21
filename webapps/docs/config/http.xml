@@ -628,6 +628,7 @@
       the size of the buffer will be increased for the duration of the write. If
       not specified the default value of 8192 will be used.</p>
     </attribute>
+
   </attributes>
 
   </subsection>
@@ -645,7 +646,9 @@
       </attribute>
       <attribute name="socket.txBufSize" required="false">
         <p>(int)The socket send buffer (SO_SNDBUF) size in bytes. JVM default
-        used if not set.</p>
+        used if not set. Care should be taken if explicitly setting this value.
+        Very poor performance has been observed on some JVMs with values less
+        than ~8k.</p>
       </attribute>
       <attribute name="socket.tcpNoDelay" required="false">
         <p>(bool)This is equivalent to standard attribute
@@ -938,7 +941,9 @@
 
       <attribute name="useSendfile" required="false">
         <p>(bool)Use this attribute to enable or disable sendfile capability.
-        The default value is <code>true</code>.</p>
+        The default value is <code>true</code>. Note that the use of sendfile
+        will disable any compression that Tomcat may otherwise have performed on
+        the response.</p>
       </attribute>
 
     </attributes>
@@ -961,15 +966,15 @@
   <subsection name="HTTP/1.1 and HTTP/1.0 Support">
 
   <p>This <strong>Connector</strong> supports all of the required features
-  of the HTTP/1.1 protocol, as described in RFC 2616, including persistent
+  of the HTTP/1.1 protocol, as described in RFCs 7230-7235, including persistent
   connections, pipelining, expectations and chunked encoding.  If the client
-  (typically a browser) supports only HTTP/1.0, the
+  supports only HTTP/1.0 or HTTP/0.9, the
   <strong>Connector</strong> will gracefully fall back to supporting this
   protocol as well.  No special configuration is required to enable this
   support. The <strong>Connector</strong> also supports HTTP/1.0
   keep-alive.</p>
 
-  <p>RFC 2616 requires that HTTP servers always begin their responses with
+  <p>RFC 7230 requires that HTTP servers always begin their responses with
   the highest HTTP version that they claim to support.  Therefore, this
   <strong>Connector</strong> will always return <code>HTTP/1.1</code> at
   the beginning of its responses.</p>
@@ -993,7 +998,6 @@
   <a href="../proxy-howto.html">Proxy Support HOW-TO</a>.</p>
 
   </subsection>
-
 
 
   <subsection name="SSL Support">

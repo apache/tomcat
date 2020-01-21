@@ -29,11 +29,8 @@ import org.apache.tomcat.util.res.StringManager;
 
 public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
 
-    /**
-     * The string manager for this package.
-     */
     protected static final StringManager sm =
-        StringManager.getManager(Constants.Package);
+            StringManager.getManager(AbstractHttp11Protocol.class);
 
 
     @Override
@@ -117,13 +114,26 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
     }
 
 
-    /**
-     * Maximum size of the post which will be saved when processing certain
-     * requests, such as a POST.
-     */
     private int maxSavePostSize = 4 * 1024;
+    /**
+     * Return the maximum size of the post which will be saved during FORM or
+     * CLIENT-CERT authentication.
+     *
+     * @return The size in bytes
+     */
     public int getMaxSavePostSize() { return maxSavePostSize; }
-    public void setMaxSavePostSize(int valueI) { maxSavePostSize = valueI; }
+    /**
+     * Set the maximum size of a POST which will be buffered during FORM or
+     * CLIENT-CERT authentication. When a POST is received where the security
+     * constraints require a client certificate, the POST body needs to be
+     * buffered while an SSL handshake takes place to obtain the certificate. A
+     * similar buffering is required during FDORM auth.
+     *
+     * @param maxSavePostSize The maximum size POST body to buffer in bytes
+     */
+    public void setMaxSavePostSize(int maxSavePostSize) {
+        this.maxSavePostSize = maxSavePostSize;
+    }
 
 
     /**
@@ -134,42 +144,60 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
     public void setMaxHttpHeaderSize(int valueI) { maxHttpHeaderSize = valueI; }
 
 
-    /**
-     * Specifies a different (usually  longer) connection timeout during data
-     * upload.
-     */
     private int connectionUploadTimeout = 300000;
+    /**
+     * Specifies a different (usually longer) connection timeout during data
+     * upload. Default is 5 minutes as in Apache HTTPD server.
+     *
+     * @return The timeout in milliseconds
+     */
     public int getConnectionUploadTimeout() { return connectionUploadTimeout; }
-    public void setConnectionUploadTimeout(int i) {
-        connectionUploadTimeout = i;
+    /**
+     * Set the upload timeout.
+     *
+     * @param timeout Upload timeout in milliseconds
+     */
+    public void setConnectionUploadTimeout(int timeout) {
+        connectionUploadTimeout = timeout;
     }
 
 
-    /**
-     * If true, the connectionUploadTimeout will be ignored and the regular
-     * socket timeout will be used for the full duration of the connection.
-     */
     private boolean disableUploadTimeout = true;
+    /**
+     * Get the flag that controls upload time-outs. If true, the
+     * connectionUploadTimeout will be ignored and the regular socket timeout
+     * will be used for the full duration of the connection.
+     *
+     * @return {@code true} if the separate upload timeout is disabled
+     */
     public boolean getDisableUploadTimeout() { return disableUploadTimeout; }
+    /**
+     * Set the flag to control whether a separate connection timeout is used
+     * during upload of a request body.
+     *
+     * @param isDisabled {@code true} if the separate upload timeout should be
+     *                   disabled
+     */
     public void setDisableUploadTimeout(boolean isDisabled) {
         disableUploadTimeout = isDisabled;
     }
 
 
-    /**
-     * Integrated compression support.
-     */
     private String compression = "off";
-    public String getCompression() { return compression; }
-    public void setCompression(String valueS) { compression = valueS; }
+    public void setCompression(String compression) {
+        this.compression = compression;
+    }
+    public String getCompression() {
+        return compression;
+    }
 
 
     private String noCompressionUserAgents = null;
     public String getNoCompressionUserAgents() {
         return noCompressionUserAgents;
     }
-    public void setNoCompressionUserAgents(String valueS) {
-        noCompressionUserAgents = valueS;
+    public void setNoCompressionUserAgents(String noCompressionUserAgents) {
+        this.noCompressionUserAgents = noCompressionUserAgents;
     }
 
 
@@ -190,16 +218,20 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
     public void setCompressableMimeTypes(String valueS) {
         setCompressibleMimeType(valueS);
     }
-    public String getCompressibleMimeType() { return compressibleMimeTypes; }
     public void setCompressibleMimeType(String valueS) {
         compressibleMimeTypes = valueS;
+    }
+    public String getCompressibleMimeType() {
+        return compressibleMimeTypes;
     }
 
 
     private int compressionMinSize = 2048;
-    public int getCompressionMinSize() { return compressionMinSize; }
-    public void setCompressionMinSize(int valueI) {
-        compressionMinSize = valueI;
+    public int getCompressionMinSize() {
+        return compressionMinSize;
+    }
+    public void setCompressionMinSize(int compressionMinSize) {
+        this.compressionMinSize = compressionMinSize;
     }
 
 
@@ -223,12 +255,14 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
     }
 
 
-    /**
-     * Server header.
-     */
     private String server;
     public String getServer() { return server; }
-    public void setServer( String server ) {
+    /**
+     * Set the server header name.
+     *
+     * @param server The new value to use for the server header
+     */
+    public void setServer(String server) {
         this.server = server;
     }
 
