@@ -286,7 +286,7 @@ public class MimeHeaders {
      * @return the message bytes container for the value
      */
     public MessageBytes addValue( String name ) {
-         MimeHeaderField mh = createHeader();
+        MimeHeaderField mh = createHeader();
         mh.getName().setString(name);
         return mh.getValue();
     }
@@ -300,8 +300,7 @@ public class MimeHeaders {
      * @param len Length
      * @return the message bytes container for the value
      */
-    public MessageBytes addValue(byte b[], int startN, int len)
-    {
+    public MessageBytes addValue(byte b[], int startN, int len) {
         MimeHeaderField mhf=createHeader();
         mhf.getName().setBytes(b, startN, len);
         return mhf.getValue();

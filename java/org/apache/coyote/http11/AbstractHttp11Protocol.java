@@ -64,6 +64,9 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
 
     @Override
     public void init() throws Exception {
+        // Upgrade protocols have to be configured first since the endpoint
+        // init (triggered via super.init() below) uses this list to configure
+        // the list of ALPN protocols to advertise
         for (UpgradeProtocol upgradeProtocol : upgradeProtocols) {
             configureUpgradeProtocol(upgradeProtocol);
         }
@@ -166,13 +169,26 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
     }
 
 
-    /**
-     * Maximum size of the post which will be saved when processing certain
-     * requests, such as a POST.
-     */
     private int maxSavePostSize = 4 * 1024;
+    /**
+     * Return the maximum size of the post which will be saved during FORM or
+     * CLIENT-CERT authentication.
+     *
+     * @return The size in bytes
+     */
     public int getMaxSavePostSize() { return maxSavePostSize; }
-    public void setMaxSavePostSize(int valueI) { maxSavePostSize = valueI; }
+    /**
+     * Set the maximum size of a POST which will be buffered during FORM or
+     * CLIENT-CERT authentication. When a POST is received where the security
+     * constraints require a client certificate, the POST body needs to be
+     * buffered while an SSL handshake takes place to obtain the certificate. A
+     * similar buffering is required during FDORM auth.
+     *
+     * @param maxSavePostSize The maximum size POST body to buffer in bytes
+     */
+    public void setMaxSavePostSize(int maxSavePostSize) {
+        this.maxSavePostSize = maxSavePostSize;
+    }
 
 
     /**
@@ -183,41 +199,58 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
     public void setMaxHttpHeaderSize(int valueI) { maxHttpHeaderSize = valueI; }
 
 
-    /**
-     * Specifies a different (usually  longer) connection timeout during data
-     * upload.
-     */
     private int connectionUploadTimeout = 300000;
+    /**
+     * Specifies a different (usually longer) connection timeout during data
+     * upload. Default is 5 minutes as in Apache HTTPD server.
+     *
+     * @return The timeout in milliseconds
+     */
     public int getConnectionUploadTimeout() { return connectionUploadTimeout; }
-    public void setConnectionUploadTimeout(int i) {
-        connectionUploadTimeout = i;
+    /**
+     * Set the upload timeout.
+     *
+     * @param timeout Upload timeout in milliseconds
+     */
+    public void setConnectionUploadTimeout(int timeout) {
+        connectionUploadTimeout = timeout;
     }
 
 
-    /**
-     * If true, the connectionUploadTimeout will be ignored and the regular
-     * socket timeout will be used for the full duration of the connection.
-     */
     private boolean disableUploadTimeout = true;
+    /**
+     * Get the flag that controls upload time-outs. If true, the
+     * connectionUploadTimeout will be ignored and the regular socket timeout
+     * will be used for the full duration of the connection.
+     *
+     * @return {@code true} if the separate upload timeout is disabled
+     */
     public boolean getDisableUploadTimeout() { return disableUploadTimeout; }
+    /**
+     * Set the flag to control whether a separate connection timeout is used
+     * during upload of a request body.
+     *
+     * @param isDisabled {@code true} if the separate upload timeout should be
+     *                   disabled
+     */
     public void setDisableUploadTimeout(boolean isDisabled) {
         disableUploadTimeout = isDisabled;
     }
 
 
+    public void setCompression(String compression) {
+        compressionConfig.setCompression(compression);
+    }
     public String getCompression() {
         return compressionConfig.getCompression();
-    }
-    public void setCompression(String valueS) {
-        compressionConfig.setCompression(valueS);
     }
 
 
     public String getNoCompressionUserAgents() {
         return compressionConfig.getNoCompressionUserAgents();
     }
-    public void setNoCompressionUserAgents(String valueS) {
-        compressionConfig.setNoCompressionUserAgents(valueS);
+    public void setNoCompressionUserAgents(String noCompressionUserAgents) {
+        compressionConfig.setNoCompressionUserAgents(noCompressionUserAgents);
     }
 
 
@@ -261,8 +294,8 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
     public int getCompressionMinSize() {
         return compressionConfig.getCompressionMinSize();
     }
-    public void setCompressionMinSize(int valueI) {
-        compressionConfig.setCompressionMinSize(valueI);
+    public void setCompressionMinSize(int compressionMinSize) {
+        compressionConfig.setCompressionMinSize(compressionMinSize);
     }
 
 
@@ -292,17 +325,27 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
     }
 
 
-    /**
-     * Server header.
-     */
     private String server;
     public String getServer() { return server; }
-    public void setServer( String server ) {
+    /**
+     * Set the server header name.
+     *
+     * @param server The new value to use for the server header
+     */
+    public void setServer(String server) {
         this.server = server;
     }
 
 
     private boolean serverRemoveAppProvidedValues = false;
+    /**
+     * Should application provider values for the HTTP Server header be removed.
+     * Note that if {@link #server} is set, any application provided value will
+     * be over-ridden.
+     *
+     * @return {@code true} if application provided values should be removed,
+     *         otherwise {@code false}
+     */
     public boolean getServerRemoveAppProvidedValues() { return serverRemoveAppProvidedValues; }
     public void setServerRemoveAppProvidedValues(boolean serverRemoveAppProvidedValues) {
         this.serverRemoveAppProvidedValues = serverRemoveAppProvidedValues;
@@ -410,6 +453,7 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
         return upgradeProtocols.toArray(new UpgradeProtocol[0]);
     }
 
+
     /**
      * The protocols that are available via internal Tomcat support for access
      * via HTTP upgrade.
@@ -487,6 +531,13 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
     public int getMaxKeepAliveRequests() {
         return getEndpoint().getMaxKeepAliveRequests();
     }
+    /**
+     * Set the maximum number of Keep-Alive requests to allow.
+     * This is to safeguard from DoS attacks. Setting to a negative
+     * value disables the limit.
+     *
+     * @param mkar The new maximum number of Keep-Alive requests allowed
+     */
     public void setMaxKeepAliveRequests(int mkar) {
         getEndpoint().setMaxKeepAliveRequests(mkar);
     }
