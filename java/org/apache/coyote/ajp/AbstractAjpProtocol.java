@@ -16,6 +16,8 @@
  */
 package org.apache.coyote.ajp;
 
+import java.util.regex.Pattern;
+
 import org.apache.coyote.AbstractProtocol;
 import org.apache.coyote.Processor;
 import org.apache.coyote.http11.upgrade.servlet31.HttpUpgradeHandler;
@@ -138,6 +140,18 @@ public abstract class AbstractAjpProtocol<S> extends AbstractProtocol<S> {
     }
     public boolean getSecretRequired() {
         return secretRequired;
+    }
+
+
+    private Pattern allowedRequestAttributesPatternPattern;
+    public void setAllowedRequestAttributesPattern(String allowedRequestAttributesPattern) {
+        this.allowedRequestAttributesPatternPattern = Pattern.compile(allowedRequestAttributesPattern);
+    }
+    public String getAllowedRequestAttributesPattern() {
+        return allowedRequestAttributesPatternPattern.pattern();
+    }
+    protected Pattern getAllowedRequestAttributesPatternPattern() {
+        return allowedRequestAttributesPatternPattern;
     }
 
 

@@ -154,6 +154,7 @@ public class AjpAprProtocol extends AbstractAjpProtocol<Long> {
             processor.setKeepAliveTimeout(proto.getKeepAliveTimeout());
             processor.setClientCertProvider(proto.getClientCertProvider());
             processor.setMaxCookieCount(proto.getMaxCookieCount());
+            processor.setAllowedRequestAttributesPatternPattern(proto.getAllowedRequestAttributesPatternPattern());
             register(processor);
             return processor;
         }
