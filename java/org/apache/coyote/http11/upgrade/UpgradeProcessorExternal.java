@@ -134,6 +134,6 @@ public class UpgradeProcessorExternal extends UpgradeProcessorBase {
 
     @Override
     public void pause() {
-        // NOOP for AJP
+        // NOOP
     }
 }
