@@ -698,8 +698,8 @@ public class AjpProcessor extends AbstractProcessor {
         }
 
         // Decode extra attributes
-        String requiredSecret = protocol.getRequiredSecret();
-        boolean secret = false;
+        String secret = protocol.getSecret();
+        boolean secretPresentInRequest = false;
         byte attributeCode;
         while ((attributeCode = requestHeaderMessage.getByte())
                 != Constants.SC_A_ARE_DONE) {
@@ -801,9 +801,9 @@ public class AjpProcessor extends AbstractProcessor {
 
             case Constants.SC_A_SECRET:
                 requestHeaderMessage.getBytes(tmpMB);
-                if (requiredSecret != null) {
-                    secret = true;
-                    if (!tmpMB.equals(requiredSecret)) {
+                if (secret != null) {
+                    secretPresentInRequest = true;
+                    if (!tmpMB.equals(secret)) {
                         response.setStatus(403);
                         setErrorState(ErrorState.CLOSE_CLEAN, null);
                     }
@@ -819,7 +819,7 @@ public class AjpProcessor extends AbstractProcessor {
         }
 
         // Check if secret was submitted if required
-        if ((requiredSecret != null) && !secret) {
+        if ((secret != null) && !secretPresentInRequest) {
             response.setStatus(403);
             setErrorState(ErrorState.CLOSE_CLEAN, null);
         }
