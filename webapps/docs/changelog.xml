@@ -149,6 +149,10 @@
         Add support for RFC 5915 formatted, unencrypted EC key files when using
         a JSSE based TLS connector. (markt)
       </add>
+      <add>
+        When reporting / logging invalid HTTP headers encode any non-printing
+        characters using the 0xNN form. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Jasper">

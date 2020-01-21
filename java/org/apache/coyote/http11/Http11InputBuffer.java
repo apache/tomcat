@@ -28,6 +28,7 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.MessageBytes;
+import org.apache.tomcat.util.http.HeaderUtil;
 import org.apache.tomcat.util.http.MimeHeaders;
 import org.apache.tomcat.util.http.parser.HttpParser;
 import org.apache.tomcat.util.net.ApplicationBufferHandler;
@@ -785,6 +786,7 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
         if (headerParsePos == HeaderParsePosition.HEADER_START) {
             // Mark the current buffer position
             headerData.start = byteBuffer.position();
+            headerData.lineStart = headerData.start;
             headerParsePos = HeaderParsePosition.HEADER_NAME;
         }
 
@@ -953,9 +955,8 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
         }
         if (rejectIllegalHeaderName || log.isDebugEnabled()) {
             String message = sm.getString("iib.invalidheader",
-                    new String(byteBuffer.array(), headerData.start,
-                            headerData.lastSignificantChar - headerData.start + 1,
-                            StandardCharsets.ISO_8859_1));
+                    HeaderUtil.toPrintableString(byteBuffer.array(), headerData.lineStart,
+                            headerData.lastSignificantChar - headerData.lineStart + 1));
             if (rejectIllegalHeaderName) {
                 throw new IllegalArgumentException(message);
             }
@@ -1016,6 +1017,10 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
 
     private static class HeaderParseData {
         /**
+         * The first character of the header line.
+         */
+        int lineStart = 0;
+        /**
          * When parsing header name: first character of the header.<br>
          * When skipping broken header line: first character of the header.<br>
          * When parsing header value: first character after ':'.
@@ -1043,6 +1048,7 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
          */
         MessageBytes headerValue = null;
         public void recycle() {
+            lineStart = 0;
             start = 0;
             realPos = 0;
             lastSignificantChar = 0;
