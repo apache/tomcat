@@ -20,6 +20,7 @@ import java.io.OutputStream;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.net.InetAddress;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
@@ -56,6 +57,7 @@ class Jre7Compat extends JreCompat {
     private static final Method resultSetGetObjectName;
     private static final Method statementCloseOnCompletion;
     private static final Method statementIsCloseOnCompletion;
+    private static final Method getLoopbackAddress;
 
     static {
         Method m1 = null;
@@ -72,6 +74,7 @@ class Jre7Compat extends JreCompat {
         Method m12 = null;
         Method m13 = null;
         Method m14 = null;
+        Method m15 = null;
         Constructor<GZIPOutputStream> c = null;
         try {
             // Order is important for the error handling below.
@@ -91,6 +94,7 @@ class Jre7Compat extends JreCompat {
             m12 = ResultSet.class.getMethod("getObject", String.class, Class.class);
             m13 = Statement.class.getMethod("closeOnCompletion");
             m14 = Statement.class.getMethod("isCloseOnCompletion");
+            m15 = InetAddress.class.getMethod("getLoopbackAddress");
         } catch (SecurityException e) {
             // Should never happen
             log.error(sm.getString("jre7Compat.unexpected"), e);
@@ -118,6 +122,7 @@ class Jre7Compat extends JreCompat {
         resultSetGetObjectName = m12;
         statementCloseOnCompletion = m13;
         statementIsCloseOnCompletion = m14;
+        getLoopbackAddress = m15;
     }
 
 
@@ -349,6 +354,20 @@ class Jre7Compat extends JreCompat {
             throw new SQLException(e);
         } catch (InvocationTargetException e) {
             throw new SQLException(e);
+        }
+    }
+
+
+    @Override
+    public InetAddress getLoopbackAddress() {
+        try {
+            return (InetAddress) getLoopbackAddress.invoke(null);
+        } catch (IllegalArgumentException e) {
+            throw new UnsupportedOperationException(e);
+       } catch (IllegalAccessException e) {
+           throw new UnsupportedOperationException(e);
+        } catch (InvocationTargetException e) {
+            throw new UnsupportedOperationException(e);
         }
     }
 

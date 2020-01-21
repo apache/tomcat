@@ -306,10 +306,7 @@
     <attribute name="address" required="false">
       <p>For servers with more than one IP address, this attribute
       specifies which address will be used for listening on the specified
-      port.  By default, this port will be used on all IP addresses
-      associated with the server. A value of <code>127.0.0.1</code>
-      indicates that the Connector will only listen on the loopback
-      interface.</p>
+      port. By default, the loopback address will be used.</p>
     </attribute>
 
     <attribute name="bindOnInit" required="false">
