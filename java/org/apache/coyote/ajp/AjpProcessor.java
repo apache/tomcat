@@ -25,6 +25,9 @@ import java.nio.ByteBuffer;
 import java.security.NoSuchProviderException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -78,6 +81,9 @@ public class AjpProcessor extends AbstractProcessor {
     private static final byte[] pongMessageArray;
 
 
+    private static final Map<String,String> jakartaAttributeMapping;
+
+
     static {
         // Allocate the end message array
         AjpMessage endMessage = new AjpMessage(16);
@@ -118,6 +124,14 @@ public class AjpProcessor extends AbstractProcessor {
         pongMessageArray = new byte[pongMessage.getLen()];
         System.arraycopy(pongMessage.getBuffer(), 0, pongMessageArray,
                 0, pongMessage.getLen());
+
+        // Build Map of Java Servlet to Jakarta Servlet attribute names
+        Map<String,String> m = new HashMap<>();
+        m.put("javax.servlet.request.cipher_suite", "jakarta.servlet.request.cipher_suite");
+        m.put("javax.servlet.request.key_size", "jakarta.servlet.request.key_size");
+        m.put("javax.servlet.request.ssl_session", "jakarta.servlet.request.ssl_session");
+        m.put("javax.servlet.request.X509Certificate", "jakarta.servlet.request.X509Certificate");
+        jakartaAttributeMapping = Collections.unmodifiableMap(m);
     }
 
 
@@ -728,6 +742,10 @@ public class AjpProcessor extends AbstractProcessor {
                     }
                 } else if(n.equals(Constants.SC_A_SSL_PROTOCOL)) {
                     request.setAttribute(SSLSupport.PROTOCOL_VERSION_KEY, v);
+                } else if (jakartaAttributeMapping.containsKey(n)) {
+                    // AJP uses the Java Servlet attribute names.
+                    // Need to convert these to Jakarta SAervlet.
+                    request.setAttribute(jakartaAttributeMapping.get(n), v);
                 } else {
                     request.setAttribute(n, v );
                 }

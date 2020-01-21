@@ -72,6 +72,10 @@
       <update>
         Remove unused NIO blocking selector. (remm)
       </update>
+      <add>
+        When using an AJP Connector, convert Java Servlet specific request
+        attributes to the Jakarta Servlet equivalent. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Other">
