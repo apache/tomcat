@@ -20,7 +20,6 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.net.SocketTimeoutException;
 import java.nio.ByteBuffer;
-import java.nio.charset.Charset;
 
 import org.apache.coyote.InputBuffer;
 import org.apache.coyote.Request;
@@ -30,6 +29,7 @@ import org.apache.tomcat.jni.Socket;
 import org.apache.tomcat.jni.Status;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.MessageBytes;
+import org.apache.tomcat.util.http.HeaderUtil;
 import org.apache.tomcat.util.http.parser.HttpParser;
 import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.SocketWrapper;
@@ -376,6 +376,7 @@ public class InternalAprInputBuffer extends AbstractInputBuffer<Long> {
 
         // Mark the current buffer position
         int start = pos;
+        int lineStart = start;
 
         //
         // Reading the header name
@@ -400,7 +401,7 @@ public class InternalAprInputBuffer extends AbstractInputBuffer<Long> {
                 // Non-token characters are illegal in header names
                 // Parsing continues so the error can be reported in context
                 // skipLine() will handle the error
-                skipLine(start);
+                skipLine(lineStart, start);
                 return true;
             }
             chr = buf[pos];
@@ -504,7 +505,7 @@ public class InternalAprInputBuffer extends AbstractInputBuffer<Long> {
     }
 
 
-    private void skipLine(int start) throws IOException {
+    private void skipLine(int lineStart, int start) throws IOException {
         boolean eol = false;
         int lastRealByte = start;
         if (pos - 1 > start) {
@@ -530,8 +531,8 @@ public class InternalAprInputBuffer extends AbstractInputBuffer<Long> {
         }
 
         if (rejectIllegalHeaderName || log.isDebugEnabled()) {
-            String message = sm.getString("iib.invalidheader", new String(buf, start,
-                    lastRealByte - start + 1, Charset.forName("ISO-8859-1")));
+            String message = sm.getString("iib.invalidheader", HeaderUtil.toPrintableString(
+                    buf, lineStart, lastRealByte - lineStart + 1));
             if (rejectIllegalHeaderName) {
                 throw new IllegalArgumentException(message);
             }

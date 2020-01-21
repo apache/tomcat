@@ -25,6 +25,7 @@ import org.apache.coyote.InputBuffer;
 import org.apache.coyote.Request;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.MessageBytes;
+import org.apache.tomcat.util.http.HeaderUtil;
 import org.apache.tomcat.util.http.parser.HttpParser;
 import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.NioChannel;
@@ -542,6 +543,7 @@ public class InternalNioInputBuffer extends AbstractInputBuffer<NioChannel> {
         if ( headerParsePos == HeaderParsePosition.HEADER_START ) {
             // Mark the current buffer position
             headerData.start = pos;
+            headerData.lineStart = headerData.start;
             headerParsePos = HeaderParsePosition.HEADER_NAME;
         }
 
@@ -714,8 +716,8 @@ public class InternalNioInputBuffer extends AbstractInputBuffer<NioChannel> {
             pos++;
         }
         if (rejectIllegalHeaderName || log.isDebugEnabled()) {
-            String message = sm.getString("iib.invalidheader", new String(buf, headerData.start,
-                    headerData.lastSignificantChar - headerData.start + 1, DEFAULT_CHARSET));
+            String message = sm.getString("iib.invalidheader", HeaderUtil.toPrintableString(
+                    buf, headerData.lineStart, headerData.lastSignificantChar - headerData.lineStart + 1));
             if (rejectIllegalHeaderName) {
                 throw new IllegalArgumentException(message);
             }
@@ -728,6 +730,10 @@ public class InternalNioInputBuffer extends AbstractInputBuffer<NioChannel> {
 
     private HeaderParseData headerData = new HeaderParseData();
     public static class HeaderParseData {
+        /**
+         * The first character of the header line.
+         */
+        int lineStart = 0;
         /**
          * When parsing header name: first character of the header.<br />
          * When skipping broken header line: first character of the header.<br />
@@ -756,6 +762,7 @@ public class InternalNioInputBuffer extends AbstractInputBuffer<NioChannel> {
          */
         MessageBytes headerValue = null;
         public void recycle() {
+            lineStart = 0;
             start = 0;
             realPos = 0;
             lastSignificantChar = 0;
