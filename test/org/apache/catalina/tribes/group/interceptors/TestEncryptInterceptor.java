@@ -19,6 +19,7 @@ package org.apache.catalina.tribes.group.interceptors;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -27,6 +28,7 @@ import org.hamcrest.core.IsNot;
 
 import org.junit.AfterClass;
 import org.junit.Assert;
+import org.junit.Assume;
 import org.junit.Before;
 import org.junit.FixMethodOrder;
 import org.junit.Ignore;
@@ -268,10 +270,18 @@ public class TestEncryptInterceptor {
 
     @Test
     public void testGCM() throws Exception {
-        src.setEncryptionAlgorithm("AES/GCM/PKCS5Padding");
-        src.start(Channel.SND_TX_SEQ);
-        dest.setEncryptionAlgorithm("AES/GCM/PKCS5Padding");
-        dest.start(Channel.SND_TX_SEQ);
+        try {
+            src.setEncryptionAlgorithm("AES/GCM/PKCS5Padding");
+            src.start(Channel.SND_TX_SEQ);
+            dest.setEncryptionAlgorithm("AES/GCM/PKCS5Padding");
+            dest.start(Channel.SND_TX_SEQ);
+        } catch (ChannelException ce) {
+            Assume.assumeFalse("Skipping testGCM due to lack of JVM support",
+                    ce.getCause() instanceof NoSuchAlgorithmException
+                    && ce.getCause().getMessage().contains("GCM"));
+
+            throw ce;
+        }
 
         String testInput = "The quick brown fox jumps over the lazy dog.";
 
