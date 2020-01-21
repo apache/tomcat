@@ -16,6 +16,8 @@
  */
 package org.apache.coyote.ajp;
 
+import java.net.InetAddress;
+
 import org.apache.coyote.AbstractProtocol;
 import org.apache.coyote.Processor;
 import org.apache.coyote.UpgradeProtocol;
@@ -46,6 +48,8 @@ public abstract class AbstractAjpProtocol<S> extends AbstractProtocol<S> {
         setConnectionTimeout(Constants.DEFAULT_CONNECTION_TIMEOUT);
         // AJP does not use Send File
         getEndpoint().setUseSendfile(false);
+        // AJP listens on loopback by default
+        getEndpoint().setAddress(InetAddress.getLoopbackAddress());
         ConnectionHandler<S> cHandler = new ConnectionHandler<>(this);
         setHandler(cHandler);
         getEndpoint().setHandler(cHandler);
