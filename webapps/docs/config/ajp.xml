@@ -311,6 +311,25 @@
       port. By default, the loopback address will be used.</p>
     </attribute>
 
+    <attribute name="allowedArbitraryRequestAttributes" required="false">
+      <p>The AJP protocol passes some information from the reverse proxy to the
+      AJP connector using request attributes. These attributes are:</p>
+      <ul>
+        <li>javax.servlet.request.cipher_suite</li>
+        <li>javax.servlet.request.key_size</li>
+        <li>javax.servlet.request.ssl_session</li>
+        <li>javax.servlet.request.X509Certificate</li>
+        <li>AJP_LOCAL_ADDR</li>
+        <li>AJP_REMOTE_PORT</li>
+        <li>AJP_SSL_PROTOCOL</li>
+        <li>JK_LB_ACTIVATION</li>
+      </ul>
+      <p>The AJP protocol supports the passing of arbitrary request attributes.
+      Requests containing arbitrary request attributes will be rejected with a
+      403 response unless the entire attribute name matches this regular
+      expression. If not specified, the default value is <code>null</code>.</p>
+    </attribute>
+
     <attribute name="bindOnInit" required="false">
       <p>Controls when the socket used by the connector is bound. By default it
       is bound when the connector is initiated and unbound when the connector is

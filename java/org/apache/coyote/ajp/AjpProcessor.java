@@ -28,6 +28,8 @@ import java.security.cert.X509Certificate;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -742,12 +744,28 @@ public class AjpProcessor extends AbstractProcessor {
                     }
                 } else if(n.equals(Constants.SC_A_SSL_PROTOCOL)) {
                     request.setAttribute(SSLSupport.PROTOCOL_VERSION_KEY, v);
+                } else if (n.equals("JK_LB_ACTIVATION")) {
+                    request.setAttribute(n, v);
                 } else if (jakartaAttributeMapping.containsKey(n)) {
                     // AJP uses the Java Servlet attribute names.
                     // Need to convert these to Jakarta SAervlet.
                     request.setAttribute(jakartaAttributeMapping.get(n), v);
                 } else {
-                    request.setAttribute(n, v );
+                    // All 'known' attributes will be processed by the previous
+                    // blocks. Any remaining attribute is an 'arbitrary' one.
+                    Pattern pattern = protocol.getAllowedArbitraryRequestAttributesPattern();
+                    if (pattern == null) {
+                        response.setStatus(403);
+                        setErrorState(ErrorState.CLOSE_CLEAN, null);
+                    } else {
+                        Matcher m = pattern.matcher(n);
+                        if (m.matches()) {
+                            request.setAttribute(n, v);
+                        } else {
+                            response.setStatus(403);
+                            setErrorState(ErrorState.CLOSE_CLEAN, null);
+                        }
+                    }
                 }
                 break;
 
