@@ -183,6 +183,10 @@
         Disable (comment out in server.xml) the AJP/1.3 connector by default.
         (markt)
       </update>
+      <update>
+        Change the default bind address for the AJP/1.3 connector to be the
+        loopback address. (markt)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Jasper">
