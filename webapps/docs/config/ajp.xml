@@ -44,6 +44,13 @@
   contained in the web application, and/or utilize Apache's SSL
   processing.</p>
 
+  <p>Use of the AJP protocol requires additional security considerations because
+  it allows greater direct manipulation of Tomcat's internal data structures
+  than the HTTP connectors. Particular attention should be paid to the values
+  used for the <code>address</code>, <code>secret</code>,
+  <code>secretRequired</code> and <code>allowedArbitraryRequestAttributes</code>
+  attributes.</p>
+
   <p>This connector supports load balancing when used in conjunction with
   the <code>jvmRoute</code> attribute of the
   <a href="engine.html">Engine</a>.</p>
@@ -468,7 +475,8 @@
       <p>If this attribute is <code>true</code>, the AJP Connector will only
       start if the <strong>secret</strong> attribute is configured with a
       non-null, non-zero length value. The default value is <code>true</code>.
-      </p>
+      This attributue should only be set to <code>false</code> when the
+      Connector is used on a trusted network.</p>
     </attribute>
 
     <attribute name="tcpNoDelay" required="false">

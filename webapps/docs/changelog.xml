@@ -237,6 +237,9 @@
         example includes ii18n support, the Locale used should be based on the
         request locale and not the server locale. (markt)
       </fix>
+      <add>
+        Add additional information on securing AJP/1.3 Connectors. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Other">
