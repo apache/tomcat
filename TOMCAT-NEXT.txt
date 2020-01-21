@@ -47,8 +47,6 @@ New items for 10.0.0.x onwards:
 
  7. Refactor DefaultServlet to use Ranges in parseRanges().
 
- 8. Consider disabling the AJP connector by default.
-
 
 Deferred until 10.0.x:
 
