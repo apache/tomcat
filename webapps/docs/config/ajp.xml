@@ -431,8 +431,18 @@
       expected concurrent requests (synchronous and asynchronous).</p>
     </attribute>
 
-    <attribute name="requiredSecret" required="false">
+    <attribute name="secret" required="false">
       <p>Only requests from workers with this secret keyword will be accepted.
+      The default value is <code>null</code>. This attrbute must be specified
+      with a non-null, non-zero length value unless
+      <strong>secretRequired</strong> is explicitly configured to be
+      <code>false</code>.</p>
+    </attribute>
+
+    <attribute name="secretRequired" required="false">
+      <p>If this attribute is <code>true</code>, the AJP Connector will only
+      start if the <strong>secret</strong> attribute is configured with a
+      non-null, non-zero length value. The default value is <code>true</code>.
       </p>
     </attribute>
 

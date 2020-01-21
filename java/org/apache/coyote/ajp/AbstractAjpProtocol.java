@@ -95,13 +95,49 @@ public abstract class AbstractAjpProtocol<S> extends AbstractProtocol<S> {
 
 
     protected String requiredSecret = null;
+    private String secret = null;
+    /**
+     * Set the secret that must be included with every request.
+     *
+     * @param secret The required secret
+     */
+    public void setSecret(String secret) {
+        this.secret = secret;
+        this.requiredSecret = secret;
+    }
+    protected String getSecret() {
+        return secret;
+    }
     /**
      * Set the required secret that must be included with every request.
      *
      * @param requiredSecret The required secret
+     *
+     * @deprecated Replaced by {@link #setSecret(String)}.
+     *             Will be removed in Tomcat 11 onwards
      */
+    @Deprecated
     public void setRequiredSecret(String requiredSecret) {
-        this.requiredSecret = requiredSecret;
+        setSecret(requiredSecret);
+    }
+    /**
+     * @return The current secret
+     *
+     * @deprecated Replaced by {@link #getSecret()}.
+     *             Will be removed in Tomcat 11 onwards
+     */
+    @Deprecated
+    protected String getRequiredSecret() {
+        return getSecret();
+    }
+
+
+    private boolean secretRequired = true;
+    public void setSecretRequired(boolean secretRequired) {
+        this.secretRequired = secretRequired;
+    }
+    public boolean getSecretRequired() {
+        return secretRequired;
     }
 
 
@@ -150,5 +186,17 @@ public abstract class AbstractAjpProtocol<S> extends AbstractProtocol<S> {
             // TODO should fail - throw IOE
             return null;
         }
+    }
+
+
+    @Override
+    public void init() throws Exception {
+        if (getSecretRequired()) {
+            String secret = getSecret();
+            if (secret == null || secret.length() == 0) {
+                throw new IllegalArgumentException(sm.getString("ajpprotocol.nosecret"));
+            }
+        }
+        super.init();
     }
 }

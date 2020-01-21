@@ -140,7 +140,7 @@ public class AjpProtocol extends AbstractAjpProtocol<Socket> {
             processor.setAjpFlush(proto.getAjpFlush());
             processor.setTomcatAuthentication(proto.tomcatAuthentication);
             processor.setTomcatAuthorization(proto.getTomcatAuthorization());
-            processor.setRequiredSecret(proto.requiredSecret);
+            processor.setSecret(proto.getSecret());
             processor.setKeepAliveTimeout(proto.getKeepAliveTimeout());
             processor.setClientCertProvider(proto.getClientCertProvider());
             processor.setMaxCookieCount(proto.getMaxCookieCount());
