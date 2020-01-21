@@ -93,10 +93,7 @@ public final class SessionEvent extends EventObject {
 
     @Override
     public String toString() {
-
-        return ("SessionEvent['" + getSession() + "','" +
-                getType() + "']");
-
+        return "SessionEvent['" + getSession() + "','" + getType() + "']";
     }
 
 
