@@ -85,7 +85,6 @@
             <li>JavaHome</li>
             <li>TomcatPortShutdown</li>
             <li>TomcatPortHttp</li>
-            <li>TomcatPortAjp</li>
             <li>TomcatMenuEntriesEnable</li>
             <li>TomcatShortcutAllUsers</li>
             <li>TomcatServiceDefaultName</li>

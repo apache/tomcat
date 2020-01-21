@@ -246,12 +246,12 @@
     </subsection>
 
     <subsection name="Connectors">
-      <p>By default, an HTTP and an AJP connector are configured. Connectors
-      that will not be used should be removed from server.xml.</p>
+      <p>By default, a non-TLS, HTTP/1.1 connector is configured on port 8080.
+      Connectors that will not be used should be removed from server.xml.</p>
 
       <p>The <strong>address</strong> attribute may be used to control which IP
-      address the connector listens on for connections. By default, the
-      connector listens on all configured IP addresses.</p>
+      address a connector listens on for connections. By default, a connector
+      listens on all configured IP addresses.</p>
 
       <p>The <strong>allowTrace</strong> attribute may be used to enable TRACE
       requests which can be useful for debugging. Due to the way some browsers
