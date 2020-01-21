@@ -286,6 +286,10 @@
         exception occurs for the operation, and add a boolean to make sure the
         completion handler is called only once. (remm/markt)
       </fix>
+      <add>
+        When reporting / logging invalid HTTP headers encode any non-printing
+        characters using the 0xNN form. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="WebSocket">
@@ -8986,10 +8990,6 @@
       </update>
       <add>
         Add support for HTTP/2 including server push. (markt)
-      </add>
-      <add>
-        When reporting / logging invalid HTTP headers encode any non-printing
-        characters using the 0xNN form. (markt)
       </add>
     </changelog>
   </subsection>
