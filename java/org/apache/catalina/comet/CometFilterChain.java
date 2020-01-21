@@ -39,6 +39,9 @@ public interface CometFilterChain {
      * in the chain, causes the resource at the end of the chain to be invoked.
      *
      * @param event the event to pass along the chain.
+     *
+     * @throws IOException If an I/O error occurs
+     * @throws ServletException If an error occurs during event processing
      */
     public void doFilterEvent(CometEvent event) throws IOException, ServletException;
 

@@ -35,19 +35,19 @@ public final class SessionEvent extends EventObject {
     /**
      * The event data associated with this event.
      */
-    private Object data = null;
+    private final Object data;
 
 
     /**
      * The Session on which this event occurred.
      */
-    private Session session = null;
+    private final Session session;
 
 
     /**
      * The event type this instance represents.
      */
-    private String type = null;
+    private final String type;
 
 
     /**
@@ -68,44 +68,32 @@ public final class SessionEvent extends EventObject {
 
 
     /**
-     * Return the event data of this event.
+     * @return the event data of this event.
      */
     public Object getData() {
-
-        return (this.data);
-
+        return this.data;
     }
 
 
     /**
-     * Return the Session on which this event occurred.
+     * @return the Session on which this event occurred.
      */
     public Session getSession() {
-
-        return (this.session);
-
+        return this.session;
     }
 
 
     /**
-     * Return the event type of this event.
+     * @return the event type of this event.
      */
     public String getType() {
-
-        return (this.type);
-
+        return this.type;
     }
 
 
-    /**
-     * Return a string representation of this event.
-     */
     @Override
     public String toString() {
-
-        return ("SessionEvent['" + getSession() + "','" +
-                getType() + "']");
-
+        return "SessionEvent['" + getSession() + "','" + getType() + "']";
     }
 
 

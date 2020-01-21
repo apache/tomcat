@@ -36,8 +36,9 @@ public interface CometProcessor extends Servlet{
      * Process the given Comet event.
      *
      * @param event The Comet event that will be processed
-     * @throws IOException
-     * @throws ServletException
+     *
+     * @throws IOException If an I/O error occurs
+     * @throws ServletException If an error occurs during event processing
      */
     public void event(CometEvent event)
         throws IOException, ServletException;

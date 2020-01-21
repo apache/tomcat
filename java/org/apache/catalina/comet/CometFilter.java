@@ -71,9 +71,9 @@ public interface CometFilter extends Filter {
      * 5. Directly set fields on the response after invocation of the next entity in the filter chain.
      *
      * @param event the event that is being processed. Another event may be passed along the chain.
-     * @param chain
-     * @throws IOException
-     * @throws ServletException
+     * @param chain the chain of CometFilter instances for the current request/response
+     * @throws IOException If an I/O error occurs
+     * @throws ServletException If an error occurs during event processing
      */
     public void doFilterEvent(CometEvent event, CometFilterChain chain)
         throws IOException, ServletException;
