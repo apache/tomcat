@@ -54,6 +54,10 @@
   <subsection name="Catalina">
     <changelog>
       <update>
+        Refactor recycle facade system property into a new connector attribute
+        named <code>discardFacades</code> and enable it by default. (remm)
+      </update>
+      <update>
         Update to Jakarta Servlet 5.0, Jakarta Server Pages 3.0. Jakarta
         Expression Language 4.0, Jakarta WebSocket 2.0, Jakarta Authentication
         2.0 and Jakarta Annotations 2.0. (markt)

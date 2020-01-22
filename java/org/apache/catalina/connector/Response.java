@@ -43,7 +43,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpServletResponseWrapper;
 
 import org.apache.catalina.Context;
-import org.apache.catalina.Globals;
 import org.apache.catalina.Session;
 import org.apache.catalina.security.SecurityUtil;
 import org.apache.catalina.util.SessionConfig;
@@ -219,7 +218,7 @@ public class Response implements HttpServletResponse {
         isCharacterEncodingSet = false;
 
         applicationResponse = null;
-        if (Globals.IS_SECURITY_ENABLED || Connector.RECYCLE_FACADES) {
+        if (getRequest().getDiscardFacades()) {
             if (facade != null) {
                 facade.clear();
                 facade = null;
