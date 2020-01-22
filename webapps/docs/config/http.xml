@@ -94,6 +94,17 @@
       <code>_default_</code> will be used.</p>
     </attribute>
 
+    <attribute name="discardFacades" required="false">
+      <p>A boolean value which can be used to enable or disable the recycling
+      of the facade objects that isolate the container internal request
+      processing objects. If set to <code>true</code> the facades will be
+      set for garbage collection after every request, otherwise they will be
+      reused. This setting has no effect when the security manager is enabled.
+      If not specified, this attribute is set to the value of the
+      <code>org.apache.catalina.connector.RECYCLE_FACADES</code> system
+      property, or <code>false</code> if not set.</p>
+    </attribute>
+
     <attribute name="enableLookups" required="false">
       <p>Set to <code>true</code> if you want calls to
       <code>request.getRemoteHost()</code> to perform DNS lookups in
