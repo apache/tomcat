@@ -488,7 +488,7 @@ public class Request implements org.apache.catalina.servlet4preview.http.HttpSer
         recycleSessionInfo();
         recycleCookieInfo(false);
 
-        if (Globals.IS_SECURITY_ENABLED || Connector.RECYCLE_FACADES) {
+        if (getDiscardFacades()) {
             parameterMap = new ParameterMap<>();
         } else {
             parameterMap.setLocked(false);
@@ -499,7 +499,7 @@ public class Request implements org.apache.catalina.servlet4preview.http.HttpSer
         applicationMapping.recycle();
 
         applicationRequest = null;
-        if (Globals.IS_SECURITY_ENABLED || Connector.RECYCLE_FACADES) {
+        if (getDiscardFacades()) {
             if (facade != null) {
                 facade.clear();
                 facade = null;
@@ -584,6 +584,16 @@ public class Request implements org.apache.catalina.servlet4preview.http.HttpSer
      */
     public Context getContext() {
         return mappingData.context;
+    }
+
+
+    /**
+     * Get the recycling strategy of the facade objects.
+     * @return the value of the flag as set on the connector, or
+     *   <code>true</code> if no connector is associated with this request
+     */
+    public boolean getDiscardFacades() {
+        return (connector == null) ? true : connector.getDiscardFacades();
     }
 
 
