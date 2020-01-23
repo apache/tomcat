@@ -57,13 +57,6 @@ public class Connector extends LifecycleMBeanBase  {
     private static final Log log = LogFactory.getLog(Connector.class);
 
 
-    /**
-     * Alternate flag to enable recycling of facades.
-     */
-    public static final boolean RECYCLE_FACADES =
-        Boolean.parseBoolean(System.getProperty("org.apache.catalina.connector.RECYCLE_FACADES", "false"));
-
-
     public static final String INTERNAL_EXECUTOR_NAME = "Internal";
 
 
@@ -151,6 +144,17 @@ public class Connector extends LifecycleMBeanBase  {
      * the port number specified by the <code>port</code> property is used.
      */
     protected int proxyPort = 0;
+
+
+    /**
+     * The flag that controls recycling of the facades of the request
+     * processing objects. If set to <code>true</code> the object facades
+     * will be discarded when the request is recycled. If the security
+     * manager is enabled, this setting is ignored and object facades are
+     * always discarded.
+     */
+    protected boolean discardFacades =
+            Boolean.parseBoolean(System.getProperty("org.apache.catalina.connector.RECYCLE_FACADES", "false"));
 
 
     /**
@@ -386,6 +390,25 @@ public class Connector extends LifecycleMBeanBase  {
     public void setAsyncTimeout(long asyncTimeout) {
         this.asyncTimeout= asyncTimeout;
         setProperty("asyncTimeout", String.valueOf(asyncTimeout));
+    }
+
+
+    /**
+     * @return <code>true</code> if the object facades are discarded, either
+     *   when the discardFacades value is <code>true</code> or when the
+     *   security manager is enabled.
+     */
+    public boolean getDiscardFacades() {
+        return discardFacades || Globals.IS_SECURITY_ENABLED;
+    }
+
+
+    /**
+     * Set the recycling strategy for the object facades.
+     * @param discardFacades the new value of the flag
+     */
+    public void setDiscardFacades(boolean discardFacades) {
+        this.discardFacades = discardFacades;
     }
 
 

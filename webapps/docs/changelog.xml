@@ -127,6 +127,10 @@
         <code>CachedResourceURLConnection</code>, it expands the feature to
         include packedWARs and to take account of resource JARs. (markt)
       </fix>
+      <update>
+        Refactor recycle facade system property into a new connector attribute
+        named <code>discardFacades</code>. (remm)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Coyote">
