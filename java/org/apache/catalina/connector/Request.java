@@ -509,7 +509,7 @@ public class Request implements HttpServletRequest {
 
         recycleSessionInfo();
 
-        if (Globals.IS_SECURITY_ENABLED || Connector.RECYCLE_FACADES) {
+        if (getDiscardFacades()) {
             parameterMap = new ParameterMap<String, String[]>();
         } else {
             parameterMap.setLocked(false);
@@ -518,7 +518,7 @@ public class Request implements HttpServletRequest {
 
         mappingData.recycle();
 
-        if (Globals.IS_SECURITY_ENABLED || Connector.RECYCLE_FACADES) {
+        if (getDiscardFacades()) {
             if (facade != null) {
                 facade.clear();
                 facade = null;
@@ -630,6 +630,16 @@ public class Request implements HttpServletRequest {
      */
     public void setContext(Context context) {
         this.context = context;
+    }
+
+
+    /**
+     * Get the recycling strategy of the facade objects.
+     * @return the value of the flag as set on the connector, or
+     *   <code>true</code> if no connector is associated with this request
+     */
+    public boolean getDiscardFacades() {
+        return (connector == null) ? true : connector.getDiscardFacades();
     }
 
 

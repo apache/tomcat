@@ -257,6 +257,11 @@
       handle the response from a TRACE request (which exposes the browser to an
       XSS attack), support for TRACE requests is disabled by default.</p>
 
+      <p>The <strong>discardFacades</strong> attribute set to <code>true</code>
+      will cause a new facade object to be created for each request. This
+      reduces the chances of a bug in an application exposing data from one
+      request to another.</p>
+
       <p>The <strong>maxPostSize</strong> attribute controls the maximum size
       of a POST request that will be parsed for parameters. The parameters are
       cached for the duration of the request so this is limited to 2MB by
@@ -449,11 +454,6 @@
   </section>
 
   <section name="System Properties">
-    <p>Setting <strong>org.apache.catalina.connector.RECYCLE_FACADES</strong>
-    system property to <code>true</code> will cause a new facade object to be
-    created for each request. This reduces the chances of a bug in an
-    application exposing data from one request to another.</p>
-
     <p>The <strong>
     org.apache.catalina.connector.CoyoteAdapter.ALLOW_BACKSLASH</strong> and
     <strong>org.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH</strong>

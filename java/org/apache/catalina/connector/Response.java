@@ -38,7 +38,6 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.catalina.Context;
-import org.apache.catalina.Globals;
 import org.apache.catalina.Session;
 import org.apache.catalina.Wrapper;
 import org.apache.catalina.security.SecurityUtil;
@@ -258,7 +257,7 @@ public class Response implements HttpServletResponse {
         included = false;
         isCharacterEncodingSet = false;
 
-        if (Globals.IS_SECURITY_ENABLED || Connector.RECYCLE_FACADES) {
+        if (request.getDiscardFacades()) {
             if (facade != null) {
                 facade.clear();
                 facade = null;
