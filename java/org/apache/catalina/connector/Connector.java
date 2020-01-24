@@ -49,6 +49,14 @@ public class Connector extends LifecycleMBeanBase  {
 
     private static final Log log = LogFactory.getLog(Connector.class);
 
+
+    /**
+     * Alternate flag to enable recycling of facades.
+     */
+    public static final boolean RECYCLE_FACADES =
+        Boolean.parseBoolean(System.getProperty("org.apache.catalina.connector.RECYCLE_FACADES", "false"));
+
+
     // ------------------------------------------------------------ Constructor
 
     public Connector() {
@@ -139,8 +147,7 @@ public class Connector extends LifecycleMBeanBase  {
      * manager is enabled, this setting is ignored and object facades are
      * always discarded.
      */
-    protected boolean discardFacades =
-            Boolean.parseBoolean(System.getProperty("org.apache.catalina.connector.RECYCLE_FACADES", "false"));
+    protected boolean discardFacades = RECYCLE_FACADES;
 
 
     /**
