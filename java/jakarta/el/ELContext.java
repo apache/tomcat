@@ -64,7 +64,6 @@ public abstract class ELContext {
         return this.resolved;
     }
 
-    // Can't use Class<?> because API needs to match specification
     /**
      * Add an object to this EL context under the given key.
      *
@@ -74,8 +73,7 @@ public abstract class ELContext {
      * @throws NullPointerException
      *              If the supplied key or context is <code>null</code>
      */
-    public void putContext(@SuppressWarnings("rawtypes") Class key,
-            Object contextObject) {
+    public void putContext(Class<?> key, Object contextObject) {
         Objects.requireNonNull(key);
         Objects.requireNonNull(contextObject);
 
@@ -86,7 +84,6 @@ public abstract class ELContext {
         this.map.put(key, contextObject);
     }
 
-    // Can't use Class<?> because API needs to match specification
     /**
      * Obtain the context object for the given key.
      *
@@ -97,7 +94,7 @@ public abstract class ELContext {
      * @throws NullPointerException
      *              If the supplied key is <code>null</code>
      */
-    public Object getContext(@SuppressWarnings("rawtypes") Class key) {
+    public Object getContext(Class<?> key) {
         Objects.requireNonNull(key);
         if (this.map == null) {
             return null;
