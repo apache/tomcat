@@ -124,6 +124,15 @@
       </add>
     </changelog>
   </subsection>
+  <subsection name="Jasper">
+    <changelog>
+      <fix>
+        <bug>64097</bug>: Replace the faulty custom services lookup used for
+        <code>ExpressionFactory</code> implementations with
+        <code>ServiceLoader</code>. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Cluster">
     <changelog>
       <fix>
