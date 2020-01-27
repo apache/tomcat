@@ -131,6 +131,11 @@
         <code>ExpressionFactory</code> implementations with
         <code>ServiceLoader</code>. (markt)
       </fix>
+      <add>
+        Add a <code>META-INF/services</code> entry to jasper-el.jar so that the
+        Expression Language implementation can be discovered via the services
+        API. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Cluster">
