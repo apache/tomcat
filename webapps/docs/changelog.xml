@@ -162,6 +162,11 @@
         performance optimisation aware of the new public class
         (<code>java.lang.Record</code>) added in Java 14. (markt)
       </fix>
+      <fix>
+        <bug>64097</bug>: Replace the faulty custom services lookup used for
+        <code>ExpressionFactory</code> implementations with
+        <code>ServiceLoader</code>. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">
