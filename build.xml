@@ -904,6 +904,7 @@
     <jarIt jarfile="${jasper-el.jar}"
       filesDir="${tomcat.classes}"
       filesId="files.jasper-el"
+      meta-inf="${tomcat.manifests}/jasper-el.jar"
       addOSGi="true" />
 
     <!-- Re-packaged Apache Commons DBCP 2-->
