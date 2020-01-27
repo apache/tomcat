@@ -858,7 +858,8 @@
     <!-- Jasper EL Implementation JAR File -->
     <jarIt jarfile="${jasper-el.jar}"
       filesDir="${tomcat.classes}"
-      filesId="files.jasper-el" />
+      filesId="files.jasper-el"
+      meta-inf="${tomcat.manifests}/jasper-el.jar"/>
 
     <!-- Re-packaged Apache Commons DBCP 2-->
     <jarIt jarfile="${tomcat-dbcp.jar}"
