@@ -66,6 +66,9 @@
         Remove GenericPrincipal.getPassword. The credentials should remain
         managed by the realm. (remm)
       </update>
+      <update>
+        Add connection pooling to JNDI realm. (remm)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Coyote">
