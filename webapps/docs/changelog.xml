@@ -10186,6 +10186,9 @@
         Update the internal fork of Commons Codec to r1725746 (1.9 plus
         additional fixes). (markt)
       </update>
+      <update>
+        Add connection pooling to JNDI realm. (remm)
+      </update>
     </changelog>
   </subsection>
 </section>
