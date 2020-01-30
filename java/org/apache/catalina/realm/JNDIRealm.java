@@ -1719,7 +1719,6 @@ System.out.println("getUserBySearch " + username);
 
             // Retrieve values of userRoleName attribute
             ArrayList<String> roles = null;
-System.out.println("userRoleName " + userRoleName + " " + attrs.get(userRoleName));
             if (userRoleName != null)
                 roles = addAttributeValues(userRoleName, attrs, roles);
 
