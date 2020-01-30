@@ -39,6 +39,7 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.IntrospectionUtils;
+import org.apache.tomcat.util.IntrospectionUtils.PropertySource;
 import org.apache.tomcat.util.security.PermissionCheck;
 import org.xml.sax.Attributes;
 import org.xml.sax.EntityResolver;
@@ -51,6 +52,7 @@ import org.xml.sax.SAXNotSupportedException;
 import org.xml.sax.SAXParseException;
 import org.xml.sax.XMLReader;
 import org.xml.sax.ext.DefaultHandler2;
+import org.xml.sax.ext.EntityResolver2;
 import org.xml.sax.helpers.AttributesImpl;
 
 
@@ -889,11 +891,19 @@ public class Digester extends DefaultHandler2 {
         reader.setDTDHandler(this);
         reader.setContentHandler(this);
 
+        EntityResolver entityResolver = getEntityResolver();
         if (entityResolver == null) {
-            reader.setEntityResolver(this);
-        } else {
-            reader.setEntityResolver(entityResolver);
+            entityResolver = this;
         }
+
+        // Wrap the resolver so we can perform ${...} property replacement
+        if (entityResolver instanceof EntityResolver2) {
+            entityResolver = new EntityResolver2Wrapper((EntityResolver2) entityResolver, source, classLoader);
+        } else {
+            entityResolver = new EntityResolverWrapper(entityResolver, source, classLoader);
+        }
+
+        reader.setEntityResolver(entityResolver);
 
         reader.setProperty("http://xml.org/sax/properties/lexical-handler", this);
 
@@ -2741,6 +2751,66 @@ public class Digester extends DefaultHandler2 {
             return bodyText;
         } else {
             return new StringBuilder(out);
+        }
+    }
+
+
+    private static class EntityResolverWrapper implements EntityResolver {
+
+        private final EntityResolver entityResolver;
+        private final PropertySource[] source;
+        private final ClassLoader classLoader;
+
+        public EntityResolverWrapper(EntityResolver entityResolver, PropertySource[] source, ClassLoader classLoader) {
+            this.entityResolver = entityResolver;
+            this.source = source;
+            this.classLoader = classLoader;
+        }
+
+        @Override
+        public InputSource resolveEntity(String publicId, String systemId)
+                throws SAXException, IOException {
+            publicId = replace(publicId);
+            systemId = replace(systemId);
+            return entityResolver.resolveEntity(publicId, systemId);
+        }
+
+        protected String replace(String input) {
+            try {
+                return IntrospectionUtils.replaceProperties(input, null, source, classLoader);
+            } catch (Exception e) {
+                return input;
+            }
+        }
+    }
+
+
+    private static class EntityResolver2Wrapper extends EntityResolverWrapper implements EntityResolver2 {
+
+        private final EntityResolver2 entityResolver2;
+
+        public EntityResolver2Wrapper(EntityResolver2 entityResolver, PropertySource[] source,
+                ClassLoader classLoader) {
+            super(entityResolver, source, classLoader);
+            this.entityResolver2 = entityResolver;
+        }
+
+        @Override
+        public InputSource getExternalSubset(String name, String baseURI)
+                throws SAXException, IOException {
+            name = replace(name);
+            baseURI = replace(baseURI);
+            return entityResolver2.getExternalSubset(name, baseURI);
+        }
+
+        @Override
+        public InputSource resolveEntity(String name, String publicId, String baseURI,
+                String systemId) throws SAXException, IOException {
+            name = replace(name);
+            publicId = replace(publicId);
+            baseURI = replace(baseURI);
+            systemId = replace(systemId);
+            return entityResolver2.resolveEntity(name, publicId, baseURI, systemId);
         }
     }
 }
