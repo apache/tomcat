@@ -54,6 +54,9 @@
         context. This option is only useful when the Realm is defined on the
         Context. (markt)
       </fix>
+      <update>
+        Add connection pooling to JNDI realm. (remm)
+      </update>
     </changelog>
   </subsection>
 </section>
