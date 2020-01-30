@@ -131,6 +131,10 @@
         Refactor recycle facade system property into a new connector attribute
         named <code>discardFacades</code>. (remm)
       </update>
+      <fix>
+        <bug>64089</bug>: Add <code>${...}</code> property replacement support
+        to XML external entity definitions. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
