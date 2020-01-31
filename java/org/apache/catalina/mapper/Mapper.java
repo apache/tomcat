@@ -732,7 +732,6 @@ public final class Mapper {
      * Map the specified URI.
      * @throws IOException
      */
-    @SuppressWarnings("deprecation") // contextPath
     private final void internalMap(CharChunk host, CharChunk uri,
             String version, MappingData mappingData) throws IOException {
 
@@ -822,8 +821,6 @@ public final class Mapper {
         if (context == null) {
             return;
         }
-
-        mappingData.contextPath.setString(context.name);
 
         ContextVersion contextVersion = null;
         ContextVersion[] contextVersions = context.versions;
@@ -1065,7 +1062,6 @@ public final class Mapper {
     /**
      * Exact mapping.
      */
-    @SuppressWarnings("deprecation") // contextPath
     private final void internalMapExactWrapper
         (MappedWrapper[] wrappers, CharChunk path, MappingData mappingData) {
         MappedWrapper wrapper = exactFind(wrappers, path);
@@ -1076,8 +1072,6 @@ public final class Mapper {
                 // Special handling for Context Root mapped servlet
                 mappingData.pathInfo.setString("/");
                 mappingData.wrapperPath.setString("");
-                // This seems wrong but it is what the spec says...
-                mappingData.contextPath.setString("");
                 mappingData.matchType = MappingMatch.CONTEXT_ROOT;
             } else {
                 mappingData.wrapperPath.setString(wrapper.name);
