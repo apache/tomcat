@@ -32,6 +32,11 @@
   <!-- They should go in the "/WEB-INF/web.xml" file in your application.   -->
 
 
+  <!-- Set the default request and response character encodings to UTF-8.   -->
+  <request-character-encoding>UTF-8</request-character-encoding>
+  <response-character-encoding>UTF-8</response-character-encoding>
+
+
   <!-- ================== Built In Servlet Definitions ==================== -->
 
 

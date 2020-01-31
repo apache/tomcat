@@ -69,6 +69,12 @@
       <update>
         Add connection pooling to JNDI realm. (remm)
       </update>
+      <update>
+        Use <code>&lt;request-character-encoding&gt;</code> and
+        <code>&lt;response-character-encoding&gt;</code> in
+        <code>conf/web.xml</code> to set the default request and response
+        character encodings to UTF-8. (markt)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Coyote">
