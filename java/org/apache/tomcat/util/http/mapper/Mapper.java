@@ -770,6 +770,7 @@ public final class Mapper {
     /**
      * Map the specified URI.
      */
+    @SuppressWarnings("deprecation") // contextPath
     private final void internalMap(CharChunk host, CharChunk uri,
             String version, MappingData mappingData) throws Exception {
 
@@ -1087,6 +1088,7 @@ public final class Mapper {
     /**
      * Exact mapping.
      */
+    @SuppressWarnings("deprecation") // contextPath
     private final void internalMapExactWrapper
         (Wrapper[] wrappers, CharChunk path, MappingData mappingData) {
         Wrapper wrapper = exactFind(wrappers, path);

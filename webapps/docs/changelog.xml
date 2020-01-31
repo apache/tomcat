@@ -118,6 +118,9 @@
         <bug>64089</bug>: Add <code>${...}</code> property replacement support
         to XML external entity definitions. (markt)
       </fix>
+      <scode>
+        Deprecate <code>MappingData.contextPath</code> as it is unused. (markt)
+      </scode>
     </changelog>
   </subsection>
   <subsection name="Coyote">

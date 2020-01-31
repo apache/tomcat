@@ -219,6 +219,7 @@ public class TestMapper extends LoggingBaseTest {
     }
 
     @Test
+    @SuppressWarnings("deprecation") // contextPath
     public void testMap() throws Exception {
         MappingData mappingData = new MappingData();
         MessageBytes host = MessageBytes.newInstance();
@@ -444,6 +445,7 @@ public class TestMapper extends LoggingBaseTest {
     }
 
     @Test
+    @SuppressWarnings("deprecation") // contextPath
     public void testContextListConcurrencyBug56653() throws Exception {
         final Object host = new Object(); // "localhost";
         final Object contextRoot = new Object(); // "ROOT";

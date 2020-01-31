@@ -33,6 +33,10 @@ public class MappingData {
     public Object wrapper = null;
     public boolean jspWildCard = false;
 
+    /**
+     * @deprecated Unused. This will be removed in Tomcat 10.
+     */
+    @Deprecated
     public MessageBytes contextPath = MessageBytes.newInstance();
     public MessageBytes requestPath = MessageBytes.newInstance();
     public MessageBytes wrapperPath = MessageBytes.newInstance();
