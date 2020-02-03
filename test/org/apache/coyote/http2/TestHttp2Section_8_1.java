@@ -23,6 +23,8 @@ import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
 
+import org.apache.coyote.http11.AbstractHttp11Protocol;
+
 /**
  * Unit tests for Section 8.1 of
  * <a href="https://tools.ietf.org/html/rfc7540">RFC 7540</a>.
@@ -47,7 +49,7 @@ public class TestHttp2Section_8_1 extends Http2TestBase {
     private void doTestPostWithTrailerHeaders(boolean allowTrailerHeader) throws Exception{
         http2Connect();
         if (allowTrailerHeader) {
-            http2Protocol.setAllowedTrailerHeaders(TRAILER_HEADER_NAME);
+            ((AbstractHttp11Protocol<?>) http2Protocol.getHttp11Protocol()).setAllowedTrailerHeaders(TRAILER_HEADER_NAME);
         }
 
         byte[] headersFrameHeader = new byte[9];

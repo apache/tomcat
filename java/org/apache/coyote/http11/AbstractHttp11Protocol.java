@@ -414,6 +414,9 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
     protected Set<String> getAllowedTrailerHeadersInternal() {
         return allowedTrailerHeaders;
     }
+    public boolean isTrailerHeaderAllowed(String headerName) {
+        return allowedTrailerHeaders.contains(headerName);
+    }
     public String getAllowedTrailerHeaders() {
         // Chances of a size change between these lines are small enough that a
         // sync is unnecessary.

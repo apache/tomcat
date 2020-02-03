@@ -49,8 +49,6 @@ New items for 10.0.0.x onwards:
 
  8. Consider disabling the AJP connector by default.
 
- 9. Share configuration between HTTP/1.1 and nested HTTP/2 rather than duplicating.
-
 
 Deferred until 10.0.x:
 

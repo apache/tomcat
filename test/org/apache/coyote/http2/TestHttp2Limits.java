@@ -29,6 +29,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import org.apache.catalina.connector.Connector;
+import org.apache.coyote.http11.AbstractHttp11Protocol;
 import org.apache.coyote.http2.HpackEncoder.State;
 import org.apache.tomcat.util.http.MimeHeaders;
 import org.apache.tomcat.util.res.StringManager;
@@ -108,7 +109,6 @@ public class TestHttp2Limits extends Http2TestBase {
     public void testHeaderLimits1x12kin1kChunksThenNewRequest() throws Exception {
         // Bug 60232
         doTestHeaderLimits(1, 12*1024, 1024, FailureMode.STREAM_RESET);
-
 
         output.clearTrace();
         sendSimpleGetRequest(5);
@@ -195,11 +195,11 @@ public class TestHttp2Limits extends Http2TestBase {
         }
 
         enableHttp2();
+        configureAndStartWebApplication();
 
         http2Protocol.setMaxHeaderCount(maxHeaderCount);
-        http2Protocol.setMaxHeaderSize(maxHeaderSize);
+        ((AbstractHttp11Protocol<?>) http2Protocol.getHttp11Protocol()).setMaxHttpHeaderSize(maxHeaderSize);
 
-        configureAndStartWebApplication();
         openClientConnection();
         doHttpUpgrade();
         sendClientPreface();
@@ -437,12 +437,12 @@ public class TestHttp2Limits extends Http2TestBase {
     private void doTestPostWithTrailerHeaders(int maxTrailerCount, int maxTrailerSize,
             FailureMode failMode) throws Exception {
         enableHttp2();
-
-        http2Protocol.setAllowedTrailerHeaders(TRAILER_HEADER_NAME);
-        http2Protocol.setMaxTrailerCount(maxTrailerCount);
-        http2Protocol.setMaxTrailerSize(maxTrailerSize);
-
         configureAndStartWebApplication();
+
+        ((AbstractHttp11Protocol<?>) http2Protocol.getHttp11Protocol()).setAllowedTrailerHeaders(TRAILER_HEADER_NAME);
+        http2Protocol.setMaxTrailerCount(maxTrailerCount);
+        ((AbstractHttp11Protocol<?>) http2Protocol.getHttp11Protocol()).setMaxTrailerSize(maxTrailerSize);
+
         openClientConnection();
         doHttpUpgrade();
         sendClientPreface();

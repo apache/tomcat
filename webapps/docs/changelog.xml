@@ -93,6 +93,11 @@
         When reporting / logging invalid HTTP headers encode any non-printing
         characters using the 0xNN form. (markt)
       </add>
+      <update>
+        Remove duplication of HTTP/1.1 configuration on the HTTP/2
+        UpgradeProtocol element. Configuration from the main Connector element
+        will now be used. (remm)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Other">
