@@ -27,40 +27,29 @@ Items carried over from the 9.0.x list:
 
 New items for 10.0.0.x onwards:
 
- 1.  Remove APR connector.
+ 1. Remove APR connector.
 
- 2.  Remove org.apache.tomcat.jni and replace with the minimum necessary to
-     interface with OpenSSL and clones.
-     We might want to park this one until we see what is available direct from
-     the JRE with project Panama.
+ 2. Remove org.apache.tomcat.jni and replace with the minimum necessary to
+    interface with OpenSSL and clones.
+    We might want to park this one until we see what is available direct from
+    the JRE with project Panama.
 
- 3.  Clean-up content-type header processing. Remove the optional space after
-     the ';' character (if any). Don't mutate the header if there is no charset
-     parameter. See BZ 62912 for some discussion and additional references.
+ 3. Clean-up content-type header processing. Remove the optional space after
+    the ';' character (if any). Don't mutate the header if there is no charset
+    parameter. See BZ 62912 for some discussion and additional references.
 
- 4.  Consider applying the delayed log file opening (until there is something to
-     log). See BZ 53620.
-
- 5. Consider including
-    <request-character-encoding>UTF-8</request-character-encoding>
-    in conf/web.xml
-
- 6. Consider including
-    <response-character-encoding>UTF-8</response-character-encoding>
-    in conf/web.xml
-
- 7. RFC 3986 states (section 2.2) that a %nn encoded delimiter is NOT equivalent
+ 4. RFC 3986 states (section 2.2) that a %nn encoded delimiter is NOT equivalent
     to the decoded form. Provide an option not to decode delimiters in %nn form.
 
- 8. BZ 56966. Refactor internal request timing to use System.nanoTime()
+ 5. BZ 56966. Refactor internal request timing to use System.nanoTime()
 
- 9. BZ 63286. Make behaviour of %D and %T consistent with httpd.
+ 6. BZ 63286. Make behaviour of %D and %T consistent with httpd.
 
-10. Refactor DefaultServlet to use Ranges in parseRanges().
+ 7. Refactor DefaultServlet to use Ranges in parseRanges().
 
-11. Consider disabling the AJP connector by default.
+ 8. Consider disabling the AJP connector by default.
 
-12. Share configuration between HTTP/1.1 and nested HTTP/2 rather than duplicating.
+ 9. Share configuration between HTTP/1.1 and nested HTTP/2 rather than duplicating.
 
 
 Deferred until 10.0.x:

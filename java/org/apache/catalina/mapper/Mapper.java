@@ -822,8 +822,6 @@ public final class Mapper {
             return;
         }
 
-        mappingData.contextPath.setString(context.name);
-
         ContextVersion contextVersion = null;
         ContextVersion[] contextVersions = context.versions;
         final int versionCount = contextVersions.length;
@@ -1074,8 +1072,6 @@ public final class Mapper {
                 // Special handling for Context Root mapped servlet
                 mappingData.pathInfo.setString("/");
                 mappingData.wrapperPath.setString("");
-                // This seems wrong but it is what the spec says...
-                mappingData.contextPath.setString("");
                 mappingData.matchType = MappingMatch.CONTEXT_ROOT;
             } else {
                 mappingData.wrapperPath.setString(wrapper.name);

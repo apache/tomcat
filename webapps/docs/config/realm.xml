@@ -433,6 +433,13 @@
         property.</p>
       </attribute>
 
+      <attribute name="connectionPoolSize" required="false">
+        <p>The JNDI realm can use a pool of connections to the directory server
+        to avoid blocking on a single connection. This attribute value is the
+        maximum pool size. If not specified, it will use <code>1</code>, which
+        means a single connection will be used.</p>
+      </attribute>
+
       <attribute name="connectionTimeout" required="false">
         <p>The timeout in milliseconds to use when establishing the connection
         to the LDAP directory. If not specified, a value of 5000 (5 seconds) is

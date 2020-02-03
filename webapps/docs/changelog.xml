@@ -47,7 +47,7 @@
 <section name="Tomcat 10.0.0.0-M1 (markt)" rtext="in development">
   <subsection name="General">
     <scode>
-      This release contains all of the changes to and including those in
+      This release contains all of the changes upto and including those in
       Apache Tomcat 9.0.31 plus the additional changes listed below. (markt)
     </scode>
   </subsection>
@@ -65,6 +65,15 @@
       <update>
         Remove GenericPrincipal.getPassword. The credentials should remain
         managed by the realm. (remm)
+      </update>
+      <update>
+        Add connection pooling to JNDI realm. (remm)
+      </update>
+      <update>
+        Use <code>&lt;request-character-encoding&gt;</code> and
+        <code>&lt;response-character-encoding&gt;</code> in
+        <code>conf/web.xml</code> to set the default request and response
+        character encodings to UTF-8. (markt)
       </update>
     </changelog>
   </subsection>

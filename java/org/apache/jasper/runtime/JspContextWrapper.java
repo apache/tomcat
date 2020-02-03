@@ -549,12 +549,12 @@ public class JspContextWrapper extends PageContext implements VariableResolver {
         }
 
         @Override
-        public void putContext(@SuppressWarnings("rawtypes") Class key, Object contextObject) {
+        public void putContext(Class<?> key, Object contextObject) {
             wrapped.putContext(key, contextObject);
         }
 
         @Override
-        public Object getContext(@SuppressWarnings("rawtypes") Class key) {
+        public Object getContext(Class<?> key) {
             if (key == JspContext.class) {
                 return pageContext;
             }
