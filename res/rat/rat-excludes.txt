@@ -185,5 +185,3 @@ output/dist/temp/safeToDelete.tmp
 
 output/res/checkstyle/*
 
-.travis.yml
-.travis/antTest.sh
