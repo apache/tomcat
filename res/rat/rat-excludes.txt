@@ -55,6 +55,8 @@
 
   - Temporary cache files used by Checkstle
 
+  - Configuration files for third party Continuous Integration systems like Travis CI
+
 
 output/build/logs/*
 output/test-tmp/**
@@ -184,3 +186,6 @@ output/dist/temp/safeToDelete.tmp
 **/*.md
 
 output/res/checkstyle/*
+
+.travis.yml
+.travis/antTest.sh
