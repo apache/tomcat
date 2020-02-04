@@ -50,7 +50,7 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
 
         Connector c = getTomcatInstance().getConnector();
         c.setProperty("secretRequired", "false");
-        c.setProperty("allowedArbitraryRequestAttributes", "MYATTRIBUTE.*");
+        c.setProperty("allowedRequestAttributesPattern", "MYATTRIBUTE.*");
     }
 
 
