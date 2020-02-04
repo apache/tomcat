@@ -751,7 +751,7 @@ public class AjpProcessor extends AbstractProcessor {
                 } else {
                     // All 'known' attributes will be processed by the previous
                     // blocks. Any remaining attribute is an 'arbitrary' one.
-                    Pattern pattern = protocol.getAllowedArbitraryRequestAttributesPattern();
+                    Pattern pattern = protocol.getAllowedRequestAttributesPatternInternal();
                     if (pattern == null) {
                         response.setStatus(403);
                         setErrorState(ErrorState.CLOSE_CLEAN, null);
