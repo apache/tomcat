@@ -138,6 +138,11 @@
       <scode>
         Deprecate <code>MappingData.contextPath</code> as it is unused. (markt)
       </scode>
+      <fix>
+        Fix a problem that meant that remote host, address and port information
+        could be missing in the access log for an HTTP/2 request where the
+        connection was closed unexpectely.
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
