@@ -563,7 +563,7 @@ public class AccessLogValve extends ValveBase implements AccessLog {
     protected AccessLogElement[] logElements = null;
 
     /**
-     * Should this valve set request attributes for IP address, hostname,
+     * Should this valve use request attributes for IP address, hostname,
      * protocol and port used for the request.
      * Default is <code>false</code>.
      * @see #setRequestAttributesEnabled(boolean)
