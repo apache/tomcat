@@ -81,22 +81,21 @@ public interface AccessLog {
     public void log(Request request, Response response, long time);
 
     /**
-     * Should this valve set request attributes for IP address, hostname,
-     * protocol and port used for the request? This are typically used in
-     * conjunction with the {@link org.apache.catalina.valves.AccessLogValve}
-     * which will otherwise log the original values.
+     * Should this valve use request attributes for IP address, hostname,
+     * protocol and port used for the request?
      *
-     * The attributes set are:
+     * The attributes used are:
      * <ul>
      * <li>org.apache.catalina.RemoteAddr</li>
      * <li>org.apache.catalina.RemoteHost</li>
      * <li>org.apache.catalina.Protocol</li>
+     * <li>org.apache.catalina.ServerName</li>
      * <li>org.apache.catalina.ServerPost</li>
      * </ul>
      *
      * @param requestAttributesEnabled  <code>true</code> causes the attributes
-     *                                  to be set, <code>false</code> disables
-     *                                  the setting of the attributes.
+     *                                  to be used, <code>false</code> causes
+     *                                  the original values to be used.
      */
     public void setRequestAttributesEnabled(boolean requestAttributesEnabled);
 
