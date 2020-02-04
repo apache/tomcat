@@ -456,6 +456,12 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
     protected AccessLogElement[] logElements = null;
 
     /**
+     * Array of elements where the value needs to be cached at the start of the
+     * request.
+     */
+    protected CachedElement[] cachedElements = null;
+
+    /**
      * Should this valve use request attributes for IP address, hostname,
      * protocol and port used for the request.
      * Default is <code>false</code>.
@@ -563,6 +569,7 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
             this.pattern = pattern;
         }
         logElements = createLogElements();
+        cachedElements = createCachedElements(logElements);
     }
 
     /**
@@ -674,6 +681,9 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
             // the access log requests the TLS info. Requesting it now causes it
             // to be cached in the request.
             request.getAttribute(Globals.CERTIFICATES_ATTR);
+        }
+        for (CachedElement element : cachedElements) {
+                element.cache(request);
         }
         getNext().invoke(request, response);
     }
@@ -797,7 +807,20 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
     protected interface AccessLogElement {
         public void addElement(CharArrayWriter buf, Date date, Request request,
                 Response response, long time);
+    }
 
+    /**
+     * Marks an AccessLogElement as needing to be have the value cached at the
+     * start of the request rather than just recorded at the end as the source
+     * data for the element may not be available at the end of the request. This
+     * typically occurs for remote network information, such as ports, IP
+     * addresses etc. when the connection is closed unexpectedly. These elements
+     * take advantage of these values being cached elsewhere on first request
+     * and do not cache the value in the element since the elements are
+     * state-less.
+     */
+    protected interface CachedElement {
+        public void cache(Request request);
     }
 
     /**
@@ -849,7 +872,7 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
     /**
      * write remote IP address - %a
      */
-    protected class RemoteAddrElement implements AccessLogElement {
+    protected class RemoteAddrElement implements AccessLogElement, CachedElement {
         @Override
         public void addElement(CharArrayWriter buf, Date date, Request request,
                 Response response, long time) {
@@ -870,12 +893,19 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
             }
             buf.append(value);
         }
+
+        @Override
+        public void cache(Request request) {
+            if (!requestAttributesEnabled) {
+                request.getRemoteAddr();
+            }
+        }
     }
 
     /**
      * write remote host name - %h
      */
-    protected class HostElement implements AccessLogElement {
+    protected class HostElement implements AccessLogElement, CachedElement {
         @Override
         public void addElement(CharArrayWriter buf, Date date, Request request,
                 Response response, long time) {
@@ -897,6 +927,13 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
                 value = IPv6Utils.canonize(value);
             }
             buf.append(value);
+        }
+
+        @Override
+        public void cache(Request request) {
+            if (!requestAttributesEnabled) {
+                request.getRemoteHost();
+            }
         }
     }
 
@@ -1183,7 +1220,7 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
     /**
      * write local or remote port for request connection - %p and %{xxx}p
      */
-    protected class PortElement implements AccessLogElement {
+    protected class PortElement implements AccessLogElement, CachedElement {
 
         /**
          * Type of port to log
@@ -1228,6 +1265,13 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
                 } else {
                     buf.append(Integer.toString(request.getRemotePort()));
                 }
+            }
+        }
+
+        @Override
+        public void cache(Request request) {
+            if (portType == PortType.REMOTE) {
+                request.getRemotePort();
             }
         }
     }
@@ -1667,6 +1711,18 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
         }
         return list.toArray(new AccessLogElement[0]);
     }
+
+
+    private CachedElement[] createCachedElements(AccessLogElement[] elements) {
+        List<CachedElement> list = new ArrayList<>();
+        for (AccessLogElement element : elements) {
+            if (element instanceof CachedElement) {
+                list.add((CachedElement) element);
+            }
+        }
+        return list.toArray(new CachedElement[0]);
+    }
+
 
     /**
      * Create an AccessLogElement implementation which needs an element name.
