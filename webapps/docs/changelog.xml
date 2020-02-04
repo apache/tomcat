@@ -191,8 +191,8 @@
         a non-null, non-zero length String. (markt)
       </add>
       <add>
-        Add a new attribute, <code>allowedArbitraryRequestAttributes</code> to
-        the AJP/1.3 Connector. Requests with unreconised attributes will be
+        Add a new attribute, <code>allowedRequestAttributesPattern</code> to
+        the AJP/1.3 Connector. Requests with unrecognised attributes will be
         blocked with a 403. (markt)
       </add>
     </changelog>
