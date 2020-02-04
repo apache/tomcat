@@ -369,9 +369,9 @@ public class AjpProcessor extends AbstractProcessor {
     }
 
 
-    private Pattern allowedArbitraryRequestAttributesPattern;
-    public void setAllowedArbitraryRequestAttributesPattern(Pattern allowedArbitraryRequestAttributesPattern) {
-        this.allowedArbitraryRequestAttributesPattern = allowedArbitraryRequestAttributesPattern;
+    private Pattern allowedRequestAttributesPattern;
+    public void setAllowedRequestAttributesPattern(Pattern allowedRequestAttributesPattern) {
+        this.allowedRequestAttributesPattern = allowedRequestAttributesPattern;
     }
 
     // --------------------------------------------------------- Public Methods
@@ -844,11 +844,11 @@ public class AjpProcessor extends AbstractProcessor {
                 } else {
                     // All 'known' attributes will be processed by the previous
                     // blocks. Any remaining attribute is an 'arbitrary' one.
-                    if (allowedArbitraryRequestAttributesPattern == null) {
+                    if (allowedRequestAttributesPattern == null) {
                         response.setStatus(403);
                         setErrorState(ErrorState.CLOSE_CLEAN, null);
                     } else {
-                        Matcher m = allowedArbitraryRequestAttributesPattern.matcher(n);
+                        Matcher m = allowedRequestAttributesPattern.matcher(n);
                         if (m.matches()) {
                             request.setAttribute(n, v);
                         } else {

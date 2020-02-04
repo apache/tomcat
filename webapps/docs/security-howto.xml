@@ -255,7 +255,7 @@
       <p>AJP Connectors block forwarded requests with unknown request
       attributes. Known safe and/or expected attributes may be allowed by
       configuration an appropriate regular expression for the
-      <code>allowedArbitraryRequestAttributes</code> attribute.</p>
+      <code>allowedRequestAttributesPattern</code> attribute.</p>
 
       <p>The <strong>address</strong> attribute may be used to control which IP
       address a connector listens on for connections. By default, a connector

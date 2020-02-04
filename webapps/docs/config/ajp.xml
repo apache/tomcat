@@ -48,7 +48,7 @@
   it allows greater direct manipulation of Tomcat's internal data structures
   than the HTTP connectors. Particular attention should be paid to the values
   used for the <code>address</code>, <code>secret</code>,
-  <code>secretRequired</code> and <code>allowedArbitraryRequestAttributes</code>
+  <code>secretRequired</code> and <code>allowedRequestAttributesPattern</code>
   attributes.</p>
 
   <p>This connector supports load balancing when used in conjunction with
@@ -326,7 +326,7 @@
       port. By default, the loopback address will be used.</p>
     </attribute>
 
-    <attribute name="allowedArbitraryRequestAttributes" required="false">
+    <attribute name="allowedRequestAttributesPattern" required="false">
       <p>The AJP protocol passes some information from the reverse proxy to the
       AJP connector using request attributes. These attributes are:</p>
       <ul>

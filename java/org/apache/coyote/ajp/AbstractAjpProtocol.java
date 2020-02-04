@@ -189,15 +189,15 @@ public abstract class AbstractAjpProtocol<S> extends AbstractProtocol<S> {
     }
 
 
-    private Pattern allowedArbitraryRequestAttributesPattern;
-    public void setAllowedArbitraryRequestAttributes(String allowedArbitraryRequestAttributes) {
-        this.allowedArbitraryRequestAttributesPattern = Pattern.compile(allowedArbitraryRequestAttributes);
+    private Pattern allowedRequestAttributesPattern;
+    public void setAllowedRequestAttributesPattern(String allowedRequestAttributesPattern) {
+        this.allowedRequestAttributesPattern = Pattern.compile(allowedRequestAttributesPattern);
     }
-    public String getAllowedArbitraryRequestAttributes() {
-        return allowedArbitraryRequestAttributesPattern.pattern();
+    public String getAllowedRequestAttributesPattern() {
+        return allowedRequestAttributesPattern.pattern();
     }
-    protected Pattern getAllowedArbitraryRequestAttributesPattern() {
-        return allowedArbitraryRequestAttributesPattern;
+    protected Pattern getAllowedRequestAttributesPatternInternal() {
+        return allowedRequestAttributesPattern;
     }
 
 
@@ -253,7 +253,7 @@ public abstract class AbstractAjpProtocol<S> extends AbstractProtocol<S> {
         processor.setKeepAliveTimeout(getKeepAliveTimeout());
         processor.setClientCertProvider(getClientCertProvider());
         processor.setSendReasonPhrase(getSendReasonPhrase());
-        processor.setAllowedArbitraryRequestAttributesPattern(getAllowedArbitraryRequestAttributesPattern());
+        processor.setAllowedRequestAttributesPattern(getAllowedRequestAttributesPatternInternal());
         return processor;
     }
 
