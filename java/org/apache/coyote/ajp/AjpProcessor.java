@@ -360,6 +360,7 @@ public class AjpProcessor extends AbstractProcessor {
         this.clientCertProvider = clientCertProvider;
     }
 
+
     @Deprecated
     private boolean sendReasonPhrase = false;
     @Deprecated
@@ -367,6 +368,11 @@ public class AjpProcessor extends AbstractProcessor {
         this.sendReasonPhrase = sendReasonPhrase;
     }
 
+
+    private Pattern allowedArbitraryRequestAttributesPattern;
+    public void setAllowedArbitraryRequestAttributesPattern(Pattern allowedArbitraryRequestAttributesPattern) {
+        this.allowedArbitraryRequestAttributesPattern = allowedArbitraryRequestAttributesPattern;
+    }
 
     // --------------------------------------------------------- Public Methods
 
@@ -838,12 +844,11 @@ public class AjpProcessor extends AbstractProcessor {
                 } else {
                     // All 'known' attributes will be processed by the previous
                     // blocks. Any remaining attribute is an 'arbitrary' one.
-                    Pattern pattern = protocol.getAllowedArbitraryRequestAttributesPattern();
-                    if (pattern == null) {
+                    if (allowedArbitraryRequestAttributesPattern == null) {
                         response.setStatus(403);
                         setErrorState(ErrorState.CLOSE_CLEAN, null);
                     } else {
-                        Matcher m = pattern.matcher(n);
+                        Matcher m = allowedArbitraryRequestAttributesPattern.matcher(n);
                         if (m.matches()) {
                             request.setAttribute(n, v);
                         } else {

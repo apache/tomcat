@@ -253,6 +253,7 @@ public abstract class AbstractAjpProtocol<S> extends AbstractProtocol<S> {
         processor.setKeepAliveTimeout(getKeepAliveTimeout());
         processor.setClientCertProvider(getClientCertProvider());
         processor.setSendReasonPhrase(getSendReasonPhrase());
+        processor.setAllowedArbitraryRequestAttributesPattern(getAllowedArbitraryRequestAttributesPattern());
         return processor;
     }
 
