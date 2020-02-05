@@ -141,7 +141,7 @@
       <fix>
         Fix a problem that meant that remote host, address and port information
         could be missing in the access log for an HTTP/2 request where the
-        connection was closed unexpectely.
+        connection was closed unexpectely. (markt)
       </fix>
     </changelog>
   </subsection>
