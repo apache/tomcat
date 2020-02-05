@@ -23,6 +23,8 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import javax.crypto.Cipher;
+
 import org.hamcrest.core.IsEqual;
 import org.hamcrest.core.IsNot;
 
@@ -177,6 +179,7 @@ public class TestEncryptInterceptor {
 
     @Test
     public void test192BitKey() throws Exception {
+        Assume.assumeTrue(Cipher.getMaxAllowedKeyLength("AES") >= 192);
         src.setEncryptionKey(encryptionKey192);
         dest.setEncryptionKey(encryptionKey192);
         src.start(Channel.SND_TX_SEQ);
@@ -191,6 +194,7 @@ public class TestEncryptInterceptor {
 
     @Test
     public void test256BitKey() throws Exception {
+        Assume.assumeTrue(Cipher.getMaxAllowedKeyLength("AES") >= 256);
         src.setEncryptionKey(encryptionKey256);
         dest.setEncryptionKey(encryptionKey256);
         src.start(Channel.SND_TX_SEQ);
