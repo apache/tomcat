@@ -93,7 +93,7 @@
     <!--
     <Connector protocol="AJP/1.3"
                address="::1"
-               port="8009" 
+               port="8009"
                redirectPort="8443" />
     -->
 
