@@ -59,6 +59,10 @@
         Update implementated specification version information in a few places
         where it has not been updated for Jakarta EE 9. (markt)
       </fix>
+      <add>
+        Expand the coverage of the French translations provided with Apache
+        Tomcat. (remm)
+      </add>
     </changelog>
   </subsection>
 </section>
