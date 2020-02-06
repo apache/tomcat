@@ -207,6 +207,18 @@
       </add>
     </changelog>
   </subsection>
+  <subsection name="Other">
+    <changelog>
+      <add>
+        Expand the coverage of the French translations provided with Apache
+        Tomcat. (remm)
+      </add>
+      <add>
+        Expand the coverage of the Chinese translations provided with Apache
+        Tomcat. Contribution provided by BoltzmannWxd. (markt)
+      </add>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 7.0.99 (violetagg)" rtext="released 2019-12-17">
   <subsection name="Catalina">
