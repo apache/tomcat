@@ -26,6 +26,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.jsp.HttpJspPage;
 
+import org.apache.jasper.Constants;
 import org.apache.jasper.compiler.Localizer;
 
 /**
@@ -51,7 +52,7 @@ public abstract class HttpJspBase extends HttpServlet implements HttpJspPage {
 
     @Override
     public String getServletInfo() {
-        return Localizer.getMessage("jsp.engine.info");
+        return Localizer.getMessage("jsp.engine.info", Constants.SPEC_VERSION);
     }
 
     @Override
