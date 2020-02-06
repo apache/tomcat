@@ -45,6 +45,14 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 9.0.32 (markt)" rtext="in development">
+  <subsection name="Jasper">
+    <changelog>
+      <scode>
+        Parameterize JSP version in localization messages to allow simpler
+        re-use between major versions. (markt)
+      </scode>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 9.0.31 (markt)" rtext="release in progress">
   <subsection name="Catalina">
