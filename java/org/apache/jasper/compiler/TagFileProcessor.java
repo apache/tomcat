@@ -25,6 +25,7 @@ import java.util.Vector;
 
 import jakarta.el.MethodExpression;
 import jakarta.el.ValueExpression;
+import jakarta.servlet.jsp.tagext.JspFragment;
 import jakarta.servlet.jsp.tagext.TagAttributeInfo;
 import jakarta.servlet.jsp.tagext.TagFileInfo;
 import jakarta.servlet.jsp.tagext.TagInfo;
@@ -252,7 +253,7 @@ class TagFileProcessor {
                 // type is fixed to "JspFragment" and a translation error
                 // must occur if specified.
                 if (type != null) {
-                    err.jspError(n, "jsp.error.fragmentwithtype");
+                    err.jspError(n, "jsp.error.fragmentwithtype", JspFragment.class.getName());
                 }
                 // rtexprvalue is fixed to "true" and a translation error
                 // must occur if specified.
