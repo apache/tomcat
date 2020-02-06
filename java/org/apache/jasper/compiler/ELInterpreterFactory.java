@@ -43,6 +43,9 @@ public class ELInterpreterFactory {
 
     /**
      * Obtain the correct EL Interpreter for the given web application.
+     * @param context The Servlet context
+     * @return the EL interpreter
+     * @throws Exception If an error occurs creating the interpreter
      */
     public static ELInterpreter getELInterpreter(ServletContext context)
             throws Exception {
@@ -82,7 +85,7 @@ public class ELInterpreterFactory {
     private static ELInterpreter createInstance(ServletContext context,
             String className) throws Exception {
         return (ELInterpreter) context.getClassLoader().loadClass(
-                    className).newInstance();
+                    className).getConstructor().newInstance();
     }
 
 

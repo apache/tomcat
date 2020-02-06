@@ -349,6 +349,8 @@ public class AntCompiler extends Compiler {
 
 
         /**
+         * @return the stream that has been wrapped
+         *
          * @deprecated Unused. Will be removed in Tomcat 8.0.x.
          */
         @Deprecated
