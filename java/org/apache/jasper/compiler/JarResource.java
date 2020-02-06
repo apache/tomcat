@@ -26,7 +26,7 @@ public interface JarResource {
     /**
      * @return The JarFile for this resource. A new instance of JarFile
      *         should be returned on each call.
-     * @throws IOException
+     * @throws IOException If an I/O error occurs reading the JAR
      */
     JarFile getJarFile() throws IOException;
 
@@ -37,7 +37,7 @@ public interface JarResource {
     String getUrl();
 
     /**
-     * @param name
+     * @param name Name of entry to return
      * @return The URL for the entry within this resource.
      */
     URL getEntry(String name);

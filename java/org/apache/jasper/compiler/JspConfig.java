@@ -296,6 +296,7 @@ public class JspConfig {
      * Find a property that best matches the supplied resource.
      * @param uri the resource supplied.
      * @return a JspProperty indicating the best match, or some default.
+     * @throws JasperException Not used
      */
     public JspProperty findJspProperty(String uri) throws JasperException {
 
@@ -459,6 +460,9 @@ public class JspConfig {
     /**
      * To find out if a uri matches a url pattern in jsp config.  If so,
      * then the uri is a JSP page.  This is used primarily for jspc.
+     * @param uri The path to check
+     * @return <code>true</code> if the path denotes a JSP page
+     * @throws JasperException Not used
      */
     public boolean isJspPage(String uri) throws JasperException {
 

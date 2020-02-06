@@ -932,6 +932,8 @@ public class PageContextImpl extends PageContext {
      *            The page context
      * @param functionMap
      *            Maps prefix and name to Method
+     * @param escape
+     *            Unused
      * @return The result of the evaluation
      * @throws ELException If an error occurs during the evaluation
      */

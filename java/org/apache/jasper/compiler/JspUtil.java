@@ -243,6 +243,13 @@ public class JspUtil {
     /**
      * Replaces any occurrences of the character <code>replace</code> with the
      * string <code>with</code>.
+     *
+     * @param name      String in which character is to be replaced
+     * @param replace   The character to replace
+     * @param with      The string with which the character is to be replaced
+     *
+     * @return The supplied string with all instances of <code>replace</code>
+     *         replaced with <code>with</code>
      */
     public static String replace(String name, char replace, String with) {
         StringBuilder buf = new StringBuilder();
