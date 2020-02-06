@@ -19,9 +19,10 @@
             Building The Apache Tomcat @VERSION_MAJOR_MINOR@ Servlet/JSP Container
             ====================================================
 
-This subproject contains the source code for Tomcat @VERSION_MAJOR_MINOR@, a container that
-implements the Servlet 4.0, JSP 2.3, EL 3.0, WebSocket 1.1 and JASPIC 1.1
-specifications from the Java Community Process <https://www.jcp.org/>.
+This project contains the source code for Tomcat @VERSION_MAJOR_MINOR@, a container that
+implements the Jakarta Servlet 5.0, JSP 3.0, EL 4.0, WebSocket 2.0 and
+Authentication 2.0 specifications from the Jakarta EE project at Eclipse
+<https://jakarta.ee//>.
 
 Note: If you just need to run Apache Tomcat, it is not necessary to build
 it. You may simply download a binary distribution. It is cross-platform.

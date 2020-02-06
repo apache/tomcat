@@ -53,6 +53,14 @@
       </scode>
     </changelog>
   </subsection>
+  <subsection name="Other">
+    <changelog>
+      <fix>
+        Update implementated specification version information in a few places
+        where it has not been updated for Jakarta EE 9. (markt)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 10.0.0.0-M1 (markt)" rtext="release in progress">
   <subsection name="General">
