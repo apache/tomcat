@@ -30,6 +30,8 @@ import java.util.List;
  */
 public class Constants {
 
+    public static final String SPEC_VERSION = "2.3";
+
     /**
      * The base class of the generated servlets.
      */
