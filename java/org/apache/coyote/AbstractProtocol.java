@@ -369,7 +369,7 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
 
     public void addWaitingProcessor(Processor processor) {
         if (getLog().isDebugEnabled()) {
-            getLog().debug(sm.getString("abstractProcotol.waitingProcerssor.add", processor));
+            getLog().debug(sm.getString("abstractProtocol.waitingProcessor.add", processor));
         }
         waitingProcessors.add(processor);
     }
@@ -377,7 +377,7 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
 
     public void removeWaitingProcessor(Processor processor) {
         if (getLog().isDebugEnabled()) {
-            getLog().debug(sm.getString("abstractProcotol.waitingProcerssor.remove", processor));
+            getLog().debug(sm.getString("abstractProtocol.waitingProcessor.remove", processor));
         }
         waitingProcessors.remove(processor);
     }
