@@ -26,4 +26,7 @@ public class Constants {
     public static final String STORAGE_DIR = ".settings/translations";
 
     public static final String END_PACKAGE_MARKER = ".zzz.";
+
+    public static final String JAVA_EE_SUBSTRING = "java.javax";
+    public static final String JAKARTA_EE_SUBSTRING = "java.jakarta";
 }

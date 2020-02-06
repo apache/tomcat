@@ -124,7 +124,7 @@ public class Import {
 
         public CompositeKey(String in) {
             int posPkg = in.indexOf(Constants.END_PACKAGE_MARKER);
-            pkg = in.substring(0, posPkg);
+            pkg = in.substring(0, posPkg).replace(Constants.JAVA_EE_SUBSTRING, Constants.JAKARTA_EE_SUBSTRING);
             key = in.substring(posPkg + Constants.END_PACKAGE_MARKER.length());
             int posGroup = key.indexOf('.');
             if (posGroup == -1) {

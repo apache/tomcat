@@ -129,6 +129,9 @@ public class Utils {
         prefix = prefix.substring(root.getCanonicalPath().length() + 1);
         prefix = prefix.replace(File.separatorChar, '.');
         prefix = prefix + Constants.END_PACKAGE_MARKER;
+        // POEditor uses javax package names.
+        // Renaming here is less work than renaming terms in POEditor
+        prefix = prefix.replace(Constants.JAKARTA_EE_SUBSTRING, Constants.JAVA_EE_SUBSTRING);
         return prefix;
     }
 
