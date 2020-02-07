@@ -99,9 +99,6 @@
         children="true"
         storeFactoryClass="org.apache.catalina.storeconfig.ConnectorSF"
         storeAppenderClass="org.apache.catalina.storeconfig.ConnectorStoreAppender">
-        <TransientAttribute>URIEncoding</TransientAttribute>
-        <TransientAttribute>maxProcessor</TransientAttribute>
-        <TransientAttribute>minProcessor</TransientAttribute>
         <!-- All attribute duplicated from the SSLHostConfig, removed in Tomcat 10 -->
         <TransientAttribute>SSLProtocol</TransientAttribute>
         <TransientAttribute>sslEnabledProtocols</TransientAttribute>
@@ -290,6 +287,7 @@
        <TransientChild>org.apache.catalina.mbeans.ServerLifecycleListener</TransientChild>
        <TransientChild>org.apache.catalina.core.NamingContextListener</TransientChild>
        <TransientChild>org.apache.catalina.startup.ContextConfig</TransientChild>
+       <TransientChild>org.apache.catalina.startup.ContextConfig$HostWebXmlCacheCleaner</TransientChild>
        <TransientChild>org.apache.catalina.startup.EngineConfig</TransientChild>
        <TransientChild>org.apache.catalina.startup.HostConfig</TransientChild>
        <TransientChild>org.apache.catalina.core.StandardHost$MemoryLeakTrackingListener</TransientChild>
