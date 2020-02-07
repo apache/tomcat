@@ -100,13 +100,13 @@ public abstract class CloudMembershipProvider extends MembershipProviderBase imp
     public void init(Properties properties) throws IOException {
         startTime = Instant.now();
 
-        connectionTimeout = Integer.parseInt(properties.getProperty("connectionTimeout", "1000"));
-        readTimeout = Integer.parseInt(properties.getProperty("readTimeout", "1000"));
+        CloudMembershipService service = (CloudMembershipService) this.service;
+        connectionTimeout = service.getConnectTimeout();
+        readTimeout = service.getReadTimeout();
+        expirationTime = service.getExpirationTime();
 
         localIp = InetAddress.getLocalHost().getHostAddress();
         port = Integer.parseInt(properties.getProperty("tcpListenPort"));
-
-        expirationTime = Long.parseLong(properties.getProperty("expirationTime", "5000"));
     }
 
     @Override

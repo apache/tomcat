@@ -209,8 +209,7 @@ public class CloudMembershipService extends MembershipServiceBase
 
     @Override
     public int getConnectTimeout() {
-        String connectTimeout = properties.getProperty("connectTimeout");
-        return Integer.parseInt(connectTimeout);
+        return Integer.parseInt(properties.getProperty("connectTimeout", "1000"));
     }
 
     public void setConnectTimeout(int connectTimeout) {
@@ -219,8 +218,7 @@ public class CloudMembershipService extends MembershipServiceBase
 
     @Override
     public int getReadTimeout() {
-        String readTimeout = properties.getProperty("readTimeout");
-        return Integer.parseInt(readTimeout);
+        return Integer.parseInt(properties.getProperty("readTimeout", "1000"));
     }
 
     public void setReadTimeout(int readTimeout) {
@@ -229,8 +227,7 @@ public class CloudMembershipService extends MembershipServiceBase
 
     @Override
     public long getExpirationTime() {
-        String expirationTime = properties.getProperty("expirationTime");
-        return Long.parseLong(expirationTime);
+        return Long.parseLong(properties.getProperty("expirationTime", "5000"));
     }
 
     public void setExpirationTime(long expirationTime) {
