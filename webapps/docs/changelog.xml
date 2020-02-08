@@ -50,6 +50,12 @@
       <fix>
         Store config compatibility with HostWebXmlCacheCleaner listener. (remm)
       </fix>
+      <fix>
+        Modify the <code>RewriteValve</code> to use
+        <code>ServletRequest.getServerName()</code> to populate the
+        <code>HTTP_HOST</code> variable rather than extracting it from the
+        <code>Host</code> header as this allows HTTP/2 to be supported. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
