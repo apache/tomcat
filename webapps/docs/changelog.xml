@@ -170,7 +170,7 @@
       <fix>
         Fix a problem that meant that remote host, address and port information
         could be missing in the access log for an HTTP/2 request where the
-        connection was closed unexpectely. (markt)
+        connection was closed unexpectedly. (markt)
       </fix>
     </changelog>
   </subsection>
@@ -181,7 +181,7 @@
         are made using HTTP/2. (markt)
       </fix>
       <fix>
-        Fix the corrupton of the TLS configuration when using the deprecated TLS
+        Fix the corruption of the TLS configuration when using the deprecated TLS
         attributes on the Connector if the configuration has already been set
         via the new <code>SSLHostConfig</code> and
         <code>SSLHostConfigCertificate</code> elements. (markt)
