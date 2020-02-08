@@ -66,6 +66,10 @@
         Avoid useless environment restore when not using GSSCredential
         in JNDIRealm. (remm)
       </fix>
+      <fix>
+        <bug>58577</bug>: Respect the argument-count when searching for MBean
+        operations to invoke via the JMXProxyServlet. (schultz)
+      </fix>
       <add>
         <bug>62755</bug>: Add ability to opt out of adding the default web.xml
         config when embedding Tomcat and adding a context via
@@ -105,10 +109,6 @@
       <fix>
         Do not throw a NullPointerException when an MBean or operation cannot
         be found by the JMXProxyServlet. (schultz)
-      </fix>
-      <fix>
-        <bug>58577</bug>: Respect the argument-count when searching for MBean
-        operations to invoke via the JMXProxyServlet. (schultz)
       </fix>
       <update>
         Refactor recycle facade system property into a new connector attribute
@@ -157,7 +157,7 @@
       </add>
       <add>
         Add a new attribute, <code>allowedRequestAttributesPattern</code> to
-        the AJP/1.3 Connector. Requests with unreconised attributes will be
+        the AJP/1.3 Connector. Requests with unrecognised attributes will be
         blocked with a 403. (markt)
       </add>
     </changelog>
