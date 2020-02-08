@@ -49,14 +49,11 @@ public class ResolverImpl extends Resolver {
         } else if (key.equals("HTTP_FORWARDED")) {
             return request.getHeader("forwarded");
         } else if (key.equals("HTTP_HOST")) {
-            String host = request.getHeader("host");
-            if (host != null) {
-                int index = host.indexOf(':');
-                if (index != -1) {
-                    host = host.substring(0, index);
-                }
-            }
-            return host;
+            // Don't look directly at the host header to handle:
+            // - Host name in HTTP/1.1 request line
+            // - HTTP/0.9 & HTTP/1.0 requests
+            // - HTTP/2 :authority pseudo header
+            return request.getServerName();
         } else if (key.equals("HTTP_PROXY_CONNECTION")) {
             return request.getHeader("proxy-connection");
         } else if (key.equals("HTTP_ACCEPT")) {
