@@ -35,6 +35,8 @@ public class DNSMembershipProvider extends CloudMembershipProvider {
 
     private String namespace;
 
+    private String dnsServiceName;
+
     @Override
     public void start(int level) throws Exception {
         if ((level & MembershipService.MBR_RX) == 0) {
@@ -46,8 +48,10 @@ public class DNSMembershipProvider extends CloudMembershipProvider {
         // Set up Kubernetes API parameters
         namespace = getNamespace();
 
+        dnsServiceName = getEnv("DNS_MEMBERSHIP_SERVICE_NAME");
+
         if (log.isDebugEnabled()) {
-            log.debug(String.format("Namespace [%s] set; clustering enabled", namespace));
+            log.debug(String.format("Namespace [%s] dnsServiceName [%s] set; clustering enabled", namespace, dnsServiceName));
         }
         namespace = URLEncoder.encode(namespace, "UTF-8");
 
@@ -64,12 +68,7 @@ public class DNSMembershipProvider extends CloudMembershipProvider {
     protected Member[] fetchMembers() {
         List<MemberImpl> members = new ArrayList<>();
 
-        InetAddress[] inetAddresses = null;
-        try {
-            inetAddresses = InetAddress.getAllByName(namespace);
-        } catch (UnknownHostException exception) {
-            log.warn(sm.getString("dnsMembershipProvider.dnsError", namespace), exception);
-        }
+        InetAddress[] inetAddresses = getInetAddresses(dnsServiceName != null ? dnsServiceName : namespace);
 
         if (inetAddresses != null) {
             for (InetAddress inetAddress : inetAddresses) {
@@ -98,5 +97,14 @@ public class DNSMembershipProvider extends CloudMembershipProvider {
         }
 
         return members.toArray(new Member[0]);
+    }
+
+    private InetAddress[] getInetAddresses(String host) {
+        try {
+            return InetAddress.getAllByName(host);
+        } catch (UnknownHostException exception) {
+            log.warn(sm.getString("dnsMembershipProvider.dnsError", host), exception);
+        }
+        return null;
     }
 }
