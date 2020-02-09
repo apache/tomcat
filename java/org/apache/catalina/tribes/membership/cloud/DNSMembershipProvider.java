@@ -55,6 +55,22 @@ public class DNSMembershipProvider extends CloudMembershipProvider {
         heartbeat();
     }
 
+    /**
+     * Get the DNS_MEMBERSHIP_SERVICE_NAME or KUBERNETES_NAMESPACE or OPENSHIFT_KUBE_PING_NAMESPACE
+     * or "tomcat" if the environment variable
+     * cannot be found (with a warning log about the missing namespace).
+     * @return the namespace
+     */
+    protected String getNamespace() {
+        String namespace = getEnv("DNS_MEMBERSHIP_SERVICE_NAME", "KUBERNETES_NAMESPACE", CUSTOM_ENV_PREFIX + "NAMESPACE");
+        if (namespace == null || namespace.length() == 0) {
+            log.warn(sm.getString("kubernetesMembershipProvider.noNamespace"));
+            namespace = "tomcat";
+        }
+        return namespace;
+    }
+
+
     @Override
     public boolean stop(int level) throws Exception {
         return super.stop(level);
