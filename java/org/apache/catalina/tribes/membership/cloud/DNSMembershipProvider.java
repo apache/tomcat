@@ -33,7 +33,7 @@ import org.apache.juli.logging.LogFactory;
 public class DNSMembershipProvider extends CloudMembershipProvider {
     private static final Log log = LogFactory.getLog(DNSMembershipProvider.class);
 
-    private String namespace;
+    private String dnsServiceName;
 
     @Override
     public void start(int level) throws Exception {
@@ -44,12 +44,15 @@ public class DNSMembershipProvider extends CloudMembershipProvider {
         super.start(level);
 
         // Set up Kubernetes API parameters
-        namespace = getNamespace();
+        dnsServiceName = getEnv("DNS_MEMBERSHIP_SERVICE_NAME");
+        if (dnsServiceName == null) {
+            dnsServiceName = getNamespace();
+        }
 
         if (log.isDebugEnabled()) {
-            log.debug(String.format("Namespace [%s] set; clustering enabled", namespace));
+            log.debug(String.format("Namespace [%s] set; clustering enabled", dnsServiceName));
         }
-        namespace = URLEncoder.encode(namespace, "UTF-8");
+        dnsServiceName = URLEncoder.encode(dnsServiceName, "UTF-8");
 
         // Fetch initial members
         heartbeat();
@@ -66,9 +69,9 @@ public class DNSMembershipProvider extends CloudMembershipProvider {
 
         InetAddress[] inetAddresses = null;
         try {
-            inetAddresses = InetAddress.getAllByName(namespace);
+            inetAddresses = InetAddress.getAllByName(dnsServiceName);
         } catch (UnknownHostException exception) {
-            log.warn(sm.getString("dnsMembershipProvider.dnsError", namespace), exception);
+            log.warn(sm.getString("dnsMembershipProvider.dnsError", dnsServiceName), exception);
         }
 
         if (inetAddresses != null) {

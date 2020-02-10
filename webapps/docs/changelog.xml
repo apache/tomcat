@@ -66,6 +66,15 @@
       </scode>
     </changelog>
   </subsection>
+  <subsection name="Cluster">
+    <changelog>
+      <fix>
+        Fix cloud environment lookup order and add a dedicated
+        <code>DNS_MEMBERSHIP_SERVICE_NAME</code> environment for use with the
+        DNS membership provider. Submitted by Bernd Bohmann. (remm)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <add>
