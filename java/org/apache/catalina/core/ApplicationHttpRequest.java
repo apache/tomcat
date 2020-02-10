@@ -43,7 +43,6 @@ import org.apache.catalina.Manager;
 import org.apache.catalina.Session;
 import org.apache.catalina.connector.RequestFacade;
 import org.apache.catalina.servlet4preview.http.HttpServletMapping;
-import org.apache.catalina.servlet4preview.http.PushBuilder;
 import org.apache.catalina.util.ParameterMap;
 import org.apache.catalina.util.URLEncoder;
 import org.apache.tomcat.util.buf.B2CConverter;
@@ -639,8 +638,7 @@ class ApplicationHttpRequest
     }
 
 
-    @Override
-    public PushBuilder newPushBuilder() {
+    public ApplicationPushBuilder newPushBuilder() {
         ServletRequest current = getRequest();
         while (current instanceof ServletRequestWrapper) {
             current = ((ServletRequestWrapper) current).getRequest();

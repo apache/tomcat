@@ -35,7 +35,6 @@ import javax.servlet.http.HttpSession;
 import org.apache.catalina.Context;
 import org.apache.catalina.authenticator.AuthenticatorBase;
 import org.apache.catalina.connector.Request;
-import org.apache.catalina.servlet4preview.http.PushBuilder;
 import org.apache.catalina.util.SessionConfig;
 import org.apache.coyote.ActionCode;
 import org.apache.tomcat.util.buf.HexUtils;
@@ -45,7 +44,7 @@ import org.apache.tomcat.util.http.CookieProcessor;
 import org.apache.tomcat.util.http.parser.HttpParser;
 import org.apache.tomcat.util.res.StringManager;
 
-public class ApplicationPushBuilder implements PushBuilder {
+public class ApplicationPushBuilder {
 
     private static final StringManager sm = StringManager.getManager(ApplicationPushBuilder.class);
     private static final Set<String> DISALLOWED_METHODS = new HashSet<>();
@@ -176,7 +175,7 @@ public class ApplicationPushBuilder implements PushBuilder {
         }
     }
 
-    @Override
+
     public ApplicationPushBuilder path(String path) {
         if (path.startsWith("/")) {
             this.path = path;
@@ -193,13 +192,11 @@ public class ApplicationPushBuilder implements PushBuilder {
     }
 
 
-    @Override
     public String getPath() {
         return path;
     }
 
 
-    @Override
     public ApplicationPushBuilder method(String method) {
         String upperMethod = method.trim().toUpperCase(Locale.ENGLISH);
         if (DISALLOWED_METHODS.contains(upperMethod) || upperMethod.length() == 0) {
@@ -218,39 +215,33 @@ public class ApplicationPushBuilder implements PushBuilder {
     }
 
 
-    @Override
     public String getMethod() {
         return method;
     }
 
 
-    @Override
     public ApplicationPushBuilder queryString(String queryString) {
         this.queryString = queryString;
         return this;
     }
 
 
-    @Override
     public String getQueryString() {
         return queryString;
     }
 
 
-    @Override
     public ApplicationPushBuilder sessionId(String sessionId) {
         this.sessionId = sessionId;
         return this;
     }
 
 
-    @Override
     public String getSessionId() {
         return sessionId;
     }
 
 
-    @Override
     public ApplicationPushBuilder addHeader(String name, String value) {
         List<String> values = headers.get(name);
         if (values == null) {
@@ -263,7 +254,6 @@ public class ApplicationPushBuilder implements PushBuilder {
     }
 
 
-    @Override
     public ApplicationPushBuilder setHeader(String name, String value) {
         List<String> values = headers.get(name);
         if (values == null) {
@@ -278,7 +268,6 @@ public class ApplicationPushBuilder implements PushBuilder {
     }
 
 
-    @Override
     public ApplicationPushBuilder removeHeader(String name) {
         headers.remove(name);
 
@@ -286,13 +275,11 @@ public class ApplicationPushBuilder implements PushBuilder {
     }
 
 
-    @Override
     public Set<String> getHeaderNames() {
         return Collections.unmodifiableSet(headers.keySet());
     }
 
 
-    @Override
     public String getHeader(String name) {
         List<String> values = headers.get(name);
         if (values == null) {
@@ -303,7 +290,6 @@ public class ApplicationPushBuilder implements PushBuilder {
     }
 
 
-    @Override
     public void push() {
         if (path == null) {
             throw new IllegalStateException(sm.getString("pushBuilder.noPath"));

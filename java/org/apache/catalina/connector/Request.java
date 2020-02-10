@@ -82,7 +82,6 @@ import org.apache.catalina.core.ApplicationSessionCookieConfig;
 import org.apache.catalina.core.AsyncContextImpl;
 import org.apache.catalina.mapper.MappingData;
 import org.apache.catalina.servlet4preview.http.HttpServletMapping;
-import org.apache.catalina.servlet4preview.http.PushBuilder;
 import org.apache.catalina.session.ManagerBase;
 import org.apache.catalina.util.ParameterMap;
 import org.apache.catalina.util.TLSUtil;
@@ -2004,21 +2003,12 @@ public class Request implements org.apache.catalina.servlet4preview.http.HttpSer
     }
 
 
-    // --------------------------------------------- HttpServletRequest Methods
-
-    /**
-     * Pulled forward from Servlet 4.0. The method signature may be modified,
-     * removed or replaced at any time until Servlet 4.0 becomes final.
-     *
-     * @return A builder to use to construct the push request
-     */
-    @Override
-    public PushBuilder newPushBuilder() {
+    public ApplicationPushBuilder newPushBuilder() {
         return newPushBuilder(this);
     }
 
 
-    public PushBuilder newPushBuilder(HttpServletRequest request) {
+    public ApplicationPushBuilder newPushBuilder(HttpServletRequest request) {
         AtomicBoolean result = new AtomicBoolean();
         coyoteRequest.action(ActionCode.IS_PUSH_SUPPORTED, result);
         if (result.get()) {
@@ -2028,6 +2018,8 @@ public class Request implements org.apache.catalina.servlet4preview.http.HttpSer
         }
     }
 
+
+    // --------------------------------------------- HttpServletRequest Methods
 
     /**
      * {@inheritDoc}

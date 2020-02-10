@@ -50,18 +50,4 @@ public class HttpServletRequestWrapper extends javax.servlet.http.HttpServletReq
     public HttpServletMapping getHttpServletMapping() {
         return this._getHttpServletRequest().getHttpServletMapping();
     }
-
-    /**
-     * {@inheritDoc}
-     * <p>
-     * The default behavior of this method is to return
-     * {@link HttpServletRequest#newPushBuilder()} on the wrapped request
-     * object.
-     *
-     * @since Servlet 4.0
-     */
-    @Override
-    public PushBuilder newPushBuilder() {
-        return this._getHttpServletRequest().newPushBuilder();
-    }
 }

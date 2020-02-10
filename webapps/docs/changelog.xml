@@ -56,6 +56,12 @@
         <code>HTTP_HOST</code> variable rather than extracting it from the
         <code>Host</code> header as this allows HTTP/2 to be supported. (markt)
       </fix>
+      <scode>
+        Remove <code>PushBuilder</code> from the deprecated Servlet 4 Preview
+        API. Users still depending on this feature should ideally upgrade to
+        Tomcat 9.0.x. If upgrade is not possible, application code should cast
+        to the internal Tomcat implementation classes. (markt)
+      </scode>
     </changelog>
   </subsection>
   <subsection name="Jasper">
