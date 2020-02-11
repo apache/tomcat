@@ -175,7 +175,7 @@
         API. (markt)
       </add>
       <scode>
-        Parameterize JSP version and API class names in localization messages to 
+        Parameterize JSP version and API class names in localization messages to
         allow simpler re-use between major versions. (markt)
       </scode>
     </changelog>
