@@ -4658,10 +4658,6 @@
         <mime-type>application/x-compress</mime-type>
     </mime-mapping>
     <mime-mapping>
-        <extension>Z</extension>
-        <mime-type>application/x-compress</mime-type>
-    </mime-mapping>
-    <mime-mapping>
         <extension>z1</extension>
         <mime-type>application/x-zmachine</mime-type>
     </mime-mapping>
