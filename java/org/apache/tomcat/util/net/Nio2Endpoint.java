@@ -726,15 +726,6 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
 
         }
 
-        private static boolean arrayHasData(ByteBuffer[] byteBuffers) {
-            for (ByteBuffer byteBuffer : byteBuffers) {
-                if (byteBuffer.hasRemaining()) {
-                    return true;
-                }
-            }
-            return false;
-        }
-
 
         public void setSendfileData(SendfileData sf) { this.sendfileData = sf; }
         public SendfileData getSendfileData() { return this.sendfileData; }

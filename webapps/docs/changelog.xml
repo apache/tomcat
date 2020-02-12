@@ -66,6 +66,16 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+        When the NIO or APR/native connectors were configured with
+        <code>useAsyncIO="true"</code> and a zero length read or write was
+        performed, the read/write would time out rather than return immediately.
+        (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Jasper">
     <changelog>
       <scode>

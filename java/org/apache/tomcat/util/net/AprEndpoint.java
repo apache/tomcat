@@ -2646,6 +2646,7 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
                             }
                             if (buffer == null && flushBytes == 0) {
                                 // Nothing to do
+                                completion.completed(Long.valueOf(0), this);
                                 return;
                             }
                             if (read) {
