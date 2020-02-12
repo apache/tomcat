@@ -1532,7 +1532,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
                                     updateLastWrite();
                                 }
                             }
-                            if (nBytes != 0) {
+                            if (nBytes != 0 || !arrayHasData(buffers)) {
                                 completionDone = false;
                             }
                         }
@@ -1540,7 +1540,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
                         setError(e);
                     }
                 }
-                if (nBytes > 0) {
+                if (nBytes > 0 || (nBytes == 0 && !arrayHasData(buffers))) {
                     // The bytes processed are only updated in the completion handler
                     completion.completed(Long.valueOf(nBytes), this);
                 } else if (nBytes < 0 || getError() != null) {

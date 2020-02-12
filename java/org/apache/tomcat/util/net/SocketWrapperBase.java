@@ -1425,4 +1425,13 @@ public abstract class SocketWrapperBase<E> {
         }
         return max;
     }
+
+    protected static boolean arrayHasData(ByteBuffer[] byteBuffers) {
+        for (ByteBuffer byteBuffer : byteBuffers) {
+            if (byteBuffer.hasRemaining()) {
+                return true;
+            }
+        }
+        return false;
+    }
 }
