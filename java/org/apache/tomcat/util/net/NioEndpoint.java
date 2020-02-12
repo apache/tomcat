@@ -1457,7 +1457,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                                     updateLastWrite();
                                 }
                             }
-                            if (nBytes != 0 || !arrayHasData(buffers)) {
+                            if (nBytes != 0 || !buffersArrayHasRemaining(buffers, offset, length)) {
                                 completionDone = false;
                             }
                         }
@@ -1465,7 +1465,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                         setError(e);
                     }
                 }
-                if (nBytes > 0 || (nBytes == 0 && !arrayHasData(buffers))) {
+                if (nBytes > 0 || (nBytes == 0 && !buffersArrayHasRemaining(buffers, offset, length))) {
                     // The bytes processed are only updated in the completion handler
                     completion.completed(Long.valueOf(nBytes), this);
                 } else if (nBytes < 0 || getError() != null) {

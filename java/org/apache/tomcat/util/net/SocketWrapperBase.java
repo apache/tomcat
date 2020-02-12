@@ -1445,9 +1445,9 @@ public abstract class SocketWrapperBase<E> {
         return max;
     }
 
-    protected static boolean arrayHasData(ByteBuffer[] byteBuffers) {
-        for (ByteBuffer byteBuffer : byteBuffers) {
-            if (byteBuffer.hasRemaining()) {
+    protected static boolean buffersArrayHasRemaining(ByteBuffer[] buffers, int offset, int length) {
+        for (int pos = offset; pos < offset + length; pos++) {
+            if (buffers[pos].hasRemaining()) {
                 return true;
             }
         }
