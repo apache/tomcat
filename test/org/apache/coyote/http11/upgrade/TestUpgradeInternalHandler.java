@@ -226,6 +226,17 @@ public class TestUpgradeInternalHandler extends TomcatBaseTest {
                 }
             }, buffer);
             System.out.println("CompletionState: " + state);
+            // Test zero length write used by websockets
+            state = wrapper.write(BlockingMode.BLOCK, 10, TimeUnit.SECONDS, null, SocketWrapperBase.COMPLETE_WRITE_WITH_COMPLETION, new CompletionHandler<Long, Void>() {
+                @Override
+                public void completed(Long result, Void attachment) {
+                    System.out.println("Write: " + result.longValue());
+                }
+                @Override
+                public void failed(Throwable exc, Void attachment) {
+                    exc.printStackTrace();
+                }
+            }, buffer);
         }
 
         @Override

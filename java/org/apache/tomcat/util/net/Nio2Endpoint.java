@@ -644,7 +644,7 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
                     synchronized (writeCompletionHandler) {
                         if (nBytes.longValue() < 0) {
                             failed(new EOFException(sm.getString("iob.failedwrite")), attachment);
-                        } else if (!nonBlockingWriteBuffer.isEmpty() || arrayHasData(attachment)) {
+                        } else if (!nonBlockingWriteBuffer.isEmpty() || buffersArrayHasRemaining(attachment, 0, attachment.length)) {
                             // Continue writing data using a gathering write
                             ByteBuffer[] array = nonBlockingWriteBuffer.toArray(attachment);
                             getSocket().write(array, 0, array.length,
@@ -993,17 +993,17 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
                     if (!socketBufferHandler.isWriteBufferEmpty()) {
                         synchronized (writeCompletionHandler) {
                             socketBufferHandler.configureWriteBufferForRead();
-                            final ByteBuffer[] array = nonBlockingWriteBuffer.toArray(socketBufferHandler.getWriteBuffer());
-                            if (arrayHasData(array)) {
+                            ByteBuffer[] array = nonBlockingWriteBuffer.toArray(socketBufferHandler.getWriteBuffer());
+                            if (buffersArrayHasRemaining(array, 0, array.length)) {
                                 getSocket().write(array, 0, array.length, timeout, unit,
                                         array, new CompletionHandler<Long, ByteBuffer[]>() {
                                             @Override
                                             public void completed(Long nBytes, ByteBuffer[] buffers) {
                                                 if (nBytes.longValue() < 0) {
                                                     failed(new EOFException(), null);
-                                                } else if (arrayHasData(buffers)) {
-                                                    getSocket().write(array, 0, array.length, toTimeout(getWriteTimeout()),
-                                                            TimeUnit.MILLISECONDS, array, this);
+                                                } else if (buffersArrayHasRemaining(buffers, 0, buffers.length)) {
+                                                    getSocket().write(buffers, 0, buffers.length, toTimeout(getWriteTimeout()),
+                                                            TimeUnit.MILLISECONDS, buffers, this);
                                                 } else {
                                                     // Continue until everything is written
                                                     process();
