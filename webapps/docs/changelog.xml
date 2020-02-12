@@ -61,6 +61,9 @@
         file generated from the default <code>web.xml</code> so the MIME type
         mappings are consistent regardless of how Tomcat is started. (markt)
       </fix>
+      <fix>
+        Missing store config attributes for Resources elements. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
