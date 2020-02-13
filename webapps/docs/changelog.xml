@@ -44,9 +44,37 @@
   They eventually become mixed with the numbered issues (i.e., numbered
   issues do not "pop up" wrt. others).
 -->
-<section name="Tomcat 10.0.0.0-M2 (markt)" rtext="in development">
+<section name="Tomcat 10.0.0-M1 (markt)" rtext="in development">
+  <subsection name="General">
+    <scode>
+      This release contains all of the changes upto and including those in
+      Apache Tomcat 9.0.31 plus the additional changes listed below. (markt)
+    </scode>
+  </subsection>
   <subsection name="Catalina">
     <changelog>
+      <update>
+        Refactor recycle facade system property into a new connector attribute
+        named <code>discardFacades</code> and enable it by default. (remm)
+      </update>
+      <update>
+        Update to Jakarta Servlet 5.0, Jakarta Server Pages 3.0. Jakarta
+        Expression Language 4.0, Jakarta WebSocket 2.0, Jakarta Authentication
+        2.0 and Jakarta Annotations 2.0. (markt)
+      </update>
+      <update>
+        Remove GenericPrincipal.getPassword. The credentials should remain
+        managed by the realm. (remm)
+      </update>
+      <update>
+        Add connection pooling to JNDI realm. (remm)
+      </update>
+      <update>
+        Use <code>&lt;request-character-encoding&gt;</code> and
+        <code>&lt;response-character-encoding&gt;</code> in
+        <code>conf/web.xml</code> to set the default request and response
+        character encodings to UTF-8. (markt)
+      </update>
       <fix>
         Store config compatibility with HostWebXmlCacheCleaner listener. (remm)
       </fix>
@@ -68,6 +96,25 @@
   </subsection>
   <subsection name="Coyote">
     <changelog>
+      <update>
+        Update endpoint cache sizes defaults. (remm)
+      </update>
+      <update>
+        Remove unused NIO blocking selector. (remm)
+      </update>
+      <add>
+        When using an AJP Connector, convert Java Servlet specific request
+        attributes to the Jakarta Servlet equivalent. (markt)
+      </add>
+      <add>
+        When reporting / logging invalid HTTP headers encode any non-printing
+        characters using the 0xNN form. (markt)
+      </add>
+      <update>
+        Remove duplication of HTTP/1.1 configuration on the HTTP/2
+        UpgradeProtocol element. Configuration from the main Connector element
+        will now be used. (remm)
+      </update>
       <fix>
         When the NIO or APR/native connectors were configured with
         <code>useAsyncIO="true"</code> and a zero length read or write was
@@ -103,6 +150,10 @@
   <subsection name="Other">
     <changelog>
       <fix>
+        <bug>53620</bug>: JULI now only creates logging files when there is a
+        log entry to write. Based on a patch by Karol Bucek. (markt)
+      </fix>
+      <fix>
         Update implementated specification version information in a few places
         where it has not been updated for Jakarta EE 9. (markt)
       </fix>
@@ -114,71 +165,6 @@
         Expand the coverage of the Chinese translations provided with Apache
         Tomcat. Contribution provided by BoltzmannWxd. (markt)
       </add>
-    </changelog>
-  </subsection>
-</section>
-<section name="Tomcat 10.0.0.0-M1 (markt)" rtext="release in progress">
-  <subsection name="General">
-    <scode>
-      This release contains all of the changes upto and including those in
-      Apache Tomcat 9.0.31 plus the additional changes listed below. (markt)
-    </scode>
-  </subsection>
-  <subsection name="Catalina">
-    <changelog>
-      <update>
-        Refactor recycle facade system property into a new connector attribute
-        named <code>discardFacades</code> and enable it by default. (remm)
-      </update>
-      <update>
-        Update to Jakarta Servlet 5.0, Jakarta Server Pages 3.0. Jakarta
-        Expression Language 4.0, Jakarta WebSocket 2.0, Jakarta Authentication
-        2.0 and Jakarta Annotations 2.0. (markt)
-      </update>
-      <update>
-        Remove GenericPrincipal.getPassword. The credentials should remain
-        managed by the realm. (remm)
-      </update>
-      <update>
-        Add connection pooling to JNDI realm. (remm)
-      </update>
-      <update>
-        Use <code>&lt;request-character-encoding&gt;</code> and
-        <code>&lt;response-character-encoding&gt;</code> in
-        <code>conf/web.xml</code> to set the default request and response
-        character encodings to UTF-8. (markt)
-      </update>
-    </changelog>
-  </subsection>
-  <subsection name="Coyote">
-    <changelog>
-      <update>
-        Update endpoint cache sizes defaults. (remm)
-      </update>
-      <update>
-        Remove unused NIO blocking selector. (remm)
-      </update>
-      <add>
-        When using an AJP Connector, convert Java Servlet specific request
-        attributes to the Jakarta Servlet equivalent. (markt)
-      </add>
-      <add>
-        When reporting / logging invalid HTTP headers encode any non-printing
-        characters using the 0xNN form. (markt)
-      </add>
-      <update>
-        Remove duplication of HTTP/1.1 configuration on the HTTP/2
-        UpgradeProtocol element. Configuration from the main Connector element
-        will now be used. (remm)
-      </update>
-    </changelog>
-  </subsection>
-  <subsection name="Other">
-    <changelog>
-      <fix>
-        <bug>53620</bug>: JULI now only creates logging files when there is a
-        log entry to write. Based on a patch by Karol Bucek. (markt)
-      </fix>
     </changelog>
   </subsection>
 </section>
