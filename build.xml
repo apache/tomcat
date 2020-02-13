@@ -44,7 +44,7 @@
   <property name="project"               value="apache-tomcat" />
 
   <!-- Version numbers -->
-  <property name="version"               value="${version.major}.${version.minor}.${version.build}.${version.patch}${version.suffix}" />
+  <property name="version"               value="${version.major}.${version.minor}.${version.build}${version.suffix}" />
   <property name="version.number"        value="${version.major}.${version.minor}.${version.build}.${version.patch}" />
   <property name="version.major.minor"   value="${version.major}.${version.minor}" />
 
