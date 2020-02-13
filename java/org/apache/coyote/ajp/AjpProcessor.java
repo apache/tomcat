@@ -748,7 +748,7 @@ public class AjpProcessor extends AbstractProcessor {
                     request.setAttribute(n, v);
                 } else if (jakartaAttributeMapping.containsKey(n)) {
                     // AJP uses the Java Servlet attribute names.
-                    // Need to convert these to Jakarta SAervlet.
+                    // Need to convert these to Jakarta Servlet.
                     request.setAttribute(jakartaAttributeMapping.get(n), v);
                 } else {
                     // All 'known' attributes will be processed by the previous
