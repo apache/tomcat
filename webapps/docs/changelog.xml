@@ -127,6 +127,15 @@
       </add>
     </changelog>
   </subsection>
+  <subsection name="Cluster">
+    <changelog>
+      <scode>
+        Refactor the creation of <code>DeltaRequest</code> objects to make it
+        simpler to use custom implementations. Based on a pull request provided
+        by Thomas Stock. (markt)
+      </scode>
+    </changelog>
+  </subsection>
   <subsection name="Web applications">
     <changelog>
       <fix>
