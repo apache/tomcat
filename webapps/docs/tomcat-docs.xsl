@@ -37,7 +37,7 @@
   <xsl:param    name="apache-logo"         select="'/images/asf-logo.svg'"/>
   <xsl:param    name="subdir"              select="''"/>
   <xsl:param    name="relative-path"       select="'.'"/>
-  <xsl:param    name="version"             select="'10.0.0.x'"/>
+  <xsl:param    name="version"             select="'10.0.x'"/>
   <xsl:param    name="majorversion"        select="'10'"/>
   <xsl:param    name="majorminorversion"   select="'10.0'"/>
   <xsl:param    name="minjavaversion"      select="'8'"/>
