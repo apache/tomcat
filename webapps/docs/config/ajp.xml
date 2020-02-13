@@ -452,7 +452,7 @@
 
     <attribute name="secret" required="false">
       <p>Only requests from workers with this secret keyword will be accepted.
-      The default value is <code>null</code>. This attrbute must be specified
+      The default value is <code>null</code>. This attribute must be specified
       with a non-null, non-zero length value unless
       <strong>secretRequired</strong> is explicitly configured to be
       <code>false</code>.</p>
@@ -462,7 +462,8 @@
       <p>If this attribute is <code>true</code>, the AJP Connector will only
       start if the <strong>secret</strong> attribute is configured with a
       non-null, non-zero length value. The default value is <code>true</code>.
-      </p>
+      This attribute should only be set to <code>false</code> when the
+      Connector is used on a trusted network.</p>
     </attribute>
 
     <attribute name="tcpNoDelay" required="false">
