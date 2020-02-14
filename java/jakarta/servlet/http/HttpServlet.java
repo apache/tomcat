@@ -535,7 +535,7 @@ public abstract class HttpServlet extends GenericServlet {
 
             ALLOW_TRACE = executeAllowTraceOn(request);
 
-        } catch (ClassNotFoundException | NoSuchMethodException | SecurityException | IllegalAccessException
+        } catch (NoSuchMethodException | SecurityException | IllegalAccessException
                 | IllegalArgumentException | InvocationTargetException e) {
             // Ignore. Not running on Tomcat. TRACE is always allowed.
         }
@@ -544,16 +544,16 @@ public abstract class HttpServlet extends GenericServlet {
     }
 
     private Boolean executeAllowTraceOn(HttpServletRequest request)
-            throws IllegalAccessException, InvocationTargetException, NoSuchMethodException, ClassNotFoundException {
+            throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
         return ((Boolean) getGetAllowTraceMethodFromRequestFacade().invoke(request, (Object[]) null)).booleanValue();
     }
 
-    private Class<RequestFacade> getRequestFacadeClazz() throws ClassNotFoundException {
+    private Class<RequestFacade> getRequestFacadeClazz() {
         return RequestFacade.class;
     }
 
     private Method getGetAllowTraceMethodFromRequestFacade()
-            throws NoSuchMethodException, SecurityException, ClassNotFoundException {
+            throws NoSuchMethodException, SecurityException {
         return getRequestFacadeClazz().getMethod("getAllowTrace", (Class<?>[]) null);
     }
 
