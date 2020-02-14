@@ -129,6 +129,10 @@ public class AjpProcessor extends AbstractProcessor {
 
         // Build Map of Java Servlet to Jakarta Servlet attribute names
         Map<String,String> m = new HashMap<>();
+        m.put("jakarta.servlet.request.cipher_suite", "jakarta.servlet.request.cipher_suite");
+        m.put("jakarta.servlet.request.key_size", "jakarta.servlet.request.key_size");
+        m.put("jakarta.servlet.request.ssl_session", "jakarta.servlet.request.ssl_session");
+        m.put("jakarta.servlet.request.X509Certificate", "jakarta.servlet.request.X509Certificate");
         m.put("javax.servlet.request.cipher_suite", "jakarta.servlet.request.cipher_suite");
         m.put("javax.servlet.request.key_size", "jakarta.servlet.request.key_size");
         m.put("javax.servlet.request.ssl_session", "jakarta.servlet.request.ssl_session");
