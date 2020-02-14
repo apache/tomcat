@@ -23,8 +23,15 @@ import java.io.UnsupportedEncodingException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.text.MessageFormat;
+import java.util.Arrays;
 import java.util.Enumeration;
+import java.util.HashSet;
+import java.util.List;
 import java.util.ResourceBundle;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import org.apache.catalina.connector.RequestFacade;
 
 import jakarta.servlet.DispatcherType;
 import jakarta.servlet.GenericServlet;
