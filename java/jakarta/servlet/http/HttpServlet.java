@@ -476,72 +476,79 @@ public abstract class HttpServlet extends GenericServlet {
      * @exception ServletException  if the request for the
      *                                  OPTIONS cannot be handled
      */
-    protected void doOptions(HttpServletRequest req,
-            HttpServletResponse resp)
-        throws ServletException, IOException {
-
-        Method[] methods = getAllDeclaredMethods(this.getClass());
-
-        boolean ALLOW_GET = false;
-        boolean ALLOW_HEAD = false;
-        boolean ALLOW_POST = false;
-        boolean ALLOW_PUT = false;
-        boolean ALLOW_DELETE = false;
-        boolean ALLOW_TRACE = true;
-        boolean ALLOW_OPTIONS = true;
-
-        // Tomcat specific hack to see if TRACE is allowed
-        Class<?> clazz = null;
-        try {
-            clazz = Class.forName("org.apache.catalina.connector.RequestFacade");
-            Method getAllowTrace = clazz.getMethod("getAllowTrace", (Class<?>[]) null);
-            ALLOW_TRACE = ((Boolean) getAllowTrace.invoke(req, (Object[]) null)).booleanValue();
-        } catch (ClassNotFoundException | NoSuchMethodException | SecurityException |
-                IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-            // Ignore. Not running on Tomcat. TRACE is always allowed.
-        }
-        // End of Tomcat specific hack
-
-        for (int i=0; i<methods.length; i++) {
-            Method m = methods[i];
-
-            if (m.getName().equals("doGet")) {
-                ALLOW_GET = true;
-                ALLOW_HEAD = true;
-            }
-            if (m.getName().equals("doPost"))
-                ALLOW_POST = true;
-            if (m.getName().equals("doPut"))
-                ALLOW_PUT = true;
-            if (m.getName().equals("doDelete"))
-                ALLOW_DELETE = true;
-        }
-
-        String allow = null;
-        if (ALLOW_GET)
-            allow=METHOD_GET;
-        if (ALLOW_HEAD)
-            if (allow==null) allow=METHOD_HEAD;
-            else allow += ", " + METHOD_HEAD;
-        if (ALLOW_POST)
-            if (allow==null) allow=METHOD_POST;
-            else allow += ", " + METHOD_POST;
-        if (ALLOW_PUT)
-            if (allow==null) allow=METHOD_PUT;
-            else allow += ", " + METHOD_PUT;
-        if (ALLOW_DELETE)
-            if (allow==null) allow=METHOD_DELETE;
-            else allow += ", " + METHOD_DELETE;
-        if (ALLOW_TRACE)
-            if (allow==null) allow=METHOD_TRACE;
-            else allow += ", " + METHOD_TRACE;
-        if (ALLOW_OPTIONS)
-            if (allow==null) allow=METHOD_OPTIONS;
-            else allow += ", " + METHOD_OPTIONS;
-
-        resp.setHeader("Allow", allow);
+    protected void doOptions(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        resp.setHeader("Allow", String.join(", ", allowedHttpMethods(req)));
     }
 
+    private Set<String> allowedHttpMethods(HttpServletRequest req) {
+
+        List<String> methodNamesFromThis = toMethodNames(allDeclaredMethodsFromThisClazz());
+        Set<String>  allowedHttpMethods  = new HashSet<>();
+
+        if (methodNamesFromThis.contains("doGet")) {
+            allowedHttpMethods.add(METHOD_GET);
+            allowedHttpMethods.add(METHOD_HEAD);
+        }
+        if (methodNamesFromThis.contains("doPost")) {
+            allowedHttpMethods.add(METHOD_POST);
+        }
+        if (methodNamesFromThis.contains("doPut")) {
+            allowedHttpMethods.add(METHOD_PUT);
+        }
+        if (methodNamesFromThis.contains("doDelete")) {
+            allowedHttpMethods.add(METHOD_DELETE);
+        }
+        if (traceAllowed(req)) {
+            allowedHttpMethods.add(METHOD_TRACE);
+        }
+        if (optionsAllowed()) {
+            allowedHttpMethods.add(METHOD_OPTIONS);
+        }
+
+        return allowedHttpMethods;
+    }
+
+    private boolean optionsAllowed() {
+        return true;
+    }
+
+    private List<String> toMethodNames(List<Method> methods) {
+        return methods.stream().map(method -> method.getName()).collect(Collectors.toList());
+    }
+
+    private List<Method> allDeclaredMethodsFromThisClazz() {
+        return Arrays.asList(getAllDeclaredMethods(this.getClass()));
+    }
+
+    private boolean traceAllowed(HttpServletRequest request) {
+
+        boolean ALLOW_TRACE = true;
+
+        try {
+
+            ALLOW_TRACE = executeAllowTraceOn(request);
+
+        } catch (ClassNotFoundException | NoSuchMethodException | SecurityException | IllegalAccessException
+                | IllegalArgumentException | InvocationTargetException e) {
+            // Ignore. Not running on Tomcat. TRACE is always allowed.
+        }
+
+        return ALLOW_TRACE;
+    }
+
+    private Boolean executeAllowTraceOn(HttpServletRequest request)
+            throws IllegalAccessException, InvocationTargetException, NoSuchMethodException, ClassNotFoundException {
+        return ((Boolean) getGetAllowTraceMethodFromRequestFacade().invoke(request, (Object[]) null)).booleanValue();
+    }
+
+    private Class<RequestFacade> getRequestFacadeClazz() throws ClassNotFoundException {
+        return RequestFacade.class;
+    }
+
+    private Method getGetAllowTraceMethodFromRequestFacade()
+            throws NoSuchMethodException, SecurityException, ClassNotFoundException {
+        return getRequestFacadeClazz().getMethod("getAllowTrace", (Class<?>[]) null);
+    }
 
     /**
      * Called by the server (via the <code>service</code> method)
