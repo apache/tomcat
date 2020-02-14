@@ -338,6 +338,7 @@ public class OutputBuffer extends Writer
     /**
      * Flush bytes or chars contained in the buffer.
      *
+     * @param realFlush <code>true</code> if this should also cause a real network flush
      * @throws IOException An underlying IOException occurred
      */
     protected void doFlush(boolean realFlush) throws IOException {
@@ -645,8 +646,10 @@ public class OutputBuffer extends Writer
     }
 
     /**
-     * True if this buffer hasn't been used ( since recycle() ) -
-     * i.e. no chars or bytes have been added to the buffer.
+     * Has this buffer been used at all?
+     *
+     * @return true if no chars or bytes have been added to the buffer since the
+     *         last call to {@link #recycle()}
      */
     public boolean isNew() {
         return (bytesWritten == 0) && (charsWritten == 0);

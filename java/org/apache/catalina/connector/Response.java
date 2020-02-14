@@ -113,7 +113,7 @@ public class Response implements HttpServletResponse {
     protected Connector connector;
 
     /**
-     * Return the Connector through which this Request was received.
+     * @return the Connector through which this Request was received.
      */
     @Deprecated
     public Connector getConnector() {
@@ -336,7 +336,7 @@ public class Response implements HttpServletResponse {
 
 
     /**
-     * Return the "processing inside an include" flag.
+     * @return the "processing inside an include" flag.
      */
     @Deprecated
     public boolean getIncluded() {
@@ -357,7 +357,7 @@ public class Response implements HttpServletResponse {
 
 
     /**
-     * Return descriptive information about this Response implementation and
+     * @return descriptive information about this Response implementation and
      * the corresponding version number, in the format
      * <code>&lt;description&gt;/&lt;version&gt;</code>.
      */
@@ -407,7 +407,7 @@ public class Response implements HttpServletResponse {
 
 
     /**
-     * Return the output stream associated with this Response.
+     * @return the output stream associated with this Response.
      */
     @Deprecated
     public OutputStream getStream() {
@@ -490,6 +490,9 @@ public class Response implements HttpServletResponse {
      * associated with this Response.
      *
      * @exception IOException if an input/output error occurs
+     *
+     * @return The ServletOutpuStream to write the content associated with this
+     *           response
      */
     @Deprecated
     public ServletOutputStream createOutputStream()

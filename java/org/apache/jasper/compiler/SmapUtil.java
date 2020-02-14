@@ -60,6 +60,7 @@ public class SmapUtil {
      * @param ctxt Current compilation context
      * @param pageNodes The current JSP page
      * @return a SMAP for the page
+     * @throws IOException Error writing SMAP
      */
     public static String[] generateSmap(
         JspCompilationContext ctxt,

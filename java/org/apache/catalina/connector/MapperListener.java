@@ -80,6 +80,10 @@ public class MapperListener extends LifecycleMBeanBase
 
     /**
      * Create mapper listener.
+     *
+     * @param mapper    The Mapper with which this listener will be associated
+     * @param connector The Connector with which this listener will be
+     *                    associated
      */
     public MapperListener(Mapper mapper, Connector connector) {
         this.mapper = mapper;

@@ -30,6 +30,9 @@ public interface Adapter {
     /**
      * Call the service method, and notify all listeners
      *
+     * @param req The request object
+     * @param res The response object
+     *
      * @exception Exception if an error happens during handling of
      *   the request. Common errors are:
      *   <ul><li>IOException if an input/output error occurs and we are

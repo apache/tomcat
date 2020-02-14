@@ -1112,6 +1112,7 @@ public class CoyoteAdapter implements Adapter {
     /**
      * Parse session id in Cookie.
      *
+     * @param req     The Coyote request object
      * @param request The Servlet request object
      */
     protected void parseSessionCookiesId(org.apache.coyote.Request req, Request request) {

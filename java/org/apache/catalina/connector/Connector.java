@@ -420,7 +420,7 @@ public class Connector extends LifecycleMBeanBase  {
 
 
     /**
-     * Return descriptive information about this Connector implementation.
+     * @return descriptive information about this Connector implementation.
      */
     public String getInfo() {
 
@@ -430,7 +430,7 @@ public class Connector extends LifecycleMBeanBase  {
 
 
     /**
-     * Return the mapper.
+     * @return the mapper.
      */
     public Mapper getMapper() {
         return (mapper);
@@ -438,7 +438,7 @@ public class Connector extends LifecycleMBeanBase  {
 
 
     /**
-     * Return the maximum number of headers that are allowed by the container. A
+     * @return the maximum number of headers that are allowed by the container. A
      * value of less than 0 means no limit.
      */
     public int getMaxHeaderCount() {

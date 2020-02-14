@@ -173,6 +173,10 @@ public class TldLocationsCache {
     /**
      * Obtains the TLD location cache for the given {@link ServletContext} and
      * creates one if one does not currently exist.
+     *
+     * @param ctxt The Servlet context for which the cache is required.
+     *
+     * @return The TLD location cache for the provided Servlet context
      */
     public static synchronized TldLocationsCache getInstance(
             ServletContext ctxt) {
@@ -202,6 +206,8 @@ public class TldLocationsCache {
      * second element denotes the name of the TLD entry in the jar file.
      * Returns null if the uri is not associated with any tag library 'exposed'
      * in the web application.
+     *
+     * @throws JasperException if initialisation of the cache fails
      */
     public TldLocation getLocation(String uri) throws JasperException {
         if (!initialized) {
@@ -215,6 +221,10 @@ public class TldLocationsCache {
      *     ABS_URI
      *     ROOT_REL_URI
      *     NOROOT_REL_URI
+     *
+     * @param uri   The URI for which the type is required
+     *
+     * @return The type as an int constant
      */
     public static int uriType(String uri) {
         if (uri.indexOf(':') != -1) {
