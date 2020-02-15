@@ -155,7 +155,7 @@ public class SSLHostConfig implements Serializable {
      * Set property which belongs to the specified configuration type.
      * @param name the property name
      * @param configType the configuration type
-     * @return true if the property belongs to the current confuguration,
+     * @return true if the property belongs to the current configuration,
      *   and false otherwise
      */
     boolean setProperty(String name, Type configType) {
