@@ -151,15 +151,24 @@ public class SSLHostConfig implements Serializable {
     }
 
 
-    void setProperty(String name, Type configType) {
+    /**
+     * Set property which belongs to the specified configuration type.
+     * @param name the property name
+     * @param configType the configuration type
+     * @return true if the property belongs to the current configuration,
+     *   and false otherwise
+     */
+    boolean setProperty(String name, Type configType) {
         if (this.configType == null) {
             this.configType = configType;
         } else {
             if (configType != this.configType) {
                 log.warn(sm.getString("sslHostConfig.mismatch",
                         name, getHostName(), configType, this.configType));
+                return false;
             }
         }
+        return true;
     }
 
 
@@ -788,7 +797,12 @@ public class SSLHostConfig implements Serializable {
 
 
     public void setCaCertificateFile(String caCertificateFile) {
-        setProperty("caCertificateFile", Type.OPENSSL);
+        if (setProperty("caCertificateFile", Type.OPENSSL)) {
+            // Reset default JSSE trust store if not a JSSE configuration
+            if (truststoreFile != null) {
+                truststoreFile = null;
+            }
+        }
         this.caCertificateFile = caCertificateFile;
     }
 
@@ -799,7 +813,12 @@ public class SSLHostConfig implements Serializable {
 
 
     public void setCaCertificatePath(String caCertificatePath) {
-        setProperty("caCertificatePath", Type.OPENSSL);
+        if (setProperty("caCertificatePath", Type.OPENSSL)) {
+            // Reset default JSSE trust store if not a JSSE configuration
+            if (truststoreFile != null) {
+                truststoreFile = null;
+            }
+        }
         this.caCertificatePath = caCertificatePath;
     }
 
