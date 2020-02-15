@@ -80,6 +80,10 @@
         performed, the read/write would time out rather than return immediately.
         (markt)
       </fix>
+      <fix>
+        <bug>64141</bug>: If using a CA certificate, remove a default value
+        for the truststore file when not using a JSSE configuration. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
