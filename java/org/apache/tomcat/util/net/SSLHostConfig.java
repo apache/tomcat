@@ -674,7 +674,6 @@ public class SSLHostConfig implements Serializable {
         if (setProperty("caCertificateFile", Type.OPENSSL)) {
             // Reset default JSSE trust store if not a JSSE configuration
             if (truststoreFile != null) {
-                System.out.println("RESET !!!!!!!!!!!!!!!!!");
                 truststoreFile = null;
             }
         }
