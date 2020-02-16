@@ -145,24 +145,8 @@ public class Digester extends DefaultHandler2 {
         }
     }
 
-
-    public static class EnvironmentPropertySource implements IntrospectionUtils.SecurePropertySource {
-
-        @Override
-        public String getProperty(String key) {
-            return null;
-        }
-
-        @Override
-        public String getProperty(String key, ClassLoader classLoader) {
-            if (classLoader instanceof PermissionCheck) {
-                Permission p = new RuntimePermission("getenv." + key, null);
-                if (!((PermissionCheck) classLoader).check(p)) {
-                    return null;
-                }
-            }
-            return System.getenv(key);
-        }
+    // for backwards compatibility
+    public static class EnvironmentPropertySource extends org.apache.tomcat.util.digester.EnvironmentPropertySource {
     }
 
 
