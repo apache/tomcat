@@ -30,6 +30,61 @@ import org.apache.catalina.tribes.membership.MemberImpl;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
+/**
+ * A {@link org.apache.catalina.tribes.MembershipProvider} that uses DNS to retrieve the members of a cluster.<br>
+ *
+ * <p>
+ * <strong>Configuration example for Kubernetes</strong>
+ * </p>
+ *
+ * {@code server.xml }
+ *
+ * <pre>
+ * {@code
+ * <Server ...
+ *
+ *   <Service ...
+ *
+ *     <Engine ...
+ *
+ *       <Host ...
+ *
+ *         <Cluster className="org.apache.catalina.ha.tcp.SimpleTcpCluster">
+ *           <Channel className="org.apache.catalina.tribes.group.GroupChannel">
+ *             <Membership className="org.apache.catalina.tribes.membership.cloud.CloudMembershipService"
+ *                 membershipProviderClassName="org.apache.catalina.tribes.membership.cloud.DNSMembershipProvider"/>
+ *           </Channel>
+ *         </Cluster>
+ *         ...
+ *  }
+ *  </pre>
+ *
+ * {@code dns-membership-service.yml }
+ *
+ * <pre>
+ * {@code
+ * apiVersion: v1
+ * kind: Service
+ * metadata:
+ *   annotations:
+ *     service.alpha.kubernetes.io/tolerate-unready-endpoints: "true"
+ *     description: "The service for tomcat cluster membership."
+ *   name: my-tomcat-app-membership
+ * spec:
+ *   clusterIP: None
+ *   ports:
+ *   - name: membership
+ *     port: 8888
+ *   selector:
+ *     app: my-tomcat-app
+ * }
+ * </pre>
+ *
+ * Environment variable configuration<br>
+ *
+ * {@code DNS_MEMBERSHIP_SERVICE_NAME=my-tomcat-app-membership }
+ */
+
 public class DNSMembershipProvider extends CloudMembershipProvider {
     private static final Log log = LogFactory.getLog(DNSMembershipProvider.class);
 
