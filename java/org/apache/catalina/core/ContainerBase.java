@@ -1331,7 +1331,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
     // -------------------------------------- ContainerExecuteDelay Inner Class
 
     /**
-     * Private thread class to invoke the backgroundProcess method
+     * Private runnable class to invoke the backgroundProcess method
      * of this container and its children after a fixed delay.
      */
     protected class ContainerBackgroundProcessor implements Runnable {
@@ -1397,7 +1397,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
     }
 
 
-    // ----------------------------- Inner classes used with start/stop Executor
+    // ---------------------------- Inner classes used with start/stop Executor
 
     private static class StartChild implements Callable<Void> {
 
