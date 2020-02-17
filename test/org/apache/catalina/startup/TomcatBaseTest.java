@@ -667,8 +667,13 @@ public abstract class TomcatBaseTest extends LoggingBaseTest {
         connection.connect();
         int rc = connection.getResponseCode();
         if (resHead != null) {
-            Map<String, List<String>> head = connection.getHeaderFields();
-            resHead.putAll(head);
+            // Skip the entry with null key that is used for the response line
+            // that some Map implementations may not accept.
+            for (Map.Entry<String, List<String>> entry : connection.getHeaderFields().entrySet()) {
+                if (entry.getKey() != null) {
+                    resHead.put(entry.getKey(), entry.getValue());
+                }
+            }
         }
         InputStream is;
         if (rc < 400) {
