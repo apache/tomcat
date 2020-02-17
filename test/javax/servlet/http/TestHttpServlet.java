@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.Servlet;
 import javax.servlet.ServletException;
 
 import org.junit.Assert;
@@ -157,6 +158,41 @@ public class TestHttpServlet extends TomcatBaseTest {
     }
 
 
+
+
+    @Test
+    public void testDoOptions() throws Exception {
+        doTestDoOptions(new OptionsServlet(), "GET, HEAD, OPTIONS");
+    }
+
+
+    @Test
+    public void testDoOptionsSub() throws Exception {
+        doTestDoOptions(new OptionsServletSub(), "GET, HEAD, POST, OPTIONS");
+    }
+
+
+    private void doTestDoOptions(Servlet servlet, String expectedAllow) throws Exception{
+        Tomcat tomcat = getTomcatInstance();
+
+        // No file system docBase required
+        StandardContext ctx = (StandardContext) tomcat.addContext("", null);
+
+        // Map the test Servlet
+        Tomcat.addServlet(ctx, "servlet", servlet);
+        ctx.addServletMappingDecoded("/", "servlet");
+
+        tomcat.start();
+
+        Map<String,List<String>> resHeaders= new HashMap<>();
+        int rc = methodUrl("http://localhost:" + getPort() + "/", new ByteChunk(),
+               DEFAULT_CLIENT_TIMEOUT_MS, null, resHeaders, "OPTIONS");
+
+        Assert.assertEquals(HttpServletResponse.SC_OK, rc);
+        Assert.assertEquals(expectedAllow, resHeaders.get("Allow").get(0));
+    }
+
+
     private static class Bug57602ServletOuter extends HttpServlet {
 
         private static final long serialVersionUID = 1L;
@@ -202,6 +238,33 @@ public class TestHttpServlet extends TomcatBaseTest {
             // Trigger chunking
             pw.write(new char[8192 * 16]);
             pw.println("Data");
+        }
+    }
+
+
+    private static class OptionsServlet extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+                throws ServletException, IOException {
+            resp.setContentType("text/plain");
+            resp.setCharacterEncoding("UTF-8");
+            PrintWriter pw = resp.getWriter();
+            pw.print("OK");
+        }
+    }
+
+
+    private static class OptionsServletSub extends OptionsServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        protected void doPost(HttpServletRequest req, HttpServletResponse resp)
+                throws ServletException, IOException {
+            doGet(req, resp);
         }
     }
 }
