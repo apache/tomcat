@@ -944,6 +944,9 @@ public class Response implements HttpServletResponse {
      * Reset this response, and specify the values for the HTTP status code
      * and corresponding message.
      *
+     * @param status The new HTTP status
+     * @param message The associated text message
+     *
      * @exception IllegalStateException if this response has already been
      *  committed
      */
