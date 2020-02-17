@@ -102,6 +102,10 @@
         <code>DNS_MEMBERSHIP_SERVICE_NAME</code> environment for use with the
         DNS membership provider. Submitted by Bernd Bohmann. (remm)
       </fix>
+      <fix>
+        Allow configuring the <code>DNSMembershipProvider</code> using the
+        <code>dns</code> alias. Submitted by Bernd Bohmann. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
