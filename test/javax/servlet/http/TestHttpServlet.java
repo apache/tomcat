@@ -158,8 +158,6 @@ public class TestHttpServlet extends TomcatBaseTest {
     }
 
 
-
-
     @Test
     public void testDoOptions() throws Exception {
         doTestDoOptions(new OptionsServlet(), "GET, HEAD, OPTIONS");
