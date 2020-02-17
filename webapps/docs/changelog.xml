@@ -57,6 +57,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Cluster">
+    <changelog>
+      <fix>
+        Allow configuring the <code>DNSMembershipProvider</code> using the
+        <code>dns</code> alias. Submitted by Bernd Bohmann. (remm)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 10.0.0-M1 (markt)" rtext="release in progress">
   <subsection name="General">
