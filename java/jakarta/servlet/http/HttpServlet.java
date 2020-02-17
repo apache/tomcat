@@ -92,6 +92,9 @@ public abstract class HttpServlet extends GenericServlet {
     private static final ResourceBundle lStrings =
         ResourceBundle.getBundle(LSTRING_FILE);
 
+    private final Object cachedAllowHeaderValueLock = new Object();
+    private volatile String cachedAllowHeaderValue = null;
+
 
     /**
      * Does nothing, because this is an abstract class.
@@ -421,6 +424,89 @@ public abstract class HttpServlet extends GenericServlet {
     }
 
 
+    private String getCachedAllowHeaderValue() {
+        if (cachedAllowHeaderValue == null) {
+            synchronized (cachedAllowHeaderValueLock) {
+                if (cachedAllowHeaderValue == null) {
+
+                    Method[] methods = getAllDeclaredMethods(this.getClass());
+
+                    // RFC 7230 does not define an order for this header
+                    // This code aims to retain, broadly, the order of method
+                    // tokens returned in earlier versions of this code. If that
+                    // constraint is dropped then the code can be simplified
+                    // further.
+
+                    boolean allowGet = false;
+                    boolean allowHead = false;
+                    boolean allowPost = false;
+                    boolean allowPut = false;
+                    boolean allowDelete = false;
+
+                    for (int i = 0; i < methods.length; i++) {
+                        switch (methods[i].getName()) {
+                            case "doGet": {
+                                allowGet = true;
+                                allowHead = true;
+                                break;
+                            }
+                            case "doPost": {
+                                allowPost = true;
+                                break;
+                            }
+                            case "doPut": {
+                                allowPut = true;
+                                break;
+                            }
+                            case "doDelete": {
+                                allowDelete = true;
+                                break;
+                            }
+                            default:
+                                // NO-OP
+                        }
+
+                    }
+
+                    StringBuilder allow = new StringBuilder();
+
+                    if (allowGet) {
+                        allow.append(METHOD_GET);
+                        allow.append(", ");
+                    }
+
+                    if (allowHead) {
+                        allow.append(METHOD_HEAD);
+                        allow.append(", ");
+                    }
+
+                    if (allowPost) {
+                        allow.append(METHOD_POST);
+                        allow.append(", ");
+                    }
+
+                    if (allowPut) {
+                        allow.append(METHOD_PUT);
+                        allow.append(", ");
+                    }
+
+                    if (allowDelete) {
+                        allow.append(METHOD_DELETE);
+                        allow.append(", ");
+                    }
+
+                    // Options is always allowed
+                    allow.append(METHOD_OPTIONS);
+
+                    cachedAllowHeaderValue = allow.toString();
+                }
+            }
+        }
+
+        return cachedAllowHeaderValue;
+    }
+
+
     private static Method[] getAllDeclaredMethods(Class<?> c) {
 
         if (c.equals(jakarta.servlet.http.HttpServlet.class)) {
@@ -476,68 +562,19 @@ public abstract class HttpServlet extends GenericServlet {
      * @exception ServletException  if the request for the
      *                                  OPTIONS cannot be handled
      */
-    protected void doOptions(HttpServletRequest req,
-            HttpServletResponse resp)
-        throws ServletException, IOException {
+    protected void doOptions(HttpServletRequest req, HttpServletResponse resp)
+            throws ServletException, IOException {
 
-        Method[] methods = getAllDeclaredMethods(this.getClass());
-
-        boolean ALLOW_GET = false;
-        boolean ALLOW_HEAD = false;
-        boolean ALLOW_POST = false;
-        boolean ALLOW_PUT = false;
-        boolean ALLOW_DELETE = false;
-        boolean ALLOW_TRACE = true;
-        boolean ALLOW_OPTIONS = true;
+        String allow = getCachedAllowHeaderValue();
 
         // Tomcat specific hack to see if TRACE is allowed
-        Class<?> clazz = null;
-        try {
-            clazz = Class.forName("org.apache.catalina.connector.RequestFacade");
-            Method getAllowTrace = clazz.getMethod("getAllowTrace", (Class<?>[]) null);
-            ALLOW_TRACE = ((Boolean) getAllowTrace.invoke(req, (Object[]) null)).booleanValue();
-        } catch (ClassNotFoundException | NoSuchMethodException | SecurityException |
-                IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-            // Ignore. Not running on Tomcat. TRACE is always allowed.
-        }
-        // End of Tomcat specific hack
-
-        for (int i=0; i<methods.length; i++) {
-            Method m = methods[i];
-
-            if (m.getName().equals("doGet")) {
-                ALLOW_GET = true;
-                ALLOW_HEAD = true;
+        if (TomcatHack.getAllowTrace(req)) {
+            if (allow.length() == 0) {
+                allow = METHOD_TRACE;
+            } else {
+                allow = allow + ", " + METHOD_TRACE;
             }
-            if (m.getName().equals("doPost"))
-                ALLOW_POST = true;
-            if (m.getName().equals("doPut"))
-                ALLOW_PUT = true;
-            if (m.getName().equals("doDelete"))
-                ALLOW_DELETE = true;
         }
-
-        String allow = null;
-        if (ALLOW_GET)
-            allow=METHOD_GET;
-        if (ALLOW_HEAD)
-            if (allow==null) allow=METHOD_HEAD;
-            else allow += ", " + METHOD_HEAD;
-        if (ALLOW_POST)
-            if (allow==null) allow=METHOD_POST;
-            else allow += ", " + METHOD_POST;
-        if (ALLOW_PUT)
-            if (allow==null) allow=METHOD_PUT;
-            else allow += ", " + METHOD_PUT;
-        if (ALLOW_DELETE)
-            if (allow==null) allow=METHOD_DELETE;
-            else allow += ", " + METHOD_DELETE;
-        if (ALLOW_TRACE)
-            if (allow==null) allow=METHOD_TRACE;
-            else allow += ", " + METHOD_TRACE;
-        if (ALLOW_OPTIONS)
-            if (allow==null) allow=METHOD_OPTIONS;
-            else allow += ", " + METHOD_OPTIONS;
 
         resp.setHeader("Allow", allow);
     }
@@ -739,6 +776,41 @@ public abstract class HttpServlet extends GenericServlet {
             throw new ServletException(lStrings.getString("http.non_http"));
         }
         service(request, response);
+    }
+
+
+    private static class TomcatHack {
+
+        private static final Class<?> REQUEST_FACADE_CLAZZ;
+        private static final Method GET_ALLOW_TRACE;
+
+
+        static {
+            Method m1 = null;
+            Class<?> c1 = null;
+            try {
+                c1 = Class.forName("org.apache.catalina.connector.RequestFacade");
+                m1 = c1.getMethod("getAllowTrace", (Class<?>[]) null);
+            } catch (ReflectiveOperationException | SecurityException | IllegalArgumentException e) {
+                // Ignore. Not running on Tomcat. TRACE is always allowed.
+            }
+            REQUEST_FACADE_CLAZZ = c1;
+            GET_ALLOW_TRACE = m1;
+        }
+
+        public static boolean getAllowTrace(HttpServletRequest req) {
+            if (REQUEST_FACADE_CLAZZ != null && GET_ALLOW_TRACE != null) {
+                if (REQUEST_FACADE_CLAZZ.isAssignableFrom(req.getClass())) {
+                    try {
+                        return ((Boolean) GET_ALLOW_TRACE.invoke(req, (Object[]) null)).booleanValue();
+                    } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+                        // Should never happen given the checks in place.
+                        // Ignore
+                    }
+                }
+            }
+            return true;
+        }
     }
 }
 
