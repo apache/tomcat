@@ -41,8 +41,7 @@ public class TestHttpServlet extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
-        StandardContext ctx = (StandardContext)
-            tomcat.addContext("", null);
+        StandardContext ctx = (StandardContext) tomcat.addContext("", null);
 
         // Map the test Servlet
         LargeBodyServlet largeBodyServlet = new LargeBodyServlet();
@@ -51,8 +50,7 @@ public class TestHttpServlet extends TomcatBaseTest {
 
         tomcat.start();
 
-        Map<String,List<String>> resHeaders=
-                new HashMap<String, List<String>>();
+        Map<String,List<String>> resHeaders= new HashMap<String, List<String>>();
         int rc = headUrl("http://localhost:" + getPort() + "/", new ByteChunk(),
                resHeaders);
 
@@ -75,7 +73,7 @@ public class TestHttpServlet extends TomcatBaseTest {
     }
 
 
-    /**
+    /*
      * Verifies that the same Content-Length is returned for both GET and HEAD
      * operations when a Servlet includes content from another Servlet
      */
