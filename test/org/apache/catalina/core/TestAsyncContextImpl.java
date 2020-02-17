@@ -311,7 +311,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
 
         private volatile boolean done = false;
 
-        private StringBuilder result;
+        private volatile StringBuilder result;
 
         public static final long THREAD_SLEEP_TIME = 1000;
 
