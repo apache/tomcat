@@ -447,7 +447,7 @@ public abstract class HttpServlet extends GenericServlet {
 
     /**
      * Called by the server (via the <code>service</code> method)
-     * to allow a servlet to handle a OPTIONS request.
+     * to allow a servlet to handle an OPTIONS request.
      *
      * The OPTIONS request determines which HTTP methods
      * the server supports and
