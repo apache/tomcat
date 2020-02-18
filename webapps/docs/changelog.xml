@@ -51,6 +51,10 @@
         Refactor <code>HttpServlet.doOptions()</code> to improve performance.
         (markt)
       </scode>
+      <update>
+        Disable StandardManager session persistence by default. It can be
+        enabled back in <code>context.xml</code>. (remm)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Coyote">

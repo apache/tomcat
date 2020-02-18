@@ -47,8 +47,6 @@ New items for 10.0.0.x onwards:
 
  7. Refactor DefaultServlet to use Ranges in parseRanges().
 
- 8. Disable session persistence: StandardManager.pathname defaults to null.
-
 Deferred until 10.0.x:
 
  1.  Remove the ExtensionValidator and associated classes (assuming that the

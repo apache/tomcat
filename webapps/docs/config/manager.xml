@@ -116,10 +116,10 @@
         <p>Absolute or relative (to the work directory for this Context)
         pathname of the file in which session state will be preserved
         across application restarts, if possible.  The default is
-        "SESSIONS.ser".<br />See
+        null.<br />See
         <a href="#Persistence_Across_Restarts">Persistence Across Restarts</a>
         for more information. This persistence may be
-        disabled by setting this attribute to an empty string.</p>
+        enabled by setting this attribute to a non empty string.</p>
       </attribute>
 
       <attribute name="processExpiresFrequency" required="false">
@@ -555,15 +555,16 @@
 
   </subsection>
 
-  <subsection name="Disable Session Persistence">
+  <subsection name="Enable Session Persistence">
 
     <p>As documented above, every web application by default has
-    standard manager implementation configured, and it performs session
-    persistence across restarts. To disable this persistence feature, create
+    standard manager implementation configured, which can perform session
+    persistence across restarts. To enable this persistence feature, create
     a <a href="context.html">Context</a> configuration file for your web
-    application and add the following element there:</p>
+    application and add the following element there (in this example,
+    it will save sessions to files named <code>SESSIONS.ser</code>):</p>
 
-    <source><![CDATA[<Manager pathname="" />]]></source>
+    <source><![CDATA[<Manager pathname="SESSIONS.ser" />]]></source>
   </subsection>
 
 </section>

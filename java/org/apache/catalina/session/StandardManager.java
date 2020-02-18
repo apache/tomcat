@@ -108,7 +108,7 @@ public class StandardManager extends ManagerBase {
      * temporary working directory provided by our context, available via
      * the <code>jakarta.servlet.context.tempdir</code> context attribute.
      */
-    protected String pathname = "SESSIONS.ser";
+    protected String pathname = null;
 
 
     // ------------------------------------------------------------- Properties
