@@ -145,7 +145,12 @@ public class Digester extends DefaultHandler2 {
         }
     }
 
-    // for backwards compatibility
+    /**
+     * A {@link org.apache.tomcat.util.IntrospectionUtils.SecurePropertySource} that uses environment variables to resolve expressions.
+     * Still available for backwards compatibility.
+     * @see org.apache.tomcat.util.digester.EnvironmentPropertySource
+     *
+     */
     public static class EnvironmentPropertySource extends org.apache.tomcat.util.digester.EnvironmentPropertySource {
     }
 
