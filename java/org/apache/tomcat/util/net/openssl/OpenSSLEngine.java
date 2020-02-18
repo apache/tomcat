@@ -141,7 +141,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
     private boolean handshakeFinished;
     private int currentHandshake;
     private boolean receivedShutdown;
-    private volatile boolean destroyed;
+    private final AtomicBoolean destroyed = new AtomicBoolean(false);
 
     // Use an invalid cipherSuite until the handshake is completed
     // See http://docs.oracle.com/javase/7/docs/api/javax/net/ssl/SSLEngine.html#getSession()
@@ -197,10 +197,8 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
             throw new IllegalArgumentException(sm.getString("engine.noSSLContext"));
         }
         session = new OpenSSLSession();
-        destroyed = true;
         ssl = SSL.newSSL(sslCtx, !clientMode);
         networkBIO = SSL.makeNetworkBIO(ssl);
-        destroyed = false;
         this.fallbackApplicationProtocol = fallbackApplicationProtocol;
         this.clientMode = clientMode;
         this.sessionContext = sessionContext;
@@ -219,10 +217,14 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
      * Destroys this engine.
      */
     public synchronized void shutdown() {
-        if (!destroyed) {
-            destroyed = true;
-            SSL.freeBIO(networkBIO);
-            SSL.freeSSL(ssl);
+        // Guard against multiple shutdown() calls triggered by construction exception and finalize() later
+        if (destroyed.compareAndSet(false, true)) {
+            if (networkBIO != 0) {
+                SSL.freeBIO(networkBIO);
+            }
+            if (ssl != 0) {
+                SSL.freeSSL(ssl);
+            }
             ssl = networkBIO = 0;
 
             // internal errors can cause shutdown without marking the engine closed
@@ -388,7 +390,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
     public synchronized SSLEngineResult wrap(final ByteBuffer[] srcs, final int offset, final int length, final ByteBuffer dst) throws SSLException {
 
         // Check to make sure the engine has not been closed
-        if (destroyed) {
+        if (destroyed.get()) {
             return new SSLEngineResult(SSLEngineResult.Status.CLOSED, SSLEngineResult.HandshakeStatus.NOT_HANDSHAKING, 0, 0);
         }
 
@@ -491,7 +493,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
     @Override
     public synchronized SSLEngineResult unwrap(final ByteBuffer src, final ByteBuffer[] dsts, final int offset, final int length) throws SSLException {
         // Check to make sure the engine has not been closed
-        if (destroyed) {
+        if (destroyed.get()) {
             return new SSLEngineResult(SSLEngineResult.Status.CLOSED, SSLEngineResult.HandshakeStatus.NOT_HANDSHAKING, 0, 0);
         }
 
@@ -684,7 +686,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         isOutboundDone = true;
         engineClosed = true;
 
-        if (accepted != Accepted.NOT && !destroyed) {
+        if (accepted != Accepted.NOT && !destroyed.get()) {
             int mode = SSL.getShutdown(ssl);
             if ((mode & SSL.SSL_SENT_SHUTDOWN) != SSL.SSL_SENT_SHUTDOWN) {
                 SSL.shutdownSSL(ssl);
@@ -708,7 +710,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
 
     @Override
     public synchronized String[] getEnabledCipherSuites() {
-        if (destroyed) {
+        if (destroyed.get()) {
             return new String[0];
         }
         String[] enabled = SSL.getCiphers(ssl);
@@ -733,7 +735,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         if (cipherSuites == null) {
             throw new IllegalArgumentException(sm.getString("engine.nullCipherSuite"));
         }
-        if (destroyed) {
+        if (destroyed.get()) {
             return;
         }
         final StringBuilder buf = new StringBuilder();
@@ -773,7 +775,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
 
     @Override
     public synchronized String[] getEnabledProtocols() {
-        if (destroyed) {
+        if (destroyed.get()) {
             return new String[0];
         }
         List<String> enabled = new ArrayList<>();
@@ -812,7 +814,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
             // This is correct from the API docs
             throw new IllegalArgumentException();
         }
-        if (destroyed) {
+        if (destroyed.get()) {
             return;
         }
         boolean sslv2 = false;
@@ -863,7 +865,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
 
     @Override
     public synchronized void beginHandshake() throws SSLException {
-        if (engineClosed || destroyed) {
+        if (engineClosed || destroyed.get()) {
             throw new SSLException(sm.getString("engine.engineClosed"));
         }
         switch (accepted) {
@@ -972,7 +974,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
 
     @Override
     public synchronized SSLEngineResult.HandshakeStatus getHandshakeStatus() {
-        if (accepted == Accepted.NOT || destroyed) {
+        if (accepted == Accepted.NOT || destroyed.get()) {
             return SSLEngineResult.HandshakeStatus.NOT_HANDSHAKING;
         }
 
@@ -1146,7 +1148,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         public byte[] getId() {
             byte[] id = null;
             synchronized (OpenSSLEngine.this) {
-                if (!destroyed) {
+                if (!destroyed.get()) {
                     id = SSL.getSessionId(ssl);
                 }
             }
@@ -1164,7 +1166,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
             // We need to multiply by 1000 as OpenSSL uses seconds and we need milliseconds.
             long creationTime = 0;
             synchronized (OpenSSLEngine.this) {
-                if (!destroyed) {
+                if (!destroyed.get()) {
                     creationTime = SSL.getTime(ssl);
                 }
             }
@@ -1253,7 +1255,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
                 byte[] clientCert;
                 byte[][] chain;
                 synchronized (OpenSSLEngine.this) {
-                    if (destroyed || SSL.isInInit(ssl) != 0) {
+                    if (destroyed.get() || SSL.isInInit(ssl) != 0) {
                         throw new SSLPeerUnverifiedException(sm.getString("engine.unverifiedPeer"));
                     }
                     chain = SSL.getPeerCertChain(ssl);
@@ -1310,7 +1312,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
             if (c == null) {
                 byte[][] chain;
                 synchronized (OpenSSLEngine.this) {
-                    if (destroyed || SSL.isInInit(ssl) != 0) {
+                    if (destroyed.get() || SSL.isInInit(ssl) != 0) {
                         throw new SSLPeerUnverifiedException(sm.getString("engine.unverifiedPeer"));
                     }
                     chain = SSL.getPeerCertChain(ssl);
@@ -1362,7 +1364,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
                     if (!handshakeFinished) {
                         return INVALID_CIPHER;
                     }
-                    if (destroyed) {
+                    if (destroyed.get()) {
                         return INVALID_CIPHER;
                     }
                     ciphers = SSL.getCipherForSSL(ssl);
@@ -1380,7 +1382,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
             String applicationProtocol = OpenSSLEngine.this.applicationProtocol;
             if (applicationProtocol == null) {
                 synchronized (OpenSSLEngine.this) {
-                    if (!destroyed) {
+                    if (!destroyed.get()) {
                         applicationProtocol = SSL.getNextProtoNegotiated(ssl);
                     }
                 }
@@ -1395,7 +1397,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
             }
             String version = null;
             synchronized (OpenSSLEngine.this) {
-                if (!destroyed) {
+                if (!destroyed.get()) {
                     version = SSL.getVersion(ssl);
                 }
             }
