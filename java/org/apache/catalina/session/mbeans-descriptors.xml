@@ -65,6 +65,10 @@
           description="Path name of the disk file in which active sessions"
                  type="java.lang.String"/>
 
+    <attribute   name="persistAuthentication"
+          description="Indicates whether sessions shall persist authentication information when being persisted (e.g. across application restarts)."
+                 type="boolean"/>
+
     <attribute   name="processExpiresFrequency"
           description="The frequency of the manager checks (expiration and passivation)"
                  type="int"/>
@@ -255,6 +259,10 @@
           description="The descriptive name of this Manager implementation (for logging)"
                  type="java.lang.String"
             writeable="false"/>
+
+    <attribute   name="persistAuthentication"
+          description="Indicates whether sessions shall persist authentication information when being backed up to the store (e.g. across application restarts)."
+                 type="boolean"/>
 
     <attribute   name="processExpiresFrequency"
           description="The frequency of the manager checks (expiration and passivation)"
