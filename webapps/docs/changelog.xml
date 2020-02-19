@@ -85,6 +85,12 @@
         The old class is still available but deprecated. Patch provided by Bernd
         Bohmann. (markt)
       </scode>
+      <add>
+        Add new attribute <code>persistAuthentication</code> to both
+        <code>StandardManager</code> and <code>PersistentManager</code> to
+        support authentication persistence. Patch provided by Carsten Klein.
+        (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
