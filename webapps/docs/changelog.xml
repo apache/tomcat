@@ -78,6 +78,10 @@
         <bug>64141</bug>: If using a CA certificate, remove a default value
         for the truststore file when not using a JSSE configuration. (remm)
       </fix>
+      <fix>
+        Improve robustness of OpenSSLEngine shutdown. Based on code submitted
+        by Manuel Dominguez Sarmiento. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
