@@ -197,6 +197,12 @@ public abstract class ManagerBase extends LifecycleMBeanBase implements Manager 
 
     private boolean notifyAttributeListenerOnUnchangedValue = true;
 
+    /**
+     * Determines whether newly created sessions managed by this manager shall persist (serialize)
+     * authentication information or not. This value is passed to sessions upon creation, so changes
+     * to this property are only reflected by sessions that have been created after such a change.
+     */
+    private boolean persistAuthentication = false;
 
     // ------------------------------------------------------------ Constructors
 
@@ -205,7 +211,8 @@ public abstract class ManagerBase extends LifecycleMBeanBase implements Manager 
             // Minimum set required for default distribution/persistence to work
             // plus String
             setSessionAttributeValueClassNameFilter(
-                    "java\\.lang\\.(?:Boolean|Integer|Long|Number|String)");
+                    "java\\.lang\\.(?:Boolean|Integer|Long|Number|String)"
+                    + "|org\\.apache\\.catalina\\.realm\\.GenericPrincipal\\.SerializablePrincipal");
             setWarnOnSessionAttributeFilterFailure(true);
         }
     }
@@ -543,6 +550,29 @@ public abstract class ManagerBase extends LifecycleMBeanBase implements Manager 
                                    Integer.valueOf(this.processExpiresFrequency));
 
     }
+
+    /**
+     * Return whether newly created sessions managed by this manager shall persist authentication
+     * information or not.
+     * 
+     * @return {@code true}, newly created sessions managed by this manager shall persist
+     *         authentication information; {@code false} otherwise
+     */
+    public boolean getPersistAuthentication() {
+        return this.persistAuthentication;
+    }
+
+    /**
+     * Set whether newly created sessions managed by this manager shall persist authentication
+     * information or not.
+     * 
+     * @param persistAuthentication if {@code true}, newly created sessions managed by this
+     *                              manager shall persist authentication information
+     */
+    public void setPersistAuthentication(boolean persistAuthentication) {
+        this.persistAuthentication = persistAuthentication;
+    }
+
     // --------------------------------------------------------- Public Methods
 
 
