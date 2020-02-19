@@ -210,9 +210,11 @@ public abstract class ManagerBase extends LifecycleMBeanBase implements Manager 
         if (Globals.IS_SECURITY_ENABLED) {
             // Minimum set required for default distribution/persistence to work
             // plus String
+            // plus SerializablePrincipal and String[] (required for authentication persistence)
             setSessionAttributeValueClassNameFilter(
                     "java\\.lang\\.(?:Boolean|Integer|Long|Number|String)"
-                    + "|org\\.apache\\.catalina\\.realm\\.GenericPrincipal\\.SerializablePrincipal");
+                    + "|org\\.apache\\.catalina\\.realm\\.GenericPrincipal\\$SerializablePrincipal"
+                    + "|\\[Ljava.lang.String;");
             setWarnOnSessionAttributeFilterFailure(true);
         }
     }
