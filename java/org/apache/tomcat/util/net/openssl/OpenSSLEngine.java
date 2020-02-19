@@ -133,8 +133,8 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
     private static final long EMPTY_ADDR = Buffer.address(ByteBuffer.allocate(0));
 
     // OpenSSL state
-    private long ssl;
-    private long networkBIO;
+    private final long ssl;
+    private final long networkBIO;
 
     private enum Accepted { NOT, IMPLICIT, EXPLICIT }
     private Accepted accepted = Accepted.NOT;
@@ -197,10 +197,8 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
             throw new IllegalArgumentException(sm.getString("engine.noSSLContext"));
         }
         session = new OpenSSLSession();
-        destroyed = true;
         ssl = SSL.newSSL(sslCtx, !clientMode);
         networkBIO = SSL.makeNetworkBIO(ssl);
-        destroyed = false;
         this.fallbackApplicationProtocol = fallbackApplicationProtocol;
         this.clientMode = clientMode;
         this.sessionContext = sessionContext;
@@ -221,10 +219,12 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
     public synchronized void shutdown() {
         if (!destroyed) {
             destroyed = true;
-            SSL.freeBIO(networkBIO);
-            SSL.freeSSL(ssl);
-            ssl = networkBIO = 0;
-
+            if (networkBIO != 0) {
+                SSL.freeBIO(networkBIO);
+            }
+            if (ssl != 0) {
+                SSL.freeSSL(ssl);
+            }
             // internal errors can cause shutdown without marking the engine closed
             isInboundDone = isOutboundDone = engineClosed = true;
         }
