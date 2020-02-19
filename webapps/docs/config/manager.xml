@@ -212,7 +212,7 @@
         must fully match the pattern. If not specified, the default value of
         <code>null</code> will be used unless a <code>SecurityManager</code> is
         enabled in which case the default will be
-        <code><nobr>java\\.lang\\.(?:Boolean|Integer|Long|Number|String)|org\\.apache\\.catalina\\.realm\\.GenericPrincipal\\.SerializablePrincipal</nobr></code>.</p>
+        <code><nobr>java\\.lang\\.(?:Boolean|Integer|Long|Number|String)|org\\.apache\\.catalina\\.realm\\.GenericPrincipal\\$SerializablePrincipal|\\[Ljava.lang.String;</nobr></code>.</p>
       </attribute>
 
       <attribute name="warnOnSessionAttributeFilterFailure" required="false">
@@ -350,7 +350,7 @@
         must fully match the pattern. If not specified, the default value of
         <code>null</code> will be used unless a <code>SecurityManager</code> is
         enabled in which case the default will be
-        <code><nobr>java\\.lang\\.(?:Boolean|Integer|Long|Number|String)|org\\.apache\\.catalina\\.realm\\.GenericPrincipal\\.SerializablePrincipal</nobr></code>.</p>
+        <code><nobr>java\\.lang\\.(?:Boolean|Integer|Long|Number|String)|org\\.apache\\.catalina\\.realm\\.GenericPrincipal\\$SerializablePrincipal|\\[Ljava.lang.String;</nobr></code>.</p>
       </attribute>
 
       <attribute name="warnOnSessionAttributeFilterFailure" required="false">
