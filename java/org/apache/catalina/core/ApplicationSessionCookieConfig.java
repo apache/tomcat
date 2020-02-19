@@ -158,6 +158,7 @@ public class ApplicationSessionCookieConfig implements SessionCookieConfig {
      * @param sessionId   The ID of the session for which the cookie will be
      *                    created
      * @param secure      Should session cookie be configured as secure
+     * @return the cookie for the session
      */
     public static Cookie createSessionCookie(Context context,
             String sessionId, boolean secure) {
@@ -227,7 +228,10 @@ public class ApplicationSessionCookieConfig implements SessionCookieConfig {
     /**
      * Determine the name to use for the session cookie for the provided
      * context.
-     * @param context
+     *
+     * @param context     The Context for the web application
+     *
+     * @return The name to use for the session cookie
      *
      * @deprecated  Replaced by
      *              {@link SessionConfig#getSessionCookieName(Context)}. This
@@ -239,9 +243,12 @@ public class ApplicationSessionCookieConfig implements SessionCookieConfig {
     }
 
     /**
-     * Determine the name to use for the session cookie for the provided
-     * context.
-     * @param context
+     * Determine the name to use for the session ID URI parameter name for the
+     * provided context.
+     *
+     * @param context     The Context for the web application
+     *
+     * @return The name to use for the URI parameter
      *
      * @deprecated  Replaced by
      *              {@link SessionConfig#getSessionUriParamName(Context)}. This
