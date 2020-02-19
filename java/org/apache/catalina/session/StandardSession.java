@@ -1665,7 +1665,7 @@ public class StandardSession implements HttpSession, Session, Serializable {
             manager.getContext().getLogger().debug
                 ("writeObject() storing session " + id);
 
-        // Write authentication information (if configured)
+        // Gather authentication information (if configured)
         String sessionAuthType = null;
         Principal sessionPrincipal = null;
         if (isPersistAuthentication()) {
@@ -1673,10 +1673,19 @@ public class StandardSession implements HttpSession, Session, Serializable {
             sessionPrincipal = getPrincipal();
             if (!(sessionPrincipal instanceof Serializable)) {
                 sessionPrincipal = null;
+                manager.getContext().getLogger().warn(
+                        sm.getString("standardSession.principalNotSerializable", id));
             }
         }
+        
+        // Write authentication information (may be null values) 
         stream.writeObject(sessionAuthType);
-        stream.writeObject(sessionPrincipal);
+        try {
+            stream.writeObject(sessionPrincipal);
+        } catch (NotSerializableException e) {
+            manager.getContext().getLogger().warn(
+                    sm.getString("standardSession.principalNotSerializable", id), e);
+        }
 
         // Accumulate the names of serializable and non-serializable attributes
         String keys[] = keys();
