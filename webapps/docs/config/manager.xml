@@ -144,6 +144,40 @@
         disabled by setting this attribute to an empty string.</p>
       </attribute>
 
+      <attribute name="persistAuthentication" required="false">
+        <p>Should authentication information be included when session state is
+        preserved across application restarts? If <code>true</code>, the session's
+        authentication is preserved so that the session remains authenticated
+        after the application has been restarted. If not specified, the default
+        value of <code>false</code> will be used.<br />See
+        <a href="#Persistence_Across_Restarts">Persistence Across Restarts</a>
+        for more information.</p>
+
+        <p>Please note that the session's <code>Principal</code> class as well
+        as its descendant classes are all subject to the
+        <strong>sessionAttributeValueClassNameFilter</strong>. If such a filter
+        is specified or a <code>SecurityManager</code> is enabled, the names of
+        the <code>Principal</code> class and descendant classes must match that
+        filter pattern in order to be restored.</p>
+      </attribute>
+
+      <attribute name="persistAuthentication" required="false">
+        <p>Should authentication information be included when session state is
+        preserved across application restarts? If <code>true</code>, the session's
+        authentication is preserved so that the session remains authenticated
+        after the application has been restarted. If not specified, the default
+        value of <code>false</code> will be used.<br />See
+        <a href="#Persistence_Across_Restarts">Persistence Across Restarts</a>
+        for more information.</p>
+
+        <p>Please note that the session's <code>Principal</code> class as well
+        as its descendant classes are all subject to the
+        <strong>sessionAttributeValueClassNameFilter</strong>. If such a filter
+        is specified or a <code>SecurityManager</code> is enabled, the names of
+        the <code>Principal</code> class and descendant classes must match that
+        filter pattern in order to be restored.</p>
+      </attribute>
+
       <attribute name="processExpiresFrequency" required="false">
         <p>Frequency of the session expiration, and related manager operations.
         Manager operations will be done once for the specified amount of
@@ -200,7 +234,7 @@
         must fully match the pattern. If not specified, the default value of
         <code>null</code> will be used unless a <code>SecurityManager</code> is
         enabled in which case the default will be
-        <code>java\\.lang\\.(?:Boolean|Integer|Long|Number|String)</code>.</p>
+        <code><nobr>java\\.lang\\.(?:Boolean|Integer|Long|Number|String)|org\\.apache\\.catalina\\.realm\\.GenericPrincipal\\$SerializablePrincipal|\\[Ljava.lang.String;</nobr></code>.</p>
       </attribute>
 
       <attribute name="warnOnSessionAttributeFilterFailure" required="false">
@@ -271,6 +305,21 @@
         By default, this value is set to <code>-1</code>.</p>
       </attribute>
 
+      <attribute name="persistAuthentication" required="false">
+        <p>Should authentication information be included when sessions are
+        swapped out to persistent storage? If <code>true</code>, the session's
+        authentication is preserved so that the session remains authenticated
+        after being reloaded (swapped in) from persistent storage. If not 
+        specified, the default value of <code>false</code> will be used.</p>
+
+        <p>Please note that the session's <code>Principal</code> class as well
+        as its descendant classes are all subject to the
+        <strong>sessionAttributeValueClassNameFilter</strong>. If such a filter
+        is specified or a <code>SecurityManager</code> is enabled, the names of
+        the <code>Principal</code> class and descendant classes must match that
+        filter pattern in order to be restored.</p>
+      </attribute>
+
       <attribute name="processExpiresFrequency" required="false">
         <p>It is the same as described above for the
         <code>org.apache.catalina.session.StandardManager</code> class.
@@ -323,7 +372,7 @@
         must fully match the pattern. If not specified, the default value of
         <code>null</code> will be used unless a <code>SecurityManager</code> is
         enabled in which case the default will be
-        <code>java\\.lang\\.(?:Boolean|Integer|Long|Number|String)</code>.</p>
+        <code><nobr>java\\.lang\\.(?:Boolean|Integer|Long|Number|String)|org\\.apache\\.catalina\\.realm\\.GenericPrincipal\\$SerializablePrincipal|\\[Ljava.lang.String;</nobr></code>.</p>
       </attribute>
 
       <attribute name="warnOnSessionAttributeFilterFailure" required="false">
@@ -554,6 +603,15 @@
     interface.  You MAY cause the Manager to enforce this restriction by
     including the <code>&lt;distributable&gt;</code> element in your web
     application deployment descriptor (<code>/WEB-INF/web.xml</code>).</p>
+
+    <p>Note that, if <strong>persistAuthentication</strong> is also set to
+    <code>true</code>, the <code>Principal</code> class present in the session
+    MUST also implement the <code>java.io.Serializable</code> interface in order
+    to make authentication persistence work properly. The actual type of that
+    <code>Principal</code> class is determined by the <a href="realm.html">
+    Realm</a> implementation used with the application. Tomcat's standard
+    <code>Principal</code> class instantiated by most of the Realms (except
+    <code>JAASRealm</code>) implements <code>java.io.Serializable</code>.</p>
 
     <p>The persistence across restarts provided by the
     <strong>StandardManager</strong> is a simpler implementation than that

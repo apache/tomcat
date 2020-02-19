@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.ObjectStreamException;
 import java.io.Serializable;
 import java.io.WriteAbortedException;
 import java.security.AccessController;
@@ -1582,24 +1583,52 @@ public class StandardSession implements HttpSession, Session, Serializable {
         throws ClassNotFoundException, IOException {
 
         // Deserialize the scalar instance variables (except Manager)
-        authType = null;        // Transient only
+        authType = null;        // Transient (may be set later)
         creationTime = ((Long) stream.readObject()).longValue();
         lastAccessedTime = ((Long) stream.readObject()).longValue();
         maxInactiveInterval = ((Integer) stream.readObject()).intValue();
         isNew = ((Boolean) stream.readObject()).booleanValue();
         isValid = ((Boolean) stream.readObject()).booleanValue();
         thisAccessedTime = ((Long) stream.readObject()).longValue();
-        principal = null;        // Transient only
+        principal = null;        // Transient (may be set later)
         //        setId((String) stream.readObject());
         id = (String) stream.readObject();
         if (manager.getContainer().getLogger().isDebugEnabled())
             manager.getContainer().getLogger().debug
                 ("readObject() loading session " + id);
 
+        // The next object read could either be the number of attributes (Integer) or the session's
+        // authType followed by a Principal object (not an Integer)
+        Object nextObject = stream.readObject();
+        if (!(nextObject instanceof Integer)) {
+            setAuthType((String) nextObject);
+            try {
+                setPrincipal((Principal) stream.readObject());
+            } catch (ClassNotFoundException e) {
+                String msg = sm.getString("standardSession.principalNotDeserializable", id);
+                if (manager.getContainer().getLogger().isDebugEnabled()) {
+                    manager.getContainer().getLogger().debug(msg, e);
+                } else {
+                    manager.getContainer().getLogger().warn(msg);
+                }
+                throw e;
+            } catch (ObjectStreamException e) {
+                String msg = sm.getString("standardSession.principalNotDeserializable", id);
+                if (manager.getContainer().getLogger().isDebugEnabled()) {
+                    manager.getContainer().getLogger().debug(msg, e);
+                } else {
+                    manager.getContainer().getLogger().warn(msg);
+                }
+                throw e;
+            }
+            // After that, the next object read should be the number of attributes (Integer)
+            nextObject = stream.readObject();
+        }
+
         // Deserialize the attribute count and attribute values
         if (attributes == null)
             attributes = new ConcurrentHashMap<String, Object>();
-        int n = ((Integer) stream.readObject()).intValue();
+        int n = ((Integer) nextObject).intValue();
         boolean isValidSave = isValid;
         isValid = true;
         for (int i = 0; i < n; i++) {
@@ -1677,6 +1706,28 @@ public class StandardSession implements HttpSession, Session, Serializable {
             manager.getContainer().getLogger().debug
                 ("writeObject() storing session " + id);
 
+        // Gather authentication information (if configured)
+        String sessionAuthType = null;
+        Principal sessionPrincipal = null;
+        if (isPersistAuthentication()) {
+            sessionAuthType = getAuthType();
+            sessionPrincipal = getPrincipal();
+            if (!(sessionPrincipal instanceof Serializable)) {
+                sessionPrincipal = null;
+                manager.getContainer().getLogger().warn(
+                        sm.getString("standardSession.principalNotSerializable", id));
+            }
+        }
+
+        // Write authentication information (may be null values)
+        stream.writeObject(sessionAuthType);
+        try {
+            stream.writeObject(sessionPrincipal);
+        } catch (NotSerializableException e) {
+            manager.getContainer().getLogger().warn(
+                    sm.getString("standardSession.principalNotSerializable", id), e);
+        }
+
         // Accumulate the names of serializable and non-serializable attributes
         String keys[] = keys();
         ArrayList<String> saveNames = new ArrayList<String>();
@@ -1711,6 +1762,18 @@ public class StandardSession implements HttpSession, Session, Serializable {
 
     }
 
+    /**
+     * Return whether authentication information shall be persisted or not.
+     *
+     * @return {@code true}, if authentication information shall be persisted;
+     *         {@code false} otherwise
+     */
+    private boolean isPersistAuthentication() {
+        if (manager instanceof ManagerBase) {
+            return ((ManagerBase) manager).getPersistAuthentication();
+        }
+        return false;
+    }
 
     /**
      * Exclude standard attributes that cannot be serialized.
