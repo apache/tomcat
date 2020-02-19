@@ -118,6 +118,9 @@
         Expand the coverage of the Chinese translations provided with Apache
         Tomcat. Contribution provided by BoltzmannWxd. (markt)
       </add>
+      <update>
+        Update the OWB module to Apache OpenWebBeans 2.0.15. (remm)
+      </update>
     </changelog>
   </subsection>
 </section>
