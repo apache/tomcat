@@ -78,6 +78,12 @@
         changes the element API to use a nanosecond resolution elapsed time
         argument. (remm)
       </fix>
+      <add>
+        Add new attribute <code>persistAuthentication</code> to both
+        <code>StandardManager</code> and <code>PersistentManager</code> to
+        support authentication persistence. Patch provided by Carsten Klein.
+        (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
