@@ -55,6 +55,11 @@
         Disable StandardManager session persistence by default. It can be
         enabled back in <code>context.xml</code>. (remm)
       </update>
+      <add>
+        Add new attribute <code>persistAuthentication</code> to both
+        <code>StandardManager</code> and <code>PersistentManager</code> to
+        support authentication persistence. (cklein)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
