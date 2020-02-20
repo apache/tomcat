@@ -443,31 +443,29 @@ public abstract class HttpServlet extends GenericServlet {
                     boolean allowPut = false;
                     boolean allowDelete = false;
 
-                    if (methods != null) {
-                        for (final Method method : methods) {
-                            switch (method.getName()) {
-                                case "doGet": {
-                                    allowGet = true;
-                                    allowHead = true;
-                                    break;
-                                }
-                                case "doPost": {
-                                    allowPost = true;
-                                    break;
-                                }
-                                case "doPut": {
-                                    allowPut = true;
-                                    break;
-                                }
-                                case "doDelete": {
-                                    allowDelete = true;
-                                    break;
-                                }
-                                default:
-                                    // NO-OP
+                    for (int i = 0; i < methods.length; i++) {
+                        switch (methods[i].getName()) {
+                            case "doGet": {
+                                allowGet = true;
+                                allowHead = true;
+                                break;
                             }
-
+                            case "doPost": {
+                                allowPost = true;
+                                break;
+                            }
+                            case "doPut": {
+                                allowPut = true;
+                                break;
+                            }
+                            case "doDelete": {
+                                allowDelete = true;
+                                break;
+                            }
+                            default:
+                                // NO-OP
                         }
+
                     }
 
                     StringBuilder allow = new StringBuilder();
