@@ -41,13 +41,13 @@ import org.apache.tomcat.util.security.PermissionCheck;
  * How to configure:
  * <pre>
  * {@code
- *   echo "org.apache.tomcat.util.digester.EnvironmentPropertySource=org.apache.tomcat.util.digester.EnvironmentPropertySource" >> conf/catalina.properties}
+ *   echo "org.apache.tomcat.util.digester.PROPERTY_SOURCE=org.apache.tomcat.util.digester.EnvironmentPropertySource" >> conf/catalina.properties}
  * </pre>
  * or add this to {@code CATALINA_OPTS}
  *
  * <pre>
  * {@code
- *   -Dorg.apache.tomcat.util.digester.EnvironmentPropertySource=org.apache.tomcat.util.digester.EnvironmentPropertySource}
+ *   -Dorg.apache.tomcat.util.digester.PROPERTY_SOURCE=org.apache.tomcat.util.digester.EnvironmentPropertySource}
  * </pre>
  * 
  * <b>NOTE</b>: When configured the PropertySource for resolving expressions from system properties is still active.
