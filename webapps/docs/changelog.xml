@@ -94,7 +94,7 @@
       </fix>
       <scode>
         Rename <code>org.apache.tomcat.util.digester.Digester$EnvironmentPropertySource</code> to
-        <code>org.apache.tomcat.util.digester.EnvironmentPropertySource</code> old class is still available.
+        <code>org.apache.tomcat.util.digester.EnvironmentPropertySource</code>. Old class is still available.
       </scode>
     </changelog>
   </subsection>
