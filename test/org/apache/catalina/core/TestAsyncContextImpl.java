@@ -152,7 +152,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
 
         // Give the async thread a chance to finish (but not too long)
         int counter = 0;
-        while (!servlet.isDone() && counter < 10) {
+        while (!servlet.isDone() && counter < 20) {
             Thread.sleep(1000);
             counter++;
         }
