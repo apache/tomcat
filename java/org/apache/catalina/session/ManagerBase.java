@@ -198,9 +198,8 @@ public abstract class ManagerBase extends LifecycleMBeanBase implements Manager 
     private boolean notifyAttributeListenerOnUnchangedValue = true;
 
     /**
-     * Determines whether newly created sessions managed by this manager shall persist (serialize)
-     * authentication information or not. This value is passed to sessions upon creation, so changes
-     * to this property are only reflected by sessions that have been created after such a change.
+     * Determines whether sessions managed by this manager shall persist (serialize)
+     * authentication information or not.
      */
     private boolean persistAuthentication = false;
 
@@ -554,10 +553,10 @@ public abstract class ManagerBase extends LifecycleMBeanBase implements Manager 
     }
 
     /**
-     * Return whether newly created sessions managed by this manager shall persist authentication
+     * Return whether sessions managed by this manager shall persist authentication
      * information or not.
      * 
-     * @return {@code true}, newly created sessions managed by this manager shall persist
+     * @return {@code true}, sessions managed by this manager shall persist
      *         authentication information; {@code false} otherwise
      */
     public boolean getPersistAuthentication() {
@@ -565,11 +564,11 @@ public abstract class ManagerBase extends LifecycleMBeanBase implements Manager 
     }
 
     /**
-     * Set whether newly created sessions managed by this manager shall persist authentication
+     * Set whether sessions managed by this manager shall persist authentication
      * information or not.
      * 
-     * @param persistAuthentication if {@code true}, newly created sessions managed by this
-     *                              manager shall persist authentication information
+     * @param persistAuthentication if {@code true}, sessions managed by this manager
+     *                              shall persist authentication information
      */
     public void setPersistAuthentication(boolean persistAuthentication) {
         this.persistAuthentication = persistAuthentication;
