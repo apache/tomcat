@@ -601,7 +601,7 @@
     to make authentication persistence work properly. The actual type of that
     <code>Principal</code> class is determined by the <a href="realm.html">
     Realm</a> implementation used with the application. Tomcat's standard
-    <code>Principal</code> class instanciated by most of the Realms (except
+    <code>Principal</code> class instantiated by most of the Realms (except
     <code>JAASRealm</code>) implements <code>java.io.Serializable</code>.</p>
 
     <p>The persistence across restarts provided by the
