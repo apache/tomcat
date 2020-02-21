@@ -62,6 +62,7 @@ install:
     - make install
     - cd $CURR_PWD
     - yes | cp build.properties.default build.properties
+    - echo >> build.properties
     - echo "test.threads=16" >> build.properties
     - echo "test.relaxTiming=true" >> build.properties
     - echo "test.excludePerformance=true" >> build.properties
