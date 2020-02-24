@@ -106,7 +106,15 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
         super(manager);
         boolean recordAllActions = manager instanceof ClusterManagerBase &&
                 ((ClusterManagerBase)manager).isRecordAllActions();
-        deltaRequest = new DeltaRequest(getIdInternal(), recordAllActions);
+        deltaRequest = createRequest(getIdInternal(), recordAllActions);
+    }
+
+    private DeltaRequest createRequest() {
+        return createRequest(null, false);
+    }
+
+    protected DeltaRequest createRequest(String sessionId, boolean recordAllActions) {
+        return new DeltaRequest(sessionId, recordAllActions);
     }
 
     // ----------------------------------------------------- ReplicatedMapEntry
@@ -145,10 +153,10 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
             deltaRequestPool = ((ClusterManagerBase) manager).getDeltaRequestPool();
             newDeltaRequest = deltaRequestPool.pop();
             if (newDeltaRequest == null) {
-                newDeltaRequest = new DeltaRequest(null, ((ClusterManagerBase) manager).isRecordAllActions());
+                newDeltaRequest = createRequest(null, ((ClusterManagerBase) manager).isRecordAllActions());
             }
         } else {
-            newDeltaRequest = new DeltaRequest();
+            newDeltaRequest = createRequest();
         }
 
         DeltaRequest oldDeltaRequest = replaceDeltaRequest(newDeltaRequest);
@@ -679,7 +687,7 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
 
             DeltaRequest newDeltaRequest = deltaRequestPool.pop();
             if (newDeltaRequest == null) {
-                newDeltaRequest = new DeltaRequest(null, ((ClusterManagerBase) manager).isRecordAllActions());
+                newDeltaRequest = createRequest(null, ((ClusterManagerBase) manager).isRecordAllActions());
             }
 
             ReplicationStream ois = ((ClusterManagerBase) manager).getReplicationStream(delta);
