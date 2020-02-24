@@ -55,6 +55,10 @@
         Disable StandardManager session persistence by default. It can be
         enabled back in <code>context.xml</code>. (remm)
       </update>
+      <add>
+        Add extension point to DeltaSession to improve subclassing.
+        Patch provided by ThStock. (schultz)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
