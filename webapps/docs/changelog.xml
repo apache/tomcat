@@ -85,6 +85,16 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Other">
+    <changelog>
+      <update>
+        Update the OWB module to Apache OpenWebBeans 2.0.15. (remm)
+      </update>
+      <update>
+        Update the CXF module to Apache CXF 3.3.5. (remm)
+      </update>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 10.0.0-M1 (markt)" rtext="2020-02-20">
   <subsection name="General">

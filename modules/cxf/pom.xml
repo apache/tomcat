@@ -29,14 +29,14 @@
     <name>Apache CXF for Apache Tomcat CDI</name>
     <description>Apache CXF packaged for Apache Tomcat CDI</description>
     <!-- This is the Apache CXF version -->
-    <version>3.3.4</version>
+    <version>3.3.5</version>
     <packaging>jar</packaging>
 
     <properties>
         <geronimo-jcdi.version>1.0.1</geronimo-jcdi.version>
         <javax.json-api.version>1.1.4</javax.json-api.version>
         <javax.json.bind-api.version>1.0</javax.json.bind-api.version>
-        <johnzon.version>1.2.1</johnzon.version>
+        <johnzon.version>1.2.3</johnzon.version>
     </properties>
 
     <dependencies>
@@ -96,7 +96,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.5.1</version>
+                <version>3.8.1</version>
                 <configuration>
                     <source>1.8</source>
                     <target>1.8</target>
@@ -105,7 +105,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
-                <version>3.0.0</version>
+                <version>3.2.1</version>
                 <executions>
                     <execution>
                         <phase>package</phase>
@@ -127,6 +127,8 @@
                                     <!-- Already present in Tomcat or in the CDI bundle -->
                                     <exclude>jakarta.annotation:jakarta.annotation-api</exclude>
 									<exclude>jakarta.el:*</exclude>
+                                    <exclude>javax.annotation:javax.annotation-api</exclude>
+                                    <exclude>javax.el:*</exclude>
 									<exclude>javax.enterprise:cdi-api</exclude>
 									<exclude>javax.inject:*</exclude>
 									<exclude>javax.interceptor:*</exclude>

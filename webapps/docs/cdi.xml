@@ -59,7 +59,8 @@ mvn clean && mvn package]]></source>
     The resulting JAR at
     <code>target/tomcat-owb-x.y.z.jar</code> (where x.y.z depends on the
     Apache OpenWebBeans version used during the build)
-    should then be placed into the <code>lib</code> folder of the Tomcat
+    should be processed by the Tomcat migration tool for Jakarta EE, and
+    then be placed into the <code>lib</code> folder of the Tomcat
     installation.<br/>
     CDI support can then be enabled for all webapps in the container by adding
     the following listener in <code>server.xml</code> nested inside the
@@ -105,6 +106,11 @@ mvn clean && mvn package]]></source>
     present in the JAR). The CXF Servlet class that should be used is
     <code>org.apache.cxf.cdi.CXFCdiServlet</code> and should be mapped to the
     desired root path where JAX-RS resources will be available.
+  </p>
+
+  <p>
+    The webapp as a whole should be processed by the Tomcat migration tool for
+    Jakarta EE.
   </p>
 
   </section>
