@@ -125,6 +125,9 @@
       <update>
         Update the OWB module to Apache OpenWebBeans 2.0.15. (remm)
       </update>
+      <update>
+        Update the CXF module to Apache CXF 3.3.5. (remm)
+      </update>
     </changelog>
   </subsection>
 </section>
