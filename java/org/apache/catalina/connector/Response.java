@@ -30,9 +30,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Enumeration;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Supplier;
 
 import jakarta.servlet.ServletOutputStream;
@@ -868,9 +870,8 @@ public class Response implements HttpServletResponse {
 
     @Override
     public Collection<String> getHeaders(String name) {
-        Enumeration<String> enumeration =
-                getCoyoteResponse().getMimeHeaders().values(name);
-        List<String> result = new ArrayList<>();
+        Enumeration<String> enumeration = getCoyoteResponse().getMimeHeaders().values(name);
+        Set<String> result = new LinkedHashSet<>();
         while (enumeration.hasMoreElements()) {
             result.add(enumeration.nextElement());
         }

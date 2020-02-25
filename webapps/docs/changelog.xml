@@ -59,6 +59,10 @@
         Add extension point to DeltaSession to improve subclassing.
         Patch provided by ThStock. (schultz)
       </add>
+      <fix>
+        <bug>64166</bug>: Ensure that the names returned by
+        <code>HttpServletResponse.getHeaderNames()</code> are unique. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
