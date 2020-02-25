@@ -25,7 +25,7 @@ Items carried over from the 9.0.x list:
 2.  Reduce instances of setters and getters for the same property existing on an
     object and its parent. This may require new objects to be exposed via JMX.
 
-New items for 10.0.0.x onwards:
+New items for 10.0.x onwards:
 
  1. Remove APR connector.
 
@@ -47,7 +47,7 @@ New items for 10.0.0.x onwards:
 
  7. Refactor DefaultServlet to use Ranges in parseRanges().
 
-Deferred until 10.0.x:
+Deferred until 10.1.x:
 
  1.  Remove the ExtensionValidator and associated classes (assuming that the
      minimum Java version is Java 9 or later).
