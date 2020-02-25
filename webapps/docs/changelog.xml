@@ -72,6 +72,10 @@
         <code>HttpServlet</code> is relied upon to generate the HEAD response
         and the GET response uses chunking. (markt)
       </fix>
+      <fix>
+        <bug>64166</bug>: Ensure that the names returned by
+        <code>HttpServletResponse.getHeaderNames()</code> are unique. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
