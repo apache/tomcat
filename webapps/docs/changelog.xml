@@ -92,6 +92,10 @@
         Improve robustness of OpenSSLEngine shutdown. Based on code submitted
         by Manuel Dominguez Sarmiento. (remm)
       </fix>
+      <fix>
+        Add the TLS request attributes used by IIS to the attributes that an AJP
+        Connector will always accept. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
