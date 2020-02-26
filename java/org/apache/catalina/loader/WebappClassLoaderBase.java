@@ -1571,14 +1571,15 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
         }
 
         // Looking at the JAR files
+        String jarPath = (name.startsWith("/")) ? name.substring(1) : name;
         synchronized (jarFiles) {
             if (openJARs()) {
                 for (i = 0; i < jarFilesLength; i++) {
-                    JarEntry jarEntry = jarFiles[i].getJarEntry(name);
+                    JarEntry jarEntry = jarFiles[i].getJarEntry(jarPath);
                     if (jarEntry != null) {
                         try {
                             String jarFakeUrl = getURI(jarRealFiles[i]).toString();
-                            result.add(UriUtil.buildJarUrl(jarFakeUrl, name));
+                            result.add(UriUtil.buildJarUrl(jarFakeUrl, jarPath));
                         } catch (MalformedURLException e) {
                             // Ignore
                         }

@@ -76,6 +76,10 @@
         <bug>64166</bug>: Ensure that the names returned by
         <code>HttpServletResponse.getHeaderNames()</code> are unique. (markt)
       </fix>
+      <fix>
+        Fix SCI support regression that was caused by a JAR path lookup error
+        in the classloader findResources. (remm)
+      </fix>
     </changelog>
   </subsection>
 </section>
