@@ -5455,7 +5455,7 @@ public class StandardContext extends ContainerBase
         }
 
         if (getLoader() == null) {
-            WebappLoader webappLoader = new WebappLoader(getParentClassLoader());
+            WebappLoader webappLoader = new WebappLoader();
             webappLoader.setDelegate(getDelegate());
             setLoader(webappLoader);
         }

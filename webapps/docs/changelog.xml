@@ -73,6 +73,10 @@
         and the GET response uses chunking. (markt)
       </fix>
       <fix>
+        <bug>64153</bug>: Ensure that the parent for the web application class
+        loader is set consistently. 
+      </fix>
+      <fix>
         <bug>64166</bug>: Ensure that the names returned by
         <code>HttpServletResponse.getHeaderNames()</code> are unique. (markt)
       </fix>
