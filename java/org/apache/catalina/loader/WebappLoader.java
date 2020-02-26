@@ -69,8 +69,8 @@ public class WebappLoader extends LifecycleMBeanBase
     // ----------------------------------------------------------- Constructors
 
     /**
-     * Construct a new WebappLoader with no defined parent class loader
-     * (so that the actual parent will be the system class loader).
+     * Construct a new WebappLoader. The parent class loader will be defined by
+     * {@link Context#getParentClassLoader()}.
      */
     public WebappLoader() {
         this(null);
@@ -82,7 +82,12 @@ public class WebappLoader extends LifecycleMBeanBase
      * to be defined as the parent of the ClassLoader we ultimately create.
      *
      * @param parent The parent class loader
+     *
+     * @deprecated Use {@link Context#setParentClassLoader(ClassLoader)} to
+     *             specify the required class loader. This method will be
+     *             removed in Tomcat 10 onwards.
      */
+    @Deprecated
     public WebappLoader(ClassLoader parent) {
         super();
         this.parentClassLoader = parent;
@@ -507,6 +512,8 @@ public class WebappLoader extends LifecycleMBeanBase
 
         if (parentClassLoader == null) {
             parentClassLoader = context.getParentClassLoader();
+        } else {
+            context.setParentClassLoader(parentClassLoader);
         }
         Class<?>[] argTypes = { ClassLoader.class };
         Object[] args = { parentClassLoader };
