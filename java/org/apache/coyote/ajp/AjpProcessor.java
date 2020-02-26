@@ -27,7 +27,9 @@ import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -84,6 +86,7 @@ public class AjpProcessor extends AbstractProcessor {
 
 
     private static final Map<String,String> jakartaAttributeMapping;
+    private static final Set<String> iisTlsAttributes;
 
 
     static {
@@ -138,6 +141,18 @@ public class AjpProcessor extends AbstractProcessor {
         m.put("javax.servlet.request.ssl_session", "jakarta.servlet.request.ssl_session");
         m.put("javax.servlet.request.X509Certificate", "jakarta.servlet.request.X509Certificate");
         jakartaAttributeMapping = Collections.unmodifiableMap(m);
+
+        Set<String> s = new HashSet<>();
+        s.add("CERT_ISSUER");
+        s.add("CERT_SUBJECT");
+        s.add("CERT_COOKIE");
+        s.add("HTTPS_SERVER_SUBJECT");
+        s.add("CERT_FLAGS");
+        s.add("HTTPS_SECRETKEYSIZE");
+        s.add("CERT_SERIALNUMBER");
+        s.add("HTTPS_SERVER_ISSUER");
+        s.add("HTTPS_KEYSIZE");
+        iisTlsAttributes = Collections.unmodifiableSet(s);
     }
 
 
@@ -754,6 +769,9 @@ public class AjpProcessor extends AbstractProcessor {
                     // AJP uses the Java Servlet attribute names.
                     // Need to convert these to Jakarta Servlet.
                     request.setAttribute(jakartaAttributeMapping.get(n), v);
+                } else if (iisTlsAttributes.contains(n)) {
+                    // Allow IIS TLS attributes
+                    request.setAttribute(n, v);
                 } else {
                     // All 'known' attributes will be processed by the previous
                     // blocks. Any remaining attribute is an 'arbitrary' one.

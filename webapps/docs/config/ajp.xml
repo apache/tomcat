@@ -330,6 +330,15 @@
         <li>AJP_REMOTE_PORT</li>
         <li>AJP_SSL_PROTOCOL</li>
         <li>JK_LB_ACTIVATION</li>
+        <li>CERT_ISSUER (IIS only)</li>
+        <li>CERT_SUBJECT (IIS only)</li>
+        <li>CERT_COOKIE (IIS only)</li>
+        <li>HTTPS_SERVER_SUBJECT (IIS only)</li>
+        <li>CERT_FLAGS (IIS only)</li>
+        <li>HTTPS_SECRETKEYSIZE (IIS only)</li>
+        <li>CERT_SERIALNUMBER (IIS only)</li>
+        <li>HTTPS_SERVER_ISSUER (IIS only)</li>
+        <li>HTTPS_KEYSIZE (IIS only)</li>
       </ul>
       <p>The AJP protocol supports the passing of arbitrary request attributes.
       Requests containing arbitrary request attributes will be rejected with a
