@@ -66,34 +66,6 @@ public class WebappLoader extends LifecycleMBeanBase
 
     private static final Log log = LogFactory.getLog(WebappLoader.class);
 
-    // ----------------------------------------------------------- Constructors
-
-    /**
-     * Construct a new WebappLoader. The parent class loader will be defined by
-     * {@link Context#getParentClassLoader()}.
-     */
-    public WebappLoader() {
-        this(null);
-    }
-
-
-    /**
-     * Construct a new WebappLoader with the specified class loader
-     * to be defined as the parent of the ClassLoader we ultimately create.
-     *
-     * @param parent The parent class loader
-     *
-     * @deprecated Use {@link Context#setParentClassLoader(ClassLoader)} to
-     *             specify the required class loader. This method will be
-     *             removed in Tomcat 10 onwards.
-     */
-    @Deprecated
-    public WebappLoader(ClassLoader parent) {
-        super();
-        this.parentClassLoader = parent;
-    }
-
-
     // ----------------------------------------------------- Instance Variables
 
     /**
@@ -121,12 +93,6 @@ public class WebappLoader extends LifecycleMBeanBase
      * loader implementation must be used.
      */
     private String loaderClass = ParallelWebappClassLoader.class.getName();
-
-
-    /**
-     * The parent class loader of the class loader we will create.
-     */
-    private ClassLoader parentClassLoader = null;
 
 
     /**
@@ -510,11 +476,8 @@ public class WebappLoader extends LifecycleMBeanBase
         Class<?> clazz = Class.forName(loaderClass);
         WebappClassLoaderBase classLoader = null;
 
-        if (parentClassLoader == null) {
-            parentClassLoader = context.getParentClassLoader();
-        } else {
-            context.setParentClassLoader(parentClassLoader);
-        }
+        ClassLoader parentClassLoader = context.getParentClassLoader();
+
         Class<?>[] argTypes = { ClassLoader.class };
         Object[] args = { parentClassLoader };
         Constructor<?> constr = clazz.getConstructor(argTypes);
