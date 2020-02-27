@@ -978,6 +978,7 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
         setSocketWrapper(socketWrapper);
         // Setup the minimal request information
         request.setStartTime(System.currentTimeMillis());
+        request.setStartTimeNanos(System.nanoTime());
         // Setup the minimal response information
         response.setStatus(400);
         response.setError();

@@ -91,6 +91,10 @@
         A zero length AJP secret will now behave as if it has not been
         specified. (remm)
       </fix>
+      <update>
+        <bug>56966</bug>: Add use of System.nanoTime to track request
+        execution time. (remm)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Cluster">

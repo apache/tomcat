@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.EnumSet;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import jakarta.servlet.ReadListener;
@@ -273,8 +274,8 @@ public class CoyoteAdapter implements Adapter {
             // Access logging
             if (!success || !request.isAsync()) {
                 long time = 0;
-                if (req.getStartTime() != -1) {
-                    time = System.currentTimeMillis() - req.getStartTime();
+                if (req.getStartTimeNanos() != -1) {
+                    time = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - req.getStartTimeNanos());
                 }
                 Context context = request.getContext();
                 if (context != null) {
@@ -402,7 +403,7 @@ public class CoyoteAdapter implements Adapter {
                 // The other possibility is that an error occurred early in
                 // processing and the request could not be mapped to a Context.
                 // Log via the host or engine in that case.
-                long time = System.currentTimeMillis() - req.getStartTime();
+                long time = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - req.getStartTimeNanos());
                 if (context != null) {
                     context.logAccess(request, response, time, false);
                 } else if (response.isError()) {

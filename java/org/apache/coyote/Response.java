@@ -258,7 +258,7 @@ public final class Response {
 
     public void setCommitted(boolean v) {
         if (v && !this.committed) {
-            this.commitTime = System.currentTimeMillis();
+            this.commitTime = System.nanoTime();
         }
         this.committed = v;
     }

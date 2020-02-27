@@ -132,6 +132,9 @@ class Stream extends AbstractStream implements HeaderEmitter {
         if (this.coyoteRequest.getStartTime() < 0) {
             this.coyoteRequest.setStartTime(System.currentTimeMillis());
         }
+        if (this.coyoteRequest.getStartTimeNanos() < 0) {
+            this.coyoteRequest.setStartTimeNanos(System.nanoTime());
+        }
     }
 
 

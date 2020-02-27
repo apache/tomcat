@@ -378,6 +378,9 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
                 if (request.getStartTime() < 0) {
                     request.setStartTime(System.currentTimeMillis());
                 }
+                if (request.getStartTimeNanos() < 0) {
+                    request.setStartTimeNanos(System.nanoTime());
+                }
                 chr = byteBuffer.get();
             } while ((chr == Constants.CR) || (chr == Constants.LF));
             byteBuffer.position(byteBuffer.position() - 1);

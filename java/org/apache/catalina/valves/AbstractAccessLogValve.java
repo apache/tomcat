@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import jakarta.servlet.RequestDispatcher;
@@ -699,14 +700,9 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
             return;
         }
 
-        /**
-         * XXX This is a bit silly, but we want to have start and stop time and
-         * duration consistent. It would be better to keep start and stop
-         * simply in the request and/or response object and remove time
-         * (duration) from the interface.
-         */
-        long start = request.getCoyoteRequest().getStartTime();
-        Date date = getDate(start + time);
+        long elapsed = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - request.getCoyoteRequest().getStartTimeNanos());
+        // Date for access log should be the beginning of the request
+        Date date = getDate(System.currentTimeMillis() - elapsed);
 
         CharArrayWriter result = charArrayWriters.pop();
         if (result == null) {
@@ -1372,8 +1368,8 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
             if (commitTime == -1) {
                 buf.append('-');
             } else {
-                long delta = commitTime - request.getCoyoteRequest().getStartTime();
-                buf.append(Long.toString(delta));
+                long delta = commitTime - request.getCoyoteRequest().getStartTimeNanos();
+                buf.append(Long.toString(TimeUnit.NANOSECONDS.toMillis(delta)));
             }
         }
     }

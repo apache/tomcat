@@ -154,6 +154,7 @@ public final class Request {
     private long bytesRead=0;
     // Time of the request - useful to avoid repeated calls to System.currentTime
     private long startTime = -1;
+    private long startTimeNanos = -1;
     private int available = 0;
 
     private final RequestInfo reqProcessorMX=new RequestInfo(this);
@@ -571,6 +572,14 @@ public final class Request {
         this.startTime = startTime;
     }
 
+    public long getStartTimeNanos() {
+        return startTimeNanos;
+    }
+
+    public void setStartTimeNanos(long startTimeNanos) {
+        this.startTimeNanos = startTimeNanos;
+    }
+
     // -------------------- Per-Request "notes" --------------------
 
 
@@ -647,6 +656,7 @@ public final class Request {
         allDataReadEventSent.set(false);
 
         startTime = -1;
+        startTimeNanos = -1;
     }
 
     // -------------------- Info  --------------------

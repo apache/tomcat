@@ -41,11 +41,9 @@ New items for 10.0.x onwards:
  4. RFC 3986 states (section 2.2) that a %nn encoded delimiter is NOT equivalent
     to the decoded form. Provide an option not to decode delimiters in %nn form.
 
- 5. BZ 56966. Refactor internal request timing to use System.nanoTime()
+ 5. BZ 63286. Make behaviour of %D and %T consistent with httpd.
 
- 6. BZ 63286. Make behaviour of %D and %T consistent with httpd.
-
- 7. Refactor DefaultServlet to use Ranges in parseRanges().
+ 6. Refactor DefaultServlet to use Ranges in parseRanges().
 
 Deferred until 10.1.x:
 
