@@ -851,7 +851,7 @@ public class AjpProcessor extends AbstractProcessor {
 
             case Constants.SC_A_SECRET:
                 requestHeaderMessage.getBytes(tmpMB);
-                if (secret != null) {
+                if (secret != null && secret.length() > 0) {
                     secretPresentInRequest = true;
                     if (!tmpMB.equals(secret)) {
                         response.setStatus(403);
@@ -869,7 +869,7 @@ public class AjpProcessor extends AbstractProcessor {
         }
 
         // Check if secret was submitted if required
-        if ((secret != null) && !secretPresentInRequest) {
+        if (secret != null && secret.length() > 0 && !secretPresentInRequest) {
             response.setStatus(403);
             setErrorState(ErrorState.CLOSE_CLEAN, null);
         }
