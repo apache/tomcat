@@ -92,6 +92,10 @@
         Add the TLS request attributes used by IIS to the attributes that an AJP
         Connector will always accept. (markt)
       </fix>
+      <fix>
+        A zero length AJP secret will now behave as if it has not been
+        specified. (remm)
+      </fix>
     </changelog>
   </subsection>
 </section>
