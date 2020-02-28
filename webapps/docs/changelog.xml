@@ -72,6 +72,13 @@
         <bug>64166</bug>: Ensure that the names returned by
         <code>HttpServletResponse.getHeaderNames()</code> are unique. (markt)
       </fix>
+      <scode>
+        Rename <code>org.apache.tomcat.util.digester.Digester$EnvironmentPropertySource</code>
+        to
+        <code>org.apache.tomcat.util.digester.EnvironmentPropertySource</code>.
+        The old class is still available but deprecated. Patch provided by Bernd
+        Bohmann. (markt)
+      </scode>
     </changelog>
   </subsection>
   <subsection name="Coyote">
