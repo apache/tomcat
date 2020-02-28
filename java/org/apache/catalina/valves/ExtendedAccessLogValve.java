@@ -584,7 +584,7 @@ public class ExtendedAccessLogValve extends AccessLogValve {
             if (tokenizer.hasSubToken()) {
                 String nextToken = tokenizer.getToken();
                 if ("taken".equals(nextToken)) {
-                    return new ElapsedTimeElement(false);
+                    return new ElapsedTimeElement(false, false);
                 }
             } else {
                 return new TimeElement();

@@ -700,9 +700,8 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
             return;
         }
 
-        long elapsed = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - request.getCoyoteRequest().getStartTimeNanos());
         // Date for access log should be the beginning of the request
-        Date date = getDate(System.currentTimeMillis() - elapsed);
+        Date date = getDate(request.getCoyoteRequest().getStartTime());
 
         CharArrayWriter result = charArrayWriters.pop();
         if (result == null) {
@@ -1109,8 +1108,8 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
                 Response response, long time) {
             long timestamp = date.getTime();
             long frac;
-            if (usesBegin) {
-                timestamp -= time;
+            if (!usesBegin) {
+                timestamp += TimeUnit.NANOSECONDS.toMillis(time);
             }
             /*  Implementation note: This is deliberately not implemented using
              *  switch. If a switch is used the compiler (at least the Oracle
@@ -1330,30 +1329,29 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
      * write time taken to process the request - %D, %T
      */
     protected static class ElapsedTimeElement implements AccessLogElement {
+        private final boolean micros;
         private final boolean millis;
 
         /**
-         * @param millis <code>true</code>, write time in millis - %D,
-         * if <code>false</code>, write time in seconds - %T
+         * @param micros <code>true</code>, write time in micros - %D
+         * @param millis <code>true</code>, write time in millis,
+         * if both arguments are <code>false</code>, write time in seconds - %T
          */
-        public ElapsedTimeElement(boolean millis) {
+        public ElapsedTimeElement(boolean micros, boolean millis) {
+            this.micros = micros;
             this.millis = millis;
         }
 
         @Override
         public void addElement(CharArrayWriter buf, Date date, Request request,
                 Response response, long time) {
-            if (millis) {
-                buf.append(Long.toString(time));
+            if (micros) {
+                buf.append(Long.toString(TimeUnit.NANOSECONDS.toMicros(time)));
+            } else if (millis) {
+                buf.append(Long.toString(TimeUnit.NANOSECONDS.toMillis(time)));
             } else {
                 // second
-                buf.append(Long.toString(time / 1000));
-                buf.append('.');
-                int remains = (int) (time % 1000);
-                buf.append(Long.toString(remains / 100));
-                remains = remains % 100;
-                buf.append(Long.toString(remains / 10));
-                buf.append(Long.toString(remains % 10));
+                buf.append(Long.toString(TimeUnit.NANOSECONDS.toSeconds(time)));
             }
         }
     }
@@ -1364,7 +1362,7 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
     protected static class FirstByteTimeElement implements AccessLogElement {
         @Override
         public void addElement(CharArrayWriter buf, Date date, Request request, Response response, long time) {
-            long commitTime = response.getCoyoteResponse().getCommitTime();
+            long commitTime = response.getCoyoteResponse().getCommitTimeNanos();
             if (commitTime == -1) {
                 buf.append('-');
             } else {
@@ -1745,6 +1743,15 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
             return new SessionAttributeElement(name);
         case 't':
             return new DateAndTimeElement(name);
+        case 'T':
+            // ms for milliseconds, us for microseconds, and s for seconds
+            if ("ms".equals(name)) {
+                return new ElapsedTimeElement(false, true);
+            } else if ("us".equals(name)) {
+                return new ElapsedTimeElement(true, false);
+            } else {
+                return new ElapsedTimeElement(false, false);
+            }
         default:
             return new StringElement("???");
         }
@@ -1766,7 +1773,7 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
         case 'B':
             return new ByteSentElement(false);
         case 'D':
-            return new ElapsedTimeElement(true);
+            return new ElapsedTimeElement(true, false);
         case 'F':
             return new FirstByteTimeElement();
         case 'h':
@@ -1790,7 +1797,7 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
         case 't':
             return new DateAndTimeElement();
         case 'T':
-            return new ElapsedTimeElement(false);
+            return new ElapsedTimeElement(false, false);
         case 'u':
             return new UserElement();
         case 'U':

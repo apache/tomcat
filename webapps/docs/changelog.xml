@@ -73,6 +73,11 @@
         <code>org.apache.tomcat.util.digester.EnvironmentPropertySource</code>.
         Patch provided by Bernd Bohmann. (markt)
       </scode>
+      <fix>
+        <bug>63286</bug>: Resolve inconsistencies with access log valve. This
+        changes the element API to use a nanosecond resolution elapsed time
+        argument. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

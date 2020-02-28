@@ -76,7 +76,7 @@ public interface AccessLog {
      * @param request   Request (associated with the response) to log
      * @param response  Response (associated with the request) to log
      * @param time      Time taken to process the request/response in
-     *                  milliseconds (use 0 if not known)
+     *                  nanoseconds (use 0 if not known)
      */
     public void log(Request request, Response response, long time);
 
