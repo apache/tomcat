@@ -161,23 +161,6 @@
         filter pattern in order to be restored.</p>
       </attribute>
 
-      <attribute name="persistAuthentication" required="false">
-        <p>Should authentication information be included when session state is
-        preserved across application restarts? If <code>true</code>, the session's
-        authentication is preserved so that the session remains authenticated
-        after the application has been restarted. If not specified, the default
-        value of <code>false</code> will be used.<br />See
-        <a href="#Persistence_Across_Restarts">Persistence Across Restarts</a>
-        for more information.</p>
-
-        <p>Please note that the session's <code>Principal</code> class as well
-        as its descendant classes are all subject to the
-        <strong>sessionAttributeValueClassNameFilter</strong>. If such a filter
-        is specified or a <code>SecurityManager</code> is enabled, the names of
-        the <code>Principal</code> class and descendant classes must match that
-        filter pattern in order to be restored.</p>
-      </attribute>
-
       <attribute name="processExpiresFrequency" required="false">
         <p>Frequency of the session expiration, and related manager operations.
         Manager operations will be done once for the specified amount of
@@ -234,7 +217,7 @@
         must fully match the pattern. If not specified, the default value of
         <code>null</code> will be used unless a <code>SecurityManager</code> is
         enabled in which case the default will be
-        <code><nobr>java\\.lang\\.(?:Boolean|Integer|Long|Number|String)|org\\.apache\\.catalina\\.realm\\.GenericPrincipal\\$SerializablePrincipal|\\[Ljava.lang.String;</nobr></code>.</p>
+        <code>java\\.lang\\.(?:Boolean|Integer|Long|Number|String)|org\\.apache\\.catalina\\.realm\\.GenericPrincipal\\$SerializablePrincipal|\\[Ljava.lang.String;</code>.</p>
       </attribute>
 
       <attribute name="warnOnSessionAttributeFilterFailure" required="false">
@@ -372,7 +355,7 @@
         must fully match the pattern. If not specified, the default value of
         <code>null</code> will be used unless a <code>SecurityManager</code> is
         enabled in which case the default will be
-        <code><nobr>java\\.lang\\.(?:Boolean|Integer|Long|Number|String)|org\\.apache\\.catalina\\.realm\\.GenericPrincipal\\$SerializablePrincipal|\\[Ljava.lang.String;</nobr></code>.</p>
+        <code>java\\.lang\\.(?:Boolean|Integer|Long|Number|String)|org\\.apache\\.catalina\\.realm\\.GenericPrincipal\\$SerializablePrincipal|\\[Ljava.lang.String;</code>.</p>
       </attribute>
 
       <attribute name="warnOnSessionAttributeFilterFailure" required="false">
