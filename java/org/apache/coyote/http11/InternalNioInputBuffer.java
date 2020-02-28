@@ -394,7 +394,7 @@ public class InternalNioInputBuffer extends AbstractInputBuffer<NioChannel> {
             parsingRequestLineStart = 0;
             return true;
         }
-        throw new IllegalStateException("Invalid request line parse phase:"+parsingRequestLinePhase);
+        throw new IllegalStateException(sm.getString("iib.invalidPhase", Integer.valueOf(parsingRequestLinePhase)));
     }
 
     private void expand(int newsize) {
