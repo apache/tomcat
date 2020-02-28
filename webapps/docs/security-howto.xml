@@ -447,6 +447,10 @@
 
       <p>The length of the session ID may be changed with the
       <strong>sessionIdLength</strong> attribute.</p>
+
+      <p>The <strong>persistAuthentication</strong> controls whether the
+      authenticated Principal associated with the session (if any) is included
+      when the session is persisted during a restart or to a Store.</p>
     </subsection>
 
     <subsection name="Cluster">
