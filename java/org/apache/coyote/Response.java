@@ -23,6 +23,7 @@ import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
@@ -122,7 +123,7 @@ public final class Response {
 
     // General informations
     private long contentWritten = 0;
-    private long commitTime = -1;
+    private long commitTimeNanos = -1;
 
     /**
      * Holds request error exception.
@@ -258,7 +259,7 @@ public final class Response {
 
     public void setCommitted(boolean v) {
         if (v && !this.committed) {
-            this.commitTime = System.nanoTime();
+            this.commitTimeNanos = System.nanoTime();
         }
         this.committed = v;
     }
@@ -269,7 +270,16 @@ public final class Response {
      * @return the time the response was committed
      */
     public long getCommitTime() {
-        return commitTime;
+        return System.currentTimeMillis() - TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - commitTimeNanos);
+    }
+
+    /**
+     * Return the time the response was committed (based on System.nanoTime).
+     *
+     * @return the time the response was committed
+     */
+    public long getCommitTimeNanos() {
+        return commitTimeNanos;
     }
 
     // -----------------Error State --------------------
@@ -615,7 +625,7 @@ public final class Response {
         status = 200;
         message = null;
         committed = false;
-        commitTime = -1;
+        commitTimeNanos = -1;
         errorException = null;
         errorState.set(0);
         headers.clear();
