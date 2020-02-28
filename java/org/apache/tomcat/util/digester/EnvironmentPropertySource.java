@@ -22,7 +22,8 @@ import org.apache.tomcat.util.IntrospectionUtils;
 import org.apache.tomcat.util.security.PermissionCheck;
 
 /**
- * A {@link org.apache.tomcat.util.IntrospectionUtils.SecurePropertySource} that uses environment variables to resolve expressions.
+ * A {@link org.apache.tomcat.util.IntrospectionUtils.SecurePropertySource}
+ * that uses environment variables to resolve expressions.
  *
  * <p><strong>Usage example:</strong></p>
  *
@@ -49,8 +50,9 @@ import org.apache.tomcat.util.security.PermissionCheck;
  * {@code
  *   -Dorg.apache.tomcat.util.digester.PROPERTY_SOURCE=org.apache.tomcat.util.digester.EnvironmentPropertySource}
  * </pre>
- * 
- * <b>NOTE</b>: When configured the PropertySource for resolving expressions from system properties is still active.
+ *
+ * <b>NOTE</b>: When configured the PropertySource for resolving expressions
+ *              from system properties is still active.
  *
  * @see Digester
  *
