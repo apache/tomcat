@@ -21,6 +21,7 @@ import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import jakarta.servlet.ReadListener;
@@ -153,7 +154,6 @@ public final class Request {
 
     private long bytesRead=0;
     // Time of the request - useful to avoid repeated calls to System.currentTime
-    private long startTime = -1;
     private long startTimeNanos = -1;
     private int available = 0;
 
@@ -565,11 +565,16 @@ public final class Request {
     }
 
     public long getStartTime() {
-        return startTime;
+        return System.currentTimeMillis() - TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTimeNanos);
     }
 
+    /**
+     *
+     * @param startTime
+     * @deprecated This setter will be removed in Tomcat 10.
+     */
+    @Deprecated
     public void setStartTime(long startTime) {
-        this.startTime = startTime;
     }
 
     public long getStartTimeNanos() {
@@ -655,7 +660,6 @@ public final class Request {
         listener = null;
         allDataReadEventSent.set(false);
 
-        startTime = -1;
         startTimeNanos = -1;
     }
 
