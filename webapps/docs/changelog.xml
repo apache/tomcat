@@ -164,6 +164,10 @@
       <fix>
         Missing store config attributes for Resources elements. (remm)
       </fix>
+      <scode>
+        Rename <code>org.apache.tomcat.util.digester.Digester$EnvironmentPropertySource</code> to
+        <code>org.apache.tomcat.util.digester.EnvironmentPropertySource</code>. Old class is still available.
+      </scode>
     </changelog>
   </subsection>
   <subsection name="Coyote">
