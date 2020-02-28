@@ -1668,7 +1668,7 @@ public class StandardSession implements HttpSession, Session, Serializable {
         // Gather authentication information (if configured)
         String sessionAuthType = null;
         Principal sessionPrincipal = null;
-        if (isPersistAuthentication()) {
+        if (getPersistAuthentication()) {
             sessionAuthType = getAuthType();
             sessionPrincipal = getPrincipal();
             if (!(sessionPrincipal instanceof Serializable)) {
@@ -1727,7 +1727,7 @@ public class StandardSession implements HttpSession, Session, Serializable {
      * @return {@code true}, if authentication information shall be persisted;
      *         {@code false} otherwise
      */
-    private boolean isPersistAuthentication() {
+    private boolean getPersistAuthentication() {
         if (manager instanceof ManagerBase) {
             return ((ManagerBase) manager).getPersistAuthentication();
         }
