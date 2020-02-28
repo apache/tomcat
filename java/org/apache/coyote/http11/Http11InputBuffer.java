@@ -375,9 +375,6 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
                 }
                 // Set the start time once we start reading data (even if it is
                 // just skipping blank lines)
-                if (request.getStartTime() < 0) {
-                    request.setStartTime(System.currentTimeMillis());
-                }
                 if (request.getStartTimeNanos() < 0) {
                     request.setStartTimeNanos(System.nanoTime());
                 }
