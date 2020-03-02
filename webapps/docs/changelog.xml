@@ -111,6 +111,18 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Other">
+    <changelog>
+      <add>
+        Expand the coverage of the French translations provided with Apache
+        Tomcat. (remm)
+      </add>
+      <add>
+        Expand the coverage of the Korean translations provided with Apache
+        Tomcat. Contributions provided by B. Cansmile Cha. (markt)
+      </add>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 7.0.100 (violetagg)" rtext="released 2020-02-14">
   <subsection name="Catalina">
