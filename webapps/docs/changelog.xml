@@ -97,6 +97,10 @@
         Fix support of native jakarta servlet attributes in AJP connector.
         (remm)
       </fix>
+      <update>
+        <bug>56966</bug>: Add use of System.nanoTime to track request
+        execution time. (remm)
+      </update>
       <fix>
         <bug>64141</bug>: If using a CA certificate, remove a default value
         for the truststore file when not using a JSSE configuration. (remm)
@@ -113,10 +117,6 @@
         A zero length AJP secret will now behave as if it has not been
         specified. (remm)
       </fix>
-      <update>
-        <bug>56966</bug>: Add use of System.nanoTime to track request
-        execution time. (remm)
-      </update>
     </changelog>
   </subsection>
   <subsection name="Cluster">
