@@ -292,4 +292,12 @@ public final class Globals {
      */
     public static final String CREDENTIAL_HANDLER
             = "org.apache.catalina.CredentialHandler";
+
+
+    /**
+     * Name of the ServletContext attribute under which we store the web
+     * application version string (the text that appears after ## when parallel
+     * deployment is used).
+     */
+    public static final String WEBAPP_VERSION = "org.apache.catalina.webappVersion";
 }
