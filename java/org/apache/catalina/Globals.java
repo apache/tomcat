@@ -369,6 +369,15 @@ public final class Globals {
     public static final String JASPER_XML_BLOCK_EXTERNAL_INIT_PARAM =
             "org.apache.jasper.XML_BLOCK_EXTERNAL";
 
+
+    /**
+     * Name of the ServletContext attribute under which we store the web
+     * application version string (the text that appears after ## when parallel
+     * deployment is used).
+     */
+    public static final String WEBAPP_VERSION = "org.apache.catalina.webappVersion";
+
+
     @Deprecated // Will be removed in Tomcat 9.0.x
     public static final boolean IS_ORACLE_JVM = JreVendor.IS_ORACLE_JVM;
 

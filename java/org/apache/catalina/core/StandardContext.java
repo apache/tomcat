@@ -5631,6 +5631,9 @@ public class StandardContext extends ContainerBase
             if (ok) {
                 getServletContext().setAttribute(
                         JarScanner.class.getName(), getJarScanner());
+
+                // Make the version info available
+                getServletContext().setAttribute(Globals.WEBAPP_VERSION, getWebappVersion());
             }
 
             // Set up the context init params
