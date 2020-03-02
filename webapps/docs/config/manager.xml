@@ -292,7 +292,7 @@
         <p>Should authentication information be included when sessions are
         swapped out to persistent storage? If <code>true</code>, the session's
         authentication is preserved so that the session remains authenticated
-        after being reloaded (swapped in) from persistent storage. If not 
+        after being reloaded (swapped in) from persistent storage. If not
         specified, the default value of <code>false</code> will be used.</p>
 
         <p>Please note that the session's <code>Principal</code> class as well
