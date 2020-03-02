@@ -157,6 +157,14 @@
       <update>
         Update the CXF module to Apache CXF 3.3.5. (remm)
       </update>
+      <add>
+        Expand the coverage of the Korean translations provided with Apache
+        Tomcat. Contributions provided by B. Cansmile Cha. (markt)
+      </add>
+      <add>
+        Expand the coverage of the French translations provided with Apache
+        Tomcat. (remm)
+      </add>
     </changelog>
   </subsection>
 </section>
