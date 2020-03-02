@@ -84,6 +84,11 @@
         support authentication persistence. Patch provided by Carsten Klein.
         (markt)
       </add>
+      <add>
+        <bug>64189</bug>: Expose the web application version String as a
+        <code>ServletContext</code> attribute named
+        <code>org.apache.catalina.webappVersion</code>. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
