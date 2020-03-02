@@ -122,6 +122,13 @@
         A zero length AJP secret will now behave as if it has not been
         specified. (remm)
       </fix>
+      <fix>
+        <bug>64188</bug>: If an error occurs while committing or flushing the
+        response when using a multiplexing protocol like HTTP/2 that requires
+        the channel to be closed but not the connection, just close the channel
+        and allow the other channels using the connection to continue. Based on
+        a suggestion from Alejandro Anadon. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">

@@ -379,7 +379,7 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
                     // Validate and write response headers
                     prepareResponse();
                 } catch (IOException e) {
-                    setErrorState(ErrorState.CLOSE_CONNECTION_NOW, e);
+                    handleIOException(e);
                 }
             }
             break;
@@ -388,10 +388,8 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
             action(ActionCode.COMMIT, null);
             try {
                 finishResponse();
-            } catch (CloseNowException cne) {
-                setErrorState(ErrorState.CLOSE_NOW, cne);
             } catch (IOException e) {
-                setErrorState(ErrorState.CLOSE_CONNECTION_NOW, e);
+                handleIOException(e);
             }
             break;
         }
@@ -404,7 +402,7 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
             try {
                 flush();
             } catch (IOException e) {
-                setErrorState(ErrorState.CLOSE_CONNECTION_NOW, e);
+                handleIOException(e);
                 response.setErrorException(e);
             }
             break;
@@ -614,6 +612,17 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
             doPush((Request) param);
             break;
         }
+        }
+    }
+
+
+    private void handleIOException (IOException ioe) {
+        if (ioe instanceof CloseNowException) {
+            // Close the channel but keep the connection open
+            setErrorState(ErrorState.CLOSE_NOW, ioe);
+        } else {
+            // Close the connection and all channels within that connection
+            setErrorState(ErrorState.CLOSE_CONNECTION_NOW, ioe);
         }
     }
 
