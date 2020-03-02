@@ -347,7 +347,21 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
                                 resp.getWriter().print("OK");
                                 req.getAsyncContext().complete();
                                 result.append('5');
-                                result.append(req.isAsyncStarted());
+                                try {
+                                    // Once complete() has been called on a
+                                    // non-container thread it is not safe to
+                                    // continue to use the request object as it
+                                    // may be recycled at any point. Normally
+                                    // there is enough time for this call to
+                                    // complete but not always. If this call
+                                    // fails in Tomcat an NPE will result so
+                                    // handle this here with a hack. What we are
+                                    // really checking here is that it does not
+                                    // return true.
+                                    result.append(req.isAsyncStarted());
+                                } catch (NullPointerException npe) {
+                                    result.append("false");
+                                }
                                 done = true;
                             } catch (InterruptedException e) {
                                 result.append(e);
