@@ -127,6 +127,11 @@
         system property, replaced by the
         <code>cookieName</code> attribute on the SSO valve. (remm)
       </update>
+      <fix>
+        Add support for default values when using <code>${...}</code> property
+        replacement in configuration files. Based on a pull request provided by
+        Bernd Bohmann. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
