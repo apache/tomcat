@@ -5115,11 +5115,10 @@ public class StandardContext extends ContainerBase
             }
 
             // We put the resources into the servlet context
-            if (ok)
+            if (ok) {
                 getServletContext().setAttribute
                     (Globals.RESOURCES_ATTR, getResources());
 
-            if (ok ) {
                 if (getInstanceManager() == null) {
                     javax.naming.Context context = null;
                     if (isUseNaming() && getNamingContextListener() != null) {
@@ -5133,10 +5132,8 @@ public class StandardContext extends ContainerBase
                 getServletContext().setAttribute(
                         InstanceManager.class.getName(), getInstanceManager());
                 InstanceManagerBindings.bind(getLoader().getClassLoader(), getInstanceManager());
-            }
 
-            // Create context attributes that will be required
-            if (ok) {
+                // Create context attributes that will be required
                 getServletContext().setAttribute(
                         JarScanner.class.getName(), getJarScanner());
             }
