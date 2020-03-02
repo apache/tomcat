@@ -129,6 +129,11 @@
         and allow the other channels using the connection to continue. Based on
         a suggestion from Alejandro Anadon. (markt)
       </fix>
+      <fix>
+        Correct the semantics of <code>getEnableSessionCreation</code> and
+        <code>setEnableSessionCreation</code> for <code>OpenSSLEngine</code>.
+        Pull request provided by Alexander Scheel. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">

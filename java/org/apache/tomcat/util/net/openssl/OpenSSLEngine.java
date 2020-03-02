@@ -1117,14 +1117,15 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
 
     @Override
     public void setEnableSessionCreation(boolean b) {
-        if (b) {
-            throw new UnsupportedOperationException();
+        if (!b) {
+            String msg = sm.getString("engine.noRestrictSessionCreation");
+            throw new UnsupportedOperationException(msg);
         }
     }
 
     @Override
     public boolean getEnableSessionCreation() {
-        return false;
+        return true;
     }
 
     @Override
