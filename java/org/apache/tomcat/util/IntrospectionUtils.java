@@ -256,25 +256,21 @@ public final class IntrospectionUtils {
                     continue;
                 }
                 String n = value.substring(pos + 2, endName);
-                String v = null;
-                if (staticProp != null) {
-                    v = (String) staticProp.get(n);
-                }
-                if (v == null && dynamicProp != null) {
-                    for (PropertySource propertySource : dynamicProp) {
-                        if (propertySource instanceof SecurePropertySource) {
-                            v = ((SecurePropertySource) propertySource).getProperty(n, classLoader);
-                        } else {
-                            v = propertySource.getProperty(n);
+                String v = getProperty(n, staticProp, dynamicProp, classLoader);
+                if (v == null) {
+                    // {name:default}
+                    int col = n.indexOf(':');
+                    if (col != -1) {
+                        String dV = n.substring(col+1);
+                        n = n.substring(0, col);
+                        v = getProperty(n, staticProp, dynamicProp, classLoader);
+                        if (v == null) {
+                            v = dV;
                         }
-                        if (v != null) {
-                            break;
-                        }
+                    } else {
+                        v = "${" + n + "}";
                     }
                 }
-                if (v == null)
-                    v = "${" + n + "}";
-
                 sb.append(v);
                 prev = endName + 1;
             }
@@ -282,6 +278,26 @@ public final class IntrospectionUtils {
         if (prev < value.length())
             sb.append(value.substring(prev));
         return sb.toString();
+    }
+
+    private static String getProperty(String name, Hashtable<Object, Object> staticProp, PropertySource[] dynamicProp, ClassLoader classLoader) {
+        String v = null;
+        if (staticProp != null) {
+            v = (String) staticProp.get(name);
+        }
+        if (v == null && dynamicProp != null) {
+            for (PropertySource propertySource : dynamicProp) {
+                if (propertySource instanceof SecurePropertySource) {
+                    v = ((SecurePropertySource) propertySource).getProperty(name, classLoader);
+                } else {
+                    v = propertySource.getProperty(name);
+                }
+                if (v != null) {
+                    break;
+                }
+            }
+        }
+        return v;
     }
 
     /**
