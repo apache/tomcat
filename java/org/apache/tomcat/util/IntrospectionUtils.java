@@ -280,7 +280,8 @@ public final class IntrospectionUtils {
         return sb.toString();
     }
 
-    private static String getProperty(String name, Hashtable<Object, Object> staticProp, PropertySource[] dynamicProp, ClassLoader classLoader) {
+    private static String getProperty(String name, Hashtable<Object, Object> staticProp,
+            PropertySource[] dynamicProp, ClassLoader classLoader) {
         String v = null;
         if (staticProp != null) {
             v = (String) staticProp.get(name);
