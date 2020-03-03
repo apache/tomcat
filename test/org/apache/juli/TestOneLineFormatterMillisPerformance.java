@@ -31,7 +31,7 @@ public class TestOneLineFormatterMillisPerformance {
     @Parameterized.Parameters(name = "{index}: format[{0}]")
     public static Collection<Object[]> parameters() {
 
-        List<Object[]> parameterSets = new ArrayList<>();
+        List<Object[]> parameterSets = new ArrayList<Object[]>();
 
         parameterSets.add(new String[] { "dd-MMM-yyyy HH:mm:ss.SSS" });
         parameterSets.add(new String[] { "dd-MMM-yyyy HH:mm:ss.SS" });
