@@ -17,6 +17,7 @@
 package org.apache.catalina.users;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
@@ -683,6 +684,11 @@ public class MemoryUserDatabase implements UserDatabase {
                 try {
                     // Can't close a uConn directly. Have to do it like this.
                     uConn.getInputStream().close();
+                } catch (FileNotFoundException fnfe) {
+                    // The file doesn't exist.
+                    // This has been logged above. No need to log again.
+                    // Set the last modified time to avoid repeated log messages
+                    this.lastModified = 0;
                 } catch (IOException ioe) {
                     log.warn(sm.getString("memoryUserDatabase.fileClose", pathname), ioe);
                 }
