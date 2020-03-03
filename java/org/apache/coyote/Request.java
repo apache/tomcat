@@ -571,7 +571,7 @@ public final class Request {
     /**
      *
      * @param startTime time
-     * @deprecated This setter will be removed in Tomcat 10.
+     * @deprecated This setter will be removed in Tomcat 10.1.
      */
     @Deprecated
     public void setStartTime(long startTime) {
