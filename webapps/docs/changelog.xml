@@ -126,6 +126,11 @@
         Expand the coverage of the Korean translations provided with Apache
         Tomcat. Contributions provided by B. Cansmile Cha. (markt)
       </add>
+      <add>
+        <bug>64190</bug>: Add support for specifing milliseconds (using
+        <code>S</code>, <code>SS</code> or <code>SSS</code>) in the timestamp
+        used by JULI&apos;s <code>OneLineFormatter</code>. (markt)
+      </add>
     </changelog>
   </subsection>
 </section>
