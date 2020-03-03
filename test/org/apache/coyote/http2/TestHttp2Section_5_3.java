@@ -168,9 +168,9 @@ public class TestHttp2Section_5_3 extends Http2TestBase {
                 Assert.fail("Unexpected stream: [" + output.getTrace() + "]");
             }
             // A value of more than 1 here is unlikely but possible depending on
-            // how threads are scheduled. This has been observed as high as 12
-            // on ci.apache.org so allow a margin and use 20.
-            if (data[1] > 20) {
+            // how threads are scheduled. This has been observed as high as 21
+            // on ci.apache.org so allow a margin and use 30.
+            if (data[1] > 30) {
                 // Larger than expected body size
                 Assert.fail("Larger than expected body: [" + output.getTrace() + "]");
             }
