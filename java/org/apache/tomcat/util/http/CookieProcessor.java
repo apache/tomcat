@@ -16,13 +16,11 @@
  */
 package org.apache.tomcat.util.http;
 
-import org.apache.catalina.connector.Request;
-
 import java.nio.charset.Charset;
-import java.util.List;
-import java.util.Map;
 
 import javax.servlet.http.Cookie;
+
+import org.apache.catalina.connector.Request;
 
 public interface CookieProcessor {
 

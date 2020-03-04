@@ -424,7 +424,8 @@ public class ApplicationPushBuilder {
             // However, if passed a Cookie with just a name and value set it
             // will generate an appropriate header for the Cookie header on the
             // pushed request.
-            result.append(request.getContext().getCookieProcessor().generateHeader(request, cookie));
+            CookieProcessor cookieProcessor = request.getContext().getCookieProcessor();
+            result.append(cookieProcessor.generateHeader(request, cookie));
         }
         return result.toString();
     }
