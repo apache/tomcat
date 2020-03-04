@@ -100,11 +100,14 @@ public class TestLargeUpload extends Http2TestBase {
             byte[] buf = new byte[8192];
             InputStream is = req.getInputStream();
             int n = is.read(buf);
-            while (n > 0) {
-                read += n;
-                n = is.read(buf);
+            try {
+                while (n > 0) {
+                    read += n;
+                    n = is.read(buf);
+                }
+            } finally {
+                done.countDown();
             }
-            done.countDown();
             if (read != bodySize * bodyCount) {
                 resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             } else {
