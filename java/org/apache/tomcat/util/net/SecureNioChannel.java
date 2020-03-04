@@ -657,13 +657,11 @@ public class SecureNioChannel extends NioChannel {
         int read = 0;
         //the SSL engine result
         SSLEngineResult unwrap;
-        boolean processOverflow = false;
+        OverflowState overflowState = OverflowState.NONE;
         do {
-            boolean useOverflow = false;
-            if (processOverflow) {
-                useOverflow = true;
+            if (overflowState == OverflowState.PROCESSING) {
+                overflowState = OverflowState.DONE;
             }
-            processOverflow = false;
             //prepare the buffer
             netInBuffer.flip();
             //unwrap the data
@@ -674,7 +672,7 @@ public class SecureNioChannel extends NioChannel {
             if (unwrap.getStatus() == Status.OK || unwrap.getStatus() == Status.BUFFER_UNDERFLOW) {
                 //we did receive some data, add it to our total
                 read += unwrap.bytesProduced();
-                if (useOverflow) {
+                if (overflowState == OverflowState.DONE) {
                     // Remove the data read into the overflow buffer
                     read -= getBufHandler().getReadBuffer().position();
                 }
@@ -734,14 +732,15 @@ public class SecureNioChannel extends NioChannel {
                         dsts = dsts2;
                         length++;
                         getBufHandler().configureReadBufferForWrite();
-                        processOverflow = true;
+                        overflowState = OverflowState.PROCESSING;
                     }
                 }
             } else {
                 // Something else went wrong
                 throw new IOException(sm.getString("channel.nio.ssl.unwrapFail", unwrap.getStatus()));
             }
-        } while (netInBuffer.position() != 0 || processOverflow); //continue to unwrapping as long as the input buffer has stuff
+        } while ((netInBuffer.position() != 0 || overflowState == OverflowState.PROCESSING) &&
+                overflowState != OverflowState.DONE);
         return read;
     }
 
@@ -857,5 +856,12 @@ public class SecureNioChannel extends NioChannel {
 
     public ByteBuffer getEmptyBuf() {
         return emptyBuf;
+    }
+
+
+    private enum OverflowState {
+        NONE,
+        PROCESSING,
+        DONE;
     }
 }

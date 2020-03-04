@@ -136,7 +136,9 @@
       </fix>
       <fix>
         <bug>64192</bug>: Correctly handle case where unread data is returned to
-        the read buffer when the read buffer is non empty. (markt)
+        the read buffer when the read buffer is non empty. Ensure a gathering
+        TLS read stops once the provided ByteBuffers are full or no more data is
+        available. (markt)
       </fix>
     </changelog>
   </subsection>
