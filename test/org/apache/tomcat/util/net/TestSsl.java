@@ -16,18 +16,26 @@
  */
 package org.apache.tomcat.util.net;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.Reader;
+import java.util.Arrays;
 
+import javax.net.SocketFactory;
 import javax.net.ssl.HandshakeCompletedEvent;
 import javax.net.ssl.HandshakeCompletedListener;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.junit.Assert;
 import org.junit.Assume;
@@ -67,6 +75,52 @@ public class TestSsl extends TomcatBaseTest {
         Assert.assertTrue(res.toString().indexOf("<a href=\"../helloworld.html\">") > 0);
         Assert.assertTrue("Checking no client issuer has been requested",
                 TesterSupport.getLastClientAuthRequestedIssuerCount() == 0);
+    }
+
+    @Test
+    public void testPost() throws Exception {
+        SocketFactory socketFactory = TesterSupport.configureClientSsl();
+
+        Tomcat tomcat = getTomcatInstance();
+        TesterSupport.initSsl(tomcat);
+
+        Context ctxt = tomcat.addContext("", null);
+        Tomcat.addServlet(ctxt, "post", new SimplePostServlet());
+        ctxt.addServletMappingDecoded("/post", "post");
+        tomcat.start();
+
+        SSLSocket socket = (SSLSocket) socketFactory.createSocket("localhost",
+                getPort());
+
+        OutputStream os = socket.getOutputStream();
+
+        byte[] bytes = new byte[1024 * 1024]; // 1MB
+        Arrays.fill(bytes, (byte) 1);
+
+        os.write("POST /post HTTP/1.1\r\n".getBytes());
+        os.write("Host: localhost\r\n".getBytes());
+        os.write("Content-Length: 1048576\r\n\r\n".getBytes());
+        os.write(bytes);
+        os.flush();
+
+        InputStream is = socket.getInputStream();
+
+        // Skip to the end of the headers
+        byte[] endOfHeaders = "\r\n\r\n".getBytes();
+        int found = 0;
+        while (found != endOfHeaders.length) {
+            if (is.read() == endOfHeaders[found]) {
+                found++;
+            } else {
+                found = 0;
+            }
+        }
+
+        for (byte c : bytes) {
+            int read = is.read();
+            Assert.assertEquals(c, read);
+        }
+
     }
 
     @Test
@@ -194,5 +248,29 @@ public class TestSsl extends TomcatBaseTest {
         public boolean isComplete() {
             return complete;
         }
+    }
+
+    public class SimplePostServlet extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            byte[] in = new byte[1500];
+            InputStream input = req.getInputStream();
+            while (true) {
+                int n = input.read(in);
+                if (n > 0) {
+                    baos.write(in, 0, n);
+                } else {
+                    break;
+                }
+            }
+            byte[] out = baos.toByteArray();
+            resp.setContentLength(out.length);
+            resp.getOutputStream().write(out);
+        }
+
     }
 }
