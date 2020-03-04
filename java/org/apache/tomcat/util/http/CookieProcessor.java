@@ -16,7 +16,11 @@
  */
 package org.apache.tomcat.util.http;
 
+import org.apache.catalina.connector.Request;
+
 import java.nio.charset.Charset;
+import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.Cookie;
 
@@ -40,6 +44,24 @@ public interface CookieProcessor {
      *         response
      */
     String generateHeader(Cookie cookie);
+
+    /**
+     * Generate the {@code Set-Cookie} HTTP header value for the given Cookie.
+     * This method receives as parameter the servlet request so that
+     * it can make decisions based on request properties. One such use-case is decide if
+     * SameSite attribute should be added to the cookie based on the User-Agent
+     * or other request header because there are browser versions incompatible with
+     * the SameSite attribute. This is described in
+     * {@link https://www.chromium.org/updates/same-site/incompatible-clients}
+     *
+     * @param request The servlet request
+     *
+     * @param cookie The cookie for which the header will be generated
+     *
+     * @return The header value in a form that can be added directly to the
+     *         response
+     */
+    String generateHeader(Request request, Cookie cookie);
 
     /**
      * Obtain the character set that will be used when converting between bytes
