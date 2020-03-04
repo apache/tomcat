@@ -134,6 +134,10 @@
         <code>setEnableSessionCreation</code> for <code>OpenSSLEngine</code>.
         Pull request provided by Alexander Scheel. (markt)
       </fix>
+      <fix>
+        <bug>64192</bug>: Correctly handle case where unread data is returned to
+        the read buffer when the read buffer is non empty. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">
