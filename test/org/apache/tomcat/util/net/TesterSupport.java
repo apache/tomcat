@@ -197,7 +197,7 @@ public final class TesterSupport {
         return tmf.getTrustManagers();
     }
 
-    protected static ClientSSLSocketFactory configureClientSsl() {
+    public static ClientSSLSocketFactory configureClientSsl() {
         ClientSSLSocketFactory clientSSLSocketFactory = null;
         try {
             SSLContext sc = SSLContext.getInstance(Constants.SSL_PROTO_TLS);
