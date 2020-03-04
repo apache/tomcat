@@ -36,17 +36,18 @@ import org.apache.coyote.http11.AbstractHttp11Protocol;
 
 public class TestLargeUpload extends Http2TestBase {
 
+    int bodySize = 13107;
+    int bodyCount = 5;
+
+    volatile int read = 0;
+    CountDownLatch done = new CountDownLatch(1);
+
     @Test
     public void testLargePostRequest() throws Exception {
-        // FIXME: Skip test for now, some control flow errors with non async
-        org.junit.Assume.assumeFalse(true);
 
         http2Connect(true);
 
         ((AbstractHttp11Protocol<?>) http2Protocol.getHttp11Protocol()).setAllowedTrailerHeaders(TRAILER_HEADER_NAME);
-
-        int bodySize = 15000;
-        int bodyCount = 100;
 
         byte[] headersFrameHeader = new byte[9];
         ByteBuffer headersPayload = ByteBuffer.allocate(128);
@@ -90,9 +91,6 @@ public class TestLargeUpload extends Http2TestBase {
         tomcat.start();
     }
 
-    volatile int read = 0;
-    CountDownLatch done = new CountDownLatch(1);
-
     private class DataReadServlet extends SimpleServlet {
 
         private static final long serialVersionUID = 1L;
@@ -107,7 +105,7 @@ public class TestLargeUpload extends Http2TestBase {
                 n = is.read(buf);
             }
             done.countDown();
-            if (read < 16384 * 20) {
+            if (read != bodySize * bodyCount) {
                 resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             } else {
                 resp.setStatus(HttpServletResponse.SC_OK);
