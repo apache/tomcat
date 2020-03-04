@@ -16,6 +16,7 @@
  */
 package org.apache.tomcat.util.net;
 
+import java.nio.BufferOverflowException;
 import java.nio.ByteBuffer;
 
 import org.apache.tomcat.util.buf.ByteBufferUtils;
@@ -89,6 +90,55 @@ public class SocketBufferHandler {
             return readBuffer.position() == 0;
         } else {
             return readBuffer.remaining() == 0;
+        }
+    }
+
+
+    public void unReadReadBuffer(ByteBuffer returnedData) {
+        if (isReadBufferEmpty()) {
+            configureReadBufferForWrite();
+            readBuffer.put(returnedData);
+        } else {
+            int bytesReturned = returnedData.remaining();
+            if (readBufferConfiguredForWrite) {
+                // Writes always start at position zero
+                if ((readBuffer.position() + bytesReturned) > readBuffer.capacity()) {
+                    throw new BufferOverflowException();
+                } else {
+                    // Move the bytes up to make space for the returned data
+                    for (int i = 0; i < readBuffer.position(); i++) {
+                        readBuffer.put(i + bytesReturned, readBuffer.get(i));
+                    }
+                    // Insert the bytes returned
+                    for (int i = 0; i < bytesReturned; i++) {
+                        readBuffer.put(i, returnedData.get());
+                    }
+                    // Update the position
+                    readBuffer.position(readBuffer.position() + bytesReturned);
+                }
+            } else {
+                // Reads will start at zero but may have progressed
+                int shiftRequired = bytesReturned - readBuffer.position();
+                if (shiftRequired > 0) {
+                    if ((readBuffer.capacity() - readBuffer.limit()) < shiftRequired) {
+                        throw new BufferOverflowException();
+                    }
+                    // Move the bytes up to make space for the returned data
+                    int oldLimit = readBuffer.limit();
+                    readBuffer.limit(oldLimit + shiftRequired);
+                    for (int i = readBuffer.position(); i < oldLimit; i++) {
+                        readBuffer.put(i + shiftRequired, readBuffer.get(i));
+                    }
+                } else {
+                    shiftRequired = 0;
+                }
+                // Insert the returned bytes
+                int insertOffset = readBuffer.position() + shiftRequired - bytesReturned;
+                for (int i = insertOffset; i < bytesReturned + insertOffset; i++) {
+                    readBuffer.put(i, returnedData.get());
+                }
+                readBuffer.position(insertOffset);
+            }
         }
     }
 

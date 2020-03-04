@@ -134,6 +134,10 @@
         Pull request provided by Alexander Scheel. (markt)
       </fix>
       <fix>
+        <bug>64192</bug>: Correctly handle case where unread data is returned to
+        the read buffer when the read buffer is non empty. (markt)
+      </fix>
+      <fix>
         <bug>64195</bug>: Revert simplification of NIO block read and write,
         deferred to Tomcat 10. (remm)
       </fix>
