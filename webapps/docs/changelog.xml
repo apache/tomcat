@@ -80,9 +80,14 @@
         <bug>64166</bug>: Ensure that the names returned by
         <code>HttpServletResponse.getHeaderNames()</code> are unique. (markt)
       </fix>
+      <add>
+        <bug>64189</bug>: Expose the web application version String as a
+        <code>ServletContext</code> attribute named
+        <code>org.apache.catalina.webappVersion</code>. (markt)
+      </add>
       <fix>
-        Fix SCI support regression that was caused by a JAR path lookup error
-        in the classloader findResources. (remm)
+        <bug>64191</bug>: Fix an SCI support regression that was caused by a JAR
+        path lookup error in the classloader findResources. (remm)
       </fix>
       <scode>
         Rename <code>org.apache.tomcat.util.digester.Digester$EnvironmentPropertySource</code>
@@ -96,11 +101,6 @@
         <code>StandardManager</code> and <code>PersistentManager</code> to
         support authentication persistence. Patch provided by Carsten Klein.
         (markt)
-      </add>
-      <add>
-        <bug>64189</bug>: Expose the web application version String as a
-        <code>ServletContext</code> attribute named
-        <code>org.apache.catalina.webappVersion</code>. (markt)
       </add>
     </changelog>
   </subsection>
