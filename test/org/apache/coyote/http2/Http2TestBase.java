@@ -52,6 +52,7 @@ import org.apache.coyote.http2.Http2Parser.Output;
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.apache.tomcat.util.http.FastHttpDateFormat;
 import org.apache.tomcat.util.http.MimeHeaders;
+import org.apache.tomcat.util.net.TesterSupport;
 
 /**
  * Tests for compliance with the <a href="https://tools.ietf.org/html/rfc7540">
@@ -103,9 +104,13 @@ public abstract class Http2TestBase extends TomcatBaseTest {
      * that the first response is correctly received.
      */
     protected void http2Connect() throws Exception {
-        enableHttp2();
+        http2Connect(false);
+    }
+
+    protected void http2Connect(boolean tls) throws Exception {
+        enableHttp2(tls);
         configureAndStartWebApplication();
-        openClientConnection();
+        openClientConnection(tls);
         doHttpUpgrade();
         sendClientPreface();
         validateHttp2InitialResponse();
@@ -538,8 +543,17 @@ public abstract class Http2TestBase extends TomcatBaseTest {
     }
 
     protected void enableHttp2(long maxConcurrentStreams) {
-        Connector connector = getTomcatInstance().getConnector();
-        http2Protocol = new Http2Protocol();
+        enableHttp2(maxConcurrentStreams, false);
+    }
+
+    protected void enableHttp2(boolean tls) {
+        enableHttp2(200, tls);
+    }
+
+    protected void enableHttp2(long maxConcurrentStreams, boolean tls) {
+        Tomcat tomcat = getTomcatInstance();
+        Connector connector = tomcat.getConnector();
+        http2Protocol = new UpgradableHttp2Protocol();
         // Short timeouts for now. May need to increase these for CI systems.
         http2Protocol.setReadTimeout(6000);
         http2Protocol.setWriteTimeout(6000);
@@ -548,8 +562,18 @@ public abstract class Http2TestBase extends TomcatBaseTest {
         http2Protocol.setStreamWriteTimeout(3000);
         http2Protocol.setMaxConcurrentStreams(maxConcurrentStreams);
         connector.addUpgradeProtocol(http2Protocol);
+        if (tls) {
+            // Enable TLS
+            TesterSupport.initSsl(tomcat);
+        }
     }
 
+    private class UpgradableHttp2Protocol extends Http2Protocol {
+        @Override
+        public String getHttpUpgradeName(boolean isSSLEnabled) {
+            return "h2c";
+        }
+    }
 
     protected void configureAndStartWebApplication() throws LifecycleException {
         Tomcat tomcat = getTomcatInstance();
@@ -571,8 +595,13 @@ public abstract class Http2TestBase extends TomcatBaseTest {
 
 
     protected void openClientConnection() throws IOException {
+        openClientConnection(false);
+    }
+
+    protected void openClientConnection(boolean tls) throws IOException {
+        SocketFactory socketFactory = tls ? TesterSupport.configureClientSsl() : SocketFactory.getDefault();
         // Open a connection
-        s = SocketFactory.getDefault().createSocket("localhost", getPort());
+        s = socketFactory.createSocket("localhost", getPort());
         s.setSoTimeout(30000);
 
         os = s.getOutputStream();
@@ -609,6 +638,9 @@ public abstract class Http2TestBase extends TomcatBaseTest {
 
     boolean readHttpUpgradeResponse() throws IOException {
         String[] responseHeaders = readHttpResponseHeaders();
+        for (String header : responseHeaders) {
+            System.out.println("HEADER: " + header);
+        }
 
         if (responseHeaders.length < 3) {
             return false;
