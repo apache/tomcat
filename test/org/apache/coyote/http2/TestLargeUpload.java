@@ -16,6 +16,7 @@
  */
 package org.apache.coyote.http2;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
@@ -44,8 +45,8 @@ public class TestLargeUpload extends Http2TestBase {
 
         ((AbstractHttp11Protocol<?>) http2Protocol.getHttp11Protocol()).setAllowedTrailerHeaders(TRAILER_HEADER_NAME);
 
-        int bodySize = 16384;
-        int bodyCount = 20;
+        int bodySize = 15000;
+        int bodyCount = 100;
 
         byte[] headersFrameHeader = new byte[9];
         ByteBuffer headersPayload = ByteBuffer.allocate(128);
@@ -60,9 +61,13 @@ public class TestLargeUpload extends Http2TestBase {
         // Write the headers
         writeFrame(headersFrameHeader, headersPayload);
         // Body
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
         for (int i = 0; i < bodyCount; i++) {
-            writeFrame(dataFrameHeader, dataPayload);
+            baos.write(dataFrameHeader);
+            baos.write(dataPayload.array(), dataPayload.arrayOffset(), dataPayload.limit());
         }
+        os.write(baos.toByteArray());
+        os.flush();
 
         // Trailers
         writeFrame(trailerFrameHeader, trailerPayload);
