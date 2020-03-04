@@ -645,9 +645,6 @@ public abstract class Http2TestBase extends TomcatBaseTest {
 
     boolean readHttpUpgradeResponse() throws IOException {
         String[] responseHeaders = readHttpResponseHeaders();
-        for (String header : responseHeaders) {
-            System.out.println("HEADER: " + header);
-        }
 
         if (responseHeaders.length < 3) {
             return false;
