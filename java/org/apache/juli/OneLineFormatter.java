@@ -197,7 +197,7 @@ public class OneLineFormatter extends Formatter {
             // Some version of replace
             long frac = timestamp % 1000;
             // Formatted string may vary in length so the insert point may vary
-            int insertStart = cachedTimeStamp.indexOf('#');
+            int insertStart = cachedTimeStamp.indexOf(DateFormatCache.MSEC_PATTERN);
             buf.append(cachedTimeStamp.subSequence(0, insertStart));
             if (frac < 100 && millisHandling == MillisHandling.REPLACE_SSS) {
                 buf.append('0');
