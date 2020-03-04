@@ -849,6 +849,11 @@ public class StandardContext extends ContainerBase
     }
 
 
+    public long getInProgressAsyncCount() {
+        return inProgressAsyncCount.get();
+    }
+
+
     @Override
     public void setAllowMultipleLeadingForwardSlashInPath(
             boolean allowMultipleLeadingForwardSlashInPath) {
