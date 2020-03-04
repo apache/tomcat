@@ -163,6 +163,17 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Web applications">
+    <changelog>
+      <fix>
+        Add to the documentation for the <code>JmxRemoteLifecycleListener</code>
+        the requirement to use
+        <code>-Dcom.sun.management.jmxremote.registry.ssl=false</code> if TLS is
+        not being used else clients will be unable to connect to the JMX server.
+        (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <add>

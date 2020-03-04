@@ -649,7 +649,8 @@
     <p>with the following system properties set (e.g. in setenv.sh):</p>
   <source>  -Dcom.sun.management.jmxremote.password.file=$CATALINA_BASE/conf/jmxremote.password
   -Dcom.sun.management.jmxremote.access.file=$CATALINA_BASE/conf/jmxremote.access
-  -Dcom.sun.management.jmxremote.ssl=false</source>
+  -Dcom.sun.management.jmxremote.ssl=false
+  -Dcom.sun.management.jmxremote.registry.ssl=false</source>
     <p>$CATALINA_BASE/conf/jmxremote.password containing:</p>
   <source>admin letmein</source>
     <p>$CATALINA_BASE/conf/jmxremote.access containing:</p>
@@ -685,7 +686,8 @@
   <source>  -Dcom.sun.management.jmxremote.login.config=Tomcat
   -Djava.security.auth.login.config=$CATALINA_BASE/conf/login.config
   -Dcom.sun.management.jmxremote.access.file=$CATALINA_BASE/conf/jmxremote.access
-  -Dcom.sun.management.jmxremote.ssl=false</source>
+  -Dcom.sun.management.jmxremote.ssl=false
+  -Dcom.sun.management.jmxremote.registry.ssl=false</source>
     <p>$CATALINA_BASE/conf/login.config containing your choice of JAAS LoginModule implementation, for example:</p>
   <source>  Tomcat { /* should match to the com.sun.management.jmxremote.login.config property */
 
