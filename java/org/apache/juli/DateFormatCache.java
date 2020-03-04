@@ -43,7 +43,7 @@ import java.util.TimeZone;
  */
 public class DateFormatCache {
 
-    private static final String msecPattern = "#";
+    public static final char MSEC_PATTERN = '#';
 
     /* Timestamp format */
     private final String format;
@@ -70,7 +70,7 @@ public class DateFormatCache {
             if (escape || x != 'S') {
                 result.append(x);
             } else {
-                result.append(msecPattern);
+                result.append(MSEC_PATTERN);
             }
             if (x == '\'') {
                 escape = !escape;
