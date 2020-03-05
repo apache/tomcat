@@ -182,6 +182,12 @@
         not being used else clients will be unable to connect to the JMX server.
         (markt)
       </fix>
+      <add>
+        Expand the documentation for the <code>address</code> attribute of the
+        AJP Connector and document that the AJP Connector also supports the
+        <code>ipv6v6only</code> attribute with the APR/Native implementaiton.
+        (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Other">
