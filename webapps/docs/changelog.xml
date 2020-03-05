@@ -150,6 +150,16 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Web applications">
+    <changelog>
+      <add>
+        Expand the documentation for the <code>address</code> attribute of the
+        AJP Connector and document that the AJP Connector also supports the
+        <code>ipv6v6only</code> attribute with the APR/Native implementaiton.
+        (markt)
+      </add>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <update>
