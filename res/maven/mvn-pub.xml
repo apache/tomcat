@@ -390,6 +390,8 @@
     <exec executable="${gpg.exec}" failonerror="true"
           inputstring="${gpg.passphrase}">
       <arg value="--batch"/>
+      <arg value="--pinentry-mode"/>
+      <arg value="loopback"/>
       <arg value="--passphrase-fd"/>
       <arg value="0"/>
       <arg value="-a"/>
