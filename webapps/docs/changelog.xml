@@ -114,6 +114,10 @@
         A zero length AJP secret will now behave as if it has not been
         specified. (remm)
       </fix>
+      <fix>
+        Allow async requests to complete cleanly when the Connector is paused
+        before <code>complete()</code> is called on a container thread. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">

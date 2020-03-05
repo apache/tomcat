@@ -1847,7 +1847,7 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
         } else if (isAsync()) {
             state = SocketState.LONG;
         } else {
-            if (!keepAlive) {
+            if (!keepAlive || endpoint.isPaused()) {
                 state = SocketState.CLOSED;
             } else {
                 endRequest();

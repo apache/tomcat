@@ -620,7 +620,7 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
             }
         } else {
             request.updateCounters();
-            if (getErrorState().isError()) {
+            if (getErrorState().isError() || endpoint.isPaused()) {
                 state = SocketState.CLOSED;
             } else {
                 recycle(false);

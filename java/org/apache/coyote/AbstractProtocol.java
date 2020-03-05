@@ -654,7 +654,7 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
                         state = processor.process(wrapper);
                     }
 
-                    if (state != SocketState.CLOSED && processor.isAsync()) {
+                    if (processor.isAsync()) {
                         state = processor.asyncPostProcess();
                     }
 
