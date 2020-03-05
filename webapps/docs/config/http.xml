@@ -338,7 +338,7 @@
       with either <code>0.0.0.0</code> or <code>::</code>. The APR/native
       connector will only listen on IPv4 addresses if configured with
       <code>0.0.0.0</code> and will listen on IPv6 addresses (and optionally
-      IPv4 addresses depending on the setting of <strong>ipv6onlyv6</strong>) if
+      IPv4 addresses depending on the setting of <strong>ipv6v6only</strong>) if
       configured with <code>::</code>.</p>
     </attribute>
 
