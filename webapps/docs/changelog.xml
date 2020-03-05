@@ -140,6 +140,10 @@
         TLS read stops once the provided ByteBuffers are full or no more data is
         available. (markt)
       </fix>
+      <fix>
+        Allow async requests to complete cleanly when the Connector is paused
+        before <code>complete()</code> is called on a container thread. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">
