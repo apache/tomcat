@@ -87,9 +87,9 @@ import org.apache.tomcat.util.net.IPv6Utils;
  * <li><b>%u</b> - Remote user that was authenticated
  * <li><b>%U</b> - Requested URL path
  * <li><b>%v</b> - Local server name
- * <li><b>%D</b> - Time taken to process the request, in millis
+ * <li><b>%D</b> - Time taken to process the request, in microseconds
  * <li><b>%T</b> - Time taken to process the request, in seconds
- * <li><b>%F</b> - Time taken to commit the response, in millis
+ * <li><b>%F</b> - Time taken to commit the response, in milliseconds
  * <li><b>%I</b> - current Request thread name (can compare later with stacktraces)
  * <li><b>%X</b> - Connection status when response is completed:
  *   <ul>
@@ -120,6 +120,8 @@ import org.apache.tomcat.util.net.IPv6Utils;
  * <li><code>%{xxx}s</code> xxx is an attribute in the HttpSession
  * <li><code>%{xxx}t</code> xxx is an enhanced SimpleDateFormat pattern
  * (see Configuration Reference document for details on supported time patterns)
+ * <li><code>%{xxx}T</code> xxx is the unit for the time taken to process the request
+ * (see Configuration Reference document for details on supported units)
  * </ul>
  *
  * <p>
@@ -1333,8 +1335,8 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
         private final boolean millis;
 
         /**
-         * @param micros <code>true</code>, write time in micros - %D
-         * @param millis <code>true</code>, write time in millis,
+         * @param micros <code>true</code>, write time in microseconds - %D
+         * @param millis <code>true</code>, write time in milliseconds,
          * if both arguments are <code>false</code>, write time in seconds - %T
          */
         public ElapsedTimeElement(boolean micros, boolean millis) {
