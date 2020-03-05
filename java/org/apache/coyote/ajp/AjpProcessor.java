@@ -328,7 +328,11 @@ public class AjpProcessor extends AbstractProcessor {
         // Set keep alive timeout for next request
         socketWrapper.setReadTimeout(protocol.getKeepAliveTimeout());
         recycle();
-        return SocketState.OPEN;
+        if (protocol.isPaused()) {
+            return SocketState.CLOSED;
+        } else {
+            return SocketState.OPEN;
+        }
     }
 
 
