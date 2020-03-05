@@ -680,7 +680,7 @@ public class Http11Processor extends AbstractProcessor {
 
         rp.setStage(org.apache.coyote.Constants.STAGE_ENDED);
 
-        if (getErrorState().isError() || endpoint.isPaused()) {
+        if (getErrorState().isError() || (endpoint.isPaused() && !isAsync())) {
             return SocketState.CLOSED;
         } else if (isAsync()) {
             return SocketState.LONG;
@@ -1282,7 +1282,7 @@ public class Http11Processor extends AbstractProcessor {
 
     @Override
     protected SocketState dispatchEndRequest() {
-        if (!keepAlive) {
+        if (!keepAlive || endpoint.isPaused()) {
             return SocketState.CLOSED;
         } else {
             endRequest();

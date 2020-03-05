@@ -419,7 +419,11 @@ public class AjpProcessor extends AbstractProcessor {
             socketWrapper.setReadTimeout(keepAliveTimeout);
         }
         recycle();
-        return SocketState.OPEN;
+        if (endpoint.isPaused()) {
+            return SocketState.CLOSED;
+        } else {
+            return SocketState.OPEN;
+        }
     }
 
 
