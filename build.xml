@@ -3415,6 +3415,8 @@ Read the Building page on the Apache Tomcat documentation site for details on ho
       <arg value="--batch"/>
       <arg value="--pinentry-mode"/>
       <arg value="loopback"/>
+      <arg value="--passphrase-fd"/>
+      <arg value="0"/>
       <arg value="-a"/>
       <arg value="-b"/>
       <arg value="${file}"/>
