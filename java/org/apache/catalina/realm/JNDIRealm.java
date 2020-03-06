@@ -1329,9 +1329,6 @@ public class JNDIRealm extends RealmBase {
             // Log the problem for posterity
             containerLog.error(sm.getString("jndiRealm.exception"), e);
 
-            // Close the connection so that it gets reopened next time
-            close(connection);
-
             // Return "not authenticated" for this request
             if (containerLog.isDebugEnabled())
                 containerLog.debug("Returning null principal.");
@@ -2309,9 +2306,6 @@ System.out.println("getUserBySearch " + username);
 
             // Log the problem for posterity
             containerLog.error(sm.getString("jndiRealm.exception"), e);
-
-            // Close the connection so that it gets reopened next time
-            close(connection);
 
             // Return "not authenticated" for this request
             return null;
