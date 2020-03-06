@@ -24,6 +24,8 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.Reader;
 import java.util.Arrays;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.net.SocketFactory;
 import javax.net.ssl.HandshakeCompletedEvent;
@@ -87,39 +89,61 @@ public class TestSsl extends TomcatBaseTest {
         Tomcat.addServlet(ctxt, "post", new SimplePostServlet());
         ctxt.addServletMappingDecoded("/post", "post");
         tomcat.start();
+        int iterations = 8;
+        CountDownLatch latch = new CountDownLatch(iterations);
+        AtomicInteger errorCount = new AtomicInteger(0);
+        for (int i = 0; i < iterations; i++) {
+            new Thread() {
+                public void run() {
+                    try {
+                        SSLSocket socket = (SSLSocket) socketFactory.createSocket("localhost",
+                                getPort());
 
-        SSLSocket socket = (SSLSocket) socketFactory.createSocket("localhost",
-                getPort());
+                        OutputStream os = socket.getOutputStream();
 
-        OutputStream os = socket.getOutputStream();
+                        byte[] bytes = new byte[16 * 1024 * 1024]; // 16MB
+                        Arrays.fill(bytes, (byte) 1);
 
-        byte[] bytes = new byte[1024 * 1024]; // 1MB
-        Arrays.fill(bytes, (byte) 1);
+                        os.write("POST /post HTTP/1.1\r\n".getBytes());
+                        os.write("Host: localhost\r\n".getBytes());
+                        os.write(("Content-Length: " + Integer.valueOf(bytes.length) + "\r\n\r\n").getBytes());
+                        // Write in 128KB blocks
+                        for (int i = 0; i < bytes.length / (128 * 1024); i++) {
+                            os.write(bytes, 0, 1024 * 128);
+                            Thread.sleep(10);
+                        }
+                        os.flush();
 
-        os.write("POST /post HTTP/1.1\r\n".getBytes());
-        os.write("Host: localhost\r\n".getBytes());
-        os.write("Content-Length: 1048576\r\n\r\n".getBytes());
-        os.write(bytes);
-        os.flush();
+                        InputStream is = socket.getInputStream();
 
-        InputStream is = socket.getInputStream();
+                        // Skip to the end of the headers
+                        byte[] endOfHeaders = "\r\n\r\n".getBytes();
+                        int found = 0;
+                        while (found != endOfHeaders.length) {
+                            if (is.read() == endOfHeaders[found]) {
+                                found++;
+                            } else {
+                                found = 0;
+                            }
+                        }
 
-        // Skip to the end of the headers
-        byte[] endOfHeaders = "\r\n\r\n".getBytes();
-        int found = 0;
-        while (found != endOfHeaders.length) {
-            if (is.read() == endOfHeaders[found]) {
-                found++;
-            } else {
-                found = 0;
-            }
+                        for (byte c : bytes) {
+                            int read = is.read();
+                            if (c != read) {
+                                errorCount.incrementAndGet();
+                                break;
+                            }
+                        }
+                    } catch (Exception e) {
+                        errorCount.incrementAndGet();
+                    } finally {
+                        latch.countDown();
+                    }
+                }
+            }.start();
         }
-
-        for (byte c : bytes) {
-            int read = is.read();
-            Assert.assertEquals(c, read);
-        }
-
+        latch.await();
+        Assert.assertEquals(0, errorCount.get());
     }
 
     @Test
