@@ -33,6 +33,7 @@ public class TokenStreamProvider extends AbstractStreamProvider {
     TokenStreamProvider(String token, String caCertFile) throws Exception {
         this.token = token;
         TrustManager[] trustManagers = configureCaCert(caCertFile);
+        /** TLS is not secure, recommend use TLSv1.1*/
         SSLContext context = SSLContext.getInstance("TLS");
         context.init(null, trustManagers, null);
         this.factory = context.getSocketFactory();
