@@ -52,8 +52,8 @@ public class TestAsyncTimeout extends Http2TestBase {
 
         // This is the servlet that does that actual test
         // This latch is used to signal that that async thread used by the test
-        // has ended. It isn;t essential to the test but it allows the test to
-        // complete without Tmcat logging an error about a still running thread.
+        // has ended. It isn't essential to the test but it allows the test to
+        // complete without Tomcat logging an error about a still running thread.
         CountDownLatch latch = new CountDownLatch(1);
         Wrapper w = Tomcat.addServlet(ctxt, "async", new AsyncTimeoutServlet(latch));
         w.setAsyncSupported(true);
@@ -95,7 +95,7 @@ public class TestAsyncTimeout extends Http2TestBase {
 
         private static final long serialVersionUID = 1L;
 
-        private final CountDownLatch latch;
+        private final transient CountDownLatch latch;
 
         public AsyncTimeoutServlet(CountDownLatch latch) {
             this.latch = latch;

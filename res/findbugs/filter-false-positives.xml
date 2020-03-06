@@ -1602,6 +1602,7 @@
     <Or>
       <Method name="testAuthMethodBadMethod"/>
       <Method name="testBadBase64Char"/>
+      <Method name="testBadBase64InlineEquals"/>
     </Or>
     <Bug pattern="DLS_DEAD_LOCAL_STORE"/>
   </Match>
@@ -1610,6 +1611,12 @@
     <Class name="org.apache.catalina.connector.TestCoyoteAdapter$AsyncServlet"/>
     <Field name="t"/>
     <Bug pattern="MSF_MUTABLE_SERVLET_FIELD"/>
+  </Match>
+  <Match>
+    <!-- Container handles close -->
+    <Class name="org.apache.catalina.connector.TestOutputBuffer$WritingServlet"/>
+    <Method name="doGet"/>
+    <Bug pattern="OS_OPEN_STREAM"/>
   </Match>
   <Match>
     <!-- ByteChunk.toString() can return null -->
@@ -1897,6 +1904,12 @@
     <Class name="org.apache.coyote.http11.TestHttp11Processor"/>
     <Field name="bug55772IsSecondRequest"/>
     <Bug pattern="ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD"/>
+  </Match>
+  <Match>
+    <!-- Latch isn't essential so no need to check return -->
+    <Class name="org.apache.coyote.http2.TestAsyncTimeout"/>
+    <Method name="testTimeout"/>
+    <Bug pattern="RV_RETURN_VALUE_IGNORED"/>
   </Match>
   <Match>
     <!-- Result is negated to compare result when order is reversed -->
