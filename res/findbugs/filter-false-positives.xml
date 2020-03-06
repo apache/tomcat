@@ -1458,6 +1458,21 @@
     <Bug code="SF" />
   </Match>
   <Match>
+    <!-- Single condition. notify() is OK -->
+    <Class name="org.apache.tomcat.util.net.SocketWrapperBase" />
+    <Method name="vectoredOperation"/>
+    <Bug pattern="WA_NOT_IN_LOOP" />
+  </Match>
+  <Match>
+    <!-- Single condition. notify() is OK -->
+    <Class name="org.apache.tomcat.util.net.SocketWrapperBase$VectoredIOCompletionHandler" />
+    <Or>
+      <Method name="completed"/>
+      <Method name="failed"/>
+    </Or>
+    <Bug pattern="NO_NOTIFY_NOT_NOTIFYALL" />
+  </Match>
+  <Match>
     <!-- Stream will be closed -->
     <Class name="org.apache.tomcat.util.net.jsse.PEMFile" />
     <Method name="&lt;init&gt;" />
