@@ -95,6 +95,7 @@ public class TestSsl extends TomcatBaseTest {
         AtomicInteger errorCount = new AtomicInteger(0);
         for (int i = 0; i < iterations; i++) {
             new Thread() {
+                @Override
                 public void run() {
                     try {
                         SSLSocket socket = (SSLSocket) socketFactory.createSocket("localhost",
