@@ -1136,100 +1136,100 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
         }
 
 
-        private int fillReadBuffer(boolean block, ByteBuffer to) throws IOException {
-            int nRead;
+        private int fillReadBuffer(boolean block, ByteBuffer buffer) throws IOException {
+            int n = 0;
             NioChannel socket = getSocket();
             if (socket instanceof ClosedNioChannel) {
                 throw new ClosedChannelException();
             }
-            nRead = socket.read(to);
-            if (nRead == -1) {
-                throw new EOFException();
-            }
-            if (block && nRead == 0) {
+            if (block) {
                 long timeout = getReadTimeout();
-                try {
-                    readBlocking = true;
-                    registerReadInterest();
-                    synchronized (readLock) {
-                        if (readBlocking) {
-                            try {
-                                if (timeout > 0) {
-                                    readLock.wait(timeout);
-                                } else {
-                                    readLock.wait();
-                                }
-                            } catch (InterruptedException e) {
-                                // Continue ...
-                            }
+                do {
+                    n = socket.read(buffer);
+                    if (n == -1) {
+                        throw new EOFException();
+                    }
+                    if (n == 0) {
+                        readBlocking = true;
+                        registerReadInterest();
+                        synchronized (readLock) {
                             if (readBlocking) {
-                                throw new SocketTimeoutException();
+                                try {
+                                    if (timeout > 0) {
+                                        readLock.wait(timeout);
+                                    } else {
+                                        readLock.wait();
+                                    }
+                                } catch (InterruptedException e) {
+                                    // Continue ...
+                                }
+                                if (readBlocking) {
+                                    readBlocking = false;
+                                    throw new SocketTimeoutException();
+                                }
+                                readBlocking = false;
                             }
                         }
                     }
-                    nRead = socket.read(to);
-                    if (nRead == -1) {
-                        throw new EOFException();
-                    }
-                } finally {
-                    readBlocking = false;
+                } while (n == 0); // TLS needs to loop as reading zero application bytes is possible
+            } else {
+                n = socket.read(buffer);
+                if (n == -1) {
+                    throw new EOFException();
                 }
             }
-            return nRead;
+            return n;
         }
 
 
         @Override
-        protected void doWrite(boolean block, ByteBuffer from) throws IOException {
+        protected void doWrite(boolean block, ByteBuffer buffer) throws IOException {
+            int n = 0;
             NioChannel socket = getSocket();
             if (socket instanceof ClosedNioChannel) {
                 throw new ClosedChannelException();
             }
             if (block) {
                 long timeout = getWriteTimeout();
-                try {
-                    int n = 0;
-                    do {
-                        n = socket.write(from);
-                        if (n == -1) {
-                            throw new EOFException();
-                        }
-                        if (n == 0) {
-                            writeBlocking = true;
-                            registerWriteInterest();
-                            synchronized (writeLock) {
-                                if (writeBlocking) {
-                                    try {
-                                        if (timeout > 0) {
-                                            writeLock.wait(timeout);
-                                        } else {
-                                            writeLock.wait();
-                                        }
-                                    } catch (InterruptedException e) {
-                                        // Continue ...
+                do {
+                    n = socket.write(buffer);
+                    if (n == -1) {
+                        throw new EOFException();
+                    }
+                    if (n == 0) {
+                        writeBlocking = true;
+                        registerWriteInterest();
+                        synchronized (writeLock) {
+                            if (writeBlocking) {
+                                try {
+                                    if (timeout > 0) {
+                                        writeLock.wait(timeout);
+                                    } else {
+                                        writeLock.wait();
                                     }
-                                    if (writeBlocking) {
-                                        throw new SocketTimeoutException();
-                                    }
+                                } catch (InterruptedException e) {
+                                    // Continue ...
                                 }
+                                if (writeBlocking) {
+                                    writeBlocking = false;
+                                    throw new SocketTimeoutException();
+                                }
+                                writeBlocking = false;
                             }
                         }
-                    } while (from.hasRemaining());
-                } finally {
-                    writeBlocking = false;
-                }
+                    }
+                } while (buffer.hasRemaining());
                 // If there is data left in the buffer the socket will be registered for
                 // write further up the stack. This is to ensure the socket is only
                 // registered for write once as both container and user code can trigger
                 // write registration.
             } else {
-                int n = 0;
                 do {
-                    n = socket.write(from);
+                    n = socket.write(buffer);
                     if (n == -1) {
                         throw new EOFException();
                     }
-                } while (n > 0 && from.hasRemaining());
+                } while (n > 0 && buffer.hasRemaining());
             }
             updateLastWrite();
         }

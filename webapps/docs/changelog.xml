@@ -45,6 +45,14 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 10.0.0-M3 (markt)" rtext="in development">
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+        <fix>64202</fix>: Use a loop on NIO blocking reads, as it is possible
+        zero bytes are produced by a network read. (markt/remm)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <fix>
