@@ -143,6 +143,11 @@
         <code>S</code>, <code>SS</code> or <code>SSS</code>) in the timestamp
         used by JULI&apos;s <code>OneLineFormatter</code>. (markt)
       </add>
+      <fix>
+        <bug>64206</bug>: Correct regression introduced in 10.0.0-M1 that meant
+        the HTTP specified when using the Windows Installer was ignored and 8080
+        was always used. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
