@@ -45,13 +45,6 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 10.0.0-M3 (markt)" rtext="in development">
-  <subsection name="Coyote">
-    <changelog>
-      <fix>
-        Use a latch again for NIO blocking reads and writes. (remm)
-      </fix>
-    </changelog>
-  </subsection>
   <subsection name="Other">
     <changelog>
       <fix>
