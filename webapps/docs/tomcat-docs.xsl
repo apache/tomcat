@@ -62,7 +62,6 @@
   <xsl:variable name="attributes-color" select="'#023264'"/>
   <xsl:variable name="table-th-bg"      select="'#039acc'"/>
   <xsl:variable name="table-td-bg"      select="'#a0ddf0'"/>
-  <xsl:variable name="commentslink"><xsl:value-of select="$relative-path"/>/comments.html</xsl:variable>
 
   <!-- Process an entire document into an HTML page -->
   <xsl:template match="document">
@@ -231,57 +230,6 @@ p.notice {
         </td>
 
       </tr>
-
-      <xsl:if test="not(properties/no-comments)">
-      <tr class="noPrint">
-
-        <td width="20%" valign="top" nowrap="nowrap" class="noPrint">
-        </td>
-        <td width="80%" valign="top" align="left">
-          <table border="0" cellspacing="0" cellpadding="2">
-            <!-- Comment heading -->
-            <tr><td bgcolor="{$banner-bg}">
-                <font color="{$banner-fg}" face="arial,helvetica.sanserif">
-                <a name="comments_section" id="comments_section"><strong>Comments</strong></a></font>
-              </td>
-            </tr>
-            <!-- Comment body -->
-            <tr><td>
-            <blockquote>
-            <p class="notice">
-              <strong>Notice:</strong> This comments section collects your suggestions
-              on improving documentation for Apache Tomcat.<br/><br/>
-              If you have trouble and need help, read
-              <a href="http://tomcat.apache.org/findhelp.html">Find Help</a> page
-              and ask your question on the tomcat-users
-              <a href="http://tomcat.apache.org/lists.html">mailing list</a>.
-              Do not ask such questions here. This is not a Q&amp;A section.<br/><br/>
-              The Apache Comments System is explained <a href="{$commentslink}">here</a>.
-              Comments may be removed by our moderators if they are either
-              implemented or considered invalid/off-topic.</p>
-              <script type="text/javascript">
-              <xsl:text disable-output-escaping="yes"><![CDATA[<!--//--><![CDATA[//><!--
-              var comments_shortname = 'tomcat';
-              var comments_identifier = 'http://tomcat.apache.org/]]></xsl:text><xsl:value-of select="$sitedir"/><xsl:value-of select="$subdir"/><xsl:value-of select="substring($filename,1,string-length($filename)-4)"/><xsl:text disable-output-escaping="yes"><![CDATA[.html';
-              (function(w, d) {
-                  if (w.location.hostname.toLowerCase() == "tomcat.apache.org") {
-                      d.write('<div id="comments_thread"><\/div>');
-                      var s = d.createElement('script');
-                      s.type = 'text/javascript';
-                      s.async = true;
-                      s.src = 'https://comments.apache.org/show_comments.lua?site=' + comments_shortname + '&page=' + comments_identifier;
-                      (d.getElementsByTagName('head')[0] || d.getElementsByTagName('body')[0]).appendChild(s);
-                  }
-                  else {
-                      d.write('<div id="comments_thread"><strong>Comments are disabled for this page at the moment.<\/strong><\/div>');
-                  }
-              })(window, document);
-              //--><!]]]]>></xsl:text></script>
-            </blockquote></td></tr>
-          </table>
-        </td>
-      </tr>
-      </xsl:if>
 
       <xsl:comment>FOOTER SEPARATOR</xsl:comment>
       <tr>
