@@ -54,9 +54,11 @@
   </subsection>
   <subsection name="Other">
     <changelog>
-      <fix>64206</fix>: Correct regression introduced in 10.0.0-M1 that meant
-      the HTTP specified when using the Windows Installer was ignored and 8080
-      was always used. (markt)
+      <fix>
+        <bug>64206</bug>: Correct regression introduced in 10.0.0-M1 that meant
+        the HTTP specified when using the Windows Installer was ignored and 8080
+        was always used. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
