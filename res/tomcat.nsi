@@ -1045,7 +1045,7 @@ Function configure
     IfErrors SERVER_XML_LEAVELOOP
     ${StrRep} $R4 $R3 "8005" "$TomcatPortShutdown"
     ${StrRep} $R3 $R4 "8080" "$TomcatPortHttp"
-    FileWrite $R2 $R4
+    FileWrite $R2 $R3
   Goto SERVER_XML_LOOP
   SERVER_XML_LEAVELOOP:
 
