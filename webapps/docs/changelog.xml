@@ -52,6 +52,13 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Other">
+    <changelog>
+      <fix>64206</fix>: Correct regression introduced in 10.0.0-M1 that meant
+      the HTTP specified when using the Windows Installer was ignored and 8080
+      was always used. (markt)
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 10.0.0-M2 (markt)" rtext="release in progress">
   <subsection name="Catalina">
