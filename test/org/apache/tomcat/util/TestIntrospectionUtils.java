@@ -116,18 +116,23 @@ public class TestIntrospectionUtils {
     public void testReplaceProperties() {
         Properties properties = new Properties();
 
-        Assert.assertEquals("no-expression", IntrospectionUtils.replaceProperties("no-expression", properties, null, null));
+        Assert.assertEquals("no-expression", IntrospectionUtils.replaceProperties(
+                "no-expression", properties, null, null));
 
         properties.setProperty("normal", "value1");
-        Assert.assertEquals("value1", IntrospectionUtils.replaceProperties("${normal}", properties, null, null));
+        Assert.assertEquals("value1", IntrospectionUtils.replaceProperties(
+                "${normal}", properties, null, null));
 
-        properties.setProperty("property_with:colon", "value2");
-        Assert.assertEquals("value2", IntrospectionUtils.replaceProperties("${property_with:colon}", properties, null, null));
+        properties.setProperty("prop_with:colon", "value2");
+        Assert.assertEquals("value2", IntrospectionUtils.replaceProperties(
+                "${prop_with:colon}", properties, null, null));
         
-        Assert.assertEquals("value1", IntrospectionUtils.replaceProperties("${normal:default}", properties, null, null));
+        Assert.assertEquals("value1", IntrospectionUtils.replaceProperties(
+                "${normal:default}", properties, null, null));
 
         properties.remove("normal");
-        Assert.assertEquals("default", IntrospectionUtils.replaceProperties("${test1:default}", properties, null, null));
+        Assert.assertEquals("default", IntrospectionUtils.replaceProperties(
+                "${test1:default}", properties, null, null));
 
     }
 }
