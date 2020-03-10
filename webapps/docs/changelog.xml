@@ -45,12 +45,23 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 8.5.53 (markt)" rtext="in development">
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+        <bug>64210</bug>: Correct a regression in the improvements to HTTP
+        header validation that caused requests to be incorrectly treated as
+        invalid if a <code>CRLF</code> sequence was split between TCP packets.
+        Improve validation of request lines, including for HTTP/0.9 requests.
+        (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <fix>
-        <bug>64206</bug>: Correct regression introduced in 10.0.0-M1 that meant
-        the HTTP specified when using the Windows Installer was ignored and 8080
-        was always used. (markt)
+        <bug>64206</bug>: Correct a regression introduced in 8.5.51 that meant
+        that the HTTP port specified when using the Windows Installer was
+        ignored and 8080 was always used. (markt)
       </fix>
     </changelog>
   </subsection>
