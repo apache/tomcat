@@ -285,6 +285,8 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
         parsingHeader = true;
         swallowInput = true;
 
+        chr = 0;
+        prevChr = 0;
         headerParsePos = HeaderParsePosition.HEADER_START;
         parsingRequestLine = true;
         parsingRequestLinePhase = 0;
