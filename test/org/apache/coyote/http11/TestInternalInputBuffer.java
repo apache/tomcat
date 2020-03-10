@@ -38,6 +38,10 @@ import org.apache.catalina.startup.TomcatBaseTest;
 
 public class TestInternalInputBuffer extends TomcatBaseTest {
 
+    private static final String CR = "\r";
+    private static final String LF = "\n";
+    private  static final String CRLF = CR + LF;
+
     /**
      * Test case for https://bz.apache.org/bugzilla/show_bug.cgi?id=48839
      */
@@ -661,7 +665,83 @@ public class TestInternalInputBuffer extends TomcatBaseTest {
     @Test
     public void testInvalidMethod() {
 
-        InvalidMethodClient client = new InvalidMethodClient();
+        String[] request = new String[1];
+        request[0] =
+            "GET" + (char) 0 + " /test HTTP/1.1" + CRLF +
+            "Host: localhost:8080" + CRLF +
+            "Connection: close" + CRLF +
+            CRLF;
+
+        InvalidClient client = new InvalidClient(request);
+
+        client.doRequest();
+        Assert.assertTrue(client.getResponseLine(), client.isResponse400());
+        Assert.assertTrue(client.isResponseBodyOK());
+    }
+
+
+    @Test
+    public void testInvalidHttp09() {
+
+        String[] request = new String[1];
+        request[0] = "GET /test" + CR + " " + LF;
+
+        InvalidClient client = new InvalidClient(request);
+
+        client.doRequest();
+        Assert.assertTrue(client.getResponseLine(), client.isResponse400());
+        Assert.assertTrue(client.isResponseBodyOK());
+    }
+
+
+    @Test
+    public void testInvalidEndOfRequestLine01() {
+
+        String[] request = new String[1];
+        request[0] =
+                "GET /test HTTP/1.1" + CR +
+                "Host: localhost:8080" + CRLF +
+                "Connection: close" + CRLF +
+                CRLF;
+
+        InvalidClient client = new InvalidClient(request);
+
+        client.doRequest();
+        Assert.assertTrue(client.getResponseLine(), client.isResponse400());
+        Assert.assertTrue(client.isResponseBodyOK());
+    }
+
+
+    @Test
+    public void testInvalidEndOfRequestLine02() {
+
+        String[] request = new String[1];
+        request[0] =
+                "GET /test HTTP/1.1" + LF +
+                "Host: localhost:8080" + CRLF +
+                "Connection: close" + CRLF +
+                CRLF;
+
+        InvalidClient client = new InvalidClient(request);
+
+        client.doRequest();
+        Assert.assertTrue(client.getResponseLine(), client.isResponse400());
+        Assert.assertTrue(client.isResponseBodyOK());
+    }
+
+
+    @Test
+    public void testInvalidHeader01() {
+
+        String[] request = new String[1];
+        request[0] =
+                "GET /test HTTP/1.1" + CRLF +
+                "Host: localhost:8080" + CRLF +
+                CR + "X-Header: xxx" + CRLF +
+                "Connection: close" + CRLF +
+                CRLF;
+
+        InvalidClient client = new InvalidClient(request);
 
         client.doRequest();
         Assert.assertTrue(client.getResponseLine(), client.isResponse400());
@@ -670,13 +750,20 @@ public class TestInternalInputBuffer extends TomcatBaseTest {
 
 
     /**
-     * Bug 48839 test client.
+     * Invalid request test client.
      */
-    private class InvalidMethodClient extends SimpleHttpClient {
+    private class InvalidClient extends SimpleHttpClient {
+
+        private final String[] request;
+
+        public InvalidClient(String[] request) {
+            this.request = request;
+        }
 
         private Exception doRequest() {
 
             Tomcat tomcat = getTomcatInstance();
+            tomcat.getConnector().setProperty("rejectIllegalHeader", "true");
 
             tomcat.addContext("", TEMP_DIR);
 
@@ -686,14 +773,6 @@ public class TestInternalInputBuffer extends TomcatBaseTest {
 
                 // Open connection
                 connect();
-
-                String[] request = new String[1];
-                request[0] =
-                    "GET" + (char) 0 + " /test HTTP/1.1" + CRLF +
-                    "Host: localhost:8080" + CRLF +
-                    "Connection: close" + CRLF +
-                    CRLF;
-
                 setRequest(request);
                 processRequest(); // blocks until response has been read
 
