@@ -738,6 +738,7 @@ public class TestHttp11InputBuffer extends TomcatBaseTest {
         private Exception doRequest() {
 
             Tomcat tomcat = getTomcatInstance();
+            tomcat.getConnector().setProperty("rejectIllegalHeader", "true");
 
             tomcat.addContext("", TEMP_DIR);
 
