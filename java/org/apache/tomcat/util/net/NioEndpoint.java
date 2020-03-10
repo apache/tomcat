@@ -1144,28 +1144,35 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
             }
             if (block) {
                 long timeout = getReadTimeout();
+                long startNanos = 0;
                 do {
+                    if (startNanos > 0) {
+                        long elapsedMillis = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startNanos);
+                        if (elapsedMillis == 0) {
+                            elapsedMillis = 1;
+                        }
+                        timeout -= elapsedMillis;
+                        if (timeout <= 0) {
+                            throw new SocketTimeoutException();
+                        }
+                    }
                     n = socket.read(buffer);
                     if (n == -1) {
                         throw new EOFException();
-                    }
-                    if (n == 0) {
+                    } else if (n == 0) {
                         readBlocking = true;
                         registerReadInterest();
                         synchronized (readLock) {
                             if (readBlocking) {
                                 try {
                                     if (timeout > 0) {
+                                        startNanos = System.nanoTime();
                                         readLock.wait(timeout);
                                     } else {
                                         readLock.wait();
                                     }
                                 } catch (InterruptedException e) {
-                                    // Continue ...
-                                }
-                                if (readBlocking) {
-                                    readBlocking = false;
-                                    throw new SocketTimeoutException();
+                                    // Continue
                                 }
                                 readBlocking = false;
                             }
@@ -1191,32 +1198,43 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
             }
             if (block) {
                 long timeout = getWriteTimeout();
+                long startNanos = 0;
                 do {
+                    if (startNanos > 0) {
+                        long elapsedMillis = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startNanos);
+                        if (elapsedMillis == 0) {
+                            elapsedMillis = 1;
+                        }
+                        timeout -= elapsedMillis;
+                        if (timeout <= 0) {
+                            throw new SocketTimeoutException();
+                        }
+                    }
                     n = socket.write(buffer);
                     if (n == -1) {
                         throw new EOFException();
-                    }
-                    if (n == 0) {
+                    } else if (n == 0) {
                         writeBlocking = true;
                         registerWriteInterest();
                         synchronized (writeLock) {
                             if (writeBlocking) {
                                 try {
                                     if (timeout > 0) {
+                                        startNanos = System.nanoTime();
                                         writeLock.wait(timeout);
                                     } else {
                                         writeLock.wait();
                                     }
                                 } catch (InterruptedException e) {
-                                    // Continue ...
-                                }
-                                if (writeBlocking) {
-                                    writeBlocking = false;
-                                    throw new SocketTimeoutException();
+                                    // Continue
                                 }
                                 writeBlocking = false;
                             }
                         }
+                    } else if (startNanos > 0) {
+                        // If something was written, reset timeout
+                        timeout = getWriteTimeout();
+                        startNanos = 0;
                     }
                 } while (buffer.hasRemaining());
                 // If there is data left in the buffer the socket will be registered for
