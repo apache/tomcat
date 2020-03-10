@@ -266,6 +266,11 @@ public class Http11Processor extends AbstractProcessor {
                     }
                 }
 
+                // Process the Protocol component of the request line
+                // Need to know if this is an HTTP 0.9 request before trying to
+                // parse headers.
+                prepareRequestProtocol();
+
                 if (protocol.isPaused()) {
                     // 503 - Service unavailable
                     response.setStatus(503);
@@ -274,7 +279,8 @@ public class Http11Processor extends AbstractProcessor {
                     keptAlive = true;
                     // Set this every time in case limit has been changed via JMX
                     request.getMimeHeaders().setLimit(protocol.getMaxHeaderCount());
-                    if (!inputBuffer.parseHeaders()) {
+                    // Don't parse headers for HTTP/0.9
+                    if (!http09 && !inputBuffer.parseHeaders()) {
                         // We've read part of the request, don't recycle it
                         // instead associate it with the socket
                         openSocket = true;
@@ -521,22 +527,15 @@ public class Http11Processor extends AbstractProcessor {
     }
 
 
-    /**
-     * After reading the request headers, we have to setup the request filters.
-     */
-    private void prepareRequest() throws IOException {
+    private void prepareRequestProtocol() {
 
-        http11 = true;
-        http09 = false;
-        contentDelimitation = false;
-
-        if (protocol.isSSLEnabled()) {
-            request.scheme().setString("https");
-        }
         MessageBytes protocolMB = request.protocol();
         if (protocolMB.equals(Constants.HTTP_11)) {
+            http09 = false;
+            http11 = true;
             protocolMB.setString(Constants.HTTP_11);
         } else if (protocolMB.equals(Constants.HTTP_10)) {
+            http09 = false;
             http11 = false;
             keepAlive = false;
             protocolMB.setString(Constants.HTTP_10);
@@ -547,6 +546,7 @@ public class Http11Processor extends AbstractProcessor {
             keepAlive = false;
         } else {
             // Unsupported protocol
+            http09 = false;
             http11 = false;
             // Send 505; Unsupported HTTP version
             response.setStatus(505);
@@ -555,6 +555,19 @@ public class Http11Processor extends AbstractProcessor {
                 log.debug(sm.getString("http11processor.request.prepare")+
                           " Unsupported HTTP version \""+protocolMB+"\"");
             }
+        }
+    }
+
+
+    /**
+     * After reading the request headers, we have to setup the request filters.
+     */
+    private void prepareRequest() throws IOException {
+
+        contentDelimitation = false;
+
+        if (protocol.isSSLEnabled()) {
+            request.scheme().setString("https");
         }
 
         MimeHeaders headers = request.getMimeHeaders();
