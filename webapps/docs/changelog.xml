@@ -178,7 +178,7 @@
       <add>
         Expand the documentation for the <code>address</code> attribute of the
         AJP Connector and document that the AJP Connector also supports the
-        <code>ipv6v6only</code> attribute with the APR/Native implementaiton.
+        <code>ipv6v6only</code> attribute with the APR/Native implementation.
         (markt)
       </add>
     </changelog>
@@ -200,7 +200,7 @@
         Tomcat. (remm)
       </add>
       <add>
-        <bug>64190</bug>: Add support for specifing milliseconds (using
+        <bug>64190</bug>: Add support for specifying milliseconds (using
         <code>S</code>, <code>SS</code> or <code>SSS</code>) in the timestamp
         used by JULI&apos;s <code>OneLineFormatter</code>. (markt)
       </add>
@@ -317,7 +317,7 @@
         log entry to write. Based on a patch by Karol Bucek. (markt)
       </fix>
       <fix>
-        Update implementated specification version information in a few places
+        Update implemented specification version information in a few places
         where it has not been updated for Jakarta EE 9. (markt)
       </fix>
       <add>
