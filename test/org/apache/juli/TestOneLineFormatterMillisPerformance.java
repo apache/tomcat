@@ -37,10 +37,10 @@ public class TestOneLineFormatterMillisPerformance {
         parameterSets.add(new String[] { "dd-MMM-yyyy HH:mm:ss.SS" });
         parameterSets.add(new String[] { "dd-MMM-yyyy HH:mm:ss.S" });
         parameterSets.add(new String[] { "dd-MMM-yyyy HH:mm:ss" });
-        parameterSets.add(new String[] { "dd-MMM-yyyy HH:mm:ss XXX" });
-        parameterSets.add(new String[] { "dd-MMM-yyyy HH:mm:ss.SSSXXX" });
-        parameterSets.add(new String[] { "dd-MMM-yyyy HH:mm:ss.SSXXX" });
-        parameterSets.add(new String[] { "dd-MMM-yyyy HH:mm:ss.SXXX" });
+        parameterSets.add(new String[] { "dd-MMM-yyyy HH:mm:ss Z" });
+        parameterSets.add(new String[] { "dd-MMM-yyyy HH:mm:ss.SSSZ" });
+        parameterSets.add(new String[] { "dd-MMM-yyyy HH:mm:ss.SSZ" });
+        parameterSets.add(new String[] { "dd-MMM-yyyy HH:mm:ss.SZ" });
         parameterSets.add(new String[] { "SSS dd-MMM-yyyy HH:mm:ss" });
         parameterSets.add(new String[] { "SS dd-MMM-yyyy HH:mm:ss" });
         parameterSets.add(new String[] { "S dd-MMM-yyyy HH:mm:ss" });
