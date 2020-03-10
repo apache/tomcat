@@ -141,7 +141,7 @@
         Tomcat. Contributions provided by B. Cansmile Cha. (markt)
       </add>
       <add>
-        <bug>64190</bug>: Add support for specifing milliseconds (using
+        <bug>64190</bug>: Add support for specifying milliseconds (using
         <code>S</code>, <code>SS</code> or <code>SSS</code>) in the timestamp
         used by JULI&apos;s <code>OneLineFormatter</code>. (markt)
       </add>
