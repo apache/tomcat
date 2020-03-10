@@ -219,7 +219,13 @@ public final class IntrospectionUtils {
     }
 
     /**
-     * Replace ${NAME} with the property value.
+     * Replaces ${NAME} in the value with the value of the property 'NAME'.
+     * Replaces ${NAME:DEFAULT} with the value of the property 'NAME:DEFAULT',
+     * if the property 'NAME:DEFAULT' is not set,
+     * the expresson is replaced with the value of the property 'NAME',
+     * if the property 'NAME' is not set,
+     * the expresson is replaced with 'DEFAULT'.
+     * If the property is not set and there is no default the value will be returned unmodified.
      * @param value The value
      * @param staticProp Replacement properties
      * @param dynamicProp Replacement properties

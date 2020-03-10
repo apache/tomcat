@@ -119,9 +119,15 @@ public class TestIntrospectionUtils {
         Assert.assertEquals("no-expression", IntrospectionUtils.replaceProperties(
                 "no-expression", properties, null, null));
 
+        Assert.assertEquals("${normal}", IntrospectionUtils.replaceProperties(
+                "${normal}", properties, null, null));
+
         properties.setProperty("normal", "value1");
         Assert.assertEquals("value1", IntrospectionUtils.replaceProperties(
                 "${normal}", properties, null, null));
+
+        Assert.assertEquals("abcvalue1xyz", IntrospectionUtils.replaceProperties(
+                "abc${normal}xyz", properties, null, null));
 
         properties.setProperty("prop_with:colon", "value2");
         Assert.assertEquals("value2", IntrospectionUtils.replaceProperties(
@@ -132,7 +138,11 @@ public class TestIntrospectionUtils {
 
         properties.remove("normal");
         Assert.assertEquals("default", IntrospectionUtils.replaceProperties(
-                "${test1:default}", properties, null, null));
+                "${normal:default}", properties, null, null));
+
+        Assert.assertEquals("abc${normal}xyz", IntrospectionUtils.replaceProperties(
+                "abc${normal}xyz", properties, null, null));
+
 
     }
 }
