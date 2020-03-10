@@ -60,8 +60,8 @@
     <changelog>
       <fix>
         <bug>64206</bug>: Correct regression introduced in 9.0.31 that meant
-        the HTTP port specified when using the Windows Installer was ignored and 
-        8080 was always used. (markt)
+        that the HTTP port specified when using the Windows Installer was
+        ignored and 8080 was always used. (markt)
       </fix>
     </changelog>
   </subsection>
