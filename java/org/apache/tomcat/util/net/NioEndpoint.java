@@ -52,7 +52,6 @@ import org.apache.tomcat.util.IntrospectionUtils;
 import org.apache.tomcat.util.collections.SynchronizedQueue;
 import org.apache.tomcat.util.collections.SynchronizedStack;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
-import org.apache.tomcat.util.net.NioChannel.ClosedNioChannel;
 import org.apache.tomcat.util.net.jsse.JSSESupport;
 
 /**
@@ -1208,7 +1207,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
         private int fillReadBuffer(boolean block, ByteBuffer to) throws IOException {
             int nRead;
             NioChannel socket = getSocket();
-            if (socket instanceof ClosedNioChannel) {
+            if (socket == NioChannel.CLOSED_NIO_CHANNEL) {
                 throw new ClosedChannelException();
             }
             if (block) {
@@ -1238,7 +1237,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
         @Override
         protected void doWrite(boolean block, ByteBuffer from) throws IOException {
             NioChannel socket = getSocket();
-            if (socket instanceof ClosedNioChannel) {
+            if (socket == NioChannel.CLOSED_NIO_CHANNEL) {
                 throw new ClosedChannelException();
             }
             if (block) {
