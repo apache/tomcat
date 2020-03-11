@@ -713,6 +713,7 @@
            deprecation="${compile.deprecation}"
            source="${compile.source}"
            target="${compile.target}"
+           release="${compile.release}"
            encoding="ISO-8859-1"
            includeAntRuntime="true" >
       <!-- Uncomment this to show unchecked warnings:
