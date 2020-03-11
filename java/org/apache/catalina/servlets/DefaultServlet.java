@@ -570,7 +570,7 @@ public class DefaultServlet extends HttpServlet {
     protected void sendNotAllowed(HttpServletRequest req, HttpServletResponse resp)
             throws IOException {
         resp.addHeader("Allow", determineMethodsAllowed(req));
-        resp.sendError(WebdavStatus.SC_METHOD_NOT_ALLOWED);
+        resp.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
     }
 
 
