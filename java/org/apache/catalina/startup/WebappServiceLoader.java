@@ -108,7 +108,7 @@ public class WebappServiceLoader<T> {
         if (orderedLibs == null) {
             // No ordered libs, so use every service definition we can find
             if (loader instanceof URLClassLoader) {
-                Enumeration<URL> resources = ((URLClassLoader) loader).findResources("/" + configFile);
+                Enumeration<URL> resources = ((URLClassLoader) loader).findResources(configFile);
                 while (resources.hasMoreElements()) {
                     URL resource = resources.nextElement();
                     parseConfigFile(applicationServicesFound, resource);
