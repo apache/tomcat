@@ -45,6 +45,16 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 10.0.0-M4 (markt)" rtext="in development">
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+        When closing a NIO channel, avoid canceling keys as a workaround for
+        deadlocks when running on Java 11. Excessive internal NIO
+        synchronization on channel close is resolved starting with this
+        Java version. (remm)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 10.0.0-M3 (markt)" rtext="release in progress">
   <subsection name="Coyote">

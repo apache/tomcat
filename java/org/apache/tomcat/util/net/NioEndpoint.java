@@ -50,6 +50,7 @@ import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.collections.SynchronizedQueue;
 import org.apache.tomcat.util.collections.SynchronizedStack;
+import org.apache.tomcat.util.compat.JreCompat;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.net.jsse.JSSESupport;
 
@@ -613,25 +614,30 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
         }
 
         public void cancelledKey(SelectionKey sk, SocketWrapperBase<NioChannel> socketWrapper) {
-            try {
-                // If is important to cancel the key first, otherwise a deadlock may occur between the
-                // poller select and the socket channel close which would cancel the key
-                // TODO: This workaround will likely be useless on Java 14+ (maybe even 11+)
-                //   and the cancelledKey method can be removed in favor of socketWrapper.close(), see BZ 64007
-                if (sk != null) {
-                    sk.attach(null);
-                    if (sk.isValid()) {
-                        sk.cancel();
+            if (JreCompat.isJre11Available() && socketWrapper != null) {
+                socketWrapper.close();
+            } else {
+                try {
+                    // If is important to cancel the key first, otherwise a deadlock may occur between the
+                    // poller select and the socket channel close which would cancel the key
+                    // This workaround is not needed on Java 11+
+                    // TODO: verify, if not fixed in Java 11+ then 14+ is needed, see BZ 64007
+                    // TODO: the cancelledKey method can be removed with Java 11 as minimum
+                    if (sk != null) {
+                        sk.attach(null);
+                        if (sk.isValid()) {
+                            sk.cancel();
+                        }
                     }
-                }
-            } catch (Throwable e) {
-                ExceptionUtils.handleThrowable(e);
-                if (log.isDebugEnabled()) {
-                    log.error(sm.getString("endpoint.debug.channelCloseFail"), e);
-                }
-            } finally {
-                if (socketWrapper != null) {
-                    socketWrapper.close();
+                } catch (Throwable e) {
+                    ExceptionUtils.handleThrowable(e);
+                    if (log.isDebugEnabled()) {
+                        log.error(sm.getString("endpoint.debug.channelCloseFail"), e);
+                    }
+                } finally {
+                    if (socketWrapper != null) {
+                        socketWrapper.close();
+                    }
                 }
             }
         }
