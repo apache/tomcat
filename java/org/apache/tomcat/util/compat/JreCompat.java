@@ -40,6 +40,7 @@ public class JreCompat {
 
     private static final JreCompat instance;
     private static final boolean graalAvailable;
+    private static final boolean jre11Available;
     private static final boolean jre9Available;
     private static final StringManager sm = StringManager.getManager(JreCompat.class);
 
@@ -59,6 +60,7 @@ public class JreCompat {
             graalAvailable = false;
             jre9Available = false;
         }
+        jre11Available = instance.jarFileRuntimeMajorVersion() >= 11;
     }
 
 
@@ -74,6 +76,11 @@ public class JreCompat {
 
     public static boolean isJre9Available() {
         return jre9Available;
+    }
+
+
+    public static boolean isJre11Available() {
+        return jre11Available;
     }
 
 
