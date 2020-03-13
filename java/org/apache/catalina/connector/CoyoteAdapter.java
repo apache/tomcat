@@ -641,6 +641,9 @@ public class CoyoteAdapter implements Adapter {
                 // Character decoding
                 convertURI(decodedURI, request);
                 // Check that the URI is still normalized
+                // Note: checkNormalize is deprecated because the test is no
+                //       longer required in Tomcat 10 onwards and has been
+                //       removed
                 if (!checkNormalize(req.decodedURI())) {
                     response.sendError(400, "Invalid URI");
                 }
@@ -1247,7 +1250,10 @@ public class CoyoteAdapter implements Adapter {
      * @return <code>false</code> if sequences that are supposed to be
      *         normalized are still present in the URI, otherwise
      *         <code>true</code>
+     *
+     * @deprecated This code will be removed in Apache Tomcat 10 onwards
      */
+    @Deprecated
     public static boolean checkNormalize(MessageBytes uriMB) {
 
         CharChunk uriCC = uriMB.getCharChunk();
