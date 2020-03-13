@@ -60,6 +60,16 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 7.0.103 (violetagg)">
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        <bug>64191</bug>: Make an additional fix for the SCI regression
+        introduced by the fix for <bug>64021</bug> for the case, such as when
+        embedding, when the class loader performing the SCI service lookup is not
+        the Tomcat web application class loader. (markt)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 7.0.102 (violetagg)">
   <subsection name="Coyote">
