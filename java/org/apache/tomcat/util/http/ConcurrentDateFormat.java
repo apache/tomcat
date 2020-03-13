@@ -34,33 +34,34 @@ public class ConcurrentDateFormat {
     private final String format;
     private final Locale locale;
     private final TimeZone timezone;
-    private final Queue<SimpleDateFormat> queue = new ConcurrentLinkedQueue<>();
+    private final Queue<SimpleDateFormat> formatQueue = new ConcurrentLinkedQueue<>();
+    private final Queue<SimpleDateFormat> parseQueue = new ConcurrentLinkedQueue<>();
 
     public ConcurrentDateFormat(String format, Locale locale, TimeZone timezone) {
         this.format = format;
         this.locale = locale;
         this.timezone = timezone;
-        SimpleDateFormat initial = createInstance();
-        queue.add(initial);
+        formatQueue.add(createInstance());
+        parseQueue.add(createInstance());
     }
 
     public String format(Date date) {
-        SimpleDateFormat sdf = queue.poll();
+        SimpleDateFormat sdf = formatQueue.poll();
         if (sdf == null) {
             sdf = createInstance();
         }
         String result = sdf.format(date);
-        queue.add(sdf);
+        formatQueue.add(sdf);
         return result;
     }
 
     public Date parse(String source) throws ParseException {
-        SimpleDateFormat sdf = queue.poll();
+        SimpleDateFormat sdf = parseQueue.poll();
         if (sdf == null) {
             sdf = createInstance();
         }
         Date result = sdf.parse(source);
-        queue.add(sdf);
+        parseQueue.add(sdf);
         return result;
     }
 
