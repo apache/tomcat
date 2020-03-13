@@ -41,6 +41,7 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.IntrospectionUtils;
 import org.apache.tomcat.util.buf.B2CConverter;
+import org.apache.tomcat.util.buf.CharsetUtil;
 import org.apache.tomcat.util.net.SSLHostConfig;
 import org.apache.tomcat.util.net.openssl.OpenSSLImplementation;
 import org.apache.tomcat.util.res.StringManager;
@@ -805,10 +806,13 @@ public class Connector extends LifecycleMBeanBase  {
      */
     public void setURIEncoding(String URIEncoding) {
         try {
-            uriCharset = B2CConverter.getCharset(URIEncoding);
+             Charset charset = B2CConverter.getCharset(URIEncoding);
+             if (!CharsetUtil.isAsciiSuperset(charset)) {
+                 log.error(sm.getString("coyoteConnector.notAsciiSuperset", URIEncoding));
+             }
+             uriCharset = charset;
         } catch (UnsupportedEncodingException e) {
-            log.error(sm.getString("coyoteConnector.invalidEncoding",
-                    URIEncoding, uriCharset.name()), e);
+            log.error(sm.getString("coyoteConnector.invalidEncoding", URIEncoding, uriCharset.name()), e);
         }
         setProperty("uRIEncoding", URIEncoding);
     }
