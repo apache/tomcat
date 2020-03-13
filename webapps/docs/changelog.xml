@@ -60,6 +60,15 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 7.0.104 (violetagg)">
+  <subsection name="Coyote">
+    <changelog>
+      <add>
+        When configuring an HTTP Connector, warn if the encoding specified for
+        <code>URIEncoding</code> is not a superset of US-ASCII as required by
+        RFC7230. (markt)
+      </add>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 7.0.103 (violetagg)">
   <subsection name="Catalina">

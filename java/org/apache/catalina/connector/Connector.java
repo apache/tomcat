@@ -16,7 +16,9 @@
  */
 package org.apache.catalina.connector;
 
+import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
+import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -35,6 +37,8 @@ import org.apache.coyote.ProtocolHandler;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.IntrospectionUtils;
+import org.apache.tomcat.util.buf.B2CConverter;
+import org.apache.tomcat.util.buf.CharsetUtil;
 import org.apache.tomcat.util.http.mapper.Mapper;
 import org.apache.tomcat.util.res.StringManager;
 
@@ -793,7 +797,14 @@ public class Connector extends LifecycleMBeanBase  {
      */
     public void setURIEncoding(String URIEncoding) {
         this.URIEncoding = URIEncoding;
-        setProperty("uRIEncoding", URIEncoding);
+        try {
+             Charset charset = B2CConverter.getCharset(URIEncoding);
+             if (!CharsetUtil.isAsciiSuperset(charset)) {
+                 log.error(sm.getString("coyoteConnector.notAsciiSuperset", URIEncoding));
+             }
+        } catch (UnsupportedEncodingException e) {
+            // Ignore. A warning will be logged in the CoyoteAdapter
+        }
     }
 
 
