@@ -640,10 +640,9 @@ public class CoyoteAdapter implements Adapter {
             if (normalize(req.decodedURI())) {
                 // Character decoding
                 convertURI(decodedURI, request);
-                // Check that the URI is still normalized
-                if (!checkNormalize(req.decodedURI())) {
-                    response.sendError(400, "Invalid URI");
-                }
+                // URIEncoding values are limited to US-ASCII supersets.
+                // Therefore it is not necessary to check that the URI remains
+                // normalized after character decoding
             } else {
                 response.sendError(400, "Invalid URI");
             }
