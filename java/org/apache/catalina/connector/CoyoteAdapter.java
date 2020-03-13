@@ -1246,7 +1246,10 @@ public class CoyoteAdapter implements Adapter {
      * @return <code>false</code> if sequences that are supposed to be
      *         normalized are still present in the URI, otherwise
      *         <code>true</code>
+     *
+     * @deprecated This code will be removed in Apache Tomcat 10 onwards
      */
+    @Deprecated
     public static boolean checkNormalize(MessageBytes uriMB) {
 
         CharChunk uriCC = uriMB.getCharChunk();
