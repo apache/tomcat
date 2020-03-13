@@ -53,6 +53,11 @@
         synchronization on channel close is resolved starting with this
         Java version. (remm)
       </fix>
+      <add>
+        When configuring an HTTP Connector, ensure that the encoding specified
+        for <code>URIEncoding</code> is a superset of US-ASCII as required by
+        RFC7230. (markt)
+      </add>
     </changelog>
   </subsection>
 </section>
