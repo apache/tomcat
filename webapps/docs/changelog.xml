@@ -46,7 +46,7 @@
 -->
 <section name="Tomcat 9.0.34 (markt)" rtext="in development">
 </section>
-<section name="Tomcat 9.0.33 (markt)" rtext="in development">
+<section name="Tomcat 9.0.33 (markt)" rtext="2020-03-16">
   <subsection name="Coyote">
     <changelog>
       <fix>
