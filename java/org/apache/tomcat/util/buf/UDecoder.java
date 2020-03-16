@@ -289,25 +289,6 @@ public final class UDecoder {
 
 
     /**
-     * Decode and return the specified URL-encoded String.
-     * When the byte array is converted to a string, UTF-8 is used. This may
-     * be different than some other servers. It is assumed the string is not a
-     * query string.
-     *
-     * @param str The url-encoded string
-     * @return the decoded string
-     * @exception IllegalArgumentException if a '%' character is not followed
-     * by a valid 2-digit hexadecimal number
-     *
-     * @deprecated Unused. This will be removed in Tomcat 10 onwards
-     */
-    @Deprecated
-    public static String URLDecode(String str) {
-        return URLDecode(str, StandardCharsets.UTF_8);
-    }
-
-
-    /**
      * Decode and return the specified URL-encoded String. It is assumed the
      * string is not a query string.
      *
