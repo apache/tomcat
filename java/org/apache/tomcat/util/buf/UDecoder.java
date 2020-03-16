@@ -298,7 +298,10 @@ public final class UDecoder {
      * @return the decoded string
      * @exception IllegalArgumentException if a '%' character is not followed
      * by a valid 2-digit hexadecimal number
+     *
+     * @deprecated Unused. This will be removed in Tomcat 10 onwards
      */
+    @Deprecated
     public static String URLDecode(String str) {
         return URLDecode(str, StandardCharsets.UTF_8);
     }
