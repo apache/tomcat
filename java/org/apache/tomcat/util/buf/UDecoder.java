@@ -69,7 +69,9 @@ public final class UDecoder {
     }
 
     /**
-     * URLDecode, will modify the source.
+     * URLDecode, will modify the source. Assumes source bytes are encoded using
+     * a superset of US-ASCII as per RFC 7230.
+     *
      * @param mb The URL encoded bytes
      * @param query <code>true</code> if this is a query string
      * @throws IOException Invalid %xx URL encoding
@@ -126,14 +128,19 @@ public final class UDecoder {
     }
 
     // -------------------- Additional methods --------------------
-    // XXX What do we do about charset ????
 
     /**
      * In-buffer processing - the buffer will be modified.
+     * <p>
+     * <b>WARNING:</b> This method assumes US-ASCII encoding.
+     *
      * @param mb The URL encoded chars
      * @param query <code>true</code> if this is a query string
      * @throws IOException Invalid %xx URL encoding
+     *
+     * @deprecated Unused. Will be removed in Tomcat 10
      */
+    @Deprecated
     public void convert( CharChunk mb, boolean query )
         throws IOException
     {
@@ -187,11 +194,17 @@ public final class UDecoder {
     }
 
     /**
-     * URLDecode, will modify the source
+     * URLDecode, will modify the source.
+     * <p>
+     * <b>WARNING:</b> This method assumes US-ASCII encoding.
+     *
      * @param mb The URL encoded String, bytes or chars
      * @param query <code>true</code> if this is a query string
      * @throws IOException Invalid %xx URL encoding
+     *
+     * @deprecated Unused. Will be removed in Tomcat 10
      */
+    @Deprecated
     public void convert(MessageBytes mb, boolean query)
         throws IOException
     {
@@ -220,11 +233,19 @@ public final class UDecoder {
     }
 
     /**
-     * %xx decoding of a string. FIXME: this is inefficient.
+     * %xx decoding of a string.
+     * <p>
+     * <b>WARNING:</b> This method assumes US-ASCII encoding.
+     * <p>
+     * FIXME: this is inefficient.
+     *
      * @param str The URL encoded string
      * @param query <code>true</code> if this is a query string
      * @return the decoded string
+     *
+     * @deprecated Unused. Will be removed in Tomcat 10
      */
+    @Deprecated
     public final String convert(String str, boolean query)
     {
         if (str == null) {
