@@ -74,6 +74,7 @@ import org.apache.catalina.util.URLEncoder;
 import org.apache.naming.resources.DirContextURLStreamHandler;
 import org.apache.naming.resources.Resource;
 import org.apache.tomcat.util.ExceptionUtils;
+import org.apache.tomcat.util.buf.B2CConverter;
 import org.apache.tomcat.util.buf.CharChunk;
 import org.apache.tomcat.util.buf.MessageBytes;
 import org.apache.tomcat.util.buf.UDecoder;
@@ -446,7 +447,7 @@ public class ApplicationContext implements ServletContext {
 
         if (getContext().getDispatchersUseEncodedPaths()) {
             // Decode
-            String decodedUri = UDecoder.URLDecode(normalizedUri, StandardCharsets.UTF_8);
+            String decodedUri = UDecoder.URLDecode(normalizedUri, B2CConverter.UTF_8);
 
             // Security check to catch attempts to encode /../ sequences
             normalizedUri = RequestUtil.normalize(decodedUri);

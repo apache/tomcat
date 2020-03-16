@@ -26,7 +26,7 @@ public class TestRequestUtil {
         // %n rather than %nn should throw an IAE according to the Javadoc
         Exception exception = null;
         try {
-            RequestUtil.URLDecode("%5xxxxx");
+            RequestUtil.URLDecode("%5xxxxx", "UTF-8");
         } catch (Exception e) {
             exception = e;
         }
@@ -35,7 +35,7 @@ public class TestRequestUtil {
         // Edge case trying to trigger ArrayIndexOutOfBoundsException
         exception = null;
         try {
-            RequestUtil.URLDecode("%5");
+            RequestUtil.URLDecode("%5", "UTF-8");
         } catch (Exception e) {
             exception = e;
         }
