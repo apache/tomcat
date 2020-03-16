@@ -27,14 +27,13 @@ import org.apache.tomcat.util.buf.UDecoder;
  *
  * @author Craig R. McClanahan
  */
-public class LoginConfig implements Serializable {
+public class LoginConfig extends XmlEncodingBase implements Serializable {
 
 
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 2L;
 
 
     // ----------------------------------------------------------- Constructors
-
 
     /**
      * Construct a new LoginConfig with default properties.
@@ -97,7 +96,7 @@ public class LoginConfig implements Serializable {
         //        if ((errorPage == null) || !errorPage.startsWith("/"))
         //            throw new IllegalArgumentException
         //                ("Error Page resource path must start with a '/'");
-        this.errorPage = UDecoder.URLDecode(errorPage);
+        this.errorPage = UDecoder.URLDecode(errorPage, getCharset());
     }
 
 
@@ -114,7 +113,7 @@ public class LoginConfig implements Serializable {
         //        if ((loginPage == null) || !loginPage.startsWith("/"))
         //            throw new IllegalArgumentException
         //                ("Login Page resource path must start with a '/'");
-        this.loginPage = UDecoder.URLDecode(loginPage);
+        this.loginPage = UDecoder.URLDecode(loginPage, getCharset());
     }
 
 

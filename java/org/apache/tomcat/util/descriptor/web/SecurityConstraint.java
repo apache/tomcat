@@ -17,6 +17,7 @@
 package org.apache.tomcat.util.descriptor.web;
 
 import java.io.Serializable;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -262,6 +263,15 @@ public class SecurityConstraint extends XmlEncodingBase implements Serializable 
         results[authRoles.length] = authRole;
         authRoles = results;
         authConstraint = true;
+    }
+
+
+    @Override
+    public void setCharset(Charset charset) {
+        super.setCharset(charset);
+        for (SecurityCollection collection : collections) {
+            collection.setCharset(getCharset());
+        }
     }
 
 

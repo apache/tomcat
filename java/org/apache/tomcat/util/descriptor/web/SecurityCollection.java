@@ -206,7 +206,7 @@ public class SecurityCollection extends XmlEncodingBase implements Serializable 
         if (pattern == null)
             return;
 
-        String decodedPattern = UDecoder.URLDecode(pattern);
+        String decodedPattern = UDecoder.URLDecode(pattern, getCharset());
         String[] results = Arrays.copyOf(patterns, patterns.length + 1);
         results[patterns.length] = decodedPattern;
         patterns = results;

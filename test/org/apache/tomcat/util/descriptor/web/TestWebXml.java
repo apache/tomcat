@@ -19,6 +19,8 @@ package org.apache.tomcat.util.descriptor.web;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
+import java.nio.charset.StandardCharsets;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -485,5 +487,46 @@ public class TestWebXml {
         webxml.addServletMapping("/foo", "main");
 
         webxml.merge(fragments);
+    }
+
+
+    @Test
+    public void testEncoding() {
+        WebXml webXml = new WebXml();
+        webXml.setCharset(StandardCharsets.ISO_8859_1);
+
+        webXml.addErrorPage(new ErrorPage());
+        Collection<ErrorPage> errorPages = webXml.getErrorPages().values();
+        for (ErrorPage errorPage : errorPages) {
+            Assert.assertEquals(StandardCharsets.ISO_8859_1, errorPage.getCharset());
+        }
+
+        webXml.addFilterMapping(new FilterMap());
+        Set<FilterMap> filterMaps = webXml.getFilterMappings();
+        for (FilterMap filterMap : filterMaps) {
+            Assert.assertEquals(StandardCharsets.ISO_8859_1, filterMap.getCharset());
+        }
+
+        webXml.addJspPropertyGroup(new JspPropertyGroup());
+        Set<JspPropertyGroup> jspPropertyGroups = webXml.getJspPropertyGroups();
+        for (JspPropertyGroup jspPropertyGroup : jspPropertyGroups) {
+            Assert.assertEquals(StandardCharsets.ISO_8859_1, jspPropertyGroup.getCharset());
+        }
+
+        webXml.setLoginConfig(new LoginConfig());
+        LoginConfig loginConfig = webXml.getLoginConfig();
+        Assert.assertEquals(StandardCharsets.ISO_8859_1, loginConfig.getCharset());
+
+        SecurityConstraint constraint = new SecurityConstraint();
+        constraint.addCollection(new SecurityCollection());
+        webXml.addSecurityConstraint(constraint);
+        Set<SecurityConstraint> securityConstraints = webXml.getSecurityConstraints();
+        for (SecurityConstraint securityConstraint : securityConstraints) {
+            Assert.assertEquals(StandardCharsets.ISO_8859_1, securityConstraint.getCharset());
+            for (SecurityCollection securityCollection : securityConstraint.findCollections()) {
+                Assert.assertEquals(StandardCharsets.ISO_8859_1, securityCollection.getCharset());
+            }
+        }
+
     }
 }

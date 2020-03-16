@@ -296,6 +296,7 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
     private final Set<FilterMap> filterMaps = new LinkedHashSet<>();
     private final Set<String> filterMappingNames = new HashSet<>();
     public void addFilterMapping(FilterMap filterMap) {
+        filterMap.setCharset(getCharset());
         filterMaps.add(filterMap);
         filterMappingNames.add(filterMap.getFilterName());
     }
@@ -397,6 +398,7 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
     // error-page
     private final Map<String,ErrorPage> errorPages = new HashMap<>();
     public void addErrorPage(ErrorPage errorPage) {
+        errorPage.setCharset(getCharset());
         errorPages.put(errorPage.getName(), errorPage);
     }
     public Map<String,ErrorPage> getErrorPages() { return errorPages; }
@@ -440,6 +442,7 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
     // Digester will check there is only one of these
     private LoginConfig loginConfig = null;
     public void setLoginConfig(LoginConfig loginConfig) {
+        loginConfig.setCharset(getCharset());
         this.loginConfig = loginConfig;
     }
     public LoginConfig getLoginConfig() { return loginConfig; }
