@@ -721,13 +721,14 @@ public class CoyoteAdapter implements Adapter {
 
         // Parse the path parameters. This will:
         //   - strip out the path parameters
-        //   - convert the decodedURI to bytes
+        //   - convert the decodedURI to bytes (if it isn't already)
         parsePathParameters(req, request);
 
         // URI decoding
         // %xx decoding of the URL
         try {
-            req.getURLDecoder().convert(decodedURI, false);
+            // Will always by in bytes at this point
+            req.getURLDecoder().convert(decodedURI.getByteChunk(), false);
         } catch (IOException ioe) {
             res.setStatus(400);
             res.setMessage("Invalid URI: " + ioe.getMessage());
