@@ -374,7 +374,8 @@
         ares expected to be encoded. This affects both how Tomcat handles calls
         to obtain a request dispatcher as well as how Tomcat generates paths
         used to obtain request dispatchers internally. If not specified, the
-        default value of <code>true</code> is used.</p>
+        default value of <code>true</code> is used. When encoding/decoding paths
+        for a request dispatcher, UTF-8 is always used.</p>
       </attribute>
 
       <attribute name="failCtxIfServletStartFails" required="false">

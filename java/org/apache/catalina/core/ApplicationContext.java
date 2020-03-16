@@ -446,7 +446,7 @@ public class ApplicationContext implements ServletContext {
 
         if (getContext().getDispatchersUseEncodedPaths()) {
             // Decode
-            String decodedUri = UDecoder.URLDecode(normalizedUri);
+            String decodedUri = UDecoder.URLDecode(normalizedUri, StandardCharsets.UTF_8);
 
             // Security check to catch attempts to encode /../ sequences
             normalizedUri = RequestUtil.normalize(decodedUri);
