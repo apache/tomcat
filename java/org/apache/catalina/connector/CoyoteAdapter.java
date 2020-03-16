@@ -624,15 +624,13 @@ public class CoyoteAdapter implements Adapter {
             // Copy the raw URI to the decodedURI
             decodedURI.duplicate(undecodedURI);
 
-            // Parse the path parameters. This will:
-            //   - strip out the path parameters
-            //   - convert the decodedURI to bytes
+            // Parse (and strip out) the path parameters
             parsePathParameters(req, request);
 
             // URI decoding
             // %xx decoding of the URL
             try {
-                req.getURLDecoder().convert(decodedURI, false);
+                req.getURLDecoder().convert(decodedURI.getByteChunk(), false);
             } catch (IOException ioe) {
                 response.sendError(400, "Invalid URI: " + ioe.getMessage());
             }
