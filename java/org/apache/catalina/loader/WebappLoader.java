@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.nio.charset.StandardCharsets;
 
 import javax.management.ObjectName;
 
@@ -573,9 +574,9 @@ public class WebappLoader extends LifecycleMBeanBase
                 for (int i = 0; i < repositories.length; i++) {
                     String repository = repositories[i].toString();
                     if (repository.startsWith("file://"))
-                        repository = UDecoder.URLDecode(repository.substring(7));
+                        repository = UDecoder.URLDecode(repository.substring(7), StandardCharsets.UTF_8);
                     else if (repository.startsWith("file:"))
-                        repository = UDecoder.URLDecode(repository.substring(5));
+                        repository = UDecoder.URLDecode(repository.substring(5), StandardCharsets.UTF_8);
                     else
                         continue;
                     if (repository == null)
