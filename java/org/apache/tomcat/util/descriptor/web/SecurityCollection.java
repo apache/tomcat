@@ -18,6 +18,7 @@ package org.apache.tomcat.util.descriptor.web;
 
 import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 
 import org.apache.tomcat.util.buf.UDecoder;
 
@@ -209,11 +210,8 @@ public class SecurityCollection extends XmlEncodingBase implements Serializable 
         if (pattern == null)
             return;
 
-        String decodedPattern = UDecoder.URLDecode(pattern);
-        String results[] = new String[patterns.length + 1];
-        for (int i = 0; i < patterns.length; i++) {
-            results[i] = patterns[i];
-        }
+        String decodedPattern = UDecoder.URLDecode(pattern, getCharset());
+        String[] results = Arrays.copyOf(patterns, patterns.length + 1);
         results[patterns.length] = decodedPattern;
         patterns = results;
     }
