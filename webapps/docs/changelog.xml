@@ -61,6 +61,10 @@
         <code>URIEncoding</code> is not a superset of US-ASCII as required by
         RFC7230. (markt)
       </add>
+      <fix>
+        Avoid always retrieving the NIO poller selection key when processing
+        to reduce sync. (remm)
+      </fix>
     </changelog>
   </subsection>
 </section>
