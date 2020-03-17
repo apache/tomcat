@@ -1525,12 +1525,12 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
         @Override
         protected void doRun() {
             NioChannel socket = socketWrapper.getSocket();
-            SelectionKey key = socket.getIOChannel().keyFor(socket.getSocketWrapper().getPoller().getSelector());
             Poller poller = NioEndpoint.this.poller;
             if (poller == null) {
                 socketWrapper.close();
                 return;
             }
+            SelectionKey key = socket.getIOChannel().keyFor(poller.getSelector());
 
             try {
                 int handshake = -1;
