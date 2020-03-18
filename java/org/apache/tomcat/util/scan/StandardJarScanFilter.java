@@ -260,7 +260,7 @@ public class StandardJarScanFilter implements JarScanFilter {
     }
 
     private static boolean determineSkipAll() {
-       return defaultScanSet.isEmpty() &&
+        return defaultScanSet.isEmpty() &&
                (defaultSkipSet.contains("*") || defaultSkipSet.contains("*.jar"));
     }
 }
