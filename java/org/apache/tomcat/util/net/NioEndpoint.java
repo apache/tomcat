@@ -1569,23 +1569,27 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                         state = getHandler().process(socketWrapper, event);
                     }
                     if (state == SocketState.CLOSED) {
-                        poller.cancelledKey(socket.getIOChannel().keyFor(poller.getSelector()), socketWrapper);
+                        SelectionKey key = JreCompat.isJre11Available() ? null : socket.getIOChannel().keyFor(poller.getSelector());
+                        poller.cancelledKey(key, socketWrapper);
                     }
                 } else if (handshake == -1 ) {
                     getHandler().process(socketWrapper, SocketEvent.CONNECT_FAIL);
-                    poller.cancelledKey(socket.getIOChannel().keyFor(poller.getSelector()), socketWrapper);
+                    SelectionKey key = JreCompat.isJre11Available() ? null : socket.getIOChannel().keyFor(poller.getSelector());
+                    poller.cancelledKey(key, socketWrapper);
                 } else if (handshake == SelectionKey.OP_READ){
                     socketWrapper.registerReadInterest();
                 } else if (handshake == SelectionKey.OP_WRITE){
                     socketWrapper.registerWriteInterest();
                 }
             } catch (CancelledKeyException cx) {
-                poller.cancelledKey(socket.getIOChannel().keyFor(poller.getSelector()), socketWrapper);
+                SelectionKey key = JreCompat.isJre11Available() ? null : socket.getIOChannel().keyFor(poller.getSelector());
+                poller.cancelledKey(key, socketWrapper);
             } catch (VirtualMachineError vme) {
                 ExceptionUtils.handleThrowable(vme);
             } catch (Throwable t) {
                 log.error(sm.getString("endpoint.processing.fail"), t);
-                poller.cancelledKey(socket.getIOChannel().keyFor(poller.getSelector()), socketWrapper);
+                SelectionKey key = JreCompat.isJre11Available() ? null : socket.getIOChannel().keyFor(poller.getSelector());
+                poller.cancelledKey(key, socketWrapper);
             } finally {
                 socketWrapper = null;
                 event = null;
