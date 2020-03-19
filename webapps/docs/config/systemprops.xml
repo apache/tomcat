@@ -40,7 +40,8 @@
 <section name="Property replacements">
   <properties>
     <property name="org.apache.tomcat.util.digester. PROPERTY_SOURCE">
-      <p>Set this to a fully qualified name of a class that implements
+      <p>Set this to a comma separated list of fully qualified name of classes
+         that implement
          <code>org.apache.tomcat.util.IntrospectionUtils.PropertySource</code>.
          Required to have a public constructor with no arguments.</p>
       <p>Use this to add a property source, that will be invoked when

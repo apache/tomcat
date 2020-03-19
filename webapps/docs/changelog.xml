@@ -52,6 +52,11 @@
         consistently using the encoding of the web.xml file where specified and
         UTF-8 where no explicit encoding is specified. (markt)
       </fix>
+      <update>
+        Allow a comma separated list of class names for the
+        <code>org.apache.tomcat.util.digester.PROPERTY_SOURCE</code>
+        system property. (remm)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Coyote">

@@ -25,6 +25,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.Permission;
+import java.util.ArrayList;
 import java.util.EmptyStackException;
 import java.util.HashMap;
 import java.util.List;
@@ -32,6 +33,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.PropertyPermission;
 import java.util.Set;
+import java.util.StringTokenizer;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
@@ -84,31 +86,36 @@ public class Digester extends DefaultHandler2 {
 
     // ---------------------------------------------------------- Static Fields
 
-    protected static IntrospectionUtils.PropertySource propertySource;
-    private static boolean propertySourceSet = false;
+    protected static IntrospectionUtils.PropertySource[] propertySources;
+    private static boolean propertySourcesSet = false;
     protected static final StringManager sm = StringManager.getManager(Digester.class);
 
     static {
-        String className = System.getProperty("org.apache.tomcat.util.digester.PROPERTY_SOURCE");
-        IntrospectionUtils.PropertySource source = null;
-        if (className != null) {
-            ClassLoader[] cls = new ClassLoader[] { Digester.class.getClassLoader(),
-                    Thread.currentThread().getContextClassLoader() };
-            for (int i = 0; i < cls.length; i++) {
-                try {
-                    Class<?> clazz = Class.forName(className, true, cls[i]);
-                    source = (IntrospectionUtils.PropertySource)
-                            clazz.getConstructor().newInstance();
-                    break;
-                } catch (Throwable t) {
-                    ExceptionUtils.handleThrowable(t);
-                    LogFactory.getLog(Digester.class).error(sm.getString("digester.propertySourceLoadError", className), t);
+        String classNames = System.getProperty("org.apache.tomcat.util.digester.PROPERTY_SOURCE");
+        ArrayList<IntrospectionUtils.PropertySource> sourcesList = new ArrayList<>();
+        IntrospectionUtils.PropertySource[] sources = null;
+        if (classNames != null) {
+            StringTokenizer classNamesTokenizer = new StringTokenizer(classNames, ",");
+            while (classNamesTokenizer.hasMoreTokens()) {
+                String className = classNamesTokenizer.nextToken().trim();
+                ClassLoader[] cls = new ClassLoader[] { Digester.class.getClassLoader(),
+                        Thread.currentThread().getContextClassLoader() };
+                for (int i = 0; i < cls.length; i++) {
+                    try {
+                        Class<?> clazz = Class.forName(className, true, cls[i]);
+                        sourcesList.add((IntrospectionUtils.PropertySource) clazz.getConstructor().newInstance());
+                        break;
+                    } catch (Throwable t) {
+                        ExceptionUtils.handleThrowable(t);
+                        LogFactory.getLog(Digester.class).error(sm.getString("digester.propertySourceLoadError", className), t);
+                    }
                 }
             }
+            sources = sourcesList.toArray(new IntrospectionUtils.PropertySource[0]);
         }
-        if (source != null) {
-            propertySource = source;
-            propertySourceSet = true;
+        if (sources != null) {
+            propertySources = sources;
+            propertySourcesSet = true;
         }
         if (Boolean.getBoolean("org.apache.tomcat.util.digester.REPLACE_SYSTEM_PROPERTIES")) {
             replaceSystemProperties();
@@ -116,9 +123,17 @@ public class Digester extends DefaultHandler2 {
     }
 
     public static void setPropertySource(IntrospectionUtils.PropertySource propertySource) {
-        if (!propertySourceSet) {
-            Digester.propertySource = propertySource;
-            propertySourceSet = true;
+        if (!propertySourcesSet) {
+            propertySources = new IntrospectionUtils.PropertySource[1];
+            propertySources[0] = propertySource;
+            propertySourcesSet = true;
+        }
+    }
+
+    public static void setPropertySource(IntrospectionUtils.PropertySource[] propertySources) {
+        if (!propertySourcesSet) {
+            Digester.propertySources = propertySources;
+            propertySourcesSet = true;
         }
     }
 
@@ -158,7 +173,7 @@ public class Digester extends DefaultHandler2 {
     }
 
 
-    protected IntrospectionUtils.PropertySource source[] = new IntrospectionUtils.PropertySource[] {
+    protected IntrospectionUtils.PropertySource[] source = new IntrospectionUtils.PropertySource[] {
             new SystemPropertySource() };
 
 
@@ -338,18 +353,21 @@ public class Digester extends DefaultHandler2 {
 
 
     public Digester() {
-        propertySourceSet = true;
-        if (propertySource != null) {
-            source = new IntrospectionUtils.PropertySource[] { propertySource, source[0] };
+        propertySourcesSet = true;
+        if (propertySources != null) {
+            ArrayList<IntrospectionUtils.PropertySource> sourcesList = new ArrayList<>();
+            for (IntrospectionUtils.PropertySource cur : propertySources) {
+                sourcesList.add(cur);
+            }
+            sourcesList.add(source[0]);
+            source = sourcesList.toArray(new IntrospectionUtils.PropertySource[0]);
         }
     }
 
 
     public static void replaceSystemProperties() {
         Log log = LogFactory.getLog(Digester.class);
-        if (propertySource != null) {
-            IntrospectionUtils.PropertySource[] propertySources =
-                    new IntrospectionUtils.PropertySource[] { propertySource };
+        if (propertySources != null) {
             Properties properties = System.getProperties();
             Set<String> names = properties.stringPropertyNames();
             for (String name : names) {
