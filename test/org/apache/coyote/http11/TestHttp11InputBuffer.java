@@ -17,15 +17,8 @@
 
 package org.apache.coyote.http11;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
-import java.io.Writer;
-import java.net.Socket;
 import java.util.Enumeration;
 
 import jakarta.servlet.ServletException;
@@ -659,44 +652,6 @@ public class TestHttp11InputBuffer extends TomcatBaseTest {
         client.doRequest();
         Assert.assertTrue(client.getResponseLine(), client.isResponse400());
         Assert.assertTrue(client.isResponseBodyOK());
-    }
-
-
-    @Test
-    public void testValidHttp09() throws Exception {
-
-        Tomcat tomcat = getTomcatInstance();
-
-        tomcat.addContext("", TEMP_DIR);
-        tomcat.start();
-
-        Socket socket = null;
-        OutputStream os = null;
-        InputStream is = null;
-        BufferedReader reader = null;
-        Writer writer = null;
-        final String encoding = "ISO-8859-1";
-
-        for (int i = 0; i < 10; i++) {
-            socket = new Socket("localhost", getPort());
-            os = socket.getOutputStream();
-            writer = new OutputStreamWriter(os, encoding);
-            writer.write("GET /");
-            writer.flush();
-            Thread.sleep(10);
-            writer.write(CR);
-            writer.flush();
-            Thread.sleep(10);
-            writer.write(LF);
-            writer.flush();
-            is = socket.getInputStream();
-            reader = new BufferedReader(new InputStreamReader(is));
-            String line = reader.readLine();
-            Assert.assertNotNull(line);
-            Assert.assertTrue(line.indexOf("404") != -1);
-            socket.close();
-        }
-
     }
 
 
