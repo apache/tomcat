@@ -57,6 +57,10 @@
         <code>org.apache.tomcat.util.digester.PROPERTY_SOURCE</code>
         system property. (remm)
       </update>
+      <fix>
+        <bug>64226</bug>: Reset timezone after parsing a date since the date
+        format is reused. Test case submitted by Gary Thomas. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
