@@ -60,6 +60,14 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 7.0.104 (violetagg)">
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        <bug>64226</bug>: Reset timezone after parsing a date since the date
+        format is reused. Test case submitted by Gary Thomas. (remm)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Coyote">
     <changelog>
       <add>

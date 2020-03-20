@@ -60,6 +60,7 @@ public class ConcurrentDateFormat {
             sdf = createInstance();
         }
         Date result = sdf.parse(source);
+        sdf.setTimeZone(timezone);
         queue.add(sdf);
         return result;
     }
