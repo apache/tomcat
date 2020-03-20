@@ -61,6 +61,10 @@
         <bug>64226</bug>: Reset timezone after parsing a date since the date
         format is reused. Test case submitted by Gary Thomas. (remm)
       </fix>
+      <fix>
+        <bug>64247</bug>: Using a wildcard for <code>jarsToSkip</code> should
+        not override a possibly present <code>jarsToScan</code>. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
