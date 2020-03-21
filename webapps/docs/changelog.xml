@@ -77,7 +77,7 @@
     </changelog>
   </subsection>
 </section>
-<section name="Tomcat 8.5.53 (markt)" rtext="release in progress]">
+<section name="Tomcat 8.5.53 (markt)" rtext="2020-03-16">
   <subsection name="Coyote">
     <changelog>
       <fix>
