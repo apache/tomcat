@@ -36,8 +36,6 @@ New items for 10.0.x onwards:
  3. RFC 3986 states (section 2.2) that a %nn encoded delimiter is NOT equivalent
     to the decoded form. Provide an option not to decode delimiters in %nn form.
 
- 4. Refactor DefaultServlet to use Ranges in parseRanges().
-
 Deferred until 10.1.x:
 
  1.  Remove the ExtensionValidator and associated classes (assuming that the

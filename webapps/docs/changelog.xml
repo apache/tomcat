@@ -66,6 +66,10 @@
         not override a possibly present <code>jarsToScan</code>. Based on code
         submitted by Iridias. (remm)
       </fix>
+      <update>
+        Refactor DefaultServlet to avoid using an internal Range structure that
+        is duplicated from the parsing result. (remm)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Coyote">

@@ -28,7 +28,7 @@ public class Ranges {
     private final List<Entry> entries;
 
 
-    private Ranges(String units, List<Entry> entries) {
+    public Ranges(String units, List<Entry> entries) {
         this.units = units;
         this.entries = Collections.unmodifiableList(entries);
     }
