@@ -63,7 +63,8 @@
       </fix>
       <fix>
         <bug>64247</bug>: Using a wildcard for <code>jarsToSkip</code> should
-        not override a possibly present <code>jarsToScan</code>. (remm)
+        not override a possibly present <code>jarsToScan</code>. Based on code
+        submitted by Iridias. (remm)
       </fix>
     </changelog>
   </subsection>

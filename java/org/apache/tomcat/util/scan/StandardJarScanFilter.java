@@ -43,8 +43,8 @@ public class StandardJarScanFilter implements JarScanFilter {
         defaultSkip = System.getProperty(Constants.SKIP_JARS_PROPERTY);
         populateSetFromAttribute(defaultSkip, defaultSkipSet);
         defaultScan = System.getProperty(Constants.SCAN_JARS_PROPERTY);
-        defaultSkipAll = (defaultSkipSet.contains("*") || defaultSkipSet.contains("*.jar")) && defaultScan == null;
         populateSetFromAttribute(defaultScan, defaultScanSet);
+        defaultSkipAll = (defaultSkipSet.contains("*") || defaultSkipSet.contains("*.jar")) && defaultScanSet.isEmpty();
     }
 
     private String tldSkip;
