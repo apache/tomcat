@@ -89,6 +89,11 @@
         Avoid always retrieving the NIO poller selection key when processing
         to reduce sync. (remm)
       </fix>
+      <fix>
+        <bug>64240</bug>: Ensure that HTTP/0.9 requests that contain additional
+        data on the request line after the URI are treated consistently. Such
+        requests will now always be treated as HTTP/1.1. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
