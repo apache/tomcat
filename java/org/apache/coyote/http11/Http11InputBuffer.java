@@ -462,9 +462,6 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
                     request.protocol().setString(Constants.HTTP_11);
                     throw new IllegalArgumentException(sm.getString("iib.invalidRequestTarget"));
                 }
-                if (chr == '<') {
-                    System.out.println("debug");
-                }
                 if (chr == Constants.SP || chr == Constants.HT) {
                     space = true;
                     end = pos;
