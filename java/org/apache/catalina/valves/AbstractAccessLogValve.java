@@ -682,8 +682,10 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
             // to be cached in the request.
             request.getAttribute(Globals.CERTIFICATES_ATTR);
         }
-        for (CachedElement element : cachedElements) {
+        if (cachedElements != null) {
+            for (CachedElement element : cachedElements) {
                 element.cache(request);
+            }
         }
         getNext().invoke(request, response);
     }
