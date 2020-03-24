@@ -471,9 +471,10 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
                     // HTTP/0.9 style request
                     // Stop this processing loop
                     space = true;
+                    // Set blank protocol (indicates HTTP/0.9)
+                    request.protocol().setString("");
                     // Skip the protocol processing
-                    parsingRequestLinePhase = 6;
-                    parsingRequestLineEol = true;
+                    parsingRequestLinePhase = 7;
                     if (prevChr == Constants.CR) {
                         end = pos - 1;
                     } else {
@@ -504,7 +505,9 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
                 request.requestURI().setBytes(byteBuffer.array(), parsingRequestLineStart,
                         end - parsingRequestLineStart);
             }
-            if (!parsingRequestLineEol) {
+            // HTTP/0.9 processing jumps to stage 7.
+            // Don't want to overwrite that here.
+            if (parsingRequestLinePhase == 4) {
                 parsingRequestLinePhase = 5;
             }
         }
@@ -557,9 +560,12 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
             if ((end - parsingRequestLineStart) > 0) {
                 request.protocol().setBytes(byteBuffer.array(), parsingRequestLineStart,
                         end - parsingRequestLineStart);
-            } else {
-                request.protocol().setString("");
+                parsingRequestLinePhase = 7;
             }
+            // If no protocol is found, the ISE below will be triggered.
+        }
+        if (parsingRequestLinePhase == 7) {
+            // Parsing is complete. Return and clean-up.
             parsingRequestLine = false;
             parsingRequestLinePhase = 0;
             parsingRequestLineEol = false;
