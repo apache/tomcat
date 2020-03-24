@@ -62,6 +62,10 @@
         format is reused. Test case submitted by Gary Thomas. (remm)
       </fix>
       <fix>
+        <bug>64149</bug>: Avoid NPE when using the access log valve without
+        a pattern. (remm)
+      </fix>
+      <fix>
         <bug>64247</bug>: Using a wildcard for <code>jarsToSkip</code> should
         not override a possibly present <code>jarsToScan</code>. Based on code
         submitted by Iridias. (remm)
