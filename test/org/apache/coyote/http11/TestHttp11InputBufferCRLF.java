@@ -45,32 +45,74 @@ public class TestHttp11InputBufferCRLF extends TomcatBaseTest {
 
         // Requests to exercise code that allows HT in place of SP
         parameterSets.add(new Object[] { Boolean.FALSE, new String[] {
-                "GET\thttp://localhost:8080/test\tHTTP/1.1" + CRLF +
+                "GET\t/test\tHTTP/1.1" + CRLF +
                 "Host: localhost:8080" + CRLF +
-                "Connection: close" + CRLF +
-                CRLF } } );
+               "Connection: close" + CRLF +
+                CRLF }, Boolean.TRUE } );
 
         // Requests to simulate package boundaries
         // HTTP/0.9 request
         addRequestWithSplits("GET /test" + CRLF, Boolean.TRUE, parameterSets);
 
+        // HTTP/0.9 request with space
+        // Either malformed but acceptable HTTP/0.9 or invalid HTTP/1.1
+        // Tomcat opts for invalid HTTP/1.1
+        addRequestWithSplits("GET /test " + CRLF, Boolean.FALSE, Boolean.FALSE, parameterSets);
+
         // HTTP/0.9 request (no optional CR)
         addRequestWithSplits("GET /test" + LF, Boolean.TRUE, parameterSets);
 
+        // HTTP/0.9 request with space (no optional CR)
+        // Either malformed but acceptable HTTP/0.9 or invalid HTTP/1.1
+        // Tomcat opts for invalid HTTP/1.1
+        addRequestWithSplits("GET /test " + LF, Boolean.FALSE, Boolean.FALSE, parameterSets);
+
         // Standard HTTP/1.1 request
-        addRequestWithSplits("GET http://localhost:8080/test HTTP/1.1" + CRLF +
+        addRequestWithSplits("GET /test HTTP/1.1" + CRLF +
                 "Host: localhost:8080" + CRLF +
                 "Connection: close" + CRLF +
                 CRLF,
                 Boolean.FALSE, parameterSets);
+
+        // Invalid HTTP/1.1 request
+        addRequestWithSplits("GET /te<st HTTP/1.1" + CRLF +
+                "Host: localhost:8080" + CRLF +
+                "Connection: close" + CRLF +
+                CRLF,
+                Boolean.FALSE, Boolean.FALSE, parameterSets);
+
+        // Standard HTTP/1.1 request with a query string
+        addRequestWithSplits("GET /test?a=b HTTP/1.1" + CRLF +
+                "Host: localhost:8080" + CRLF +
+                "Connection: close" + CRLF +
+                CRLF,
+                Boolean.FALSE, parameterSets);
+
+        // Standard HTTP/1.1 request with a query string that includes ?
+        addRequestWithSplits("GET /test?a=?b HTTP/1.1" + CRLF +
+                "Host: localhost:8080" + CRLF +
+                "Connection: close" + CRLF +
+                CRLF,
+                Boolean.FALSE, parameterSets);
+
+        // Standard HTTP/1.1 request with an invalid query string
+        addRequestWithSplits("GET /test?a=<b HTTP/1.1" + CRLF +
+                "Host: localhost:8080" + CRLF +
+                "Connection: close" + CRLF +
+                CRLF,
+                Boolean.FALSE, Boolean.FALSE, parameterSets);
 
         return parameterSets;
     }
 
 
     private static void addRequestWithSplits(String request, Boolean isHttp09, List<Object[]> parameterSets) {
+        addRequestWithSplits(request, isHttp09, Boolean.TRUE, parameterSets);
+    }
+
+    private static void addRequestWithSplits(String request, Boolean isHttp09, Boolean valid, List<Object[]> parameterSets) {
         // Add as a single String
-        parameterSets.add(new Object[] { isHttp09, new String[] { request } } );
+        parameterSets.add(new Object[] { isHttp09, new String[] { request }, valid });
 
         // Add with all CRLF split between the CR and LF
         List<String> parts = new ArrayList<String>();
@@ -82,14 +124,14 @@ public class TestHttp11InputBufferCRLF extends TomcatBaseTest {
             pos = request.indexOf("\n", lastPos + 1);
         }
         parts.add(request.substring(lastPos));
-        parameterSets.add(new Object[] { isHttp09, parts.toArray(new String[0]) });
+        parameterSets.add(new Object[] { isHttp09, parts.toArray(new String[0]), valid });
 
         // Add with a split between each character
         List<String> chars = new ArrayList<String>();
         for (char c : request.toCharArray()) {
             chars.add(Character.toString(c));
         }
-        parameterSets.add(new Object[] { isHttp09, chars.toArray(new String[0]) });
+        parameterSets.add(new Object[] { isHttp09, chars.toArray(new String[0]), valid });
     }
 
     @Parameter(0)
@@ -98,13 +140,26 @@ public class TestHttp11InputBufferCRLF extends TomcatBaseTest {
     @Parameter(1)
     public String[] request;
 
+    @Parameter(2)
+    public boolean valid;
+
+
     @Test
     public void testBug54947() {
 
         Client client = new Client(request, isHttp09);
 
-        client.doRequest();
-        Assert.assertTrue(client.isResponseBodyOK());
+        Exception e = client.doRequest();
+
+        if (valid) {
+            Assert.assertTrue(client.isResponseBodyOK());
+        } else if (e == null){
+            Assert.assertTrue(client.isResponse400());
+        } else {
+            // The invalid request was detected before the entire request had
+            // been sent to Tomcat reset the connection when the client tried to
+            // continue sending the invalid request.
+        }
     }
 
 

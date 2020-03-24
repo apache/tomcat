@@ -322,10 +322,12 @@ public class InternalNioInputBuffer extends AbstractInputBuffer<NioChannel> {
                     // HTTP/0.9 style request. CR is optional. LF is not.
                 } else if (buf[pos] == Constants.LF) {
                     // HTTP/0.9 style request
-                    parsingRequestLineEol = true;
+                    // Stop this processing loop
                     space = true;
+                    // Set blank protocol (indicates HTTP/0.9)
+                    request.protocol().setString("");
                     // Skip the protocol processing
-                    parsingRequestLinePhase = 6;
+                    parsingRequestLinePhase = 7;
                     if (buf[pos - 1] == Constants.CR) {
                         end = pos - 1;
                     } else {
@@ -352,7 +354,9 @@ public class InternalNioInputBuffer extends AbstractInputBuffer<NioChannel> {
             } else {
                 request.requestURI().setBytes(buf, parsingRequestLineStart, end - parsingRequestLineStart);
             }
-            if (!parsingRequestLineEol) {
+            // HTTP/0.9 processing jumps to stage 7.
+            // Don't want to overwrite that here.
+            if (parsingRequestLinePhase == 4) {
                 parsingRequestLinePhase = 5;
             }
         }
@@ -402,9 +406,12 @@ public class InternalNioInputBuffer extends AbstractInputBuffer<NioChannel> {
 
             if ( (end - parsingRequestLineStart) > 0) {
                 request.protocol().setBytes(buf, parsingRequestLineStart, end - parsingRequestLineStart);
-            } else {
-                request.protocol().setString("");
+                parsingRequestLinePhase = 7;
             }
+            // If no protocol is found, the ISE below will be triggered.
+        }
+        if (parsingRequestLinePhase == 7) {
+            // Parsing is complete. Return and clean-up.
             parsingRequestLine = false;
             parsingRequestLinePhase = 0;
             parsingRequestLineEol = false;

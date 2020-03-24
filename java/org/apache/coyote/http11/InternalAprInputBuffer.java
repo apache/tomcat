@@ -238,8 +238,12 @@ public class InternalAprInputBuffer extends AbstractInputBuffer<Long> {
                 // HTTP/0.9 style request. CR is optional. LF is not.
             } else if (buf[pos] == Constants.LF) {
                 // HTTP/0.9 style request
-                eol = true;
+                // Stop this processing loop
                 space = true;
+                // Set blank protocol (indicates HTTP/0.9)
+                request.protocol().setString("");
+                // Skip the protocol processing
+                eol = true;
                 if (buf[pos - 1] == Constants.CR) {
                     end = pos - 1;
                 } else {
@@ -314,12 +318,13 @@ public class InternalAprInputBuffer extends AbstractInputBuffer<Long> {
 
         if ((end - start) > 0) {
             request.protocol().setBytes(buf, start, end - start);
-        } else {
-            request.protocol().setString("");
+        }
+
+        if (request.protocol().isNull()) {
+            throw new IllegalArgumentException(sm.getString("iib.invalidHttpProtocol"));
         }
 
         return true;
-
     }
 
 
