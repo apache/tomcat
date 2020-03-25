@@ -1157,11 +1157,10 @@ public class DefaultServlet extends HttpServlet {
             if (ranges.getEntries().size() == 1) {
 
                 Ranges.Entry range = ranges.getEntries().get(0);
-                long resourceLength = resource.getContentLength();
-                long start = getStart(range, resourceLength);
-                long end = getEnd(range, resourceLength);
+                long start = getStart(range, contentLength);
+                long end = getEnd(range, contentLength);
                 response.addHeader("Content-Range",
-                        "bytes " + start + "-" + end + "/" + resourceLength);
+                        "bytes " + start + "-" + end + "/" + contentLength);
                 long length = end - start + 1;
                 response.setContentLengthLong(length);
 
@@ -1180,8 +1179,8 @@ public class DefaultServlet extends HttpServlet {
                     }
                     if (ostream != null) {
                         if (!checkSendfile(request, response, resource,
-                                end - start + 1, range))
-                            copy(resource, ostream, range);
+                                contentLength, range))
+                            copy(resource, contentLength, ostream, range);
                     } else {
                         // we should not get here
                         throw new IllegalStateException();
@@ -1197,7 +1196,7 @@ public class DefaultServlet extends HttpServlet {
                         // Silent catch
                     }
                     if (ostream != null) {
-                        copy(resource, ostream, ranges, contentType);
+                        copy(resource, contentLength, ostream, ranges, contentType);
                     } else {
                         // we should not get here
                         throw new IllegalStateException();
@@ -2137,8 +2136,8 @@ public class DefaultServlet extends HttpServlet {
                 request.setAttribute(Globals.SENDFILE_FILE_START_ATTR, Long.valueOf(0L));
                 request.setAttribute(Globals.SENDFILE_FILE_END_ATTR, Long.valueOf(length));
             } else {
-                request.setAttribute(Globals.SENDFILE_FILE_START_ATTR, Long.valueOf(getStart(range, resource.getContentLength())));
-                request.setAttribute(Globals.SENDFILE_FILE_END_ATTR, Long.valueOf(getEnd(range, resource.getContentLength()) + 1));
+                request.setAttribute(Globals.SENDFILE_FILE_START_ATTR, Long.valueOf(getStart(range, length)));
+                request.setAttribute(Globals.SENDFILE_FILE_END_ATTR, Long.valueOf(getEnd(range, length) + 1));
             }
             return true;
         }
@@ -2381,11 +2380,12 @@ public class DefaultServlet extends HttpServlet {
      * (even in the face of an exception).
      *
      * @param resource  The source resource
+     * @param length the resource length
      * @param ostream   The output stream to write to
      * @param range     Range the client wanted to retrieve
      * @exception IOException if an input/output error occurs
      */
-    protected void copy(WebResource resource, ServletOutputStream ostream,
+    protected void copy(WebResource resource, long length, ServletOutputStream ostream,
                       Ranges.Entry range)
         throws IOException {
 
@@ -2394,8 +2394,7 @@ public class DefaultServlet extends HttpServlet {
         InputStream resourceInputStream = resource.getInputStream();
         InputStream istream =
             new BufferedInputStream(resourceInputStream, input);
-        exception = copyRange(istream, ostream, getStart(range, resource.getContentLength()),
-                getEnd(range, resource.getContentLength()));
+        exception = copyRange(istream, ostream, getStart(range, length), getEnd(range, length));
 
         // Clean up the input stream
         istream.close();
@@ -2413,18 +2412,18 @@ public class DefaultServlet extends HttpServlet {
      * (even in the face of an exception).
      *
      * @param resource      The source resource
+     * @param length the resource length
      * @param ostream       The output stream to write to
      * @param ranges        Enumeration of the ranges the client wanted to
      *                          retrieve
      * @param contentType   Content type of the resource
      * @exception IOException if an input/output error occurs
      */
-    protected void copy(WebResource resource, ServletOutputStream ostream,
+    protected void copy(WebResource resource, long length, ServletOutputStream ostream,
                       Ranges ranges, String contentType)
         throws IOException {
 
         IOException exception = null;
-        long length = resource.getContentLength();
 
         for (Ranges.Entry range : ranges.getEntries()) {
             if (exception != null) {
