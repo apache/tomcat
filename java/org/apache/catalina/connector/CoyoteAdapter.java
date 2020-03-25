@@ -78,10 +78,6 @@ public class CoyoteAdapter implements Adapter {
     public static final int ADAPTER_NOTES = 1;
 
 
-    protected static final boolean ALLOW_BACKSLASH =
-        Boolean.parseBoolean(System.getProperty("org.apache.catalina.connector.CoyoteAdapter.ALLOW_BACKSLASH", "false"));
-
-
     private static final ThreadLocal<String> THREAD_NAME =
             new ThreadLocal<String>() {
 
@@ -635,7 +631,7 @@ public class CoyoteAdapter implements Adapter {
                 response.sendError(400, "Invalid URI: " + ioe.getMessage());
             }
             // Normalization
-            if (normalize(req.decodedURI())) {
+            if (normalize(req.decodedURI(), connector.getAllowBackslash())) {
                 // Character decoding
                 convertURI(decodedURI, request);
                 // URIEncoding values are limited to US-ASCII supersets.
@@ -1127,12 +1123,13 @@ public class CoyoteAdapter implements Adapter {
      * This method normalizes "\", "//", "/./" and "/../".
      *
      * @param uriMB URI to be normalized
+     * @param allowBackslash <code>true</code> if backslash characters are allowed in URLs
      *
      * @return <code>false</code> if normalizing this URI would require going
      *         above the root, or if the URI contains a null byte, otherwise
      *         <code>true</code>
      */
-    public static boolean normalize(MessageBytes uriMB) {
+    public static boolean normalize(MessageBytes uriMB, boolean allowBackslash) {
 
         ByteChunk uriBC = uriMB.getByteChunk();
         final byte[] b = uriBC.getBytes();
@@ -1151,7 +1148,7 @@ public class CoyoteAdapter implements Adapter {
         // Check for null byte
         for (pos = start; pos < end; pos++) {
             if (b[pos] == (byte) '\\') {
-                if (ALLOW_BACKSLASH) {
+                if (allowBackslash) {
                     b[pos] = (byte) '/';
                 } else {
                     return false;

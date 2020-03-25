@@ -333,7 +333,7 @@ public class TestCoyoteAdapter extends TomcatBaseTest {
         byte[] b = input.getBytes(StandardCharsets.UTF_8);
         mb.setBytes(b, 0, b.length);
 
-        boolean result = CoyoteAdapter.normalize(mb);
+        boolean result = CoyoteAdapter.normalize(mb, false);
         mb.toString();
 
         if (expected == null) {

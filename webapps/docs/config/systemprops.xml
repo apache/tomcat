@@ -264,13 +264,6 @@
   <properties>
 
     <property
-    name="org.apache.catalina.connector. CoyoteAdapter.ALLOW_BACKSLASH">
-      <p>If this is <code>true</code> the '\' character will be permitted as a
-      path delimiter.</p>
-      <p>If not specified, the default value of <code>false</code> will be used.</p>
-    </property>
-
-    <property
     name="org.apache.tomcat.util.buf. UDecoder.ALLOW_ENCODED_SLASH">
       <p>If this is <code>true</code> '%2F' and '%5C' will be permitted as path
       delimiters.</p>
@@ -310,17 +303,6 @@
       <li>The <code>xmlValidation</code> attribute of any
           <a href="context.html">Context</a> element.</li>
       </ul>
-    </property>
-
-    <property name="org.apache.catalina.connector. Response.ENFORCE_ENCODING_IN_GET_WRITER">
-      <p>If this is <code>true</code> then
-      a call to <code>Response.getWriter()</code> if no character encoding
-      has been specified will result in subsequent calls to
-      <code>Response.getCharacterEncoding()</code> returning
-      <code>ISO-8859-1</code> and the <code>Content-Type</code> response header
-      will include a <code>charset=ISO-8859-1</code> component. (SRV.15.2.22.1)</p>
-      <p>If not specified, the default specification compliant value of
-      <code>true</code> will be used.</p>
     </property>
 
     <property name="org.apache.catalina.core.ApplicationContext .GET_RESOURCE_REQUIRE_SLASH">

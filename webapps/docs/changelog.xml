@@ -74,6 +74,19 @@
         Refactor DefaultServlet to avoid using an internal Range structure that
         is duplicated from the parsing result. (remm)
       </update>
+      <update>
+        Remove
+        <code>org.apache.catalina.connector.CoyoteAdapter.ALLOW_BACKSLASH</code>
+        system property, replaced by the <code>allowBackslash</code> attribute
+        on the Connector. (remm)
+      </update>
+      <update>
+        Remove
+        <code>org.apache.catalina.connector.Response.ENFORCE_ENCODING_IN_GET_WRITER</code>
+        system property, replaced by the
+        <code>enforceEncodingInGetWriter</code> attribute on the Connector.
+        (remm)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Coyote">

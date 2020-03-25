@@ -118,6 +118,14 @@ public class Connector extends LifecycleMBeanBase  {
 
 
     /**
+     * If this is <code>true</code> the '\' character will be permitted as a
+     * path delimiter. If not specified, the default value of
+     * <code>false</code> will be used.
+     */
+    protected boolean allowBackslash = false;
+
+
+    /**
      * Do we allow TRACE ?
      */
     protected boolean allowTrace = false;
@@ -134,6 +142,19 @@ public class Connector extends LifecycleMBeanBase  {
      */
     protected boolean enableLookups = false;
 
+
+    /**
+     * If this is <code>true</code> then a call to
+     * <code>Response.getWriter()</code> if no character encoding
+     * has been specified will result in subsequent calls to
+     * <code>Response.getCharacterEncoding()</code> returning
+     * <code>ISO-8859-1</code> and the <code>Content-Type</code> response header
+     * will include a <code>charset=ISO-8859-1</code> component.
+     * (SRV.15.2.22.1)
+     * If not specified, the default specification compliant value of
+     * <code>true</code> will be used.
+     */
+    protected boolean enforceEncodingInGetWriter = true;
 
     /*
      * Is generation of X-Powered-By response header enabled/disabled?
@@ -339,6 +360,24 @@ public class Connector extends LifecycleMBeanBase  {
 
 
     /**
+     * @return <code>true</code> if backslash characters are allowed in URLs.
+     *   Default value is <code>false</code>.
+     */
+    public boolean getAllowBackslash() {
+        return allowBackslash;
+    }
+
+
+    /**
+     * Set the allowBackslash flag.
+     * @param allowBackslash the new flag value
+     */
+    public void setAllowBackslash(boolean allowBackslash) {
+        this.allowBackslash = allowBackslash;
+    }
+
+
+    /**
      * @return <code>true</code> if the TRACE method is allowed. Default value
      *         is <code>false</code>.
      */
@@ -412,6 +451,24 @@ public class Connector extends LifecycleMBeanBase  {
     public void setEnableLookups(boolean enableLookups) {
         this.enableLookups = enableLookups;
         setProperty("enableLookups", String.valueOf(enableLookups));
+    }
+
+
+    /**
+     * @return <code>true</code> if a default character encoding will be set
+     *   when calling Response.getWriter()
+     */
+    public boolean getEnforceEncodingInGetWriter() {
+        return enforceEncodingInGetWriter;
+    }
+
+
+    /**
+     * Set the enforceEncodingInGetWriter flag.
+     * @param enforceEncodingInGetWriter the new flag value
+     */
+    public void setEnforceEncodingInGetWriter(boolean enforceEncodingInGetWriter) {
+        this.enforceEncodingInGetWriter = enforceEncodingInGetWriter;
     }
 
 

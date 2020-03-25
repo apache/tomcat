@@ -74,21 +74,6 @@ public class Response implements HttpServletResponse {
 
     private static final MediaTypeCache MEDIA_TYPE_CACHE = new MediaTypeCache(100);
 
-    /**
-     * Compliance with SRV.15.2.22.1. A call to Response.getWriter() if no
-     * character encoding has been specified will result in subsequent calls to
-     * Response.getCharacterEncoding() returning ISO-8859-1 and the Content-Type
-     * response header will include a charset=ISO-8859-1 component.
-     */
-    private static final boolean ENFORCE_ENCODING_IN_GET_WRITER;
-
-    static {
-        ENFORCE_ENCODING_IN_GET_WRITER = Boolean.parseBoolean(
-                System.getProperty("org.apache.catalina.connector.Response.ENFORCE_ENCODING_IN_GET_WRITER",
-                        "true"));
-    }
-
-
     // ----------------------------------------------------- Instance Variables
 
     public Response() {
@@ -572,7 +557,7 @@ public class Response implements HttpServletResponse {
                 (sm.getString("coyoteResponse.getWriter.ise"));
         }
 
-        if (ENFORCE_ENCODING_IN_GET_WRITER) {
+        if (request.getConnector().getEnforceEncodingInGetWriter()) {
             /*
              * If the response's character encoding has not been specified as
              * described in <code>getCharacterEncoding</code> (i.e., the method
