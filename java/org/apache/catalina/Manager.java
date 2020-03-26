@@ -440,4 +440,55 @@ public interface Manager {
      */
     public void setNotifyAttributeListenerOnUnchangedValue(
             boolean notifyAttributeListenerOnUnchangedValue);
+
+
+    /**
+     * If this is <code>true</code>, Tomcat will track the number of active
+     * requests for each session. When determining if a session is valid, any
+     * session with at least one active request will always be considered valid.
+     * If <code>org.apache.catalina.STRICT_SERVLET_COMPLIANCE</code> is set to
+     * <code>true</code>, the default of this setting will be <code>true</code>,
+     * else the default value will be <code>false</code>.
+     * @return the flag value
+     */
+    public default boolean getSessionActivityCheck() {
+        return Globals.STRICT_SERVLET_COMPLIANCE;
+    }
+
+
+    /**
+     * Configure if Tomcat will track the number of active requests for each
+     * session. When determining if a session is valid, any session with at
+     * least one active request will always be considered valid.
+     * @param sessionActivityCheck the new flag value
+     */
+    public void setSessionActivityCheck(boolean sessionActivityCheck);
+
+
+    /**
+     * If this is <code>true</code>, the last accessed time for sessions will
+     * be calculated from the beginning of the previous request. If
+     * <code>false</code>, the last accessed time for sessions will be calculated
+     * from the end of the previous request. This also affects how the idle time
+     * is calculated.
+     * If <code>org.apache.catalina.STRICT_SERVLET_COMPLIANCE</code> is set to
+     * <code>true</code>, the default of this setting will be <code>true</code>,
+     * else the default value will be <code>false</code>.
+     * @return the flag value
+     */
+    public default boolean getSessionLastAccessAtStart() {
+        return Globals.STRICT_SERVLET_COMPLIANCE;
+    }
+
+
+    /**
+     * Configure if the last accessed time for sessions will
+     * be calculated from the beginning of the previous request. If
+     * <code>false</code>, the last accessed time for sessions will be calculated
+     * from the end of the previous request. This also affects how the idle time
+     * is calculated.
+     * @param sessionLastAccessAtStart the new flag value
+     */
+    public void setSessionLastAccessAtStart(boolean sessionLastAccessAtStart);
+
 }

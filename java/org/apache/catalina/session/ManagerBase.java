@@ -203,6 +203,9 @@ public abstract class ManagerBase extends LifecycleMBeanBase implements Manager 
      */
     private boolean persistAuthentication = false;
 
+    private boolean sessionActivityCheck = Globals.STRICT_SERVLET_COMPLIANCE;
+
+    private boolean sessionLastAccessAtStart = Globals.STRICT_SERVLET_COMPLIANCE;
 
     // ------------------------------------------------------------ Constructors
 
@@ -244,6 +247,30 @@ public abstract class ManagerBase extends LifecycleMBeanBase implements Manager 
     @Override
     public void setNotifyBindingListenerOnUnchangedValue(boolean notifyBindingListenerOnUnchangedValue) {
         this.notifyBindingListenerOnUnchangedValue = notifyBindingListenerOnUnchangedValue;
+    }
+
+
+    @Override
+    public boolean getSessionActivityCheck() {
+        return sessionActivityCheck;
+    }
+
+
+    @Override
+    public void setSessionActivityCheck(boolean sessionActivityCheck) {
+        this.sessionActivityCheck = sessionActivityCheck;
+    }
+
+
+    @Override
+    public boolean getSessionLastAccessAtStart() {
+        return sessionLastAccessAtStart;
+    }
+
+
+    @Override
+    public void setSessionLastAccessAtStart(boolean sessionLastAccessAtStart) {
+        this.sessionLastAccessAtStart = sessionLastAccessAtStart;
     }
 
 

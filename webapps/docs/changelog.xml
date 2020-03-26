@@ -87,6 +87,18 @@
         <code>enforceEncodingInGetWriter</code> attribute on the Connector.
         (remm)
       </update>
+      <update>
+        Remove
+        <code>org.apache.catalina.session.StandardSession.ACTIVITY_CHECK</code>
+        system property, replaced by the <code>sessionActivityCheck</code> attribute
+        on the Manager. (remm)
+      </update>
+      <update>
+        Remove
+        <code>org.apache.catalina.session.StandardSession.LAST_ACCESS_AT_START</code>
+        system property, replaced by the
+        <code>sessionLastAccessAtStart</code> attribute on the Manager. (remm)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Coyote">
