@@ -74,6 +74,12 @@
 
   <attributes>
 
+    <attribute name="allowBackslash" required="false">
+      <p>If this is <code>true</code> the '\' character will be permitted as a
+      path delimiter.</p>
+      <p>If not specified, the default value of <code>false</code> will be used.</p>
+    </attribute>
+
     <attribute name="allowTrace" required="false">
       <p>A boolean value which can be used to enable or disable the TRACE
       HTTP method. If not specified, this attribute is set to false.</p>
@@ -110,6 +116,17 @@
       to <code>false</code> to skip the DNS lookup and return the IP
       address in String form instead (thereby improving performance).
       By default, DNS lookups are disabled.</p>
+    </attribute>
+
+    <attribute name="enforceEncodingInGetWriter" required="false">
+      <p>If this is <code>true</code> then
+      a call to <code>Response.getWriter()</code> if no character encoding
+      has been specified will result in subsequent calls to
+      <code>Response.getCharacterEncoding()</code> returning
+      <code>ISO-8859-1</code> and the <code>Content-Type</code> response header
+      will include a <code>charset=ISO-8859-1</code> component. (SRV.15.2.22.1)</p>
+      <p>If not specified, the default specification compliant value of
+      <code>true</code> will be used.</p>
     </attribute>
 
     <attribute name="maxHeaderCount" required="false">
