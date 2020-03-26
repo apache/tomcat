@@ -565,11 +565,6 @@
       <p>If not specified, the default value of <code>1000</code> will be used.</p>
     </property>
 
-    <property name="org.apache.tomcat.util. net.NioSelectorShared">
-      <p>If <code>true</code>, use a shared selector for servlet write/read.</p>
-      <p>If not specified, the default value of <code>true</code> will be used.</p>
-    </property>
-
     <property name="org.apache.catalina.startup. EXIT_ON_INIT_FAILURE">
       <p>If <code>true</code>, the server will exit if an exception happens
       during the server initialization phase. To support this feature, this
