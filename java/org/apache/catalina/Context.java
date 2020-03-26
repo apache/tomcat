@@ -86,6 +86,7 @@ public interface Context extends Container, ContextBind {
 
     // ------------------------------------------------------------- Properties
 
+
     /**
      * Returns <code>true</code> if requests mapped to servlets without
      * "multipart config" to parse multipart/form-data requests anyway.
@@ -1867,4 +1868,68 @@ public interface Context extends Container, ContextBind {
      *         otherwise {@code false}
      */
     public boolean getCreateUploadTargets();
+
+
+    /**
+     * If this is <code>true</code>, every request that is associated with a
+     * session will cause the session's last accessed time to be updated
+     * regardless of whether or not the request explicitly accesses the session.
+     * If <code>org.apache.catalina.STRICT_SERVLET_COMPLIANCE</code> is set to
+     * <code>true</code>, the default of this setting will be <code>true</code>,
+     * else the default value will be <code>false</code>.
+     * @return the flag value
+     */
+    public boolean getAlwaysAccessSession();
+
+
+    /**
+     * Set the session access behavior.
+     * @param alwaysAccessSession the new flag value
+     */
+    public void setAlwaysAccessSession(boolean alwaysAccessSession);
+
+
+    /**
+     * If this is <code>true</code> then the path passed to
+     * <code>ServletContext.getResource()</code> or
+     * <code>ServletContext.getResourceAsStream()</code> must start with
+     * &quot;/&quot;. If <code>false</code>, code like
+     * <code>getResource("myfolder/myresource.txt")</code> will work as Tomcat
+     * will prepend &quot;/&quot; to the provided path.
+     * If <code>org.apache.catalina.STRICT_SERVLET_COMPLIANCE</code> is set to
+     * <code>true</code>, the default of this setting will be <code>true</code>,
+     * else the default value will be <code>false</code>.
+     * @return the flag value
+     */
+    public boolean getContextGetResourceRequiresSlash();
+
+
+    /**
+     * Allow using <code>ServletContext.getResource()</code> or
+     * <code>ServletContext.getResourceAsStream()</code> without
+     * a leading &quot;/&quot;.
+     * @param contextGetResourceRequiresSlash the new flag value
+     */
+    public void setContextGetResourceRequiresSlash(boolean contextGetResourceRequiresSlash);
+
+
+    /**
+     * If this is <code>true</code> then any wrapped request or response
+     * object passed to an application dispatcher will be checked to ensure that
+     * it has wrapped the original request or response.
+     * If <code>org.apache.catalina.STRICT_SERVLET_COMPLIANCE</code> is set to
+     * <code>true</code>, the default of this setting will be <code>true</code>,
+     * else the default value will be <code>false</code>.
+     * @return the flag value
+     */
+    public boolean getDispatcherWrapsSameObject();
+
+
+    /**
+     * Allow disabling the object wrap check in the request dispatcher.
+     * @param dispatcherWrapsSameObject the new flag value
+     */
+    public void setDispatcherWrapsSameObject(boolean dispatcherWrapsSameObject);
+
+
 }

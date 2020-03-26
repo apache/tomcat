@@ -90,22 +90,6 @@ import org.apache.tomcat.util.res.StringManager;
  */
 public class ApplicationContext implements ServletContext {
 
-    protected static final boolean STRICT_SERVLET_COMPLIANCE;
-
-    protected static final boolean GET_RESOURCE_REQUIRE_SLASH;
-
-
-    static {
-        STRICT_SERVLET_COMPLIANCE = Globals.STRICT_SERVLET_COMPLIANCE;
-
-        String requireSlash = System.getProperty(
-                "org.apache.catalina.core.ApplicationContext.GET_RESOURCE_REQUIRE_SLASH");
-        if (requireSlash == null) {
-            GET_RESOURCE_REQUIRE_SLASH = STRICT_SERVLET_COMPLIANCE;
-        } else {
-            GET_RESOURCE_REQUIRE_SLASH = Boolean.parseBoolean(requireSlash);
-        }
-    }
 
     // ----------------------------------------------------------- Constructors
 
@@ -575,7 +559,7 @@ public class ApplicationContext implements ServletContext {
         }
 
         if (!path.startsWith("/")) {
-            if (GET_RESOURCE_REQUIRE_SLASH) {
+            if (context.getContextGetResourceRequiresSlash()) {
                 return null;
             } else {
                 return "/" + path;

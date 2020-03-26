@@ -99,6 +99,24 @@
         system property, replaced by the
         <code>sessionLastAccessAtStart</code> attribute on the Manager. (remm)
       </update>
+      <update>
+        Remove
+        <code>org.apache.catalina.core.StandardHostValve.ACCESS_SESSION</code>
+        system property, replaced by the
+        <code>alwaysAccessSession</code> attribute on the Context. (remm)
+      </update>
+      <update>
+        Remove
+        <code>org.apache.catalina.core.ApplicationContext.GET_RESOURCE_REQUIRE_SLASH</code>
+        system property, replaced by the
+        <code>contextGetResourceRequiresSlash</code> attribute on the Context. (remm)
+      </update>
+      <update>
+        Remove
+        <code>org.apache.catalina.core.ApplicationDispatcher.WRAP_SAME_OBJECT</code>
+        system property, replaced by the
+        <code>dispatcherWrapsSameObject</code> attribute on the Context. (remm)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Coyote">

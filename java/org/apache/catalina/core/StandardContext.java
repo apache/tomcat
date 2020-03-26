@@ -827,6 +827,11 @@ public class StandardContext extends ContainerBase
 
     private boolean createUploadTargets = false;
 
+    private boolean alwaysAccessSession = Globals.STRICT_SERVLET_COMPLIANCE;
+
+    private boolean contextGetResourceRequiresSlash = Globals.STRICT_SERVLET_COMPLIANCE;
+
+    private boolean dispatcherWrapsSameObject = Globals.STRICT_SERVLET_COMPLIANCE;
 
     // ----------------------------------------------------- Context Properties
 
@@ -869,6 +874,44 @@ public class StandardContext extends ContainerBase
     @Override
     public boolean getAllowMultipleLeadingForwardSlashInPath() {
         return allowMultipleLeadingForwardSlashInPath;
+    }
+
+
+    @Override
+    public boolean getAlwaysAccessSession() {
+        return alwaysAccessSession;
+    }
+
+
+    @Override
+    public void setAlwaysAccessSession(boolean alwaysAccessSession) {
+        this.alwaysAccessSession = alwaysAccessSession;
+    }
+
+
+    @Override
+    public boolean getContextGetResourceRequiresSlash() {
+        return contextGetResourceRequiresSlash;
+    }
+
+
+    @Override
+    public void setContextGetResourceRequiresSlash(
+            boolean contextGetResourceRequiresSlash) {
+        this.contextGetResourceRequiresSlash = contextGetResourceRequiresSlash;
+    }
+
+
+    @Override
+    public boolean getDispatcherWrapsSameObject() {
+        return dispatcherWrapsSameObject;
+    }
+
+
+    @Override
+    public void setDispatcherWrapsSameObject(
+            boolean dispatcherWrapsSameObject) {
+        this.dispatcherWrapsSameObject = dispatcherWrapsSameObject;
     }
 
 

@@ -1275,4 +1275,20 @@ public class TesterContext implements Context {
     public void setCreateUploadTargets(boolean createUploadTargets) { /* NO-OP */}
     @Override
     public boolean getCreateUploadTargets() { return false; }
+
+    @Override
+    public boolean getAlwaysAccessSession() { return false; }
+    @Override
+    public void setAlwaysAccessSession(boolean alwaysAccessSession) {}
+
+    @Override
+    public boolean getContextGetResourceRequiresSlash() { return false; }
+    @Override
+    public void setContextGetResourceRequiresSlash(boolean contextGetResourceRequiresSlash) {}
+
+    @Override
+    public boolean getDispatcherWrapsSameObject() { return false; }
+    @Override
+    public void setDispatcherWrapsSameObject(boolean dispatcherWrapsSameObject) {}
+
 }

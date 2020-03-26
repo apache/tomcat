@@ -63,24 +63,6 @@ import org.apache.tomcat.util.res.StringManager;
  */
 final class ApplicationDispatcher implements AsyncDispatcher, RequestDispatcher {
 
-    static final boolean STRICT_SERVLET_COMPLIANCE;
-
-    static final boolean WRAP_SAME_OBJECT;
-
-
-    static {
-        STRICT_SERVLET_COMPLIANCE = Globals.STRICT_SERVLET_COMPLIANCE;
-
-        String wrapSameObject = System.getProperty(
-                "org.apache.catalina.core.ApplicationDispatcher.WRAP_SAME_OBJECT");
-        if (wrapSameObject == null) {
-            WRAP_SAME_OBJECT = STRICT_SERVLET_COMPLIANCE;
-        } else {
-            WRAP_SAME_OBJECT = Boolean.parseBoolean(wrapSameObject);
-        }
-    }
-
-
     protected class PrivilegedForward
             implements PrivilegedExceptionAction<Void> {
         private final ServletRequest request;
@@ -331,7 +313,7 @@ final class ApplicationDispatcher implements AsyncDispatcher, RequestDispatcher 
         // Set up to handle the specified request and response
         State state = new State(request, response, false);
 
-        if (WRAP_SAME_OBJECT) {
+        if (context.getDispatcherWrapsSameObject()) {
             // Check SRV.8.2 / SRV.14.2.5.1 compliance
             checkSameObjects(request, response);
         }
@@ -523,7 +505,7 @@ final class ApplicationDispatcher implements AsyncDispatcher, RequestDispatcher 
         // Set up to handle the specified request and response
         State state = new State(request, response, true);
 
-        if (WRAP_SAME_OBJECT) {
+        if (context.getDispatcherWrapsSameObject()) {
             // Check SRV.8.2 / SRV.14.2.5.1 compliance
             checkSameObjects(request, response);
         }
