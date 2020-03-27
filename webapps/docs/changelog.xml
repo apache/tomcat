@@ -149,6 +149,10 @@
         Improve the quality and expand the coverage of the French translations
         provided with Apache Tomcat. Contribution provided by Tom Bens. (remm)
       </add>
+      <add>
+        Expand the coverage of the Chinese translations provided with Apache
+        Tomcat. Contribution provided by Lee Yazhou. (markt)
+      </add>
     </changelog>
   </subsection>
 </section>
