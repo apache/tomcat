@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Random;
 
 import org.hamcrest.Description;
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.TypeSafeMatcher;
 
 import org.junit.Assert;
@@ -265,7 +266,7 @@ public class TestHttp2Limits extends Http2TestBase {
             //       above.
             try {
                 parser.readFrame(true);
-                Assert.assertThat(output.getTrace(), RegexMatcher.matchesRegex(
+                MatcherAssert.assertThat(output.getTrace(), RegexMatcher.matchesRegex(
                         "0-Goaway-\\[1\\]-\\[11\\]-\\[" + limitMessage + "\\]"));
             } catch (IOException se) {
                 // Expected on some platforms
@@ -505,7 +506,7 @@ public class TestHttp2Limits extends Http2TestBase {
             // the escaped values.
             String limitMessage = sm.getString("http2Parser.headerLimitSize", "\\d++", "3");
             limitMessage = limitMessage.replace("[", "\\[").replace("]", "\\]");
-            Assert.assertThat(output.getTrace(), RegexMatcher.matchesRegex(
+            MatcherAssert.assertThat(output.getTrace(), RegexMatcher.matchesRegex(
                     "0-Goaway-\\[3\\]-\\[11\\]-\\[" + limitMessage + "\\]"));
             break;
         }

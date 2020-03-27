@@ -23,8 +23,8 @@ import java.util.Collections;
 import java.util.List;
 
 import org.hamcrest.CoreMatchers;
+import org.hamcrest.MatcherAssert;
 
-import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -60,12 +60,12 @@ public class TestQuotedStringTokenizer {
         List<String> result = new ArrayList<>();
         int count = tokens.size();
         while (tokenizer.hasMoreTokens()) {
-            Assert.assertThat(Integer.valueOf(tokenizer.countTokens()), CoreMatchers.is(Integer.valueOf(count)));
+            MatcherAssert.assertThat(Integer.valueOf(tokenizer.countTokens()), CoreMatchers.is(Integer.valueOf(count)));
             result.add(tokenizer.nextToken());
             count--;
         }
-        Assert.assertThat(Integer.valueOf(tokenizer.countTokens()), CoreMatchers.is(Integer.valueOf(0)));
-        Assert.assertThat(tokens, CoreMatchers.is(result));
+        MatcherAssert.assertThat(Integer.valueOf(tokenizer.countTokens()), CoreMatchers.is(Integer.valueOf(0)));
+        MatcherAssert.assertThat(tokens, CoreMatchers.is(result));
     }
 
 }
