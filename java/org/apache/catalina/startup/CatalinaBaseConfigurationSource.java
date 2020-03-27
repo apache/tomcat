@@ -85,7 +85,8 @@ public class CatalinaBaseConfigurationSource implements ConfigurationSource {
             f = new File(catalinaBaseFile, name);
         }
         if (f.isFile()) {
-            return new Resource(new FileInputStream(f), f.toURI());
+            FileInputStream fis = new FileInputStream(f);
+            return new Resource(fis, f.toURI());
         }
 
         // Try classloader
