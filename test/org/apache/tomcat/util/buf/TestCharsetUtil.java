@@ -44,7 +44,7 @@ public class TestCharsetUtil {
 
 
     /*
-     * More comprehensive test that checks that, part from where the encoding
+     * More comprehensive test that checks that, apart from where the encoding
      * overlaps with ASCII, no valid ASCII bytes are used.
      */
     @Test
