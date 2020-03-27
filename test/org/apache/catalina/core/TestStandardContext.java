@@ -46,6 +46,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import org.hamcrest.CoreMatchers;
+import org.hamcrest.MatcherAssert;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -972,7 +973,7 @@ public class TestStandardContext extends TomcatBaseTest {
         Context context = new StandardContext();
 
         context.setResourceOnlyServlets("a,b,c");
-        Assert.assertThat(Arrays.asList(context.getResourceOnlyServlets().split(",")),
+        MatcherAssert.assertThat(Arrays.asList(context.getResourceOnlyServlets().split(",")),
                 CoreMatchers.hasItems("a", "b", "c"));
     }
 
