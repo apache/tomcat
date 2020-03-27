@@ -208,7 +208,7 @@ public abstract class AbstractAjpProtocol<S> extends AbstractProtocol<S> {
         if (getSecretRequired()) {
             String secret = getSecret();
             if (secret == null || secret.length() == 0) {
-                throw new IllegalArgumentException(sm.getString("ajpprotocol.nosecret"));
+                throw new IllegalArgumentException(sm.getString("ajpprotocol.noSecret"));
             }
         }
         super.start();
