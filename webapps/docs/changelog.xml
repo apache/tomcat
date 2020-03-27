@@ -101,6 +101,7 @@
         Tomcat. Contribution provided by Lee Yazhou. (markt)
       </add>
     </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 9.0.33 (markt)" rtext="2020-03-16">
   <subsection name="Coyote">
