@@ -21,6 +21,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.hamcrest.CoreMatchers;
+import org.hamcrest.MatcherAssert;
 
 import org.junit.Assert;
 import org.junit.Assume;
@@ -97,10 +98,10 @@ public class TestOpenSSLConf extends TomcatBaseTest {
             sslHostConfig = initOpenSSLConfCmd("CipherString", ENABLED_CIPHER);
         }
         String[] ciphers = sslHostConfig.getEnabledCiphers();
-        Assert.assertThat("Wrong HostConfig ciphers", ciphers,
+        MatcherAssert.assertThat("Wrong HostConfig ciphers", ciphers,
                 CoreMatchers.is(EXPECTED_CIPHERS));
         ciphers = SSLContext.getCiphers(sslHostConfig.getOpenSslContext().longValue());
-        Assert.assertThat("Wrong native SSL context ciphers", ciphers,
+        MatcherAssert.assertThat("Wrong native SSL context ciphers", ciphers,
                 CoreMatchers.is(EXPECTED_CIPHERS));
     }
 
