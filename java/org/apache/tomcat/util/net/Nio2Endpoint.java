@@ -85,19 +85,6 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
      */
     private SynchronizedStack<Nio2Channel> nioChannels;
 
-    // ------------------------------------------------------------- Properties
-
-
-    /**
-     * Is deferAccept supported?
-     */
-    @Override
-    public boolean getDeferAccept() {
-        // Not supported
-        return false;
-    }
-
-
     // --------------------------------------------------------- Public Methods
 
 

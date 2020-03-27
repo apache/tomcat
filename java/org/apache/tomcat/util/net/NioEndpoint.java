@@ -130,16 +130,6 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
     private Poller poller = null;
 
 
-    /**
-     * Is deferAccept supported?
-     */
-    @Override
-    public boolean getDeferAccept() {
-        // Not supported
-        return false;
-    }
-
-
     // --------------------------------------------------------- Public Methods
 
     /**

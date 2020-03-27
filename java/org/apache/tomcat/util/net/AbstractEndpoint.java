@@ -750,7 +750,9 @@ public abstract class AbstractEndpoint<S,U> {
     public boolean getUseAsyncIO() { return useAsyncIO; }
 
 
-    protected abstract boolean getDeferAccept();
+    protected boolean getDeferAccept() {
+        return false;
+    }
 
 
     protected final List<String> negotiableProtocols = new ArrayList<>();
