@@ -393,7 +393,6 @@ public class Connector extends LifecycleMBeanBase  {
      */
     public void setAllowTrace(boolean allowTrace) {
         this.allowTrace = allowTrace;
-        setProperty("allowTrace", String.valueOf(allowTrace));
     }
 
 
@@ -450,7 +449,6 @@ public class Connector extends LifecycleMBeanBase  {
      */
     public void setEnableLookups(boolean enableLookups) {
         this.enableLookups = enableLookups;
-        setProperty("enableLookups", String.valueOf(enableLookups));
     }
 
 
@@ -501,7 +499,6 @@ public class Connector extends LifecycleMBeanBase  {
      */
     public void setMaxParameterCount(int maxParameterCount) {
         this.maxParameterCount = maxParameterCount;
-        setProperty("maxParameterCount", String.valueOf(maxParameterCount));
     }
 
 
@@ -523,7 +520,6 @@ public class Connector extends LifecycleMBeanBase  {
      */
     public void setMaxPostSize(int maxPostSize) {
         this.maxPostSize = maxPostSize;
-        setProperty("maxPostSize", String.valueOf(maxPostSize));
     }
 
 
@@ -577,7 +573,6 @@ public class Connector extends LifecycleMBeanBase  {
 
         this.parseBodyMethods = methods;
         this.parseBodyMethodsSet = methodSet;
-        setProperty("parseBodyMethods", methods);
     }
 
 
@@ -713,7 +708,6 @@ public class Connector extends LifecycleMBeanBase  {
         } else {
             this.proxyName = null;
         }
-        setProperty("proxyName", this.proxyName);
     }
 
 
@@ -732,7 +726,6 @@ public class Connector extends LifecycleMBeanBase  {
      */
     public void setProxyPort(int proxyPort) {
         this.proxyPort = proxyPort;
-        setProperty("proxyPort", String.valueOf(proxyPort));
     }
 
 
@@ -753,7 +746,6 @@ public class Connector extends LifecycleMBeanBase  {
      */
     public void setRedirectPort(int redirectPort) {
         this.redirectPort = redirectPort;
-        setProperty("redirectPort", String.valueOf(redirectPort));
     }
 
 
@@ -855,7 +847,6 @@ public class Connector extends LifecycleMBeanBase  {
      */
     public void setUseBodyEncodingForURI(boolean useBodyEncodingForURI) {
         this.useBodyEncodingForURI = useBodyEncodingForURI;
-        setProperty("useBodyEncodingForURI", String.valueOf(useBodyEncodingForURI));
     }
 
     /**
@@ -880,7 +871,6 @@ public class Connector extends LifecycleMBeanBase  {
      */
     public void setXpoweredBy(boolean xpoweredBy) {
         this.xpoweredBy = xpoweredBy;
-        setProperty("xpoweredBy", String.valueOf(xpoweredBy));
     }
 
 
@@ -892,7 +882,6 @@ public class Connector extends LifecycleMBeanBase  {
      */
     public void setUseIPVHosts(boolean useIPVHosts) {
         this.useIPVHosts = useIPVHosts;
-        setProperty("useIPVHosts", String.valueOf(useIPVHosts));
     }
 
 
