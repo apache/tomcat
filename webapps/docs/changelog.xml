@@ -143,6 +143,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Other">
+    <changelog>
+      <add>
+        Improve the quality and expand the coverage of the French translations
+        provided with Apache Tomcat. Contribution provided by Tom Bens. (remm)
+      </add>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 10.0.0-M3 (markt)" rtext="2020-03-16">
   <subsection name="Coyote">
