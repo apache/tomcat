@@ -281,17 +281,19 @@
 
     <property name="org.apache.catalina. STRICT_SERVLET_COMPLIANCE">
       <p>The default value of this system property is <code>false</code>.</p>
-      <p>If this is <code>true</code> the default values will be changed for:</p>
+      <p>If this is <code>true</code> the default values will be changed
+      to <code>true</code> instead of <code>false</code> for:</p>
       <ul>
-      <li><code>org.apache.catalina.<br/>Context.alwaysAccessSession</code></li>
-      <li><code>org.apache.catalina.<br/>Context.contextGetResourceRequiresSlash</code></li>
-      <li><code>org.apache.catalina.<br/>Context.dispatcherWrapsSameObject</code></li>
-      <li><code>org.apache.catalina.<br/>Manager.sessionActivityCheck</code></li>
-      <li><code>org.apache.catalina.<br/>Manager.sessionLastAccessAtStart</code></li>
       <li><code>org.apache.tomcat.util.http.<br/>ServerCookie.STRICT_NAMING</code></li>
       <li>The <code>URIEncoding</code> attribute of any
           <a href="http.html">HTTP connector</a> or
           <a href="ajp.html">AJP connector</a> element.</li>
+      <li>The <code>alwaysAccessSession</code> attribute of any
+          <a href="context.html">Context</a> element.</li>
+      <li>The <code>contextGetResourceRequiresSlash</code> attribute of any
+          <a href="context.html">Context</a> element.</li>
+      <li>The <code>dispatcherWrapsSameObject</code> attribute of any
+          <a href="context.html">Context</a> element.</li>
       <li>The <code>resourceOnlyServlets</code> attribute of any
           <a href="context.html">Context</a> element.</li>
       <li>The <code>tldValidation</code> attribute of any
@@ -302,15 +304,19 @@
           <a href="context.html">Context</a> element.</li>
       <li>The <code>xmlValidation</code> attribute of any
           <a href="context.html">Context</a> element.</li>
+      <li>The <code>sessionActivityCheck</code> attribute of any
+          <a href="manager.html">Manager</a> element.</li>
+      <li>The <code>sessionLastAccessAtStart</code> attribute of any
+          <a href="manager.html">Manager</a> element.</li>
       </ul>
     </property>
 
     <property name="org.apache.tomcat.websocket. STRICT_SPEC_COMPLIANCE">
       <p>The default value of this system property is <code>false</code>.</p>
-      <p>If this is <code>true</code> the default values will be changed for:</p>
+      <p>If this is <code>true</code> the default values will be changed
+      to <code>true</code> instead of <code>false</code> for:</p>
       <ul>
-        <li><code>org.apache.tomcat.websocket.server#isEnforceNoAddAfterHandshake</code>
-        (default changes from <code>false</code> to <code>true</code>)</li>
+        <li><code>org.apache.tomcat.websocket.server.WsServerContainer#isEnforceNoAddAfterHandshake</code></li>
       </ul>
     </property>
 
