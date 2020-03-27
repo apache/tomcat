@@ -44,7 +44,8 @@ public interface ConfigurationSource {
                 f = new File(userDir, name);
             }
             if (f.isFile()) {
-                return new Resource(new FileInputStream(f), f.toURI());
+                FileInputStream fis = new FileInputStream(f);
+                return new Resource(fis, f.toURI());
             }
             URI uri = null;
             try {
