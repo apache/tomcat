@@ -165,7 +165,9 @@ public class ErrorReportValve extends ValveBase {
             if (throwable != null) {
                 String exceptionMessage = throwable.getMessage();
                 if (exceptionMessage != null && exceptionMessage.length() > 0) {
-                    message = Escape.htmlElementContent((new Scanner(exceptionMessage)).nextLine());
+                    try (Scanner scanner = new Scanner(exceptionMessage)) {
+                        message = Escape.htmlElementContent(scanner.nextLine());
+                    }
                 }
             }
             if (message == null) {
