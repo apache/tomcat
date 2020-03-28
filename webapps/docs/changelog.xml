@@ -143,6 +143,13 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Jasper">
+    <changelog>
+      <update>
+        Update to the Eclipse JDT compiler 4.15. (markt)
+      </update>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <add>
