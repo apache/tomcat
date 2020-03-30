@@ -62,6 +62,11 @@
 <section name="Tomcat 7.0.104 (violetagg)">
   <subsection name="Catalina">
     <changelog>
+      <add>
+        <bug>45995</bug>, <bug>64237</bug>: Align Tomcat with Apache httpd and
+        perform MIME type mapping based on file extension in a case insensitive
+        manner. (markt)
+      </add>
       <fix>
         <bug>64226</bug>: Reset timezone after parsing a date since the date
         format is reused. Test case submitted by Gary Thomas. (remm)
