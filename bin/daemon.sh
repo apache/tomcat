@@ -90,7 +90,6 @@ test ".$MAX_FD" = . && MAX_FD="maximum"
 #
 test ".$TOMCAT_USER" = . && TOMCAT_USER=tomcat
 # Set JAVA_HOME to working JDK or JRE
-# JAVA_HOME=/opt/jdk-1.6.0.22
 # If not set we'll try to guess the JAVA_HOME
 # from java binary if on the PATH
 #
@@ -183,6 +182,12 @@ if [ "$cygwin" = "false" ]; then
     fi
 fi
 
+# Set UMASK unless it has been overridden
+if [ -z "$UMASK" ]; then
+    UMASK="0027"
+fi
+umask $UMASK
+
 # Java 9 no longer supports the java.endorsed.dirs
 # system property. Only try to use it if
 # JAVA_ENDORSED_DIRS was explicitly set
@@ -204,6 +209,7 @@ case "$1" in
       -java-home "\"$JAVA_HOME\"" \
       -pidfile "\"$CATALINA_PID\"" \
       -wait $SERVICE_START_WAIT_TIME \
+      -umask $UMASK \
       -nodetach \
       -outfile "\"&1\"" \
       -errfile "\"&2\"" \
@@ -223,6 +229,7 @@ case "$1" in
       -user $TOMCAT_USER \
       -pidfile "\"$CATALINA_PID\"" \
       -wait $SERVICE_START_WAIT_TIME \
+      -umask $UMASK \
       -outfile "\"$CATALINA_OUT\"" \
       -errfile "\"&1\"" \
       -classpath "\"$CLASSPATH\"" \
