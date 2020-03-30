@@ -45,9 +45,12 @@ Tomcat @VERSION_MAJOR_MINOR@ is designed to run on Java @MIN_JAVA_VERSION@ and l
 API Stability:
 ==============
 
+The following notes on API stability only applies once Tomcat 10.0.x has had its
+first stable release.
+
 The public interfaces for the following classes are fixed and will not be
 changed at all during the remaining lifetime of the @VERSION_MAJOR@.x series:
-- All classes in the javax namespace
+- All classes in the jakarta namespace
 
 The public interfaces for the following classes may be added to in order to
 resolve bugs and/or add new features. No existing interface method will be
