@@ -266,16 +266,6 @@ com.sun.security.jgss.krb5.accept {
   </ul>
   </subsection>
 
-  <subsection name="SPNEGO project at SourceForge">
-  <p>Full details of this solution can be found through the
-  <a href="http://spnego.sourceforge.net/index.html/"  rel="nofollow">project
-  site</a>. The key features are:</p>
-  <ul>
-  <li>Uses Kerberos</li>
-  <li>Pure Java solution</li>
-  </ul>
-  </subsection>
-
   <subsection name="Jespa">
   <p>Full details of this solution can be found through the
   <a href="http://www.ioplex.com/" rel="nofollow">project web site.</a> The key
@@ -283,6 +273,17 @@ com.sun.security.jgss.krb5.accept {
   <ul>
   <li>Pure Java solution</li>
   <li>Advanced Active Directory integration</li>
+  </ul>
+  </subsection>
+
+  <subsection name="SPNEGO AD project at SourceForge">
+  <p>Full details of this solution can be found through the
+  <a href="http://tomcatspnegoad.sourceforge.net/"  rel="nofollow">project
+  site</a>. The key features are:</p>
+  <ul>
+  <li>Pure Java solution</li>
+  <li>SPNEGO/Kerberos Authenticator</li>
+  <li>Active Directory Realm</li>
   </ul>
   </subsection>
 </section>
