@@ -70,6 +70,10 @@
         not override a possibly present <code>jarsToScan</code>. Based on code
         submitted by Iridias. (remm)
       </fix>
+      <fix>
+        <bug>64265</bug>: Fix ETag comparison performed by the default servlet.
+        The default servley always uses weak comparison. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
