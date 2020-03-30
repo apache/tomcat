@@ -114,6 +114,12 @@
         Expand the coverage of the Chinese translations provided with Apache
         Tomcat. Contribution provided by Lee Yazhou. (markt)
       </add>
+      <fix>
+        <bug>64270</bug>: Set the documented default umask of <code>0027</code>
+        when using jsvc via <code>daemon.sh</code> and allow the umask used to
+        be configured via the <code>UMASK</code> environment variable as it is
+        when using <code>catalina.sh</code>. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
