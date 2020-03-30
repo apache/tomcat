@@ -71,6 +71,10 @@
         <bug>64226</bug>: Reset timezone after parsing a date since the date
         format is reused. Test case submitted by Gary Thomas. (remm)
       </fix>
+      <fix>
+        <bug>64265</bug>: Fix ETag comparison performed by the default servlet.
+        The default servley always uses weak comparison. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

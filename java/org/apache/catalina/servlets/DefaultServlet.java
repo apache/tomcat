@@ -1910,17 +1910,25 @@ public class DefaultServlet extends HttpServlet {
             throws IOException {
 
         String eTag = resourceAttributes.getETag();
+        // Default servlet uses weak matching so we strip any leading "W/" and
+        // then compare using equals
+        if (eTag.startsWith("W/")) {
+            eTag = eTag.substring(2);
+        }
         String headerValue = request.getHeader("If-Match");
         if (headerValue != null) {
             if (headerValue.indexOf('*') == -1) {
 
-                StringTokenizer commaTokenizer = new StringTokenizer
-                    (headerValue, ",");
+                StringTokenizer commaTokenizer = new StringTokenizer(headerValue, ",");
                 boolean conditionSatisfied = false;
 
                 while (!conditionSatisfied && commaTokenizer.hasMoreTokens()) {
                     String currentToken = commaTokenizer.nextToken();
-                    if (currentToken.trim().equals(eTag))
+                    currentToken = currentToken.trim();
+                    if (currentToken.startsWith("W/")) {
+                        currentToken = currentToken.substring(2);
+                    }
+                    if (currentToken.equals(eTag))
                         conditionSatisfied = true;
                 }
 
