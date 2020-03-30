@@ -285,9 +285,6 @@
       to <code>true</code> instead of <code>false</code> for:</p>
       <ul>
       <li><code>org.apache.tomcat.util.http.<br/>ServerCookie.STRICT_NAMING</code></li>
-      <li>The <code>URIEncoding</code> attribute of any
-          <a href="http.html">HTTP connector</a> or
-          <a href="ajp.html">AJP connector</a> element.</li>
       <li>The <code>alwaysAccessSession</code> attribute of any
           <a href="context.html">Context</a> element.</li>
       <li>The <code>contextGetResourceRequiresSlash</code> attribute of any

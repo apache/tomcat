@@ -161,6 +161,16 @@
       </add>
     </changelog>
   </subsection>
+  <subsection name="Web applications">
+    <changelog>
+      <fix>
+        Correct documentation web application to remove references to the
+        <code>org.apache.catalina.STRICT_SERVLET_COMPLIANCE</code> system
+        property changing the default for the <code>URIEncoding</code> attribute
+        of the Connector. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <add>
