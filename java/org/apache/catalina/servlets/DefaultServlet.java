@@ -2325,7 +2325,7 @@ public class DefaultServlet extends HttpServlet {
                     if (currentToken.startsWith("W/")) {
                         currentToken = currentToken.substring(2);
                     }
-                    if (currentToken.trim().equals(eTag))
+                    if (currentToken.equals(eTag))
                         conditionSatisfied = true;
                 }
 
