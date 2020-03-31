@@ -28,10 +28,24 @@ import org.junit.Test;
 public class TestCharsetUtil {
 
     /*
-     * More comprehensive test that checks that, part from where the encoding
-     * overlaps with ASCII, no valid ASCII bytes are used.
+     * Check the standard character sets return the expected values
      */
     @Test
+    public void testIsAsciiSupersetStandardCharsets() {
+        Assert.assertTrue(CharsetUtil.isAsciiSuperset(Charset.forName("ASCII")));
+        Assert.assertTrue(CharsetUtil.isAsciiSuperset(Charset.forName("ISO-8859-1")));
+        Assert.assertTrue(CharsetUtil.isAsciiSuperset(Charset.forName("UTF-8")));
+    }
+
+
+    /*
+     * More comprehensive test that checks that, part from where the encoding
+     * overlaps with ASCII, no valid ASCII bytes are used.
+     *
+     * This is relatively slow.
+     * Only need to run this when we detect a new Charset.
+     */
+    //@Test
     public void testIsAcsiiSupersetAll() {
         for (Charset charset : Charset.availableCharsets().values()) {
             System.out.println("Testing: " + charset.name());

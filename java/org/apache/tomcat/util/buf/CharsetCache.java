@@ -152,6 +152,8 @@ public class CharsetCache {
             "ibm858", "x-ibm29626c",
             // Added from HPE JVM 1.8.0.17-hp-ux
             "cp1051", "cp1386", "cshproman8", "hp-roman8", "ibm-1051", "r8", "roman8", "roman9"
+            // If you add and entry to this list, ensure you run
+            // TestCharsetUtil#testIsAcsiiSupersetAll()
             };
 
     private static final Charset DUMMY_CHARSET = new DummyCharset("Dummy",  null);
