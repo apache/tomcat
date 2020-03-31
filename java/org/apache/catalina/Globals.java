@@ -152,7 +152,7 @@ public final class Globals {
      * objects representing the certificate chain presented by our client,
      * if any.
      */
-    public static final String CERTIFICATES_ATTR = "java.servlet.request.X509Certificate";
+    public static final String CERTIFICATES_ATTR = "javax.servlet.request.X509Certificate";
 
 
     /**
@@ -160,28 +160,28 @@ public final class Globals {
      * being used on an SSL connection (as an object of type
      * java.lang.String).
      */
-    public static final String CIPHER_SUITE_ATTR = "java.servlet.request.cipher_suite";
+    public static final String CIPHER_SUITE_ATTR = "javax.servlet.request.cipher_suite";
 
 
     /**
      * The request attribute under which we store the key size being used for
      * this SSL connection (as an object of type java.lang.Integer).
      */
-    public static final String KEY_SIZE_ATTR = "java.servlet.request.key_size";
+    public static final String KEY_SIZE_ATTR = "javax.servlet.request.key_size";
 
 
     /**
      * The request attribute under which we store the session id being used
      * for this SSL connection (as an object of type java.lang.String).
      */
-    public static final String SSL_SESSION_ID_ATTR = "java.servlet.request.ssl_session_id";
+    public static final String SSL_SESSION_ID_ATTR = "javax.servlet.request.ssl_session_id";
 
 
     /**
      * The request attribute key for the session manager.
      * This one is a Tomcat extension to the Servlet spec.
      */
-    public static final String SSL_SESSION_MGR_ATTR = "java.servlet.request.ssl_session_mgr";
+    public static final String SSL_SESSION_MGR_ATTR = "javax.servlet.request.ssl_session_mgr";
 
 
     // ------------------------------------------------- Session attribute names
