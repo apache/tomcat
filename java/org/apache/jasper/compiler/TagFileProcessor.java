@@ -348,7 +348,7 @@ class TagFileProcessor {
                     nameFromAttribute, className, declare, scope));
         }
 
-        public TagInfo getTagInfo() throws JasperException {
+        public TagInfo getTagInfo(String packageName) throws JasperException {
 
             if (name == null) {
                 // XXX Get it from tag file name
@@ -359,7 +359,7 @@ class TagFileProcessor {
             }
 
             String tagClassName = JspUtil.getTagHandlerClassName(
-                    path, tagLibInfo.getReliableURN(), err);
+                    path, packageName, tagLibInfo.getReliableURN(), err);
 
             TagVariableInfo[] tagVariableInfos = new TagVariableInfo[variableVector
                     .size()];
@@ -506,7 +506,7 @@ class TagFileProcessor {
         page.visit(tagFileVisitor);
         tagFileVisitor.postCheck();
 
-        return tagFileVisitor.getTagInfo();
+        return tagFileVisitor.getTagInfo(pc.getJspCompilationContext().getOptions().getGeneratedTagFilePackageName());
     }
 
     /**

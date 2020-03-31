@@ -97,7 +97,7 @@ public class TestParser extends TomcatBaseTest {
         getTomcatInstanceTestWebapp(false, true);
 
         int sc = getUrl("http://localhost:" + getPort() +
-                "/test/bug49nnn/bug49297NoSpace.jsp", new ByteChunk(), null);
+                "/test/bug49nnn/bug49297NoSpaceStrict.jsp", new ByteChunk(), null);
 
         Assert.assertEquals(500, sc);
     }

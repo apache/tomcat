@@ -256,4 +256,108 @@ public interface Options {
      *         the quoting rules in JSP.1.6 applied to the expression.
      */
     public boolean getQuoteAttributeEL();
+
+    /**
+     * @return the name of the variable that will be used in the generated
+     * JSP code for the expression factory
+     */
+    public default String getVariableForExpressionFactory() {
+        return "_el_expressionfactory";
+    }
+
+    /**
+     * @return the name of the variable that will be used in the generated
+     * JSP code for the instance manager
+     */
+    public default String getVariableForInstanceManager() {
+        return "_jsp_instancemanager";
+    }
+
+    /**
+     * @return {@code true} if tag pooling is disabled with page that uses
+     * extends.
+     */
+    public default boolean getPoolTagsWithExtends() {
+        return false;
+    }
+
+    /**
+     * @return {@code true} if the requirement to have the object
+     * used in jsp:getProperty action to be previously "introduced"
+     * to the JSP processor (see JSP.5.3) is enforced.
+     */
+    public default boolean getStrictGetProperty() {
+        return true;
+    }
+
+    /**
+     * @return {@code true} if the strict white space rules are
+     * applied.
+     */
+    public default boolean getStrictWhitespace() {
+        return true;
+    }
+
+    /**
+     * @return the default base class for generated JSP Servlets
+     */
+    public default String getJspServletBase() {
+        return "org.apache.jasper.runtime.HttpJspBase";
+    }
+
+    /**
+     * _jspService is the name of the method that is called by
+     * HttpJspBase.service(). This is where most of the code generated
+     * from JSPs go.
+     * @return the method name
+     */
+    public default String getServiceMethodName() {
+        return "_jspService";
+    }
+
+    /**
+     * @return ServletContext attribute for classpath. This is tomcat specific.
+     * Other servlet engines may choose to support this attribute if they
+     * want to have this JSP engine running on them.
+     */
+    public default String getServletClasspathAttribute() {
+        return "org.apache.catalina.jsp_classpath";
+    }
+
+    /**
+     * @return The query parameter that causes the JSP engine to just
+     * pregenerated the servlet but not invoke it.
+     */
+    public default String getJspPrecompilationQueryParameter() {
+        return "jsp_precompile";
+    }
+
+    /**
+     * @return The default package name for compiled jsp pages.
+     */
+    public default String getGeneratedJspPackageName() {
+        return "org.apache.jsp";
+    }
+
+    /**
+     * @return The default package name for tag handlers generated from tag files.
+     */
+    public default String getGeneratedTagFilePackageName() {
+        return "org.apache.jsp.tag";
+    }
+
+    /**
+     * @return Prefix to use for generated temporary variable names
+     */
+    public default String getTempVariableNamePrefix() {
+        return "_jspx_temp";
+    }
+
+    /**
+     * @return {@code true} if the container instance manager will be used
+     * to create the bean instances
+     */
+    public default boolean getUseInstanceManagerForTags() {
+        return false;
+    }
 }

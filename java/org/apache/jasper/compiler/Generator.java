@@ -81,22 +81,6 @@ class Generator {
 
     private static final Class<?>[] OBJECT_CLASS = { Object.class };
 
-    private static final String VAR_EXPRESSIONFACTORY =
-        System.getProperty("org.apache.jasper.compiler.Generator.VAR_EXPRESSIONFACTORY", "_el_expressionfactory");
-    private static final String VAR_INSTANCEMANAGER =
-        System.getProperty("org.apache.jasper.compiler.Generator.VAR_INSTANCEMANAGER", "_jsp_instancemanager");
-    private static final boolean POOL_TAGS_WITH_EXTENDS =
-        Boolean.getBoolean("org.apache.jasper.compiler.Generator.POOL_TAGS_WITH_EXTENDS");
-
-    /* System property that controls if the requirement to have the object
-     * used in jsp:getProperty action to be previously "introduced"
-     * to the JSP processor (see JSP.5.3) is enforced.
-     */
-    private static final boolean STRICT_GET_PROPERTY = Boolean.parseBoolean(
-            System.getProperty(
-                    "org.apache.jasper.compiler.Generator.STRICT_GET_PROPERTY",
-                    "true"));
-
     private final ServletWriter out;
 
     private final ArrayList<GenBuffer> methodsBuffered;
@@ -435,16 +419,16 @@ class Generator {
         out.pushIndent();
         if (!ctxt.isTagFile()) {
             out.printin("if (");
-            out.print(VAR_EXPRESSIONFACTORY);
+            out.print(ctxt.getOptions().getVariableForExpressionFactory());
             out.println(" == null) {");
             out.pushIndent();
             out.printil("synchronized (this) {");
             out.pushIndent();
             out.printin("if (");
-            out.print(VAR_EXPRESSIONFACTORY);
+            out.print(ctxt.getOptions().getVariableForExpressionFactory());
             out.println(" == null) {");
             out.pushIndent();
-            out.printin(VAR_EXPRESSIONFACTORY);
+            out.printin(ctxt.getOptions().getVariableForExpressionFactory());
             out.println(" = _jspxFactory.getJspApplicationContext(getServletConfig().getServletContext()).getExpressionFactory();");
             out.popIndent();
             out.printil("}");
@@ -454,7 +438,7 @@ class Generator {
             out.printil("}");
         }
         out.printin("return ");
-        out.print(VAR_EXPRESSIONFACTORY);
+        out.print(ctxt.getOptions().getVariableForExpressionFactory());
         out.println(";");
         out.popIndent();
         out.printil("}");
@@ -465,16 +449,16 @@ class Generator {
         out.pushIndent();
         if (!ctxt.isTagFile()) {
             out.printin("if (");
-            out.print(VAR_INSTANCEMANAGER);
+            out.print(ctxt.getOptions().getVariableForInstanceManager());
             out.println(" == null) {");
             out.pushIndent();
             out.printil("synchronized (this) {");
             out.pushIndent();
             out.printin("if (");
-            out.print(VAR_INSTANCEMANAGER);
+            out.print(ctxt.getOptions().getVariableForInstanceManager());
             out.println(" == null) {");
             out.pushIndent();
-            out.printin(VAR_INSTANCEMANAGER);
+            out.printin(ctxt.getOptions().getVariableForInstanceManager());
             out.println(" = org.apache.jasper.runtime.InstanceManagerFactory.getInstanceManager(getServletConfig());");
             out.popIndent();
             out.printil("}");
@@ -484,7 +468,7 @@ class Generator {
             out.printil("}");
         }
         out.printin("return ");
-        out.print(VAR_INSTANCEMANAGER);
+        out.print(ctxt.getOptions().getVariableForInstanceManager());
         out.println(";");
         out.popIndent();
         out.printil("}");
@@ -524,9 +508,9 @@ class Generator {
         // Tag files can't (easily) use lazy init for these so initialise them
         // here.
         if (ctxt.isTagFile()) {
-            out.printin(VAR_EXPRESSIONFACTORY);
+            out.printin(ctxt.getOptions().getVariableForExpressionFactory());
             out.println(" = _jspxFactory.getJspApplicationContext(config.getServletContext()).getExpressionFactory();");
-            out.printin(VAR_INSTANCEMANAGER);
+            out.printin(ctxt.getOptions().getVariableForInstanceManager());
             out.println(" = org.apache.jasper.runtime.InstanceManagerFactory.getInstanceManager(config);");
         }
 
@@ -679,10 +663,10 @@ class Generator {
             out.println();
         }
         out.printin("private volatile jakarta.el.ExpressionFactory ");
-        out.print(VAR_EXPRESSIONFACTORY);
+        out.print(ctxt.getOptions().getVariableForExpressionFactory());
         out.println(";");
         out.printin("private volatile org.apache.tomcat.InstanceManager ");
-        out.print(VAR_INSTANCEMANAGER);
+        out.print(ctxt.getOptions().getVariableForInstanceManager());
         out.println(";");
         out.println();
     }
@@ -727,7 +711,7 @@ class Generator {
 
         String servletPackageName = ctxt.getServletPackageName();
         String servletClassName = ctxt.getServletClassName();
-        String serviceMethodName = Constants.SERVICE_METHOD_NAME;
+        String serviceMethodName = ctxt.getOptions().getServiceMethodName();
 
         // First the package name:
         genPreamblePackage(servletPackageName);
@@ -939,15 +923,18 @@ class Generator {
 
         private HashMap<String,String> textMap;
 
+        private final boolean useInstanceManagerForTags;
 
         public GenerateVisitor(boolean isTagFile, ServletWriter out,
                 ArrayList<GenBuffer> methodsBuffered,
-                FragmentHelperClass fragmentHelperClass) {
+                FragmentHelperClass fragmentHelperClass,
+                boolean useInstanceManagerForTags) {
 
             this.isTagFile = isTagFile;
             this.out = out;
             this.methodsBuffered = methodsBuffered;
             this.fragmentHelperClass = fragmentHelperClass;
+            this.useInstanceManagerForTags = useInstanceManagerForTags;
             methodNesting = 0;
             handlerInfos = new Hashtable<>();
             tagVarNumbers = new Hashtable<>();
@@ -1232,7 +1219,7 @@ class Generator {
                         + ")_jspx_page_context.findAttribute("
                         + "\""
                         + name + "\"))." + methodName + "())));");
-            } else if (!STRICT_GET_PROPERTY || varInfoNames.contains(name)) {
+            } else if (!ctxt.getOptions().getStrictGetProperty() || varInfoNames.contains(name)) {
                 // The object is a custom action with an associated
                 // VariableInfo entry for this name.
                 // Get the class name and then introspect at runtime.
@@ -2492,7 +2479,7 @@ class Generator {
             out.print(" ");
             out.print(tagHandlerVar);
             out.print(" = ");
-            if (Constants.USE_INSTANCE_MANAGER_FOR_TAGS) {
+            if (useInstanceManagerForTags) {
                 out.print("(");
                 out.print(tagHandlerClassName);
                 out.print(")");
@@ -3618,7 +3605,7 @@ class Generator {
          * clarify whether containers can override init() and destroy(). For
          * now, we just disable tag pooling for pages that use "extends".
          */
-        if (pageInfo.getExtends(false) == null || POOL_TAGS_WITH_EXTENDS) {
+        if (pageInfo.getExtends(false) == null || ctxt.getOptions().getPoolTagsWithExtends()) {
             isPoolingEnabled = ctxt.getOptions().isPoolingEnabled();
         } else {
             isPoolingEnabled = false;
@@ -3667,14 +3654,16 @@ class Generator {
             gen.generateXmlProlog(page);
             gen.fragmentHelperClass.generatePreamble();
             page.visit(gen.new GenerateVisitor(gen.ctxt.isTagFile(), out,
-                    gen.methodsBuffered, gen.fragmentHelperClass));
+                    gen.methodsBuffered, gen.fragmentHelperClass,
+                    gen.ctxt.getOptions().getUseInstanceManagerForTags()));
             gen.generateTagHandlerPostamble(tagInfo);
         } else {
             gen.generatePreamble(page);
             gen.generateXmlProlog(page);
             gen.fragmentHelperClass.generatePreamble();
             page.visit(gen.new GenerateVisitor(gen.ctxt.isTagFile(), out,
-                    gen.methodsBuffered, gen.fragmentHelperClass));
+                    gen.methodsBuffered, gen.fragmentHelperClass,
+                    gen.ctxt.getOptions().getUseInstanceManagerForTags()));
             gen.generatePostamble();
         }
     }

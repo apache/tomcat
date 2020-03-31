@@ -24,7 +24,6 @@ import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 
-import org.apache.jasper.Constants;
 import org.apache.jasper.JasperException;
 import org.apache.jasper.JspCompilationContext;
 import org.apache.tomcat.Jar;
@@ -672,6 +671,7 @@ public class JspUtil {
      * the given tag file path.
      *
      * @param path Tag file path
+     * @param packageName The package name
      * @param urn The tag identifier
      * @param err Error dispatcher
      *
@@ -679,7 +679,7 @@ public class JspUtil {
      *         the given tag file path
      * @throws JasperException Failed to generate a class name for the tag
      */
-    public static String getTagHandlerClassName(String path, String urn,
+    public static String getTagHandlerClassName(String path, String packageName, String urn,
             ErrorDispatcher err) throws JasperException {
 
 
@@ -704,12 +704,12 @@ public class JspUtil {
 
         index = path.indexOf(WEB_INF_TAGS);
         if (index != -1) {
-            className = Constants.TAG_FILE_PACKAGE_NAME + ".web.";
+            className = packageName + ".web.";
             begin = index + WEB_INF_TAGS.length();
         } else {
             index = path.indexOf(META_INF_TAGS);
             if (index != -1) {
-                className = getClassNameBase(urn);
+                className = getClassNameBase(packageName, urn);
                 begin = index + META_INF_TAGS.length();
             } else {
                 err.jspError("jsp.error.tagfile.illegalPath", path);
@@ -721,9 +721,9 @@ public class JspUtil {
         return className;
     }
 
-    private static String getClassNameBase(String urn) {
+    private static String getClassNameBase(String packageName, String urn) {
         StringBuilder base =
-                new StringBuilder(Constants.TAG_FILE_PACKAGE_NAME + ".meta.");
+                new StringBuilder(packageName + ".meta.");
         if (urn != null) {
             base.append(makeJavaPackage(urn));
             base.append('.');

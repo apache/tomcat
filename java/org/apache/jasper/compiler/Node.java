@@ -36,7 +36,6 @@ import jakarta.servlet.jsp.tagext.TagVariableInfo;
 import jakarta.servlet.jsp.tagext.TryCatchFinally;
 import jakarta.servlet.jsp.tagext.VariableInfo;
 
-import org.apache.jasper.Constants;
 import org.apache.jasper.JasperException;
 import org.apache.jasper.compiler.tagplugin.TagPluginContext;
 import org.xml.sax.Attributes;
@@ -412,6 +411,8 @@ abstract class Node implements TagConstants {
 
         private final boolean isXmlSyntax;
 
+        private final String variablePrefix;
+
         // Source encoding of the page containing this Root
         private String pageEnc;
 
@@ -452,9 +453,10 @@ abstract class Node implements TagConstants {
         /*
          * Constructor.
          */
-        Root(Mark start, Node parent, boolean isXmlSyntax) {
+        Root(Mark start, Node parent, boolean isXmlSyntax, String variablePrefix) {
             super(start, parent);
             this.isXmlSyntax = isXmlSyntax;
+            this.variablePrefix = variablePrefix;
             this.qName = JSP_ROOT_ACTION;
             this.localName = ROOT_ACTION;
 
@@ -529,7 +531,7 @@ abstract class Node implements TagConstants {
          */
         public String nextTemporaryVariableName() {
             if (parentRoot == null) {
-                return Constants.TEMP_VARIABLE_NAME_PREFIX + (tempSequenceNumber++);
+                return variablePrefix + (tempSequenceNumber++);
             } else {
                 return parentRoot.nextTemporaryVariableName();
             }

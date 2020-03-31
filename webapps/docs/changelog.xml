@@ -164,6 +164,10 @@
         does not support these values, a warning will be logged and the latest
         supported version will used. (markt)
       </add>
+      <update>
+        Remove many rarely used Jasper system property configuration,
+        replaced by a new set of init parameters. (remm)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Web applications">

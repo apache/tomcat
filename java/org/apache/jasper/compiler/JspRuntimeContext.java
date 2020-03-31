@@ -440,6 +440,10 @@ public final class JspRuntimeContext {
     }
 
 
+    public Options getOptions() {
+        return options;
+    }
+
     // -------------------------------------------------------- Private Methods
 
     /**
@@ -473,7 +477,7 @@ public final class JspRuntimeContext {
 
         cpath.append(options.getScratchDir() + File.pathSeparator);
 
-        String cp = (String) context.getAttribute(Constants.SERVLET_CLASSPATH);
+        String cp = (String) context.getAttribute(options.getServletClasspathAttribute());
         if (cp == null || cp.equals("")) {
             cp = options.getClassPath();
         }

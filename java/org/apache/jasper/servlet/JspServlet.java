@@ -234,16 +234,17 @@ public class JspServlet extends HttpServlet implements PeriodicEventListener {
      */
     boolean preCompile(HttpServletRequest request) throws ServletException {
 
+        String precompileParameter = rctxt.getOptions().getJspPrecompilationQueryParameter();
         String queryString = request.getQueryString();
         if (queryString == null) {
             return false;
         }
-        int start = queryString.indexOf(Constants.PRECOMPILE);
+        int start = queryString.indexOf(precompileParameter);
         if (start < 0) {
             return false;
         }
         queryString =
-            queryString.substring(start + Constants.PRECOMPILE.length());
+            queryString.substring(start + precompileParameter.length());
         if (queryString.length() == 0) {
             return true;             // ?jsp_precompile
         }
@@ -270,7 +271,7 @@ public class JspServlet extends HttpServlet implements PeriodicEventListener {
             return true;             // ?jsp_precompile=false
         } else {
             throw new ServletException(Localizer.getMessage("jsp.error.precompilation.parameter",
-                    Constants.PRECOMPILE, value));
+                    precompileParameter, value));
         }
 
     }

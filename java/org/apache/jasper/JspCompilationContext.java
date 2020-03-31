@@ -130,7 +130,7 @@ public class JspCompilationContext {
         this.baseURI = baseURI;
 
         this.rctxt = rctxt;
-        this.basePackageName = Constants.JSP_PACKAGE_NAME;
+        this.basePackageName = options.getGeneratedJspPackageName();
 
         this.tagInfo = tagInfo;
         this.tagJar = tagJar;
@@ -178,10 +178,8 @@ public class JspCompilationContext {
 
     public ClassLoader getJspLoader() {
         if( jspLoader == null ) {
-            jspLoader = new JasperLoader
-                    (new URL[] {baseUrl},
-                            getClassLoader(),
-                            rctxt.getPermissionCollection());
+            jspLoader = new JasperLoader(new URL[] {baseUrl}, getClassLoader(),
+                    basePackageName, rctxt.getPermissionCollection());
         }
         return jspLoader;
     }

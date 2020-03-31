@@ -67,6 +67,14 @@
     <dispatcher>INCLUDE</dispatcher>
   </filter-mapping>
   <servlet>
+    <servlet-name>bug49297NoSpace</servlet-name>
+    <jsp-file>/bug49nnn/bug49297NoSpace.jsp</jsp-file>
+      <init-param>
+        <param-name>strictWhitespace</param-name>
+        <param-value>false</param-value>
+      </init-param>
+  </servlet>
+  <servlet>
     <servlet-name>Bug49922Forward</servlet-name>
     <servlet-class>
       org.apache.catalina.core.TestStandardContext$Bug49922ForwardServlet

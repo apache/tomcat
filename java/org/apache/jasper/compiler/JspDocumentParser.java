@@ -168,7 +168,8 @@ class JspDocumentParser
         try {
 
             // Create dummy root and initialize it with given page encodings
-            Node.Root dummyRoot = new Node.Root(null, parent, true);
+            Node.Root dummyRoot = new Node.Root(null, parent, true,
+                    pc.getJspCompilationContext().getOptions().getTempVariableNamePrefix());
             dummyRoot.setPageEncoding(pageEnc);
             dummyRoot.setJspConfigPageEncoding(jspConfigPageEnc);
             dummyRoot.setIsEncodingSpecifiedInProlog(

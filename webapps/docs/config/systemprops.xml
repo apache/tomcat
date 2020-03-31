@@ -116,50 +116,6 @@
 <section name="Jasper">
   <properties>
 
-    <property name="org.apache.jasper.compiler. Generator.POOL_TAGS_WITH_EXTENDS">
-      <p>By default, JSPs that use their own base class via the extends
-      attribute of the page directive, will have Tag pooling disabled since
-      Jasper cannot guarantee that the necessary initialisation will have taken
-      place. This can have a negative impact on performance. Providing the
-      alternative base class calls _jspInit() from Servlet.init(), setting  this
-      property to <code>true</code> will enable pooling with an alternative base
-      class. If the alternative base class does not call _jspInit() and this
-      property is <code>true</code>, NPEs will occur when attempting to use
-      tags.</p>
-      <p>If not specified, the default value of <code>false</code> will be used.
-      </p>
-    </property>
-
-    <property name="org.apache.jasper.compiler. Generator.STRICT_GET_PROPERTY">
-      <p>If <code>true</code>, the requirement to have the object referenced in
-      <code>jsp:getProperty</code> action to be previously "introduced"
-      to the JSP processor, as specified in the chapter JSP.5.3 of JSP 2.0 and
-      later specifications, is enforced.</p>
-      <p>If not specified, the specification compliant default of
-      <code>true</code> will be used.</p>
-    </property>
-
-    <property name="org.apache.jasper.compiler. Generator.VAR_EXPRESSIONFACTORY">
-      <p>The name of the variable to use for the expression language expression
-      factory.</p>
-      <p>If not specified, the default value of <code>_el_expressionfactory</code>
-      will be used.</p>
-    </property>
-
-    <property name="org.apache.jasper.compiler. Generator.VAR_INSTANCEMANAGER">
-      <p>The name of the variable to use for the instance manager factory.</p>
-      <p>If not specified, the default value of <code>_jsp_instancemanager</code>
-      will be used.</p>
-    </property>
-
-    <property name="org.apache.jasper.compiler. Parser.STRICT_WHITESPACE">
-      <p>If <code>false</code> the requirements for whitespace before an
-      attribute name will be relaxed so that the lack of whitespace will not
-      cause an error.</p>
-      <p>If not specified, the specification compliant default of
-      <code>true</code> will be used.</p>
-    </property>
-
     <property name="org.apache.jasper.runtime. BodyContentImpl.BUFFER_SIZE">
       <p>The size (in characters) to use when creating a tag buffer.</p>
       <p>If not specified, the default value of
@@ -183,75 +139,6 @@
     <property name="org.apache.jasper.runtime. JspFactoryImpl.POOL_SIZE">
       <p>The size of the ThreadLocal <code>PageContext</code>.</p>
       <p>If not specified, the default value of <code>8</code> will be used.</p>
-    </property>
-
-    <property name="org.apache.jasper.Constants. JSP_SERVLET_BASE">
-      <p>The base class of the Servlets generated from the JSPs.</p>
-      <p>If not specified, the default value of
-      <code>org.apache.jasper.runtime.HttpJspBase</code> will be used.</p>
-    </property>
-
-    <property name="org.apache.jasper.Constants. SERVICE_METHOD_NAME">
-      <p>The name of the service method called by the base class.</p>
-      <p>If not specified, the default value of <code>_jspService</code>
-      will be used.</p>
-    </property>
-
-    <property name="org.apache.jasper.Constants. SERVLET_CLASSPATH">
-      <p>The name of the ServletContext attribute that provides the classpath
-      for the JSP.</p>
-      <p>If not specified, the default value of
-      <code>org.apache.catalina.jsp_classpath</code> will be used.</p>
-    </property>
-
-    <property name="org.apache.jasper.Constants. JSP_FILE">
-      <p>The name of the request attribute for <code>&lt;jsp-file&gt;</code>
-      element of a servlet definition. If present on a request, this overrides
-      the value returned by <code>request.getServletPath()</code> to select the
-      JSP page to be executed.</p>
-      <p>If not specified, the default value of
-      <code>org.apache.catalina.jsp_file</code> will be used.</p>
-      <p><strong>Deprecated:</strong> This will be removed in Tomcat 9.0.x
-      onwards. It is replaced by the use of the jspFile servlet initialisation
-      parameter</p>
-    </property>
-
-    <property name="org.apache.jasper.Constants. PRECOMPILE">
-      <p>The name of the query parameter that causes the JSP engine to just
-      pregenerate the servlet but not invoke it.</p>
-      <p>If not specified, the default value of <code>jsp_precompile</code>
-      will be used, as defined by JSP specification (JSP.11.4.2).</p>
-    </property>
-
-    <property name="org.apache.jasper.Constants. JSP_PACKAGE_NAME">
-      <p>The default package name for compiled JSPs.</p>
-      <p>If not specified, the default value of <code>org.apache.jsp</code>
-      will be used.</p>
-    </property>
-
-    <property name="org.apache.jasper.Constants. TAG_FILE_PACKAGE_NAME">
-      <p>The default package name for tag handlers generated from tag files.</p>
-      <p>If not specified, the default value of <code>org.apache.jsp.tag</code>
-      will be used.</p>
-    </property>
-
-    <property name="org.apache.jasper.Constants. ALT_DD_ATTR">
-      <p>The servlet context attribute under which the alternate deployment
-      descriptor for this web application is stored.</p>
-      <p>If not specified, the default value of
-      <code>org.apache.catalina.deploy.alt_dd</code> will be used.</p>
-    </property>
-
-    <property name="org.apache.jasper.Constants. TEMP_VARIABLE_NAME_PREFIX">
-      <p>Prefix to use for generated temporary variable names.</p>
-      <p>If not specified, the default value of <code>_jspx_temp</code>
-      will be used.</p>
-    </property>
-
-    <property name="org.apache.jasper.Constants. USE_INSTANCE_MANAGER_FOR_TAGS">
-      <p>If <code>true</code>, the instance manager is used to obtain tag
-      handler instances.</p>
-      <p>If not specified, the default value of <code>false</code> will be used.</p>
     </property>
 
   </properties>

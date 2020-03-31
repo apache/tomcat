@@ -34,7 +34,6 @@ import jakarta.servlet.jsp.JspException;
 import jakarta.servlet.jsp.JspTagException;
 import jakarta.servlet.jsp.PageContext;
 
-import org.apache.jasper.Constants;
 import org.apache.jasper.compiler.Localizer;
 
 /**
@@ -148,31 +147,6 @@ public class Util {
         }
         return input.substring(begin, end).trim();
     }
-
-    /**
-     * Strips a servlet session ID from <code>url</code>.  The session ID
-     * is encoded as a URL "path parameter" beginning with "jsessionid=".
-     * We thus remove anything we find between ";jsessionid=" (inclusive)
-     * and either EOS or a subsequent ';' (exclusive).
-     *
-     * taken from org.apache.taglibs.standard.tag.common.core.ImportSupport
-     * @param url The URL
-     * @return the URL without a user submitted session id parameter
-     */
-    public static String stripSession(String url) {
-        StringBuilder u = new StringBuilder(url);
-        int sessionStart;
-        while ((sessionStart = u.toString().indexOf(";" + Constants.SESSION_PARAMETER_NAME + "=")) != -1) {
-            int sessionEnd = u.toString().indexOf(';', sessionStart + 1);
-            if (sessionEnd == -1)
-                sessionEnd = u.toString().indexOf('?', sessionStart + 1);
-            if (sessionEnd == -1) // still
-                sessionEnd = u.length();
-            u.delete(sessionStart, sessionEnd);
-        }
-        return u.toString();
-    }
-
 
     /**
      * Performs the following substring replacements
