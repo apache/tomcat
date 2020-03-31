@@ -42,7 +42,6 @@ public class Constants {
     static {
         Set<String> names = new HashSet<>();
         names.add(Globals.SUBJECT_ATTR);
-        names.add(Globals.GSS_CREDENTIAL_ATTR);
         names.add(CrawlerSessionManagerValve.class.getName());
         excludedAttributeNames = Collections.unmodifiableSet(names);
     }
