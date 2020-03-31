@@ -43,7 +43,7 @@ public final class SecurityClassLoad {
         loadServletsPackage(loader);
         loadSessionPackage(loader);
         loadUtilPackage(loader);
-        loadJavaxPackage(loader);
+        loadJakartaPackage(loader);
         loadConnectorPackage(loader);
         loadTomcatPackage(loader);
     }
@@ -120,7 +120,7 @@ public final class SecurityClassLoad {
     }
 
 
-    private static final void loadJavaxPackage(ClassLoader loader) throws Exception {
+    private static final void loadJakartaPackage(ClassLoader loader) throws Exception {
         loader.loadClass("jakarta.servlet.http.Cookie");
     }
 
