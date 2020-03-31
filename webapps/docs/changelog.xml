@@ -165,8 +165,8 @@
         supported version will used. (markt)
       </add>
       <update>
-        Remove many rarely used Jasper system property configuration,
-        replaced by a new set of init parameters. (remm)
+        Remove Jasper configuration using system properties and replace them
+        by a new set of JSP Servlet init parameters. (remm)
       </update>
     </changelog>
   </subsection>

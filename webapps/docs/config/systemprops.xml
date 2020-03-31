@@ -113,38 +113,6 @@
   </properties>
 </section>
 
-<section name="Jasper">
-  <properties>
-
-    <property name="org.apache.jasper.runtime. BodyContentImpl.BUFFER_SIZE">
-      <p>The size (in characters) to use when creating a tag buffer.</p>
-      <p>If not specified, the default value of
-      <code>org.apache.jasper.Constants.DEFAULT_TAG_BUFFER_SIZE</code> (512)
-      will be used.</p>
-    </property>
-
-    <property name="org.apache.jasper.runtime. BodyContentImpl.LIMIT_BUFFER">
-      <p>If <code>true</code>, any tag buffer that expands beyond
-      <code>org.apache.jasper.runtime.BodyContentImpl.BUFFER_SIZE</code> will be
-      destroyed and a new buffer created.</p>
-      <p>If not specified, the default value of <code>false</code> will be used.</p>
-    </property>
-
-    <property name="org.apache.jasper.runtime. JspFactoryImpl.USE_POOL">
-      <p>If <code>true</code>, a ThreadLocal <code>PageContext</code> pool will
-      be used.</p>
-      <p>If not specified, the default value of <code>true</code> will be used.</p>
-    </property>
-
-    <property name="org.apache.jasper.runtime. JspFactoryImpl.POOL_SIZE">
-      <p>The size of the ThreadLocal <code>PageContext</code>.</p>
-      <p>If not specified, the default value of <code>8</code> will be used.</p>
-    </property>
-
-  </properties>
-
-</section>
-
 
 <section name="Security">
 

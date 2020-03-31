@@ -98,4 +98,13 @@ public class Constants {
      */
     public static final String XML_BLOCK_EXTERNAL_INIT_PARAM =
             "org.apache.jasper.XML_BLOCK_EXTERNAL";
+
+    /**
+     * Name of the ServletContext init-param that determines the JSP
+     * factory pool size. Set the value to a positive integer to enable it.
+     * The default value is <code>8</code> per thread.
+     */
+    public static final String JSP_FACTORY_POOL_SIZE_INIT_PARAM =
+            "org.apache.jasper.runtime.JspFactoryImpl.POOL_SIZE";
+
 }

@@ -279,6 +279,17 @@ be applied to the expression? <code>true</code> or <code>false</code>, default
  the instance manager is used to obtain tag handler instances.
  <code>true</code> or <code>false</code>, default <code>false</code>.</li>
 
+<li><strong>limitBodyContentBuffer</strong> - If <code>true</code>, any
+ tag buffer that expands beyond the value of the
+ <code>bodyContentTagBufferSize</code> init parameter will be
+ destroyed and a new buffer created.
+ <code>true</code> or <code>false</code>, default <code>false</code>.</li>
+
+<li><strong>bodyContentTagBufferSize</strong> - The size (in characters)
+ to use when creating a tag buffer. If not specified, the default value of
+ <code>org.apache.jasper.Constants.DEFAULT_TAG_BUFFER_SIZE</code> (512)
+ will be used.</li>
+
 </ul>
 
 <p>The Java compiler from Eclipse JDT in included as the default compiler. It is
@@ -454,10 +465,10 @@ and the compile JSP servlet classes at
 <ul>
 <li> When you switch to another Tomcat release, then regenerate and recompile
 your JSP's with the new Tomcat version.</li>
-<li>Use java system property at server runtime to disable PageContext pooling
-<code>org.apache.jasper.runtime.JspFactoryImpl.USE_POOL=false</code>.
-and limit the buffering with
-<code>org.apache.jasper.runtime.BodyContentImpl.LIMIT_BUFFER=true</code>. Note
+<li>Use a Servlet context parameter to disable PageContext pooling
+<code>org.apache.jasper.runtime.JspFactoryImpl.POOL_SIZE=-1</code>
+and limit the buffering with the JSP Servlet init-param
+<code>limitBodyContentBuffer=true</code>. Note
 that changing from the defaults may affect performance, but it will vary
 depending on the application.</li>
 </ul>

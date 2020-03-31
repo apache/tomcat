@@ -43,6 +43,7 @@ public class JasperInitializer implements ServletContainerInitializer {
     private static final String MSG = "org.apache.jasper.servlet.JasperInitializer";
     private final Log log = LogFactory.getLog(JasperInitializer.class); // must not be static
 
+    private static JspFactoryImpl defaultFactory;
     /**
      * Preload classes required at runtime by a JSP servlet so that
      * we don't get a defineClassInPackage security exception.
@@ -52,6 +53,7 @@ public class JasperInitializer implements ServletContainerInitializer {
         SecurityClassLoad.securityClassLoad(factory.getClass().getClassLoader());
         if (JspFactory.getDefaultFactory() == null) {
             JspFactory.setDefaultFactory(factory);
+            defaultFactory = factory;
         }
     }
 
@@ -93,6 +95,18 @@ public class JasperInitializer implements ServletContainerInitializer {
         context.setAttribute(TldCache.SERVLET_CONTEXT_ATTRIBUTE_NAME,
                 new TldCache(context, scanner.getUriTldResourcePathMap(),
                         scanner.getTldResourcePathTaglibXmlMap()));
+
+        String poolSizeValue = context.getInitParameter(Constants.JSP_FACTORY_POOL_SIZE_INIT_PARAM);
+        int poolSize = 8;
+        if (poolSizeValue != null) {
+            try {
+                poolSize = Integer.parseInt(poolSizeValue);
+            } catch (NumberFormatException e) {
+                throw new ServletException(e);
+            }
+        }
+        defaultFactory.setPoolSize(poolSize);
+
     }
 
     protected TldScanner newTldScanner(ServletContext context, boolean namespaceAware,

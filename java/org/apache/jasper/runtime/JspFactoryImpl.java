@@ -38,12 +38,8 @@ import org.apache.jasper.Constants;
  */
 public class JspFactoryImpl extends JspFactory {
 
-    private static final boolean USE_POOL =
-        Boolean.parseBoolean(System.getProperty("org.apache.jasper.runtime.JspFactoryImpl.USE_POOL", "true"));
-    private static final int POOL_SIZE =
-        Integer.parseInt(System.getProperty("org.apache.jasper.runtime.JspFactoryImpl.POOL_SIZE", "8"));
-
     private final ThreadLocal<PageContextPool> localPool = new ThreadLocal<>();
+    private int poolSize = -1;
 
     @Override
     public PageContext getPageContext(Servlet servlet, ServletRequest request,
@@ -85,15 +81,19 @@ public class JspFactoryImpl extends JspFactory {
         };
     }
 
+    public void setPoolSize(int poolSize) {
+        this.poolSize = poolSize;
+    }
+
     private PageContext internalGetPageContext(Servlet servlet, ServletRequest request,
             ServletResponse response, String errorPageURL, boolean needsSession,
             int bufferSize, boolean autoflush) {
 
         PageContext pc;
-        if (USE_POOL) {
+        if (poolSize > 0) {
             PageContextPool pool = localPool.get();
             if (pool == null) {
-                pool = new PageContextPool();
+                pool = new PageContextPool(poolSize);
                 localPool.set(pool);
             }
             pc = pool.get();
@@ -117,7 +117,7 @@ public class JspFactoryImpl extends JspFactory {
 
     private void internalReleasePageContext(PageContext pc) {
         pc.release();
-        if (USE_POOL && (pc instanceof PageContextImpl)) {
+        if (poolSize > 0 && (pc instanceof PageContextImpl)) {
             localPool.get().put(pc);
         }
     }
@@ -179,12 +179,12 @@ public class JspFactoryImpl extends JspFactory {
 
         private int current = -1;
 
-        public PageContextPool() {
-            this.pool = new PageContext[POOL_SIZE];
+        public PageContextPool(int poolSize) {
+            this.pool = new PageContext[poolSize];
         }
 
         public void put(PageContext o) {
-            if (current < (POOL_SIZE - 1)) {
+            if (current < (pool.length - 1)) {
                 current++;
                 pool[current] = o;
             }
