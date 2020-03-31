@@ -29,14 +29,14 @@
     <name>Apache CXF for Apache Tomcat CDI</name>
     <description>Apache CXF packaged for Apache Tomcat CDI</description>
     <!-- This is the Apache CXF version -->
-    <version>3.3.5</version>
+    <version>3.3.6</version>
     <packaging>jar</packaging>
 
     <properties>
         <geronimo-jcdi.version>1.0.1</geronimo-jcdi.version>
         <javax.json-api.version>1.1.4</javax.json-api.version>
         <javax.json.bind-api.version>1.0</javax.json.bind-api.version>
-        <johnzon.version>1.2.3</johnzon.version>
+        <johnzon.version>1.2.4</johnzon.version>
     </properties>
 
     <dependencies>
