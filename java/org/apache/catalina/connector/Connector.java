@@ -106,11 +106,6 @@ public class Connector extends LifecycleMBeanBase  {
 
         // Default for Connector depends on this system property
         setThrowOnFailure(Boolean.getBoolean("org.apache.catalina.startup.EXIT_ON_INIT_FAILURE"));
-
-        // Default for Connector depends on this (deprecated) system property
-        if (Boolean.parseBoolean(System.getProperty("org.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH", "false"))) {
-            encodedSolidusHandling = EncodedSolidusHandling.DECODE;
-        }
     }
 
 

@@ -126,11 +126,7 @@
       time other <code>%nn</code> sequences are decoded. When set to
       <code>passthrough</code> request paths containing a <code>%2f</code>
       sequence will be processed with the <code>%2f</code> sequence unchanged.
-      If not specified the default value is <code>reject</code>. This default
-      may be modified if the deprecated <a href="systemprops.html">system
-      property</a>
-      <code>org.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH</code> is
-      set.</p>
+      If not specified the default value is <code>reject</code>.</p>
     </attribute>
 
     <attribute name="enforceEncodingInGetWriter" required="false">
