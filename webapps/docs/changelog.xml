@@ -89,6 +89,14 @@
         data on the request line after the URI are treated consistently. Such
         requests will now always be treated as HTTP/1.1. (markt)
       </fix>
+      <add>
+        Replace the system property
+        <code>org.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH</code>
+        with the Connector attribute <code>encodedSolidusHandling</code> that
+        adds an additional option to pass the <code>%2f</code> sequence through
+        to the application without decoding it in addition to rejecting such
+        sequences and decoding such sequences. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Jasper">

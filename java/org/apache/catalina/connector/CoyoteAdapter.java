@@ -728,7 +728,7 @@ public class CoyoteAdapter implements Adapter {
         // %xx decoding of the URL
         try {
             // Will always by in bytes at this point
-            req.getURLDecoder().convert(decodedURI.getByteChunk(), false);
+            req.getURLDecoder().convert(decodedURI.getByteChunk(), connector.getEncodedSolidusHandlingInternal());
         } catch (IOException ioe) {
             res.setStatus(400);
             res.setMessage("Invalid URI: " + ioe.getMessage());

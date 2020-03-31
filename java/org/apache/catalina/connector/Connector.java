@@ -39,6 +39,7 @@ import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.IntrospectionUtils;
 import org.apache.tomcat.util.buf.B2CConverter;
 import org.apache.tomcat.util.buf.CharsetUtil;
+import org.apache.tomcat.util.buf.EncodedSolidusHandling;
 import org.apache.tomcat.util.http.mapper.Mapper;
 import org.apache.tomcat.util.res.StringManager;
 
@@ -76,6 +77,11 @@ public class Connector extends LifecycleMBeanBase  {
         } catch (Exception e) {
             log.error(sm.getString(
                     "coyoteConnector.protocolHandlerInstantiationFailed"), e);
+        }
+
+        // Default for Connector depends on this (deprecated) system property
+        if (Boolean.parseBoolean(System.getProperty("org.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH", "false"))) {
+            encodedSolidusHandling = EncodedSolidusHandling.DECODE;
         }
     }
 
@@ -255,6 +261,9 @@ public class Connector extends LifecycleMBeanBase  {
      * URI encoding.
      */
     protected String URIEncoding = null;
+
+
+    private EncodedSolidusHandling encodedSolidusHandling = EncodedSolidusHandling.REJECT;
 
 
     /**
@@ -880,6 +889,21 @@ public class Connector extends LifecycleMBeanBase  {
             return ((org.apache.catalina.Executor) obj).getName();
         }
         return "Internal";
+    }
+
+
+    public String getEncodedSolidusHandling() {
+        return encodedSolidusHandling.getValue();
+    }
+
+
+    public void setEncodedSolidusHandling(String encodedSolidusHandling) {
+        this.encodedSolidusHandling = EncodedSolidusHandling.fromString(encodedSolidusHandling);
+    }
+
+
+    public EncodedSolidusHandling getEncodedSolidusHandlingInternal() {
+        return encodedSolidusHandling;
     }
 
 
