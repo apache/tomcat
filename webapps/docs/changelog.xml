@@ -92,6 +92,11 @@
         data on the request line after the URI are treated consistently. Such
         requests will now always be treated as HTTP/1.1. (markt)
       </fix>
+      <add>
+        Expose the HTTP/2 connection ID and stream ID to applications via the
+        request attributes <code>org.apache.coyote.connectionID</code> and
+        <code>org.apache.coyote.streamID</code> respectively. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Jasper">
