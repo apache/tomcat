@@ -46,8 +46,11 @@ public class TestCharsetUtil {
     /*
      * More comprehensive test that checks that, apart from where the encoding
      * overlaps with ASCII, no valid ASCII bytes are used.
+     *
+     * This is relatively slow.
+     * Only need to run this when we detect a new Charset.
      */
-    @Test
+    //@Test
     public void testIsAcsiiSupersetAll() {
         for (Charset charset : Charset.availableCharsets().values()) {
             System.out.println("Testing: " + charset.name());
