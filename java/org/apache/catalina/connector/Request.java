@@ -41,6 +41,7 @@ import java.util.TimeZone;
 import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 
 import javax.naming.NamingException;
 import javax.security.auth.Subject;
@@ -3556,6 +3557,32 @@ public class Request implements org.apache.catalina.servlet4preview.http.HttpSer
                         return Boolean.valueOf(
                                 request.getConnector().getProtocolHandler(
                                         ).isSendfileSupported() && request.getCoyoteRequest().getSendfile());
+                    }
+                    @Override
+                    public void set(Request request, String name, Object value) {
+                        // NO-OP
+                    }
+                });
+        specialAttributes.put(Globals.CONNECTION_ID,
+                new SpecialAttributeAdapter() {
+                    @Override
+                    public Object get(Request request, String name) {
+                        AtomicReference<Object> result = new AtomicReference<>();
+                        request.getCoyoteRequest().action(ActionCode.CONNECTION_ID, result);
+                        return result.get();
+                    }
+                    @Override
+                    public void set(Request request, String name, Object value) {
+                        // NO-OP
+                    }
+                });
+        specialAttributes.put(Globals.STREAM_ID,
+                new SpecialAttributeAdapter() {
+                    @Override
+                    public Object get(Request request, String name) {
+                        AtomicReference<Object> result = new AtomicReference<>();
+                        request.getCoyoteRequest().action(ActionCode.STREAM_ID, result);
+                        return result.get();
                     }
                     @Override
                     public void set(Request request, String name, Object value) {

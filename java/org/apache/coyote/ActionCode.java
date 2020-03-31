@@ -251,5 +251,17 @@ public enum ActionCode {
     /**
      * Push a request on behalf of the client of the current request.
      */
-    PUSH_REQUEST
+    PUSH_REQUEST,
+
+    /**
+     * Obtain the connection identifier for the request. Used with multiplexing
+     * protocols such as HTTP/2.
+     */
+    CONNECTION_ID,
+
+    /**
+     * Obtain the stream identifier for the request. Used with multiplexing
+     * protocols such as HTTP/2.
+     */
+    STREAM_ID
 }
