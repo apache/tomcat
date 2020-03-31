@@ -278,8 +278,8 @@
 
     <property
     name="org.apache.tomcat.util.buf. UDecoder.ALLOW_ENCODED_SLASH">
-      <p>If this is <code>true</code> '%2F' and '%5C' will be permitted as path
-      delimiters.</p>
+      <p>If this is <code>true</code> '%2F' will be permitted as a path
+      delimiter.</p>
       <p>If not specified, the default value of <code>false</code> will be used.</p>
     </property>
 

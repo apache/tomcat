@@ -116,10 +116,16 @@
   <subsection name="Web applications">
     <changelog>
       <fix>
-        Correct documentation web application to remove references to the
+        Correct the documentation web application to remove references to the
         <code>org.apache.catalina.STRICT_SERVLET_COMPLIANCE</code> system
         property changing the default for the <code>URIEncoding</code> attribute
         of the Connector. (markt)
+      </fix>
+      <fix>
+        Correct the documentation web application to remove references to the
+        <code>org.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH</code>
+        system property changing how the sequence <code>%5c</code> is
+        interpretted in a URI. (markt)
       </fix>
     </changelog>
   </subsection>
