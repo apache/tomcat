@@ -22,6 +22,7 @@ import java.nio.ByteBuffer;
 import java.util.Iterator;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 
 import jakarta.servlet.RequestDispatcher;
 
@@ -619,6 +620,20 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
             result.set(isTrailerFieldsSupported());
             break;
         }
+
+        // Identifiers associated with multiplexing protocols like HTTP/2
+        case CONNECTION_ID: {
+            @SuppressWarnings("unchecked")
+            AtomicReference<Object> result = (AtomicReference<Object>) param;
+            result.set(getConnectionID());
+            break;
+        }
+        case STREAM_ID: {
+            @SuppressWarnings("unchecked")
+            AtomicReference<Object> result = (AtomicReference<Object>) param;
+            result.set(getStreamID());
+            break;
+        }
         }
     }
 
@@ -951,6 +966,30 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
      */
     protected boolean isTrailerFieldsSupported() {
         return false;
+    }
+
+
+    /**
+     * Protocols that support multiplexing (e.g. HTTP/2) should override this
+     * method and return the appropriate ID.
+     *
+     * @return The stream ID associated with this request or {@code null} if a
+     *         multiplexing protocol is not being used
+      */
+    protected Object getConnectionID() {
+        return null;
+    }
+
+
+    /**
+     * Protocols that support multiplexing (e.g. HTTP/2) should override this
+     * method and return the appropriate ID.
+     *
+     * @return The stream ID associated with this request or {@code null} if a
+     *         multiplexing protocol is not being used
+     */
+    protected Object getStreamID() {
+        return null;
     }
 
 

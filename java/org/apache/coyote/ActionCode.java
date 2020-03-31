@@ -265,5 +265,17 @@ public enum ActionCode {
      * once an HTTP/1.1 response has been committed, it will no longer support
      * trailer fields.
      */
-    IS_TRAILER_FIELDS_SUPPORTED
+    IS_TRAILER_FIELDS_SUPPORTED,
+
+    /**
+     * Obtain the connection identifier for the request. Used with multiplexing
+     * protocols such as HTTP/2.
+     */
+    CONNECTION_ID,
+
+    /**
+     * Obtain the stream identifier for the request. Used with multiplexing
+     * protocols such as HTTP/2.
+     */
+    STREAM_ID
 }

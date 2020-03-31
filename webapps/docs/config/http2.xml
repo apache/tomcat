@@ -44,6 +44,15 @@
   the Servlet API is fundamentally blocking, each HTTP/2 stream requires a
   dedicated container thread for the duration of that stream.</p>
 
+  <p>Requests processed using HTTP/2 will have the following additional request
+  attributes available:</p>
+  <ul>
+    <li><code>org.apache.coyote.connectionID</code> will return the HTTP/2
+        connection ID</li>
+    <li><code>org.apache.coyote.streamID</code> will return the HTTP/2 stream
+        ID</li>
+  </ul>
+
 </section>
 
 

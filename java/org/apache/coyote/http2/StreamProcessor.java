@@ -339,6 +339,18 @@ class StreamProcessor extends AbstractProcessor {
 
 
     @Override
+    protected Object getConnectionID() {
+        return stream.getConnectionId();
+    }
+
+
+    @Override
+    protected Object getStreamID() {
+        return stream.getIdentifier().toString();
+    }
+
+
+    @Override
     public final void recycle() {
         // StreamProcessor instances are not re-used.
         // Clear fields that can be cleared to aid GC and trigger NPEs if this
