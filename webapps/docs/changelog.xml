@@ -187,6 +187,12 @@
         be configured via the <code>UMASK</code> environment variable as it is
         when using <code>catalina.sh</code>. (markt)
       </fix>
+      <update>
+        Update the OWB module to Apache OpenWebBeans 2.0.16. (remm)
+      </update>
+      <update>
+        Update the CXF module to Apache CXF 3.3.6. (remm)
+      </update>
     </changelog>
   </subsection>
 </section>
