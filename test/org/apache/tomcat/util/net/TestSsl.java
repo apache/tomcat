@@ -116,7 +116,7 @@ public class TestSsl extends TomcatBaseTest {
         });
 
         OutputStream os = socket.getOutputStream();
-        os.write("GET /examples/servlets/servlet/HelloWorldExample HTTP/1.0\n".getBytes());
+        os.write("GET /examples/servlets/servlet/HelloWorldExample HTTP/1.0\r\n".getBytes());
         os.flush();
 
 
@@ -130,7 +130,7 @@ public class TestSsl extends TomcatBaseTest {
         os = socket.getOutputStream();
 
         try {
-            os.write("Host: localhost\n\n".getBytes());
+            os.write("Host: localhost\r\n\r\n".getBytes());
         } catch (IOException ex) {
             ex.printStackTrace();
             Assert.fail("Re-negotiation failed");
@@ -175,13 +175,13 @@ public class TestSsl extends TomcatBaseTest {
 
         OutputStream os = socket.getOutputStream();
 
-        os.write("GET /examples/servlets/servlet/HelloWorldExample HTTP/1.1\n".getBytes());
+        os.write("GET /examples/servlets/servlet/HelloWorldExample HTTP/1.1\r\n".getBytes());
         os.flush();
 
         socket.startHandshake();
 
         try {
-            os.write("Host: localhost\n\n".getBytes());
+            os.write("Host: localhost\r\n\r\n".getBytes());
         } catch (IOException ex) {
             ex.printStackTrace();
             Assert.fail("Re-negotiation failed");
