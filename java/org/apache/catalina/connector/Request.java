@@ -95,6 +95,7 @@ import org.apache.tomcat.InstanceManager;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.buf.B2CConverter;
 import org.apache.tomcat.util.buf.ByteChunk;
+import org.apache.tomcat.util.buf.EncodedSolidusHandling;
 import org.apache.tomcat.util.buf.MessageBytes;
 import org.apache.tomcat.util.buf.StringUtils;
 import org.apache.tomcat.util.buf.UDecoder;
@@ -2149,8 +2150,9 @@ public class Request implements HttpServletRequest {
         while (pos < len) {
             if (uri[pos] == '/') {
                 return pos;
-            } else if (UDecoder.ALLOW_ENCODED_SLASH && uri[pos] == '%' && pos + 2 < len &&
-                    uri[pos+1] == '2' && (uri[pos + 2] == 'f' || uri[pos + 2] == 'F')) {
+            } else if (connector.getEncodedSolidusHandlingInternal() == EncodedSolidusHandling.DECODE &&
+                    uri[pos] == '%' && pos + 2 < len && uri[pos+1] == '2' &&
+                    (uri[pos + 2] == 'f' || uri[pos + 2] == 'F')) {
                 return pos;
             }
             pos++;

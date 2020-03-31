@@ -37,9 +37,6 @@ public final class UDecoder {
 
     private static final StringManager sm = StringManager.getManager(UDecoder.class);
 
-    public static final boolean ALLOW_ENCODED_SLASH =
-        Boolean.parseBoolean(System.getProperty("org.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH", "false"));
-
     private static class DecodeException extends CharConversionException {
         private static final long serialVersionUID = 1L;
         public DecodeException(String s) {
@@ -64,21 +61,45 @@ public final class UDecoder {
     private static final IOException EXCEPTION_SLASH = new DecodeException(
             "noSlash");
 
-    public UDecoder()
-    {
+
+    /**
+     * URLDecode, will modify the source. Assumes source bytes are encoded using
+     * a superset of US-ASCII as per RFC 7230. "%2f" will be rejected unless the
+     * input is a query string.
+     *
+     * @param mb    The URL encoded bytes
+     * @param query {@code true} if this is a query string. For a query string
+     *                  '+' will be decoded to ' '
+     *
+     * @throws IOException Invalid %xx URL encoding
+     */
+    public void convert(ByteChunk mb, boolean query) throws IOException {
+        if (query) {
+            convert(mb, true, EncodedSolidusHandling.DECODE);
+        } else {
+            convert(mb, false, EncodedSolidusHandling.REJECT);
+        }
     }
+
 
     /**
      * URLDecode, will modify the source. Assumes source bytes are encoded using
      * a superset of US-ASCII as per RFC 7230.
      *
-     * @param mb The URL encoded bytes
-     * @param query <code>true</code> if this is a query string
+     * @param mb                        The URL encoded bytes
+     * @param encodedSolidusHandling    How should the %2f sequence handled by
+     *                                      the decoder? For query strings this
+     *                                      parameter will be ignored and the
+     *                                      %2f sequence will be decoded
      * @throws IOException Invalid %xx URL encoding
      */
-    public void convert( ByteChunk mb, boolean query )
-        throws IOException
-    {
+    public void convert(ByteChunk mb, EncodedSolidusHandling encodedSolidusHandling) throws IOException {
+        convert(mb, false, encodedSolidusHandling);
+    }
+
+
+    private void convert(ByteChunk mb, boolean query, EncodedSolidusHandling encodedSolidusHandling) throws IOException {
+
         int start=mb.getOffset();
         byte buff[]=mb.getBytes();
         int end=mb.getEnd();
@@ -96,8 +117,6 @@ public final class UDecoder {
         if( (idx2 >= 0 && idx2 < idx) || idx < 0 ) {
             idx=idx2;
         }
-
-        final boolean noSlash = !(ALLOW_ENCODED_SLASH || query);
 
         for( int j=idx; j<end; j++, idx++ ) {
             if( buff[ j ] == '+' && query) {
@@ -117,10 +136,22 @@ public final class UDecoder {
 
                 j+=2;
                 int res=x2c( b1, b2 );
-                if (noSlash && (res == '/')) {
-                    throw EXCEPTION_SLASH;
+                if (res == '/') {
+                    switch (encodedSolidusHandling) {
+                    case DECODE: {
+                        buff[idx]=(byte)res;
+                        break;
+                    }
+                    case REJECT: {
+                        throw EXCEPTION_SLASH;
+                    }
+                    case PASS_THROUGH: {
+                        idx += 2;
+                    }
+                    }
+                } else {
+                    buff[idx]=(byte)res;
                 }
-                buff[idx]=(byte)res;
             }
         }
 

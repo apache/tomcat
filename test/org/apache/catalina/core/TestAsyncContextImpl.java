@@ -49,7 +49,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 
 import org.apache.catalina.Context;
@@ -63,6 +62,7 @@ import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.catalina.valves.TesterAccessLogValve;
 import org.apache.tomcat.unittest.TesterContext;
 import org.apache.tomcat.util.buf.ByteChunk;
+import org.apache.tomcat.util.buf.EncodedSolidusHandling;
 import org.apache.tomcat.util.collections.CaseInsensitiveKeyMap;
 import org.apache.tomcat.util.descriptor.web.ErrorPage;
 import org.easymock.EasyMock;
@@ -2670,20 +2670,12 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
     }
 
 
-    @Override
-    @Before
-    public void setUp() throws Exception {
-        super.setUp();
-        // Required by testBug61185()
-        // Does not impact other tests in this class
-        System.setProperty("org.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH", "true");
-    }
-
-
     @Test
     public void testBug61185() throws Exception {
         // Setup Tomcat instance
         Tomcat tomcat = getTomcatInstance();
+
+        tomcat.getConnector().setEncodedSolidusHandling(EncodedSolidusHandling.DECODE.getValue());
 
         // No file system docBase required
         Context ctx = tomcat.addContext("", null);

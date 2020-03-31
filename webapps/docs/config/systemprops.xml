@@ -120,9 +120,12 @@
 
     <property
     name="org.apache.tomcat.util.buf. UDecoder.ALLOW_ENCODED_SLASH">
-      <p>If this is <code>true</code> '%2F' will be permitted as a path
-      delimiter.</p>
-      <p>If not specified, the default value of <code>false</code> will be used.</p>
+      <p>Use of this system property is deprecated. It will be removed from
+      Tomcat 10 onwards.</p>
+      <p>If this system property is set to <code>true</code>, the default for
+      the <code>encodedSolidusHandling</code> attribute of all Connectors will
+      be changed from <code>reject</code> to <code>decode</code>. If decoded, it
+      will be treated a path delimiter.</p>
     </property>
 
   </properties>

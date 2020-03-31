@@ -626,7 +626,7 @@ public class CoyoteAdapter implements Adapter {
             // URI decoding
             // %xx decoding of the URL
             try {
-                req.getURLDecoder().convert(decodedURI.getByteChunk(), false);
+                req.getURLDecoder().convert(decodedURI.getByteChunk(), connector.getEncodedSolidusHandlingInternal());
             } catch (IOException ioe) {
                 response.sendError(400, "Invalid URI: " + ioe.getMessage());
             }
