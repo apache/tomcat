@@ -113,6 +113,21 @@
       By default, DNS lookups are disabled.</p>
     </attribute>
 
+    <attribute name="encodedSolidusHandling" required="false">
+      <p>When set to <code>reject</code> request paths containing a
+      <code>%2f</code> sequence will be rejected with a 400 response. When set
+      to <code>decode</code> request paths containing a <code>%2f</code>
+      sequence will have that sequence decoded to <code>/</code> at the same
+      time other <code>%nn</code> sequences are decoded. When set to
+      <code>passthrough</code> request paths containing a <code>%2f</code>
+      sequence will be processed with the <code>%2f</code> sequence unchanged.
+      If not specified the default value is <code>reject</code>. This default
+      may be modified if the deprecated <a href="systemprops.html">system
+      property</a>
+      <code>org.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH</code> is
+      set.</p>
+    </attribute>
+
     <attribute name="maxHeaderCount" required="false">
       <p>The maximum number of headers in a request that are allowed by the
       container. A request that contains more headers than the specified limit
