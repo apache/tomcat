@@ -122,8 +122,10 @@
         The default servley always uses weak comparison. (markt)
       </fix>
       <update>
-        Add <code>cookieName</code> attribute to the SSO valve to configure the
-        SSO cookie name. (remm)
+        Remove
+        <code>org.apache.catalina.authenticator.Constants.SSO_SESSION_COOKIE_NAME</code>
+        system property, replaced by the
+        <code>cookieName</code> attribute on the SSO valve. (remm)
       </update>
     </changelog>
   </subsection>
