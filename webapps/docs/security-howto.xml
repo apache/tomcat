@@ -261,6 +261,11 @@
       address a connector listens on for connections. By default, a connector
       listens on all configured IP addresses.</p>
 
+      <p>The <strong>allowBackslash</strong> attribute allows non-standard
+      parsing of the request URI. Setting this attribute to a non-default value
+      when behind a reverse proxy may enable an attacker to bypass any security
+      constraints enforced by the proxy.</p>
+
       <p>The <strong>allowTrace</strong> attribute may be used to enable TRACE
       requests which can be useful for debugging. Due to the way some browsers
       handle the response from a TRACE request (which exposes the browser to an
@@ -270,6 +275,18 @@
       will cause a new facade object to be created for each request. This is
       the default value, and this reduces the chances of a bug in an
       application exposing data from one request to another.</p>
+
+      <p>The <strong>encodedSolidusHandling</strong> attribute allows
+      non-standard parsing of the request URI. Setting this attribute to a
+      non-default value when behind a reverse proxy may enable an attacker to
+      bypass any security constraints enforced by the proxy.</p>
+
+      <p>The <strong>enforceEncodingInGetWriter</strong> attribute has security
+      implications if set to <code>false</code>. Many user agents, in breach of
+      RFC 7230, try to guess the character encoding of text media types when the
+      specification-mandated default of ISO-8859-1 should be used. Some browsers
+      will interpret as UTF-7 a response containing characters that are safe for
+      ISO-8859-1 but trigger an XSS vulnerability if interpreted as UTF-7.</p>
 
       <p>The <strong>maxPostSize</strong> attribute controls the maximum size
       of a POST request that will be parsed for parameters. The parameters are
@@ -463,24 +480,6 @@
       <a href="config/cluster-interceptor.html#org.apache.catalina.tribes.group.interceptors.EncryptInterceptor_Attributes">EncryptInterceptor</a>
       to encrypt traffic between nodes.</p>
     </subsection>
-  </section>
-
-  <section name="System Properties">
-    <p>The <strong>
-    org.apache.catalina.connector.CoyoteAdapter.ALLOW_BACKSLASH</strong> and
-    <strong>org.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH</strong>
-    system properties allow non-standard parsing of the request URI. Using
-    these options when behind a reverse proxy may enable an attacker to bypass
-    any security constraints enforced by the proxy.</p>
-
-    <p>The <strong>
-    org.apache.catalina.connector.Response.ENFORCE_ENCODING_IN_GET_WRITER
-    </strong> system property has security implications if disabled. Many user
-    agents, in breach of RFC2616, try to guess the character encoding of text
-    media types when the specification-mandated default of ISO-8859-1 should be
-    used. Some browsers will interpret as UTF-7 a response containing characters
-    that are safe for ISO-8859-1 but trigger an XSS vulnerability if interpreted
-    as UTF-7.</p>
   </section>
 
   <section name="web.xml">
