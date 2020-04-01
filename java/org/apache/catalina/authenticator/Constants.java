@@ -17,6 +17,7 @@
 package org.apache.catalina.authenticator;
 
 public class Constants {
+
     // Authentication methods for login configuration
     // Servlet spec schemes are defined in HttpServletRequest
     // Vendor specific schemes

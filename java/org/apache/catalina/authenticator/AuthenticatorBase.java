@@ -1214,7 +1214,7 @@ public abstract class AuthenticatorBase extends ValveBase
         if (ssoId == null) {
             // Construct a cookie to be returned to the client
             ssoId = sessionIdGenerator.generateSessionId();
-            Cookie cookie = new Cookie(Constants.SINGLE_SIGN_ON_COOKIE, ssoId);
+            Cookie cookie = new Cookie(sso.getCookieName(), ssoId);
             cookie.setMaxAge(-1);
             cookie.setPath("/");
 
