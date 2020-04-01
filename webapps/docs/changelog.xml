@@ -222,6 +222,12 @@
       <update>
         Update the CXF module to Apache CXF 3.3.6. (remm)
       </update>
+      <fix>
+        Depreacted the <code>LOGGING_CONFIG</code> environment variable and
+        replace it with the <code>CATALINA_LOGGING_CONFIG</code> environment
+        variable to avoid clashes with other components that use
+        <code>LOGGING_CONFIG</code>. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
