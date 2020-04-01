@@ -148,13 +148,22 @@ if [ -r "$CATALINA_BASE/bin/tomcat-juli.jar" ] ; then
 else
   CLASSPATH="$CLASSPATH:$CATALINA_HOME/bin/tomcat-juli.jar"
 fi
+
+# Check for the deprecated LOGGING_CONFIG
+# Only use it if CATALINA_LOGGING_CONFIG is not set and LOGGING_CONFIG starts with "-D..."
+if [ -z "$CATALINA_LOGGING_CONFIG" ]; then
+  if [ "${LOGGING_CONFIG#*-D}" != "$LOGGING_CONFIG" ]; then
+    CATALINA_LOGGING_CONFIG="$LOGGING_CONFIG"
+  fi
+fi
+
 # Set juli LogManager config file if it is present and an override has not been issued
-if [ -z "$LOGGING_CONFIG" ]; then
+if [ -z "$CATALINA_LOGGING_CONFIG" ]; then
   if [ -r "$CATALINA_BASE/conf/logging.properties" ]; then
-    LOGGING_CONFIG="-Djava.util.logging.config.file=$CATALINA_BASE/conf/logging.properties"
+    CATALINA_LOGGING_CONFIG="-Djava.util.logging.config.file=$CATALINA_BASE/conf/logging.properties"
   else
     # Bugzilla 45585
-    LOGGING_CONFIG="-Dnop"
+    CATALINA_LOGGING_CONFIG="-Dnop"
   fi
 fi
 
@@ -214,7 +223,7 @@ case "$1" in
       -outfile "\"&1\"" \
       -errfile "\"&2\"" \
       -classpath "\"$CLASSPATH\"" \
-      "\"$LOGGING_CONFIG\"" "$JAVA_OPTS" "$CATALINA_OPTS" \
+      "\"$CATALINA_LOGGING_CONFIG\"" "$JAVA_OPTS" "$CATALINA_OPTS" \
       -D$ENDORSED_PROP="\"$JAVA_ENDORSED_DIRS\"" \
       -Dcatalina.base="\"$CATALINA_BASE\"" \
       -Dcatalina.home="\"$CATALINA_HOME\"" \
@@ -233,7 +242,7 @@ case "$1" in
       -outfile "\"$CATALINA_OUT\"" \
       -errfile "\"&1\"" \
       -classpath "\"$CLASSPATH\"" \
-      "\"$LOGGING_CONFIG\"" "$JAVA_OPTS" "$CATALINA_OPTS" \
+      "\"$CATALINA_LOGGING_CONFIG\"" "$JAVA_OPTS" "$CATALINA_OPTS" \
       -D$ENDORSED_PROP="\"$JAVA_ENDORSED_DIRS\"" \
       -Dcatalina.base="\"$CATALINA_BASE\"" \
       -Dcatalina.home="\"$CATALINA_HOME\"" \
