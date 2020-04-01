@@ -124,6 +124,10 @@
         encoding of the file. Based on a pull request by Jean-Louis Monteiro.
         (markt)
       </add>
+      <update>
+        Add <code>cookieName</code> attribute to the SSO valve to configure the
+        SSO cookie name. (remm)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Coyote">
