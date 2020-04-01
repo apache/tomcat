@@ -1166,6 +1166,11 @@
         <p>Sets the host domain to be used for sso cookies.</p>
       </attribute>
 
+      <attribute name="cookieName" required="false">
+        <p>Sets the cookie name to be used for sso cookies. The default value
+        is <code>JSESSIONIDSSO</code></p>
+      </attribute>
+
     </attributes>
 
   </subsection>

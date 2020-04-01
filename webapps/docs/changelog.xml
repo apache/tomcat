@@ -121,6 +121,10 @@
         <bug>64265</bug>: Fix ETag comparison performed by the default servlet.
         The default servley always uses weak comparison. (markt)
       </fix>
+      <update>
+        Add <code>cookieName</code> attribute to the SSO valve to configure the
+        SSO cookie name. (remm)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Coyote">

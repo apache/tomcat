@@ -94,6 +94,10 @@ public class SingleSignOn extends ValveBase {
      */
     private String cookieDomain;
 
+    /**
+     * SSO cookie name, the default value is <code>JSESSIONIDSSO</code>.
+     */
+    private String cookieName = Constants.SINGLE_SIGN_ON_COOKIE;
 
     // ------------------------------------------------------------- Properties
 
@@ -119,6 +123,23 @@ public class SingleSignOn extends ValveBase {
         } else {
             this.cookieDomain = cookieDomain;
         }
+    }
+
+
+    /**
+     * @return the cookie name
+     */
+    public String getCookieName() {
+        return cookieName;
+    }
+
+
+    /**
+     * Set the cookie name that will be used for the SSO cookie.
+     * @param cookieName the cookieName to set
+     */
+    public void setCookieName(String cookieName) {
+        this.cookieName = cookieName;
     }
 
 
@@ -227,7 +248,7 @@ public class SingleSignOn extends ValveBase {
         Cookie cookies[] = request.getCookies();
         if (cookies != null) {
             for (int i = 0; i < cookies.length; i++) {
-                if (Constants.SINGLE_SIGN_ON_COOKIE.equals(cookies[i].getName())) {
+                if (cookieName.equals(cookies[i].getName())) {
                     cookie = cookies[i];
                     break;
                 }
