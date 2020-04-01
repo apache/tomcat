@@ -98,11 +98,6 @@
 #                   Example (all one line)
 #                   CATALINA_LOGGING_CONFIG="-Djava.util.logging.config.file=$CATALINA_BASE/conf/logging.properties"
 #
-#   LOGGING_CONFIG  Deprecated
-#                   Use CATALINA_LOGGING_CONFIG
-#                   This is only used if CATALINA_LOGGING_CONFIG is not set
-#                   and LOGGING_CONFIG starts with "-D..."
-#
 #   LOGGING_MANAGER (Optional) Override Tomcat's logging manager
 #                   Example (all one line)
 #                   LOGGING_MANAGER="-Djava.util.logging.manager=org.apache.juli.ClassLoaderLogManager"
@@ -259,14 +254,6 @@ JAVA_OPTS="$JAVA_OPTS $JSSE_OPTS"
 # Register custom URL handlers
 # Do this here so custom URL handles (specifically 'war:...') can be used in the security policy
 JAVA_OPTS="$JAVA_OPTS -Djava.protocol.handler.pkgs=org.apache.catalina.webresources"
-
-# Check for the deprecated LOGGING_CONFIG
-# Only use it if CATALINA_LOGGING_CONFIG is not set and LOGGING_CONFIG starts with "-D..."
-if [ -z "$CATALINA_LOGGING_CONFIG" ]; then
-  if [ "${LOGGING_CONFIG#*-D}" != "$LOGGING_CONFIG" ]; then
-    CATALINA_LOGGING_CONFIG="$LOGGING_CONFIG"
-  fi
-fi
 
 # Set juli LogManager config file if it is present and an override has not been issued
 if [ -z "$CATALINA_LOGGING_CONFIG" ]; then
