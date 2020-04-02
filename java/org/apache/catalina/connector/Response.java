@@ -42,6 +42,7 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.ServletResponse;
 import javax.servlet.SessionTrackingMode;
 import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletResponseWrapper;
 
@@ -968,9 +969,9 @@ public class Response implements HttpServletResponse {
         // from the generateHeader() invocation
         if (SecurityUtil.isPackageProtectionEnabled()) {
             return AccessController.doPrivileged(
-                    new PrivilegedGenerateCookieString(getContext(), cookie));
+                    new PrivilegedGenerateCookieString(getContext(), cookie, request.getRequest()));
         } else {
-            return getContext().getCookieProcessor().generateHeader(cookie);
+            return getContext().getCookieProcessor().generateHeader(cookie, request.getRequest());
         }
     }
 
@@ -1829,15 +1830,17 @@ public class Response implements HttpServletResponse {
 
         private final Context context;
         private final Cookie cookie;
+        private final HttpServletRequest request;
 
-        public PrivilegedGenerateCookieString(Context context, Cookie cookie) {
+        public PrivilegedGenerateCookieString(Context context, Cookie cookie, HttpServletRequest request) {
             this.context = context;
             this.cookie = cookie;
+            this.request = request;
         }
 
         @Override
         public String run(){
-            return context.getCookieProcessor().generateHeader(cookie);
+            return context.getCookieProcessor().generateHeader(cookie, request);
         }
     }
 
