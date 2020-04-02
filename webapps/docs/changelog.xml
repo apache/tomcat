@@ -211,6 +211,15 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Tribes">
+    <changelog>
+      <scode>
+        Remove support for the deprecated system property
+        <code>org.apache.catalina.tribes.dns_lookups</code>. The default value
+        of <code>false</code> will now always be used. (markt)
+      </scode>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <add>
