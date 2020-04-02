@@ -168,7 +168,7 @@
         Expose the associated <code>HttpServletRequest</code> to the
         <code>CookieProcessor</code> when generating a cookie header so the
         header can be tailored based on the properties of the request, such as
-        the user agent, if required. (markt)
+        the user agent, if required. Based on a patch by Lazar Kirchev. (markt)
       </add>
     </changelog>
   </subsection>
