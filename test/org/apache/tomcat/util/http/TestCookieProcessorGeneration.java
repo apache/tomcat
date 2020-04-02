@@ -17,8 +17,8 @@
 package org.apache.tomcat.util.http;
 
 import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
 
-import org.apache.catalina.connector.Request;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -259,8 +259,8 @@ public class TestCookieProcessorGeneration {
     public void testSameSiteCookies() {
         LegacyCookieProcessor legacy = new LegacyCookieProcessor();
         Rfc6265CookieProcessor rfc6265 = new Rfc6265CookieProcessor();
-        Request request = new Request();
 
+        HttpServletRequest request = new DummyHttpServletRequest();
         Cookie cookie = new Cookie("foo", "bar");
 
         Assert.assertEquals("foo=bar", legacy.generateHeader(request, cookie));
@@ -357,7 +357,7 @@ public class TestCookieProcessorGeneration {
 
 
     private void doTest(Cookie cookie, CookieProcessor cookieProcessor, String expected) {
-        Request request = new Request();
+        HttpServletRequest request = new DummyHttpServletRequest();
         if (expected == null) {
             IllegalArgumentException e = null;
             try {

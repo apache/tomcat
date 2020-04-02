@@ -19,8 +19,7 @@ package org.apache.tomcat.util.http;
 import java.nio.charset.Charset;
 
 import javax.servlet.http.Cookie;
-
-import org.apache.catalina.connector.Request;
+import javax.servlet.http.HttpServletRequest;
 
 public interface CookieProcessor {
 
@@ -59,7 +58,7 @@ public interface CookieProcessor {
      * @return The header value in a form that can be added directly to the
      *         response
      */
-    String generateHeader(Request request, Cookie cookie);
+    String generateHeader(HttpServletRequest request, Cookie cookie);
 
     /**
      * Obtain the character set that will be used when converting between bytes

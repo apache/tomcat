@@ -17,13 +17,12 @@
 package org.apache.tomcat.util.http;
 
 import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
-
-import org.apache.catalina.connector.Request;
 
 public abstract class CookieProcessorBase implements CookieProcessor {
 
@@ -57,7 +56,7 @@ public abstract class CookieProcessorBase implements CookieProcessor {
     }
 
     @Override
-    public String generateHeader(Request request, Cookie cookie) {
+    public String generateHeader(HttpServletRequest request, Cookie cookie) {
         return generateHeader(cookie);
     }
 }

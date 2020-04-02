@@ -425,7 +425,7 @@ public class ApplicationPushBuilder {
             // will generate an appropriate header for the Cookie header on the
             // pushed request.
             CookieProcessor cookieProcessor = request.getContext().getCookieProcessor();
-            result.append(cookieProcessor.generateHeader(request, cookie));
+            result.append(cookieProcessor.generateHeader(request.getRequest(), cookie));
         }
         return result.toString();
     }
