@@ -113,6 +113,11 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
         return createRequest(null, false);
     }
 
+    /*
+     * DeltaRequest instances are created via this protected method to enable
+     * sub-classes to over-ride the method to use custom DeltaRequest
+     * implementations.
+     */
     protected DeltaRequest createRequest(String sessionId, boolean recordAllActions) {
         return new DeltaRequest(sessionId, recordAllActions);
     }
