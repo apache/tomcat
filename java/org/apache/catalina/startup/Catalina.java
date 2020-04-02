@@ -132,6 +132,13 @@ public class Catalina {
     protected boolean loaded = false;
 
 
+    /**
+     * Rethrow exceptions on init failure.
+     */
+    protected boolean throwOnInitFailure =
+            Boolean.getBoolean("org.apache.catalina.startup.EXIT_ON_INIT_FAILURE");
+
+
     // ----------------------------------------------------------- Constructors
 
     public Catalina() {
@@ -159,6 +166,24 @@ public class Catalina {
 
     public boolean getUseShutdownHook() {
         return useShutdownHook;
+    }
+
+
+    /**
+     * @return <code>true</code> if an exception should be thrown if an error
+     * occurs during server init
+     */
+    public boolean getThrowOnInitFailure() {
+        return throwOnInitFailure;
+    }
+
+
+    /**
+     * Set the behavior regarding errors that could occur during server init.
+     * @param throwOnInitFailure the new flag value
+     */
+    public void setThrowOnInitFailure(boolean throwOnInitFailure) {
+        this.throwOnInitFailure = throwOnInitFailure;
     }
 
 
@@ -583,7 +608,7 @@ public class Catalina {
         try {
             getServer().init();
         } catch (LifecycleException e) {
-            if (Boolean.getBoolean("org.apache.catalina.startup.EXIT_ON_INIT_FAILURE")) {
+            if (throwOnInitFailure) {
                 throw new java.lang.Error(e);
             } else {
                 log.error(sm.getString("catalina.initError"), e);
