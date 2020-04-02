@@ -38,7 +38,10 @@ public class MemberImpl implements Member, java.io.Externalizable {
     /**
      * Should a call to getName or getHostName try to do a DNS lookup?
      * default is false
+     *
+     * @deprecated This will be removed without replacement in Tomact 10 onwards
      */
+    @Deprecated
     public static final boolean DO_DNS_LOOKUPS = Boolean.parseBoolean(System.getProperty("org.apache.catalina.tribes.dns_lookups","false"));
 
     /**

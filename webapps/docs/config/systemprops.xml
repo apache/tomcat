@@ -60,6 +60,8 @@
   <properties>
 
     <property name="org.apache.catalina. tribes.dns_lookups">
+      <p>This system property is deprecated and will be removed without
+      replacement in Apache Tomcat 10 onwards.</p>
       <p>If <code>true</code>, the clustering module will attempt to use DNS to
       resolve any host names provided in the cluster configuration.</p>
       <p>If not specified, the default value of <code>false</code> will be used.</p>
