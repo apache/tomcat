@@ -974,11 +974,11 @@ public class Response implements HttpServletResponse {
             return AccessController.doPrivileged(new PrivilegedAction<String>() {
                 @Override
                 public String run(){
-                    return getContext().getCookieProcessor().generateHeader(cookie);
+                    return getContext().getCookieProcessor().generateHeader(cookie, request.getRequest());
                 }
             });
         } else {
-            return getContext().getCookieProcessor().generateHeader(cookie);
+            return getContext().getCookieProcessor().generateHeader(cookie, request.getRequest());
         }
     }
 
