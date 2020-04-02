@@ -330,7 +330,11 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
         if (running) {
             stop();
         }
-        doCloseServerSocket();
+        try {
+            doCloseServerSocket();
+        } catch (IOException ioe) {
+            getLog().warn(sm.getString("endpoint.serverSocket.closeFailed", getName()), ioe);
+        }
         destroySsl();
         super.unbind();
         if (getHandler() != null ) {
