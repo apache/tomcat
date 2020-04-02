@@ -29,6 +29,8 @@ import org.apache.tomcat.util.buf.MessageBytes;
 import org.apache.tomcat.util.http.parser.Cookie;
 import org.apache.tomcat.util.res.StringManager;
 
+import jakarta.servlet.http.HttpServletRequest;
+
 public class Rfc6265CookieProcessor extends CookieProcessorBase {
 
     private static final Log log = LogFactory.getLog(Rfc6265CookieProcessor.class);
@@ -99,6 +101,12 @@ public class Rfc6265CookieProcessor extends CookieProcessorBase {
 
     @Override
     public String generateHeader(jakarta.servlet.http.Cookie cookie) {
+        return generateHeader(cookie, null);
+    }
+
+
+    @Override
+    public String generateHeader(jakarta.servlet.http.Cookie cookie, HttpServletRequest request) {
 
         // Can't use StringBuilder due to DateFormat
         StringBuffer header = new StringBuffer();

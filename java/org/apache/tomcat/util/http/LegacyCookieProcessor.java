@@ -23,6 +23,7 @@ import java.util.BitSet;
 import java.util.Date;
 
 import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -234,6 +235,13 @@ public final class LegacyCookieProcessor extends CookieProcessorBase {
 
     @Override
     public String generateHeader(Cookie cookie) {
+        return generateHeader(cookie, null);
+    }
+
+
+    @Override
+    public String generateHeader(Cookie cookie, HttpServletRequest request) {
+
         /*
          * The spec allows some latitude on when to send the version attribute
          * with a Set-Cookie header. To be nice to clients, we'll make sure the

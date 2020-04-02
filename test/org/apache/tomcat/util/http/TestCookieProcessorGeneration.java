@@ -358,7 +358,7 @@ public class TestCookieProcessorGeneration {
         if (expected == null) {
             IllegalArgumentException e = null;
             try {
-                cookieProcessor.generateHeader(cookie);
+                cookieProcessor.generateHeader(cookie, null);
             } catch (IllegalArgumentException iae) {
                 e = iae;
             }
@@ -368,9 +368,9 @@ public class TestCookieProcessorGeneration {
                     cookie.getMaxAge() > 0) {
                 // Expires attribute will depend on time cookie is generated so
                 // use a modified test
-                Assert.assertTrue(cookieProcessor.generateHeader(cookie).startsWith(expected));
+                Assert.assertTrue(cookieProcessor.generateHeader(cookie, null).startsWith(expected));
             } else {
-                Assert.assertEquals(expected, cookieProcessor.generateHeader(cookie));
+                Assert.assertEquals(expected, cookieProcessor.generateHeader(cookie, null));
             }
         }
     }
