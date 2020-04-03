@@ -73,7 +73,7 @@
       </fix>
       <fix>
         <bug>64265</bug>: Fix ETag comparison performed by the default servlet.
-        The default servley always uses weak comparison. (markt)
+        The default servlet always uses weak comparison. (markt)
       </fix>
       <fix>
         Add support for default values when using <code>${...}</code> property
