@@ -80,7 +80,7 @@ public class TestSsl extends TomcatBaseTest {
 
     @Test
     public void testPost() throws Exception {
-        SocketFactory socketFactory = TesterSupport.configureClientSsl();
+        final SocketFactory socketFactory = TesterSupport.configureClientSsl();
 
         Tomcat tomcat = getTomcatInstance();
         TesterSupport.initSsl(tomcat);
@@ -90,8 +90,8 @@ public class TestSsl extends TomcatBaseTest {
         ctxt.addServletMappingDecoded("/post", "post");
         tomcat.start();
         int iterations = 8;
-        CountDownLatch latch = new CountDownLatch(iterations);
-        AtomicInteger errorCount = new AtomicInteger(0);
+        final CountDownLatch latch = new CountDownLatch(iterations);
+        final AtomicInteger errorCount = new AtomicInteger(0);
         for (int i = 0; i < iterations; i++) {
             new Thread() {
                 @Override
