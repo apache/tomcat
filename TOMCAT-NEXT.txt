@@ -19,10 +19,10 @@ Notes of things to consider for the next major Tomcat release (10.0.x)
 
 Items carried over from the 9.0.x list:
 
-1.  Remove the use of system properties to control configuration wherever
+ 1. Remove the use of system properties to control configuration wherever
     possible.
 
-2.  Reduce instances of setters and getters for the same property existing on an
+ 2. Reduce instances of setters and getters for the same property existing on an
     object and its parent. This may require new objects to be exposed via JMX.
 
 New items for 10.0.x onwards:
@@ -33,16 +33,12 @@ New items for 10.0.x onwards:
     the ';' character (if any). Don't mutate the header if there is no charset
     parameter. See BZ 62912 for some discussion and additional references.
 
- 3. RFC 3986 states (section 2.2) that a %nn encoded delimiter is NOT equivalent
-    to the decoded form. Provide an option not to decode delimiters in %nn form.
-
 Deferred until 10.1.x:
 
- 1.  Remove the ExtensionValidator and associated classes (assuming that the
-     minimum Java version is Java 9 or later).
+ 1. Remove the ExtensionValidator and associated classes (assuming that the
+    minimum Java version is Java 9 or later).
 
  2. Remove org.apache.tomcat.jni and replace with the minimum necessary to
     interface with OpenSSL and clones.
     We might want to park this one until we see what is available direct from
     the JRE with project Panama.
-
