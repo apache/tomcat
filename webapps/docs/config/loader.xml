@@ -90,6 +90,10 @@
       </attribute>
 
       <attribute name="reloadable" required="false">
+        <p><strong>NOTE</strong> - This attribute has been deprecated in Tomcat
+        9 and will be removed in Tomcat 10. Use the equivalent attribute on the
+        surrounding <a href="context.html">Context</a> component.</p>
+
         <p>Set to <code>true</code> if you want Catalina to monitor classes in
         <code>/WEB-INF/classes/</code> and <code>/WEB-INF/lib</code> for
         changes, and automatically reload the web application if a change
