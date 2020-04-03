@@ -29,10 +29,6 @@ New items for 10.0.x onwards:
 
  1. Remove APR connector.
 
- 2. Clean-up content-type header processing. Remove the optional space after
-    the ';' character (if any). Don't mutate the header if there is no charset
-    parameter. See BZ 62912 for some discussion and additional references.
-
 Deferred until 10.1.x:
 
  1. Remove the ExtensionValidator and associated classes (assuming that the
