@@ -546,6 +546,11 @@
       <p>The default value is <code>false</code>.</p>
     </property>
 
+    <property name="org.apache.tomcat. websocket.DEFAULT_BUFFER_SIZE">
+      <p>The default size for buffers used in the Websockets container.</p>
+      <p>The default value is <code>8192</code> which corresponds to 8KB.</p>
+    </property>
+
     <property name="org.apache.tomcat. websocket.DEFAULT_ORIGIN_HEADER_VALUE">
       <p>Default value of the origin header that will be sent by the client
          during the upgrade handshake.</p>
