@@ -53,9 +53,17 @@ public class TestStringManager {
     }
 
     @Test
-    public void testMissing() {
+    public void testMissingWithTccl() {
         Thread.currentThread().setContextClassLoader(TestStringManager.class.getClassLoader());
-        StringManager sm = StringManager.getManager("org.does.no.exist");
+        StringManager sm = StringManager.getManager("org.does.not.exist");
+        Assert.assertNull(sm.getLocale());
+    }
+
+
+    @Test
+    public void testMissingNullTccl() {
+        Thread.currentThread().setContextClassLoader(null);
+        StringManager sm = StringManager.getManager("org.does.not.exist");
         Assert.assertNull(sm.getLocale());
     }
 
