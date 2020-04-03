@@ -52,6 +52,11 @@
         <code>AprLifecycleListener</code> so that the only way to use the APR
         connectors is to set the full class name. (remm)
       </update>
+      <fix>
+        <bug>62912</bug>: Don't mutate an application provided content header if
+        it does not contain a charset. Also remove the outdated workaround for
+        the buggy Adobe Reader 9 plug-in for IE. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
