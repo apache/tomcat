@@ -40,9 +40,9 @@ import javax.servlet.http.HttpUpgradeHandler;
 import javax.servlet.http.Part;
 
 import org.apache.catalina.Globals;
+import org.apache.catalina.core.ApplicationMappingImpl;
 import org.apache.catalina.core.ApplicationPushBuilder;
 import org.apache.catalina.security.SecurityUtil;
-import org.apache.catalina.servlet4preview.http.HttpServletMapping;
 import org.apache.catalina.servlet4preview.http.HttpServletRequest;
 import org.apache.tomcat.util.res.StringManager;
 
@@ -1123,7 +1123,7 @@ public class RequestFacade implements HttpServletRequest {
      * removed or replaced at any time until Servlet 4.0 becomes final.
      */
     @Override
-    public HttpServletMapping getHttpServletMapping() {
+    public ApplicationMappingImpl getHttpServletMapping() {
         return request.getHttpServletMapping();
     }
 

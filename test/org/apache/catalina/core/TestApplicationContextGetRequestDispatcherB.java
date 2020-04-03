@@ -38,7 +38,6 @@ import org.junit.runners.Parameterized.Parameters;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.Wrapper;
-import org.apache.catalina.servlet4preview.http.HttpServletMapping;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.buf.ByteChunk;
@@ -527,7 +526,7 @@ public class TestApplicationContextGetRequestDispatcherB extends TomcatBaseTest 
             Assert.assertEquals(expectedServletPath, req.getServletPath());
             Assert.assertEquals(expectedPathInfo, req.getPathInfo());
             Assert.assertEquals(expectedQueryString, req.getQueryString());
-            HttpServletMapping mapping =
+            ApplicationMappingImpl mapping =
                     ((org.apache.catalina.servlet4preview.http.HttpServletRequest) req).getHttpServletMapping();
             Assert.assertEquals(expectedMappingMatch, mapping.getMappingMatch());
             Assert.assertEquals(expectedMappingPattern, mapping.getPattern());
@@ -547,9 +546,8 @@ public class TestApplicationContextGetRequestDispatcherB extends TomcatBaseTest 
                             req.getAttribute("javax.servlet." + name + ".path_info"));
                     Assert.assertEquals(expectedDispatcherQueryString,
                             req.getAttribute("javax.servlet." + name + ".query_string"));
-                    HttpServletMapping dispatcherMapping =
-                            (HttpServletMapping) ((org.apache.catalina.servlet4preview.http.HttpServletRequest) req).getAttribute(
-                                    "javax.servlet." + name + ".mapping");
+                    ApplicationMappingImpl dispatcherMapping =
+                            (ApplicationMappingImpl) req.getAttribute("javax.servlet." + name + ".mapping");
                     Assert.assertNotNull(dispatcherMapping);
                     Assert.assertEquals(expectedDispatcherMappingMatch,
                             dispatcherMapping.getMappingMatch());

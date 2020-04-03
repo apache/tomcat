@@ -42,7 +42,6 @@ import org.apache.catalina.Globals;
 import org.apache.catalina.Manager;
 import org.apache.catalina.Session;
 import org.apache.catalina.connector.RequestFacade;
-import org.apache.catalina.servlet4preview.http.HttpServletMapping;
 import org.apache.catalina.util.ParameterMap;
 import org.apache.catalina.util.URLEncoder;
 import org.apache.tomcat.util.buf.B2CConverter;
@@ -193,7 +192,7 @@ class ApplicationHttpRequest
     /**
      * The mapping for this request.
      */
-    private HttpServletMapping mapping = null;
+    private ApplicationMappingImpl mapping = null;
 
 
     /**
@@ -528,7 +527,7 @@ class ApplicationHttpRequest
 
 
     @Override
-    public HttpServletMapping getHttpServletMapping() {
+    public ApplicationMappingImpl getHttpServletMapping() {
         return mapping;
     }
 
@@ -781,7 +780,7 @@ class ApplicationHttpRequest
     }
 
 
-    void setMapping(HttpServletMapping mapping) {
+    void setMapping(ApplicationMappingImpl mapping) {
         this.mapping = mapping;
     }
 

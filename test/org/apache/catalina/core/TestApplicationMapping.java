@@ -31,7 +31,6 @@ import org.junit.Test;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.Wrapper;
-import org.apache.catalina.servlet4preview.http.HttpServletMapping;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.buf.ByteChunk;
@@ -340,13 +339,13 @@ public class TestApplicationMapping extends TomcatBaseTest {
                 throws ServletException, IOException {
             resp.setContentType("text/plain;charset=UTF-8");
             PrintWriter pw = resp.getWriter();
-            HttpServletMapping mapping = ((org.apache.catalina.servlet4preview.http.HttpServletRequest)
+            ApplicationMappingImpl mapping = ((org.apache.catalina.servlet4preview.http.HttpServletRequest)
                     req).getHttpServletMapping();
             pw.println("MatchValue=[" + mapping.getMatchValue() + "]");
             pw.println("Pattern=[" + mapping.getPattern() + "]");
             pw.println("MatchType=[" + mapping.getMappingMatch() + "]");
             pw.println("ServletName=[" + mapping.getServletName() + "]");
-            HttpServletMapping includeMapping = (HttpServletMapping) req.getAttribute(
+            ApplicationMappingImpl includeMapping = (ApplicationMappingImpl) req.getAttribute(
                     ApplicationDispatcher.INCLUDE_MAPPING);
             if (includeMapping != null) {
                 pw.println("IncludeMatchValue=[" + includeMapping.getMatchValue() + "]");
@@ -355,7 +354,7 @@ public class TestApplicationMapping extends TomcatBaseTest {
                 pw.println("IncludeServletName=[" + includeMapping.getServletName() + "]");
 
             }
-            HttpServletMapping forwardMapping = (HttpServletMapping) req.getAttribute(
+            ApplicationMappingImpl forwardMapping = (ApplicationMappingImpl) req.getAttribute(
                     ApplicationDispatcher.FORWARD_MAPPING);
             if (forwardMapping != null) {
                 pw.println("ForwardMatchValue=[" + forwardMapping.getMatchValue() + "]");
@@ -363,7 +362,7 @@ public class TestApplicationMapping extends TomcatBaseTest {
                 pw.println("ForwardMatchType=[" + forwardMapping.getMappingMatch() + "]");
                 pw.println("ForwardServletName=[" + forwardMapping.getServletName() + "]");
             }
-            HttpServletMapping asyncMapping = (HttpServletMapping) req.getAttribute(
+            ApplicationMappingImpl asyncMapping = (ApplicationMappingImpl) req.getAttribute(
                     ApplicationDispatcher.ASYNC_MAPPING);
             if (asyncMapping != null) {
                 pw.println("AsyncMatchValue=[" + asyncMapping.getMatchValue() + "]");

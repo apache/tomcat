@@ -17,19 +17,18 @@
 package org.apache.catalina.core;
 
 import org.apache.catalina.mapper.MappingData;
-import org.apache.catalina.servlet4preview.http.HttpServletMapping;
 
 public class ApplicationMapping {
 
     private final MappingData mappingData;
 
-    private volatile HttpServletMapping mapping = null;
+    private volatile ApplicationMappingImpl mapping = null;
 
     public ApplicationMapping(MappingData mappingData) {
         this.mappingData = mappingData;
     }
 
-    public HttpServletMapping getHttpServletMapping() {
+    public ApplicationMappingImpl getHttpServletMapping() {
         if (mapping == null) {
             if (mappingData == null) {
                 // This can happen when dispatching from an application provided

@@ -16,6 +16,7 @@
  */
 package org.apache.catalina.servlet4preview.http;
 
+import org.apache.catalina.core.ApplicationMappingImpl;
 
 /**
  * Provides early access to some parts of the Servlet 4.0 API.
@@ -47,7 +48,7 @@ public class HttpServletRequestWrapper extends javax.servlet.http.HttpServletReq
      * @since Servlet 4.0
      */
     @Override
-    public HttpServletMapping getHttpServletMapping() {
+    public ApplicationMappingImpl getHttpServletMapping() {
         return this._getHttpServletRequest().getHttpServletMapping();
     }
 }

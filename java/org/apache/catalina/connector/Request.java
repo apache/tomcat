@@ -77,12 +77,12 @@ import org.apache.catalina.TomcatPrincipal;
 import org.apache.catalina.Wrapper;
 import org.apache.catalina.core.ApplicationFilterChain;
 import org.apache.catalina.core.ApplicationMapping;
+import org.apache.catalina.core.ApplicationMappingImpl;
 import org.apache.catalina.core.ApplicationPart;
 import org.apache.catalina.core.ApplicationPushBuilder;
 import org.apache.catalina.core.ApplicationSessionCookieConfig;
 import org.apache.catalina.core.AsyncContextImpl;
 import org.apache.catalina.mapper.MappingData;
-import org.apache.catalina.servlet4preview.http.HttpServletMapping;
 import org.apache.catalina.session.ManagerBase;
 import org.apache.catalina.util.ParameterMap;
 import org.apache.catalina.util.TLSUtil;
@@ -2304,7 +2304,7 @@ public class Request implements org.apache.catalina.servlet4preview.http.HttpSer
 
 
     @Override
-    public HttpServletMapping getHttpServletMapping() {
+    public ApplicationMappingImpl getHttpServletMapping() {
         return applicationMapping.getHttpServletMapping();
     }
 

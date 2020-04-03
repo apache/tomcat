@@ -67,7 +67,6 @@ import org.apache.catalina.WebResourceRoot;
 import org.apache.catalina.Wrapper;
 import org.apache.catalina.connector.Connector;
 import org.apache.catalina.mapper.MappingData;
-import org.apache.catalina.servlet4preview.http.HttpServletMapping;
 import org.apache.catalina.util.Introspection;
 import org.apache.catalina.util.ServerInfo;
 import org.apache.catalina.util.URLEncoder;
@@ -482,7 +481,7 @@ public class ApplicationContext implements ServletContext {
             Wrapper wrapper = mappingData.wrapper;
             String wrapperPath = mappingData.wrapperPath.toString();
             String pathInfo = mappingData.pathInfo.toString();
-            HttpServletMapping mapping = new ApplicationMapping(mappingData).getHttpServletMapping();
+            ApplicationMappingImpl mapping = new ApplicationMapping(mappingData).getHttpServletMapping();
 
             // Construct a RequestDispatcher to process this request
             return new ApplicationDispatcher(wrapper, uri, wrapperPath, pathInfo,

@@ -44,7 +44,6 @@ import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.RequestFacade;
 import org.apache.catalina.connector.Response;
 import org.apache.catalina.connector.ResponseFacade;
-import org.apache.catalina.servlet4preview.http.HttpServletMapping;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.res.StringManager;
 
@@ -211,7 +210,7 @@ final class ApplicationDispatcher implements AsyncDispatcher, RequestDispatcher 
      */
     public ApplicationDispatcher
         (Wrapper wrapper, String requestURI, String servletPath,
-         String pathInfo, String queryString, HttpServletMapping mapping, String name) {
+         String pathInfo, String queryString, ApplicationMappingImpl mapping, String name) {
 
         super();
 
@@ -268,7 +267,7 @@ final class ApplicationDispatcher implements AsyncDispatcher, RequestDispatcher 
     /**
      * The mapping for this RequestDispatcher.
      */
-    private final HttpServletMapping mapping;
+    private final ApplicationMappingImpl mapping;
 
 
     /**
@@ -372,7 +371,7 @@ final class ApplicationDispatcher implements AsyncDispatcher, RequestDispatcher 
                                       hrequest.getPathInfo());
                 wrequest.setAttribute(RequestDispatcher.FORWARD_QUERY_STRING,
                                       hrequest.getQueryString());
-                HttpServletMapping mapping;
+                ApplicationMappingImpl mapping;
                 if (hrequest instanceof org.apache.catalina.servlet4preview.http.HttpServletRequest) {
                     mapping = ((org.apache.catalina.servlet4preview.http.HttpServletRequest)
                             hrequest).getHttpServletMapping();
@@ -627,7 +626,7 @@ final class ApplicationDispatcher implements AsyncDispatcher, RequestDispatcher 
 
         wrequest.setAttribute(Globals.DISPATCHER_TYPE_ATTR, DispatcherType.ASYNC);
         wrequest.setAttribute(Globals.DISPATCHER_REQUEST_PATH_ATTR, getCombinedPath());
-        HttpServletMapping mapping;
+        ApplicationMappingImpl mapping;
         if (hrequest instanceof org.apache.catalina.servlet4preview.http.HttpServletRequest) {
             mapping = ((org.apache.catalina.servlet4preview.http.HttpServletRequest)
                     hrequest).getHttpServletMapping();
