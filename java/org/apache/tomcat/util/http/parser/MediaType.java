@@ -103,10 +103,6 @@ public class MediaType {
                             continue;
                         }
                         result.append(';');
-                        // Workaround for Adobe Read 9 plug-in on IE bug
-                        // Can be removed after 26 June 2013 (EOL of Reader 9)
-                        // See BZ 53814
-                        result.append(' ');
                         result.append(entry.getKey());
                         result.append('=');
                         result.append(entry.getValue());
