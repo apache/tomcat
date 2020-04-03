@@ -526,8 +526,7 @@ public class TestApplicationContextGetRequestDispatcherB extends TomcatBaseTest 
             Assert.assertEquals(expectedServletPath, req.getServletPath());
             Assert.assertEquals(expectedPathInfo, req.getPathInfo());
             Assert.assertEquals(expectedQueryString, req.getQueryString());
-            ApplicationMappingImpl mapping =
-                    ((org.apache.catalina.servlet4preview.http.HttpServletRequest) req).getHttpServletMapping();
+            ApplicationMappingImpl mapping = ApplicationMapping.getHttpServletMapping(req);
             Assert.assertEquals(expectedMappingMatch, mapping.getMappingMatch());
             Assert.assertEquals(expectedMappingPattern, mapping.getPattern());
             Assert.assertEquals(expectedMappingMatchValue, mapping.getMatchValue());

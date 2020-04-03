@@ -371,14 +371,7 @@ final class ApplicationDispatcher implements AsyncDispatcher, RequestDispatcher 
                                       hrequest.getPathInfo());
                 wrequest.setAttribute(RequestDispatcher.FORWARD_QUERY_STRING,
                                       hrequest.getQueryString());
-                ApplicationMappingImpl mapping;
-                if (hrequest instanceof org.apache.catalina.servlet4preview.http.HttpServletRequest) {
-                    mapping = ((org.apache.catalina.servlet4preview.http.HttpServletRequest)
-                            hrequest).getHttpServletMapping();
-                } else {
-                    mapping = (new ApplicationMapping(null)).getHttpServletMapping();
-                }
-                wrequest.setAttribute(FORWARD_MAPPING, mapping);
+                wrequest.setAttribute(FORWARD_MAPPING, ApplicationMapping.getHttpServletMapping(hrequest));
             }
 
             wrequest.setContextPath(context.getEncodedPath());
@@ -626,14 +619,7 @@ final class ApplicationDispatcher implements AsyncDispatcher, RequestDispatcher 
 
         wrequest.setAttribute(Globals.DISPATCHER_TYPE_ATTR, DispatcherType.ASYNC);
         wrequest.setAttribute(Globals.DISPATCHER_REQUEST_PATH_ATTR, getCombinedPath());
-        ApplicationMappingImpl mapping;
-        if (hrequest instanceof org.apache.catalina.servlet4preview.http.HttpServletRequest) {
-            mapping = ((org.apache.catalina.servlet4preview.http.HttpServletRequest)
-                    hrequest).getHttpServletMapping();
-        } else {
-            mapping = (new ApplicationMapping(null)).getHttpServletMapping();
-        }
-        wrequest.setAttribute(ASYNC_MAPPING, mapping);
+        wrequest.setAttribute(ASYNC_MAPPING, ApplicationMapping.getHttpServletMapping(hrequest));
 
         wrequest.setContextPath(context.getEncodedPath());
         wrequest.setRequestURI(requestURI);

@@ -34,6 +34,7 @@ import javax.servlet.ServletInputStream;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpUpgradeHandler;
@@ -43,7 +44,6 @@ import org.apache.catalina.Globals;
 import org.apache.catalina.core.ApplicationMappingImpl;
 import org.apache.catalina.core.ApplicationPushBuilder;
 import org.apache.catalina.security.SecurityUtil;
-import org.apache.catalina.servlet4preview.http.HttpServletRequest;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -1116,13 +1116,6 @@ public class RequestFacade implements HttpServletRequest {
     }
 
 
-    /**
-     * {@inheritDoc}
-     * <p>
-     * Pulled forward from Servlet 4.0. The method signature may be modified,
-     * removed or replaced at any time until Servlet 4.0 becomes final.
-     */
-    @Override
     public ApplicationMappingImpl getHttpServletMapping() {
         return request.getHttpServletMapping();
     }

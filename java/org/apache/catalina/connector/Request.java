@@ -125,7 +125,7 @@ import org.ietf.jgss.GSSException;
  * @author Remy Maucherat
  * @author Craig R. McClanahan
  */
-public class Request implements org.apache.catalina.servlet4preview.http.HttpServletRequest {
+public class Request implements HttpServletRequest {
 
     private static final Log log = LogFactory.getLog(Request.class);
 
@@ -2303,7 +2303,6 @@ public class Request implements org.apache.catalina.servlet4preview.http.HttpSer
     }
 
 
-    @Override
     public ApplicationMappingImpl getHttpServletMapping() {
         return applicationMapping.getHttpServletMapping();
     }

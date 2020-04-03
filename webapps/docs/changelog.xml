@@ -45,6 +45,16 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 8.5.55 (markt)" rtext="in development">
+  <subsection name="Catalina">
+    <changelog>
+      <scode>
+        Remove the remainder of the deprecated Servlet 4 Preview API. Users
+        still depending on this feature should ideally upgrade to Tomcat
+        9.0.x. If upgrade is not possible, application code should cast to the
+        internal Tomcat implementation classes. (markt)
+      </scode>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 8.5.54 (markt)" rtext="release in progress">
   <subsection name="Catalina">

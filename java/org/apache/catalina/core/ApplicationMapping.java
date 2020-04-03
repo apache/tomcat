@@ -16,6 +16,11 @@
  */
 package org.apache.catalina.core;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletRequestWrapper;
+
+import org.apache.catalina.connector.Request;
+import org.apache.catalina.connector.RequestFacade;
 import org.apache.catalina.mapper.MappingData;
 
 public class ApplicationMapping {
@@ -82,5 +87,25 @@ public class ApplicationMapping {
 
     public void recycle() {
         mapping = null;
+    }
+
+
+    public static ApplicationMappingImpl getHttpServletMapping(HttpServletRequest request) {
+        if (request instanceof RequestFacade) {
+            return ((RequestFacade) request).getHttpServletMapping();
+        } else if (request instanceof Request) {
+            return ((Request) request).getHttpServletMapping();
+        } else if (request instanceof ApplicationHttpRequest) {
+            return ((ApplicationHttpRequest) request).getHttpServletMapping();
+        }
+        return (new ApplicationMapping(null)).getHttpServletMapping();
+    }
+
+
+    public static ApplicationMappingImpl getHttpServletMapping(HttpServletRequestWrapper wrapper) {
+        if (wrapper instanceof ApplicationHttpRequest) {
+            return ((ApplicationHttpRequest) wrapper).getHttpServletMapping();
+        }
+        return (new ApplicationMapping(null)).getHttpServletMapping();
     }
 }

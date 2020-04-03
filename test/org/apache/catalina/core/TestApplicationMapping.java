@@ -339,8 +339,7 @@ public class TestApplicationMapping extends TomcatBaseTest {
                 throws ServletException, IOException {
             resp.setContentType("text/plain;charset=UTF-8");
             PrintWriter pw = resp.getWriter();
-            ApplicationMappingImpl mapping = ((org.apache.catalina.servlet4preview.http.HttpServletRequest)
-                    req).getHttpServletMapping();
+            ApplicationMappingImpl mapping = ApplicationMapping.getHttpServletMapping(req);
             pw.println("MatchValue=[" + mapping.getMatchValue() + "]");
             pw.println("Pattern=[" + mapping.getPattern() + "]");
             pw.println("MatchType=[" + mapping.getMappingMatch() + "]");
