@@ -27,7 +27,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import org.apache.catalina.Context;
@@ -86,7 +85,6 @@ public class TestResponse extends TomcatBaseTest {
     }
 
 
-    @Ignore // Disabled until Bug 62912 is addressed
     @Test
     public void testContentTypeWithoutSpace() throws Exception {
         doTestContentTypeSpacing(false);

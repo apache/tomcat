@@ -769,9 +769,17 @@ public class Response implements HttpServletResponse {
             return;
         }
 
-        getCoyoteResponse().setContentTypeNoCharset(m[0]);
 
-        if (m[1] != null) {
+        if (m[1] == null) {
+            // No charset and we know value is valid as cache lookup was
+            // successful
+            // Pass-through user provided value in case user-agent is buggy and
+            // requires specific format
+            getCoyoteResponse().setContentTypeNoCharset(type);
+        } else {
+            // There is a charset so have to rebuild content-type without it
+            getCoyoteResponse().setContentTypeNoCharset(m[0]);
+
             // Ignore charset if getWriter() has already been called
             if (!usingWriter) {
                 try {
