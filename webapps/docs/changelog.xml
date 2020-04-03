@@ -57,6 +57,11 @@
         it does not contain a charset. Also remove the outdated workaround for
         the buggy Adobe Reader 9 plug-in for IE. (markt)
       </fix>
+      <scode>
+        Remove the <code>reloadable</code> attribute from the
+        <code>Loader</code> interface as it is duplicated on the
+        <code>Context</code> interface. (markt)
+      </scode>
     </changelog>
   </subsection>
 </section>

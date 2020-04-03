@@ -16,7 +16,6 @@
  */
 package org.apache.catalina.loader;
 
-import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.File;
@@ -62,8 +61,7 @@ import org.apache.tomcat.util.res.StringManager;
  * @author Craig R. McClanahan
  * @author Remy Maucherat
  */
-public class WebappLoader extends LifecycleMBeanBase
-    implements Loader, PropertyChangeListener {
+public class WebappLoader extends LifecycleMBeanBase implements Loader{
 
     private static final Log log = LogFactory.getLog(WebappLoader.class);
 
@@ -94,12 +92,6 @@ public class WebappLoader extends LifecycleMBeanBase
      * loader implementation must be used.
      */
     private String loaderClass = ParallelWebappClassLoader.class.getName();
-
-
-    /**
-     * The reloadable flag for this Loader.
-     */
-    private boolean reloadable = false;
 
 
     /**
@@ -145,25 +137,13 @@ public class WebappLoader extends LifecycleMBeanBase
         }
 
         if (getState().isAvailable()) {
-            throw new IllegalStateException(
-                    sm.getString("webappLoader.setContext.ise"));
-        }
-
-        // Deregister from the old Context (if any)
-        if (this.context != null) {
-            this.context.removePropertyChangeListener(this);
+            throw new IllegalStateException(sm.getString("webappLoader.setContext.ise"));
         }
 
         // Process this property change
         Context oldContext = this.context;
         this.context = context;
         support.firePropertyChange("context", oldContext, this.context);
-
-        // Register with the new Container (if any)
-        if (this.context != null) {
-            setReloadable(this.context.getReloadable());
-            this.context.addPropertyChangeListener(this);
-        }
     }
 
 
@@ -210,31 +190,6 @@ public class WebappLoader extends LifecycleMBeanBase
     }
 
 
-    /**
-     * Return the reloadable flag for this Loader.
-     */
-    @Override
-    public boolean getReloadable() {
-        return this.reloadable;
-    }
-
-
-    /**
-     * Set the reloadable flag for this Loader.
-     *
-     * @param reloadable The new reloadable flag
-     */
-    @Override
-    public void setReloadable(boolean reloadable) {
-        // Process this property change
-        boolean oldReloadable = this.reloadable;
-        this.reloadable = reloadable;
-        support.firePropertyChange("reloadable",
-                                   Boolean.valueOf(oldReloadable),
-                                   Boolean.valueOf(this.reloadable));
-    }
-
-
     // --------------------------------------------------------- Public Methods
 
     /**
@@ -257,17 +212,15 @@ public class WebappLoader extends LifecycleMBeanBase
      */
     @Override
     public void backgroundProcess() {
-        if (reloadable && modified()) {
-            try {
-                Thread.currentThread().setContextClassLoader
-                    (WebappLoader.class.getClassLoader());
-                if (context != null) {
+        Context context = getContext();
+        if (context != null) {
+            if (context.getReloadable() && modified()) {
+                ClassLoader originalTccl = Thread.currentThread().getContextClassLoader();
+                try {
+                    Thread.currentThread().setContextClassLoader(WebappLoader.class.getClassLoader());
                     context.reload();
-                }
-            } finally {
-                if (context != null && context.getLoader() != null) {
-                    Thread.currentThread().setContextClassLoader
-                        (context.getLoader().getClassLoader());
+                } finally {
+                    Thread.currentThread().setContextClassLoader(originalTccl);
                 }
             }
         }
@@ -434,34 +387,6 @@ public class WebappLoader extends LifecycleMBeanBase
 
 
         classLoader = null;
-    }
-
-
-    // ----------------------------------------- PropertyChangeListener Methods
-
-
-    /**
-     * Process property change events from our associated Context.
-     *
-     * @param event The property change event that has occurred
-     */
-    @Override
-    public void propertyChange(PropertyChangeEvent event) {
-
-        // Validate the source of this event
-        if (!(event.getSource() instanceof Context))
-            return;
-
-        // Process a relevant property change
-        if (event.getPropertyName().equals("reloadable")) {
-            try {
-                setReloadable
-                    ( ((Boolean) event.getNewValue()).booleanValue() );
-            } catch (NumberFormatException e) {
-                log.error(sm.getString("webappLoader.reloadable",
-                                 event.getNewValue().toString()));
-            }
-        }
     }
 
 

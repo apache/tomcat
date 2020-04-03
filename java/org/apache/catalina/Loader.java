@@ -95,20 +95,6 @@ public interface Loader {
 
 
     /**
-     * @return the reloadable flag for this Loader.
-     */
-    public boolean getReloadable();
-
-
-    /**
-     * Set the reloadable flag for this Loader.
-     *
-     * @param reloadable The new reloadable flag
-     */
-    public void setReloadable(boolean reloadable);
-
-
-    /**
      * Add a property change listener to this component.
      *
      * @param listener The listener to add

@@ -343,10 +343,6 @@ public class TestContextConfigAnnotation {
         @Override
         public void setDelegate(boolean delegate) {}
         @Override
-        public boolean getReloadable() { return false; }
-        @Override
-        public void setReloadable(boolean reloadable) {}
-        @Override
         public void addPropertyChangeListener(PropertyChangeListener l) {
         }
         @Override
