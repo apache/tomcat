@@ -45,6 +45,15 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 10.0.0-M5 (markt)" rtext="in development">
+  <subsection name="Catalina">
+    <changelog>
+      <update>
+        Remove <code>useAprConnector</code> flag from
+        <code>AprLifecycleListener</code> so that the only way to use the APR
+        connectors is to set the full class name. (remm)
+      </update>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 10.0.0-M4 (markt)" rtext="release in progress">
   <subsection name="Catalina">

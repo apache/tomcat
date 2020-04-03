@@ -78,7 +78,6 @@ public class AprLifecycleListener
     protected static boolean sslInitialized = false;
     protected static boolean aprInitialized = false;
     protected static boolean aprAvailable = false;
-    protected static boolean useAprConnector = false;
     protected static boolean useOpenSSL = true;
     protected static boolean fipsModeActive = false;
 
@@ -254,10 +253,6 @@ public class AprLifecycleListener
                 Boolean.valueOf(Library.APR_HAS_SO_ACCEPTFILTER),
                 Boolean.valueOf(Library.APR_HAS_RANDOM)));
 
-        initInfoLogMessages.add(sm.getString("aprListener.config",
-                Boolean.valueOf(useAprConnector),
-                Boolean.valueOf(useOpenSSL)));
-
         aprAvailable = true;
     }
 
@@ -399,16 +394,6 @@ public class AprLifecycleListener
 
     public boolean isFIPSModeActive() {
         return fipsModeActive;
-    }
-
-    public void setUseAprConnector(boolean useAprConnector) {
-        if (useAprConnector != AprLifecycleListener.useAprConnector) {
-            AprLifecycleListener.useAprConnector = useAprConnector;
-        }
-    }
-
-    public static boolean getUseAprConnector() {
-        return useAprConnector;
     }
 
     public void setUseOpenSSL(boolean useOpenSSL) {

@@ -73,21 +73,10 @@ public class Connector extends LifecycleMBeanBase  {
 
 
     public Connector(String protocol) {
-        boolean aprConnector = AprLifecycleListener.isAprAvailable() &&
-                AprLifecycleListener.getUseAprConnector();
-
         if ("HTTP/1.1".equals(protocol) || protocol == null) {
-            if (aprConnector) {
-                protocolHandlerClassName = "org.apache.coyote.http11.Http11AprProtocol";
-            } else {
-                protocolHandlerClassName = "org.apache.coyote.http11.Http11NioProtocol";
-            }
+            protocolHandlerClassName = "org.apache.coyote.http11.Http11NioProtocol";
         } else if ("AJP/1.3".equals(protocol)) {
-            if (aprConnector) {
-                protocolHandlerClassName = "org.apache.coyote.ajp.AjpAprProtocol";
-            } else {
-                protocolHandlerClassName = "org.apache.coyote.ajp.AjpNioProtocol";
-            }
+            protocolHandlerClassName = "org.apache.coyote.ajp.AjpNioProtocol";
         } else {
             protocolHandlerClassName = protocol;
         }
@@ -661,15 +650,9 @@ public class Connector extends LifecycleMBeanBase  {
      * @return the Coyote protocol handler in use.
      */
     public String getProtocol() {
-        if (("org.apache.coyote.http11.Http11NioProtocol".equals(getProtocolHandlerClassName()) &&
-                    (!AprLifecycleListener.isAprAvailable() || !AprLifecycleListener.getUseAprConnector())) ||
-                "org.apache.coyote.http11.Http11AprProtocol".equals(getProtocolHandlerClassName()) &&
-                    AprLifecycleListener.getUseAprConnector()) {
+        if ("org.apache.coyote.http11.Http11NioProtocol".equals(getProtocolHandlerClassName())) {
             return "HTTP/1.1";
-        } else if (("org.apache.coyote.ajp.AjpNioProtocol".equals(getProtocolHandlerClassName()) &&
-                    (!AprLifecycleListener.isAprAvailable() || !AprLifecycleListener.getUseAprConnector())) ||
-                "org.apache.coyote.ajp.AjpAprProtocol".equals(getProtocolHandlerClassName()) &&
-                    AprLifecycleListener.getUseAprConnector()) {
+        } else if ("org.apache.coyote.ajp.AjpNioProtocol".equals(getProtocolHandlerClassName())) {
             return "AJP/1.3";
         }
         return getProtocolHandlerClassName();

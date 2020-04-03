@@ -126,14 +126,6 @@
         <p>The default value is <code>off</code>.</p>
       </attribute>
 
-      <attribute name="useAprConnector" required="false">
-        <p>This attribute controls the auto-selection of the connector
-        implementation. When the <strong>protocol</strong> is specified as
-        <code>HTTP/1.1</code> or <code>AJP/1.3</code> then if this attribute is
-        <code>true</code> the APR/native connector will be used but if this
-        attribute is false the NIO connector will be used.</p>
-      </attribute>
-
       <attribute name="useOpenSSL" required="false">
         <p>This attribute controls the auto-selection of the OpenSSL JSSE
         implementation. The default is <code>true</code> which will use OpenSSL

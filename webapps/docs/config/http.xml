@@ -205,18 +205,8 @@
 
     <attribute name="protocol" required="false">
       <p>Sets the protocol to handle incoming traffic. The default value is
-        <code>HTTP/1.1</code> which uses an auto-switching mechanism to select
-        either a Java NIO based connector or an APR/native based connector.
-        If the <code>PATH</code> (Windows) or <code>LD_LIBRARY_PATH</code> (on
-        most unix systems) environment variables contain the Tomcat native
-        library, and the <code>AprLifecycleListener</code> that is used to
-        initialize APR has its <code>useAprConnector</code> attribute set to
-        <code>true</code>, the APR/native connector will be used. If the native library
-        cannot be found or the attribute is not configured, the Java NIO based
-        connector will be used. Note that the APR/native connector has different
-        settings for HTTPS than the Java connectors.<br/>
-        To use an explicit protocol rather than rely on the auto-switching
-        mechanism described above, the following values may be used:<br/>
+        <code>HTTP/1.1</code> which uses a Java NIO based connector.<br/>
+        To use an explicit protocol, the following values may be used:<br/>
         <code>org.apache.coyote.http11.Http11NioProtocol</code> -
               non blocking Java NIO connector<br/>
         <code>org.apache.coyote.http11.Http11Nio2Protocol</code> -
@@ -1528,8 +1518,9 @@
 
   <subsection name="SSL Support - Connector - NIO and NIO2">
 
-  <p>When APR/native is enabled, the connectors will default to using OpenSSL through JSSE,
-  which may be more optimized than the JSSE Java implementation depending on the processor being used,
+  <p>When APR/native is enabled, the connectors will default to using
+  OpenSSL through JSSE, which may be more optimized than the JSSE Java
+  implementation depending on the processor being used,
   and can be complemented with many commercial accelerator components.</p>
 
   <p>The following NIO and NIO2 SSL configuration attributes are not specific to
