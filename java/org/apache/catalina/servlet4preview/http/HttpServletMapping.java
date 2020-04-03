@@ -18,6 +18,8 @@ package org.apache.catalina.servlet4preview.http;
 
 import javax.servlet.annotation.WebServlet;
 
+import org.apache.catalina.core.ApplicationMappingMatch;
+
 /**
  * Represents how the request from which this object was obtained was mapped to
  * the associated servlet.
@@ -49,5 +51,5 @@ public interface HttpServletMapping {
     /**
      * @return The type of match ({@code null} if not known)
      */
-    MappingMatch getMappingMatch();
+    ApplicationMappingMatch getMappingMatch();
 }

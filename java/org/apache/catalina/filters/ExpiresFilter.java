@@ -42,7 +42,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletResponseWrapper;
 
-import org.apache.catalina.servlet4preview.http.MappingMatch;
+import org.apache.catalina.core.ApplicationMappingMatch;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
@@ -1296,7 +1296,7 @@ public class ExpiresFilter extends FilterBase {
                 org.apache.catalina.servlet4preview.http.HttpServletRequest servlet4Request =
                         (org.apache.catalina.servlet4preview.http.HttpServletRequest) innerRequest;
 
-                if (servlet4Request.getHttpServletMapping().getMappingMatch() == MappingMatch.DEFAULT &&
+                if (servlet4Request.getHttpServletMapping().getMappingMatch() == ApplicationMappingMatch.DEFAULT &&
                         response.getStatus() == HttpServletResponse.SC_NOT_MODIFIED) {
                     // Default servlet normally sets the content type but does not for
                     // 304 responses. Look it up.

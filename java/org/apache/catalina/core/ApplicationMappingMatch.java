@@ -14,14 +14,12 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.apache.catalina.servlet4preview.http;
+package org.apache.catalina.core;
 
 /**
  * Represents the ways that a request can be mapped to a servlet
- *
- * @since 4.0
  */
-public enum MappingMatch {
+public enum ApplicationMappingMatch {
 
     CONTEXT_ROOT,
     DEFAULT,

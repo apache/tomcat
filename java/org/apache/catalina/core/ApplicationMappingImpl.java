@@ -1,16 +1,15 @@
 package org.apache.catalina.core;
 
 import org.apache.catalina.servlet4preview.http.HttpServletMapping;
-import org.apache.catalina.servlet4preview.http.MappingMatch;
 
 public class ApplicationMappingImpl implements HttpServletMapping {
 
     private final String matchValue;
     private final String pattern;
-    private final MappingMatch mappingType;
+    private final ApplicationMappingMatch mappingType;
     private final String servletName;
 
-    public ApplicationMappingImpl(String matchValue, String pattern, MappingMatch mappingType, String servletName) {
+    public ApplicationMappingImpl(String matchValue, String pattern, ApplicationMappingMatch mappingType, String servletName) {
         this.matchValue = matchValue;
         this.pattern = pattern;
         this.mappingType = mappingType;
@@ -28,7 +27,7 @@ public class ApplicationMappingImpl implements HttpServletMapping {
     }
 
     @Override
-    public MappingMatch getMappingMatch() {
+    public ApplicationMappingMatch getMappingMatch() {
         return mappingType;
     }
 

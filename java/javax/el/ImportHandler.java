@@ -114,7 +114,7 @@ public class ImportHandler {
         servletHttpClassNames.add("HttpSessionEvent");
         servletHttpClassNames.add("HttpUtils");
         // Enums
-        servletHttpClassNames.add("MappingMatch");
+        servletHttpClassNames.add("ApplicationMappingMatch");
         standardPackages.put("javax.servlet.http", servletHttpClassNames);
 
         // JSP 2.3

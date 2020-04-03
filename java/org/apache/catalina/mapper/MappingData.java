@@ -20,7 +20,7 @@ package org.apache.catalina.mapper;
 import org.apache.catalina.Context;
 import org.apache.catalina.Host;
 import org.apache.catalina.Wrapper;
-import org.apache.catalina.servlet4preview.http.MappingMatch;
+import org.apache.catalina.core.ApplicationMappingMatch;
 import org.apache.tomcat.util.buf.MessageBytes;
 
 /**
@@ -49,7 +49,7 @@ public class MappingData {
     public final MessageBytes redirectPath = MessageBytes.newInstance();
 
     // Fields used by ApplicationMapping to implement javax.servlet.http.HttpServletMapping
-    public MappingMatch matchType = null;
+    public ApplicationMappingMatch matchType = null;
 
     public void recycle() {
         host = null;
