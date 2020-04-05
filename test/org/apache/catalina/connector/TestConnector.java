@@ -24,6 +24,7 @@ import java.util.Map;
 
 import jakarta.servlet.Servlet;
 
+import org.apache.coyote.http11.Http11NioProtocol;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -86,7 +87,7 @@ public class TestConnector extends TomcatBaseTest {
         Connector connector1 = tomcat.getConnector();
         connector1.setPort(0);
 
-        Connector connector2 = new Connector();
+        Connector connector2 = new Connector(new Http11NioProtocol());
         connector2.setPort(0);
 
         tomcat.getService().addConnector(connector2);
@@ -98,26 +99,6 @@ public class TestConnector extends TomcatBaseTest {
 
         Assert.assertTrue(localPort1 > 0);
         Assert.assertTrue(localPort2 > 0);
-    }
-
-
-    @Test(expected=LifecycleException.class)
-    public void testInvalidProtocolThrows() throws Exception {
-        doTestInvalidProtocol(true);
-    }
-
-
-    @Test
-    public void testInvalidProtocolNoThrows() throws Exception {
-        doTestInvalidProtocol(false);
-    }
-
-
-    private void doTestInvalidProtocol(boolean throwOnFailure) throws Exception {
-        Connector c = new Connector("foo.Bar");
-        c.setThrowOnFailure(throwOnFailure);
-
-        c.start();
     }
 
 
@@ -134,12 +115,12 @@ public class TestConnector extends TomcatBaseTest {
 
 
     private void doTestDuplicatePort(boolean throwOnFailure) throws Exception {
-        Connector c1 = new Connector();
+        Connector c1 = new Connector(new Http11NioProtocol());
         c1.setThrowOnFailure(throwOnFailure);
         c1.setPort(0);
         c1.start();
 
-        Connector c2 = new Connector();
+        Connector c2 = new Connector(new Http11NioProtocol());
         c2.setThrowOnFailure(throwOnFailure);
         c2.setPort(c1.getLocalPort());
 

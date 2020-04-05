@@ -49,6 +49,8 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.res.StringManager;
 
+import static org.apache.catalina.util.ProtocolHandlerFactory.createProtocolHandler;
+
 
 /**
  * @author Amy Roh
@@ -285,7 +287,7 @@ public class MBeanFactory {
         throws Exception {
         // Set the protocol in the constructor
         String protocol = isAjp ? "AJP/1.3" : "HTTP/1.1";
-        Connector retobj = new Connector(protocol);
+        Connector retobj = new Connector(createProtocolHandler(protocol));
         if ((address!=null) && (address.length()>0)) {
             retobj.setProperty("address", address);
         }

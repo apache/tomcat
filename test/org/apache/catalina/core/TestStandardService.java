@@ -18,6 +18,7 @@ package org.apache.catalina.core;
 
 import java.net.InetAddress;
 
+import org.apache.coyote.http11.Http11NioProtocol;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -47,7 +48,7 @@ public class TestStandardService extends TomcatBaseTest {
 
         tomcat.start();
 
-        Connector c2 = new Connector("HTTP/1.1");
+        Connector c2 = new Connector(new Http11NioProtocol());
         c2.setThrowOnFailure(throwOnFailure);
 
         Assert.assertTrue(c2.setProperty("address", ((InetAddress) connector.getProperty("address")).getHostAddress()));

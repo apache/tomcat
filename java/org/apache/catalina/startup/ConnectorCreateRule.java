@@ -31,6 +31,8 @@ import org.apache.tomcat.util.digester.Rule;
 import org.apache.tomcat.util.res.StringManager;
 import org.xml.sax.Attributes;
 
+import static org.apache.catalina.util.ProtocolHandlerFactory.createProtocolHandler;
+
 
 /**
  * Rule implementation that creates a connector.
@@ -61,7 +63,7 @@ public class ConnectorCreateRule extends Rule {
         if ( attributes.getValue("executor")!=null ) {
             ex = svc.getExecutor(attributes.getValue("executor"));
         }
-        Connector con = new Connector(attributes.getValue("protocol"));
+        Connector con = new Connector(createProtocolHandler((attributes.getValue("protocol"))));
         if (ex != null) {
             setExecutor(con, ex);
         }

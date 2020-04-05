@@ -28,6 +28,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
+import org.apache.coyote.http11.Http11NioProtocol;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -595,7 +596,7 @@ public class TestResponse extends TomcatBaseTest {
     private void doTestSendRedirect(String input, String expectedLocation) throws Exception {
         // Set-up.
         // Note: Not sufficient for testing relative -> absolute
-        Connector connector = new Connector();
+        Connector connector = new Connector(new Http11NioProtocol());
         org.apache.coyote.Response cResponse = new org.apache.coyote.Response();
         Response response = new Response();
         response.setCoyoteResponse(cResponse);

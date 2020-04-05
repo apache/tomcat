@@ -179,4 +179,21 @@ public interface ProtocolHandler {
      * @return the protocols
      */
     public UpgradeProtocol[] findUpgradeProtocols();
+
+    /**
+     * Returns {@code HTTP/1.1} unless implementation overrides it
+     * @return the protocol name for this implementation
+     */
+    default String getProtocolAbbreviation() {
+        return "HTTP/1.1";
+    }
+
+    /**
+     * For protocols that have a packet size, return a positive packet size.
+     * Used when creating response messages
+     * @return default is -1, no packet size available.
+     */
+    default int getPacketSize() {
+        return -1;
+    }
 }

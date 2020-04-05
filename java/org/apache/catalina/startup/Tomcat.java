@@ -70,6 +70,7 @@ import org.apache.catalina.realm.RealmBase;
 import org.apache.catalina.security.SecurityClassLoad;
 import org.apache.catalina.util.ContextName;
 import org.apache.catalina.util.IOTools;
+import org.apache.coyote.http11.Http11NioProtocol;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.buf.UriUtil;
 import org.apache.tomcat.util.compat.JreCompat;
@@ -533,14 +534,16 @@ public class Tomcat {
         if (service.findConnectors().length > 0) {
             return service.findConnectors()[0];
         }
-        // The same as in standard Tomcat configuration.
-        // This creates an APR HTTP connector if AprLifecycleListener has been
-        // configured (created) and Tomcat Native library is available.
-        // Otherwise it creates a NIO HTTP connector.
-        Connector connector = new Connector("HTTP/1.1");
-        connector.setPort(port);
-        service.addConnector(connector);
-        return connector;
+        // If no connectors are available
+        // create a NIO connector
+        try {
+            Connector connector = new Connector(new Http11NioProtocol());
+            connector.setPort(port);
+            service.addConnector(connector);
+            return connector;
+        } catch (Exception e) {
+            throw new IllegalStateException(e);
+        }
     }
 
     /**

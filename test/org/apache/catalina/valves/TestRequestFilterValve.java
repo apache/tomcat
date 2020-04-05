@@ -20,6 +20,7 @@ import java.io.IOException;
 
 import jakarta.servlet.ServletException;
 
+import org.apache.coyote.http11.Http11NioProtocol;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -82,7 +83,7 @@ public class TestRequestFilterValve {
                          String property, String type, boolean allowed) {
         // PREPARE
         RequestFilterValve valve = null;
-        Connector connector = new Connector();
+        Connector connector = new Connector(new Http11NioProtocol());
         Context context = new StandardContext();
         Request request = new Request(connector);
         Response response = new MockResponse();

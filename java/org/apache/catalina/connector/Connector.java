@@ -35,7 +35,6 @@ import org.apache.coyote.AbstractProtocol;
 import org.apache.coyote.Adapter;
 import org.apache.coyote.ProtocolHandler;
 import org.apache.coyote.UpgradeProtocol;
-import org.apache.coyote.ajp.AbstractAjpProtocol;
 import org.apache.coyote.http11.AbstractHttp11JsseProtocol;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -46,7 +45,6 @@ import org.apache.tomcat.util.buf.EncodedSolidusHandling;
 import org.apache.tomcat.util.net.SSLHostConfig;
 import org.apache.tomcat.util.net.openssl.OpenSSLImplementation;
 import org.apache.tomcat.util.res.StringManager;
-
 
 /**
  * Implementation of a Coyote connector.
@@ -65,45 +63,17 @@ public class Connector extends LifecycleMBeanBase  {
     // ------------------------------------------------------------ Constructor
 
     /**
-     * Defaults to using HTTP/1.1 NIO implementation.
+     *
+     * @param handler
      */
-    public Connector() {
-        this("org.apache.coyote.http11.Http11NioProtocol");
-    }
-
-
-    public Connector(String protocol) {
-        boolean aprConnector = AprLifecycleListener.isAprAvailable() &&
-                AprLifecycleListener.getUseAprConnector();
-
-        if ("HTTP/1.1".equals(protocol) || protocol == null) {
-            if (aprConnector) {
-                protocolHandlerClassName = "org.apache.coyote.http11.Http11AprProtocol";
-            } else {
-                protocolHandlerClassName = "org.apache.coyote.http11.Http11NioProtocol";
-            }
-        } else if ("AJP/1.3".equals(protocol)) {
-            if (aprConnector) {
-                protocolHandlerClassName = "org.apache.coyote.ajp.AjpAprProtocol";
-            } else {
-                protocolHandlerClassName = "org.apache.coyote.ajp.AjpNioProtocol";
-            }
-        } else {
-            protocolHandlerClassName = protocol;
+    public Connector(ProtocolHandler handler) {
+        if (handler == null) {
+            throw new IllegalArgumentException(
+                sm.getString("coyoteConnector.protocolHandlerInstantiationFailed")
+            );
         }
-
-        // Instantiate protocol handler
-        ProtocolHandler p = null;
-        try {
-            Class<?> clazz = Class.forName(protocolHandlerClassName);
-            p = (ProtocolHandler) clazz.getConstructor().newInstance();
-        } catch (Exception e) {
-            log.error(sm.getString(
-                    "coyoteConnector.protocolHandlerInstantiationFailed"), e);
-        } finally {
-            this.protocolHandler = p;
-        }
-
+        this.protocolHandler = handler;
+        this.protocolHandlerClassName = handler.getClass().getName();
         // Default for Connector depends on this system property
         setThrowOnFailure(Boolean.getBoolean("org.apache.catalina.startup.EXIT_ON_INIT_FAILURE"));
     }
@@ -263,7 +233,6 @@ public class Connector extends LifecycleMBeanBase  {
 
     /**
      * Coyote Protocol handler class name.
-     * See {@link #Connector()} for current default.
      */
     protected final String protocolHandlerClassName;
 
@@ -661,18 +630,7 @@ public class Connector extends LifecycleMBeanBase  {
      * @return the Coyote protocol handler in use.
      */
     public String getProtocol() {
-        if (("org.apache.coyote.http11.Http11NioProtocol".equals(getProtocolHandlerClassName()) &&
-                    (!AprLifecycleListener.isAprAvailable() || !AprLifecycleListener.getUseAprConnector())) ||
-                "org.apache.coyote.http11.Http11AprProtocol".equals(getProtocolHandlerClassName()) &&
-                    AprLifecycleListener.getUseAprConnector()) {
-            return "HTTP/1.1";
-        } else if (("org.apache.coyote.ajp.AjpNioProtocol".equals(getProtocolHandlerClassName()) &&
-                    (!AprLifecycleListener.isAprAvailable() || !AprLifecycleListener.getUseAprConnector())) ||
-                "org.apache.coyote.ajp.AjpAprProtocol".equals(getProtocolHandlerClassName()) &&
-                    AprLifecycleListener.getUseAprConnector()) {
-            return "AJP/1.3";
-        }
-        return getProtocolHandlerClassName();
+        return protocolHandler.getProtocolAbbreviation();
     }
 
 
@@ -963,9 +921,9 @@ public class Connector extends LifecycleMBeanBase  {
      * @return a new Servlet response object
      */
     public Response createResponse() {
-        if (protocolHandler instanceof AbstractAjpProtocol<?>) {
-            int packetSize = ((AbstractAjpProtocol<?>) protocolHandler).getPacketSize();
-            return new Response(packetSize - org.apache.coyote.ajp.Constants.SEND_HEAD_LEN);
+        if (protocolHandler.getPacketSize() > 0) {
+            int size = protocolHandler.getPacketSize() - org.apache.coyote.ajp.Constants.SEND_HEAD_LEN;
+            return new Response(size);
         } else {
             return new Response();
         }
@@ -1032,11 +990,6 @@ public class Connector extends LifecycleMBeanBase  {
     protected void initInternal() throws LifecycleException {
 
         super.initInternal();
-
-        if (protocolHandler == null) {
-            throw new LifecycleException(
-                    sm.getString("coyoteConnector.protocolHandlerInstantiationFailed"));
-        }
 
         // Initialize adapter
         adapter = new CoyoteAdapter(this);

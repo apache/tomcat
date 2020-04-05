@@ -42,6 +42,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
+import org.apache.catalina.util.ProtocolHandlerFactory;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -168,7 +169,7 @@ public abstract class TomcatBaseTest extends LoggingBaseTest {
         tomcat = new TomcatWithFastSessionIDs();
 
         String protocol = getProtocol();
-        Connector connector = new Connector(protocol);
+        Connector connector = new Connector(ProtocolHandlerFactory.createProtocolHandler(protocol));
         // Listen only on localhost
         Assert.assertTrue(connector.setProperty("address", InetAddress.getByName("localhost").getHostAddress()));
         // Use random free port

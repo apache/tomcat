@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.catalina.connector.Connector;
+import org.apache.catalina.util.ProtocolHandlerFactory;
 import org.apache.coyote.ProtocolHandler;
 import org.apache.tomcat.util.IntrospectionUtils;
 import org.apache.tomcat.util.net.SocketProperties;
@@ -69,7 +70,7 @@ public class ConnectorStoreAppender extends StoreAppender {
         String protocol = connector.getProtocol();
         List<String> propertyKeys = getPropertyKeys(connector);
         // Create blank instance
-        Object bean2 = new Connector(protocol);//defaultInstance(bean);
+        Object bean2 = new Connector(ProtocolHandlerFactory.createProtocolHandler(protocol));//defaultInstance(bean);
         for (String key : propertyKeys) {
             Object value = IntrospectionUtils.getProperty(bean, key);
             if (desc.isTransientAttribute(key)) {

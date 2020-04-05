@@ -37,6 +37,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+import org.apache.coyote.http11.Http11NioProtocol;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -113,7 +114,7 @@ public class TestRemoteIpFilter extends TomcatBaseTest {
      */
     public static class MockHttpServletRequest extends Request {
         public MockHttpServletRequest() {
-            super(new Connector());
+            super(new Connector(new Http11NioProtocol()));
             setCoyoteRequest(new org.apache.coyote.Request());
         }
 

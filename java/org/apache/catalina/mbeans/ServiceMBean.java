@@ -16,11 +16,13 @@
  */
 package org.apache.catalina.mbeans;
 
-import javax.management.MBeanException;
-
 import org.apache.catalina.Executor;
 import org.apache.catalina.Service;
 import org.apache.catalina.connector.Connector;
+
+import javax.management.MBeanException;
+
+import static org.apache.catalina.util.ProtocolHandlerFactory.createProtocolHandler;
 
 public class ServiceMBean extends BaseCatalinaMBean<Service> {
 
@@ -39,7 +41,12 @@ public class ServiceMBean extends BaseCatalinaMBean<Service> {
 
         Service service = doGetManagedResource();
         String protocol = isAjp ? "AJP/1.3" : "HTTP/1.1";
-        Connector connector = new Connector(protocol);
+        Connector connector = null;
+        try {
+            connector = new Connector(createProtocolHandler(protocol));
+        } catch (Exception e) {
+            throw new MBeanException(e);
+        }
         if ((address!=null) && (address.length()>0)) {
             connector.setProperty("address", address);
         }

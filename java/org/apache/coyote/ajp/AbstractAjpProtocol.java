@@ -56,6 +56,10 @@ public abstract class AbstractAjpProtocol<S> extends AbstractProtocol<S> {
         getEndpoint().setHandler(cHandler);
     }
 
+    @Override
+    public String getProtocolAbbreviation() {
+        return "AJP/1.3";
+    }
 
     @Override
     protected String getProtocolName() {
@@ -205,6 +209,7 @@ public abstract class AbstractAjpProtocol<S> extends AbstractProtocol<S> {
      * AJP packet size.
      */
     private int packetSize = Constants.MAX_PACKET_SIZE;
+    @Override
     public int getPacketSize() { return packetSize; }
     public void setPacketSize(int packetSize) {
         if(packetSize < Constants.MAX_PACKET_SIZE) {
