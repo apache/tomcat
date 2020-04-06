@@ -78,6 +78,8 @@ public class TestSsl extends TomcatBaseTest {
                 TesterSupport.getLastClientAuthRequestedIssuerCount() == 0);
     }
 
+    private static final int POST_DATA_SIZE = 16 * 1024 * 1024;
+
     @Test
     public void testPost() throws Exception {
         final SocketFactory socketFactory = TesterSupport.configureClientSsl();
@@ -102,7 +104,7 @@ public class TestSsl extends TomcatBaseTest {
 
                         OutputStream os = socket.getOutputStream();
 
-                        byte[] bytes = new byte[16 * 1024 * 1024]; // 16MB
+                        byte[] bytes = new byte[POST_DATA_SIZE]; // 16MB
                         Arrays.fill(bytes, (byte) 1);
 
                         os.write("POST /post HTTP/1.1\r\n".getBytes());
@@ -283,7 +285,7 @@ public class TestSsl extends TomcatBaseTest {
 
         @Override
         protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            ByteArrayOutputStream baos = new ByteArrayOutputStream(POST_DATA_SIZE);
             byte[] in = new byte[1500];
             InputStream input = req.getInputStream();
             while (true) {
@@ -295,6 +297,7 @@ public class TestSsl extends TomcatBaseTest {
                 }
             }
             byte[] out = baos.toByteArray();
+            // Set the content-length to avoid having to parse chunked
             resp.setContentLength(out.length);
             resp.getOutputStream().write(out);
         }
