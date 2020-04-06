@@ -55,6 +55,14 @@
       </scode>
     </changelog>
   </subsection>
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+        Move <code>SocketProperties</code> mbean to its own type rather than
+        use a subType to improve robustness with tools. (remm)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 8.5.54 (markt)" rtext="release in progress">
   <subsection name="Catalina">
