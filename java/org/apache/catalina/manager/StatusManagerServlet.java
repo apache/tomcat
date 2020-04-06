@@ -120,15 +120,10 @@ public class StatusManagerServlet
             onStr = "*:type=ThreadPool,*";
             objectName = new ObjectName(onStr);
             set = mBeanServer.queryMBeans(objectName, null);
-            onStr = "*:type=ThreadPool,*,subType=SocketProperties";
-            objectName = new ObjectName(onStr);
-            Set<ObjectInstance> set2 = mBeanServer.queryMBeans(objectName, null);
             iterator = set.iterator();
             while (iterator.hasNext()) {
                 ObjectInstance oi = iterator.next();
-                if (!set2.contains(oi)) {
-                    threadPools.addElement(oi.getObjectName());
-                }
+                threadPools.addElement(oi.getObjectName());
             }
 
             // Query Global Request Processors
