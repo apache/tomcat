@@ -135,9 +135,8 @@ public class TestRegistration extends TomcatBaseTest {
                 + ObjectName.quote(ADDRESS),
         "Tomcat:type=ThreadPool,name="
                 + ObjectName.quote("http-" + type + "-" + ADDRESS + "-" + port),
-        "Tomcat:type=ThreadPool,name="
-                + ObjectName.quote("http-" + type + "-" + ADDRESS + "-" + port) +
-                ",subType=SocketProperties",
+        "Tomcat:type=SocketProperties,name="
+                + ObjectName.quote("http-" + type + "-" + ADDRESS + "-" + port),
         };
     }
 

@@ -1131,7 +1131,7 @@ public abstract class AbstractEndpoint<S,U> {
             Registry.getRegistry(null, null).registerComponent(this, oname, null);
 
             ObjectName socketPropertiesOname = new ObjectName(domain +
-                    ":type=ThreadPool,name=\"" + getName() + "\",subType=SocketProperties");
+                    ":type=SocketProperties,name=\"" + getName() + "\"");
             socketProperties.setObjectName(socketPropertiesOname);
             Registry.getRegistry(null, null).registerComponent(socketProperties, socketPropertiesOname, null);
 
