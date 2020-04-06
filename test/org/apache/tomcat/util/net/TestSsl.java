@@ -134,8 +134,8 @@ public class TestSsl extends TomcatBaseTest {
                         for (int i = 0; i < bytes.length; i++) {
                             int read = is.read();
                             if (bytes[i] != read) {
-                                System.err.print("Byte in position [" + i + "] had value [" + read +
-                                        "] rather than " + Byte.toString(bytes[i]));
+                                System.err.println("Byte in position [" + i + "] had value [" + read +
+                                        "] rather than [" + Byte.toString(bytes[i]) + "]");
                                 errorCount.incrementAndGet();
                                 break;
                             }
