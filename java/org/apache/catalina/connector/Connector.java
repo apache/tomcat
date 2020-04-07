@@ -35,7 +35,6 @@ import org.apache.coyote.AbstractProtocol;
 import org.apache.coyote.Adapter;
 import org.apache.coyote.ProtocolHandler;
 import org.apache.coyote.UpgradeProtocol;
-import org.apache.coyote.ajp.AbstractAjpProtocol;
 import org.apache.coyote.http11.AbstractHttp11JsseProtocol;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -64,39 +63,41 @@ public class Connector extends LifecycleMBeanBase  {
 
     // ------------------------------------------------------------ Constructor
 
+
     /**
      * Defaults to using HTTP/1.1 NIO implementation.
      */
     public Connector() {
-        this("org.apache.coyote.http11.Http11NioProtocol");
+        this("HTTP/1.1");
     }
 
 
     public Connector(String protocol) {
-        if ("HTTP/1.1".equals(protocol) || protocol == null) {
-            protocolHandlerClassName = "org.apache.coyote.http11.Http11NioProtocol";
-        } else if ("AJP/1.3".equals(protocol)) {
-            protocolHandlerClassName = "org.apache.coyote.ajp.AjpNioProtocol";
-        } else {
-            protocolHandlerClassName = protocol;
-        }
-
-        // Instantiate protocol handler
         ProtocolHandler p = null;
         try {
-            Class<?> clazz = Class.forName(protocolHandlerClassName);
-            p = (ProtocolHandler) clazz.getConstructor().newInstance();
+            p = ProtocolHandler.create(protocol);
         } catch (Exception e) {
             log.error(sm.getString(
                     "coyoteConnector.protocolHandlerInstantiationFailed"), e);
-        } finally {
-            this.protocolHandler = p;
         }
-
+        if (p != null) {
+            protocolHandler = p;
+            protocolHandlerClassName = protocolHandler.getClass().getName();
+        } else {
+            protocolHandler = null;
+            protocolHandlerClassName = protocol;
+        }
         // Default for Connector depends on this system property
         setThrowOnFailure(Boolean.getBoolean("org.apache.catalina.startup.EXIT_ON_INIT_FAILURE"));
     }
 
+
+    public Connector(ProtocolHandler protocolHandler) {
+        protocolHandlerClassName = protocolHandler.getClass().getName();
+        this.protocolHandler = protocolHandler;
+        // Default for Connector depends on this system property
+        setThrowOnFailure(Boolean.getBoolean("org.apache.catalina.startup.EXIT_ON_INIT_FAILURE"));
+    }
 
     // ----------------------------------------------------- Instance Variables
 
@@ -946,9 +947,9 @@ public class Connector extends LifecycleMBeanBase  {
      * @return a new Servlet response object
      */
     public Response createResponse() {
-        if (protocolHandler instanceof AbstractAjpProtocol<?>) {
-            int packetSize = ((AbstractAjpProtocol<?>) protocolHandler).getPacketSize();
-            return new Response(packetSize - org.apache.coyote.ajp.Constants.SEND_HEAD_LEN);
+        int size = protocolHandler.getDesiredBufferSize();
+        if (size > 0) {
+            return new Response(size);
         } else {
             return new Response();
         }

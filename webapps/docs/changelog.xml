@@ -62,6 +62,10 @@
         <code>Loader</code> interface as it is duplicated on the
         <code>Context</code> interface. (markt)
       </scode>
+      <fix>
+        Reduce reflection use and remove AJP specific code in the Connector.
+        (remm/markt/fhanik)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
