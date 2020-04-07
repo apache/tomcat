@@ -59,7 +59,7 @@ public final class Bootstrap {
     private static final File catalinaBaseFile;
     private static final File catalinaHomeFile;
 
-    private static final Pattern PATH_PATTERN = Pattern.compile("(\".*?\")|(([^,])*)");
+    private static final Pattern PATH_PATTERN = Pattern.compile("(\"[^\"]*\")|(([^,])*)");
 
     static {
         // Will always be non-null
