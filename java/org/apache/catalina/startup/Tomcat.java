@@ -528,6 +528,7 @@ public class Tomcat {
         for (Connector serviceConnector : service.findConnectors()) {
             if (connector == serviceConnector) {
                 found = true;
+                break;
             }
         }
         if (!found) {
@@ -557,6 +558,7 @@ public class Tomcat {
         for (Container engineHost : engine.findChildren()) {
             if (engineHost == host) {
                 found = true;
+                break;
             }
         }
         if (!found) {

@@ -758,10 +758,11 @@ public abstract class RealmBase extends LifecycleMBeanBase implements org.apache
                 }
 
                 boolean matched = false;
-                for(int k=0; k < patterns.length && !matched; k++) {
+                for(int k = 0; k < patterns.length; k++) {
                     String pattern = patterns[k];
-                    if(pattern.equals("/")){
+                    if (pattern.equals("/")) {
                         matched = true;
+                        break;
                     }
                 }
                 if(matched) {
