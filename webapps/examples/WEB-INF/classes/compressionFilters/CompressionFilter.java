@@ -118,7 +118,7 @@ public class CompressionFilter extends GenericFilter {
 
             if (values.size() > 0) {
                 compressionMimeTypes = values.toArray(
-                        new String[values.size()]);
+                        new String[0]);
             } else {
                 compressionMimeTypes = null;
             }

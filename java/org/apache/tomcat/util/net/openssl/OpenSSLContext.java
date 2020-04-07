@@ -353,7 +353,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                     enabled.add(Constants.SSL_PROTO_SSLv3);
                 }
                 sslHostConfig.setEnabledProtocols(
-                        enabled.toArray(new String[enabled.size()]));
+                        enabled.toArray(new String[0]));
                 // Reconfigure the enabled ciphers
                 sslHostConfig.setEnabledCiphers(SSLContext.getCiphers(ctx));
             }

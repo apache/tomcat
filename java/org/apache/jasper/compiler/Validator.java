@@ -1689,7 +1689,7 @@ class Validator {
                 }
                 start = p + 1;
             }
-            return params.toArray(new String[params.size()]);
+            return params.toArray(new String[0]);
         }
 
         private FunctionMapper getFunctionMapper(ELNode.Nodes el)

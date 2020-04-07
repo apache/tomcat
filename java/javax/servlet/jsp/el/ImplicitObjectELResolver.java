@@ -323,7 +323,7 @@ public class ImplicitObjectELResolver extends ELResolver {
                             while (e.hasMoreElements()) {
                                 list.add(e.nextElement());
                             }
-                            return list.toArray(new String[list.size()]);
+                            return list.toArray(new String[0]);
                         }
                         return null;
                     }

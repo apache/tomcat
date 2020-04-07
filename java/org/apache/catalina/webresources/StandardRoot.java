@@ -134,7 +134,7 @@ public class StandardRoot extends LifecycleMBeanBase implements WebResourceRoot 
                 }
             }
         }
-        return result.toArray(new String[result.size()]);
+        return result.toArray(new String[0]);
     }
 
 
@@ -337,7 +337,7 @@ public class StandardRoot extends LifecycleMBeanBase implements WebResourceRoot 
             result.add(main.getResource(path));
         }
 
-        return result.toArray(new WebResource[result.size()]);
+        return result.toArray(new WebResource[0]);
     }
 
     @Override
@@ -438,7 +438,7 @@ public class StandardRoot extends LifecycleMBeanBase implements WebResourceRoot 
 
     @Override
     public WebResourceSet[] getPreResources() {
-        return preResources.toArray(new WebResourceSet[preResources.size()]);
+        return preResources.toArray(new WebResourceSet[0]);
     }
 
     @Override
@@ -449,7 +449,7 @@ public class StandardRoot extends LifecycleMBeanBase implements WebResourceRoot 
 
     @Override
     public WebResourceSet[] getJarResources() {
-        return jarResources.toArray(new WebResourceSet[jarResources.size()]);
+        return jarResources.toArray(new WebResourceSet[0]);
     }
 
     @Override
@@ -460,11 +460,11 @@ public class StandardRoot extends LifecycleMBeanBase implements WebResourceRoot 
 
     @Override
     public WebResourceSet[] getPostResources() {
-        return postResources.toArray(new WebResourceSet[postResources.size()]);
+        return postResources.toArray(new WebResourceSet[0]);
     }
 
     protected WebResourceSet[] getClassResources() {
-        return classResources.toArray(new WebResourceSet[classResources.size()]);
+        return classResources.toArray(new WebResourceSet[0]);
     }
 
     protected void addClassResources(WebResourceSet webResourceSet) {
