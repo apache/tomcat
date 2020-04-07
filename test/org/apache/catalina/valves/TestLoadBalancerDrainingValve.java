@@ -223,7 +223,7 @@ public class TestLoadBalancerDrainingValve {
 
             EasyMock.expect(request.getRequestedSessionId()).andStubReturn(sessionId);
             EasyMock.expect(request.getRequestURI()).andStubReturn(requestURI);
-            EasyMock.expect(request.getCookies()).andStubReturn(cookies.toArray(new Cookie[cookies.size()]));
+            EasyMock.expect(request.getCookies()).andStubReturn(cookies.toArray(new Cookie[0]));
             EasyMock.expect(request.getContext()).andStubReturn(ctx);
             EasyMock.expect(ctx.getSessionCookieName()).andStubReturn(sessionCookieName);
             EasyMock.expect(servletContext.getSessionCookieConfig()).andStubReturn(cookieConfig);

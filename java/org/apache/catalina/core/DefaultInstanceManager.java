@@ -445,7 +445,7 @@ public class DefaultInstanceManager implements InstanceManager {
                     annotationsArray = ANNOTATIONS_EMPTY;
                 } else {
                     annotationsArray = annotations.toArray(
-                            new AnnotationCacheEntry[annotations.size()]);
+							new AnnotationCacheEntry[0]);
                 }
                 synchronized (annotationCache) {
                     annotationCache.put(clazz, annotationsArray);

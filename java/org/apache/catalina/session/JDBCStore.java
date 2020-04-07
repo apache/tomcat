@@ -530,7 +530,7 @@ public class JDBCStore extends StoreBase {
                                     tmpkeys.add(rst.getString(1));
                                 }
                             }
-                            keys = tmpkeys.toArray(new String[tmpkeys.size()]);
+                            keys = tmpkeys.toArray(new String[0]);
                             // Break out after the finally block
                             numberOfTries = 0;
                         }

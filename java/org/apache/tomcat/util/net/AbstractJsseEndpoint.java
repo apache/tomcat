@@ -139,7 +139,7 @@ public abstract class AbstractJsseEndpoint<S> extends AbstractEndpoint<S> {
             List<String> commonProtocols = new ArrayList<>(negotiableProtocols);
             commonProtocols.retainAll(clientRequestedApplicationProtocols);
             if (commonProtocols.size() > 0) {
-                String[] commonProtocolsArray = commonProtocols.toArray(new String[commonProtocols.size()]);
+                String[] commonProtocolsArray = commonProtocols.toArray(new String[0]);
                 JreCompat.getInstance().setApplicationProtocols(sslParameters, commonProtocolsArray);
             }
         }

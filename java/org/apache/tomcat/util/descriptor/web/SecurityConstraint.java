@@ -581,7 +581,7 @@ public class SecurityConstraint extends XmlEncodingBase implements Serializable 
 
         }
 
-        return result.toArray(new SecurityConstraint[result.size()]);
+        return result.toArray(new SecurityConstraint[0]);
     }
 
     private static SecurityConstraint createConstraint(
@@ -740,7 +740,7 @@ public class SecurityConstraint extends XmlEncodingBase implements Serializable 
                     newConstraints, log);
         }
 
-        return newConstraints.toArray(new SecurityConstraint[newConstraints.size()]);
+        return newConstraints.toArray(new SecurityConstraint[0]);
     }
 
 

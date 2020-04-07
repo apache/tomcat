@@ -312,7 +312,7 @@ public abstract class AbstractReplicatedMap<K,V>
         }
         //update our map of members, expire some if we didn't receive a ping back
         synchronized (mapMembers) {
-            Member[] members = mapMembers.keySet().toArray(new Member[mapMembers.size()]);
+            Member[] members = mapMembers.keySet().toArray(new Member[0]);
             long now = System.currentTimeMillis();
             for (Member member : members) {
                 long access = mapMembers.get(member).longValue();
@@ -836,7 +836,7 @@ public abstract class AbstractReplicatedMap<K,V>
                 if ( mbrs[j].equals(set[i]) ) include = false;
             if ( include ) result.add(set[i]);
         }
-        return result.toArray(new Member[result.size()]);
+        return result.toArray(new Member[0]);
     }
 
     @Override

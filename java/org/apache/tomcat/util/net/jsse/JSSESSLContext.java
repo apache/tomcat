@@ -105,6 +105,6 @@ class JSSESSLContext implements SSLContext {
                 }
             }
         }
-        return certs.toArray(new X509Certificate[certs.size()]);
+        return certs.toArray(new X509Certificate[0]);
     }
 }
