@@ -19,6 +19,7 @@ package org.apache.tomcat.util.net;
 import java.io.IOException;
 import java.io.Serializable;
 import java.security.KeyStore;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -280,9 +281,7 @@ public class SSLHostConfigCertificate implements Serializable {
         private Type(Authentication... authentications) {
             compatibleAuthentications = new HashSet<>();
             if (authentications != null) {
-                for (Authentication authentication : authentications) {
-                    compatibleAuthentications.add(authentication);
-                }
+                compatibleAuthentications.addAll(Arrays.asList(authentications));
             }
         }
 

@@ -26,6 +26,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.Permission;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.EmptyStackException;
 import java.util.HashMap;
 import java.util.List;
@@ -344,9 +345,7 @@ public class Digester extends DefaultHandler2 {
         propertySourcesSet = true;
         if (propertySources != null) {
             ArrayList<IntrospectionUtils.PropertySource> sourcesList = new ArrayList<>();
-            for (IntrospectionUtils.PropertySource cur : propertySources) {
-                sourcesList.add(cur);
-            }
+            sourcesList.addAll(Arrays.asList(propertySources));
             sourcesList.add(source[0]);
             source = sourcesList.toArray(new IntrospectionUtils.PropertySource[0]);
         }
