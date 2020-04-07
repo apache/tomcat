@@ -204,8 +204,7 @@ public class TestWebXmlOrdering {
                         for (int m = 0; m < 2; m++) {
                             setUp();
                             runner.init();
-                            ArrayList<WebXml> source = new ArrayList<WebXml>();
-                            source.addAll(fragments.values());
+                            ArrayList<WebXml> source = new ArrayList<WebXml>(fragments.values());
                             Map<String,WebXml> input =
                                     new LinkedHashMap<String,WebXml>();
 
@@ -256,8 +255,7 @@ public class TestWebXmlOrdering {
     }
 
     private void populatePositions(Set<WebXml> ordered) {
-        List<WebXml> indexed = new ArrayList<WebXml>();
-        indexed.addAll(ordered);
+        List<WebXml> indexed = new ArrayList<WebXml>(ordered);
 
         posA = indexed.indexOf(a);
         posB = indexed.indexOf(b);

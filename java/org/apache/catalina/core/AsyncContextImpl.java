@@ -101,8 +101,7 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
         if (log.isDebugEnabled()) {
             log.debug(sm.getString("asyncContextImpl.fireOnComplete"));
         }
-        List<AsyncListenerWrapper> listenersCopy = new ArrayList<AsyncListenerWrapper>();
-        listenersCopy.addAll(listeners);
+        List<AsyncListenerWrapper> listenersCopy = new ArrayList<AsyncListenerWrapper>(listeners);
 
         ClassLoader oldCL;
         if (Globals.IS_SECURITY_ENABLED) {
@@ -156,9 +155,7 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
             ClassLoader newCL = request.getContext().getLoader().getClassLoader();
             try {
                 Thread.currentThread().setContextClassLoader(newCL);
-                List<AsyncListenerWrapper> listenersCopy =
-                    new ArrayList<AsyncListenerWrapper>();
-                listenersCopy.addAll(listeners);
+                List<AsyncListenerWrapper> listenersCopy = new ArrayList<AsyncListenerWrapper>(listeners);
                 for (AsyncListenerWrapper listener : listenersCopy) {
                     try {
                         listener.fireOnTimeout(event);
@@ -368,8 +365,7 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
             this.hasOriginalRequestAndResponse = originalRequestResponse;
             this.event = new AsyncEvent(this, request, response);
 
-            List<AsyncListenerWrapper> listenersCopy = new ArrayList<AsyncListenerWrapper>();
-            listenersCopy.addAll(listeners);
+            List<AsyncListenerWrapper> listenersCopy = new ArrayList<AsyncListenerWrapper>(listeners);
             listeners.clear();
             if (log.isDebugEnabled()) {
                 log.debug(sm.getString("asyncContextImpl.fireOnStartAsync"));
@@ -453,8 +449,7 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
             }
             AsyncEvent errorEvent = new AsyncEvent(event.getAsyncContext(),
                     event.getSuppliedRequest(), event.getSuppliedResponse(), t);
-            List<AsyncListenerWrapper> listenersCopy = new ArrayList<AsyncListenerWrapper>();
-            listenersCopy.addAll(listeners);
+            List<AsyncListenerWrapper> listenersCopy = new ArrayList<AsyncListenerWrapper>(listeners);
             for (AsyncListenerWrapper listener : listenersCopy) {
                 try {
                     listener.fireOnError(errorEvent);

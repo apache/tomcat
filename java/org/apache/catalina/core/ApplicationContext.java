@@ -231,8 +231,7 @@ public class ApplicationContext implements ServletContext {
 
     @Override
     public Enumeration<String> getAttributeNames() {
-        Set<String> names = new HashSet<String>();
-        names.addAll(attributes.keySet());
+        Set<String> names = new HashSet<String>(attributes.keySet());
         return Collections.enumeration(names);
     }
 
@@ -329,8 +328,7 @@ public class ApplicationContext implements ServletContext {
 
     @Override
     public Enumeration<String> getInitParameterNames() {
-        Set<String> names = new HashSet<String>();
-        names.addAll(parameters.keySet());
+        Set<String> names = new HashSet<String>(parameters.keySet());
         // Special handling for XML settings as these attributes will always be
         // available if they have been set on the context
         if (context.getTldValidation()) {

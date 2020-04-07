@@ -1056,10 +1056,8 @@ public class TestRemoteIpValve {
         }
         Assert.assertNotNull(actual);
         Assert.assertEquals(expected.length, actual.length);
-        List<String> e = new ArrayList<String>();
-        e.addAll(Arrays.asList(expected));
-        List<String> a = new ArrayList<String>();
-        a.addAll(Arrays.asList(actual));
+        List<String> e = new ArrayList<String>(Arrays.asList(expected));
+        List<String> a = new ArrayList<String>(Arrays.asList(actual));
 
         for (String entry : e) {
             Assert.assertTrue(a.remove(entry));

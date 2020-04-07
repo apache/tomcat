@@ -1198,8 +1198,7 @@ public class StandardSession implements HttpSession, Session, Serializable {
             throw new IllegalStateException
                 (sm.getString("standardSession.getAttributeNames.ise"));
 
-        Set<String> names = new HashSet<String>();
-        names.addAll(attributes.keySet());
+        Set<String> names = new HashSet<String>(attributes.keySet());
         return Collections.enumeration(names);
     }
 

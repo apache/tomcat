@@ -187,8 +187,7 @@ public class ReplicatedContext extends StandardContext implements MapOwner {
         @SuppressWarnings("unchecked")
         @Override
         public Enumeration<String> getAttributeNames() {
-            Set<String> names = new HashSet<String>();
-            names.addAll(attributes.keySet());
+            Set<String> names = new HashSet<String>(attributes.keySet());
 
             return new MultiEnumeration<String>(new Enumeration[] {
                     super.getAttributeNames(),

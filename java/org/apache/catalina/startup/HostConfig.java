@@ -1824,8 +1824,7 @@ public class HostConfig
         }
 
         // Need ordered set of names
-        SortedSet<String> sortedAppNames = new TreeSet<String>();
-        sortedAppNames.addAll(deployed.keySet());
+        SortedSet<String> sortedAppNames = new TreeSet<String>(deployed.keySet());
 
         Iterator<String> iter = sortedAppNames.iterator();
 

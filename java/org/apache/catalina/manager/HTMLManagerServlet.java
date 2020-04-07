@@ -844,8 +844,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
                     RequestUtil.filter(cn.getDisplayName())));
         }
         Manager manager = ctxt.getManager();
-        List<Session> sessions = new ArrayList<Session>();
-        sessions.addAll(Arrays.asList(manager.findSessions()));
+        List<Session> sessions = new ArrayList<Session>(Arrays.asList(manager.findSessions()));
         if (manager instanceof DistributedManager && showProxySessions) {
             // Add dummy proxy sessions
             Set<String> sessionIds =

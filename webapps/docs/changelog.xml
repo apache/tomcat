@@ -184,6 +184,10 @@
       <update>
         Update JUnit to version 4.13. (markt)
       </update>
+      <scode>
+        Refactor to use parameterized <code>Collection</code> constructors where
+        possible. Pull request provided by Lars Grefer. (markt)
+      </scode>
     </changelog>
   </subsection>
 </section>
