@@ -287,7 +287,7 @@ public class RpcChannel implements ChannelListener {
         }
 
         public Response[] getResponses() {
-            return responses.toArray(new Response[responses.size()]);
+            return responses.toArray(new Response[0]);
         }
     }
 

@@ -129,7 +129,7 @@ public class PoolablePreparedStatement<K> extends DelegatingPreparedStatement {
         // See bug 17301 for what could happen when ResultSets are closed twice.
         List<AbandonedTrace> resultSets = getTrace();
         if( resultSets != null) {
-            ResultSet[] set = resultSets.toArray(new ResultSet[resultSets.size()]);
+            ResultSet[] set = resultSets.toArray(new ResultSet[0]);
             for (int i = 0; i < set.length; i++) {
                 set[i].close();
             }

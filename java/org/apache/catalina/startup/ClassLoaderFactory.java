@@ -126,7 +126,7 @@ public final class ClassLoaderFactory {
         }
 
         // Construct the class loader itself
-        final URL[] array = set.toArray(new URL[set.size()]);
+        final URL[] array = set.toArray(new URL[0]);
         return AccessController.doPrivileged(
                 new PrivilegedAction<URLClassLoader>() {
                     @Override
@@ -222,7 +222,7 @@ public final class ClassLoaderFactory {
         }
 
         // Construct the class loader itself
-        final URL[] array = set.toArray(new URL[set.size()]);
+        final URL[] array = set.toArray(new URL[0]);
         if (log.isDebugEnabled())
             for (int i = 0; i < array.length; i++) {
                 log.debug("  location " + i + " is " + array[i]);

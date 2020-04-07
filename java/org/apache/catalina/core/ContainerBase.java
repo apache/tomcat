@@ -1559,7 +1559,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
                 names.add(((ContainerBase)next).getObjectName());
             }
         }
-        return names.toArray(new ObjectName[names.size()]);
+        return names.toArray(new ObjectName[0]);
     }
 
 

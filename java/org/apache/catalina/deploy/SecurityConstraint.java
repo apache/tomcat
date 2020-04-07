@@ -509,7 +509,7 @@ public class SecurityConstraint implements Serializable {
 
         }
 
-        return result.toArray(new SecurityConstraint[result.size()]);
+        return result.toArray(new SecurityConstraint[0]);
     }
 
     private static SecurityConstraint createConstraint(

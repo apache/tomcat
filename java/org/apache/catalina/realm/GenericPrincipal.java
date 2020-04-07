@@ -123,10 +123,10 @@ public class GenericPrincipal implements Principal {
         this.password = password;
         this.userPrincipal = userPrincipal;
         if (roles != null) {
-            this.roles = new String[roles.size()];
-            this.roles = roles.toArray(this.roles);
-            if (this.roles.length > 1)
+            this.roles = roles.toArray(new String[0]);
+            if (this.roles.length > 1) {
                 Arrays.sort(this.roles);
+            }
         }
         this.loginContext = loginContext;
         this.gssCredential = gssCredential;

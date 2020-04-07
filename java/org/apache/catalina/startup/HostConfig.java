@@ -562,7 +562,7 @@ public class HostConfig
                 filteredList.add(appPath);
             }
         }
-        return filteredList.toArray(new String[filteredList.size()]);
+        return filteredList.toArray(new String[0]);
     }
 
 

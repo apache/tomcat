@@ -290,7 +290,7 @@ public class ServiceRefFactory implements ObjectFactory {
 
                     // Set the handlers informations
                     handlerInfo.setHandlerClass(handlerClass);
-                    handlerInfo.setHeaders(headers.toArray(new QName[headers.size()]));
+                    handlerInfo.setHeaders(headers.toArray(new QName[0]));
                     handlerInfo.setHandlerConfig(config);
 
                     if (!portNames.isEmpty()) {

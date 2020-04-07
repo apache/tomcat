@@ -104,7 +104,7 @@ public class BaseAttributeFilter implements NotificationFilter {
     public String[] getNames() {
 
         synchronized (names) {
-            return names.toArray(new String[names.size()]);
+            return names.toArray(new String[0]);
         }
 
     }

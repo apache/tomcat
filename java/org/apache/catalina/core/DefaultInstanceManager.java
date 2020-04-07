@@ -438,8 +438,7 @@ public class DefaultInstanceManager implements InstanceManager {
                     // Use common object to save memory
                     annotationsArray = ANNOTATIONS_EMPTY;
                 } else {
-                    annotationsArray = annotations.toArray(
-                            new AnnotationCacheEntry[annotations.size()]);
+                    annotationsArray = annotations.toArray(new AnnotationCacheEntry[0]);
                 }
                 synchronized (annotationCache) {
                     annotationCache.put(clazz, annotationsArray);

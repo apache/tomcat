@@ -130,8 +130,7 @@ public class CompressionFilter implements Filter {
                 }
 
                 if (values.size() > 0) {
-                    compressionMimeTypes = values.toArray(
-                            new String[values.size()]);
+                    compressionMimeTypes = values.toArray(new String[0]);
                 } else {
                     compressionMimeTypes = null;
                 }

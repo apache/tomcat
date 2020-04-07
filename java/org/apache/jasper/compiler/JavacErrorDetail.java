@@ -237,6 +237,6 @@ public class JavacErrorDetail {
             lines.add(line);
         }
 
-        return lines.toArray( new String[lines.size()] );
+        return lines.toArray(new String[0]);
     }
 }
