@@ -24,6 +24,7 @@ import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
@@ -849,17 +850,13 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
         if (values1 == null) {
             // Skip - nothing to merge
         } else {
-            for (String value : values1) {
-                results.add(value);
-            }
+            results.addAll(Arrays.asList(values1));
         }
 
         if (values2 == null) {
             // Skip - nothing to merge
         } else {
-            for (String value : values2) {
-                results.add(value);
-            }
+            results.addAll(Arrays.asList(values2));
         }
 
         String values[] = new String[results.size()];
