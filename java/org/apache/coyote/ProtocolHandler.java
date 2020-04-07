@@ -197,13 +197,13 @@ public interface ProtocolHandler {
      * Create a new ProtocolHandler for the given protocol.
      * @param protocol the protocol
      * @return the newly instantiated protocol handler
-     * @throws ClassNotFoundException
-     * @throws InstantiationException
-     * @throws IllegalAccessException
-     * @throws IllegalArgumentException
-     * @throws InvocationTargetException
-     * @throws NoSuchMethodException
-     * @throws SecurityException
+     * @throws ClassNotFoundException Specified protocol was not found
+     * @throws InstantiationException Specified protocol could not be instantiated
+     * @throws IllegalAccessException Exception occurred
+     * @throws IllegalArgumentException Exception occurred
+     * @throws InvocationTargetException Exception occurred
+     * @throws NoSuchMethodException Exception occurred
+     * @throws SecurityException Exception occurred
      */
     public static ProtocolHandler create(String protocol)
             throws ClassNotFoundException, InstantiationException, IllegalAccessException,
