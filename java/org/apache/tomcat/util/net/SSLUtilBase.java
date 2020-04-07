@@ -110,7 +110,7 @@ public abstract class SSLUtilBase implements SSLUtil {
         if (enabledProtocols.contains("SSLv3")) {
             log.warn(sm.getString("jsse.ssl3"));
         }
-        this.enabledProtocols = enabledProtocols.toArray(new String[enabledProtocols.size()]);
+        this.enabledProtocols = enabledProtocols.toArray(new String[0]);
 
         if (enabledProtocols.contains(Constants.SSL_PROTO_TLSv1_3) &&
                 sslHostConfig.getCertificateVerification() == CertificateVerification.OPTIONAL &&
@@ -123,7 +123,7 @@ public abstract class SSLUtilBase implements SSLUtil {
         Set<String> implementedCiphers = getImplementedCiphers();
         List<String> enabledCiphers =
                 getEnabled("ciphers", getLog(), false, configuredCiphers, implementedCiphers);
-        this.enabledCiphers = enabledCiphers.toArray(new String[enabledCiphers.size()]);
+        this.enabledCiphers = enabledCiphers.toArray(new String[0]);
     }
 
 
@@ -322,7 +322,7 @@ public abstract class SSLUtilBase implements SSLUtil {
             ksUsed = KeyStore.getInstance("JKS");
             ksUsed.load(null,  null);
             ksUsed.setKeyEntry(keyAlias, privateKeyFile.getPrivateKey(), keyPass.toCharArray(),
-                    chain.toArray(new Certificate[chain.size()]));
+                    chain.toArray(new Certificate[0]));
         } else {
             if (keyAlias != null && !ks.isKeyEntry(keyAlias)) {
                 throw new IOException(sm.getString("jsse.alias_no_key_entry", keyAlias));

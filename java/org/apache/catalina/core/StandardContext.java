@@ -3533,7 +3533,7 @@ public class StandardContext extends ContainerBase
     public String[] findParameters() {
         List<String> parameterNames = new ArrayList<>(parameters.size());
         parameterNames.addAll(parameters.keySet());
-        return parameterNames.toArray(new String[parameterNames.size()]);
+        return parameterNames.toArray(new String[0]);
     }
 
 

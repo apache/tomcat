@@ -85,7 +85,7 @@ public class TesterContext implements Context {
 
     @Override
     public String[] findSecurityRoles() {
-        return securityRoles.toArray(new String[securityRoles.size()]);
+        return securityRoles.toArray(new String[0]);
     }
 
     @Override
@@ -102,7 +102,7 @@ public class TesterContext implements Context {
     @Override
     public SecurityConstraint[] findConstraints() {
         return securityConstraints.toArray(
-                new SecurityConstraint[securityConstraints.size()]);
+				new SecurityConstraint[0]);
     }
 
     @Override

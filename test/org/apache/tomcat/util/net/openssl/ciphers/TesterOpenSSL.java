@@ -385,7 +385,7 @@ public class TesterOpenSSL {
             args.add(specification);
         }
 
-        String stdout = executeOpenSSLCommand(args.toArray(new String[args.size()]));
+        String stdout = executeOpenSSLCommand(args.toArray(new String[0]));
 
         if (stdout.length() == 0) {
             return stdout;
@@ -461,7 +461,7 @@ public class TesterOpenSSL {
             cmd.add(arg);
         }
 
-        ProcessBuilder pb = new ProcessBuilder(cmd.toArray(new String[cmd.size()]));
+        ProcessBuilder pb = new ProcessBuilder(cmd.toArray(new String[0]));
 
         if (openSSLLibPath != null) {
             Map<String,String> env = pb.environment();

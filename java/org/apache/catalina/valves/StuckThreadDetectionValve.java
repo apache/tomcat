@@ -271,7 +271,7 @@ public class StuckThreadDetectionValve extends ValveBase {
                 nameList.add(monitoredThread.getThread().getName());
             }
         }
-        return nameList.toArray(new String[nameList.size()]);
+        return nameList.toArray(new String[0]);
     }
 
     public long getInterruptedThreadsCount() {

@@ -160,7 +160,7 @@ public class CompressionConfig {
                 values.add(token);
             }
         }
-        result = values.toArray(new String[values.size()]);
+        result = values.toArray(new String[0]);
         compressibleMimeTypes = result;
         return result;
     }

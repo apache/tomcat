@@ -135,7 +135,7 @@ public class PoolingDriver implements Driver {
      */
     public synchronized String[] getPoolNames() {
         final Set<String> names = pools.keySet();
-        return names.toArray(new String[names.size()]);
+        return names.toArray(new String[0]);
     }
 
     @Override

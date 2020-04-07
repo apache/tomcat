@@ -1646,7 +1646,7 @@ public final class CGIServlet extends HttpServlet {
             try {
                 rt = Runtime.getRuntime();
                 proc = rt.exec(
-                        cmdAndArgs.toArray(new String[cmdAndArgs.size()]),
+                        cmdAndArgs.toArray(new String[0]),
                         hashToStringArray(env), wd);
 
                 String sContentLength = env.get("CONTENT_LENGTH");
