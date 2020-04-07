@@ -618,6 +618,7 @@ public class TestHttp11Processor extends TomcatBaseTest {
                     for (Cookie cookie : req.getCookies()) {
                         if (cookie.getName().equalsIgnoreCase("something.that.should.not.leak")) {
                             bug55772RequestStateLeaked = true;
+                            break;
                         }
                     }
                 }
