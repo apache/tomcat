@@ -651,12 +651,7 @@ public class Connector extends LifecycleMBeanBase  {
      * @return the Coyote protocol handler in use.
      */
     public String getProtocol() {
-        if ("org.apache.coyote.http11.Http11NioProtocol".equals(getProtocolHandlerClassName())) {
-            return "HTTP/1.1";
-        } else if ("org.apache.coyote.ajp.AjpNioProtocol".equals(getProtocolHandlerClassName())) {
-            return "AJP/1.3";
-        }
-        return getProtocolHandlerClassName();
+        return ProtocolHandler.getProtocol(getProtocolHandlerClassName());
     }
 
 
