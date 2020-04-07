@@ -905,7 +905,7 @@ public class StandardWrapper extends ContainerBase
 
         mappingsLock.readLock().lock();
         try {
-            return mappings.toArray(new String[mappings.size()]);
+            return mappings.toArray(new String[0]);
         } finally {
             mappingsLock.readLock().unlock();
         }

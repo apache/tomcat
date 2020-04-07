@@ -262,7 +262,7 @@ public class SimpleTcpCluster extends LifecycleMBeanBase
      */
     @Override
     public Valve[] getValves() {
-        return valves.toArray(new Valve[valves.size()]);
+        return valves.toArray(new Valve[0]);
     }
 
     /**

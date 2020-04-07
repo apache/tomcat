@@ -97,7 +97,7 @@ public class WriteBuffer {
             result.add(buffer.getBuf());
         }
         buffers.clear();
-        return result.toArray(new ByteBuffer[result.size()]);
+        return result.toArray(new ByteBuffer[0]);
     }
 
 

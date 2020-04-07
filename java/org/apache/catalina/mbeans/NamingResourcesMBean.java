@@ -76,7 +76,7 @@ public class NamingResourcesMBean extends BaseModelMBean {
                 throw iae;
             }
         }
-        return results.toArray(new String[results.size()]);
+        return results.toArray(new String[0]);
     }
 
 
@@ -99,7 +99,7 @@ public class NamingResourcesMBean extends BaseModelMBean {
                 throw iae;
             }
         }
-        return results.toArray(new String[results.size()]);
+        return results.toArray(new String[0]);
     }
 
 
@@ -124,7 +124,7 @@ public class NamingResourcesMBean extends BaseModelMBean {
                 throw iae;
             }
         }
-        return results.toArray(new String[results.size()]);
+        return results.toArray(new String[0]);
     }
 
 

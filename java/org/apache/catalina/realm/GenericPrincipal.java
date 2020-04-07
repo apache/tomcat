@@ -164,7 +164,7 @@ public class GenericPrincipal implements TomcatPrincipal, Serializable {
         if (roles == null) {
             this.roles = new String[0];
         } else {
-            this.roles = roles.toArray(new String[roles.size()]);
+            this.roles = roles.toArray(new String[0]);
             if (this.roles.length > 1) {
                 Arrays.sort(this.roles);
             }

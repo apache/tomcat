@@ -353,7 +353,7 @@ public class StandardContextSF extends StoreFactoryBase {
                 continue;
             resource.add(wresources[i]);
         }
-        return resource.toArray(new String[resource.size()]);
+        return resource.toArray(new String[0]);
     }
 
 }

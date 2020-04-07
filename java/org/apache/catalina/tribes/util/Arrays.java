@@ -159,7 +159,7 @@ public class Arrays {
             if ( ignore!=null && ignore.equals(comp[i]) ) continue;
             if ( local.getMember(comp[i]) == null ) result.add(comp[i]);
         }
-        return result.toArray(new Member[result.size()]);
+        return result.toArray(new Member[0]);
     }
 
     public static Member[] remove(Member[] all, Member remove) {
@@ -170,7 +170,7 @@ public class Arrays {
         List<Member> alist = java.util.Arrays.asList(all);
         ArrayList<Member> list = new ArrayList<>(alist);
         for (int i=0; i<remove.length; i++ ) list.remove(remove[i]);
-        return list.toArray(new Member[list.size()]);
+        return list.toArray(new Member[0]);
     }
 
     public static int indexOf(Member member, Member[] members) {

@@ -135,7 +135,7 @@ public class ChannelException extends Exception {
      */
     public FaultyMember[] getFaultyMembers() {
         if ( this.faultyMembers==null ) return EMPTY_LIST;
-        return faultyMembers.toArray(new FaultyMember[faultyMembers.size()]);
+        return faultyMembers.toArray(new FaultyMember[0]);
     }
 
     /**

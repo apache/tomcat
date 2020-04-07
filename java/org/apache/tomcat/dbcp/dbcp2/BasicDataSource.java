@@ -802,7 +802,7 @@ public class BasicDataSource implements DataSource, BasicDataSourceMXBean, MBean
     @Override
     public String[] getConnectionInitSqlsAsArray() {
         final Collection<String> result = getConnectionInitSqls();
-        return result.toArray(new String[result.size()]);
+        return result.toArray(new String[0]);
     }
 
     protected GenericObjectPool<PoolableConnection> getConnectionPool() {
@@ -898,7 +898,7 @@ public class BasicDataSource implements DataSource, BasicDataSourceMXBean, MBean
     @Override
     public String[] getDisconnectionSqlCodesAsArray() {
         final Collection<String> result = getDisconnectionSqlCodes();
-        return result.toArray(new String[result.size()]);
+        return result.toArray(new String[0]);
     }
 
     /**

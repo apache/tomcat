@@ -193,7 +193,7 @@ public class FilterMap extends XmlEncodingBase implements Serializable {
         if ((dispatcherMapping & ASYNC) != 0) {
             result.add(DispatcherType.ASYNC.name());
         }
-        return result.toArray(new String[result.size()]);
+        return result.toArray(new String[0]);
     }
 
     // --------------------------------------------------------- Public Methods

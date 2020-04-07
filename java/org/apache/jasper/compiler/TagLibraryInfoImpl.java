@@ -221,9 +221,9 @@ class TagLibraryInfoImpl extends TagLibraryInfo implements TagConstants {
                 err.jspError("jsp.error.tld.mandatory.element.missing", "jsp-version", uri);
             }
 
-            this.tags = tagInfos.toArray(new TagInfo[tagInfos.size()]);
-            this.tagFiles = tagFileInfos.toArray(new TagFileInfo[tagFileInfos.size()]);
-            this.functions = functionInfos.toArray(new FunctionInfo[functionInfos.size()]);
+            this.tags = tagInfos.toArray(new TagInfo[0]);
+            this.tagFiles = tagFileInfos.toArray(new TagFileInfo[0]);
+            this.functions = functionInfos.toArray(new FunctionInfo[0]);
         } catch (IOException ioe) {
             throw new JasperException(ioe);
         }
@@ -232,7 +232,7 @@ class TagLibraryInfoImpl extends TagLibraryInfo implements TagConstants {
     @Override
     public TagLibraryInfo[] getTagLibraryInfos() {
         Collection<TagLibraryInfo> coll = pi.getTaglibs();
-        return coll.toArray(new TagLibraryInfo[coll.size()]);
+        return coll.toArray(new TagLibraryInfo[0]);
     }
 
     /*
@@ -305,11 +305,11 @@ class TagLibraryInfoImpl extends TagLibraryInfo implements TagConstants {
                 tagXml.getInfo(),
                 this,
                 tei,
-                attributeInfos.toArray(new TagAttributeInfo[attributeInfos.size()]),
+                attributeInfos.toArray(new TagAttributeInfo[0]),
                 tagXml.getDisplayName(),
                 tagXml.getSmallIcon(),
                 tagXml.getLargeIcon(),
-                variableInfos.toArray(new TagVariableInfo[variableInfos.size()]),
+                variableInfos.toArray(new TagVariableInfo[0]),
                 tagXml.hasDynamicAttributes());
     }
 

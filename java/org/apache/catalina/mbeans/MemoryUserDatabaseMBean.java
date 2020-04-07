@@ -87,7 +87,7 @@ public class MemoryUserDatabaseMBean extends BaseModelMBean {
             Group group = groups.next();
             results.add(findGroup(group.getGroupname()));
         }
-        return results.toArray(new String[results.size()]);
+        return results.toArray(new String[0]);
     }
 
 
@@ -102,7 +102,7 @@ public class MemoryUserDatabaseMBean extends BaseModelMBean {
             Role role = roles.next();
             results.add(findRole(role.getRolename()));
         }
-        return results.toArray(new String[results.size()]);
+        return results.toArray(new String[0]);
     }
 
 
@@ -117,7 +117,7 @@ public class MemoryUserDatabaseMBean extends BaseModelMBean {
             User user = users.next();
             results.add(findUser(user.getUsername()));
         }
-        return results.toArray(new String[results.size()]);
+        return results.toArray(new String[0]);
     }
 
 

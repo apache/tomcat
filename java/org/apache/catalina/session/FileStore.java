@@ -191,7 +191,7 @@ public final class FileStore extends StoreBase {
                 list.add (file.substring(0, file.length() - n));
             }
         }
-        return list.toArray(new String[list.size()]);
+        return list.toArray(new String[0]);
     }
 
 
