@@ -647,9 +647,8 @@ public abstract class PersistentManagerBase extends ManagerBase
 
     @Override
     public Set<String> getSessionIdsFull() {
-        Set<String> sessionIds = new HashSet<>();
         // In memory session ID list
-        sessionIds.addAll(sessions.keySet());
+        Set<String> sessionIds = new HashSet<>(sessions.keySet());
         // Store session ID list
         String[] storeKeys;
         try {

@@ -1020,8 +1020,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
 
         // Recipients are children of the current stream that are in the
         // backlog.
-        Set<AbstractStream> recipients = new HashSet<>();
-        recipients.addAll(stream.getChildStreams());
+        Set<AbstractStream> recipients = new HashSet<>(stream.getChildStreams());
         recipients.retainAll(backLogStreams.keySet());
 
         // Loop until we run out of allocation or recipients

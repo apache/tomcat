@@ -300,8 +300,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
             }
 
             if (negotiableProtocols != null && negotiableProtocols.size() > 0) {
-                List<String> protocols = new ArrayList<>();
-                protocols.addAll(negotiableProtocols);
+                List<String> protocols = new ArrayList<>(negotiableProtocols);
                 protocols.add("http/1.1");
                 String[] protocolsArray = protocols.toArray(new String[0]);
                 SSLContext.setAlpnProtos(ctx, protocolsArray, SSL.SSL_SELECTOR_FAILURE_NO_ADVERTISE);
