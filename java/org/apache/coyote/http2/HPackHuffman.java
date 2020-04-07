@@ -315,8 +315,7 @@ public class HPackHuffman {
         HuffmanCode[] currentCode = new HuffmanCode[256];
         currentCode[0] = new HuffmanCode(0, 0);
 
-        final Set<HuffmanCode> allCodes = new HashSet<>();
-        allCodes.addAll(Arrays.asList(HUFFMAN_CODES));
+        final Set<HuffmanCode> allCodes = new HashSet<>(Arrays.asList(HUFFMAN_CODES));
 
         while (!allCodes.isEmpty()) {
             int length = currentCode[pos].length;

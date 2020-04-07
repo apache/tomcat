@@ -5019,8 +5019,7 @@ public enum Cipher {
         this.id = id;
         this.openSSLAlias = openSSLAlias;
         if (openSSlAltNames != null && openSSlAltNames.length != 0) {
-            Set<String> altNames = new HashSet<>();
-            altNames.addAll(Arrays.asList(openSSlAltNames));
+            Set<String> altNames = new HashSet<>(Arrays.asList(openSSlAltNames));
             this.openSSLAltNames = Collections.unmodifiableSet(altNames);
         } else {
             this.openSSLAltNames = Collections.emptySet();

@@ -979,10 +979,8 @@ public final class CGIServlet extends HttpServlet {
              * (apologies to Marv Albert regarding MJ)
              */
 
-            Hashtable<String,String> envp = new Hashtable<>();
-
             // Add the shell environment variables (if any)
-            envp.putAll(shellEnv);
+            Hashtable<String, String> envp = new Hashtable<>(shellEnv);
 
             // Add the CGI environment variables
             String sPathInfoOrig = null;

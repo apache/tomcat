@@ -65,8 +65,7 @@ public class LambdaExpression {
         // Build the argument map
         // Start with the arguments from any outer expressions so if there is
         // any overlap the local arguments have priority
-        Map<String,Object> lambdaArguments = new HashMap<>();
-        lambdaArguments.putAll(nestedArguments);
+        Map<String, Object> lambdaArguments = new HashMap<>(nestedArguments);
         for (int i = 0; i < formalParamCount; i++) {
             lambdaArguments.put(formalParameters.get(i), args[i]);
         }
