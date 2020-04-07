@@ -155,8 +155,7 @@ public abstract class SSLUtilBase implements SSLUtil {
             }
             if (log.isDebugEnabled() || warnOnSkip) {
                 if (enabled.size() != configured.size()) {
-                    List<T> skipped = new ArrayList<>();
-                    skipped.addAll(configured);
+                    List<T> skipped = new ArrayList<>(configured);
                     skipped.removeAll(enabled);
                     String msg = sm.getString("sslUtilBase.skipped", name, skipped);
                     if (warnOnSkip) {
@@ -307,8 +306,7 @@ public abstract class SSLUtilBase implements SSLUtil {
                     keyPass);
             PEMFile certificateFile = new PEMFile(certificate.getCertificateFile());
 
-            Collection<Certificate> chain = new ArrayList<>();
-            chain.addAll(certificateFile.getCertificates());
+            Collection<Certificate> chain = new ArrayList<>(certificateFile.getCertificates());
             if (certificate.getCertificateChainFile() != null) {
                 PEMFile certificateChainFile = new PEMFile(certificate.getCertificateChainFile());
                 chain.addAll(certificateChainFile.getCertificates());

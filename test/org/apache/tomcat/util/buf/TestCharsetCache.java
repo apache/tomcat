@@ -33,10 +33,8 @@ public class TestCharsetCache {
     @Test
     public void testAllKnownCharsets() {
 
-        Set<String> known = new HashSet<>();
-        known.addAll(Arrays.asList(CharsetCache.LAZY_CHARSETS));
-        Set<String> initial = new HashSet<>();
-        initial.addAll(Arrays.asList(CharsetCache.INITIAL_CHARSETS));
+        Set<String> known = new HashSet<>(Arrays.asList(CharsetCache.LAZY_CHARSETS));
+        Set<String> initial = new HashSet<>(Arrays.asList(CharsetCache.INITIAL_CHARSETS));
 
         List<String> cacheMisses = new ArrayList<>();
 

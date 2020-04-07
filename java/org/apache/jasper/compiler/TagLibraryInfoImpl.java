@@ -341,8 +341,7 @@ class TagLibraryInfoImpl extends TagLibraryInfo implements TagConstants {
             return null;
         }
 
-        Map<String,Object> initParams = new Hashtable<>();
-        initParams.putAll(validatorXml.getInitParams());
+        Map<String, Object> initParams = new Hashtable<>(validatorXml.getInitParams());
 
         try {
             Class<?> tlvClass = ctxt.getClassLoader().loadClass(validatorClass);

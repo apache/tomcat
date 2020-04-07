@@ -930,8 +930,7 @@ public class Request implements HttpServletRequest {
         }
         // Take a copy to prevent ConcurrentModificationExceptions if used to
         // remove attributes
-        Set<String> names = new HashSet<>();
-        names.addAll(attributes.keySet());
+        Set<String> names = new HashSet<>(attributes.keySet());
         return Collections.enumeration(names);
     }
 
@@ -1978,8 +1977,7 @@ public class Request implements HttpServletRequest {
         if (!isTrailerFieldsReady()) {
             throw new IllegalStateException(sm.getString("coyoteRequest.trailersNotReady"));
         }
-        Map<String,String> result = new HashMap<>();
-        result.putAll(coyoteRequest.getTrailerFields());
+        Map<String, String> result = new HashMap<>(coyoteRequest.getTrailerFields());
         return result;
     }
 

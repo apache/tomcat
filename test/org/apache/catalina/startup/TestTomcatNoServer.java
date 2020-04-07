@@ -62,12 +62,10 @@ public class TestTomcatNoServer {
 
         Map<String,String> webXmlMimeMappings = webXmlDefaultFragment.getMimeMappings();
 
-        Set<String> embeddedExtensions = new HashSet<>();
-        embeddedExtensions.addAll(Arrays.asList(ctx.findMimeMappings()));
+        Set<String> embeddedExtensions = new HashSet<>(Arrays.asList(ctx.findMimeMappings()));
 
         // Find entries present in conf/web.xml that are missing in embedded
-        Set<String> missingInEmbedded = new HashSet<>();
-        missingInEmbedded.addAll(webXmlMimeMappings.keySet());
+        Set<String> missingInEmbedded = new HashSet<>(webXmlMimeMappings.keySet());
         missingInEmbedded.removeAll(embeddedExtensions);
         if (missingInEmbedded.size() > 0) {
             for (String missingExtension : missingInEmbedded) {
@@ -78,8 +76,7 @@ public class TestTomcatNoServer {
         }
 
         // Find entries present in embedded that are missing in conf/web.xml
-        Set<String> missingInWebXml = new HashSet<>();
-        missingInWebXml.addAll(embeddedExtensions);
+        Set<String> missingInWebXml = new HashSet<>(embeddedExtensions);
         missingInWebXml.removeAll(webXmlMimeMappings.keySet());
         if (missingInWebXml.size() > 0) {
             for (String missingExtension : missingInWebXml) {

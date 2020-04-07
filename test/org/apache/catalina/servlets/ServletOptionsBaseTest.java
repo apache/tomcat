@@ -152,8 +152,7 @@ public abstract class ServletOptionsBaseTest extends TomcatBaseTest {
             for (int i = 0; i < values.length; i++) {
                 values[i] = values[i].trim();
             }
-            Set<String> allowed = new HashSet<>();
-            allowed.addAll(Arrays.asList(values));
+            Set<String> allowed = new HashSet<>(Arrays.asList(values));
 
             return allowed;
         }
