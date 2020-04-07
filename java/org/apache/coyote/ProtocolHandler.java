@@ -16,6 +16,7 @@
  */
 package org.apache.coyote;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ScheduledExecutorService;
 
@@ -179,4 +180,74 @@ public interface ProtocolHandler {
      * @return the protocols
      */
     public UpgradeProtocol[] findUpgradeProtocols();
+
+
+    /**
+     * Some protocols, like AJP, have a packet length that
+     * shouldn't be exceeded, and this can be used to adjust the buffering
+     * used by the application layer.
+     * @return the desired buffer size, or -1 if not relevant
+     */
+    public default int getDesiredBufferSize() {
+        return -1;
+    }
+
+
+    /**
+     * Create a new ProtocolHandler for the given protocol.
+     * @param protocol the protocol
+     * @param apr if <code>true</code> the APR protcol handler will be used
+     * @return the newly instantiated protocol handler
+     * @throws ClassNotFoundException Specified protocol was not found
+     * @throws InstantiationException Specified protocol could not be instantiated
+     * @throws IllegalAccessException Exception occurred
+     * @throws IllegalArgumentException Exception occurred
+     * @throws InvocationTargetException Exception occurred
+     * @throws NoSuchMethodException Exception occurred
+     * @throws SecurityException Exception occurred
+     */
+    public static ProtocolHandler create(String protocol, boolean apr)
+            throws ClassNotFoundException, InstantiationException, IllegalAccessException,
+            IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException {
+        if (protocol == null || "HTTP/1.1".equals(protocol)
+                || (!apr && org.apache.coyote.http11.Http11NioProtocol.class.getName().equals(protocol))
+                || (apr && org.apache.coyote.http11.Http11AprProtocol.class.getName().equals(protocol))) {
+            if (apr) {
+                return new org.apache.coyote.http11.Http11AprProtocol();
+            } else {
+                return new org.apache.coyote.http11.Http11NioProtocol();
+            }
+        } else if ("AJP/1.3".equals(protocol)
+                || (!apr && org.apache.coyote.ajp.AjpNioProtocol.class.getName().equals(protocol))
+                || (apr && org.apache.coyote.ajp.AjpAprProtocol.class.getName().equals(protocol))) {
+            if (apr) {
+                return new org.apache.coyote.ajp.AjpAprProtocol();
+            } else {
+                return new org.apache.coyote.ajp.AjpNioProtocol();
+            }
+        } else {
+            // Instantiate protocol handler
+            Class<?> clazz = Class.forName(protocol);
+            return (ProtocolHandler) clazz.getConstructor().newInstance();
+        }
+    }
+
+
+    /**
+     * Get the protocol name associated with the protocol class.
+     * @param protocolClassName the protocol class name
+     * @param apr if <code>true</code> the APR protcol handler will be used
+     * @return the protocol name
+     */
+    public static String getProtocol(String protocolClassName, boolean apr) {
+        if ((!apr && org.apache.coyote.http11.Http11NioProtocol.class.getName().equals(protocolClassName))
+                || (apr && org.apache.coyote.http11.Http11AprProtocol.class.getName().equals(protocolClassName))) {
+            return "HTTP/1.1";
+        } else if ((!apr && org.apache.coyote.ajp.AjpNioProtocol.class.getName().equals(protocolClassName))
+                || (apr && org.apache.coyote.ajp.AjpAprProtocol.class.getName().equals(protocolClassName))) {
+            return "AJP/1.3";
+        }
+        return protocolClassName;
+    }
+
 }

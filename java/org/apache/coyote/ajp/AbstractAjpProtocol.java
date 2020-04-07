@@ -215,6 +215,12 @@ public abstract class AbstractAjpProtocol<S> extends AbstractProtocol<S> {
     }
 
 
+    @Override
+    public int getDesiredBufferSize() {
+        return getPacketSize() - Constants.SEND_HEAD_LEN;
+    }
+
+
     // --------------------------------------------- SSL is not supported in AJP
 
     @Override
