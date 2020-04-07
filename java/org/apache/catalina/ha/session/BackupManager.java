@@ -256,9 +256,7 @@ public class BackupManager extends ClusterManagerBase
         Set<String> sessionIds = new HashSet<>();
         LazyReplicatedMap<String,Session> map =
                 (LazyReplicatedMap<String,Session>)sessions;
-        for (String id : map.keySetFull()) {
-            sessionIds.add(id);
-        }
+        sessionIds.addAll(map.keySetFull());
         return sessionIds;
     }
 

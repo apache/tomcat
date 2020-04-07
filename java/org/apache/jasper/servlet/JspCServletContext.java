@@ -192,9 +192,7 @@ public class JspCServletContext implements ServletContext {
         List<URL> resourceJars = new ArrayList<>();
         // Build list of potential resource JARs. Use same ordering as ContextConfig
         Set<WebXml> resourceFragments = new LinkedHashSet<>();
-        for (WebXml fragment : orderedFragments) {
-            resourceFragments.add(fragment);
-        }
+        resourceFragments.addAll(orderedFragments);
         for (WebXml fragment : fragments) {
             if (!resourceFragments.contains(fragment)) {
                 resourceFragments.add(fragment);

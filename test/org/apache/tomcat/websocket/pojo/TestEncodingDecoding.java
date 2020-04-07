@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -685,9 +686,7 @@ public class TestEncodingDecoding extends TomcatBaseTest {
             List<String> lst = new ArrayList<>(1);
             str = str.substring(1,str.length()-1);
             String[] strings = str.split(",");
-            for (String t : strings){
-                lst.add(t);
-            }
+            lst.addAll(Arrays.asList(strings));
             return lst;
         }
 

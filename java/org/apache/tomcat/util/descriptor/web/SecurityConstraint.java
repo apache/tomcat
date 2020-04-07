@@ -638,9 +638,7 @@ public class SecurityConstraint extends XmlEncodingBase implements Serializable 
                 String[] omittedMethods = collection.findOmittedMethods();
                 // Simple case: no methods
                 if (methods.length == 0 && omittedMethods.length == 0) {
-                    for (String pattern : patterns) {
-                        coveredPatterns.add(pattern);
-                    }
+                    coveredPatterns.addAll(Arrays.asList(patterns));
                     continue;
                 }
 
@@ -672,9 +670,7 @@ public class SecurityConstraint extends XmlEncodingBase implements Serializable 
                                 m = new HashSet<>();
                                 urlMethodMap.put(pattern, m);
                             }
-                            for (String method : methods) {
-                                m.add(method);
-                            }
+                            m.addAll(Arrays.asList(methods));
                         }
                     }
                 }
