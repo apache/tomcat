@@ -824,8 +824,11 @@ public abstract class AbstractReplicatedMap<K,V>
     public boolean inSet(Member m, Member[] set) {
         if ( set == null ) return false;
         boolean result = false;
-        for (int i=0; i<set.length && (!result); i++ )
-            if ( m.equals(set[i]) ) result = true;
+        for (int i = 0; i < set.length; i++ )
+            if (m.equals(set[i])) {
+                result = true;
+                break;
+            }
         return result;
     }
 
@@ -833,8 +836,11 @@ public abstract class AbstractReplicatedMap<K,V>
         List<Member> result = new ArrayList<>();
         for (int i=0; i<set.length; i++ ) {
             boolean include = true;
-            for (int j=0; j<mbrs.length && include; j++ )
-                if ( mbrs[j].equals(set[i]) ) include = false;
+            for (int j = 0; j < mbrs.length; j++ )
+                if (mbrs[j].equals(set[i])) {
+                    include = false;
+                    break;
+                }
             if ( include ) result.add(set[i]);
         }
         return result.toArray(new Member[0]);
