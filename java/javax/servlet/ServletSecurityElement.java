@@ -107,14 +107,12 @@ public class ServletSecurityElement extends HttpConstraintElement {
     }
 
     public Collection<HttpMethodConstraintElement> getHttpMethodConstraints() {
-        Collection<HttpMethodConstraintElement> result = new HashSet<>();
-        result.addAll(methodConstraints.values());
+        Collection<HttpMethodConstraintElement> result = new HashSet<>(methodConstraints.values());
         return result;
     }
 
     public Collection<String> getMethodNames() {
-        Collection<String> result = new HashSet<>();
-        result.addAll(methodConstraints.keySet());
+        Collection<String> result = new HashSet<>(methodConstraints.keySet());
         return result;
     }
 

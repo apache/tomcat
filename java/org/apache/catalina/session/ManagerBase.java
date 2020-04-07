@@ -1011,9 +1011,9 @@ public abstract class ManagerBase extends LifecycleMBeanBase implements Manager 
     @Override
     public int getSessionAverageAliveTime() {
         // Copy current stats
-        List<SessionTiming> copy = new ArrayList<>();
+        List<SessionTiming> copy;
         synchronized (sessionExpirationTiming) {
-            copy.addAll(sessionExpirationTiming);
+            copy = new ArrayList<>(sessionExpirationTiming);
         }
 
         // Init
@@ -1042,9 +1042,9 @@ public abstract class ManagerBase extends LifecycleMBeanBase implements Manager 
     @Override
     public int getSessionCreateRate() {
         // Copy current stats
-        List<SessionTiming> copy = new ArrayList<>();
+        List<SessionTiming> copy;
         synchronized (sessionCreationTiming) {
-            copy.addAll(sessionCreationTiming);
+            copy = new ArrayList<>(sessionCreationTiming);
         }
 
         return calculateRate(copy);
@@ -1062,9 +1062,9 @@ public abstract class ManagerBase extends LifecycleMBeanBase implements Manager 
     @Override
     public int getSessionExpireRate() {
         // Copy current stats
-        List<SessionTiming> copy = new ArrayList<>();
+        List<SessionTiming> copy;
         synchronized (sessionExpirationTiming) {
-            copy.addAll(sessionExpirationTiming);
+            copy = new ArrayList<>(sessionExpirationTiming);
         }
 
         return calculateRate(copy);

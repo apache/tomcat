@@ -154,8 +154,7 @@ public abstract class SSLUtilBase implements SSLUtil {
             }
             if (log.isDebugEnabled() || warnOnSkip) {
                 if (enabled.size() != configured.size()) {
-                    List<T> skipped = new ArrayList<>();
-                    skipped.addAll(configured);
+                    List<T> skipped = new ArrayList<>(configured);
                     skipped.removeAll(enabled);
                     String msg = sm.getString("sslUtilBase.skipped", name, skipped);
                     if (warnOnSkip) {

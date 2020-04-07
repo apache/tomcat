@@ -989,8 +989,7 @@ public class Request implements HttpServletRequest {
         }
         // Take a copy to prevent ConcurrentModificationExceptions if used to
         // remove attributes
-        Set<String> names = new HashSet<>();
-        names.addAll(attributes.keySet());
+        Set<String> names = new HashSet<>(attributes.keySet());
         return Collections.enumeration(names);
     }
 

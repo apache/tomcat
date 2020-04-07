@@ -1644,8 +1644,7 @@ public class HostConfig implements LifecycleListener {
         }
 
         // Need ordered set of names
-        SortedSet<String> sortedAppNames = new TreeSet<>();
-        sortedAppNames.addAll(deployed.keySet());
+        SortedSet<String> sortedAppNames = new TreeSet<>(deployed.keySet());
 
         Iterator<String> iter = sortedAppNames.iterator();
 
