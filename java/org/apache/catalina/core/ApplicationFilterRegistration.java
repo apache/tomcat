@@ -17,6 +17,7 @@
 
 package org.apache.catalina.core;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.EnumSet;
 import java.util.HashSet;
@@ -118,9 +119,7 @@ public class ApplicationFilterRegistration
 
         for (FilterMap filterMap : filterMaps) {
             if (filterMap.getFilterName().equals(filterDef.getFilterName())) {
-                for (String servletName : filterMap.getServletNames()) {
-                    result.add(servletName);
-                }
+                result.addAll(Arrays.asList(filterMap.getServletNames()));
             }
         }
         return result;
@@ -134,9 +133,7 @@ public class ApplicationFilterRegistration
 
         for (FilterMap filterMap : filterMaps) {
             if (filterMap.getFilterName().equals(filterDef.getFilterName())) {
-                for (String urlPattern : filterMap.getURLPatterns()) {
-                    result.add(urlPattern);
-                }
+                result.addAll(Arrays.asList(filterMap.getURLPatterns()));
             }
         }
         return result;

@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.security.AccessController;
 import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -680,9 +681,7 @@ public abstract class PersistentManagerBase extends ManagerBase
         String[] storeKeys;
         try {
             storeKeys = getStore().keys();
-            for (String storeKey : storeKeys) {
-                sessionIds.add(storeKey);
-            }
+            sessionIds.addAll(Arrays.asList(storeKeys));
         } catch (IOException e) {
             log.warn(sm.getString("persistentManager.storeKeysException"));
         }

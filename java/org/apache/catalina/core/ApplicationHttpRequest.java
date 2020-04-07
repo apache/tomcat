@@ -22,6 +22,7 @@ package org.apache.catalina.core;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Map;
@@ -851,9 +852,7 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
         if (values1 == null) {
             // Skip - nothing to merge
         } else if (values1 instanceof String[]) {
-            for (String value : (String[]) values1) {
-                results.add(value);
-            }
+            results.addAll(Arrays.asList(values1));
         } else { // String
             results.add(values1.toString());
         }
@@ -861,9 +860,7 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
         if (values2 == null) {
             // Skip - nothing to merge
         } else if (values2 instanceof String[]) {
-            for (String value : (String[]) values2) {
-                results.add(value);
-            }
+            results.addAll(Arrays.asList(values2));
         } else { // String
             results.add(values2.toString());
         }
