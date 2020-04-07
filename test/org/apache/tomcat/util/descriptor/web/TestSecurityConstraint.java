@@ -16,6 +16,7 @@
  */
 package org.apache.tomcat.util.descriptor.web;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -396,9 +397,7 @@ public class TestSecurityConstraint {
         Assert.assertEquals(0, sc.findMethods().length);
         Assert.assertEquals(2, sc.findOmittedMethods().length);
         HashSet<String> omittedMethods = new HashSet<>();
-        for (String omittedMethod : sc.findOmittedMethods()) {
-            omittedMethods.add(omittedMethod);
-        }
+        omittedMethods.addAll(Arrays.asList(sc.findOmittedMethods()));
         Assert.assertTrue(omittedMethods.remove("GET"));
         Assert.assertTrue(omittedMethods.remove("POST"));
     }

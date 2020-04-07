@@ -20,6 +20,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -366,9 +367,7 @@ public class TesterOpenSSL {
     public static Set<String> getOpenSSLCiphersAsSet(String specification) throws Exception {
         String[] ciphers = getOpenSSLCiphersAsExpression(specification).trim().split(":");
         Set<String> result = new HashSet<>(ciphers.length);
-        for (String cipher : ciphers) {
-            result.add(cipher);
-        }
+        result.addAll(Arrays.asList(ciphers));
         return result;
     }
 
@@ -469,9 +468,7 @@ public class TesterOpenSSL {
         }
         List<String> cmd = new ArrayList<>();
         cmd.add(openSSLPath);
-        for (String arg : args) {
-            cmd.add(arg);
-        }
+        cmd.addAll(Arrays.asList(args));
 
         ProcessBuilder pb = new ProcessBuilder(cmd.toArray(new String[0]));
 

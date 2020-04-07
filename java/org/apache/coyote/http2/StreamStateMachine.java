@@ -16,6 +16,7 @@
  */
 package org.apache.coyote.http2;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -224,9 +225,7 @@ class StreamStateMachine {
             this.canReset = canReset;
             this.connectionErrorForInvalidFrame = connectionErrorForInvalidFrame;
             this.errorCodeForInvalidFrame = errorCode;
-            for (FrameType frameType : frameTypes) {
-                frameTypesPermitted.add(frameType);
-            }
+            frameTypesPermitted.addAll(Arrays.asList(frameTypes));
         }
 
         public boolean isActive() {

@@ -23,6 +23,7 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -128,9 +129,7 @@ public class StandardRoot extends LifecycleMBeanBase implements WebResourceRoot 
             for (WebResourceSet webResourceSet : list) {
                 if (!webResourceSet.getClassLoaderOnly()) {
                     String[] entries = webResourceSet.list(path);
-                    for (String entry : entries) {
-                        result.add(entry);
-                    }
+                    result.addAll(Arrays.asList(entries));
                 }
             }
         }
