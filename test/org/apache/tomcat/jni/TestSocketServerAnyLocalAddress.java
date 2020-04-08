@@ -43,8 +43,13 @@ public class TestSocketServerAnyLocalAddress extends AbstractJniTest {
     @Before
     public void init() throws Exception {
         long serverPool = Pool.create(0);
-        long inetAddress = Address.info(null, Socket.APR_UNSPEC,
-                                        0, 0, serverPool);
+        int family;
+        if (Boolean.getBoolean("java.net.preferIPv4Stack")) {
+            family = Socket.APR_INET;
+        } else {
+            family = Socket.APR_UNSPEC;
+        }
+        long inetAddress = Address.info(null, family, 0, 0, serverPool);
         serverSocket = Socket.create(Address.getInfo(inetAddress).family, Socket.SOCK_STREAM,
                                    Socket.APR_PROTO_TCP, serverPool);
         if (OS.IS_UNIX) {
