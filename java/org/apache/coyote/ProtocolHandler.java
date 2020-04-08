@@ -222,18 +222,4 @@ public interface ProtocolHandler {
     }
 
 
-    /**
-     * Get the protocol name associated with the protocol class.
-     * @param protocolClassName the protocol class name
-     * @return the protocol name
-     */
-    public static String getProtocol(String protocolClassName) {
-        if (org.apache.coyote.http11.Http11NioProtocol.class.getName().equals(protocolClassName)) {
-            return "HTTP/1.1";
-        } else if (org.apache.coyote.ajp.AjpNioProtocol.class.getName().equals(protocolClassName)) {
-            return "AJP/1.3";
-        }
-        return protocolClassName;
-    }
-
 }

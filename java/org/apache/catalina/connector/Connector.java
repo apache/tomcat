@@ -73,6 +73,7 @@ public class Connector extends LifecycleMBeanBase  {
 
 
     public Connector(String protocol) {
+        configuredProtocol = protocol;
         ProtocolHandler p = null;
         try {
             p = ProtocolHandler.create(protocol);
@@ -94,6 +95,7 @@ public class Connector extends LifecycleMBeanBase  {
 
     public Connector(ProtocolHandler protocolHandler) {
         protocolHandlerClassName = protocolHandler.getClass().getName();
+        configuredProtocol = protocolHandlerClassName;
         this.protocolHandler = protocolHandler;
         // Default for Connector depends on this system property
         setThrowOnFailure(Boolean.getBoolean("org.apache.catalina.startup.EXIT_ON_INIT_FAILURE"));
@@ -256,6 +258,12 @@ public class Connector extends LifecycleMBeanBase  {
      * See {@link #Connector()} for current default.
      */
     protected final String protocolHandlerClassName;
+
+
+    /**
+     * Name of the protocol that was configured.
+     */
+    protected final String configuredProtocol;
 
 
     /**
@@ -651,7 +659,7 @@ public class Connector extends LifecycleMBeanBase  {
      * @return the Coyote protocol handler in use.
      */
     public String getProtocol() {
-        return ProtocolHandler.getProtocol(getProtocolHandlerClassName());
+        return configuredProtocol;
     }
 
 
