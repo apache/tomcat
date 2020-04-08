@@ -124,6 +124,7 @@ public class TestSocketServerAnyLocalAddress extends AbstractJniTest {
 
             try {
                 InetSocketAddress connectAddress = getConnectAddress(serverSocket);
+                System.out.println("Client attempting to connect to [" + connectAddress + "]");
                 java.net.Socket sock = new java.net.Socket();
                 sock.connect(connectAddress, TIMEOUT_MICROSECONDS);
                 sock.setSoTimeout(TIMEOUT_MICROSECONDS);
@@ -165,6 +166,7 @@ public class TestSocketServerAnyLocalAddress extends AbstractJniTest {
             } else {
                 localAddress = new InetSocketAddress("0.0.0.0", addr.port);
             }
+            System.out.println("Server is listening at [" + localAddress + "]");
 
             // Need a local address of the same type (IPv4 or IPV6) as the
             // configured bind address since the connector may be configured
