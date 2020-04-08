@@ -146,6 +146,9 @@ public class TestSocketServerAnyLocalAddress extends AbstractJniTest {
                 sock.close();
             } catch (Exception e) {
                 e.printStackTrace();
+                // Prevent the test from hanging on Socket.accept(serverSocket)
+                // if the client fails
+                Socket.shutdown(serverSocket, Socket.APR_SHUTDOWN_READWRITE);
             }
         }
 
