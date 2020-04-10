@@ -1,0 +1,11 @@
+{
+  "bundles":[
+    {"name":"org.apache.jasper.resources.LocalStrings"}
+  ],
+  "resources":[
+    {"pattern":".*/mbeans-descriptors.xml$"},
+    {"pattern":".*/*.properties$"},
+    {"pattern":".*/*.dtd$"},
+    {"pattern":".*/*.xsd$"}
+  ]
+}
