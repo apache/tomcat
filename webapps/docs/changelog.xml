@@ -80,6 +80,11 @@
         replacement in configuration files. Based on a pull request provided by
         Bernd Bohmann. (markt)
       </fix>
+      <fix>
+        Rework the fix for <bug>64021</bug> to better support web applications
+        that use a custom class loader that loads resources from non-standard
+        locations. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

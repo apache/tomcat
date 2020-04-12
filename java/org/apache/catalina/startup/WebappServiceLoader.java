@@ -22,14 +22,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
-import java.net.URLClassLoader;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import javax.servlet.ServletContext;
@@ -68,6 +69,7 @@ public class WebappServiceLoader<T> {
     private final ServletContext servletContext;
     private final Pattern containerSciFilterPattern;
 
+
     /**
      * Construct a loader to load services from a ServletContext.
      *
@@ -84,8 +86,14 @@ public class WebappServiceLoader<T> {
         }
     }
 
+
     /**
-     * Load the providers for a service type.
+     * Load the providers for a service type. Container defined services will be
+     * loaded before application defined services in case the application
+     * depends on a Container provided service. Note that services are always
+     * loaded via the Context (web application) class loader so it is possible
+     * for an application to provide an alternative implementation of what would
+     * normally be a Container provided service.
      *
      * @param serviceType the type of service to load
      * @return an unmodifiable collection of service providers
@@ -94,24 +102,64 @@ public class WebappServiceLoader<T> {
     public List<T> load(Class<T> serviceType) throws IOException {
         String configFile = SERVICES + serviceType.getName();
 
-        LinkedHashSet<String> applicationServicesFound = new LinkedHashSet<String>();
-        LinkedHashSet<String> containerServicesFound = new LinkedHashSet<String>();
+        // Obtain the Container provided service configuration files.
+        ClassLoader loader = context.getParentClassLoader();
+        Enumeration<URL> containerResources;
+        if (loader == null) {
+            containerResources = ClassLoader.getSystemResources(configFile);
+        } else {
+            containerResources = loader.getResources(configFile);
+        }
 
-        ClassLoader loader = servletContext.getClassLoader();
+        // Extract the Container provided service class names. Each
+        // configuration file may list more than one service class name. This
+        // uses a LinkedHashSet so if a service class name appears more than
+        // once in the configuration files, only the first one found is used.
+        LinkedHashSet<String> containerServiceClassNames = new LinkedHashSet<String>();
+        Set<URL> containerServiceConfigFiles = new HashSet<URL>();
+        while (containerResources.hasMoreElements()) {
+            URL containerServiceConfigFile = containerResources.nextElement();
+            containerServiceConfigFiles.add(containerServiceConfigFile);
+            parseConfigFile(containerServiceClassNames, containerServiceConfigFile);
+        }
 
-        // if the ServletContext has ORDERED_LIBS, then use that to specify the
-        // set of JARs from WEB-INF/lib that should be used for loading services
+        // Filter the discovered container SCIs if required
+        if (containerSciFilterPattern != null) {
+            Iterator<String> iter = containerServiceClassNames.iterator();
+            while (iter.hasNext()) {
+                if (containerSciFilterPattern.matcher(iter.next()).find()) {
+                    iter.remove();
+                }
+            }
+        }
+
+        // Obtaining the application provided configuration files is a little
+        // more difficult for two reasons:
+        // - The web application may employ a custom class loader. Ideally, we
+        //   would use ClassLoader.findResources() but that method is protected.
+        //   We could force custom class loaders to override that method and
+        //   make it public but that would be a new requirement and break
+        //   backwards compatibility for what is an often customised component.
+        // - If the application web.xml file has defined an order for fragments
+        //   then only those JAR files represented by fragments in that order
+        //   (and arguably WEB-INF/classes) should be scanned for services.
+        LinkedHashSet<String> applicationServiceClassNames = new LinkedHashSet<String>();
+
+        // Check to see if the ServletContext has ORDERED_LIBS defined
         @SuppressWarnings("unchecked")
         List<String> orderedLibs = (List<String>) servletContext.getAttribute(ServletContext.ORDERED_LIBS);
 
-        // Handle application SCIs directly...
+        // Obtain the application provided service configuration files
         if (orderedLibs == null) {
-            // No ordered libs, so use every service definition we can find
-            if (loader instanceof URLClassLoader) {
-                Enumeration<URL> resources = ((URLClassLoader) loader).findResources(configFile);
-                while (resources.hasMoreElements()) {
-                    URL resource = resources.nextElement();
-                    parseConfigFile(applicationServicesFound, resource);
+            // Because a custom class loader may be being used, we have to use
+            // getResources() which will return application and Container files.
+            Enumeration<URL> allResources = servletContext.getClassLoader().getResources(configFile);
+            while (allResources.hasMoreElements()) {
+                URL serviceConfigFile = allResources.nextElement();
+                // Only process the service configuration file if it is not a
+                // Container level file that has already been processed
+                if (!containerServiceConfigFiles.contains(serviceConfigFile)) {
+                    parseConfigFile(applicationServiceClassNames, serviceConfigFile);
                 }
             }
         } else {
@@ -119,7 +167,7 @@ public class WebappServiceLoader<T> {
             // in WEB-INF/classes
             URL unpacked = servletContext.getResource(CLASSES + configFile);
             if (unpacked != null) {
-                parseConfigFile(applicationServicesFound, unpacked);
+                parseConfigFile(applicationServiceClassNames, unpacked);
             }
 
             for (String lib : orderedLibs) {
@@ -137,48 +185,26 @@ public class WebappServiceLoader<T> {
                     url = UriUtil.buildJarUrl(base, configFile);
                 }
                 try {
-                    parseConfigFile(applicationServicesFound, url);
+                    parseConfigFile(applicationServiceClassNames, url);
                 } catch (FileNotFoundException e) {
                     // no provider file found, this is OK
                 }
             }
         }
 
-        // and use the parent ClassLoader for all other SCIs
-        loader = context.getParentClassLoader();
-
-        Enumeration<URL> resources;
-        if (loader == null) {
-            resources = ClassLoader.getSystemResources(configFile);
-        } else {
-            resources = loader.getResources(configFile);
-        }
-        while (resources.hasMoreElements()) {
-            parseConfigFile(containerServicesFound, resources.nextElement());
-        }
-
-        // Filter the discovered container SCIs if required
-        if (containerSciFilterPattern != null) {
-            Iterator<String> iter = containerServicesFound.iterator();
-            while (iter.hasNext()) {
-                if (containerSciFilterPattern.matcher(iter.next()).find()) {
-                    iter.remove();
-                }
-            }
-        }
-
         // Add the application services after the container services to ensure
         // that the container services are loaded first
-        containerServicesFound.addAll(applicationServicesFound);
+        containerServiceClassNames.addAll(applicationServiceClassNames);
 
-        // load the discovered services
-        if (containerServicesFound.isEmpty()) {
+        // Short-cut if no services have been found
+        if (containerServiceClassNames.isEmpty()) {
             return Collections.emptyList();
         }
-        return loadServices(serviceType, containerServicesFound);
+        // Load the discovered services
+        return loadServices(serviceType, containerServiceClassNames);
     }
 
-    private void parseConfigFile(LinkedHashSet<String> servicesFound, URL url)
+    void parseConfigFile(LinkedHashSet<String> servicesFound, URL url)
             throws IOException {
         InputStream is = null;
         BufferedReader reader = null;
@@ -208,7 +234,7 @@ public class WebappServiceLoader<T> {
         }
     }
 
-    private List<T> loadServices(Class<T> serviceType, LinkedHashSet<String> servicesFound)
+    List<T> loadServices(Class<T> serviceType, LinkedHashSet<String> servicesFound)
             throws IOException {
         ClassLoader loader = servletContext.getClassLoader();
         List<T> services = new ArrayList<T>(servicesFound.size());

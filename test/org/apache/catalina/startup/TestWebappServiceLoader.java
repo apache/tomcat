@@ -16,27 +16,196 @@
  */
 package org.apache.catalina.startup;
 
-import java.io.File;
+import java.io.IOException;
+import java.net.URL;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedHashSet;
+import java.util.List;
 
 import javax.servlet.ServletContainerInitializer;
+import javax.servlet.ServletContext;
 
+import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
-import org.apache.catalina.core.StandardContext;
+import org.apache.catalina.Context;
+import org.apache.tomcat.unittest.TesterContext;
+import org.easymock.EasyMock;
+import org.easymock.IMocksControl;
 
-public class TestWebappServiceLoader extends TomcatBaseTest {
+public class TestWebappServiceLoader {
+    private static final String CONFIG_FILE =
+            "META-INF/services/javax.servlet.ServletContainerInitializer";
+    private IMocksControl control;
+    private ClassLoader cl;
+    private ClassLoader parent;
+    private Context context;
+    private ServletContext servletContext;
+    private WebappServiceLoader<ServletContainerInitializer> loader;
+
+    @Before
+    public void init() {
+        control = EasyMock.createStrictControl();
+        parent = control.createMock(ClassLoader.class);
+        cl = EasyMock.createMockBuilder(ClassLoader.class)
+                .withConstructor(parent)
+                .addMockedMethod("loadClass", String.class)
+                .createMock(control);
+        servletContext = control.createMock(ServletContext.class);
+        EasyMock.expect(servletContext.getClassLoader()).andStubReturn(cl);
+        context = new ExtendedTesterContext(servletContext, parent);
+    }
+
     @Test
-    public void testWebapp() throws Exception {
-        Tomcat tomcat = getTomcatInstance();
-        File appDir = new File("test/webapp-fragments-empty-absolute-ordering");
-        StandardContext ctxt = (StandardContext) tomcat.addContext(null, "/test", appDir.getAbsolutePath());
-        ctxt.addLifecycleListener(new ContextConfig());
-        tomcat.start();
+    public void testNoInitializersFound() throws IOException {
+        loader = new WebappServiceLoader<ServletContainerInitializer>(context);
+        EasyMock.expect(cl.getResources(CONFIG_FILE))
+                .andReturn(Collections.<URL>enumeration(Collections.<URL>emptyList()));
+        EasyMock.expect(servletContext.getAttribute(ServletContext.ORDERED_LIBS))
+                .andReturn(null);
+        EasyMock.expect(cl.getResources(CONFIG_FILE))
+                .andReturn(Collections.<URL>enumeration(Collections.<URL>emptyList()));
+        control.replay();
+        Assert.assertTrue(loader.load(ServletContainerInitializer.class).isEmpty());
+        control.verify();
+    }
 
-        WebappServiceLoader<ServletContainerInitializer> loader =
-                new WebappServiceLoader<ServletContainerInitializer>(ctxt);
-        @SuppressWarnings("unused")
-        Collection<ServletContainerInitializer> initializers = loader.load(ServletContainerInitializer.class);
+    @Test
+    @SuppressWarnings("unchecked")
+    public void testInitializerFromClasspath() throws IOException {
+        URL url = new URL("file://test");
+        loader = EasyMock.createMockBuilder(WebappServiceLoader.class)
+                .addMockedMethod("parseConfigFile", LinkedHashSet.class, URL.class)
+                .withConstructor(context).createMock(control);
+        EasyMock.expect(cl.getResources(CONFIG_FILE))
+                .andReturn(Collections.enumeration(Collections.singleton(url)));
+        loader.parseConfigFile(EasyMock.isA(LinkedHashSet.class), EasyMock.same(url));
+        EasyMock.expect(servletContext.getAttribute(ServletContext.ORDERED_LIBS))
+                .andReturn(null);
+        EasyMock.expect(cl.getResources(CONFIG_FILE))
+                .andReturn(Collections.enumeration(Collections.singleton(url)));
+        control.replay();
+        Assert.assertTrue(loader.load(ServletContainerInitializer.class).isEmpty());
+        control.verify();
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void testWithOrdering() throws IOException {
+        URL url1 = new URL("file://jar1.jar");
+        URL sci1 = new URL("jar:file://jar1.jar!/" + CONFIG_FILE);
+        URL url2 = new URL("file://dir/");
+        URL sci2 = new URL("file://dir/" + CONFIG_FILE);
+        loader = EasyMock.createMockBuilder(WebappServiceLoader.class)
+                .addMockedMethod("parseConfigFile", LinkedHashSet.class, URL.class)
+                .withConstructor(context).createMock(control);
+        List<String> jars = Arrays.asList("jar1.jar", "dir/");
+        EasyMock.expect(parent.getResources(CONFIG_FILE))
+                .andReturn(Collections.<URL>enumeration(Collections.<URL>emptyList()));
+        EasyMock.expect(servletContext.getAttribute(ServletContext.ORDERED_LIBS))
+                .andReturn(jars);
+        EasyMock.expect(servletContext.getResource("/WEB-INF/classes/" + CONFIG_FILE))
+                .andReturn(null);
+        EasyMock.expect(servletContext.getResource("/WEB-INF/lib/jar1.jar"))
+                .andReturn(url1);
+        loader.parseConfigFile(EasyMock.isA(LinkedHashSet.class), EasyMock.eq(sci1));
+        EasyMock.expect(servletContext.getResource("/WEB-INF/lib/dir/"))
+                .andReturn(url2);
+        loader.parseConfigFile(EasyMock.isA(LinkedHashSet.class), EasyMock.eq(sci2));
+
+        control.replay();
+        Assert.assertTrue(loader.load(ServletContainerInitializer.class).isEmpty());
+        control.verify();
+    }
+
+    @Test
+    public void testParseConfigFile() throws IOException {
+        LinkedHashSet<String> found = new LinkedHashSet<String>();
+        loader = new WebappServiceLoader<ServletContainerInitializer>(context);
+        loader.parseConfigFile(found, getClass().getResource("service-config.txt"));
+        Assert.assertEquals(Collections.singleton("provider1"), found);
+    }
+
+    @Test
+    public void testLoadServices() throws Exception {
+        Class<?> sci = TesterServletContainerInitializer1.class;
+        loader = new WebappServiceLoader<ServletContainerInitializer>(context);
+        cl.loadClass(sci.getName());
+        EasyMock.expectLastCall()
+                .andReturn(sci);
+        LinkedHashSet<String> names = new LinkedHashSet<String>();
+        names.add(sci.getName());
+        control.replay();
+        Collection<ServletContainerInitializer> initializers =
+                loader.loadServices(ServletContainerInitializer.class, names);
+        Assert.assertEquals(1, initializers.size());
+        Assert.assertTrue(sci.isInstance(initializers.iterator().next()));
+        control.verify();
+    }
+
+    @Test
+    public void testServiceIsNotExpectedType() throws Exception {
+        Class<?> sci = Object.class;
+        loader = new WebappServiceLoader<ServletContainerInitializer>(context);
+        cl.loadClass(sci.getName());
+        EasyMock.expectLastCall()
+                .andReturn(sci);
+        LinkedHashSet<String> names = new LinkedHashSet<String>();
+        names.add(sci.getName());
+        control.replay();
+        try {
+            loader.loadServices(ServletContainerInitializer.class, names);
+        } catch (IOException e) {
+            Assert.assertTrue(e.getCause() instanceof ClassCastException);
+        } finally {
+            control.verify();
+        }
+    }
+
+    @Test
+    public void testServiceCannotBeConstructed() throws Exception {
+        Class<?> sci = Integer.class;
+        loader = new WebappServiceLoader<ServletContainerInitializer>(context);
+        cl.loadClass(sci.getName());
+        EasyMock.expectLastCall()
+                .andReturn(sci);
+        LinkedHashSet<String> names = new LinkedHashSet<String>();
+        names.add(sci.getName());
+        control.replay();
+        try {
+            loader.loadServices(ServletContainerInitializer.class, names);
+        } catch (IOException e) {
+            Assert.assertTrue(e.getCause() instanceof InstantiationException);
+        } finally {
+            control.verify();
+        }
+    }
+
+    private static class ExtendedTesterContext extends TesterContext {
+        private final ServletContext servletContext;
+        private final ClassLoader parent;
+
+        public ExtendedTesterContext(ServletContext servletContext, ClassLoader parent) {
+            this.servletContext = servletContext;
+            this.parent = parent;
+        }
+
+        @Override
+        public ServletContext getServletContext() {
+            return servletContext;
+        }
+
+        @Override
+        public String getContainerSciFilter() {
+            return "";
+        }
+
+        @Override
+        public ClassLoader getParentClassLoader() {
+            return parent;
+        }
     }
 }
