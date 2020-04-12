@@ -65,6 +65,8 @@ public class TestWebappServiceLoader {
     @Test
     public void testNoInitializersFound() throws IOException {
         loader = new WebappServiceLoader<>(context);
+        EasyMock.expect(cl.getResources(CONFIG_FILE))
+                .andReturn(Collections.<URL>emptyEnumeration());
         EasyMock.expect(servletContext.getAttribute(ServletContext.ORDERED_LIBS))
                 .andReturn(null);
         EasyMock.expect(cl.getResources(CONFIG_FILE))
@@ -81,11 +83,13 @@ public class TestWebappServiceLoader {
         loader = EasyMock.createMockBuilder(WebappServiceLoader.class)
                 .addMockedMethod("parseConfigFile", LinkedHashSet.class, URL.class)
                 .withConstructor(context).createMock(control);
+        EasyMock.expect(cl.getResources(CONFIG_FILE))
+                .andReturn(Collections.enumeration(Collections.singleton(url)));
+        loader.parseConfigFile(EasyMock.isA(LinkedHashSet.class), EasyMock.same(url));
         EasyMock.expect(servletContext.getAttribute(ServletContext.ORDERED_LIBS))
                 .andReturn(null);
         EasyMock.expect(cl.getResources(CONFIG_FILE))
                 .andReturn(Collections.enumeration(Collections.singleton(url)));
-        loader.parseConfigFile(EasyMock.isA(LinkedHashSet.class), EasyMock.same(url));
         control.replay();
         Assert.assertTrue(loader.load(ServletContainerInitializer.class).isEmpty());
         control.verify();
@@ -102,6 +106,8 @@ public class TestWebappServiceLoader {
                 .addMockedMethod("parseConfigFile", LinkedHashSet.class, URL.class)
                 .withConstructor(context).createMock(control);
         List<String> jars = Arrays.asList("jar1.jar", "dir/");
+        EasyMock.expect(parent.getResources(CONFIG_FILE))
+                .andReturn(Collections.<URL>emptyEnumeration());
         EasyMock.expect(servletContext.getAttribute(ServletContext.ORDERED_LIBS))
                 .andReturn(jars);
         EasyMock.expect(servletContext.getResource("/WEB-INF/classes/" + CONFIG_FILE))
@@ -112,8 +118,6 @@ public class TestWebappServiceLoader {
         EasyMock.expect(servletContext.getResource("/WEB-INF/lib/dir/"))
                 .andReturn(url2);
         loader.parseConfigFile(EasyMock.isA(LinkedHashSet.class), EasyMock.eq(sci2));
-        EasyMock.expect(parent.getResources(CONFIG_FILE))
-                .andReturn(Collections.<URL>emptyEnumeration());
 
         control.replay();
         Assert.assertTrue(loader.load(ServletContainerInitializer.class).isEmpty());

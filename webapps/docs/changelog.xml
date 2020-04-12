@@ -66,6 +66,11 @@
         Reduce reflection use and remove AJP specific code in the Connector.
         (remm/markt/fhanik)
       </fix>
+      <fix>
+        Rework the fix for <bug>64021</bug> to better support web applications
+        that use a custom class loader that loads resources from non-standard
+        locations. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
