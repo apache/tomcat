@@ -93,7 +93,7 @@ public final class UriUtil {
         if (entryPath != null) {
             sb.append(makeSafeForJarUrl(entryPath));
         }
-        return new URL("jar", null, -1, sb.toString());
+        return new URL("jar", "", -1, sb.toString());
     }
 
 
