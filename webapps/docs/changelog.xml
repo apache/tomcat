@@ -53,6 +53,11 @@
         9.0.x. If upgrade is not possible, application code should cast to the
         internal Tomcat implementation classes. (markt)
       </scode>
+      <fix>
+        Rework the fix for <bug>64021</bug> to better support web applications
+        that use a custom class loader that loads resources from non-standard
+        locations. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
