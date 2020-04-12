@@ -1435,6 +1435,7 @@
       <fileset dir="test">
         <include name="**/*.jks"/>
         <include name="**/*.pem"/>
+        <include name="**/service-config.txt"/>
         <include name="**/logging-non-rotatable.properties"/>
       </fileset>
     </copy>
