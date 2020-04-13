@@ -1,0 +1,44 @@
+#!/bin/bash
+
+CURDIR=`pwd`
+
+# resolve links - $0 may be a softlink
+PRG="$0"
+while [ -h "$PRG" ]; do
+  ls=`ls -ld "$PRG"`
+  link=`expr "$ls" : '.*-> \(.*\)$'`
+  if expr "$link" : '/.*' > /dev/null; then
+    PRG="$link"
+  else
+    PRG=`dirname "$PRG"`/"$link"
+  fi
+done
+
+# directory of this script
+PRGDIR=`dirname "$PRG"`
+
+cd $PRGDIR/../..
+ant && ant embed && ant test-compile
+
+mkdir -p output/graal
+cd output/testclasses
+jar cvfM ../graal/tomcat-embedded-sample.jar org/apache/catalina/startup/EmbeddedTomcat*class
+
+cd ../graal
+
+native-image \
+--verbose \
+--no-server \
+-H:EnableURLProtocols=http \
+--report-unsupported-elements-at-runtime \
+--initialize-at-run-time=org.apache,javax.servlet \
+-H:+TraceClassInitialization \
+-H:+PrintClassInitialization \
+-H:Name=tc-graal-image \
+-H:+ReportExceptionStackTraces \
+--allow-incomplete-classpath \
+--no-fallback \
+-cp ../embed/tomcat-embed-core.jar:tomcat-embedded-sample.jar \
+org.apache.catalina.startup.EmbeddedTomcat
+
+cd $CURDIR

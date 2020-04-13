@@ -1,0 +1,8 @@
+[
+{ "name":"org.apache.tomcat.websocket.server.WsHttpUpgradeHandler", "methods" : [{"name": "<init>","parameterTypes":[] }] },
+{ "name":"org.apache.tomcat.websocket.pojo.PojoEndpointBase", "allDeclaredMethods":true },
+{ "name":"org.apache.tomcat.websocket.pojo.PojoEndpointServer", "allDeclaredMethods":true },
+{ "name":"org.apache.tomcat.websocket.server.WsContextListener", "allDeclaredMethods":true },
+{ "name":"org.apache.tomcat.websocket.server.WsFilter", "allDeclaredMethods":true },
+{ "name":"org.apache.tomcat.websocket.server.WsHttpUpgradeHandler", "methods":[{"name":"<init>","parameterTypes":[] }] }
+]
