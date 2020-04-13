@@ -307,6 +307,18 @@ public class TesterOpenSSL {
             unimplemented.add(Cipher.TLS_RSA_PSK_WITH_ARIA_256_GCM_SHA384);
         }
 
+        if (VERSION < 30000) {
+            // No new ciphers in 3.0.0 so far
+        } else {
+            // These were moved to the legacy provided in 3.0.0 so won't be
+            // available from that version onwards.
+            unimplemented.add(Cipher.TLS_RSA_WITH_IDEA_CBC_SHA);
+            unimplemented.add(Cipher.TLS_DH_anon_WITH_SEED_CBC_SHA);
+            unimplemented.add(Cipher.TLS_DHE_DSS_WITH_SEED_CBC_SHA);
+            unimplemented.add(Cipher.TLS_RSA_WITH_SEED_CBC_SHA);
+            unimplemented.add(Cipher.TLS_DHE_RSA_WITH_SEED_CBC_SHA);
+        }
+
         String skipCiphers = System.getProperty("tomcat.test.openssl.unimplemented", "");
         if (!skipCiphers.isEmpty()) {
             String[] skip = skipCiphers.split(",");
