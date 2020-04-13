@@ -5,6 +5,7 @@ import org.apache.catalina.connector.Connector;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.scan.StandardJarScanFilter;
 import org.apache.tomcat.util.scan.StandardJarScanner;
+import org.junit.Ignore;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -17,6 +18,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.LogManager;
 
+@Ignore
 public class EmbeddedTomcat {
 
     private static void resetLogging() {
