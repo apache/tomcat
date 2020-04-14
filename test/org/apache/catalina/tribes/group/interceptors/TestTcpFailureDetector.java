@@ -83,7 +83,16 @@ public class TestTcpFailureDetector {
         channel2.stop(Channel.SND_RX_SEQ);
         ByteMessage msg = new ByteMessage(new byte[1024]);
         try {
-            channel1.send(channel1.getMembers(), msg, 0);
+            int msgCount = 0;
+            // Normally the first message sent should fail but occasional
+            // failures are observed on CI systems so messages are sent in a
+            // loop with a delay between them to try and account for timing
+            // differences.
+            while (msgCount < 5) {
+                channel1.send(channel1.getMembers(), msg, 0);
+                msgCount++;
+                Thread.sleep(500);
+            }
             Assert.fail("Message send should have failed.");
         } catch ( ChannelException x ) {
             // Ignore
