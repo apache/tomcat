@@ -128,6 +128,10 @@ public class TestWebSocketFrameClient extends WebSocketBaseTest {
         if (clientEndpointConfig == null) {
             clientEndpointConfig = ClientEndpointConfig.Builder.create().build();
         }
+        // Increase default timeout from 5s to 10s to try and reduce errors on
+        // CI systems.
+        clientEndpointConfig.getUserProperties().put(Constants.IO_TIMEOUT_MS_PROPERTY, "10000");
+
         Session wsSession = wsContainer.connectToServer(TesterProgrammaticEndpoint.class,
                 clientEndpointConfig, new URI("ws://localhost:" + getPort() + path));
         CountDownLatch latch = new CountDownLatch(1);
