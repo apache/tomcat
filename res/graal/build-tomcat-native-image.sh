@@ -38,7 +38,7 @@ native-image \
 -H:+ReportExceptionStackTraces \
 --allow-incomplete-classpath \
 --no-fallback \
--cp ../embed/tomcat-embed-core.jar:tomcat-embedded-sample.jar \
+-cp ../embed/tomcat-embed-core.jar:../embed/tomcat-embed-websocket.jar:../embed/tomcat-embed-el.jar:tomcat-embedded-sample.jar \
 org.apache.catalina.startup.EmbeddedTomcat
 
 cd $CURDIR

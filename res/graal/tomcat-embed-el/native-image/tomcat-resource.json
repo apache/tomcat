@@ -1,6 +1,6 @@
 {
   "bundles":[
-    {"name":"jakarta.el.LocalStrings"},
+    {"name":"javax.el.LocalStrings"},
     {"name":"org.apache.el.Messages"}
   ],
   "resources":[
