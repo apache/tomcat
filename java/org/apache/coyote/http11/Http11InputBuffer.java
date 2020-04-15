@@ -412,10 +412,10 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
                     request.method().setBytes(byteBuffer.array(), parsingRequestLineStart,
                             pos - parsingRequestLineStart);
                 } else if (!HttpParser.isToken(chr)) {
-                    byteBuffer.position(byteBuffer.position() - 1);
                     // Avoid unknown protocol triggering an additional error
                     request.protocol().setString(Constants.HTTP_11);
-                    throw new IllegalArgumentException(sm.getString("iib.invalidmethod"));
+                    String invalidMethodValue = parseInvalid(parsingRequestLineStart, byteBuffer);
+                    throw new IllegalArgumentException(sm.getString("iib.invalidmethod", invalidMethodValue));
                 }
             }
             parsingRequestLinePhase = 3;
@@ -460,7 +460,8 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
                     // therefore invalid. Trigger error handling.
                     // Avoid unknown protocol triggering an additional error
                     request.protocol().setString(Constants.HTTP_11);
-                    throw new IllegalArgumentException(sm.getString("iib.invalidRequestTarget"));
+                    String invalidRequestTarget = parseInvalid(parsingRequestLineStart, byteBuffer);
+                    throw new IllegalArgumentException(sm.getString("iib.invalidRequestTarget", invalidRequestTarget));
                 }
                 if (chr == Constants.SP || chr == Constants.HT) {
                     space = true;
@@ -486,14 +487,16 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
                     // Avoid unknown protocol triggering an additional error
                     request.protocol().setString(Constants.HTTP_11);
                     // %nn decoding will be checked at the point of decoding
-                    throw new IllegalArgumentException(sm.getString("iib.invalidRequestTarget"));
+                    String invalidRequestTarget = parseInvalid(parsingRequestLineStart, byteBuffer);
+                    throw new IllegalArgumentException(sm.getString("iib.invalidRequestTarget", invalidRequestTarget));
                 } else if (httpParser.isNotRequestTargetRelaxed(chr)) {
                     // Avoid unknown protocol triggering an additional error
                     request.protocol().setString(Constants.HTTP_11);
                     // This is a general check that aims to catch problems early
                     // Detailed checking of each part of the request target will
                     // happen in Http11Processor#prepareRequest()
-                    throw new IllegalArgumentException(sm.getString("iib.invalidRequestTarget"));
+                    String invalidRequestTarget = parseInvalid(parsingRequestLineStart, byteBuffer);
+                    throw new IllegalArgumentException(sm.getString("iib.invalidRequestTarget", invalidRequestTarget));
                 }
             }
             if (parsingRequestLineQPos >= 0) {
@@ -553,7 +556,8 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
                     end = pos - 1;
                     parsingRequestLineEol = true;
                 } else if (!HttpParser.isHttpProtocol(chr)) {
-                    throw new IllegalArgumentException(sm.getString("iib.invalidHttpProtocol"));
+                    String invalidProtocol = parseInvalid(parsingRequestLineStart, byteBuffer);
+                    throw new IllegalArgumentException(sm.getString("iib.invalidHttpProtocol", invalidProtocol));
                 }
             }
 
@@ -612,6 +616,21 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
 
     int getParsingRequestLinePhase() {
         return parsingRequestLinePhase;
+    }
+
+
+    private String parseInvalid(int startPos, ByteBuffer buffer) {
+        // Look for the next space
+        byte b = 0;
+        while (buffer.hasRemaining() && b != 0x20) {
+            b = buffer.get();
+        }
+        String result = HeaderUtil.toPrintableString(buffer.array(), buffer.arrayOffset() + startPos, buffer.position() - startPos - 1);
+        if (b != 0x20) {
+            // Ran out of buffer rather than found a space
+            result = result + "...";
+        }
+        return result;
     }
 
 
