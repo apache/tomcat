@@ -193,11 +193,11 @@ public class TestWsWebSocketContainerGetOpenSessions extends WebSocketBaseTest {
             delayCount++;
         }
 
-        Assert.assertTrue(Tracker.checkRecord("client1", client1Count));
-        Assert.assertTrue(Tracker.checkRecord("client2", client2Count));
+        Assert.assertTrue(Tracker.dump(), Tracker.checkRecord("client1", client1Count));
+        Assert.assertTrue(Tracker.dump(), Tracker.checkRecord("client2", client2Count));
         // Note: need to strip leading '/' from path
-        Assert.assertTrue(Tracker.checkRecord(server1.substring(1), server1Count));
-        Assert.assertTrue(Tracker.checkRecord(server2.substring(1), server2Count));
+        Assert.assertTrue(Tracker.dump(), Tracker.checkRecord(server1.substring(1), server1Count));
+        Assert.assertTrue(Tracker.dump(), Tracker.checkRecord(server2.substring(1), server2Count));
 
         sClient1Server1.close();
         sClient1Server2.close();
@@ -383,6 +383,10 @@ public class TestWsWebSocketContainerGetOpenSessions extends WebSocketBaseTest {
         public static void reset() {
             records.clear();
             updateCount.set(0);
+        }
+
+        public static String dump() {
+            return records.toString();
         }
     }
 }
