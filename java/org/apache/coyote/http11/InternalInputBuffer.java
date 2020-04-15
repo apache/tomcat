@@ -136,7 +136,8 @@ public class InternalInputBuffer extends AbstractInputBuffer<Socket> {
                 space = true;
                 request.method().setBytes(buf, start, pos - start);
             } else if (!HttpParser.isToken(buf[pos])) {
-                throw new IllegalArgumentException(sm.getString("iib.invalidmethod"));
+                String invalidMethodValue = parseInvalid(start, buf);
+                throw new IllegalArgumentException(sm.getString("iib.invalidmethod", invalidMethodValue));
             }
 
             pos++;
@@ -181,7 +182,8 @@ public class InternalInputBuffer extends AbstractInputBuffer<Socket> {
                 // therefore invalid. Trigger error handling.
                 // Avoid unknown protocol triggering an additional error
                 request.protocol().setString(Constants.HTTP_11);
-                throw new IllegalArgumentException(sm.getString("iib.invalidRequestTarget"));
+                String invalidRequestTarget = parseInvalid(start, buf);
+                throw new IllegalArgumentException(sm.getString("iib.invalidRequestTarget", invalidRequestTarget));
             }
 
             // Spec says single SP but it also says be tolerant of HT
@@ -207,12 +209,14 @@ public class InternalInputBuffer extends AbstractInputBuffer<Socket> {
                 questionPos = pos;
             } else if (questionPos != -1 && !httpParser.isQueryRelaxed(buf[pos])) {
                 // %nn decoding will be checked at the point of decoding
-                throw new IllegalArgumentException(sm.getString("iib.invalidRequestTarget"));
+                String invalidRequestTarget = parseInvalid(start, buf);
+                throw new IllegalArgumentException(sm.getString("iib.invalidRequestTarget", invalidRequestTarget));
             } else if (httpParser.isNotRequestTargetRelaxed(buf[pos])) {
                 // This is a general check that aims to catch problems early
                 // Detailed checking of each part of the request target will
                 // happen in AbstractHttp11Processor#prepareRequest()
-                throw new IllegalArgumentException(sm.getString("iib.invalidRequestTarget"));
+                String invalidRequestTarget = parseInvalid(start, buf);
+                throw new IllegalArgumentException(sm.getString("iib.invalidRequestTarget", invalidRequestTarget));
             }
             pos++;
         }
@@ -261,7 +265,8 @@ public class InternalInputBuffer extends AbstractInputBuffer<Socket> {
                 end = pos - 1;
                 eol = true;
             } else if (!HttpParser.isHttpProtocol(buf[pos])) {
-                throw new IllegalArgumentException(sm.getString("iib.invalidHttpProtocol"));
+                String invalidProtocol = parseInvalid(start, buf);
+                throw new IllegalArgumentException(sm.getString("iib.invalidHttpProtocol", invalidProtocol));
             }
 
             pos++;

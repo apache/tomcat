@@ -21,6 +21,7 @@ import java.io.IOException;
 import org.apache.coyote.InputBuffer;
 import org.apache.coyote.Request;
 import org.apache.tomcat.util.buf.ByteChunk;
+import org.apache.tomcat.util.http.HeaderUtil;
 import org.apache.tomcat.util.http.MimeHeaders;
 import org.apache.tomcat.util.http.parser.HttpParser;
 import org.apache.tomcat.util.net.AbstractEndpoint;
@@ -180,6 +181,21 @@ public abstract class AbstractInputBuffer<S> implements InputBuffer{
      */
     public void setSwallowInput(boolean swallowInput) {
         this.swallowInput = swallowInput;
+    }
+
+
+    protected String parseInvalid(int startPos, byte[] buffer) {
+        // Look for the next space
+        int pos = startPos;
+        while (pos < lastValid && buffer[pos] != 0x20) {
+            pos++;
+        }
+        String result = HeaderUtil.toPrintableString(buffer, startPos, pos - startPos);
+        if (pos == lastValid) {
+            // Ran out of buffer rather than found a space
+            result = result + "...";
+        }
+        return result;
     }
 
 

@@ -107,6 +107,10 @@
         to the application without decoding it in addition to rejecting such
         sequences and decoding such sequences. (markt)
       </add>
+      <fix>
+        Include the problematic data in the error message when reporting that
+        the provided request line contains an invalid component. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
