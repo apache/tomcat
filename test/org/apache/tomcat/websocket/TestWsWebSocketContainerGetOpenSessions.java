@@ -53,7 +53,7 @@ import org.apache.tomcat.websocket.server.WsContextListener;
  *
  * Each test uses 2 client endpoint and 2 server endpoints with each client
  * connecting to each server for a total of four connections (note sometimes
- * the two clients and/or the two servers will be the sam)e.
+ * the two clients and/or the two servers will be the same).
  */
 public class TestWsWebSocketContainerGetOpenSessions extends WebSocketBaseTest {
 
