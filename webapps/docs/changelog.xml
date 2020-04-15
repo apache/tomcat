@@ -58,10 +58,6 @@
         that use a custom class loader that loads resources from non-standard
         locations. (markt)
       </fix>
-      <fix>
-        Include the problematic data in the error message when reporting that
-        the provided request line contains an invalid component. (markt)
-      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
@@ -69,6 +65,10 @@
       <fix>
         Move <code>SocketProperties</code> mbean to its own type rather than
         use a subType to improve robustness with tools. (remm)
+      </fix>
+      <fix>
+        Include the problematic data in the error message when reporting that
+        the provided request line contains an invalid component. (markt)
       </fix>
     </changelog>
   </subsection>
