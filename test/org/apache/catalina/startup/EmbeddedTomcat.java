@@ -79,6 +79,8 @@ public class EmbeddedTomcat {
 
     private static class CounterServlet extends HttpServlet {
 
+        private static final long serialVersionUID = 1L;
+
         private AtomicInteger callCount = new AtomicInteger(0);
 
         @Override
