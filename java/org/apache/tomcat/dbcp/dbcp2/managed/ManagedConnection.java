@@ -258,7 +258,6 @@ public class ManagedConnection<C extends Connection> extends DelegatingConnectio
             // in the transaction, replace our delegate with the enrolled connection
 
             // return current connection to the pool
-            @SuppressWarnings("resource")
             final C connection = getDelegateInternal();
             setDelegate(null);
             if (connection != null && transactionContext.getSharedConnection() != connection) {

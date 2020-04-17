@@ -89,7 +89,6 @@ abstract class InstanceKeyDataSourceFactory implements ObjectFactory {
             // Bullet-proof to avoid anything else but problems from InstanceKeyDataSource#close().
             final Entry<String, InstanceKeyDataSource> next = instanceIterator.next();
             if (next != null) {
-                @SuppressWarnings("resource")
                 final InstanceKeyDataSource value = next.getValue();
                 if (value != null) {
                     try {

@@ -605,7 +605,6 @@ public final class DelegatingResultSet extends AbandonedTrace implements ResultS
      *
      * @return the innermost delegate.
      */
-    @SuppressWarnings("resource")
     public ResultSet getInnermostDelegate() {
         ResultSet r = resultSet;
         while (r != null && r instanceof DelegatingResultSet) {
