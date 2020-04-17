@@ -694,7 +694,7 @@ public class CoyoteAdapter implements Adapter {
             if (request.getContext() == null) {
                 // Don't overwrite an existing error
                 if (!response.isError()) {
-                    response.sendError(404, "Not found");
+                    response.sendError(404);
                 }
                 // Allow processing to continue.
                 // If present, the error reporting valve will provide a response
