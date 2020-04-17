@@ -106,7 +106,6 @@ public class BasicDataSource implements DataSource, BasicDataSourceMXBean, MBean
         }
     }
 
-    @SuppressWarnings("resource")
     protected static void validateConnectionFactory(final PoolableConnectionFactory connectionFactory)
             throws Exception {
         PoolableConnection conn = null;
@@ -1442,7 +1441,6 @@ public class BasicDataSource implements DataSource, BasicDataSourceMXBean, MBean
      * @throws IllegalStateException if invalidating the connection failed.
      * @since 2.1
      */
-    @SuppressWarnings("resource")
     public void invalidateConnection(final Connection connection) throws IllegalStateException {
         if (connection == null) {
             return;

@@ -295,7 +295,6 @@ public class PoolingConnection extends DelegatingConnection<Connection>
      *            the key for the {@link PreparedStatement} to be created
      * @see #createKey(String, int, int, StatementType)
      */
-    @SuppressWarnings("resource")
     @Override
     public PooledObject<DelegatingPreparedStatement> makeObject(final PStmtKey key) throws Exception {
         if (null == key) {
@@ -335,7 +334,6 @@ public class PoolingConnection extends DelegatingConnection<Connection>
     @Override
     public void passivateObject(final PStmtKey key, final PooledObject<DelegatingPreparedStatement> pooledObject)
             throws Exception {
-        @SuppressWarnings("resource")
         final DelegatingPreparedStatement dps = pooledObject.getObject();
         dps.clearParameters();
         dps.passivate();

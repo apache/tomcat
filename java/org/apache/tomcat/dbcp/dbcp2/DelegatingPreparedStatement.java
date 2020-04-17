@@ -686,7 +686,6 @@ public class DelegatingPreparedStatement extends DelegatingStatement implements 
      *
      * @return String
      */
-    @SuppressWarnings("resource")
     @Override
     public synchronized String toString() {
         final Statement statement = getDelegate();
