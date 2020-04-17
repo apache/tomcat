@@ -790,7 +790,6 @@ public class CoyoteAdapter implements Adapter {
             // so no context could be mapped.
             if (request.getContext() == null) {
                 res.setStatus(404);
-                res.setMessage("Not found");
                 // No context, so use host
                 Host host = request.getHost();
                 // Make sure there is a host (might not be during shutdown)
