@@ -19,9 +19,8 @@ package org.apache.tomcat.websocket;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.servlet.ServletContextEvent;
 import javax.websocket.ClientEndpointConfig;
@@ -355,15 +354,20 @@ public class TestWsWebSocketContainerGetOpenSessions extends WebSocketBaseTest {
 
     public static class Tracker {
 
-        private static final Map<String, Integer> records = new ConcurrentHashMap<String, Integer>();
-        private static final AtomicInteger updateCount = new AtomicInteger(0);
+        private static final Map<String, Integer> records = new HashMap<String,Integer>();
+        private static int updateCount = 0;
 
-        public static void addRecord(String key, int count) {
-            records.put(key, Integer.valueOf(count));
-            updateCount.incrementAndGet();
+        public static synchronized void addRecord(String key, int count) {
+            // Need to avoid out of order updates to the Map. If out of order
+            // updates occur, keep the one with the highest count.
+            Integer oldCount = records.get(key);
+            if (oldCount == null || oldCount.intValue() < count) {
+                records.put(key, Integer.valueOf(count));
+            }
+            updateCount++;
         }
 
-        public static boolean checkRecord(String key, int expectedCount) {
+        public static synchronized boolean checkRecord(String key, int expectedCount) {
             Integer actualCount = records.get(key);
             if (actualCount == null) {
                 if (expectedCount == 0) {
@@ -376,16 +380,16 @@ public class TestWsWebSocketContainerGetOpenSessions extends WebSocketBaseTest {
             }
         }
 
-        public static int getUpdateCount() {
-            return updateCount.intValue();
+        public static synchronized int getUpdateCount() {
+            return updateCount;
         }
 
-        public static void reset() {
+        public static synchronized void reset() {
             records.clear();
-            updateCount.set(0);
+            updateCount = 0;
         }
 
-        public static String dump() {
+        public static synchronized String dump() {
             return records.toString();
         }
     }
