@@ -29,10 +29,6 @@ New items for 10.0.x onwards:
 
  1. Remove APR connector.
 
- 2. Connector API and XML refactoring
-    https://cwiki.apache.org/confluence/display/TOMCAT/Connector+API+refactoring
-    for details.
-
 Deferred until 10.1.x:
 
  1. Remove the ExtensionValidator and associated classes (assuming that the
