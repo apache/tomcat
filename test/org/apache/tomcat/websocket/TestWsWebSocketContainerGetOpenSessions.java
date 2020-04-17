@@ -21,6 +21,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
+
 import jakarta.servlet.ServletContextEvent;
 import jakarta.websocket.ClientEndpointConfig;
 import jakarta.websocket.CloseReason;
@@ -356,7 +357,7 @@ public class TestWsWebSocketContainerGetOpenSessions extends WebSocketBaseTest {
         private static final Map<String, Integer> records = new HashMap<>();
         private static int updateCount = 0;
 
-        public synchronized static void addRecord(String key, int count) {
+        public static synchronized void addRecord(String key, int count) {
             // Need to avoid out of order updates to the Map. If out of order
             // updates occur, keep the one with the highest count.
             Integer oldCount = records.get(key);
@@ -366,7 +367,7 @@ public class TestWsWebSocketContainerGetOpenSessions extends WebSocketBaseTest {
             updateCount++;
         }
 
-        public synchronized static boolean checkRecord(String key, int expectedCount) {
+        public static synchronized boolean checkRecord(String key, int expectedCount) {
             Integer actualCount = records.get(key);
             if (actualCount == null) {
                 if (expectedCount == 0) {
@@ -379,16 +380,16 @@ public class TestWsWebSocketContainerGetOpenSessions extends WebSocketBaseTest {
             }
         }
 
-        public synchronized static int getUpdateCount() {
+        public static synchronized int getUpdateCount() {
             return updateCount;
         }
 
-        public synchronized static void reset() {
+        public static synchronized void reset() {
             records.clear();
             updateCount = 0;
         }
 
-        public synchronized static String dump() {
+        public static synchronized String dump() {
             return records.toString();
         }
     }
