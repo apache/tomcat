@@ -123,7 +123,6 @@
       <jvmarg value="-Xrunjdwp:transport=dt_socket,address=${jpda.address}"/>
       <jvmarg value="-Djava.compiler=none"/>
 
-      <jvmarg value="${test.jvmarg.egd}"/>
       <jvmarg value="-Djava.library.path=${test.apr.loc}"/>
       <jvmarg value="${nb-junit.formatter}"/>
 
