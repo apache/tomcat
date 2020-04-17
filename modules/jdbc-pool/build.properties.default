@@ -61,7 +61,7 @@ testdb.validationQuery=SELECT 1
 #testdb.validationQuery=VALUES 1
 
 # JUnit Unit Test Suite
-junit.version=4.11
+junit.version=4.13
 junit.home=${base.path}/junit-${junit.version}
 junit.jar=${junit.home}/junit-${junit.version}.jar
 junit.loc=https://repo.maven.apache.org/maven2/junit/junit/${junit.version}/junit-${junit.version}.jar

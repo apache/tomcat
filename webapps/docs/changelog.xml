@@ -165,6 +165,9 @@
         variable to avoid clashes with other components that use
         <code>LOGGING_CONFIG</code>. (markt)
       </fix>
+      <update>
+        Update JUnit to version 4.13. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
