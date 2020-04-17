@@ -116,7 +116,6 @@ public class PoolingDriver implements Driver {
      *             Thrown when a problem is caught closing the pool.
      */
     public synchronized void closePool(final String name) throws SQLException {
-        @SuppressWarnings("resource")
         final ObjectPool<? extends Connection> pool = pools.get(name);
         if (pool != null) {
             pools.remove(name);
