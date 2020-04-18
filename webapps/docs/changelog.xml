@@ -94,6 +94,7 @@
       <update>
         Remove redundant sole path/URI from error page message on SC_NOT_FOUND.
         (michaelo)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Other">
