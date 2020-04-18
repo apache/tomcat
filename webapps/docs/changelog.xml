@@ -58,6 +58,10 @@
         that use a custom class loader that loads resources from non-standard
         locations. (markt)
       </fix>
+      <update>
+        Remove redundant sole path/URI from error page message on SC_NOT_FOUND.
+        (michaelo)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Coyote">
@@ -70,6 +74,14 @@
         Include the problematic data in the error message when reporting that
         the provided request line contains an invalid component. (markt)
       </fix>
+    </changelog>
+  </subsection>
+  <subsection name="Jasper">
+    <changelog>
+      <update>
+        Remove redundant sole path/URI from error page message on SC_NOT_FOUND.
+        (michaelo)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Other">
