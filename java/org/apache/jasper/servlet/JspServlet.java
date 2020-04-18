@@ -408,8 +408,7 @@ public class JspServlet extends HttpServlet implements PeriodicEventListener {
             throw new ServletException(Escape.htmlElementContent(msg));
         } else {
             try {
-                response.sendError(HttpServletResponse.SC_NOT_FOUND,
-                        request.getRequestURI());
+                response.sendError(HttpServletResponse.SC_NOT_FOUND);
             } catch (IllegalStateException ise) {
                 log.error(Localizer.getMessage("jsp.error.file.not.found",
                         jspUri));
