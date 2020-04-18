@@ -497,28 +497,27 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
             String protocol = url.getProtocol();
             if ("file".equalsIgnoreCase(protocol)) {
                 URI uri;
-                File f;
+                File file;
                 String path;
                 try {
                     uri = url.toURI();
-                    f = new File(uri);
-                    path = f.getCanonicalPath();
+                    file = new File(uri);
+                    path = file.getCanonicalPath();
                 } catch (IOException | URISyntaxException e) {
                     log.warn(sm.getString(
                             "webappClassLoader.addPermisionNoCanonicalFile",
                             url.toExternalForm()));
                     return;
                 }
-                if (f.isFile()) {
+                if (file.isFile()) {
                     // Allow the file to be read
                     addPermission(new FilePermission(path, "read"));
-                } else if (f.isDirectory()) {
+                } else if (file.isDirectory()) {
                     addPermission(new FilePermission(path, "read"));
                     addPermission(new FilePermission(
                             path + File.separator + "-", "read"));
-                } else {
-                    // File does not exist - ignore (shouldn't happen)
                 }
+
             } else {
                 // Unsupported URL protocol
                 log.warn(sm.getString(
@@ -778,7 +777,6 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
                     resources.getContext().getName()));
             return true;
         }
-
 
         // No classes have been modified
         return false;
@@ -1815,11 +1813,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
                         // stopped and check them at the end of the method.
                         executorThreadsToStop.add(thread);
                     } else {
-                        // This method is deprecated and for good reason. This
-                        // is very risky code but is the only option at this
-                        // point. A *very* good reason for apps to do this
-                        // clean-up themselves.
-                        thread.stop();
+                        thread.interrupt();
                     }
                 }
             }
@@ -1954,20 +1948,20 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
             Method expungeStaleEntriesMethod = tlmClass.getDeclaredMethod("expungeStaleEntries");
             expungeStaleEntriesMethod.setAccessible(true);
 
-            for (int i = 0; i < threads.length; i++) {
+            for (Thread thread : threads) {
                 Object threadLocalMap;
-                if (threads[i] != null) {
+                if (thread != null) {
 
                     // Clear the first map
-                    threadLocalMap = threadLocalsField.get(threads[i]);
-                    if (null != threadLocalMap){
+                    threadLocalMap = threadLocalsField.get(thread);
+                    if (null != threadLocalMap) {
                         expungeStaleEntriesMethod.invoke(threadLocalMap);
                         checkThreadLocalMapForLeaks(threadLocalMap, tableField);
                     }
 
                     // Clear the second map
-                    threadLocalMap =inheritableThreadLocalsField.get(threads[i]);
-                    if (null != threadLocalMap){
+                    threadLocalMap = inheritableThreadLocalsField.get(thread);
+                    if (null != threadLocalMap) {
                         expungeStaleEntriesMethod.invoke(threadLocalMap);
                         checkThreadLocalMapForLeaks(threadLocalMap, tableField);
                     }
@@ -2000,8 +1994,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
         if (map != null) {
             Object[] table = (Object[]) internalTableField.get(map);
             if (table != null) {
-                for (int j =0; j < table.length; j++) {
-                    Object obj = table[j];
+                for (Object obj : table) {
                     if (obj != null) {
                         boolean keyLoadedByWebapp = false;
                         boolean valueLoadedByWebapp = false;
@@ -2049,18 +2042,14 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
                                 log.error(sm.getString(
                                         "webappClassLoader.checkThreadLocalsForLeaks",
                                         args));
-                            } else if (value == null) {
-                                if (log.isDebugEnabled()) {
-                                    log.debug(sm.getString(
-                                            "webappClassLoader.checkThreadLocalsForLeaksNull",
-                                            args));
-                                }
-                            } else {
-                                if (log.isDebugEnabled()) {
-                                    log.debug(sm.getString(
-                                            "webappClassLoader.checkThreadLocalsForLeaksNone",
-                                            args));
-                                }
+                            } else if (value == null && log.isDebugEnabled()) {
+                                log.debug(sm.getString(
+                                        "webappClassLoader.checkThreadLocalsForLeaksNull",
+                                        args));
+                            } else if (log.isDebugEnabled()) {
+                                log.debug(sm.getString(
+                                        "webappClassLoader.checkThreadLocalsForLeaksNone",
+                                        args));
                             }
                         }
                     }
@@ -2079,8 +2068,8 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
 
     private String getStackTrace(Thread thread) {
         StringBuilder builder = new StringBuilder();
-        for (StackTraceElement ste : thread.getStackTrace()) {
-            builder.append("\n ").append(ste);
+        for (StackTraceElement stackTraceElement : thread.getStackTrace()) {
+            builder.append("\n ").append(stackTraceElement);
         }
         return builder.toString();
     }
@@ -2669,8 +2658,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
     @Override
     public boolean hasLoggingConfig() {
         if (Globals.IS_SECURITY_ENABLED) {
-            Boolean result = AccessController.doPrivileged(new PrivilegedHasLoggingConfig());
-            return result.booleanValue();
+            return AccessController.doPrivileged(new PrivilegedHasLoggingConfig());
         } else {
             return findResource("logging.properties") != null;
         }
@@ -2681,7 +2669,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
 
         @Override
         public Boolean run() {
-            return Boolean.valueOf(findResource("logging.properties") != null);
+            return findResource("logging.properties") != null;
         }
     }
 
