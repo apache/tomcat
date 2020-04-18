@@ -156,13 +156,13 @@ public class SSIServlet extends HttpServlet {
         // (the "toUpperCase()" avoids problems on Windows systems)
         if (path == null || path.toUpperCase(Locale.ENGLISH).startsWith("/WEB-INF")
                 || path.toUpperCase(Locale.ENGLISH).startsWith("/META-INF")) {
-            res.sendError(HttpServletResponse.SC_NOT_FOUND, path);
+            res.sendError(HttpServletResponse.SC_NOT_FOUND);
             log("Can't serve file: " + path);
             return;
         }
         URL resource = servletContext.getResource(path);
         if (resource == null) {
-            res.sendError(HttpServletResponse.SC_NOT_FOUND, path);
+            res.sendError(HttpServletResponse.SC_NOT_FOUND);
             log("Can't find file: " + path);
             return;
         }

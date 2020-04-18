@@ -59,7 +59,7 @@
   They eventually become mixed with the numbered issues (i.e., numbered
   issues do not "pop up" wrt. others).
 -->
-<section name="Tomcat 7.0.104 (violetagg)">
+<section name="Tomcat 7.0.104 (violetagg)" rtext="in development">
   <subsection name="Catalina">
     <changelog>
       <add>
@@ -85,6 +85,10 @@
         that use a custom class loader that loads resources from non-standard
         locations. (markt)
       </fix>
+      <update>
+        Remove redundant sole path/URI from error page message on SC_NOT_FOUND.
+        (michaelo)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Coyote">
@@ -122,6 +126,10 @@
         does not support these values, a warning will be logged and the latest
         supported version will used. (markt)
       </add>
+      <update>
+        Remove redundant sole path/URI from error page message on SC_NOT_FOUND.
+        (michaelo)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Cluster">

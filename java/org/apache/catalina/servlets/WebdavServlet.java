@@ -656,7 +656,7 @@ public class WebdavServlet extends DefaultServlet {
         }
 
         if (!exists) {
-            resp.sendError(HttpServletResponse.SC_NOT_FOUND, path);
+            resp.sendError(HttpServletResponse.SC_NOT_FOUND);
             return;
         }
 

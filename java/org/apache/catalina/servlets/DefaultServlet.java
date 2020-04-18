@@ -849,7 +849,7 @@ public class DefaultServlet extends HttpServlet {
                 response.sendError(((Integer) request.getAttribute(
                         RequestDispatcher.ERROR_STATUS_CODE)).intValue());
             } else {
-                response.sendError(HttpServletResponse.SC_NOT_FOUND, requestUri);
+                response.sendError(HttpServletResponse.SC_NOT_FOUND);
             }
             return;
         }
@@ -885,8 +885,7 @@ public class DefaultServlet extends HttpServlet {
             // Skip directory listings if we have been configured to
             // suppress them
             if (!listings) {
-                response.sendError(HttpServletResponse.SC_NOT_FOUND,
-                                   request.getRequestURI());
+                response.sendError(HttpServletResponse.SC_NOT_FOUND);
                 return;
             }
             contentType = "text/html;charset=UTF-8";
