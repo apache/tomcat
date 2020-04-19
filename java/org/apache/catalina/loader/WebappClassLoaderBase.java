@@ -1813,35 +1813,40 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
                         // stopped and check them at the end of the method.
                         executorThreadsToStop.add(thread);
                     } else {
-                        thread.interrupt();
+                        clearThread(thread);
                     }
                 }
             }
         }
 
-        // If thread stopping is enabled, executor threads should have been
-        // stopped above when the executor was shut down but that depends on the
-        // thread correctly handling the interrupt. Give all the executor
-        // threads a few seconds shutdown and if they are still running
-        // Give threads up to 2 seconds to shutdown
-        int count = 0;
+        // clear executor threads
         for (Thread t : executorThreadsToStop) {
-            while (t.isAlive() && count < 100) {
-                try {
-                    Thread.sleep(20);
-                } catch (InterruptedException e) {
-                    // Quit the while loop
-                    break;
-                }
-                count++;
+            clearThread(t);
+        }
+    }
+
+    private void clearThread(Thread t) {
+        int count = 0;
+        if (!t.isInterrupted()) {
+            t.interrupt();
+        }
+
+        // Give threads up to 2 seconds to shutdown
+        while (t.isAlive() && count < 100) {
+            try {
+                Thread.sleep(20);
+            } catch (InterruptedException e) {
+                // Quit the while loop
+                break;
             }
-            if (t.isAlive()) {
-                // This method is deprecated and for good reason. This is
-                // very risky code but is the only option at this point.
-                // A *very* good reason for apps to do this clean-up
-                // themselves.
-                t.stop();
-            }
+            count++;
+        }
+        if (t.isAlive()) {
+            // This method is deprecated and for good reason. This is
+            // very risky code but is the only option at this point.
+            // A *very* good reason for apps to do this clean-up
+            // themselves.
+            t.stop();
         }
     }
 
