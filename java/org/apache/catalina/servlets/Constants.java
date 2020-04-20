@@ -18,7 +18,10 @@
 
 package org.apache.catalina.servlets;
 
-
+/**
+ * Unused. Will be removed in Tomcat 10.
+ */
+@Deprecated
 public class Constants {
 
     public static final String Package = "org.apache.catalina.servlets";
