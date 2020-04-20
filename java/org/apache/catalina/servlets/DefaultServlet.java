@@ -141,7 +141,7 @@ public class DefaultServlet extends HttpServlet {
     /**
      * The string manager for this package.
      */
-    protected static final StringManager sm = StringManager.getManager(Constants.Package);
+    protected static final StringManager sm = StringManager.getManager(DefaultServlet.class);
 
     private static final DocumentBuilderFactory factory;
 
