@@ -62,6 +62,13 @@
         Remove redundant sole path/URI from error page message on SC_NOT_FOUND.
         (michaelo)
       </update>
+      <add>
+        Log a warning if a <code>CredentialHandler</code> instance is added to
+        an instance of the <code>CombinedRealm</code> (or a sub-class) as the
+        <code>CombinedRealm</code> doesn't use a configued
+        <code>CredentialHandler</code> and it is likely that a configuration
+        error has occurred. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
