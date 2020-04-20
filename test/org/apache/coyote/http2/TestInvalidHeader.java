@@ -38,35 +38,6 @@ public class TestInvalidHeader extends Http2TestBase {
     /*
      * @see org.apache.coyote.Response#checkSpecialHeaders()
      */
-//    @Test
-//    public void testInvalidHeader() throws Exception {
-//
-//        enableHttp2();
-//        configureAndStartWebApplication();
-//
-//        openClientConnection();
-//        doHttpUpgrade();
-//        sendClientPreface();
-//        validateHttp2InitialResponse();
-//
-//        byte[] frameHeader = new byte[9];
-//        ByteBuffer headersPayload = ByteBuffer.allocate(128);
-//        List<Header> headers = new ArrayList<>(3);
-//        headers.add(new Header(":method", "GET"));
-//        headers.add(new Header(":scheme", "http"));
-//        headers.add(new Header(":path", "/simple"));
-//        headers.add(new Header(":authority", "localhost:" + getPort()));
-//        headers.add(new Header("Connection", "keep-alive"));
-//
-//        buildGetRequest(frameHeader, headersPayload, null, headers, 3);
-//
-//        writeFrame(frameHeader, headersPayload);
-//
-//        readSimpleGetResponse();
-//
-//        Assert.assertEquals(getSimpleResponseTrace(3), output.getTrace());
-//    }
-
     protected static class FaultyServlet extends SimpleServlet
     {
 
