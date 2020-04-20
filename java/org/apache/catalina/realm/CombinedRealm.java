@@ -26,6 +26,7 @@ import java.util.List;
 import javax.management.ObjectName;
 
 import org.apache.catalina.Container;
+import org.apache.catalina.CredentialHandler;
 import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.Realm;
@@ -461,4 +462,12 @@ public class CombinedRealm extends RealmBase {
         return true;
     }
 
+
+    @Override
+    public void setCredentialHandler(CredentialHandler credentialHandler) {
+        // This is unusual for a CombinedRealm as it does not use
+        // CredentialHandlers. It might be a mis-configuration so warn the user.
+        log.warn(sm.getString("combinedRealm.setCredentialHandler"));
+        super.setCredentialHandler(credentialHandler);
+    }
 }
