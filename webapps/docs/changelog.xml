@@ -109,6 +109,10 @@
       <update>
         Update JUnit to version 4.13. (markt)
       </update>
+      <fix>
+        Add missing entries to test class path in sample NetBeans configuration
+        files. Patch provided by Brian Burch. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
