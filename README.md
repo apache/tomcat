@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/apache/tomcat.svg?branch=master)](https://travis-ci.org/github/apache/tomcat)
+
 ## Welcome to Apache Tomcat!
 
 ### What Is It?
