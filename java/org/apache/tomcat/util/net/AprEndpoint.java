@@ -1770,7 +1770,7 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
                     maintainTime = 0;
                     try {
                         synchronized (this) {
-                            if (sendfileRunning && sendfileCount < 1 && addS.size() < 1) {
+                            while (sendfileRunning && sendfileCount < 1 && addS.size() < 1) {
                                 this.wait();
                             }
                         }
