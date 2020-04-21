@@ -1813,7 +1813,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
                         // stopped and check them at the end of the method.
                         executorThreadsToStop.add(thread);
                     } else {
-                        clearThread(thread);
+                        clearThread(thread, usingExecutor);
                     }
                 }
             }
@@ -1821,17 +1821,20 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
 
         // clear executor threads
         for (Thread t : executorThreadsToStop) {
-            clearThread(t);
+            clearThread(t, true);
         }
     }
 
-    private void clearThread(Thread t) {
+    private void clearThread(Thread t, boolean usingExecutor) {
         int count = 0;
-        if (!t.isInterrupted()) {
+
+        // Step1: Interrupt all the threads
+        // executor is stopped thus executor threads are already interrupted
+        if (!usingExecutor && !t.isInterrupted()) {
             t.interrupt();
         }
 
-        // Give threads up to 2 seconds to shutdown
+        // Step 2: Give threads up to 2 seconds to shutdown
         while (t.isAlive() && count < 100) {
             try {
                 Thread.sleep(20);
@@ -1841,6 +1844,8 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
             }
             count++;
         }
+
+        // Step 3: if thread is still alive, clear it using stop
         if (t.isAlive()) {
             // This method is deprecated and for good reason. This is
             // very risky code but is the only option at this point.
@@ -1853,7 +1858,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
 
     /*
      * Look at a threads stack trace to see if it is a request thread or not. It
-     * isn't perfect, but it should be good-enough for most cases.
+git s     * isn't perfect, but it should be good-enough for most cases.
      */
     private boolean isRequestThread(Thread thread) {
 
