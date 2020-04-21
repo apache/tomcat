@@ -441,13 +441,13 @@ public final class Response {
             /*
              *    Connection headers are invalid in HTTP/2.0, and some clients (like Safari or curl)
              *    are very touchy about it. Most probably, an application component has added the
-             *    typical HTTP/1.x "Connection: keep-alive" header, but despide the component's
+             *    typical HTTP/1.x "Connection: keep-alive" header, but despite the component's
              *    good intention, the header is faulty in HTTP/2.0 and *should* be refused.
              * .
-             *    @see https: *tools.ietf.org/html/rfc7540#section-8.1.2.2
+             *    @see https://tools.ietf.org/html/rfc7540#section-8.1.2.2
              */
 
-            throw new IllegalArgumentException(sm.getString("response.ignoringInvalidHeader", "Connection", value));
+            throw new IllegalArgumentException(sm.getString("response.invalidHeader", "Connection", value));
         }
         return false;
     }
