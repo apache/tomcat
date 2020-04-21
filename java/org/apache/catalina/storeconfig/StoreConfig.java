@@ -241,26 +241,21 @@ public class StoreConfig implements IStoreConfig {
      */
     @Override
     public synchronized boolean store(Context aContext) {
-        URL configFile = aContext.getConfigFile();
-        if (configFile != null) {
-            try {
-                StoreDescription desc = null;
-                desc = getRegistry().findDescription(aContext.getClass());
-                if (desc != null) {
-                    boolean old = desc.isStoreSeparate();
-                    try {
-                        desc.setStoreSeparate(true);
-                        desc.getStoreFactory().store(null, -2, aContext);
-                    } finally {
-                        desc.setStoreSeparate(old);
-                    }
+        try {
+            StoreDescription desc = null;
+            desc = getRegistry().findDescription(aContext.getClass());
+            if (desc != null) {
+                boolean old = desc.isStoreSeparate();
+                try {
+                    desc.setStoreSeparate(true);
+                    desc.getStoreFactory().store(null, -2, aContext);
+                } finally {
+                    desc.setStoreSeparate(old);
                 }
-                return true;
-            } catch (Exception e) {
-                log.error(sm.getString("config.storeContextError", aContext.getName()), e);
             }
-        } else {
-            log.error(sm.getString("config.missingContextFile", aContext.getPath()));
+            return true;
+        } catch (Exception e) {
+            log.error(sm.getString("config.storeContextError", aContext.getName()), e);
         }
         return false;
     }

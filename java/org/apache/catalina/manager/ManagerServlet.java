@@ -711,11 +711,14 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
                 return;
             }
             try {
-                mBeanServer.invoke(storeConfigOname, "store",
+                Boolean result = (Boolean) mBeanServer.invoke(storeConfigOname, "store",
                         new Object[] {context},
-                        new String [] { "java.lang.String"});
-                writer.println(smClient.getString("managerServlet.savedContext",
-                        path));
+                        new String [] { "org.apache.catalina.Context"});
+                if (result.booleanValue()) {
+                    writer.println(smClient.getString("managerServlet.savedContext", path));
+                } else {
+                    writer.println(smClient.getString("managerServlet.savedContextFail", path));
+                }
             } catch (Exception e) {
                 log(sm.getString("managerServlet.error.storeContextConfig", path), e);
                 writer.println(smClient.getString("managerServlet.exception",
