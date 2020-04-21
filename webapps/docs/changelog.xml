@@ -69,6 +69,10 @@
         <code>CredentialHandler</code> and it is likely that a configuration
         error has occurred. (markt)
       </add>
+      <add>
+        Add more descriptive error message in DefaultServlet for SC_NOT_FOUND.
+        (michaelo)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
@@ -89,6 +93,10 @@
         Remove redundant sole path/URI from error page message on SC_NOT_FOUND.
         (michaelo)
       </update>
+      <add>
+        Add more descriptive error message in DefaultServlet for SC_NOT_FOUND.
+        (michaelo)
+      </add>
     </changelog>
   </subsection>
   <subseciton name="Web applications">
