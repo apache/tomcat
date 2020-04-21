@@ -398,20 +398,18 @@ public class JspServlet extends HttpServlet implements PeriodicEventListener {
         String includeRequestUri =
             (String)request.getAttribute(RequestDispatcher.INCLUDE_REQUEST_URI);
 
+        String msg = Localizer.getMessage("jsp.error.file.not.found",jspUri);
         if (includeRequestUri != null) {
             // This file was included. Throw an exception as
             // a response.sendError() will be ignored
-            String msg =
-                Localizer.getMessage("jsp.error.file.not.found",jspUri);
             // Strictly, filtering this is an application
             // responsibility but just in case...
             throw new ServletException(Escape.htmlElementContent(msg));
         } else {
             try {
-                response.sendError(HttpServletResponse.SC_NOT_FOUND);
+                response.sendError(HttpServletResponse.SC_NOT_FOUND, msg);
             } catch (IllegalStateException ise) {
-                log.error(Localizer.getMessage("jsp.error.file.not.found",
-                        jspUri));
+                log.error(msg);
             }
         }
     }
