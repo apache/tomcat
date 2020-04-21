@@ -70,7 +70,7 @@
                impact="ACTION" returnType="void" >
           <parameter name="context"
                  description="Context"
-                 type="org.apache.catalina.context"/>
+                 type="org.apache.catalina.Context"/>
     </operation>
     <operation name="store"
                description="Store Host"
