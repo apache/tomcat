@@ -91,6 +91,14 @@
       </update>
     </changelog>
   </subsection>
+  <subseciton name="Web applications">
+    <changelog>
+      <fix>
+        Fix the saving of a Context configuration file via the scripting
+        interface of the Manager web application. (markt)
+      </fix>
+    </changelog>
+  </subseciton>
   <subsection name="Other">
     <changelog>
       <update>
