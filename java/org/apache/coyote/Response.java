@@ -62,12 +62,6 @@ public final class Response {
      */
     private static final Locale DEFAULT_LOCALE = Locale.getDefault();
 
-    /**
-     * Helper to log the invalid HTTP/2.0 header error only once per instance
-     */
-    private static AtomicBoolean invalidHeaderWarningEmitted = new AtomicBoolean(false);
-
-
     // ----------------------------------------------------- Instance Variables
 
     /**
@@ -441,36 +435,19 @@ public final class Response {
                 return false;
             }
         }
+
         if (outputBuffer instanceof Http2OutputBuffer && name.equalsIgnoreCase("Connection") ) {
 
             /*
-                Connection headers are invalid in HTTP/2.0, and some clients (like Safari or curl)
-                are very touchy about it. Most probably, an application component has added the
-                typical HTTP/1.x "Connection: keep-alive" header, but despide the component's
-                good intention, the header is faulty in HTTP/2.0 and *should* always be filtered.
+             *    Connection headers are invalid in HTTP/2.0, and some clients (like Safari or curl)
+             *    are very touchy about it. Most probably, an application component has added the
+             *    typical HTTP/1.x "Connection: keep-alive" header, but despide the component's
+             *    good intention, the header is faulty in HTTP/2.0 and *should* be refused.
+             * .
+             *    @see https: *tools.ietf.org/html/rfc7540#section-8.1.2.2
+             */
 
-                The current implementation emits a warning in the logs only once per instance.
-                We could want to add an HTTP/2.0 option to rather always send/log an exception.
-
-                @see https://tools.ietf.org/html/rfc7540#section-8.1.2.2
-            */
-
-            if (log.isWarnEnabled())
-            {
-                /* log a warning only once per instance *with the stacktrace* */
-                if (!invalidHeaderWarningEmitted.getAndSet(true))
-                {
-                    try
-                    {
-                        throw new IllegalArgumentException(sm.getString("response.ignoringInvalidHeader", "Connection", value));
-                    }
-                    catch (IllegalArgumentException iae)
-                    {
-                        log.warn(iae);
-                    }
-                }
-            }
-            return true;
+            throw new IllegalArgumentException(sm.getString("response.ignoringInvalidHeader", "Connection", value));
         }
         return false;
     }
