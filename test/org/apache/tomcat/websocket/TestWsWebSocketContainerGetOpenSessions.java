@@ -361,7 +361,7 @@ public class TestWsWebSocketContainerGetOpenSessions extends WebSocketBaseTest {
             // Need to avoid out of order updates to the Map. If out of order
             // updates occur, keep the one with the highest count.
             Integer oldCount = records.get(key);
-            if (oldCount == null || oldCount.intValue() < count) {
+            if (oldCount == null || oldCount < count) {
                 records.put(key, count);
             }
             updateCount++;
@@ -376,7 +376,7 @@ public class TestWsWebSocketContainerGetOpenSessions extends WebSocketBaseTest {
                     return false;
                 }
             } else {
-                return actualCount.intValue() == expectedCount;
+                return actualCount == expectedCount;
             }
         }
 

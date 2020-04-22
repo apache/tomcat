@@ -158,7 +158,7 @@ public class TestOrderInterceptor {
         public synchronized void messageReceived(Serializable msg, Member sender) {
             total++;
             Integer i = (Integer)msg;
-            if ( i.intValue() != cnt ) fail = true;
+            if (i != cnt ) fail = true;
             else cnt++;
             System.out.println("Listener["+id+"] Message received:"+i+" Count:"+total+" Fail:"+fail);
 

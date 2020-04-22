@@ -385,7 +385,7 @@ public abstract class Compiler {
             final Long jspLastModified = ctxt.getLastModified(ctxt.getJspFile());
             Map<String,SmapStratum> smaps = generateJava();
             File javaFile = new File(ctxt.getServletJavaFileName());
-            if (!javaFile.setLastModified(jspLastModified.longValue())) {
+            if (!javaFile.setLastModified(jspLastModified)) {
                 throw new JasperException(Localizer.getMessage("jsp.error.setLastModified", javaFile));
             }
             if (compileClass) {
@@ -394,13 +394,13 @@ public abstract class Compiler {
                 // Set JspServletWrapper.servletClassLastModifiedTime after successful compile
                 File targetFile = new File(ctxt.getClassFileName());
                 if (targetFile.exists()) {
-                    if (!targetFile.setLastModified(jspLastModified.longValue())) {
+                    if (!targetFile.setLastModified(jspLastModified)) {
                         throw new JasperException(
                                 Localizer.getMessage("jsp.error.setLastModified", targetFile));
                     }
                     if (jsw != null) {
                         jsw.setServletClassLastModifiedTime(
-                                jspLastModified.longValue());
+                                jspLastModified);
                     }
                 }
             }
@@ -478,12 +478,12 @@ public abstract class Compiler {
         }
 
         Long jspRealLastModified = ctxt.getLastModified(ctxt.getJspFile());
-        if (jspRealLastModified.longValue() < 0) {
+        if (jspRealLastModified < 0) {
             // Something went wrong - assume modification
             return true;
         }
 
-        if (targetLastModified != jspRealLastModified.longValue()) {
+        if (targetLastModified != jspRealLastModified) {
             if (log.isDebugEnabled()) {
                 log.debug("Compiler: outdated: " + targetFile + " "
                         + targetLastModified);
@@ -533,7 +533,7 @@ public abstract class Compiler {
                     iuc.getInputStream().close();
                 }
 
-                if (includeLastModified != include.getValue().longValue()) {
+                if (includeLastModified != include.getValue()) {
                     return true;
                 }
             } catch (Exception e) {

@@ -597,7 +597,7 @@ public class Connector extends LifecycleMBeanBase  {
         // Fall back for custom protocol handlers not based on AbstractProtocol
         Object port = getProperty("port");
         if (port instanceof Integer) {
-            return ((Integer) port).intValue();
+            return (Integer) port;
         }
         // Usually means an invalid protocol has been configured
         return -1;
@@ -623,7 +623,7 @@ public class Connector extends LifecycleMBeanBase  {
         // Fall back for custom protocol handlers not based on AbstractProtocol
         Object port = getProperty("portOffset");
         if (port instanceof Integer) {
-            return ((Integer) port).intValue();
+            return (Integer) port;
         }
         // Usually means an invalid protocol has been configured.
         return 0;
@@ -651,7 +651,7 @@ public class Connector extends LifecycleMBeanBase  {
      * will report the actual port bound.
      */
     public int getLocalPort() {
-        return ((Integer) getProperty("localPort")).intValue();
+        return (Integer) getProperty("localPort");
     }
 
 

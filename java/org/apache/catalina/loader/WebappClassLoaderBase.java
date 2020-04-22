@@ -763,7 +763,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
                             resources.getContext().getName()));
                     return true;
                 }
-                if (recordedLastModified.longValue() != jar.getLastModified()) {
+                if (recordedLastModified != jar.getLastModified()) {
                     // Jar has been changed
                     log.info(sm.getString("webappClassLoader.jarsModified",
                             resources.getContext().getName()));
@@ -2669,7 +2669,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
     public boolean hasLoggingConfig() {
         if (Globals.IS_SECURITY_ENABLED) {
             Boolean result = AccessController.doPrivileged(new PrivilegedHasLoggingConfig());
-            return result.booleanValue();
+            return result;
         } else {
             return findResource("logging.properties") != null;
         }

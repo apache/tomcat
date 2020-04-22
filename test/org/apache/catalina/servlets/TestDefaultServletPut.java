@@ -152,7 +152,7 @@ public class TestDefaultServletPut extends TomcatBaseTest {
         if (contentRangeHeaderValid == null) {
             // Not present (so will do a full PUT, replacing the existing)
             Assert.assertTrue(putClient.isResponse204());
-        } else if (contentRangeHeaderValid.booleanValue() && allowPartialPut) {
+        } else if (contentRangeHeaderValid && allowPartialPut) {
             // Valid
             Assert.assertTrue(putClient.isResponse204());
         } else {

@@ -133,7 +133,7 @@ public class SSIFilter extends GenericFilter {
             // override headers
             if (expires != null) {
                 res.setDateHeader("expires", (new java.util.Date()).getTime()
-                        + expires.longValue() * 1000);
+                        + expires * 1000);
             }
             if (lastModified > 0) {
                 res.setDateHeader("last-modified", lastModified);

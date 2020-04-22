@@ -73,7 +73,7 @@ public abstract class DefaultServletEncodingBaseTest extends TomcatBaseTest {
             for (String fileEncoding : encodings) {
                 for (String targetFile : targetFiles) {
                     for (Boolean useInclude : booleans) {
-                        if (useInclude.booleanValue()) {
+                        if (useInclude) {
                             for (String outputEncoding : encodings) {
                                 for (Boolean callSetCharacterEncoding : booleans) {
                                     for (Boolean useWriter : booleans) {

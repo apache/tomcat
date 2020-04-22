@@ -466,7 +466,7 @@ public class TestEncodingDecoding extends TomcatBaseTest {
 
         public static boolean isLifeCycleEventCalled(String event){
             Boolean called = lifeCyclesCalled.get(event);
-            return called == null ? false : called.booleanValue();
+            return called == null ? false : called;
         }
     }
 

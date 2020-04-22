@@ -485,7 +485,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
 
         String dispatchUrl = null;
         if (asyncDispatch != null) {
-            if (asyncDispatch.booleanValue()) {
+            if (asyncDispatch) {
                 dispatchUrl = "/async";
             } else {
                 dispatchUrl = "/nonasync";
@@ -505,7 +505,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         ctx.addServletMappingDecoded("/start", "time");
 
         if (asyncDispatch != null) {
-            if (asyncDispatch.booleanValue()) {
+            if (asyncDispatch) {
                 AsyncStartRunnable asyncStartRunnable =
                         new AsyncStartRunnable();
                 Wrapper async =
@@ -536,14 +536,14 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         expected.append("TimeoutServletGet-");
         if (completeOnTimeout == null) {
             expected.append("requestDestroyed");
-        } else if (completeOnTimeout.booleanValue()) {
+        } else if (completeOnTimeout) {
             expected.append("onTimeout-");
             expected.append("onComplete-");
             expected.append("requestDestroyed");
         } else {
             expected.append("onTimeout-");
             if (asyncDispatch != null) {
-                if (asyncDispatch.booleanValue()) {
+                if (asyncDispatch) {
                     expected.append("onStartAsync-Runnable-");
                 } else {
                     expected.append("NonAsyncServletGet-");
@@ -564,7 +564,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
 
         // Check the access log
         if (completeOnTimeout == null ||
-                (!completeOnTimeout.booleanValue() && asyncDispatch == null)) {
+                (!completeOnTimeout && asyncDispatch == null)) {
             alvGlobal.validateAccessLog(1, 500, TimeoutServlet.ASYNC_TIMEOUT,
                     TimeoutServlet.ASYNC_TIMEOUT + TIMEOUT_MARGIN +
                     REQUEST_TIME);
@@ -573,8 +573,8 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
                     REQUEST_TIME);
         } else {
             long timeoutDelay = TimeoutServlet.ASYNC_TIMEOUT;
-            if (asyncDispatch != null && asyncDispatch.booleanValue() &&
-                    !completeOnTimeout.booleanValue()) {
+            if (asyncDispatch != null && asyncDispatch &&
+                    !completeOnTimeout) {
                 // The async dispatch includes a sleep
                 timeoutDelay += AsyncStartRunnable.THREAD_SLEEP_TIME;
             }
@@ -600,7 +600,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
             if (completeOnTimeout == null) {
                 this.trackingListener = null;
             } else {
-                this.trackingListener = new TrackingListener(false, completeOnTimeout.booleanValue(), dispatchUrl);
+                this.trackingListener = new TrackingListener(false, completeOnTimeout, dispatchUrl);
             }
         }
 
@@ -1685,7 +1685,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         if (asyncError != null) {
             ErrorPage ep = new ErrorPage();
             ep.setErrorCode(500);
-            if (asyncError.booleanValue()) {
+            if (asyncError) {
                 ep.setLocation("/error/async");
             } else {
                 ep.setLocation("/error/nonasync");
@@ -1712,7 +1712,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         StringBuilder expected = new StringBuilder();
         expected.append("requestInitialized-TimeoutServletGet-");
         if (asyncError != null) {
-            if (asyncError.booleanValue()) {
+            if (asyncError) {
                 expected.append("AsyncErrorPageGet-");
                 if (mode == ErrorPageAsyncMode.NO_COMPLETE){
                     expected.append("NoOp-");
@@ -1947,7 +1947,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
 
             int loops = 0;
             if (loopsAttr != null) {
-                loops = loopsAttr.intValue();
+                loops = loopsAttr;
             } else if (loopsParam != null) {
                 loops = Integer.parseInt(loopsParam);
             }
@@ -2607,7 +2607,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
             Integer countObj = (Integer) req.getAttribute("count");
             int count = 0;
             if (countObj != null) {
-                count = countObj.intValue();
+                count = countObj;
             }
             count++;
             req.setAttribute("count", count);
@@ -2644,7 +2644,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
             Integer countObj = (Integer) req.getAttribute("count");
             int count = 0;
             if (countObj != null) {
-                count = countObj.intValue();
+                count = countObj;
             }
             count++;
             req.setAttribute("count", count);

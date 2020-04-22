@@ -459,7 +459,7 @@ public class TestMethodExpressionImpl {
         MethodExpression me = factory.createMethodExpression(context,
                 "#{beanB.sayHello().length()}", null, new Class<?>[] {});
         Integer result = (Integer) me.invoke(context, null);
-        Assert.assertEquals(beanB.sayHello().length(), result.intValue());
+        Assert.assertEquals(beanB.sayHello().length(), result);
     }
 
 
@@ -468,7 +468,7 @@ public class TestMethodExpressionImpl {
         MethodExpression me = factory.createMethodExpression(context,
                 "#{beanB.sayHello().length()}", null, new Class<?>[] {});
         Integer result = (Integer) me.invoke(context, new Object[] { "foo" });
-        Assert.assertEquals(beanB.sayHello().length(), result.intValue());
+        Assert.assertEquals(beanB.sayHello().length(), result);
     }
 
 

@@ -61,24 +61,24 @@ public final class AstNegative extends SimpleNode {
             return -Long.parseLong((String) obj);
         }
         if (obj instanceof Long) {
-            return -((Long) obj).longValue();
+            return -(Long) obj;
         }
         if (obj instanceof Double) {
-            return -((Double) obj).doubleValue();
+            return -(Double) obj;
         }
         if (obj instanceof Integer) {
-            return -((Integer) obj).intValue();
+            return -(Integer) obj;
         }
         if (obj instanceof Float) {
-            return -((Float) obj).floatValue();
+            return -(Float) obj;
         }
         if (obj instanceof Short) {
-            return (short) -((Short) obj).shortValue();
+            return (short) -(Short) obj;
         }
         if (obj instanceof Byte) {
-            return (byte) -((Byte) obj).byteValue();
+            return (byte) -(Byte) obj;
         }
         Long num = (Long) coerceToNumber(ctx, obj, Long.class);
-        return -num.longValue();
+        return -num;
     }
 }

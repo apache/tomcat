@@ -511,7 +511,7 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
         if (userTimeout == null) {
             return Constants.DEFAULT_BLOCKING_SEND_TIMEOUT;
         } else {
-            return userTimeout.longValue();
+            return userTimeout;
         }
     }
 

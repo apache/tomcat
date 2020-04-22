@@ -42,8 +42,7 @@ public class Constants {
 
     // Buffers
     static final int DEFAULT_BUFFER_SIZE = Integer.getInteger(
-            "org.apache.tomcat.websocket.DEFAULT_BUFFER_SIZE", 8 * 1024)
-            .intValue();
+            "org.apache.tomcat.websocket.DEFAULT_BUFFER_SIZE", 8 * 1024);
 
     // Client connection
     /**
@@ -116,8 +115,7 @@ public class Constants {
 
     // Configuration for background processing checks intervals
     static final int DEFAULT_PROCESS_PERIOD = Integer.getInteger(
-            "org.apache.tomcat.websocket.DEFAULT_PROCESS_PERIOD", 10)
-            .intValue();
+            "org.apache.tomcat.websocket.DEFAULT_PROCESS_PERIOD", 10);
 
     public static final String WS_AUTHENTICATION_USER_NAME = "org.apache.tomcat.websocket.WS_AUTHENTICATION_USER_NAME";
     public static final String WS_AUTHENTICATION_PASSWORD = "org.apache.tomcat.websocket.WS_AUTHENTICATION_PASSWORD";

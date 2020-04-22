@@ -43,6 +43,6 @@ public final class AstChoice extends SimpleNode {
             throws ELException {
         Object obj0 = this.children[0].getValue(ctx);
         Boolean b0 = coerceToBoolean(ctx, obj0, true);
-        return this.children[((b0.booleanValue() ? 1 : 2))].getValue(ctx);
+        return this.children[((b0 ? 1 : 2))].getValue(ctx);
     }
 }

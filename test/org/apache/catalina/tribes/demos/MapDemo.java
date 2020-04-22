@@ -534,9 +534,9 @@ public class MapDemo implements ChannelListener, MembershipListener{
             cell.setBackground(Color.WHITE);
             if ( row > 0 ) {
                 Color color = null;
-                boolean primary = ( (Boolean) table.getValueAt(row, 5)).booleanValue();
-                boolean proxy = ( (Boolean) table.getValueAt(row, 6)).booleanValue();
-                boolean backup = ( (Boolean) table.getValueAt(row, 7)).booleanValue();
+                boolean primary = (Boolean) table.getValueAt(row, 5);
+                boolean proxy = (Boolean) table.getValueAt(row, 6);
+                boolean backup = (Boolean) table.getValueAt(row, 7);
                 if (primary) color = Color.GREEN;
                 else if (proxy) color = Color.RED;
                 else if (backup) color = Color.BLUE;

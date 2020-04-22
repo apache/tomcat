@@ -167,7 +167,7 @@ public class SecurityListener implements LifecycleListener {
                 }
                 return;
             } else {
-                if (minimumUmask.intValue() > 0) {
+                if (minimumUmask > 0) {
                     log.warn(sm.getString(
                             "SecurityListener.checkUmaskNone",
                             UMASK_PROPERTY_NAME, getMinimumUmask()));
@@ -176,8 +176,8 @@ public class SecurityListener implements LifecycleListener {
             }
         }
 
-        if ((umask.intValue() & minimumUmask.intValue()) !=
-                minimumUmask.intValue()) {
+        if ((umask & minimumUmask) !=
+                minimumUmask) {
             throw new Error(sm.getString("SecurityListener.checkUmaskFail",
                     String.format(UMASK_FORMAT, umask), getMinimumUmask()));
         }

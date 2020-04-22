@@ -768,7 +768,7 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
             Iterator<Integer> itAvailable = servlet.availableList.iterator();
             Iterator<Integer> itRead = servlet.readList.iterator();
             while (success && itAvailable.hasNext()) {
-                success = ((itRead.next().intValue() > 0) == (itAvailable.next().intValue() > 0));
+                success = ((itRead.next() > 0) == (itAvailable.next() > 0));
             }
             if (!success) {
                 Assert.fail("available() and read() results do not match.\nAvailable: "

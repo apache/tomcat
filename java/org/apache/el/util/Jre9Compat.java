@@ -50,7 +50,7 @@ class Jre9Compat extends JreCompat {
     @Override
     public boolean canAcccess(Object base, AccessibleObject accessibleObject) {
         try {
-            return ((Boolean) canAccessMethod.invoke(accessibleObject, base)).booleanValue();
+            return (Boolean) canAccessMethod.invoke(accessibleObject, base);
         } catch (ReflectiveOperationException | IllegalArgumentException e) {
             return false;
         }

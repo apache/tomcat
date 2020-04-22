@@ -518,7 +518,7 @@ public abstract class PageContext
                 RequestDispatcher.ERROR_STATUS_CODE);
         // Avoid NPE if attribute is not set
         if (status_code != null) {
-            status = status_code.intValue();
+            status = status_code;
         }
 
         return new ErrorData(

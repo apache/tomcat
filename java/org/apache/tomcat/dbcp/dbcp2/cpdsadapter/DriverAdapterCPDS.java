@@ -147,7 +147,7 @@ public class DriverAdapterCPDS implements ConnectionPoolDataSource, Referenceabl
     }
 
     private boolean getBooleanContentString(RefAddr ra) {
-        return Boolean.valueOf(getStringContent(ra)).booleanValue();
+        return Boolean.valueOf(getStringContent(ra));
     }
 
     /**

@@ -414,7 +414,7 @@ class JspReader {
 
     skip:
         while((result = indexOf(firstChar, ret)) != null) {
-           if (result.booleanValue()) {
+           if (result) {
                if (restart != null) {
                    restart.init(current, true);
                } else {

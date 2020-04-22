@@ -178,11 +178,11 @@ public class DeltaRequest implements Externalizable {
                     break;
                 case TYPE_ISNEW:
                     if ( log.isTraceEnabled() ) log.trace("Session.setNew('"+info.getValue()+"')");
-                    session.setNew(((Boolean)info.getValue()).booleanValue(),false);
+                    session.setNew((Boolean) info.getValue(),false);
                     break;
                 case TYPE_MAXINTERVAL:
                     if ( log.isTraceEnabled() ) log.trace("Session.setMaxInactiveInterval('"+info.getValue()+"')");
-                    session.setMaxInactiveInterval(((Integer)info.getValue()).intValue(),false);
+                    session.setMaxInactiveInterval((Integer) info.getValue(),false);
                     break;
                 case TYPE_PRINCIPAL:
                     Principal p = null;

@@ -291,7 +291,7 @@ public class Registry implements RegistryMBean, MBeanRegistration {
         Integer i = domainTable.get(name);
 
         if (i != null) {
-            return i.intValue();
+            return i;
         }
 
         int id[] = ids.get(domain);

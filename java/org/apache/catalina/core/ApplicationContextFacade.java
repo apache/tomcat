@@ -630,8 +630,8 @@ public class ApplicationContextFacade implements ServletContext {
     @Override
     public boolean setInitParameter(String name, String value) {
         if (SecurityUtil.isPackageProtectionEnabled()) {
-            return ((Boolean) doPrivileged("setInitParameter",
-                    new Object[]{name, value})).booleanValue();
+            return (Boolean) doPrivileged("setInitParameter",
+                    new Object[]{name, value});
         } else {
             return context.setInitParameter(name, value);
         }
@@ -717,8 +717,8 @@ public class ApplicationContextFacade implements ServletContext {
     @Override
     public int getEffectiveMajorVersion() {
         if (SecurityUtil.isPackageProtectionEnabled()) {
-            return ((Integer) doPrivileged("getEffectiveMajorVersion",
-                    null)).intValue();
+            return (Integer) doPrivileged("getEffectiveMajorVersion",
+                    null);
         } else  {
             return context.getEffectiveMajorVersion();
         }
@@ -728,8 +728,8 @@ public class ApplicationContextFacade implements ServletContext {
     @Override
     public int getEffectiveMinorVersion() {
         if (SecurityUtil.isPackageProtectionEnabled()) {
-            return ((Integer) doPrivileged("getEffectiveMinorVersion",
-                    null)).intValue();
+            return (Integer) doPrivileged("getEffectiveMinorVersion",
+                    null);
         } else  {
             return context.getEffectiveMinorVersion();
         }
@@ -784,7 +784,7 @@ public class ApplicationContextFacade implements ServletContext {
     @Override
     public int getSessionTimeout() {
         if (SecurityUtil.isPackageProtectionEnabled()) {
-            return ((Integer) doPrivileged("getSessionTimeout", null)).intValue();
+            return (Integer) doPrivileged("getSessionTimeout", null);
         } else  {
             return context.getSessionTimeout();
         }

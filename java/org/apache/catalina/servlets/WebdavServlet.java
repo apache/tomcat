@@ -1666,7 +1666,7 @@ public class WebdavServlet extends DefaultServlet {
 
         if ((!result) || (!errorList.isEmpty())) {
             if (errorList.size() == 1) {
-                resp.sendError(errorList.elements().nextElement().intValue());
+                resp.sendError(errorList.elements().nextElement());
             } else {
                 sendReport(req, resp, errorList);
             }
@@ -1929,7 +1929,7 @@ public class WebdavServlet extends DefaultServlet {
         while (pathList.hasMoreElements()) {
 
             String errorPath = pathList.nextElement();
-            int errorCode = errorList.get(errorPath).intValue();
+            int errorCode = errorList.get(errorPath);
 
             generatedXML.writeElement("D", "response", XMLWriter.OPENING);
 

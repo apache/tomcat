@@ -54,9 +54,9 @@ public class TestAsyncContextImplDispatch extends TomcatBaseTest {
         for (Boolean targetAsyncSupported : booleans) {
             for (Boolean dispatchAsyncSupported : booleans) {
                 for (Boolean dispatchAsyncStart : booleans) {
-                    Boolean allowed = !dispatchAsyncStart.booleanValue() ||
-                            targetAsyncSupported.booleanValue() && dispatchAsyncSupported.booleanValue() &&
-                                    dispatchAsyncStart.booleanValue();
+                    Boolean allowed = !dispatchAsyncStart ||
+                            targetAsyncSupported && dispatchAsyncSupported &&
+                                    dispatchAsyncStart;
 
                     parameterSets.add(new Object[] { targetAsyncSupported, dispatchAsyncSupported, dispatchAsyncStart, allowed} );
                 }

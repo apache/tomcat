@@ -641,7 +641,7 @@ public class PojoMethodMapping {
                     params = new Object[] { de };
                     break;
                 }
-                params[entry.getKey().intValue()] = value;
+                params[entry.getKey()] = value;
             }
 
             Set<MessageHandler> results = new HashSet<>(2);

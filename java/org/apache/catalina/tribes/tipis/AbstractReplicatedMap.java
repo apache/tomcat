@@ -316,7 +316,7 @@ public abstract class AbstractReplicatedMap<K,V>
             Member[] members = mapMembers.keySet().toArray(new Member[0]);
             long now = System.currentTimeMillis();
             for (Member member : members) {
-                long access = mapMembers.get(member).longValue();
+                long access = mapMembers.get(member);
                 if ( (now - access) > timeout ) {
                     log.warn(sm.getString("abstractReplicatedMap.ping.timeout", member, mapname));
                     memberDisappeared(member);

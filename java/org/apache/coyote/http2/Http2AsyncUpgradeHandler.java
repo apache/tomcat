@@ -333,7 +333,7 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
     protected class SendfileCompletionHandler implements CompletionHandler<Long, SendfileData> {
         @Override
         public void completed(Long nBytes, SendfileData sendfile) {
-            long bytesWritten = nBytes.longValue() - 9;
+            long bytesWritten = nBytes - 9;
             sendfile.left -= bytesWritten;
             if (sendfile.left == 0) {
                 try {

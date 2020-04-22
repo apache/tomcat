@@ -141,10 +141,10 @@ public class ListELResolver extends ELResolver {
             return ((Number) property).intValue();
         }
         if (property instanceof Character) {
-            return ((Character) property).charValue();
+            return (Character) property;
         }
         if (property instanceof Boolean) {
-            return ((Boolean) property).booleanValue() ? 1 : 0;
+            return (Boolean) property ? 1 : 0;
         }
         if (property instanceof String) {
             return Integer.parseInt((String) property);

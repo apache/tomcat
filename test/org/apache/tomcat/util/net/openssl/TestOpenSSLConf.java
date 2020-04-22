@@ -104,7 +104,7 @@ public class TestOpenSSLConf extends TomcatBaseTest {
         String[] ciphers = sslHostConfig.getEnabledCiphers();
         MatcherAssert.assertThat("Wrong HostConfig ciphers", ciphers,
                 CoreMatchers.is(EXPECTED_CIPHERS));
-        ciphers = SSLContext.getCiphers(sslHostConfig.getOpenSslContext().longValue());
+        ciphers = SSLContext.getCiphers(sslHostConfig.getOpenSslContext());
         MatcherAssert.assertThat("Wrong native SSL context ciphers", ciphers,
                 CoreMatchers.is(EXPECTED_CIPHERS));
     }

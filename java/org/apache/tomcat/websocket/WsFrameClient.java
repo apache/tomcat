@@ -149,7 +149,7 @@ public class WsFrameClient extends WsFrameBase {
 
         @Override
         public void completed(Integer result, Void attachment) {
-            if (result.intValue() == -1) {
+            if (result == -1) {
                 // BZ 57762. A dropped connection will get reported as EOF
                 // rather than as an error so handle it here.
                 if (isOpen()) {

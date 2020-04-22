@@ -223,7 +223,7 @@ public class AsyncChannelWrapperSecure implements AsyncChannelWrapper {
                             Future<Integer> f =
                                     socketChannel.write(socketWriteBuffer);
                             Integer socketWrite = f.get();
-                            toWrite -= socketWrite.intValue();
+                            toWrite -= socketWrite;
                         }
                     }
                 }
@@ -267,7 +267,7 @@ public class AsyncChannelWrapperSecure implements AsyncChannelWrapper {
                         forceRead = false;
                         Future<Integer> f = socketChannel.read(socketReadBuffer);
                         Integer socketRead = f.get();
-                        if (socketRead.intValue() == -1) {
+                        if (socketRead == -1) {
                             throw new EOFException(sm.getString("asyncChannelWrapperSecure.eof"));
                         }
                     }
@@ -540,7 +540,7 @@ public class AsyncChannelWrapperSecure implements AsyncChannelWrapper {
         @Override
         public Integer get() throws InterruptedException, ExecutionException {
             Long result = wrapped.get();
-            if (result.longValue() > Integer.MAX_VALUE) {
+            if (result > Integer.MAX_VALUE) {
                 throw new ExecutionException(sm.getString(
                         "asyncChannelWrapperSecure.tooBig", result), null);
             }
@@ -552,7 +552,7 @@ public class AsyncChannelWrapperSecure implements AsyncChannelWrapper {
                 throws InterruptedException, ExecutionException,
                 TimeoutException {
             Long result = wrapped.get(timeout, unit);
-            if (result.longValue() > Integer.MAX_VALUE) {
+            if (result > Integer.MAX_VALUE) {
                 throw new ExecutionException(sm.getString(
                         "asyncChannelWrapperSecure.tooBig", result), null);
             }

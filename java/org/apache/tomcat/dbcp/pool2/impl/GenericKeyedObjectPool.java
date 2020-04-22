@@ -1042,7 +1042,7 @@ public class GenericKeyedObjectPool<K, T> extends BaseGenericObjectPool<T>
             }
         }
 
-        if (!create.booleanValue()) {
+        if (!create) {
             numTotal.decrementAndGet();
             return null;
         }

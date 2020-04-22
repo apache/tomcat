@@ -230,7 +230,7 @@ public class TestHttpParserHost {
         } catch (Exception e) {
             exceptionClass = e.getClass();
         }
-        Assert.assertEquals(input, expectedResult.intValue(), result);
+        Assert.assertEquals(input, expectedResult, result);
         if (expectedException == null) {
             Assert.assertNull(input, exceptionClass);
         } else {
@@ -258,7 +258,7 @@ public class TestHttpParserHost {
         } catch (Exception e) {
             exceptionClass = e.getClass();
         }
-        Assert.assertEquals(input, expectedResult.intValue(), result);
+        Assert.assertEquals(input, expectedResult, result);
         if (expectedException == null) {
             Assert.assertNull(input, exceptionClass);
         } else {

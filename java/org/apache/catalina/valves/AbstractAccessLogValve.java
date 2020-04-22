@@ -1303,8 +1303,8 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
                     Object end = request.getAttribute(
                             Globals.SENDFILE_FILE_END_ATTR);
                     if (end instanceof Long) {
-                        length = ((Long) end).longValue() -
-                                ((Long) start).longValue();
+                        length = (Long) end -
+                                (Long) start;
                     }
                 }
             }

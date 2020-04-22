@@ -36,7 +36,7 @@ public final class AstOr extends BooleanNode {
             throws ELException {
         Object obj = this.children[0].getValue(ctx);
         Boolean b = coerceToBoolean(ctx, obj, true);
-        if (b.booleanValue()) {
+        if (b) {
             return b;
         }
         obj = this.children[1].getValue(ctx);

@@ -1343,10 +1343,10 @@ public class ContextConfig implements LifecycleListener {
             // jsp-file gets passed to the JSP Servlet as an init-param
 
             if (servlet.getLoadOnStartup() != null) {
-                wrapper.setLoadOnStartup(servlet.getLoadOnStartup().intValue());
+                wrapper.setLoadOnStartup(servlet.getLoadOnStartup());
             }
             if (servlet.getEnabled() != null) {
-                wrapper.setEnabled(servlet.getEnabled().booleanValue());
+                wrapper.setEnabled(servlet.getEnabled());
             }
             wrapper.setName(servlet.getServletName());
             Map<String,String> params = servlet.getParameterMap();
@@ -1378,7 +1378,7 @@ public class ContextConfig implements LifecycleListener {
             }
             if (servlet.getAsyncSupported() != null) {
                 wrapper.setAsyncSupported(
-                        servlet.getAsyncSupported().booleanValue());
+                        servlet.getAsyncSupported());
             }
             wrapper.setOverridable(servlet.isOverridable());
             context.addChild(wrapper);
@@ -1391,7 +1391,7 @@ public class ContextConfig implements LifecycleListener {
         if (sessionConfig != null) {
             if (sessionConfig.getSessionTimeout() != null) {
                 context.setSessionTimeout(
-                        sessionConfig.getSessionTimeout().intValue());
+                        sessionConfig.getSessionTimeout());
             }
             SessionCookieConfig scc =
                 context.getServletContext().getSessionCookieConfig();
@@ -1400,13 +1400,13 @@ public class ContextConfig implements LifecycleListener {
             scc.setPath(sessionConfig.getCookiePath());
             scc.setComment(sessionConfig.getCookieComment());
             if (sessionConfig.getCookieHttpOnly() != null) {
-                scc.setHttpOnly(sessionConfig.getCookieHttpOnly().booleanValue());
+                scc.setHttpOnly(sessionConfig.getCookieHttpOnly());
             }
             if (sessionConfig.getCookieSecure() != null) {
-                scc.setSecure(sessionConfig.getCookieSecure().booleanValue());
+                scc.setSecure(sessionConfig.getCookieSecure());
             }
             if (sessionConfig.getCookieMaxAge() != null) {
-                scc.setMaxAge(sessionConfig.getCookieMaxAge().intValue());
+                scc.setMaxAge(sessionConfig.getCookieMaxAge());
             }
             if (sessionConfig.getSessionTrackingModes().size() > 0) {
                 context.getServletContext().setSessionTrackingModes(

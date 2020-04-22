@@ -235,6 +235,6 @@ public final class Constants {
         if (i == null)
             return 0;
         else
-            return i.intValue();
+            return i;
     }
 }

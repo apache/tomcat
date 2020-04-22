@@ -274,7 +274,7 @@ public class ClassLoaderLogManager extends LogManager {
 
         // Use a ThreadLocal to work around
         // https://bugs.openjdk.java.net/browse/JDK-8195096
-        if (".handlers".equals(name) && !addingLocalRootLogger.get().booleanValue()) {
+        if (".handlers".equals(name) && !addingLocalRootLogger.get()) {
             return null;
         }
 

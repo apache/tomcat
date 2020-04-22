@@ -260,8 +260,8 @@ public class DelegatingConnection<C extends Connection> extends AbandonedTrace i
     }
 
     private void initializeStatement(final DelegatingStatement ds) throws SQLException {
-        if (defaultQueryTimeoutSeconds != null && defaultQueryTimeoutSeconds.intValue() != ds.getQueryTimeout()) {
-            ds.setQueryTimeout(defaultQueryTimeoutSeconds.intValue());
+        if (defaultQueryTimeoutSeconds != null && defaultQueryTimeoutSeconds != ds.getQueryTimeout()) {
+            ds.setQueryTimeout(defaultQueryTimeoutSeconds);
         }
     }
 
@@ -382,11 +382,11 @@ public class DelegatingConnection<C extends Connection> extends AbandonedTrace i
     public boolean getAutoCommit() throws SQLException {
         checkOpen();
         if (cacheState && autoCommitCached != null) {
-            return autoCommitCached.booleanValue();
+            return autoCommitCached;
         }
         try {
             autoCommitCached = connection.getAutoCommit();
-            return autoCommitCached.booleanValue();
+            return autoCommitCached;
         } catch (final SQLException e) {
             handleException(e);
             return false;
@@ -452,11 +452,11 @@ public class DelegatingConnection<C extends Connection> extends AbandonedTrace i
     public boolean isReadOnly() throws SQLException {
         checkOpen();
         if (cacheState && readOnlyCached != null) {
-            return readOnlyCached.booleanValue();
+            return readOnlyCached;
         }
         try {
             readOnlyCached = connection.isReadOnly();
-            return readOnlyCached.booleanValue();
+            return readOnlyCached;
         } catch (final SQLException e) {
             handleException(e);
             return false;

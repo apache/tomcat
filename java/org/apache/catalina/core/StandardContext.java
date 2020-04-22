@@ -2812,7 +2812,7 @@ public class StandardContext extends ContainerBase
 
     protected boolean getComputedFailCtxIfServletStartFails() {
         if(failCtxIfServletStartFails != null) {
-            return failCtxIfServletStartFails.booleanValue();
+            return failCtxIfServletStartFails;
         }
         //else look at Host config
         if(getParent() instanceof StandardHost) {

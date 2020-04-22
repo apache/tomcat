@@ -583,7 +583,7 @@ public abstract class AbstractEndpoint<S,U> {
         if (keepAliveTimeout == null) {
             return getConnectionTimeout();
         } else {
-            return keepAliveTimeout.intValue();
+            return keepAliveTimeout;
         }
     }
     public void setKeepAliveTimeout(int keepAliveTimeout) {

@@ -112,7 +112,7 @@ public final class TestNetMask {
             exception =e;
         }
 
-        if (valid.booleanValue()) {
+        if (valid) {
             Assert.assertNull(exception);
             Assert.assertNotNull(netMask);
         } else {

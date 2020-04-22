@@ -370,11 +370,11 @@ public class JKStatusUpdateTask extends AbstractCatalinaTask {
                 throw new BuildException("Must specify at a lb worker either"
                         + "'lbStickySession' and 'lbForceSession' attribute");
             }
-            if (null != lbRecovertime && 60 < lbRecovertime.intValue()) {
+            if (null != lbRecovertime && 60 < lbRecovertime) {
                 throw new BuildException(
                         "The 'lbRecovertime' must be greater than 59");
             }
-            if (null != lbRetries && 1 < lbRetries.intValue()) {
+            if (null != lbRetries && 1 < lbRetries) {
                 throw new BuildException(
                         "The 'lbRetries' must be greater than 1");
             }
@@ -403,7 +403,7 @@ public class JKStatusUpdateTask extends AbstractCatalinaTask {
             if (workerLb == null) {
                 throw new BuildException("Must specify 'workerLb' attribute");
             }
-            if (workerLoadFactor.intValue() < 1) {
+            if (workerLoadFactor < 1) {
                 throw new BuildException(
                         "The 'workerLoadFactor' must be greater or equal 1");
             }

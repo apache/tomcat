@@ -49,7 +49,7 @@ public class Stream {
                 while (iterator.hasNext()) {
                     Object obj = iterator.next();
                     if (ELSupport.coerceToBoolean(null, le.invoke(obj),
-                            true).booleanValue()) {
+                            true)) {
                         next = obj;
                         foundNext = true;
                         break;
@@ -357,7 +357,7 @@ public class Stream {
 
         Boolean match = Boolean.FALSE;
 
-        while (!match.booleanValue() && iterator.hasNext()) {
+        while (!match && iterator.hasNext()) {
             match = (Boolean) le.invoke(iterator.next());
         }
 
@@ -372,7 +372,7 @@ public class Stream {
 
         Boolean match = Boolean.TRUE;
 
-        while (match.booleanValue() && iterator.hasNext()) {
+        while (match && iterator.hasNext()) {
             match = (Boolean) le.invoke(iterator.next());
         }
 
@@ -387,11 +387,11 @@ public class Stream {
 
         Boolean match = Boolean.FALSE;
 
-        while (!match.booleanValue() && iterator.hasNext()) {
+        while (!match && iterator.hasNext()) {
             match = (Boolean) le.invoke(iterator.next());
         }
 
-        return new Optional(!match.booleanValue());
+        return new Optional(!match);
     }
 
 

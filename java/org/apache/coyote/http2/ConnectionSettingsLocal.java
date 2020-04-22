@@ -67,7 +67,7 @@ class ConnectionSettingsLocal extends ConnectionSettingsBase<IllegalArgumentExce
         for (Map.Entry<Setting,Long> setting : pending.entrySet()) {
             ByteUtil.setTwoBytes(result, pos, setting.getKey().getId());
             pos += 2;
-            ByteUtil.setFourBytes(result, pos, setting.getValue().longValue());
+            ByteUtil.setFourBytes(result, pos, setting.getValue());
             pos += 4;
         }
         sendInProgress = true;

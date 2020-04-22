@@ -144,7 +144,7 @@ class Jre9Compat extends JreCompat {
 
         RUNTIME_VERSION = o14;
         if (o15 != null) {
-            RUNTIME_MAJOR_VERSION = ((Integer) o15).intValue();
+            RUNTIME_MAJOR_VERSION = (Integer) o15;
         } else {
             // Must be Java 8
             RUNTIME_MAJOR_VERSION = 8;
@@ -211,7 +211,7 @@ class Jre9Compat extends JreCompat {
                 Object moduleReference = referenceMethod.invoke(resolvedModule);
                 Object optionalURI = locationMethod.invoke(moduleReference);
                 Boolean isPresent = (Boolean) isPresentMethod.invoke(optionalURI);
-                if (isPresent.booleanValue()) {
+                if (isPresent) {
                     URI uri = (URI) getMethod.invoke(optionalURI);
                     try {
                         URL url = uri.toURL();
@@ -241,7 +241,7 @@ class Jre9Compat extends JreCompat {
     @Override
     public boolean jarFileIsMultiRelease(JarFile jarFile) {
         try {
-            return ((Boolean) isMultiReleaseMethod.invoke(jarFile)).booleanValue();
+            return (Boolean) isMultiReleaseMethod.invoke(jarFile);
         } catch (ReflectiveOperationException | IllegalArgumentException e) {
             return false;
         }
@@ -257,7 +257,7 @@ class Jre9Compat extends JreCompat {
     @Override
     public boolean canAcccess(Object base, AccessibleObject accessibleObject) {
         try {
-            return ((Boolean) canAccessMethod.invoke(accessibleObject, base)).booleanValue();
+            return (Boolean) canAccessMethod.invoke(accessibleObject, base);
         } catch (ReflectiveOperationException | IllegalArgumentException e) {
             return false;
         }
@@ -269,7 +269,7 @@ class Jre9Compat extends JreCompat {
         try {
             String packageName = type.getPackage().getName();
             Object module = getModuleMethod.invoke(type);
-            return ((Boolean) isExportedMethod.invoke(module, packageName)).booleanValue();
+            return (Boolean) isExportedMethod.invoke(module, packageName);
         } catch (ReflectiveOperationException e) {
             return false;
         }

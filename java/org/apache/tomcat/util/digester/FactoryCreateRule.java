@@ -135,7 +135,7 @@ public class FactoryCreateRule extends Rule {
                 exceptionIgnoredStack != null &&
                 !(exceptionIgnoredStack.empty())) {
 
-            if ((exceptionIgnoredStack.pop()).booleanValue()) {
+            if (exceptionIgnoredStack.pop()) {
                 // creation exception was ignored
                 // nothing was put onto the stack
                 if (digester.log.isTraceEnabled()) {

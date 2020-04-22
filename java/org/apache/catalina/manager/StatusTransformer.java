@@ -462,7 +462,7 @@ public class StatusTransformer {
 
         Integer stageValue =
             (Integer) mBeanServer.getAttribute(pName, "stage");
-        int stage = stageValue.intValue();
+        int stage = stageValue;
         boolean fullStatus = true;
         boolean showRequest = true;
         String stageStr = null;
@@ -768,7 +768,7 @@ public class StatusTransformer {
             Object startTime = mBeanServer.getAttribute(objectName,
                                                         "startTime");
             writer.print(" Start time: " +
-                         new Date(((Long) startTime).longValue()));
+                         new Date((Long) startTime));
             writer.print(" Startup time: ");
             writer.print(formatTime(mBeanServer.getAttribute
                                     (objectName, "startupTime"), false));
@@ -866,9 +866,9 @@ public class StatusTransformer {
 
         for (ObjectName jspMonitorON : jspMonitorONs) {
             Object obj = mBeanServer.getAttribute(jspMonitorON, "jspCount");
-            jspCount += ((Integer) obj).intValue();
+            jspCount += (Integer) obj;
             obj = mBeanServer.getAttribute(jspMonitorON, "jspReloadCount");
-            jspReloadCount += ((Integer) obj).intValue();
+            jspReloadCount += (Integer) obj;
         }
 
         if (mode == 0) {
@@ -953,9 +953,9 @@ public class StatusTransformer {
         long bytes = -1L;
 
         if (obj instanceof Long) {
-            bytes = ((Long) obj).longValue();
+            bytes = (Long) obj;
         } else if (obj instanceof Integer) {
-            bytes = ((Integer) obj).intValue();
+            bytes = (Integer) obj;
         }
 
         if (mb) {
@@ -992,9 +992,9 @@ public class StatusTransformer {
         long time = -1L;
 
         if (obj instanceof Long) {
-            time = ((Long) obj).longValue();
+            time = (Long) obj;
         } else if (obj instanceof Integer) {
-            time = ((Integer) obj).intValue();
+            time = (Integer) obj;
         }
 
         if (seconds) {
@@ -1016,9 +1016,9 @@ public class StatusTransformer {
         long time = -1L;
 
         if (obj instanceof Long) {
-            time = ((Long) obj).longValue();
+            time = (Long) obj;
         } else if (obj instanceof Integer) {
-            time = ((Integer) obj).intValue();
+            time = (Integer) obj;
         }
 
         return (time + " s");

@@ -614,7 +614,7 @@ public class TestStandardContext extends TomcatBaseTest {
 
         @Override
         public void destroy() {
-            if (initOk.booleanValue() && destroyOk == null) {
+            if (initOk && destroyOk == null) {
                 destroyOk = Boolean.TRUE;
             } else {
                 destroyOk = Boolean.FALSE;
@@ -629,8 +629,8 @@ public class TestStandardContext extends TomcatBaseTest {
         }
 
         protected boolean isOk() {
-            if (initOk != null && initOk.booleanValue() && destroyOk != null &&
-                    destroyOk.booleanValue()) {
+            if (initOk != null && initOk && destroyOk != null &&
+                    destroyOk) {
                 return true;
             } else if (initOk == null && destroyOk == null) {
                 return true;
@@ -640,7 +640,7 @@ public class TestStandardContext extends TomcatBaseTest {
         }
 
         protected boolean isInitCalled() {
-            return initOk != null && initOk.booleanValue();
+            return initOk != null && initOk;
         }
     }
 

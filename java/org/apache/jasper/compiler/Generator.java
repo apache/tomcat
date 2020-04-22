@@ -2958,9 +2958,9 @@ class Generator {
                 varName = prefix + "_" + shortName + "_";
                 if (tagVarNumbers.get(fullName) != null) {
                     Integer i = tagVarNumbers.get(fullName);
-                    varName = varName + i.intValue();
+                    varName = varName + i;
                     tagVarNumbers.put(fullName,
-                            i.intValue() + 1);
+                            i + 1);
                 } else {
                     tagVarNumbers.put(fullName, 1);
                     varName = varName + "0";

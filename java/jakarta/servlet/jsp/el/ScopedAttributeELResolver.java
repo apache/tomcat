@@ -73,7 +73,7 @@ public class ScopedAttributeELResolver extends ELResolver {
                         // identifier.something). Imports do not need to be
                         // checked if this is a stand-alone identifier
                         Boolean value = (Boolean) context.getContext(AST_IDENTIFIER_KEY);
-                        if (value != null && value.booleanValue()) {
+                        if (value != null && value) {
                             resolveClass = false;
                         }
                     }

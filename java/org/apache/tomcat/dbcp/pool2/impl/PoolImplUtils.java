@@ -48,7 +48,7 @@ class PoolImplUtils {
             // A bit hackish, but we must handle cases when getGenericType() does not return a concrete types.
             final ParameterizedType pi = getParameterizedType(type, factoryClass);
             if (pi != null) {
-                final Type[] bounds = ((TypeVariable) pi.getActualTypeArguments()[((Integer) genericType).intValue()]).getBounds();
+                final Type[] bounds = ((TypeVariable) pi.getActualTypeArguments()[(Integer) genericType]).getBounds();
                 if (bounds != null && bounds.length > 0) {
                     final Type bound0 = bounds[0];
                     if (bound0 instanceof Class) {
@@ -98,7 +98,7 @@ class PoolImplUtils {
             // Superclass implements interface and defines unknown type for generic
             // Map that unknown type to the generic types defined in this class
             final ParameterizedType superClassType = (ParameterizedType) clazz.getGenericSuperclass();
-            return getTypeParameter(clazz, superClassType.getActualTypeArguments()[((Integer) result).intValue()]);
+            return getTypeParameter(clazz, superClassType.getActualTypeArguments()[(Integer) result]);
         } else {
             // Error will be logged further up the call stack
             return null;

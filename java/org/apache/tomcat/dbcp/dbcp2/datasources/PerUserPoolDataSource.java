@@ -199,7 +199,7 @@ public class PerUserPoolDataSource extends InstanceKeyDataSource {
         if (value == null) {
             return getDefaultBlockWhenExhausted();
         }
-        return value.booleanValue();
+        return value;
     }
 
     /**
@@ -283,7 +283,7 @@ public class PerUserPoolDataSource extends InstanceKeyDataSource {
         if (value == null) {
             return getDefaultLifo();
         }
-        return value.booleanValue();
+        return value;
     }
 
     /**
@@ -302,7 +302,7 @@ public class PerUserPoolDataSource extends InstanceKeyDataSource {
         if (value == null) {
             return getDefaultMaxIdle();
         }
-        return value.intValue();
+        return value;
     }
 
     /**
@@ -321,7 +321,7 @@ public class PerUserPoolDataSource extends InstanceKeyDataSource {
         if (value == null) {
             return getDefaultMaxTotal();
         }
-        return value.intValue();
+        return value;
     }
 
     /**
@@ -340,7 +340,7 @@ public class PerUserPoolDataSource extends InstanceKeyDataSource {
         if (value == null) {
             return getDefaultMaxWaitMillis();
         }
-        return value.longValue();
+        return value;
     }
 
     /**
@@ -359,7 +359,7 @@ public class PerUserPoolDataSource extends InstanceKeyDataSource {
         if (value == null) {
             return getDefaultMinEvictableIdleTimeMillis();
         }
-        return value.longValue();
+        return value;
     }
 
     /**
@@ -378,7 +378,7 @@ public class PerUserPoolDataSource extends InstanceKeyDataSource {
         if (value == null) {
             return getDefaultMinIdle();
         }
-        return value.intValue();
+        return value;
     }
 
     /**
@@ -397,7 +397,7 @@ public class PerUserPoolDataSource extends InstanceKeyDataSource {
         if (value == null) {
             return getDefaultNumTestsPerEvictionRun();
         }
-        return value.intValue();
+        return value;
     }
 
     /**
@@ -416,7 +416,7 @@ public class PerUserPoolDataSource extends InstanceKeyDataSource {
         if (value == null) {
             return getDefaultSoftMinEvictableIdleTimeMillis();
         }
-        return value.longValue();
+        return value;
     }
 
     /**
@@ -435,7 +435,7 @@ public class PerUserPoolDataSource extends InstanceKeyDataSource {
         if (value == null) {
             return getDefaultTestOnBorrow();
         }
-        return value.booleanValue();
+        return value;
     }
 
     /**
@@ -454,7 +454,7 @@ public class PerUserPoolDataSource extends InstanceKeyDataSource {
         if (value == null) {
             return getDefaultTestOnCreate();
         }
-        return value.booleanValue();
+        return value;
     }
 
     /**
@@ -473,7 +473,7 @@ public class PerUserPoolDataSource extends InstanceKeyDataSource {
         if (value == null) {
             return getDefaultTestOnReturn();
         }
-        return value.booleanValue();
+        return value;
     }
 
     /**
@@ -492,7 +492,7 @@ public class PerUserPoolDataSource extends InstanceKeyDataSource {
         if (value == null) {
             return getDefaultTestWhileIdle();
         }
-        return value.booleanValue();
+        return value;
     }
 
     /**
@@ -511,7 +511,7 @@ public class PerUserPoolDataSource extends InstanceKeyDataSource {
         if (value == null) {
             return getDefaultTimeBetweenEvictionRunsMillis();
         }
-        return value.longValue();
+        return value;
     }
 
     /**
@@ -1155,20 +1155,20 @@ public class PerUserPoolDataSource extends InstanceKeyDataSource {
         if (userName != null) {
             final Integer userMax = getPerUserDefaultTransactionIsolation(userName);
             if (userMax != null) {
-                defaultTransactionIsolation = userMax.intValue();
+                defaultTransactionIsolation = userMax;
             }
         }
 
-        if (defaultAutoCommit != null && con.getAutoCommit() != defaultAutoCommit.booleanValue()) {
-            con.setAutoCommit(defaultAutoCommit.booleanValue());
+        if (defaultAutoCommit != null && con.getAutoCommit() != defaultAutoCommit) {
+            con.setAutoCommit(defaultAutoCommit);
         }
 
         if (defaultTransactionIsolation != UNKNOWN_TRANSACTIONISOLATION) {
             con.setTransactionIsolation(defaultTransactionIsolation);
         }
 
-        if (defaultReadOnly != null && con.isReadOnly() != defaultReadOnly.booleanValue()) {
-            con.setReadOnly(defaultReadOnly.booleanValue());
+        if (defaultReadOnly != null && con.isReadOnly() != defaultReadOnly) {
+            con.setReadOnly(defaultReadOnly);
         }
     }
 }

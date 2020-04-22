@@ -93,7 +93,7 @@ public class SecureNio2Channel extends Nio2Channel  {
             implements CompletionHandler<Integer, SocketWrapperBase<Nio2Channel>> {
         @Override
         public void completed(Integer result, SocketWrapperBase<Nio2Channel> attachment) {
-            if (result.intValue() < 0) {
+            if (result < 0) {
                 failed(new EOFException(), attachment);
             } else {
                 endpoint.processSocket(attachment, SocketEvent.OPEN_READ, false);
@@ -110,7 +110,7 @@ public class SecureNio2Channel extends Nio2Channel  {
             implements CompletionHandler<Integer, SocketWrapperBase<Nio2Channel>> {
         @Override
         public void completed(Integer result, SocketWrapperBase<Nio2Channel> attachment) {
-            if (result.intValue() < 0) {
+            if (result < 0) {
                 failed(new EOFException(), attachment);
             } else {
                 endpoint.processSocket(attachment, SocketEvent.OPEN_WRITE, false);
@@ -173,7 +173,7 @@ public class SecureNio2Channel extends Nio2Channel  {
             if (e != null) {
                 throw new ExecutionException(e);
             }
-            return integer.get().intValue() >= 0;
+            return integer.get() >= 0;
         }
         @Override
         public Boolean get(long timeout, TimeUnit unit)
@@ -182,7 +182,7 @@ public class SecureNio2Channel extends Nio2Channel  {
             if (e != null) {
                 throw new ExecutionException(e);
             }
-            return integer.get(timeout, unit).intValue() >= 0;
+            return integer.get(timeout, unit) >= 0;
         }
     }
 
@@ -333,9 +333,9 @@ public class SecureNio2Channel extends Nio2Channel  {
                             try {
                                 int read;
                                 if (timeout > 0) {
-                                    read = sc.read(netInBuffer).get(timeout, TimeUnit.MILLISECONDS).intValue();
+                                    read = sc.read(netInBuffer).get(timeout, TimeUnit.MILLISECONDS);
                                 } else {
-                                    read = sc.read(netInBuffer).get().intValue();
+                                    read = sc.read(netInBuffer).get();
                                 }
                                 if (read == -1) {
                                     throw new EOFException();
@@ -583,12 +583,12 @@ public class SecureNio2Channel extends Nio2Channel  {
 
         try {
             if (timeout > 0) {
-                if (!flush().get(timeout, TimeUnit.MILLISECONDS).booleanValue()) {
+                if (!flush().get(timeout, TimeUnit.MILLISECONDS)) {
                     closeSilently();
                     throw new IOException(sm.getString("channel.nio.ssl.remainingDataDuringClose"));
                 }
             } else {
-                if (!flush().get().booleanValue()) {
+                if (!flush().get()) {
                     closeSilently();
                     throw new IOException(sm.getString("channel.nio.ssl.remainingDataDuringClose"));
                 }
@@ -613,12 +613,12 @@ public class SecureNio2Channel extends Nio2Channel  {
         //if there is data to be written
         try {
             if (timeout > 0) {
-                if (!flush().get(timeout, TimeUnit.MILLISECONDS).booleanValue()) {
+                if (!flush().get(timeout, TimeUnit.MILLISECONDS)) {
                     closeSilently();
                     throw new IOException(sm.getString("channel.nio.ssl.remainingDataDuringClose"));
                 }
             } else {
-                if (!flush().get().booleanValue()) {
+                if (!flush().get()) {
                     closeSilently();
                     throw new IOException(sm.getString("channel.nio.ssl.remainingDataDuringClose"));
                 }
@@ -686,7 +686,7 @@ public class SecureNio2Channel extends Nio2Channel  {
         @Override
         public Integer get() throws InterruptedException, ExecutionException {
             try {
-                return (integer == null) ? unwrap(netInBuffer.position(), -1, TimeUnit.MILLISECONDS) : unwrap(integer.get().intValue(), -1, TimeUnit.MILLISECONDS);
+                return (integer == null) ? unwrap(netInBuffer.position(), -1, TimeUnit.MILLISECONDS) : unwrap(integer.get(), -1, TimeUnit.MILLISECONDS);
             } catch (TimeoutException e) {
                 // Cannot happen: no timeout
                 throw new ExecutionException(e);
@@ -696,7 +696,7 @@ public class SecureNio2Channel extends Nio2Channel  {
         public Integer get(long timeout, TimeUnit unit)
                 throws InterruptedException, ExecutionException,
                 TimeoutException {
-            return (integer == null) ? unwrap(netInBuffer.position(), timeout, unit) : unwrap(integer.get(timeout, unit).intValue(), timeout, unit);
+            return (integer == null) ? unwrap(netInBuffer.position(), timeout, unit) : unwrap(integer.get(timeout, unit), timeout, unit);
         }
         private Integer unwrap(int nRead, long timeout, TimeUnit unit) throws ExecutionException, TimeoutException, InterruptedException {
             //are we in the middle of closing or closed?
@@ -732,9 +732,9 @@ public class SecureNio2Channel extends Nio2Channel  {
                         if (read == 0) {
                             integer = sc.read(netInBuffer);
                             if (timeout > 0) {
-                                return unwrap(integer.get(timeout, unit).intValue(), timeout, unit);
+                                return unwrap(integer.get(timeout, unit), timeout, unit);
                             } else {
-                                return unwrap(integer.get().intValue(), -1, TimeUnit.MILLISECONDS);
+                                return unwrap(integer.get(), -1, TimeUnit.MILLISECONDS);
                             }
                         } else {
                             break;
@@ -824,7 +824,7 @@ public class SecureNio2Channel extends Nio2Channel  {
             if (t != null) {
                 throw new ExecutionException(t);
             }
-            if (integer.get().intValue() > 0 && written == 0) {
+            if (integer.get() > 0 && written == 0) {
                 wrap();
                 return get();
             } else if (netOutBuffer.hasRemaining()) {
@@ -841,7 +841,7 @@ public class SecureNio2Channel extends Nio2Channel  {
             if (t != null) {
                 throw new ExecutionException(t);
             }
-            if (integer.get(timeout, unit).intValue() > 0 && written == 0) {
+            if (integer.get(timeout, unit) > 0 && written == 0) {
                 wrap();
                 return get(timeout, unit);
             } else if (netOutBuffer.hasRemaining()) {
@@ -898,7 +898,7 @@ public class SecureNio2Channel extends Nio2Channel  {
         CompletionHandler<Integer, A> readCompletionHandler = new CompletionHandler<Integer, A>() {
             @Override
             public void completed(Integer nBytes, A attach) {
-                if (nBytes.intValue() < 0) {
+                if (nBytes < 0) {
                     failed(new EOFException(), attach);
                 } else {
                     try {
@@ -1001,7 +1001,7 @@ public class SecureNio2Channel extends Nio2Channel  {
         CompletionHandler<Integer, A> readCompletionHandler = new CompletionHandler<Integer, A>() {
             @Override
             public void completed(Integer nBytes, A attach) {
-                if (nBytes.intValue() < 0) {
+                if (nBytes < 0) {
                     failed(new EOFException(), attach);
                 } else {
                     try {
@@ -1151,7 +1151,7 @@ public class SecureNio2Channel extends Nio2Channel  {
                         new CompletionHandler<Integer, A>() {
                     @Override
                     public void completed(Integer nBytes, A attach) {
-                        if (nBytes.intValue() < 0) {
+                        if (nBytes < 0) {
                             failed(new EOFException(), attach);
                         } else if (netOutBuffer.hasRemaining()) {
                             sc.write(netOutBuffer, timeout, unit, attachment, this);
@@ -1204,7 +1204,7 @@ public class SecureNio2Channel extends Nio2Channel  {
                 sc.write(netOutBuffer, timeout, unit, attachment, new CompletionHandler<Integer, A>() {
                     @Override
                     public void completed(Integer nBytes, A attach) {
-                        if (nBytes.intValue() < 0) {
+                        if (nBytes < 0) {
                             failed(new EOFException(), attach);
                         } else if (netOutBuffer.hasRemaining()) {
                             sc.write(netOutBuffer, timeout, unit, attachment, this);

@@ -64,7 +64,7 @@ public abstract class AbstractInputStreamJar implements Jar {
         }
         try {
             entry = jarInputStream.getNextJarEntry();
-            if (multiRelease.booleanValue()) {
+            if (multiRelease) {
                 // Skip base entries where there is a multi-release entry
                 // Skip multi-release entries that are not being used
                 while (entry != null &&
@@ -176,7 +176,7 @@ public abstract class AbstractInputStreamJar implements Jar {
             } else {
                 multiRelease = Boolean.FALSE;
             }
-            if (multiRelease.booleanValue()) {
+            if (multiRelease) {
                 if (mrMap == null) {
                     populateMrMap();
                 }
@@ -207,7 +207,7 @@ public abstract class AbstractInputStreamJar implements Jar {
         }
 
         // Need to convert requested name to multi-release name (if one exists)
-        if (multiRelease.booleanValue()) {
+        if (multiRelease) {
             String mrName = mrMap.get(name);
             if (mrName != null) {
                 name = mrName;
@@ -264,7 +264,7 @@ public abstract class AbstractInputStreamJar implements Jar {
                         } else {
                             // Ignore any entry for which we have already found
                             // a later version
-                            if (version > mappedVersion.intValue()) {
+                            if (version > mappedVersion) {
                                 // Replace the earlier version
                                 mrVersions.put(baseName, version);
                             }

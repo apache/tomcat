@@ -532,12 +532,12 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
 
         Future<Integer> fWrite = channel.write(request);
         Integer thisWrite = fWrite.get(timeout, TimeUnit.MILLISECONDS);
-        toWrite -= thisWrite.intValue();
+        toWrite -= thisWrite;
 
         while (toWrite > 0) {
             fWrite = channel.write(request);
             thisWrite = fWrite.get(timeout, TimeUnit.MILLISECONDS);
-            toWrite -= thisWrite.intValue();
+            toWrite -= thisWrite;
         }
     }
 
@@ -805,7 +805,7 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
             // Blocking read
             Future<Integer> read = channel.read(response);
             Integer bytesRead = read.get(timeout, TimeUnit.MILLISECONDS);
-            if (bytesRead.intValue() == -1) {
+            if (bytesRead == -1) {
                 throw new EOFException();
             }
             response.flip();

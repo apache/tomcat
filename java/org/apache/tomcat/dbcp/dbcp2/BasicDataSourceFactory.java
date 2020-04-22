@@ -347,7 +347,7 @@ public class BasicDataSourceFactory implements ObjectFactory {
 
         value = properties.getProperty(PROP_CACHE_STATE);
         if (value != null) {
-            dataSource.setCacheState(Boolean.valueOf(value).booleanValue());
+            dataSource.setCacheState(Boolean.valueOf(value));
         }
 
         value = properties.getProperty(PROP_DRIVER_CLASS_NAME);
@@ -357,7 +357,7 @@ public class BasicDataSourceFactory implements ObjectFactory {
 
         value = properties.getProperty(PROP_LIFO);
         if (value != null) {
-            dataSource.setLifo(Boolean.valueOf(value).booleanValue());
+            dataSource.setLifo(Boolean.valueOf(value));
         }
 
         value = properties.getProperty(PROP_MAX_TOTAL);
@@ -387,17 +387,17 @@ public class BasicDataSourceFactory implements ObjectFactory {
 
         value = properties.getProperty(PROP_TEST_ON_CREATE);
         if (value != null) {
-            dataSource.setTestOnCreate(Boolean.valueOf(value).booleanValue());
+            dataSource.setTestOnCreate(Boolean.valueOf(value));
         }
 
         value = properties.getProperty(PROP_TEST_ON_BORROW);
         if (value != null) {
-            dataSource.setTestOnBorrow(Boolean.valueOf(value).booleanValue());
+            dataSource.setTestOnBorrow(Boolean.valueOf(value));
         }
 
         value = properties.getProperty(PROP_TEST_ON_RETURN);
         if (value != null) {
-            dataSource.setTestOnReturn(Boolean.valueOf(value).booleanValue());
+            dataSource.setTestOnReturn(Boolean.valueOf(value));
         }
 
         value = properties.getProperty(PROP_TIME_BETWEEN_EVICTION_RUNS_MILLIS);
@@ -427,7 +427,7 @@ public class BasicDataSourceFactory implements ObjectFactory {
 
         value = properties.getProperty(PROP_TEST_WHILE_IDLE);
         if (value != null) {
-            dataSource.setTestWhileIdle(Boolean.valueOf(value).booleanValue());
+            dataSource.setTestWhileIdle(Boolean.valueOf(value));
         }
 
         value = properties.getProperty(PROP_PASSWORD);
@@ -457,17 +457,17 @@ public class BasicDataSourceFactory implements ObjectFactory {
 
         value = properties.getProperty(PROP_ACCESS_TO_UNDERLYING_CONNECTION_ALLOWED);
         if (value != null) {
-            dataSource.setAccessToUnderlyingConnectionAllowed(Boolean.valueOf(value).booleanValue());
+            dataSource.setAccessToUnderlyingConnectionAllowed(Boolean.valueOf(value));
         }
 
         value = properties.getProperty(PROP_REMOVE_ABANDONED_ON_BORROW);
         if (value != null) {
-            dataSource.setRemoveAbandonedOnBorrow(Boolean.valueOf(value).booleanValue());
+            dataSource.setRemoveAbandonedOnBorrow(Boolean.valueOf(value));
         }
 
         value = properties.getProperty(PROP_REMOVE_ABANDONED_ON_MAINTENANCE);
         if (value != null) {
-            dataSource.setRemoveAbandonedOnMaintenance(Boolean.valueOf(value).booleanValue());
+            dataSource.setRemoveAbandonedOnMaintenance(Boolean.valueOf(value));
         }
 
         value = properties.getProperty(PROP_REMOVE_ABANDONED_TIMEOUT);
@@ -477,17 +477,17 @@ public class BasicDataSourceFactory implements ObjectFactory {
 
         value = properties.getProperty(PROP_LOG_ABANDONED);
         if (value != null) {
-            dataSource.setLogAbandoned(Boolean.valueOf(value).booleanValue());
+            dataSource.setLogAbandoned(Boolean.valueOf(value));
         }
 
         value = properties.getProperty(PROP_ABANDONED_USAGE_TRACKING);
         if (value != null) {
-            dataSource.setAbandonedUsageTracking(Boolean.valueOf(value).booleanValue());
+            dataSource.setAbandonedUsageTracking(Boolean.valueOf(value));
         }
 
         value = properties.getProperty(PROP_POOL_PREPARED_STATEMENTS);
         if (value != null) {
-            dataSource.setPoolPreparedStatements(Boolean.valueOf(value).booleanValue());
+            dataSource.setPoolPreparedStatements(Boolean.valueOf(value));
         }
 
         value = properties.getProperty(PROP_MAX_OPEN_PREPARED_STATEMENTS);
@@ -517,7 +517,7 @@ public class BasicDataSourceFactory implements ObjectFactory {
 
         value = properties.getProperty(PROP_LOG_EXPIRED_CONNECTIONS);
         if (value != null) {
-            dataSource.setLogExpiredConnections(Boolean.valueOf(value).booleanValue());
+            dataSource.setLogExpiredConnections(Boolean.valueOf(value));
         }
 
         value = properties.getProperty(PROP_JMX_NAME);
@@ -527,12 +527,12 @@ public class BasicDataSourceFactory implements ObjectFactory {
 
         value = properties.getProperty(PROP_ENABLE_AUTO_COMMIT_ON_RETURN);
         if (value != null) {
-            dataSource.setAutoCommitOnReturn(Boolean.valueOf(value).booleanValue());
+            dataSource.setAutoCommitOnReturn(Boolean.valueOf(value));
         }
 
         value = properties.getProperty(PROP_ROLLBACK_ON_RETURN);
         if (value != null) {
-            dataSource.setRollbackOnReturn(Boolean.valueOf(value).booleanValue());
+            dataSource.setRollbackOnReturn(Boolean.valueOf(value));
         }
 
         value = properties.getProperty(PROP_DEFAULT_QUERY_TIMEOUT);
@@ -542,7 +542,7 @@ public class BasicDataSourceFactory implements ObjectFactory {
 
         value = properties.getProperty(PROP_FAST_FAIL_VALIDATION);
         if (value != null) {
-            dataSource.setFastFailValidation(Boolean.valueOf(value).booleanValue());
+            dataSource.setFastFailValidation(Boolean.valueOf(value));
         }
 
         value = properties.getProperty(PROP_DISCONNECTION_SQL_CODES);

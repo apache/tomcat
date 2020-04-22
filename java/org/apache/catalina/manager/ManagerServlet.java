@@ -714,7 +714,7 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
                 Boolean result = (Boolean) mBeanServer.invoke(storeConfigOname, "store",
                         new Object[] {context},
                         new String [] { "org.apache.catalina.Context"});
-                if (result.booleanValue()) {
+                if (result) {
                     writer.println(smClient.getString("managerServlet.savedContext", path));
                 } else {
                     writer.println(smClient.getString("managerServlet.savedContextFail", path));
@@ -1554,7 +1554,7 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
         String[] signature = { "java.lang.String" };
         Boolean result =
             (Boolean) mBeanServer.invoke(oname, "isDeployed", params, signature);
-        return result.booleanValue();
+        return result;
     }
 
 
@@ -1585,7 +1585,7 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
         String[] signature = { "java.lang.String" };
         Boolean result =
             (Boolean) mBeanServer.invoke(oname, "isServiced", params, signature);
-        return result.booleanValue();
+        return result;
     }
 
 
@@ -1699,7 +1699,7 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
             if (Boolean.TRUE.equals(connector.getProperty("SSLEnabled"))) {
                 SSLHostConfig[] sslHostConfigs = connector.getProtocolHandler().findSslHostConfigs();
                 for (SSLHostConfig sslHostConfig : sslHostConfigs) {
-                    if (sslHostConfig.getOpenSslContext().longValue() == 0) {
+                    if (sslHostConfig.getOpenSslContext() == 0) {
                         // Not set. Must be JSSE based.
                         Set<SSLHostConfigCertificate> sslHostConfigCerts =
                                 sslHostConfig.getCertificates();
@@ -1750,7 +1750,7 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
                 for (SSLHostConfig sslHostConfig : sslHostConfigs) {
                     String name = connector.toString() + "-" + sslHostConfig.getHostName();
                     List<String> certList = new ArrayList<>();
-                    if (sslHostConfig.getOpenSslContext().longValue() == 0) {
+                    if (sslHostConfig.getOpenSslContext() == 0) {
                         // Not set. Must be JSSE based.
                         SSLContext sslContext =
                                 sslHostConfig.getCertificates().iterator().next().getSslContext();

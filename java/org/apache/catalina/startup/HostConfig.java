@@ -1281,7 +1281,7 @@ public class HostConfig implements LifecycleListener {
                 log.debug("Checking context[" + app.name +
                         "] redeploy resource " + resource);
             long lastModified =
-                    app.redeployResources.get(resources[i]).longValue();
+                    app.redeployResources.get(resources[i]);
             if (resource.exists() || lastModified == 0) {
                 // File.lastModified() has a resolution of 1s (1000ms). The last
                 // modified time has to be more than 1000ms ago to ensure that
@@ -1361,7 +1361,7 @@ public class HostConfig implements LifecycleListener {
             if (log.isDebugEnabled()) {
                 log.debug("Checking context[" + app.name + "] reload resource " + resource);
             }
-            long lastModified = app.reloadResources.get(resources[i]).longValue();
+            long lastModified = app.reloadResources.get(resources[i]);
             // File.lastModified() has a resolution of 1s (1000ms). The last
             // modified time has to be more than 1000ms ago to ensure that
             // modifications that take place in the same second are not

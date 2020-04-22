@@ -196,7 +196,7 @@ public class TestUpgradeInternalHandler extends TomcatBaseTest {
             CompletionState state = wrapper.read(BlockingMode.NON_BLOCK, 10, TimeUnit.SECONDS, null, SocketWrapperBase.READ_DATA, new CompletionHandler<Long, Void>() {
                 @Override
                 public void completed(Long result, Void attachment) {
-                    System.out.println("Read: " + result.longValue());
+                    System.out.println("Read: " + result);
                     write(buffer);
                 }
                 @Override
@@ -215,7 +215,7 @@ public class TestUpgradeInternalHandler extends TomcatBaseTest {
             CompletionState state = wrapper.write(BlockingMode.BLOCK, 10, TimeUnit.SECONDS, null, SocketWrapperBase.COMPLETE_WRITE, new CompletionHandler<Long, Void>() {
                 @Override
                 public void completed(Long result, Void attachment) {
-                    System.out.println("Write: " + result.longValue());
+                    System.out.println("Write: " + result);
                 }
                 @Override
                 public void failed(Throwable exc, Void attachment) {
@@ -227,7 +227,7 @@ public class TestUpgradeInternalHandler extends TomcatBaseTest {
             wrapper.write(BlockingMode.BLOCK, 10, TimeUnit.SECONDS, null, SocketWrapperBase.COMPLETE_WRITE_WITH_COMPLETION, new CompletionHandler<Long, Void>() {
                 @Override
                 public void completed(Long result, Void attachment) {
-                    System.out.println("Write: " + result.longValue());
+                    System.out.println("Write: " + result);
                 }
                 @Override
                 public void failed(Throwable exc, Void attachment) {

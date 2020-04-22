@@ -549,7 +549,7 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
             if (param == null) {
                 return;
             }
-            long timeout = ((Long) param).longValue();
+            long timeout = (Long) param;
             setAsyncTimeout(timeout);
             break;
         }

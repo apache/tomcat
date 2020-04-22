@@ -847,8 +847,8 @@ public class DefaultServlet extends HttpServlet {
             }
 
             if (isError) {
-                response.sendError(((Integer) request.getAttribute(
-                        RequestDispatcher.ERROR_STATUS_CODE)).intValue());
+                response.sendError((Integer) request.getAttribute(
+                        RequestDispatcher.ERROR_STATUS_CODE));
             } else {
                 response.sendError(HttpServletResponse.SC_NOT_FOUND,
                         sm.getString("defaultServlet.missingResource", requestUri));
@@ -872,8 +872,8 @@ public class DefaultServlet extends HttpServlet {
             }
 
             if (isError) {
-                response.sendError(((Integer) request.getAttribute(
-                        RequestDispatcher.ERROR_STATUS_CODE)).intValue());
+                response.sendError((Integer) request.getAttribute(
+                        RequestDispatcher.ERROR_STATUS_CODE));
             } else {
                 response.sendError(HttpServletResponse.SC_FORBIDDEN, requestUri);
             }

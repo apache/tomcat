@@ -135,11 +135,11 @@ abstract class ConnectionSettingsBase<T extends Throwable> {
 
     private synchronized long getMin(Setting setting) {
         Long pendingValue = pending.get(setting);
-        long currentValue = current.get(setting).longValue();
+        long currentValue = current.get(setting);
         if (pendingValue == null) {
             return currentValue;
         } else {
-            return Long.min(pendingValue.longValue(), currentValue);
+            return Long.min(pendingValue, currentValue);
         }
     }
 
@@ -156,11 +156,11 @@ abstract class ConnectionSettingsBase<T extends Throwable> {
 
     private synchronized long getMax(Setting setting) {
         Long pendingValue = pending.get(setting);
-        long currentValue = current.get(setting).longValue();
+        long currentValue = current.get(setting);
         if (pendingValue == null) {
             return currentValue;
         } else {
-            return Long.max(pendingValue.longValue(), currentValue);
+            return Long.max(pendingValue, currentValue);
         }
     }
 

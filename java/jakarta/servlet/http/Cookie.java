@@ -80,7 +80,7 @@ public class Cookie implements Cloneable, Serializable {
                                     "org.apache.catalina.STRICT_SERVLET_COMPLIANCE"));
                         }
                     }
-                ).booleanValue();
+            );
             propStrictNaming = AccessController.doPrivileged(
                     new PrivilegedAction<String>() {
                         @Override

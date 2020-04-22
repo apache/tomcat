@@ -85,11 +85,11 @@ public class TestHttpServletResponseSendError extends TomcatBaseTest {
 
         for (Boolean async : booleans) {
             for (Boolean throwException : booleans) {
-                if (async.booleanValue()) {
+                if (async) {
                     for (Boolean useDispatch : booleans) {
                         for (AsyncErrorPoint errorPoint : AsyncErrorPoint.values()) {
                             for (Boolean useStart : booleans) {
-                                if (throwException.booleanValue() && !useStart.booleanValue() &&
+                                if (throwException && !useStart &&
                                         errorPoint == AsyncErrorPoint.THREAD_B_BEFORE_COMPLETE) {
                                     // Skip this combination as exceptions that occur on application
                                     // managed threads are not visible to the container.

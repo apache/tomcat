@@ -558,7 +558,7 @@ public class DeltaManager extends ClusterManagerBase{
         // Load the previously unloaded active sessions
         try (ObjectInputStream ois = getReplicationStream(data)) {
             Integer count = (Integer) ois.readObject();
-            int n = count.intValue();
+            int n = count;
             for (int i = 0; i < n; i++) {
                 DeltaSession session = (DeltaSession) createEmptySession();
                 session.readObjectData(ois);

@@ -259,7 +259,7 @@ public class StuckThreadDetectionValve extends ValveBase {
 
         long[] result = new long[idList.size()];
         for (int i = 0; i < result.length; i++) {
-            result[i] = idList.get(i).longValue();
+            result[i] = idList.get(i);
         }
         return result;
     }

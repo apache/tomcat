@@ -71,7 +71,7 @@ public class CoyoteInputStream extends ServletInputStream {
 
             try {
                 Integer result = AccessController.doPrivileged(new PrivilegedRead(ib));
-                return result.intValue();
+                return result;
             } catch (PrivilegedActionException pae) {
                 Exception e = pae.getException();
                 if (e instanceof IOException) {
@@ -91,7 +91,7 @@ public class CoyoteInputStream extends ServletInputStream {
         if (SecurityUtil.isPackageProtectionEnabled()) {
             try {
                 Integer result = AccessController.doPrivileged(new PrivilegedAvailable(ib));
-                return result.intValue();
+                return result;
             } catch (PrivilegedActionException pae) {
                 Exception e = pae.getException();
                 if (e instanceof IOException) {
@@ -119,7 +119,7 @@ public class CoyoteInputStream extends ServletInputStream {
             try {
                 Integer result = AccessController.doPrivileged(
                         new PrivilegedReadArray(ib, b, off, len));
-                return result.intValue();
+                return result;
             } catch (PrivilegedActionException pae) {
                 Exception e = pae.getException();
                 if (e instanceof IOException) {
@@ -151,7 +151,7 @@ public class CoyoteInputStream extends ServletInputStream {
         if (SecurityUtil.isPackageProtectionEnabled()) {
             try {
                 Integer result = AccessController.doPrivileged(new PrivilegedReadBuffer(ib, b));
-                return result.intValue();
+                return result;
             } catch (PrivilegedActionException pae) {
                 Exception e = pae.getException();
                 if (e instanceof IOException) {

@@ -92,7 +92,7 @@ public class Benchmarks {
 
         public Date getCurrentDate() {
             long systime = System.currentTimeMillis();
-            if ((systime - currentMillisLocal.get().longValue()) > 1000) {
+            if ((systime - currentMillisLocal.get()) > 1000) {
                 currentDateLocal.set(new Date(systime));
                 currentMillisLocal.set(systime);
             }

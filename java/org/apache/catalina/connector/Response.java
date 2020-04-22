@@ -1499,7 +1499,7 @@ public class Response implements HttpServletResponse {
         if (SecurityUtil.isPackageProtectionEnabled()) {
             Boolean result =  AccessController.doPrivileged(
                     new PrivilegedDoIsEncodable(getContext(), hreq, session, location));
-            return result.booleanValue();
+            return result;
         } else {
             return doIsEncodeable(getContext(), hreq, session, location);
         }

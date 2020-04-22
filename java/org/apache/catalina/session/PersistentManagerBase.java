@@ -1022,7 +1022,7 @@ public abstract class PersistentManagerBase extends ManagerBase
                     Long persistedLastAccessedTime =
                             (Long) session.getNote(PERSISTED_LAST_ACCESSED_TIME);
                     if (persistedLastAccessedTime != null &&
-                            lastAccessedTime == persistedLastAccessedTime.longValue())
+                            lastAccessedTime == persistedLastAccessedTime)
                         continue;
                     int timeIdle = (int) (session.getIdleTimeInternal() / 1000L);
                     if (timeIdle >= maxIdleBackup) {

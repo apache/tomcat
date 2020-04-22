@@ -802,7 +802,7 @@ public abstract class HttpServlet extends GenericServlet {
             if (REQUEST_FACADE_CLAZZ != null && GET_ALLOW_TRACE != null) {
                 if (REQUEST_FACADE_CLAZZ.isAssignableFrom(req.getClass())) {
                     try {
-                        return ((Boolean) GET_ALLOW_TRACE.invoke(req, (Object[]) null)).booleanValue();
+                        return (Boolean) GET_ALLOW_TRACE.invoke(req, (Object[]) null);
                     } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
                         // Should never happen given the checks in place.
                         // Ignore

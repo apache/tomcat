@@ -205,7 +205,7 @@ public class TestELProcessor {
         Integer[] resultArray = (Integer[]) result;
         Assert.assertEquals(bean01.getValueB().length, resultArray.length);
         for (int i = 0; i < resultArray.length; i++) {
-            Assert.assertEquals(bean01.getValueB()[i], resultArray[i].intValue());
+            Assert.assertEquals(bean01.getValueB()[i], resultArray[i]);
         }
     }
 }

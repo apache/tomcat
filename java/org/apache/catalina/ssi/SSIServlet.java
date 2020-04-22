@@ -172,7 +172,7 @@ public class SSIServlet extends HttpServlet {
         res.setContentType(resourceMimeType + ";charset=" + outputEncoding);
         if (expires != null) {
             res.setDateHeader("Expires", (new java.util.Date()).getTime()
-                    + expires.longValue() * 1000);
+                    + expires * 1000);
         }
         processSSI(req, res, resource);
     }

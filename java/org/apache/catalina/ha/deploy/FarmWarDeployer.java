@@ -600,7 +600,7 @@ public class FarmWarDeployer extends ClusterListener
         String[] signature = { "java.lang.String" };
         Boolean result = (Boolean) mBeanServer.invoke(oname, "isServiced",
                 params, signature);
-        return result.booleanValue();
+        return result;
     }
 
     /**

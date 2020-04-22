@@ -114,7 +114,7 @@ public class TaskQueue extends LinkedBlockingQueue<Runnable> {
             // remainingCapacity==0 to allow to interrupt idle threads
             // I don't see why, but this hack allows to conform to this
             // "requirement"
-            return forcedRemainingCapacity.intValue();
+            return forcedRemainingCapacity;
         }
         return super.remainingCapacity();
     }

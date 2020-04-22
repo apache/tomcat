@@ -190,7 +190,7 @@ public class CachedResource implements WebResource {
                     webResource.getLastModified();
             this.cachedLastModified = cachedLastModified;
         }
-        return cachedLastModified.longValue();
+        return cachedLastModified;
     }
 
     @Override
@@ -210,7 +210,7 @@ public class CachedResource implements WebResource {
             cachedExists = webResource.exists();
             this.cachedExists = cachedExists;
         }
-        return cachedExists.booleanValue();
+        return cachedExists;
     }
 
     @Override
@@ -220,7 +220,7 @@ public class CachedResource implements WebResource {
             cachedIsVirtual = webResource.isVirtual();
             this.cachedIsVirtual = cachedIsVirtual;
         }
-        return cachedIsVirtual.booleanValue();
+        return cachedIsVirtual;
     }
 
     @Override
@@ -230,7 +230,7 @@ public class CachedResource implements WebResource {
             cachedIsDirectory = webResource.isDirectory();
             this.cachedIsDirectory = cachedIsDirectory;
         }
-        return cachedIsDirectory.booleanValue();
+        return cachedIsDirectory;
     }
 
     @Override
@@ -240,7 +240,7 @@ public class CachedResource implements WebResource {
             cachedIsFile = webResource.isFile();
             this.cachedIsFile = cachedIsFile;
         }
-        return cachedIsFile.booleanValue();
+        return cachedIsFile;
     }
 
     @Override
@@ -269,7 +269,7 @@ public class CachedResource implements WebResource {
             }
             return result;
         }
-        return cachedContentLength.longValue();
+        return cachedContentLength;
     }
 
     @Override

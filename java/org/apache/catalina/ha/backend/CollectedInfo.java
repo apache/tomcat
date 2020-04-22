@@ -113,7 +113,7 @@ public class CollectedInfo {
 
         Integer ibusy  = (Integer) mBeanServer.getAttribute(objName, "currentThreadsBusy");
 
-        busy = ibusy.intValue();
-        ready = imax.intValue() - ibusy.intValue();
+        busy = ibusy;
+        ready = imax - ibusy;
     }
 }

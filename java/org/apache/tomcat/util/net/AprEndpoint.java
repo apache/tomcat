@@ -368,7 +368,7 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
                         getDefaultSSLHostConfigName(), getName()));
             }
             Long defaultSSLContext = defaultSSLHostConfig.getOpenSslContext();
-            sslContext = defaultSSLContext.longValue();
+            sslContext = defaultSSLContext;
             SSLContext.registerDefault(defaultSSLContext, this);
 
             // For now, sendfile is not supported with SSL
@@ -420,7 +420,7 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
         SSLHostConfig sslHostConfig = getSSLHostConfig(sniHostName);
         Long ctx = sslHostConfig.getOpenSslContext();
         if (ctx != null) {
-            return ctx.longValue();
+            return ctx;
         }
         // Default
         return 0;
@@ -515,7 +515,7 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
             // read/writes. Need to do this before destroying the poller since
             // that will also destroy the root pool for these sockets.
             for (Long s : connections.keySet()) {
-                Socket.shutdown(s.longValue(), Socket.APR_SHUTDOWN_READWRITE);
+                Socket.shutdown(s, Socket.APR_SHUTDOWN_READWRITE);
             }
             try {
                 poller.destroy();
@@ -590,7 +590,7 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
      *  close immediately
      */
     protected boolean setSocketOptions(SocketWrapperBase<Long> socketWrapper) {
-        long socket = socketWrapper.getSocket().longValue();
+        long socket = socketWrapper.getSocket();
         // Process the connection
         int step = 1;
         try {
@@ -747,7 +747,7 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
     @Override
     protected void destroySocket(Long socket) {
         countDownConnection();
-        destroySocketInternal(socket.longValue());
+        destroySocketInternal(socket);
     }
 
     private void destroySocketInternal(long socket) {
@@ -1558,9 +1558,9 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
             Map<Long,Long> merged = new HashMap<>(startCount);
             for (int n = 0; n < startCount; n++) {
                 Long newValue = merged.merge(desc[2 * n + 1], desc[2 * n],
-                        (v1, v2) -> v1.longValue() | v2.longValue());
+                        (v1, v2) -> v1 | v2);
                 if (log.isDebugEnabled()) {
-                    if (newValue.longValue() != desc[2*n]) {
+                    if (newValue != desc[2*n]) {
                         log.debug(sm.getString("endpoint.apr.pollMergeEvents",
                                 desc[2 * n + 1], desc[2 * n], newValue));
                     }
@@ -1568,8 +1568,8 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
             }
             int i = 0;
             for (Map.Entry<Long,Long> entry : merged.entrySet()) {
-                desc[i++] = entry.getValue().longValue();
-                desc[i++] = entry.getKey().longValue();
+                desc[i++] = entry.getValue();
+                desc[i++] = entry.getKey();
             }
             return merged.size();
         }
@@ -1947,7 +1947,7 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
             synchronized (socket) {
                 if (!deferAccept) {
                     if (setSocketOptions(socket)) {
-                        getPoller().add(socket.getSocket().longValue(),
+                        getPoller().add(socket.getSocket(),
                                 getConnectionTimeout(), Poll.APR_POLLIN);
                     } else {
                         // Close socket and pool
@@ -2141,9 +2141,9 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
                 checkClosed();
                 if (getBlockingStatus() == block) {
                     if (block) {
-                        Socket.timeoutSet(getSocket().longValue(), getReadTimeout() * 1000);
+                        Socket.timeoutSet(getSocket(), getReadTimeout() * 1000);
                     }
-                    result = Socket.recvb(getSocket().longValue(), to, to.position(),
+                    result = Socket.recvb(getSocket(), to, to.position(),
                             to.remaining());
                     readDone = true;
                 }
@@ -2158,15 +2158,15 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
                     // Set the current settings for this socket
                     setBlockingStatus(block);
                     if (block) {
-                        Socket.timeoutSet(getSocket().longValue(), getReadTimeout() * 1000);
+                        Socket.timeoutSet(getSocket(), getReadTimeout() * 1000);
                     } else {
-                        Socket.timeoutSet(getSocket().longValue(), 0);
+                        Socket.timeoutSet(getSocket(), 0);
                     }
                     // Downgrade the lock
                     readLock.lock();
                     try {
                         writeLock.unlock();
-                        result = Socket.recvb(getSocket().longValue(), to, to.position(),
+                        result = Socket.recvb(getSocket(), to, to.position(),
                                 to.remaining());
                     } finally {
                         readLock.unlock();
@@ -2243,7 +2243,7 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
             if (sslOutputBuffer != null) {
                 ByteBufferUtils.cleanDirectBuffer(sslOutputBuffer);
             }
-            ((AprEndpoint) getEndpoint()).getPoller().close(getSocket().longValue());
+            ((AprEndpoint) getEndpoint()).getPoller().close(getSocket());
         }
 
 
@@ -2257,7 +2257,7 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
                 checkClosed();
                 if (getBlockingStatus() == block) {
                     if (block) {
-                        Socket.timeoutSet(getSocket().longValue(), getWriteTimeout() * 1000);
+                        Socket.timeoutSet(getSocket(), getWriteTimeout() * 1000);
                     }
                     doWriteInternal(from);
                     return;
@@ -2272,9 +2272,9 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
                 // Set the current settings for this socket
                 setBlockingStatus(block);
                 if (block) {
-                    Socket.timeoutSet(getSocket().longValue(), getWriteTimeout() * 1000);
+                    Socket.timeoutSet(getSocket(), getWriteTimeout() * 1000);
                 } else {
-                    Socket.timeoutSet(getSocket().longValue(), 0);
+                    Socket.timeoutSet(getSocket(), 0);
                 }
 
                 // Downgrade the lock
@@ -2311,13 +2311,13 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
                         // APR + SSL requires that exactly the same parameters are
                         // passed when re-attempting the write
                     }
-                    thisTime = Socket.sendb(getSocket().longValue(), sslOutputBuffer,
+                    thisTime = Socket.sendb(getSocket(), sslOutputBuffer,
                             sslOutputBuffer.position(), sslOutputBuffer.limit());
                     if (thisTime > 0) {
                         sslOutputBuffer.position(sslOutputBuffer.position() + thisTime);
                     }
                 } else {
-                    thisTime = Socket.sendb(getSocket().longValue(), from, from.position(),
+                    thisTime = Socket.sendb(getSocket(), from, from.position(),
                             from.remaining());
                     if (thisTime > 0) {
                         from.position(from.position() + thisTime);
@@ -2356,7 +2356,7 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
                 }
                 Poller p = ((AprEndpoint) getEndpoint()).getPoller();
                 if (p != null) {
-                    p.add(getSocket().longValue(), getReadTimeout(), Poll.APR_POLLIN);
+                    p.add(getSocket(), getReadTimeout(), Poll.APR_POLLIN);
                 }
             }
         }
@@ -2373,7 +2373,7 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
                     log.debug(sm.getString("endpoint.debug.registerWrite", this));
                 }
                 ((AprEndpoint) getEndpoint()).getPoller().add(
-                        getSocket().longValue(), getWriteTimeout(), Poll.APR_POLLOUT);
+                        getSocket(), getWriteTimeout(), Poll.APR_POLLOUT);
             }
         }
 
@@ -2386,7 +2386,7 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
 
         @Override
         public SendfileState processSendfile(SendfileDataBase sendfileData) {
-            ((SendfileData) sendfileData).socket = getSocket().longValue();
+            ((SendfileData) sendfileData).socket = getSocket();
             return ((AprEndpoint) getEndpoint()).getSendfile().add((SendfileData) sendfileData);
         }
 
@@ -2397,7 +2397,7 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
                 return;
             }
             try {
-                long socket = getSocket().longValue();
+                long socket = getSocket();
                 long sa = Address.get(Socket.APR_REMOTE, socket);
                 remoteAddr = Address.getip(sa);
             } catch (Exception e) {
@@ -2412,7 +2412,7 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
                 return;
             }
             try {
-                long socket = getSocket().longValue();
+                long socket = getSocket();
                 long sa = Address.get(Socket.APR_REMOTE, socket);
                 remoteHost = Address.getnameinfo(sa, 0);
                 if (remoteAddr == null) {
@@ -2430,7 +2430,7 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
                 return;
             }
             try {
-                long socket = getSocket().longValue();
+                long socket = getSocket();
                 long sa = Address.get(Socket.APR_REMOTE, socket);
                 Sockaddr addr = Address.getInfo(sa);
                 remotePort = addr.port;
@@ -2446,7 +2446,7 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
                 return;
             }
             try {
-                long socket = getSocket().longValue();
+                long socket = getSocket();
                 long sa = Address.get(Socket.APR_LOCAL, socket);
                 localName =Address.getnameinfo(sa, 0);
             } catch (Exception e) {
@@ -2461,7 +2461,7 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
                 return;
             }
             try {
-                long socket = getSocket().longValue();
+                long socket = getSocket();
                 long sa = Address.get(Socket.APR_LOCAL, socket);
                 localAddr = Address.getip(sa);
             } catch (Exception e) {
@@ -2476,7 +2476,7 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
                 return;
             }
             try {
-                long socket = getSocket().longValue();
+                long socket = getSocket();
                 long sa = Address.get(Socket.APR_LOCAL, socket);
                 Sockaddr addr = Address.getInfo(sa);
                 localPort = addr.port;
@@ -2498,7 +2498,7 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
 
         @Override
         public void doClientAuth(SSLSupport sslSupport) throws IOException {
-            long socket = getSocket().longValue();
+            long socket = getSocket();
             // Configure connection to require a certificate. This requires a
             // re-handshake and must block until the re-handshake completes.
             // Therefore, make sure socket is in blocking mode.
@@ -2509,7 +2509,7 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
                 readLock.lock();
                 try {
                     if (getBlockingStatus()) {
-                        Socket.timeoutSet(getSocket().longValue(), getReadTimeout() * 1000);
+                        Socket.timeoutSet(getSocket(), getReadTimeout() * 1000);
 
                         SSLSocket.setVerify(socket, SSL.SSL_CVERIFY_REQUIRE, -1);
                         SSLSocket.renegotiate(socket);
@@ -2525,7 +2525,7 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
                     try {
                         // Set the current settings for this socket
                         setBlockingStatus(true);
-                        Socket.timeoutSet(getSocket().longValue(), getReadTimeout() * 1000);
+                        Socket.timeoutSet(getSocket(), getReadTimeout() * 1000);
                         // Downgrade the lock
                         readLock.lock();
                         try {
@@ -2561,7 +2561,7 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
                     return null;
                 }
                 try {
-                    return SSLSocket.getInfoS(getSocket().longValue(), id);
+                    return SSLSocket.getInfoS(getSocket(), id);
                 } catch (Exception e) {
                     throw new IllegalStateException(e);
                 }
@@ -2574,7 +2574,7 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
                     return 0;
                 }
                 try {
-                    return SSLSocket.getInfoI(getSocket().longValue(), id);
+                    return SSLSocket.getInfoI(getSocket(), id);
                 } catch (Exception e) {
                     throw new IllegalStateException(e);
                 }
@@ -2587,7 +2587,7 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
                     return null;
                 }
                 try {
-                    return SSLSocket.getInfoB(getSocket().longValue(), id);
+                    return SSLSocket.getInfoB(getSocket(), id);
                 } catch (Exception e) {
                     throw new IllegalStateException(e);
                 }

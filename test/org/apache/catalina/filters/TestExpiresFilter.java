@@ -466,8 +466,8 @@ public class TestExpiresFilter extends TomcatBaseTest {
 
             String contentType = getSingleHeader("Content-Type", responseHeaders);
 
-            int deltaInSeconds = Math.abs(actualMaxAgeInSeconds.intValue() -
-                    expectedMaxAgeInSeconds.intValue());
+            int deltaInSeconds = Math.abs(actualMaxAgeInSeconds -
+                    expectedMaxAgeInSeconds);
             Assert.assertTrue("actualMaxAgeInSeconds: " +
                     actualMaxAgeInSeconds + ", expectedMaxAgeInSeconds: " +
                     expectedMaxAgeInSeconds + ", request time: " +
@@ -566,6 +566,6 @@ public class TestExpiresFilter extends TomcatBaseTest {
         }
 
         Assert.assertNotNull(actualMaxAgeInSeconds);
-        Assert.assertTrue(Math.abs(actualMaxAgeInSeconds.intValue() - 420) < 3);
+        Assert.assertTrue(Math.abs(actualMaxAgeInSeconds - 420) < 3);
     }
 }

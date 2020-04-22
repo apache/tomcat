@@ -210,7 +210,7 @@ public class StandardManager extends ManagerBase {
                         getSessionAttributeValueClassNamePattern(),
                         getWarnOnSessionAttributeFilterFailure())) {
                     Integer count = (Integer) ois.readObject();
-                    int n = count.intValue();
+                    int n = count;
                     if (log.isDebugEnabled())
                         log.debug("Loading " + n + " persisted sessions");
                     for (int i = 0; i < n; i++) {

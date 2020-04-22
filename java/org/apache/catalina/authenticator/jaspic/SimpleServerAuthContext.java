@@ -61,7 +61,7 @@ public class SimpleServerAuthContext implements ServerAuthContext {
     @Override
     public AuthStatus secureResponse(MessageInfo messageInfo, Subject serviceSubject)
             throws AuthException {
-        ServerAuthModule module = modules.get(((Integer) messageInfo.getMap().get("moduleIndex")).intValue());
+        ServerAuthModule module = modules.get((Integer) messageInfo.getMap().get("moduleIndex"));
         return module.secureResponse(messageInfo, serviceSubject);
     }
 

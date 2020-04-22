@@ -31,7 +31,7 @@ public class ContainerThreadMarker {
         if (flag == null) {
             return false;
         } else {
-            return flag.booleanValue();
+            return flag;
         }
     }
 

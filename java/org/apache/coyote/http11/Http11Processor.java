@@ -1008,10 +1008,10 @@ public class Http11Processor extends AbstractProcessor {
             // No entity body sent here
             outputBuffer.addActiveFilter(outputFilters[Constants.VOID_FILTER]);
             contentDelimitation = true;
-            long pos = ((Long) request.getAttribute(
-                    org.apache.coyote.Constants.SENDFILE_FILE_START_ATTR)).longValue();
-            long end = ((Long) request.getAttribute(
-                    org.apache.coyote.Constants.SENDFILE_FILE_END_ATTR)).longValue();
+            long pos = (Long) request.getAttribute(
+                    org.apache.coyote.Constants.SENDFILE_FILE_START_ATTR);
+            long end = (Long) request.getAttribute(
+                    org.apache.coyote.Constants.SENDFILE_FILE_END_ATTR);
             sendfileData = socketWrapper.createSendfileData(fileName, pos, end - pos);
         }
     }

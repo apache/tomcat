@@ -36,7 +36,7 @@ public final class AstAnd extends BooleanNode {
             throws ELException {
         Object obj = children[0].getValue(ctx);
         Boolean b = coerceToBoolean(ctx, obj, true);
-        if (!b.booleanValue()) {
+        if (!b) {
             return b;
         }
         obj = children[1].getValue(ctx);

@@ -598,7 +598,7 @@ public class SmapUtil {
                 for (int i = 0; i < extraSmap.size(); i++) {
                     iOutputStartLine += iOutputLineIncrement;
                     smap.addLineData(
-                        iInputStartLine+extraSmap.get(i).intValue(),
+                        iInputStartLine+ extraSmap.get(i),
                         fileName,
                         1,
                         iOutputStartLine,

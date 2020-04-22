@@ -128,7 +128,7 @@ public abstract class AbstractSingleArchiveResourceSet extends AbstractArchiveRe
             }
         }
 
-        return multiRelease.booleanValue();
+        return multiRelease;
     }
 
 

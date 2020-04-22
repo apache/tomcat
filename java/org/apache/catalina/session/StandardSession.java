@@ -1541,12 +1541,12 @@ public class StandardSession implements HttpSession, Session, Serializable {
 
         // Deserialize the scalar instance variables (except Manager)
         authType = null;        // Transient (may be set later)
-        creationTime = ((Long) stream.readObject()).longValue();
-        lastAccessedTime = ((Long) stream.readObject()).longValue();
-        maxInactiveInterval = ((Integer) stream.readObject()).intValue();
-        isNew = ((Boolean) stream.readObject()).booleanValue();
-        isValid = ((Boolean) stream.readObject()).booleanValue();
-        thisAccessedTime = ((Long) stream.readObject()).longValue();
+        creationTime = (Long) stream.readObject();
+        lastAccessedTime = (Long) stream.readObject();
+        maxInactiveInterval = (Integer) stream.readObject();
+        isNew = (Boolean) stream.readObject();
+        isValid = (Boolean) stream.readObject();
+        thisAccessedTime = (Long) stream.readObject();
         principal = null;        // Transient (may be set later)
         //        setId((String) stream.readObject());
         id = (String) stream.readObject();
@@ -1577,7 +1577,7 @@ public class StandardSession implements HttpSession, Session, Serializable {
         // Deserialize the attribute count and attribute values
         if (attributes == null)
             attributes = new ConcurrentHashMap<>();
-        int n = ((Integer) nextObject).intValue();
+        int n = (Integer) nextObject;
         boolean isValidSave = isValid;
         isValid = true;
         for (int i = 0; i < n; i++) {

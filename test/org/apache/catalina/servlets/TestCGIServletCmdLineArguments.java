@@ -93,7 +93,7 @@ public class TestCGIServletCmdLineArguments {
 
     @Test
     public void test() {
-        if (allowed.booleanValue()) {
+        if (allowed) {
             Assert.assertTrue(defaultDecodedPatternWindows.matcher(argument).matches());
         } else {
             Assert.assertFalse(defaultDecodedPatternWindows.matcher(argument).matches());

@@ -23,7 +23,7 @@
       Context envCtx = (Context) initCtx.lookup("java:comp/env");
       Integer test = (Integer) envCtx.lookup("bug53465");
 
-      out.print("<p>" + test.intValue() + "</p>");
+      out.print("<p>" + test + "</p>");
     %>
   </body>
 </head>

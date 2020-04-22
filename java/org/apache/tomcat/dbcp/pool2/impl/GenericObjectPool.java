@@ -891,7 +891,7 @@ public class GenericObjectPool<T> extends BaseGenericObjectPool<T>
             }
         }
 
-        if (!create.booleanValue()) {
+        if (!create) {
             return null;
         }
 

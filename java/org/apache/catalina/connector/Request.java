@@ -1743,7 +1743,7 @@ public class Request implements HttpServletRequest {
             return true;
         }
 
-        return asyncSupported.booleanValue();
+        return asyncSupported;
     }
 
     @Override

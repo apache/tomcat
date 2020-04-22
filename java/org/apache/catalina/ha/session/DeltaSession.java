@@ -820,13 +820,13 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
 
         // Deserialize the scalar instance variables (except Manager)
         authType = null; // Transient only
-        creationTime = ( (Long) stream.readObject()).longValue();
-        lastAccessedTime = ( (Long) stream.readObject()).longValue();
-        maxInactiveInterval = ( (Integer) stream.readObject()).intValue();
-        isNew = ( (Boolean) stream.readObject()).booleanValue();
-        isValid = ( (Boolean) stream.readObject()).booleanValue();
-        thisAccessedTime = ( (Long) stream.readObject()).longValue();
-        version = ( (Long) stream.readObject()).longValue();
+        creationTime = (Long) stream.readObject();
+        lastAccessedTime = (Long) stream.readObject();
+        maxInactiveInterval = (Integer) stream.readObject();
+        isNew = (Boolean) stream.readObject();
+        isValid = (Boolean) stream.readObject();
+        thisAccessedTime = (Long) stream.readObject();
+        version = (Long) stream.readObject();
         boolean hasPrincipal = stream.readBoolean();
         principal = null;
         if (hasPrincipal) {
@@ -839,7 +839,7 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
 
         // Deserialize the attribute count and attribute values
         if (attributes == null) attributes = new ConcurrentHashMap<>();
-        int n = ( (Integer) stream.readObject()).intValue();
+        int n = (Integer) stream.readObject();
         boolean isValidSave = isValid;
         isValid = true;
         for (int i = 0; i < n; i++) {
@@ -866,7 +866,7 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
         isValid = isValidSave;
 
         // Session listeners
-        n = ((Integer) stream.readObject()).intValue();
+        n = (Integer) stream.readObject();
         if (listeners == null || n > 0) {
             listeners = new ArrayList<>();
         }

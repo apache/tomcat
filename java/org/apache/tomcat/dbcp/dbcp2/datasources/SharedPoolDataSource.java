@@ -200,8 +200,8 @@ public class SharedPoolDataSource extends InstanceKeyDataSource {
     @Override
     protected void setupDefaults(final Connection connection, final String userName) throws SQLException {
         final Boolean defaultAutoCommit = isDefaultAutoCommit();
-        if (defaultAutoCommit != null && connection.getAutoCommit() != defaultAutoCommit.booleanValue()) {
-            connection.setAutoCommit(defaultAutoCommit.booleanValue());
+        if (defaultAutoCommit != null && connection.getAutoCommit() != defaultAutoCommit) {
+            connection.setAutoCommit(defaultAutoCommit);
         }
 
         final int defaultTransactionIsolation = getDefaultTransactionIsolation();
@@ -210,8 +210,8 @@ public class SharedPoolDataSource extends InstanceKeyDataSource {
         }
 
         final Boolean defaultReadOnly = isDefaultReadOnly();
-        if (defaultReadOnly != null && connection.isReadOnly() != defaultReadOnly.booleanValue()) {
-            connection.setReadOnly(defaultReadOnly.booleanValue());
+        if (defaultReadOnly != null && connection.isReadOnly() != defaultReadOnly) {
+            connection.setReadOnly(defaultReadOnly);
         }
     }
 

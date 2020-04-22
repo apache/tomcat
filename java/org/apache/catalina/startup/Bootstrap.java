@@ -413,7 +413,7 @@ public final class Bootstrap {
         Method method =
             catalinaDaemon.getClass().getMethod("getAwait", paramTypes);
         Boolean b=(Boolean)method.invoke(catalinaDaemon, paramValues);
-        return b.booleanValue();
+        return b;
     }
 
 

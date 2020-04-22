@@ -130,7 +130,7 @@ public final class FastHttpDateFormat {
 
         Long cachedDate = parseCache.get(value);
         if (cachedDate != null) {
-            return cachedDate.longValue();
+            return cachedDate;
         }
 
         long date = -1;
