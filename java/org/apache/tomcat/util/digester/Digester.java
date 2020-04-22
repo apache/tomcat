@@ -85,9 +85,9 @@ public class Digester extends DefaultHandler2 {
         String className = System.getProperty("org.apache.tomcat.util.digester.PROPERTY_SOURCE");
         if (className != null) {
             ClassLoader[] cls = new ClassLoader[] {Digester.class.getClassLoader(),Thread.currentThread().getContextClassLoader()};
-            for (int i = 0; i < cls.length; i++) {
+            for (ClassLoader cl : cls) {
                 try {
-                    Class<?> clazz = Class.forName(className, true, cls[i]);
+                    Class<?> clazz = Class.forName(className, true, cl);
                     propertySource = (IntrospectionUtils.PropertySource) clazz.newInstance();
                     break;
                 } catch (Throwable t) {
@@ -1007,9 +1007,9 @@ public class Digester extends DefaultHandler2 {
         List<Rule> rules = matches.pop();
         if ((rules != null) && (rules.size() > 0)) {
             String bodyText = this.bodyText.toString().intern();
-            for (int i = 0; i < rules.size(); i++) {
+            for (Rule value : rules) {
                 try {
-                    Rule rule = rules.get(i);
+                    Rule rule = value;
                     if (debug) {
                         log.debug("  Fire body() for " + rule);
                     }
@@ -1254,9 +1254,9 @@ public class Digester extends DefaultHandler2 {
         List<Rule> rules = getRules().match(namespaceURI, match);
         matches.push(rules);
         if ((rules != null) && (rules.size() > 0)) {
-            for (int i = 0; i < rules.size(); i++) {
+            for (Rule value : rules) {
                 try {
-                    Rule rule = rules.get(i);
+                    Rule rule = value;
                     if (debug) {
                         log.debug("  Fire begin() for " + rule);
                     }

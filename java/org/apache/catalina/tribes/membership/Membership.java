@@ -205,13 +205,12 @@ public class Membership implements Cloneable {
      * @return the list of expired members
      */
     public synchronized MemberImpl[] expire(long maxtime) {
-        if(!hasMembers() )
+        if(!hasMembers()) {
            return EMPTY_MEMBERS;
+        }
 
         ArrayList<MemberImpl> list = null;
-        Iterator<MbrEntry> i = map.values().iterator();
-        while(i.hasNext()) {
-            MbrEntry entry = i.next();
+        for (MbrEntry entry : map.values()) {
             if( entry.hasExpired(maxtime) ) {
                 if(list == null) // only need a list when members are expired (smaller gc)
                     list = new java.util.ArrayList<MemberImpl>();
@@ -222,8 +221,8 @@ public class Membership implements Cloneable {
         if(list != null) {
             MemberImpl[] result = new MemberImpl[list.size()];
             list.toArray(result);
-            for( int j=0; j<result.length; j++) {
-                removeMember(result[j]);
+            for (MemberImpl member : result) {
+                removeMember(member);
             }
             return result;
         } else {
@@ -239,16 +238,16 @@ public class Membership implements Cloneable {
     }
 
 
-    public MemberImpl getMember(Member mbr) {
-        if(hasMembers()) {
-            MemberImpl result = null;
-            for ( int i=0; i<this.members.length && result==null; i++ ) {
-                if ( members[i].equals(mbr) ) result = members[i];
-            }//for
-            return result;
-        } else {
-            return null;
+    public Member getMember(Member mbr) {
+        Member[] members = this.members;
+        if (members.length > 0) {
+            for (Member member : members) {
+                if (member.equals(mbr)) {
+                    return member;
+                }
+            }
         }
+        return null;
     }
 
     public boolean contains(Member mbr) {

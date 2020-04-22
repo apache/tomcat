@@ -89,9 +89,9 @@ public final class ClassLoaderFactory {
 
         // Add unpacked directories
         if (unpacked != null) {
-            for (int i = 0; i < unpacked.length; i++)  {
-                File file = unpacked[i];
-                if (!file.exists() || !file.canRead())
+            for (File value : unpacked) {
+                File file = value;
+                if (!file.canRead())
                     continue;
                 file = new File(file.getCanonicalPath() + File.separator);
                 URL url = file.toURI().toURL();
@@ -103,20 +103,18 @@ public final class ClassLoaderFactory {
 
         // Add packed directory JAR files
         if (packed != null) {
-            for (int i = 0; i < packed.length; i++) {
-                File directory = packed[i];
-                if (!directory.isDirectory() || !directory.exists() ||
-                    !directory.canRead())
+            for (File directory : packed) {
+                if (!directory.isDirectory() || !directory.canRead())
                     continue;
                 String filenames[] = directory.list();
                 if (filenames == null) {
                     continue;
                 }
-                for (int j = 0; j < filenames.length; j++) {
-                    String filename = filenames[j].toLowerCase(Locale.ENGLISH);
+                for (String s : filenames) {
+                    String filename = s.toLowerCase(Locale.ENGLISH);
                     if (!filename.endsWith(".jar"))
                         continue;
-                    File file = new File(directory, filenames[j]);
+                    File file = new File(directory, s);
                     if (log.isDebugEnabled())
                         log.debug("  Including jar file " + file.getAbsolutePath());
                     URL url = file.toURI().toURL();
@@ -202,18 +200,18 @@ public final class ClassLoaderFactory {
                     if (filenames == null) {
                         continue;
                     }
-                    for (int j = 0; j < filenames.length; j++) {
-                        String filename = filenames[j].toLowerCase(Locale.ENGLISH);
+                    for (String s : filenames) {
+                        String filename = s.toLowerCase(Locale.ENGLISH);
                         if (!filename.endsWith(".jar"))
                             continue;
-                        File file = new File(directory, filenames[j]);
+                        File file = new File(directory, s);
                         file = file.getCanonicalFile();
                         if (!validateFile(file, RepositoryType.JAR)) {
                             continue;
                         }
                         if (log.isDebugEnabled())
                             log.debug("    Including glob jar file "
-                                + file.getAbsolutePath());
+                                    + file.getAbsolutePath());
                         URL url = buildClassLoaderUrl(file);
                         set.add(url);
                     }

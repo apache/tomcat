@@ -338,24 +338,23 @@ public class JspCServletContext implements ServletContext {
         if (!path.endsWith("/"))
             path += "/";
         String basePath = getRealPath(path);
-        if (basePath == null)
-            return (thePaths);
-        File theBaseDir = new File(basePath);
-        if (!theBaseDir.exists() || !theBaseDir.isDirectory())
-            return (thePaths);
-        String theFiles[] = theBaseDir.list();
-        if (theFiles == null) {
-            return thePaths;
+        if (basePath != null) {
+            File theBaseDir = new File(basePath);
+            if (theBaseDir.isDirectory()) {
+                String theFiles[] = theBaseDir.list();
+                if (theFiles != null) {
+                    for (String theFile : theFiles) {
+                        File testFile = new File(basePath + File.separator + theFile);
+                        if (testFile.isFile()) {
+                            thePaths.add(path + theFile);
+                        } else if (testFile.isDirectory()) {
+                            thePaths.add(path + theFile + "/");
+                        }
+                    }
+                }
+            }
         }
-        for (int i = 0; i < theFiles.length; i++) {
-            File testFile = new File(basePath + File.separator + theFiles[i]);
-            if (testFile.isFile())
-                thePaths.add(path + theFiles[i]);
-            else if (testFile.isDirectory())
-                thePaths.add(path + theFiles[i] + "/");
-        }
-        return (thePaths);
-
+        return thePaths;
     }
 
 

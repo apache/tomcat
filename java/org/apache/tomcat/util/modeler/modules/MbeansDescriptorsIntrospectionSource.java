@@ -139,8 +139,8 @@ public class MbeansDescriptorsIntrospectionSource extends ModelerSource
      * @return boolean True if class is supported
      */
     private boolean supportedType(Class<?> ret) {
-        for (int i = 0; i < supportedTypes.length; i++) {
-            if (ret == supportedTypes[i]) {
+        for (Class<?> supportedType : supportedTypes) {
+            if (ret == supportedType) {
                 return true;
             }
         }
@@ -203,76 +203,78 @@ public class MbeansDescriptorsIntrospectionSource extends ModelerSource
             Hashtable<String,Method> getAttMap, Hashtable<String,Method> setAttMap,
             Hashtable<String,Method> invokeAttMap) {
 
-        for (int j = 0; j < methods.length; ++j) {
-            String name = methods[j].getName();
+        for (Method method : methods) {
+            String name = method.getName();
 
-            if (Modifier.isStatic(methods[j].getModifiers())) {
+            if (Modifier.isStatic(method.getModifiers())) {
                 continue;
             }
-            if (!Modifier.isPublic(methods[j].getModifiers())) {
+            if (!Modifier.isPublic(method.getModifiers())) {
                 if (log.isDebugEnabled()) {
-                    log.debug("Not public " + methods[j] );
+                    log.debug("Not public " + method);
                 }
                 continue;
             }
-            if (methods[j].getDeclaringClass() == Object.class) {
+            if (method.getDeclaringClass() == Object.class) {
                 continue;
             }
-            Class<?> params[] = methods[j].getParameterTypes();
+            Class<?> params[] = method.getParameterTypes();
 
-            if (name.startsWith("get") && params.length==0) {
-                Class<?> ret = methods[j].getReturnType();
+            if (name.startsWith("get") && params.length == 0) {
+                Class<?> ret = method.getReturnType();
                 if (!supportedType(ret)) {
                     if (log.isDebugEnabled()) {
-                        log.debug("Unsupported type " + methods[j]);
+                        log.debug("Unsupported type " + method);
                     }
                     continue;
                 }
-                name=unCapitalize(name.substring(3));
+                name = unCapitalize(name.substring(3));
 
-                getAttMap.put(name, methods[j]);
+                getAttMap.put(name, method);
                 // just a marker, we don't use the value
-                attMap.put(name, methods[j]);
-            } else if(name.startsWith("is") && params.length == 0) {
-                Class<?> ret = methods[j].getReturnType();
+                attMap.put(name, method);
+            }
+            else if (name.startsWith("is") && params.length == 0) {
+                Class<?> ret = method.getReturnType();
                 if (Boolean.TYPE != ret) {
                     if (log.isDebugEnabled()) {
-                        log.debug("Unsupported type " + methods[j] + " " + ret );
+                        log.debug("Unsupported type " + method + " " + ret);
                     }
                     continue;
                 }
                 name = unCapitalize(name.substring(2));
 
-                getAttMap.put(name, methods[j]);
+                getAttMap.put(name, method);
                 // just a marker, we don't use the value
-                attMap.put(name, methods[j]);
+                attMap.put(name, method);
 
-            } else if (name.startsWith("set") && params.length == 1) {
+            }
+            else if (name.startsWith("set") && params.length == 1) {
                 if (!supportedType(params[0])) {
                     if (log.isDebugEnabled()) {
-                        log.debug("Unsupported type " + methods[j] + " " + params[0]);
+                        log.debug("Unsupported type " + method + " " + params[0]);
                     }
                     continue;
                 }
                 name = unCapitalize(name.substring(3));
-                setAttMap.put(name, methods[j]);
-                attMap.put(name, methods[j]);
+                setAttMap.put(name, method);
+                attMap.put(name, method);
             } else {
                 if (params.length == 0) {
-                    if (specialMethods.get(methods[j].getName()) != null) {
+                    if (specialMethods.get(method.getName()) != null) {
                         continue;
                     }
-                    invokeAttMap.put(name, methods[j]);
+                    invokeAttMap.put(name, method);
                 } else {
                     boolean supported = true;
-                    for (int i = 0; i < params.length; i++ ) {
-                        if (!supportedType(params[i])) {
+                    for (Class<?> param : params) {
+                        if (!supportedType(param)) {
                             supported = false;
                             break;
                         }
                     }
                     if (supported) {
-                        invokeAttMap.put( name, methods[j]);
+                        invokeAttMap.put(name, method);
                     }
                 }
             }

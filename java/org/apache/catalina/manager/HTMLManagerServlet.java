@@ -960,10 +960,9 @@ public final class HTMLManagerServlet extends ManagerServlet {
             return 0;
         }
         int nbAffectedSessions = 0;
-        for (int i = 0; i < sessionIds.length; ++i) {
-            String sessionId = sessionIds[i];
+        for (String sessionId : sessionIds) {
             HttpSession session =
-                getSessionForNameAndId(cn, sessionId, smClient).getSession();
+                    getSessionForNameAndId(cn, sessionId, smClient).getSession();
             if (null == session) {
                 // Shouldn't happen, but let's play nice...
                 if (debug >= 1) {

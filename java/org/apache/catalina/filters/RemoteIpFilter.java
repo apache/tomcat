@@ -921,8 +921,8 @@ public class RemoteIpFilter implements Filter {
         if (forwardedProtocols.length == 0) {
             return false;
         }
-        for (int i = 0; i < forwardedProtocols.length; i++) {
-            if (!protocolHeaderHttpsValue.equalsIgnoreCase(forwardedProtocols[i])) {
+        for (String forwardedProtocol : forwardedProtocols) {
+            if (!protocolHeaderHttpsValue.equalsIgnoreCase(forwardedProtocol)) {
                 return false;
             }
         }

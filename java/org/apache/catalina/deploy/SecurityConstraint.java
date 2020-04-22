@@ -242,10 +242,10 @@ public class SecurityConstraint implements Serializable {
     public boolean findAuthRole(String role) {
 
         if (role == null)
-            return (false);
-        for (int i = 0; i < authRoles.length; i++) {
-            if (role.equals(authRoles[i]))
-                return (true);
+            return false;
+        for (String authRole : authRoles) {
+            if (role.equals(authRole))
+                return true;
         }
         return (false);
 
@@ -274,10 +274,10 @@ public class SecurityConstraint implements Serializable {
     public SecurityCollection findCollection(String name) {
 
         if (name == null)
-            return (null);
-        for (int i = 0; i < collections.length; i++) {
-            if (name.equals(collections[i].getName()))
-                return (collections[i]);
+            return null;
+        for (SecurityCollection collection : collections) {
+            if (name.equals(collection.getName()))
+                return collection;
         }
         return (null);
 
@@ -310,13 +310,13 @@ public class SecurityConstraint implements Serializable {
             return (false);
 
         // Check all of the collections included in this constraint
-        for (int i = 0; i < collections.length; i++) {
-            if (!collections[i].findMethod(method))
+        for (SecurityCollection collection : collections) {
+            if (!collection.findMethod(method))
                 continue;
-            String patterns[] = collections[i].findPatterns();
-            for (int j = 0; j < patterns.length; j++) {
-                if (matchPattern(uri, patterns[j]))
-                    return (true);
+            String patterns[] = collection.findPatterns();
+            for (String pattern : patterns) {
+                if (matchPattern(uri, pattern))
+                    return true;
             }
         }
 

@@ -118,9 +118,9 @@ public class RequestDumperFilter implements Filter {
             doLog("       contextPath", hRequest.getContextPath());
             Cookie cookies[] = hRequest.getCookies();
             if (cookies != null) {
-                for (int i = 0; i < cookies.length; i++) {
-                    doLog("            cookie", cookies[i].getName() +
-                            "=" + cookies[i].getValue());
+                for (Cookie cookie : cookies) {
+                    doLog("            cookie", cookie.getName() +
+                            "=" + cookie.getValue());
                 }
             }
             Enumeration<String> hnames = hRequest.getHeaderNames();

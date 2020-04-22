@@ -40,26 +40,26 @@ public class TesterValidator {
     private static void doTestBug53867() {
         int count = 100000;
 
-        for (int j = 0; j < bug53867TestData.length; j++) {
-            Assert.assertEquals(doTestBug53867OldVersion(bug53867TestData[j]),
-                    Validator.xmlEscape(bug53867TestData[j]));
+        for (String testDatum : bug53867TestData) {
+            Assert.assertEquals(doTestBug53867OldVersion(testDatum),
+                    Validator.xmlEscape(testDatum));
         }
 
         for (int i = 0; i < 100; i++) {
-            for (int j = 0; j < bug53867TestData.length; j++) {
-                doTestBug53867OldVersion(bug53867TestData[j]);
+            for (String bug53867TestDatum : bug53867TestData) {
+                doTestBug53867OldVersion(bug53867TestDatum);
             }
         }
         for (int i = 0; i < 100; i++) {
-            for (int j = 0; j < bug53867TestData.length; j++) {
-                Validator.xmlEscape(bug53867TestData[j]);
+            for (String bug53867TestDatum : bug53867TestData) {
+                Validator.xmlEscape(bug53867TestDatum);
             }
         }
 
         long start = System.currentTimeMillis();
         for (int i = 0; i < count; i++) {
-            for (int j = 0; j < bug53867TestData.length; j++) {
-                doTestBug53867OldVersion(bug53867TestData[j]);
+            for (String bug53867TestDatum : bug53867TestData) {
+                doTestBug53867OldVersion(bug53867TestDatum);
             }
         }
         System.out.println(
@@ -67,8 +67,8 @@ public class TesterValidator {
 
         start = System.currentTimeMillis();
         for (int i = 0; i < count; i++) {
-            for (int j = 0; j < bug53867TestData.length; j++) {
-                Validator.xmlEscape(bug53867TestData[j]);
+            for (String bug53867TestDatum : bug53867TestData) {
+                Validator.xmlEscape(bug53867TestDatum);
             }
         }
         System.out.println(

@@ -602,8 +602,8 @@ public final class Mapper {
                 if (removeMap(oldWrappers, newWrappers, name)) {
                     // Recalculate nesting
                     context.nesting = 0;
-                    for (int i = 0; i < newWrappers.length; i++) {
-                        int slashCount = slashCount(newWrappers[i].name);
+                    for (Wrapper newWrapper : newWrappers) {
+                        int slashCount = slashCount(newWrapper.name);
                         if (slashCount > context.nesting) {
                             context.nesting = slashCount;
                         }

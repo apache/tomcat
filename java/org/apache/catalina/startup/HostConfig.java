@@ -611,11 +611,11 @@ public class HostConfig
         ExecutorService es = host.getStartStopExecutor();
         List<Future<?>> results = new ArrayList<Future<?>>();
 
-        for (int i = 0; i < files.length; i++) {
-            File contextXml = new File(configBase, files[i]);
+        for (String file : files) {
+            File contextXml = new File(configBase, file);
 
-            if (files[i].toLowerCase(Locale.ENGLISH).endsWith(".xml")) {
-                ContextName cn = new ContextName(files[i], true);
+            if (file.toLowerCase(Locale.ENGLISH).endsWith(".xml")) {
+                ContextName cn = new ContextName(file, true);
 
                 if (isServiced(cn.getName()) || deploymentExists(cn.getName()))
                     continue;
@@ -808,17 +808,17 @@ public class HostConfig
         ExecutorService es = host.getStartStopExecutor();
         List<Future<?>> results = new ArrayList<Future<?>>();
 
-        for (int i = 0; i < files.length; i++) {
+        for (String file : files) {
 
-            if (files[i].equalsIgnoreCase("META-INF"))
+            if (file.equalsIgnoreCase("META-INF"))
                 continue;
-            if (files[i].equalsIgnoreCase("WEB-INF"))
+            if (file.equalsIgnoreCase("WEB-INF"))
                 continue;
-            File war = new File(appBase, files[i]);
-            if (files[i].toLowerCase(Locale.ENGLISH).endsWith(".war") &&
-                    war.isFile() && !invalidWars.contains(files[i]) ) {
+            File war = new File(appBase, file);
+            if (file.toLowerCase(Locale.ENGLISH).endsWith(".war") &&
+                    war.isFile() && !invalidWars.contains(file)) {
 
-                ContextName cn = new ContextName(files[i], true);
+                ContextName cn = new ContextName(file, true);
 
                 if (isServiced(cn.getName())) {
                     continue;
@@ -851,8 +851,8 @@ public class HostConfig
                 // Check for WARs with /../ /./ or similar sequences in the name
                 if (!validateContextPath(appBase, cn.getBaseName())) {
                     log.error(sm.getString(
-                            "hostConfig.illegalWarName", files[i]));
-                    invalidWars.add(files[i]);
+                            "hostConfig.illegalWarName", file));
+                    invalidWars.add(file);
                     continue;
                 }
 
@@ -1176,15 +1176,15 @@ public class HostConfig
         ExecutorService es = host.getStartStopExecutor();
         List<Future<?>> results = new ArrayList<Future<?>>();
 
-        for (int i = 0; i < files.length; i++) {
+        for (String file : files) {
 
-            if (files[i].equalsIgnoreCase("META-INF"))
+            if (file.equalsIgnoreCase("META-INF"))
                 continue;
-            if (files[i].equalsIgnoreCase("WEB-INF"))
+            if (file.equalsIgnoreCase("WEB-INF"))
                 continue;
-            File dir = new File(appBase, files[i]);
+            File dir = new File(appBase, file);
             if (dir.isDirectory()) {
-                ContextName cn = new ContextName(files[i], false);
+                ContextName cn = new ContextName(file, false);
 
                 if (isServiced(cn.getName()) || deploymentExists(cn.getName()))
                     continue;
@@ -1380,19 +1380,19 @@ public class HostConfig
             }
         }
         String[] watchedResources = context.findWatchedResources();
-        for (int i = 0; i < watchedResources.length; i++) {
-            File resource = new File(watchedResources[i]);
+        for (String watchedResource : watchedResources) {
+            File resource = new File(watchedResource);
             if (!resource.isAbsolute()) {
                 if (docBase != null) {
-                    resource = new File(docBaseFile, watchedResources[i]);
+                    resource = new File(docBaseFile, watchedResource);
                 } else {
-                    if(log.isDebugEnabled())
+                    if (log.isDebugEnabled())
                         log.debug("Ignoring non-existent WatchedResource '" +
                                 resource.getAbsolutePath() + "'");
                     continue;
                 }
             }
-            if(log.isDebugEnabled())
+            if (log.isDebugEnabled())
                 log.debug("Watching WatchedResource '" +
                         resource.getAbsolutePath() + "'");
             app.reloadResources.put(resource.getAbsolutePath(),
@@ -1528,12 +1528,12 @@ public class HostConfig
         }
         resources = app.reloadResources.keySet().toArray(new String[0]);
         boolean update = false;
-        for (int i = 0; i < resources.length; i++) {
-            File resource = new File(resources[i]);
+        for (String s : resources) {
+            File resource = new File(s);
             if (log.isDebugEnabled()) {
                 log.debug("Checking context[" + app.name + "] reload resource " + resource);
             }
-            long lastModified = app.reloadResources.get(resources[i]).longValue();
+            long lastModified = app.reloadResources.get(s).longValue();
             // File.lastModified() has a resolution of 1s (1000ms). The last
             // modified time has to be more than 1000ms ago to ensure that
             // modifications that take place in the same second are not
@@ -1550,7 +1550,7 @@ public class HostConfig
                 }
                 // Update times. More than one file may have been updated. We
                 // don't want to trigger a series of reloads.
-                app.reloadResources.put(resources[i],
+                app.reloadResources.put(s,
                         Long.valueOf(resource.lastModified()));
             }
             app.timestamp = System.currentTimeMillis();
@@ -1627,8 +1627,8 @@ public class HostConfig
         // Delete reload resources (to remove any remaining .xml descriptor)
         if (deleteReloadResources) {
             String[] resources2 = app.reloadResources.keySet().toArray(new String[0]);
-            for (int j = 0; j < resources2.length; j++) {
-                File current = new File(resources2[j]);
+            for (String s : resources2) {
+                File current = new File(s);
                 // Never delete per host context.xml defaults
                 if (Constants.HostContextXml.equals(current.getName())) {
                     continue;
@@ -1710,9 +1710,9 @@ public class HostConfig
     public void beforeStart() {
         if (host.getCreateDirs()) {
             File[] dirs = new File[] {appBase(),configBase()};
-            for (int i=0; i<dirs.length; i++) {
-                if (!dirs[i].mkdirs() && !dirs[i].isDirectory()) {
-                    log.error(sm.getString("hostConfig.createDirs",dirs[i]));
+            for (File dir : dirs) {
+                if (!dir.mkdirs() && !dir.isDirectory()) {
+                    log.error(sm.getString("hostConfig.createDirs",dir));
                 }
             }
         }
@@ -1778,9 +1778,9 @@ public class HostConfig
             // Check for resources modification to trigger redeployment
             DeployedApplication[] apps =
                 deployed.values().toArray(new DeployedApplication[0]);
-            for (int i = 0; i < apps.length; i++) {
-                if (!isServiced(apps[i].name))
-                    checkResources(apps[i], false);
+            for (DeployedApplication app : apps) {
+                if (!isServiced(app.name))
+                    checkResources(app, false);
             }
 
             // Check for old versions of applications that can now be undeployed

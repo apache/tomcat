@@ -28,10 +28,10 @@
 <ol>
 <%
     String[] items = cart.getItems();
-    for (int i=0; i<items.length; i++) {
+    for (String item : items) {
 %>
-<li> <% out.print(util.HTMLFilter.filter(items[i])); %>
-<%
+    <li> <% out.print(util.HTMLFilter.filter(item)); %>
+            <%
     }
 %>
 </ol>

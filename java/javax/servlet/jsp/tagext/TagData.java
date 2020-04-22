@@ -62,8 +62,8 @@ public class TagData implements Cloneable {
         }
 
         if (atts != null) {
-            for (int i = 0; i < atts.length; i++) {
-                attributes.put((String) atts[i][0], atts[i][1]);
+            for (Object[] att : atts) {
+                attributes.put((String) att[0], att[1]);
             }
         }
     }

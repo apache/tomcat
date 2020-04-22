@@ -697,8 +697,8 @@ public abstract class ManagerBase extends LifecycleMBeanBase implements Manager 
 
         if(log.isDebugEnabled())
             log.debug("Start expire sessions " + getName() + " at " + timeNow + " sessioncount " + sessions.length);
-        for (int i = 0; i < sessions.length; i++) {
-            if (sessions[i]!=null && !sessions[i].isValid()) {
+        for (Session session : sessions) {
+            if (session != null && !session.isValid()) {
                 expireHere++;
             }
         }

@@ -311,9 +311,9 @@ public class NonBlockingCoordinator extends ChannelInterceptorBase {
         Arrays.fill(merged,msg.getMembers());
         Arrays.fill(merged,getMembers());
         Member[] diff = Arrays.diff(merged,membership,local);
-        for ( int i=0; i<diff.length; i++ ) {
-            if (!alive(diff[i])) merged.removeMember((MemberImpl)diff[i]);
-            else memberAdded(diff[i],false);
+        for (Member member : diff) {
+            if (!alive(member)) merged.removeMember((MemberImpl)member);
+            else memberAdded(member, false);
         }
         fireInterceptorEvent(new CoordinationEvent(CoordinationEvent.EVT_POST_MERGE,this,"Post merge"));
         return merged;
@@ -754,10 +754,10 @@ public class NonBlockingCoordinator extends ChannelInterceptorBase {
             src = null;
             //view
             buf.append(view.length);
-            for (int i=0; i<view.length; i++ ) {
-                byte[] mbr = view[i].getData(false,false);
+            for (MemberImpl member : view) {
+                byte[] mbr = member.getData(false, false);
                 buf.append(mbr.length);
-                buf.append(mbr,0,mbr.length);
+                buf.append(mbr, 0, mbr.length);
             }
             //id
             buf.append(id.getBytes(),0,id.getBytes().length);

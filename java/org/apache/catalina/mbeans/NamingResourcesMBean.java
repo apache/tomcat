@@ -18,6 +18,7 @@
 package org.apache.catalina.mbeans;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.management.MBeanException;
 import javax.management.MalformedObjectNameException;
@@ -83,17 +84,15 @@ public class NamingResourcesMBean extends BaseModelMBean {
      * this web application
      */
     public String[] getEnvironments() {
-        ContextEnvironment[] envs =
-                            ((NamingResources)this.resource).findEnvironments();
-        ArrayList<String> results = new ArrayList<String>();
-        for (int i = 0; i < envs.length; i++) {
+        ContextEnvironment[] envs = ((NamingResources)this.resource).findEnvironments();
+        List<String> results = new ArrayList<String>();
+        for (ContextEnvironment env : envs) {
             try {
-                ObjectName oname =
-                    MBeanUtils.createObjectName(managed.getDomain(), envs[i]);
+                ObjectName oname = MBeanUtils.createObjectName(managed.getDomain(), env);
                 results.add(oname.toString());
             } catch (MalformedObjectNameException e) {
                 IllegalArgumentException iae = new IllegalArgumentException
-                    ("Cannot create object name for environment " + envs[i]);
+                    ("Cannot create object name for environment " + env);
                 iae.initCause(e);
                 throw iae;
             }
@@ -108,17 +107,15 @@ public class NamingResourcesMBean extends BaseModelMBean {
      */
     public String[] getResources() {
 
-        ContextResource[] resources =
-                            ((NamingResources)this.resource).findResources();
-        ArrayList<String> results = new ArrayList<String>();
-        for (int i = 0; i < resources.length; i++) {
+        ContextResource[] resources = ((NamingResources)this.resource).findResources();
+        List<String> results = new ArrayList<String>();
+        for (ContextResource contextResource : resources) {
             try {
-                ObjectName oname =
-                    MBeanUtils.createObjectName(managed.getDomain(), resources[i]);
+                ObjectName oname = MBeanUtils.createObjectName(managed.getDomain(), contextResource);
                 results.add(oname.toString());
             } catch (MalformedObjectNameException e) {
                 IllegalArgumentException iae = new IllegalArgumentException
-                    ("Cannot create object name for resource " + resources[i]);
+                    ("Cannot create object name for resource " + contextResource);
                 iae.initCause(e);
                 throw iae;
             }
@@ -133,17 +130,15 @@ public class NamingResourcesMBean extends BaseModelMBean {
      */
     public String[] getResourceLinks() {
 
-        ContextResourceLink[] resourceLinks =
-                            ((NamingResources)this.resource).findResourceLinks();
-        ArrayList<String> results = new ArrayList<String>();
-        for (int i = 0; i < resourceLinks.length; i++) {
+        ContextResourceLink[] resourceLinks = ((NamingResources)this.resource).findResourceLinks();
+        List<String> results = new ArrayList<String>();
+        for (ContextResourceLink resourceLink : resourceLinks) {
             try {
-                ObjectName oname =
-                    MBeanUtils.createObjectName(managed.getDomain(), resourceLinks[i]);
+                ObjectName oname = MBeanUtils.createObjectName(managed.getDomain(), resourceLink);
                 results.add(oname.toString());
             } catch (MalformedObjectNameException e) {
                 IllegalArgumentException iae = new IllegalArgumentException
-                    ("Cannot create object name for resource " + resourceLinks[i]);
+                    ("Cannot create object name for resource " + resourceLink);
                 iae.initCause(e);
                 throw iae;
             }

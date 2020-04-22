@@ -407,11 +407,11 @@ public final class JspRuntimeContext {
         compileCheckInProgress = true;
 
         Object [] wrappers = jsps.values().toArray();
-        for (int i = 0; i < wrappers.length; i++ ) {
-            JspServletWrapper jsw = (JspServletWrapper)wrappers[i];
+        for (Object wrapper : wrappers) {
+            JspServletWrapper jsw = (JspServletWrapper) wrapper;
             JspCompilationContext ctxt = jsw.getJspEngineContext();
             // Sync on JspServletWrapper when calling ctxt.compile()
-            synchronized(jsw) {
+            synchronized (jsw) {
                 try {
                     ctxt.compile();
                     if (jsw.getReload()) {
@@ -482,14 +482,14 @@ public final class JspRuntimeContext {
         if (parentClassLoader instanceof URLClassLoader) {
             URL [] urls = ((URLClassLoader)parentClassLoader).getURLs();
 
-            for(int i = 0; i < urls.length; i++) {
+            for (URL url : urls) {
                 // Tomcat 4 can use URL's other than file URL's,
                 // a protocol other than file: will generate a
                 // bad file system path, so only add file:
                 // protocol URL's to the classpath.
 
-                if( urls[i].getProtocol().equals("file") ) {
-                    cpath.append(urls[i].getFile()+File.pathSeparator);
+                if( url.getProtocol().equals("file") ) {
+                    cpath.append(url.getFile()+File.pathSeparator);
                 }
             }
         }
@@ -642,14 +642,14 @@ public final class JspRuntimeContext {
         if (jspIdleTimeout > 0) {
             long unloadBefore = now - jspIdleTimeout;
             Object [] wrappers = jsps.values().toArray();
-            for (int i = 0; i < wrappers.length; i++ ) {
-                JspServletWrapper jsw = (JspServletWrapper)wrappers[i];
-                synchronized(jsw) {
+            for (Object wrapper : wrappers) {
+                JspServletWrapper jsw = (JspServletWrapper) wrapper;
+                synchronized (jsw) {
                     if (jsw.getLastUsageTime() < unloadBefore) {
                         if (log.isDebugEnabled()) {
                             log.debug(Localizer.getMessage("jsp.message.jsp_removed_idle",
-                                                           jsw.getJspUri(), context.getContextPath(),
-                                                           "" + (now-jsw.getLastUsageTime())));
+                                    jsw.getJspUri(), context.getContextPath(),
+                                    "" + (now - jsw.getLastUsageTime())));
                         }
                         if (jspQueue != null) {
                             jspQueue.remove(jsw.getUnloadHandle());

@@ -565,11 +565,11 @@ public class ReplicationValve
     protected void sendInvalidSessions(ClusterManager manager, CatalinaCluster cluster) {
         String[] invalidIds=manager.getInvalidatedSessions();
         if ( invalidIds.length > 0 ) {
-            for ( int i=0;i<invalidIds.length; i++ ) {
+            for (String invalidId : invalidIds) {
                 try {
-                    send(manager,cluster,invalidIds[i]);
-                } catch ( Exception x ) {
-                    log.error(sm.getString("ReplicationValve.send.invalid.failure",invalidIds[i]),x);
+                    send(manager, cluster, invalidId);
+                } catch (Exception x) {
+                    log.error(sm.getString("ReplicationValve.send.invalid.failure", invalidId), x);
                 }
             }
         }

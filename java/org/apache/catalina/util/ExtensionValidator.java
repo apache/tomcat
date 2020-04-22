@@ -434,15 +434,15 @@ public final class ExtensionValidator {
                 if (files == null) {
                     continue;
                 }
-                for (int i = 0; i < files.length; i++) {
-                    if (files[i].getName().toLowerCase(Locale.ENGLISH).endsWith(".jar") &&
-                            files[i].isFile()) {
+                for (File file : files) {
+                    if (file.getName().toLowerCase(Locale.ENGLISH).endsWith(".jar") &&
+                            file.isFile()) {
                         try {
-                            addSystemResource(files[i]);
+                            addSystemResource(file);
                         } catch (IOException e) {
                             log.error
-                                (sm.getString
-                                 ("extensionValidator.failload", files[i]), e);
+                                    (sm.getString
+                                            ("extensionValidator.failload", file), e);
                         }
                     }
                 }

@@ -1731,8 +1731,7 @@ public class JNDIRealm extends RealmBase {
 
         if (userSubtree) {
             constraints.setSearchScope(SearchControls.SUBTREE_SCOPE);
-        }
-        else {
+        } else {
             constraints.setSearchScope(SearchControls.ONELEVEL_SCOPE);
         }
 
@@ -1963,8 +1962,7 @@ public class JNDIRealm extends RealmBase {
         if (connectionPassword != null) {
             context.addToEnvironment(Context.SECURITY_CREDENTIALS,
                                      connectionPassword);
-        }
-        else {
+        } else {
             context.removeFromEnvironment(Context.SECURITY_CREDENTIALS);
         }
     }

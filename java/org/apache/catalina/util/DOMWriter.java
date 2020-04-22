@@ -175,8 +175,7 @@ public class DOMWriter {
                   out.print(node.getLocalName());
                }
                Attr attrs[] = sortAttributes(node.getAttributes());
-               for ( int i = 0; i < attrs.length; i++ ) {
-                  Attr attr = attrs[i];
+               for (Attr attr : attrs) {
                   out.print(' ');
                   if (this.qualifiedNames) {
                      out.print(attr.getNodeName());

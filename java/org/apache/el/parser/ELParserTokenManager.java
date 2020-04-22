@@ -193,9 +193,7 @@ private int jjMoveNfa_0(int startState, int curPos)
                default : break;
             }
          } while(i != startsAt);
-      }
-      else
-      {
+      } else {
          int hiByte = (int)(curChar >> 8);
          int i1 = hiByte >> 6;
          long l1 = 1L << (hiByte & 077);
@@ -962,9 +960,7 @@ private int jjMoveNfa_1(int startState, int curPos)
                default : break;
             }
          } while(i != startsAt);
-      }
-      else
-      {
+      } else {
          int hiByte = (int)(curChar >> 8);
          int i1 = hiByte >> 6;
          long l1 = 1L << (hiByte & 077);
@@ -1232,9 +1228,7 @@ public Token getNextToken()
        if (jjnewLexState[jjmatchedKind] != -1)
          curLexState = jjnewLexState[jjmatchedKind];
            return matchedToken;
-        }
-        else
-        {
+        } else {
          if (jjnewLexState[jjmatchedKind] != -1)
            curLexState = jjnewLexState[jjmatchedKind];
            continue EOFLoop;

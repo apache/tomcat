@@ -167,8 +167,8 @@ public final class FileStore extends StoreBase {
     @Override
     public void clear() throws IOException {
         String[] keys = keys();
-        for (int i = 0; i < keys.length; i++) {
-            remove(keys[i]);
+        for (String key : keys) {
+            remove(key);
         }
     }
 

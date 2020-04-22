@@ -206,11 +206,11 @@ public class ContainerMBean extends BaseModelMBean {
 
         if (container != null) {
             Valve[] valves = container.getPipeline().getValves();
-            for (int i = 0; i < valves.length; i++) {
-                if (valves[i] instanceof JmxEnabled) {
-                    ObjectName voname = ((JmxEnabled) valves[i]).getObjectName();
+            for (Valve valve : valves) {
+                if (valve instanceof JmxEnabled) {
+                    ObjectName voname = ((JmxEnabled) valve).getObjectName();
                     if (voname.equals(oname)) {
-                        container.getPipeline().removeValve(valves[i]);
+                        container.getPipeline().removeValve(valve);
                     }
                 }
             }

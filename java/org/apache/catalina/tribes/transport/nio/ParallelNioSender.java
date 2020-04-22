@@ -91,9 +91,9 @@ public class ParallelNioSender extends AbstractSender implements MultiPointSende
                         if ( x instanceof ChannelException ) cx = (ChannelException)x;
                         else cx = new ChannelException("Parallel NIO send failed.", x);
                     }
-                    for (int i=0; i<senders.length; i++ ) {
-                        if (!senders[i].isComplete()) {
-                            cx.addFaultyMember(senders[i].getDestination(),x);
+                    for (NioSender sender : senders) {
+                        if (!sender.isComplete()) {
+                            cx.addFaultyMember(sender.getDestination(), x);
                         }
                     }
                     throw cx;
@@ -102,10 +102,12 @@ public class ParallelNioSender extends AbstractSender implements MultiPointSende
             }
             if ( remaining > 0 ) {
                 //timeout has occurred
-                ChannelException cxtimeout = new ChannelException("Operation has timed out("+getTimeout()+" ms.).");
-                if ( cx==null ) cx = new ChannelException("Operation has timed out("+getTimeout()+" ms.).");
-                for (int i=0; i<senders.length; i++ ) {
-                    if (!senders[i].isComplete() ) cx.addFaultyMember(senders[i].getDestination(),cxtimeout);
+                ChannelException cxtimeout = new ChannelException("Operation has timed out(" + getTimeout() + " ms.).");
+                if (cx == null) {
+                    cx = new ChannelException("Operation has timed out(" + getTimeout() + " ms.).");
+                }
+                for (NioSender sender : senders) {
+                    if (!sender.isComplete() ) cx.addFaultyMember(sender.getDestination(),cxtimeout);
                 }
                 throw cx;
             } else if ( cx != null ) {
@@ -222,12 +224,12 @@ public class ParallelNioSender extends AbstractSender implements MultiPointSende
 
     private void connect(NioSender[] senders) throws ChannelException {
         ChannelException x = null;
-        for (int i=0; i<senders.length; i++ ) {
+        for (NioSender sender : senders) {
             try {
-                senders[i].connect();
-            }catch ( IOException io ) {
-                if ( x==null ) x = new ChannelException(io);
-                x.addFaultyMember(senders[i].getDestination(),io);
+                sender.connect();
+            } catch (IOException io) {
+                if (x == null) x = new ChannelException(io);
+                x.addFaultyMember(sender.getDestination(), io);
             }
         }
         if ( x != null ) throw x;
@@ -235,12 +237,12 @@ public class ParallelNioSender extends AbstractSender implements MultiPointSende
 
     private void setData(NioSender[] senders, byte[] data) throws ChannelException {
         ChannelException x = null;
-        for (int i=0; i<senders.length; i++ ) {
+        for (NioSender sender : senders) {
             try {
-                senders[i].setMessage(data);
-            }catch ( IOException io ) {
-                if ( x==null ) x = new ChannelException(io);
-                x.addFaultyMember(senders[i].getDestination(),io);
+                sender.setMessage(data);
+            } catch (IOException io) {
+                if (x == null) x = new ChannelException(io);
+                x.addFaultyMember(sender.getDestination(), io);
             }
         }
         if ( x != null ) throw x;
@@ -283,14 +285,14 @@ public class ParallelNioSender extends AbstractSender implements MultiPointSende
     private synchronized void close() throws ChannelException  {
         ChannelException x = null;
         Object[] members = nioSenders.keySet().toArray();
-        for (int i=0; i<members.length; i++ ) {
-            Member mbr = (Member)members[i];
+        for (Object member : members) {
+            Member mbr = (Member) member;
             try {
                 NioSender sender = nioSenders.get(mbr);
                 sender.disconnect();
-            }catch ( Exception e ) {
-                if ( x == null ) x = new ChannelException(e);
-                x.addFaultyMember(mbr,e);
+            } catch (Exception e) {
+                if (x == null) x = new ChannelException(e);
+                x.addFaultyMember(mbr, e);
             }
             nioSenders.remove(mbr);
         }

@@ -250,7 +250,7 @@ public class JAASRealm extends RealmBase {
      protected String roleClassNames = null;
 
      public String getRoleClassNames() {
-         return (this.roleClassNames);
+         return this.roleClassNames;
      }
 
      /**
@@ -281,19 +281,19 @@ public class JAASRealm extends RealmBase {
              loader = Thread.currentThread().getContextClassLoader();
 
          String[] classNames = classNamesString.split("[ ]*,[ ]*");
-         for (int i=0; i<classNames.length; i++) {
-             if (classNames[i].length()==0) continue;
+         for (String className : classNames) {
+             if (className.length()==0) continue;
              try {
-                 Class<?> principalClass = Class.forName(classNames[i], false,
+                 Class<?> principalClass = Class.forName(className, false,
                          loader);
                  if (Principal.class.isAssignableFrom(principalClass)) {
-                     classNamesList.add(classNames[i]);
+                     classNamesList.add(className);
                  } else {
-                     log.error("Class "+classNames[i]+" is not implementing "+
+                     log.error("Class " + className + " is not implementing "+
                                "java.security.Principal! Class not added.");
                  }
              } catch (ClassNotFoundException e) {
-                 log.error("Class "+classNames[i]+" not found! Class not added.");
+                 log.error("Class " + className + " not found! Class not added.");
              }
          }
      }

@@ -246,15 +246,15 @@ public class SecurityCollection implements Serializable {
         if (methods.length == 0 && omittedMethods.length == 0)
             return (true);
         if (methods.length > 0) {
-            for (int i = 0; i < methods.length; i++) {
-                if (methods[i].equals(method))
+            for (String s : methods) {
+                if (s.equals(method))
                     return true;
             }
             return false;
         }
         if (omittedMethods.length > 0) {
-            for (int i = 0; i < omittedMethods.length; i++) {
-                if (omittedMethods[i].equals(method))
+            for (String omittedMethod : omittedMethods) {
+                if (omittedMethod.equals(method))
                     return false;
             }
         }
@@ -292,10 +292,9 @@ public class SecurityCollection implements Serializable {
      * @param pattern Pattern to be compared
      */
     public boolean findPattern(String pattern) {
-
-        for (int i = 0; i < patterns.length; i++) {
-            if (patterns[i].equals(pattern))
-                return (true);
+        for (String s : patterns) {
+            if (s.equals(pattern))
+                return true;
         }
         return (false);
 

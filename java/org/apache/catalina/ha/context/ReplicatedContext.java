@@ -202,15 +202,15 @@ public class ReplicatedContext extends StandardContext implements MapOwner {
         }
         @Override
         public boolean hasMoreElements() {
-            for ( int i=0; i<e.length; i++ ) {
-                if ( e[i].hasMoreElements() ) return true;
+            for (Enumeration<T> tEnumeration : e) {
+                if (tEnumeration.hasMoreElements()) return true;
             }
             return false;
         }
         @Override
         public T nextElement() {
-            for ( int i=0; i<e.length; i++ ) {
-                if ( e[i].hasMoreElements() ) return e[i].nextElement();
+            for (Enumeration<T> tEnumeration : e) {
+                if (tEnumeration.hasMoreElements()) return tEnumeration.nextElement();
             }
             return null;
 

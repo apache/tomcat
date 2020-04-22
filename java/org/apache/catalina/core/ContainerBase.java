@@ -1216,8 +1216,8 @@ public abstract class ContainerBase extends LifecycleMBeanBase
         // Start our child containers, if any
         Container children[] = findChildren();
         List<Future<Void>> results = new ArrayList<Future<Void>>();
-        for (int i = 0; i < children.length; i++) {
-            results.add(startStopExecutor.submit(new StartChild(children[i])));
+        for (Container child : children) {
+            results.add(startStopExecutor.submit(new StartChild(child)));
         }
 
         MultiThrowable multiThrowable = null;
@@ -1276,8 +1276,8 @@ public abstract class ContainerBase extends LifecycleMBeanBase
         // Stop our child containers, if any
         Container children[] = findChildren();
         List<Future<Void>> results = new ArrayList<Future<Void>>();
-        for (int i = 0; i < children.length; i++) {
-            results.add(startStopExecutor.submit(new StopChild(children[i])));
+        for (Container child : children) {
+            results.add(startStopExecutor.submit(new StopChild(child)));
         }
 
         boolean fail = false;

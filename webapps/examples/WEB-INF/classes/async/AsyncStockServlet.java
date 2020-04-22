@@ -19,7 +19,6 @@ package async;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -77,9 +76,7 @@ public class AsyncStockServlet extends HttpServlet implements TickListener, Asyn
     @Override
     public void tick(Stock stock) {
         ticks.add((Stock)stock.clone());
-        Iterator<AsyncContext> it = clients.iterator();
-        while (it.hasNext()) {
-            AsyncContext actx = it.next();
+        for (AsyncContext actx : clients) {
             try {
                 writeStock(actx, stock);
             } catch (Exception e) {
@@ -110,9 +107,7 @@ public class AsyncStockServlet extends HttpServlet implements TickListener, Asyn
     public void shutdown() {
         // The web application is shutting down. Complete any AsyncContexts
         // associated with an active client.
-        Iterator<AsyncContext> it = clients.iterator();
-        while (it.hasNext()) {
-            AsyncContext actx = it.next();
+        for (AsyncContext actx : clients) {
             try {
                 actx.complete();
             } catch (Exception e) {

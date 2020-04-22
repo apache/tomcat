@@ -961,11 +961,11 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
         writer.println(smClient.getString("managerServlet.listed",
                                     host.getName()));
         Container[] contexts = host.findChildren();
-        for (int i = 0; i < contexts.length; i++) {
-            Context context = (Context) contexts[i];
-            if (context != null ) {
+        for (Container container : contexts) {
+            Context context = (Context) container;
+            if (context != null) {
                 String displayPath = context.getPath();
-                if( displayPath.equals("") )
+                if (displayPath.equals(""))
                     displayPath = "/";
                 if (context.getState().isAvailable()) {
                     writer.println(smClient.getString("managerServlet.listitem",
@@ -1206,18 +1206,18 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
             int notimeout = 0;
             int expired = 0;
             long now = System.currentTimeMillis();
-            for (int i = 0; i < sessions.length; i++) {
+            for (Session session : sessions) {
                 int time;
                 if (LAST_ACCESS_AT_START) {
-                    time = (int) ((now - sessions[i].getLastAccessedTimeInternal()) / 1000L);
+                    time = (int) ((now - session.getLastAccessedTimeInternal()) / 1000L);
                 } else {
-                    time = (int) ((now - sessions[i].getThisAccessedTimeInternal()) / 1000L);
+                    time = (int) ((now - session.getThisAccessedTimeInternal()) / 1000L);
                 }
                 if (idle >= 0 && time >= idle*60) {
-                    sessions[i].expire();
+                    session.expire();
                     expired++;
                 }
-                time=time/60/histoInterval;
+                time = time / 60 / histoInterval;
                 if (time < 0)
                     notimeout++;
                 else if (time >= maxCount)

@@ -363,8 +363,7 @@ public class TestSSOnonLoginAndBasicAuthenticator extends TomcatBaseTest {
         if (expectedRC != HttpServletResponse.SC_OK) {
             Assert.assertEquals(expectedRC, rc);
             Assert.assertTrue(bc.getLength() > 0);
-        }
-        else {
+        } else {
             Assert.assertEquals("OK", bc.toString());
         }
 }
@@ -378,8 +377,7 @@ public class TestSSOnonLoginAndBasicAuthenticator extends TomcatBaseTest {
 
         if (useCookie && (cookies != null)) {
             reqHeaders.put(CLIENT_COOKIE_HEADER, cookies);
-        }
-        else {
+        } else {
             if (credentials != null) {
                 List<String> auth = new ArrayList<String>();
                 auth.add(credentials.getCredentials());
@@ -406,8 +404,7 @@ public class TestSSOnonLoginAndBasicAuthenticator extends TomcatBaseTest {
                 }
                 Assert.assertTrue(methodFound);
             }
-        }
-        else {
+        } else {
             String thePage = bc.toString();
             Assert.assertNotNull(thePage);
             Assert.assertTrue(thePage.startsWith("OK"));
@@ -417,8 +414,7 @@ public class TestSSOnonLoginAndBasicAuthenticator extends TomcatBaseTest {
                     // harvest cookies whenever the server sends some new ones
                     cookies = newCookies;
                 }
-            }
-            else {
+            } else {
                 encodedURL = "";
                 final String start = "<a href=\"";
                 final String end = "\">";
@@ -590,9 +586,9 @@ public class TestSSOnonLoginAndBasicAuthenticator extends TomcatBaseTest {
 
         ManagerBase manager = (ManagerBase) activeContext.getManager();
         Session[] sessions = manager.findSessions();
-        for (int i = 0; i < sessions.length; i++) {
-            if (sessions[i]!=null && sessions[i].isValid()) {
-                sessions[i].setMaxInactiveInterval(EXTRA_DELAY_SECS);
+        for (Session session : sessions) {
+            if (session != null && session.isValid()) {
+                session.setMaxInactiveInterval(EXTRA_DELAY_SECS);
                 // leave it to be expired by the manager
             }
         }

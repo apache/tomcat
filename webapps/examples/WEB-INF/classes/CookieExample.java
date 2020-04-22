@@ -91,14 +91,13 @@ public class CookieExample extends HttpServlet {
                 sessionId = session.getId();
             }
             out.println(rb.getString("cookies.cookies") + "<br>");
-            for (int i = 0; i < cookies.length; i++) {
-                Cookie cookie = cookies[i];
+            for (Cookie cookie : cookies) {
                 String cName = cookie.getName();
                 String cValue = cookie.getValue();
                 out.print("Cookie Name: " + HTMLFilter.filter(cName) + "<br>");
                 out.println("  Cookie Value: "
-                            + HTMLFilter.filter(CookieFilter.filter(cName, cValue, sessionId))
-                            + "<br><br>");
+                        + HTMLFilter.filter(CookieFilter.filter(cName, cValue, sessionId))
+                        + "<br><br>");
             }
         } else {
             out.println(rb.getString("cookies.no-cookies"));

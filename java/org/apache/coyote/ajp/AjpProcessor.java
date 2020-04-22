@@ -384,8 +384,7 @@ public class AjpProcessor extends AbstractAjpProcessor<Socket> {
         else if (messageLength == 0) {
             // Zero length message.
             return true;
-        }
-        else {
+        } else {
             if (messageLength > buf.length) {
                 // Message too long for the buffer
                 // Need to trigger a 400 response

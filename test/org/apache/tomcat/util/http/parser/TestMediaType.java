@@ -252,9 +252,9 @@ public class TestMediaType {
         Assert.assertEquals(SUBTYPE.trim(), m.getSubtype());
 
         // Check the parameters
-        for (int i = 0; i <  parameters.length; i++) {
-            Assert.assertEquals(parameters[i].getValue().trim(),
-                    m.getParameterValue(parameters[i].getName().trim()));
+        for (Parameter parameter : parameters) {
+            Assert.assertEquals(parameter.getValue().trim(),
+                    m.getParameterValue(parameter.getName().trim()));
         }
     }
 

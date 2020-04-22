@@ -172,9 +172,9 @@ public class TagAttributeInfo {
      * @return The TagAttributeInfo reference with name "id"
      */
     public static TagAttributeInfo getIdAttribute(TagAttributeInfo a[]) {
-        for (int i = 0; i < a.length; i++) {
-            if (a[i].getName().equals(ID)) {
-                return a[i];
+        for (TagAttributeInfo tagAttributeInfo : a) {
+            if (tagAttributeInfo.getName().equals(ID)) {
+                return tagAttributeInfo;
             }
         }
         return null; // no such attribute

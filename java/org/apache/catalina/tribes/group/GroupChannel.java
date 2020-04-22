@@ -283,14 +283,14 @@ public class GroupChannel extends ChannelInterceptorBase implements ManagedChann
             Member source = msg.getAddress();
             boolean rx = false;
             boolean delivered = false;
-            for ( int i=0; i<channelListeners.size(); i++ ) {
-                ChannelListener channelListener = (ChannelListener)channelListeners.get(i);
+            for (Object o : channelListeners) {
+                ChannelListener channelListener = (ChannelListener ) o;
                 if (channelListener != null && channelListener.accept(fwd, source)) {
                     channelListener.messageReceived(fwd, source);
                     delivered = true;
                     //if the message was accepted by an RPC channel, that channel
                     //is responsible for returning the reply, otherwise we send an absence reply
-                    if ( channelListener instanceof RpcChannel ) rx = true;
+                    if (channelListener instanceof RpcChannel) rx = true;
                 }
             }//for
             if ((!rx) && (fwd instanceof RpcMessage)) {
@@ -336,8 +336,8 @@ public class GroupChannel extends ChannelInterceptorBase implements ManagedChann
     @Override
     public void memberAdded(Member member) {
         //notify upwards
-        for (int i=0; i<membershipListeners.size(); i++ ) {
-            MembershipListener membershipListener = (MembershipListener)membershipListeners.get(i);
+        for (Object o : membershipListeners) {
+            MembershipListener membershipListener = (MembershipListener) o;
             if (membershipListener != null) membershipListener.memberAdded(member);
         }
     }
@@ -350,8 +350,8 @@ public class GroupChannel extends ChannelInterceptorBase implements ManagedChann
     @Override
     public void memberDisappeared(Member member) {
         //notify upwards
-        for (int i=0; i<membershipListeners.size(); i++ ) {
-            MembershipListener membershipListener = (MembershipListener)membershipListeners.get(i);
+        for (Object o : membershipListeners) {
+            MembershipListener membershipListener = (MembershipListener) o;
             if (membershipListener != null) membershipListener.memberDisappeared(member);
         }
     }

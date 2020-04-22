@@ -419,10 +419,10 @@ public class McastServiceImpl
                     String name = Thread.currentThread().getName();
                     try {
                         Thread.currentThread().setName("Membership-MemberAdded.");
-                        for (int i=0; i<data.length; i++ ) {
+                        for (ChannelData datum : data) {
                             try {
-                                if (data[i]!=null && !member.equals(data[i].getAddress())) {
-                                    msgservice.messageReceived(data[i]);
+                                if (datum != null && !member.equals(datum.getAddress())) {
+                                    msgservice.messageReceived(datum);
                                 }
                             } catch (Throwable t) {
                                 if (t instanceof ThreadDeath) {
@@ -431,7 +431,7 @@ public class McastServiceImpl
                                 if (t instanceof VirtualMachineError) {
                                     throw (VirtualMachineError) t;
                                 }
-                                log.error("Unable to receive broadcast message.",t);
+                                log.error("Unable to receive broadcast message.", t);
                             }
                         }
                     }finally {
@@ -447,10 +447,9 @@ public class McastServiceImpl
     protected void checkExpired() {
         synchronized (expiredMutex) {
             MemberImpl[] expired = membership.expire(timeToExpiration);
-            for (int i = 0; i < expired.length; i++) {
-                final MemberImpl member = expired[i];
+            for (final MemberImpl member : expired) {
                 if (log.isDebugEnabled())
-                    log.debug("Mcast expire  member " + expired[i]);
+                    log.debug("Mcast expire  member " + member);
                 try {
                     Runnable t = new Runnable() {
                         @Override
@@ -459,7 +458,7 @@ public class McastServiceImpl
                             try {
                                 Thread.currentThread().setName("Membership-MemberExpired.");
                                 service.memberDisappeared(member);
-                            }finally {
+                            } finally {
                                 Thread.currentThread().setName(name);
                             }
 
