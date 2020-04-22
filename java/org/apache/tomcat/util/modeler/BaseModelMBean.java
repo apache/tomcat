@@ -461,9 +461,8 @@ public class BaseModelMBean implements DynamicMBean, MBeanRegistration,
         // Prepare and return our response, eating all exceptions
         String names[] = new String[attributes.size()];
         int n = 0;
-        Iterator<?> items = attributes.iterator();
-        while (items.hasNext()) {
-            Attribute item = (Attribute) items.next();
+        for (Object attribute : attributes) {
+            Attribute item = (Attribute) attribute;
             names[n++] = item.getName();
             try {
                 setAttribute(item);

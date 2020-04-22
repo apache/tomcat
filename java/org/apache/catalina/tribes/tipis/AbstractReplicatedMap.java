@@ -1119,11 +1119,10 @@ public abstract class AbstractReplicatedMap<K,V>
      */
     @Override
     public void putAll(Map<? extends K, ? extends V> m) {
-        Iterator<?> i = m.entrySet().iterator();
-        while ( i.hasNext() ) {
+        for (Entry<? extends K, ? extends V> value : m.entrySet()) {
             @SuppressWarnings("unchecked")
-            Map.Entry<K,V> entry = (Map.Entry<K,V>) i.next();
-            put(entry.getKey(),entry.getValue());
+            Entry<K, V> entry = (Entry<K, V>) value;
+            put(entry.getKey(), entry.getValue());
         }
     }
 
