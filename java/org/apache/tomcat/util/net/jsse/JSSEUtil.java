@@ -147,8 +147,7 @@ public class JSSEUtil extends SSLUtilBase {
                             }
                         }
                     } else {
-                        implementedCiphers = new HashSet<>(implementedCipherSuiteArray.length);
-                        implementedCiphers.addAll(Arrays.asList(implementedCipherSuiteArray));
+                        implementedCiphers = new HashSet<>(Arrays.asList(implementedCipherSuiteArray));
                     }
                     initialized = true;
                 }

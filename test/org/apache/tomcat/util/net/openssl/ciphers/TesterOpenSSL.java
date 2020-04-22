@@ -366,8 +366,7 @@ public class TesterOpenSSL {
 
     public static Set<String> getOpenSSLCiphersAsSet(String specification) throws Exception {
         String[] ciphers = getOpenSSLCiphersAsExpression(specification).trim().split(":");
-        Set<String> result = new HashSet<>(ciphers.length);
-        result.addAll(Arrays.asList(ciphers));
+        Set<String> result = new HashSet<>(Arrays.asList(ciphers));
         return result;
     }
 

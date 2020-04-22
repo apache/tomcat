@@ -650,11 +650,9 @@ public abstract class PersistentManagerBase extends ManagerBase
     public Set<String> getSessionIdsFull() {
         // In memory session ID list
         Set<String> sessionIds = new HashSet<>(sessions.keySet());
-        // Store session ID list
-        String[] storeKeys;
         try {
-            storeKeys = getStore().keys();
-            sessionIds.addAll(Arrays.asList(storeKeys));
+            // Store session ID list
+            sessionIds.addAll(Arrays.asList(getStore().keys()));
         } catch (IOException e) {
             log.warn(sm.getString("persistentManager.storeKeysException"));
         }

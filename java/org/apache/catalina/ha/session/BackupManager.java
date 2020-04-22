@@ -269,10 +269,8 @@ public class BackupManager extends ClusterManagerBase
 
     @Override
     public Set<String> getSessionIdsFull() {
-        Set<String> sessionIds = new HashSet<>();
-        LazyReplicatedMap<String,Session> map =
-                (LazyReplicatedMap<String,Session>)sessions;
-        sessionIds.addAll(map.keySetFull());
+        LazyReplicatedMap<String,Session> map = (LazyReplicatedMap<String,Session>)sessions;
+        Set<String> sessionIds = new HashSet<>(map.keySetFull());
         return sessionIds;
     }
 

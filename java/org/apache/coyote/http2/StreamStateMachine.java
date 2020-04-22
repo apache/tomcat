@@ -215,7 +215,7 @@ class StreamStateMachine {
         private final boolean canReset;
         private final boolean connectionErrorForInvalidFrame;
         private final Http2Error errorCodeForInvalidFrame;
-        private final Set<FrameType> frameTypesPermitted = new HashSet<>();
+        private final Set<FrameType> frameTypesPermitted;
 
         private State(boolean canRead, boolean canWrite, boolean canReset,
                 boolean connectionErrorForInvalidFrame, Http2Error errorCode,
@@ -225,7 +225,7 @@ class StreamStateMachine {
             this.canReset = canReset;
             this.connectionErrorForInvalidFrame = connectionErrorForInvalidFrame;
             this.errorCodeForInvalidFrame = errorCode;
-            frameTypesPermitted.addAll(Arrays.asList(frameTypes));
+            frameTypesPermitted = new HashSet<>(Arrays.asList(frameTypes));
         }
 
         public boolean isActive() {

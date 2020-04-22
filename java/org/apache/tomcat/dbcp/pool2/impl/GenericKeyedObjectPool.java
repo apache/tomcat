@@ -873,11 +873,11 @@ public class GenericKeyedObjectPool<K, T> extends BaseGenericObjectPool<T>
                 if(evictionIterator == null || !evictionIterator.hasNext()) {
                     if (evictionKeyIterator == null ||
                             !evictionKeyIterator.hasNext()) {
-                        final List<K> keyCopy = new ArrayList<>();
+                        final List<K> keyCopy;
                         final Lock readLock = keyLock.readLock();
                         readLock.lock();
                         try {
-                            keyCopy.addAll(poolKeyList);
+                            keyCopy = new ArrayList<>(poolKeyList);
                         } finally {
                             readLock.unlock();
                         }
