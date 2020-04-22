@@ -112,7 +112,6 @@ class PageInfo {
         this.jspPrefixMapper = new HashMap<>();
         this.xmlPrefixMapper = new HashMap<>();
         this.nonCustomTagPrefixMap = new HashMap<>();
-        this.imports = new Vector<>();
         this.dependants = new HashMap<>();
         this.includePrelude = new Vector<>();
         this.includeCoda = new Vector<>();
@@ -120,7 +119,7 @@ class PageInfo {
         this.prefixes = new HashSet<>();
 
         // Enter standard imports
-        imports.addAll(Constants.STANDARD_IMPORTS);
+        this.imports = new Vector<>(Constants.STANDARD_IMPORTS);
     }
 
     public boolean isTagFile() {

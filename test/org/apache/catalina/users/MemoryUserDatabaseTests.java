@@ -176,10 +176,8 @@ public class MemoryUserDatabaseTests {
         assertPrincipalNames(new String[] { "testgroup", "othergroup"}, user.getGroups());
     }
 
-    private void assertPrincipalNames(String[] expectedNames, Iterator<? extends Principal> i)
-    {
-        HashSet<String> names = new HashSet<>(expectedNames.length);
-        names.addAll(Arrays.asList(expectedNames));
+    private void assertPrincipalNames(String[] expectedNames, Iterator<? extends Principal> i) {
+        HashSet<String> names = new HashSet<>(Arrays.asList(expectedNames));
 
         int j=0;
         while(i.hasNext()) {
