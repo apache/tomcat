@@ -100,8 +100,7 @@ public class TesterContext implements Context {
 
     @Override
     public SecurityConstraint[] findConstraints() {
-        return securityConstraints.toArray(
-				new SecurityConstraint[0]);
+        return securityConstraints.toArray(new SecurityConstraint[0]);
     }
 
     @Override
