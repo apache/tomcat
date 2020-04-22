@@ -791,8 +791,8 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
      */
     protected boolean isSpecial(String name) {
 
-        for (int i = 0; i < specials.length; i++) {
-            if (specials[i].equals(name))
+        for (String special : specials) {
+            if (special.equals(name))
                 return true;
         }
         return false;

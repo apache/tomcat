@@ -269,16 +269,14 @@ public class JspRuntimeLibrary {
         Class<?> type = null;
         Class<?> propertyEditorClass = null;
         try {
-            java.beans.BeanInfo info
-                = java.beans.Introspector.getBeanInfo(bean.getClass());
-            if ( info != null ) {
-                java.beans.PropertyDescriptor pd[]
-                    = info.getPropertyDescriptors();
-                for (int i = 0 ; i < pd.length ; i++) {
-                    if ( pd[i].getName().equals(prop) ) {
-                        method = pd[i].getWriteMethod();
-                        type   = pd[i].getPropertyType();
-                        propertyEditorClass = pd[i].getPropertyEditorClass();
+            java.beans.BeanInfo info = java.beans.Introspector.getBeanInfo(bean.getClass());
+            if (info != null) {
+                java.beans.PropertyDescriptor pd[] = info.getPropertyDescriptors();
+                for (java.beans.PropertyDescriptor propertyDescriptor : pd) {
+                    if (propertyDescriptor.getName().equals(prop)) {
+                        method = propertyDescriptor.getWriteMethod();
+                        type = propertyDescriptor.getPropertyType();
+                        propertyEditorClass = propertyDescriptor.getPropertyEditorClass();
                         break;
                     }
                 }
@@ -694,10 +692,10 @@ public class JspRuntimeLibrary {
         try {
             java.beans.BeanInfo info = java.beans.Introspector.getBeanInfo(beanClass);
             java.beans.PropertyDescriptor pd[] = info.getPropertyDescriptors();
-            for (int i = 0 ; i < pd.length ; i++) {
-                if ( pd[i].getName().equals(prop) ) {
-                    method = pd[i].getWriteMethod();
-                    type = pd[i].getPropertyType();
+            for (java.beans.PropertyDescriptor propertyDescriptor : pd) {
+                if (propertyDescriptor.getName().equals(prop)) {
+                    method = propertyDescriptor.getWriteMethod();
+                    type = propertyDescriptor.getPropertyType();
                     break;
                 }
             }
@@ -725,10 +723,10 @@ public class JspRuntimeLibrary {
         try {
             java.beans.BeanInfo info = java.beans.Introspector.getBeanInfo(beanClass);
             java.beans.PropertyDescriptor pd[] = info.getPropertyDescriptors();
-            for (int i = 0 ; i < pd.length ; i++) {
-                if (pd[i].getName().equals(prop)) {
-                    method = pd[i].getReadMethod();
-                    type = pd[i].getPropertyType();
+            for (java.beans.PropertyDescriptor propertyDescriptor : pd) {
+                if (propertyDescriptor.getName().equals(prop)) {
+                    method = propertyDescriptor.getReadMethod();
+                    type = propertyDescriptor.getPropertyType();
                     break;
                 }
             }
@@ -821,8 +819,7 @@ public class JspRuntimeLibrary {
                 if (uri.lastIndexOf('/') >= 0)
                     uri = uri.substring(0, uri.lastIndexOf('/'));
             }
-        }
-        else {
+        } else {
             uri = hrequest.getServletPath();
             if (uri.lastIndexOf('/') >= 0)
                 uri = uri.substring(0, uri.lastIndexOf('/'));
@@ -915,11 +912,11 @@ public class JspRuntimeLibrary {
                     continue;
                 }
                 byte[] ba = buf.toByteArray();
-                for (int j = 0; j < ba.length; j++) {
+                for (byte b : ba) {
                     out.append('%');
                     // Converting each byte in the buffer
-                    out.append(Character.forDigit((ba[j]>>4) & 0xf, 16));
-                    out.append(Character.forDigit(ba[j] & 0xf, 16));
+                    out.append(Character.forDigit((b >> 4) & 0xf, 16));
+                    out.append(Character.forDigit(b & 0xf, 16));
                 }
                 buf.reset();
             }

@@ -188,9 +188,9 @@ public class BeanELResolver extends ELResolver {
         try {
             BeanInfo info = Introspector.getBeanInfo(base.getClass());
             PropertyDescriptor[] pds = info.getPropertyDescriptors();
-            for (int i = 0; i < pds.length; i++) {
-                pds[i].setValue(RESOLVABLE_AT_DESIGN_TIME, Boolean.TRUE);
-                pds[i].setValue(TYPE, pds[i].getPropertyType());
+            for (PropertyDescriptor pd : pds) {
+                pd.setValue(RESOLVABLE_AT_DESIGN_TIME, Boolean.TRUE);
+                pd.setValue(TYPE, pd.getPropertyType());
             }
             return Arrays.asList((FeatureDescriptor[]) pds).iterator();
         } catch (IntrospectionException e) {

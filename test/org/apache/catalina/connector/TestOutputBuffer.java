@@ -205,8 +205,8 @@ public class TestOutputBuffer extends TomcatBaseTest{
             resp.setContentType("text/plain");
             Writer w = resp.getWriter();
 
-            for (int i = 0; i < chars.length; i++) {
-                w.write(chars[i]);
+            for (char aChar : chars) {
+                w.write(aChar);
             }
         }
     }

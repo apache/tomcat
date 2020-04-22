@@ -2872,18 +2872,18 @@ public class StandardContext extends ContainerBase
 
         // Validate the proposed constraint
         SecurityCollection collections[] = constraint.findCollections();
-        for (int i = 0; i < collections.length; i++) {
-            String patterns[] = collections[i].findPatterns();
+        for (SecurityCollection collection : collections) {
+            String patterns[] = collection.findPatterns();
             for (int j = 0; j < patterns.length; j++) {
                 patterns[j] = adjustURLPattern(patterns[j]);
                 if (!validateURLPattern(patterns[j]))
                     throw new IllegalArgumentException
-                        (sm.getString
-                         ("standardContext.securityConstraint.pattern",
-                          patterns[j]));
+                            (sm.getString
+                                    ("standardContext.securityConstraint.pattern",
+                                            patterns[j]));
             }
-            if (collections[i].findMethods().length > 0 &&
-                    collections[i].findOmittedMethods().length > 0) {
+            if (collection.findMethods().length > 0 &&
+                    collection.findOmittedMethods().length > 0) {
                 throw new IllegalArgumentException(sm.getString(
                         "standardContext.securityConstraint.mixHttpMethod"));
             }
@@ -3012,11 +3012,11 @@ public class StandardContext extends ContainerBase
             throw new IllegalArgumentException
                 (sm.getString("standardContext.filterMap.either"));
         */
-        for (int i = 0; i < urlPatterns.length; i++) {
-            if (!validateURLPattern(urlPatterns[i])) {
+        for (String urlPattern : urlPatterns) {
+            if (!validateURLPattern(urlPattern)) {
                 throw new IllegalArgumentException
-                    (sm.getString("standardContext.filterMap.pattern",
-                            urlPatterns[i]));
+                        (sm.getString("standardContext.filterMap.pattern",
+                                urlPattern));
             }
         }
     }
@@ -3308,11 +3308,11 @@ public class StandardContext extends ContainerBase
         }
 
         synchronized (wrapperLifecyclesLock) {
-            for (int i = 0; i < wrapperLifecycles.length; i++) {
+            for (String wrapperLifecycle : wrapperLifecycles) {
                 try {
-                    Class<?> clazz = Class.forName(wrapperLifecycles[i]);
+                    Class<?> clazz = Class.forName(wrapperLifecycle);
                     LifecycleListener listener =
-                        (LifecycleListener) clazz.getConstructor().newInstance();
+                            (LifecycleListener) clazz.getConstructor().newInstance();
                     wrapper.addLifecycleListener(listener);
                 } catch (Throwable t) {
                     ExceptionUtils.handleThrowable(t);
@@ -3323,9 +3323,9 @@ public class StandardContext extends ContainerBase
         }
 
         synchronized (wrapperListenersLock) {
-            for (int i = 0; i < wrapperListeners.length; i++) {
+            for (String wrapperListener : wrapperListeners) {
                 try {
-                    Class<?> clazz = Class.forName(wrapperListeners[i]);
+                    Class<?> clazz = Class.forName(wrapperListener);
                     ContainerListener listener =
                             (ContainerListener) clazz.getConstructor().newInstance();
                     wrapper.addContainerListener(listener);
@@ -3571,8 +3571,8 @@ public class StandardContext extends ContainerBase
     public boolean findSecurityRole(String role) {
 
         synchronized (securityRolesLock) {
-            for (int i = 0; i < securityRoles.length; i++) {
-                if (role.equals(securityRoles[i]))
+            for (String securityRole : securityRoles) {
+                if (role.equals(securityRole))
                     return true;
             }
         }
@@ -3660,8 +3660,8 @@ public class StandardContext extends ContainerBase
     public boolean findWelcomeFile(String name) {
 
         synchronized (welcomeFilesLock) {
-            for (int i = 0; i < welcomeFiles.length; i++) {
-                if (name.equals(welcomeFiles[i]))
+            for (String welcomeFile : welcomeFiles) {
+                if (name.equals(welcomeFile))
                     return true;
             }
         }
@@ -4259,8 +4259,8 @@ public class StandardContext extends ContainerBase
 
         Container[] children = findChildren();
         if (children != null) {
-            for( int i=0; i< children.length; i++ ) {
-                result += ((StandardWrapper)children[i]).getProcessingTime();
+            for (Container child : children) {
+                result += ((StandardWrapper) child).getProcessingTime();
             }
         }
 
@@ -4281,8 +4281,8 @@ public class StandardContext extends ContainerBase
 
         Container[] children = findChildren();
         if (children != null) {
-            for( int i=0; i< children.length; i++ ) {
-                time = ((StandardWrapper)children[i]).getMaxTime();
+            for (Container child : children) {
+                time = ((StandardWrapper) child).getMaxTime();
                 if (time > result)
                     result = time;
             }
@@ -4305,8 +4305,8 @@ public class StandardContext extends ContainerBase
 
         Container[] children = findChildren();
         if (children != null) {
-            for( int i=0; i< children.length; i++ ) {
-                time = ((StandardWrapper)children[i]).getMinTime();
+            for (Container child : children) {
+                time = ((StandardWrapper) child).getMinTime();
                 if (result < 0 || time < result)
                     result = time;
             }
@@ -4328,8 +4328,8 @@ public class StandardContext extends ContainerBase
 
         Container[] children = findChildren();
         if (children != null) {
-            for( int i=0; i< children.length; i++ ) {
-                result += ((StandardWrapper)children[i]).getRequestCount();
+            for (Container child : children) {
+                result += ((StandardWrapper) child).getRequestCount();
             }
         }
 
@@ -4349,8 +4349,8 @@ public class StandardContext extends ContainerBase
 
         Container[] children = findChildren();
         if (children != null) {
-            for( int i=0; i< children.length; i++ ) {
-                result += ((StandardWrapper)children[i]).getErrorCount();
+            for (Container child : children) {
+                result += ((StandardWrapper) child).getErrorCount();
             }
         }
 
@@ -4633,19 +4633,19 @@ public class StandardContext extends ContainerBase
         }
 
         // Sort listeners in two arrays
-        ArrayList<Object> eventListeners = new ArrayList<>();
-        ArrayList<Object> lifecycleListeners = new ArrayList<>();
-        for (int i = 0; i < results.length; i++) {
-            if ((results[i] instanceof ServletContextAttributeListener)
-                || (results[i] instanceof ServletRequestAttributeListener)
-                || (results[i] instanceof ServletRequestListener)
-                || (results[i] instanceof HttpSessionIdListener)
-                || (results[i] instanceof HttpSessionAttributeListener)) {
-                eventListeners.add(results[i]);
+        List<Object> eventListeners = new ArrayList<>();
+        List<Object> lifecycleListeners = new ArrayList<>();
+        for (Object result : results) {
+            if ((result instanceof ServletContextAttributeListener)
+                    || (result instanceof ServletRequestAttributeListener)
+                    || (result instanceof ServletRequestListener)
+                    || (result instanceof HttpSessionIdListener)
+                    || (result instanceof HttpSessionAttributeListener)) {
+                eventListeners.add(result);
             }
-            if ((results[i] instanceof ServletContextListener)
-                || (results[i] instanceof HttpSessionListener)) {
-                lifecycleListeners.add(results[i]);
+            if ((result instanceof ServletContextListener)
+                    || (result instanceof HttpSessionListener)) {
+                lifecycleListeners.add(result);
             }
         }
 
@@ -4684,11 +4684,11 @@ public class StandardContext extends ContainerBase
             noPluggabilityServletContext = new NoPluggabilityServletContext(getServletContext());
             tldEvent = new ServletContextEvent(noPluggabilityServletContext);
         }
-        for (int i = 0; i < instances.length; i++) {
-            if (!(instances[i] instanceof ServletContextListener))
+        for (Object instance : instances) {
+            if (!(instance instanceof ServletContextListener))
                 continue;
             ServletContextListener listener =
-                (ServletContextListener) instances[i];
+                    (ServletContextListener) instance;
             try {
                 fireContainerEvent("beforeContextInitialized", listener);
                 if (noPluggabilityListeners.contains(listener)) {
@@ -4701,8 +4701,8 @@ public class StandardContext extends ContainerBase
                 ExceptionUtils.handleThrowable(t);
                 fireContainerEvent("afterContextInitialized", listener);
                 getLogger().error
-                    (sm.getString("standardContext.listenerStart",
-                                  instances[i].getClass().getName()), t);
+                        (sm.getString("standardContext.listenerStart",
+                                instance.getClass().getName()), t);
                 ok = false;
             }
         }
@@ -4862,8 +4862,8 @@ public class StandardContext extends ContainerBase
 
         // Collect "load on startup" servlets that need to be initialized
         TreeMap<Integer, ArrayList<Wrapper>> map = new TreeMap<>();
-        for (int i = 0; i < children.length; i++) {
-            Wrapper wrapper = (Wrapper) children[i];
+        for (Container child : children) {
+            Wrapper wrapper = (Wrapper) child;
             int loadOnStartup = wrapper.getLoadOnStartup();
             if (loadOnStartup < 0)
                 continue;
@@ -5315,19 +5315,19 @@ public class StandardContext extends ContainerBase
         Map<String,String> mergedParams = new HashMap<>();
 
         String names[] = findParameters();
-        for (int i = 0; i < names.length; i++) {
-            mergedParams.put(names[i], findParameter(names[i]));
+        for (String s : names) {
+            mergedParams.put(s, findParameter(s));
         }
 
         ApplicationParameter params[] = findApplicationParameters();
-        for (int i = 0; i < params.length; i++) {
-            if (params[i].getOverride()) {
-                if (mergedParams.get(params[i].getName()) == null) {
-                    mergedParams.put(params[i].getName(),
-                            params[i].getValue());
+        for (ApplicationParameter param : params) {
+            if (param.getOverride()) {
+                if (mergedParams.get(param.getName()) == null) {
+                    mergedParams.put(param.getName(),
+                            param.getValue());
                 }
             } else {
-                mergedParams.put(params[i].getName(), params[i].getValue());
+                mergedParams.put(param.getName(), param.getValue());
             }
         }
 
@@ -5385,8 +5385,8 @@ public class StandardContext extends ContainerBase
             // Stop ContainerBackgroundProcessor thread
             threadStop();
 
-            for (int i = 0; i < children.length; i++) {
-                children[i].stop();
+            for (Container child : children) {
+                child.stop();
             }
 
             // Stop our filters
@@ -5896,13 +5896,13 @@ public class StandardContext extends ContainerBase
             ServletRequestEvent event =
                     new ServletRequestEvent(getServletContext(), request);
 
-            for (int i = 0; i < instances.length; i++) {
-                if (instances[i] == null)
+            for (Object instance : instances) {
+                if (instance == null)
                     continue;
-                if (!(instances[i] instanceof ServletRequestListener))
+                if (!(instance instanceof ServletRequestListener))
                     continue;
                 ServletRequestListener listener =
-                    (ServletRequestListener) instances[i];
+                        (ServletRequestListener) instance;
 
                 try {
                     listener.requestInitialized(event);
@@ -5910,7 +5910,7 @@ public class StandardContext extends ContainerBase
                     ExceptionUtils.handleThrowable(t);
                     getLogger().error(sm.getString(
                             "standardContext.requestListener.requestInit",
-                            instances[i].getClass().getName()), t);
+                            instance.getClass().getName()), t);
                     request.setAttribute(RequestDispatcher.ERROR_EXCEPTION, t);
                     return false;
                 }

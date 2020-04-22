@@ -216,11 +216,11 @@ public class RewriteValve extends ValveBase {
         if (mapsConfiguration.size() > 0) {
             buffer.append("\r\n");
         }
-        for (int i = 0; i < rules.length; i++) {
-            for (int j = 0; j < rules[i].getConditions().length; j++) {
-                buffer.append(rules[i].getConditions()[j].toString()).append("\r\n");
+        for (RewriteRule rule : rules) {
+            for (int j = 0; j < rule.getConditions().length; j++) {
+                buffer.append(rule.getConditions()[j].toString()).append("\r\n");
             }
-            buffer.append(rules[i].toString()).append("\r\n").append("\r\n");
+            buffer.append(rule.toString()).append("\r\n").append("\r\n");
         }
         return buffer.toString();
     }
@@ -246,16 +246,16 @@ public class RewriteValve extends ValveBase {
                             conditions.get(i).setOrnext(true);
                         }
                     }
-                    for (int i = 0; i < conditions.size(); i++) {
+                    for (RewriteCond condition : conditions) {
                         if (containerLog.isDebugEnabled()) {
-                            RewriteCond cond = conditions.get(i);
+                            RewriteCond cond = condition;
                             containerLog.debug("Add condition " + cond.getCondPattern()
                                     + " test " + cond.getTestString() + " to rule with pattern "
                                     + rule.getPatternString() + " and substitution "
                                     + rule.getSubstitutionString() + (cond.isOrnext() ? " [OR]" : "")
                                     + (cond.isNocase() ? " [NC]" : ""));
                         }
-                        rule.addCondition(conditions.get(i));
+                        rule.addCondition(condition);
                     }
                     conditions.clear();
                     rules.add(rule);
@@ -279,8 +279,8 @@ public class RewriteValve extends ValveBase {
         this.rules = rules.toArray(new RewriteRule[0]);
 
         // Finish parsing the rules
-        for (int i = 0; i < this.rules.length; i++) {
-            this.rules[i].parse(maps);
+        for (RewriteRule rule : this.rules) {
+            rule.parse(maps);
         }
     }
 

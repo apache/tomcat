@@ -1651,9 +1651,7 @@ public class TestHttp11Processor extends TomcatBaseTest {
             if (null == req.getServerName())
             {
                 out.print("request.getServerName() is null");
-            }
-            else
-            {
+            } else {
                 out.print("request.getServerName() is [" + req.getServerName() + "]");
             }
 

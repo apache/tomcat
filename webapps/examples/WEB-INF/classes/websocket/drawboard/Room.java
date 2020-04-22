@@ -371,9 +371,9 @@ public final class Room {
 
                 // Run the cached runnables.
                 if (cachedRunnables != null) {
-                    for (int i = 0; i < cachedRunnables.size(); i++) {
+                    for (Runnable cachedRunnable : cachedRunnables) {
                         if (!closed) {
-                            cachedRunnables.get(i).run();
+                            cachedRunnable.run();
                         }
                     }
                     cachedRunnables = null;

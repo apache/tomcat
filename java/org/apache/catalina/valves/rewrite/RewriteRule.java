@@ -53,14 +53,14 @@ public class RewriteRule {
         }
         Pattern.compile(patternString, flags);
         // Parse conditions
-        for (int i = 0; i < conditions.length; i++) {
-            conditions[i].parse(maps);
+        for (RewriteCond condition : conditions) {
+            condition.parse(maps);
         }
         // Parse flag which have substitution values
         if (isEnv()) {
-            for (int i = 0; i < envValue.size(); i++) {
+            for (String s : envValue) {
                 Substitution newEnvSubstitution = new Substitution();
-                newEnvSubstitution.setSub(envValue.get(i));
+                newEnvSubstitution.setSub(s);
                 newEnvSubstitution.parse(maps);
                 envSubstitution.add(newEnvSubstitution);
                 envResult.add(new ThreadLocal<String>());

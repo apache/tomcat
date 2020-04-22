@@ -18,7 +18,6 @@ package org.apache.tomcat.dbcp.pool2;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -194,9 +193,7 @@ public final class PoolUtils {
             throw new IllegalArgumentException(MSG_NULL_KEYS);
         }
         final Map<K, TimerTask> tasks = new HashMap<>(keys.size());
-        final Iterator<K> iter = keys.iterator();
-        while (iter.hasNext()) {
-            final K key = iter.next();
+        for (K key : keys) {
             final TimerTask task = checkMinIdle(keyedPool, key, minIdle, period);
             tasks.put(key, task);
         }

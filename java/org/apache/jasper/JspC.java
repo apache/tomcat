@@ -1730,10 +1730,10 @@ public class JspC extends Task implements Options {
             if (lib.exists() && lib.isDirectory()) {
                 String[] libs = lib.list();
                 if (libs != null) {
-                    for (int i = 0; i < libs.length; i++) {
-                        if( libs[i].length() <5 ) continue;
-                        String ext=libs[i].substring( libs[i].length() - 4 );
-                        if (! ".jar".equalsIgnoreCase(ext)) {
+                    for (String s : libs) {
+                        if (s.length() < 5) continue;
+                        String ext = s.substring(s.length() - 4);
+                        if (!".jar".equalsIgnoreCase(ext)) {
                             if (".tld".equalsIgnoreCase(ext)) {
                                 log.warn("TLD files should not be placed in "
                                          + "/WEB-INF/lib");
@@ -1741,9 +1741,9 @@ public class JspC extends Task implements Options {
                             continue;
                         }
                         try {
-                            File libFile = new File(lib, libs[i]);
+                            File libFile = new File(lib, s);
                             classPath = classPath + File.pathSeparator
-                                + libFile.getAbsolutePath();
+                                    + libFile.getAbsolutePath();
                             urls.add(libFile.getAbsoluteFile().toURI().toURL());
                         } catch (IOException ioe) {
                             // failing a toCanonicalPath on a file that

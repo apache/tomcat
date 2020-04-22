@@ -650,8 +650,8 @@ public class FormAuthenticator
         SavedRequest saved = new SavedRequest();
         Cookie cookies[] = request.getCookies();
         if (cookies != null) {
-            for (int i = 0; i < cookies.length; i++) {
-                saved.addCookie(cookies[i]);
+            for (Cookie cookie : cookies) {
+                saved.addCookie(cookie);
             }
         }
         Enumeration<String> names = request.getHeaderNames();

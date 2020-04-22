@@ -109,8 +109,8 @@ public class JspApplicationContextImpl implements JspApplicationContext {
 
     protected void fireListeners(ELContext elContext) {
         ELContextEvent event = new ELContextEvent(elContext);
-        for (int i = 0; i < this.contextListeners.size(); i++) {
-            this.contextListeners.get(i).contextCreated(event);
+        for (ELContextListener contextListener : this.contextListeners) {
+            contextListener.contextCreated(event);
         }
     }
 

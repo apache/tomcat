@@ -163,51 +163,51 @@ public class DeltaRequest implements Externalizable {
         if ( !this.sessionId.equals( session.getId() ) )
             throw new java.lang.IllegalArgumentException(sm.getString("deltaRequest.ssid.mismatch"));
         session.access();
-        for ( int i=0; i<actions.size(); i++ ) {
-            AttributeInfo info = actions.get(i);
-            switch ( info.getType() ) {
+        for (AttributeInfo info : actions) {
+            switch (info.getType()) {
                 case TYPE_ATTRIBUTE:
-                    if ( info.getAction() == ACTION_SET ) {
-                        if ( log.isTraceEnabled() ) log.trace("Session.setAttribute('"+info.getName()+"', '"+info.getValue()+"')");
-                        session.setAttribute(info.getName(), info.getValue(),notifyListeners,false);
-                    }  else {
-                        if ( log.isTraceEnabled() ) log.trace("Session.removeAttribute('"+info.getName()+"')");
-                        session.removeAttribute(info.getName(),notifyListeners,false);
+                    if (info.getAction() == ACTION_SET) {
+                        if (log.isTraceEnabled())
+                            log.trace("Session.setAttribute('" + info.getName() + "', '" + info.getValue() + "')");
+                        session.setAttribute(info.getName(), info.getValue(), notifyListeners, false);
+                    } else {
+                        if (log.isTraceEnabled()) log.trace("Session.removeAttribute('" + info.getName() + "')");
+                        session.removeAttribute(info.getName(), notifyListeners, false);
                     }
 
                     break;
                 case TYPE_ISNEW:
-                    if ( log.isTraceEnabled() ) log.trace("Session.setNew('"+info.getValue()+"')");
-                    session.setNew(((Boolean)info.getValue()).booleanValue(),false);
+                    if (log.isTraceEnabled()) log.trace("Session.setNew('" + info.getValue() + "')");
+                    session.setNew(((Boolean) info.getValue()).booleanValue(), false);
                     break;
                 case TYPE_MAXINTERVAL:
-                    if ( log.isTraceEnabled() ) log.trace("Session.setMaxInactiveInterval('"+info.getValue()+"')");
-                    session.setMaxInactiveInterval(((Integer)info.getValue()).intValue(),false);
+                    if (log.isTraceEnabled()) log.trace("Session.setMaxInactiveInterval('" + info.getValue() + "')");
+                    session.setMaxInactiveInterval(((Integer) info.getValue()).intValue(), false);
                     break;
                 case TYPE_PRINCIPAL:
                     Principal p = null;
                     if (info.getAction() == ACTION_SET) {
                         p = (Principal) info.getValue();
                     }
-                    session.setPrincipal(p,false);
+                    session.setPrincipal(p, false);
                     break;
                 case TYPE_AUTHTYPE:
                     String authType = null;
-                    if ( info.getAction() == ACTION_SET ) {
-                        authType = (String)info.getValue();
+                    if (info.getAction() == ACTION_SET) {
+                        authType = (String) info.getValue();
                     }
-                    session.setAuthType(authType,false);
+                    session.setAuthType(authType, false);
                     break;
                 case TYPE_LISTENER:
                     SessionListener listener = (SessionListener) info.getValue();
                     if (info.getAction() == ACTION_SET) {
-                        session.addSessionListener(listener,false);
+                        session.addSessionListener(listener, false);
                     } else {
-                        session.removeSessionListener(listener,false);
+                        session.removeSessionListener(listener, false);
                     }
                     break;
-                default :
-                    throw new java.lang.IllegalArgumentException(sm.getString("deltaRequest.invalidAttributeInfoType", info));
+                default:
+                    throw new IllegalArgumentException(sm.getString("deltaRequest.invalidAttributeInfoType", info));
             }//switch
         }//for
         session.endAccess();
@@ -268,8 +268,7 @@ public class DeltaRequest implements Externalizable {
                     log.error(sm.getString("deltaRequest.removeUnable"),x);
                     info = new AttributeInfo();
                 }
-            }
-            else {
+            } else {
                 info = new AttributeInfo();
             }
             info.readExternal(in);

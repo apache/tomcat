@@ -1599,12 +1599,12 @@ public class Request implements HttpServletRequest {
                     context.getServletContext(), getRequest(), name, value);
         }
 
-        for (int i = 0; i < listeners.length; i++) {
-            if (!(listeners[i] instanceof ServletRequestAttributeListener)) {
+        for (Object o : listeners) {
+            if (!(o instanceof ServletRequestAttributeListener)) {
                 continue;
             }
             ServletRequestAttributeListener listener =
-                    (ServletRequestAttributeListener) listeners[i];
+                    (ServletRequestAttributeListener) o;
             try {
                 if (replaced) {
                     listener.attributeReplaced(event);
@@ -1636,12 +1636,12 @@ public class Request implements HttpServletRequest {
         ServletRequestAttributeEvent event =
                 new ServletRequestAttributeEvent(context.getServletContext(),
                         getRequest(), name, value);
-        for (int i = 0; i < listeners.length; i++) {
-            if (!(listeners[i] instanceof ServletRequestAttributeListener)) {
+        for (Object o : listeners) {
+            if (!(o instanceof ServletRequestAttributeListener)) {
                 continue;
             }
             ServletRequestAttributeListener listener =
-                    (ServletRequestAttributeListener) listeners[i];
+                    (ServletRequestAttributeListener) o;
             try {
                 listener.attributeRemoved(event);
             } catch (Throwable t) {

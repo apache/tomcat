@@ -48,8 +48,8 @@ public class OpenSSLConf implements Serializable {
         String name;
         String value;
         int rc;
-        for (int i = 0; i < commands.size(); i++) {
-            cmd = commands.get(i);
+        for (OpenSSLConfCmd command : commands) {
+            cmd = command;
             name = cmd.getName();
             value = cmd.getValue();
             if (name == null) {
@@ -70,7 +70,8 @@ public class OpenSSLConf implements Serializable {
                 log.error(sm.getString("opensslconf.failedCommand", name, value,
                         Integer.toString(rc)));
                 result = false;
-            } else if (log.isDebugEnabled()) {
+            }
+            else if (log.isDebugEnabled()) {
                 log.debug(sm.getString("opensslconf.resultCommand", name, value,
                         Integer.toString(rc)));
             }
@@ -88,8 +89,8 @@ public class OpenSSLConf implements Serializable {
         String name;
         String value;
         int rc;
-        for (int i = 0; i < commands.size(); i++) {
-            cmd = commands.get(i);
+        for (OpenSSLConfCmd command : commands) {
+            cmd = command;
             name = cmd.getName();
             value = cmd.getValue();
             if (name == null) {
@@ -110,7 +111,8 @@ public class OpenSSLConf implements Serializable {
                 log.error(sm.getString("opensslconf.failedCommand", name, value,
                         Integer.toString(rc)));
                 result = false;
-            } else if (log.isDebugEnabled()) {
+            }
+            else if (log.isDebugEnabled()) {
                 log.debug(sm.getString("opensslconf.resultCommand", name, value,
                         Integer.toString(rc)));
             }

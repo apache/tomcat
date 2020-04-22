@@ -341,8 +341,8 @@ public class CompressionConfig {
         if (value == null) {
             return false;
         }
-        for (int i = 0; i < sArray.length; i++) {
-            if (value.startsWith(sArray[i])) {
+        for (String s : sArray) {
+            if (value.startsWith(s)) {
                 return true;
             }
         }

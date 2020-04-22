@@ -229,8 +229,7 @@ public abstract class SimpleHttpClient {
             if (requestPart != null) {
                 if (first) {
                     first = false;
-                }
-                else {
+                } else {
                     Thread.sleep(requestPause);
                 }
                 writer.write(requestPart);
@@ -320,8 +319,7 @@ public abstract class SimpleHttpClient {
                 int read = reader.read(body);
                 Assert.assertEquals(contentLength, read);
                 builder.append(body);
-            }
-            else {
+            } else {
                 // not using content length, so just read it line by line
                 String line = null;
                 try {

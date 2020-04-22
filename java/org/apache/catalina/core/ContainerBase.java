@@ -920,8 +920,8 @@ public abstract class ContainerBase extends LifecycleMBeanBase
         // Start our child containers, if any
         Container children[] = findChildren();
         List<Future<Void>> results = new ArrayList<>();
-        for (int i = 0; i < children.length; i++) {
-            results.add(startStopExecutor.submit(new StartChild(children[i])));
+        for (Container child : children) {
+            results.add(startStopExecutor.submit(new StartChild(child)));
         }
 
         MultiThrowable multiThrowable = null;
@@ -980,8 +980,8 @@ public abstract class ContainerBase extends LifecycleMBeanBase
         // Stop our child containers, if any
         Container children[] = findChildren();
         List<Future<Void>> results = new ArrayList<>();
-        for (int i = 0; i < children.length; i++) {
-            results.add(startStopExecutor.submit(new StopChild(children[i])));
+        for (Container child : children) {
+            results.add(startStopExecutor.submit(new StopChild(child)));
         }
 
         boolean fail = false;
@@ -1380,9 +1380,9 @@ public abstract class ContainerBase extends LifecycleMBeanBase
                 }
                 container.backgroundProcess();
                 Container[] children = container.findChildren();
-                for (int i = 0; i < children.length; i++) {
-                    if (children[i].getBackgroundProcessorDelay() <= 0) {
-                        processChildren(children[i]);
+                for (Container child : children) {
+                    if (child.getBackgroundProcessorDelay() <= 0) {
+                        processChildren(child);
                     }
                 }
             } catch (Throwable t) {

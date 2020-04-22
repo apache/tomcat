@@ -445,8 +445,7 @@ class ParserController implements TagConstants {
             boolean isDirective = jspReader.matches("%@");
             if (isDirective) {
                 jspReader.skipSpaces();
-            }
-            else {
+            } else {
                 isDirective = jspReader.matches("jsp:directive.");
             }
             if (!isDirective) {

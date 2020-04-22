@@ -600,10 +600,9 @@ public class GenericKeyedObjectPool<K, T> extends BaseGenericObjectPool<T>
      */
     @Override
     public void clear() {
-        final Iterator<K> iter = poolMap.keySet().iterator();
 
-        while (iter.hasNext()) {
-            clear(iter.next());
+        for (K k : poolMap.keySet()) {
+            clear(k);
         }
     }
 
@@ -709,9 +708,8 @@ public class GenericKeyedObjectPool<K, T> extends BaseGenericObjectPool<T>
             jmxUnregister();
 
             // Release any threads that were waiting for an object
-            final Iterator<ObjectDeque<T>> iter = poolMap.values().iterator();
-            while (iter.hasNext()) {
-                iter.next().getIdleObjects().interuptTakeWaiters();
+            for (ObjectDeque<T> tObjectDeque : poolMap.values()) {
+                tObjectDeque.getIdleObjects().interuptTakeWaiters();
             }
             // This clear cleans up the keys now any waiting threads have been
             // interrupted
@@ -1412,16 +1410,14 @@ public class GenericKeyedObjectPool<K, T> extends BaseGenericObjectPool<T>
     public Map<String,Integer> getNumActivePerKey() {
         final HashMap<String,Integer> result = new HashMap<>();
 
-        final Iterator<Entry<K,ObjectDeque<T>>> iter = poolMap.entrySet().iterator();
-        while (iter.hasNext()) {
-            final Entry<K,ObjectDeque<T>> entry = iter.next();
+        for (Entry<K, ObjectDeque<T>> entry : poolMap.entrySet()) {
             if (entry != null) {
                 final K key = entry.getKey();
                 final ObjectDeque<T> objectDequeue = entry.getValue();
                 if (key != null && objectDequeue != null) {
                     result.put(key.toString(), Integer.valueOf(
                             objectDequeue.getAllObjects().size() -
-                            objectDequeue.getIdleObjects().size()));
+                                    objectDequeue.getIdleObjects().size()));
                 }
             }
         }
@@ -1441,11 +1437,10 @@ public class GenericKeyedObjectPool<K, T> extends BaseGenericObjectPool<T>
         int result = 0;
 
         if (getBlockWhenExhausted()) {
-            final Iterator<ObjectDeque<T>> iter = poolMap.values().iterator();
 
-            while (iter.hasNext()) {
+            for (ObjectDeque<T> tObjectDeque : poolMap.values()) {
                 // Assume no overflow
-                result += iter.next().getIdleObjects().getTakeQueueLength();
+                result += tObjectDeque.getIdleObjects().getTakeQueueLength();
             }
         }
 

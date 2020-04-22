@@ -228,22 +228,28 @@ public class Catalina {
             return false;
         }
 
-        for (int i = 0; i < args.length; i++) {
+        for (String arg : args) {
             if (isConfig) {
-                configFile = args[i];
+                configFile = arg;
                 isConfig = false;
-            } else if (args[i].equals("-config")) {
+            }
+            else if (arg.equals("-config")) {
                 isConfig = true;
-            } else if (args[i].equals("-nonaming")) {
+            }
+            else if (arg.equals("-nonaming")) {
                 setUseNaming(false);
-            } else if (args[i].equals("-help")) {
+            }
+            else if (arg.equals("-help")) {
                 usage();
                 return false;
-            } else if (args[i].equals("start")) {
+            }
+            else if (arg.equals("start")) {
                 // NOOP
-            } else if (args[i].equals("configtest")) {
+            }
+            else if (arg.equals("configtest")) {
                 // NOOP
-            } else if (args[i].equals("stop")) {
+            }
+            else if (arg.equals("stop")) {
                 // NOOP
             } else {
                 usage();

@@ -93,10 +93,10 @@ public class TcpFailureDetector extends ChannelInterceptorBase implements TcpFai
             super.sendMessage(destination, msg, payload);
         }catch ( ChannelException cx ) {
             FaultyMember[] mbrs = cx.getFaultyMembers();
-            for ( int i=0; i<mbrs.length; i++ ) {
-                if ( mbrs[i].getCause()!=null &&
-                     (!(mbrs[i].getCause() instanceof RemoteProcessException)) ) {//RemoteProcessException's are ok
-                    this.memberDisappeared(mbrs[i].getMember());
+            for (FaultyMember mbr : mbrs) {
+                if (mbr.getCause() != null &&
+                        (!(mbr.getCause() instanceof RemoteProcessException))) {//RemoteProcessException's are ok
+                    this.memberDisappeared(mbr.getMember());
                 }//end if
             }//for
             throw cx;
@@ -277,8 +277,7 @@ public class TcpFailureDetector extends ChannelInterceptorBase implements TcpFai
         //check suspect members if they are still alive,
         //if not, simply issue the memberDisappeared message
         Member[] keys = removeSuspects.keySet().toArray(new Member[0]);
-        for (int i = 0; i < keys.length; i++) {
-            Member m = keys[i];
+        for (Member m : keys) {
             if (membership.getMember(m) != null && (!memberAlive(m))) {
                 membership.removeMember(m);
                 if (m instanceof StaticMember) {
@@ -286,7 +285,7 @@ public class TcpFailureDetector extends ChannelInterceptorBase implements TcpFai
                 }
                 super.memberDisappeared(m);
                 removeSuspects.remove(m);
-                if(log.isInfoEnabled())
+                if (log.isInfoEnabled())
                     log.info(sm.getString("tcpFailureDetector.suspectMember.dead", m));
             } else {
                 if (removeSuspectsTimeout > 0) {
@@ -302,13 +301,12 @@ public class TcpFailureDetector extends ChannelInterceptorBase implements TcpFai
         //check add suspects members if they are alive now,
         //if they are, simply issue the memberAdded message
         keys = addSuspects.keySet().toArray(new Member[0]);
-        for (int i = 0; i < keys.length; i++) {
-            Member m = keys[i];
-            if ( membership.getMember(m) == null && (memberAlive(m))) {
+        for (Member m : keys) {
+            if (membership.getMember(m) == null && (memberAlive(m))) {
                 membership.memberAlive(m);
                 super.memberAdded(m);
                 addSuspects.remove(m);
-                if(log.isInfoEnabled())
+                if (log.isInfoEnabled())
                     log.info(sm.getString("tcpFailureDetector.suspectMember.alive", m));
             } //end if
         }
