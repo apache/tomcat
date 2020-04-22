@@ -196,7 +196,7 @@ public class TestSendFile extends TomcatBaseTest {
         @Override
         protected void doGet(HttpServletRequest req, HttpServletResponse resp)
                 throws ServletException, IOException {
-            if (Boolean.valueOf(req.getParameter(Globals.SENDFILE_SUPPORTED_ATTR))) {
+            if (Boolean.parseBoolean(req.getParameter(Globals.SENDFILE_SUPPORTED_ATTR))) {
                 resp.setContentType("'application/octet-stream");
                 resp.setCharacterEncoding("ISO-8859-1");
                 resp.setContentLengthLong(file.length());

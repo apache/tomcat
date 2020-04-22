@@ -76,7 +76,7 @@ public class TagHandlerPool {
             maxSize = Constants.MAX_POOL_SIZE;
         }
         String useInstanceManagerForTagsValue = getOption(config, OPTION_USEIMFORTAGS, "false");
-        useInstanceManagerForTags = Boolean.valueOf(useInstanceManagerForTagsValue);
+        useInstanceManagerForTags = Boolean.parseBoolean(useInstanceManagerForTagsValue);
         this.handlers = new Tag[maxSize];
         this.current = -1;
         instanceManager = InstanceManagerFactory.getInstanceManager(config);
