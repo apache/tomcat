@@ -88,7 +88,7 @@ public class AprSSLSupport implements SSLSupport {
     @Override
     public Integer getKeySize() throws IOException {
         try {
-            return Integer.valueOf(socketWrapper.getSSLInfoI(SSL.SSL_INFO_CIPHER_USEKEYSIZE));
+            return socketWrapper.getSSLInfoI(SSL.SSL_INFO_CIPHER_USEKEYSIZE);
         } catch (Exception e) {
             throw new IOException(e);
         }

@@ -176,19 +176,19 @@ public class StatusTransformer {
                 writer.print("<p>");
                 writer.print( args[0] );
                 writer.print(' ');
-                writer.print(formatSize(Long.valueOf(result[0]), true));
+                writer.print(formatSize(result[0], true));
                 writer.print(' ');
                 writer.print(args[1]);
                 writer.print(' ');
-                writer.print(formatSize(Long.valueOf(result[1]), true));
+                writer.print(formatSize(result[1], true));
                 writer.print(' ');
                 writer.print(args[2]);
                 writer.print(' ');
-                writer.print(formatSize(Long.valueOf(result[2]), true));
+                writer.print(formatSize(result[2], true));
                 writer.print(' ');
                 writer.print(args[3]);
                 writer.print(' ');
-                writer.print(formatSize(Long.valueOf(result[3]), true));
+                writer.print(formatSize(result[3], true));
                 writer.print(' ');
                 writer.print(args[4]);
                 writer.print(' ');
@@ -196,11 +196,11 @@ public class StatusTransformer {
                 writer.print("<br>");
                 writer.print(args[5]);
                 writer.print(' ');
-                writer.print(formatTime(Long.valueOf(result[11] / 1000), true));
+                writer.print(formatTime(result[11] / 1000, true));
                 writer.print(' ');
                 writer.print(args[6]);
                 writer.print(' ');
-                writer.print(formatTime(Long.valueOf(result[12] / 1000), true));
+                writer.print(formatTime(result[12] / 1000, true));
                 writer.print("</p>");
             } else if (mode == 1){
                 // NO-OP
@@ -234,17 +234,17 @@ public class StatusTransformer {
             writer.print( args[0] );
             writer.print(' ');
             writer.print(formatSize(
-                    Long.valueOf(Runtime.getRuntime().freeMemory()), true));
+                    Runtime.getRuntime().freeMemory(), true));
             writer.print(' ');
             writer.print(args[1]);
             writer.print(' ');
             writer.print(formatSize(
-                    Long.valueOf(Runtime.getRuntime().totalMemory()), true));
+                    Runtime.getRuntime().totalMemory(), true));
             writer.print(' ');
             writer.print(args[2]);
             writer.print(' ');
             writer.print(formatSize(
-                    Long.valueOf(Runtime.getRuntime().maxMemory()), true));
+                    Runtime.getRuntime().maxMemory(), true));
             writer.print("</p>");
 
             writer.write("<table border=\"0\"><thead><tr><th>" + args[3] + "</th><th>" + args[4] + "</th><th>" + args[5] + "</th><th>" + args[6] + "</th><th>" + args[7] + "</th><th>" + args[8] + "</th></tr></thead><tbody>");
@@ -255,13 +255,13 @@ public class StatusTransformer {
                 writer.write("</td><td>");
                 writer.print(memoryPoolMBean.getType());
                 writer.write("</td><td>");
-                writer.print(formatSize(Long.valueOf(usage.getInit()), true));
+                writer.print(formatSize(usage.getInit(), true));
                 writer.write("</td><td>");
-                writer.print(formatSize(Long.valueOf(usage.getCommitted()), true));
+                writer.print(formatSize(usage.getCommitted(), true));
                 writer.write("</td><td>");
-                writer.print(formatSize(Long.valueOf(usage.getMax()), true));
+                writer.print(formatSize(usage.getMax(), true));
                 writer.write("</td><td>");
-                writer.print(formatSize(Long.valueOf(usage.getUsed()), true));
+                writer.print(formatSize(usage.getUsed(), true));
                 if (usage.getMax() > 0) {
                     writer.write(" ("
                             + (usage.getUsed() * 100 / usage.getMax()) + "%)");

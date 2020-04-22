@@ -44,23 +44,23 @@ public class TestFile extends AbstractJniTest {
 
     public static String inspectFileInfo(FileInfo fileInfo) {
         String result = fileInfo.toString() + " : {" +
-                String.format("\n  pool : %d", Long.valueOf(fileInfo.pool)) +
-                String.format("\n  valid : %d", Integer.valueOf(fileInfo.valid)) +
-                String.format("\n  protection : %d", Integer.valueOf(fileInfo.protection)) +
-                String.format("\n  filetype : %d", Integer.valueOf(fileInfo.filetype)) +
-                String.format("\n  user : %d", Integer.valueOf(fileInfo.user)) +
-                String.format("\n  group : %d", Integer.valueOf(fileInfo.group)) +
-                String.format("\n  inode : %d", Integer.valueOf(fileInfo.inode)) +
-                String.format("\n  device : %d", Integer.valueOf(fileInfo.device)) +
-                String.format("\n  nlink : %d", Integer.valueOf(fileInfo.nlink)) +
-                String.format("\n  size : %d", Long.valueOf(fileInfo.size)) +
-                String.format("\n  csize : %d", Long.valueOf(fileInfo.csize)) +
-                String.format("\n  atime : %d", Long.valueOf(fileInfo.atime)) +
-                String.format("\n  mtime : %d", Long.valueOf(fileInfo.mtime)) +
-                String.format("\n  ctime : %d", Long.valueOf(fileInfo.ctime)) +
+                String.format("\n  pool : %d", fileInfo.pool) +
+                String.format("\n  valid : %d", fileInfo.valid) +
+                String.format("\n  protection : %d", fileInfo.protection) +
+                String.format("\n  filetype : %d", fileInfo.filetype) +
+                String.format("\n  user : %d", fileInfo.user) +
+                String.format("\n  group : %d", fileInfo.group) +
+                String.format("\n  inode : %d", fileInfo.inode) +
+                String.format("\n  device : %d", fileInfo.device) +
+                String.format("\n  nlink : %d", fileInfo.nlink) +
+                String.format("\n  size : %d", fileInfo.size) +
+                String.format("\n  csize : %d", fileInfo.csize) +
+                String.format("\n  atime : %d", fileInfo.atime) +
+                String.format("\n  mtime : %d", fileInfo.mtime) +
+                String.format("\n  ctime : %d", fileInfo.ctime) +
                 String.format("\n  fname : %s", fileInfo.fname) +
                 String.format("\n  name : %s", fileInfo.name) +
-                String.format("\n  filehand : %d", Long.valueOf(fileInfo.filehand)) +
+                String.format("\n  filehand : %d", fileInfo.filehand) +
                 "\n}";
         return result;
     }

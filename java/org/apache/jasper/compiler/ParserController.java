@@ -207,7 +207,7 @@ class ParserController implements TagConstants {
             } else {
                 String entry = absFileName.substring(1);
                 compiler.getPageInfo().addDependant(jar.getURL(entry),
-                        Long.valueOf(jar.getLastModified(entry)));
+                        jar.getLastModified(entry));
 
             }
         }

@@ -88,7 +88,7 @@ public class DigestAuthenticator extends Authenticator {
         if (!messageQop.isEmpty()) {
             challenge.append("qop=\"" + messageQop + "\"");
             challenge.append(",cnonce=\"" + cNonce + "\",");
-            challenge.append("nc=" + String.format("%08X", Integer.valueOf(nonceCount)));
+            challenge.append("nc=" + String.format("%08X", nonceCount));
         }
 
         return challenge.toString();
@@ -121,7 +121,7 @@ public class DigestAuthenticator extends Authenticator {
 
         if (qop.toLowerCase().contains("auth")) {
             preDigest.append(":");
-            preDigest.append(String.format("%08X", Integer.valueOf(nonceCount)));
+            preDigest.append(String.format("%08X", nonceCount));
             preDigest.append(":");
             preDigest.append(String.valueOf(cNonce));
             preDigest.append(":");

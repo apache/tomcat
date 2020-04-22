@@ -362,7 +362,7 @@ public class TestWsWebSocketContainerGetOpenSessions extends WebSocketBaseTest {
             // updates occur, keep the one with the highest count.
             Integer oldCount = records.get(key);
             if (oldCount == null || oldCount.intValue() < count) {
-                records.put(key, Integer.valueOf(count));
+                records.put(key, count);
             }
             updateCount++;
         }

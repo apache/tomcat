@@ -58,7 +58,7 @@ class Stream extends AbstractStream implements HeaderEmitter {
 
     private static final MimeHeaders ACK_HEADERS;
 
-    private static final Integer HTTP_UPGRADE_STREAM = Integer.valueOf(1);
+    private static final Integer HTTP_UPGRADE_STREAM = 1;
 
     static {
         Response response =  new Response();
@@ -616,8 +616,8 @@ class Stream extends AbstractStream implements HeaderEmitter {
         long contentLengthHeader = coyoteRequest.getContentLengthLong();
         if (contentLengthHeader > -1 && contentLengthReceived > contentLengthHeader) {
             throw new ConnectionException(sm.getString("stream.header.contentLength",
-                    getConnectionId(), getIdentifier(), Long.valueOf(contentLengthHeader),
-                    Long.valueOf(contentLengthReceived)), Http2Error.PROTOCOL_ERROR);
+                    getConnectionId(), getIdentifier(), contentLengthHeader,
+                    contentLengthReceived), Http2Error.PROTOCOL_ERROR);
         }
     }
 
@@ -626,8 +626,8 @@ class Stream extends AbstractStream implements HeaderEmitter {
         if (isContentLengthInconsistent()) {
             throw new ConnectionException(sm.getString("stream.header.contentLength",
                     getConnectionId(), getIdentifier(),
-                    Long.valueOf(coyoteRequest.getContentLengthLong()),
-                    Long.valueOf(contentLengthReceived)), Http2Error.PROTOCOL_ERROR);
+                    coyoteRequest.getContentLengthLong(),
+                    contentLengthReceived), Http2Error.PROTOCOL_ERROR);
         }
         state.receivedEndOfStream();
         if (inputBuffer != null) {

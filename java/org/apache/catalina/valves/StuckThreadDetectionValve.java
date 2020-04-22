@@ -146,11 +146,11 @@ public class StuckThreadDetectionValve extends ValveBase {
             String msg = sm.getString(
                 "stuckThreadDetectionValve.notifyStuckThreadDetected",
                 monitoredThread.getThread().getName(),
-                Long.valueOf(activeTime),
+                    activeTime,
                 monitoredThread.getStartTime(),
-                Integer.valueOf(numStuckThreads),
+                    numStuckThreads,
                 monitoredThread.getRequestUri(),
-                Integer.valueOf(threshold),
+                    threshold,
                 String.valueOf(monitoredThread.getThread().getId())
                 );
             // msg += "\n" + getStackTraceAsString(trace);
@@ -166,8 +166,8 @@ public class StuckThreadDetectionValve extends ValveBase {
             String msg = sm.getString(
                 "stuckThreadDetectionValve.notifyStuckThreadCompleted",
                 thread.getName(),
-                Long.valueOf(thread.getTotalActiveTime()),
-                Integer.valueOf(numStuckThreads),
+                    thread.getTotalActiveTime(),
+                    numStuckThreads,
                 String.valueOf(thread.getId()));
             // Since the "stuck thread notification" is warn, this should also
             // be warn
@@ -192,7 +192,7 @@ public class StuckThreadDetectionValve extends ValveBase {
         // Keeping a reference to the thread object here does not prevent
         // GC'ing, as the reference is removed from the Map in the finally clause
 
-        Long key = Long.valueOf(Thread.currentThread().getId());
+        Long key = Thread.currentThread().getId();
         StringBuffer requestUrl = request.getRequestURL();
         if(request.getQueryString()!=null) {
             requestUrl.append("?");
@@ -253,7 +253,7 @@ public class StuckThreadDetectionValve extends ValveBase {
         List<Long> idList = new ArrayList<>();
         for (MonitoredThread monitoredThread : activeThreads.values()) {
             if (monitoredThread.isMarkedAsStuck()) {
-                idList.add(Long.valueOf(monitoredThread.getThread().getId()));
+                idList.add(monitoredThread.getThread().getId());
             }
         }
 
@@ -373,9 +373,9 @@ public class StuckThreadDetectionValve extends ValveBase {
                     String msg = sm.getString(
                         "stuckThreadDetectionValve.notifyStuckThreadInterrupted",
                         this.getThread().getName(),
-                        Long.valueOf(getActiveTimeInMillis()),
+                            getActiveTimeInMillis(),
                         this.getStartTime(), this.getRequestUri(),
-                        Long.valueOf(interruptThreadThreshold),
+                            interruptThreadThreshold,
                         String.valueOf(this.getThread().getId()));
                     Throwable th = new Throwable();
                     th.setStackTrace(this.getThread().getStackTrace());

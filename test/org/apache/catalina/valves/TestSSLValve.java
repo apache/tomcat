@@ -281,7 +281,7 @@ public class TestSSLValve {
 
     @Test
     public void testSslCipherUserKeySizeHeaderPresent() throws Exception {
-        Integer keySize = Integer.valueOf(452);
+        Integer keySize = 452;
         mockRequest.setHeader(valve.getSslCipherUserKeySizeHeader(), String.valueOf(keySize));
 
         valve.invoke(mockRequest, null);

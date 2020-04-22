@@ -57,7 +57,7 @@ public class JSSESupport implements SSLSupport, SSLSessionManager {
     static {
         for (Cipher cipher : Cipher.values()) {
             for (String jsseName : cipher.getJsseNames()) {
-                keySizeCache.put(jsseName, Integer.valueOf(cipher.getStrength_bits()));
+                keySizeCache.put(jsseName, cipher.getStrength_bits());
             }
         }
     }

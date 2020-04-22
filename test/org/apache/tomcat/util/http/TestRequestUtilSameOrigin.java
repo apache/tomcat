@@ -73,7 +73,7 @@ public class TestRequestUtilSameOrigin {
 
     @Test
     public void testSameOrigin() {
-        Assert.assertEquals(same, Boolean.valueOf(RequestUtil.isSameOrigin(request, origin)));
+        Assert.assertEquals(same, RequestUtil.isSameOrigin(request, origin));
     }
 
 

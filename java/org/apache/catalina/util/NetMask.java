@@ -137,7 +137,7 @@ public final class NetMask {
         }
         if (cidr > addrlen) {
             throw new IllegalArgumentException(
-                    sm.getString("netmask.cidrTooBig", cidrPart, Integer.valueOf(addrlen)));
+                    sm.getString("netmask.cidrTooBig", cidrPart, addrlen));
         }
 
         nrBytes = cidr / 8;

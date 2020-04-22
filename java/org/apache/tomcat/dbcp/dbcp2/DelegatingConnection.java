@@ -385,7 +385,7 @@ public class DelegatingConnection<C extends Connection> extends AbandonedTrace i
             return autoCommitCached.booleanValue();
         }
         try {
-            autoCommitCached = Boolean.valueOf(connection.getAutoCommit());
+            autoCommitCached = connection.getAutoCommit();
             return autoCommitCached.booleanValue();
         } catch (final SQLException e) {
             handleException(e);
@@ -455,7 +455,7 @@ public class DelegatingConnection<C extends Connection> extends AbandonedTrace i
             return readOnlyCached.booleanValue();
         }
         try {
-            readOnlyCached = Boolean.valueOf(connection.isReadOnly());
+            readOnlyCached = connection.isReadOnly();
             return readOnlyCached.booleanValue();
         } catch (final SQLException e) {
             handleException(e);
@@ -533,7 +533,7 @@ public class DelegatingConnection<C extends Connection> extends AbandonedTrace i
         try {
             connection.setAutoCommit(autoCommit);
             if (cacheState) {
-                autoCommitCached = Boolean.valueOf(autoCommit);
+                autoCommitCached = autoCommit;
             }
         } catch (final SQLException e) {
             autoCommitCached = null;
@@ -557,7 +557,7 @@ public class DelegatingConnection<C extends Connection> extends AbandonedTrace i
         try {
             connection.setReadOnly(readOnly);
             if (cacheState) {
-                readOnlyCached = Boolean.valueOf(readOnly);
+                readOnlyCached = readOnly;
             }
         } catch (final SQLException e) {
             readOnlyCached = null;

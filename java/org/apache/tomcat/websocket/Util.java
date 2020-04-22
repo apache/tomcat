@@ -312,7 +312,7 @@ public class Util {
         } else if (type.equals(byte.class) || type.equals(Byte.class)) {
             return Byte.valueOf(value);
         } else if (type.equals(char.class) || type.equals(Character.class)) {
-            return Character.valueOf(value.charAt(0));
+            return value.charAt(0);
         } else if (type.equals(double.class) || type.equals(Double.class)) {
             return Double.valueOf(value);
         } else if (type.equals(float.class) || type.equals(Float.class)) {

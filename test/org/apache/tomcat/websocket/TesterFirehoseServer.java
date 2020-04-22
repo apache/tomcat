@@ -100,7 +100,7 @@ public class TesterFirehoseServer {
 
             session.getUserProperties().put(
                     org.apache.tomcat.websocket.Constants.BLOCKING_SEND_TIMEOUT_PROPERTY,
-                    Long.valueOf(SEND_TIME_OUT_MILLIS));
+                    (long) SEND_TIME_OUT_MILLIS);
 
             Basic remote = session.getBasicRemote();
             remote.setBatchingAllowed(true);

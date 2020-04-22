@@ -913,7 +913,7 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
             reuse = true;
         }
 
-        Assert.assertEquals(Boolean.valueOf(expectedReuse), Boolean.valueOf(reuse));
+        Assert.assertEquals(expectedReuse, reuse);
     }
 
     private void validateCpong(TesterAjpMessage message) throws Exception {
@@ -980,8 +980,8 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
                     if (callAvailable) {
                         int available = s.available();
                         read = s.read(buf);
-                        availableList.add(Integer.valueOf(available));
-                        readList.add(Integer.valueOf(read));
+                        availableList.add(available);
+                        readList.add(read);
                     } else {
                         read = s.read(buf);
                     }

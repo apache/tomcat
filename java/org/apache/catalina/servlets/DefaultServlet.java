@@ -2134,11 +2134,11 @@ public class DefaultServlet extends HttpServlet {
             ) {
             request.setAttribute(Globals.SENDFILE_FILENAME_ATTR, canonicalPath);
             if (range == null) {
-                request.setAttribute(Globals.SENDFILE_FILE_START_ATTR, Long.valueOf(0L));
-                request.setAttribute(Globals.SENDFILE_FILE_END_ATTR, Long.valueOf(length));
+                request.setAttribute(Globals.SENDFILE_FILE_START_ATTR, 0L);
+                request.setAttribute(Globals.SENDFILE_FILE_END_ATTR, length);
             } else {
-                request.setAttribute(Globals.SENDFILE_FILE_START_ATTR, Long.valueOf(getStart(range, length)));
-                request.setAttribute(Globals.SENDFILE_FILE_END_ATTR, Long.valueOf(getEnd(range, length) + 1));
+                request.setAttribute(Globals.SENDFILE_FILE_START_ATTR, getStart(range, length));
+                request.setAttribute(Globals.SENDFILE_FILE_END_ATTR, getEnd(range, length) + 1);
             }
             return true;
         }
@@ -2559,7 +2559,7 @@ public class DefaultServlet extends HttpServlet {
         }
         if (skipped < start) {
             return new IOException(sm.getString("defaultServlet.skipfail",
-                    Long.valueOf(skipped), Long.valueOf(start)));
+                    skipped, start));
         }
 
         IOException exception = null;

@@ -148,7 +148,7 @@ public class TestGroupChannelSenderConnections extends LoggingBaseTest {
             for (int i=0; i<size; i++ ) {
                 int length = Math.abs(r.nextInt() %65000);
                 ArrayList<Object> list = new ArrayList<>(length);
-                map.put(Integer.valueOf(i),list);
+                map.put(i,list);
             }
         }
     }

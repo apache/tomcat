@@ -160,7 +160,7 @@ final class Hpack {
             do {
                 if(count++ > MAX_INTEGER_OCTETS) {
                     throw new HpackException(sm.getString("hpack.integerEncodedOverTooManyOctets",
-                            Integer.valueOf(MAX_INTEGER_OCTETS)));
+                            MAX_INTEGER_OCTETS));
                 }
                 if (source.remaining() == 0) {
                     //we have run out of data

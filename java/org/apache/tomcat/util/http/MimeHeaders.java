@@ -258,7 +258,7 @@ public class MimeHeaders {
     private MimeHeaderField createHeader() {
         if (limit > -1 && count >= limit) {
             throw new IllegalStateException(sm.getString(
-                    "headers.maxCountFail", Integer.valueOf(limit)));
+                    "headers.maxCountFail", limit));
         }
         MimeHeaderField mh;
         int len = headers.length;

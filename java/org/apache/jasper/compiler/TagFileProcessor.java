@@ -651,10 +651,10 @@ class TagFileProcessor {
                         if (jar != null) {
                             // Add TLD
                             pageInfo.addDependant(jar.getURL(tldResourcePath.getEntryName()),
-                                                  Long.valueOf(jar.getLastModified(tldResourcePath.getEntryName())));
+                                    jar.getLastModified(tldResourcePath.getEntryName()));
                             // Add Tag
                             pageInfo.addDependant(jar.getURL(tagFilePath.substring(1)),
-                                                  Long.valueOf(jar.getLastModified(tagFilePath.substring(1))));
+                                    jar.getLastModified(tagFilePath.substring(1)));
                         } else {
                             pageInfo.addDependant(tagFilePath,
                                                   compiler.getCompilationContext().getLastModified(tagFilePath));

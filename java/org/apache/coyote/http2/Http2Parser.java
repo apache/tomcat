@@ -292,7 +292,7 @@ class Http2Parser {
 
         if (streamId == parentStreamId) {
             throw new StreamException(sm.getString("http2Parser.processFramePriority.invalidParent",
-                    connectionId, Integer.valueOf(streamId)), Http2Error.PROTOCOL_ERROR, streamId);
+                    connectionId, streamId), Http2Error.PROTOCOL_ERROR, streamId);
         }
 
         output.reprioritise(streamId, parentStreamId, exclusive, weight);
@@ -355,7 +355,7 @@ class Http2Parser {
      */
     protected void readPushPromiseFrame(int streamId, ByteBuffer buffer) throws Http2Exception {
         throw new ConnectionException(sm.getString("http2Parser.processFramePushPromise",
-                connectionId, Integer.valueOf(streamId)), Http2Error.PROTOCOL_ERROR);
+                connectionId, streamId), Http2Error.PROTOCOL_ERROR);
     }
 
 
@@ -449,7 +449,7 @@ class Http2Parser {
 
         if (log.isDebugEnabled()) {
             log.debug(sm.getString("http2Parser.processFrameHeaders.payload", connectionId,
-                    Integer.valueOf(streamId), Integer.valueOf(payloadSize)));
+                    streamId, payloadSize));
         }
 
         int remaining = payloadSize;
@@ -495,21 +495,21 @@ class Http2Parser {
 
             if (hpackDecoder.isHeaderCountExceeded()) {
                 StreamException headerException = new StreamException(sm.getString(
-                        "http2Parser.headerLimitCount", connectionId, Integer.valueOf(streamId)),
+                        "http2Parser.headerLimitCount", connectionId, streamId),
                         Http2Error.ENHANCE_YOUR_CALM, streamId);
                 hpackDecoder.getHeaderEmitter().setHeaderException(headerException);
             }
 
             if (hpackDecoder.isHeaderSizeExceeded(headerReadBuffer.position())) {
                 StreamException headerException = new StreamException(sm.getString(
-                        "http2Parser.headerLimitSize", connectionId, Integer.valueOf(streamId)),
+                        "http2Parser.headerLimitSize", connectionId, streamId),
                         Http2Error.ENHANCE_YOUR_CALM, streamId);
                 hpackDecoder.getHeaderEmitter().setHeaderException(headerException);
             }
 
             if (hpackDecoder.isHeaderSwallowSizeExceeded(headerReadBuffer.position())) {
                 throw new ConnectionException(sm.getString("http2Parser.headerLimitSize",
-                        connectionId, Integer.valueOf(streamId)), Http2Error.ENHANCE_YOUR_CALM);
+                        connectionId, streamId), Http2Error.ENHANCE_YOUR_CALM);
             }
         }
     }

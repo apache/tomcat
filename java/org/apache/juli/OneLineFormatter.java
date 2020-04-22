@@ -233,7 +233,7 @@ public class OneLineFormatter extends Formatter {
         String result = null;
 
         if (logRecordThreadId > (Integer.MAX_VALUE / 2)) {
-            result = cache.get(Integer.valueOf(logRecordThreadId));
+            result = cache.get(logRecordThreadId);
         }
 
         if (result != null) {
@@ -259,7 +259,7 @@ public class OneLineFormatter extends Formatter {
             result = threadInfo.getThreadName();
         }
 
-        cache.put(Integer.valueOf(logRecordThreadId), result);
+        cache.put(logRecordThreadId, result);
 
         return result;
     }

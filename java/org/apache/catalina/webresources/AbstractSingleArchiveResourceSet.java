@@ -115,8 +115,7 @@ public abstract class AbstractSingleArchiveResourceSet extends AbstractArchiveRe
                     JarFile jarFile = null;
                     try {
                         jarFile = openJarFile();
-                        multiRelease = Boolean.valueOf(
-                                JreCompat.getInstance().jarFileIsMultiRelease(jarFile));
+                        multiRelease = JreCompat.getInstance().jarFileIsMultiRelease(jarFile);
                     } catch (IOException ioe) {
                         // Should never happen
                         throw new IllegalStateException(ioe);

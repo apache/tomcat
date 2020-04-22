@@ -128,7 +128,7 @@ public class NumberWriter extends HttpServlet {
                 boolean ready = true;
                 while (i < LIMIT && ready) {
                     i = counter.incrementAndGet();
-                    String msg = String.format("%1$020d\n", Integer.valueOf(i));
+                    String msg = String.format("%1$020d\n", i);
                     sos.write(msg.getBytes(StandardCharsets.UTF_8));
                     ready = sos.isReady();
                 }

@@ -78,7 +78,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
     protected static final StringManager sm = StringManager.getManager(Http2UpgradeHandler.class);
 
     private static final AtomicInteger connectionIdGenerator = new AtomicInteger(0);
-    private static final Integer STREAM_ID_ZERO = Integer.valueOf(0);
+    private static final Integer STREAM_ID_ZERO = 0;
 
     protected static final int FLAG_END_OF_STREAM = 1;
     protected static final int FLAG_END_OF_HEADERS = 4;
@@ -168,7 +168,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
             if (log.isDebugEnabled()) {
                 log.debug(sm.getString("upgradeHandler.upgrade", connectionId));
             }
-            Integer key = Integer.valueOf(1);
+            Integer key = 1;
             Stream stream = new Stream(key, this, coyoteRequest);
             streams.put(key, stream);
             maxActiveRemoteStreamId = 1;
@@ -663,8 +663,8 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
                         stream.getIdentifier()));
             } else {
                 log.debug(sm.getString("upgradeHandler.writePushHeaders", connectionId,
-                        stream.getIdentifier(), Integer.valueOf(pushedStreamId),
-                        Boolean.valueOf(endOfStream)));
+                        stream.getIdentifier(), pushedStreamId,
+                        endOfStream));
             }
         }
 
@@ -1069,7 +1069,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
 
 
     private Stream getStream(int streamId, boolean unknownIsError) throws ConnectionException {
-        Integer key = Integer.valueOf(streamId);
+        Integer key = streamId;
         Stream result = streams.get(key);
         if (result == null && unknownIsError) {
             // Stream has been closed and removed from the map
@@ -1081,7 +1081,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
 
 
     private Stream createRemoteStream(int streamId) throws ConnectionException {
-        Integer key = Integer.valueOf(streamId);
+        Integer key = streamId;
 
         if (streamId %2 != 1) {
             throw new ConnectionException(
@@ -1099,7 +1099,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
     private Stream createLocalStream(Request request) {
         int streamId = nextLocalStreamId.getAndAdd(2);
 
-        Integer key = Integer.valueOf(streamId);
+        Integer key = streamId;
 
         Stream result = new Stream(key, this, request);
         streams.put(key, result);
@@ -1444,7 +1444,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
             }
             if (streamId < maxActiveRemoteStreamId) {
                 throw new ConnectionException(sm.getString("upgradeHandler.stream.old",
-                        Integer.valueOf(streamId), Integer.valueOf(maxActiveRemoteStreamId)),
+                        streamId, maxActiveRemoteStreamId),
                         Http2Error.PROTOCOL_ERROR);
             }
             stream.checkState(FrameType.HEADERS);
@@ -1489,7 +1489,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
             boolean exclusive, int weight) throws Http2Exception {
         if (streamId == parentStreamId) {
             throw new ConnectionException(sm.getString("upgradeHandler.dependency.invalid",
-                    getConnectionId(), Integer.valueOf(streamId)), Http2Error.PROTOCOL_ERROR);
+                    getConnectionId(), streamId), Http2Error.PROTOCOL_ERROR);
         }
 
         increaseOverheadCount();
@@ -1726,7 +1726,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
                     // Unexpected ACK. Log it.
                 } else {
                     long roundTripTime = System.nanoTime() - pingRecord.getSentNanoTime();
-                    roundTripTimes.add(Long.valueOf(roundTripTime));
+                    roundTripTimes.add(roundTripTime);
                     while (roundTripTimes.size() > 3) {
                         // Ignore the returned value as we just want to reduce
                         // the queue to 3 entries to use for the rolling average.
@@ -1734,7 +1734,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
                     }
                     if (log.isDebugEnabled()) {
                         log.debug(sm.getString("pingManager.roundTripTime",
-                                connectionId, Long.valueOf(roundTripTime)));
+                                connectionId, roundTripTime));
                     }
                 }
 

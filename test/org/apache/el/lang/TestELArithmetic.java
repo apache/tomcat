@@ -39,7 +39,7 @@ public class TestELArithmetic {
     public void testAdd02() {
         ELProcessor processor = new ELProcessor();
         Object result = processor.eval("null + null");
-        Assert.assertEquals(Long.valueOf(0), result);
+        Assert.assertEquals(0L, result);
     }
 
     @Test
@@ -52,7 +52,7 @@ public class TestELArithmetic {
     public void testSubtract02() {
         ELProcessor processor = new ELProcessor();
         Object result = processor.eval("null - null");
-        Assert.assertEquals(Long.valueOf(0), result);
+        Assert.assertEquals(0L, result);
     }
 
     @Test
@@ -65,7 +65,7 @@ public class TestELArithmetic {
     public void testMultiply02() {
         ELProcessor processor = new ELProcessor();
         Object result = processor.eval("null * null");
-        Assert.assertEquals(Long.valueOf(0), result);
+        Assert.assertEquals(0L, result);
     }
 
     @Test
@@ -78,7 +78,7 @@ public class TestELArithmetic {
     public void testDivide02() {
         ELProcessor processor = new ELProcessor();
         Object result = processor.eval("null / null");
-        Assert.assertEquals(Long.valueOf(0), result);
+        Assert.assertEquals(0L, result);
     }
 
     @Test
@@ -91,14 +91,14 @@ public class TestELArithmetic {
     public void testMod02() {
         ELProcessor processor = new ELProcessor();
         Object result = processor.eval("null % null");
-        Assert.assertEquals(Long.valueOf(0), result);
+        Assert.assertEquals(0L, result);
     }
 
     @Test
     public void testUnaryMinus01() {
         ELProcessor processor = new ELProcessor();
         Object result = processor.eval("-null");
-        Assert.assertEquals(Long.valueOf(0), result);
+        Assert.assertEquals(0L, result);
     }
 
     @Test
@@ -109,12 +109,12 @@ public class TestELArithmetic {
 
     @Test
     public void testBug47371double() throws Exception {
-        Assert.assertEquals(Double.valueOf(7), ELArithmetic.add("", Double.valueOf(7)));
+        Assert.assertEquals(7d, ELArithmetic.add("", 7d));
     }
 
     @Test
     public void testBug47371doubleString() throws Exception {
-        Assert.assertEquals(Double.valueOf(2), ELArithmetic.add("", "2."));
+        Assert.assertEquals(2d, ELArithmetic.add("", "2."));
     }
 
     @Test
@@ -125,16 +125,16 @@ public class TestELArithmetic {
 
     @Test
     public void testBug47371long() throws Exception {
-        Assert.assertEquals(Long.valueOf(1), ELArithmetic.add("", Integer.valueOf(1)));
+        Assert.assertEquals(1L, ELArithmetic.add("", 1));
     }
 
     @Test
     public void testBug47371long2() throws Exception {
-        Assert.assertEquals(Long.valueOf(-3), ELArithmetic.subtract("1", "4"));
+        Assert.assertEquals((long) -3, ELArithmetic.subtract("1", "4"));
     }
 
     @Test
     public void testBug47371doubleString2() throws Exception {
-        Assert.assertEquals(Double.valueOf(2), ELArithmetic.add("1.", "1"));
+        Assert.assertEquals(2d, ELArithmetic.add("1.", "1"));
     }
 }

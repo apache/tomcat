@@ -50,7 +50,7 @@ public class SimpleServerAuthContext implements ServerAuthContext {
             ServerAuthModule module = modules.get(moduleIndex);
             AuthStatus result = module.validateRequest(messageInfo, clientSubject, serviceSubject);
             if (result != AuthStatus.SEND_FAILURE) {
-                messageInfo.getMap().put("moduleIndex", Integer.valueOf(moduleIndex));
+                messageInfo.getMap().put("moduleIndex", moduleIndex);
                 return result;
             }
         }

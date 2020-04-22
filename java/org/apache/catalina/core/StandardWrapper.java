@@ -314,8 +314,8 @@ public class StandardWrapper extends ContainerBase
             this.available = available;
         else
             this.available = 0L;
-        support.firePropertyChange("available", Long.valueOf(oldAvailable),
-                                   Long.valueOf(this.available));
+        support.firePropertyChange("available", oldAvailable,
+                this.available);
     }
 
 
@@ -520,7 +520,7 @@ public class StandardWrapper extends ContainerBase
         // If the servlet has been loaded either singleThreadModel will be true
         // or instance will be non-null
         if (singleThreadModel || instance != null) {
-            return Boolean.valueOf(singleThreadModel);
+            return singleThreadModel;
         }
         return null;
     }

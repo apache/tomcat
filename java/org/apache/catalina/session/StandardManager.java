@@ -307,7 +307,7 @@ public class StandardManager extends ManagerBase {
                     log.debug("Unloading " + sessions.size() + " sessions");
                 }
                 // Write the number of active sessions, followed by the details
-                oos.writeObject(Integer.valueOf(sessions.size()));
+                oos.writeObject(sessions.size());
                 for (Session s : sessions.values()) {
                     StandardSession session = (StandardSession) s;
                     list.add(session);

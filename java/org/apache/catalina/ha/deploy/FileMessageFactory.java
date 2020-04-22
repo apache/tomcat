@@ -245,23 +245,23 @@ public class FileMessageFactory {
         if (msg.getMessageNumber() <= lastMessageProcessed.get()) {
             // Duplicate of message already processed
             log.warn(sm.getString("fileMessageFactory.duplicateMessage", msg.getContextName(), msg.getFileName(),
-                    HexUtils.toHexString(msg.getData()), Integer.valueOf(msg.getDataLength())));
+                    HexUtils.toHexString(msg.getData()), msg.getDataLength()));
             return false;
         }
 
         FileMessage previous =
-            msgBuffer.put(Long.valueOf(msg.getMessageNumber()), msg);
+            msgBuffer.put((long) msg.getMessageNumber(), msg);
         if (previous != null) {
             // Duplicate of message not yet processed
             log.warn(sm.getString("fileMessageFactory.duplicateMessage", msg.getContextName(), msg.getFileName(),
-                    HexUtils.toHexString(msg.getData()), Integer.valueOf(msg.getDataLength())));
+                    HexUtils.toHexString(msg.getData()), msg.getDataLength()));
             return false;
         }
 
         FileMessage next = null;
         synchronized (this) {
             if (!isWriting) {
-                next = msgBuffer.get(Long.valueOf(lastMessageProcessed.get() + 1));
+                next = msgBuffer.get(lastMessageProcessed.get() + 1);
                 if (next != null) {
                     isWriting = true;
                 } else {
@@ -283,7 +283,7 @@ public class FileMessageFactory {
             }
             synchronized(this) {
                 next =
-                    msgBuffer.get(Long.valueOf(lastMessageProcessed.get() + 1));
+                    msgBuffer.get(lastMessageProcessed.get() + 1);
                 if (next == null) {
                     isWriting = false;
                 }

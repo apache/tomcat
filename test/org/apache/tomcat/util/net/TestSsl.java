@@ -112,7 +112,7 @@ public class TestSsl extends TomcatBaseTest {
 
                         os.write("POST /post HTTP/1.1\r\n".getBytes());
                         os.write("Host: localhost\r\n".getBytes());
-                        os.write(("Content-Length: " + Integer.valueOf(bytes.length) + "\r\n\r\n").getBytes());
+                        os.write(("Content-Length: " + bytes.length + "\r\n\r\n").getBytes());
                         // Write in 128KB blocks
                         for (int i = 0; i < bytes.length / (128 * 1024); i++) {
                             os.write(bytes, 0, 1024 * 128);

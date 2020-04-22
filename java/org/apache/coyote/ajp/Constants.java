@@ -221,7 +221,7 @@ public final class Constants {
             int i;
             for (i = 0; i < SC_RESP_AJP13_MAX; i++) {
                 responseTransHash.put(getResponseHeaderForCode(i),
-                        Integer.valueOf(0xA001 + i));
+                        0xA001 + i);
             }
         }
         catch (Exception e) {

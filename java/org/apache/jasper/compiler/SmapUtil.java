@@ -214,7 +214,7 @@ public class SmapUtil {
             try (FileInputStream inStream = new FileInputStream(input)) {
                 if (inStream.read(bytes, 0, len) != len) {
                     throw new IOException(Localizer.getMessage(
-                            "jsp.error.readContent", Integer.valueOf(len)));
+                            "jsp.error.readContent", len));
                 }
             }
             return bytes;
@@ -420,7 +420,7 @@ public class SmapUtil {
                         break;
                     default :
                         throw new IOException(Localizer.getMessage(
-                                "jsp.error.unexpectedTag", Integer.valueOf(tag)));
+                                "jsp.error.unexpectedTag", tag));
                 }
             }
             return sdeIndex;

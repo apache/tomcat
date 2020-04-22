@@ -600,7 +600,7 @@ public class OpenSSLCipherConfigurationParser {
          */
         Set<Integer> keySizes = new HashSet<>();
         for (Cipher cipher : ciphers) {
-            keySizes.add(Integer.valueOf(cipher.getStrength_bits()));
+            keySizes.add(cipher.getStrength_bits());
         }
         List<Integer> strength_bits = new ArrayList<>(keySizes);
         Collections.sort(strength_bits);

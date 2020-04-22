@@ -466,7 +466,7 @@ public final class ByteChunk extends AbstractChunk {
         // assert out!=null
         if (out == null) {
             throw new IOException(sm.getString(
-                    "chunk.overflow", Integer.valueOf(getLimit()), Integer.valueOf(buff.length)));
+                    "chunk.overflow", getLimit(), buff.length));
         }
         out.realWriteBytes(buff, start, end - start);
         end = start;

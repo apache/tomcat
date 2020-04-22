@@ -413,7 +413,7 @@ public class FileHandler extends Handler {
             try {
                 maxDays = Integer.valueOf(sMaxDays);
             } catch (NumberFormatException ignore) {
-                maxDays = Integer.valueOf(DEFAULT_MAX_DAYS);
+                maxDays = DEFAULT_MAX_DAYS;
             }
         }
 
@@ -423,7 +423,7 @@ public class FileHandler extends Handler {
             try {
                 bufferSize = Integer.valueOf(sBufferSize);
             } catch (NumberFormatException ignore) {
-                bufferSize = Integer.valueOf(DEFAULT_BUFFER_SIZE);
+                bufferSize = DEFAULT_BUFFER_SIZE;
             }
         }
 

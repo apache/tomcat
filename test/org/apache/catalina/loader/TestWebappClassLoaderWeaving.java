@@ -257,22 +257,22 @@ public class TestWebappClassLoaderWeaving extends TomcatBaseTest {
         Assert.assertEquals("The fourth result is not correct.", "Hello, Unweaved World!", result);
 
         Assert.assertEquals("getClearReferencesHttpClientKeepAliveThread did not match.",
-                Boolean.valueOf(this.loader.getClearReferencesHttpClientKeepAliveThread()),
-                Boolean.valueOf(copiedLoader.getClearReferencesHttpClientKeepAliveThread()));
+                this.loader.getClearReferencesHttpClientKeepAliveThread(),
+                copiedLoader.getClearReferencesHttpClientKeepAliveThread());
         Assert.assertEquals("getClearReferencesLogFactoryRelease did not match.",
-                Boolean.valueOf(this.loader.getClearReferencesLogFactoryRelease()),
-                Boolean.valueOf(copiedLoader.getClearReferencesLogFactoryRelease()));
+                this.loader.getClearReferencesLogFactoryRelease(),
+                copiedLoader.getClearReferencesLogFactoryRelease());
         Assert.assertEquals("getClearReferencesStopThreads did not match.",
-                Boolean.valueOf(this.loader.getClearReferencesStopThreads()),
-                Boolean.valueOf(copiedLoader.getClearReferencesStopThreads()));
+                this.loader.getClearReferencesStopThreads(),
+                copiedLoader.getClearReferencesStopThreads());
         Assert.assertEquals("getClearReferencesStopTimerThreads did not match.",
-                Boolean.valueOf(this.loader.getClearReferencesStopTimerThreads()),
-                Boolean.valueOf(copiedLoader.getClearReferencesStopTimerThreads()));
+                this.loader.getClearReferencesStopTimerThreads(),
+                copiedLoader.getClearReferencesStopTimerThreads());
         Assert.assertEquals("getContextName did not match.", this.loader.getContextName(),
                 copiedLoader.getContextName());
         Assert.assertEquals("getDelegate did not match.",
-                Boolean.valueOf(this.loader.getDelegate()),
-                Boolean.valueOf(copiedLoader.getDelegate()));
+                this.loader.getDelegate(),
+                copiedLoader.getDelegate());
         Assert.assertEquals("getURLs did not match.", this.loader.getURLs().length,
                 copiedLoader.getURLs().length);
         Assert.assertSame("getParent did not match.", this.loader.getParent(), copiedLoader.getParent());

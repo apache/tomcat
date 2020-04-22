@@ -382,7 +382,7 @@ public class JspCompilationContext {
                 URL jspUrl = getResource(resource);
                 if (jspUrl == null) {
                     incrementRemoved();
-                    return Long.valueOf(result);
+                    return result;
                 }
                 uc = jspUrl.openConnection();
                 if (uc instanceof JarURLConnection) {
@@ -415,7 +415,7 @@ public class JspCompilationContext {
                 }
             }
         }
-        return Long.valueOf(result);
+        return result;
     }
 
     public boolean isTagFile() {

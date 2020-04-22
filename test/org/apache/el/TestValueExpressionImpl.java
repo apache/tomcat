@@ -147,7 +147,7 @@ public class TestValueExpressionImpl {
         ELContext context = new ELContextImpl(factory);
 
         Object o1 = "String value";
-        Object o2 = Integer.valueOf(32);
+        Object o2 = 32;
 
         Map<Object,Object> map = new HashMap<>();
         map.put("key1", o1);
@@ -174,7 +174,7 @@ public class TestValueExpressionImpl {
         ELContext context = new ELContextImpl(factory);
 
         Object o1 = "String value";
-        Object o2 = Integer.valueOf(32);
+        Object o2 = 32;
 
         List<Object> list = new ArrayList<>();
         list.add(0, o1);
@@ -215,7 +215,7 @@ public class TestValueExpressionImpl {
                 context, "${beanA.valList.size()}", Integer.class);
 
         Integer result = (Integer) ve.getValue(context);
-        Assert.assertEquals(Integer.valueOf(0), result);
+        Assert.assertEquals(0, result);
     }
 
 
@@ -237,7 +237,7 @@ public class TestValueExpressionImpl {
                 context, "${list.size()}", Integer.class);
 
         Integer result = (Integer) ve.getValue(context);
-        Assert.assertEquals(Integer.valueOf(0), result);
+        Assert.assertEquals(0, result);
     }
 
 

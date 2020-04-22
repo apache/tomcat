@@ -934,8 +934,8 @@ public class TestWsWebSocketContainer extends WebSocketBaseTest {
             open = s.isOpen();
         }
 
-        Assert.assertEquals(Boolean.valueOf(expectOpen),
-                Boolean.valueOf(s.isOpen()));
+        Assert.assertEquals(expectOpen,
+                s.isOpen());
 
         // Close the session if it is expected to be open
         if (expectOpen) {

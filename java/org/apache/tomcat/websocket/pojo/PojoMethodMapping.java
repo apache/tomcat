@@ -393,7 +393,7 @@ public class PojoMethodMapping {
                     if (paramAnnotation.annotationType().equals(
                             PathParam.class)) {
                         indexPathParams.put(
-                                Integer.valueOf(i), new PojoPathParam(types[i],
+                                i, new PojoPathParam(types[i],
                                         ((PathParam) paramAnnotation).value()));
                         paramFound = true;
                         break;

@@ -225,7 +225,7 @@ public class CoyoteInputStream extends ServletInputStream {
 
         @Override
         public Integer run() throws IOException {
-            return Integer.valueOf(inputBuffer.available());
+            return inputBuffer.available();
         }
     }
 
@@ -256,7 +256,7 @@ public class CoyoteInputStream extends ServletInputStream {
 
         @Override
         public Integer run() throws IOException {
-            Integer integer = Integer.valueOf(inputBuffer.readByte());
+            Integer integer = inputBuffer.readByte();
             return integer;
         }
     }
@@ -278,7 +278,7 @@ public class CoyoteInputStream extends ServletInputStream {
 
         @Override
         public Integer run() throws IOException {
-            Integer integer = Integer.valueOf(inputBuffer.read(buf, off, len));
+            Integer integer = inputBuffer.read(buf, off, len);
             return integer;
         }
     }
@@ -296,7 +296,7 @@ public class CoyoteInputStream extends ServletInputStream {
 
         @Override
         public Integer run() throws IOException {
-            Integer integer = Integer.valueOf(inputBuffer.read(bb));
+            Integer integer = inputBuffer.read(bb);
             return integer;
         }
     }

@@ -207,7 +207,7 @@ public class TestLoadBalancerDrainingValve {
 
         // Set up the actual test
         EasyMock.expect(request.getAttribute(LoadBalancerDrainingValve.ATTRIBUTE_KEY_JK_LB_ACTIVATION)).andStubReturn(jkActivation);
-        EasyMock.expect(Boolean.valueOf(request.isRequestedSessionIdValid())).andStubReturn(Boolean.valueOf(validSessionId));
+        EasyMock.expect(request.isRequestedSessionIdValid()).andStubReturn(validSessionId);
 
         ArrayList<Cookie> cookies = new ArrayList<>();
         if(enableIgnore) {
@@ -231,7 +231,7 @@ public class TestLoadBalancerDrainingValve {
             EasyMock.expect(ctx.getSessionCookiePath()).andStubReturn("/");
 
             if (!enableIgnore) {
-                EasyMock.expect(Boolean.valueOf(ctx.getSessionCookiePathUsesTrailingSlash())).andStubReturn(Boolean.TRUE);
+                EasyMock.expect(ctx.getSessionCookiePathUsesTrailingSlash()).andStubReturn(Boolean.TRUE);
                 EasyMock.expect(request.getQueryString()).andStubReturn(queryString);
                 // Response will have cookie deleted
                 MyCookie expectedCookie = new MyCookie(cookieConfig.getName(), "");

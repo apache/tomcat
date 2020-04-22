@@ -90,7 +90,7 @@ public class DeltaRequest implements Externalizable {
     }
 
     public void setMaxInactiveInterval(int interval) {
-        addAction(TYPE_MAXINTERVAL, ACTION_SET, NAME_MAXINTERVAL, Integer.valueOf(interval));
+        addAction(TYPE_MAXINTERVAL, ACTION_SET, NAME_MAXINTERVAL, interval);
     }
 
     /**
@@ -114,7 +114,7 @@ public class DeltaRequest implements Externalizable {
 
     public void setNew(boolean n) {
         int action = ACTION_SET;
-        addAction(TYPE_ISNEW,action,NAME_ISNEW,Boolean.valueOf(n));
+        addAction(TYPE_ISNEW,action,NAME_ISNEW, n);
     }
 
     public void setAuthType(String authType) {

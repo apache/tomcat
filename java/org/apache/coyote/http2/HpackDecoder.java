@@ -172,7 +172,7 @@ public class HpackDecoder {
         }
         if (size > maxMemorySizeHard) {
             throw new HpackException(sm.getString("hpackdecoder.maxMemorySizeExceeded",
-                    Integer.valueOf(size), Integer.valueOf(maxMemorySizeHard)));
+                    size, maxMemorySizeHard));
         }
         maxMemorySizeSoft = size;
         if (currentMemorySize > maxMemorySizeSoft) {
@@ -244,13 +244,13 @@ public class HpackDecoder {
             // index is 1 based
             if (index > Hpack.STATIC_TABLE_LENGTH + filledTableSlots) {
                 throw new HpackException(sm.getString("hpackdecoder.headerTableIndexInvalid",
-                        Integer.valueOf(index), Integer.valueOf(Hpack.STATIC_TABLE_LENGTH),
-                        Integer.valueOf(filledTableSlots)));
+                        index, Hpack.STATIC_TABLE_LENGTH,
+                        filledTableSlots));
             }
             int adjustedIndex = getRealIndex(index - Hpack.STATIC_TABLE_LENGTH);
             Hpack.HeaderField res = headerTable[adjustedIndex];
             if (res == null) {
-                throw new HpackException(sm.getString("hpackdecoder.nullHeader", Integer.valueOf(index)));
+                throw new HpackException(sm.getString("hpackdecoder.nullHeader", index));
             }
             return res.name;
         }
@@ -288,8 +288,8 @@ public class HpackDecoder {
         int realIndex = (firstSlotPosition + (filledTableSlots - index)) % headerTable.length;
         if (realIndex < 0) {
             throw new HpackException(sm.getString("hpackdecoder.headerTableIndexInvalid",
-                    Integer.valueOf(index), Integer.valueOf(Hpack.STATIC_TABLE_LENGTH),
-                    Integer.valueOf(filledTableSlots)));
+                    index, Hpack.STATIC_TABLE_LENGTH,
+                    filledTableSlots));
         }
         return realIndex;
     }

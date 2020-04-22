@@ -581,7 +581,7 @@ public class AjpProcessor extends AbstractProcessor {
         if (messageLength < 0) {
             // Invalid AJP header signature
             throw new IOException(sm.getString("ajpmessage.invalidLength",
-                    Integer.valueOf(messageLength)));
+                    messageLength));
         }
         else if (messageLength == 0) {
             // Zero length message.
@@ -592,7 +592,7 @@ public class AjpProcessor extends AbstractProcessor {
                 // Message too long for the buffer
                 // Need to trigger a 400 response
                 String msg = sm.getString("ajpprocessor.header.tooLong",
-                        Integer.valueOf(messageLength), Integer.valueOf(buf.length));
+                        messageLength, buf.length);
                 log.error(msg);
                 throw new IllegalArgumentException(msg);
             }
@@ -854,7 +854,7 @@ public class AjpProcessor extends AbstractProcessor {
 
             case Constants.SC_A_SSL_KEY_SIZE :
                 request.setAttribute(SSLSupport.KEY_SIZE_KEY,
-                        Integer.valueOf(requestHeaderMessage.getInt()));
+                        requestHeaderMessage.getInt());
                 break;
 
             case Constants.SC_A_STORED_METHOD:

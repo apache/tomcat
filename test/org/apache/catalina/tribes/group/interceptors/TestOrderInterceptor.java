@@ -87,7 +87,7 @@ public class TestOrderInterceptor {
         Member[] dest = channels[0].getMembers();
         final AtomicInteger value = new AtomicInteger(0);
         for ( int i=0; i<100; i++ ) {
-            channels[0].send(dest,Integer.valueOf(value.getAndAdd(1)),0);
+            channels[0].send(dest, value.getAndAdd(1),0);
         }
         Thread.sleep(5000);
         for ( int i=0; i<test.length; i++ ) {
@@ -106,7 +106,7 @@ public class TestOrderInterceptor {
                 for (int i = 0; i < 100; i++) {
                     try {
                         synchronized (channels[0]) {
-                            channels[0].send(dest, Integer.valueOf(value.getAndAdd(1)), 0);
+                            channels[0].send(dest, value.getAndAdd(1), 0);
                         }
                     }catch ( Exception x ) {
                         exceptionQueue.add(x);

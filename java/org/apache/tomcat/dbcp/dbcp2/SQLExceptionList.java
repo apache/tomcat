@@ -40,7 +40,7 @@ public class SQLExceptionList extends SQLException {
      * @param causeList a list of cause exceptions.
      */
     public SQLExceptionList(List<? extends Throwable> causeList) {
-        super(String.format("%,d exceptions: %s", Integer.valueOf(causeList == null ? 0 : causeList.size()), causeList),
+        super(String.format("%,d exceptions: %s", causeList == null ? 0 : causeList.size(), causeList),
                 causeList == null ? null : causeList.get(0));
         this.causeList = causeList;
     }

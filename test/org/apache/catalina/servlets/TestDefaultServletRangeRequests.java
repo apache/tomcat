@@ -50,51 +50,51 @@ public class TestDefaultServletRangeRequests extends TomcatBaseTest {
 
         List<Object[]> parameterSets = new ArrayList<>();
 
-        parameterSets.add(new Object[] { "", null, Integer.valueOf(200), strLen, "" });
+        parameterSets.add(new Object[] { "", null, 200, strLen, "" });
         // Invalid
-        parameterSets.add(new Object[] { "bytes", null, Integer.valueOf(416), "", "*/" + len });
-        parameterSets.add(new Object[] { "bytes=", null, Integer.valueOf(416), "", "*/" + len });
+        parameterSets.add(new Object[] { "bytes", null, 416, "", "*/" + len });
+        parameterSets.add(new Object[] { "bytes=", null, 416, "", "*/" + len });
         // Invalid with unknown type
-        parameterSets.add(new Object[] { "unknown", null, Integer.valueOf(416), "", "*/" + len });
-        parameterSets.add(new Object[] { "unknown=", null, Integer.valueOf(416), "", "*/" + len });
+        parameterSets.add(new Object[] { "unknown", null, 416, "", "*/" + len });
+        parameterSets.add(new Object[] { "unknown=", null, 416, "", "*/" + len });
         // Invalid ranges
-        parameterSets.add(new Object[] { "bytes=-", null, Integer.valueOf(416), "", "*/" + len });
-        parameterSets.add(new Object[] { "bytes=10-b", null, Integer.valueOf(416), "", "*/" + len });
-        parameterSets.add(new Object[] { "bytes=b-10", null, Integer.valueOf(416), "", "*/" + len });
+        parameterSets.add(new Object[] { "bytes=-", null, 416, "", "*/" + len });
+        parameterSets.add(new Object[] { "bytes=10-b", null, 416, "", "*/" + len });
+        parameterSets.add(new Object[] { "bytes=b-10", null, 416, "", "*/" + len });
         // Invalid ranges (out of range)
-        parameterSets.add(new Object[] { "bytes=1000-2000", null, Integer.valueOf(416), "", "*/" + len });
+        parameterSets.add(new Object[] { "bytes=1000-2000", null, 416, "", "*/" + len });
         // Invalid no equals
-        parameterSets.add(new Object[] { "bytes 1-10", null, Integer.valueOf(416), "", "*/" + len });
-        parameterSets.add(new Object[] { "bytes1-10", null, Integer.valueOf(416), "", "*/" + len });
-        parameterSets.add(new Object[] { "bytes10-", null, Integer.valueOf(416), "", "*/" + len });
-        parameterSets.add(new Object[] { "bytes-10", null, Integer.valueOf(416), "", "*/" + len });
+        parameterSets.add(new Object[] { "bytes 1-10", null, 416, "", "*/" + len });
+        parameterSets.add(new Object[] { "bytes1-10", null, 416, "", "*/" + len });
+        parameterSets.add(new Object[] { "bytes10-", null, 416, "", "*/" + len });
+        parameterSets.add(new Object[] { "bytes-10", null, 416, "", "*/" + len });
         // Unknown types
-        parameterSets.add(new Object[] { "unknown=1-2", null, Integer.valueOf(200), strLen, "" });
-        parameterSets.add(new Object[] { "bytesX=1-2", null, Integer.valueOf(200), strLen, "" });
-        parameterSets.add(new Object[] { "Xbytes=1-2", null, Integer.valueOf(200), strLen, "" });
+        parameterSets.add(new Object[] { "unknown=1-2", null, 200, strLen, "" });
+        parameterSets.add(new Object[] { "bytesX=1-2", null, 200, strLen, "" });
+        parameterSets.add(new Object[] { "Xbytes=1-2", null, 200, strLen, "" });
         // Valid range
         parameterSets.add(new Object[] {
-                "bytes=0-9", null, Integer.valueOf(206), "10", "0-9/" + len });
+                "bytes=0-9", null, 206, "10", "0-9/" + len });
         parameterSets.add(new Object[] {
-                "bytes=-100", null, Integer.valueOf(206), "100", (len - 100) + "-" + (len - 1) + "/" + len });
+                "bytes=-100", null, 206, "100", (len - 100) + "-" + (len - 1) + "/" + len });
         parameterSets.add(new Object[] {
-                "bytes=100-", null, Integer.valueOf(206), "" + (len - 100), "100-" + (len - 1) + "/" + len });
+                "bytes=100-", null, 206, "" + (len - 100), "100-" + (len - 1) + "/" + len });
         // Valid range (too much)
         parameterSets.add(new Object[] {
-                "bytes=0-1000", null, Integer.valueOf(206), strLen, "0-" +  (len - 1) + "/" + len });
+                "bytes=0-1000", null, 206, strLen, "0-" +  (len - 1) + "/" + len });
         parameterSets.add(new Object[] {
-                "bytes=-1000", null, Integer.valueOf(206), strLen, "0-" + (len - 1) + "/" + len });
+                "bytes=-1000", null, 206, strLen, "0-" + (len - 1) + "/" + len });
 
         /* If-Range tests */
         // Valid
         parameterSets.add(new Object[] {
-                "bytes=0-9", lastModified, Integer.valueOf(206), "10", "0-9/" + len });
+                "bytes=0-9", lastModified, 206, "10", "0-9/" + len });
         // Nonsense date (return whole entity)
         parameterSets.add(new Object[] {
-                "bytes=0-9", "a-b-c", Integer.valueOf(200), strLen, ""});
+                "bytes=0-9", "a-b-c", 200, strLen, ""});
         // Different date (return whole entity)
         parameterSets.add(new Object[] {
-                "bytes=0-9", FastHttpDateFormat.formatDate(1000), Integer.valueOf(200), strLen, ""});
+                "bytes=0-9", FastHttpDateFormat.formatDate(1000), 200, strLen, ""});
 
         return parameterSets;
     }

@@ -49,7 +49,7 @@ public class DefaultPooledObjectInfo implements DefaultPooledObjectInfoMBean {
     @Override
     public String getCreateTimeFormatted() {
         final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss Z");
-        return sdf.format(Long.valueOf(pooledObject.getCreateTime()));
+        return sdf.format(pooledObject.getCreateTime());
     }
 
     @Override
@@ -60,7 +60,7 @@ public class DefaultPooledObjectInfo implements DefaultPooledObjectInfoMBean {
     @Override
     public String getLastBorrowTimeFormatted() {
         final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss Z");
-        return sdf.format(Long.valueOf(pooledObject.getLastBorrowTime()));
+        return sdf.format(pooledObject.getLastBorrowTime());
     }
 
     @Override
@@ -78,7 +78,7 @@ public class DefaultPooledObjectInfo implements DefaultPooledObjectInfoMBean {
     @Override
     public String getLastReturnTimeFormatted() {
         final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss Z");
-        return sdf.format(Long.valueOf(pooledObject.getLastReturnTime()));
+        return sdf.format(pooledObject.getLastReturnTime());
     }
 
     @Override

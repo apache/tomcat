@@ -102,7 +102,7 @@ class FutureToSendHandler implements Future<Void>, SendHandler {
         }
         if (retval == false) {
             throw new TimeoutException(sm.getString("futureToSendHandler.timeout",
-                    Long.valueOf(timeout), unit.toString().toLowerCase()));
+                    timeout, unit.toString().toLowerCase()));
         }
         if (result.get().getException() != null) {
             throw new ExecutionException(result.get().getException());

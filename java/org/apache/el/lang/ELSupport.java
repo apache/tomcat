@@ -40,7 +40,7 @@ import org.apache.el.util.MessageFactory;
  */
 public class ELSupport {
 
-    private static final Long ZERO = Long.valueOf(0L);
+    private static final Long ZERO = 0L;
 
     protected static final boolean COERCE_TO_ZERO;
 
@@ -288,13 +288,13 @@ public class ELSupport {
         }
 
         if (obj == null || "".equals(obj)) {
-            return Character.valueOf((char) 0);
+            return (char) 0;
         }
         if (obj instanceof String) {
-            return Character.valueOf(((String) obj).charAt(0));
+            return ((String) obj).charAt(0);
         }
         if (ELArithmetic.isNumber(obj)) {
-            return Character.valueOf((char) ((Number) obj).shortValue());
+            return (char) ((Number) obj).shortValue();
         }
         Class<?> objType = obj.getClass();
         if (obj instanceof Character) {
@@ -308,13 +308,13 @@ public class ELSupport {
     protected static final Number coerceToNumber(final Number number,
             final Class<?> type) throws ELException {
         if (Long.TYPE == type || Long.class.equals(type)) {
-            return Long.valueOf(number.longValue());
+            return number.longValue();
         }
         if (Double.TYPE == type || Double.class.equals(type)) {
-            return Double.valueOf(number.doubleValue());
+            return number.doubleValue();
         }
         if (Integer.TYPE == type || Integer.class.equals(type)) {
-            return Integer.valueOf(number.intValue());
+            return number.intValue();
         }
         if (BigInteger.class.equals(type)) {
             if (number instanceof BigDecimal) {
@@ -335,13 +335,13 @@ public class ELSupport {
             return new BigDecimal(number.doubleValue());
         }
         if (Byte.TYPE == type || Byte.class.equals(type)) {
-            return Byte.valueOf(number.byteValue());
+            return number.byteValue();
         }
         if (Short.TYPE == type || Short.class.equals(type)) {
-            return Short.valueOf(number.shortValue());
+            return number.shortValue();
         }
         if (Float.TYPE == type || Float.class.equals(type)) {
-            return Float.valueOf(number.floatValue());
+            return number.floatValue();
         }
         if (Number.class.equals(type)) {
             return number;
@@ -383,8 +383,8 @@ public class ELSupport {
         }
 
         if (obj instanceof Character) {
-            return coerceToNumber(Short.valueOf((short) ((Character) obj)
-                    .charValue()), type);
+            return coerceToNumber((short) ((Character) obj)
+                    .charValue(), type);
         }
 
         throw new ELException(MessageFactory.get("error.convert",

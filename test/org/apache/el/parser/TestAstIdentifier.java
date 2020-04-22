@@ -29,7 +29,7 @@ public class TestAstIdentifier {
         Object result =
                 processor.getValue("Integer.MAX_VALUE",
                         Integer.class);
-        Assert.assertEquals(Integer.valueOf(Integer.MAX_VALUE), result);
+        Assert.assertEquals(Integer.MAX_VALUE, result);
     }
 
 
@@ -41,6 +41,6 @@ public class TestAstIdentifier {
         Object result =
                 processor.getValue("MAX_VALUE",
                         Integer.class);
-        Assert.assertEquals(Integer.valueOf(Integer.MAX_VALUE), result);
+        Assert.assertEquals(Integer.MAX_VALUE, result);
     }
 }

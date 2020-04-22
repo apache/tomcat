@@ -81,7 +81,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         int blockSize = padding.length;
 
         for (int i = 0; i < WRITE_SIZE / blockSize; i++) {
-            String hex = String.format("%01X", Integer.valueOf(i));
+            String hex = String.format("%01X", i);
             int hexSize = hex.length();
             int padSize = blockSize - hexSize;
 

@@ -399,9 +399,9 @@ public class SimpleAjpClient {
         } else {
             if (messageLength > buf.length) {
                 throw new IllegalArgumentException("Message too long [" +
-                        Integer.valueOf(messageLength) +
+                        messageLength +
                         "] for buffer length [" +
-                        Integer.valueOf(buf.length) + "]");
+                        buf.length + "]");
             }
             read(is, buf, Constants.H_SIZE, messageLength);
             return message;

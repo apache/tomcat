@@ -935,7 +935,7 @@ public abstract class PersistentManagerBase extends ManagerBase
                             log.debug(sm.getString
                                 ("persistentManager.swapMaxIdle",
                                  session.getIdInternal(),
-                                 Integer.valueOf(timeIdle)));
+                                        timeIdle));
                         try {
                             swapOut(session);
                         } catch (IOException e) {
@@ -969,7 +969,7 @@ public abstract class PersistentManagerBase extends ManagerBase
         if(log.isDebugEnabled())
             log.debug(sm.getString
                 ("persistentManager.tooManyActive",
-                 Integer.valueOf(sessions.length)));
+                        sessions.length));
 
         int toswap = sessions.length - limit;
 
@@ -987,7 +987,7 @@ public abstract class PersistentManagerBase extends ManagerBase
                         log.debug(sm.getString
                             ("persistentManager.swapTooManyActive",
                              session.getIdInternal(),
-                             Integer.valueOf(timeIdle)));
+                                    timeIdle));
                     try {
                         swapOut(session);
                     } catch (IOException e) {
@@ -1030,7 +1030,7 @@ public abstract class PersistentManagerBase extends ManagerBase
                             log.debug(sm.getString
                                 ("persistentManager.backupMaxIdle",
                                 session.getIdInternal(),
-                                Integer.valueOf(timeIdle)));
+                                        timeIdle));
 
                         try {
                             writeSession(session);
@@ -1038,7 +1038,7 @@ public abstract class PersistentManagerBase extends ManagerBase
                             // This is logged in writeSession()
                         }
                         session.setNote(PERSISTED_LAST_ACCESSED_TIME,
-                                Long.valueOf(lastAccessedTime));
+                                lastAccessedTime);
                     }
                 }
             }

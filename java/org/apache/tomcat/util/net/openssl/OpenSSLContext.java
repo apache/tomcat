@@ -128,7 +128,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
             } else {
                 cctx = 0;
             }
-            sslHostConfig.setOpenSslConfContext(Long.valueOf(cctx));
+            sslHostConfig.setOpenSslConfContext(cctx);
 
             // SSL protocol
             int value = SSL.SSL_PROTOCOL_NONE;
@@ -363,7 +363,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
             // this is set so always set it in case an app is configured to
             // require it
             sessionContext.setSessionIdContext(SSLContext.DEFAULT_SESSION_ID_CONTEXT);
-            sslHostConfig.setOpenSslContext(Long.valueOf(ctx));
+            sslHostConfig.setOpenSslContext(ctx);
             initialized = true;
         } catch (Exception e) {
             log.warn(sm.getString("openssl.errorSSLCtxInit"), e);

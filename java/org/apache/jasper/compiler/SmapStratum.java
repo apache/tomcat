@@ -47,14 +47,14 @@ public class SmapStratum {
         public void setInputStartLine(int inputStartLine) {
             if (inputStartLine < 0)
                 throw new IllegalArgumentException(Localizer.getMessage(
-                        "jsp.error.negativeParameter", Integer.valueOf(inputStartLine)));
+                        "jsp.error.negativeParameter", inputStartLine));
             this.inputStartLine = inputStartLine;
         }
 
         public void setOutputStartLine(int outputStartLine) {
             if (outputStartLine < 0)
                 throw new IllegalArgumentException(Localizer.getMessage(
-                        "jsp.error.negativeParameter", Integer.valueOf(outputStartLine)));
+                        "jsp.error.negativeParameter", outputStartLine));
             this.outputStartLine = outputStartLine;
         }
 
@@ -69,7 +69,7 @@ public class SmapStratum {
         public void setLineFileID(int lineFileID) {
             if (lineFileID < 0)
                 throw new IllegalArgumentException(Localizer.getMessage(
-                        "jsp.error.negativeParameter", Integer.valueOf(lineFileID)));
+                        "jsp.error.negativeParameter", lineFileID));
             this.lineFileID = lineFileID;
             this.lineFileIDSet = true;
         }
@@ -77,14 +77,14 @@ public class SmapStratum {
         public void setInputLineCount(int inputLineCount) {
             if (inputLineCount < 0)
                 throw new IllegalArgumentException(Localizer.getMessage(
-                        "jsp.error.negativeParameter", Integer.valueOf(inputLineCount)));
+                        "jsp.error.negativeParameter", inputLineCount));
             this.inputLineCount = inputLineCount;
         }
 
         public void setOutputLineIncrement(int outputLineIncrement) {
             if (outputLineIncrement < 0)
                 throw new IllegalArgumentException(Localizer.getMessage(
-                        "jsp.error.negativeParameter", Integer.valueOf(outputLineIncrement)));
+                        "jsp.error.negativeParameter", outputLineIncrement));
             this.outputLineIncrement = outputLineIncrement;
         }
 

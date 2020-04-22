@@ -271,7 +271,7 @@ public abstract class SessionIdGeneratorBase extends LifecycleBase
         long t2 = System.currentTimeMillis();
         if ((t2 - t1) > 100) {
             log.warn(sm.getString("sessionIdGeneratorBase.createRandom",
-                    result.getAlgorithm(), Long.valueOf(t2 - t1)));
+                    result.getAlgorithm(), t2 - t1));
         }
         return result;
     }

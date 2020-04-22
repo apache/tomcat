@@ -53,7 +53,7 @@ public class TestOneLineFormatterPerformance {
 
         @Override
         public String format(long timestamp) {
-            return String.format("%1$td-%1$tb-%1$tY %1$tH:%1$tM:%1$tS", Long.valueOf(timestamp));
+            return String.format("%1$td-%1$tb-%1$tY %1$tH:%1$tM:%1$tS", timestamp);
         }
     }
 

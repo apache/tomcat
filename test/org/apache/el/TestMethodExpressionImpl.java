@@ -450,7 +450,7 @@ public class TestMethodExpressionImpl {
         ValueExpression ve = factory.createValueExpression(context,
                 "#{beanA.getBean().name.length()}", java.lang.Integer.class);
         Integer actual = (Integer) ve.getValue(context);
-        Assert.assertEquals(Integer.valueOf(BUG53792.length()), actual);
+        Assert.assertEquals(BUG53792.length(), actual);
     }
 
 

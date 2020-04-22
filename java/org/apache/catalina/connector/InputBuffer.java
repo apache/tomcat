@@ -218,7 +218,7 @@ public class InputBuffer extends Reader
         int available = availableInThisBuffer();
         if (available == 0) {
             coyoteRequest.action(ActionCode.AVAILABLE,
-                    Boolean.valueOf(coyoteRequest.getReadListener() != null));
+                    coyoteRequest.getReadListener() != null);
             available = (coyoteRequest.getAvailable() > 0) ? 1 : 0;
         }
         return available;

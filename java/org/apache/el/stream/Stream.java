@@ -213,12 +213,12 @@ public class Stream {
 
 
     public Stream limit(final Number count) {
-        return substream(Integer.valueOf(0), count);
+        return substream(0, count);
     }
 
 
     public Stream substream(final Number start) {
-        return substream(start, Integer.valueOf(Integer.MAX_VALUE));
+        return substream(start, Integer.MAX_VALUE);
     }
 
     public Stream substream(final Number start, final Number end) {
@@ -312,7 +312,7 @@ public class Stream {
 
     public Optional average() {
         long count = 0;
-        Number sum = Long.valueOf(0);
+        Number sum = 0L;
 
         while (iterator.hasNext()) {
             count++;
@@ -322,13 +322,13 @@ public class Stream {
         if (count == 0) {
             return Optional.EMPTY;
         } else {
-            return new Optional(ELArithmetic.divide(sum, Long.valueOf(count)));
+            return new Optional(ELArithmetic.divide(sum, count));
         }
     }
 
 
     public Number sum() {
-        Number sum = Long.valueOf(0);
+        Number sum = 0L;
 
         while (iterator.hasNext()) {
             sum = ELArithmetic.add(sum, iterator.next());
@@ -346,7 +346,7 @@ public class Stream {
             count ++;
         }
 
-        return Long.valueOf(count);
+        return count;
     }
 
 
@@ -391,7 +391,7 @@ public class Stream {
             match = (Boolean) le.invoke(iterator.next());
         }
 
-        return new Optional(Boolean.valueOf(!match.booleanValue()));
+        return new Optional(!match.booleanValue());
     }
 
 

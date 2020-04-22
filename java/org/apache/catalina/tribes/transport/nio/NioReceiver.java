@@ -217,8 +217,8 @@ public class NioReceiver extends ReceiverBase implements Runnable, NioReceiverMB
                             if (log.isWarnEnabled())
                                 log.warn(sm.getString(
                                         "nioReceiver.threadsExhausted",
-                                        Integer.valueOf(getTimeout()),
-                                        Boolean.valueOf(ka.isCancelled()),
+                                        getTimeout(),
+                                        ka.isCancelled(),
                                         key,
                                         new java.sql.Timestamp(ka.getLastAccess())));
                             ka.setLastAccess(now);

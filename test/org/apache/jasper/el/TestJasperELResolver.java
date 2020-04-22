@@ -57,12 +57,12 @@ public class TestJasperELResolver {
                 new JasperELResolver(list, new StreamELResolverImpl());
 
 
-        Assert.assertEquals(Integer.valueOf(count),
+        Assert.assertEquals(count,
                 getField("appResolversSize", resolver));
         Assert.assertEquals(9 + count,
                 ((ELResolver[])getField("resolvers", resolver)).length);
-        Assert.assertEquals(Integer.valueOf(9 + count),
-                Integer.valueOf(((AtomicInteger) getField("resolversSize", resolver)).get()));
+        Assert.assertEquals(9 + count,
+                ((AtomicInteger) getField("resolversSize", resolver)).get());
     }
 
     private static final Object getField(String name, Object target)

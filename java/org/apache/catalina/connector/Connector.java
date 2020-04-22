@@ -1076,7 +1076,7 @@ public class Connector extends LifecycleMBeanBase  {
         // Validate settings before starting
         if (getPortWithOffset() < 0) {
             throw new LifecycleException(sm.getString(
-                    "coyoteConnector.invalidPort", Integer.valueOf(getPortWithOffset())));
+                    "coyoteConnector.invalidPort", getPortWithOffset()));
         }
 
         setState(LifecycleState.STARTING);

@@ -34,13 +34,13 @@ public class TestGzipInterceptor {
     @Parameters(name = "{index}: bufferSize[{0}]")
     public static Collection<Object[]> inputs() {
         List<Object[]> result = new ArrayList<>();
-        result.add(new Object[] { Integer.valueOf(GzipInterceptor.DEFAULT_BUFFER_SIZE / 2) });
-        result.add(new Object[] { Integer.valueOf(GzipInterceptor.DEFAULT_BUFFER_SIZE - 1) });
-        result.add(new Object[] { Integer.valueOf(GzipInterceptor.DEFAULT_BUFFER_SIZE) });
-        result.add(new Object[] { Integer.valueOf(GzipInterceptor.DEFAULT_BUFFER_SIZE + 1) });
-        result.add(new Object[] { Integer.valueOf(GzipInterceptor.DEFAULT_BUFFER_SIZE * 2) });
-        result.add(new Object[] { Integer.valueOf(GzipInterceptor.DEFAULT_BUFFER_SIZE * 4) });
-        result.add(new Object[] { Integer.valueOf(GzipInterceptor.DEFAULT_BUFFER_SIZE * 10 + 1000) });
+        result.add(new Object[] {GzipInterceptor.DEFAULT_BUFFER_SIZE / 2});
+        result.add(new Object[] {GzipInterceptor.DEFAULT_BUFFER_SIZE - 1});
+        result.add(new Object[] {GzipInterceptor.DEFAULT_BUFFER_SIZE});
+        result.add(new Object[] {GzipInterceptor.DEFAULT_BUFFER_SIZE + 1});
+        result.add(new Object[] {GzipInterceptor.DEFAULT_BUFFER_SIZE * 2});
+        result.add(new Object[] {GzipInterceptor.DEFAULT_BUFFER_SIZE * 4});
+        result.add(new Object[] {GzipInterceptor.DEFAULT_BUFFER_SIZE * 10 + 1000});
         return result;
     }
 

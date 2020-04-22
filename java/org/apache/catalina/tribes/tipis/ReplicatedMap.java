@@ -245,7 +245,7 @@ public class ReplicatedMap<K,V> extends AbstractReplicatedMap<K,V> {
         boolean memberAdded = false;
         synchronized (mapMembers) {
             if (!mapMembers.containsKey(member) ) {
-                mapMembers.put(member, Long.valueOf(System.currentTimeMillis()));
+                mapMembers.put(member, System.currentTimeMillis());
                 memberAdded = true;
             }
         }

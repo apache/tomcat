@@ -47,7 +47,7 @@ public class UUIDGenerator {
         long time = System.currentTimeMillis() - start;
         if (time > 100) {
             log.info(sm.getString("uuidGenerator.createRandom",
-                    secrand.getAlgorithm(), Long.valueOf(time)));
+                    secrand.getAlgorithm(), time));
         }
     }
 

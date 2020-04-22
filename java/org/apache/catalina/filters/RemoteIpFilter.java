@@ -899,7 +899,7 @@ public class RemoteIpFilter extends GenericFilter {
                 request.setAttribute(AccessLog.SERVER_NAME_ATTRIBUTE,
                         xRequest.getServerName());
                 request.setAttribute(AccessLog.SERVER_PORT_ATTRIBUTE,
-                        Integer.valueOf(xRequest.getServerPort()));
+                        xRequest.getServerPort());
             }
             chain.doFilter(xRequest, response);
         } else {

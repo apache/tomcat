@@ -503,7 +503,7 @@ public abstract class AbstractEndpoint<S,U> {
     public void setPortOffset(int portOffset ) {
         if (portOffset < 0) {
             throw new IllegalArgumentException(
-                    sm.getString("endpoint.portOffset.invalid", Integer.valueOf(portOffset)));
+                    sm.getString("endpoint.portOffset.invalid", portOffset));
         }
         this.portOffset = portOffset;
     }
@@ -587,7 +587,7 @@ public abstract class AbstractEndpoint<S,U> {
         }
     }
     public void setKeepAliveTimeout(int keepAliveTimeout) {
-        this.keepAliveTimeout = Integer.valueOf(keepAliveTimeout);
+        this.keepAliveTimeout = keepAliveTimeout;
     }
 
 

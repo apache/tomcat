@@ -231,7 +231,7 @@ public class BeanFactory
                             } else if (propType.equals(Character.class)
                                        || propType.equals(char.class)) {
                                 valueArray[0] =
-                                    Character.valueOf(value.charAt(0));
+                                        value.charAt(0);
                             } else if (propType.equals(Byte.class)
                                        || propType.equals(byte.class)) {
                                 valueArray[0] = Byte.valueOf(value);

@@ -130,7 +130,7 @@ public class TestTokenList {
         Set<String> tokens = new HashSet<>();
         boolean result = TokenList.parseTokenList(reader, tokens);
         Assert.assertEquals(expectedTokens, tokens);
-        Assert.assertEquals(Boolean.valueOf(expectedResult), Boolean.valueOf(result));
+        Assert.assertEquals(expectedResult, result);
     }
 
 

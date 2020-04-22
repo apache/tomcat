@@ -580,14 +580,14 @@ public class ReplicationValve
             if ( (nrOfRequests % 100) == 0 ) {
                  log.info(sm.getString("ReplicationValve.stats",
                      new Object[]{
-                         Long.valueOf(totalRequestTime/nrOfRequests),
-                         Long.valueOf(totalSendTime/nrOfRequests),
-                         Long.valueOf(nrOfRequests),
-                         Long.valueOf(nrOfSendRequests),
-                         Long.valueOf(nrOfCrossContextSendRequests),
-                         Long.valueOf(nrOfFilterRequests),
-                         Long.valueOf(totalRequestTime),
-                         Long.valueOf(totalSendTime)}));
+                             totalRequestTime / nrOfRequests,
+                             totalSendTime / nrOfRequests,
+                             nrOfRequests,
+                             nrOfSendRequests,
+                             nrOfCrossContextSendRequests,
+                             nrOfFilterRequests,
+                             totalRequestTime,
+                             totalSendTime}));
              }
         }
     }
@@ -611,7 +611,7 @@ public class ReplicationValve
                     log.debug(sm.getString(
                             "ReplicationValve.session.indicator", request.getContext().getName(),id,
                             primaryIndicatorName,
-                            Boolean.valueOf(cses.isPrimarySession())));
+                            cses.isPrimarySession()));
                 }
                 request.setAttribute(primaryIndicatorName, cses.isPrimarySession()?Boolean.TRUE:Boolean.FALSE);
             } else {

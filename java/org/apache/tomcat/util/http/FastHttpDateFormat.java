@@ -108,7 +108,7 @@ public final class FastHttpDateFormat {
      * @return the HTTP date
      */
     public static final String formatDate(long value) {
-        Long longValue = Long.valueOf(value);
+        Long longValue = value;
         String cachedDate = formatCache.get(longValue);
         if (cachedDate != null) {
             return cachedDate;
@@ -137,7 +137,7 @@ public final class FastHttpDateFormat {
         for (int i = 0; (date == -1) && (i < httpParseFormats.length); i++) {
             try {
                 date = httpParseFormats[i].parse(value).getTime();
-                updateParseCache(value, Long.valueOf(date));
+                updateParseCache(value, date);
             } catch (ParseException e) {
                 // Ignore
             }

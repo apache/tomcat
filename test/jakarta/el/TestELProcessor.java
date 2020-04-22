@@ -57,7 +57,7 @@ public class TestELProcessor {
         ELProcessor elp = new ELProcessor();
         elp.defineFunction("fn", "toBoolean",
                 Boolean.class.getMethod("valueOf", String.class));
-        Assert.assertEquals(Boolean.valueOf(true),
+        Assert.assertEquals(Boolean.TRUE,
                 elp.eval("fn:toBoolean(true)"));
     }
 
@@ -68,7 +68,7 @@ public class TestELProcessor {
         // java.lang should be automatically imported so no need for full class
         // name
         elp.defineFunction("fn", "toBoolean", "Boolean", "valueOf");
-        Assert.assertEquals(Boolean.valueOf(true),
+        Assert.assertEquals(Boolean.TRUE,
                 elp.eval("fn:toBoolean(true)"));
     }
 
@@ -77,7 +77,7 @@ public class TestELProcessor {
     public void testDefineFunctionName02() throws Exception {
         ELProcessor elp = new ELProcessor();
         elp.defineFunction("fn", "test", "java.lang.Integer", "Integer valueOf(int)");
-        Assert.assertEquals(Integer.valueOf(1), elp.eval("fn:test(1)"));
+        Assert.assertEquals(1, elp.eval("fn:test(1)"));
     }
 
 

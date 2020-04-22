@@ -104,7 +104,7 @@ public class WarWatcher {
             }
             if(log.isTraceEnabled())
                 log.trace(sm.getString("warWatcher.checkWarResult",
-                                       Integer.valueOf(check),
+                        check,
                                        info.getWar()));
         }
 

@@ -425,7 +425,7 @@ public class DeltaManager extends ClusterManagerBase{
         }
         if (log.isDebugEnabled())
             log.debug(sm.getString("deltaManager.createSession.newSession",
-                    session.getId(), Integer.valueOf(sessions.size())));
+                    session.getId(), sessions.size()));
         return session;
     }
 
@@ -616,7 +616,7 @@ public class DeltaManager extends ClusterManagerBase{
         // Open an output stream to the specified pathname, if any
         ByteArrayOutputStream fos = new ByteArrayOutputStream();
         try (ObjectOutputStream oos = new ObjectOutputStream(new BufferedOutputStream(fos))) {
-            oos.writeObject(Integer.valueOf(currentSessions.length));
+            oos.writeObject(currentSessions.length);
             for(int i=0 ; i < currentSessions.length;i++) {
                 ((DeltaSession)currentSessions[i]).writeObjectData(oos);
             }
@@ -701,7 +701,7 @@ public class DeltaManager extends ClusterManagerBase{
                 cluster.send(msg, mbr, Channel.SEND_OPTIONS_ASYNCHRONOUS);
                 if (log.isInfoEnabled())
                     log.info(sm.getString("deltaManager.waitForSessionState",
-                            getName(), mbr, Integer.valueOf(getStateTransferTimeout())));
+                            getName(), mbr, getStateTransferTimeout()));
                 // FIXME At sender ack mode this method check only the state
                 //       transfer and resend is a problem!
                 waitForSendAllSessions(beforeSendTime);
@@ -787,15 +787,15 @@ public class DeltaManager extends ClusterManagerBase{
         if (isTimeout) {
             counterNoStateTransfered++ ;
             log.error(sm.getString("deltaManager.noSessionState", getName(),
-                    new Date(beforeSendTime), Long.valueOf(reqNow - beforeSendTime)));
+                    new Date(beforeSendTime), reqNow - beforeSendTime));
         }else if (isNoContextManagerReceived()) {
             if (log.isWarnEnabled())
                 log.warn(sm.getString("deltaManager.noContextManager", getName(),
-                        new Date(beforeSendTime), Long.valueOf(reqNow - beforeSendTime)));
+                        new Date(beforeSendTime), reqNow - beforeSendTime));
         } else {
             if (log.isInfoEnabled())
                 log.info(sm.getString("deltaManager.sessionReceived", getName(),
-                        new Date(beforeSendTime), Long.valueOf(reqNow - beforeSendTime)));
+                        new Date(beforeSendTime), reqNow - beforeSendTime));
         }
     }
 
@@ -1148,7 +1148,7 @@ public class DeltaManager extends ClusterManagerBase{
         counterReceive_EVT_ALL_SESSION_TRANSFERCOMPLETE++ ;
         if (log.isDebugEnabled()) {
             log.debug(sm.getString("deltaManager.receiveMessage.transfercomplete",
-                    getName(), sender.getHost(), Integer.valueOf(sender.getPort())));
+                    getName(), sender.getHost(), sender.getPort()));
         }
         stateTransferCreateSendTime = msg.getTimestamp() ;
         stateTransfered = true ;
@@ -1343,7 +1343,7 @@ public class DeltaManager extends ClusterManagerBase{
         counterReceive_EVT_ALL_SESSION_NOCONTEXTMANAGER++ ;
         if (log.isDebugEnabled())
             log.debug(sm.getString("deltaManager.receiveMessage.noContextManager",
-                    getName(), sender.getHost(), Integer.valueOf(sender.getPort())));
+                    getName(), sender.getHost(), sender.getPort()));
         noContextManagerReceived = true ;
     }
 

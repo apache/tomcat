@@ -141,7 +141,7 @@ public class SocketProperties {
     /**
      * SO_TIMEOUT option. default is 20000.
      */
-    protected Integer soTimeout = Integer.valueOf(20000);
+    protected Integer soTimeout = 20000;
 
     /**
      * Performance preferences according to
@@ -339,47 +339,47 @@ public class SocketProperties {
 
     public void setPerformanceConnectionTime(int performanceConnectionTime) {
         this.performanceConnectionTime =
-            Integer.valueOf(performanceConnectionTime);
+                performanceConnectionTime;
     }
 
     public void setTxBufSize(int txBufSize) {
-        this.txBufSize = Integer.valueOf(txBufSize);
+        this.txBufSize = txBufSize;
     }
 
     public void setTcpNoDelay(boolean tcpNoDelay) {
-        this.tcpNoDelay = Boolean.valueOf(tcpNoDelay);
+        this.tcpNoDelay = tcpNoDelay;
     }
 
     public void setSoTimeout(int soTimeout) {
-        this.soTimeout = Integer.valueOf(soTimeout);
+        this.soTimeout = soTimeout;
     }
 
     public void setSoReuseAddress(boolean soReuseAddress) {
-        this.soReuseAddress = Boolean.valueOf(soReuseAddress);
+        this.soReuseAddress = soReuseAddress;
     }
 
     public void setSoLingerTime(int soLingerTime) {
-        this.soLingerTime = Integer.valueOf(soLingerTime);
+        this.soLingerTime = soLingerTime;
     }
 
     public void setSoKeepAlive(boolean soKeepAlive) {
-        this.soKeepAlive = Boolean.valueOf(soKeepAlive);
+        this.soKeepAlive = soKeepAlive;
     }
 
     public void setRxBufSize(int rxBufSize) {
-        this.rxBufSize = Integer.valueOf(rxBufSize);
+        this.rxBufSize = rxBufSize;
     }
 
     public void setPerformanceLatency(int performanceLatency) {
-        this.performanceLatency = Integer.valueOf(performanceLatency);
+        this.performanceLatency = performanceLatency;
     }
 
     public void setPerformanceBandwidth(int performanceBandwidth) {
-        this.performanceBandwidth = Integer.valueOf(performanceBandwidth);
+        this.performanceBandwidth = performanceBandwidth;
     }
 
     public void setOoBInline(boolean ooBInline) {
-        this.ooBInline = Boolean.valueOf(ooBInline);
+        this.ooBInline = ooBInline;
     }
 
     public void setDirectBuffer(boolean directBuffer) {
@@ -391,7 +391,7 @@ public class SocketProperties {
     }
 
     public void setSoLingerOn(boolean soLingerOn) {
-        this.soLingerOn = Boolean.valueOf(soLingerOn);
+        this.soLingerOn = soLingerOn;
     }
 
     public void setBufferPool(int bufferPool) {

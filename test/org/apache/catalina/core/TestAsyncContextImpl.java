@@ -1954,7 +1954,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
 
             if (loops > 1) {
                 loops--;
-                req.setAttribute("loops", Integer.valueOf(loops));
+                req.setAttribute("loops", loops);
                 ctx.dispatch();
             } else
                 throw new ServletException();
@@ -2610,7 +2610,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
                 count = countObj.intValue();
             }
             count++;
-            req.setAttribute("count", Integer.valueOf(count));
+            req.setAttribute("count", count);
 
             String encodedUri = req.getRequestURI();
 
@@ -2647,7 +2647,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
                 count = countObj.intValue();
             }
             count++;
-            req.setAttribute("count", Integer.valueOf(count));
+            req.setAttribute("count", count);
 
             String encodedUri = req.getRequestURI();
 

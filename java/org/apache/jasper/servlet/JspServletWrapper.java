@@ -76,7 +76,7 @@ public class JspServletWrapper {
 
     static {
         // If this is missing,
-        ALWAYS_OUTDATED_DEPENDENCIES.put("/WEB-INF/web.xml", Long.valueOf(-1));
+        ALWAYS_OUTDATED_DEPENDENCIES.put("/WEB-INF/web.xml", (long) -1);
     }
 
     // Logger

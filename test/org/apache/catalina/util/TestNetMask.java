@@ -130,7 +130,7 @@ public final class TestNetMask {
             Assert.fail();
         }
 
-        Assert.assertEquals(matches, Boolean.valueOf(netMask.matches(inetAddress)));
+        Assert.assertEquals(matches, netMask.matches(inetAddress));
 
         Assert.assertEquals(mask, netMask.toString());
     }

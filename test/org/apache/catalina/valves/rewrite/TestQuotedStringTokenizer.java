@@ -60,11 +60,11 @@ public class TestQuotedStringTokenizer {
         List<String> result = new ArrayList<>();
         int count = tokens.size();
         while (tokenizer.hasMoreTokens()) {
-            MatcherAssert.assertThat(Integer.valueOf(tokenizer.countTokens()), CoreMatchers.is(Integer.valueOf(count)));
+            MatcherAssert.assertThat(tokenizer.countTokens(), CoreMatchers.is(count));
             result.add(tokenizer.nextToken());
             count--;
         }
-        MatcherAssert.assertThat(Integer.valueOf(tokenizer.countTokens()), CoreMatchers.is(Integer.valueOf(0)));
+        MatcherAssert.assertThat(tokenizer.countTokens(), CoreMatchers.is(0));
         MatcherAssert.assertThat(tokens, CoreMatchers.is(result));
     }
 

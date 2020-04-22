@@ -238,13 +238,13 @@ public class Nio2Channel implements AsynchronousByteChannel {
         @Override
         public Integer get() throws InterruptedException,
                 ExecutionException {
-            return Integer.valueOf(-1);
+            return -1;
         }
         @Override
         public Integer get(long timeout, TimeUnit unit)
                 throws InterruptedException, ExecutionException,
                 TimeoutException {
-            return Integer.valueOf(-1);
+            return -1;
         }
     };
 

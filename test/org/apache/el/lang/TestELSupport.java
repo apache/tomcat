@@ -29,7 +29,7 @@ import org.junit.Test;
 public class TestELSupport {
     @Test
     public void testEquals() {
-        Assert.assertTrue(ELSupport.equals(null, "01", Long.valueOf(1)));
+        Assert.assertTrue(ELSupport.equals(null, "01", 1L));
     }
 
     @Test
@@ -46,37 +46,37 @@ public class TestELSupport {
 
     @Test
     public void testLong() {
-        testIsSame(Long.valueOf(0x0102030405060708L));
+        testIsSame(0x0102030405060708L);
     }
 
     @Test
     public void testInteger() {
-        testIsSame(Integer.valueOf(0x01020304));
+        testIsSame(0x01020304);
     }
 
     @Test
     public void testShort() {
-        testIsSame(Short.valueOf((short) 0x0102));
+        testIsSame((short) 0x0102);
     }
 
     @Test
     public void testByte() {
-        testIsSame(Byte.valueOf((byte) 0xEF));
+        testIsSame((byte) 0xEF);
     }
 
     @Test
     public void testDouble() {
-        testIsSame(Double.valueOf(0.123456789012345678901234));
+        testIsSame(0.123456789012345678901234);
     }
 
     @Test
     public void testFloat() {
-        testIsSame(Float.valueOf(0.123456F));
+        testIsSame(0.123456F);
     }
 
     @Test
     public void testCoerceIntegerToNumber() {
-        Integer input = Integer.valueOf(4390241);
+        Integer input = 4390241;
         Object output = ELSupport.coerceToType(null, input, Number.class);
         Assert.assertEquals(input, output);
     }
@@ -130,14 +130,14 @@ public class TestELSupport {
     public void testCoerceToType02() {
         Object result = ELManager.getExpressionFactory().coerceToType(
                 null, int.class);
-        Assert.assertEquals(Integer.valueOf(0), result);
+        Assert.assertEquals(0, result);
     }
 
     @Test
     public void testCoerceToType03() {
         Object result = ELManager.getExpressionFactory().coerceToType(
                 null, boolean.class);
-        Assert.assertEquals(Boolean.valueOf(null), result);
+        Assert.assertEquals((boolean) null, result);
     }
 
     @Test
@@ -158,21 +158,21 @@ public class TestELSupport {
     public void testCoerceToType06() {
         Object result = ELManager.getExpressionFactory().coerceToType(
                 "", Character.class);
-        Assert.assertEquals(Character.valueOf((char) 0), result);
+        Assert.assertEquals((char) 0, result);
     }
 
     @Test
     public void testCoerceToType07() {
         Object result = ELManager.getExpressionFactory().coerceToType(
                 null, char.class);
-        Assert.assertEquals(Character.valueOf((char) 0), result);
+        Assert.assertEquals((char) 0, result);
     }
 
     @Test
     public void testCoerceToType08() {
         Object result = ELManager.getExpressionFactory().coerceToType(
                 "", char.class);
-        Assert.assertEquals(Character.valueOf((char) 0), result);
+        Assert.assertEquals((char) 0, result);
     }
 
     @Test
@@ -245,7 +245,7 @@ public class TestELSupport {
     @Test
     public void testCoerceToNumber02() {
         Object result = ELSupport.coerceToNumber(null, null, int.class);
-        Assert.assertEquals(Integer.valueOf(0), result);
+        Assert.assertEquals(0, result);
     }
 
     @Test

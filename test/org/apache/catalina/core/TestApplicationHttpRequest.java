@@ -337,7 +337,7 @@ public class TestApplicationHttpRequest extends TomcatBaseTest {
 
             boolean insertWorks;
             try {
-                map.put("test", new Integer[] { Integer.valueOf(0) });
+                map.put("test", new Integer[] {0});
                 insertWorks = true;
             } catch (Throwable t) {
                 ExceptionUtils.handleThrowable(t);

@@ -1858,7 +1858,7 @@ public final class CGIServlet extends HttpServlet {
                 }
             }
             if (lineCount > 0) {
-                log.warn(sm.getString("cgiServlet.runStdErrCount", Integer.valueOf(lineCount)));
+                log.warn(sm.getString("cgiServlet.runStdErrCount", lineCount));
             }
         }
     } //class CGIRunner

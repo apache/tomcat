@@ -378,7 +378,7 @@ public class McastService
             }
         } catch ( Exception x)  {
             log.error(sm.getString(
-                    "McastService.stopFail", Integer.valueOf(svc)), x);
+                    "McastService.stopFail", svc), x);
         }
     }
 

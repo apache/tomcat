@@ -73,6 +73,6 @@ public class TestCompressionConfig {
         }
 
 
-        Assert.assertEquals(compress, Boolean.valueOf(compressionConfig.useCompression(request, response)));
+        Assert.assertEquals(compress, compressionConfig.useCompression(request, response));
     }
 }

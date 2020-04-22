@@ -141,7 +141,7 @@ public class TestJNDIRealm {
         @SuppressWarnings("unchecked")
         NamingEnumeration<SearchResult> searchResults =
                 EasyMock.createNiceMock(NamingEnumeration.class);
-        EasyMock.expect(Boolean.valueOf(searchResults.hasMore()))
+        EasyMock.expect(searchResults.hasMore())
                 .andReturn(Boolean.TRUE)
                 .andReturn(Boolean.FALSE)
                 .andReturn(Boolean.TRUE)

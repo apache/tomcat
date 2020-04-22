@@ -1000,7 +1000,7 @@ public class JspC extends Task implements Options {
         }
         if (newThreadCount < 1) {
             throw new BuildException(Localizer.getMessage(
-                    "jspc.error.minThreadCount", Integer.valueOf(newThreadCount)));
+                    "jspc.error.minThreadCount", newThreadCount));
         }
         this.threadCount = newThreadCount;
     }
@@ -1535,7 +1535,7 @@ public class JspC extends Task implements Options {
                     Integer.toString(errorCount), Long.toString(time));
             if (failOnError && errorCount > 0) {
                 System.out.println(Localizer.getMessage(
-                        "jspc.errorCount", Integer.valueOf(errorCount)));
+                        "jspc.errorCount", errorCount));
                 throw new BuildException(msg);
             } else {
                 log.info(msg);

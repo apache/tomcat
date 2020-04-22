@@ -1002,7 +1002,7 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
                             }
                         }
                         if (nBytes > 0) {
-                            completion.completed(Long.valueOf(nBytes), this);
+                            completion.completed(nBytes, this);
                         }
                     }
                     if (nBytes == 0) {

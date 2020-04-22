@@ -1644,12 +1644,12 @@ public class StandardSession implements HttpSession, Session, Serializable {
     protected void doWriteObject(ObjectOutputStream stream) throws IOException {
 
         // Write the scalar instance variables (except Manager)
-        stream.writeObject(Long.valueOf(creationTime));
-        stream.writeObject(Long.valueOf(lastAccessedTime));
-        stream.writeObject(Integer.valueOf(maxInactiveInterval));
-        stream.writeObject(Boolean.valueOf(isNew));
-        stream.writeObject(Boolean.valueOf(isValid));
-        stream.writeObject(Long.valueOf(thisAccessedTime));
+        stream.writeObject(creationTime);
+        stream.writeObject(lastAccessedTime);
+        stream.writeObject(maxInactiveInterval);
+        stream.writeObject(isNew);
+        stream.writeObject(isValid);
+        stream.writeObject(thisAccessedTime);
         stream.writeObject(id);
         if (manager.getContext().getLogger().isDebugEnabled())
             manager.getContext().getLogger().debug
@@ -1695,7 +1695,7 @@ public class StandardSession implements HttpSession, Session, Serializable {
 
         // Serialize the attribute count and the Serializable attributes
         int n = saveNames.size();
-        stream.writeObject(Integer.valueOf(n));
+        stream.writeObject(n);
         for (int i = 0; i < n; i++) {
             stream.writeObject(saveNames.get(i));
             try {

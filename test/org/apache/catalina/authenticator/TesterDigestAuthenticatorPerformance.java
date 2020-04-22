@@ -209,7 +209,7 @@ public class TesterDigestAuthenticatorPerformance {
         private String buildDigestResponse(String nonce) {
 
             String ncString = String.format("%1$08x",
-                    Integer.valueOf(nonceCount.incrementAndGet()));
+                    nonceCount.incrementAndGet());
             String cnonce = "cnonce";
 
             String response = MD5A1 + ":" + nonce + ":" + ncString + ":" +

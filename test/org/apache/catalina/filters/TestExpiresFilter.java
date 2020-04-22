@@ -179,7 +179,7 @@ public class TestExpiresFilter extends TomcatBaseTest {
             }
         };
 
-        validate(servlet, Integer.valueOf(7 * 60));
+        validate(servlet, 7 * 60);
     }
 
     @Test
@@ -225,7 +225,7 @@ public class TestExpiresFilter extends TomcatBaseTest {
             }
         };
 
-        validate(servlet, Integer.valueOf(232));
+        validate(servlet, 232);
     }
 
     @Test
@@ -259,7 +259,7 @@ public class TestExpiresFilter extends TomcatBaseTest {
             }
         };
 
-        validate(servlet, Integer.valueOf(1 * 60));
+        validate(servlet, 1 * 60);
     }
 
     @Test
@@ -294,7 +294,7 @@ public class TestExpiresFilter extends TomcatBaseTest {
             }
         };
 
-        validate(servlet, Integer.valueOf(3 * 60));
+        validate(servlet, 3 * 60);
     }
 
     @Test
@@ -312,7 +312,7 @@ public class TestExpiresFilter extends TomcatBaseTest {
             }
         };
 
-        validate(servlet, Integer.valueOf(5 * 60));
+        validate(servlet, 5 * 60);
     }
 
     @Test
@@ -329,7 +329,7 @@ public class TestExpiresFilter extends TomcatBaseTest {
             }
         };
 
-        validate(servlet, Integer.valueOf(1 * 60));
+        validate(servlet, 1 * 60);
     }
 
     @Test
@@ -348,7 +348,7 @@ public class TestExpiresFilter extends TomcatBaseTest {
             }
         };
 
-        validate(servlet, Integer.valueOf(1 * 60));
+        validate(servlet, 1 * 60);
     }
 
     @Test
@@ -365,7 +365,7 @@ public class TestExpiresFilter extends TomcatBaseTest {
             }
         };
 
-        validate(servlet, Integer.valueOf(7 * 60));
+        validate(servlet, 7 * 60);
     }
 
     protected void validate(HttpServlet servlet, Integer expectedMaxAgeInSeconds)

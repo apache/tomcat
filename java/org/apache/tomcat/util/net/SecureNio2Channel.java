@@ -173,7 +173,7 @@ public class SecureNio2Channel extends Nio2Channel  {
             if (e != null) {
                 throw new ExecutionException(e);
             }
-            return Boolean.valueOf(integer.get().intValue() >= 0);
+            return integer.get().intValue() >= 0;
         }
         @Override
         public Boolean get(long timeout, TimeUnit unit)
@@ -182,7 +182,7 @@ public class SecureNio2Channel extends Nio2Channel  {
             if (e != null) {
                 throw new ExecutionException(e);
             }
-            return Boolean.valueOf(integer.get(timeout, unit).intValue() >= 0);
+            return integer.get(timeout, unit).intValue() >= 0;
         }
     }
 
@@ -701,10 +701,10 @@ public class SecureNio2Channel extends Nio2Channel  {
         private Integer unwrap(int nRead, long timeout, TimeUnit unit) throws ExecutionException, TimeoutException, InterruptedException {
             //are we in the middle of closing or closed?
             if (closing || closed)
-                return Integer.valueOf(-1);
+                return -1;
             //did we reach EOF? if so send EOF up one layer.
             if (nRead < 0)
-                return Integer.valueOf(-1);
+                return -1;
             //the data read
             int read = 0;
             //the SSL engine result
@@ -774,7 +774,7 @@ public class SecureNio2Channel extends Nio2Channel  {
             } else {
                 unwrapBeforeRead = false;
             }
-            return Integer.valueOf(read);
+            return read;
         }
     }
 
@@ -831,7 +831,7 @@ public class SecureNio2Channel extends Nio2Channel  {
                 integer = sc.write(netOutBuffer);
                 return get();
             } else {
-                return Integer.valueOf(written);
+                return written;
             }
         }
         @Override
@@ -848,7 +848,7 @@ public class SecureNio2Channel extends Nio2Channel  {
                 integer = sc.write(netOutBuffer);
                 return get(timeout, unit);
             } else {
-                return Integer.valueOf(written);
+                return written;
             }
         }
         protected void wrap() {
@@ -889,7 +889,7 @@ public class SecureNio2Channel extends Nio2Channel  {
             final CompletionHandler<Integer, ? super A> handler) {
         // Check state
         if (closing || closed) {
-            handler.completed(Integer.valueOf(-1), attachment);
+            handler.completed(-1, attachment);
             return;
         }
         if (!handshakeComplete) {
@@ -966,7 +966,7 @@ public class SecureNio2Channel extends Nio2Channel  {
                             unwrapBeforeRead = false;
                         }
                         // If everything is OK, so complete
-                        handler.completed(Integer.valueOf(read), attach);
+                        handler.completed(read, attach);
                     } catch (Exception e) {
                         failed(e, attach);
                     }
@@ -978,7 +978,7 @@ public class SecureNio2Channel extends Nio2Channel  {
             }
         };
         if (unwrapBeforeRead || netInBuffer.position() > 0) {
-            readCompletionHandler.completed(Integer.valueOf(netInBuffer.position()), attachment);
+            readCompletionHandler.completed(netInBuffer.position(), attachment);
         } else {
             sc.read(netInBuffer, timeout, unit, attachment, readCompletionHandler);
         }
@@ -992,7 +992,7 @@ public class SecureNio2Channel extends Nio2Channel  {
             throw new IllegalArgumentException();
         }
         if (closing || closed) {
-            handler.completed(Long.valueOf(-1), attachment);
+            handler.completed((long) -1, attachment);
             return;
         }
         if (!handshakeComplete) {
@@ -1109,7 +1109,7 @@ public class SecureNio2Channel extends Nio2Channel  {
                             unwrapBeforeRead = false;
                         }
                         // If everything is OK, so complete
-                        handler.completed(Long.valueOf(read), attach);
+                        handler.completed(read, attach);
                     } catch (Exception e) {
                         failed(e, attach);
                     }
@@ -1121,7 +1121,7 @@ public class SecureNio2Channel extends Nio2Channel  {
             }
         };
         if (unwrapBeforeRead || netInBuffer.position() > 0) {
-            readCompletionHandler.completed(Integer.valueOf(netInBuffer.position()), attachment);
+            readCompletionHandler.completed(netInBuffer.position(), attachment);
         } else {
             sc.read(netInBuffer, timeout, unit, attachment, readCompletionHandler);
         }
@@ -1161,7 +1161,7 @@ public class SecureNio2Channel extends Nio2Channel  {
                         } else {
                             // Call the handler completed method with the
                             // consumed bytes number
-                            handler.completed(Integer.valueOf(written), attach);
+                            handler.completed(written, attach);
                         }
                     }
                     @Override
@@ -1214,7 +1214,7 @@ public class SecureNio2Channel extends Nio2Channel  {
                         } else {
                             // Call the handler completed method with the
                             // consumed bytes number
-                            handler.completed(Long.valueOf(written), attach);
+                            handler.completed((long) written, attach);
                         }
                     }
                     @Override

@@ -74,7 +74,7 @@ class DefaultErrorHandler implements ErrorHandler {
         for (int i=0; i < details.length; i++) {
             if (details[i].getJspBeginLineNumber() >= 0) {
                 args = new Object[] {
-                        Integer.valueOf(details[i].getJspBeginLineNumber()),
+                        details[i].getJspBeginLineNumber(),
                         details[i].getJspFileName() };
                 buf.append(System.lineSeparator());
                 buf.append(System.lineSeparator());
@@ -86,7 +86,7 @@ class DefaultErrorHandler implements ErrorHandler {
                 buf.append(details[i].getJspExtract());
             } else {
                 args = new Object[] {
-                        Integer.valueOf(details[i].getJavaLineNumber()),
+                        details[i].getJavaLineNumber(),
                         details[i].getJavaFileName() };
                 buf.append(System.lineSeparator());
                 buf.append(System.lineSeparator());

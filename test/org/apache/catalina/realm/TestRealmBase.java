@@ -633,7 +633,7 @@ public class TestRealmBase {
         boolean result = mapRealm.hasResourcePermission(
                 request, response, constraints, null);
 
-        Assert.assertEquals(Boolean.valueOf(expected), Boolean.valueOf(result));
+        Assert.assertEquals(expected, result);
     }
 
 

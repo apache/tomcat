@@ -39,7 +39,7 @@ public class TestAstSemicolon {
     public void testGetValue02() {
         ELProcessor processor = new ELProcessor();
         Object result = processor.getValue("1;2", Integer.class);
-        Assert.assertEquals(Integer.valueOf(2), result);
+        Assert.assertEquals(2, result);
     }
 
 
@@ -47,7 +47,7 @@ public class TestAstSemicolon {
     public void testGetValue03() {
         ELProcessor processor = new ELProcessor();
         Object result = processor.getValue("1;2 + 3", Integer.class);
-        Assert.assertEquals(Integer.valueOf(5), result);
+        Assert.assertEquals(5, result);
     }
 
 
@@ -61,6 +61,6 @@ public class TestAstSemicolon {
                 context, "${1+1;2+2}", Integer.class);
 
         Assert.assertEquals(Number.class, ve.getType(context));
-        Assert.assertEquals(Integer.valueOf(4), ve.getValue(context));
+        Assert.assertEquals(4, ve.getValue(context));
     }
 }

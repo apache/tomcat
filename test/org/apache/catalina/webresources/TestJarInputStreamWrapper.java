@@ -41,7 +41,7 @@ public class TestJarInputStreamWrapper {
     @Test
     public void testSkipAfterClose() throws Exception {
         Method m = InputStream.class.getMethod("skip", long.class);
-        testMethodAfterClose(m, Long.valueOf(1));
+        testMethodAfterClose(m, 1L);
     }
 
 
@@ -62,7 +62,7 @@ public class TestJarInputStreamWrapper {
     @Test
     public void testMarkAfterClose() throws Exception {
         Method m = InputStream.class.getMethod("mark", int.class);
-        testMethodAfterClose(m, Integer.valueOf(1));
+        testMethodAfterClose(m, 1);
     }
 
 

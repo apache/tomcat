@@ -49,7 +49,7 @@ public class SecurityListener implements LifecycleListener {
      * The minimum umask that must be configured for the operating system user
      * running Tomcat. The umask is handled as an octal.
      */
-    private Integer minimumUmask = Integer.valueOf(7);
+    private Integer minimumUmask = 7;
 
 
     public SecurityListener() {
@@ -108,7 +108,7 @@ public class SecurityListener implements LifecycleListener {
      */
     public void setMinimumUmask(String umask) {
         if (umask == null || umask.length() == 0) {
-            minimumUmask = Integer.valueOf(0);
+            minimumUmask = 0;
         } else {
             minimumUmask = Integer.valueOf(umask, 8);
         }

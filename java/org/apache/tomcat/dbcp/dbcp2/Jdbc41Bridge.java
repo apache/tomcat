@@ -210,7 +210,7 @@ public class Jdbc41Bridge {
                 return (T) resultSet.getURL(columnIndex);
             }
             throw new SQLFeatureNotSupportedException(
-                    String.format("resultSet=%s, columnIndex=%,d, type=%s", resultSet, Integer.valueOf(columnIndex), type));
+                    String.format("resultSet=%s, columnIndex=%,d, type=%s", resultSet, columnIndex, type));
         }
     }
 

@@ -74,7 +74,7 @@ public class TestLargeUpload extends Http2TestBase {
         writeFrame(trailerFrameHeader, trailerPayload);
 
         done.await();
-        Assert.assertEquals(Integer.valueOf(bodySize * bodyCount), Integer.valueOf(read));
+        Assert.assertEquals(bodySize * bodyCount, read);
 
     }
 

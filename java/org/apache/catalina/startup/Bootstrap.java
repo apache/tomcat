@@ -401,7 +401,7 @@ public final class Bootstrap {
         Class<?> paramTypes[] = new Class[1];
         paramTypes[0] = Boolean.TYPE;
         Object paramValues[] = new Object[1];
-        paramValues[0] = Boolean.valueOf(await);
+        paramValues[0] = await;
         Method method =
             catalinaDaemon.getClass().getMethod("setAwait", paramTypes);
         method.invoke(catalinaDaemon, paramValues);

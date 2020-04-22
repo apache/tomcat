@@ -96,7 +96,7 @@ public class PerMessageDeflate implements Transformation {
                             throw new IllegalArgumentException(sm.getString(
                                     "perMessageDeflate.invalidWindowSize",
                                     SERVER_MAX_WINDOW_BITS,
-                                    Integer.valueOf(serverMaxWindowBits)));
+                                    serverMaxWindowBits));
                         }
                         // Java SE API (as of Java 8) does not expose the API to
                         // control the Window size. It is effectively hard-coded
@@ -129,7 +129,7 @@ public class PerMessageDeflate implements Transformation {
                                 throw new IllegalArgumentException(sm.getString(
                                         "perMessageDeflate.invalidWindowSize",
                                         CLIENT_MAX_WINDOW_BITS,
-                                        Integer.valueOf(clientMaxWindowBits)));
+                                        clientMaxWindowBits));
                             }
                         }
                         // Java SE API (as of Java 8) does not expose the API to

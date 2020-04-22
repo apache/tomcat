@@ -332,7 +332,7 @@ public class TestBeanELResolver {
         BeanELResolver resolver = new BeanELResolver();
         ELContext context = new StandardELContext(ELManager.getExpressionFactory());
 
-        resolver.isReadOnly(context, new TesterBean(BEAN_NAME), Integer.valueOf(0));
+        resolver.isReadOnly(context, new TesterBean(BEAN_NAME), 0);
     }
 
     /**
@@ -815,7 +815,7 @@ public class TestBeanELResolver {
         ELContext context = new StandardELContext(ELManager.getExpressionFactory());
 
         Object result = resolver.invoke(context, new TesterBean(BEAN_NAME), "getNameVarargs",
-                new Class<?>[] { Integer.class }, new Object[] { Integer.valueOf(10) });
+                new Class<?>[] { Integer.class }, new Object[] {10});
 
         Assert.assertEquals(BEAN_NAME, result);
     }
@@ -826,7 +826,7 @@ public class TestBeanELResolver {
         ELContext context = new StandardELContext(ELManager.getExpressionFactory());
 
         Object result = resolver.invoke(context, new TesterBean(BEAN_NAME), "getNameVarargs",
-                new Class<?>[] { Integer[].class }, new Object[] { Integer.valueOf(10) });
+                new Class<?>[] { Integer[].class }, new Object[] {10});
 
         Assert.assertEquals(BEAN_NAME, result);
     }
@@ -837,7 +837,7 @@ public class TestBeanELResolver {
         ELContext context = new StandardELContext(ELManager.getExpressionFactory());
 
         Object result = resolver.invoke(context, new TesterBean(BEAN_NAME), "getNameVarargs",
-                new Class<?>[] { Integer.class, Integer.class }, new Object[] { Integer.valueOf(10), Integer.valueOf(11) });
+                new Class<?>[] { Integer.class, Integer.class }, new Object[] {10, 11});
 
         Assert.assertEquals(BEAN_NAME, result);
     }
@@ -873,7 +873,7 @@ public class TestBeanELResolver {
 
         Object result = resolver.invoke(context, new TesterBean(BEAN_NAME), "getNameVarargs",
                 new Class<?>[] { Integer.class, Integer.class, Integer.class },
-                new Object[] { Integer.valueOf(10), Integer.valueOf(11),  Integer.valueOf(12) });
+                new Object[] {10, 11, 12});
 
         Assert.assertEquals(BEAN_NAME, result);
     }
@@ -885,7 +885,7 @@ public class TestBeanELResolver {
 
         Object result = resolver.invoke(context, new TesterBean(BEAN_NAME), "getNameVarargs",
                 new Class<?>[] { Integer.class, Integer.class },
-                new Object[] { Integer.valueOf(10), Integer.valueOf(11),  Integer.valueOf(12) });
+                new Object[] {10, 11, 12});
 
         Assert.assertEquals(BEAN_NAME, result);
     }
@@ -897,7 +897,7 @@ public class TestBeanELResolver {
 
         Object result = resolver.invoke(context, new TesterBean(BEAN_NAME), "getNameVarargs",
                 new Class<?>[] { Integer.class, Integer.class, Integer.class, Integer.class },
-                new Object[] { Integer.valueOf(10), Integer.valueOf(11),  Integer.valueOf(12) });
+                new Object[] {10, 11, 12});
 
         Assert.assertEquals(BEAN_NAME, result);
     }
@@ -909,7 +909,7 @@ public class TestBeanELResolver {
 
         Object result = resolver.invoke(context, new TesterBean(BEAN_NAME), "getNameVarargs",
                 new Class<?>[] { Boolean.class, Integer.class, Integer.class, Integer.class },
-                new Object[] { Boolean.TRUE, Integer.valueOf(10), Integer.valueOf(11),  Integer.valueOf(12) });
+                new Object[] { Boolean.TRUE, 10, 11, 12});
 
         Assert.assertEquals(BEAN_NAME, result);
     }
@@ -921,7 +921,7 @@ public class TestBeanELResolver {
 
         Object result = resolver.invoke(context, new TesterBean(BEAN_NAME), "getNameVarargs",
                 new Class<?>[] { Boolean.class, Integer.class, Integer.class },
-                new Object[] { Boolean.TRUE, Integer.valueOf(10), Integer.valueOf(11),  Integer.valueOf(12) });
+                new Object[] { Boolean.TRUE, 10, 11, 12});
 
         Assert.assertEquals(BEAN_NAME, result);
     }
@@ -933,7 +933,7 @@ public class TestBeanELResolver {
 
         Object result = resolver.invoke(context, new TesterBean(BEAN_NAME), "getNameVarargs",
                 new Class<?>[] { Boolean.class, Integer.class, Integer.class, Integer.class, Integer.class },
-                new Object[] { Boolean.TRUE, Integer.valueOf(10), Integer.valueOf(11),  Integer.valueOf(12) });
+                new Object[] { Boolean.TRUE, 10, 11, 12});
 
         Assert.assertEquals(BEAN_NAME, result);
     }

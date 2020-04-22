@@ -168,7 +168,7 @@ public abstract class AbstractArchiveResource extends AbstractResource {
             // Can't create an array that big
             throw new ArrayIndexOutOfBoundsException(sm.getString(
                     "abstractResource.getContentTooLarge", getWebappPath(),
-                    Long.valueOf(len)));
+                    len));
         }
 
         if (len < 0) {

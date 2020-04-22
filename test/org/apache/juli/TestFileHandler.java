@@ -77,7 +77,7 @@ public class TestFileHandler {
     public void testCleanOnInitOneHandler() throws Exception {
         generateLogFiles(logsDir, PREFIX_1, SUFIX_1, 3);
 
-        FileHandler fh1 = new FileHandler(logsDir.getAbsolutePath(), PREFIX_1, SUFIX_1, Integer.valueOf(2));
+        FileHandler fh1 = new FileHandler(logsDir.getAbsolutePath(), PREFIX_1, SUFIX_1, 2);
         fh1.open();
 
         Thread.sleep(1000);
@@ -91,10 +91,10 @@ public class TestFileHandler {
     public void testCleanOnInitMultipleHandlers() throws Exception {
         generateLogFiles(logsDir, PREFIX_1, SUFIX_1, 3);
 
-        FileHandler fh1 = new FileHandler(logsDir.getAbsolutePath(), PREFIX_1, SUFIX_1, Integer.valueOf(2));
-        FileHandler fh2 = new FileHandler(logsDir.getAbsolutePath(), PREFIX_1, SUFIX_2, Integer.valueOf(2));
-        FileHandler fh3 = new FileHandler(logsDir.getAbsolutePath(), PREFIX_2, SUFIX_1, Integer.valueOf(2));
-        FileHandler fh4 = new FileHandler(logsDir.getAbsolutePath(), PREFIX_3, SUFIX_1, Integer.valueOf(2));
+        FileHandler fh1 = new FileHandler(logsDir.getAbsolutePath(), PREFIX_1, SUFIX_1, 2);
+        FileHandler fh2 = new FileHandler(logsDir.getAbsolutePath(), PREFIX_1, SUFIX_2, 2);
+        FileHandler fh3 = new FileHandler(logsDir.getAbsolutePath(), PREFIX_2, SUFIX_1, 2);
+        FileHandler fh4 = new FileHandler(logsDir.getAbsolutePath(), PREFIX_3, SUFIX_1, 2);
         fh1.open();
         fh2.open();
         fh3.open();

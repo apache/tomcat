@@ -1362,7 +1362,7 @@ class Generator {
                             Modifier.isAbstract(modifiers) ||
                             !jreCompat.canAcccess(null, constructor) ) {
                         throw new Exception(Localizer.getMessage("jsp.error.invalid.bean",
-                                Integer.valueOf(modifiers)));
+                                modifiers));
                     }
                     // At compile time, we have determined that the bean class
                     // exists, with a public zero constructor, new() can be
@@ -2960,9 +2960,9 @@ class Generator {
                     Integer i = tagVarNumbers.get(fullName);
                     varName = varName + i.intValue();
                     tagVarNumbers.put(fullName,
-                            Integer.valueOf(i.intValue() + 1));
+                            i.intValue() + 1);
                 } else {
-                    tagVarNumbers.put(fullName, Integer.valueOf(1));
+                    tagVarNumbers.put(fullName, 1);
                     varName = varName + "0";
                 }
             }

@@ -52,12 +52,12 @@ abstract class ConnectionSettingsBase<T extends Throwable> {
     ConnectionSettingsBase(String connectionId) {
         this.connectionId = connectionId;
         // Set up the defaults
-        current.put(Setting.HEADER_TABLE_SIZE,      Long.valueOf(DEFAULT_HEADER_TABLE_SIZE));
-        current.put(Setting.ENABLE_PUSH,            Long.valueOf(DEFAULT_ENABLE_PUSH ? 1 : 0));
-        current.put(Setting.MAX_CONCURRENT_STREAMS, Long.valueOf(DEFAULT_MAX_CONCURRENT_STREAMS));
-        current.put(Setting.INITIAL_WINDOW_SIZE,    Long.valueOf(DEFAULT_INITIAL_WINDOW_SIZE));
-        current.put(Setting.MAX_FRAME_SIZE,         Long.valueOf(DEFAULT_MAX_FRAME_SIZE));
-        current.put(Setting.MAX_HEADER_LIST_SIZE,   Long.valueOf(DEFAULT_MAX_HEADER_LIST_SIZE));
+        current.put(Setting.HEADER_TABLE_SIZE, (long) DEFAULT_HEADER_TABLE_SIZE);
+        current.put(Setting.ENABLE_PUSH, (long) (DEFAULT_ENABLE_PUSH ? 1 : 0));
+        current.put(Setting.MAX_CONCURRENT_STREAMS, DEFAULT_MAX_CONCURRENT_STREAMS);
+        current.put(Setting.INITIAL_WINDOW_SIZE, (long) DEFAULT_INITIAL_WINDOW_SIZE);
+        current.put(Setting.MAX_FRAME_SIZE, (long) DEFAULT_MAX_FRAME_SIZE);
+        current.put(Setting.MAX_HEADER_LIST_SIZE, DEFAULT_MAX_HEADER_LIST_SIZE);
     }
 
 

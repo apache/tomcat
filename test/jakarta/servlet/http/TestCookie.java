@@ -141,11 +141,11 @@ public class TestCookie {
             try {
                 validator.validate(name);
                 if (!expected) {
-                    Assert.fail(String.format("Char %d should not be allowed", Integer.valueOf(ch)));
+                    Assert.fail(String.format("Char %d should not be allowed", (int) ch));
                 }
             } catch (IllegalArgumentException e) {
                 if (expected) {
-                    Assert.fail(String.format("Char %d should be allowed", Integer.valueOf(ch)));
+                    Assert.fail(String.format("Char %d should be allowed", (int) ch));
                 }
             }
         }

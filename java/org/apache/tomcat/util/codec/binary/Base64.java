@@ -385,7 +385,7 @@ public class Base64 extends BaseNCodec {
                     break;
                 default:
                     throw new IllegalStateException(sm.getString(
-                            "base64.impossibleModulus", Integer.valueOf(context.modulus)));
+                            "base64.impossibleModulus", context.modulus));
             }
             context.currentLinePos += context.pos - savedPos; // keep track of current line position
             // if currentPos == 0 we are at the start of a line, so don't add CRLF
@@ -499,7 +499,7 @@ public class Base64 extends BaseNCodec {
                     break;
                 default:
                     throw new IllegalStateException(sm.getString(
-                            "base64.impossibleModulus", Integer.valueOf(context.modulus)));
+                            "base64.impossibleModulus", context.modulus));
             }
         }
     }
@@ -675,7 +675,7 @@ public class Base64 extends BaseNCodec {
         final long len = b64.getEncodedLength(binaryData);
         if (len > maxResultSize) {
             throw new IllegalArgumentException(sm.getString(
-                    "base64.inputTooLarge", Long.valueOf(len), Integer.valueOf(maxResultSize)));
+                    "base64.inputTooLarge", len, maxResultSize));
         }
 
         return b64.encode(binaryData);

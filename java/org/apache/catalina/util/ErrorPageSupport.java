@@ -39,7 +39,7 @@ public class ErrorPageSupport {
     public void add(ErrorPage errorPage) {
         String exceptionType = errorPage.getExceptionType();
         if (exceptionType == null) {
-            statusPages.put(Integer.valueOf(errorPage.getErrorCode()), errorPage);
+            statusPages.put(errorPage.getErrorCode(), errorPage);
         } else {
             exceptionPages.put(exceptionType, errorPage);
         }
@@ -49,7 +49,7 @@ public class ErrorPageSupport {
     public void remove(ErrorPage errorPage) {
         String exceptionType = errorPage.getExceptionType();
         if (exceptionType == null) {
-            statusPages.remove(Integer.valueOf(errorPage.getErrorCode()), errorPage);
+            statusPages.remove(errorPage.getErrorCode(), errorPage);
         } else {
             exceptionPages.remove(exceptionType, errorPage);
         }
@@ -57,7 +57,7 @@ public class ErrorPageSupport {
 
 
     public ErrorPage find(int statusCode) {
-        return statusPages.get(Integer.valueOf(statusCode));
+        return statusPages.get(statusCode);
     }
 
 

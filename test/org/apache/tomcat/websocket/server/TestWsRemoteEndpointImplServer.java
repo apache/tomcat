@@ -111,7 +111,7 @@ public class TestWsRemoteEndpointImplServer extends WebSocketBaseTest {
             // Disabling blocking timeouts for this test
             session.getUserProperties().put(
                     org.apache.tomcat.websocket.Constants.BLOCKING_SEND_TIMEOUT_PROPERTY,
-                    Long.valueOf(-1));
+                    (long) -1);
             ex.submit(new Bug58624SendMessage(session));
         }
 

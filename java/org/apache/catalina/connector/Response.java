@@ -1845,7 +1845,7 @@ public class Response implements HttpServletResponse {
 
         @Override
         public Boolean run(){
-            return Boolean.valueOf(doIsEncodeable(context, hreq, session, location));
+            return doIsEncodeable(context, hreq, session, location);
         }
     }
 

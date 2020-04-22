@@ -402,7 +402,7 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
                     if (userProperties.get(Constants.AUTHORIZATION_HEADER_NAME) != null) {
                         throw new DeploymentException(sm.getString(
                                 "wsWebSocketContainer.failedAuthentication",
-                                Integer.valueOf(httpResponse.status)));
+                                httpResponse.status));
                     }
 
                     List<String> wwwAuthenticateHeaders = httpResponse.getHandshakeResponse()
@@ -424,7 +424,7 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
                     if (auth == null) {
                         throw new DeploymentException(
                                 sm.getString("wsWebSocketContainer.unsupportedAuthScheme",
-                                        Integer.valueOf(httpResponse.status), authScheme));
+                                        httpResponse.status, authScheme));
                     }
 
                     userProperties.put(Constants.AUTHORIZATION_HEADER_NAME, auth.getAuthorization(

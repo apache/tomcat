@@ -693,7 +693,7 @@ public class TestRemoteIpFilter extends TomcatBaseTest {
 
         // VERIFY
         Assert.assertEquals("org.apache.catalina.AccessLog.ServerPort",
-                Integer.valueOf(8080),
+                8080,
                 actualRequest.getAttribute(AccessLog.SERVER_PORT_ATTRIBUTE));
 
         Assert.assertEquals("org.apache.catalina.AccessLog.RemoteAddr",

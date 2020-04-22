@@ -778,11 +778,11 @@ public class TestRemoteIpValve {
 
         boolean actualSecure = remoteAddrAndHostTrackerValve.isSecure();
         Assert.assertEquals("x-forwarded-proto says " + expectedScheme,
-                Boolean.valueOf(shouldBeSecure), Boolean.valueOf(actualSecure));
+                shouldBeSecure, actualSecure);
 
         boolean actualPostInvokeSecure = request.isSecure();
         Assert.assertEquals("postInvoke secure",
-                Boolean.valueOf(arrivesAsSecure), Boolean.valueOf(actualPostInvokeSecure));
+                arrivesAsSecure, actualPostInvokeSecure);
 
         int actualPostInvokeServerPort = request.getServerPort();
         Assert.assertEquals("postInvoke serverPort", incommingServerPort, actualPostInvokeServerPort);
@@ -1092,7 +1092,7 @@ public class TestRemoteIpValve {
 
         // VERIFY
         Assert.assertEquals("org.apache.catalina.AccessLog.ServerPort",
-                Integer.valueOf(8080),
+                8080,
                 request.getAttribute(AccessLog.SERVER_PORT_ATTRIBUTE));
 
         Assert.assertEquals("org.apache.catalina.AccessLog.RemoteAddr",

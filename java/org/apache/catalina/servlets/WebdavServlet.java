@@ -1709,7 +1709,7 @@ public class WebdavServlet extends DefaultServlet {
             if (!resources.mkdir(dest)) {
                 WebResource destResource = resources.getResource(dest);
                 if (!destResource.isDirectory()) {
-                    errorList.put(dest, Integer.valueOf(WebdavStatus.SC_CONFLICT));
+                    errorList.put(dest, WebdavStatus.SC_CONFLICT);
                     return false;
                 }
             }
@@ -1736,7 +1736,7 @@ public class WebdavServlet extends DefaultServlet {
                     String parent = destResource.getWebappPath().substring(0, lastSlash);
                     WebResource parentResource = resources.getResource(parent);
                     if (!parentResource.isDirectory()) {
-                        errorList.put(source, Integer.valueOf(WebdavStatus.SC_CONFLICT));
+                        errorList.put(source, WebdavStatus.SC_CONFLICT);
                         return false;
                     }
                 }
@@ -1750,14 +1750,14 @@ public class WebdavServlet extends DefaultServlet {
             }
             try (InputStream is = sourceResource.getInputStream()) {
                 if (!resources.write(dest, is, false)) {
-                    errorList.put(source, Integer.valueOf(WebdavStatus.SC_INTERNAL_SERVER_ERROR));
+                    errorList.put(source, WebdavStatus.SC_INTERNAL_SERVER_ERROR);
                     return false;
                 }
             } catch (IOException e) {
                 log(sm.getString("webdavservlet.inputstreamclosefail", source), e);
             }
         } else {
-            errorList.put(source, Integer.valueOf(WebdavStatus.SC_INTERNAL_SERVER_ERROR));
+            errorList.put(source, WebdavStatus.SC_INTERNAL_SERVER_ERROR);
             return false;
         }
         return true;
@@ -1829,8 +1829,7 @@ public class WebdavServlet extends DefaultServlet {
 
             deleteCollection(req, path, errorList);
             if (!resource.delete()) {
-                errorList.put(path, Integer.valueOf
-                    (WebdavStatus.SC_INTERNAL_SERVER_ERROR));
+                errorList.put(path, WebdavStatus.SC_INTERNAL_SERVER_ERROR);
             }
 
             if (!errorList.isEmpty()) {
@@ -1860,7 +1859,7 @@ public class WebdavServlet extends DefaultServlet {
 
         // Prevent deletion of special subdirectories
         if (isSpecialPath(path)) {
-            errorList.put(path, Integer.valueOf(WebdavStatus.SC_FORBIDDEN));
+            errorList.put(path, WebdavStatus.SC_FORBIDDEN);
             return;
         }
 
@@ -1882,7 +1881,7 @@ public class WebdavServlet extends DefaultServlet {
 
             if (isLocked(childName, ifHeader + lockTokenHeader)) {
 
-                errorList.put(childName, Integer.valueOf(WebdavStatus.SC_LOCKED));
+                errorList.put(childName, WebdavStatus.SC_LOCKED);
 
             } else {
                 WebResource childResource = resources.getResource(childName);
@@ -1894,8 +1893,7 @@ public class WebdavServlet extends DefaultServlet {
                     if (!childResource.isDirectory()) {
                         // If it's not a collection, then it's an unknown
                         // error
-                        errorList.put(childName, Integer.valueOf(
-                                WebdavStatus.SC_INTERNAL_SERVER_ERROR));
+                        errorList.put(childName, WebdavStatus.SC_INTERNAL_SERVER_ERROR);
                     }
                 }
             }
@@ -2806,7 +2804,7 @@ class WebdavStatus {
      *                  HTTP status code (e.g., "OK").
      */
     public static String getStatusText(int nHttpStatusCode) {
-        Integer intKey = Integer.valueOf(nHttpStatusCode);
+        Integer intKey = nHttpStatusCode;
 
         if (!mapStatusCodes.containsKey(intKey)) {
             return "";
@@ -2827,7 +2825,7 @@ class WebdavStatus {
      * @param   strVal  [IN] HTTP status text
      */
     private static void addStatusCodeMap(int nKey, String strVal) {
-        mapStatusCodes.put(Integer.valueOf(nKey), strVal);
+        mapStatusCodes.put(nKey, strVal);
     }
 
 }

@@ -525,7 +525,7 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
                 if (log.isDebugEnabled())
                     log.debug(sm.getString("deltaSession.notifying",
                                            ((ClusterManager)manager).getName(),
-                                           Boolean.valueOf(isPrimarySession()),
+                            isPrimarySession(),
                                            expiredId));
                 if ( manager instanceof DeltaManager ) {
                     ( (DeltaManager) manager).sessionExpired(expiredId);
@@ -920,13 +920,13 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
 
     private void doWriteObject(ObjectOutput stream) throws IOException {
         // Write the scalar instance variables (except Manager)
-        stream.writeObject(Long.valueOf(creationTime));
-        stream.writeObject(Long.valueOf(lastAccessedTime));
-        stream.writeObject(Integer.valueOf(maxInactiveInterval));
-        stream.writeObject(Boolean.valueOf(isNew));
-        stream.writeObject(Boolean.valueOf(isValid));
-        stream.writeObject(Long.valueOf(thisAccessedTime));
-        stream.writeObject(Long.valueOf(version));
+        stream.writeObject(creationTime);
+        stream.writeObject(lastAccessedTime);
+        stream.writeObject(maxInactiveInterval);
+        stream.writeObject(isNew);
+        stream.writeObject(isValid);
+        stream.writeObject(thisAccessedTime);
+        stream.writeObject(version);
         stream.writeBoolean(getPrincipal() instanceof Serializable);
         if (getPrincipal() instanceof Serializable) {
             stream.writeObject(getPrincipal());
@@ -951,7 +951,7 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
 
         // Serialize the attribute count and the Serializable attributes
         int n = saveNames.size();
-        stream.writeObject(Integer.valueOf(n));
+        stream.writeObject(n);
         for (int i = 0; i < n; i++) {
             stream.writeObject( saveNames.get(i));
             try {
@@ -968,7 +968,7 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
                 saveListeners.add(listener);
             }
         }
-        stream.writeObject(Integer.valueOf(saveListeners.size()));
+        stream.writeObject(saveListeners.size());
         for (SessionListener listener : saveListeners) {
             stream.writeObject(listener);
         }

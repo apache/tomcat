@@ -281,7 +281,7 @@ public class JMXProxyServlet extends HttpServlet {
             }
             throw new IllegalArgumentException(
                     sm.getString("jmxProxyServlet.noOperationOnBean",
-                            operation, Integer.valueOf(paramCount), onameStr, info.getClassName()));
+                            operation, paramCount, onameStr, info.getClassName()));
         }
 
         MBeanParameterInfo[] signature = methodInfo.getSignature();

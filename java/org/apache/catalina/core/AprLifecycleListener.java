@@ -248,10 +248,10 @@ public class AprLifecycleListener
 
         // Log APR flags
         initInfoLogMessages.add(sm.getString("aprListener.flags",
-                Boolean.valueOf(Library.APR_HAVE_IPV6),
-                Boolean.valueOf(Library.APR_HAS_SENDFILE),
-                Boolean.valueOf(Library.APR_HAS_SO_ACCEPTFILTER),
-                Boolean.valueOf(Library.APR_HAS_RANDOM)));
+                Library.APR_HAVE_IPV6,
+                Library.APR_HAS_SENDFILE,
+                Library.APR_HAS_SO_ACCEPTFILTER,
+                Library.APR_HAS_RANDOM));
 
         aprAvailable = true;
     }
@@ -292,7 +292,7 @@ public class AprLifecycleListener
 
             if(log.isDebugEnabled()) {
                 log.debug(sm.getString("aprListener.currentFIPSMode",
-                                       Integer.valueOf(fipsModeState)));
+                        fipsModeState));
             }
 
             if ("on".equalsIgnoreCase(FIPSMode)) {
@@ -317,7 +317,7 @@ public class AprLifecycleListener
                 } else {
                     throw new IllegalStateException(sm.getString(
                             "aprListener.enterAlreadyInFIPSMode",
-                            Integer.valueOf(fipsModeState)));
+                            fipsModeState));
                 }
             } else {
                 throw new IllegalArgumentException(sm.getString(

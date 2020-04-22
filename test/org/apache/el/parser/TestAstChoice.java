@@ -27,6 +27,6 @@ public class TestAstChoice {
     public void test01() {
         ELProcessor processor = new ELProcessor();
         Object result = processor.eval("null?1:2");
-        Assert.assertEquals(Long.valueOf(2), result);
+        Assert.assertEquals(2L, result);
     }
 }

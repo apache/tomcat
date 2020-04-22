@@ -290,7 +290,7 @@ public abstract class AbstractReplicatedMap<K,V>
                                     log.info(sm.getString("abstractReplicatedMap.ping.stateTransferredMember",
                                             member));
                                 if (mapMembers.containsKey(member) ) {
-                                    mapMembers.put(member, Long.valueOf(System.currentTimeMillis()));
+                                    mapMembers.put(member, System.currentTimeMillis());
                                 }
                             }
                         } else {
@@ -332,7 +332,7 @@ public abstract class AbstractReplicatedMap<K,V>
     protected void memberAlive(Member member) {
         mapMemberAdded(member);
         synchronized (mapMembers) {
-            mapMembers.put(member, Long.valueOf(System.currentTimeMillis()));
+            mapMembers.put(member, System.currentTimeMillis());
         }
     }
 
@@ -798,7 +798,7 @@ public abstract class AbstractReplicatedMap<K,V>
             if (!mapMembers.containsKey(mapMember) ) {
                 if (log.isInfoEnabled())
                     log.info(sm.getString("abstractReplicatedMap.mapMemberAdded.added", mapMember));
-                mapMembers.put(mapMember, Long.valueOf(System.currentTimeMillis()));
+                mapMembers.put(mapMember, System.currentTimeMillis());
                 memberAdded = true;
             }
         }

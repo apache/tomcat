@@ -45,7 +45,7 @@ public class Asn1Parser {
         int value = next();
         if (value != tag) {
             throw new IllegalArgumentException(sm.getString("asn1Parser.tagMismatch",
-                    Integer.valueOf(tag), Integer.valueOf(value)));
+                    tag, value));
         }
     }
 
@@ -54,7 +54,7 @@ public class Asn1Parser {
         int len = parseLength();
         if (len + pos != source.length) {
             throw new IllegalArgumentException(sm.getString("asn1Parser.lengthInvalid",
-                    Integer.valueOf(len), Integer.valueOf(source.length - pos)));
+                    len, source.length - pos));
         }
     }
 

@@ -794,7 +794,7 @@ public class ApplicationContextFacade implements ServletContext {
     @Override
     public void setSessionTimeout(int sessionTimeout) {
         if (SecurityUtil.isPackageProtectionEnabled()) {
-            doPrivileged("setSessionTimeout", new Object[] { Integer.valueOf(sessionTimeout) });
+            doPrivileged("setSessionTimeout", new Object[] {sessionTimeout});
         } else  {
             context.setSessionTimeout(sessionTimeout);
         }

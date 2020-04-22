@@ -1073,7 +1073,7 @@ public class ExpiresFilter extends FilterBase {
                 ints[i] = Integer.parseInt(intAsString);
             } catch (NumberFormatException e) {
                 throw new RuntimeException(sm.getString("expiresFilter.numberError",
-                        Integer.valueOf(i), commaDelimitedInts));
+                        i, commaDelimitedInts));
             }
         }
         return ints;
@@ -1452,7 +1452,7 @@ public class ExpiresFilter extends FilterBase {
                 log.debug(sm.getString(
                         "expiresFilter.expirationHeaderAlreadyDefined",
                         request.getRequestURI(),
-                        Integer.valueOf(response.getStatus()),
+                        response.getStatus(),
                         response.getContentType()));
             }
             return false;
@@ -1463,7 +1463,7 @@ public class ExpiresFilter extends FilterBase {
                 if (log.isDebugEnabled()) {
                     log.debug(sm.getString("expiresFilter.skippedStatusCode",
                             request.getRequestURI(),
-                            Integer.valueOf(response.getStatus()),
+                            response.getStatus(),
                             response.getContentType()));
                 }
                 return false;
@@ -1505,14 +1505,14 @@ public class ExpiresFilter extends FilterBase {
             if (log.isDebugEnabled()) {
                 log.debug(sm.getString("expiresFilter.noExpirationConfigured",
                         request.getRequestURI(),
-                        Integer.valueOf(response.getStatus()),
+                        response.getStatus(),
                         response.getContentType()));
             }
         } else {
             if (log.isDebugEnabled()) {
                 log.debug(sm.getString("expiresFilter.setExpirationDate",
                         request.getRequestURI(),
-                        Integer.valueOf(response.getStatus()),
+                        response.getStatus(),
                         response.getContentType(), expirationDate));
             }
 
@@ -1608,7 +1608,7 @@ public class ExpiresFilter extends FilterBase {
                 throw new IllegalStateException(
                         sm.getString(
                                 "expiresFilter.noDurationUnitAfterAmount",
-                                Integer.valueOf(amount), line));
+                                amount, line));
             }
             DurationUnit durationUnit;
             if ("year".equalsIgnoreCase(currentToken) ||

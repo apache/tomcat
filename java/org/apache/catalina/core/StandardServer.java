@@ -331,7 +331,7 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
     public void setPortOffset(int portOffset) {
         if (portOffset < 0) {
             throw new IllegalArgumentException(
-                    sm.getString("standardServer.portOffset.invalid", Integer.valueOf(portOffset)));
+                    sm.getString("standardServer.portOffset.invalid", portOffset));
         }
         this.portOffset = portOffset;
     }
@@ -613,7 +613,7 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
                         // This should never happen but bug 56684 suggests that
                         // it does.
                         log.warn(sm.getString("standardServer.accept.timeout",
-                                Long.valueOf(System.currentTimeMillis() - acceptStartTime)), ste);
+                                System.currentTimeMillis() - acceptStartTime), ste);
                         continue;
                     } catch (AccessControlException ace) {
                         log.warn(sm.getString("standardServer.accept.security"), ace);

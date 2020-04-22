@@ -1060,7 +1060,7 @@ public abstract class SocketWrapperBase<E> {
                     }
                     state.end();
                     if (completion && state.handler != null && state.callHandler.compareAndSet(true, false)) {
-                        state.handler.completed(Long.valueOf(state.nBytes), state.attachment);
+                        state.handler.completed(state.nBytes, state.attachment);
                     }
                     synchronized (state) {
                         state.completionDone = true;

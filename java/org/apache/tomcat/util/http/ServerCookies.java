@@ -45,7 +45,7 @@ public class ServerCookies {
     public ServerCookie addCookie() {
         if (limit > -1 && cookieCount >= limit) {
             throw new IllegalArgumentException(
-                    sm.getString("cookies.maxCountFail", Integer.valueOf(limit)));
+                    sm.getString("cookies.maxCountFail", limit));
         }
 
         if (cookieCount >= serverCookies.length) {

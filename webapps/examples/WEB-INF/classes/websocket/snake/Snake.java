@@ -130,14 +130,14 @@ public class Snake {
     public synchronized String getLocationsJson() {
         StringBuilder sb = new StringBuilder();
         sb.append(String.format("{\"x\": %d, \"y\": %d}",
-                Integer.valueOf(head.x), Integer.valueOf(head.y)));
+                head.x, head.y));
         for (Location location : tail) {
             sb.append(',');
             sb.append(String.format("{\"x\": %d, \"y\": %d}",
-                    Integer.valueOf(location.x), Integer.valueOf(location.y)));
+                    location.x, location.y));
         }
         return String.format("{\"id\":%d,\"body\":[%s]}",
-                Integer.valueOf(id), sb.toString());
+                id, sb.toString());
     }
 
     public int getId() {

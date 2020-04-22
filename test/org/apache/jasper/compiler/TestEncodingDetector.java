@@ -37,28 +37,28 @@ public class TestEncodingDetector extends TomcatBaseTest {
     public static Collection<Object[]> inputs() {
         /// Note: These files are saved using the encoding indicated by the BOM
         List<Object[]> result = new ArrayList<>();
-        result.add(new Object[] { "bom-none-prolog-none.jsp",        Integer.valueOf(200), Boolean.TRUE });
-        result.add(new Object[] { "bom-none-prolog-none.jspx",       Integer.valueOf(200), Boolean.TRUE });
-        result.add(new Object[] { "bom-none-prolog-utf16be.jspx",    Integer.valueOf(200), Boolean.TRUE });
-        result.add(new Object[] { "bom-none-prolog-utf16le.jspx",    Integer.valueOf(200), Boolean.TRUE });
-        result.add(new Object[] { "bom-none-prolog-utf8.jspx",       Integer.valueOf(200), Boolean.TRUE });
-        result.add(new Object[] { "bom-utf8-prolog-none.jsp",        Integer.valueOf(200), Boolean.TRUE });
-        result.add(new Object[] { "bom-utf8-prolog-none.jspx",       Integer.valueOf(200), Boolean.TRUE });
-        result.add(new Object[] { "bom-utf8-prolog-utf16be.jspx",    Integer.valueOf(500), null });
-        result.add(new Object[] { "bom-utf8-prolog-utf16le.jspx",    Integer.valueOf(500), null });
-        result.add(new Object[] { "bom-utf8-prolog-utf8.jspx",       Integer.valueOf(200), Boolean.TRUE });
-        result.add(new Object[] { "bom-utf16be-prolog-none.jsp",     Integer.valueOf(200), Boolean.TRUE });
-        result.add(new Object[] { "bom-utf16be-prolog-none.jspx",    Integer.valueOf(200), Boolean.TRUE });
-        result.add(new Object[] { "bom-utf16be-prolog-utf16be.jspx", Integer.valueOf(200), Boolean.TRUE });
-        result.add(new Object[] { "bom-utf16be-prolog-utf16le.jspx", Integer.valueOf(500), null });
-        result.add(new Object[] { "bom-utf16be-prolog-utf8.jspx",    Integer.valueOf(500), null });
-        result.add(new Object[] { "bom-utf16le-prolog-none.jsp",     Integer.valueOf(200), Boolean.TRUE });
-        result.add(new Object[] { "bom-utf16le-prolog-none.jspx",    Integer.valueOf(200), Boolean.TRUE });
-        result.add(new Object[] { "bom-utf16le-prolog-utf16be.jspx", Integer.valueOf(500), null });
-        result.add(new Object[] { "bom-utf16le-prolog-utf16le.jspx", Integer.valueOf(200), Boolean.TRUE });
-        result.add(new Object[] { "bom-utf16le-prolog-utf8.jspx",    Integer.valueOf(500), null });
-        result.add(new Object[] { "bug60769a.jspx",    Integer.valueOf(500), null });
-        result.add(new Object[] { "bug60769b.jspx",    Integer.valueOf(200), Boolean.TRUE });
+        result.add(new Object[] { "bom-none-prolog-none.jsp", 200, Boolean.TRUE });
+        result.add(new Object[] { "bom-none-prolog-none.jspx", 200, Boolean.TRUE });
+        result.add(new Object[] { "bom-none-prolog-utf16be.jspx", 200, Boolean.TRUE });
+        result.add(new Object[] { "bom-none-prolog-utf16le.jspx", 200, Boolean.TRUE });
+        result.add(new Object[] { "bom-none-prolog-utf8.jspx", 200, Boolean.TRUE });
+        result.add(new Object[] { "bom-utf8-prolog-none.jsp", 200, Boolean.TRUE });
+        result.add(new Object[] { "bom-utf8-prolog-none.jspx", 200, Boolean.TRUE });
+        result.add(new Object[] { "bom-utf8-prolog-utf16be.jspx", 500, null });
+        result.add(new Object[] { "bom-utf8-prolog-utf16le.jspx", 500, null });
+        result.add(new Object[] { "bom-utf8-prolog-utf8.jspx", 200, Boolean.TRUE });
+        result.add(new Object[] { "bom-utf16be-prolog-none.jsp", 200, Boolean.TRUE });
+        result.add(new Object[] { "bom-utf16be-prolog-none.jspx", 200, Boolean.TRUE });
+        result.add(new Object[] { "bom-utf16be-prolog-utf16be.jspx", 200, Boolean.TRUE });
+        result.add(new Object[] { "bom-utf16be-prolog-utf16le.jspx", 500, null });
+        result.add(new Object[] { "bom-utf16be-prolog-utf8.jspx", 500, null });
+        result.add(new Object[] { "bom-utf16le-prolog-none.jsp", 200, Boolean.TRUE });
+        result.add(new Object[] { "bom-utf16le-prolog-none.jspx", 200, Boolean.TRUE });
+        result.add(new Object[] { "bom-utf16le-prolog-utf16be.jspx", 500, null });
+        result.add(new Object[] { "bom-utf16le-prolog-utf16le.jspx", 200, Boolean.TRUE });
+        result.add(new Object[] { "bom-utf16le-prolog-utf8.jspx", 500, null });
+        result.add(new Object[] { "bug60769a.jspx", 500, null });
+        result.add(new Object[] { "bug60769b.jspx", 200, Boolean.TRUE });
         return result;
     }
 

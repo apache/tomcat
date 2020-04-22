@@ -355,7 +355,7 @@ public class TldRuleSet implements RuleSet {
             if(null != text)
                 text = text.trim();
             boolean value = "true".equalsIgnoreCase(text) || "yes".equalsIgnoreCase(text);
-            setter.invoke(digester.peek(), Boolean.valueOf(value));
+            setter.invoke(digester.peek(), value);
         }
     }
 }

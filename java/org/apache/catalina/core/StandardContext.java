@@ -2416,8 +2416,8 @@ public class StandardContext extends ContainerBase
         long oldUnloadDelay = this.unloadDelay;
         this.unloadDelay = unloadDelay;
         support.firePropertyChange("unloadDelay",
-                                   Long.valueOf(oldUnloadDelay),
-                                   Long.valueOf(this.unloadDelay));
+                oldUnloadDelay,
+                this.unloadDelay);
 
     }
 
@@ -4805,7 +4805,7 @@ public class StandardContext extends ContainerBase
             int loadOnStartup = wrapper.getLoadOnStartup();
             if (loadOnStartup < 0)
                 continue;
-            Integer key = Integer.valueOf(loadOnStartup);
+            Integer key = loadOnStartup;
             ArrayList<Wrapper> list = map.get(key);
             if (list == null) {
                 list = new ArrayList<>();
@@ -5019,8 +5019,8 @@ public class StandardContext extends ContainerBase
                 if (manager == null) {
                     if (log.isDebugEnabled()) {
                         log.debug(sm.getString("standardContext.cluster.noManager",
-                                Boolean.valueOf((getCluster() != null)),
-                                Boolean.valueOf(distributable)));
+                                (getCluster() != null),
+                                distributable));
                     }
                     if ((getCluster() != null) && distributable) {
                         try {

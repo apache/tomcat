@@ -450,7 +450,7 @@ public class HPackHuffman {
             char c = toEncode.charAt(i);
             if (c > 255) {
                 throw new IllegalArgumentException(sm.getString("hpack.invalidCharacter",
-                        Character.toString(c), Integer.valueOf(c)));
+                        Character.toString(c), (int) c));
             }
             if(forceLowercase) {
                 c = Hpack.toLower(c);

@@ -1531,7 +1531,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
             if (jar.getName().endsWith(".jar") && jar.isFile() && jar.canRead()) {
                 localRepositories.add(jar.getURL());
                 jarModificationTimes.put(
-                        jar.getName(), Long.valueOf(jar.getLastModified()));
+                        jar.getName(), jar.getLastModified());
             }
         }
 
@@ -2680,7 +2680,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
 
         @Override
         public Boolean run() {
-            return Boolean.valueOf(findResource("logging.properties") != null);
+            return findResource("logging.properties") != null;
         }
     }
 

@@ -767,8 +767,8 @@ public class ContextConfig implements LifecycleListener {
         if (log.isDebugEnabled()) {
             log.debug(sm.getString("contextConfig.xmlSettings",
                     context.getName(),
-                    Boolean.valueOf(context.getXmlValidation()),
-                    Boolean.valueOf(context.getXmlNamespaceAware())));
+                    context.getXmlValidation(),
+                    context.getXmlNamespaceAware()));
         }
 
         webConfig();

@@ -72,7 +72,7 @@ public class TestContextConfigAnnotation {
         Assert.assertEquals("paramLarge.png", servletDef.getLargeIcon());
         Assert.assertEquals("paramSmall.png", servletDef.getSmallIcon());
         Assert.assertEquals(Boolean.FALSE, servletDef.getAsyncSupported());
-        Assert.assertEquals(Integer.valueOf(0), servletDef.getLoadOnStartup());
+        Assert.assertEquals(0, servletDef.getLoadOnStartup());
         Assert.assertNull(servletDef.getEnabled());
         Assert.assertNull(servletDef.getJspFile());
 
@@ -114,7 +114,7 @@ public class TestContextConfigAnnotation {
         Assert.assertEquals("LargeIcon", servletDef.getLargeIcon());
         Assert.assertEquals("SmallIcon", servletDef.getSmallIcon());
         Assert.assertEquals(Boolean.TRUE, servletDef.getAsyncSupported());
-        Assert.assertEquals(Integer.valueOf(1), servletDef.getLoadOnStartup());
+        Assert.assertEquals(1, servletDef.getLoadOnStartup());
         Assert.assertNull(servletDef.getEnabled());
         Assert.assertNull(servletDef.getJspFile());
     }

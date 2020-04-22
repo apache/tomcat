@@ -58,7 +58,7 @@ public class ThrowableCallStack implements CallStack {
             message = messageFormat;
         } else {
             synchronized (dateFormat) {
-                message = dateFormat.format(Long.valueOf(snapshotRef.timestamp));
+                message = dateFormat.format(snapshotRef.timestamp);
             }
         }
         writer.println(message);

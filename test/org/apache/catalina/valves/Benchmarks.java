@@ -79,7 +79,7 @@ public class Benchmarks {
         private ThreadLocal<Long> currentMillisLocal = new ThreadLocal<Long>() {
             @Override
             protected Long initialValue() {
-                return Long.valueOf(0);
+                return 0L;
             }
         };
 
@@ -94,7 +94,7 @@ public class Benchmarks {
             long systime = System.currentTimeMillis();
             if ((systime - currentMillisLocal.get().longValue()) > 1000) {
                 currentDateLocal.set(new Date(systime));
-                currentMillisLocal.set(Long.valueOf(systime));
+                currentMillisLocal.set(systime);
             }
             return currentDateLocal.get();
         }

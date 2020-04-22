@@ -696,25 +696,25 @@ public class NamingContextListener implements LifecycleListener, PropertyChangeL
                     value = env.getValue();
                 } else if (type.equals("java.lang.Byte")) {
                     if (env.getValue() == null) {
-                        value = Byte.valueOf((byte) 0);
+                        value = (byte) 0;
                     } else {
                         value = Byte.decode(env.getValue());
                     }
                 } else if (type.equals("java.lang.Short")) {
                     if (env.getValue() == null) {
-                        value = Short.valueOf((short) 0);
+                        value = (short) 0;
                     } else {
                         value = Short.decode(env.getValue());
                     }
                 } else if (type.equals("java.lang.Integer")) {
                     if (env.getValue() == null) {
-                        value = Integer.valueOf(0);
+                        value = 0;
                     } else {
                         value = Integer.decode(env.getValue());
                     }
                 } else if (type.equals("java.lang.Long")) {
                     if (env.getValue() == null) {
-                        value = Long.valueOf(0);
+                        value = 0L;
                     } else {
                         value = Long.decode(env.getValue());
                     }
@@ -722,22 +722,22 @@ public class NamingContextListener implements LifecycleListener, PropertyChangeL
                     value = Boolean.valueOf(env.getValue());
                 } else if (type.equals("java.lang.Double")) {
                     if (env.getValue() == null) {
-                        value = Double.valueOf(0);
+                        value = (double) 0;
                     } else {
                         value = Double.valueOf(env.getValue());
                     }
                 } else if (type.equals("java.lang.Float")) {
                     if (env.getValue() == null) {
-                        value = Float.valueOf(0);
+                        value = (float) 0;
                     } else {
                         value = Float.valueOf(env.getValue());
                     }
                 } else if (type.equals("java.lang.Character")) {
                     if (env.getValue() == null) {
-                        value = Character.valueOf((char) 0);
+                        value = (char) 0;
                     } else {
                         if (env.getValue().length() == 1) {
-                            value = Character.valueOf(env.getValue().charAt(0));
+                            value = env.getValue().charAt(0);
                         } else {
                             throw new IllegalArgumentException();
                         }
@@ -788,7 +788,7 @@ public class NamingContextListener implements LifecycleListener, PropertyChangeL
 
             try {
                 c = clazz.getConstructor(char.class);
-                return c.newInstance(Character.valueOf(value.charAt(0)));
+                return c.newInstance(value.charAt(0));
             } catch (NoSuchMethodException e) {
                 // Ignore
             }

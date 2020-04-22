@@ -93,7 +93,7 @@ public class TestEvaluationListener {
         Object result = ve.getValue(context);
 
         // Check the result
-        Assert.assertEquals(Integer.valueOf(2), result);
+        Assert.assertEquals(2, result);
 
         List<String> before = listener.getBeforeEvaluationExpressions();
         Assert.assertEquals(1, before.size());

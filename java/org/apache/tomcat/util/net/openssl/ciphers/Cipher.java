@@ -5106,13 +5106,13 @@ public enum Cipher {
             int id = cipher.getId();
 
             if (id > 0 && id < 0xFFFF) {
-                idMap.put(Integer.valueOf(id), cipher);
+                idMap.put(id, cipher);
             }
         }
     }
 
 
     public static Cipher valueOf(int cipherId) {
-        return idMap.get(Integer.valueOf(cipherId));
+        return idMap.get(cipherId);
     }
 }

@@ -172,13 +172,13 @@ public class GzipInterceptor extends ChannelInterceptorBase implements GzipInter
 
     @Override
     public void report() {
-        log.info(sm.getString("gzipInterceptor.report", Integer.valueOf(getCount()),
-                Integer.valueOf(getCountCompressedTX()), Integer.valueOf(getCountUncompressedTX()),
-                Integer.valueOf(getCountCompressedRX()), Integer.valueOf(getCountUncompressedRX()),
-                Long.valueOf(getSizeTX()), Long.valueOf(getCompressedSizeTX()),
-                Long.valueOf(getUncompressedSizeTX()),
-                Long.valueOf(getSizeRX()), Long.valueOf(getCompressedSizeRX()),
-                Long.valueOf(getUncompressedSizeRX())));
+        log.info(sm.getString("gzipInterceptor.report", getCount(),
+                getCountCompressedTX(), getCountUncompressedTX(),
+                getCountCompressedRX(), getCountUncompressedRX(),
+                getSizeTX(), getCompressedSizeTX(),
+                getUncompressedSizeTX(),
+                getSizeRX(), getCompressedSizeRX(),
+                getUncompressedSizeRX()));
     }
 
 

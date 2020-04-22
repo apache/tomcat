@@ -230,7 +230,7 @@ public class AsyncChannelWrapperSecure implements AsyncChannelWrapper {
 
 
                 if (writing.compareAndSet(true, false)) {
-                    future.complete(Long.valueOf(written));
+                    future.complete(written);
                 } else {
                     future.fail(new IllegalStateException(sm.getString(
                             "asyncChannelWrapperSecure.wrongStateWrite")));
@@ -328,7 +328,7 @@ public class AsyncChannelWrapperSecure implements AsyncChannelWrapper {
 
 
                 if (reading.compareAndSet(true, false)) {
-                    future.complete(Integer.valueOf(read));
+                    future.complete(read);
                 } else {
                     future.fail(new IllegalStateException(sm.getString(
                             "asyncChannelWrapperSecure.wrongStateRead")));
@@ -544,7 +544,7 @@ public class AsyncChannelWrapperSecure implements AsyncChannelWrapper {
                 throw new ExecutionException(sm.getString(
                         "asyncChannelWrapperSecure.tooBig", result), null);
             }
-            return Integer.valueOf(result.intValue());
+            return result.intValue();
         }
 
         @Override
@@ -556,7 +556,7 @@ public class AsyncChannelWrapperSecure implements AsyncChannelWrapper {
                 throw new ExecutionException(sm.getString(
                         "asyncChannelWrapperSecure.tooBig", result), null);
             }
-            return Integer.valueOf(result.intValue());
+            return result.intValue();
         }
     }
 

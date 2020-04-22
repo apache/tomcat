@@ -418,7 +418,7 @@ public class Request implements HttpServletRequest {
     }
 
     public void setAsyncSupported(boolean asyncSupported) {
-        this.asyncSupported = Boolean.valueOf(asyncSupported);
+        this.asyncSupported = asyncSupported;
     }
 
     /**
@@ -3369,7 +3369,7 @@ public class Request implements HttpServletRequest {
 
         for (AcceptLanguage acceptLanguage : acceptLanguages) {
             // Add a new Locale to the list of Locales for this quality level
-            Double key = Double.valueOf(-acceptLanguage.getQuality());  // Reverse the order
+            Double key = -acceptLanguage.getQuality();  // Reverse the order
             ArrayList<Locale> values = locales.get(key);
             if (values == null) {
                 values = new ArrayList<>();
@@ -3483,9 +3483,8 @@ public class Request implements HttpServletRequest {
                 new SpecialAttributeAdapter() {
                     @Override
                     public Object get(Request request, String name) {
-                        return Boolean.valueOf(
-                                request.getConnector().getProtocolHandler(
-                                        ).isSendfileSupported() && request.getCoyoteRequest().getSendfile());
+                        return request.getConnector().getProtocolHandler(
+                        ).isSendfileSupported() && request.getCoyoteRequest().getSendfile();
                     }
                     @Override
                     public void set(Request request, String name, Object value) {

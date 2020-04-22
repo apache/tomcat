@@ -260,13 +260,13 @@ public abstract class AbstractInputStreamJar implements Jar {
                         Integer mappedVersion = mrVersions.get(baseName);
                         if (mappedVersion == null) {
                             // No version found for this name. Create one.
-                            mrVersions.put(baseName, Integer.valueOf(version));
+                            mrVersions.put(baseName, version);
                         } else {
                             // Ignore any entry for which we have already found
                             // a later version
                             if (version > mappedVersion.intValue()) {
                                 // Replace the earlier version
-                                mrVersions.put(baseName, Integer.valueOf(version));
+                                mrVersions.put(baseName, version);
                             }
                         }
                     }

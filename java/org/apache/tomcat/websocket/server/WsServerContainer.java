@@ -160,7 +160,7 @@ public class WsServerContainer extends WsWebSocketContainer
 
             UriTemplate uriTemplate = new UriTemplate(path);
             if (uriTemplate.hasParameters()) {
-                Integer key = Integer.valueOf(uriTemplate.getSegmentCount());
+                Integer key = uriTemplate.getSegmentCount();
                 ConcurrentSkipListMap<String,TemplatePathMatch> templateMatches =
                         configTemplateMatchMap.get(key);
                 if (templateMatches == null) {
@@ -344,7 +344,7 @@ public class WsServerContainer extends WsWebSocketContainer
         }
 
         // Number of segments has to match
-        Integer key = Integer.valueOf(pathUriTemplate.getSegmentCount());
+        Integer key = pathUriTemplate.getSegmentCount();
         ConcurrentSkipListMap<String,TemplatePathMatch> templateMatches = configTemplateMatchMap.get(key);
 
         if (templateMatches == null) {

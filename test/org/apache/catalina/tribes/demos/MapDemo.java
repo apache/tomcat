@@ -256,9 +256,9 @@ public class MapDemo implements ChannelListener, MembershipListener{
                     case 2: return entry.getValue();
                     case 3: return entry.getPrimary()!=null?entry.getPrimary().getName():"null";
                     case 4: return getMemberNames(entry.getBackupNodes());
-                    case 5: return Boolean.valueOf(entry.isPrimary());
-                    case 6: return Boolean.valueOf(entry.isProxy());
-                    case 7: return Boolean.valueOf(entry.isBackup());
+                    case 5: return entry.isPrimary();
+                    case 6: return entry.isProxy();
+                    case 7: return entry.isBackup();
                     default: return "";
                 }
 

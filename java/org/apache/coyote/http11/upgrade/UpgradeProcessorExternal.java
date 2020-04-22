@@ -115,8 +115,8 @@ public class UpgradeProcessorExternal extends UpgradeProcessorBase {
                 upgradeServletOutputStream.isClosed()) {
             if (log.isDebugEnabled()) {
                 log.debug(sm.getString("upgradeProcessor.requiredClose",
-                        Boolean.valueOf(upgradeServletInputStream.isClosed()),
-                        Boolean.valueOf(upgradeServletOutputStream.isClosed())));
+                        upgradeServletInputStream.isClosed(),
+                        upgradeServletOutputStream.isClosed()));
             }
             return SocketState.CLOSED;
         }

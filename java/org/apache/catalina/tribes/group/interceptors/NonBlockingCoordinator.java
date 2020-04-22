@@ -833,7 +833,7 @@ public class NonBlockingCoordinator extends ChannelInterceptorBase {
         @Override
         public String toString() {
             Member local = interceptor.getLocalMember(false);
-            return sm.getString("nonBlockingCoordinator.report", Integer.valueOf(type),
+            return sm.getString("nonBlockingCoordinator.report", type,
                     (local != null ? local.getName() : ""),
                     (coord != null ? coord.getName() : ""),
                     Arrays.toNameString(view != null ? view.getMembers() : null),

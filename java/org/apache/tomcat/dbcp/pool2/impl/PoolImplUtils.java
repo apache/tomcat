@@ -148,7 +148,7 @@ class PoolImplUtils {
         final TypeVariable<?>[] tvs = clazz.getTypeParameters();
         for (int i = 0; i < tvs.length; i++) {
             if (tvs[i].equals(argType)) {
-                return Integer.valueOf(i);
+                return i;
             }
         }
         return null;

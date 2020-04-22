@@ -29,10 +29,10 @@ public class TestAbstractStream {
     public void testDependenciesFig3() {
         // Setup
         Http2UpgradeHandler handler = new Http2UpgradeHandler(new Http2Protocol(), null, null);
-        Stream a = new Stream(Integer.valueOf(1), handler);
-        Stream b = new Stream(Integer.valueOf(2), handler);
-        Stream c = new Stream(Integer.valueOf(3), handler);
-        Stream d = new Stream(Integer.valueOf(4), handler);
+        Stream a = new Stream(1, handler);
+        Stream b = new Stream(2, handler);
+        Stream c = new Stream(3, handler);
+        Stream d = new Stream(4, handler);
         b.rePrioritise(a, false, 16);
         c.rePrioritise(a, false, 16);
 
@@ -60,10 +60,10 @@ public class TestAbstractStream {
     public void testDependenciesFig4() {
         // Setup
         Http2UpgradeHandler handler = new Http2UpgradeHandler(new Http2Protocol(), null, null);
-        Stream a = new Stream(Integer.valueOf(1), handler);
-        Stream b = new Stream(Integer.valueOf(2), handler);
-        Stream c = new Stream(Integer.valueOf(3), handler);
-        Stream d = new Stream(Integer.valueOf(4), handler);
+        Stream a = new Stream(1, handler);
+        Stream b = new Stream(2, handler);
+        Stream c = new Stream(3, handler);
+        Stream d = new Stream(4, handler);
         b.rePrioritise(a, false, 16);
         c.rePrioritise(a, false, 16);
 
@@ -91,12 +91,12 @@ public class TestAbstractStream {
     public void testDependenciesFig5NonExclusive() {
         // Setup
         Http2UpgradeHandler handler = new Http2UpgradeHandler(new Http2Protocol(), null, null);
-        Stream a = new Stream(Integer.valueOf(1), handler);
-        Stream b = new Stream(Integer.valueOf(2), handler);
-        Stream c = new Stream(Integer.valueOf(3), handler);
-        Stream d = new Stream(Integer.valueOf(4), handler);
-        Stream e = new Stream(Integer.valueOf(5), handler);
-        Stream f = new Stream(Integer.valueOf(6), handler);
+        Stream a = new Stream(1, handler);
+        Stream b = new Stream(2, handler);
+        Stream c = new Stream(3, handler);
+        Stream d = new Stream(4, handler);
+        Stream e = new Stream(5, handler);
+        Stream f = new Stream(6, handler);
         b.rePrioritise(a, false, 16);
         c.rePrioritise(a, false, 16);
         d.rePrioritise(c, false, 16);
@@ -133,12 +133,12 @@ public class TestAbstractStream {
     public void testDependenciesFig5Exclusive() {
         // Setup
         Http2UpgradeHandler handler = new Http2UpgradeHandler(new Http2Protocol(), null, null);
-        Stream a = new Stream(Integer.valueOf(1), handler);
-        Stream b = new Stream(Integer.valueOf(2), handler);
-        Stream c = new Stream(Integer.valueOf(3), handler);
-        Stream d = new Stream(Integer.valueOf(4), handler);
-        Stream e = new Stream(Integer.valueOf(5), handler);
-        Stream f = new Stream(Integer.valueOf(6), handler);
+        Stream a = new Stream(1, handler);
+        Stream b = new Stream(2, handler);
+        Stream c = new Stream(3, handler);
+        Stream d = new Stream(4, handler);
+        Stream e = new Stream(5, handler);
+        Stream f = new Stream(6, handler);
         b.rePrioritise(a, false, 16);
         c.rePrioritise(a, false, 16);
         d.rePrioritise(c, false, 16);
@@ -175,9 +175,9 @@ public class TestAbstractStream {
     public void testCircular01() {
         // Setup
         Http2UpgradeHandler handler = new Http2UpgradeHandler(new Http2Protocol(), null, null);
-        Stream a = new Stream(Integer.valueOf(1), handler);
-        Stream b = new Stream(Integer.valueOf(2), handler);
-        Stream c = new Stream(Integer.valueOf(3), handler);
+        Stream a = new Stream(1, handler);
+        Stream b = new Stream(2, handler);
+        Stream c = new Stream(3, handler);
 
         b.rePrioritise(a, false, 16);
         c.rePrioritise(b, false, 16);
@@ -205,12 +205,12 @@ public class TestAbstractStream {
     public void testCircular02() {
         // Setup
         Http2UpgradeHandler handler = new Http2UpgradeHandler(new Http2Protocol(), null, null);
-        Stream a = new Stream(Integer.valueOf(1), handler);
-        Stream b = new Stream(Integer.valueOf(2), handler);
-        Stream c = new Stream(Integer.valueOf(3), handler);
-        Stream d = new Stream(Integer.valueOf(4), handler);
-        Stream e = new Stream(Integer.valueOf(5), handler);
-        Stream f = new Stream(Integer.valueOf(6), handler);
+        Stream a = new Stream(1, handler);
+        Stream b = new Stream(2, handler);
+        Stream c = new Stream(3, handler);
+        Stream d = new Stream(4, handler);
+        Stream e = new Stream(5, handler);
+        Stream f = new Stream(6, handler);
 
         b.rePrioritise(a, false, 16);
         c.rePrioritise(b, false, 16);
@@ -251,10 +251,10 @@ public class TestAbstractStream {
     public void testCircular03() {
         // Setup
         Http2UpgradeHandler handler = new Http2UpgradeHandler(new Http2Protocol(), null, null);
-        Stream a = new Stream(Integer.valueOf(1), handler);
-        Stream b = new Stream(Integer.valueOf(3), handler);
-        Stream c = new Stream(Integer.valueOf(5), handler);
-        Stream d = new Stream(Integer.valueOf(7), handler);
+        Stream a = new Stream(1, handler);
+        Stream b = new Stream(3, handler);
+        Stream c = new Stream(5, handler);
+        Stream d = new Stream(7, handler);
 
         // Action
         b.rePrioritise(a, false, 16);

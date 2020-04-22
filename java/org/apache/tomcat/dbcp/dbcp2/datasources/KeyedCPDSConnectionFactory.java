@@ -343,8 +343,8 @@ class KeyedCPDSConnectionFactory implements KeyedPooledObjectFactory<UserPassKey
         if (maxConnLifetimeMillis > 0) {
             final long lifetime = System.currentTimeMillis() - p.getCreateTime();
             if (lifetime > maxConnLifetimeMillis) {
-                throw new Exception(Utils.getMessage("connectionFactory.lifetimeExceeded", Long.valueOf(lifetime),
-                        Long.valueOf(maxConnLifetimeMillis)));
+                throw new Exception(Utils.getMessage("connectionFactory.lifetimeExceeded", lifetime,
+                        maxConnLifetimeMillis));
             }
         }
     }

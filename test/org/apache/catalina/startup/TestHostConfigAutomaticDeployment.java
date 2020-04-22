@@ -608,16 +608,16 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
         File xml = new File(
                 host.getConfigBaseFile(), APP_NAME.getBaseName() + ".xml");
         Assert.assertEquals(
-                Boolean.valueOf(resultXml), Boolean.valueOf(xml.isFile()));
+                resultXml, xml.isFile());
 
         File war = new File(
                 host.getAppBaseFile(), APP_NAME.getBaseName() + ".war");
         Assert.assertEquals(
-                Boolean.valueOf(resultWar), Boolean.valueOf(war.isFile()));
+                resultWar, war.isFile());
 
         File dir = new File(host.getAppBase(), APP_NAME.getBaseName());
         Assert.assertEquals(
-                Boolean.valueOf(resultDir), Boolean.valueOf(dir.isDirectory()));
+                resultDir, dir.isDirectory());
     }
 
 
@@ -1621,7 +1621,7 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
 
         File dir = new File(host.getAppBase(), APP_NAME.getBaseName());
         Assert.assertEquals(
-                Boolean.valueOf(resultDir), Boolean.valueOf(dir.isDirectory()));
+                resultDir, dir.isDirectory());
     }
 
 
@@ -1844,7 +1844,7 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
         File xml = new File(host.getConfigBaseFile(),
                 APP_NAME.getBaseName() + ".xml");
         Assert.assertEquals(
-                Boolean.valueOf(resultXml), Boolean.valueOf(xml.isFile()));
+                resultXml, xml.isFile());
 
         Context context = (Context) host.findChild(APP_NAME.getName());
         if (external) {

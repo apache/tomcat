@@ -388,7 +388,7 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
         check();
         this.timeout = timeout;
         request.getCoyoteRequest().action(ActionCode.ASYNC_SETTIMEOUT,
-                Long.valueOf(timeout));
+                timeout);
     }
 
 

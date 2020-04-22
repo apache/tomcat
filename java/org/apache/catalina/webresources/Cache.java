@@ -192,9 +192,9 @@ public class Cache {
 
         if (newSize > targetSize) {
             log.info(sm.getString("cache.backgroundEvictFail",
-                    Long.valueOf(TARGET_FREE_PERCENT_BACKGROUND),
+                    TARGET_FREE_PERCENT_BACKGROUND,
                     root.getContext().getName(),
-                    Long.valueOf(newSize / 1024)));
+                    newSize / 1024));
         }
     }
 
@@ -271,7 +271,7 @@ public class Cache {
 
     public void setObjectMaxSize(int objectMaxSize) {
         if (objectMaxSize * 1024L > Integer.MAX_VALUE) {
-            log.warn(sm.getString("cache.objectMaxSizeTooBigBytes", Integer.valueOf(objectMaxSize)));
+            log.warn(sm.getString("cache.objectMaxSizeTooBigBytes", objectMaxSize));
             this.objectMaxSize = Integer.MAX_VALUE;
         }
         // Internally bytes, externally kilobytes
@@ -294,7 +294,7 @@ public class Cache {
         }
         if (objectMaxSize > limit) {
             log.warn(sm.getString("cache.objectMaxSizeTooBig",
-                    Integer.valueOf(objectMaxSize / 1024), Integer.valueOf((int)limit / 1024)));
+                    objectMaxSize / 1024, (int) limit / 1024));
             objectMaxSize = (int) limit;
         }
     }

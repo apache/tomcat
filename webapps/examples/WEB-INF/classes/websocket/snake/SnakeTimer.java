@@ -45,7 +45,7 @@ public class SnakeTimer {
         if (snakes.size() == 0) {
             startTimer();
         }
-        snakes.put(Integer.valueOf(snake.getId()), snake);
+        snakes.put(snake.getId(), snake);
     }
 
 
@@ -55,7 +55,7 @@ public class SnakeTimer {
 
 
     protected static synchronized void removeSnake(Snake snake) {
-        snakes.remove(Integer.valueOf(snake.getId()));
+        snakes.remove(snake.getId());
         if (snakes.size() == 0) {
             stopTimer();
         }

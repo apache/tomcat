@@ -576,7 +576,7 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
             parsingRequestLineStart = 0;
             return true;
         }
-        throw new IllegalStateException(sm.getString("iib.invalidPhase", Integer.valueOf(parsingRequestLinePhase)));
+        throw new IllegalStateException(sm.getString("iib.invalidPhase", parsingRequestLinePhase));
     }
 
 

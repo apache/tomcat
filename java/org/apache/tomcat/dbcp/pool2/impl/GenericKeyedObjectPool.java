@@ -1366,9 +1366,8 @@ public class GenericKeyedObjectPool<K, T> extends BaseGenericObjectPool<T>
                 final K key = entry.getKey();
                 final ObjectDeque<T> objectDequeue = entry.getValue();
                 if (key != null && objectDequeue != null) {
-                    result.put(key.toString(), Integer.valueOf(
-                            objectDequeue.getAllObjects().size() -
-                            objectDequeue.getIdleObjects().size()));
+                    result.put(key.toString(), objectDequeue.getAllObjects().size() -
+                            objectDequeue.getIdleObjects().size());
                 }
             }
         }
@@ -1416,10 +1415,9 @@ public class GenericKeyedObjectPool<K, T> extends BaseGenericObjectPool<T>
             final ObjectDeque<T> deque = entry.getValue();
             if (deque != null) {
                 if (getBlockWhenExhausted()) {
-                    result.put(k.toString(), Integer.valueOf(
-                            deque.getIdleObjects().getTakeQueueLength()));
+                    result.put(k.toString(), deque.getIdleObjects().getTakeQueueLength());
                 } else {
-                    result.put(k.toString(), Integer.valueOf(0));
+                    result.put(k.toString(), 0);
                 }
             }
         }

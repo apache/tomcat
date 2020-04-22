@@ -412,7 +412,7 @@ public final class SSLContext {
      *         identified
      */
     public static long sniCallBack(long currentCtx, String sniHostName) {
-        SNICallBack sniCallBack = sniCallBacks.get(Long.valueOf(currentCtx));
+        SNICallBack sniCallBack = sniCallBacks.get(currentCtx);
         if (sniCallBack == null) {
             return 0;
         }

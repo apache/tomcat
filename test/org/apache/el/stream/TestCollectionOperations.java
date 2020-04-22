@@ -130,9 +130,9 @@ public class TestCollectionOperations {
 
         Assert.assertEquals(2, list.size());
         Assert.assertEquals("bean02", list.get(0).get(0));
-        Assert.assertEquals(Long.valueOf(2), list.get(0).get(1));
+        Assert.assertEquals(2L, list.get(0).get(1));
         Assert.assertEquals("bean03", list.get(1).get(0));
-        Assert.assertEquals(Long.valueOf(3), list.get(1).get(1));
+        Assert.assertEquals(3L, list.get(1).get(1));
     }
 
 
@@ -145,24 +145,24 @@ public class TestCollectionOperations {
                 List.class);
 
         List<Character> expected = new ArrayList<>(18);
-        expected.add(Character.valueOf('b'));
-        expected.add(Character.valueOf('e'));
-        expected.add(Character.valueOf('a'));
-        expected.add(Character.valueOf('n'));
-        expected.add(Character.valueOf('0'));
-        expected.add(Character.valueOf('1'));
-        expected.add(Character.valueOf('b'));
-        expected.add(Character.valueOf('e'));
-        expected.add(Character.valueOf('a'));
-        expected.add(Character.valueOf('n'));
-        expected.add(Character.valueOf('0'));
-        expected.add(Character.valueOf('2'));
-        expected.add(Character.valueOf('b'));
-        expected.add(Character.valueOf('e'));
-        expected.add(Character.valueOf('a'));
-        expected.add(Character.valueOf('n'));
-        expected.add(Character.valueOf('0'));
-        expected.add(Character.valueOf('3'));
+        expected.add('b');
+        expected.add('e');
+        expected.add('a');
+        expected.add('n');
+        expected.add('0');
+        expected.add('1');
+        expected.add('b');
+        expected.add('e');
+        expected.add('a');
+        expected.add('n');
+        expected.add('0');
+        expected.add('2');
+        expected.add('b');
+        expected.add('e');
+        expected.add('a');
+        expected.add('n');
+        expected.add('0');
+        expected.add('3');
 
         Assert.assertEquals(expected, result);
     }
@@ -335,7 +335,7 @@ public class TestCollectionOperations {
                 "[1,2,3,4,5].stream().reduce((x,y)->x+y)",
                 Object.class);
 
-        Assert.assertEquals(Long.valueOf(15), ((Optional) result).get());
+        Assert.assertEquals(15L, ((Optional) result).get());
     }
 
 
@@ -359,7 +359,7 @@ public class TestCollectionOperations {
                 "[1,2,3,4,5].stream().reduce(10, (x,y)->x+y)",
                 Object.class);
 
-        Assert.assertEquals(Long.valueOf(25), result);
+        Assert.assertEquals(25L, result);
     }
 
 
@@ -371,7 +371,7 @@ public class TestCollectionOperations {
                 "[1,2,3,4,5].stream().max()",
                 Object.class);
 
-        Assert.assertEquals(Long.valueOf(5), ((Optional) result).get());
+        Assert.assertEquals(5L, ((Optional) result).get());
     }
 
 
@@ -383,7 +383,7 @@ public class TestCollectionOperations {
                 "[5,4,3,2,1].stream().max()",
                 Object.class);
 
-        Assert.assertEquals(Long.valueOf(5), ((Optional) result).get());
+        Assert.assertEquals(5L, ((Optional) result).get());
     }
 
 
@@ -443,7 +443,7 @@ public class TestCollectionOperations {
                 "[1,2,3,4,5].stream().min()",
                 Object.class);
 
-        Assert.assertEquals(Long.valueOf(1), ((Optional) result).get());
+        Assert.assertEquals(1L, ((Optional) result).get());
     }
 
 
@@ -455,7 +455,7 @@ public class TestCollectionOperations {
                 "[5,4,3,2,1].stream().min()",
                 Object.class);
 
-        Assert.assertEquals(Long.valueOf(1), ((Optional) result).get());
+        Assert.assertEquals(1L, ((Optional) result).get());
     }
 
 
@@ -505,7 +505,7 @@ public class TestCollectionOperations {
 
         Number average = (Number) ((Optional) result).get();
         Assert.assertTrue("Result: " + average.toString(),
-                ELSupport.equals(null, Long.valueOf(3), average));
+                ELSupport.equals(null, 3L, average));
     }
 
 
@@ -519,7 +519,7 @@ public class TestCollectionOperations {
 
         Number average = (Number) ((Optional) result).get();
         Assert.assertTrue("Result: " + average.toString(),
-                ELSupport.equals(null, Double.valueOf(3.5), average));
+                ELSupport.equals(null, 3.5, average));
     }
 
 
@@ -543,7 +543,7 @@ public class TestCollectionOperations {
                 "[].stream().average().orElseGet(()->10)",
                 Object.class);
 
-        Assert.assertEquals(Long.valueOf(10), result);
+        Assert.assertEquals(10L, result);
     }
 
 
@@ -555,7 +555,7 @@ public class TestCollectionOperations {
                 "[].stream().average().orElseGet(()->()->10)",
                 Object.class);
 
-        Assert.assertEquals(Long.valueOf(10), result);
+        Assert.assertEquals(10L, result);
     }
 
 
@@ -578,7 +578,7 @@ public class TestCollectionOperations {
                 Object.class);
 
         Assert.assertTrue("Result: " + result.toString(),
-                ELSupport.equals(null, Long.valueOf(15), result));
+                ELSupport.equals(null, 15L, result));
     }
 
 
@@ -591,7 +591,7 @@ public class TestCollectionOperations {
                 Object.class);
 
         Assert.assertTrue("Result: " + result.toString(),
-                ELSupport.equals(null, Long.valueOf(0), result));
+                ELSupport.equals(null, 0L, result));
     }
 
 
@@ -604,7 +604,7 @@ public class TestCollectionOperations {
                 Object.class);
 
         Assert.assertTrue("Result: " + result.toString(),
-                ELSupport.equals(null, Long.valueOf(5), result));
+                ELSupport.equals(null, 5L, result));
     }
 
 
@@ -617,7 +617,7 @@ public class TestCollectionOperations {
                 Object.class);
 
         Assert.assertTrue("Result: " + result.toString(),
-                ELSupport.equals(null, Long.valueOf(0), result));
+                ELSupport.equals(null, 0L, result));
     }
 
 

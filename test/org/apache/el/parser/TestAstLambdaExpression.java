@@ -28,7 +28,7 @@ public class TestAstLambdaExpression {
     public void testSpec01() {
         ELProcessor processor = new ELProcessor();
         Object result = processor.getValue("(x->x+1)(1)", Integer.class);
-        Assert.assertEquals(Integer.valueOf(2), result);
+        Assert.assertEquals(2, result);
     }
 
 
@@ -36,7 +36,7 @@ public class TestAstLambdaExpression {
     public void testSpec02() {
         ELProcessor processor = new ELProcessor();
         Object result = processor.getValue("((x,y)->x+y)(1,2)", Integer.class);
-        Assert.assertEquals(Integer.valueOf(3), result);
+        Assert.assertEquals(3, result);
     }
 
 
@@ -44,7 +44,7 @@ public class TestAstLambdaExpression {
     public void testSpec03() {
         ELProcessor processor = new ELProcessor();
         Object result = processor.getValue("(()->64)", Integer.class);
-        Assert.assertEquals(Integer.valueOf(64), result);
+        Assert.assertEquals(64, result);
     }
 
 
@@ -53,7 +53,7 @@ public class TestAstLambdaExpression {
         ELProcessor processor = new ELProcessor();
         Object result =
                 processor.getValue("v = (x,y)->x+y; v(3,4)", Integer.class);
-        Assert.assertEquals(Integer.valueOf(7), result);
+        Assert.assertEquals(7, result);
     }
 
 
@@ -63,7 +63,7 @@ public class TestAstLambdaExpression {
         Object result =
                 processor.getValue("fact = n -> n==0? 1: n*fact(n-1); fact(5)",
                         Integer.class);
-        Assert.assertEquals(Integer.valueOf(120), result);
+        Assert.assertEquals(120, result);
     }
 
 
@@ -73,7 +73,7 @@ public class TestAstLambdaExpression {
         Object result =
                 processor.getValue("(x->y->x-y)(2)(1)",
                         Integer.class);
-        Assert.assertEquals(Integer.valueOf(1), result);
+        Assert.assertEquals(1, result);
     }
 
 
@@ -83,7 +83,7 @@ public class TestAstLambdaExpression {
         Object result =
                 processor.getValue("(()->2)()",
                         Integer.class);
-        Assert.assertEquals(Integer.valueOf(2), result);
+        Assert.assertEquals(2, result);
     }
 
 
@@ -93,7 +93,7 @@ public class TestAstLambdaExpression {
         Object result =
                 processor.getValue("(()->y->2-y)()(1)",
                         Integer.class);
-        Assert.assertEquals(Integer.valueOf(1), result);
+        Assert.assertEquals(1, result);
     }
 
 
@@ -103,7 +103,7 @@ public class TestAstLambdaExpression {
         Object result =
                 processor.getValue("(()->y->()->2-y)()(1)()",
                         Integer.class);
-        Assert.assertEquals(Integer.valueOf(1), result);
+        Assert.assertEquals(1, result);
     }
 
 
@@ -122,7 +122,7 @@ public class TestAstLambdaExpression {
         Object result =
                 processor.getValue("(()->y->()->x->x-y)()(1)()(2)",
                         Integer.class);
-        Assert.assertEquals(Integer.valueOf(1), result);
+        Assert.assertEquals(1, result);
     }
 
 
@@ -132,7 +132,7 @@ public class TestAstLambdaExpression {
         Object result =
                 processor.getValue("(()->y->()->()->x->x-y)()(1)()()(2)",
                         Integer.class);
-        Assert.assertEquals(Integer.valueOf(1), result);
+        Assert.assertEquals(1, result);
     }
 
 
@@ -142,7 +142,7 @@ public class TestAstLambdaExpression {
         Object result =
                 processor.getValue("(()->y->()->()->x->x-y)()(1)()(3)(2)",
                         Integer.class);
-        Assert.assertEquals(Integer.valueOf(1), result);
+        Assert.assertEquals(1, result);
     }
 
 
@@ -152,7 +152,7 @@ public class TestAstLambdaExpression {
         Object result =
                 processor.getValue("()->()->()->42",
                         Integer.class);
-        Assert.assertEquals(Integer.valueOf(42), result);
+        Assert.assertEquals(42, result);
     }
 
 
@@ -162,7 +162,7 @@ public class TestAstLambdaExpression {
         Object result =
                 processor.getValue("v = (x->y->x-y); v(2)(1)",
                         Integer.class);
-        Assert.assertEquals(Integer.valueOf(1), result);
+        Assert.assertEquals(1, result);
     }
 
 
@@ -172,7 +172,7 @@ public class TestAstLambdaExpression {
         Object result =
                 processor.getValue("v = (()->y->2-y); v()(1)",
                         Integer.class);
-        Assert.assertEquals(Integer.valueOf(1), result);
+        Assert.assertEquals(1, result);
     }
 
 
@@ -182,7 +182,7 @@ public class TestAstLambdaExpression {
         Object result =
                 processor.getValue("v = (()->y->()->2-y); v()(1)()",
                         Integer.class);
-        Assert.assertEquals(Integer.valueOf(1), result);
+        Assert.assertEquals(1, result);
     }
 
 
@@ -201,7 +201,7 @@ public class TestAstLambdaExpression {
         Object result =
                 processor.getValue("v = (()->y->()->x->x-y); v()(1)()(2)",
                         Integer.class);
-        Assert.assertEquals(Integer.valueOf(1), result);
+        Assert.assertEquals(1, result);
     }
 
 
@@ -211,7 +211,7 @@ public class TestAstLambdaExpression {
         Object result =
                 processor.getValue("v = (()->y->()->()->x->x-y); v()(1)()()(2)",
                         Integer.class);
-        Assert.assertEquals(Integer.valueOf(1), result);
+        Assert.assertEquals(1, result);
     }
 
 
@@ -221,7 +221,7 @@ public class TestAstLambdaExpression {
         Object result =
                 processor.getValue("v = (()->y->()->()->x->x-y); v()(1)()(3)(2)",
                         Integer.class);
-        Assert.assertEquals(Integer.valueOf(1), result);
+        Assert.assertEquals(1, result);
     }
 
 
@@ -231,6 +231,6 @@ public class TestAstLambdaExpression {
         ELProcessor processor = new ELProcessor();
         Object result =
                 processor.getValue("foo:v = (x)->x+1; foo:v(0)", Integer.class);
-        Assert.assertEquals(Integer.valueOf(1), result);
+        Assert.assertEquals(1, result);
     }
 }

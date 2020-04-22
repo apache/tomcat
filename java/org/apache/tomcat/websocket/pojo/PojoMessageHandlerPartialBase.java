@@ -56,7 +56,7 @@ public abstract class PojoMessageHandlerPartialBase<T>
         }
         Object[] parameters = params.clone();
         if (indexBoolean != -1) {
-            parameters[indexBoolean] = Boolean.valueOf(last);
+            parameters[indexBoolean] = last;
         }
         if (indexSession != -1) {
             parameters[indexSession] = session;

@@ -300,7 +300,7 @@ public class Registry implements RegistryMBean, MBeanRegistration {
             ids.put(domain, id);
         }
         int code = id[0]++;
-        domainTable.put(name, Integer.valueOf(code));
+        domainTable.put(name, code);
         return code;
     }
 

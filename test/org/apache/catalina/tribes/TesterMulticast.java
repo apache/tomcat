@@ -115,7 +115,7 @@ public class TesterMulticast {
                 long counter = 0;
                 String msg;
                 while (run) {
-                    msg = String.format("%04d", Long.valueOf(counter));
+                    msg = String.format("%04d", counter);
                     p.setData(msg.getBytes());
                     System.out.println("Tx: " + msg);
                     s.send(p);

@@ -170,7 +170,7 @@ public class CloudMembershipService extends MembershipServiceBase
                 channel = null;
             }
         } catch (Exception e) {
-            log.error(sm.getString("cloudMembershipService.stopFail", Integer.valueOf(level)), e);
+            log.error(sm.getString("cloudMembershipService.stopFail", level), e);
         }
     }
 
@@ -186,7 +186,7 @@ public class CloudMembershipService extends MembershipServiceBase
     public void setLocalMemberProperties(String listenHost, int listenPort, int securePort, int udpPort) {
         if (log.isDebugEnabled()) {
             log.debug(String.format("setLocalMemberProperties(%s, %d, %d, %d)", listenHost,
-                    Integer.valueOf(listenPort), Integer.valueOf(securePort), Integer.valueOf(udpPort)));
+                    listenPort, securePort, udpPort));
         }
         properties.setProperty("tcpListenHost", listenHost);
         properties.setProperty("tcpListenPort", String.valueOf(listenPort));

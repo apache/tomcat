@@ -82,7 +82,7 @@ public class SnakeAnnotation {
                 iterator.hasNext();) {
             Snake snake = iterator.next();
             sb.append(String.format("{\"id\": %d, \"color\": \"%s\"}",
-                    Integer.valueOf(snake.getId()), snake.getHexColor()));
+                    snake.getId(), snake.getHexColor()));
             if (iterator.hasNext()) {
                 sb.append(',');
             }
@@ -110,7 +110,7 @@ public class SnakeAnnotation {
     public void onClose() {
         SnakeTimer.removeSnake(snake);
         SnakeTimer.broadcast(String.format("{\"type\": \"leave\", \"id\": %d}",
-                Integer.valueOf(id)));
+                id));
     }
 
 

@@ -1481,7 +1481,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                 }
                 if (nBytes > 0 || (nBytes == 0 && !buffersArrayHasRemaining(buffers, offset, length))) {
                     // The bytes processed are only updated in the completion handler
-                    completion.completed(Long.valueOf(nBytes), this);
+                    completion.completed(nBytes, this);
                 } else if (nBytes < 0 || getError() != null) {
                     IOException error = getError();
                     if (error == null) {
