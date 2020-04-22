@@ -138,6 +138,10 @@
         Refactor to use parameterized <code>Collection</code> constructors where
         possible. Pull request provided by Lars Grefer. (markt)
       </scode>
+      <scode>
+        Refactor to use empty arrays with <code>Collections.toArray()</code>.
+        Pull request provided by Lars Grefer. (markt)
+      </scode>
     </changelog>
   </subsection>
 </section>
