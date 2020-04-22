@@ -142,6 +142,10 @@
         Refactor to use empty arrays with <code>Collections.toArray()</code>.
         Pull request provided by Lars Grefer. (markt)
       </scode>
+      <scode>
+        Refactor loops with a condition to exit as soon as the condition is met.
+        Pull request provided by Lars Grefer. (markt)
+      </scode>
     </changelog>
   </subsection>
 </section>
