@@ -1355,8 +1355,7 @@ public class ApplicationContext implements ServletContext {
     protected void clearAttributes() {
 
         // Create list of attributes to be removed
-        List<String> list = new ArrayList<>();
-        list.addAll(attributes.keySet());
+        List<String> list = new ArrayList<>(attributes.keySet());
 
         // Remove application originated attributes
         // (read only attributes will be left in place)
