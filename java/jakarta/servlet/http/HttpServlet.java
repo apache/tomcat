@@ -443,8 +443,8 @@ public abstract class HttpServlet extends GenericServlet {
                     boolean allowPut = false;
                     boolean allowDelete = false;
 
-                    for (int i = 0; i < methods.length; i++) {
-                        switch (methods[i].getName()) {
+                    for (Method method : methods) {
+                        switch (method.getName()) {
                             case "doGet": {
                                 allowGet = true;
                                 allowHead = true;

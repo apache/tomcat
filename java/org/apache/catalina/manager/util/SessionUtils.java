@@ -86,18 +86,18 @@ public class SessionUtils {
             Locale locale = null;
 
             // First search "known locations"
-            for (int i = 0; i < LOCALE_TEST_ATTRIBUTES.length; ++i) {
-                Object obj = in_session.getAttribute(LOCALE_TEST_ATTRIBUTES[i]);
+            for (String localeTestAttribute : LOCALE_TEST_ATTRIBUTES) {
+                Object obj = in_session.getAttribute(localeTestAttribute);
                 if (obj instanceof Locale) {
                     locale = (Locale) obj;
                     break;
                 }
-                obj = in_session.getAttribute(LOCALE_TEST_ATTRIBUTES[i].toLowerCase(Locale.ENGLISH));
+                obj = in_session.getAttribute(localeTestAttribute.toLowerCase(Locale.ENGLISH));
                 if (obj instanceof Locale) {
                     locale = (Locale) obj;
                     break;
                 }
-                obj = in_session.getAttribute(LOCALE_TEST_ATTRIBUTES[i].toUpperCase(Locale.ENGLISH));
+                obj = in_session.getAttribute(localeTestAttribute.toUpperCase(Locale.ENGLISH));
                 if (obj instanceof Locale) {
                     locale = (Locale) obj;
                     break;
@@ -181,18 +181,18 @@ public class SessionUtils {
         try {
             Object user = null;
             // First search "known locations"
-            for (int i = 0; i < USER_TEST_ATTRIBUTES.length; ++i) {
-                Object obj = httpSession.getAttribute(USER_TEST_ATTRIBUTES[i]);
+            for (String userTestAttribute : USER_TEST_ATTRIBUTES) {
+                Object obj = httpSession.getAttribute(userTestAttribute);
                 if (null != obj) {
                     user = obj;
                     break;
                 }
-                obj = httpSession.getAttribute(USER_TEST_ATTRIBUTES[i].toLowerCase(Locale.ENGLISH));
+                obj = httpSession.getAttribute(userTestAttribute.toLowerCase(Locale.ENGLISH));
                 if (null != obj) {
                     user = obj;
                     break;
                 }
-                obj = httpSession.getAttribute(USER_TEST_ATTRIBUTES[i].toUpperCase(Locale.ENGLISH));
+                obj = httpSession.getAttribute(userTestAttribute.toUpperCase(Locale.ENGLISH));
                 if (null != obj) {
                     user = obj;
                     break;

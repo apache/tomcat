@@ -450,11 +450,10 @@ public class JDTCompiler extends org.apache.jasper.compiler.Compiler {
                     try {
                         if (result.hasProblems()) {
                             IProblem[] problems = result.getProblems();
-                            for (int i = 0; i < problems.length; i++) {
-                                IProblem problem = problems[i];
+                            for (IProblem problem : problems) {
                                 if (problem.isError()) {
                                     String name =
-                                        new String(problems[i].getOriginatingFileName());
+                                            new String(problem.getOriginatingFileName());
                                     try {
                                         problemList.add(ErrorDispatcher.createJavacError
                                                 (name, pageNodes, new StringBuilder(problem.getMessage()),
@@ -467,14 +466,13 @@ public class JDTCompiler extends org.apache.jasper.compiler.Compiler {
                         }
                         if (problemList.isEmpty()) {
                             ClassFile[] classFiles = result.getClassFiles();
-                            for (int i = 0; i < classFiles.length; i++) {
-                                ClassFile classFile = classFiles[i];
+                            for (ClassFile classFile : classFiles) {
                                 char[][] compoundName =
-                                    classFile.getCompoundName();
+                                        classFile.getCompoundName();
                                 StringBuilder classFileName = new StringBuilder(outputDir).append('/');
                                 for (int j = 0;
                                      j < compoundName.length; j++) {
-                                    if(j > 0)
+                                    if (j > 0)
                                         classFileName.append('/');
                                     classFileName.append(compoundName[j]);
                                 }
@@ -482,7 +480,7 @@ public class JDTCompiler extends org.apache.jasper.compiler.Compiler {
                                 classFileName.append(".class");
                                 try (FileOutputStream fout = new FileOutputStream(
                                         classFileName.toString());
-                                        BufferedOutputStream bos = new BufferedOutputStream(fout)) {
+                                     BufferedOutputStream bos = new BufferedOutputStream(fout)) {
                                     bos.write(bytes);
                                 }
                             }

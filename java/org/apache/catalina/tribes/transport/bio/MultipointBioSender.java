@@ -89,14 +89,14 @@ public class MultipointBioSender extends AbstractSender implements MultiPointSen
     private synchronized void close() throws ChannelException  {
         ChannelException x = null;
         Object[] members = bioSenders.keySet().toArray();
-        for (int i=0; i<members.length; i++ ) {
-            Member mbr = (Member)members[i];
+        for (Object member : members) {
+            Member mbr = (Member) member;
             try {
                 BioSender sender = bioSenders.get(mbr);
                 sender.disconnect();
-            }catch ( Exception e ) {
-                if ( x == null ) x = new ChannelException(e);
-                x.addFaultyMember(mbr,e);
+            } catch (Exception e) {
+                if (x == null) x = new ChannelException(e);
+                x.addFaultyMember(mbr, e);
             }
             bioSenders.remove(mbr);
         }
@@ -144,10 +144,10 @@ public class MultipointBioSender extends AbstractSender implements MultiPointSen
         boolean result = false;
         @SuppressWarnings("unchecked")
         Map.Entry<Member,BioSender>[] entries = bioSenders.entrySet().toArray(new Map.Entry[0]);
-        for ( int i=0; i<entries.length; i++ ) {
-            BioSender sender = entries[i].getValue();
-            if ( sender.keepalive() ) {
-                bioSenders.remove(entries[i].getKey());
+        for (Map.Entry<Member, BioSender> entry : entries) {
+            BioSender sender = entry.getValue();
+            if (sender.keepalive()) {
+                bioSenders.remove(entry.getKey());
             }
         }
         return result;

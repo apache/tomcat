@@ -519,8 +519,8 @@ public class HostManagerServlet
         writer.println(smClient.getString("hostManagerServlet.listed",
                 engine.getName()));
         Container[] hosts = engine.findChildren();
-        for (int i = 0; i < hosts.length; i++) {
-            Host host = (Host) hosts[i];
+        for (Container container : hosts) {
+            Host host = (Host) container;
             String name = host.getName();
             String[] aliases = host.findAliases();
             writer.println(smClient.getString("hostManagerServlet.listitem",

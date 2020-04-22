@@ -141,9 +141,9 @@ public abstract class TagLibraryInfo {
             return null;
         }
 
-        for (int i = 0; i < tags.length; i++) {
-            if (shortname.equals(tags[i].getTagName())) {
-                return tags[i];
+        for (TagInfo tag : tags) {
+            if (shortname.equals(tag.getTagName())) {
+                return tag;
             }
         }
         return null;
@@ -166,9 +166,9 @@ public abstract class TagLibraryInfo {
             return null;
         }
 
-        for (int i = 0; i < tagFiles.length; i++) {
-            if (tagFiles[i].getName().equals(shortname)) {
-                return tagFiles[i];
+        for (TagFileInfo tagFile : tagFiles) {
+            if (tagFile.getName().equals(shortname)) {
+                return tagFile;
             }
         }
         return null;
@@ -201,9 +201,9 @@ public abstract class TagLibraryInfo {
             return null;
         }
 
-        for (int i = 0; i < functions.length; i++) {
-            if (functions[i].getName().equals(name)) {
-                return functions[i];
+        for (FunctionInfo function : functions) {
+            if (function.getName().equals(name)) {
+                return function;
             }
         }
         return null;

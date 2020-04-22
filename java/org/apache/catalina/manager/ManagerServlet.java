@@ -1069,11 +1069,11 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
         writer.println(smClient.getString("managerServlet.listed",
                                     host.getName()));
         Container[] contexts = host.findChildren();
-        for (int i = 0; i < contexts.length; i++) {
-            Context context = (Context) contexts[i];
-            if (context != null ) {
+        for (Container container : contexts) {
+            Context context = (Context) container;
+            if (context != null) {
                 String displayPath = context.getPath();
-                if( displayPath.equals("") )
+                if (displayPath.equals(""))
                     displayPath = "/";
                 if (context.getState().isAvailable()) {
                     writer.println(smClient.getString("managerServlet.listitem",
@@ -1081,7 +1081,8 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
                             "running",
                             "" + context.getManager().findSessions().length,
                             context.getDocBase()));
-                } else {
+                }
+                else {
                     writer.println(smClient.getString("managerServlet.listitem",
                             displayPath,
                             "stopped",
@@ -1296,13 +1297,13 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
             int[] timeout = new int[maxCount + 1];
             int notimeout = 0;
             int expired = 0;
-            for (int i = 0; i < sessions.length; i++) {
-                int time = (int) (sessions[i].getIdleTimeInternal() / 1000L);
-                if (idle >= 0 && time >= idle*60) {
-                    sessions[i].expire();
+            for (Session session : sessions) {
+                int time = (int) (session.getIdleTimeInternal() / 1000L);
+                if (idle >= 0 && time >= idle * 60) {
+                    session.expire();
                     expired++;
                 }
-                time=time/60/histoInterval;
+                time = time / 60 / histoInterval;
                 if (time < 0)
                     notimeout++;
                 else if (time >= maxCount)

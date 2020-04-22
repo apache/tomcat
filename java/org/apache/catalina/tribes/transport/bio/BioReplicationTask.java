@@ -97,29 +97,39 @@ public class BioReplicationTask extends AbstractRxTask {
 
         if ( pkgcnt > 0 ) {
             ChannelMessage[] msgs = reader.execute();
-            for ( int i=0; i<msgs.length; i++ ) {
+            /**
+             * Use send ack here if you want to ack the request to the remote
+             * server before completing the request
+             * This is considered an asynchronous request
+             */
+            /**
+             * Use send ack here if you want the request to complete on this
+             * server before sending the ack to the remote server
+             * This is considered a synchronized request
+             */
+            for (ChannelMessage msg : msgs) {
                 /**
                  * Use send ack here if you want to ack the request to the remote
                  * server before completing the request
                  * This is considered an asynchronous request
                  */
-                if (ChannelData.sendAckAsync(msgs[i].getOptions())) sendAck(Constants.ACK_COMMAND);
+                if (ChannelData.sendAckAsync(msg.getOptions())) sendAck(Constants.ACK_COMMAND);
                 try {
                     //process the message
-                    getCallback().messageDataReceived(msgs[i]);
+                    getCallback().messageDataReceived(msg);
                     /**
                      * Use send ack here if you want the request to complete on this
                      * server before sending the ack to the remote server
                      * This is considered a synchronized request
                      */
-                    if (ChannelData.sendAckSync(msgs[i].getOptions())) sendAck(Constants.ACK_COMMAND);
-                }catch  ( Exception x ) {
-                    if (ChannelData.sendAckSync(msgs[i].getOptions())) sendAck(Constants.FAIL_ACK_COMMAND);
-                    log.error(sm.getString("bioReplicationTask.messageDataReceived.error"),x);
+                    if (ChannelData.sendAckSync(msg.getOptions())) sendAck(Constants.ACK_COMMAND);
+                } catch (Exception x) {
+                    if (ChannelData.sendAckSync(msg.getOptions())) sendAck(Constants.FAIL_ACK_COMMAND);
+                    log.error(sm.getString("bioReplicationTask.messageDataReceived.error"), x);
                 }
-                if ( getUseBufferPool() ) {
-                    BufferPool.getBufferPool().returnBuffer(msgs[i].getMessage());
-                    msgs[i].setMessage(null);
+                if (getUseBufferPool()) {
+                    BufferPool.getBufferPool().returnBuffer(msg.getMessage());
+                    msg.setMessage(null);
                 }
             }
         }

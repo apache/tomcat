@@ -242,8 +242,8 @@ public class WebappLoader extends LifecycleMBeanBase implements Loader{
     public String getLoaderRepositoriesString() {
         String repositories[]=getLoaderRepositories();
         StringBuilder sb=new StringBuilder();
-        for( int i=0; i<repositories.length ; i++ ) {
-            sb.append( repositories[i]).append(":");
+        for (String repository : repositories) {
+            sb.append(repository).append(":");
         }
         return sb.toString();
     }
@@ -495,20 +495,20 @@ public class WebappLoader extends LifecycleMBeanBase implements Loader{
     private boolean buildClassPath(StringBuilder classpath, ClassLoader loader) {
         if (loader instanceof URLClassLoader) {
             URL repositories[] = ((URLClassLoader) loader).getURLs();
-                for (int i = 0; i < repositories.length; i++) {
-                    String repository = repositories[i].toString();
-                    if (repository.startsWith("file://"))
-                        repository = UDecoder.URLDecode(repository.substring(7), StandardCharsets.UTF_8);
-                    else if (repository.startsWith("file:"))
-                        repository = UDecoder.URLDecode(repository.substring(5), StandardCharsets.UTF_8);
-                    else
-                        continue;
-                    if (repository == null)
-                        continue;
-                    if (classpath.length() > 0)
-                        classpath.append(File.pathSeparator);
-                    classpath.append(repository);
-                }
+            for (URL url : repositories) {
+                String repository = url.toString();
+                if (repository.startsWith("file://"))
+                    repository = UDecoder.URLDecode(repository.substring(7), StandardCharsets.UTF_8);
+                else if (repository.startsWith("file:"))
+                    repository = UDecoder.URLDecode(repository.substring(5), StandardCharsets.UTF_8);
+                else
+                    continue;
+                if (repository == null)
+                    continue;
+                if (classpath.length() > 0)
+                    classpath.append(File.pathSeparator);
+                classpath.append(repository);
+            }
         } else if (loader == ClassLoader.getSystemClassLoader()){
             // Java 9 onwards. The internal class loaders no longer extend
             // URLCLassLoader

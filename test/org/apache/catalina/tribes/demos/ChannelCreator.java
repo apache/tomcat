@@ -237,8 +237,8 @@ public class ChannelCreator {
         }
         if ( staticMembers.size() > 0 ) {
             StaticMembershipInterceptor smi = new StaticMembershipInterceptor();
-            for (int x=0; x<staticMembers.size(); x++ ) {
-                smi.addStaticMember(staticMembers.get(x));
+            for (Member staticMember : staticMembers) {
+                smi.addStaticMember(staticMember);
             }
             channel.addInterceptor(smi);
         }

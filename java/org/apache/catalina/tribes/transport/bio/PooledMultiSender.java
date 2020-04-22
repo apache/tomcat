@@ -41,8 +41,8 @@ public class PooledMultiSender extends PooledSender {
             if (sender == null) {
                 ChannelException cx = new ChannelException(sm.getString(
                         "pooledMultiSender.unable.retrieve.sender", Long.toString(getMaxWait())));
-                for (int i = 0; i < destination.length; i++)
-                    cx.addFaultyMember(destination[i], new NullPointerException(sm.getString("pooledMultiSender.retrieve.fail")));
+                for (Member member : destination)
+                    cx.addFaultyMember(member, new NullPointerException(sm.getString("pooledMultiSender.retrieve.fail")));
                 throw cx;
             } else {
                 sender.sendMessage(destination, msg);

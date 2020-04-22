@@ -380,11 +380,12 @@ class Util {
     private static final String paramString(Class<?>[] types) {
         if (types != null) {
             StringBuilder sb = new StringBuilder();
-            for (int i = 0; i < types.length; i++) {
-                if (types[i] == null) {
+            for (Class<?> type : types) {
+                if (type == null) {
                     sb.append("null, ");
-                } else {
-                    sb.append(types[i].getName()).append(", ");
+                }
+                else {
+                    sb.append(type.getName()).append(", ");
                 }
             }
             if (sb.length() > 2) {
@@ -550,9 +551,9 @@ class Util {
         }
         Class<?>[] inf = type.getInterfaces();
         Method mp = null;
-        for (int i = 0; i < inf.length; i++) {
+        for (Class<?> aClass : inf) {
             try {
-                mp = inf[i].getMethod(m.getName(), m.getParameterTypes());
+                mp = aClass.getMethod(m.getName(), m.getParameterTypes());
                 mp = getMethod(mp.getDeclaringClass(), base, mp);
                 if (mp != null) {
                     return mp;

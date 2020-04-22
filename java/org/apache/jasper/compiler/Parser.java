@@ -1736,12 +1736,12 @@ class Parser implements TagConstants {
         if (n instanceof Node.CustomTag) {
             TagInfo tagInfo = ((Node.CustomTag) n).getTagInfo();
             TagAttributeInfo[] tldAttrs = tagInfo.getAttributes();
-            for (int i = 0; i < tldAttrs.length; i++) {
-                if (name.equals(tldAttrs[i].getName())) {
-                    if (tldAttrs[i].isFragment()) {
+            for (TagAttributeInfo tldAttr : tldAttrs) {
+                if (name.equals(tldAttr.getName())) {
+                    if (tldAttr.isFragment()) {
                         return TagInfo.BODY_CONTENT_SCRIPTLESS;
                     }
-                    if (tldAttrs[i].canBeRequestTime()) {
+                    if (tldAttr.canBeRequestTime()) {
                         return TagInfo.BODY_CONTENT_JSP;
                     }
                 }

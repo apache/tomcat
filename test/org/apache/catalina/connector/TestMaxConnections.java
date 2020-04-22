@@ -44,12 +44,12 @@ public class TestMaxConnections extends TomcatBaseTest {
             t[i] = new ConnectThread();
             t[i].setName("ConnectThread["+i+"]");
         }
-        for (int i=0; i<t.length; i++) {
-            t[i].start();
+        for (ConnectThread thread : t) {
+            thread.start();
             Thread.sleep(50);
         }
-        for (int i=0; i<t.length; i++) {
-            t[i].join();
+        for (ConnectThread connectThread : t) {
+            connectThread.join();
         }
 
         Assert.assertEquals(MAX_CONNECTIONS, SimpleServlet.getMaxConnections());

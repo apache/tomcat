@@ -308,8 +308,8 @@ public class SmapUtil {
         void writeAttrForSDE(int index) {
             writeU2(index);
             writeU4(sdeAttr.length);
-            for (int i = 0; i < sdeAttr.length; ++i) {
-                writeU1(sdeAttr[i]);
+            for (byte b : sdeAttr) {
+                writeU1(b);
             }
         }
 
@@ -363,8 +363,8 @@ public class SmapUtil {
         }
 
         void writeBytes(byte[] bytes) {
-            for (int i = 0; i < bytes.length; ++i) {
-                gen[genPos++] = bytes[i];
+            for (byte aByte : bytes) {
+                gen[genPos++] = aByte;
             }
         }
 
@@ -595,14 +595,14 @@ public class SmapUtil {
             java.util.ArrayList<Integer> extraSmap = n.getExtraSmap();
 
             if (extraSmap != null) {
-                for (int i = 0; i < extraSmap.size(); i++) {
+                for (Integer integer : extraSmap) {
                     iOutputStartLine += iOutputLineIncrement;
                     smap.addLineData(
-                        iInputStartLine+extraSmap.get(i).intValue(),
-                        fileName,
-                        1,
-                        iOutputStartLine,
-                        iOutputLineIncrement);
+                            iInputStartLine + integer.intValue(),
+                            fileName,
+                            1,
+                            iOutputStartLine,
+                            iOutputLineIncrement);
                 }
             }
         }

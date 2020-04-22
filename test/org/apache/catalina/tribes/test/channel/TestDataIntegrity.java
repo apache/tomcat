@@ -77,8 +77,12 @@ public class TestDataIntegrity {
                 }
             };
         }
-        for (int x=0; x<threads.length; x++ ) { threads[x].start();}
-        for (int x=0; x<threads.length; x++ ) { threads[x].join();}
+        for (Thread value : threads) {
+            value.start();
+        }
+        for (Thread thread : threads) {
+            thread.join();
+        }
         //sleep for 50 sec, let the other messages in
         long start = System.currentTimeMillis();
         while ( (System.currentTimeMillis()-start)<15000 && msgCount*threadCount!=listener1.count) Thread.sleep(500);
@@ -104,8 +108,12 @@ public class TestDataIntegrity {
                     }
                 };
             }
-            for (int x=0; x<threads.length; x++ ) { threads[x].start();}
-            for (int x=0; x<threads.length; x++ ) { threads[x].join();}
+        for (Thread value : threads) {
+            value.start();
+        }
+        for (Thread thread : threads) {
+            thread.join();
+        }
             //sleep for 50 sec, let the other messages in
             long start = System.currentTimeMillis();
             while ( (System.currentTimeMillis()-start)<25000 && msgCount*threadCount!=listener1.count) Thread.sleep(500);

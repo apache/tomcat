@@ -95,8 +95,7 @@ public class BaseNotificationBroadcaster implements NotificationBroadcaster {
                             oldFilter.clear();
                         } else {
                             if (oldNames.length != 0) {
-                                for (int i = 0; i < newNames.length; i++)
-                                    oldFilter.addAttribute(newNames[i]);
+                                for (String newName : newNames) oldFilter.addAttribute(newName);
                             }
                         }
                         return;

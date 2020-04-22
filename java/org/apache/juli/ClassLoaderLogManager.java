@@ -751,12 +751,11 @@ public class ClassLoaderLogManager extends LogManager {
         }
 
         void setParentLogger(final Logger parent) {
-            for (final Iterator<LogNode> iter =
-                children.values().iterator(); iter.hasNext();) {
-                final LogNode childNode = iter.next();
+            for (final LogNode childNode : children.values()) {
                 if (childNode.logger == null) {
                     childNode.setParentLogger(parent);
-                } else {
+                }
+                else {
                     doSetParentLogger(childNode.logger, parent);
                 }
             }

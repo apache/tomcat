@@ -285,8 +285,8 @@ public class GenericPrincipal implements TomcatPrincipal, Serializable {
         StringBuilder sb = new StringBuilder("GenericPrincipal[");
         sb.append(this.name);
         sb.append("(");
-        for (int i = 0; i < roles.length; i++ ) {
-            sb.append( roles[i]).append(",");
+        for (String role : roles) {
+            sb.append(role).append(",");
         }
         sb.append(")]");
         return sb.toString();

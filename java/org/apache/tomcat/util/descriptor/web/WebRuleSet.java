@@ -1033,13 +1033,13 @@ final class CallMethodMultiRule extends CallMethodRule {
             return;
         }
 
-        for (int j = 0; j < multiParams.size(); j++) {
-            Object param = multiParams.get(j);
-            if(param == null || (param instanceof String
+        for (Object param : multiParams) {
+            if (param == null || (param instanceof String
                     && !String.class.isAssignableFrom(paramTypes[multiParamIndex]))) {
                 paramValues[multiParamIndex] =
-                    IntrospectionUtils.convert((String) param, paramTypes[multiParamIndex]);
-            } else {
+                        IntrospectionUtils.convert((String) param, paramTypes[multiParamIndex]);
+            }
+            else {
                 paramValues[multiParamIndex] = param;
             }
             IntrospectionUtils.callMethodN(target, methodName, paramValues,

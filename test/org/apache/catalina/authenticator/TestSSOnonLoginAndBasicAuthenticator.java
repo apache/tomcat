@@ -608,9 +608,9 @@ public class TestSSOnonLoginAndBasicAuthenticator extends TomcatBaseTest {
 
         ManagerBase manager = (ManagerBase) activeContext.getManager();
         Session[] sessions = manager.findSessions();
-        for (int i = 0; i < sessions.length; i++) {
-            if (sessions[i]!=null && sessions[i].isValid()) {
-                sessions[i].setMaxInactiveInterval(EXTRA_DELAY_SECS);
+        for (Session session : sessions) {
+            if (session != null && session.isValid()) {
+                session.setMaxInactiveInterval(EXTRA_DELAY_SECS);
                 // leave it to be expired by the manager
             }
         }

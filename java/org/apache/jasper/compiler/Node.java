@@ -1720,9 +1720,9 @@ abstract class Node implements TagConstants {
             boolean result = false;
 
             TagAttributeInfo[] attributes = tagInfo.getAttributes();
-            for (int i = 0; i < attributes.length; i++) {
-                if (attributes[i].getName().equals(name)
-                        && attributes[i].isFragment()) {
+            for (TagAttributeInfo attribute : attributes) {
+                if (attribute.getName().equals(name)
+                        && attribute.isFragment()) {
                     result = true;
                     break;
                 }

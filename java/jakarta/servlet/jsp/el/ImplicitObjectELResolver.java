@@ -162,12 +162,12 @@ public class ImplicitObjectELResolver extends ELResolver {
     public Iterator<FeatureDescriptor> getFeatureDescriptors(ELContext context, Object base) {
         List<FeatureDescriptor> feats = new ArrayList<>(SCOPE_NAMES.length);
         FeatureDescriptor feat;
-        for (int i = 0; i < SCOPE_NAMES.length; i++) {
+        for (String scopeName : SCOPE_NAMES) {
             feat = new FeatureDescriptor();
-            feat.setDisplayName(SCOPE_NAMES[i]);
+            feat.setDisplayName(scopeName);
             feat.setExpert(false);
             feat.setHidden(false);
-            feat.setName(SCOPE_NAMES[i]);
+            feat.setName(scopeName);
             feat.setPreferred(true);
             feat.setValue(RESOLVABLE_AT_DESIGN_TIME, Boolean.TRUE);
             feat.setValue(TYPE, String.class);
@@ -258,8 +258,8 @@ public class ImplicitObjectELResolver extends ELResolver {
                                 .getCookies();
                         if (c != null) {
                             Vector<String> v = new Vector<>();
-                            for (int i = 0; i < c.length; i++) {
-                                v.add(c[i].getName());
+                            for (Cookie value : c) {
+                                v.add(value.getName());
                             }
                             return v.elements();
                         }
@@ -271,9 +271,9 @@ public class ImplicitObjectELResolver extends ELResolver {
                         Cookie[] c = ((HttpServletRequest) page.getRequest())
                                 .getCookies();
                         if (c != null) {
-                            for (int i = 0; i < c.length; i++) {
-                                if (name.equals(c[i].getName())) {
-                                    return c[i];
+                            for (Cookie value : c) {
+                                if (name.equals(value.getName())) {
+                                    return value;
                                 }
                             }
                         }
