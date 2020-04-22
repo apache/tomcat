@@ -369,11 +369,11 @@ public class FarmWarDeployer extends ClusterListener
                     webapp));
         msg = factory.readMessage(msg);
         while (msg != null) {
-            for (int i = 0; i < members.length; i++) {
+            for (Member member : members) {
                 if (log.isDebugEnabled())
                     log.debug(sm.getString("farmWarDeployer.sendFragment",
-                            contextName, webapp, members[i]));
-                getCluster().send(msg, members[i]);
+                            contextName, webapp, member));
+                getCluster().send(msg, member);
             }
             msg = factory.readMessage(msg);
         }
@@ -542,8 +542,8 @@ public class FarmWarDeployer extends ClusterListener
         if (files == null) {
             files = new String[0];
         }
-        for (int i = 0; i < files.length; i++) {
-            File file = new File(dir, files[i]);
+        for (String s : files) {
+            File file = new File(dir, s);
             if (file.isDirectory()) {
                 undeployDir(file);
             } else {

@@ -93,13 +93,13 @@ public class ServletSecurityElement extends HttpConstraintElement {
         List<HttpMethodConstraintElement> l = new ArrayList<>();
         HttpMethodConstraint[] constraints = annotation.httpMethodConstraints();
         if (constraints != null) {
-            for (int i = 0; i < constraints.length; i++) {
+            for (HttpMethodConstraint constraint : constraints) {
                 HttpMethodConstraintElement e =
-                    new HttpMethodConstraintElement(constraints[i].value(),
-                            new HttpConstraintElement(
-                                    constraints[i].emptyRoleSemantic(),
-                                    constraints[i].transportGuarantee(),
-                                    constraints[i].rolesAllowed()));
+                        new HttpMethodConstraintElement(constraint.value(),
+                                new HttpConstraintElement(
+                                        constraint.emptyRoleSemantic(),
+                                        constraint.transportGuarantee(),
+                                        constraint.rolesAllowed()));
                 l.add(e);
             }
         }

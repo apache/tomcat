@@ -617,8 +617,8 @@ public class DeltaManager extends ClusterManagerBase{
         ByteArrayOutputStream fos = new ByteArrayOutputStream();
         try (ObjectOutputStream oos = new ObjectOutputStream(new BufferedOutputStream(fos))) {
             oos.writeObject(Integer.valueOf(currentSessions.length));
-            for(int i=0 ; i < currentSessions.length;i++) {
-                ((DeltaSession)currentSessions[i]).writeObjectData(oos);
+            for (Session currentSession : currentSessions) {
+                ((DeltaSession) currentSession).writeObjectData(oos);
             }
             // Flush and close the output stream
             oos.flush();
@@ -817,8 +817,8 @@ public class DeltaManager extends ClusterManagerBase{
         // Expire all active sessions
         if (log.isInfoEnabled()) log.info(sm.getString("deltaManager.expireSessions", getName()));
         Session sessions[] = findSessions();
-        for (int i = 0; i < sessions.length; i++) {
-            DeltaSession session = (DeltaSession) sessions[i];
+        for (Session value : sessions) {
+            DeltaSession session = (DeltaSession) value;
             if (!session.isValid())
                 continue;
             try {
@@ -1046,9 +1046,9 @@ public class DeltaManager extends ClusterManagerBase{
             log.debug("Start expire all sessions " + getName() + " at " + timeNow +
                     " sessioncount " + sessions.length);
         }
-        for (int i = 0; i < sessions.length; i++) {
-            if (sessions[i] instanceof DeltaSession) {
-                DeltaSession session = (DeltaSession) sessions[i];
+        for (Session value : sessions) {
+            if (value instanceof DeltaSession) {
+                DeltaSession session = (DeltaSession) value;
                 if (session.isPrimarySession()) {
                     if (session.isValid()) {
                         session.expire();

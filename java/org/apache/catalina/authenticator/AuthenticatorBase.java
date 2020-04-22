@@ -1327,9 +1327,9 @@ public abstract class AuthenticatorBase extends ValveBase
         Container parent = context.getParent();
         while ((sso == null) && (parent != null)) {
             Valve valves[] = parent.getPipeline().getValves();
-            for (int i = 0; i < valves.length; i++) {
-                if (valves[i] instanceof SingleSignOn) {
-                    sso = (SingleSignOn) valves[i];
+            for (Valve valve : valves) {
+                if (valve instanceof SingleSignOn) {
+                    sso = (SingleSignOn) valve;
                     break;
                 }
             }

@@ -209,8 +209,7 @@ public class BasicAuthenticator extends AuthenticatorBase {
                 // step past the auth method name
                 base64blobOffset = initialOffset + METHOD.length();
                 base64blobLength = authorization.getLength() - METHOD.length();
-            }
-            else {
+            } else {
                 // is this possible, or permitted?
                 throw new IllegalArgumentException(
                         "Authorization header method is not \"Basic\"");
@@ -253,8 +252,7 @@ public class BasicAuthenticator extends AuthenticatorBase {
             if (colon < 0) {
                 username = new String(decoded, charset);
                 // password will remain null!
-            }
-            else {
+            } else {
                 username = new String(decoded, 0, colon, charset);
                 password = new String(decoded, colon + 1, decoded.length - colon - 1, charset);
                 // tolerate surplus white space around credentials

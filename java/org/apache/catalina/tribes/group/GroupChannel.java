@@ -330,14 +330,13 @@ public class GroupChannel extends ChannelInterceptorBase
             Member source = msg.getAddress();
             boolean rx = false;
             boolean delivered = false;
-            for ( int i=0; i<channelListeners.size(); i++ ) {
-                ChannelListener channelListener = channelListeners.get(i);
+            for (ChannelListener channelListener : channelListeners) {
                 if (channelListener != null && channelListener.accept(fwd, source)) {
                     channelListener.messageReceived(fwd, source);
                     delivered = true;
                     //if the message was accepted by an RPC channel, that channel
                     //is responsible for returning the reply, otherwise we send an absence reply
-                    if ( channelListener instanceof RpcChannel ) rx = true;
+                    if (channelListener instanceof RpcChannel) rx = true;
                 }
             }//for
             if ((!rx) && (fwd instanceof RpcMessage)) {
@@ -385,8 +384,7 @@ public class GroupChannel extends ChannelInterceptorBase
     @Override
     public void memberAdded(Member member) {
         //notify upwards
-        for (int i=0; i<membershipListeners.size(); i++ ) {
-            MembershipListener membershipListener = membershipListeners.get(i);
+        for (MembershipListener membershipListener : membershipListeners) {
             if (membershipListener != null) membershipListener.memberAdded(member);
         }
     }
@@ -399,8 +397,7 @@ public class GroupChannel extends ChannelInterceptorBase
     @Override
     public void memberDisappeared(Member member) {
         //notify upwards
-        for (int i=0; i<membershipListeners.size(); i++ ) {
-            MembershipListener membershipListener = membershipListeners.get(i);
+        for (MembershipListener membershipListener : membershipListeners) {
             if (membershipListener != null) membershipListener.memberDisappeared(member);
         }
     }

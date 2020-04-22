@@ -1289,8 +1289,8 @@ public class Tomcat {
      */
     public static void main(String[] args) throws Exception {
         // Process some command line parameters
-        for (int i = 0; i < args.length; i++) {
-            if (args[i].equals("--no-jmx")) {
+        for (String arg : args) {
+            if (arg.equals("--no-jmx")) {
                 Registry.disableRegistry();
             }
         }

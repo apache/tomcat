@@ -101,10 +101,10 @@ public class Digester extends DefaultHandler2 {
                 String className = classNamesTokenizer.nextToken().trim();
                 ClassLoader[] cls = new ClassLoader[] { Digester.class.getClassLoader(),
                         Thread.currentThread().getContextClassLoader() };
-                for (int i = 0; i < cls.length; i++) {
+                for (ClassLoader cl : cls) {
                     try {
-                        Class<?> clazz = Class.forName(className, true, cls[i]);
-                        sourcesList.add((IntrospectionUtils.PropertySource) clazz.getConstructor().newInstance());
+                        Class<?> clazz = Class.forName(className, true, cl);
+                        sourcesList.add((PropertySource) clazz.getConstructor().newInstance());
                         break;
                     } catch (Throwable t) {
                         ExceptionUtils.handleThrowable(t);
@@ -938,9 +938,9 @@ public class Digester extends DefaultHandler2 {
         List<Rule> rules = matches.pop();
         if ((rules != null) && (rules.size() > 0)) {
             String bodyText = this.bodyText.toString().intern();
-            for (int i = 0; i < rules.size(); i++) {
+            for (Rule value : rules) {
                 try {
-                    Rule rule = rules.get(i);
+                    Rule rule = value;
                     if (debug) {
                         log.debug("  Fire body() for " + rule);
                     }
@@ -1198,9 +1198,9 @@ public class Digester extends DefaultHandler2 {
         List<Rule> rules = getRules().match(namespaceURI, match);
         matches.push(rules);
         if ((rules != null) && (rules.size() > 0)) {
-            for (int i = 0; i < rules.size(); i++) {
+            for (Rule value : rules) {
                 try {
-                    Rule rule = rules.get(i);
+                    Rule rule = value;
                     if (debug) {
                         log.debug("  Fire begin() for " + rule);
                     }

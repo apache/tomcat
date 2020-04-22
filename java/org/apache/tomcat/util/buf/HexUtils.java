@@ -81,10 +81,10 @@ public final class HexUtils {
 
         StringBuilder sb = new StringBuilder(bytes.length << 1);
 
-        for(int i = 0; i < bytes.length; ++i) {
-            sb.append(hex[(bytes[i] & 0xf0) >> 4])
-                .append(hex[(bytes[i] & 0x0f)])
-                ;
+        for (byte aByte : bytes) {
+            sb.append(hex[(aByte & 0xf0) >> 4])
+                    .append(hex[(aByte & 0x0f)])
+            ;
         }
 
         return sb.toString();

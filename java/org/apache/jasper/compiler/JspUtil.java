@@ -167,16 +167,16 @@ public class JspUtil {
          */
         String missingAttribute = null;
 
-        for (int i = 0; i < validAttributes.length; i++) {
+        for (ValidAttribute value : validAttributes) {
             int attrPos;
-            if (validAttributes[i].mandatory) {
-                attrPos = temp.indexOf(validAttributes[i].name);
+            if (value.mandatory) {
+                attrPos = temp.indexOf(value.name);
                 if (attrPos != -1) {
                     temp.remove(attrPos);
                     valid = true;
                 } else {
                     valid = false;
-                    missingAttribute = validAttributes[i].name;
+                    missingAttribute = value.name;
                     break;
                 }
             }
@@ -197,8 +197,8 @@ public class JspUtil {
         // Now check to see if the rest of the attributes are valid too.
         for(String attribute : temp) {
             valid = false;
-            for (int i = 0; i < validAttributes.length; i++) {
-                if (attribute.equals(validAttributes[i].name)) {
+            for (ValidAttribute validAttribute : validAttributes) {
+                if (attribute.equals(validAttribute.name)) {
                     valid = true;
                     break;
                 }
@@ -742,12 +742,12 @@ public class JspUtil {
     public static final String makeJavaPackage(String path) {
         String classNameComponents[] = path.split("/");
         StringBuilder legalClassNames = new StringBuilder();
-        for (int i = 0; i < classNameComponents.length; i++) {
-            if (classNameComponents[i].length() > 0) {
+        for (String classNameComponent : classNameComponents) {
+            if (classNameComponent.length() > 0) {
                 if (legalClassNames.length() > 0) {
                     legalClassNames.append('.');
                 }
-                legalClassNames.append(makeJavaIdentifier(classNameComponents[i]));
+                legalClassNames.append(makeJavaIdentifier(classNameComponent));
             }
         }
         return legalClassNames.toString();

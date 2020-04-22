@@ -338,8 +338,7 @@ public class TestFormAuthenticator extends TomcatBaseTest {
         String originalSessionId = null;
         if (serverWillUseCookies && clientShouldUseCookies) {
             originalSessionId = client.getSessionId();
-        }
-        else {
+        } else {
             originalSessionId = client.extractPathSessionId(loginUri);
         }
         client.reset();
@@ -372,8 +371,7 @@ public class TestFormAuthenticator extends TomcatBaseTest {
         String newSessionId = null;
         if (serverWillUseCookies && clientShouldUseCookies) {
             newSessionId = client.getSessionId();
-        }
-        else {
+        } else {
             newSessionId = client.extractPathSessionId(protectedUri);
         }
         boolean sessionIdIsChanged = !(originalSessionId.equals(newSessionId));
@@ -470,13 +468,11 @@ public class TestFormAuthenticator extends TomcatBaseTest {
             requestHead.append(method).append(" ");
             if (isFullQualUri) {
                 requestHead.append(resourceUri);
-            }
-            else {
+            } else {
                 if (resourceUri == null) {
                     // the default relative url
                     requestHead.append(PROTECTED_RESOURCE_URL);
-                }
-                else {
+                } else {
                     requestHead.append(PROTECTED_RELATIVE_PATH)
                             .append(resourceUri);
                 }
@@ -614,8 +610,7 @@ public class TestFormAuthenticator extends TomcatBaseTest {
                         SESSION_PATH_PARAMETER_TAILS);
                 if (parser.hasMoreElements()) {
                     sessionId = parser.nextToken();
-                }
-                else {
+                } else {
                     sessionId = url.substring(iStart);
                 }
             }

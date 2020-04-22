@@ -154,9 +154,9 @@ public abstract class StoreBase extends LifecycleBase implements Store {
 
         long timeNow = System.currentTimeMillis();
 
-        for (int i = 0; i < keys.length; i++) {
+        for (String key : keys) {
             try {
-                StandardSession session = (StandardSession) load(keys[i]);
+                StandardSession session = (StandardSession) load(key);
                 if (session == null) {
                     continue;
                 }
@@ -165,14 +165,14 @@ public abstract class StoreBase extends LifecycleBase implements Store {
                     continue;
                 }
                 if (manager.getContext().getLogger().isDebugEnabled()) {
-                    manager.getContext().getLogger().debug(getStoreName()+ ": processExpires expire store session " + keys[i] );
+                    manager.getContext().getLogger().debug(getStoreName() + ": processExpires expire store session " + key);
                 }
                 boolean isLoaded = false;
                 if (manager instanceof PersistentManagerBase) {
-                    isLoaded = ((PersistentManagerBase) manager).isLoaded(keys[i]);
+                    isLoaded = ((PersistentManagerBase) manager).isLoaded(key);
                 } else {
                     try {
-                        if (manager.findSession(keys[i]) != null) {
+                        if (manager.findSession(key) != null) {
                             isLoaded = true;
                         }
                     } catch (IOException ioe) {
@@ -186,11 +186,11 @@ public abstract class StoreBase extends LifecycleBase implements Store {
                     // expire swapped out session
                     session.expire();
                 }
-                remove(keys[i]);
+                remove(key);
             } catch (Exception e) {
-                manager.getContext().getLogger().error("Session: "+keys[i]+"; ", e);
+                manager.getContext().getLogger().error("Session: " + key + "; ", e);
                 try {
-                    remove(keys[i]);
+                    remove(key);
                 } catch (IOException e2) {
                     manager.getContext().getLogger().error("Error removing key", e2);
                 }

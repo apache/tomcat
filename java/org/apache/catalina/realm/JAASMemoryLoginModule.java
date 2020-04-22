@@ -196,8 +196,8 @@ public class JAASMemoryLoginModule extends MemoryRealm implements LoginModule {
             // JAASRealm
             if (principal instanceof GenericPrincipal) {
                 String roles[] = ((GenericPrincipal) principal).getRoles();
-                for (int i = 0; i < roles.length; i++) {
-                    subject.getPrincipals().add(new GenericPrincipal(roles[i]));
+                for (String role : roles) {
+                    subject.getPrincipals().add(new GenericPrincipal(role));
                 }
 
             }

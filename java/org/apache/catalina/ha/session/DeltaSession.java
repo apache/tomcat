@@ -939,12 +939,12 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
         String keys[] = keys();
         List<String> saveNames = new ArrayList<>();
         List<Object> saveValues = new ArrayList<>();
-        for (int i = 0; i < keys.length; i++) {
+        for (String key : keys) {
             Object value = null;
-            value = attributes.get(keys[i]);
-            if (value != null && !exclude(keys[i], value) &&
-                    isAttributeDistributable(keys[i], value)) {
-                saveNames.add(keys[i]);
+            value = attributes.get(key);
+            if (value != null && !exclude(key, value) &&
+                    isAttributeDistributable(key, value)) {
+                saveNames.add(key);
                 saveValues.add(value);
             }
         }

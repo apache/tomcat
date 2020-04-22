@@ -60,9 +60,7 @@ public class SimpleCharStream
         bufcolumn = newbufcolumn;
 
         maxNextCharInd = (bufpos += (bufsize - tokenBegin));
-      }
-      else
-      {
+      } else {
         System.arraycopy(buffer, tokenBegin, newbuffer, 0, bufsize - tokenBegin);
         buffer = newbuffer;
 
@@ -432,9 +430,7 @@ public class SimpleCharStream
     if (bufpos >= tokenBegin)
     {
       len = bufpos - tokenBegin + inBuf + 1;
-    }
-    else
-    {
+    } else {
       len = bufsize - tokenBegin + bufpos + 1 + inBuf;
     }
 

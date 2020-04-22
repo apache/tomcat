@@ -247,9 +247,9 @@ public class SingleSignOn extends ValveBase {
         Cookie cookie = null;
         Cookie cookies[] = request.getCookies();
         if (cookies != null) {
-            for (int i = 0; i < cookies.length; i++) {
-                if (cookieName.equals(cookies[i].getName())) {
-                    cookie = cookies[i];
+            for (Cookie value : cookies) {
+                if (cookieName.equals(value.getName())) {
+                    cookie = value;
                     break;
                 }
             }

@@ -369,8 +369,7 @@ public class TestNonLoginAndBasicAuthenticator extends TomcatBaseTest {
         if (expectedRC != HttpServletResponse.SC_OK) {
             Assert.assertEquals(expectedRC, rc);
             Assert.assertTrue(bc.getLength() > 0);
-        }
-        else {
+        } else {
             Assert.assertEquals("OK", bc.toString());
         }
     }
@@ -383,8 +382,7 @@ public class TestNonLoginAndBasicAuthenticator extends TomcatBaseTest {
 
         if (useCookie) {
             addCookies(reqHeaders);
-        }
-        else {
+        } else {
             if (credentials != null) {
                 List<String> auth = new ArrayList<>();
                 auth.add(credentials.getCredentials());
@@ -411,8 +409,7 @@ public class TestNonLoginAndBasicAuthenticator extends TomcatBaseTest {
                 }
                 Assert.assertTrue(methodFound);
             }
-        }
-        else {
+        } else {
             Assert.assertEquals("OK", bc.toString());
             List<String> newCookies = respHeaders.get(SERVER_COOKIE_HEADER);
             if (newCookies != null) {

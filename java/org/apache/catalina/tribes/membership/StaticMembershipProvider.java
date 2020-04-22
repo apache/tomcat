@@ -141,8 +141,8 @@ public class StaticMembershipProvider extends MembershipProviderBase implements 
         MemberMessage msg = new MemberMessage(membershipId, MemberMessage.MSG_START, service.getLocalMember(true));
         Response[] resp = rpcChannel.send(members, msg, RpcChannel.ALL_REPLY, sendOptions, rpcTimeout);
         if (resp.length > 0) {
-            for (int i = 0; i < resp.length; i++) {
-                messageReceived(resp[i].getMessage(), resp[i].getSource());
+            for (Response response : resp) {
+                messageReceived(response.getMessage(), response.getSource());
             }
         } else {
             log.warn(sm.getString("staticMembershipProvider.startMembership.noReplies"));
@@ -282,8 +282,8 @@ public class StaticMembershipProvider extends MembershipProviderBase implements 
             try {
                 MemberMessage msg = new MemberMessage(membershipId, MemberMessage.MSG_PING, service.getLocalMember(true));
                 Response[] resp = rpcChannel.send(members, msg, RpcChannel.ALL_REPLY, sendOptions, rpcTimeout);
-                for (int i = 0; i < resp.length; i++) {
-                    messageReceived(resp[i].getMessage(), resp[i].getSource());
+                for (Response response : resp) {
+                    messageReceived(response.getMessage(), response.getSource());
                 }
             } catch (ChannelException ce) {
                 // Handle known failed members

@@ -1052,9 +1052,7 @@ public class GenericObjectPool<T> extends BaseGenericObjectPool<T>
         final long timeout =
                 now - (ac.getRemoveAbandonedTimeout() * 1000L);
         final ArrayList<PooledObject<T>> remove = new ArrayList<>();
-        final Iterator<PooledObject<T>> it = allObjects.values().iterator();
-        while (it.hasNext()) {
-            final PooledObject<T> pooledObject = it.next();
+        for (PooledObject<T> pooledObject : allObjects.values()) {
             synchronized (pooledObject) {
                 if (pooledObject.getState() == PooledObjectState.ALLOCATED &&
                         pooledObject.getLastUsedTime() <= timeout) {
@@ -1065,9 +1063,7 @@ public class GenericObjectPool<T> extends BaseGenericObjectPool<T>
         }
 
         // Now remove the abandoned objects
-        final Iterator<PooledObject<T>> itr = remove.iterator();
-        while (itr.hasNext()) {
-            final PooledObject<T> pooledObject = itr.next();
+        for (PooledObject<T> pooledObject : remove) {
             if (ac.getLogAbandoned()) {
                 pooledObject.printStackTrace(ac.getLogWriter());
             }

@@ -141,10 +141,10 @@ public class JMXAccessorQueryTask extends JMXAccessorTask {
             MBeanAttributeInfo attrs[] = minfo.getAttributes();
             Object value = null;
 
-            for (int i = 0; i < attrs.length; i++) {
-                if (!attrs[i].isReadable())
+            for (MBeanAttributeInfo attr : attrs) {
+                if (!attr.isReadable())
                     continue;
-                String attName = attrs[i].getName();
+                String attName = attr.getName();
                 if (attName.indexOf('=') >= 0 || attName.indexOf(':') >= 0
                         || attName.indexOf(' ') >= 0) {
                     continue;

@@ -239,8 +239,7 @@ public class ELFunctionMapper {
                         int iArray = params[k].indexOf('[');
                         if (iArray < 0) {
                             ds.append(params[k] + ".class");
-                        }
-                        else {
+                        } else {
                             String baseType = params[k].substring(0, iArray);
                             ds.append("java.lang.reflect.Array.newInstance(");
                             ds.append(baseType);

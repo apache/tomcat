@@ -224,15 +224,15 @@ public class SecurityCollection extends XmlEncodingBase implements Serializable 
         if (methods.length == 0 && omittedMethods.length == 0)
             return true;
         if (methods.length > 0) {
-            for (int i = 0; i < methods.length; i++) {
-                if (methods[i].equals(method))
+            for (String s : methods) {
+                if (s.equals(method))
                     return true;
             }
             return false;
         }
         if (omittedMethods.length > 0) {
-            for (int i = 0; i < omittedMethods.length; i++) {
-                if (omittedMethods[i].equals(method))
+            for (String omittedMethod : omittedMethods) {
+                if (omittedMethod.equals(method))
                     return false;
             }
         }
@@ -267,8 +267,8 @@ public class SecurityCollection extends XmlEncodingBase implements Serializable 
      * @return <code>true</code> if the pattern is part of the collection
      */
     public boolean findPattern(String pattern) {
-        for (int i = 0; i < patterns.length; i++) {
-            if (patterns[i].equals(pattern))
+        for (String s : patterns) {
+            if (s.equals(pattern))
                 return true;
         }
         return false;

@@ -192,8 +192,7 @@ public class TestValidation extends DefaultTestCase {
         Assert.assertFalse("No transaction must be running after connection is obtained", mockCxn2.isRunningTransaction());
         if (validationOutcome == ValidationOutcome.SUCCESS) {
             Assert.assertEquals("Connection with successful validation is reused", mockCxn1, mockCxn2);
-        }
-        else {
+        } else {
             Assert.assertNotEquals("Connection with failed validation must not be returned again", mockCxn1, mockCxn2);
         }
     }
@@ -404,8 +403,7 @@ public class TestValidation extends DefaultTestCase {
 
         if (validationOutcome == ValidationOutcome.SUCCESS) {
             Assert.assertEquals("Pool must contain 1 idle connection at this time", datasource.getIdle(), 1);
-        }
-        else {
+        } else {
             Assert.assertEquals("Pool must not contain any idle connection at this time", datasource.getIdle(), 0);
         }
     }
@@ -640,8 +638,7 @@ public class TestValidation extends DefaultTestCase {
         public boolean execute(String sql) throws SQLException {
             if (connection.getValidationOutcome()==ValidationOutcome.SUCCESS) {
                 return false;
-            }
-            else {
+            } else {
                 throw new SQLException("Simulated validation query failure");
             }
         }

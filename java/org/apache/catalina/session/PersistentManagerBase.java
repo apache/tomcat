@@ -428,8 +428,8 @@ public abstract class PersistentManagerBase extends ManagerBase
         int expireHere = 0 ;
         if(log.isDebugEnabled())
              log.debug("Start expire sessions " + getName() + " at " + timeNow + " sessioncount " + sessions.length);
-        for (int i = 0; i < sessions.length; i++) {
-            if (!sessions[i].isValid()) {
+        for (Session session : sessions) {
+            if (!session.isValid()) {
                 expiredSessions.incrementAndGet();
                 expireHere++;
             }
@@ -550,9 +550,9 @@ public abstract class PersistentManagerBase extends ManagerBase
         if (log.isDebugEnabled())
             log.debug(sm.getString("persistentManager.loading", String.valueOf(n)));
 
-        for (int i = 0; i < n; i++)
+        for (String id : ids)
             try {
-                swapIn(ids[i]);
+                swapIn(id);
             } catch (IOException e) {
                 log.error(sm.getString("persistentManager.storeLoadError"), e);
             }
@@ -622,9 +622,9 @@ public abstract class PersistentManagerBase extends ManagerBase
             log.debug(sm.getString("persistentManager.unloading",
                              String.valueOf(n)));
 
-        for (int i = 0; i < n; i++)
+        for (Session session : sessions)
             try {
-                swapOut(sessions[i]);
+                swapOut(session);
             } catch (IOException e) {
                 // This is logged in writeSession()
             }
@@ -887,8 +887,8 @@ public abstract class PersistentManagerBase extends ManagerBase
         } else {
             // Expire all active sessions
             Session sessions[] = findSessions();
-            for (int i = 0; i < sessions.length; i++) {
-                StandardSession session = (StandardSession) sessions[i];
+            for (Session value : sessions) {
+                StandardSession session = (StandardSession) value;
                 if (!session.isValid())
                     continue;
                 session.expire();
@@ -919,8 +919,8 @@ public abstract class PersistentManagerBase extends ManagerBase
 
         // Swap out all sessions idle longer than maxIdleSwap
         if (maxIdleSwap >= 0) {
-            for (int i = 0; i < sessions.length; i++) {
-                StandardSession session = (StandardSession) sessions[i];
+            for (Session value : sessions) {
+                StandardSession session = (StandardSession) value;
                 synchronized (session) {
                     if (!session.isValid())
                         continue;
@@ -933,9 +933,9 @@ public abstract class PersistentManagerBase extends ManagerBase
                         }
                         if (log.isDebugEnabled())
                             log.debug(sm.getString
-                                ("persistentManager.swapMaxIdle",
-                                 session.getIdInternal(),
-                                 Integer.valueOf(timeIdle)));
+                                    ("persistentManager.swapMaxIdle",
+                                            session.getIdInternal(),
+                                            Integer.valueOf(timeIdle)));
                         try {
                             swapOut(session);
                         } catch (IOException e) {
@@ -1013,8 +1013,8 @@ public abstract class PersistentManagerBase extends ManagerBase
 
         // Back up all sessions idle longer than maxIdleBackup
         if (maxIdleBackup >= 0) {
-            for (int i = 0; i < sessions.length; i++) {
-                StandardSession session = (StandardSession) sessions[i];
+            for (Session value : sessions) {
+                StandardSession session = (StandardSession) value;
                 synchronized (session) {
                     if (!session.isValid())
                         continue;
@@ -1028,9 +1028,9 @@ public abstract class PersistentManagerBase extends ManagerBase
                     if (timeIdle >= maxIdleBackup) {
                         if (log.isDebugEnabled())
                             log.debug(sm.getString
-                                ("persistentManager.backupMaxIdle",
-                                session.getIdInternal(),
-                                Integer.valueOf(timeIdle)));
+                                    ("persistentManager.backupMaxIdle",
+                                            session.getIdInternal(),
+                                            Integer.valueOf(timeIdle)));
 
                         try {
                             writeSession(session);

@@ -712,8 +712,8 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
             result = new CharArrayWriter(128);
         }
 
-        for (int i = 0; i < logElements.length; i++) {
-            logElements[i].addElement(result, date, request, response, time);
+        for (AccessLogElement logElement : logElements) {
+            logElement.addElement(result, date, request, response, time);
         }
 
         log(result);
@@ -1515,9 +1515,9 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
             String value = "-";
             Cookie[] c = request.getCookies();
             if (c != null) {
-                for (int i = 0; i < c.length; i++) {
-                    if (header.equals(c[i].getName())) {
-                        value = c[i].getValue();
+                for (Cookie cookie : c) {
+                    if (header.equals(cookie.getName())) {
+                        value = cookie.getValue();
                         break;
                     }
                 }
