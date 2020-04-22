@@ -3920,9 +3920,7 @@ public class StandardContext extends ContainerBase
      */
     @Override
     public String[] findParameters() {
-        List<String> parameterNames = new ArrayList<String>(parameters.size());
-        parameterNames.addAll(parameters.keySet());
-        return parameterNames.toArray(new String[0]);
+        return parameters.keySet().toArray(new String[0]);
     }
 
 

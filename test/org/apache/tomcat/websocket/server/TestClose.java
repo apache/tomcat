@@ -92,8 +92,7 @@ public class TestClose extends WebSocketBaseTest {
 
 
     public static void awaitOnClose(CloseCode... codes) {
-        Set<CloseCode> set = new HashSet<CloseCode>();
-        set.addAll(Arrays.asList(codes));
+        Set<CloseCode> set = new HashSet<CloseCode>(Arrays.asList(codes));
         awaitOnClose(set);
     }
 

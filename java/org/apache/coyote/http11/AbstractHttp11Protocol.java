@@ -373,10 +373,9 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
         }
     }
     public String getAllowedTrailerHeaders() {
-        // Chances of a size change between these lines are small enough that a
-        // sync is unnecessary.
-        List<String> copy = new ArrayList<String>(allowedTrailerHeaders.size());
-        copy.addAll(allowedTrailerHeaders);
+        // Chances of a change during execution of this line are small enough
+        // that a sync is unnecessary.
+        List<String> copy = new ArrayList<String>(allowedTrailerHeaders);
         StringBuilder result = new StringBuilder();
         boolean first = true;
         for (String header : copy) {
