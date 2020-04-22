@@ -103,6 +103,11 @@
         Include the problematic data in the error message when reporting that
         the provided request line contains an invalid component. (markt)
       </fix>
+      <fix>
+        Improve the handling of requests that use an expectation. Do not disable
+        keep-alive where the response has a non-2xx status code but the request
+        body has been fully read. (rjung/markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">

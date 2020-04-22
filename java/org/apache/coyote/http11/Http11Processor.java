@@ -513,7 +513,7 @@ public class Http11Processor extends AbstractProcessor {
 
 
     private void checkExpectationAndResponseStatus() {
-        if (request.hasExpectation() &&
+        if (request.hasExpectation() && !isRequestBodyFullyRead() &&
                 (response.getStatus() < 200 || response.getStatus() > 299)) {
             // Client sent Expect: 100-continue but received a
             // non-2xx final response. Disable keep-alive (if enabled)
