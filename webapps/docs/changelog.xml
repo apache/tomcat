@@ -134,6 +134,10 @@
         Add missing entries to test class path in sample NetBeans configuration
         files. Patch provided by Brian Burch. (markt)
       </fix>
+      <scode>
+        Refactor to use parameterized <code>Collection</code> constructors where
+        possible. Pull request provided by Lars Grefer. (markt)
+      </scode>
     </changelog>
   </subsection>
 </section>
