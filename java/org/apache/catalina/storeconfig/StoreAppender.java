@@ -153,9 +153,9 @@ public class StoreAppender {
     public void printTagArray(PrintWriter aWriter, String tag, int indent,
             String[] elements) throws Exception {
         if (elements != null) {
-            for (int i = 0; i < elements.length; i++) {
+            for (String element : elements) {
                 printIndent(aWriter, indent);
-                printTagContent(aWriter, tag, elements[i]);
+                printTagContent(aWriter, tag, element);
             }
         }
     }
@@ -229,10 +229,10 @@ public class StoreAppender {
 
         // Create blank instance
         Object bean2 = defaultInstance(bean);
-        for (int i = 0; i < descriptors.length; i++) {
-            Object value = checkAttribute(desc, descriptors[i], descriptors[i].getName(), bean, bean2);
+        for (PropertyDescriptor descriptor : descriptors) {
+            Object value = checkAttribute(desc, descriptor, descriptor.getName(), bean, bean2);
             if (value != null) {
-                printAttribute(writer, indent, bean, desc, descriptors[i].getName(), bean2, value);
+                printAttribute(writer, indent, bean, desc, descriptor.getName(), bean2, value);
             }
         }
 
@@ -373,8 +373,8 @@ public class StoreAppender {
      */
     protected boolean isPersistable(Class<?> clazz) {
 
-        for (int i = 0; i < persistables.length; i++) {
-            if (persistables[i] == clazz || persistables[i].isAssignableFrom(clazz)) {
+        for (Class<?> persistable : persistables) {
+            if (persistable == clazz || persistable.isAssignableFrom(clazz)) {
                 return true;
             }
         }

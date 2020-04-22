@@ -580,8 +580,7 @@ public class AjpProcessor extends AbstractProcessor {
         else if (messageLength == 0) {
             // Zero length message.
             return true;
-        }
-        else {
+        } else {
             if (messageLength > message.getBuffer().length) {
                 // Message too long for the buffer
                 // Need to trigger a 400 response
@@ -1005,8 +1004,7 @@ public class AjpProcessor extends AbstractProcessor {
             int hC = Constants.getResponseAjpIndex(hN.toString());
             if (hC > 0) {
                 responseMessage.appendInt(hC);
-            }
-            else {
+            } else {
                 responseMessage.appendBytes(hN);
             }
             MessageBytes hV=headers.getValue(i);

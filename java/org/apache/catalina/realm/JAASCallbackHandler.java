@@ -92,8 +92,7 @@ public class JAASCallbackHandler implements CallbackHandler {
 
         if (password != null && realm.hasMessageDigest()) {
             this.password = realm.getCredentialHandler().mutate(password);
-        }
-        else {
+        } else {
             this.password = password;
         }
         this.nonce = nonce;
@@ -183,44 +182,53 @@ public class JAASCallbackHandler implements CallbackHandler {
     public void handle(Callback callbacks[])
         throws IOException, UnsupportedCallbackException {
 
-        for (int i = 0; i < callbacks.length; i++) {
+        for (Callback callback : callbacks) {
 
-            if (callbacks[i] instanceof NameCallback) {
+            if (callback instanceof NameCallback) {
                 if (realm.getContainer().getLogger().isTraceEnabled())
                     realm.getContainer().getLogger().trace(sm.getString("jaasCallback.username", username));
-                ((NameCallback) callbacks[i]).setName(username);
-            } else if (callbacks[i] instanceof PasswordCallback) {
+                ((NameCallback) callback).setName(username);
+            }
+            else if (callback instanceof PasswordCallback) {
                 final char[] passwordcontents;
                 if (password != null) {
                     passwordcontents = password.toCharArray();
                 } else {
                     passwordcontents = new char[0];
                 }
-                ((PasswordCallback) callbacks[i]).setPassword
-                    (passwordcontents);
-            } else if (callbacks[i] instanceof TextInputCallback) {
-                TextInputCallback cb = ((TextInputCallback) callbacks[i]);
+                ((PasswordCallback) callback).setPassword
+                        (passwordcontents);
+            }
+            else if (callback instanceof TextInputCallback) {
+                TextInputCallback cb = ((TextInputCallback) callback);
                 if (cb.getPrompt().equals("nonce")) {
                     cb.setText(nonce);
-                } else if (cb.getPrompt().equals("nc")) {
+                }
+                else if (cb.getPrompt().equals("nc")) {
                     cb.setText(nc);
-                } else if (cb.getPrompt().equals("cnonce")) {
+                }
+                else if (cb.getPrompt().equals("cnonce")) {
                     cb.setText(cnonce);
-                } else if (cb.getPrompt().equals("qop")) {
+                }
+                else if (cb.getPrompt().equals("qop")) {
                     cb.setText(qop);
-                } else if (cb.getPrompt().equals("realmName")) {
+                }
+                else if (cb.getPrompt().equals("realmName")) {
                     cb.setText(realmName);
-                } else if (cb.getPrompt().equals("md5a2")) {
+                }
+                else if (cb.getPrompt().equals("md5a2")) {
                     cb.setText(md5a2);
-                } else if (cb.getPrompt().equals("authMethod")) {
+                }
+                else if (cb.getPrompt().equals("authMethod")) {
                     cb.setText(authMethod);
-                } else if (cb.getPrompt().equals("catalinaBase")) {
+                }
+                else if (cb.getPrompt().equals("catalinaBase")) {
                     cb.setText(realm.getContainer().getCatalinaBase().getAbsolutePath());
                 } else {
-                    throw new UnsupportedCallbackException(callbacks[i]);
+                    throw new UnsupportedCallbackException(callback);
                 }
             } else {
-                throw new UnsupportedCallbackException(callbacks[i]);
+                throw new UnsupportedCallbackException(callback);
             }
         }
     }

@@ -108,9 +108,8 @@ public interface KeyedObjectPool<K, V> extends Closeable {
         if (keys == null) {
             throw new IllegalArgumentException(PoolUtils.MSG_NULL_KEYS);
         }
-        final Iterator<K> iter = keys.iterator();
-        while (iter.hasNext()) {
-            addObjects(iter.next(), count);
+        for (K key : keys) {
+            addObjects(key, count);
         }
     }
 

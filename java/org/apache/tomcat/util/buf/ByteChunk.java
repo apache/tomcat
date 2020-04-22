@@ -853,8 +853,8 @@ public final class ByteChunk extends AbstractChunk {
         int blen = b.length;
         int offset = start;
         while (offset < end) {
-            for (int i = 0; i < blen; i++) {
-                if (bytes[offset] == b[i]) {
+            for (byte value : b) {
+                if (bytes[offset] == value) {
                     return offset;
                 }
             }

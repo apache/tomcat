@@ -415,12 +415,12 @@ public class Cookie {
     private static SkipResult skipBytes(ByteBuffer bb, byte[] target) {
         int mark = bb.position();
 
-        for (int i = 0; i < target.length; i++) {
+        for (byte b : target) {
             if (!bb.hasRemaining()) {
                 bb.position(mark);
                 return SkipResult.EOF;
             }
-            if (bb.get() != target[i]) {
+            if (bb.get() != b) {
                 bb.position(mark);
                 return SkipResult.NOT_FOUND;
             }

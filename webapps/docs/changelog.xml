@@ -190,6 +190,10 @@
         Update the packaged version of the Tomcat Native Library to 1.2.24.
         (markt)
       </update>
+      <scode>
+        Refactor to use enhanced for loops where possible. Pull request by Lars
+        Grefer. (markt)
+      </scode>
     </changelog>
   </subsection>
 </section>

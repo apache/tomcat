@@ -236,8 +236,7 @@ public class Rfc6265CookieProcessor extends CookieProcessorBase {
     private void validatePath(String path) {
         char[] chars = path.toCharArray();
 
-        for (int i = 0; i < chars.length; i++) {
-            char ch = chars[i];
+        for (char ch : chars) {
             if (ch < 0x20 || ch > 0x7E || ch == ';') {
                 throw new IllegalArgumentException(sm.getString(
                         "rfc6265CookieProcessor.invalidPath", path));

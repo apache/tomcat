@@ -108,9 +108,9 @@ public abstract class CsrfPreventionFilterBase extends FilterBase {
 
         randomSource.nextBytes(random);
 
-        for (int j = 0; j < random.length; j++) {
-            byte b1 = (byte) ((random[j] & 0xf0) >> 4);
-            byte b2 = (byte) (random[j] & 0x0f);
+        for (byte b : random) {
+            byte b1 = (byte) ((b & 0xf0) >> 4);
+            byte b2 = (byte) (b & 0x0f);
             if (b1 < 10) {
                 buffer.append((char) ('0' + b1));
             } else {

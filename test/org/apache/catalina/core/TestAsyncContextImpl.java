@@ -2481,8 +2481,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
                 throws ServletException, IOException {
             if (req.getAttribute("timeout") != null) {
                 resp.sendError(503);
-            }
-            else {
+            } else {
                 final AsyncContext context = req.startAsync();
                 context.setTimeout(5000);
                 context.addListener(new AsyncListener() {

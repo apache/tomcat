@@ -527,14 +527,13 @@ public class TestRequest extends TomcatBaseTest {
 
                 java.util.Arrays.sort(values);
 
-                for(int i=0; i<values.length; ++i)
-                {
-                    if(first)
+                for (String value : values) {
+                    if (first)
                         first = false;
                     else
                         out.print(",");
 
-                    out.print(name + "=" + values[i]);
+                    out.print(name + "=" + value);
                 }
             }
         }

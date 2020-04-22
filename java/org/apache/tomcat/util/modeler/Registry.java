@@ -363,9 +363,9 @@ public class Registry implements RegistryMBean, MBeanRegistration {
         }
 
         MBeanAttributeInfo attInfo[] = info.getAttributes();
-        for (int i = 0; i < attInfo.length; i++) {
-            if (attName.equals(attInfo[i].getName())) {
-                type = attInfo[i].getType();
+        for (MBeanAttributeInfo mBeanAttributeInfo : attInfo) {
+            if (attName.equals(mBeanAttributeInfo.getName())) {
+                type = mBeanAttributeInfo.getType();
                 return type;
             }
         }
@@ -389,9 +389,9 @@ public class Registry implements RegistryMBean, MBeanRegistration {
             return null;
         }
         MBeanOperationInfo attInfo[] = info.getOperations();
-        for (int i = 0; i < attInfo.length; i++) {
-            if (opName.equals(attInfo[i].getName())) {
-                return attInfo[i];
+        for (MBeanOperationInfo mBeanOperationInfo : attInfo) {
+            if (opName.equals(mBeanOperationInfo.getName())) {
+                return mBeanOperationInfo;
             }
         }
         return null;
@@ -419,10 +419,10 @@ public class Registry implements RegistryMBean, MBeanRegistration {
             return null;
         }
         MBeanOperationInfo attInfo[] = info.getOperations();
-        for (int i = 0; i < attInfo.length; i++) {
-            if (opName.equals(attInfo[i].getName())
-                && argCount == attInfo[i].getSignature().length) {
-                return attInfo[i];
+        for (MBeanOperationInfo mBeanOperationInfo : attInfo) {
+            if (opName.equals(mBeanOperationInfo.getName())
+                    && argCount == mBeanOperationInfo.getSignature().length) {
+                return mBeanOperationInfo;
             }
         }
         return null;

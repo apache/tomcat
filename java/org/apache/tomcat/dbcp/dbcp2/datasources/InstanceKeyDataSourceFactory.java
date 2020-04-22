@@ -47,9 +47,7 @@ abstract class InstanceKeyDataSourceFactory implements ObjectFactory {
 
     static synchronized String registerNewInstance(final InstanceKeyDataSource ds) {
         int max = 0;
-        final Iterator<String> iterator = instanceMap.keySet().iterator();
-        while (iterator.hasNext()) {
-            final String s = iterator.next();
+        for (String s : instanceMap.keySet()) {
             if (s != null) {
                 try {
                     max = Math.max(max, Integer.parseInt(s));
@@ -84,10 +82,8 @@ abstract class InstanceKeyDataSourceFactory implements ObjectFactory {
     public static void closeAll() throws Exception {
         // Get iterator to loop over all instances of this data source.
         final List<Throwable> exceptionList = new ArrayList<>(instanceMap.size());
-        final Iterator<Entry<String, InstanceKeyDataSource>> instanceIterator = instanceMap.entrySet().iterator();
-        while (instanceIterator.hasNext()) {
+        for (Entry<String, InstanceKeyDataSource> next : instanceMap.entrySet()) {
             // Bullet-proof to avoid anything else but problems from InstanceKeyDataSource#close().
-            final Entry<String, InstanceKeyDataSource> next = instanceIterator.next();
             if (next != null) {
                 final InstanceKeyDataSource value = next.getValue();
                 if (value != null) {

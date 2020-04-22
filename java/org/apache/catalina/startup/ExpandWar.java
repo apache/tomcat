@@ -354,8 +354,8 @@ public class ExpandWar {
         if (files == null) {
             files = new String[0];
         }
-        for (int i = 0; i < files.length; i++) {
-            File file = new File(dir, files[i]);
+        for (String s : files) {
+            File file = new File(dir, s);
             if (file.isDirectory()) {
                 deleteDir(file, logFailure);
             } else {

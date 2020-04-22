@@ -315,8 +315,8 @@ public class Substitution {
 
     private String evaluateSubstitution(SubstitutionElement[] elements, Matcher rule, Matcher cond, Resolver resolver) {
         StringBuffer buf = new StringBuffer();
-        for (int i = 0; i < elements.length; i++) {
-            buf.append(elements[i].evaluate(rule, cond, resolver));
+        for (SubstitutionElement element : elements) {
+            buf.append(element.evaluate(rule, cond, resolver));
         }
         return buf.toString();
     }

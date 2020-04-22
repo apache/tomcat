@@ -431,9 +431,7 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
 
                     return connectToServerRecursive(endpoint, clientEndpointConfiguration, path, redirectSet);
 
-                }
-
-                else {
+                } else {
                     throw new DeploymentException(sm.getString("wsWebSocketContainer.invalidStatus",
                             Integer.toString(httpResponse.status)));
                 }

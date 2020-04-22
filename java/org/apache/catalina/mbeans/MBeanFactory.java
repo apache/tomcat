@@ -172,8 +172,8 @@ public class MBeanFactory {
         String domain = oname.getDomain();
         if (container instanceof Server) {
             Service[] services = ((Server)container).findServices();
-            for (int i = 0; i < services.length; i++) {
-                service = (StandardService) services[i];
+            for (Service value : services) {
+                service = (StandardService) value;
                 if (domain.equals(service.getObjectName().getDomain())) {
                     break;
                 }
@@ -692,25 +692,26 @@ public class MBeanFactory {
 
         Connector conns[] = service.findConnectors();
 
-        for (int i = 0; i < conns.length; i++) {
+        for (Connector conn : conns) {
             String connAddress = null;
-            Object objConnAddress = conns[i].getProperty("address");
+            Object objConnAddress = conn.getProperty("address");
             if (objConnAddress != null) {
                 connAddress = ((InetAddress) objConnAddress).getHostAddress();
             }
-            String connPort = ""+conns[i].getPortWithOffset();
+            String connPort = "" + conn.getPortWithOffset();
 
             if (address == null) {
                 // Don't combine this with outer if or we could get an NPE in
                 // 'else if' below
                 if (connAddress == null && port.equals(connPort)) {
-                    service.removeConnector(conns[i]);
-                    conns[i].destroy();
+                    service.removeConnector(conn);
+                    conn.destroy();
                     break;
                 }
-            } else if (address.equals(connAddress) && port.equals(connPort)) {
-                service.removeConnector(conns[i]);
-                conns[i].destroy();
+            }
+            else if (address.equals(connAddress) && port.equals(connPort)) {
+                service.removeConnector(conn);
+                conn.destroy();
                 break;
             }
         }
@@ -876,10 +877,10 @@ public class MBeanFactory {
         ObjectName oname = new ObjectName(name);
         Container container = getParentContainerFromChild(oname);
         Valve[] valves = container.getPipeline().getValves();
-        for (int i = 0; i < valves.length; i++) {
-            ObjectName voname = ((JmxEnabled) valves[i]).getObjectName();
+        for (Valve valve : valves) {
+            ObjectName voname = ((JmxEnabled) valve).getObjectName();
             if (voname.equals(oname)) {
-                container.getPipeline().removeValve(valves[i]);
+                container.getPipeline().removeValve(valve);
             }
         }
     }

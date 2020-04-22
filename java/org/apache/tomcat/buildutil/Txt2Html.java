@@ -100,21 +100,19 @@ public class Txt2Html
             DirectoryScanner ds = fs.getDirectoryScanner(getProject());
             File basedir = ds.getBasedir();
             String[] files = ds.getIncludedFiles();
-            for( int i = 0; i < files.length; i++ ) {
-                File from = new File( basedir, files[i] );
-                File to = new File( todir, files[i] + ".html" );
-                if( !to.exists() ||
-                    (from.lastModified() > to.lastModified()) )
-                {
-                    log( "Converting file '" + from.getAbsolutePath() +
-                        "' to '" + to.getAbsolutePath(), Project.MSG_VERBOSE );
+            for (String file : files) {
+                File from = new File(basedir, file);
+                File to = new File(todir, file + ".html");
+                if (!to.exists() ||
+                        (from.lastModified() > to.lastModified())) {
+                    log("Converting file '" + from.getAbsolutePath() +
+                            "' to '" + to.getAbsolutePath(), Project.MSG_VERBOSE);
                     try {
-                        convert( from, to );
-                    }
-                    catch( IOException e ) {
-                        throw new BuildException( "Could not convert '" +
-                            from.getAbsolutePath() + "' to '" +
-                            to.getAbsolutePath() + "'", e );
+                        convert(from, to);
+                    } catch (IOException e) {
+                        throw new BuildException("Could not convert '" +
+                                from.getAbsolutePath() + "' to '" +
+                                to.getAbsolutePath() + "'", e);
                     }
                     count++;
                 }
