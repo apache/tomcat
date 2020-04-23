@@ -251,15 +251,13 @@ public class MbeansDescriptorsIntrospectionSource extends ModelerSource
                 name = unCapitalize(name.substring(3));
                 setAttMap.put(name, method);
                 attMap.put(name, method);
-            }
-            else {
+            } else {
                 if (params.length == 0) {
                     if (specialMethods.get(method.getName()) != null) {
                         continue;
                     }
                     invokeAttMap.put(name, method);
-                }
-                else {
+                } else {
                     boolean supported = true;
                     for (Class<?> param : params) {
                         if (!supportedType(param)) {

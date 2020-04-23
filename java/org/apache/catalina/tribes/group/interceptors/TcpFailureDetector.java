@@ -288,8 +288,7 @@ public class TcpFailureDetector extends ChannelInterceptorBase implements TcpFai
                 removeSuspects.remove(m);
                 if (log.isInfoEnabled())
                     log.info(sm.getString("tcpFailureDetector.suspectMember.dead", m));
-            }
-            else {
+            } else {
                 if (removeSuspectsTimeout > 0) {
                     long timeNow = System.currentTimeMillis();
                     int timeIdle = (int) ((timeNow - removeSuspects.get(m).longValue()) / 1000L);

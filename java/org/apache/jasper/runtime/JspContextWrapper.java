@@ -103,8 +103,7 @@ public class JspContextWrapper extends PageContext implements VariableResolver {
         this.invokingJspCtxt = (PageContext) jspContext;
         if (jspContext instanceof JspContextWrapper) {
             rootJspCtxt = ((JspContextWrapper)jspContext).rootJspCtxt;
-        }
-        else {
+        } else {
             rootJspCtxt = invokingJspCtxt;
         }
         this.nestedVars = nestedVars;

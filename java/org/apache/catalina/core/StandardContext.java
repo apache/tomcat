@@ -4631,8 +4631,7 @@ public class StandardContext extends ContainerBase
                 fireContainerEvent("beforeContextInitialized", listener);
                 if (noPluggabilityListeners.contains(listener)) {
                     listener.contextInitialized(tldEvent);
-                }
-                else {
+                } else {
                     listener.contextInitialized(event);
                 }
                 fireContainerEvent("afterContextInitialized", listener);
@@ -5272,8 +5271,7 @@ public class StandardContext extends ContainerBase
                     mergedParams.put(param.getName(),
                             param.getValue());
                 }
-            }
-            else {
+            } else {
                 mergedParams.put(param.getName(), param.getValue());
             }
         }

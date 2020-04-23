@@ -174,8 +174,7 @@ public class JspUtil {
                 if (attrPos != -1) {
                     temp.remove(attrPos);
                     valid = true;
-                }
-                else {
+                } else {
                     valid = false;
                     missingAttribute = value.name;
                     break;

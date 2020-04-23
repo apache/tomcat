@@ -755,8 +755,7 @@ public class HostConfig implements LifecycleListener {
                                         war.getAbsoluteFile()));
                                 app.loggedDirWarning = true;
                             }
-                        }
-                        else {
+                        } else {
                             app.loggedDirWarning = false;
                         }
                     }
@@ -1224,8 +1223,7 @@ public class HostConfig implements LifecycleListener {
             if (!resource.isAbsolute()) {
                 if (docBase != null) {
                     resource = new File(docBaseFile, watchedResource);
-                }
-                else {
+                } else {
                     if (log.isDebugEnabled())
                         log.debug("Ignoring non-existent WatchedResource '" +
                                 resource.getAbsolutePath() + "'");

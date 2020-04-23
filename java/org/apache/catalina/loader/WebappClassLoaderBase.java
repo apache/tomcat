@@ -2054,8 +2054,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
                                             "webappClassLoader.checkThreadLocalsForLeaksNull",
                                             args));
                                 }
-                            }
-                            else {
+                            } else {
                                 if (log.isDebugEnabled()) {
                                     log.debug(sm.getString(
                                             "webappClassLoader.checkThreadLocalsForLeaksNone",

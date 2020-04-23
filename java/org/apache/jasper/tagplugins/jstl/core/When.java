@@ -35,8 +35,7 @@ public final class When implements TagPlugin {
         if ("true".equals(parentContext.getPluginAttribute("hasBeenHere"))) {
             ctxt.generateJavaSource("} else if(");
             // See comment below for the reason we generate the extra "}" here.
-        }
-        else {
+        } else {
             ctxt.generateJavaSource("if(");
             parentContext.setPluginAttribute("hasBeenHere", "true");
         }

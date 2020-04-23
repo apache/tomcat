@@ -110,8 +110,7 @@ public final class IntrospectionUtils {
                         }
 
                         // Unknown type
-                    }
-                    else {
+                    } else {
                         if (log.isDebugEnabled())
                             log.debug("IntrospectionUtils: Unknown type " +
                                     paramType.getName());
@@ -127,8 +126,7 @@ public final class IntrospectionUtils {
                 if ("setProperty".equals(method.getName())) {
                     if (method.getReturnType() == Boolean.TYPE) {
                         setPropertyMethodBool = method;
-                    }
-                    else {
+                    } else {
                         setPropertyMethodVoid = method;
                     }
 

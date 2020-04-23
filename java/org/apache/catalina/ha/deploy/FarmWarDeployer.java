@@ -546,8 +546,7 @@ public class FarmWarDeployer extends ClusterListener
             File file = new File(dir, s);
             if (file.isDirectory()) {
                 undeployDir(file);
-            }
-            else {
+            } else {
                 if (!file.delete()) {
                     log.error(sm.getString("farmWarDeployer.deleteFail", file));
                 }

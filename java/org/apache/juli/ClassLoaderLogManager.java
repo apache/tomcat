@@ -485,8 +485,7 @@ public class ClassLoaderLogManager extends LogManager {
                     Permission perm = ace.getPermission();
                     if (perm instanceof FilePermission && perm.getActions().equals("read")) {
                         log.warning("Reading " + perm.getName() + " is not permitted. See \"per context logging\" in the default catalina.policy file.");
-                    }
-                    else {
+                    } else {
                         log.warning("Reading logging.properties is not permitted in some context. See \"per context logging\" in the default catalina.policy file.");
                         log.warning("Original error was: " + ace.getMessage());
                     }
@@ -754,8 +753,7 @@ public class ClassLoaderLogManager extends LogManager {
             for (final LogNode childNode : children.values()) {
                 if (childNode.logger == null) {
                     childNode.setParentLogger(parent);
-                }
-                else {
+                } else {
                     doSetParentLogger(childNode.logger, parent);
                 }
             }

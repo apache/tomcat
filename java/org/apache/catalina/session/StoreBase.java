@@ -170,8 +170,7 @@ public abstract class StoreBase extends LifecycleBase implements Store {
                 boolean isLoaded = false;
                 if (manager instanceof PersistentManagerBase) {
                     isLoaded = ((PersistentManagerBase) manager).isLoaded(key);
-                }
-                else {
+                } else {
                     try {
                         if (manager.findSession(key) != null) {
                             isLoaded = true;
@@ -183,8 +182,7 @@ public abstract class StoreBase extends LifecycleBase implements Store {
                 if (isLoaded) {
                     // recycle old backup session
                     session.recycle();
-                }
-                else {
+                } else {
                     // expire swapped out session
                     session.expire();
                 }

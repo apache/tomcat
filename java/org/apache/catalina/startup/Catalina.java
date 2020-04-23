@@ -279,8 +279,7 @@ public class Catalina {
             }
             else if (arg.equals("stop")) {
                 // NOOP
-            }
-            else {
+            } else {
                 usage();
                 return false;
             }

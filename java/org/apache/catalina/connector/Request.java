@@ -1568,8 +1568,7 @@ public class Request implements HttpServletRequest {
             try {
                 if (replaced) {
                     listener.attributeReplaced(event);
-                }
-                else {
+                } else {
                     listener.attributeAdded(event);
                 }
             } catch (Throwable t) {

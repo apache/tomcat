@@ -92,8 +92,7 @@ public class JAASCallbackHandler implements CallbackHandler {
 
         if (password != null && realm.hasMessageDigest()) {
             this.password = realm.getCredentialHandler().mutate(password);
-        }
-        else {
+        } else {
             this.password = password;
         }
         this.nonce = nonce;
@@ -194,8 +193,7 @@ public class JAASCallbackHandler implements CallbackHandler {
                 final char[] passwordcontents;
                 if (password != null) {
                     passwordcontents = password.toCharArray();
-                }
-                else {
+                } else {
                     passwordcontents = new char[0];
                 }
                 ((PasswordCallback) callback).setPassword
@@ -226,12 +224,10 @@ public class JAASCallbackHandler implements CallbackHandler {
                 }
                 else if (cb.getPrompt().equals("catalinaBase")) {
                     cb.setText(realm.getContainer().getCatalinaBase().getAbsolutePath());
-                }
-                else {
+                } else {
                     throw new UnsupportedCallbackException(callback);
                 }
-            }
-            else {
+            } else {
                 throw new UnsupportedCallbackException(callback);
             }
         }

@@ -383,8 +383,7 @@ class Util {
             for (Class<?> type : types) {
                 if (type == null) {
                     sb.append("null, ");
-                }
-                else {
+                } else {
                     sb.append(type.getName()).append(", ");
                 }
             }

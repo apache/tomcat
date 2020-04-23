@@ -1319,8 +1319,7 @@ class Validator {
                         if (nav != null && nav.hasDynamicContent()) {
                             tagDataAttrs.put(na.getName(),
                                     TagData.REQUEST_TIME_VALUE);
-                        }
-                        else {
+                        } else {
                             tagDataAttrs.put(na.getName(), na.getText());
                         }
                         found = true;

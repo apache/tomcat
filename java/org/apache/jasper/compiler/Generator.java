@@ -2719,8 +2719,7 @@ class Generator {
                             out.print(varInfo.getVarName());
                             out.println(" = null;");
                         }
-                    }
-                    else {
+                    } else {
                         TagVariableInfo tagVarInfo = (TagVariableInfo) elem;
                         if (tagVarInfo.getDeclare()) {
                             String varName = tagVarInfo.getNameGiven();
@@ -3849,8 +3848,7 @@ class Generator {
             out.printin("private ");
             if (info.isFragment()) {
                 out.print("jakarta.servlet.jsp.tagext.JspFragment ");
-            }
-            else {
+            } else {
                 out.print(JspUtil.toJavaSourceType(info.getTypeName()));
                 out.print(" ");
             }
@@ -3869,8 +3867,7 @@ class Generator {
             out.printin("public ");
             if (attrInfo.isFragment()) {
                 out.print("jakarta.servlet.jsp.tagext.JspFragment ");
-            }
-            else {
+            } else {
                 out.print(JspUtil.toJavaSourceType(attrInfo.getTypeName()));
                 out.print(" ");
             }
@@ -3889,8 +3886,7 @@ class Generator {
             out.print(toSetterMethodName(attrInfo.getName()));
             if (attrInfo.isFragment()) {
                 out.print("(jakarta.servlet.jsp.tagext.JspFragment ");
-            }
-            else {
+            } else {
                 out.print("(");
                 out.print(JspUtil.toJavaSourceType(attrInfo.getTypeName()));
                 out.print(" ");

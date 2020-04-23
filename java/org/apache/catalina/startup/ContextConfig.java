@@ -1826,8 +1826,7 @@ public class ContextConfig implements LifecycleListener {
                     } catch (MalformedURLException e) {
                         log.error(sm.getString("contextConfig.applicationUrl"));
                     }
-                }
-                else {
+                } else {
                     stream = servletContext.getResourceAsStream
                         (Constants.ApplicationWebXml);
                     try {

@@ -908,8 +908,7 @@ public class JspRuntimeLibrary {
                 if (uri.lastIndexOf('/') >= 0)
                     uri = uri.substring(0, uri.lastIndexOf('/'));
             }
-        }
-        else {
+        } else {
             uri = hrequest.getServletPath();
             if (uri.lastIndexOf('/') >= 0)
                 uri = uri.substring(0, uri.lastIndexOf('/'));

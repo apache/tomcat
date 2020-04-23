@@ -197,8 +197,7 @@ public class JspWriterImpl extends JspWriter {
         if (bufferSize == 0) {
             initOut();
             out.write(c);
-        }
-        else {
+        } else {
             if (nextChar >= bufferSize)
                 if (autoFlush)
                     flushBuffer();

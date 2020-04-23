@@ -1472,8 +1472,7 @@ public class StandardSession implements HttpSession, Session, Serializable {
                         listener.attributeReplaced(event);
                         context.fireContainerEvent("afterSessionAttributeReplaced", listener);
                     }
-                }
-                else {
+                } else {
                     context.fireContainerEvent("beforeSessionAttributeAdded", listener);
                     if (event == null) {
                         event = new HttpSessionBindingEvent(getSession(), name, value);
@@ -1489,8 +1488,7 @@ public class StandardSession implements HttpSession, Session, Serializable {
                                 manager.getNotifyAttributeListenerOnUnchangedValue()) {
                             context.fireContainerEvent("afterSessionAttributeReplaced", listener);
                         }
-                    }
-                    else {
+                    } else {
                         context.fireContainerEvent("afterSessionAttributeAdded", listener);
                     }
                 } catch (Exception e) {
@@ -1691,8 +1689,7 @@ public class StandardSession implements HttpSession, Session, Serializable {
             else if (isAttributeDistributable(key, value) && !exclude(key, value)) {
                 saveNames.add(key);
                 saveValues.add(value);
-            }
-            else {
+            } else {
                 removeAttributeInternal(key, true);
             }
         }

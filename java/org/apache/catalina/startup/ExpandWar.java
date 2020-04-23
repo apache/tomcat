@@ -358,8 +358,7 @@ public class ExpandWar {
             File file = new File(dir, s);
             if (file.isDirectory()) {
                 deleteDir(file, logFailure);
-            }
-            else {
+            } else {
                 file.delete();
             }
         }

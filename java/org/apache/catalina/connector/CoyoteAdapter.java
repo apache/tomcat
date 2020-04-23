@@ -824,8 +824,7 @@ public class CoyoteAdapter implements Adapter {
                         }
                         if (header == null) {
                             header = method;
-                        }
-                        else {
+                        } else {
                             header += ", " + method;
                         }
                     }

@@ -84,8 +84,7 @@ class DefaultErrorHandler implements ErrorHandler {
                 buf.append(detail.getErrorMessage());
                 buf.append(System.lineSeparator());
                 buf.append(detail.getJspExtract());
-            }
-            else {
+            } else {
                 args = new Object[]{
                         Integer.valueOf(detail.getJavaLineNumber()),
                         detail.getJavaFileName()};

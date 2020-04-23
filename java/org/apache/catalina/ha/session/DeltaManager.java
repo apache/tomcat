@@ -1053,8 +1053,7 @@ public class DeltaManager extends ClusterManagerBase{
                     if (session.isValid()) {
                         session.expire();
                         expireDirect++;
-                    }
-                    else {
+                    } else {
                         expireIndirect++;
                     }//end if
                 }//end if

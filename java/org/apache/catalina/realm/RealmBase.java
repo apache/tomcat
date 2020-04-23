@@ -824,8 +824,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
             if (constraint.getAllRoles()) {
                 // * means all roles defined in web.xml
                 roles = request.getContext().findSecurityRoles();
-            }
-            else {
+            } else {
                 roles = constraint.findAuthRoles();
             }
 
@@ -858,8 +857,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
             else if (principal == null) {
                 if (log.isDebugEnabled())
                     log.debug("  No user authenticated, cannot grant access");
-            }
-            else {
+            } else {
                 for (String role : roles) {
                     if (hasRole(request.getWrapper(), principal, role)) {
                         status = true;

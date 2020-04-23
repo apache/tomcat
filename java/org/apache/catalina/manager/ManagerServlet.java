@@ -1081,8 +1081,7 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
                             "running",
                             "" + context.getManager().findSessions().length,
                             context.getDocBase()));
-                }
-                else {
+                } else {
                     writer.println(smClient.getString("managerServlet.listitem",
                             displayPath,
                             "stopped",

@@ -46,8 +46,7 @@ public class CompressionFilterTestServlet extends HttpServlet {
             out.println(name);
             if (name.indexOf("gzip") != -1) {
                 out.println("gzip supported -- able to compress");
-            }
-            else {
+            } else {
                 out.println("gzip not supported");
             }
         }

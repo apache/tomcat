@@ -1038,8 +1038,7 @@ final class CallMethodMultiRule extends CallMethodRule {
                     && !String.class.isAssignableFrom(paramTypes[multiParamIndex]))) {
                 paramValues[multiParamIndex] =
                         IntrospectionUtils.convert((String) param, paramTypes[multiParamIndex]);
-            }
-            else {
+            } else {
                 paramValues[multiParamIndex] = param;
             }
             IntrospectionUtils.callMethodN(target, methodName, paramValues,

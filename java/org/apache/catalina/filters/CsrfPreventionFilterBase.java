@@ -113,14 +113,12 @@ public abstract class CsrfPreventionFilterBase extends FilterBase {
             byte b2 = (byte) (b & 0x0f);
             if (b1 < 10) {
                 buffer.append((char) ('0' + b1));
-            }
-            else {
+            } else {
                 buffer.append((char) ('A' + (b1 - 10)));
             }
             if (b2 < 10) {
                 buffer.append((char) ('0' + b2));
-            }
-            else {
+            } else {
                 buffer.append((char) ('A' + (b2 - 10)));
             }
         }

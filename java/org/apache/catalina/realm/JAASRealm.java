@@ -286,8 +286,7 @@ public class JAASRealm extends RealmBase {
                         loader);
                 if (Principal.class.isAssignableFrom(principalClass)) {
                     classNamesList.add(className);
-                }
-                else {
+                } else {
                     log.error(sm.getString("jaasRealm.notPrincipal", className));
                 }
             } catch (ClassNotFoundException e) {

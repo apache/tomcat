@@ -170,8 +170,7 @@ public class DeltaRequest implements Externalizable {
                         if (log.isTraceEnabled())
                             log.trace("Session.setAttribute('" + info.getName() + "', '" + info.getValue() + "')");
                         session.setAttribute(info.getName(), info.getValue(), notifyListeners, false);
-                    }
-                    else {
+                    } else {
                         if (log.isTraceEnabled()) log.trace("Session.removeAttribute('" + info.getName() + "')");
                         session.removeAttribute(info.getName(), notifyListeners, false);
                     }
@@ -203,8 +202,7 @@ public class DeltaRequest implements Externalizable {
                     SessionListener listener = (SessionListener) info.getValue();
                     if (info.getAction() == ACTION_SET) {
                         session.addSessionListener(listener, false);
-                    }
-                    else {
+                    } else {
                         session.removeSessionListener(listener, false);
                     }
                     break;
@@ -270,8 +268,7 @@ public class DeltaRequest implements Externalizable {
                     log.error(sm.getString("deltaRequest.removeUnable"),x);
                     info = new AttributeInfo();
                 }
-            }
-            else {
+            } else {
                 info = new AttributeInfo();
             }
             info.readExternal(in);
