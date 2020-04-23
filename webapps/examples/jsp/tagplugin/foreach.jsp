@@ -39,7 +39,7 @@
         ${item}
     </c:forEach>
 
-    <% Vector v = new Vector();
+    <% Vector<String> v = new Vector<String>();
         v.add("One"); v.add("Two"); v.add("Three"); v.add("Four");
 
         pageContext.setAttribute("vector", v);
