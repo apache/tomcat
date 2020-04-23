@@ -16,7 +16,7 @@
 --%>
 <%@ page import="java.io.IOException" contentType="text/plain"%>
 <%
-    boolean flush = Boolean.valueOf(request.getParameter("flush"));
+    boolean flush = Boolean.parseBoolean(request.getParameter("flush"));
     if (pageContext != null) {
         try {
             if (flush) {
