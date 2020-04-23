@@ -15,8 +15,12 @@
 
 dist: bionic
 language: java
-jdk: oraclejdk8
-arch: arm64
+jobs:
+    include:
+      - arch: s390x
+        jdk: openjdk11
+      - arch: arm64
+        jdk: oraclejdk8
 
 addons:
     apt:
@@ -36,9 +40,10 @@ install:
     - echo $ARCH
     - JDK_X64="https://github.com/AdoptOpenJDK/openjdk8-binaries/releases/download/jdk8u242-b08/OpenJDK8U-jdk_x64_linux_hotspot_8u242b08.tar.gz"
     - JDK_ARM64="https://github.com/AdoptOpenJDK/openjdk8-binaries/releases/download/jdk8u232-b09/OpenJDK8U-jdk_aarch64_linux_hotspot_8u232b09.tar.gz"
-    - if test "X$ARCH" = "Xaarch64"; then JDK_URL=$JDK_ARM64; else JDK_URL=$JDK_X64; fi
+    - JDK_s390x="https://github.com/AdoptOpenJDK/openjdk11-binaries/releases/download/jdk-11.0.5%2B10/OpenJDK11U-jdk_s390x_linux_hotspot_11.0.5_10.tar.gz"
+    - if test "X$ARCH" = "Xaarch64"; then JDK_URL=$JDK_ARM64; elif test "$ARCH" = "s390x"; then JDK_URL=$JDK_s390x; else JDK_URL=$JDK_X64; fi
     - wget -q $JDK_URL && tar xzf OpenJDK*.tar.gz
-    - mv jdk8* jdk
+    - if test "$ARCH" = "s390x"; then mv jdk-11* jdk; else mv jdk8* jdk; fi
     - export JAVA_HOME=`pwd`/jdk
     - wget -q http://mirrors.netix.net/apache/ant/binaries/apache-ant-1.10.7-bin.tar.gz && tar xzf apache-ant-*-bin.tar.gz
     - export ANT_HOME=`pwd`/apache-ant-1.10.7
