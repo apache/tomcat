@@ -1,0 +1,17 @@
+root = true
+
+[*]
+indent_style = space
+trim_trailing_whitespace = true
+
+[*.java]
+indent_size = 4
+max_line_length = 120
+ij_java_block_brace_style = end_of_line
+ij_java_else_on_new_line = false
+
+[*.{txt,md}]
+max_line_length = 80
+
+[*.xml]
+indent_size = 2
