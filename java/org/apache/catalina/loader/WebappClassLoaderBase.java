@@ -2517,7 +2517,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
     @SuppressWarnings("deprecation") // thread.stop()
     private void clearReferencesThreads() {
         Thread[] threads = getThreads();
-        List<Thread> executorThreadsToStop = new ArrayList<Thread>();
+        List<Thread> threadsToStop = new ArrayList<Thread>();
 
         // Iterate over the set of threads
         for (Thread thread : threads) {
@@ -2626,29 +2626,29 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
                                 thread.getName(), contextName), e);
                     }
 
-                    if (usingExecutor) {
-                        // Executor may take a short time to stop all the
-                        // threads. Make a note of threads that should be
-                        // stopped and check them at the end of the method.
-                        executorThreadsToStop.add(thread);
-                    } else {
-                        // This method is deprecated and for good reason. This
-                        // is very risky code but is the only option at this
-                        // point. A *very* good reason for apps to do this
-                        // clean-up themselves.
-                        thread.stop();
+                    // Stopping an executor automatically interrupts the
+                    // associated threads. For non-executor threads, interrupt
+                    // them here.
+                    if (!usingExecutor && !thread.isInterrupted()) {
+                        thread.interrupt();
                     }
+
+                    // Threads are expected to take a short time to stop after
+                    // being interrupted. Make a note of all threads that are
+                    // expected to stop to enable them to be checked at the end
+                    // of this method.
+                    threadsToStop.add(thread);
                 }
             }
         }
 
-        // If thread stopping is enabled, executor threads should have been
-        // stopped above when the executor was shut down but that depends on the
-        // thread correctly handling the interrupt. Give all the executor
-        // threads a few seconds shutdown and if they are still running
-        // Give threads up to 2 seconds to shutdown
+        // If thread stopping is enabled, threads should have been stopped above
+        // when the executor was shut down or the thread was interrupted but
+        // that depends on the thread correctly handling the interrupt. Check
+        // each thread and if any are still running give all threads up to a
+        // total of 2 seconds to shutdown.
         int count = 0;
-        for (Thread t : executorThreadsToStop) {
+        for (Thread t : threadsToStop) {
             while (t.isAlive() && count < 100) {
                 try {
                     Thread.sleep(20);

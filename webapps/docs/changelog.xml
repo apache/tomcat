@@ -67,6 +67,13 @@
         perform MIME type mapping based on file extension in a case insensitive
         manner. (markt)
       </add>
+      <add>
+        <bug>59203</bug>: Before calling <code>Thread.stop()</code> (if
+        configured to do so) on a web application created thread that is not
+        stopped by the web application when the web application is stopped, try
+        interrupting the thread first. Based on a pull request by Govinda
+        Sakhare. (markt)
+      </add>
       <fix>
         <bug>64226</bug>: Reset timezone after parsing a date since the date
         format is reused. Test case submitted by Gary Thomas. (remm)
