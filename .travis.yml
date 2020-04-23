@@ -36,7 +36,15 @@ addons:
         - libtool-bin
 
 install:
-    - export JAVA_HOME=$(dirname $(dirname $(readlink -f $(which javac))))
+    - ARCH=`uname -p`
+    - echo $ARCH
+    - JDK_X64="https://github.com/AdoptOpenJDK/openjdk8-binaries/releases/download/jdk8u242-b08/OpenJDK8U-jdk_x64_linux_hotspot_8u242b08.tar.gz"
+    - JDK_ARM64="https://github.com/AdoptOpenJDK/openjdk8-binaries/releases/download/jdk8u232-b09/OpenJDK8U-jdk_aarch64_linux_hotspot_8u232b09.tar.gz"
+    - JDK_s390x="https://github.com/AdoptOpenJDK/openjdk11-binaries/releases/download/jdk-11.0.5%2B10/OpenJDK11U-jdk_s390x_linux_hotspot_11.0.5_10.tar.gz"
+    - if test "X$ARCH" = "Xaarch64"; then JDK_URL=$JDK_ARM64; elif test "$ARCH" = "s390x"; then JDK_URL=$JDK_s390x; else JDK_URL=$JDK_X64; fi
+    - wget -q $JDK_URL && tar xzf OpenJDK*.tar.gz
+    - if test "$ARCH" = "s390x"; then mv jdk-11* jdk; else mv jdk8* jdk; fi
+    - export JAVA_HOME=`pwd`/jdk
     - wget -q http://mirrors.netix.net/apache/ant/binaries/apache-ant-1.10.7-bin.tar.gz && tar xzf apache-ant-*-bin.tar.gz
     - export ANT_HOME=`pwd`/apache-ant-1.10.7
     - export PATH="$JAVA_HOME/bin:$ANT_HOME/bin:$PATH"
