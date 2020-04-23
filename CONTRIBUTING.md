@@ -124,6 +124,29 @@ of time has lapsed since your submission, such as a couple of months, feel free
 to either update your BZ, PR, or email the dev list with a message to bump your
 issue. Sometimes things get lost in all the work and we need a reminder :smile:
 
+## IDE Support
+
+Special IDE support for
+[Eclipse](https://www.eclipse.org/ide/),
+[IntelliJ IDEA](https://www.jetbrains.com/idea/) and
+[NetBeans](https://netbeans.org/)
+is provided through special ant targets:
+
+```bash
+ant ide-eclipse
+```
+```bash
+ant ide-intellij
+```
+```bash
+ant ide-netbeans
+```
+
+Just execute the ant target for your IDE after checking out the sources
+to set up the appropriate configuration files.
+Also make sure to re-execute the target after switching branches or
+after pulling upstream changes in order to keep your IDE configurations in sync.
+
 ## Style Guide
 
 Apache Tomcat has very loosely defined coding conventions, but the following
