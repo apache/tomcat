@@ -19,6 +19,8 @@ package org.apache.catalina.core;
 import java.io.IOException;
 import java.security.Principal;
 import java.security.PrivilegedActionException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 import jakarta.servlet.Filter;
@@ -51,31 +53,18 @@ public final class ApplicationFilterChain implements FilterChain {
     private static final ThreadLocal<ServletResponse> lastServicedResponse = new ThreadLocal<>();
 
 
-    // -------------------------------------------------------------- Constants
-
-
-    public static final int INCREMENT = 10;
-
-
     // ----------------------------------------------------- Instance Variables
 
     /**
      * Filters.
      */
-    private ApplicationFilterConfig[] filters = new ApplicationFilterConfig[0];
-
+    private List<ApplicationFilterConfig> filters = new ArrayList<>();
 
     /**
      * The int which is used to maintain the current position
      * in the filter chain.
      */
-    private int pos = 0;
-
-
-    /**
-     * The int which gives the current number of filters in the chain.
-     */
-    private int n = 0;
+    private int filterPos = 0;
 
 
     /**
@@ -168,8 +157,8 @@ public final class ApplicationFilterChain implements FilterChain {
         throws IOException, ServletException {
 
         // Call the next filter if there is one
-        if (pos < n) {
-            ApplicationFilterConfig filterConfig = filters[pos++];
+        if (filterPos < filters.size()) {
+            ApplicationFilterConfig filterConfig = filters.get(filterPos++);
             try {
                 Filter filter = filterConfig.getFilter();
 
@@ -273,18 +262,12 @@ public final class ApplicationFilterChain implements FilterChain {
     void addFilter(ApplicationFilterConfig filterConfig) {
 
         // Prevent the same filter being added multiple times
-        for(ApplicationFilterConfig filter:filters)
-            if(filter==filterConfig)
+        for (ApplicationFilterConfig filter : filters) {
+            if (filter == filterConfig)
                 return;
-
-        if (n == filters.length) {
-            ApplicationFilterConfig[] newFilters =
-                new ApplicationFilterConfig[n + INCREMENT];
-            System.arraycopy(filters, 0, newFilters, 0, n);
-            filters = newFilters;
         }
-        filters[n++] = filterConfig;
 
+        filters.add(filterConfig);
     }
 
 
@@ -292,11 +275,8 @@ public final class ApplicationFilterChain implements FilterChain {
      * Release references to the filters and wrapper executed by this chain.
      */
     void release() {
-        for (int i = 0; i < n; i++) {
-            filters[i] = null;
-        }
-        n = 0;
-        pos = 0;
+        filters.clear();
+        filterPos = 0;
         servlet = null;
         servletSupportsAsync = false;
         dispatcherWrapsSameObject = false;
@@ -307,7 +287,7 @@ public final class ApplicationFilterChain implements FilterChain {
      * Prepare for reuse of the filters and wrapper executed by this chain.
      */
     void reuse() {
-        pos = 0;
+        filterPos = 0;
     }
 
 
@@ -340,8 +320,7 @@ public final class ApplicationFilterChain implements FilterChain {
      *               be added
      */
     public void findNonAsyncFilters(Set<String> result) {
-        for (int i = 0; i < n ; i++) {
-            ApplicationFilterConfig filter = filters[i];
+        for (ApplicationFilterConfig filter : filters) {
             if ("false".equalsIgnoreCase(filter.getFilterDef().getAsyncSupported())) {
                 result.add(filter.getFilterClass());
             }
