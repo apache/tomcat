@@ -52,7 +52,6 @@
 
     <attribute   name="writeable"
           description="Check if user database is writeable"
-               impact="INFO"
                    is="true"
            writeable="false"/>
 
