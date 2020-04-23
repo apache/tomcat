@@ -852,7 +852,7 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
         if (values1 == null) {
             // Skip - nothing to merge
         } else if (values1 instanceof String[]) {
-            results.addAll(Arrays.asList(values1));
+            results.addAll(Arrays.asList((String[]) values1));
         } else { // String
             results.add(values1.toString());
         }
@@ -860,7 +860,7 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
         if (values2 == null) {
             // Skip - nothing to merge
         } else if (values2 instanceof String[]) {
-            results.addAll(Arrays.asList(values2));
+            results.addAll(Arrays.asList((String[]) values2));
         } else { // String
             results.add(values2.toString());
         }
