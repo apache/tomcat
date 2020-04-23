@@ -52,6 +52,13 @@
         <code>AprLifecycleListener</code> so that the only way to use the APR
         connectors is to set the full class name. (remm)
       </update>
+      <add>
+        <bug>59203</bug>: Before calling <code>Thread.stop()</code> (if
+        configured to do so) on a web application created thread that is not
+        stopped by the web application when the web application is stopped, try
+        interrupting the thread first. Based on a pull request by Govinda
+        Sakhare. (markt)
+      </add>
       <fix>
         <bug>62912</bug>: Don't mutate an application provided content header if
         it does not contain a charset. Also remove the outdated workaround for
