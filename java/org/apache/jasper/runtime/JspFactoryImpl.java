@@ -38,7 +38,7 @@ import org.apache.jasper.Constants;
  */
 public class JspFactoryImpl extends JspFactory {
 
-    private final ThreadLocal<PageContextPool> localPool = new ThreadLocal<>();
+    private static final ThreadLocal<PageContextPool> localPool = new ThreadLocal<>();
     private int poolSize = -1;
 
     @Override

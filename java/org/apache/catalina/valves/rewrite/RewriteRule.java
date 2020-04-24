@@ -26,7 +26,7 @@ public class RewriteRule {
 
     protected RewriteCond[] conditions = new RewriteCond[0];
 
-    protected ThreadLocal<Pattern> pattern = new ThreadLocal<>();
+    protected static ThreadLocal<Pattern> pattern = new ThreadLocal<>();
     protected Substitution substitution = null;
 
     protected String patternString = null;
@@ -186,7 +186,7 @@ public class RewriteRule {
     protected boolean cookieSecure = false;
     protected boolean cookieHttpOnly = false;
     protected Substitution cookieSubstitution = null;
-    protected ThreadLocal<String> cookieResult = new ThreadLocal<>();
+    protected static ThreadLocal<String> cookieResult = new ThreadLocal<>();
 
     /**
      *  This forces a request attribute named VAR to be set to the value VAL,
