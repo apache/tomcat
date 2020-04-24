@@ -249,7 +249,7 @@ public final class Library {
                                                aprVersionString() + ")");
             }
             if (!APR_HAS_THREADS) {
-                throw new UnsatisfiedLinkError("Missing APR_HAS_THREADS");
+                throw new UnsatisfiedLinkError("Missing threading support from APR");
             }
         }
         return initialize();
