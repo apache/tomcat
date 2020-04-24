@@ -171,7 +171,7 @@ public class ApplicationContext implements ServletContext {
     /**
      * Thread local data used during request dispatch.
      */
-    private final ThreadLocal<DispatchData> dispatchData = new ThreadLocal<>();
+    private static final ThreadLocal<DispatchData> dispatchData = new ThreadLocal<>();
 
 
     /**
