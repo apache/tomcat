@@ -112,7 +112,7 @@ public class ClassLoaderLogManager extends LogManager {
      * This prefix is used to allow using prefixes for the properties names
      * of handlers and their subcomponents.
      */
-    protected final ThreadLocal<String> prefix = new ThreadLocal<>();
+    protected static final ThreadLocal<String> prefix = new ThreadLocal<>();
 
 
     /**
