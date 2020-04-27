@@ -112,6 +112,11 @@
         Add more descriptive error message in DefaultServlet for SC_NOT_FOUND.
         (michaelo)
       </add>
+      <fix>
+        <bug>64373</bug>: When a tag file is packaged in a WAR and then that WAR
+        is unpacked in <code>/WEB-INF/classes</code> ensure that the tag file
+        can still be found. Patch provided by Karl von Randow. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
