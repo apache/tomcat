@@ -1354,19 +1354,25 @@ public class ContextConfig implements LifecycleListener {
             wrapper.setServletClass(servlet.getServletClass());
             MultipartDef multipartdef = servlet.getMultipartDef();
             if (multipartdef != null) {
-                if (multipartdef.getMaxFileSize() != null &&
-                        multipartdef.getMaxRequestSize()!= null &&
-                        multipartdef.getFileSizeThreshold() != null) {
-                    wrapper.setMultipartConfigElement(new MultipartConfigElement(
-                            multipartdef.getLocation(),
-                            Long.parseLong(multipartdef.getMaxFileSize()),
-                            Long.parseLong(multipartdef.getMaxRequestSize()),
-                            Integer.parseInt(
-                                    multipartdef.getFileSizeThreshold())));
-                } else {
-                    wrapper.setMultipartConfigElement(new MultipartConfigElement(
-                            multipartdef.getLocation()));
+                long maxFileSize = -1;
+                long maxRequestSize = -1;
+                int fileSizeThreshold = 0;
+
+                if(null != multipartdef.getMaxFileSize()) {
+                    maxFileSize = Long.parseLong(multipartdef.getMaxFileSize());
                 }
+                if(null != multipartdef.getMaxRequestSize()) {
+                    maxRequestSize = Long.parseLong(multipartdef.getMaxRequestSize());
+                }
+                if(null != multipartdef.getFileSizeThreshold()) {
+                    fileSizeThreshold = Integer.parseInt(multipartdef.getFileSizeThreshold());
+                }
+
+                wrapper.setMultipartConfigElement(new MultipartConfigElement(
+                        multipartdef.getLocation(),
+                        maxFileSize,
+                        maxRequestSize,
+                        fileSizeThreshold));
             }
             if (servlet.getAsyncSupported() != null) {
                 wrapper.setAsyncSupported(
