@@ -94,9 +94,13 @@
         (michaelo)
       </add>
       <fix>
-        <bug>64309</bug>; Improve the regular expression used to search for
+        <bug>64309</bug>: Improve the regular expression used to search for
         class loader repositories when bootstrapping Tomcat. Pull request
         provided by Paul Muriel Biya-Bi. (markt)
+      </fix>
+      <fix>
+        <bug>64384</bug>: Fix multipart configuration ignoring some parameters
+        in some cases. (schultz)
       </fix>
     </changelog>
   </subsection>
