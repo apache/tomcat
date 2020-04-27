@@ -313,6 +313,7 @@ class TagLibraryInfoImpl extends TagLibraryInfo implements TagConstants {
                 tagXml.hasDynamicAttributes());
     }
 
+    @SuppressWarnings("null") // Impossible for path to be null at warning
     private TagFileInfo createTagFileInfo(TagFileXml tagFileXml, Jar jar) throws JasperException {
 
         String name = tagFileXml.getName();
@@ -323,6 +324,13 @@ class TagLibraryInfoImpl extends TagLibraryInfo implements TagConstants {
             err.jspError("jsp.error.tagfile.missingPath");
         } else if (!path.startsWith("/META-INF/tags") && !path.startsWith("/WEB-INF/tags")) {
             err.jspError("jsp.error.tagfile.illegalPath", path);
+        }
+
+        if (jar == null && path.startsWith("/META-INF/tags")) {
+            // This is a tag file that was packaged in a JAR that has been
+            // unpacked into /WEB-INF/classes (probably by an IDE). Adjust the
+            // path accordingly.
+            path = "/WEB-INF/classes" + path;
         }
 
         TagInfo tagInfo =
