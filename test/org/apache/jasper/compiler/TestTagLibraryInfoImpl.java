@@ -40,4 +40,19 @@ public class TestTagLibraryInfoImpl extends TomcatBaseTest {
         Assert.assertEquals(HttpServletResponse.SC_OK, rc);
     }
 
+
+    /*
+     * https://bz.apache.org/bugzilla/show_bug.cgi?id=64373
+     */
+    @Test
+    public void testTldFromExplodedWar() throws Exception {
+        getTomcatInstanceTestWebapp(false, true);
+
+        ByteChunk res = new ByteChunk();
+
+        int rc = getUrl("http://localhost:" + getPort() +
+                "/test/bug6nnnn/bug64373.jsp", res, null);
+        Assert.assertEquals(HttpServletResponse.SC_OK, rc);
+    }
+
 }
