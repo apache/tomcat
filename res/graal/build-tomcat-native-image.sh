@@ -33,7 +33,7 @@ done
 PRGDIR=`dirname "$PRG"`
 
 cd $PRGDIR/../..
-ant && ant embed && ant test-compile
+ant clean && ant && ant embed && ant test-compile
 
 mkdir -p output/graal
 cd output/testclasses
