@@ -96,8 +96,7 @@ public class JDTCompiler extends org.apache.jasper.compiler.Compiler {
      * Compile the servlet from .java file to .class file
      */
     @Override
-    protected void generateClass(String[] smap)
-        throws FileNotFoundException, JasperException, Exception {
+    protected void generateClass(String[] smap) throws FileNotFoundException, JasperException, Exception {
 
         long t1 = 0;
         if (log.isDebugEnabled()) {
@@ -107,14 +106,11 @@ public class JDTCompiler extends org.apache.jasper.compiler.Compiler {
         final String sourceFile = ctxt.getServletJavaFileName();
         final String outputDir = ctxt.getOptions().getScratchDir().getAbsolutePath();
         String packageName = ctxt.getServletPackageName();
-        final String targetClassName =
-            ((packageName.length() != 0) ? (packageName + ".") : "")
-                    + ctxt.getServletClassName();
+        final String targetClassName = ((packageName.length() != 0) ? (packageName + ".") : "") + ctxt.getServletClassName();
         final ClassLoader classLoader = ctxt.getJspLoader();
         String[] fileNames = new String[] {sourceFile};
         String[] classNames = new String[] {targetClassName};
-        final ArrayList<JavacErrorDetail> problemList =
-            new ArrayList<JavacErrorDetail>();
+        final ArrayList<JavacErrorDetail> problemList = new ArrayList<JavacErrorDetail>();
 
         class CompilationUnit implements ICompilationUnit {
 
@@ -139,14 +135,12 @@ public class JDTCompiler extends org.apache.jasper.compiler.Compiler {
                 Reader reader = null;
                 try {
                     is = new FileInputStream(sourceFile);
-                    isr = new InputStreamReader(is,
-                            ctxt.getOptions().getJavaEncoding());
+                    isr = new InputStreamReader(is, ctxt.getOptions().getJavaEncoding());
                     reader = new BufferedReader(isr);
                     char[] chars = new char[8192];
                     StringBuilder buf = new StringBuilder();
                     int count;
-                    while ((count = reader.read(chars, 0,
-                                                chars.length)) > 0) {
+                    while ((count = reader.read(chars, 0, chars.length)) > 0) {
                         buf.append(chars, 0, count);
                     }
                     result = new char[buf.length()];
@@ -184,8 +178,7 @@ public class JDTCompiler extends org.apache.jasper.compiler.Compiler {
 
             @Override
             public char[][] getPackageName() {
-                StringTokenizer izer =
-                    new StringTokenizer(className, ".");
+                StringTokenizer izer = new StringTokenizer(className, ".");
                 char[][] result = new char[izer.countTokens()-1][];
                 for (int i = 0; i < result.length; i++) {
                     String tok = izer.nextToken();
@@ -216,9 +209,7 @@ public class JDTCompiler extends org.apache.jasper.compiler.Compiler {
                 }
 
                 @Override
-                public NameEnvironmentAnswer
-                    findType(char[] typeName,
-                             char[][] packageName) {
+                public NameEnvironmentAnswer findType(char[] typeName, char[][] packageName) {
                     StringBuilder result = new StringBuilder();
                     String sep = "";
                     for (int i = 0; i < packageName.length; i++) {
@@ -236,19 +227,15 @@ public class JDTCompiler extends org.apache.jasper.compiler.Compiler {
                     InputStream is = null;
                     try {
                         if (className.equals(targetClassName)) {
-                            ICompilationUnit compilationUnit =
-                                new CompilationUnit(sourceFile, className);
-                            return
-                                new NameEnvironmentAnswer(compilationUnit, null);
+                            ICompilationUnit compilationUnit = new CompilationUnit(sourceFile, className);
+                            return new NameEnvironmentAnswer(compilationUnit, null);
                         }
-                        String resourceName =
-                            className.replace('.', '/') + ".class";
+                        String resourceName = className.replace('.', '/') + ".class";
                         is = classLoader.getResourceAsStream(resourceName);
                         if (is != null) {
                             byte[] classBytes;
                             byte[] buf = new byte[8192];
-                            ByteArrayOutputStream baos =
-                                new ByteArrayOutputStream(buf.length);
+                            ByteArrayOutputStream baos = new ByteArrayOutputStream(buf.length);
                             int count;
                             while ((count = is.read(buf, 0, buf.length)) > 0) {
                                 baos.write(buf, 0, count);
@@ -256,11 +243,8 @@ public class JDTCompiler extends org.apache.jasper.compiler.Compiler {
                             baos.flush();
                             classBytes = baos.toByteArray();
                             char[] fileName = className.toCharArray();
-                            ClassFileReader classFileReader =
-                                new ClassFileReader(classBytes, fileName,
-                                                    true);
-                            return
-                                new NameEnvironmentAnswer(classFileReader, null);
+                            ClassFileReader classFileReader = new ClassFileReader(classBytes, fileName, true);
+                            return new NameEnvironmentAnswer(classFileReader, null);
                         }
                     } catch (IOException exc) {
                         log.error("Compilation error", exc);
@@ -298,8 +282,7 @@ public class JDTCompiler extends org.apache.jasper.compiler.Compiler {
                 }
 
                 @Override
-                public boolean isPackage(char[][] parentPackageName,
-                                         char[] packageName) {
+                public boolean isPackage(char[][] parentPackageName, char[] packageName) {
                     StringBuilder result = new StringBuilder();
                     String sep = "";
                     if (parentPackageName != null) {
@@ -325,8 +308,7 @@ public class JDTCompiler extends org.apache.jasper.compiler.Compiler {
 
             };
 
-        final IErrorHandlingPolicy policy =
-            DefaultErrorHandlingPolicies.proceedWithAllProblems();
+        final IErrorHandlingPolicy policy = DefaultErrorHandlingPolicies.proceedWithAllProblems();
 
         final Map<String,String> settings = new HashMap<String,String>();
         settings.put(CompilerOptions.OPTION_LineNumberAttribute,
