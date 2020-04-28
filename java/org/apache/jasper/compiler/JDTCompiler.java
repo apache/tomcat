@@ -212,7 +212,7 @@ public class JDTCompiler extends org.apache.jasper.compiler.Compiler {
                 }
 
                 private boolean isPackage(String result) {
-                    if (result.equals(targetClassName)) {
+                    if (result.equals(targetClassName) || result.startsWith(targetClassName + '$')) {
                         return false;
                     }
                     String resourceName = result.replace('.', '/') + ".class";
