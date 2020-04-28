@@ -36,7 +36,7 @@ done
 # directory of this script
 PRGDIR=`dirname "$PRG"`
 
-EXECUTABLE=${PRGDIR}/output/graal/tc-graal-image
+EXECUTABLE=${PRGDIR}/../../output/graal/tc-graal-image
 
 ./${EXECUTABLE} "$@" 2>&1 &
 PID=$!
