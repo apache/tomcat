@@ -121,6 +121,11 @@
         is unpacked in <code>/WEB-INF/classes</code> ensure that the tag file
         can still be found. Patch provided by Karl von Randow. (markt)
       </fix>
+      <fix>
+        Ensure that the Jasper code that interfaces with the Eclipse Compiler
+        for Java (ECJ) enables Jasper to compile JSPs using ECJ 4.14 onwards
+        when the JSPs have inner classes. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
