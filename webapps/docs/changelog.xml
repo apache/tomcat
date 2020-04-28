@@ -145,6 +145,11 @@
         Add more descriptive error message in DefaultServlet for SC_NOT_FOUND.
         (michaelo)
       </add>
+      <fix>
+        Ensure that the Jasper code that interfaces with the Eclipse Compiler
+        for Java (ECJ) enables Jasper to compile JSPs using ECJ 4.14 onwards
+        when the JSPs have inner classes. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">
