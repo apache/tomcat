@@ -73,7 +73,7 @@ public class Utils {
         if (result.contains("[{0}]")) {
             result = FIX_SINGLE_QUOTE.matcher(result).replaceAll("''");
         }
-        return result;
+        return result.trim();
     }
 
 
