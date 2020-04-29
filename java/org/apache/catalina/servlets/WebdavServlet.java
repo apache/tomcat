@@ -783,9 +783,7 @@ public class WebdavServlet extends DefaultServlet {
             // Removing any lock-null resource which would be present
             lockNullResources.remove(path);
         } else {
-            resp.sendError(WebdavStatus.SC_CONFLICT,
-                           WebdavStatus.getStatusText
-                           (WebdavStatus.SC_CONFLICT));
+            resp.sendError(WebdavStatus.SC_CONFLICT);
         }
     }
 
@@ -1189,8 +1187,7 @@ public class WebdavServlet extends DefaultServlet {
                                 XMLWriter.OPENING);
                         generatedXML
                             .writeText("HTTP/1.1 " + WebdavStatus.SC_LOCKED
-                                       + " " + WebdavStatus
-                                       .getStatusText(WebdavStatus.SC_LOCKED));
+                                       + " ");
                         generatedXML.writeElement("D", "status",
                                 XMLWriter.CLOSING);
 
@@ -1941,8 +1938,7 @@ public class WebdavServlet extends DefaultServlet {
             generatedXML.writeText(absoluteUri + toAppend);
             generatedXML.writeElement("D", "href", XMLWriter.CLOSING);
             generatedXML.writeElement("D", "status", XMLWriter.OPENING);
-            generatedXML.writeText("HTTP/1.1 " + errorCode + " "
-                    + WebdavStatus.getStatusText(errorCode));
+            generatedXML.writeText("HTTP/1.1 " + errorCode + " ");
             generatedXML.writeElement("D", "status", XMLWriter.CLOSING);
 
             generatedXML.writeElement("D", "response", XMLWriter.CLOSING);
@@ -2047,8 +2043,7 @@ public class WebdavServlet extends DefaultServlet {
             String contentType, String eTag) {
 
         generatedXML.writeElement("D", "response", XMLWriter.OPENING);
-        String status = "HTTP/1.1 " + WebdavStatus.SC_OK + " " +
-                WebdavStatus.getStatusText(WebdavStatus.SC_OK);
+        String status = "HTTP/1.1 " + WebdavStatus.SC_OK + " ";
 
         // Generating href element
         generatedXML.writeElement("D", "href", XMLWriter.OPENING);
@@ -2243,8 +2238,7 @@ public class WebdavServlet extends DefaultServlet {
 
             if (propertiesNotFoundList.hasMoreElements()) {
 
-                status = "HTTP/1.1 " + WebdavStatus.SC_NOT_FOUND + " " +
-                        WebdavStatus.getStatusText(WebdavStatus.SC_NOT_FOUND);
+                status = "HTTP/1.1 " + WebdavStatus.SC_NOT_FOUND + " ";
 
                 generatedXML.writeElement("D", "propstat", XMLWriter.OPENING);
                 generatedXML.writeElement("D", "prop", XMLWriter.OPENING);
@@ -2528,19 +2522,6 @@ public class WebdavServlet extends DefaultServlet {
  */
 class WebdavStatus {
 
-
-    // ----------------------------------------------------- Instance Variables
-
-
-    /**
-     * This Hashtable contains the mapping of HTTP and WebDAV
-     * status codes to descriptive text.  This is a static
-     * variable.
-     */
-    private static final Hashtable<Integer,String> mapStatusCodes =
-            new Hashtable<>();
-
-
     // ------------------------------------------------------ HTTP Status Codes
 
 
@@ -2757,80 +2738,4 @@ class WebdavStatus {
      */
     public static final int SC_LOCKED = 423;
 
-
-    // ------------------------------------------------------------ Initializer
-
-
-    static {
-        // HTTP 1.0 status Code
-        addStatusCodeMap(SC_OK, "OK");
-        addStatusCodeMap(SC_CREATED, "Created");
-        addStatusCodeMap(SC_ACCEPTED, "Accepted");
-        addStatusCodeMap(SC_NO_CONTENT, "No Content");
-        addStatusCodeMap(SC_MOVED_PERMANENTLY, "Moved Permanently");
-        addStatusCodeMap(SC_MOVED_TEMPORARILY, "Moved Temporarily");
-        addStatusCodeMap(SC_NOT_MODIFIED, "Not Modified");
-        addStatusCodeMap(SC_BAD_REQUEST, "Bad Request");
-        addStatusCodeMap(SC_UNAUTHORIZED, "Unauthorized");
-        addStatusCodeMap(SC_FORBIDDEN, "Forbidden");
-        addStatusCodeMap(SC_NOT_FOUND, "Not Found");
-        addStatusCodeMap(SC_INTERNAL_SERVER_ERROR, "Internal Server Error");
-        addStatusCodeMap(SC_NOT_IMPLEMENTED, "Not Implemented");
-        addStatusCodeMap(SC_BAD_GATEWAY, "Bad Gateway");
-        addStatusCodeMap(SC_SERVICE_UNAVAILABLE, "Service Unavailable");
-        addStatusCodeMap(SC_CONTINUE, "Continue");
-        addStatusCodeMap(SC_METHOD_NOT_ALLOWED, "Method Not Allowed");
-        addStatusCodeMap(SC_CONFLICT, "Conflict");
-        addStatusCodeMap(SC_PRECONDITION_FAILED, "Precondition Failed");
-        addStatusCodeMap(SC_REQUEST_TOO_LONG, "Request Too Long");
-        addStatusCodeMap(SC_UNSUPPORTED_MEDIA_TYPE, "Unsupported Media Type");
-        // WebDav Status Codes
-        addStatusCodeMap(SC_MULTI_STATUS, "Multi-Status");
-        addStatusCodeMap(SC_UNPROCESSABLE_ENTITY, "Unprocessable Entity");
-        addStatusCodeMap(SC_INSUFFICIENT_SPACE_ON_RESOURCE,
-                         "Insufficient Space On Resource");
-        addStatusCodeMap(SC_METHOD_FAILURE, "Method Failure");
-        addStatusCodeMap(SC_LOCKED, "Locked");
-    }
-
-
-    // --------------------------------------------------------- Public Methods
-
-
-    /**
-     * Returns the HTTP status text for the HTTP or WebDav status code
-     * specified by looking it up in the static mapping.  This is a
-     * static function.
-     *
-     * @param   nHttpStatusCode [IN] HTTP or WebDAV status code
-     * @return  A string with a short descriptive phrase for the
-     *                  HTTP status code (e.g., "OK").
-     */
-    public static String getStatusText(int nHttpStatusCode) {
-        Integer intKey = Integer.valueOf(nHttpStatusCode);
-
-        if (!mapStatusCodes.containsKey(intKey)) {
-            return "";
-        } else {
-            return mapStatusCodes.get(intKey);
-        }
-    }
-
-
-    // -------------------------------------------------------- Private Methods
-
-
-    /**
-     * Adds a new status code -> status text mapping.  This is a static
-     * method because the mapping is a static variable.
-     *
-     * @param   nKey    [IN] HTTP or WebDAV status code
-     * @param   strVal  [IN] HTTP status text
-     */
-    private static void addStatusCodeMap(int nKey, String strVal) {
-        mapStatusCodes.put(Integer.valueOf(nKey), strVal);
-    }
-
 }
-
-
