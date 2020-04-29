@@ -106,6 +106,9 @@
         <bug>64386</bug>: WebdavServlet does not send "getlastmodified"
         property for resource collections. (michaelo)
       </add>
+      <update>
+        Remove reason phrase on WebDAV Multi-Status (207) response. (michaelo)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Coyote">
