@@ -100,6 +100,10 @@
         Add more descriptive error message in DefaultServlet for SC_NOT_FOUND.
         (michaelo)
       </add>
+      <add>
+        <bug>64386</bug>: WebdavServlet does not send "getlastmodified"
+        property for resource collections. (michaelo)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
