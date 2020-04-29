@@ -205,6 +205,10 @@
         Improve the quality and expand the coverage of the French translations
         provided with Apache Tomcat. (remm)
       </add>
+      <add>
+        Improve the quality of the Japanese translations provided with Apache
+        Tomcat. Includes contributions from Yoshy. (markt)
+      </add>
     </changelog>
   </subsection>
 </section>
