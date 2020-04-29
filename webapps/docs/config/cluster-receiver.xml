@@ -46,11 +46,9 @@
   </p>
 </section>
 
-<section name="Blocking vs Non-Blocking Receiver">
+<section name="Receiver">
   <p>
-  The receiver supports both a non blocking, <code>org.apache.catalina.tribes.transport.nio.NioReceiver</code>, and a
-  blocking, <code>org.apache.catalina.tribes.transport.bio.BioReceiver</code>. It is preferred to use the non blocking receiver
-  to be able to grow your cluster without running into thread starvation.<br/>
+  The receiver supports a non blocking <code>org.apache.catalina.tribes.transport.nio.NioReceiver</code> reciever.<br/>
   Using the non blocking receiver allows you to with a very limited thread count to serve a large number of messages.
   Usually the rule is to use 1 thread per node in the cluster for small clusters, and then depending on your message frequency
   and your hardware, you'll find an optimal number of threads peak out at a certain number.
@@ -61,11 +59,9 @@
   <subsection name="Common Attributes">
   <attributes>
     <attribute name="className" required="true">
-      The implementation of the receiver component. Two implementations available,
-      <code>org.apache.catalina.tribes.transport.nio.NioReceiver</code> and
-      <code>org.apache.catalina.tribes.transport.bio.BioReceiver</code>.<br/>
-      The <code>org.apache.catalina.tribes.transport.nio.NioReceiver</code> is the
-      preferred implementation
+      The implementation of the receiver component.
+      <code>org.apache.catalina.tribes.transport.nio.NioReceiver</code>
+      is provided by Tomcat.
     </attribute>
     <attribute name="address" required="false">
       The address (network interface) to listen for incoming traffic.
