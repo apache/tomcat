@@ -194,6 +194,10 @@
         Tomcat. Contributions provided by winsonzhao, ZhangJieWen and Lee
         Yazhou. (markt)
       </add>
+      <add>
+        Improve the quality and expand the coverage of the French translations
+        provided with Apache Tomcat. (remm)
+      </add>
     </changelog>
   </subsection>
 </section>
