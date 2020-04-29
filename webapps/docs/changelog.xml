@@ -167,6 +167,11 @@
         Refactor bulk addition to collections to use <code>addAll()</code>
         rather than a loop. Pull request provided by Lars Grefer. (markt)
       </scode>
+      <add>
+        Expand the coverage of the Chinese translations provided with Apache
+        Tomcat. Contributions provided by winsonzhao, ZhangJieWen and Lee
+        Yazhou. (markt)
+      </add>
     </changelog>
   </subsection>
 </section>
