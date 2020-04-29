@@ -147,6 +147,15 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Cluster">
+    <changelog>
+      <update>
+        Refactor Tribes BufferPool and add the
+        <code>org.apache.catalina.tribes.io.BufferPool.DEFAULT_POOL_SIZE</code>
+        system property to configure its size. (remm)
+      </update>
+    </changelog>
+  </subsection>
   <subsection name="Web applications">
     <changelog>
       <fix>
