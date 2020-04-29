@@ -168,6 +168,10 @@
         Refactor bulk addition to collections to use <code>addAll()</code>
         rather than a loop. Pull request provided by Lars Grefer. (markt)
       </scode>
+      <add>
+        Improve the quality and expand the coverage of the French translations
+        provided with Apache Tomcat. (remm)
+      </add>
     </changelog>
   </subsection>
 </section>
