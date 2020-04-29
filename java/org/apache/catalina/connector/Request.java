@@ -2975,6 +2975,11 @@ public class Request implements HttpServletRequest {
             try {
                 session = manager.findSession(requestedSessionId);
             } catch (IOException e) {
+                if (log.isDebugEnabled()) {
+                    log.debug(sm.getString("request.session.failed", requestedSessionId, e.getMessage()), e);
+                } else {
+                    log.info(sm.getString("request.session.failed", requestedSessionId, e.getMessage()));
+                }
                 session = null;
             }
             if ((session != null) && !session.isValid()) {
