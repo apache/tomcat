@@ -102,6 +102,10 @@
         <bug>64384</bug>: Fix multipart configuration ignoring some parameters
         in some cases. (schultz)
       </fix>
+      <add>
+        <bug>64386</bug>: WebdavServlet does not send "getlastmodified"
+        property for resource collections. (michaelo)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">

@@ -2088,6 +2088,8 @@ public class WebdavServlet extends DefaultServlet {
                     generatedXML.writeElement("D", "resourcetype", XMLWriter.NO_CONTENT);
                 }
             } else {
+                generatedXML.writeProperty("D", "getlastmodified",
+                        FastHttpDateFormat.formatDate(lastModified));
                 generatedXML.writeElement("D", "resourcetype", XMLWriter.OPENING);
                 generatedXML.writeElement("D", "collection", XMLWriter.NO_CONTENT);
                 generatedXML.writeElement("D", "resourcetype", XMLWriter.CLOSING);
