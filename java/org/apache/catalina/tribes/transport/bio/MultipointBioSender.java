@@ -30,6 +30,10 @@ import org.apache.catalina.tribes.io.XByteBuffer;
 import org.apache.catalina.tribes.transport.AbstractSender;
 import org.apache.catalina.tribes.transport.MultiPointSender;
 
+/**
+ * @deprecated This will be removed in Tomcat 10
+ */
+@Deprecated
 public class MultipointBioSender extends AbstractSender implements MultiPointSender {
     public MultipointBioSender() {
         // NO-OP

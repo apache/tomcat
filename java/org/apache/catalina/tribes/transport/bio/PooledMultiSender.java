@@ -25,6 +25,10 @@ import org.apache.catalina.tribes.transport.MultiPointSender;
 import org.apache.catalina.tribes.transport.PooledSender;
 import org.apache.catalina.tribes.util.StringManager;
 
+/**
+ * @deprecated This will be removed in Tomcat 10
+ */
+@Deprecated
 public class PooledMultiSender extends PooledSender {
 
     protected static final StringManager sm = StringManager.getManager(PooledMultiSender.class);

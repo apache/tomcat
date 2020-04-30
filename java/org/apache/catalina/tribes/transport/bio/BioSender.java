@@ -39,7 +39,9 @@ import org.apache.juli.logging.LogFactory;
  *
  * @author Peter Rossbach
  * @since 5.5.16
+ * @deprecated This will be removed in Tomcat 10
  */
+@Deprecated
 public class BioSender extends AbstractSender {
 
     private static final Log log = LogFactory.getLog(BioSender.class);
