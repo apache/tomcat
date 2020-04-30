@@ -216,6 +216,10 @@
         Refactor bulk addition to collections to use <code>addAll()</code>
         rather than a loop. Pull request provided by Lars Grefer. (markt)
       </scode>
+      <update>
+        Update the packaged version of the Tomcat Native Library to 1.2.24.
+        (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
