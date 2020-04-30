@@ -208,11 +208,15 @@
       <add>
         Improve the quality of the Japanese translations provided with Apache
         Tomcat. Includes contributions from Yoshy. (markt)
+      </add>
       <add>
         Improve the quality of the Germasn translations provided with Apache
         Tomcat. (markt)
       </add>
-      </add>
+      <update>
+        Update the packaged version of the Tomcat Native Library to 1.2.24.
+        (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
