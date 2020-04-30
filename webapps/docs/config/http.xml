@@ -1445,7 +1445,7 @@
                        Java Blocking Connector   Java Non Blocking Connector   APR/native Connector
                                  BIO                         NIO                       APR
     Classname              Http11Protocol             Http11NioProtocol         Http11AprProtocol
-    Tomcat Version           3.x onwards                 6.x onwards              5.5.x onwards
+    Tomcat Version            since 3.x                  since 6.0.x               since 5.5.x
     Support Polling              NO                          YES                       YES
     Polling Size                 N/A                   maxConnections             maxConnections
     Read Request Headers      Blocking                  Non Blocking                 Blocking
