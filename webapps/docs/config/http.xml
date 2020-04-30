@@ -1977,9 +1977,9 @@
       </tr>
       <tr>
         <th>Tomcat Version</th>
-        <td>6.x onwards</td>
-        <td>8.x onwards</td>
-        <td>5.5.x onwards</td>
+        <td>since 6.0.x</td>
+        <td>since 8.0.x</td>
+        <td>since 5.5.x</td>
       </tr>
       <tr>
         <th>Support Polling</th>
