@@ -130,16 +130,16 @@ public class TestIntrospectionUtils {
         Assert.assertEquals("abcvalue1xyz", IntrospectionUtils.replaceProperties(
                 "abc${normal}xyz", properties, null, null));
 
-        properties.setProperty("prop_with:colon", "value2");
+        properties.setProperty("prop_with:-colon", "value2");
         Assert.assertEquals("value2", IntrospectionUtils.replaceProperties(
-                "${prop_with:colon}", properties, null, null));
+                "${prop_with:-colon}", properties, null, null));
 
         Assert.assertEquals("value1", IntrospectionUtils.replaceProperties(
-                "${normal:default}", properties, null, null));
+                "${normal:-default}", properties, null, null));
 
         properties.remove("normal");
         Assert.assertEquals("default", IntrospectionUtils.replaceProperties(
-                "${normal:default}", properties, null, null));
+                "${normal:-default}", properties, null, null));
 
         Assert.assertEquals("abc${normal}xyz", IntrospectionUtils.replaceProperties(
                 "abc${normal}xyz", properties, null, null));

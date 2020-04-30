@@ -45,7 +45,7 @@
          <code>org.apache.tomcat.util.IntrospectionUtils.PropertySource</code>.
          Required to have a public constructor with no arguments.</p>
       <p>Use this to add a property source, that will be invoked when
-         <code>${parameter:default-value}</code> denoted parameters (with
+         <code>${parameter:-default-value}</code> denoted parameters (with
          optional default values) are found in the XML files that Tomcat
          parses.</p>
       <p>Property replacement from the specified property source on the JVM

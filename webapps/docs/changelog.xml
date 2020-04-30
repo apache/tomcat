@@ -109,6 +109,11 @@
       <update>
         Remove reason phrase on WebDAV Multi-Status (207) response. (michaelo)
       </update>
+      <fix>
+        <bug>64398</bug>: Change default value separator for property
+        replacement to <code>:-</code> due to possible conflicts. The
+        syntax is now <code>${name:-default}</code>. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

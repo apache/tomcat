@@ -268,9 +268,9 @@ public final class IntrospectionUtils {
                 String v = getProperty(n, staticProp, dynamicProp, classLoader);
                 if (v == null) {
                     // {name:default}
-                    int col = n.indexOf(':');
+                    int col = n.indexOf(":-");
                     if (col != -1) {
-                        String dV = n.substring(col+1);
+                        String dV = n.substring(col + 2);
                         n = n.substring(0, col);
                         v = getProperty(n, staticProp, dynamicProp, classLoader);
                         if (v == null) {
