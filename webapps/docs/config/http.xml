@@ -1175,7 +1175,8 @@
 
     <attribute name="keystoreType" required="false">
       <p>The type of keystore file to be used for the server certificate.
-      If not specified, the default value is "<code>JKS</code>".</p>
+      If not specified, the default value is "<code>JKS</code>". See the notes
+      on <a href="#Key_store_types">key store types</a> below.</p>
     </attribute>
 
     <attribute name="sessionCacheSize" required="false">
@@ -1283,7 +1284,8 @@
       <p>The type of key store used for the trust store. The default is the
       value of the <code>javax.net.ssl.trustStoreType</code> system property. If
       that property is null, the value of <code>keystoreType</code> is used as
-      the default.</p>
+      the default. See the notes on <a href="#Key_store_types">key store
+      types</a> below.</p>
      </attribute>
 
   </attributes>
@@ -1438,6 +1440,43 @@
   </subsection>
 
   </subsection>
+
+  <subsection name="Key store types">
+
+    <p>In addition to the standard key store types (JKS and PKCS12), most Java
+    runtimes support additional key store types such as Windows-ROOT,
+    Windows-My, DKS as well as hardware security modules. Generally, to use
+    these additional keystore types with a TLS Conector in Tomcat:</p>
+
+    <ul>
+      <li>Set the certificateKeystoreType and/or truststoreType Connector
+          attribute (as appropriate) to the necessary type</li>
+      <li>If a configuration file is required, set the certificateKeystoreFile
+          and/or truststoreFile Connector attribute (as appropriate) to point to
+          the file</li>
+      <li>If no configuration file is required then you will almost certainly
+          need to explicitly set the certificateKeystoreFile and/or
+          truststoreFile Connector attribute (as appropriate) to the empty
+          string ("")</li>
+      <li>If a password is required, set the certificateKeystorePassword and/or
+          truststorePassword Connector attribute (as appropriate) to the
+          required password</li>
+      <li>If no password is required then you will almost certainly need to
+          explicitly set the certificateKeystorePassword and/or
+          truststorePassword Connector attribute (as appropriate) to the empty
+          string ("")</li>
+    </ul>
+
+    <p>Variations in key store implementations, combined with the key store
+    manipulation Tomcat does in the background to allow interoperability between
+    JSSE and OpenSSL configuration styles, means that some keystores may need
+    slightly different configuration. Assitance is always available from the
+    <a href="http://tomcat.apache.org/lists.html#tomcat-users">Apache Tomcat
+    users mailing list</a>. We aim to document any key stores that vary from the
+    above advice here. Currently there are none we are aware of.</p>
+
+  </subsection>
+
   <subsection name="Connector Comparison">
 
     <p>Below is a small chart that shows how the connectors differ.</p>

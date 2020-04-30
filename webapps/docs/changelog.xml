@@ -178,6 +178,10 @@
         system property changing how the sequence <code>%5c</code> is
         interpretted in a URI. (markt)
       </fix>
+      <add>
+        Add a section to the TLS Connector documentation on different key store
+        types and how to configure them. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Other">
