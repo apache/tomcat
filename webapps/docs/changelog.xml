@@ -172,6 +172,10 @@
         Tomcat. Contributions provided by winsonzhao, ZhangJieWen and Lee
         Yazhou. (markt)
       </add>
+      <update>
+        Update the packaged version of the Tomcat Native Library to 1.2.24.
+        (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
