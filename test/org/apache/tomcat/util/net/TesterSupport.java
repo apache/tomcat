@@ -216,6 +216,12 @@ public final class TesterSupport {
         File keystoreFile = new File(keystore);
         KeyStore ks = KeyStore.getInstance("JKS");
         try (InputStream is = new FileInputStream(keystoreFile)) {
+            /*
+             * the JKS_PASS is constant value, we commend set it in other file and load from the other file
+             * or just use the default type.
+             * KeyStore ks = KeyStore.getInstance(KeyStore.getDefaultType());
+             * char[] password = getPassword();// the method should implemented
+             */
             ks.load(is, JKS_PASS.toCharArray());
         }
         return ks;
