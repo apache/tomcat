@@ -59,6 +59,11 @@ public class Import {
 
         for (Object objKey : objKeys) {
             String key = (String) objKey;
+            String value = props.getProperty(key);
+            // Skip untranslated values
+            if (value.trim().length() == 0) {
+                continue;
+            }
             CompositeKey cKey = new CompositeKey(key);
 
             if (!cKey.pkg.equals(currentPkg)) {
@@ -77,7 +82,7 @@ public class Import {
                 w.write(System.lineSeparator());
             }
 
-            w.write(cKey.key + "=" + Utils.formatValue(props.getProperty(key)));
+            w.write(cKey.key + "=" + Utils.formatValue(value));
             w.write(System.lineSeparator());
         }
         if (w != null) {
