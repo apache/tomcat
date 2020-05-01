@@ -21,7 +21,6 @@ package org.apache.tomcat.util.modeler;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Iterator;
 
 import javax.management.Attribute;
 import javax.management.AttributeChangeNotification;

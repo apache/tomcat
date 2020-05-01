@@ -30,8 +30,8 @@
     String[] items = cart.getItems();
     for (String item : items) {
 %>
-    <li> <% out.print(util.HTMLFilter.filter(item)); %>
-            <%
+<li> <% out.print(util.HTMLFilter.filter(item)); %>
+<%
     }
 %>
 </ol>

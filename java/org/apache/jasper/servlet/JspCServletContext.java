@@ -451,8 +451,7 @@ public class JspCServletContext implements ServletContext {
                         File testFile = new File(basePath + File.separator + theFile);
                         if (testFile.isFile()) {
                             thePaths.add(path + theFile);
-                        }
-                        else if (testFile.isDirectory()) {
+                        } else if (testFile.isDirectory()) {
                             thePaths.add(path + theFile + "/");
                         }
                     }

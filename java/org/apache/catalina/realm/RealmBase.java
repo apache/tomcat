@@ -565,11 +565,11 @@ public abstract class RealmBase extends LifecycleMBeanBase implements org.apache
         int i;
         boolean found = false;
         for (i = 0; i < constraints.length; i++) {
-            SecurityCollection [] collection = constraints[i].findCollections();
+            SecurityCollection[] collections = constraints[i].findCollections();
 
             // If collection is null, continue to avoid an NPE
             // See Bugzilla 30624
-            if ( collection == null) {
+            if (collections == null) {
                 continue;
             }
 
@@ -579,7 +579,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements org.apache
                     constraints[i].included(uri, method));
             }
 
-            for (SecurityCollection securityCollection : collection) {
+            for (SecurityCollection securityCollection : collections) {
                 String[] patterns = securityCollection.findPatterns();
 
                 // If patterns is null, continue to avoid an NPE
@@ -642,12 +642,9 @@ public abstract class RealmBase extends LifecycleMBeanBase implements org.apache
                         if (pattern.length() == 2) {
                             matched = true;
                             length = pattern.length();
-                        }
-                        else if (pattern.regionMatches(0, uri, 0,
-                                pattern.length() - 1) ||
+                        } else if (pattern.regionMatches(0, uri, 0, pattern.length() - 1) ||
                                 (pattern.length() - 2 == uri.length() &&
-                                        pattern.regionMatches(0, uri, 0,
-                                                pattern.length() - 2))) {
+                                        pattern.regionMatches(0, uri, 0, pattern.length() - 2))) {
                             matched = true;
                             length = pattern.length();
                         }
@@ -845,29 +842,32 @@ public abstract class RealmBase extends LifecycleMBeanBase implements org.apache
             else if (roles.length == 0 && !constraint.getAllRoles() &&
                     !constraint.getAuthenticatedUsers()) {
                 if (constraint.getAuthConstraint()) {
-                    if (log.isDebugEnabled())
+                    if (log.isDebugEnabled()) {
                         log.debug("No roles");
+                    }
                     status = false; // No listed roles means no access at all
                     denyfromall = true;
                     break;
                 }
 
-                if (log.isDebugEnabled())
+                if (log.isDebugEnabled()) {
                     log.debug("Passing all access");
+                }
                 status = true;
-            }
-            else if (principal == null) {
-                if (log.isDebugEnabled())
+            } else if (principal == null) {
+                if (log.isDebugEnabled()) {
                     log.debug("  No user authenticated, cannot grant access");
+                }
             } else {
                 for (String role : roles) {
                     if (hasRole(request.getWrapper(), principal, role)) {
                         status = true;
-                        if (log.isDebugEnabled())
+                        if (log.isDebugEnabled()) {
                             log.debug("Role found:  " + role);
-                    }
-                    else if (log.isDebugEnabled())
+                        }
+                    } else if (log.isDebugEnabled()) {
                         log.debug("No role found:  " + role);
+                    }
                 }
             }
         }

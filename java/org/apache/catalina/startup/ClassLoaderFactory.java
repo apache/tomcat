@@ -85,14 +85,15 @@ public final class ClassLoaderFactory {
 
         // Add unpacked directories
         if (unpacked != null) {
-            for (File value : unpacked) {
-                File file = value;
-                if (!file.canRead())
+            for (File file : unpacked) {
+                if (!file.canRead()) {
                     continue;
+                }
                 file = new File(file.getCanonicalPath() + File.separator);
                 URL url = file.toURI().toURL();
-                if (log.isDebugEnabled())
+                if (log.isDebugEnabled()) {
                     log.debug("  Including directory " + url);
+                }
                 set.add(url);
             }
         }
@@ -100,19 +101,22 @@ public final class ClassLoaderFactory {
         // Add packed directory JAR files
         if (packed != null) {
             for (File directory : packed) {
-                if (!directory.isDirectory() || !directory.canRead())
+                if (!directory.isDirectory() || !directory.canRead()) {
                     continue;
+                }
                 String filenames[] = directory.list();
                 if (filenames == null) {
                     continue;
                 }
                 for (String s : filenames) {
                     String filename = s.toLowerCase(Locale.ENGLISH);
-                    if (!filename.endsWith(".jar"))
+                    if (!filename.endsWith(".jar")) {
                         continue;
+                    }
                     File file = new File(directory, s);
-                    if (log.isDebugEnabled())
+                    if (log.isDebugEnabled()) {
                         log.debug("  Including jar file " + file.getAbsolutePath());
+                    }
                     URL url = file.toURI().toURL();
                     set.add(url);
                 }
@@ -125,10 +129,11 @@ public final class ClassLoaderFactory {
                 new PrivilegedAction<URLClassLoader>() {
                     @Override
                     public URLClassLoader run() {
-                        if (parent == null)
+                        if (parent == null) {
                             return new URLClassLoader(array);
-                        else
+                        } else {
                             return new URLClassLoader(array, parent);
+                        }
                     }
                 });
     }

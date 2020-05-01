@@ -626,8 +626,7 @@ public class DelegatingConnection<C extends Connection> extends AbandonedTrace i
                     } catch (Exception e) {
                         thrownList.add(e);
                     }
-                }
-                else if (trace instanceof ResultSet) {
+                } else if (trace instanceof ResultSet) {
                     // DBCP-265: Need to close the result sets that are
                     // generated via DatabaseMetaData
                     try {

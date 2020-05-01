@@ -2731,8 +2731,7 @@ class Generator {
                             if (varName == null) {
                                 varName = n.getTagData().getAttributeString(
                                         tagVarInfo.getNameFromAttribute());
-                            }
-                            else if (tagVarInfo.getNameFromAttribute() != null) {
+                            } else if (tagVarInfo.getNameFromAttribute() != null) {
                                 // alias
                                 continue;
                             }
@@ -2804,8 +2803,7 @@ class Generator {
                     if (varName == null) {
                         varName = n.getTagData().getAttributeString(
                                 tagVarInfo.getNameFromAttribute());
-                    }
-                    else if (tagVarInfo.getNameFromAttribute() != null) {
+                    } else if (tagVarInfo.getNameFromAttribute() != null) {
                         // alias
                         continue;
                     }
@@ -2875,8 +2873,7 @@ class Generator {
                     if (varName == null) {
                         varName = n.getTagData().getAttributeString(
                                 tagVarInfo.getNameFromAttribute());
-                    }
-                    else if (tagVarInfo.getNameFromAttribute() != null) {
+                    } else if (tagVarInfo.getNameFromAttribute() != null) {
                         // alias
                         continue;
                     }
@@ -2929,8 +2926,7 @@ class Generator {
                         if (name == null) {
                             name = n.getTagData().getAttributeString(
                                     tagVarInfo.getNameFromAttribute());
-                        }
-                        else if (tagVarInfo.getNameFromAttribute() != null) {
+                        } else if (tagVarInfo.getNameFromAttribute() != null) {
                             // alias
                             continue;
                         }

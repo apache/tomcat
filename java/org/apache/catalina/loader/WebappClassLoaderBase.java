@@ -2024,8 +2024,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
                                 log.error(sm.getString(
                                         "webappClassLoader.checkThreadLocalsForLeaks",
                                         args));
-                            }
-                            else if (value == null) {
+                            } else if (value == null) {
                                 if (log.isDebugEnabled()) {
                                     log.debug(sm.getString(
                                             "webappClassLoader.checkThreadLocalsForLeaksNull",

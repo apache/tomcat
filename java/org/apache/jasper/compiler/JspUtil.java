@@ -165,16 +165,16 @@ public class JspUtil {
          */
         String missingAttribute = null;
 
-        for (ValidAttribute value : validAttributes) {
+        for (ValidAttribute validAttribute : validAttributes) {
             int attrPos;
-            if (value.mandatory) {
-                attrPos = temp.indexOf(value.name);
+            if (validAttribute.mandatory) {
+                attrPos = temp.indexOf(validAttribute.name);
                 if (attrPos != -1) {
                     temp.remove(attrPos);
                     valid = true;
                 } else {
                     valid = false;
-                    missingAttribute = value.name;
+                    missingAttribute = validAttribute.name;
                     break;
                 }
             }
