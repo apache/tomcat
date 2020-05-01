@@ -1517,9 +1517,9 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
         public void addElement(CharArrayWriter buf, Date date, Request request,
                 Response response, long time) {
             String value = "-";
-            Cookie[] c = request.getCookies();
-            if (c != null) {
-                for (Cookie cookie : c) {
+            Cookie[] cookies = request.getCookies();
+            if (cookies != null) {
+                for (Cookie cookie : cookies) {
                     if (header.equals(cookie.getName())) {
                         value = cookie.getValue();
                         break;

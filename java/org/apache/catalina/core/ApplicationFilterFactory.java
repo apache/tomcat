@@ -100,14 +100,14 @@ public final class ApplicationFilterFactory {
         String servletName = wrapper.getName();
 
         // Add the relevant path-mapped filters to this filter chain
-        for (FilterMap map : filterMaps) {
-            if (!matchDispatcher(map, dispatcher)) {
+        for (FilterMap filterMap : filterMaps) {
+            if (!matchDispatcher(filterMap, dispatcher)) {
                 continue;
             }
-            if (!matchFiltersURL(map, requestPath))
+            if (!matchFiltersURL(filterMap, requestPath))
                 continue;
             ApplicationFilterConfig filterConfig = (ApplicationFilterConfig)
-                    context.findFilterConfig(map.getFilterName());
+                    context.findFilterConfig(filterMap.getFilterName());
             if (filterConfig == null) {
                 // FIXME - log configuration problem
                 continue;

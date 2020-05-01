@@ -235,24 +235,18 @@ public class Catalina {
             if (isConfig) {
                 configFile = arg;
                 isConfig = false;
-            }
-            else if (arg.equals("-config")) {
+            } else if (arg.equals("-config")) {
                 isConfig = true;
-            }
-            else if (arg.equals("-nonaming")) {
+            } else if (arg.equals("-nonaming")) {
                 setUseNaming(false);
-            }
-            else if (arg.equals("-help")) {
+            } else if (arg.equals("-help")) {
                 usage();
                 return false;
-            }
-            else if (arg.equals("start")) {
+            } else if (arg.equals("start")) {
                 // NOOP
-            }
-            else if (arg.equals("configtest")) {
+            } else if (arg.equals("configtest")) {
                 // NOOP
-            }
-            else if (arg.equals("stop")) {
+            } else if (arg.equals("stop")) {
                 // NOOP
             } else {
                 usage();

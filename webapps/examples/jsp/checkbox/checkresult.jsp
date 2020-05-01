@@ -31,10 +31,10 @@ The checked fruits (got using request) are: <br>
     if (fruits != null) {
         for (String fruit : fruits) {
 %>
-    <li>
-            <%
-          out.println (util.HTMLFilter.filter(fruit));
-      }
+<li>
+<%
+            out.println (util.HTMLFilter.filter(fruit));
+        }
     } else out.println ("none selected");
 %>
 </ul>
@@ -51,11 +51,13 @@ The checked fruits (got using beans) are <br>
     if (!fruits[0].equals("1")) {
         for (String fruit : fruits) {
 %>
-    <li>
-            <%
-          out.println (util.HTMLFilter.filter(fruit));
-      }
-    } else out.println ("none selected");
+<li>
+<%
+            out.println (util.HTMLFilter.filter(fruit));
+        }
+    } else {
+        out.println ("none selected");
+    }
 %>
 </ul>
 </font>

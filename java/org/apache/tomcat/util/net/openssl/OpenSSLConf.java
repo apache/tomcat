@@ -70,8 +70,7 @@ public class OpenSSLConf implements Serializable {
                 log.error(sm.getString("opensslconf.failedCommand", name, value,
                         Integer.toString(rc)));
                 result = false;
-            }
-            else if (log.isDebugEnabled()) {
+            } else if (log.isDebugEnabled()) {
                 log.debug(sm.getString("opensslconf.resultCommand", name, value,
                         Integer.toString(rc)));
             }
@@ -111,8 +110,7 @@ public class OpenSSLConf implements Serializable {
                 log.error(sm.getString("opensslconf.failedCommand", name, value,
                         Integer.toString(rc)));
                 result = false;
-            }
-            else if (log.isDebugEnabled()) {
+            } else if (log.isDebugEnabled()) {
                 log.debug(sm.getString("opensslconf.resultCommand", name, value,
                         Integer.toString(rc)));
             }

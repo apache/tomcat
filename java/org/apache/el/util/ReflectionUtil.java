@@ -431,11 +431,11 @@ public class ReflectionUtil {
                         (jreCompat.canAcccess(base, m) || base != null && jreCompat.canAcccess(null, m)))) {
             return m;
         }
-        Class<?>[] inf = type.getInterfaces();
+        Class<?>[] interfaces = type.getInterfaces();
         Method mp = null;
-        for (Class<?> aClass : inf) {
+        for (Class<?> iface : interfaces) {
             try {
-                mp = aClass.getMethod(m.getName(), m.getParameterTypes());
+                mp = iface.getMethod(m.getName(), m.getParameterTypes());
                 mp = getMethod(mp.getDeclaringClass(), base, mp);
                 if (mp != null) {
                     return mp;

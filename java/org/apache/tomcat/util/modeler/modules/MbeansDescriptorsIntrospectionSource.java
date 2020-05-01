@@ -225,8 +225,7 @@ public class MbeansDescriptorsIntrospectionSource extends ModelerSource
                 getAttMap.put(name, method);
                 // just a marker, we don't use the value
                 attMap.put(name, method);
-            }
-            else if (name.startsWith("is") && params.length == 0) {
+            } else if (name.startsWith("is") && params.length == 0) {
                 Class<?> ret = method.getReturnType();
                 if (Boolean.TYPE != ret) {
                     if (log.isDebugEnabled()) {
@@ -240,8 +239,7 @@ public class MbeansDescriptorsIntrospectionSource extends ModelerSource
                 // just a marker, we don't use the value
                 attMap.put(name, method);
 
-            }
-            else if (name.startsWith("set") && params.length == 1) {
+            } else if (name.startsWith("set") && params.length == 1) {
                 if (!supportedType(params[0])) {
                     if (log.isDebugEnabled()) {
                         log.debug("Unsupported type " + method + " " + params[0]);

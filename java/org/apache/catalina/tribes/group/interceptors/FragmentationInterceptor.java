@@ -208,7 +208,9 @@ public class FragmentationInterceptor extends ChannelInterceptorBase implements 
         public ChannelMessage assemble() {
             if ( !complete() ) throw new IllegalStateException(sm.getString("fragmentationInterceptor.fragments.missing"));
             int buffersize = 0;
-            for (XByteBuffer xByteBuffer : frags) buffersize += xByteBuffer.getLength();
+            for (XByteBuffer frag : frags) {
+                buffersize += frag.getLength();
+            }
             XByteBuffer buf = new XByteBuffer(buffersize,false);
             msg.setMessage(buf);
             for (XByteBuffer frag : frags) {
