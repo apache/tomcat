@@ -196,21 +196,25 @@ public class ReplicatedContext extends StandardContext implements MapOwner {
     }
 
     protected static class MultiEnumeration<T> implements Enumeration<T> {
-        Enumeration<T>[] e=null;
-        public MultiEnumeration(Enumeration<T>[] lists) {
-            e = lists;
+        private final Enumeration<T>[] enumerations;
+        public MultiEnumeration(Enumeration<T>[] enumerations) {
+            this.enumerations = enumerations;
         }
         @Override
         public boolean hasMoreElements() {
-            for (Enumeration<T> tEnumeration : e) {
-                if (tEnumeration.hasMoreElements()) return true;
+            for (Enumeration<T> enumeration : enumerations) {
+                if (enumeration.hasMoreElements()) {
+                    return true;
+                }
             }
             return false;
         }
         @Override
         public T nextElement() {
-            for (Enumeration<T> tEnumeration : e) {
-                if (tEnumeration.hasMoreElements()) return tEnumeration.nextElement();
+            for (Enumeration<T> enumeration : enumerations) {
+                if (enumeration.hasMoreElements()) {
+                    return enumeration.nextElement();
+                }
             }
             return null;
 
@@ -221,6 +225,4 @@ public class ReplicatedContext extends StandardContext implements MapOwner {
     public void objectMadePrimay(Object key, Object value) {
         //noop
     }
-
-
 }

@@ -269,12 +269,11 @@ public class ImplicitObjectELResolver extends ELResolver {
                 this.cookie = new ScopeMap<Cookie>() {
                     @Override
                     protected Enumeration<String> getAttributeNames() {
-                        Cookie[] c = ((HttpServletRequest) page.getRequest())
-                                .getCookies();
-                        if (c != null) {
+                        Cookie[] cookies = ((HttpServletRequest) page.getRequest()).getCookies();
+                        if (cookies != null) {
                             Vector<String> v = new Vector<String>();
-                            for (Cookie value : c) {
-                                v.add(value.getName());
+                            for (Cookie cookie : cookies) {
+                                v.add(cookie.getName());
                             }
                             return v.elements();
                         }
@@ -283,12 +282,11 @@ public class ImplicitObjectELResolver extends ELResolver {
 
                     @Override
                     protected Cookie getAttribute(String name) {
-                        Cookie[] c = ((HttpServletRequest) page.getRequest())
-                                .getCookies();
-                        if (c != null) {
-                            for (Cookie value : c) {
-                                if (name.equals(value.getName())) {
-                                    return value;
+                        Cookie[] cookies = ((HttpServletRequest) page.getRequest()).getCookies();
+                        if (cookies != null) {
+                            for (Cookie cookie : cookies) {
+                                if (name.equals(cookie.getName())) {
+                                    return cookie;
                                 }
                             }
                         }

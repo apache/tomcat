@@ -23,9 +23,9 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.URLEncoder;
 import java.text.MessageFormat;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.Arrays;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -281,33 +281,22 @@ public final class HTMLHostManagerServlet extends HostManagerServlet {
         writer.print(MessageFormat.format(HOSTS_HEADER_SECTION, args));
 
         // Hosts Row Section
-        // Create sorted map of host names.
+        // Create sorted set of host names.
         Container[] children = engine.findChildren();
         String hostNames[] = new String[children.length];
-        for (int i = 0; i < children.length; i++)
+        for (int i = 0; i < children.length; i++) {
             hostNames[i] = children[i].getName();
-
-        TreeMap<String,String> sortedHostNamesMap =
-            new TreeMap<String,String>();
-
-        for (String displayPath : hostNames) {
-            sortedHostNamesMap.put(displayPath, displayPath);
         }
 
-        String hostsStart =
-            smClient.getString("htmlHostManagerServlet.hostsStart");
-        String hostsStop =
-            smClient.getString("htmlHostManagerServlet.hostsStop");
-        String hostsRemove =
-            smClient.getString("htmlHostManagerServlet.hostsRemove");
-        String hostThis =
-            smClient.getString("htmlHostManagerServlet.hostThis");
+        SortedSet<String> sortedHostNames = new TreeSet<String>();
+        sortedHostNames.addAll(Arrays.asList(hostNames));
 
-        Iterator<Map.Entry<String,String>> iterator =
-            sortedHostNamesMap.entrySet().iterator();
-        while (iterator.hasNext()) {
-            Map.Entry<String,String> entry = iterator.next();
-            String hostName = entry.getKey();
+        String hostsStart = smClient.getString("htmlHostManagerServlet.hostsStart");
+        String hostsStop = smClient.getString("htmlHostManagerServlet.hostsStop");
+        String hostsRemove = smClient.getString("htmlHostManagerServlet.hostsRemove");
+        String hostThis = smClient.getString("htmlHostManagerServlet.hostThis");
+
+        for (String hostName : sortedHostNames) {
             Host host = (Host) engine.findChild(hostName);
 
             if (host != null ) {

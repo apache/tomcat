@@ -123,8 +123,8 @@ public class TestUdpPackages {
                 }
             };
         }
-        for (Thread value : threads) {
-            value.start();
+        for (Thread thread : threads) {
+            thread.start();
         }
         for (Thread thread : threads) {
             thread.join();
@@ -176,8 +176,8 @@ public class TestUdpPackages {
                 }
             };
         }
-        for (Thread value : threads) {
-            value.start();
+        for (Thread thread : threads) {
+            thread.start();
         }
         for (Thread thread : threads) {
             thread.join();
