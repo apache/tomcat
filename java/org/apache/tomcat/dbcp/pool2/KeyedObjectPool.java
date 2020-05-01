@@ -18,7 +18,6 @@ package org.apache.tomcat.dbcp.pool2;
 
 import java.io.Closeable;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 /**

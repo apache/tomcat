@@ -167,12 +167,12 @@ public class TagAttributeInfo {
      * Convenience static method that goes through an array of TagAttributeInfo
      * objects and looks for "id".
      *
-     * @param a
+     * @param tagAttributeInfos
      *            An array of TagAttributeInfo
      * @return The TagAttributeInfo reference with name "id"
      */
-    public static TagAttributeInfo getIdAttribute(TagAttributeInfo a[]) {
-        for (TagAttributeInfo tagAttributeInfo : a) {
+    public static TagAttributeInfo getIdAttribute(TagAttributeInfo[] tagAttributeInfos) {
+        for (TagAttributeInfo tagAttributeInfo : tagAttributeInfos) {
             if (tagAttributeInfo.getName().equals(ID)) {
                 return tagAttributeInfo;
             }

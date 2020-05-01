@@ -73,7 +73,7 @@ public class TestDomainFilterInterceptor {
             };
             threads[i] = t;
         }
-        for (Thread value : threads) value.start();
+        for (Thread thread : threads) thread.start();
         for (Thread thread : threads) thread.join();
         System.out.println("All channels started.");
         for (int i=listeners.length-1; i>=0; i-- ) {

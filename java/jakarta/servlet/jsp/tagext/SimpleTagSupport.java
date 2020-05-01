@@ -193,8 +193,7 @@ public class SimpleTagSupport implements SimpleTag {
             JspTag parent = null;
             if( from instanceof SimpleTag ) {
                 parent = ((SimpleTag)from).getParent();
-            }
-            else if( from instanceof Tag ) {
+            } else if( from instanceof Tag ) {
                 parent = ((Tag)from).getParent();
             }
             if (parent == null) {

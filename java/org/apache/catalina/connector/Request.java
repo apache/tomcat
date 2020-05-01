@@ -1563,8 +1563,7 @@ public class Request implements HttpServletRequest {
             if (!(o instanceof ServletRequestAttributeListener)) {
                 continue;
             }
-            ServletRequestAttributeListener listener =
-                    (ServletRequestAttributeListener) o;
+            ServletRequestAttributeListener listener = (ServletRequestAttributeListener) o;
             try {
                 if (replaced) {
                     listener.attributeReplaced(event);
@@ -1600,8 +1599,7 @@ public class Request implements HttpServletRequest {
             if (!(o instanceof ServletRequestAttributeListener)) {
                 continue;
             }
-            ServletRequestAttributeListener listener =
-                    (ServletRequestAttributeListener) o;
+            ServletRequestAttributeListener listener = (ServletRequestAttributeListener) o;
             try {
                 listener.attributeRemoved(event);
             } catch (Throwable t) {

@@ -17,7 +17,6 @@
 package org.apache.catalina.tribes.demos;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.Properties;
 
 import org.apache.catalina.tribes.Channel;

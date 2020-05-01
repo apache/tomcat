@@ -77,8 +77,8 @@ public class TestDataIntegrity {
                 }
             };
         }
-        for (Thread value : threads) {
-            value.start();
+        for (Thread thread : threads) {
+            thread.start();
         }
         for (Thread thread : threads) {
             thread.join();
@@ -92,33 +92,33 @@ public class TestDataIntegrity {
 
     @Test
     public void testDataSendASYNCM() throws Exception {
-            System.err.println("Starting ASYNC MULTI THREAD");
-            Thread[] threads = new Thread[threadCount];
-            for (int x=0; x<threads.length; x++ ) {
-                threads[x] = new Thread() {
-                    @Override
-                    public void run() {
-                        try {
-                            long start = System.currentTimeMillis();
-                            for (int i = 0; i < msgCount; i++) channel1.send(new Member[] {channel2.getLocalMember(false)}, Data.createRandomData(),Channel.SEND_OPTIONS_ASYNCHRONOUS);
-                            System.out.println("Thread["+this.getName()+"] sent "+msgCount+" messages in "+(System.currentTimeMillis()-start)+" ms.");
-                        }catch ( Exception x ) {
-                            x.printStackTrace();
-                        }
+        System.err.println("Starting ASYNC MULTI THREAD");
+        Thread[] threads = new Thread[threadCount];
+        for (int x=0; x<threads.length; x++ ) {
+            threads[x] = new Thread() {
+                @Override
+                public void run() {
+                    try {
+                        long start = System.currentTimeMillis();
+                        for (int i = 0; i < msgCount; i++) channel1.send(new Member[] {channel2.getLocalMember(false)}, Data.createRandomData(),Channel.SEND_OPTIONS_ASYNCHRONOUS);
+                        System.out.println("Thread["+this.getName()+"] sent "+msgCount+" messages in "+(System.currentTimeMillis()-start)+" ms.");
+                    }catch ( Exception x ) {
+                        x.printStackTrace();
                     }
-                };
-            }
-        for (Thread value : threads) {
-            value.start();
+                }
+            };
+        }
+        for (Thread thread : threads) {
+            thread.start();
         }
         for (Thread thread : threads) {
             thread.join();
         }
-            //sleep for 50 sec, let the other messages in
-            long start = System.currentTimeMillis();
-            while ( (System.currentTimeMillis()-start)<25000 && msgCount*threadCount!=listener1.count) Thread.sleep(500);
-            System.err.println("Finished ASYNC MULTI THREAD ["+listener1.count+"]");
-            Assert.assertEquals("Checking success messages.",msgCount*threadCount,listener1.count);
+        //sleep for 50 sec, let the other messages in
+        long start = System.currentTimeMillis();
+        while ( (System.currentTimeMillis()-start)<25000 && msgCount*threadCount!=listener1.count) Thread.sleep(500);
+        System.err.println("Finished ASYNC MULTI THREAD ["+listener1.count+"]");
+        Assert.assertEquals("Checking success messages.",msgCount*threadCount,listener1.count);
     }
 
     @Test

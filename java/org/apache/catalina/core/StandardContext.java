@@ -4623,10 +4623,10 @@ public class StandardContext extends ContainerBase
             tldEvent = new ServletContextEvent(noPluggabilityServletContext);
         }
         for (Object instance : instances) {
-            if (!(instance instanceof ServletContextListener))
+            if (!(instance instanceof ServletContextListener)) {
                 continue;
-            ServletContextListener listener =
-                    (ServletContextListener) instance;
+            }
+            ServletContextListener listener = (ServletContextListener) instance;
             try {
                 fireContainerEvent("beforeContextInitialized", listener);
                 if (noPluggabilityListeners.contains(listener)) {
@@ -4638,9 +4638,8 @@ public class StandardContext extends ContainerBase
             } catch (Throwable t) {
                 ExceptionUtils.handleThrowable(t);
                 fireContainerEvent("afterContextInitialized", listener);
-                getLogger().error
-                        (sm.getString("standardContext.listenerStart",
-                                instance.getClass().getName()), t);
+                getLogger().error(sm.getString("standardContext.listenerStart",
+                        instance.getClass().getName()), t);
                 ok = false;
             }
         }
@@ -4803,8 +4802,9 @@ public class StandardContext extends ContainerBase
         for (Container child : children) {
             Wrapper wrapper = (Wrapper) child;
             int loadOnStartup = wrapper.getLoadOnStartup();
-            if (loadOnStartup < 0)
+            if (loadOnStartup < 0) {
                 continue;
+            }
             Integer key = Integer.valueOf(loadOnStartup);
             ArrayList<Wrapper> list = map.get(key);
             if (list == null) {
@@ -5842,12 +5842,13 @@ public class StandardContext extends ContainerBase
                     new ServletRequestEvent(getServletContext(), request);
 
             for (Object instance : instances) {
-                if (instance == null)
+                if (instance == null) {
                     continue;
-                if (!(instance instanceof ServletRequestListener))
+                }
+                if (!(instance instanceof ServletRequestListener)) {
                     continue;
-                ServletRequestListener listener =
-                        (ServletRequestListener) instance;
+                }
+                ServletRequestListener listener = (ServletRequestListener) instance;
 
                 try {
                     listener.requestInitialized(event);

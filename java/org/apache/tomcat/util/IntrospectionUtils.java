@@ -92,8 +92,7 @@ public final class IntrospectionUtils {
                             ok = false;
                         }
                         // Try a setFoo ( long )
-                    }
-                    else if ("java.lang.Long".equals(paramType.getName())
+                    } else if ("java.lang.Long".equals(paramType.getName())
                             || "long".equals(paramType.getName())) {
                         try {
                             params[0] = Long.valueOf(value);
@@ -102,14 +101,12 @@ public final class IntrospectionUtils {
                         }
 
                         // Try a setFoo ( boolean )
-                    }
-                    else if ("java.lang.Boolean".equals(paramType.getName())
+                    } else if ("java.lang.Boolean".equals(paramType.getName())
                             || "boolean".equals(paramType.getName())) {
                         params[0] = Boolean.valueOf(value);
 
                         // Try a setFoo ( InetAddress )
-                    }
-                    else if ("java.net.InetAddress".equals(paramType
+                    } else if ("java.net.InetAddress".equals(paramType
                             .getName())) {
                         try {
                             params[0] = InetAddress.getByName(value);

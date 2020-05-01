@@ -345,14 +345,11 @@ public final class ExtensionValidator {
                     continue;
                 }
                 for (File file : files) {
-                    if (file.getName().toLowerCase(Locale.ENGLISH).endsWith(".jar") &&
-                            file.isFile()) {
+                    if (file.getName().toLowerCase(Locale.ENGLISH).endsWith(".jar") && file.isFile()) {
                         try {
                             addSystemResource(file);
                         } catch (IOException e) {
-                            log.error
-                                    (sm.getString
-                                            ("extensionValidator.failload", file), e);
+                            log.error(sm.getString("extensionValidator.failload", file), e);
                         }
                     }
                 }
@@ -360,6 +357,4 @@ public final class ExtensionValidator {
         }
 
     }
-
-
 }
