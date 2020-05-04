@@ -202,6 +202,10 @@
         Improve the quality of the Japanese translations provided with Apache
         Tomcat. Includes contributions from Yoshy. (markt)
       </add>
+      <add>
+        Improve the coverage and quality of the Korean translations provided
+        with Apache Tomcat. (woonsan)
+      </add>
     </changelog>
   </subsection>
 </section>
