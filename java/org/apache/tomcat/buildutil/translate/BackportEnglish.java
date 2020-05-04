@@ -17,6 +17,8 @@
 package org.apache.tomcat.buildutil.translate;
 
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Generates a set of English property files to back-port updates to a previous
@@ -27,7 +29,17 @@ import java.io.IOException;
  */
 public class BackportEnglish extends BackportBase {
 
+    private static Set<String> keysToExclude = new HashSet<>();
+
+
     public static void main(String... args) throws IOException {
+        // Exclude keys known to be different between 9.0.x and 8.5.x
+        keysToExclude.add("java.org.apache.catalina.manager.zzz.htmlManagerServlet.deployPath");
+        keysToExclude.add("java.org.apache.catalina.mbeans.zzz.jmxRemoteLifecycleListener.deprecated");
+        keysToExclude.add("java.org.apache.catalina.startup.zzz.catalina.stopServer.connectException");
+        keysToExclude.add("java.org.apache.jasper.resources.zzz.jspc.webfrg.header");
+        keysToExclude.add("java.org.apache.jasper.resources.zzz.jspc.webxml.header");
+
         BackportEnglish backport = new BackportEnglish(args);
         backport.execute();
     }
@@ -41,7 +53,7 @@ public class BackportEnglish extends BackportBase {
     @Override
     protected void execute() throws IOException {
         for (Object key : sourceEnglish.keySet()) {
-            if (targetEnglish.containsKey(key)) {
+            if (targetEnglish.containsKey(key) && !keysToExclude.contains(key)) {
                 targetEnglish.put(key, sourceEnglish.get(key));
             }
         }
