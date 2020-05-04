@@ -230,6 +230,10 @@
         Refactor to use enhanced for loops where possible. Pull request by Lars
         Grefer. (markt)
       </scode>
+      <add>
+        Improve IDE support for IntelliJ IDEA. Patch provided by Lars Grefer.
+        (markt)
+      </add>
     </changelog>
   </subsection>
 </section>
