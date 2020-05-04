@@ -36,7 +36,10 @@ public class BackportEnglish extends BackportBase {
         // Exclude keys known to be different between 9.0.x and 8.5.x
         keysToExclude.add("java.org.apache.catalina.manager.zzz.htmlManagerServlet.deployPath");
         keysToExclude.add("java.org.apache.catalina.mbeans.zzz.jmxRemoteLifecycleListener.deprecated");
+        keysToExclude.add("java.org.apache.catalina.session.zzz.managerBase.contextNull");
         keysToExclude.add("java.org.apache.catalina.startup.zzz.catalina.stopServer.connectException");
+        keysToExclude.add("java.org.apache.jasper.resources.zzz.jsp.error.jsproot.version.invalid");
+        keysToExclude.add("java.org.apache.jasper.resources.zzz.jsp.tldCache.noTldInJar");
         keysToExclude.add("java.org.apache.jasper.resources.zzz.jspc.usage");
         keysToExclude.add("java.org.apache.jasper.resources.zzz.jspc.webfrg.header");
         keysToExclude.add("java.org.apache.jasper.resources.zzz.jspc.webxml.header");
