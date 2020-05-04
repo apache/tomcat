@@ -219,7 +219,7 @@
         Tomcat. Includes contributions from Yoshy. (markt)
       </add>
       <add>
-        Improve the quality of the Germasn translations provided with Apache
+        Improve the quality of the German translations provided with Apache
         Tomcat. (markt)
       </add>
       <update>
@@ -233,6 +233,10 @@
       <add>
         Improve IDE support for IntelliJ IDEA. Patch provided by Lars Grefer.
         (markt)
+      </add>
+      <add>
+        Improve the coverage and quality of the Korean translations provided
+        with Apache Tomcat. (woonsan)
       </add>
     </changelog>
   </subsection>
