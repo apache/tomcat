@@ -37,6 +37,7 @@ public class BackportEnglish extends BackportBase {
         keysToExclude.add("java.org.apache.catalina.manager.zzz.htmlManagerServlet.deployPath");
         keysToExclude.add("java.org.apache.catalina.mbeans.zzz.jmxRemoteLifecycleListener.deprecated");
         keysToExclude.add("java.org.apache.catalina.startup.zzz.catalina.stopServer.connectException");
+        keysToExclude.add("java.org.apache.jasper.resources.zzz.jspc.usage");
         keysToExclude.add("java.org.apache.jasper.resources.zzz.jspc.webfrg.header");
         keysToExclude.add("java.org.apache.jasper.resources.zzz.jspc.webxml.header");
 
