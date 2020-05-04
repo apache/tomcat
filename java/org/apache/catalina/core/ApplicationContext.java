@@ -1010,7 +1010,7 @@ public class ApplicationContext implements ServletContext {
         Connector[] connectors = service.findConnectors();
         // Need at least one SSL enabled connector to use the SSL session ID.
         for (Connector connector : connectors) {
-            if (Boolean.TRUE.equals(connector.getAttribute("SSLEnabled"))) {
+            if (Boolean.TRUE.equals(connector.getProperty("SSLEnabled"))) {
                 supportedSessionTrackingModes.add(SessionTrackingMode.SSL);
                 break;
             }
@@ -1278,7 +1278,7 @@ public class ApplicationContext implements ServletContext {
 
         Container[] wrappers = context.findChildren();
         for (Container wrapper : wrappers) {
-            result.put(((Wrapper) wrapper).getName(),
+            result.put(wrapper.getName(),
                     new ApplicationServletRegistration(
                             (Wrapper) wrapper, context));
         }
