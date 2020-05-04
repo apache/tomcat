@@ -198,6 +198,10 @@
         Improve IDE support for IntelliJ IDEA. Patch provided by Lars Grefer.
         (markt)
       </add>
+      <add>
+        Improve the quality of the Japanese translations provided with Apache
+        Tomcat. Includes contributions from Yoshy. (markt)
+      </add>
     </changelog>
   </subsection>
 </section>
