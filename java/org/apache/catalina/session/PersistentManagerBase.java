@@ -308,9 +308,9 @@ public abstract class PersistentManagerBase extends ManagerBase
      *
      * @param id The session id for the session to be searched for
      * @return {@code true}, if the session id is loaded in memory
-     *  otherwise {@code false} is returned
+     * otherwise {@code false} is returned
      */
-    public boolean isLoaded(String id){
+    public boolean isLoaded(String id) {
         try {
             if (super.findSession(id) != null) {
                 return true;
