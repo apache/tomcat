@@ -211,6 +211,9 @@
         Improve the coverage and quality of the Korean translations provided
         with Apache Tomcat. (woonsan)
       </add>
+      <update>
+        Update dependency on bnd to 5.0.1. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>

@@ -288,16 +288,16 @@ saaj-api.loc=${base-maven.loc}/javax/xml/soap/saaj-api/${saaj-api.version}/saaj-
 
 # ----- bnd & bndlib, version 4.0.0 or later  -----
 # ----- provides OSGI metadata for JARs       -----
-bnd.version=4.2.0
+bnd.version=5.0.1
 
-# checksums for biz.aQute.bnd-4.2.0.jar, biz.aQute.bndlib-4.2.0.jar
+# checksums for biz.aQute.bnd-5.0.1.jar, biz.aQute.bndlib-5.0.1.jar
 bnd.checksum.enabled=true
 bnd.checksum.algorithm=MD5|SHA-1
-bnd.checksum.value=ca26a671ea67bf75d83b1588bdd68923|d4bc96b2619f95e596bbf3f725f3b077e96c5d43
+bnd.checksum.value=42cb2f3bbb5556f0182131c6543f1579|67d8bb4f274e8ecfd8ebfcdeed3b328f7078b13b
 
 bndlib.checksum.enabled=true
 bndlib.checksum.algorithm=MD5|SHA-1
-bndlib.checksum.value=7519e890783ade99bb74608d0efbf8c4|c4fa30ac11cc0bf27b1f706ac8ebae8cec358e77
+bndlib.checksum.value=9d29031f80e3b94e3578fea75b45c8e6|aa13aef49a74fe0bd8bbcb016df124bab5d4064e
 
 bnd.home=${base.path}/bnd-${bnd.version}
 bnd.jar=${bnd.home}/biz.aQute.bnd-${bnd.version}.jar
