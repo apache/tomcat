@@ -439,10 +439,8 @@ public class ApplicationContext implements ServletContext {
             dispatchData.set(dd);
         }
 
-        MessageBytes uriMB = dd.uriMB;
-        uriMB.recycle();
-
         // Use the thread local mapping data
+        MessageBytes uriMB = dd.uriMB;
         MappingData mappingData = dd.mappingData;
 
         try {
@@ -472,7 +470,11 @@ public class ApplicationContext implements ServletContext {
         } finally {
             // Recycle thread local data at the end of the request so references
             // are not held to a completed request as there is potential for
-            // that to trigger a memory leak if a context is unloaded.
+            // that to trigger a memory leak if a context is unloaded. Not
+            // strictly necessary here for uriMB but it needs to be recycled at
+            // some point so do it here for consistency with mappingData which
+            // must be recycled here.
+            uriMB.recycle();
             mappingData.recycle();
         }
     }
