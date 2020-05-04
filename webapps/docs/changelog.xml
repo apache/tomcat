@@ -131,6 +131,11 @@
         keep-alive where the response has a non-2xx status code but the request
         body has been fully read. (rjung/markt)
       </fix>
+      <fix>
+        <bug>64403</bug>: Ensure that compressed HTTP/2 responses are not sent
+        with a content length header appropriate for the original, uncompressed
+        response. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
