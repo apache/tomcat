@@ -86,7 +86,7 @@ public class RewriteRule {
      * @return <code>null</code> if no rewrite took place
      */
     public CharSequence evaluate(CharSequence url, Resolver resolver) {
-        Pattern pattern = this.pattern.get();
+        Pattern pattern = RewriteRule.pattern.get();
         if (pattern == null) {
             // Parse the pattern
             int flags = 0;
@@ -94,7 +94,7 @@ public class RewriteRule {
                 flags |= Pattern.CASE_INSENSITIVE;
             }
             pattern = Pattern.compile(patternString, flags);
-            this.pattern.set(pattern);
+            RewriteRule.pattern.set(pattern);
         }
         Matcher matcher = pattern.matcher(url);
         // Use XOR
