@@ -37,6 +37,7 @@ import org.apache.catalina.Context;
 import org.apache.catalina.Wrapper;
 import org.apache.catalina.connector.Connector;
 import org.apache.catalina.startup.Tomcat;
+import org.apache.coyote.UpgradeProtocol;
 import org.apache.tomcat.util.compat.JrePlatform;
 import org.apache.tomcat.util.http.FastHttpDateFormat;
 
@@ -241,11 +242,15 @@ public class TestStreamProcessor extends Http2TestBase {
 
         // Enable compression for the LargeServlet
         Connector connector = tomcat.getConnector();
-        Assert.assertTrue(connector.setProperty("compression", "on"));
 
         tomcat.start();
 
         enableHttp2();
+        for (UpgradeProtocol protocol : connector.findUpgradeProtocols()) {
+            if (protocol instanceof Http2Protocol) {
+                ((Http2Protocol) protocol).setCompression("on");
+            }
+        }
         openClientConnection();
         doHttpUpgrade();
         sendClientPreface();
