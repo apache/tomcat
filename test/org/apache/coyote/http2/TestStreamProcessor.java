@@ -240,7 +240,7 @@ public class TestStreamProcessor extends Http2TestBase {
         Tomcat.addServlet(ctxt, "compression", new CompressionServlet());
         ctxt.addServletMappingDecoded("/compression", "compression");
 
-        // Enable compression for the LargeServlet
+        // Enable compression
         Connector connector = tomcat.getConnector();
 
         tomcat.start();
