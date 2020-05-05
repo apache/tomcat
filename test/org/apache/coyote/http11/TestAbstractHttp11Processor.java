@@ -25,13 +25,11 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.Reader;
-import java.io.StringReader;
 import java.io.Writer;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketAddress;
 import java.nio.CharBuffer;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -58,7 +56,6 @@ import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.buf.B2CConverter;
 import org.apache.tomcat.util.buf.ByteChunk;
-import org.apache.tomcat.util.http.parser.TokenList;
 
 public class TestAbstractHttp11Processor extends TomcatBaseTest {
 
@@ -1595,105 +1592,6 @@ public class TestAbstractHttp11Processor extends TomcatBaseTest {
         // Expected response is a 200 response.
         Assert.assertTrue(client.isResponse200());
         Assert.assertEquals("request.getServerName() is [] and request.getServerPort() is " + getPort(), client.getResponseBody());
-    }
-
-
-    @Test
-    public void testKeepAliveHeader01() throws Exception {
-        doTestKeepAliveHeader(false, 3000, 10);
-    }
-
-    @Test
-    public void testKeepAliveHeader02() throws Exception {
-        doTestKeepAliveHeader(true, 5000, 1);
-    }
-
-    @Test
-    public void testKeepAliveHeader03() throws Exception {
-        doTestKeepAliveHeader(true, 5000, 10);
-    }
-
-    @Test
-    public void testKeepAliveHeader04() throws Exception {
-        doTestKeepAliveHeader(true, -1, 10);
-    }
-
-    @Test
-    public void testKeepAliveHeader05() throws Exception {
-        doTestKeepAliveHeader(true, -1, 1);
-    }
-
-    @Test
-    public void testKeepAliveHeader06() throws Exception {
-        doTestKeepAliveHeader(true, -1, -1);
-    }
-
-    private void doTestKeepAliveHeader(boolean sendKeepAlive, int keepAliveTimeout,
-            int maxKeepAliveRequests) throws Exception {
-        Tomcat tomcat = getTomcatInstance();
-
-        tomcat.getConnector().setProperty("keepAliveTimeout", Integer.toString(keepAliveTimeout));
-        tomcat.getConnector().setProperty("maxKeepAliveRequests", Integer.toString(maxKeepAliveRequests));
-
-        // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
-
-        // Add servlet
-        Tomcat.addServlet(ctx, "TesterServlet", new TesterServlet());
-        ctx.addServletMapping("/foo", "TesterServlet");
-
-        tomcat.start();
-
-        String request =
-                "GET /foo HTTP/1.1" + SimpleHttpClient.CRLF +
-                "Host: localhost:" + getPort() + SimpleHttpClient.CRLF;
-
-        if (sendKeepAlive) {
-            request += "Connection: keep-alive" + SimpleHttpClient.CRLF;
-        }
-
-        request += SimpleHttpClient.CRLF;
-
-        Client client = new Client(tomcat.getConnector().getLocalPort());
-        client.setRequest(new String[] {request});
-
-        client.connect();
-        client.processRequest(false);
-
-        Assert.assertTrue(client.isResponse200());
-
-        String connectionHeaderValue = null;
-        String keepAliveHeaderValue = null;
-        for (String header : client.getResponseHeaders()) {
-            if (header.startsWith("Connection:")) {
-                connectionHeaderValue = header.substring(header.indexOf(':') + 1).trim();
-            }
-            if (header.startsWith("Keep-Alive:")) {
-                keepAliveHeaderValue = header.substring(header.indexOf(':') + 1).trim();
-            }
-        }
-
-        if (!sendKeepAlive || keepAliveTimeout < 0
-            && (maxKeepAliveRequests < 0 || maxKeepAliveRequests > 1)) {
-            Assert.assertNull(connectionHeaderValue);
-            Assert.assertNull(keepAliveHeaderValue);
-        } else {
-            List<String> connectionHeaders = new ArrayList<String>();
-            TokenList.parseTokenList(new StringReader(connectionHeaderValue), connectionHeaders);
-
-            if (sendKeepAlive && keepAliveTimeout > 0 &&
-                (maxKeepAliveRequests < 0 || maxKeepAliveRequests > 1)) {
-                Assert.assertEquals(1, connectionHeaders.size());
-                Assert.assertEquals("keep-alive", connectionHeaders.get(0));
-                Assert.assertEquals("timeout=" + keepAliveTimeout / 1000L, keepAliveHeaderValue);
-            }
-
-            if (sendKeepAlive && maxKeepAliveRequests == 1) {
-                Assert.assertEquals(1, connectionHeaders.size());
-                Assert.assertEquals("close", connectionHeaders.get(0));
-                Assert.assertNull(keepAliveHeaderValue);
-            }
-        }
     }
 
 
