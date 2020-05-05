@@ -322,36 +322,6 @@ public class Connector extends LifecycleMBeanBase  {
 
 
     /**
-     * Return a property from the protocol handler.
-     *
-     * @param name the property name
-     * @return the property value
-     *
-     * @deprecated Use {@link #getProperty(String)}. This will be removed in
-     *             Tomcat 10 onwards.
-     */
-    @Deprecated
-    public Object getAttribute(String name) {
-        return getProperty(name);
-    }
-
-
-    /**
-     * Set a property on the protocol handler.
-     *
-     * @param name the property name
-     * @param value the property value
-     *
-     * @deprecated Use {@link #setAttribute(String, Object)}. This will be
-     *             removed in Tomcat 10 onwards.
-     */
-    @Deprecated
-    public void setAttribute(String name, Object value) {
-        setProperty(name, String.valueOf(value));
-    }
-
-
-    /**
      * @return the <code>Service</code> with which we are associated (if any).
      */
     public Service getService() {
