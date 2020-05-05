@@ -114,6 +114,9 @@
         replacement to <code>:-</code> due to possible conflicts. The
         syntax is now <code>${name:-default}</code>. (remm)
       </fix>
+      <add>
+        Improve validation of storage location when using FileStore. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
