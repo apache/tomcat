@@ -31,7 +31,7 @@
   <module name="RegexpHeader">
     <property name="headerFile" value="${basedir}/res/checkstyle/header-al2.txt"/>
     <property name="multiLines" value="1, 2, 3, 4"/>
-    <property name="fileExtensions" value="java,xml,jsp,txt,sh,bat,properties"/>
+    <property name="fileExtensions" value="java,xml,jsp,txt,sh,bat,properties,yaml"/>
   </module>
 
   <!-- Whitespace -->
