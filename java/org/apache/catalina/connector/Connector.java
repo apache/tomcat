@@ -330,7 +330,7 @@ public class Connector extends LifecycleMBeanBase  {
      * @param name the property name
      * @param value the property value
      *
-     * @deprecated Use {@link #setAttribute(String, Object)}. This will be
+     * @deprecated Use {@link #setProperty(String, String)}. This will be
      *             removed in Tomcat 10 onwards.
      */
     @Deprecated
