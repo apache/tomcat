@@ -168,23 +168,8 @@ public class Http11Protocol extends AbstractHttp11JsseProtocol<Socket> {
                     proto.getAllowedTrailerHeadersAsSet(), proto.getMaxExtensionSize(),
                     proto.getMaxSwallowSize(), proto.getRelaxedPathChars(),
                     proto.getRelaxedQueryChars());
-            processor.setAdapter(proto.adapter);
-            processor.setMaxKeepAliveRequests(proto.getMaxKeepAliveRequests());
-            processor.setKeepAliveTimeout(proto.getKeepAliveTimeout());
-            processor.setConnectionUploadTimeout(proto.getConnectionUploadTimeout());
-            processor.setDisableUploadTimeout(proto.getDisableUploadTimeout());
-            processor.setCompressionMinSize(proto.getCompressionMinSize());
-            processor.setNoCompressionStrongETag(proto.getNoCompressionStrongETag());
-            processor.setCompression(proto.getCompression());
-            processor.setNoCompressionUserAgents(proto.getNoCompressionUserAgents());
-            processor.setCompressableMimeTypes(proto.getCompressableMimeTypes());
-            processor.setRestrictedUserAgents(proto.getRestrictedUserAgents());
-            processor.setSocketBuffer(proto.getSocketBuffer());
-            processor.setMaxSavePostSize(proto.getMaxSavePostSize());
-            processor.setServer(proto.getServer());
-            processor.setDisableKeepAlivePercentage(
-                    proto.getDisableKeepAlivePercentage());
-            processor.setMaxCookieCount(proto.getMaxCookieCount());
+            proto.configureProcessor(processor);
+            processor.setDisableKeepAlivePercentage(proto.getDisableKeepAlivePercentage());
             register(processor);
             return processor;
         }
