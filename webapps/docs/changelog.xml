@@ -179,7 +179,7 @@
         Correct the documentation web application to remove references to the
         <code>org.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH</code>
         system property changing how the sequence <code>%5c</code> is
-        interpretted in a URI. (markt)
+        interpreted in a URI. (markt)
       </fix>
       <add>
         Add a section to the TLS Connector documentation on different key store
@@ -204,7 +204,7 @@
         when using <code>catalina.sh</code>. (markt)
       </fix>
       <fix>
-        Depreacted the <code>LOGGING_CONFIG</code> environment variable and
+        Deprecated the <code>LOGGING_CONFIG</code> environment variable and
         replace it with the <code>CATALINA_LOGGING_CONFIG</code> environment
         variable to avoid clashes with other components that use
         <code>LOGGING_CONFIG</code>. (markt)
