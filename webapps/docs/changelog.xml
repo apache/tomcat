@@ -65,7 +65,7 @@
       <add>
         Log a warning if a <code>CredentialHandler</code> instance is added to
         an instance of the <code>CombinedRealm</code> (or a sub-class) as the
-        <code>CombinedRealm</code> doesn't use a configued
+        <code>CombinedRealm</code> doesn't use a configured
         <code>CredentialHandler</code> and it is likely that a configuration
         error has occurred. (markt)
       </add>
@@ -331,7 +331,7 @@
         Correct the documentation web application to remove references to the
         <code>org.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH</code>
         system property changing how the sequence <code>%5c</code> is
-        interpretted in a URI. (markt)
+        interpreted in a URI. (markt)
       </fix>
     </changelog>
   </subsection>
@@ -358,7 +358,7 @@
         Update the CXF module to Apache CXF 3.3.6. (remm)
       </update>
       <fix>
-        Depreacted the <code>LOGGING_CONFIG</code> environment variable and
+        Deprecated the <code>LOGGING_CONFIG</code> environment variable and
         replace it with the <code>CATALINA_LOGGING_CONFIG</code> environment
         variable to avoid clashes with other components that use
         <code>LOGGING_CONFIG</code>. (markt)
