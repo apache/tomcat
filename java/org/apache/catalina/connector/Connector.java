@@ -113,7 +113,7 @@ public class Connector extends LifecycleMBeanBase  {
     protected boolean enableLookups = false;
 
 
-    /*
+    /**
      * Is generation of X-Powered-By response header enabled/disabled?
      */
     protected boolean xpoweredBy = false;
@@ -263,6 +263,9 @@ public class Connector extends LifecycleMBeanBase  {
     protected String URIEncoding = null;
 
 
+    /**
+     * The behavior when an encoded solidus (slash) is submitted.
+     */
     private EncodedSolidusHandling encodedSolidusHandling = EncodedSolidusHandling.REJECT;
 
 
