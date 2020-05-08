@@ -245,7 +245,7 @@ public class SecureNio2Channel extends Nio2Channel  {
                         if (sslEngine instanceof SSLUtil.ProtocolInfo) {
                             socket.setNegotiatedProtocol(
                                     ((SSLUtil.ProtocolInfo) sslEngine).getNegotiatedProtocol());
-                        } else if (JreCompat.isJre9Available()) {
+                        } else if (JreCompat.isAlpnSupported()) {
                             socket.setNegotiatedProtocol(
                                     JreCompat.getInstance().getApplicationProtocol(sslEngine));
                         }

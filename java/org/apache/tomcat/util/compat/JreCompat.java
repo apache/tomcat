@@ -94,6 +94,11 @@ public class JreCompat {
 
     // Java 7 implementation of Java 9 methods
 
+    public static boolean isAlpnSupported() {
+        return isJre9Available() || (isJre8Available() && Jre8Compat.isAlpnSupported());
+    }
+
+
     public static boolean isJre9Available() {
         return jre9Available;
     }

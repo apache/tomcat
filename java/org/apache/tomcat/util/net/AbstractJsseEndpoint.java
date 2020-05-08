@@ -129,7 +129,7 @@ public abstract class AbstractJsseEndpoint<S> extends AbstractEndpoint<S> {
             JreCompat.getInstance().setUseServerCipherSuitesOrder(sslParameters, honorCipherOrder);
         }
 
-        if (JreCompat.isJre9Available() && clientRequestedApplicationProtocols != null
+        if (JreCompat.isAlpnSupported() && clientRequestedApplicationProtocols != null
                 && clientRequestedApplicationProtocols.size() > 0
                 && negotiableProtocols.size() > 0) {
             // Only try to negotiate if both client and server have at least

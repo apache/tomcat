@@ -24,6 +24,7 @@ import java.security.KeyStore.LoadStoreParameter;
 import java.util.Collections;
 import java.util.Map;
 
+import javax.net.ssl.SSLEngine;
 import javax.net.ssl.SSLParameters;
 
 import org.apache.juli.logging.Log;
@@ -39,6 +40,9 @@ class Jre8Compat extends JreCompat {
 
     private static final Method setUseCipherSuitesOrderMethod;
     private static final Constructor<?> domainLoadStoreParameterConstructor;
+
+    protected static final Method setApplicationProtocolsMethod;
+    protected static final Method getApplicationProtocolMethod;
 
 
     static {
@@ -71,6 +75,16 @@ class Jre8Compat extends JreCompat {
         }
         setUseCipherSuitesOrderMethod = m1;
         domainLoadStoreParameterConstructor = c2;
+        Method m2 = null;
+        Method m3 = null;
+        try {
+            m2 = SSLParameters.class.getMethod("setApplicationProtocols", String[].class);
+            m3 = SSLEngine.class.getMethod("getApplicationProtocol");
+        } catch (ReflectiveOperationException | IllegalArgumentException e) {
+            // Only the newest Java 8 have the ALPN API, so ignore
+        }
+        setApplicationProtocolsMethod = m2;
+        getApplicationProtocolMethod = m3;
     }
 
 
@@ -111,4 +125,38 @@ class Jre8Compat extends JreCompat {
     public int jarFileRuntimeMajorVersion() {
         return RUNTIME_MAJOR_VERSION;
     }
+
+    @Override
+    public void setApplicationProtocols(SSLParameters sslParameters, String[] protocols) {
+        if (setApplicationProtocolsMethod != null) {
+            try {
+                setApplicationProtocolsMethod.invoke(sslParameters, (Object) protocols);
+            } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+                throw new UnsupportedOperationException(e);
+            }
+        } else {
+            super.setApplicationProtocols(sslParameters, protocols);
+        }
+    }
+
+
+    @Override
+    public String getApplicationProtocol(SSLEngine sslEngine) {
+        if (getApplicationProtocolMethod != null) {
+            try {
+                return (String) getApplicationProtocolMethod.invoke(sslEngine);
+            } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+                throw new UnsupportedOperationException(e);
+            }
+        } else {
+            return super.getApplicationProtocol(sslEngine);
+        }
+    }
+
+
+    public static boolean isAlpnSupported() {
+        return setApplicationProtocolsMethod != null && getApplicationProtocolMethod != null;
+    }
+
+
 }
