@@ -31,9 +31,6 @@ import java.util.Set;
 import java.util.jar.JarFile;
 import java.util.zip.ZipFile;
 
-import javax.net.ssl.SSLEngine;
-import javax.net.ssl.SSLParameters;
-
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.res.StringManager;
@@ -44,8 +41,6 @@ class Jre9Compat extends JreCompat {
     private static final StringManager sm = StringManager.getManager(Jre9Compat.class);
 
     private static final Class<?> inaccessibleObjectExceptionClazz;
-    private static final Method setApplicationProtocolsMethod;
-    private static final Method getApplicationProtocolMethod;
     private static final Method setDefaultUseCachesMethod;
     private static final Method bootMethod;
     private static final Method configurationMethod;
@@ -64,8 +59,6 @@ class Jre9Compat extends JreCompat {
 
     static {
         Class<?> c1 = null;
-        Method m2 = null;
-        Method m3 = null;
         Method m4 = null;
         Method m5 = null;
         Method m6 = null;
@@ -96,8 +89,6 @@ class Jre9Compat extends JreCompat {
             Method runtimeVersionMethod = JarFile.class.getMethod("runtimeVersion");
             Method majorMethod = versionClazz.getMethod("major");
 
-            m2 = SSLParameters.class.getMethod("setApplicationProtocols", String[].class);
-            m3 = SSLEngine.class.getMethod("getApplicationProtocol");
             m4 = URLConnection.class.getMethod("setDefaultUseCaches", String.class, boolean.class);
             m5 = moduleLayerClazz.getMethod("boot");
             m6 = moduleLayerClazz.getMethod("configuration");
@@ -129,8 +120,6 @@ class Jre9Compat extends JreCompat {
         }
 
         inaccessibleObjectExceptionClazz = c1;
-        setApplicationProtocolsMethod = m2;
-        getApplicationProtocolMethod = m3;
         setDefaultUseCachesMethod = m4;
         bootMethod = m5;
         configurationMethod = m6;
@@ -168,26 +157,6 @@ class Jre9Compat extends JreCompat {
         }
 
         return inaccessibleObjectExceptionClazz.isAssignableFrom(t.getClass());
-    }
-
-
-    @Override
-    public void setApplicationProtocols(SSLParameters sslParameters, String[] protocols) {
-        try {
-            setApplicationProtocolsMethod.invoke(sslParameters, (Object) protocols);
-        } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-            throw new UnsupportedOperationException(e);
-        }
-    }
-
-
-    @Override
-    public String getApplicationProtocol(SSLEngine sslEngine) {
-        try {
-            return (String) getApplicationProtocolMethod.invoke(sslEngine);
-        } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-            throw new UnsupportedOperationException(e);
-        }
     }
 
 

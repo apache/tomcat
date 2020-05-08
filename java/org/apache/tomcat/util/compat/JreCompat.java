@@ -19,6 +19,8 @@ package org.apache.tomcat.util.compat;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.AccessibleObject;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Deque;
@@ -44,6 +46,9 @@ public class JreCompat {
     private static final boolean jre9Available;
     private static final StringManager sm = StringManager.getManager(JreCompat.class);
 
+    protected static final Method setApplicationProtocolsMethod;
+    protected static final Method getApplicationProtocolMethod;
+
     static {
         // This is Tomcat 9 with a minimum Java version of Java 8.
         // Look for the highest supported JVM first
@@ -61,6 +66,17 @@ public class JreCompat {
             jre9Available = false;
         }
         jre11Available = instance.jarFileRuntimeMajorVersion() >= 11;
+
+        Method m1 = null;
+        Method m2 = null;
+        try {
+            m1 = SSLParameters.class.getMethod("setApplicationProtocols", String[].class);
+            m2 = SSLEngine.class.getMethod("getApplicationProtocol");
+        } catch (ReflectiveOperationException | IllegalArgumentException e) {
+            // Only the newest Java 8 have the ALPN API, so ignore
+        }
+        setApplicationProtocolsMethod = m1;
+        getApplicationProtocolMethod = m2;
     }
 
 
@@ -71,6 +87,11 @@ public class JreCompat {
 
     public static boolean isGraalAvailable() {
         return graalAvailable;
+    }
+
+
+    public static boolean isAlpnSupported() {
+        return setApplicationProtocolsMethod != null && getApplicationProtocolMethod != null;
     }
 
 
@@ -109,7 +130,15 @@ public class JreCompat {
      *                      connection
      */
     public void setApplicationProtocols(SSLParameters sslParameters, String[] protocols) {
-        throw new UnsupportedOperationException(sm.getString("jreCompat.noApplicationProtocols"));
+        if (setApplicationProtocolsMethod != null) {
+            try {
+                setApplicationProtocolsMethod.invoke(sslParameters, (Object) protocols);
+            } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+                throw new UnsupportedOperationException(e);
+            }
+        } else {
+            throw new UnsupportedOperationException(sm.getString("jreCompat.noApplicationProtocols"));
+        }
     }
 
 
@@ -123,7 +152,15 @@ public class JreCompat {
      * @return The name of the negotiated protocol
      */
     public String getApplicationProtocol(SSLEngine sslEngine) {
-        throw new UnsupportedOperationException(sm.getString("jreCompat.noApplicationProtocol"));
+        if (getApplicationProtocolMethod != null) {
+            try {
+                return (String) getApplicationProtocolMethod.invoke(sslEngine);
+            } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+                throw new UnsupportedOperationException(e);
+            }
+        } else {
+            throw new UnsupportedOperationException(sm.getString("jreCompat.noApplicationProtocol"));
+        }
     }
 
 
