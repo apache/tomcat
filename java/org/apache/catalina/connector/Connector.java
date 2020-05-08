@@ -258,7 +258,7 @@ public class Connector extends LifecycleMBeanBase  {
 
 
     /**
-     * URI encoding.
+     * The URI encoding in use.
      */
     protected String URIEncoding = null;
 
