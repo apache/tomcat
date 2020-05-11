@@ -15,6 +15,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+set -e
+
 CURDIR=`pwd`
 
 # resolve links - $0 may be a softlink
@@ -53,7 +55,7 @@ native-image \
 -H:+ReportExceptionStackTraces \
 --allow-incomplete-classpath \
 --no-fallback \
--cp ../embed/tomcat-embed-core.jar:../embed/tomcat-embed-websocket.jar:../embed/tomcat-embed-el.jar:tomcat-embedded-sample.jar \
+-cp ../embed/tomcat-embed-core.jar:../embed/tomcat-embed-websocket.jar:../embed/tomcat-embed-el.jar:tomcat-embedded-sample.jar:../embed/annotations-api.jar \
 org.apache.catalina.startup.EmbeddedTomcat
 
 cd $CURDIR
