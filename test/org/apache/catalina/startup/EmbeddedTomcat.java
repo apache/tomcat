@@ -35,6 +35,7 @@ import org.apache.catalina.connector.Connector;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.scan.StandardJarScanFilter;
 import org.apache.tomcat.util.scan.StandardJarScanner;
+import org.apache.tomcat.websocket.server.WsContextListener;
 
 @Ignore
 public class EmbeddedTomcat {
@@ -66,6 +67,7 @@ public class EmbeddedTomcat {
         CounterServlet counterServlet = new CounterServlet();
         Tomcat.addServlet(ctx, "counterServlet", counterServlet);
         ctx.addServletMappingDecoded("/", "counterServlet");
+        ctx.addApplicationListener(WsContextListener.class.getName());
 
         tomcat.start();
         Thread.sleep(60*1000);
