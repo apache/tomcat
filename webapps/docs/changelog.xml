@@ -52,7 +52,7 @@
       </update>
     </changelog>
   </subsection>
-  <subsection name="WebSopcket">
+  <subsection name="WebSocket">
     <changelog>
       <add>
         Add default implementations for <code>init()</code> and
