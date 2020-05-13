@@ -72,6 +72,8 @@ public class CoyoteAdapter implements Adapter {
             System.getProperty("java.vm.vendor") + "/" +
             System.getProperty("java.runtime.version") + ")";
 
+    private static final String INVALID_URI = "Invalid URI ";
+
     private static final EnumSet<SessionTrackingMode> SSL_ONLY =
         EnumSet.of(SessionTrackingMode.SSL);
 
@@ -610,7 +612,7 @@ public class CoyoteAdapter implements Adapter {
                 connector.getService().getContainer().logAccess(request, response, 0, true);
                 return false;
             } else {
-                response.sendError(400, "Invalid URI");
+                response.sendError(400, INVALID_URI);
             }
         }
 
@@ -628,7 +630,7 @@ public class CoyoteAdapter implements Adapter {
             try {
                 req.getURLDecoder().convert(decodedURI.getByteChunk(), connector.getEncodedSolidusHandlingInternal());
             } catch (IOException ioe) {
-                response.sendError(400, "Invalid URI: " + ioe.getMessage());
+                response.sendError(400, INVALID_URI + ioe.getMessage());
             }
             // Normalization
             if (normalize(req.decodedURI(), connector.getAllowBackslash())) {
@@ -638,7 +640,7 @@ public class CoyoteAdapter implements Adapter {
                 // Therefore it is not necessary to check that the URI remains
                 // normalized after character decoding
             } else {
-                response.sendError(400, "Invalid URI");
+                response.sendError(400, INVALID_URI);
             }
         } else {
             /* The URI is chars or String, and has been sent using an in-memory
