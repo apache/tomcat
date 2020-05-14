@@ -199,7 +199,7 @@ public abstract class PersistentManagerBase extends ManagerBase
      * Session that is currently getting swapped in to prevent loading it more
      * than once concurrently
      */
-    private static final ThreadLocal<Session> sessionToSwapIn = new ThreadLocal<Session>();
+    private final ThreadLocal<Session> sessionToSwapIn = new ThreadLocal<Session>();
 
 
     // ------------------------------------------------------------- Properties

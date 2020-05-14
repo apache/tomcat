@@ -76,14 +76,14 @@ public class Benchmarks {
             return "ThreadLocals";
         }
 
-        private static ThreadLocal<Long> currentMillisLocal = new ThreadLocal<Long>() {
+        private ThreadLocal<Long> currentMillisLocal = new ThreadLocal<Long>() {
             @Override
             protected Long initialValue() {
                 return Long.valueOf(0);
             }
         };
 
-        private static ThreadLocal<Date> currentDateLocal = new ThreadLocal<Date>();
+        private ThreadLocal<Date> currentDateLocal = new ThreadLocal<Date>();
 
         @Override
         public void run() {
@@ -112,14 +112,14 @@ public class Benchmarks {
             long value = 0;
         }
 
-        private static ThreadLocal<MutableLong> currentMillisLocal = new ThreadLocal<MutableLong>() {
+        private ThreadLocal<MutableLong> currentMillisLocal = new ThreadLocal<MutableLong>() {
             @Override
             protected MutableLong initialValue() {
                 return new MutableLong();
             }
         };
 
-        private static ThreadLocal<Date> currentDateLocal = new ThreadLocal<Date>();
+        private ThreadLocal<Date> currentDateLocal = new ThreadLocal<Date>();
 
         @Override
         public void run() {
@@ -149,7 +149,7 @@ public class Benchmarks {
             public Date currentDate;
         }
 
-        private static ThreadLocal<Struct> currentStruct = new ThreadLocal<Struct>() {
+        private ThreadLocal<Struct> currentStruct = new ThreadLocal<Struct>() {
             @Override
             protected Struct initialValue() {
                 return new Struct();
@@ -266,33 +266,33 @@ public class Benchmarks {
             return "ThreadLocals";
         }
 
-        private static ThreadLocal<String> currentDateStringLocal = new ThreadLocal<String>();
+        private ThreadLocal<String> currentDateStringLocal = new ThreadLocal<String>();
 
-        private static ThreadLocal<Date> currentDateLocal = new ThreadLocal<Date>() {
+        private ThreadLocal<Date> currentDateLocal = new ThreadLocal<Date>() {
             @Override
             protected Date initialValue() {
                 return new Date();
             }
         };
-        private static ThreadLocal<SimpleDateFormat> dayFormatterLocal = new ThreadLocal<SimpleDateFormat>() {
+        private ThreadLocal<SimpleDateFormat> dayFormatterLocal = new ThreadLocal<SimpleDateFormat>() {
             @Override
             protected SimpleDateFormat initialValue() {
                 return new SimpleDateFormat("dd");
             }
         };
-        private static ThreadLocal<SimpleDateFormat> monthFormatterLocal = new ThreadLocal<SimpleDateFormat>() {
+        private ThreadLocal<SimpleDateFormat> monthFormatterLocal = new ThreadLocal<SimpleDateFormat>() {
             @Override
             protected SimpleDateFormat initialValue() {
                 return new SimpleDateFormat("MM");
             }
         };
-        private static ThreadLocal<SimpleDateFormat> yearFormatterLocal = new ThreadLocal<SimpleDateFormat>() {
+        private ThreadLocal<SimpleDateFormat> yearFormatterLocal = new ThreadLocal<SimpleDateFormat>() {
             @Override
             protected SimpleDateFormat initialValue() {
                 return new SimpleDateFormat("yyyy");
             }
         };
-        private static ThreadLocal<SimpleDateFormat> timeFormatterLocal = new ThreadLocal<SimpleDateFormat>() {
+        private ThreadLocal<SimpleDateFormat> timeFormatterLocal = new ThreadLocal<SimpleDateFormat>() {
             @Override
             protected SimpleDateFormat initialValue() {
                 return new SimpleDateFormat("hh:mm:ss");
@@ -354,7 +354,7 @@ public class Benchmarks {
                     "hh:mm:ss");
         }
 
-        private static ThreadLocal<Struct> structLocal = new ThreadLocal<Struct>() {
+        private ThreadLocal<Struct> structLocal = new ThreadLocal<Struct>() {
             @Override
             protected Struct initialValue() {
                 return new Struct();
@@ -415,7 +415,7 @@ public class Benchmarks {
                     "hh:mm:ss");
         }
 
-        private static ThreadLocal<Struct> structLocal = new ThreadLocal<Struct>() {
+        private ThreadLocal<Struct> structLocal = new ThreadLocal<Struct>() {
             @Override
             protected Struct initialValue() {
                 return new Struct();
