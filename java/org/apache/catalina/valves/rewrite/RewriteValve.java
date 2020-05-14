@@ -79,7 +79,7 @@ public class RewriteValve extends ValveBase {
     /**
      * If rewriting occurs, the whole request will be processed again.
      */
-    protected static ThreadLocal<Boolean> invoked = new ThreadLocal<>();
+    protected ThreadLocal<Boolean> invoked = new ThreadLocal<>();
 
 
     /**
