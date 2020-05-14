@@ -277,7 +277,7 @@ public class ClassLoaderLogManager extends LogManager {
             return null;
         }
 
-        String prefix = ClassLoaderLogManager.prefix.get();
+        String prefix = this.prefix.get();
         String result = null;
 
         // If a prefix is defined look for a prefixed property first
@@ -595,13 +595,13 @@ public class ClassLoaderLogManager extends LogManager {
                     }
                 }
                 try {
-                    ClassLoaderLogManager.prefix.set(prefix);
+                    this.prefix.set(prefix);
                     Handler handler = (Handler) classLoader.loadClass(
                             handlerClassName).getConstructor().newInstance();
                     // The specification strongly implies all configuration should be done
                     // during the creation of the handler object.
                     // This includes setting level, filter, formatter and encoding.
-                    ClassLoaderLogManager.prefix.set(null);
+                    this.prefix.set(null);
                     info.handlers.put(handlerName, handler);
                     if (rootHandlers == null) {
                         localRootLogger.addHandler(handler);
