@@ -68,6 +68,10 @@
         Implement a few rewrite SSL env that correspond to Servlet request
         attributes. (remm)
       </fix>
+      <update>
+        <bug>64442</bug>Be more flexible with respect to the ordering of groups,
+        roles and users in the <code>tomcat-users.xml</code> file. (fschumacher)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Coyote">
