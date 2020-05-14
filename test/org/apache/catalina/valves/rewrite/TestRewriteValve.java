@@ -605,6 +605,15 @@ public class TestRewriteValve extends TomcatBaseTest {
         doTestRewrite("RewriteRule !^/c/.* /b/", "/c/d", "/c/d");
     }
 
+    @Test
+    public void testMultiLine001() throws Exception {
+        doTestRewrite("RewriteRule /dummy /anotherDummy [L]\nRewriteRule ^/a /c [L]", "/a", "/c");
+    }
+
+    @Test
+    public void testMultiLine002() throws Exception {
+        doTestRewrite("RewriteRule /dummy /a\nRewriteRule /a /c [L]", "/dummy", "/c");
+    }
 
     private void doTestRewrite(String config, String request, String expectedURI) throws Exception {
         doTestRewrite(config, request, expectedURI, null);

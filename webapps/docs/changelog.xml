@@ -45,6 +45,15 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 10.0.0-M6 (markt)" rtext="in development">
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        <bug>64432</bug>: Correct a refactoring regression that broke handling
+        of multi-line configuration in the RewriteValve. Patch provided by Jj.
+        (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Coyote">
     <changelog>
       <update>
