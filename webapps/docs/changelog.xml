@@ -68,6 +68,11 @@
         <code>destroy()</code> to the <code>Encoder</code> and
         <code>Decoder</code> interfaces. (markt)
       </add>
+      <fix>
+        Consistently throw a <code>DeploymentException</code> when an invalid
+        endpoint path is specified and catch invalid endpoint paths earlier.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
