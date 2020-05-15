@@ -719,14 +719,8 @@ final class ApplicationDispatcher implements AsyncDispatcher, RequestDispatcher 
         }
 
         // Release the filter chain (if any) for this request
-        try {
-            if (filterChain != null)
-                filterChain.release();
-        } catch (Throwable e) {
-            ExceptionUtils.handleThrowable(e);
-            wrapper.getLogger().error(sm.getString("standardWrapper.releaseFilters",
-                             wrapper.getName()), e);
-            // FIXME: Exception handling needs to be similar to what is in the StandardWrapperValue
+        if (filterChain != null) {
+            filterChain.release();
         }
 
         // Deallocate the allocated servlet instance
