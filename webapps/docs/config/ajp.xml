@@ -524,9 +524,11 @@
     <attribute name="tomcatAuthentication" required="false">
       <p>If set to <code>true</code>, the authentication will be done in Tomcat.
       Otherwise, the authenticated principal will be propagated from the native
-      webserver and used for authorization in Tomcat. Note that this principal
-      will have no roles associated with it.
-      The default value is <code>true</code>. If
+      webserver and used for authorization in Tomcat. </p>
+      <p>The web server must send the user principal (username) as a request
+      <i>attribute</i> named <code>REMOTE_USER</code>.</p>
+      <p>Note that this principal will have no roles associated with it.</p>
+      <p>The default value is <code>true</code>. If
       <code>tomcatAuthorization</code> is set to <code>true</code> this
       attribute has no effect.</p>
     </attribute>
