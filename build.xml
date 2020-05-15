@@ -3297,9 +3297,10 @@ skip.installer property in build.properties" />
           depends="download-compile, extras-webservices-prepare, download-test-compile"
           description="Prepares the source tree to be built in Eclipse">
 
+    <filter token="wsdl4j-lib.version" value="${wsdl4j-lib.version}" />
     <!-- Copy the sample project files into the root directory -->
     <copy file="${tomcat.home}/res/ide-support/eclipse/eclipse.project" tofile="${tomcat.home}/.project"/>
-    <copy file="${tomcat.home}/res/ide-support/eclipse/eclipse.classpath" tofile="${tomcat.home}/.classpath"/>
+    <copy file="${tomcat.home}/res/ide-support/eclipse/eclipse.classpath" tofile="${tomcat.home}/.classpath" filtering="true" />
 
     <!-- Copy compiler settings file -->
     <mkdir dir="${tomcat.home}/.settings" />
