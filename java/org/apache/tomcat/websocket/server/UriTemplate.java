@@ -43,7 +43,8 @@ public class UriTemplate {
 
     public UriTemplate(String path) throws DeploymentException {
 
-        if (path == null || path.length() ==0 || !path.startsWith("/")) {
+        if (path == null || path.length() == 0 || !path.startsWith("/") || path.contains("/../") ||
+                path.contains("/./") || path.contains("//")) {
             throw new DeploymentException(
                     sm.getString("uriTemplate.invalidPath", path));
         }
@@ -68,7 +69,7 @@ public class UriTemplate {
                 } else {
                     // As per EG discussion, all other empty segments are
                     // invalid
-                    throw new IllegalArgumentException(sm.getString(
+                    throw new DeploymentException(sm.getString(
                             "uriTemplate.emptySegment", path));
                 }
             }
@@ -81,12 +82,12 @@ public class UriTemplate {
                 normalized.append(paramCount++);
                 normalized.append('}');
                 if (!paramNames.add(segment)) {
-                    throw new IllegalArgumentException(sm.getString(
+                    throw new DeploymentException(sm.getString(
                             "uriTemplate.duplicateParameter", segment));
                 }
             } else {
                 if (segment.contains("{") || segment.contains("}")) {
-                    throw new IllegalArgumentException(sm.getString(
+                    throw new DeploymentException(sm.getString(
                             "uriTemplate.invalidSegment", segment, path));
                 }
                 normalized.append(segment);
