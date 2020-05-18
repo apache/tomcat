@@ -1732,47 +1732,36 @@ public class StandardWrapper extends ContainerBase
 
     /**
      * Get JMX Broadcaster Info
-     * FIXME: This two events we not send j2ee.state.failed and j2ee.attribute.changed!
      * @see javax.management.NotificationBroadcaster#getNotificationInfo()
      */
     @Override
     public MBeanNotificationInfo[] getNotificationInfo() {
-
-        if(notificationInfo == null) {
-            notificationInfo = new MBeanNotificationInfo[]{
-                    new MBeanNotificationInfo(new String[] {
-                    "j2ee.object.created"},
-                    Notification.class.getName(),
-                    "servlet is created"
-                    ),
-                    new MBeanNotificationInfo(new String[] {
-                    "j2ee.state.starting"},
-                    Notification.class.getName(),
-                    "servlet is starting"
-                    ),
-                    new MBeanNotificationInfo(new String[] {
-                    "j2ee.state.running"},
-                    Notification.class.getName(),
-                    "servlet is running"
-                    ),
-                    new MBeanNotificationInfo(new String[] {
-                    "j2ee.state.stopped"},
-                    Notification.class.getName(),
-                    "servlet start to stopped"
-                    ),
-                    new MBeanNotificationInfo(new String[] {
-                    "j2ee.object.stopped"},
-                    Notification.class.getName(),
-                    "servlet is stopped"
-                    ),
-                    new MBeanNotificationInfo(new String[] {
-                    "j2ee.object.deleted"},
-                    Notification.class.getName(),
-                    "servlet is deleted"
-                    )
-            };
+        // FIXME: we not send j2ee.state.failed
+        // FIXME: we not send j2ee.attribute.changed
+        if (notificationInfo == null) {
+            notificationInfo = new MBeanNotificationInfo[] {
+                    new MBeanNotificationInfo(
+                            new String[] { "j2ee.object.created" },
+                            Notification.class.getName(), "servlet is created"),
+                    new MBeanNotificationInfo(
+                            new String[] { "j2ee.state.starting" },
+                            Notification.class.getName(),
+                            "servlet is starting"),
+                    new MBeanNotificationInfo(
+                            new String[] { "j2ee.state.running" },
+                            Notification.class.getName(), "servlet is running"),
+                    new MBeanNotificationInfo(
+                            new String[] { "j2ee.state.stopped" },
+                            Notification.class.getName(),
+                            "servlet start to stopped"),
+                    new MBeanNotificationInfo(
+                            new String[] { "j2ee.object.stopped" },
+                            Notification.class.getName(), "servlet is stopped"),
+                    new MBeanNotificationInfo(
+                            new String[] { "j2ee.object.deleted" },
+                            Notification.class.getName(),
+                            "servlet is deleted") };
         }
-
         return notificationInfo;
     }
 
