@@ -107,8 +107,7 @@ commons-logging-src.checksum.enabled=true
 commons-logging-src.checksum.algorithm=MD5|SHA-1
 commons-logging-src.checksum.value=e8e197d628436490886d17cffa108fe3|95f0805de0be927c42f5f6eb14b643cb37e7caad
 commons-logging.home=${base.path}/commons-logging-${commons-logging.version}
-commons-logging-src.loc.1=${base-commons.loc.1}/logging/source/commons-logging-${commons-logging.version}-src.tar.gz
-commons-logging-src.loc.2=${base-commons.loc.2}/logging/source/commons-logging-${commons-logging.version}-src.tar.gz
+commons-logging-src.loc=${base-commons.loc.2}/logging/source/commons-logging-${commons-logging.version}-src.tar.gz
 commons-logging-src.tar.gz=${commons-logging.home}/commons-logging-${commons-logging.version}-src.tar.gz
 
 # ----- Avalon Framework (required by commons logging) -----

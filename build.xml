@@ -1686,9 +1686,8 @@
           depends="extras-prepare"
           description="Prepare to build web services extras package">
 
-    <antcall target="downloadfile-2">
-      <param name="sourcefile.1" value="${commons-logging-src.loc.1}"/>
-      <param name="sourcefile.2" value="${commons-logging-src.loc.2}"/>
+    <antcall target="downloadfile">
+      <param name="sourcefile" value="${commons-logging-src.loc}"/>
       <param name="destfile" value="${commons-logging-src.tar.gz}"/>
       <param name="destdir" value="${commons-logging.home}"/>
       <param name="checksum.enabled" value="${commons-logging-src.checksum.enabled}"/>

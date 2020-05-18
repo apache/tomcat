@@ -69,6 +69,13 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Other">
+    <changelog>
+      <fix>
+        Use Apache archives when downloading commons-logging dependency. (violetagg)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 7.0.104 (violetagg)" rtext="released 2020-05-16">
   <subsection name="Catalina">
