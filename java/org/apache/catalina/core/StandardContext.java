@@ -2804,7 +2804,6 @@ public class StandardContext extends ContainerBase
         }
         fireContainerEvent("addApplicationListener", listener);
 
-        // FIXME - add instance if already started?
     }
 
 
@@ -3018,12 +3017,6 @@ public class StandardContext extends ContainerBase
             (servletNames.length == 0) && (urlPatterns.length == 0))
             throw new IllegalArgumentException
                 (sm.getString("standardContext.filterMap.either"));
-        // FIXME: Older spec revisions may still check this
-        /*
-        if ((servletNames.length != 0) && (urlPatterns.length != 0))
-            throw new IllegalArgumentException
-                (sm.getString("standardContext.filterMap.either"));
-        */
         for (String urlPattern : urlPatterns) {
             if (!validateURLPattern(urlPattern)) {
                 throw new IllegalArgumentException
@@ -3809,7 +3802,6 @@ public class StandardContext extends ContainerBase
         // Inform interested listeners
         fireContainerEvent("removeApplicationListener", listener);
 
-        // FIXME - behavior if already started?
     }
 
 
@@ -5218,6 +5210,12 @@ public class StandardContext extends ContainerBase
         // Reinitializing if something went wrong
         if (!ok) {
             setState(LifecycleState.FAILED);
+            // Send j2ee.object.failed notification
+            if (this.getObjectName() != null) {
+                Notification notification = new Notification("j2ee.object.failed",
+                        this.getObjectName(), sequenceNumber.getAndIncrement());
+                broadcaster.sendNotification(notification);
+            }
         } else {
             setState(LifecycleState.STARTING);
         }
@@ -5472,7 +5470,8 @@ public class StandardContext extends ContainerBase
 
     }
 
-    /** Destroy needs to clean up the context completely.
+    /**
+     * Destroy needs to clean up the context completely.
      *
      * The problem is that undoing all the config in start() and restoring
      * a 'fresh' state is impossible. After stop()/destroy()/init()/start()
@@ -5480,9 +5479,6 @@ public class StandardContext extends ContainerBase
      * read modified web.xml, etc. This can only be done by completely
      * removing the context object and remapping a new one, or by cleaning
      * up everything.
-     *
-     * XXX Should this be done in stop() ?
-     *
      */
     @Override
     protected void destroyInternal() throws LifecycleException {
@@ -6203,7 +6199,8 @@ public class StandardContext extends ContainerBase
     }
 
 
-    /* Remove a JMX notificationListener
+    /**
+     * Remove a JMX notificationListener
      * @see javax.management.NotificationEmitter#removeNotificationListener(javax.management.NotificationListener, javax.management.NotificationFilter, java.lang.Object)
      */
     @Override
@@ -6214,48 +6211,43 @@ public class StandardContext extends ContainerBase
 
     private MBeanNotificationInfo[] notificationInfo;
 
-    /* Get JMX Broadcaster Info
-     * @TODO use StringManager for international support!
-     * @TODO This two events we not send j2ee.state.failed and j2ee.attribute.changed!
+    /**
+     * Get JMX Broadcaster Info
      * @see javax.management.NotificationBroadcaster#getNotificationInfo()
      */
     @Override
     public MBeanNotificationInfo[] getNotificationInfo() {
-        // FIXME: i18n
-        if(notificationInfo == null) {
-            notificationInfo = new MBeanNotificationInfo[]{
-                    new MBeanNotificationInfo(new String[] {
-                    "j2ee.object.created"},
-                    Notification.class.getName(),
-                    "web application is created"
-                    ),
-                    new MBeanNotificationInfo(new String[] {
-                    "j2ee.state.starting"},
-                    Notification.class.getName(),
-                    "change web application is starting"
-                    ),
-                    new MBeanNotificationInfo(new String[] {
-                    "j2ee.state.running"},
-                    Notification.class.getName(),
-                    "web application is running"
-                    ),
-                    new MBeanNotificationInfo(new String[] {
-                    "j2ee.state.stopping"},
-                    Notification.class.getName(),
-                    "web application start to stopped"
-                    ),
-                    new MBeanNotificationInfo(new String[] {
-                    "j2ee.object.stopped"},
-                    Notification.class.getName(),
-                    "web application is stopped"
-                    ),
-                    new MBeanNotificationInfo(new String[] {
-                    "j2ee.object.deleted"},
-                    Notification.class.getName(),
-                    "web application is deleted"
-                    )
-            };
-
+        // FIXME: we not send j2ee.attribute.changed
+        if (notificationInfo == null) {
+            notificationInfo = new MBeanNotificationInfo[] {
+                    new MBeanNotificationInfo(
+                            new String[] { "j2ee.object.created" },
+                            Notification.class.getName(),
+                            "web application is created"),
+                    new MBeanNotificationInfo(
+                            new String[] { "j2ee.state.starting" },
+                            Notification.class.getName(),
+                            "change web application is starting"),
+                    new MBeanNotificationInfo(
+                            new String[] { "j2ee.state.running" },
+                            Notification.class.getName(),
+                            "web application is running"),
+                    new MBeanNotificationInfo(
+                            new String[] { "j2ee.state.stopping" },
+                            Notification.class.getName(),
+                            "web application start to stopped"),
+                    new MBeanNotificationInfo(
+                            new String[] { "j2ee.object.stopped" },
+                            Notification.class.getName(),
+                            "web application is stopped"),
+                    new MBeanNotificationInfo(
+                            new String[] { "j2ee.object.deleted" },
+                            Notification.class.getName(),
+                            "web application is deleted"),
+                    new MBeanNotificationInfo(
+                            new String[] { "j2ee.object.failed" },
+                            Notification.class.getName(),
+                            "web application failed") };
         }
 
         return notificationInfo;
