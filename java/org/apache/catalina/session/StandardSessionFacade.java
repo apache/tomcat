@@ -70,7 +70,6 @@ public class StandardSessionFacade implements HttpSession {
 
     @Override
     public ServletContext getServletContext() {
-        // FIXME : Facade this object ?
         return session.getServletContext();
     }
 
