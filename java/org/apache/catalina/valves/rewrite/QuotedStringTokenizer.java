@@ -21,7 +21,11 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.tomcat.util.res.StringManager;
+
 public class QuotedStringTokenizer {
+
+    protected static final StringManager sm = StringManager.getManager(QuotedStringTokenizer.class);
 
     private Iterator<String> tokenIterator;
     private int tokenCount;
@@ -70,8 +74,8 @@ public class QuotedStringTokenizer {
                 }
                 break;
             default:
-                throw new IllegalStateException(
-                        "Couldn't tokenize text '" + inputText + "' after position " + pos + " from mode " + currentMode);
+                throw new IllegalStateException(sm.getString("quotedStringTokenizer.tokenizeError",
+                                inputText, Integer.valueOf(pos), currentMode));
             }
             pos++;
         }
