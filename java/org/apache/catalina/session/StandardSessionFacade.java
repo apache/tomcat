@@ -82,7 +82,6 @@ public class StandardSessionFacade
 
     @Override
     public ServletContext getServletContext() {
-        // FIXME : Facade this object ?
         return session.getServletContext();
     }
 
