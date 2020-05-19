@@ -31,8 +31,12 @@ public class TesterRewriteMapA implements RewriteMap {
 
     @Override
     public String setParameters(String params) {
+        throw new IllegalStateException();
+    }
+
+    @Override
+    public void setParameters(String... params) {
         // NO-OP
-        return null;
     }
 
     @Override
