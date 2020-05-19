@@ -630,12 +630,17 @@ public class RewriteValve extends ValveBase {
                     throw new IllegalArgumentException(sm.getString("rewriteValve.invalidMapClassName", line));
                 }
                 if (tokenizer.hasMoreTokens()) {
-                    map.setParameters(tokenizer.nextToken());
+                    if (tokenizer.countTokens() == 1) {
+                        map.setParameters(tokenizer.nextToken());
+                    } else {
+                        List<String> params = new ArrayList<>();
+                        while (tokenizer.hasMoreTokens()) {
+                            params.add(tokenizer.nextToken());
+                        }
+                        map.setParameters(params.toArray(new String[0]));
+                    }
                 }
-                Object[] result = new Object[2];
-                result[0] = name;
-                result[1] = map;
-                return result;
+                return new Object[] { name, map };
             } else if (token.startsWith("#")) {
                 // it's a comment, ignore it
             } else {

@@ -52,6 +52,10 @@
         of multi-line configuration in the RewriteValve. Patch provided by Jj.
         (markt)
       </fix>
+      <fix>
+        Fix use of multiple parameters when defining RewriteMaps.
+        (remm/fschumacher)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

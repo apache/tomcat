@@ -16,6 +16,8 @@
  */
 package org.apache.catalina.valves.rewrite;
 
+import org.apache.tomcat.util.res.StringManager;
+
 /**
  * Interface for user defined lookup/replacement logic that can be defined in
  * a {@code rewrite.config} file by a {@code RewriteMap} directive. Such a map
@@ -56,7 +58,8 @@ public interface RewriteMap {
             return;
         }
         if (params.length > 1) {
-            throw new IllegalArgumentException("Too many parameters for this map");
+            throw new IllegalArgumentException(
+                    StringManager.getManager(RewriteMap.class).getString("rewriteMap.tooManyParameters"));
         }
         setParameters(params[0]);
     }
