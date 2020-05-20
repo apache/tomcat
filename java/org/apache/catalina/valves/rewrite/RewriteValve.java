@@ -617,17 +617,25 @@ public class RewriteValve extends ValveBase {
                 return rule;
             } else if (token.equals("RewriteMap")) {
                 // RewriteMap name rewriteMapClassName whateverOptionalParameterInWhateverFormat
+                // FIXME: Possibly implement more special maps from https://httpd.apache.org/docs/2.4/rewrite/rewritemap.html
                 if (tokenizer.countTokens() < 2) {
                     throw new IllegalArgumentException(sm.getString("rewriteValve.invalidLine", line));
                 }
                 String name = tokenizer.nextToken();
                 String rewriteMapClassName = tokenizer.nextToken();
                 RewriteMap map = null;
-                try {
-                    map = (RewriteMap) (Class.forName(
-                            rewriteMapClassName).getConstructor().newInstance());
-                } catch (Exception e) {
-                    throw new IllegalArgumentException(sm.getString("rewriteValve.invalidMapClassName", line));
+                if (rewriteMapClassName.startsWith("int:")) {
+                    map = InternalRewriteMap.toMap(rewriteMapClassName.substring("int:".length()));
+                } else if (rewriteMapClassName.startsWith("prg:")) {
+                    rewriteMapClassName = rewriteMapClassName.substring("prg:".length());
+                }
+                if (map == null) {
+                    try {
+                        map = (RewriteMap) (Class.forName(
+                                rewriteMapClassName).getConstructor().newInstance());
+                    } catch (Exception e) {
+                        throw new IllegalArgumentException(sm.getString("rewriteValve.invalidMapClassName", line));
+                    }
                 }
                 if (tokenizer.hasMoreTokens()) {
                     if (tokenizer.countTokens() == 1) {
