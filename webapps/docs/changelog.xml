@@ -52,6 +52,10 @@
         of multi-line configuration in the RewriteValve. Patch provided by Jj.
         (markt)
       </fix>
+      <update>
+        Add the special internal rewrite maps for case modification and
+        escaping. (remm/fschumacher)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Coyote">
