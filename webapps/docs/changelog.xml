@@ -56,6 +56,10 @@
         Fix use of multiple parameters when defining RewriteMaps.
         (remm/fschumacher)
       </fix>
+      <update>
+        Add the special internal rewrite maps for case modification and
+        escaping. (remm/fschumacher)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Coyote">

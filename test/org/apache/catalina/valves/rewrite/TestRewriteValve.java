@@ -113,6 +113,12 @@ public class TestRewriteValve extends TomcatBaseTest {
     }
 
     @Test
+    public void testRewriteMap08() throws Exception {
+        doTestRewrite("RewriteMap lc int:tolower\n" +
+                "RewriteRule ^(.*) ${lc:$1}", "/C/AaA", "/c/aaa");
+    }
+
+    @Test
     public void testRewriteServerVar() throws Exception {
         doTestRewrite("RewriteRule /b/(.*).html$ /c%{SERVLET_PATH}", "/b/x.html", "/c/b/x.html");
     }

@@ -395,6 +395,15 @@ RewriteRule  ^/$                 /homepage.std.html  [L]</source>
 
     <p>Syntax: <code>RewriteMap name rewriteMapClassName optionalParameters</code></p>
 
+    <p>The <code>rewriteMapClassName</code> value also allows special values:
+    <ul>
+    <li><code>int:toupper</code>: Special map converting passed values to upper case</li>
+    <li><code>int:tolower</code>: Special map converting passed values to lower case</li>
+    <li><code>int:escape</code>: URL escape the passed value</li>
+    <li><code>int:unescape</code>: URL unescape the passed value</li>
+    </ul>
+    </p>
+
     <p>The maps are implemented using an interface that users must implement. Its class
     name is <code>org.apache.catalina.valves.rewrite.RewriteMap</code>, and its code is:</p>
 
