@@ -60,6 +60,10 @@
         Add the special internal rewrite maps for case modification and
         escaping. (remm/fschumacher)
       </update>
+      <fix>
+        Correct a regression in an earlier fix that broke the loading of
+        configuration files such as keystores via URIs on Windows. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
