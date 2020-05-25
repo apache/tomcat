@@ -64,6 +64,10 @@
         Correct a regression in an earlier fix that broke the loading of
         configuration files such as keystores via URIs on Windows. (markt)
       </fix>
+      <fix>
+        <bug>64470</bug>: The default value of the solidus handling should
+        reflect the associated system property. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
