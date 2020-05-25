@@ -60,6 +60,14 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 7.0.105 (violetagg)" rtext="in development">
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        <bug>64470</bug>: The default value of the solidus handling should
+        reflect the associated system property. (remm)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="WebSocket">
     <changelog>
       <fix>

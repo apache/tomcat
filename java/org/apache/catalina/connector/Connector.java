@@ -40,6 +40,7 @@ import org.apache.tomcat.util.IntrospectionUtils;
 import org.apache.tomcat.util.buf.B2CConverter;
 import org.apache.tomcat.util.buf.CharsetUtil;
 import org.apache.tomcat.util.buf.EncodedSolidusHandling;
+import org.apache.tomcat.util.buf.UDecoder;
 import org.apache.tomcat.util.http.mapper.Mapper;
 import org.apache.tomcat.util.res.StringManager;
 
@@ -266,7 +267,8 @@ public class Connector extends LifecycleMBeanBase  {
     /**
      * The behavior when an encoded solidus (slash) is submitted.
      */
-    private EncodedSolidusHandling encodedSolidusHandling = EncodedSolidusHandling.REJECT;
+    private EncodedSolidusHandling encodedSolidusHandling =
+            UDecoder.ALLOW_ENCODED_SLASH ? EncodedSolidusHandling.DECODE : EncodedSolidusHandling.REJECT;
 
 
     /**
