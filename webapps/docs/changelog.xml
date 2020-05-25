@@ -56,6 +56,10 @@
         Add the special internal rewrite maps for case modification and
         escaping. (remm/fschumacher)
       </update>
+      <fix>
+        <bug>64470</bug>: The default value of the solidus handling should
+        reflect the associated system property. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
