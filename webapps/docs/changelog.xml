@@ -90,6 +90,15 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Other">
+    <changelog>
+      <update>
+        Update the list of known <code>Charset</code>s in the
+        <code>CharsetCache</code> to include <code>ISO-8859-16</code>, added in
+        OpenJDK 15. (markt)
+      </update>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 9.0.35 (markt)" rtext="2020-05-11">
   <subsection name="Catalina">
