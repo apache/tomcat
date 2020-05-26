@@ -65,7 +65,7 @@ public interface JspApplicationContext {
      *             if called after the application's
      *             <code>ServletContextListeners</code> have been initialized.
      */
-    public void addELResolver(ELResolver resolver) throws IllegalStateException;
+    public void addELResolver(ELResolver resolver);
 
     /**
      * <p>
