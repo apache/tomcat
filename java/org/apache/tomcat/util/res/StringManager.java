@@ -146,7 +146,13 @@ public class StringManager {
             //      a null check.
             str = null;
         }
-
+        // change the encoing from "ISO-8859-1" to "UTF-8"
+        // Therefore, there will be no garbled characters when using Chinese
+        try {
+            str = new String(str.getBytes("ISO-8859-1"),"UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
         return str;
     }
 
