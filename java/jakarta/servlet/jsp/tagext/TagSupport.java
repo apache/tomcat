@@ -73,10 +73,7 @@ public class TagSupport implements IterationTag, Serializable {
      * @return the nearest ancestor that implements the interface
      * or is an instance of the class specified
      */
-    public static final Tag findAncestorWithClass(Tag from,
-            // TCK signature test fails with generics
-            @SuppressWarnings("rawtypes")
-            Class klass) {
+    public static final Tag findAncestorWithClass(Tag from, Class<?> klass) {
         boolean isInterface = false;
 
         if (from == null ||

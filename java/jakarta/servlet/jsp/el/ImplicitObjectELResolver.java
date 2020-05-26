@@ -117,8 +117,7 @@ public class ImplicitObjectELResolver extends ELResolver {
     }
 
     @Override
-    @SuppressWarnings({ "unchecked", "rawtypes" }) // TCK signature test fails with generics
-    public Class getType(ELContext context, Object base, Object property) {
+    public Class<?> getType(ELContext context, Object base, Object property) {
         Objects.requireNonNull(context);
 
         if (base == null && property != null) {

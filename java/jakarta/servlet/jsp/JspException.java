@@ -94,7 +94,7 @@ public class JspException extends Exception {
      * @deprecated As of JSP 2.1, replaced by
      * <code>java.lang.Throwable.getCause()</code>
      */
-    @SuppressWarnings("dep-ann") // TCK signature test fails with annotation
+    @Deprecated
     public Throwable getRootCause() {
         return getCause();
     }

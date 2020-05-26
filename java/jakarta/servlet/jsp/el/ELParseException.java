@@ -24,7 +24,7 @@ package jakarta.servlet.jsp.el;
  * @since 2.0
  * @deprecated As of JSP 2.1, replaced by jakarta.el.ELException
  */
-@SuppressWarnings("dep-ann") // TCK signature test fails with annotation
+@Deprecated
 public class ELParseException extends ELException {
 
  private static final long serialVersionUID = 1L;

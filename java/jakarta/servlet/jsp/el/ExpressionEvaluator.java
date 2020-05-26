@@ -54,8 +54,7 @@ package jakarta.servlet.jsp.el;
  * @since 2.0
  * @deprecated As of JSP 2.1, replaced by jakarta.el.ExpressionFactory
  */
-@SuppressWarnings("dep-ann")
-// TCK signature test fails with annotation
+@Deprecated
 public abstract class ExpressionEvaluator {
 
     /**
@@ -82,9 +81,8 @@ public abstract class ExpressionEvaluator {
      * @exception ELException
      *                Thrown if parsing errors were found.
      */
-    public abstract Expression parseExpression(String expression,
-            @SuppressWarnings("rawtypes")// TCK signature fails with generics
-            Class expectedType, FunctionMapper fMapper) throws ELException;
+    public abstract Expression parseExpression(String expression, Class<?> expectedType,
+            FunctionMapper fMapper) throws ELException;
 
     /**
      * Evaluates an expression. This method may perform some syntactic
@@ -107,9 +105,6 @@ public abstract class ExpressionEvaluator {
      * @exception ELException
      *                Thrown if the expression evaluation failed.
      */
-    public abstract Object evaluate(
-            String expression,
-            @SuppressWarnings("rawtypes")// TCK signature fails with generics
-            Class expectedType, VariableResolver vResolver,
+    public abstract Object evaluate(String expression, Class<?> expectedType, VariableResolver vResolver,
             FunctionMapper fMapper) throws ELException;
 }

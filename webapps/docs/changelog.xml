@@ -77,6 +77,15 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Jasper">
+    <changelog>
+      <update>
+        Update the Jakarta Server Pages API implementation to align with
+        specification updates to use generics and add missing
+        <code>@Deprecated</code> annotations. (markt)
+      </update>
+    </changelog>
+  </subsection>
   <subsection name="WebSocket">
     <changelog>
       <add>
