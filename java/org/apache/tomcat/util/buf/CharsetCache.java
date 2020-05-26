@@ -150,6 +150,8 @@ public class CharsetCache {
             "ibm-1146", "ibm-1147", "ibm-1148", "ibm-1149", "ibm-29626c", "ibm-858", "ibm-eucjp", "ibm1140", "ibm1141",
             "ibm1142", "ibm1143", "ibm1144", "ibm1145", "ibm1146", "ibm1147", "ibm1148", "ibm1149", "ibm29626c",
             "ibm858", "x-ibm29626c",
+            // Added from OpenJDK 15 ea24
+            "iso8859_16",
             // Added from HPE JVM 1.8.0.17-hp-ux
             "cp1051", "cp1386", "cshproman8", "hp-roman8", "ibm-1051", "r8", "roman8", "roman9"
             // If you add and entry to this list, ensure you run

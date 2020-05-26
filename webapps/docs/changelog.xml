@@ -82,6 +82,11 @@
       <fix>
         Use Apache archives when downloading commons-logging dependency. (violetagg)
       </fix>
+      <update>
+        Update the list of known <code>Charset</code>s in the
+        <code>CharsetCache</code> to include <code>ISO-8859-16</code>, added in
+        OpenJDK 15. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
