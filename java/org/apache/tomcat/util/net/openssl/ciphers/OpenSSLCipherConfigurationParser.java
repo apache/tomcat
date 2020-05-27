@@ -40,8 +40,7 @@ import org.apache.tomcat.util.res.StringManager;
 public class OpenSSLCipherConfigurationParser {
 
     private static final Log log = LogFactory.getLog(OpenSSLCipherConfigurationParser.class);
-    private static final StringManager sm =
-            StringManager.getManager("org.apache.tomcat.util.net.jsse.res");
+    private static final StringManager sm = StringManager.getManager(OpenSSLCipherConfigurationParser.class);
 
     private static boolean initialized = false;
 
