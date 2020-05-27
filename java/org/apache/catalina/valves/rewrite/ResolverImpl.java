@@ -19,10 +19,12 @@ package org.apache.catalina.valves.rewrite;
 import java.nio.charset.Charset;
 import java.util.Calendar;
 
+import org.apache.catalina.Globals;
 import org.apache.catalina.WebResource;
 import org.apache.catalina.WebResourceRoot;
 import org.apache.catalina.connector.Request;
 import org.apache.tomcat.util.http.FastHttpDateFormat;
+import org.apache.tomcat.util.net.SSLSupport;
 
 public class ResolverImpl extends Resolver {
 
@@ -133,7 +135,16 @@ public class ResolverImpl extends Resolver {
 
     @Override
     public String resolveSsl(String key) {
-        // FIXME: Implement SSL environment variables
+        if (key.equals("SSL_PROTOCOL")) {
+            return String.valueOf(request.getAttribute(SSLSupport.PROTOCOL_VERSION_KEY));
+        } else if (key.equals("SSL_SESSION_ID")) {
+            return String.valueOf(request.getAttribute(Globals.SSL_SESSION_ID_ATTR));
+        } else if (key.equals("SSL_CIPHER")) {
+            return String.valueOf(request.getAttribute(Globals.CIPHER_SUITE_ATTR));
+        } else if (key.equals("SSL_CIPHER_USEKEYSIZE")) {
+            return String.valueOf(request.getAttribute(Globals.KEY_SIZE_ATTR));
+        }
+        // FIXME: Implement other SSL environment variables when possible
         return null;
     }
 
