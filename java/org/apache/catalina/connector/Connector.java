@@ -276,6 +276,7 @@ public class Connector extends LifecycleMBeanBase  {
     /**
      * The behavior when an encoded solidus (slash) is submitted.
      */
+    @SuppressWarnings("deprecation")
     private EncodedSolidusHandling encodedSolidusHandling =
             UDecoder.ALLOW_ENCODED_SLASH ? EncodedSolidusHandling.DECODE : EncodedSolidusHandling.REJECT;
 
