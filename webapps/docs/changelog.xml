@@ -60,6 +60,10 @@
         <bug>64470</bug>: The default value of the solidus handling should
         reflect the associated system property. (remm)
       </fix>
+      <fix>
+        Implement a few rewrite SSL env that correspond to Servlet request
+        attributes. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
