@@ -35,7 +35,7 @@ import org.apache.tomcat.util.res.StringManager;
 public class OpenSSLUtil extends SSLUtilBase {
 
     private static final Log log = LogFactory.getLog(OpenSSLUtil.class);
-    private static final StringManager sm = StringManager.getManager(OpenSSLContext.class);
+    private static final StringManager sm = StringManager.getManager(OpenSSLUtil.class);
 
 
     public OpenSSLUtil(SSLHostConfigCertificate certificate) {
