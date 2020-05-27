@@ -64,6 +64,10 @@
         Correct a regression in an earlier fix that broke the loading of
         configuration files such as keystores via URIs on Windows. (markt)
       </fix>
+      <fix>
+        Implement a few rewrite SSL env that correspond to Servlet request
+        attributes. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

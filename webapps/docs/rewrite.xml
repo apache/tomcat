@@ -245,7 +245,10 @@
         <li>
         <code>%{SSL:variable}</code>, where <em>variable</em> is the
         name of an SSL environment
-        variable, are not implemented yet.  Example:
+        variable, are not implemented, except
+        <code>SSL_PROTOCOL</code>, <code>SSL_SESSION_ID</code>,
+        <code>SSL_CIPHER</code> and <code>SSL_CIPHER_USEKEYSIZE</code>.
+        Example:
         <code>%{SSL:SSL_CIPHER_USEKEYSIZE}</code> may expand to
         <code>128</code>.</li>
 
