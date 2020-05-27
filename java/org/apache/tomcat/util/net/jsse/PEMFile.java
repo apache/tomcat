@@ -172,7 +172,7 @@ public class PEMFile {
                 keySpec = privateKeyInfo.getKeySpec(cipher);
             }
 
-            InvalidKeyException exception = new InvalidKeyException(sm.getString("jsse.pemParseError", filename));
+            InvalidKeyException exception = new InvalidKeyException(sm.getString("pemFile.parseError", filename));
             if (keyAlgorithm == null) {
                 for (String algorithm : new String[] {"RSA", "DSA", "EC"}) {
                     try {

@@ -108,14 +108,14 @@ public abstract class SSLUtilBase implements SSLUtil {
         List<String> enabledProtocols =
                 getEnabled("protocols", getLog(), warnTls13, configuredProtocols, implementedProtocols);
         if (enabledProtocols.contains("SSLv3")) {
-            log.warn(sm.getString("jsse.ssl3"));
+            log.warn(sm.getString("sslUtilBase.ssl3"));
         }
         this.enabledProtocols = enabledProtocols.toArray(new String[0]);
 
         if (enabledProtocols.contains(Constants.SSL_PROTO_TLSv1_3) &&
                 sslHostConfig.getCertificateVerification() == CertificateVerification.OPTIONAL &&
                 !isTls13RenegAuthAvailable() && warnTls13) {
-            log.warn(sm.getString("jsse.tls13.auth"));
+            log.warn(sm.getString("sslUtilBase.tls13.auth"));
         }
 
         // Calculate the enabled ciphers
@@ -222,7 +222,7 @@ public abstract class SSLUtilBase implements SSLUtil {
             // Re-throw. Caller will catch and log as required
             throw ioe;
         } catch(Exception ex) {
-            String msg = sm.getString("jsse.keystore_load_failed", type, path,
+            String msg = sm.getString("sslUtilBase.keystore_load_failed", type, path,
                     ex.getMessage());
             log.error(msg, ex);
             throw new IOException(msg);

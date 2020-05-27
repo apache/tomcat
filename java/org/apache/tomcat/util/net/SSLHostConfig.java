@@ -641,7 +641,7 @@ public class SSLHostConfig implements Serializable {
                     Throwable cause = ioe.getCause();
                     if (cause instanceof UnrecoverableKeyException) {
                         // Log a warning we had a password issue
-                        log.warn(sm.getString("jsse.invalid_truststore_password"),
+                        log.warn(sm.getString("sslHostConfig.invalid_truststore_password"),
                                 cause);
                         // Re-try
                         result = SSLUtilBase.getStore(getTruststoreType(), getTruststoreProvider(),
