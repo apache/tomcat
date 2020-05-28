@@ -16,10 +16,12 @@
  */
 package org.apache.catalina.valves.rewrite;
 
+import java.io.IOException;
 import java.nio.charset.Charset;
+import java.security.cert.X509Certificate;
 import java.util.Calendar;
+import java.util.concurrent.TimeUnit;
 
-import org.apache.catalina.Globals;
 import org.apache.catalina.WebResource;
 import org.apache.catalina.WebResourceRoot;
 import org.apache.catalina.connector.Request;
@@ -135,16 +137,101 @@ public class ResolverImpl extends Resolver {
 
     @Override
     public String resolveSsl(String key) {
-        if (key.equals("SSL_PROTOCOL")) {
-            return String.valueOf(request.getAttribute(SSLSupport.PROTOCOL_VERSION_KEY));
-        } else if (key.equals("SSL_SESSION_ID")) {
-            return String.valueOf(request.getAttribute(Globals.SSL_SESSION_ID_ATTR));
-        } else if (key.equals("SSL_CIPHER")) {
-            return String.valueOf(request.getAttribute(Globals.CIPHER_SUITE_ATTR));
-        } else if (key.equals("SSL_CIPHER_USEKEYSIZE")) {
-            return String.valueOf(request.getAttribute(Globals.KEY_SIZE_ATTR));
+        SSLSupport sslSupport = (SSLSupport) request.getAttribute(SSLSupport.SESSION_MGR);
+        try {
+            // FIXME SSL_SESSION_RESUMED
+            // FIXME SSL_SECURE_RENEG
+            // FIXME SSL_CIPHER_EXPORT
+            // FIXME SSL_CIPHER_ALGKEYSIZE
+            // FIXME SSL_COMPRESS_METHOD
+            // FIXME SSL_SRP_USER
+            // FIXME SSL_SRP_USERINFO
+            // FIXME SSL_TLS_SNI
+            if (key.equals("SSL_PROTOCOL")) {
+                return sslSupport.getProtocol();
+            } else if (key.equals("SSL_SESSION_ID")) {
+                return sslSupport.getSessionId();
+            } else if (key.equals("SSL_CIPHER")) {
+                return sslSupport.getCipherSuite();
+            } else if (key.equals("SSL_CIPHER_USEKEYSIZE")) {
+                return sslSupport.getKeySize().toString();
+            } else if (key.startsWith("SSL_CLIENT_")) {
+                X509Certificate[] certificates = sslSupport.getPeerCertificateChain();
+                if (certificates != null && certificates.length > 0) {
+                    key = key.substring("SSL_CLIENT_".length());
+                    String result = resolveSslCertificates(key, certificates);
+                    if (result != null) {
+                        return result;
+                    } else if (key.startsWith("SAN_OTHER_msUPN_")) {
+                        key = key.substring("SAN_OTHER_msUPN_".length());
+                        // FIXME return certificates[0].getSubjectAlternativeNames()
+                    } else if (key.equals("CERT_RFC4523_CEA")) {
+                        // FIXME return certificates[0];
+                    } else if (key.equals("VERIFY")) {
+                        // FIXME return certificates[0];
+                    }
+                }
+            } else if (key.startsWith("SSL_SERVER_")) {
+                X509Certificate[] certificates = sslSupport.getLocalCertificateChain();
+                if (certificates != null && certificates.length > 0) {
+                    key = key.substring("SSL_SERVER_".length());
+                    String result = resolveSslCertificates(key, certificates);
+                    if (result != null) {
+                        return result;
+                    } else if (key.startsWith("SAN_OTHER_dnsSRV_")) {
+                        key = key.substring("SAN_OTHER_dnsSRV_".length());
+                        // FIXME return certificates[0].getSubjectAlternativeNames()
+                    }
+                }
+            }
+        } catch (IOException e) {
+            // TLS access error
         }
-        // FIXME: Implement other SSL environment variables when possible
+        return null;
+    }
+
+    private String resolveSslCertificates(String key, X509Certificate[] certificates) {
+        if (key.equals("M_VERSION")) {
+            return String.valueOf(certificates[0].getVersion());
+        } else if (key.equals("M_SERIAL")) {
+            return certificates[0].getSerialNumber().toString();
+        } else if (key.equals("S_DN")) {
+            return certificates[0].getSubjectDN().getName();
+        } else if (key.startsWith("S_DN_")) {
+            key = key.substring("S_DN_".length());
+            // FIXME return certificates[0].getSubjectX500Principal().?;
+        } else if (key.startsWith("SAN_Email_")) {
+            key = key.substring("SAN_Email_".length());
+            // FIXME return certificates[0].getSubjectAlternativeNames()
+        } else if (key.startsWith("SAN_DNS_")) {
+            key = key.substring("SAN_DNS_".length());
+            // FIXME return certificates[0].getSubjectAlternativeNames()
+        } else if (key.equals("I_DN")) {
+            return certificates[0].getIssuerDN().getName();
+        } else if (key.startsWith("I_DN_")) {
+            key = key.substring("I_DN_".length());
+            // FIXME return certificates[0].getIssuerX500Principal().?;
+        } else if (key.equals("V_START")) {
+            return String.valueOf(certificates[0].getNotBefore().getTime());
+        } else if (key.equals("V_END")) {
+            return String.valueOf(certificates[0].getNotAfter().getTime());
+        } else if (key.equals("V_REMAIN")) {
+            long remain = certificates[0].getNotAfter().getTime() - System.currentTimeMillis();
+            if (remain < 0) {
+                remain = 0L;
+            }
+            // Return remaining days
+            return String.valueOf(TimeUnit.MILLISECONDS.toDays(remain));
+        } else if (key.equals("A_SIG")) {
+            return certificates[0].getSigAlgName();
+        } else if (key.equals("A_KEY")) {
+            return certificates[0].getPublicKey().getAlgorithm();
+        } else if (key.equals("CERT")) {
+            // FIXME return certificates[0] to pem
+        } else if (key.startsWith("CERT_CHAIN_")) {
+            key = key.substring("CERT_CHAIN_".length());
+            // FIXME return certificates[n] to pem
+        }
         return null;
     }
 
