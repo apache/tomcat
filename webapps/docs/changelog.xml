@@ -91,6 +91,11 @@
         Improve the quality and expand the coverage of the French translations
         provided with Apache Tomcat. (remm)
       </add>
+      <add>
+        <bug>64430</bug>: Add support for the <code>CATALINA_OUT_CMD</code>
+        environment variable that defines a command to which captured stdout and
+        stderr will be redirected. Patch provided by Harald Dunkel. (markt)
+      </add>
     </changelog>
   </subsection>
 </section>
