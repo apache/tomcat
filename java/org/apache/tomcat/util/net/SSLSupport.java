@@ -91,7 +91,7 @@ public interface SSLSupport {
      *         certificate first, followed by those of any certificate
      *         authorities
      */
-    default public X509Certificate[] getLocalCertificateChain() {
+    public default X509Certificate[] getLocalCertificateChain() {
         return null;
     }
 
