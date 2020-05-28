@@ -83,6 +83,10 @@
         <bug>64467</bug>: Improve performance of closing idle HTTP/2 streams.
         (markt)
       </fix>
+      <update>
+        Expose server certificate through the <code>SSLSupport</code>
+        interface. (remm)
+      </update>
     </changelog>
   </subsection>
   <subsection name="WebSocket">

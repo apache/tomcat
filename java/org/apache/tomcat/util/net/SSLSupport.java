@@ -85,6 +85,17 @@ public interface SSLSupport {
     public X509Certificate[] getPeerCertificateChain() throws IOException;
 
     /**
+     * The server certificate chain (if any) that were sent to the peer.
+     *
+     * @return The certificate chain sent with the server
+     *         certificate first, followed by those of any certificate
+     *         authorities
+     */
+    default public X509Certificate[] getLocalCertificateChain() {
+        return null;
+    }
+
+    /**
      * Get the keysize.
      *
      * What we're supposed to put here is ill-defined by the
