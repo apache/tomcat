@@ -36,6 +36,14 @@
 #                   will be redirected.
 #                   Default is $CATALINA_BASE/logs/catalina.out
 #
+#   CATALINA_OUT_CMD (Optional) Command which will be executed and receive
+#                   as its stdin the stdout and stderr from the Tomcat java
+#                   process. If CATALINA_OUT_CMD is set, the value of
+#                   CATALINA_OUT will be used as a named pipe.
+#                   No default.
+#                   Example (all one line)
+#                   CATALINA_OUT_CMD="/usr/bin/rotatelogs -f $CATALINA_BASE/logs/catalina.out.%Y-%m-%d.log 86400"
+#
 #   CATALINA_OPTS   (Optional) Java runtime options used when the "start",
 #                   "run" or "debug" command is executed.
 #                   Include here and not in JAVA_OPTS all options, that should
@@ -463,7 +471,20 @@ elif [ "$1" = "start" ] ; then
   fi
 
   shift
-  touch "$CATALINA_OUT"
+  if [ -z "$CATALINA_OUT_CMD" ] ; then
+    touch "$CATALINA_OUT"
+  else
+    if [ ! -e "$CATALINA_OUT" ]; then
+      if ! mkfifo "$CATALINA_OUT"; then
+        echo "cannot create named pipe $CATALINA_OUT. Start aborted."
+        exit 1
+      fi
+    elif [ ! -p "$CATALINA_OUT" ]; then
+      echo "$CATALINA_OUT exists and is not a named pipe. Start aborted."
+      exit 1
+    fi
+    $CATALINA_OUT_CMD <"$CATALINA_OUT" &
+  fi
   if [ "$1" = "-security" ] ; then
     if [ $have_tty -eq 1 ]; then
       echo "Using Security Manager"
