@@ -21,6 +21,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -87,6 +88,14 @@ public class JSSESupport implements SSLSupport, SSLSessionManager {
     }
 
     @Override
+    public X509Certificate[] getLocalCertificateChain() {
+        if (session == null) {
+            return null;
+        }
+        return convertCertificates(session.getLocalCertificates());
+    }
+
+    @Override
     public java.security.cert.X509Certificate[] getPeerCertificateChain() throws IOException {
         // Look up the current SSLSession
         if (session == null)
@@ -99,6 +108,12 @@ public class JSSESupport implements SSLSupport, SSLSessionManager {
             log.debug(sm.getString("jsseSupport.clientCertError"), t);
             return null;
         }
+
+        return convertCertificates(certs);
+    }
+
+
+    private static java.security.cert.X509Certificate[] convertCertificates(Certificate[] certs) {
         if( certs==null ) return null;
 
         java.security.cert.X509Certificate [] x509Certs =
