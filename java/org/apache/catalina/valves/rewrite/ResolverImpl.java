@@ -18,15 +18,21 @@ package org.apache.catalina.valves.rewrite;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.util.Calendar;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.catalina.WebResource;
 import org.apache.catalina.WebResourceRoot;
 import org.apache.catalina.connector.Request;
+import org.apache.tomcat.util.codec.binary.Base64;
 import org.apache.tomcat.util.http.FastHttpDateFormat;
 import org.apache.tomcat.util.net.SSLSupport;
+import org.apache.tomcat.util.net.openssl.ciphers.Cipher;
+import org.apache.tomcat.util.net.openssl.ciphers.EncryptionLevel;
+import org.apache.tomcat.util.net.openssl.ciphers.OpenSSLCipherConfigurationParser;
 
 public class ResolverImpl extends Resolver {
 
@@ -139,20 +145,39 @@ public class ResolverImpl extends Resolver {
     public String resolveSsl(String key) {
         SSLSupport sslSupport = (SSLSupport) request.getAttribute(SSLSupport.SESSION_MGR);
         try {
-            // FIXME SSL_SESSION_RESUMED
-            // FIXME SSL_SECURE_RENEG
-            // FIXME SSL_CIPHER_EXPORT
-            // FIXME SSL_CIPHER_ALGKEYSIZE
-            // FIXME SSL_COMPRESS_METHOD
+            // FIXME SSL_SESSION_RESUMED in SSLHostConfig
+            // FIXME SSL_SECURE_RENEG in SSLHostConfig
+            // FIXME SSL_COMPRESS_METHOD in SSLHostConfig
+            // FIXME SSL_TLS_SNI from handshake
             // FIXME SSL_SRP_USER
             // FIXME SSL_SRP_USERINFO
-            // FIXME SSL_TLS_SNI
-            if (key.equals("SSL_PROTOCOL")) {
+            if (key.equals("HTTPS")) {
+                return String.valueOf(sslSupport != null);
+            } else if (key.equals("SSL_PROTOCOL")) {
                 return sslSupport.getProtocol();
             } else if (key.equals("SSL_SESSION_ID")) {
                 return sslSupport.getSessionId();
             } else if (key.equals("SSL_CIPHER")) {
                 return sslSupport.getCipherSuite();
+            } else if (key.equals("SSL_CIPHER_EXPORT")) {
+                String cipherSuite = sslSupport.getCipherSuite();
+                Set<Cipher> cipherList = OpenSSLCipherConfigurationParser.parse(cipherSuite);
+                if (cipherList.size() == 1) {
+                    Cipher cipher = cipherList.iterator().next();
+                    if (cipher.getLevel().equals(EncryptionLevel.EXP40)
+                            || cipher.getLevel().equals(EncryptionLevel.EXP56)) {
+                        return "true";
+                    } else {
+                        return "false";
+                    }
+                }
+            } else if (key.equals("SSL_CIPHER_ALGKEYSIZE")) {
+                String cipherSuite = sslSupport.getCipherSuite();
+                Set<Cipher> cipherList = OpenSSLCipherConfigurationParser.parse(cipherSuite);
+                if (cipherList.size() == 1) {
+                    Cipher cipher = cipherList.iterator().next();
+                    return String.valueOf(cipher.getAlg_bits());
+                }
             } else if (key.equals("SSL_CIPHER_USEKEYSIZE")) {
                 return sslSupport.getKeySize().toString();
             } else if (key.startsWith("SSL_CLIENT_")) {
@@ -166,9 +191,9 @@ public class ResolverImpl extends Resolver {
                         key = key.substring("SAN_OTHER_msUPN_".length());
                         // FIXME return certificates[0].getSubjectAlternativeNames()
                     } else if (key.equals("CERT_RFC4523_CEA")) {
-                        // FIXME return certificates[0];
+                        // FIXME return certificates[0]
                     } else if (key.equals("VERIFY")) {
-                        // FIXME return certificates[0];
+                        // FIXME return verification state
                     }
                 }
             } else if (key.startsWith("SSL_SERVER_")) {
@@ -199,7 +224,7 @@ public class ResolverImpl extends Resolver {
             return certificates[0].getSubjectDN().getName();
         } else if (key.startsWith("S_DN_")) {
             key = key.substring("S_DN_".length());
-            // FIXME return certificates[0].getSubjectX500Principal().?;
+            // FIXME would need access to X500Name from X500Principal
         } else if (key.startsWith("SAN_Email_")) {
             key = key.substring("SAN_Email_".length());
             // FIXME return certificates[0].getSubjectAlternativeNames()
@@ -210,7 +235,7 @@ public class ResolverImpl extends Resolver {
             return certificates[0].getIssuerDN().getName();
         } else if (key.startsWith("I_DN_")) {
             key = key.substring("I_DN_".length());
-            // FIXME return certificates[0].getIssuerX500Principal().?;
+            // FIXME would need access to X500Name from X500Principal
         } else if (key.equals("V_START")) {
             return String.valueOf(certificates[0].getNotBefore().getTime());
         } else if (key.equals("V_END")) {
@@ -227,12 +252,29 @@ public class ResolverImpl extends Resolver {
         } else if (key.equals("A_KEY")) {
             return certificates[0].getPublicKey().getAlgorithm();
         } else if (key.equals("CERT")) {
-            // FIXME return certificates[0] to pem
+            try {
+                return toPEM(certificates[0]);
+            } catch (CertificateEncodingException e) {
+            }
         } else if (key.startsWith("CERT_CHAIN_")) {
             key = key.substring("CERT_CHAIN_".length());
-            // FIXME return certificates[n] to pem
+            try {
+                return toPEM(certificates[Integer.parseInt(key)]);
+            } catch (NumberFormatException | CertificateEncodingException e) {
+                // Ignore
+            }
         }
         return null;
+    }
+
+    private String toPEM(X509Certificate certificate) throws CertificateEncodingException {
+        StringBuilder result = new StringBuilder();
+        result.append("-----BEGIN CERTIFICATE-----");
+        result.append(System.lineSeparator());
+        Base64 b64 = new Base64(64);
+        result.append(b64.encodeAsString(certificate.getEncoded()));
+        result.append("-----END CERTIFICATE-----");
+        return result.toString();
     }
 
     @Override
