@@ -36,7 +36,7 @@ mvn.properties
 *.asc
 *.jj
 *.tmp
-maven-ant-tasks-*.jar
+maven-resolver-ant-tasks-*.jar
 thumbs.db
 Thumbs.db
 bin/setenv.*
