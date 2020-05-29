@@ -2282,7 +2282,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
             <filename name="**/*.asc" />
             <filename name="**/*.tmp" />
             <filename name="**/*.jj" />
-            <filename name="**/maven-ant-tasks-*.jar" />
+            <filename name="**/maven-resolver-ant-tasks-*.jar" />
             <filename name="**/thumbs.db" />
             <filename name="**/Thumbs.db" />
             <filename name="*.launch"/>

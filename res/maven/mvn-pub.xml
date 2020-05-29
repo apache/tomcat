@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
   Licensed to the Apache Software Foundation (ASF) under one or more
   contributor license agreements.  See the NOTICE file distributed with
@@ -16,23 +16,67 @@
   limitations under the License.
 -->
 <project name="Tomcat 7.0 Maven Deployment" default="" basedir="."
-         xmlns:artifact="urn:maven-artifact-ant">
-  <!--
-    Built for using Maven Ant Tasks (version 2.1.0 is known to work)
-  -->
+         xmlns:resolver="antlib:org.apache.maven.resolver.ant"
+         xmlns:if="ant:if"
+         xmlns:unless="ant:unless">
 
   <property file="${basedir}/mvn.properties"/>
   <property file="${basedir}/mvn.properties.default"/>
   <property name="local.repo" value="${user.home}/.m2/repository"/>
 
   <target name="init-maven">
-    <typedef resource="org/apache/maven/artifact/ant/antlib.xml"
-             uri="urn:maven-artifact-ant">
+    <antcall target="downloadfile">
+      <param name="sourcefile" value="${maven-resolver-ant-tasks.loc}"/>
+      <param name="destfile" value="${maven-resolver-ant-tasks.jar}"/>
+      <param name="destdir" value="${maven-resolver-ant-tasks.home}"/>
+    </antcall>
+
+    <taskdef resource="org/apache/maven/resolver/ant/antlib.xml"
+             uri="antlib:org.apache.maven.resolver.ant">
       <classpath>
-        <pathelement location="${basedir}/maven-ant-tasks-2.1.0.jar" />
+        <pathelement location="${maven-resolver-ant-tasks.jar}" />
       </classpath>
-    </typedef>
+    </taskdef>
   </target>
+
+  <target name="maven-install" depends="init-maven">
+    <!--cleanup-->
+    <delete file="${pom}.tmp"/>
+
+    <!--replace the version in the pom-->
+    <copy file="${pom}" tofile="${pom}.tmp">
+      <filterset>
+        <filter token="MAVEN.DEPLOY.VERSION" value="${maven.deploy.version}"/>
+      </filterset>
+    </copy>
+
+    <resolver:install file="${file}">
+      <pom file="${pom}.tmp"/>
+    </resolver:install>
+
+    <delete file="${pom}.tmp"/>
+  </target>
+
+  <macrodef name="doMavenInstall">
+    <attribute name="artifactId"/>
+    <attribute name="jarFileName" default="@{artifactId}.jar" />
+    <attribute name="groupId" default="org.apache.tomcat" />
+    <attribute name="file" default="${tomcat.lib.path}/@{jarFileName}" />
+    <attribute name="pom" default="@{artifactId}.pom" />
+    <attribute name="srcJarFileName" default="@{artifactId}-src.jar" />
+    <attribute name="src" default="${tomcat.src.path}/@{srcJarFileName}" />
+    <sequential>
+      <antcall target="maven-install">
+        <param name="file" value="@{file}"/>
+        <param name="groupId" value="@{groupId}"/>
+        <param name="artifactId" value="@{artifactId}"/>
+        <param name="pom" value="${tomcat.pom.path}/@{pom}"/>
+        <param name="src" value="@{src}"/>
+        <param name="src.skip" value="@{src.skip}"/>
+        <param name="maven.deploy.version" value="${maven.asf.release.deploy.version}-dev"/>
+      </antcall>
+    </sequential>
+  </macrodef>
 
   <target name="maven-deploy" depends="init-maven">
     <!--cleanup-->
@@ -49,44 +93,32 @@
     </copy>
 
     <!--sign the jar, the source and the pom -->
-    <exec executable="${gpg.exec}" failonerror="true"
-          inputstring="${gpg.passphrase}">
-      <arg value="--passphrase-fd"/>
-      <arg value="0"/>
-      <arg value="-a"/>
-      <arg value="-b"/>
-      <arg value="${file}"/>
-    </exec>
-    <exec executable="${gpg.exec}" failonerror="true"
-          inputstring="${gpg.passphrase}">
-      <arg value="--passphrase-fd"/>
-      <arg value="0"/>
-      <arg value="-a"/>
-      <arg value="-b"/>
-      <arg value="${src}"/>
-    </exec>
-    <exec executable="${gpg.exec}" failonerror="true"
-          inputstring="${gpg.passphrase}">
-      <arg value="--passphrase-fd"/>
-      <arg value="0"/>
-      <arg value="-a"/>
-      <arg value="-b"/>
-      <arg value="-o"/>
-      <arg value="${pom}.asc"/>
-      <arg value="${pom}.tmp"/>
-    </exec>
+    <antcall target="-sign" >
+      <param name="file.in" value="${file}" />
+      <param name="file.out" value="${file}.asc" />
+    </antcall>
+    <antcall target="-sign" >
+      <param name="file.in" value="${src}" />
+      <param name="file.out" value="${src}.asc" />
+    </antcall>
+    <antcall target="-sign" >
+      <param name="file.in" value="${pom}.tmp" />
+      <param name="file.out" value="${pom}.asc" />
+    </antcall>
 
-    <artifact:deploy file="${file}">
-        <pom file="${pom}.tmp"/>
-        <remoteRepository url="${maven.repo.url}" layout="default">
-          <authentication username="${asf.ldap.username}"
-                          password="${asf.ldap.password}"/>
-        </remoteRepository>
-        <attach file="${file}.asc" type="jar.asc"/>
-        <attach file="${src}" classifier="sources" type="jar"/>
-        <attach file="${src}.asc" classifier="sources" type="jar.asc"/>
-        <attach file="${pom}.asc" type="pom.asc"/>
-    </artifact:deploy>
+    <resolver:deploy>
+      <artifact file="${file}" />
+      <pom file="${pom}.tmp"/>
+      <remoterepo id="${maven.repo.repositoryId}" url="${maven.repo.url}">
+        <authentication username="${asf.ldap.username}"
+                        password="${asf.ldap.password}"
+                        unless:set="maven.auth.useSettings" />
+      </remoterepo>
+      <artifact file="${file}.asc" type="jar.asc" if:set="gpg.passphrase"/>
+      <artifact file="${src}" classifier="sources" type="jar"/>
+      <artifact file="${src}.asc" classifier="sources" type="jar.asc" if:set="gpg.passphrase"/>
+      <artifact file="${pom}.asc" type="pom.asc" if:set="gpg.passphrase"/>
+    </resolver:deploy>
 
     <delete file="${pom}.tmp"/>
     <delete file="${pom}.asc"/>
@@ -128,34 +160,26 @@
     </copy>
 
     <!--sign the file and pom -->
-    <exec executable="${gpg.exec}" failonerror="true"
-          inputstring="${gpg.passphrase}">
-      <arg value="--passphrase-fd"/>
-      <arg value="0"/>
-      <arg value="-a"/>
-      <arg value="-b"/>
-      <arg value="${file}"/>
-    </exec>
-    <exec executable="${gpg.exec}" failonerror="true"
-          inputstring="${gpg.passphrase}">
-      <arg value="--passphrase-fd"/>
-      <arg value="0"/>
-      <arg value="-a"/>
-      <arg value="-b"/>
-      <arg value="-o"/>
-      <arg value="${pom}.asc"/>
-      <arg value="${pom}.tmp"/>
-    </exec>
+    <antcall target="-sign" >
+      <param name="file.in" value="${file}" />
+      <param name="file.out" value="${file}.asc" />
+    </antcall>
+    <antcall target="-sign" >
+      <param name="file.in" value="${pom}.tmp" />
+      <param name="file.out" value="${pom}.asc" />
+    </antcall>
 
-    <artifact:deploy file="${file}">
+    <resolver:deploy>
+      <artifact file="${file}" />
       <pom file="${pom}.tmp"/>
-      <remoteRepository url="${maven.repo.url}" layout="default" >
+      <remoterepo id="${maven.repo.repositoryId}" url="${maven.repo.url}">
         <authentication username="${asf.ldap.username}"
-                        password="${asf.ldap.password}"/>
-      </remoteRepository>
-      <attach file="${file}.asc" type="jar.asc"/>
-      <attach file="${pom}.asc" type="pom.asc"/>
-    </artifact:deploy>
+                        password="${asf.ldap.password}"
+                        unless:set="maven.auth.useSettings"/>
+      </remoterepo>
+      <artifact file="${file}.asc" type="jar.asc" if:set="gpg.passphrase"/>
+      <artifact file="${pom}.asc" type="pom.asc" if:set="gpg.passphrase"/>
+    </resolver:deploy>
 
     <delete file="${pom}.tmp"/>
     <delete file="${pom}.asc"/>
@@ -193,45 +217,32 @@
     </copy>
 
     <!--sign the zip, the tar.gz and the pom -->
-    <exec executable="${gpg.exec}" failonerror="true"
-          inputstring="${gpg.passphrase}">
-      <arg value="--passphrase-fd"/>
-      <arg value="0"/>
-      <arg value="-a"/>
-      <arg value="-b"/>
-      <arg value="${file}.zip"/>
-    </exec>
-    <exec executable="${gpg.exec}" failonerror="true"
-          inputstring="${gpg.passphrase}">
-      <arg value="--passphrase-fd"/>
-      <arg value="0"/>
-      <arg value="-a"/>
-      <arg value="-b"/>
-      <arg value="${file}.tar.gz"/>
-    </exec>
-    <exec executable="${gpg.exec}" failonerror="true"
-          inputstring="${gpg.passphrase}">
-      <arg value="--passphrase-fd"/>
-      <arg value="0"/>
-      <arg value="-a"/>
-      <arg value="-b"/>
-      <arg value="-o"/>
-      <arg value="${pom}.asc"/>
-      <arg value="${pom}.tmp"/>
-    </exec>
+    <antcall target="-sign" >
+      <param name="file.in" value="${file}.zip" />
+      <param name="file.out" value="${file}.zip.asc" />
+    </antcall>
+    <antcall target="-sign" >
+      <param name="file.in" value="${file}.tar.gz" />
+      <param name="file.out" value="${file}.tar.gz.asc" />
+    </antcall>
+    <antcall target="-sign" >
+      <param name="file.in" value="${pom}.tmp" />
+      <param name="file.out" value="${pom}.asc" />
+    </antcall>
 
-    <artifact:deploy file="${pom}">
-        <pom file="${pom}.tmp"/>
-        <remoteRepository url="${maven.repo.url}" layout="default">
-          <authentication username="${asf.ldap.username}"
-                          password="${asf.ldap.password}"/>
-        </remoteRepository>
-        <attach file="${file}.zip" type="zip"/>
-        <attach file="${file}.zip.asc" type="zip.asc"/>
-        <attach file="${file}.tar.gz" type="tar.gz"/>
-        <attach file="${file}.tar.gz.asc" type="tar.gz.asc"/>
-        <attach file="${pom}.asc" type="pom.asc"/>
-    </artifact:deploy>
+    <resolver:deploy>
+      <pom file="${pom}.tmp"/>
+      <remoterepo id="${maven.repo.repositoryId}" url="${maven.repo.url}">
+        <authentication username="${asf.ldap.username}"
+                        password="${asf.ldap.password}"
+                        unless:set="maven.auth.useSettings"/>
+      </remoterepo>
+      <artifact file="${file}.zip" type="zip"/>
+      <artifact file="${file}.zip.asc" type="zip.asc" if:set="gpg.passphrase"/>
+      <artifact file="${file}.tar.gz" type="tar.gz"/>
+      <artifact file="${file}.tar.gz.asc" type="tar.gz.asc" if:set="gpg.passphrase"/>
+      <artifact file="${pom}.asc" type="pom.asc" if:set="gpg.passphrase"/>
+    </resolver:deploy>
 
     <delete file="${pom}.tmp"/>
     <delete file="${pom}.asc"/>
@@ -254,7 +265,7 @@
     </sequential>
   </macrodef>
 
-  <target name="generic-deploy" depends="init-maven,init-gpg,init-ldap">
+  <target name="generic-deploy" depends="init-maven,init-gpg-1,init-gpg-2,init-ldap">
     <!-- Standard jars in bin directory -->
     <!-- Skip bootstrap.jar - it is just a subset of catalina.jar -->
     <doMavenDeploy artifactId="tomcat-juli"
@@ -403,17 +414,61 @@
     </antcall>
   </target>
 
-  <target name="init-gpg">
+  <target name="init-gpg-1">
+    <available file="${gpg.exec}" property="gpg.exec.available"/>
+  </target>
+
+  <target name="init-gpg-2" if="${gpg.exec.available}">
     <input message="Enter GPG pass-phrase" addproperty="gpg.passphrase" >
       <handler type="secure"/>
     </input>
   </target>
 
-  <target name="init-ldap">
+  <target name="init-ldap" unless="maven.auth.useSettings">
     <input message="Enter ASF LDAP (same as svn) password"
            addproperty="asf.ldap.password" >
       <handler type="secure"/>
     </input>
+  </target>
+
+  <target name="-sign" if="gpg.passphrase">
+    <fail unless="file" />
+    <exec executable="${gpg.exec}" failonerror="true"
+          inputstring="${gpg.passphrase}">
+      <arg value="--batch"/>
+      <arg value="--pinentry-mode"/>
+      <arg value="loopback"/>
+      <arg value="--passphrase-fd"/>
+      <arg value="0"/>
+      <arg value="-a"/>
+      <arg value="-b"/>
+      <arg value="-o"/>
+      <arg value="${file.out}"/>
+      <arg value="${file.in}"/>
+    </exec>
+  </target>
+
+  <!-- =============== Utility Targets to support downloads ================ -->
+
+  <target name="setproxy" if="${proxy.use}">
+    <setproxy proxyhost="${proxy.host}" proxyport="${proxy.port}"
+              proxyuser="${proxy.user}" proxypassword="${proxy.password}" />
+    <echo message="Using ${proxy.host}:${proxy.port} to download ${sourcefile}"/>
+  </target>
+
+  <target name="testexist">
+    <echo message="Testing  for ${destfile}"/>
+    <available file="${destfile}" property="exist"/>
+  </target>
+
+  <target name="downloadfile" unless="exist" depends="testexist,setproxy">
+    <!-- Download the file -->
+    <local name="temp.file"/>
+    <mkdir dir="${base.path}"/>
+    <tempfile property="temp.file" destdir="${base.path}" prefix="download-" suffix=".tmp"/>
+    <get src="${sourcefile}" httpusecaches="${trydownload.httpusecaches}" dest="${temp.file}"/>
+    <mkdir dir="${destdir}"/>
+    <move file="${temp.file}" tofile="${destfile}"/>
   </target>
 
 </project>
