@@ -39,8 +39,6 @@
     </taskdef>
   </target>
 
-<<<<<<< HEAD
-=======
   <target name="maven-install" depends="init-maven">
     <!--cleanup-->
     <delete file="${pom}.tmp"/>
@@ -80,7 +78,6 @@
     </sequential>
   </macrodef>
 
->>>>>>> 5db7d814d0... Switch to Maven Resolver Ant tasks
   <target name="maven-deploy" depends="init-maven">
     <!--cleanup-->
     <delete file="${pom}.tmp"/>
