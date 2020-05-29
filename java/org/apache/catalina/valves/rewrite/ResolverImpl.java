@@ -197,17 +197,7 @@ public class ResolverImpl extends Resolver {
                     }
                 }
             } else if (key.startsWith("SSL_SERVER_")) {
-                X509Certificate[] certificates = sslSupport.getLocalCertificateChain();
-                if (certificates != null && certificates.length > 0) {
-                    key = key.substring("SSL_SERVER_".length());
-                    String result = resolveSslCertificates(key, certificates);
-                    if (result != null) {
-                        return result;
-                    } else if (key.startsWith("SAN_OTHER_dnsSRV_")) {
-                        key = key.substring("SAN_OTHER_dnsSRV_".length());
-                        // FIXME return certificates[0].getSubjectAlternativeNames()
-                    }
-                }
+                // No access to local certificates with 8.5
             }
         } catch (IOException e) {
             // TLS access error
