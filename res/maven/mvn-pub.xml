@@ -16,7 +16,7 @@
   limitations under the License.
 -->
 <project name="Tomcat 10.0 Maven Deployment" default="" basedir="."
-         xmlns:artifact="urn:maven-artifact-ant"
+         xmlns:resolver="antlib:org.apache.maven.resolver.ant"
          xmlns:if="ant:if"
          xmlns:unless="ant:unless">
   <!--
@@ -29,17 +29,17 @@
 
   <target name="init-maven">
     <antcall target="downloadfile">
-      <param name="sourcefile" value="${maven-ant-tasks.loc}"/>
-      <param name="destfile" value="${maven-ant-tasks.jar}"/>
-      <param name="destdir" value="${maven-ant-tasks.home}"/>
+      <param name="sourcefile" value="${maven-resolver-ant-tasks.loc}"/>
+      <param name="destfile" value="${maven-resolver-ant-tasks.jar}"/>
+      <param name="destdir" value="${maven-resolver-ant-tasks.home}"/>
     </antcall>
 
-    <typedef resource="org/apache/maven/artifact/ant/antlib.xml"
-             uri="urn:maven-artifact-ant">
+    <taskdef resource="org/apache/maven/resolver/ant/antlib.xml"
+             uri="antlib:org.apache.maven.resolver.ant">
       <classpath>
-        <pathelement location="${maven-ant-tasks.jar}" />
+        <pathelement location="${maven-resolver-ant-tasks.jar}" />
       </classpath>
-    </typedef>
+    </taskdef>
   </target>
 
   <target name="maven-install" depends="init-maven">
@@ -53,9 +53,9 @@
       </filterset>
     </copy>
 
-    <artifact:install file="${file}">
+    <resolver:install file="${file}">
       <pom file="${pom}.tmp"/>
-    </artifact:install>
+    </resolver:install>
 
     <delete file="${pom}.tmp"/>
   </target>
@@ -109,18 +109,19 @@
       <param name="file.out" value="${pom}.asc" />
     </antcall>
 
-    <artifact:deploy file="${file}">
+    <resolver:deploy>
+      <artifact file="${file}" />
       <pom file="${pom}.tmp"/>
-      <remoteRepository id="${maven.repo.repositoryId}" url="${maven.repo.url}">
+      <remoterepo id="${maven.repo.repositoryId}" url="${maven.repo.url}">
         <authentication username="${asf.ldap.username}"
                         password="${asf.ldap.password}"
                         unless:set="maven.auth.useSettings" />
-      </remoteRepository>
-      <attach file="${file}.asc" type="jar.asc" if:set="gpg.passphrase"/>
-      <attach file="${src}" classifier="sources" type="jar"/>
-      <attach file="${src}.asc" classifier="sources" type="jar.asc" if:set="gpg.passphrase"/>
-      <attach file="${pom}.asc" type="pom.asc" if:set="gpg.passphrase"/>
-    </artifact:deploy>
+      </remoterepo>
+      <artifact file="${file}.asc" type="jar.asc" if:set="gpg.passphrase"/>
+      <artifact file="${src}" classifier="sources" type="jar"/>
+      <artifact file="${src}.asc" classifier="sources" type="jar.asc" if:set="gpg.passphrase"/>
+      <artifact file="${pom}.asc" type="pom.asc" if:set="gpg.passphrase"/>
+    </resolver:deploy>
 
     <delete file="${pom}.tmp"/>
     <delete file="${pom}.asc"/>
@@ -171,16 +172,17 @@
       <param name="file.out" value="${pom}.asc" />
     </antcall>
 
-    <artifact:deploy file="${file}">
+    <resolver:deploy>
+      <artifact file="${file}" />
       <pom file="${pom}.tmp"/>
-      <remoteRepository id="${maven.repo.repositoryId}" url="${maven.repo.url}">
+      <remoterepo id="${maven.repo.repositoryId}" url="${maven.repo.url}">
         <authentication username="${asf.ldap.username}"
                         password="${asf.ldap.password}"
                         unless:set="maven.auth.useSettings"/>
-      </remoteRepository>
-      <attach file="${file}.asc" type="jar.asc" if:set="gpg.passphrase"/>
-      <attach file="${pom}.asc" type="pom.asc" if:set="gpg.passphrase"/>
-    </artifact:deploy>
+      </remoterepo>
+      <artifact file="${file}.asc" type="jar.asc" if:set="gpg.passphrase"/>
+      <artifact file="${pom}.asc" type="pom.asc" if:set="gpg.passphrase"/>
+    </resolver:deploy>
 
     <delete file="${pom}.tmp"/>
     <delete file="${pom}.asc"/>
@@ -231,19 +233,19 @@
       <param name="file.out" value="${pom}.asc" />
     </antcall>
 
-    <artifact:deploy file="${pom}">
+    <resolver:deploy>
       <pom file="${pom}.tmp"/>
-        <remoteRepository id="${maven.repo.repositoryId}" url="${maven.repo.url}">
+      <remoterepo id="${maven.repo.repositoryId}" url="${maven.repo.url}">
         <authentication username="${asf.ldap.username}"
                         password="${asf.ldap.password}"
                         unless:set="maven.auth.useSettings"/>
-      </remoteRepository>
-      <attach file="${file}.zip" type="zip"/>
-      <attach file="${file}.zip.asc" type="zip.asc" if:set="gpg.passphrase"/>
-      <attach file="${file}.tar.gz" type="tar.gz"/>
-      <attach file="${file}.tar.gz.asc" type="tar.gz.asc" if:set="gpg.passphrase"/>
-      <attach file="${pom}.asc" type="pom.asc" if:set="gpg.passphrase"/>
-    </artifact:deploy>
+      </remoterepo>
+      <artifact file="${file}.zip" type="zip"/>
+      <artifact file="${file}.zip.asc" type="zip.asc" if:set="gpg.passphrase"/>
+      <artifact file="${file}.tar.gz" type="tar.gz"/>
+      <artifact file="${file}.tar.gz.asc" type="tar.gz.asc" if:set="gpg.passphrase"/>
+      <artifact file="${pom}.asc" type="pom.asc" if:set="gpg.passphrase"/>
+    </resolver:deploy>
 
     <delete file="${pom}.tmp"/>
     <delete file="${pom}.asc"/>
