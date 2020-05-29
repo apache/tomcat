@@ -19,7 +19,7 @@ package org.apache.tomcat.util.net;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-import jakarta.servlet.ServletException;
+import javax.servlet.ServletException;
 
 import org.junit.Assert;
 import org.junit.Test;
