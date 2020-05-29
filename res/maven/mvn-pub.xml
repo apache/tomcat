@@ -19,9 +19,6 @@
          xmlns:resolver="antlib:org.apache.maven.resolver.ant"
          xmlns:if="ant:if"
          xmlns:unless="ant:unless">
-  <!--
-    Built for using Maven Ant Tasks (version 2.1.0 is known to work)
-  -->
 
   <property file="${basedir}/mvn.properties"/>
   <property file="${basedir}/mvn.properties.default"/>
