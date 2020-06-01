@@ -425,7 +425,7 @@ public class MemoryUserDatabase implements UserDatabase {
 
             String pathName = getPathname();
             try (ConfigurationSource.Resource resource = ConfigFileLoader.getSource().getResource(pathName)) {
-                this.lastModified = resource.getURI().toURL().openConnection().getLastModified();
+                lastModified = resource.getLastModified();
 
                 // Construct a digester to read the XML input file
                 Digester digester = new Digester();
