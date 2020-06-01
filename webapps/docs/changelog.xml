@@ -91,6 +91,10 @@
         Expose server certificate through the <code>SSLSupport</code>
         interface. (remm)
       </update>
+      <fix>
+        <bug>64485</bug>: Fix possible resource leak geting last modified from
+        <code>ConfigurationSource.Resource</code>. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="WebSocket">
