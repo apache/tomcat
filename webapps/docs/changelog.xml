@@ -87,6 +87,10 @@
         Expose server certificate through the <code>SSLSupport</code>
         interface. (remm)
       </update>
+      <add>
+        <bug>64483</bug>: Log a warning if an AJP request is rejected because it
+        contains an unexpected request attribute. (markt)
+      </add>
       <fix>
         <bug>64485</bug>: Fix possible resource leak geting last modified from
         <code>ConfigurationSource.Resource</code>. (remm)

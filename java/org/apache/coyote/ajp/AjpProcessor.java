@@ -30,7 +30,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import jakarta.servlet.http.HttpServletResponse;
@@ -779,17 +778,12 @@ public class AjpProcessor extends AbstractProcessor {
                     // All 'known' attributes will be processed by the previous
                     // blocks. Any remaining attribute is an 'arbitrary' one.
                     Pattern pattern = protocol.getAllowedRequestAttributesPatternInternal();
-                    if (pattern == null) {
+                    if (pattern != null && pattern.matcher(n).matches()) {
+                        request.setAttribute(n, v);
+                    } else {
+                        log.warn(sm.getString("ajpprocessor.unknownAttribute", n));
                         response.setStatus(403);
                         setErrorState(ErrorState.CLOSE_CLEAN, null);
-                    } else {
-                        Matcher m = pattern.matcher(n);
-                        if (m.matches()) {
-                            request.setAttribute(n, v);
-                        } else {
-                            response.setStatus(403);
-                            setErrorState(ErrorState.CLOSE_CLEAN, null);
-                        }
                     }
                 }
                 break;
