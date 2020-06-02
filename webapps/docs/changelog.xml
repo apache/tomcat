@@ -141,6 +141,9 @@
         Resolver Ant Tasks to upload artifacts to the ASF Maven repository (and
         from there to Maven Central). (markt)
       </update>
+      <update>
+        Update dependency on bnd to 5.1.0. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
