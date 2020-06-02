@@ -27,7 +27,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletResponse;
@@ -912,17 +911,13 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
                 } else {
                     // All 'known' attributes will be processed by the previous
                     // blocks. Any remaining attribute is an 'arbitrary' one.
-                    if (allowedRequestAttributesPatternPattern == null) {
+                    if (allowedRequestAttributesPatternPattern != null &&
+                            allowedRequestAttributesPatternPattern.matcher(n).matches() ) {
+                        request.setAttribute(n, v);
+                    } else {
+                        getLog().warn(sm.getString("ajpprocessor.unknownAttribute", n));
                         response.setStatus(403);
                         setErrorState(ErrorState.CLOSE_CLEAN, null);
-                    } else {
-                        Matcher m = allowedRequestAttributesPatternPattern.matcher(n);
-                        if (m.matches()) {
-                            request.setAttribute(n, v);
-                        } else {
-                            response.setStatus(403);
-                            setErrorState(ErrorState.CLOSE_CLEAN, null);
-                        }
                     }
                 }
                 break;
