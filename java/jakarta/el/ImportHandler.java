@@ -19,6 +19,8 @@ package jakarta.el;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -30,6 +32,8 @@ import java.util.concurrent.ConcurrentHashMap;
  * @since EL 3.0
  */
 public class ImportHandler {
+
+    private static final boolean IS_SECURITY_ENABLED = (System.getSecurityManager() != null);
 
     private static final Map<String,Set<String>> standardPackages = new HashMap<>();
 
@@ -452,8 +456,18 @@ public class ImportHandler {
              * for the case where the class does exist is a lot less than the
              * overhead we save by not calling loadClass().
              */
-            if (cl.getResource(path) == null) {
-                return null;
+            if (IS_SECURITY_ENABLED) {
+                // Webapps don't have read permission for JAVA_HOME (and
+                // possibly other sources of classes). Only need to know if the
+                // class exists at this point. Class loading occurs with
+                // standard SecurityManager policy next.
+                if (!AccessController.doPrivileged(new PrivilegedResourceExists(cl, path)).booleanValue()) {
+                    return null;
+                }
+            } else {
+                if (cl.getResource(path) == null) {
+                    return null;
+                }
             }
         } catch (ClassCircularityError cce) {
             // May happen under a security manager. Ignore it and try loading
@@ -488,5 +502,26 @@ public class ImportHandler {
      * ConcurrentHashMap.
      */
     private static class NotFound {
+    }
+
+
+    private static class PrivilegedResourceExists implements PrivilegedAction<Boolean> {
+
+        private final ClassLoader cl;
+        private final String name;
+
+        public PrivilegedResourceExists(ClassLoader cl, String name) {
+            this.cl = cl;
+            this.name = name;
+        }
+
+        @Override
+        public Boolean run() {
+            if (cl.getResource(name) == null) {
+                return Boolean.FALSE;
+            } else {
+                return Boolean.TRUE;
+            }
+        }
     }
 }
