@@ -35,7 +35,7 @@
   <section name="Introduction">
 
   <p>
-    Tomcat supports using the GraalVM 19.3 Native Image tool to produce
+    Tomcat supports using the GraalVM Native Image tool to produce
     a native binary including the container. This documentation page
     describes the build process of such an image.
   </p>
