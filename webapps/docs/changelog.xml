@@ -77,6 +77,10 @@
         groups, roles and users in the <code>tomcat-users.xml</code> file.
         (fschumacher)
       </update>
+      <fix>
+        <bug>64493</bug>: Revert possible change of returned protocol
+        attribute value on the <code>Connector</code>. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

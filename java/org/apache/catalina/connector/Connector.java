@@ -80,7 +80,6 @@ public class Connector extends LifecycleMBeanBase  {
 
 
     public Connector(String protocol) {
-        configuredProtocol = protocol;
         boolean apr = AprLifecycleListener.isAprAvailable() &&
                 AprLifecycleListener.getUseAprConnector();
         ProtocolHandler p = null;
@@ -104,7 +103,6 @@ public class Connector extends LifecycleMBeanBase  {
 
     public Connector(ProtocolHandler protocolHandler) {
         protocolHandlerClassName = protocolHandler.getClass().getName();
-        configuredProtocol = protocolHandlerClassName;
         this.protocolHandler = protocolHandler;
         // Default for Connector depends on this system property
         setThrowOnFailure(Boolean.getBoolean("org.apache.catalina.startup.EXIT_ON_INIT_FAILURE"));
@@ -247,12 +245,6 @@ public class Connector extends LifecycleMBeanBase  {
      * See {@link #Connector()} for current default.
      */
     protected final String protocolHandlerClassName;
-
-
-    /**
-     * Name of the protocol that was configured.
-     */
-    protected final String configuredProtocol;
 
 
     /**
@@ -633,7 +625,15 @@ public class Connector extends LifecycleMBeanBase  {
      * @return the Coyote protocol handler in use.
      */
     public String getProtocol() {
-        return configuredProtocol;
+        boolean apr = AprLifecycleListener.getUseAprConnector();
+        if ((!apr && org.apache.coyote.http11.Http11NioProtocol.class.getName().equals(protocolHandlerClassName))
+                || (apr && org.apache.coyote.http11.Http11AprProtocol.class.getName().equals(protocolHandlerClassName))) {
+            return "HTTP/1.1";
+        } else if ((!apr && org.apache.coyote.ajp.AjpNioProtocol.class.getName().equals(protocolHandlerClassName))
+                || (apr && org.apache.coyote.ajp.AjpAprProtocol.class.getName().equals(protocolHandlerClassName))) {
+            return "AJP/1.3";
+        }
+        return protocolHandlerClassName;
     }
 
 
