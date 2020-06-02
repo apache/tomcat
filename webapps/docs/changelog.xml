@@ -106,17 +106,21 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Jasper">
+    <changelog>
+      <fix>
+        <bug>64488</bug>: Ensure that the ImportHandler from the Expression
+        Language API is able to load classes from the Java runtime when running
+        under a SecurityManager. Based on a patch by Volodymyr Siedleck. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="WebSocket">
     <changelog>
       <fix>
         Consistently throw a <code>DeploymentException</code> when an invalid
         endpoint path is specified and catch invalid endpoint paths earlier.
         (markt)
-      </fix>
-      <fix>
-        <bug>64488</bug>: Ensure that the ImportHandler from the Expression
-        Language API is able to load classes from the Java runtime when running
-        under a SecurityManager. Based on a patch by Volodymyr Siedleck. (markt)
       </fix>
     </changelog>
   </subsection>
