@@ -83,6 +83,10 @@
         endpoint path is specified and catch invalid endpoint paths earlier.
         (markt)
       </fix>
+      <add>
+        Include the target URL in the log message when a WebSocket connection
+        fails. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Other">
