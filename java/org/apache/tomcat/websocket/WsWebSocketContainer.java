@@ -482,8 +482,7 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
             success = true;
         } catch (ExecutionException | InterruptedException | SSLException |
                 EOFException | TimeoutException | URISyntaxException | AuthenticationException e) {
-            throw new DeploymentException(
-                    sm.getString("wsWebSocketContainer.httpRequestFailed"), e);
+            throw new DeploymentException(sm.getString("wsWebSocketContainer.httpRequestFailed", path), e);
         } finally {
             if (!success) {
                 channel.close();
