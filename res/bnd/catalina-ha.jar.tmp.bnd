@@ -14,7 +14,7 @@
 # limitations under the License.
 Bundle-Name: tomcat-catalina-ha
 Bundle-SymbolicName: org.apache.tomcat-catalina-ha
-Bundle-Version: @VERSION@
+Bundle-Version: ${version_cleanup;@VERSION@}
 Export-Package: \
     org.apache.catalina.ha,\
     org.apache.catalina.ha.authenticator,\
