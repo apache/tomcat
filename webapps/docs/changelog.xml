@@ -68,6 +68,14 @@
       </add>
     </changelog>
   </subsection>
+  <subsection name="Other">
+    <changelog>
+      <fix>
+        <bug>64498</bug>: Fix incorrect version format in OSGi manifests. Patch
+        provided by Raymond Augé. (markt)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 9.0.36 (markt)" rtext="2020-06-07">
   <subsection name="Catalina">

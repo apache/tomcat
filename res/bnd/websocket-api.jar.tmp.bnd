@@ -14,7 +14,7 @@
 # limitations under the License.
 Bundle-Name: tomcat-websocket-api
 Bundle-SymbolicName: org.apache.tomcat-websocket-api
-Bundle-Version: @VERSION@
+Bundle-Version: ${version_cleanup;@VERSION@}
 Export-Package: \
     javax.websocket,\
     javax.websocket.server
