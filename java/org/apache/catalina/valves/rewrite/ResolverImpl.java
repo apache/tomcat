@@ -306,7 +306,9 @@ public class ResolverImpl extends Resolver {
                         elements.add(String.valueOf(alternateName.get(1)));
                     }
                 }
-                return elements.get(n);
+                if (elements.size() > n) {
+                    return elements.get(n);
+                }
             }
         } catch (NumberFormatException | ArrayIndexOutOfBoundsException
                 | CertificateParsingException e) {
