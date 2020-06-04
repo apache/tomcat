@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.tomcat.util.net;
+package org.apache.catalina.valves.rewrite;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -30,9 +30,8 @@ import org.apache.catalina.connector.Response;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.catalina.valves.ValveBase;
-import org.apache.catalina.valves.rewrite.Resolver;
-import org.apache.catalina.valves.rewrite.ResolverImpl;
 import org.apache.tomcat.util.buf.ByteChunk;
+import org.apache.tomcat.util.net.TesterSupport;
 
 public class TestResolverSSL extends TomcatBaseTest {
 
