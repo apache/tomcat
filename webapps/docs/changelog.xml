@@ -45,6 +45,16 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 10.0.0-M7 (markt)" rtext="in development">
+  <subsection name="Catalina">
+    <changelog>
+      <add>
+        Remove the error message on start if <code>java.io.tmp</code> is missing
+        and add an explicit error message on application deployment when the
+        sole feature that depends on it (anti-resource locking) is configured
+        and can't be used. (markt)
+      </add>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 10.0.0-M6 (markt)" rtext="release in progress">
   <subsection name="Catalina">
