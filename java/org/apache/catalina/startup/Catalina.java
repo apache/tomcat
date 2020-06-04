@@ -733,11 +733,11 @@ public class Catalina {
     }
 
 
+    /**
+     * @deprecated unused. Will be removed in Tomcat 10 onwards.
+     */
+    @Deprecated
     protected void initDirs() {
-        String temp = System.getProperty("java.io.tmpdir");
-        if (temp == null || (!(new File(temp)).isDirectory())) {
-            log.error(sm.getString("embedded.notmp", temp));
-        }
     }
 
 
