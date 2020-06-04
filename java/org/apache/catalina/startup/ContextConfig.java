@@ -674,7 +674,7 @@ public class ContextConfig implements LifecycleListener {
     protected void antiLocking() {
 
         if ((context instanceof StandardContext)
-            && ((StandardContext) context).getAntiResourceLocking()) {
+                && ((StandardContext) context).getAntiResourceLocking()) {
 
             Host host = (Host) context.getParent();
             String docBase = context.getDocBase();
@@ -695,14 +695,17 @@ public class ContextConfig implements LifecycleListener {
             ContextName cn = new ContextName(path, context.getWebappVersion());
             docBase = cn.getBaseName();
 
+            String tmp = System.getProperty("java.io.tmpdir");
+            File tmpFile = new File(tmp);
+            if (!tmpFile.isDirectory()) {
+                log.error(sm.getString("contextConfig.noAntiLocking", tmp, context.getName()));
+                return;
+            }
+
             if (originalDocBase.toLowerCase(Locale.ENGLISH).endsWith(".war")) {
-                antiLockingDocBase = new File(
-                        System.getProperty("java.io.tmpdir"),
-                        deploymentCount++ + "-" + docBase + ".war");
+                antiLockingDocBase = new File(tmpFile, deploymentCount++ + "-" + docBase + ".war");
             } else {
-                antiLockingDocBase = new File(
-                        System.getProperty("java.io.tmpdir"),
-                        deploymentCount++ + "-" + docBase);
+                antiLockingDocBase = new File(tmpFile, deploymentCount++ + "-" + docBase);
             }
             antiLockingDocBase = antiLockingDocBase.getAbsoluteFile();
 
