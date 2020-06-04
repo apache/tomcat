@@ -251,7 +251,7 @@ public final class TesterSupport {
         return true;
     }
 
-    protected static void configureClientCertContext(Tomcat tomcat) {
+    public static void configureClientCertContext(Tomcat tomcat) {
         TesterSupport.initSsl(tomcat);
 
         /* When running on Java 11, TLSv1.3 is enabled by default. The JSSE
