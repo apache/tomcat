@@ -29,6 +29,6 @@ public enum Authentication {
     GOST94 /* GOST R 34.10-94 signature auth */,
     GOST01 /* GOST R 34.10-2001 */,
     FZA    /* Fortezza */,
-    SRP,
+    SRP    /* Secure Remote Password */,
     ANY    /* TLS 1.3 */
 }
