@@ -110,6 +110,9 @@ public class IPv6UtilsTest {
         // Choice in Placement of "::" (4.2.3)
         Assert.assertEquals("2001:0:0:1::1", IPv6Utils.canonize("2001:0:0:1:0:0:0:1"));
         Assert.assertEquals("2001:db8::1:0:0:1", IPv6Utils.canonize("2001:db8:0:0:1:0:0:1"));
+        
+        // IPv6 Network address or IPv6 address ending with "::"
+        Assert.assertEquals("2001:1f00:8001:3ab::", IPv6Utils.canonize("2001:1f00:8001:3ab::")
 
         // IPv4 inside IPv6
         Assert.assertEquals("::ffff:192.0.2.1", IPv6Utils.canonize("::ffff:192.0.2.1"));
