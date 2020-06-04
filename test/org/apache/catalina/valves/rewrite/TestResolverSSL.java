@@ -68,11 +68,13 @@ public class TestResolverSSL extends TomcatBaseTest {
             "SSL_CLIENT_S_DN_CN", // CN component
             "SSL_CLIENT_S_DN_O", // O component
             "SSL_CLIENT_S_DN_C", // C component
-            "SSL_CLIENT_SAN_Email_n", // FXIME: n
-            "SSL_CLIENT_SAN_DNS_n", // FXIME: n
-            "SSL_CLIENT_SAN_OTHER_msUPN_n", // FXIME: n
+            "SSL_CLIENT_SAN_Email_0",
+            "SSL_CLIENT_SAN_DNS_0",
+            "SSL_CLIENT_SAN_OTHER_msUPN_0",
             "SSL_CLIENT_I_DN",
-            "SSL_CLIENT_I_DN_x509", // FXIME: x509
+            "SSL_CLIENT_I_DN_CN", // CN component
+            "SSL_CLIENT_I_DN_O", // O component
+            "SSL_CLIENT_I_DN_C", // C component
             "SSL_CLIENT_V_START",
             "SSL_CLIENT_V_END",
             "SSL_CLIENT_V_REMAIN",
@@ -85,14 +87,16 @@ public class TestResolverSSL extends TomcatBaseTest {
             "SSL_SERVER_M_VERSION",
             "SSL_SERVER_M_SERIAL",
             "SSL_SERVER_S_DN",
-            "SSL_SERVER_SAN_Email_n", // FXIME: n
-            "SSL_SERVER_SAN_DNS_n", // FXIME: n
-            "SSL_SERVER_SAN_OTHER_dnsSRV_n", // FXIME: n
+            "SSL_SERVER_SAN_Email_0",
+            "SSL_SERVER_SAN_DNS_0",
+            "SSL_SERVER_SAN_OTHER_dnsSRV_0",
             "SSL_SERVER_S_DN_CN", // CN component
             "SSL_SERVER_S_DN_O", // O component
             "SSL_SERVER_S_DN_C", // C component
             "SSL_SERVER_I_DN",
-            "SSL_SERVER_I_DN_x509", // FXIME: x509
+            "SSL_SERVER_I_DN_CN", // CN component
+            "SSL_SERVER_I_DN_O", // O component
+            "SSL_SERVER_I_DN_C", // C component
             "SSL_SERVER_V_START",
             "SSL_SERVER_V_END",
             "SSL_SERVER_A_SIG",
