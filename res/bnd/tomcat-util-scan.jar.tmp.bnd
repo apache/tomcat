@@ -14,7 +14,7 @@
 # limitations under the License.
 Bundle-Name: tomcat-util-scan
 Bundle-SymbolicName: org.apache.tomcat-util-scan
-Bundle-Version: @VERSION@
+Bundle-Version: ${version_cleanup;@VERSION@}
 Export-Package: \
     org.apache.tomcat.util.descriptor,\
     org.apache.tomcat.util.descriptor.tagplugin,\

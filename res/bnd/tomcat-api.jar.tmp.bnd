@@ -14,5 +14,5 @@
 # limitations under the License.
 Bundle-Name: tomcat-api
 Bundle-SymbolicName: org.apache.tomcat-api
-Bundle-Version: @VERSION@
+Bundle-Version: ${version_cleanup;@VERSION@}
 Export-Package: org.apache.tomcat

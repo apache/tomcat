@@ -14,7 +14,7 @@
 # limitations under the License.
 Bundle-Name: tomcat-jsp-api
 Bundle-SymbolicName: org.apache.tomcat-jsp-api
-Bundle-Version: @VERSION@
+Bundle-Version: ${version_cleanup;@VERSION@}
 Export-Package: \
     jakarta.servlet.jsp,\
     jakarta.servlet.jsp.el,\
