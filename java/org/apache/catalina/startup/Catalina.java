@@ -571,8 +571,6 @@ public class Catalina {
 
         long t1 = System.nanoTime();
 
-        initDirs();
-
         // Before digester - it may be needed
         initNaming();
 
@@ -755,14 +753,6 @@ public class Catalina {
 
         System.out.println(sm.getString("catalina.usage"));
 
-    }
-
-
-    /**
-     * @deprecated unused. Will be removed in Tomcat 10 onwards.
-     */
-    @Deprecated
-    protected void initDirs() {
     }
 
 
