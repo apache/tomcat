@@ -48,10 +48,10 @@
   <subsection name="Catalina">
     <changelog>
       <add>
-        Remove the error message on start if <code>java.io.tmp</code> is missing
-        and add an explicit error message on application deployment when the
-        sole feature that depends on it (anti-resource locking) is configured
-        and can't be used. (markt)
+        Remove the error message on start if <code>java.io.tmpdir</code> is
+        missing and add an explicit error message on application deployment when
+        the sole feature that depends on it (anti-resource locking) is
+        configured and can't be used. (markt)
       </add>
     </changelog>
   </subsection>
