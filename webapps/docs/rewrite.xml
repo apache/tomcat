@@ -244,9 +244,16 @@
         <li>
         <code>%{SSL:variable}</code>, where <em>variable</em> is the
         name of an SSL environment
-        variable, are not implemented, except
-        <code>SSL_PROTOCOL</code>, <code>SSL_SESSION_ID</code>,
-        <code>SSL_CIPHER</code> and <code>SSL_CIPHER_USEKEYSIZE</code>.
+        variable, are implemented, except
+        <code>SSL_SESSION_RESUMED</code>, <code>SSL_SECURE_RENEG</code>,
+        <code>SSL_COMPRESS_METHOD</code>, <code>SSL_TLS_SNI</code>,
+        <code>SSL_SRP_USER</code>, <code>SSL_SRP_USERINFO</code>,
+        <code>SSL_CLIENT_VERIFY</code>,
+        <code>SSL_CLIENT_SAN_OTHER_msUPN_n</code>,
+        <code>SSL_CLIENT_CERT_RFC4523_CEA</code>,
+        <code>SSL_SERVER_SAN_OTHER_dnsSRV_n</code>.
+        When OpenSSL is used, the variables related to the server
+        certificate, prefixed by <code>SSL_SERVER_</code> are not available.
         Example:
         <code>%{SSL:SSL_CIPHER_USEKEYSIZE}</code> may expand to
         <code>128</code>.</li>
