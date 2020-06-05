@@ -527,6 +527,18 @@ public class Http11Processor extends AbstractProcessor {
     }
 
 
+    private void checkMaxSwallowSize() {
+        if (request.getContentLengthLong() > 0 &&
+                (request.getContentLengthLong() - request.getBytesRead() > protocol.getMaxSwallowSize())) {
+            // There is more data to swallow than Tomcat will accept so the
+            // connection is going to be closed. Disable keep-alive which will
+            // trigger adding the "Connection: close" header if not already
+            // present.
+            keepAlive = false;
+        }
+    }
+
+
     private void prepareRequestProtocol() {
 
         MessageBytes protocolMB = request.protocol();
@@ -912,6 +924,10 @@ public class Http11Processor extends AbstractProcessor {
         // This may disabled keep-alive to check before working out the
         // Connection header.
         checkExpectationAndResponseStatus();
+
+        // This may disable keep-alive if there is more body to swallow
+        // than the configuration allows
+        checkMaxSwallowSize();
 
         // If we know that the request is bad this early, add the
         // Connection: close header.
