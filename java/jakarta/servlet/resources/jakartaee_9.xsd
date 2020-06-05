@@ -9,19 +9,19 @@
     <xsd:documentation>
 
       Copyright (c) 2009, 2020 Oracle and/or its affiliates. All rights reserved.
-      
+
       This program and the accompanying materials are made available under the
       terms of the Eclipse Public License v. 2.0, which is available at
       http://www.eclipse.org/legal/epl-2.0.
-      
+
       This Source Code may also be made available under the following Secondary
       Licenses when the conditions for such availability set forth in the
       Eclipse Public License v. 2.0 are satisfied: GNU General Public License,
       version 2 with the GNU Classpath Exception, which is available at
       https://www.gnu.org/software/classpath/license.html.
-      
+
       SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
-      
+
     </xsd:documentation>
   </xsd:annotation>
 
@@ -31,20 +31,20 @@
       The following definitions that appear in the common
       shareable schema(s) of Jakarta EE deployment descriptors should be
       interpreted with respect to the context they are included:
-      
+
       Deployment Component may indicate one of the following:
       Jakarta EE application;
       application client;
       web application;
       enterprise bean;
-      resource adapter; 
-      
+      resource adapter;
+
       Deployment File may indicate one of the following:
       ear file;
       war file;
       jar file;
       rar file;
-      
+
     </xsd:documentation>
   </xsd:annotation>
 
@@ -59,10 +59,10 @@
 
         This group keeps the usage of the contained description related
         elements consistent across Jakarta EE deployment descriptors.
-        
+
         All elements may occur multiple times with different languages,
         to support localization of the content.
-        
+
       </xsd:documentation>
     </xsd:annotation>
     <xsd:sequence>
@@ -87,7 +87,7 @@
 
         This group keeps the usage of the contained JNDI environment
         reference elements consistent across Jakarta EE deployment descriptors.
-        
+
       </xsd:documentation>
     </xsd:annotation>
     <xsd:sequence>
@@ -165,7 +165,7 @@
 
         This group collects elements that are common to most
         JNDI resource elements.
-        
+
       </xsd:documentation>
     </xsd:annotation>
     <xsd:sequence>
@@ -177,7 +177,7 @@
           <xsd:documentation>
 
             The JNDI name to be looked up to resolve a resource reference.
-            
+
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
@@ -191,7 +191,7 @@
         This group collects elements that are common to all the
         JNDI resource elements. It does not include the lookup-name
         element, that is only applicable to some resource elements.
-        
+
       </xsd:documentation>
     </xsd:annotation>
     <xsd:sequence>
@@ -210,13 +210,13 @@
             names to names of resources known to the application
             server.  This mapped name is often a global JNDI name,
             but may be a name of any form.
-            
+
             Application servers are not required to support any
             particular form or type of mapped name, nor the ability
             to use mapped names.  The mapped name is
             product-dependent and often installation-dependent.  No
             use of a mapped name is portable.
-            
+
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
@@ -235,7 +235,7 @@
       <xsd:documentation>
 
         Configuration of an administered object.
-        
+
       </xsd:documentation>
     </xsd:annotation>
     <xsd:sequence>
@@ -246,7 +246,7 @@
           <xsd:documentation>
 
             Description of this administered object.
-            
+
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
@@ -257,7 +257,7 @@
 
             The name element specifies the JNDI name of the
             administered object being defined.
-            
+
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
@@ -268,7 +268,7 @@
           <xsd:documentation>
 
             The administered object's interface type.
-            
+
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
@@ -278,7 +278,7 @@
           <xsd:documentation>
 
             The administered object's class name.
-            
+
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
@@ -288,7 +288,7 @@
           <xsd:documentation>
 
             Resource adapter name.
-            
+
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
@@ -299,9 +299,9 @@
         <xsd:annotation>
           <xsd:documentation>
 
-            Property of the administered object property.  This may be a 
+            Property of the administered object property.  This may be a
             vendor-specific property.
-            
+
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
@@ -318,7 +318,7 @@
       <xsd:documentation>
 
         Configuration of a Connector Connection Factory resource.
-        
+
       </xsd:documentation>
     </xsd:annotation>
     <xsd:sequence>
@@ -329,7 +329,7 @@
           <xsd:documentation>
 
             Description of this resource.
-            
+
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
@@ -340,7 +340,7 @@
 
             The name element specifies the JNDI name of the
             resource being defined.
-            
+
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
@@ -349,9 +349,9 @@
         <xsd:annotation>
           <xsd:documentation>
 
-            The fully qualified class name of the connection factory 
-            interface. 
-            
+            The fully qualified class name of the connection factory
+            interface.
+
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
@@ -361,7 +361,7 @@
           <xsd:documentation>
 
             Resource adapter name.
-            
+
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
@@ -373,7 +373,7 @@
 
             Maximum number of connections that should be concurrently
             allocated for a connection pool.
-            
+
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
@@ -385,7 +385,7 @@
 
             Minimum number of connections that should be concurrently
             allocated for a connection pool.
-            
+
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
@@ -395,9 +395,9 @@
         <xsd:annotation>
           <xsd:documentation>
 
-            The level of transaction support the connection factory 
-            needs to support. 
-            
+            The level of transaction support the connection factory
+            needs to support.
+
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
@@ -410,7 +410,7 @@
 
             Resource property.  This may be a vendor-specific
             property.
-            
+
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
@@ -427,7 +427,7 @@
       <xsd:documentation>
 
         Configuration of a DataSource.
-        
+
       </xsd:documentation>
     </xsd:annotation>
     <xsd:sequence>
@@ -438,7 +438,7 @@
           <xsd:documentation>
 
             Description of this DataSource.
-            
+
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
@@ -449,7 +449,7 @@
 
             The name element specifies the JNDI name of the
             data source being defined.
-            
+
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
@@ -461,7 +461,7 @@
 
             DataSource, XADataSource or ConnectionPoolDataSource
             implementation class.
-            
+
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
@@ -472,7 +472,7 @@
           <xsd:documentation>
 
             Database server name.
-            
+
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
@@ -483,7 +483,7 @@
           <xsd:documentation>
 
             Port number where a server is listening for requests.
-            
+
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
@@ -494,7 +494,7 @@
           <xsd:documentation>
 
             Name of a database on a server.
-            
+
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
@@ -509,7 +509,7 @@
             such as <code>serverName</code>, <code>databaseName</code>
             and <code>portNumber</code>, the more specific properties will
             take precedence and <code>url</code> will be ignored.
-            
+
             ]]>
           </xsd:documentation>
         </xsd:annotation>
@@ -521,7 +521,7 @@
           <xsd:documentation>
 
             User name to use for connection authentication.
-            
+
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
@@ -532,7 +532,7 @@
           <xsd:documentation>
 
             Password to use for connection authentication.
-            
+
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
@@ -545,7 +545,7 @@
 
             JDBC DataSource property.  This may be a vendor-specific
             property or a less commonly used DataSource property.
-            
+
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
@@ -557,7 +557,7 @@
 
             Sets the maximum time in seconds that this data source
             will wait while attempting to connect to a database.
-            
+
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
@@ -569,7 +569,7 @@
 
             Set to false if connections should not participate in
             transactions.
-            
+
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
@@ -580,7 +580,7 @@
           <xsd:documentation>
 
             Isolation level for connections.
-            
+
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
@@ -592,7 +592,7 @@
 
             Number of connections that should be created when a
             connection pool is initialized.
-            
+
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
@@ -604,7 +604,7 @@
 
             Maximum number of connections that should be concurrently
             allocated for a connection pool.
-            
+
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
@@ -616,7 +616,7 @@
 
             Minimum number of connections that should be concurrently
             allocated for a connection pool.
-            
+
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
@@ -629,7 +629,7 @@
             The number of seconds that a physical connection should
             remain unused in the pool before the connection is
             closed for a connection pool.
-            
+
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
@@ -641,7 +641,7 @@
 
             The total number of statements that a connection pool
             should keep open.
-            
+
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
@@ -666,10 +666,10 @@
         tools used by such a Deployment File consumer will display
         the description when processing the parent element that
         contains the description.
-        
+
         The lang attribute defines the language that the
-        description is provided in. The default value is "en" (English). 
-        
+        description is provided in. The default value is "en" (English).
+
       </xsd:documentation>
     </xsd:annotation>
     <xsd:simpleContent>
@@ -684,8 +684,8 @@
       <xsd:documentation>
 
         This type defines a dewey decimal that is used
-        to describe versions of documents. 
-        
+        to describe versions of documents.
+
       </xsd:documentation>
     </xsd:annotation>
     <xsd:restriction base="xsd:token">
@@ -703,16 +703,16 @@
         The display-name type contains a short name that is intended
         to be displayed by tools. It is used by display-name
         elements.  The display name need not be unique.
-        
-        Example: 
-        
+
+        Example:
+
         ...
         <display-name xml:lang="en">
         Employee Self Service
         </display-name>
-        
-        The value of the xml:lang attribute is "en" (English) by default. 
-        
+
+        The value of the xml:lang attribute is "en" (English) by default.
+
         ]]>
       </xsd:documentation>
     </xsd:annotation>
@@ -733,11 +733,11 @@
         The ejb-linkType is used by ejb-link
         elements in the ejb-ref or ejb-local-ref elements to specify
         that an enterprise bean reference is linked to enterprise bean.
-        
+
         The value of the ejb-link element must be the ejb-name of an
         enterprise bean in the same ejb-jar file or in another ejb-jar
-        file in the same Jakarta EE application unit. 
-        
+        file in the same Jakarta EE application unit.
+
         Alternatively, the name in the ejb-link element may be
         composed of a path name specifying the ejb-jar containing the
         referenced enterprise bean with the ejb-name of the target
@@ -746,13 +746,13 @@
         Deployment Component that is referencing the enterprise
         bean.  This allows multiple enterprise beans with the same
         ejb-name to be uniquely identified.
-        
+
         Examples:
-        
+
         <ejb-link>EmployeeRecord</ejb-link>
-        
+
         <ejb-link>../products/product.jar#ProductEJB</ejb-link>
-        
+
         ]]>
       </xsd:documentation>
     </xsd:annotation>
@@ -772,22 +772,22 @@
         the declaration of a reference to an enterprise bean's local
         home or to the local business interface of a 3.0 bean.
         The declaration consists of:
-        
+
         - an optional description
-        - the enterprise bean's reference name used in the code of the 
+        - the enterprise bean's reference name used in the code of the
         Deployment Component that's referencing the enterprise bean.
         - the optional expected type of the referenced enterprise bean
-        - the optional expected local interface of the referenced 
-        enterprise bean or the local business interface of the 
+        - the optional expected local interface of the referenced
+        enterprise bean or the local business interface of the
         referenced enterprise bean.
-        - the optional expected local home interface of the referenced 
+        - the optional expected local home interface of the referenced
         enterprise bean. Not applicable if this ejb-local-ref refers
         to the local business interface of a 3.0 bean.
-        - optional ejb-link information, used to specify the 
+        - optional ejb-link information, used to specify the
         referenced enterprise bean
-        - optional elements to define injection of the named enterprise  
+        - optional elements to define injection of the named enterprise
         bean into a component field or property.
-        
+
       </xsd:documentation>
     </xsd:annotation>
     <xsd:sequence>
@@ -822,17 +822,17 @@
     <xsd:annotation>
       <xsd:documentation>
         <![CDATA[
-        The ejb-ref-name element contains the name of an enterprise bean reference. 
-        The enterprise bean reference is an entry in the Deployment Component's 
-        environment and is relative to the java:comp/env context.  The name must 
+        The ejb-ref-name element contains the name of an enterprise bean reference.
+        The enterprise bean reference is an entry in the Deployment Component's
+        environment and is relative to the java:comp/env context.  The name must
         be unique within the Deployment Component.
-        
+
         It is recommended that name is prefixed with "ejb/".
-        
+
         Example:
-        
+
         <ejb-ref-name>ejb/Payroll</ejb-ref-name>
-        
+
         ]]>
       </xsd:documentation>
     </xsd:annotation>
@@ -850,25 +850,25 @@
 
         The ejb-refType is used by ejb-ref elements for the
         declaration of a reference to an enterprise bean's home or
-        to the remote business interface of a 3.0 bean.  
+        to the remote business interface of a 3.0 bean.
         The declaration consists of:
-        
+
         - an optional description
         - the enterprise bean's reference name used in the code of
         the Deployment Component that's referencing the enterprise
-        bean. 
+        bean.
         - the optional expected type of the referenced enterprise bean
         - the optional remote interface of the referenced enterprise bean
-        or the remote business interface of the referenced enterprise 
+        or the remote business interface of the referenced enterprise
         bean
-        - the optional expected home interface of the referenced 
+        - the optional expected home interface of the referenced
         enterprise bean.  Not applicable if this ejb-ref
         refers to the remote business interface of a 3.0 bean.
         - optional ejb-link information, used to specify the
         referenced enterprise bean
         - optional elements to define injection of the named enterprise
         bean into a component field or property
-        
+
       </xsd:documentation>
     </xsd:annotation>
     <xsd:sequence>
@@ -905,13 +905,13 @@
 
         The ejb-ref-typeType contains the expected type of the
         referenced enterprise bean.
-        
+
         The ejb-ref-type designates a value
         that must be one of the following:
-        
+
         Entity
         Session
-        
+
       </xsd:documentation>
     </xsd:annotation>
     <xsd:simpleContent>
@@ -930,8 +930,8 @@
       <xsd:documentation>
 
         This type is used to designate an empty
-        element when used. 
-        
+        element when used.
+
       </xsd:documentation>
     </xsd:annotation>
     <xsd:attribute name="id"
@@ -950,21 +950,21 @@
         description, the name of the environment entry, a type
         (optional if the value is injected, otherwise required), and
         an optional value.
-        
+
         It also includes optional elements to define injection of
         the named resource into fields or JavaBeans properties.
-        
+
         If a value is not specified and injection is requested,
         no injection will occur and no entry of the specified name
         will be created.  This allows an initial value to be
         specified in the source code without being incorrectly
         changed when no override has been specified.
-        
+
         If a value is not specified and no injection is requested,
-        a value must be supplied during deployment. 
-        
+        a value must be supplied during deployment.
+
         This type is used by env-entry elements.
-        
+
       </xsd:documentation>
     </xsd:annotation>
     <xsd:sequence>
@@ -980,15 +980,15 @@
             The env-entry-name element contains the name of a
             Deployment Component's environment entry.  The name
             is a JNDI name relative to the java:comp/env
-            context.  The name must be unique within a 
+            context.  The name must be unique within a
             Deployment Component. The uniqueness
             constraints must be defined within the declared
             context.
-            
+
             Example:
-            
+
             <env-entry-name>minAmount</env-entry-name>
-            
+
             ]]>
           </xsd:documentation>
         </xsd:annotation>
@@ -1005,11 +1005,11 @@
             be omitted, or must match the type of the injection
             target.  If no injection target is specified, the type
             is required.
-            
+
             Example:
-            
+
             <env-entry-type>java.lang.Integer</env-entry-type>
-            
+
             ]]>
           </xsd:documentation>
         </xsd:annotation>
@@ -1026,11 +1026,11 @@
             constructor of the specified type that takes a
             single String parameter, or for java.lang.Character,
             a single character.
-            
+
             Example:
-            
+
             <env-entry-value>100.00</env-entry-value>
-            
+
             ]]>
           </xsd:documentation>
         </xsd:annotation>
@@ -1051,9 +1051,9 @@
         This type contains the fully-qualified Java type of the
         environment entry value that is expected by the
         application's code.
-        
+
         The following are the legal values of env-entry-type-valuesType:
-        
+
         java.lang.Boolean
         java.lang.Byte
         java.lang.Character
@@ -1063,15 +1063,15 @@
         java.lang.Long
         java.lang.Float
         java.lang.Double
-        		  java.lang.Class
-        		  any enumeration type (i.e. a subclass of java.lang.Enum)
-        
+                  java.lang.Class
+                  any enumeration type (i.e. a subclass of java.lang.Enum)
+
         Examples:
-        
+
         <env-entry-type>java.lang.Boolean</env-entry-type>
         <env-entry-type>java.lang.Class</env-entry-type>
         <env-entry-type>com.example.Color</env-entry-type>
-        
+
         ]]>
       </xsd:documentation>
     </xsd:annotation>
@@ -1093,7 +1093,7 @@
         of name used in Class.forName().  Tools that need the
         canonical name (the name used in source code) will need
         to convert this binary name to the canonical name.
-        
+
       </xsd:documentation>
     </xsd:annotation>
     <xsd:simpleContent>
@@ -1109,9 +1109,9 @@
       <xsd:documentation>
 
         This type defines four different values which can designate
-        boolean values. This includes values yes and no which are 
+        boolean values. This includes values yes and no which are
         not designated by xsd:boolean
-        
+
       </xsd:documentation>
     </xsd:annotation>
     <xsd:simpleContent>
@@ -1134,12 +1134,12 @@
         The icon type contains small-icon and large-icon elements
         that specify the file names for small and large GIF, JPEG,
         or PNG icon images used to represent the parent element in a
-        GUI tool. 
-        
+        GUI tool.
+
         The xml:lang attribute defines the language that the
         icon file names are provided in. Its value is "en" (English)
-        by default. 
-        
+        by default.
+
       </xsd:documentation>
     </xsd:annotation>
     <xsd:sequence>
@@ -1153,14 +1153,14 @@
             containing a small (16 x 16) icon image. The file
             name is a relative path within the Deployment
             Component's Deployment File.
-            
+
             The image may be in the GIF, JPEG, or PNG format.
             The icon can be used by tools.
-            
+
             Example:
-            
+
             <small-icon>employee-service-icon16x16.jpg</small-icon>
-            
+
             ]]>
           </xsd:documentation>
         </xsd:annotation>
@@ -1173,17 +1173,17 @@
             <![CDATA[
             The large-icon element contains the name of a file
             containing a large
-            (32 x 32) icon image. The file name is a relative 
+            (32 x 32) icon image. The file name is a relative
             path within the Deployment Component's Deployment
             File.
-            
+
             The image may be in the GIF, JPEG, or PNG format.
             The icon can be used by tools.
-            
+
             Example:
-            
+
             <large-icon>employee-service-icon32x32.jpg</large-icon>
-            
+
             ]]>
           </xsd:documentation>
         </xsd:annotation>
@@ -1203,22 +1203,22 @@
 
         An injection target specifies a class and a name within
         that class into which a resource should be injected.
-        
+
         The injection target class specifies the fully qualified
         class name that is the target of the injection.  The
         Jakarta EE specifications describe which classes can be an
         injection target.
-        
+
         The injection target name specifies the target within
         the specified class.  The target is first looked for as a
         JavaBeans property name.  If not found, the target is
         looked for as a field name.
-        
+
         The specified resource will be injected into the target
         during initialization of the class by either calling the
         set method for the target property or by setting a value
         into the named field.
-        
+
       </xsd:documentation>
     </xsd:annotation>
     <xsd:sequence>
@@ -1233,13 +1233,13 @@
     <xsd:annotation>
       <xsd:documentation>
 
-        	The following transaction isolation levels are allowed
-        	(see documentation for the java.sql.Connection interface):
+            The following transaction isolation levels are allowed
+            (see documentation for the java.sql.Connection interface):
         TRANSACTION_READ_UNCOMMITTED
         TRANSACTION_READ_COMMITTED
         TRANSACTION_REPEATABLE_READ
         TRANSACTION_SERIALIZABLE
-        
+
       </xsd:documentation>
     </xsd:annotation>
     <xsd:restriction base="xsd:string">
@@ -1258,9 +1258,9 @@
       <xsd:documentation>
 
         The java-identifierType defines a Java identifier.
-        The users of this type should further verify that 
+        The users of this type should further verify that
         the content does not contain Java reserved keywords.
-        
+
       </xsd:documentation>
     </xsd:annotation>
     <xsd:simpleContent>
@@ -1280,7 +1280,7 @@
         This is a generic type that designates a Java primitive
         type or a fully qualified name of a Java interface/type,
         or an array of such types.
-        
+
       </xsd:documentation>
     </xsd:annotation>
     <xsd:simpleContent>
@@ -1300,13 +1300,13 @@
         The jdbc-urlType contains the url pattern of the mapping.
         It must follow the rules specified in Section 9.3 of the
         JDBC Specification where the format is:
-        
+
         jdbc:<subprotocol>:<subname>
-        
+
         Example:
-        
+
         <url>jdbc:mysql://localhost:3307/testdb</url>
-        
+
         ]]>
       </xsd:documentation>
     </xsd:annotation>
@@ -1325,7 +1325,7 @@
       <xsd:documentation>
 
         Configuration of a Messaging Connection Factory.
-        
+
       </xsd:documentation>
     </xsd:annotation>
     <xsd:sequence>
@@ -1336,7 +1336,7 @@
           <xsd:documentation>
 
             Description of this Messaging Connection Factory.
-            
+
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
@@ -1347,7 +1347,7 @@
 
             The name element specifies the JNDI name of the
             messaging connection factory being defined.
-            
+
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
@@ -1359,10 +1359,10 @@
 
             Fully-qualified name of the messaging connection factory
             interface.  Permitted values are jakarta.jms.ConnectionFactory,
-            jakarta.jms.QueueConnectionFactory, or 
+            jakarta.jms.QueueConnectionFactory, or
             jakarta.jms.TopicConnectionFactory.  If not specified,
             jakarta.jms.ConnectionFactory will be used.
-            
+
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
@@ -1372,10 +1372,10 @@
         <xsd:annotation>
           <xsd:documentation>
 
-            Fully-qualified name of the messaging connection factory 
-            implementation class.  Ignored if a resource adapter  
+            Fully-qualified name of the messaging connection factory
+            implementation class.  Ignored if a resource adapter
             is used.
-            
+
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
@@ -1388,7 +1388,7 @@
             Resource adapter name.  If not specified, the application
             server will define the default behavior, which may or may
             not involve the use of a resource adapter.
-            
+
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
@@ -1399,7 +1399,7 @@
           <xsd:documentation>
 
             User name to use for connection authentication.
-            
+
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
@@ -1410,7 +1410,7 @@
           <xsd:documentation>
 
             Password to use for connection authentication.
-            
+
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
@@ -1421,7 +1421,7 @@
           <xsd:documentation>
 
             Client id to use for connection.
-            
+
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
@@ -1434,7 +1434,7 @@
 
             Messaging Connection Factory property.  This may be a vendor-specific
             property or a less commonly used ConnectionFactory property.
-            
+
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
@@ -1446,7 +1446,7 @@
 
             Set to false if connections should not participate in
             transactions.
-            
+
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
@@ -1458,7 +1458,7 @@
 
             Maximum number of connections that should be concurrently
             allocated for a connection pool.
-            
+
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
@@ -1470,7 +1470,7 @@
 
             Minimum number of connections that should be concurrently
             allocated for a connection pool.
-            
+
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
@@ -1487,7 +1487,7 @@
       <xsd:documentation>
 
         Configuration of a Messaging Destination.
-        
+
       </xsd:documentation>
     </xsd:annotation>
     <xsd:sequence>
@@ -1498,7 +1498,7 @@
           <xsd:documentation>
 
             Description of this Messaging Destination.
-            
+
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
@@ -1509,7 +1509,7 @@
 
             The name element specifies the JNDI name of the
             messaging destination being defined.
-            
+
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
@@ -1520,7 +1520,7 @@
 
             Fully-qualified name of the messaging destination interface.
             Permitted values are jakarta.jms.Queue and jakarta.jms.Topic
-            
+
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
@@ -1534,7 +1534,7 @@
             class.  Ignored if a resource adapter is used unless the
             resource adapter defines more than one destination implementation
             class for the specified interface.
-            
+
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
@@ -1547,7 +1547,7 @@
             Resource adapter name.  If not specified, the application
             server will define the default behavior, which may or may
             not involve the use of a resource adapter.
-            
+
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
@@ -1558,7 +1558,7 @@
           <xsd:documentation>
 
             Name of the queue or topic.
-            
+
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
@@ -1571,7 +1571,7 @@
 
             Messaging Destination property.  This may be a vendor-specific
             property or a less commonly used Destination property.
-            
+
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
@@ -1591,7 +1591,7 @@
         Deployment Component's environment and is relative to the
         java:comp/env context.  A JNDI name must be unique within the
         Deployment Component.
-        
+
       </xsd:documentation>
     </xsd:annotation>
     <xsd:simpleContent>
@@ -1607,12 +1607,12 @@
       <xsd:documentation>
         <![CDATA[
         The homeType defines the fully-qualified name of
-        an enterprise bean's home interface. 
-        
+        an enterprise bean's home interface.
+
         Example:
-        
+
         <home>com.aardvark.payroll.PayrollHome</home>
-        
+
         ]]>
       </xsd:documentation>
     </xsd:annotation>
@@ -1633,12 +1633,12 @@
         Note that each class may have only one lifecycle callback
         method for any given event and that the method may not
         be overloaded.
-        
+
         If the lifefycle-callback-class element is missing then
         the class defining the callback is assumed to be the
         component class in scope at the place in the descriptor
         in which the callback definition appears.
-        
+
       </xsd:documentation>
     </xsd:annotation>
     <xsd:sequence>
@@ -1659,7 +1659,7 @@
 
         The listenerType indicates the deployment properties for a web
         application listener bean.
-        
+
       </xsd:documentation>
     </xsd:annotation>
     <xsd:sequence>
@@ -1673,7 +1673,7 @@
             application must be registered as a web
             application listener bean. The value is the fully
             qualified classname of the listener class.
-            
+
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
@@ -1691,7 +1691,7 @@
 
         The localType defines the fully-qualified name of an
         enterprise bean's local interface.
-        
+
       </xsd:documentation>
     </xsd:annotation>
     <xsd:simpleContent>
@@ -1708,7 +1708,7 @@
 
         The local-homeType defines the fully-qualified
         name of an enterprise bean's local home interface.
-        
+
       </xsd:documentation>
     </xsd:annotation>
     <xsd:simpleContent>
@@ -1724,7 +1724,7 @@
       <xsd:documentation>
 
         Configuration of a Mail Session resource.
-        
+
       </xsd:documentation>
     </xsd:annotation>
     <xsd:sequence>
@@ -1735,7 +1735,7 @@
           <xsd:documentation>
 
             Description of this Mail Session resource.
-            
+
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
@@ -1746,7 +1746,7 @@
 
             The name element specifies the JNDI name of the
             Mail Session resource being defined.
-            
+
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
@@ -1757,7 +1757,7 @@
           <xsd:documentation>
 
             Storage protocol.
-            
+
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
@@ -1768,7 +1768,7 @@
           <xsd:documentation>
 
             Service provider store protocol implementation class
-            
+
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
@@ -1779,7 +1779,7 @@
           <xsd:documentation>
 
             Transport protocol.
-            
+
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
@@ -1790,7 +1790,7 @@
           <xsd:documentation>
 
             Service provider transport protocol implementation class
-            
+
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
@@ -1801,7 +1801,7 @@
           <xsd:documentation>
 
             Mail server host name.
-            
+
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
@@ -1812,7 +1812,7 @@
           <xsd:documentation>
 
             Mail server user name.
-            
+
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
@@ -1823,7 +1823,7 @@
           <xsd:documentation>
 
             Password.
-            
+
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
@@ -1834,7 +1834,7 @@
           <xsd:documentation>
 
             Email address to indicate the message sender.
-            
+
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
@@ -1847,7 +1847,7 @@
 
             Mail server property.  This may be a vendor-specific
             property.
-            
+
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
@@ -1865,7 +1865,7 @@
 
         This type is a general type that can be used to declare
         parameter/value lists.
-        
+
       </xsd:documentation>
     </xsd:annotation>
     <xsd:sequence>
@@ -1880,7 +1880,7 @@
 
             The param-name element contains the name of a
             parameter.
-            
+
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
@@ -1891,7 +1891,7 @@
 
             The param-value element contains the value of a
             parameter.
-            
+
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
@@ -1909,7 +1909,7 @@
 
         The elements that use this type designate either a relative
         path or an absolute path starting with a "/".
-        
+
         In elements that specify a pathname to a file within the
         same Deployment File, relative filenames (i.e., those not
         starting with "/") are considered relative to the root of
@@ -1918,7 +1918,7 @@
         the Deployment File's namespace.  In general, relative names
         are preferred.  The exception is .war files where absolute
         names are preferred for consistency with the Servlet API.
-        
+
       </xsd:documentation>
     </xsd:annotation>
     <xsd:simpleContent>
@@ -1937,7 +1937,7 @@
         of Deployment Component's reference to a persistence context
         associated within a Deployment Component's
         environment. It consists of:
-        
+
         - an optional description
         - the persistence context reference name
         - an optional persistence unit name.  If not specified,
@@ -1951,14 +1951,14 @@
         specified, Synchronized is assumed.
         - an optional list of persistence properties
         - optional injection targets
-        
+
         Examples:
-        
+
         <persistence-context-ref>
         <persistence-context-ref-name>myPersistenceContext
         </persistence-context-ref-name>
         </persistence-context-ref>
-        
+
         <persistence-context-ref>
         <persistence-context-ref-name>myPersistenceContext
         </persistence-context-ref-name>
@@ -1966,7 +1966,7 @@
         </persistence-unit-name>
         <persistence-context-type>Extended</persistence-context-type>
         </persistence-context-ref>
-        
+
         ]]>
       </xsd:documentation>
     </xsd:annotation>
@@ -1985,7 +1985,7 @@
             value is the environment entry name used in
             Deployment Component code.  The name is a JNDI name
             relative to the java:comp/env context.
-            
+
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
@@ -1998,16 +1998,16 @@
             The Application Assembler(or BeanProvider) may use the
             following syntax to avoid the need to rename persistence
             units to have unique names within a Jakarta EE application.
-            
+
             The Application Assembler specifies the pathname of the
             root of the persistence.xml file for the referenced
             persistence unit and appends the name of the persistence
             unit separated from the pathname by #. The pathname is
-            relative to the referencing application component jar file. 
+            relative to the referencing application component jar file.
             In this manner, multiple persistence units with the same
-            persistence unit name may be uniquely identified when the 
+            persistence unit name may be uniquely identified when the
             Application Assembler cannot change persistence unit names.
-            
+
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
@@ -2027,11 +2027,11 @@
             Used to specify properties for the container or persistence
             provider.  Vendor-specific properties may be included in
             the set of properties.  Properties that are not recognized
-            by a vendor must be ignored.  Entries that make use of the 
+            by a vendor must be ignored.  Entries that make use of the
             namespace jakarta.persistence and its subnamespaces must not
             be used for vendor-specific properties.  The namespace
             jakarta.persistence is reserved for use by the specification.
-            
+
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
@@ -2048,15 +2048,15 @@
     <xsd:annotation>
       <xsd:documentation>
 
-        The persistence-context-synchronizationType specifies 
+        The persistence-context-synchronizationType specifies
         whether a container-managed persistence context is automatically
         synchronized with the current transaction.
-        
-        The value of the persistence-context-synchronization element 
+
+        The value of the persistence-context-synchronization element
         must be one of the following:
         Synchronized
         Unsynchronized
-        
+
       </xsd:documentation>
     </xsd:annotation>
     <xsd:simpleContent>
@@ -2075,13 +2075,13 @@
       <xsd:documentation>
 
         The persistence-context-typeType specifies the transactional
-        nature of a persistence context reference.  
-        
+        nature of a persistence context reference.
+
         The value of the persistence-context-type element must be
         one of the following:
         Transaction
         Extended
-        
+
       </xsd:documentation>
     </xsd:annotation>
     <xsd:simpleContent>
@@ -2100,7 +2100,7 @@
       <xsd:documentation>
 
         Specifies a name/value pair.
-        
+
       </xsd:documentation>
     </xsd:annotation>
     <xsd:sequence>
@@ -2126,27 +2126,27 @@
         of Deployment Component's reference to a persistence unit
         associated within a Deployment Component's
         environment. It consists of:
-        
+
         - an optional description
         - the persistence unit reference name
         - an optional persistence unit name.  If not specified,
         the default persistence unit is assumed.
         - optional injection targets
-        
+
         Examples:
-        
+
         <persistence-unit-ref>
         <persistence-unit-ref-name>myPersistenceUnit
         </persistence-unit-ref-name>
         </persistence-unit-ref>
-        
+
         <persistence-unit-ref>
         <persistence-unit-ref-name>myPersistenceUnit
         </persistence-unit-ref-name>
         <persistence-unit-name>PersistenceUnit1
         </persistence-unit-name>
         </persistence-unit-ref>
-        
+
         ]]>
       </xsd:documentation>
     </xsd:annotation>
@@ -2165,7 +2165,7 @@
             value is the environment entry name used in
             Deployment Component code.  The name is a JNDI name
             relative to the java:comp/env context.
-            
+
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
@@ -2178,16 +2178,16 @@
             The Application Assembler(or BeanProvider) may use the
             following syntax to avoid the need to rename persistence
             units to have unique names within a Jakarta EE application.
-            
+
             The Application Assembler specifies the pathname of the
             root of the persistence.xml file for the referenced
             persistence unit and appends the name of the persistence
             unit separated from the pathname by #. The pathname is
-            relative to the referencing application component jar file. 
+            relative to the referencing application component jar file.
             In this manner, multiple persistence units with the same
-            persistence unit name may be uniquely identified when the 
+            persistence unit name may be uniquely identified when the
             Application Assembler cannot change persistence unit names.
-            
+
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
@@ -2206,11 +2206,11 @@
         <![CDATA[
         The remote element contains the fully-qualified name
         of the enterprise bean's remote interface.
-        
+
         Example:
-        
+
         <remote>com.wombat.empl.EmployeeService</remote>
-        
+
         ]]>
       </xsd:documentation>
     </xsd:annotation>
@@ -2234,25 +2234,25 @@
         resource environment reference name, and an optional
         indication of the resource environment reference type
         expected by the Deployment Component code.
-        
+
         It also includes optional elements to define injection of
         the named resource into fields or JavaBeans properties.
-        
+
         The resource environment type must be supplied unless an
         injection target is specified, in which case the type
         of the target is used.  If both are specified, the type
         must be assignment compatible with the type of the injection
         target.
-        
+
         Example:
-        
+
         <resource-env-ref>
         <resource-env-ref-name>jms/StockQueue
         </resource-env-ref-name>
         <resource-env-ref-type>jakarta.jms.Queue
         </resource-env-ref-type>
         </resource-env-ref>
-        
+
         ]]>
       </xsd:documentation>
     </xsd:annotation>
@@ -2269,10 +2269,10 @@
             The resource-env-ref-name element specifies the name
             of a resource environment reference; its value is
             the environment entry name used in
-            the Deployment Component code.  The name is a JNDI 
-            name relative to the java:comp/env context and must 
+            the Deployment Component code.  The name is a JNDI
+            name relative to the java:comp/env context and must
             be unique within a Deployment Component.
-            
+
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
@@ -2286,7 +2286,7 @@
             of a resource environment reference.  It is the
             fully qualified name of a Java language class or
             interface.
-            
+
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
@@ -2312,25 +2312,25 @@
         (Application or Container), and an optional specification of
         the shareability of connections obtained from the resource
         (Shareable or Unshareable).
-        
+
         It also includes optional elements to define injection of
         the named resource into fields or JavaBeans properties.
-        
+
         The connection factory type must be supplied unless an
         injection target is specified, in which case the type
         of the target is used.  If both are specified, the type
         must be assignment compatible with the type of the injection
         target.
-        
+
         Example:
-        
+
         <resource-ref>
         <res-ref-name>jdbc/EmployeeAppDB</res-ref-name>
         <res-type>javax.sql.DataSource</res-type>
         <res-auth>Container</res-auth>
         <res-sharing-scope>Shareable</res-sharing-scope>
         </resource-ref>
-        
+
         ]]>
       </xsd:documentation>
     </xsd:annotation>
@@ -2347,9 +2347,9 @@
             The res-ref-name element specifies the name of a
             resource manager connection factory reference.
             The name is a JNDI name relative to the
-            java:comp/env context.  
-            The name must be unique within a Deployment File. 
-            
+            java:comp/env context.
+            The name must be unique within a Deployment File.
+
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
@@ -2363,7 +2363,7 @@
             source. The type is specified by the fully qualified
             Java language class or interface
             expected to be implemented by the data source.
-            
+
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
@@ -2392,12 +2392,12 @@
         on behalf of the Deployment Component. In the latter case,
         the Container uses information that is supplied by the
         Deployer.
-        
+
         The value must be one of the two following:
-        
+
         Application
         Container
-        
+
       </xsd:documentation>
     </xsd:annotation>
     <xsd:simpleContent>
@@ -2419,12 +2419,12 @@
         obtained through the given resource manager connection
         factory reference can be shared. The value, if specified,
         must be one of the two following:
-        
+
         Shareable
         Unshareable
-        
+
         The default value is Shareable.
-        
+
       </xsd:documentation>
     </xsd:annotation>
     <xsd:simpleContent>
@@ -2443,9 +2443,9 @@
       <xsd:documentation>
 
         The run-asType specifies the run-as identity to be
-        used for the execution of a component. It contains an 
+        used for the execution of a component. It contains an
         optional description, and the name of a security role.
-        
+
       </xsd:documentation>
     </xsd:annotation>
     <xsd:sequence>
@@ -2468,9 +2468,9 @@
       <xsd:documentation>
 
         The role-nameType designates the name of a security role.
-        
+
         The name must conform to the lexical rules for a token.
-        
+
       </xsd:documentation>
     </xsd:annotation>
     <xsd:simpleContent>
@@ -2488,9 +2488,9 @@
         The security-roleType contains the definition of a security
         role. The definition consists of an optional description of
         the security role, and the security role name.
-        
+
         Example:
-        
+
         <security-role>
         <description>
         This role includes all employees who are authorized
@@ -2498,7 +2498,7 @@
         </description>
         <role-name>employee</role-name>
         </security-role>
-        
+
         ]]>
       </xsd:documentation>
     </xsd:annotation>
@@ -2528,7 +2528,7 @@
         code, and an optional link to a security role. If the
         security role is not specified, the Deployer must choose an
         appropriate security role.
-        
+
       </xsd:documentation>
     </xsd:annotation>
     <xsd:sequence>
@@ -2542,10 +2542,10 @@
           <xsd:documentation>
 
             The value of the role-name element must be the String used
-            as the parameter to the 
+            as the parameter to the
             EJBContext.isCallerInRole(String roleName) method or the
             HttpServletRequest.isUserInRole(String role) method.
-            
+
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
@@ -2559,7 +2559,7 @@
             security role. The role-link element must contain
             the name of one of the security roles defined in the
             security-role elements.
-            
+
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
@@ -2576,7 +2576,7 @@
       <xsd:documentation>
 
         This type adds an "id" attribute to xsd:QName.
-        
+
       </xsd:documentation>
     </xsd:annotation>
     <xsd:simpleContent>
@@ -2595,7 +2595,7 @@
       <xsd:documentation>
 
         This type adds an "id" attribute to xsd:boolean.
-        
+
       </xsd:documentation>
     </xsd:annotation>
     <xsd:simpleContent>
@@ -2614,7 +2614,7 @@
       <xsd:documentation>
 
         This type adds an "id" attribute to xsd:NMTOKEN.
-        
+
       </xsd:documentation>
     </xsd:annotation>
     <xsd:simpleContent>
@@ -2633,7 +2633,7 @@
       <xsd:documentation>
 
         This type adds an "id" attribute to xsd:anyURI.
-        
+
       </xsd:documentation>
     </xsd:annotation>
     <xsd:simpleContent>
@@ -2652,7 +2652,7 @@
       <xsd:documentation>
 
         This type adds an "id" attribute to xsd:integer.
-        
+
       </xsd:documentation>
     </xsd:annotation>
     <xsd:simpleContent>
@@ -2671,7 +2671,7 @@
       <xsd:documentation>
 
         This type adds an "id" attribute to xsd:positiveInteger.
-        
+
       </xsd:documentation>
     </xsd:annotation>
     <xsd:simpleContent>
@@ -2690,7 +2690,7 @@
       <xsd:documentation>
 
         This type adds an "id" attribute to xsd:nonNegativeInteger.
-        
+
       </xsd:documentation>
     </xsd:annotation>
     <xsd:simpleContent>
@@ -2709,7 +2709,7 @@
       <xsd:documentation>
 
         This type adds an "id" attribute to xsd:string.
-        
+
       </xsd:documentation>
     </xsd:annotation>
     <xsd:simpleContent>
@@ -2732,7 +2732,7 @@
         require trailing/leading space elimination as well as
         collapsing the existing whitespace, this base type may be
         used.
-        
+
       </xsd:documentation>
     </xsd:annotation>
     <xsd:simpleContent>
@@ -2752,10 +2752,10 @@
 
         This simple type designates a boolean with only two
         permissible values
-        
+
         - true
         - false
-        
+
       </xsd:documentation>
     </xsd:annotation>
     <xsd:simpleContent>
@@ -2779,7 +2779,7 @@
         If it contains those characters, the container must inform
         the developer with a descriptive error message.
         The container must preserve all characters including whitespaces.
-        
+
       </xsd:documentation>
     </xsd:annotation>
     <xsd:simpleContent>
@@ -2797,25 +2797,25 @@
         The message-destinationType specifies a message
         destination. The logical destination described by this
         element is mapped to a physical destination by the Deployer.
-        
-        The message destination element contains: 
-        
+
+        The message destination element contains:
+
         - an optional description
         - an optional display-name
         - an optional icon
         - a message destination name which must be unique
-        among message destination names within the same 
-        Deployment File. 
+        among message destination names within the same
+        Deployment File.
         - an optional mapped name
         - an optional lookup name
-        
-        Example: 
-        
+
+        Example:
+
         <message-destination>
         <message-destination-name>CorporateStocks
         </message-destination-name>
         </message-destination>
-        
+
         ]]>
       </xsd:documentation>
     </xsd:annotation>
@@ -2830,7 +2830,7 @@
             name for a message destination.  This name must be
             unique among the names of message destinations
             within the Deployment File.
-            
+
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
@@ -2844,19 +2844,19 @@
             should be mapped to.  Each message-destination-ref
             element that references this message destination will
             define a name in the namespace of the referencing
-            component or in one of the other predefined namespaces. 
+            component or in one of the other predefined namespaces.
             Many application servers provide a way to map these
             local names to names of resources known to the
             application server.  This mapped name is often a global
             JNDI name, but may be a name of any form.  Each of the
             local names should be mapped to this same global name.
-            
+
             Application servers are not required to support any
             particular form or type of mapped name, nor the ability
             to use mapped names.  The mapped name is
             product-dependent and often installation-dependent.  No
             use of a mapped name is portable.
-            
+
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
@@ -2867,7 +2867,7 @@
           <xsd:documentation>
 
             The JNDI name to be looked up to resolve the message destination.
-            
+
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
@@ -2887,25 +2887,25 @@
         of Deployment Component's reference to a message destination
         associated with a resource in Deployment Component's
         environment. It consists of:
-        
+
         - an optional description
         - the message destination reference name
         - an optional message destination type
         - an optional specification as to whether
-        the destination is used for 
+        the destination is used for
         consuming or producing messages, or both.
         if not specified, "both" is assumed.
         - an optional link to the message destination
         - optional injection targets
-        
+
         The message destination type must be supplied unless an
         injection target is specified, in which case the type
         of the target is used.  If both are specified, the type
         must be assignment compatible with the type of the injection
         target.
-        
+
         Examples:
-        
+
         <message-destination-ref>
         <message-destination-ref-name>jms/StockQueue
         </message-destination-ref-name>
@@ -2916,7 +2916,7 @@
         <message-destination-link>CorporateStocks
         </message-destination-link>
         </message-destination-ref>
-        
+
         ]]>
       </xsd:documentation>
     </xsd:annotation>
@@ -2934,7 +2934,7 @@
             the name of a message destination reference; its
             value is the environment entry name used in
             Deployment Component code.
-            
+
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
@@ -2966,13 +2966,13 @@
         destination, produced for the destination, or both.  The
         Assembler makes use of this information in linking producers
         of a destination with its consumers.
-        
+
         The value of the message-destination-usage element must be
         one of the following:
         Consumes
         Produces
         ConsumesProduces
-        
+
       </xsd:documentation>
     </xsd:annotation>
     <xsd:simpleContent>
@@ -2994,12 +2994,12 @@
         The message-destination-typeType specifies the type of
         the destination. The type is specified by the Java interface
         expected to be implemented by the destination.
-        
-        Example: 
-        
+
+        Example:
+
         <message-destination-type>jakarta.jms.Queue
         </message-destination-type>
-        
+
         ]]>
       </xsd:documentation>
     </xsd:annotation>
@@ -3018,14 +3018,14 @@
         The message-destination-linkType is used to link a message
         destination reference or message-driven bean to a message
         destination.
-        
+
         The Assembler sets the value to reflect the flow of messages
         between producers and consumers in the application.
-        
+
         The value must be the message-destination-name of a message
         destination in the same Deployment File or in another
         Deployment File in the same Jakarta EE application unit.
-        
+
         Alternatively, the value may be composed of a path name
         specifying a Deployment File containing the referenced
         message destination with the message-destination-name of the
@@ -3034,7 +3034,7 @@
         containing Deployment Component that is referencing the
         message destination.  This allows multiple message
         destinations with the same name to be uniquely identified.
-        
+
       </xsd:documentation>
     </xsd:annotation>
     <xsd:simpleContent>
@@ -3052,13 +3052,13 @@
         The transaction-supportType specifies the level of
         transaction support provided by the resource adapter. It is
         used by transaction-support elements.
-        
+
         The value must be one of the following:
-        
+
         NoTransaction
         LocalTransaction
         XATransaction
-        
+
       </xsd:documentation>
     </xsd:annotation>
     <xsd:simpleContent>
