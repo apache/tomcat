@@ -250,9 +250,8 @@
         <code>SSL_SRP_USER</code>, <code>SSL_SRP_USERINFO</code>,
         <code>SSL_CLIENT_VERIFY</code>,
         <code>SSL_CLIENT_SAN_OTHER_msUPN_n</code>,
-        <code>SSL_CLIENT_CERT_RFC4523_CEA</code>,
-        <code>SSL_SERVER_SAN_OTHER_dnsSRV_n</code>.
-        When OpenSSL is used, the variables related to the server
+        <code>SSL_CLIENT_CERT_RFC4523_CEA</code>.
+        Also, the variables related to the server
         certificate, prefixed by <code>SSL_SERVER_</code> are not available.
         Example:
         <code>%{SSL:SSL_CIPHER_USEKEYSIZE}</code> may expand to
