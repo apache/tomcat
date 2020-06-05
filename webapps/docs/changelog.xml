@@ -53,6 +53,10 @@
         the sole feature that depends on it (anti-resource locking) is
         configured and can't be used. (markt)
       </add>
+      <update>
+        Implement a significant portion of the TLS environment variables for
+        the rewrite valve. (remm)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Coyote">
