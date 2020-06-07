@@ -136,8 +136,8 @@
       <attribute name="cors.allowed.origins" required="false">
         <p>A list of <a href="https://tools.ietf.org/html/rfc6454">origins</a>
         that are allowed to access the resource. A <code>*</code> can be
-        specified to enable access to resource from any origin. Otherwise, a
-        whitelist of comma separated origins can be provided. Eg: <code>
+        specified to enable access to resource from any origin. Otherwise, an
+        allow list of comma separated origins can be provided. Eg: <code>
         https://www.w3.org, https://www.apache.org</code>.
         <strong>Defaults:</strong> The empty String. (No origin is allowed to
         access the resource).</p>
