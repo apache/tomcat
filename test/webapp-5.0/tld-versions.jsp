@@ -1,6 +1,5 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!--
-  Licensed to the Apache Software Foundation (ASF) under one or more
+<%--
+ Licensed to the Apache Software Foundation (ASF) under one or more
   contributor license agreements.  See the NOTICE file distributed with
   this work for additional information regarding copyright ownership.
   The ASF licenses this file to You under the Apache License, Version 2.0
@@ -14,16 +13,17 @@
   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
   See the License for the specific language governing permissions and
   limitations under the License.
--->
-<web-app xmlns="https://jakarta.ee/xml/ns/jakartaee"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee
-                      https://jakarta.ee/xml/ns/jakartaee/web-app_5_0.xsd"
-  version="5.0"
-  metadata-complete="true">
-
-  <display-name>Tomcat Documentation</display-name>
-  <description>
-     Tomcat Documentation.
-  </description>
-</web-app>
+--%>
+<html><body>
+<%@ taglib prefix="tags11" uri="http://tomcat.apache.org/tags11" %>
+<%@ taglib prefix="tags12" uri="http://tomcat.apache.org/tags12" %>
+<%@ taglib prefix="tags20" uri="http://tomcat.apache.org/tags20" %>
+<%@ taglib prefix="tags21" uri="http://tomcat.apache.org/tags21" %>
+<tags11:Echo echo="${'00-hello world'}"/>
+<tags11:Echo echo="#{'01-hello world'}"/>
+<tags12:Echo echo="${'02-hello world'}"/>
+<tags12:Echo echo="#{'03-hello world'}"/>
+<tags20:Echo echo="${'04-hello world'}"/>
+<tags20:Echo echo="#{'05-hello world'}"/>
+<tags21:Echo echo="${'06-hello world'}"/>
+</body></html>

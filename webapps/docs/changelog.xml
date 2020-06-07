@@ -57,6 +57,9 @@
         Implement a significant portion of the TLS environment variables for
         the rewrite valve. (remm)
       </update>
+      <add>
+        Add the Jakarta EE 9 schema. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
@@ -66,6 +69,14 @@
         response and it is known that the <code>maxSwallowSize</code> limit is
         going to be exceeded. (markt)
       </add>
+    </changelog>
+  </subsection>
+  <subsection name="Web Applications">
+    <changelog>
+      <update>
+        Update all web applications to use the Jakarta EE 9 schema for web.xml.
+        (markt)
+      </update>
     </changelog>
   </subsection>
 </section>

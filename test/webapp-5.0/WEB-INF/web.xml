@@ -22,8 +22,15 @@
   version="5.0"
   metadata-complete="true">
 
-  <display-name>Tomcat Documentation</display-name>
+  <display-name>Tomcat Servlet 5.0 Tests</display-name>
   <description>
-     Tomcat Documentation.
+    Provides a web application used by the Tomcat unit tests to ensure that
+    Tomcat meets the requirements of the current JSP and Servlet specification
+    for web applications that declare that they follow version 5.0 of the
+    Servlet specification and version 3.0 of the JSP specification. This
+    typically means ensuring that features introduced in later versions of the
+    specification do not change the behaviour of applications that declared an
+    earlier version of the specification.
   </description>
+
 </web-app>

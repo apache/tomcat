@@ -1,6 +1,5 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!--
-  Licensed to the Apache Software Foundation (ASF) under one or more
+<%--
+ Licensed to the Apache Software Foundation (ASF) under one or more
   contributor license agreements.  See the NOTICE file distributed with
   this work for additional information regarding copyright ownership.
   The ASF licenses this file to You under the Apache License, Version 2.0
@@ -14,16 +13,9 @@
   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
   See the License for the specific language governing permissions and
   limitations under the License.
--->
-<web-app xmlns="https://jakarta.ee/xml/ns/jakartaee"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee
-                      https://jakarta.ee/xml/ns/jakartaee/web-app_5_0.xsd"
-  version="5.0"
-  metadata-complete="true">
-
-  <display-name>Tomcat Documentation</display-name>
-  <description>
-     Tomcat Documentation.
-  </description>
-</web-app>
+--%>
+<html>
+  <body>
+    <p>00-${'hello world'}</p>
+  </body>
+</html>

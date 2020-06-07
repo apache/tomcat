@@ -182,6 +182,10 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
                 majorVersion = 4;
                 minorVersion = 0;
                 break;
+            case "5.0":
+                majorVersion = 5;
+                minorVersion = 0;
+                break;
             default:
                 log.warn(sm.getString("webXml.version.unknown", version));
         }
@@ -233,8 +237,7 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
     }
 
     // Derived major and minor version attributes
-    // Default to 4.0 until we know otherwise
-    private int majorVersion = 4;
+    private int majorVersion = 5;
     private int minorVersion = 0;
     public int getMajorVersion() { return majorVersion; }
     public int getMinorVersion() { return minorVersion; }

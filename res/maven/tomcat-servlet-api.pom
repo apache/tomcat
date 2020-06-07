@@ -29,11 +29,13 @@
     <license>
       <name>
         Apache License, Version 2.0 and
-        Common Development And Distribution License (CDDL) Version 1.0
+        Common Development And Distribution License (CDDL) Version 1.0 and
+        Eclipse Public License - v 2.0
       </name>
       <url>
         http://www.apache.org/licenses/LICENSE-2.0.txt and
-        http://www.opensource.org/licenses/cddl1.txt
+        http://www.opensource.org/licenses/cddl1.txt and
+        https://www.eclipse.org/org/documents/epl-2.0/EPL-2.0.txt
       </url>
       <distribution>repo</distribution>
       <comments>
@@ -59,7 +61,14 @@
         web-app_4_0.xsd,
         web-common_4_0.xsd,
         web-fragment_4_0.xsd,
-        to which the CDDL version 1.0 applies.
+        to which the CDDL version 1.0 applies and
+        jakartaee_9.xsd
+        jakarta_web-services_2_0.xsd
+        jakarta_web-services_client_2_0.xsd
+        jsp_3_0.xsd
+        web-app_5_0.xsd
+        web-commonn_5_0.xsd
+        to which the EPLv2 applies.
       </comments>
     </license>
   </licenses>
