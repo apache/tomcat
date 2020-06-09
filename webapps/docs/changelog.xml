@@ -68,6 +68,16 @@
       </add>
     </changelog>
   </subsection>
+  <subsection name="Other">
+    <changelog>
+      <fix>
+        <bug>64501</bug>: Refactor the handling of the deprecated
+        <code>LOGGING_CONFIG</code> environment variable to avoid using a POSIX
+        shell feature that is not available by default on Solaris 10. (markt)
+      </fix>
+    </changelog>
+  </subsection>
+>>>>>>> 4bd5c80e60... Fix BZ64501 - Avoid feature not available by default on Solaris 10
 </section>
 <section name="Tomcat 8.5.56 (markt)" rtext="2020-06-07">
   <subsection name="Catalina">
