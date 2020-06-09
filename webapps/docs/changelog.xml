@@ -95,6 +95,10 @@
         Fix incorrect version format in OSGi manifests. Patch provided by
         Raymond Augé. (markt)
       </fix>
+      <fix>
+        Remove bndlib from dependencies as it is not required. Pull request
+        provided by Raymond Augé. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
