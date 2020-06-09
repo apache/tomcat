@@ -152,9 +152,9 @@ fi
 # Check for the deprecated LOGGING_CONFIG
 # Only use it if CATALINA_LOGGING_CONFIG is not set and LOGGING_CONFIG starts with "-D..."
 if [ -z "$CATALINA_LOGGING_CONFIG" ]; then
-  if [ "${LOGGING_CONFIG#*-D}" != "$LOGGING_CONFIG" ]; then
-    CATALINA_LOGGING_CONFIG="$LOGGING_CONFIG"
-  fi
+  case $LOGGING_CONFIG in
+    -D*) CATALINA_LOGGING_CONFIG="$LOGGING_CONFIG"
+  esac
 fi
 
 # Set juli LogManager config file if it is present and an override has not been issued

@@ -113,6 +113,11 @@
         Resolver Ant Tasks to upload artifacts to the ASF Maven repository (and
         from there to Maven Central). (markt)
       </update>
+      <fix>
+        <bug>64501</bug>: Refactor the handling of the deprecated
+        <code>LOGGING_CONFIG</code> environment variable to avoid using a POSIX
+        shell feature that is not available by default on Solaris 10. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
