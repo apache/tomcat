@@ -89,6 +89,10 @@
         <code>LOGGING_CONFIG</code> environment variable to avoid using a POSIX
         shell feature that is not available by default on Solaris 10. (markt)
       </fix>
+      <fix>
+        Remove bndlib from dependencies as it is not required. Pull request
+        provided by Raymond Augé. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
