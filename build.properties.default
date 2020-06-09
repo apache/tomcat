@@ -237,8 +237,8 @@ easymock.loc=${base-maven.loc}/org/easymock/easymock/${easymock.version}/easymoc
 # ----- cglib, used by EasyMock, version 2.2 or later -----
 cglib.version=3.3.0
 cglib.checksum.enabled=true
-cglib.checksum.algorithm=MD5|SHA-1
-cglib.checksum.value=af93e373d7ddf35db0e9612480d9ed13|00d456bb230c70c0b95c76fb28e429d42f275941
+cglib.checksum.algorithm=SHA-512
+cglib.checksum.value=faa1d2121e87ae69e179e3aae217accd0834e0da716b91a029fd526e192612e71675f2740bedf48e23ef1edc45f672a2be1b3e78bbfb1ad59c96dd3d2feeedba
 cglib.home=${base.path}/cglib-${cglib.version}
 cglib.jar=${cglib.home}/cglib-nodep-${cglib.version}.jar
 cglib.loc=${base-maven.loc}/cglib/cglib-nodep/${cglib.version}/cglib-nodep-${cglib.version}.jar
@@ -246,8 +246,8 @@ cglib.loc=${base-maven.loc}/cglib/cglib-nodep/${cglib.version}/cglib-nodep-${cgl
 # ----- objenesis, used by EasyMock, version 1.2 or later -----
 objenesis.version=3.1
 objenesis.checksum.enabled=true
-objenesis.checksum.algorithm=MD5|SHA-1
-objenesis.checksum.value=bee117291d50b41b8e8cf0ac5435df1d|bfcb0539a071a4c5a30690388903ac48c0667f2a
+objenesis.checksum.algorithm=SHA-512
+objenesis.checksum.value=4dcfc065d6ccc1e0cb716fc86d844e81a347591d06f99b1840157c51c58a842bdebe86f6bcacee65996b64468d21bdf3bcf463a7f4ae5261440c8f0f6fac8ab3
 objenesis.home=${base.path}/objenesis-${objenesis.version}
 objenesis.jar=${objenesis.home}/objenesis-${objenesis.version}.jar
 objenesis.loc=${base-maven.loc}/org/objenesis/objenesis/${objenesis.version}/objenesis-${objenesis.version}.jar
