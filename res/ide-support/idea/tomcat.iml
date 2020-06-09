@@ -95,7 +95,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$TOMCAT_BUILD_LIBS$/cglib-2.2.2/cglib-nodep-2.2.2.jar!/" />
+          <root url="jar://$TOMCAT_BUILD_LIBS$/cglib-3.3.0/cglib-nodep-3.3.0.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -104,7 +104,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$TOMCAT_BUILD_LIBS$/objenesis-1.2/objenesis-1.2.jar!/" />
+          <root url="jar://$TOMCAT_BUILD_LIBS$/objenesis-3.1/objenesis-3.1.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
