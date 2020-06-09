@@ -235,7 +235,7 @@ easymock.jar=${easymock.home}/easymock-${easymock.version}.jar
 easymock.loc=${base-maven.loc}/org/easymock/easymock/${easymock.version}/easymock-${easymock.version}.jar
 
 # ----- cglib, used by EasyMock, version 2.2 or later -----
-cglib.version=2.2.2
+cglib.version=3.3.0
 cglib.checksum.enabled=true
 cglib.checksum.algorithm=MD5|SHA-1
 cglib.checksum.value=af93e373d7ddf35db0e9612480d9ed13|00d456bb230c70c0b95c76fb28e429d42f275941
@@ -244,7 +244,7 @@ cglib.jar=${cglib.home}/cglib-nodep-${cglib.version}.jar
 cglib.loc=${base-maven.loc}/cglib/cglib-nodep/${cglib.version}/cglib-nodep-${cglib.version}.jar
 
 # ----- objenesis, used by EasyMock, version 1.2 or later -----
-objenesis.version=1.2
+objenesis.version=3.1
 objenesis.checksum.enabled=true
 objenesis.checksum.algorithm=MD5|SHA-1
 objenesis.checksum.value=bee117291d50b41b8e8cf0ac5435df1d|bfcb0539a071a4c5a30690388903ac48c0667f2a
