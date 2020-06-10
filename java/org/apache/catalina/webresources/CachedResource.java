@@ -404,6 +404,11 @@ public class CachedResource implements WebResource {
         return webResources;
     }
 
+    boolean usesClassLoaderResources() {
+        return usesClassLoaderResources;
+    }
+
+
     // Assume that the cache entry will always include the content unless the
     // resource content is larger than objectMaxSizeBytes. This isn't always the
     // case but it makes tracking the current cache size easier.

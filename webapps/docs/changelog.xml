@@ -60,6 +60,11 @@
       <add>
         Add the Jakarta EE 9 schema. (markt)
       </add>
+      <fix>
+        <bug>64506</bug>: Correct a potential race condition in the resource
+        cache implementation that could lead to
+        <code>NullPointerException</code>s during class loading. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
