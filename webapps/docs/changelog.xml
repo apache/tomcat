@@ -71,6 +71,11 @@
         response and it is known that the <code>maxSwallowSize</code> limit is
         going to be exceeded. (markt)
       </add>
+      <fix>
+        <bug>64509</bug>: Correctly parse RFC 2109 version 1 cookies that use a
+        comma as a separater between cookies when using the RFC 6265 cookie
+        processor. Based on a patch by W J Carpenter. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">

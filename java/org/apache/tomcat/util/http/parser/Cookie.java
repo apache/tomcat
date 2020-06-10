@@ -275,8 +275,9 @@ public class Cookie {
             skipResult = skipByte(bb, COMMA_BYTE);
             if (skipResult == SkipResult.FOUND) {
                 parseAttributes = false;
+            } else {
+                skipResult = skipByte(bb, SEMICOLON_BYTE);
             }
-            skipResult = skipByte(bb, SEMICOLON_BYTE);
             if (skipResult == SkipResult.EOF) {
                 parseAttributes = false;
                 moreToProcess = false;
@@ -304,8 +305,9 @@ public class Cookie {
                     skipResult = skipByte(bb, COMMA_BYTE);
                     if (skipResult == SkipResult.FOUND) {
                         parseAttributes = false;
+                    } else {
+                        skipResult = skipByte(bb, SEMICOLON_BYTE);
                     }
-                    skipResult = skipByte(bb, SEMICOLON_BYTE);
                     if (skipResult == SkipResult.EOF) {
                         parseAttributes = false;
                         moreToProcess = false;
@@ -334,8 +336,9 @@ public class Cookie {
                     skipResult = skipByte(bb, COMMA_BYTE);
                     if (skipResult == SkipResult.FOUND) {
                         parseAttributes = false;
+                    } else {
+                        skipResult = skipByte(bb, SEMICOLON_BYTE);
                     }
-                    skipResult = skipByte(bb, SEMICOLON_BYTE);
                     if (skipResult == SkipResult.EOF) {
                         parseAttributes = false;
                         moreToProcess = false;
