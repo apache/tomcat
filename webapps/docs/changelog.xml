@@ -82,7 +82,6 @@
       </fix>
     </changelog>
   </subsection>
->>>>>>> 4bd5c80e60... Fix BZ64501 - Avoid feature not available by default on Solaris 10
 </section>
 <section name="Tomcat 8.5.56 (markt)" rtext="2020-06-07">
   <subsection name="Catalina">
