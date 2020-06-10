@@ -108,6 +108,24 @@ public class Cache {
                 }
             } else {
                 // Another thread added the entry to the cache
+                if (cacheEntry.usesClassLoaderResources() != useClassLoaderResources) {
+                    // Race condition adding cache entries with the same path
+                    // but differing values for useClassLoaderResources.
+                    // Cache only supports one entry per path with one value of
+                    // useClassLoaderResources.
+                    // Let the other thread "win" and add the resource to the
+                    // cache. This thread will receive a cacheEntry instance
+                    // that isn't added to the cache.
+                    // There are assumptions here. They are:
+                    // - refactoring the Cache to use a combined key of
+                    //   path+useClassLoaderResources adds unnecessary
+                    //   complexity
+                    // - the race condition is rare (over the lifetime of an
+                    //   application)
+                    // - it would be rare for an application to need to cache a
+                    //   resource for both values of useClassLoaderResources
+                    cacheEntry = newCacheEntry;
+                }
                 // Make sure it is validated
                 cacheEntry.validateResource(useClassLoaderResources);
             }

@@ -57,6 +57,11 @@
         Implement a significant portion of the TLS environment variables for
         the rewrite valve. (remm)
       </update>
+      <fix>
+        <bug>64506</bug>: Correct a potential race condition in the resource
+        cache implementation that could lead to
+        <code>NullPointerException</code>s during class loading. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
