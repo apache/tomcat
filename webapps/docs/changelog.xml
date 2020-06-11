@@ -109,6 +109,11 @@
       <update>
         Update the OWB module to Apache OpenWebBeans 2.0.17. (remm)
       </update>
+      <fix>
+        <bug>64514</bug>: Fixes some missing class dependency issus in bootstrap
+        to address packaging/dependency concerns for JPMS and OSGi. Pull request
+        provided by Raymond Augé. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
