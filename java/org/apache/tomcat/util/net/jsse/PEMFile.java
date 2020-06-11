@@ -27,6 +27,7 @@ import java.security.GeneralSecurityException;
 import java.security.InvalidKeyException;
 import java.security.KeyFactory;
 import java.security.PrivateKey;
+import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
@@ -50,9 +51,7 @@ import org.apache.tomcat.util.file.ConfigFileLoader;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
- * RFC 1421 PEM file containing X509 certificates or private keys (PKCS#8 only,
- * i.e. with boundaries containing "BEGIN PRIVATE KEY" or "BEGIN ENCRYPTED PRIVATE KEY",
- * not "BEGIN RSA PRIVATE KEY" or other variations).
+ * RFC 1421 PEM file containing X509 certificates or private keys.
  */
 public class PEMFile {
 
@@ -60,6 +59,16 @@ public class PEMFile {
 
     private static final byte[] OID_EC_PUBLIC_KEY =
             new byte[] { 0x06, 0x07, 0x2A, (byte) 0x86, 0x48, (byte) 0xCE, 0x3D, 0x02, 0x01 };
+
+    public static String toPEM(X509Certificate certificate) throws CertificateEncodingException {
+        StringBuilder result = new StringBuilder();
+        result.append("-----BEGIN CERTIFICATE-----");
+        result.append(System.lineSeparator());
+        Base64 b64 = new Base64(64);
+        result.append(b64.encodeAsString(certificate.getEncoded()));
+        result.append("-----END CERTIFICATE-----");
+        return result.toString();
+    }
 
     private String filename;
     private List<X509Certificate> certificates = new ArrayList<>();
