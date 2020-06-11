@@ -90,12 +90,12 @@
         shell feature that is not available by default on Solaris 10. (markt)
       </fix>
       <fix>
-        Remove bndlib from dependencies as it is not required. Pull request
-        provided by Raymond Augé. (markt)
+        <bug>64513</bug>: Remove bndlib from dependencies as it is not required.
+        Pull request provided by Raymond Augé. (markt)
       </fix>
       <fix>
-        Bnd files don't need to be filtered (save some work). Pull request
-        provided by Raymond Augé. (rotty3000)
+        <bug>64515</bug>: Bnd files don't need to be filtered (save some work).
+        Pull request provided by Raymond Augé. (markt)
       </fix>
     </changelog>
   </subsection>
