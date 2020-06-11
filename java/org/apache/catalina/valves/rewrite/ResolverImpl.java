@@ -33,9 +33,9 @@ import java.util.concurrent.TimeUnit;
 import org.apache.catalina.WebResource;
 import org.apache.catalina.WebResourceRoot;
 import org.apache.catalina.connector.Request;
-import org.apache.tomcat.util.codec.binary.Base64;
 import org.apache.tomcat.util.http.FastHttpDateFormat;
 import org.apache.tomcat.util.net.SSLSupport;
+import org.apache.tomcat.util.net.jsse.PEMFile;
 import org.apache.tomcat.util.net.openssl.ciphers.Cipher;
 import org.apache.tomcat.util.net.openssl.ciphers.EncryptionLevel;
 import org.apache.tomcat.util.net.openssl.ciphers.OpenSSLCipherConfigurationParser;
@@ -267,13 +267,13 @@ public class ResolverImpl extends Resolver {
             return certificates[0].getPublicKey().getAlgorithm();
         } else if (key.equals("CERT")) {
             try {
-                return toPEM(certificates[0]);
+                return PEMFile.toPEM(certificates[0]);
             } catch (CertificateEncodingException e) {
             }
         } else if (key.startsWith("CERT_CHAIN_")) {
             key = key.substring("CERT_CHAIN_".length());
             try {
-                return toPEM(certificates[Integer.parseInt(key)]);
+                return PEMFile.toPEM(certificates[Integer.parseInt(key)]);
             } catch (NumberFormatException | ArrayIndexOutOfBoundsException
                     | CertificateEncodingException e) {
                 // Ignore
@@ -315,16 +315,6 @@ public class ResolverImpl extends Resolver {
             // Ignore
         }
         return null;
-    }
-
-    private String toPEM(X509Certificate certificate) throws CertificateEncodingException {
-        StringBuilder result = new StringBuilder();
-        result.append("-----BEGIN CERTIFICATE-----");
-        result.append(System.lineSeparator());
-        Base64 b64 = new Base64(64);
-        result.append(b64.encodeAsString(certificate.getEncoded()));
-        result.append("-----END CERTIFICATE-----");
-        return result.toString();
     }
 
     @Override
