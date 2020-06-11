@@ -15,7 +15,7 @@
 Automatic-Module-Name: org.apache.tomcat.embed.jasper.el
 Bundle-Name: tomcat-embed-jasper-el
 Bundle-SymbolicName: org.apache.tomcat-embed-jasper-el
-Bundle-Version: ${version_cleanup;@VERSION@}
+Bundle-Version: ${version_cleanup;${version}}
 Export-Package: \
     jakarta.el,\
     org.apache.el,\

@@ -14,7 +14,7 @@
 # limitations under the License.
 Bundle-Name: tomcat-jasper
 Bundle-SymbolicName: org.apache.tomcat-jasper
-Bundle-Version: ${version_cleanup;@VERSION@}
+Bundle-Version: ${version_cleanup;${version}}
 Export-Package: \
     org.apache.jasper,\
     org.apache.jasper.compiler,\
