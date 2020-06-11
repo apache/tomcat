@@ -93,6 +93,10 @@
         Remove bndlib from dependencies as it is not required. Pull request
         provided by Raymond Augé. (markt)
       </fix>
+      <fix>
+        Bnd files don't need to be filtered (save some work). Pull request
+        provided by Raymond Augé. (rotty3000)
+      </fix>
     </changelog>
   </subsection>
 </section>
