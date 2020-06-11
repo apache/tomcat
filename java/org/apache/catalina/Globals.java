@@ -258,14 +258,14 @@ public final class Globals {
      * Name of the system property containing
      * the tomcat product installation path
      */
-    public static final String CATALINA_HOME_PROP = "catalina.home";
+    public static final String CATALINA_HOME_PROP = org.apache.catalina.startup.Constants.CATALINA_HOME_PROP;
 
 
     /**
      * Name of the system property containing
      * the tomcat instance installation path
      */
-    public static final String CATALINA_BASE_PROP = "catalina.base";
+    public static final String CATALINA_BASE_PROP = org.apache.catalina.startup.Constants.CATALINA_BASE_PROP;
 
 
     // -------------------------------------------------------- Global constants
