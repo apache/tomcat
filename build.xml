@@ -73,7 +73,7 @@
   <property name="tomcat.home"           value="${basedir}"/>
   <property name="tomcat-nb.home"        value="${basedir}/nbproject" />
   <property name="tomcat.output"         value="${basedir}/output"/>
-  <property name="tomcat.bnd"            value="${tomcat.output}/bnd"/>
+  <property name="tomcat.bnd"            value="${basedir}/res/bnd"/>
   <property name="tomcat.build"          value="${tomcat.output}/build"/>
   <property name="tomcat.classes"        value="${tomcat.output}/classes"/>
   <property name="tomcat.deployer"       value="${tomcat.output}/deployer"/>
@@ -558,18 +558,6 @@
       </srcfiles>
     </uptodate>
 
-    <!-- Property that determines if OSGI bnd files need updating -->
-    <uptodate property="bnd.uptodate"
-        targetfile="${tomcat.bnd}/annotations-api.bnd" >
-      <srcfiles file="${user.home}/build.properties" />
-      <srcfiles file="${basedir}/build.properties" />
-      <srcfiles file="${basedir}/build.properties.default" />
-      <srcfiles file="${basedir}/build.xml" />
-      <srcfiles dir="${tomcat.home}/res/bnd" >
-        <include name="*.bnd" />
-      </srcfiles>
-    </uptodate>
-
   </target>
 
   <target name="validate" if="${execute.validate}"
@@ -769,19 +757,7 @@
 
   </target>
 
-  <target name="build-bnd" unless="bnd.uptodate"
-          depends="setup-bnd,build-prepare">
-
-    <mkdir dir="${tomcat.bnd}" />
-    <copy todir="${tomcat.bnd}" overwrite="yes" filtering="yes"
-          encoding="ISO-8859-1">
-      <filterset refid="version.filters"/>
-      <fileset dir="${tomcat.home}/res/bnd" />
-    </copy>
-
-  </target>
-
-  <target name="package" depends="compile,build-manifests,build-bnd" >
+  <target name="package" depends="compile,build-manifests,setup-bnd" >
     <!-- Common Annotations JAR File -->
     <jarIt jarfile="${annotations-api.jar}"
       filesDir="${tomcat.classes}"
@@ -1386,7 +1362,7 @@
     </txt2html>
   </target>
   <target name="embed-jars" description="Create experimental embedded jars"
-    depends="build-manifests,build-bnd,compile" >
+    depends="build-manifests,setup-bnd,compile" >
 
     <mkdir dir="${tomcat.embed}" />
 

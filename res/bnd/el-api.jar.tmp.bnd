@@ -14,5 +14,5 @@
 # limitations under the License.
 Bundle-Name: tomcat-el-api
 Bundle-SymbolicName: org.apache.tomcat-el-api
-Bundle-Version: ${version_cleanup;@VERSION@}
+Bundle-Version: ${version_cleanup;${version}}
 Export-Package: jakarta.el

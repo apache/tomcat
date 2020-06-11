@@ -14,5 +14,5 @@
 # limitations under the License.
 Bundle-Name: tomcat-jni
 Bundle-SymbolicName: org.apache.tomcat-jni
-Bundle-Version: ${version_cleanup;@VERSION@}
+Bundle-Version: ${version_cleanup;${version}}
 Export-Package: org.apache.tomcat.jni
