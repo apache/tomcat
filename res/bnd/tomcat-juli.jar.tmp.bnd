@@ -14,7 +14,7 @@
 # limitations under the License.
 Bundle-Name: tomcat-juli
 Bundle-SymbolicName: org.apache.tomcat-juli
-Bundle-Version: ${version_cleanup;@VERSION@}
+Bundle-Version: ${version_cleanup;${version}}
 Export-Package: \
     org.apache.juli,\
     org.apache.juli.logging
