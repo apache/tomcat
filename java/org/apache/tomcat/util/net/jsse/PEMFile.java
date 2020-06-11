@@ -62,11 +62,11 @@ public class PEMFile {
 
     public static String toPEM(X509Certificate certificate) throws CertificateEncodingException {
         StringBuilder result = new StringBuilder();
-        result.append("-----BEGIN CERTIFICATE-----");
+        result.append(Part.BEGIN_BOUNDARY + Part.CERTIFICATE + Part.FINISH_BOUNDARY);
         result.append(System.lineSeparator());
         Base64 b64 = new Base64(64);
         result.append(b64.encodeAsString(certificate.getEncoded()));
-        result.append("-----END CERTIFICATE-----");
+        result.append(Part.END_BOUNDARY + Part.CERTIFICATE + Part.FINISH_BOUNDARY);
         return result.toString();
     }
 
@@ -103,7 +103,8 @@ public class PEMFile {
             while ((line = reader.readLine()) != null) {
                 if (line.startsWith(Part.BEGIN_BOUNDARY)) {
                     part = new Part();
-                    part.type = line.substring(Part.BEGIN_BOUNDARY.length(), line.length() - 5).trim();
+                    part.type = line.substring(Part.BEGIN_BOUNDARY.length(),
+                            line.length() - Part.FINISH_BOUNDARY.length()).trim();
                 } else if (line.startsWith(Part.END_BOUNDARY)) {
                     parts.add(part);
                     part = null;
@@ -115,20 +116,20 @@ public class PEMFile {
 
         for (Part part : parts) {
             switch (part.type) {
-                case "PRIVATE KEY":
+                case Part.PRIVATE_KEY:
                     privateKey = part.toPrivateKey(null, keyAlgorithm, Format.PKCS8);
                     break;
-                case "EC PRIVATE KEY":
+                case Part.EC_PRIVATE_KEY:
                     privateKey = part.toPrivateKey(null, "EC", Format.RFC5915);
                     break;
-                case "ENCRYPTED PRIVATE KEY":
+                case Part.ENCRYPTED_PRIVATE_KEY:
                     privateKey = part.toPrivateKey(password, keyAlgorithm, Format.PKCS8);
                     break;
-                case "RSA PRIVATE KEY":
+                case Part.RSA_PRIVATE_KEY:
                     privateKey = part.toPrivateKey(null, keyAlgorithm, Format.PKCS1);
                     break;
-                case "CERTIFICATE":
-                case "X509 CERTIFICATE":
+                case Part.CERTIFICATE:
+                case Part.X509_CERTIFICATE:
                     certificates.add(part.toCertificate());
                     break;
             }
@@ -138,6 +139,14 @@ public class PEMFile {
     private class Part {
         public static final String BEGIN_BOUNDARY = "-----BEGIN ";
         public static final String END_BOUNDARY   = "-----END ";
+        public static final String FINISH_BOUNDARY = "-----";
+
+        public static final String PRIVATE_KEY = "PRIVATE KEY";
+        public static final String EC_PRIVATE_KEY = "EC PRIVATE KEY";
+        public static final String ENCRYPTED_PRIVATE_KEY = "ENCRYPTED PRIVATE KEY";
+        public static final String RSA_PRIVATE_KEY = "RSA PRIVATE KEY";
+        public static final String CERTIFICATE = "CERTIFICATE";
+        public static final String X509_CERTIFICATE = "X509 CERTIFICATE";
 
         public String type;
         public String content = "";
