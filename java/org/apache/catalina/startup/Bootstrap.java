@@ -27,7 +27,6 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.catalina.Globals;
 import org.apache.catalina.security.SecurityClassLoad;
 import org.apache.catalina.startup.ClassLoaderFactory.Repository;
 import org.apache.catalina.startup.ClassLoaderFactory.RepositoryType;
@@ -66,7 +65,7 @@ public final class Bootstrap {
         String userDir = System.getProperty("user.dir");
 
         // Home first
-        String home = System.getProperty(Globals.CATALINA_HOME_PROP);
+        String home = System.getProperty(Constants.CATALINA_HOME_PROP);
         File homeFile = null;
 
         if (home != null) {
@@ -105,10 +104,10 @@ public final class Bootstrap {
 
         catalinaHomeFile = homeFile;
         System.setProperty(
-                Globals.CATALINA_HOME_PROP, catalinaHomeFile.getPath());
+                Constants.CATALINA_HOME_PROP, catalinaHomeFile.getPath());
 
         // Then base
-        String base = System.getProperty(Globals.CATALINA_BASE_PROP);
+        String base = System.getProperty(Constants.CATALINA_BASE_PROP);
         if (base == null) {
             catalinaBaseFile = catalinaHomeFile;
         } else {
@@ -121,7 +120,7 @@ public final class Bootstrap {
             catalinaBaseFile = baseFile;
         }
         System.setProperty(
-                Globals.CATALINA_BASE_PROP, catalinaBaseFile.getPath());
+                Constants.CATALINA_BASE_PROP, catalinaBaseFile.getPath());
     }
 
     // -------------------------------------------------------------- Variables
@@ -222,9 +221,9 @@ public final class Bootstrap {
                 String replacement;
                 if (propName.length() == 0) {
                     replacement = null;
-                } else if (Globals.CATALINA_HOME_PROP.equals(propName)) {
+                } else if (Constants.CATALINA_HOME_PROP.equals(propName)) {
                     replacement = getCatalinaHome();
-                } else if (Globals.CATALINA_BASE_PROP.equals(propName)) {
+                } else if (Constants.CATALINA_BASE_PROP.equals(propName)) {
                     replacement = getCatalinaBase();
                 } else {
                     replacement = System.getProperty(propName);
@@ -542,9 +541,13 @@ public final class Bootstrap {
 
 
     // Copied from ExceptionUtils since that class is not visible during start
-    private static void handleThrowable(Throwable t) {
+    static void handleThrowable(Throwable t) {
         if (t instanceof ThreadDeath) {
             throw (ThreadDeath) t;
+        }
+        if (t instanceof StackOverflowError) {
+            // Swallow silently - it should be recoverable
+            return;
         }
         if (t instanceof VirtualMachineError) {
             throw (VirtualMachineError) t;
@@ -552,6 +555,13 @@ public final class Bootstrap {
         // All other instances of Throwable will be silently swallowed
     }
 
+    // Copied from ExceptionUtils so that there is no dependency on utils
+    static Throwable unwrapInvocationTargetException(Throwable t) {
+        if (t instanceof InvocationTargetException && t.getCause() != null) {
+            return t.getCause();
+        }
+        return t;
+    }
 
     // Protected for unit testing
     protected static String[] getPaths(String value) {

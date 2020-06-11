@@ -94,6 +94,11 @@
         <code>LOGGING_CONFIG</code> environment variable to avoid using a POSIX
         shell feature that is not available by default on Solaris 10. (markt)
       </fix>
+      <fix>
+        <bug>64514</bug>: Fixes some missing class dependency issus in bootstrap
+        to address packaging/dependency concerns for JPMS and OSGi. Pull request
+        provided by Raymond Augé. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
