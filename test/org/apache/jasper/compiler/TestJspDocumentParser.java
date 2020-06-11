@@ -89,7 +89,7 @@ public class TestJspDocumentParser extends TomcatBaseTest {
         rc = getUrl("http://localhost:" + getPort() +
                 "/test/bug5nnnn/bug54821b.jspx", bc, null);
         Assert.assertEquals(HttpServletResponse.SC_OK, rc);
-   }
+    }
 
     @Test
     public void testSchemaValidation() throws Exception {
@@ -120,5 +120,5 @@ public class TestJspDocumentParser extends TomcatBaseTest {
         Document document = db.parse(path);
         Assert.assertEquals("urn:valid", document.getDocumentElement().getNamespaceURI());
         Assert.assertEquals("root", document.getDocumentElement().getLocalName());
-   }
+    }
 }
