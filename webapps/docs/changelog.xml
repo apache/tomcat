@@ -97,6 +97,11 @@
         <bug>64515</bug>: Bnd files don't need to be filtered (save some work).
         Pull request provided by Raymond Augé. (markt)
       </fix>
+      <fix>
+        <bug>64514</bug>: Fixes some missing class dependency issus in bootstrap
+        to address packaging/dependency concerns for JPMS and OSGi. Pull request
+        provided by Raymond Augé. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
