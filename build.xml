@@ -749,7 +749,13 @@
   </target>
 
   <target name="package" depends="compile,build-manifests" >
-    <!-- Common Annotations 1.2 JAR File -->
+    <!--
+    #### ORDER IS IMPORTANT ####
+    Kept in sync with later Tomcat versions even though Tomcat 8.5.x does
+    not use Bnd.
+      -->
+
+    <!-- Common Annotations JAR File -->
     <jarIt jarfile="${annotations-api.jar}"
       filesDir="${tomcat.classes}"
       filesId="files.annotations-api"
@@ -763,19 +769,19 @@
       notice="${tomcat.manifests}/servlet-api.jar.notice"
       license="${tomcat.manifests}/servlet-api.jar.license" />
 
-    <!-- JSP 2.3 Implementation JAR File -->
-    <jarIt jarfile="${jsp-api.jar}"
-      filesDir="${tomcat.classes}"
-      filesId="files.jsp-api"
-      manifest="${tomcat.manifests}/jsp-api.jar.manifest" />
-
-    <!-- EL 3.0 Implementation JAR File -->
+    <!-- EL Implementation JAR File -->
     <jarIt jarfile="${el-api.jar}"
       filesDir="${tomcat.classes}"
       filesId="files.el-api"
       manifest="${tomcat.manifests}/el-api.jar.manifest" />
 
-    <!-- WebSocket 1.1 API JAR File -->
+    <!-- JSP Implementation JAR File -->
+    <jarIt jarfile="${jsp-api.jar}"
+      filesDir="${tomcat.classes}"
+      filesId="files.jsp-api"
+      manifest="${tomcat.manifests}/jsp-api.jar.manifest" />
+
+    <!-- WebSocket API JAR File -->
     <jarIt jarfile="${websocket-api.jar}"
       filesDir="${tomcat.classes}"
       filesId="files.websocket-api"
@@ -787,11 +793,10 @@
       filesId="files.jaspic-api"
       manifest="${tomcat.manifests}/jaspic-api.jar.manifest" />
 
-    <!-- WebSocket 1.1 implementation JAR File -->
-    <jarIt jarfile="${tomcat-websocket.jar}"
+    <!-- Tomcat-juli JAR File -->
+    <jarIt jarfile="${tomcat-juli.jar}"
       filesDir="${tomcat.classes}"
-      filesId="files.tomcat-websocket"
-      meta-inf="${tomcat.manifests}/tomcat-websocket.jar"/>
+      filesId="files.tomcat-juli" />
 
     <!-- Bootstrap JAR File -->
     <jarIt jarfile="${bootstrap.jar}"
@@ -799,25 +804,55 @@
       filesId="files.bootstrap"
       manifest="${tomcat.manifests}/bootstrap.jar.manifest" />
 
-    <!-- Tomcat-juli JAR File -->
-    <jarIt jarfile="${tomcat-juli.jar}"
+    <!-- Tomcat Util JAR File -->
+    <jarIt jarfile="${tomcat-util.jar}"
       filesDir="${tomcat.classes}"
-      filesId="files.tomcat-juli" />
+      filesId="files.tomcat-util" />
 
-    <!-- Catalina Main JAR File -->
-    <jarIt jarfile="${catalina.jar}"
+    <!-- Tomcat API JAR File -->
+    <jarIt jarfile="${tomcat-api.jar}"
       filesDir="${tomcat.classes}"
-      filesId="files.catalina" />
+      filesId="files.tomcat-api" />
+
+    <!-- Tomcat Util Scan JAR File -->
+    <jarIt jarfile="${tomcat-util-scan.jar}"
+      filesDir="${tomcat.classes}"
+      filesId="files.tomcat-util-scan" />
+
+    <jarIt jarfile="${tomcat-jni.jar}"
+      filesDir="${tomcat.classes}"
+      filesId="files.tomcat-jni" />
+
+    <!-- Protocol handlers - Coyote -->
+    <jarIt jarfile="${tomcat-coyote.jar}"
+      filesDir="${tomcat.classes}"
+      filesId="files.tomcat-coyote" />
+
+    <!-- WebSocket implementation JAR File -->
+    <jarIt jarfile="${tomcat-websocket.jar}"
+      filesDir="${tomcat.classes}"
+      filesId="files.tomcat-websocket"
+      meta-inf="${tomcat.manifests}/tomcat-websocket.jar" />
 
     <!-- Catalina GroupCom/Tribes JAR File -->
     <jarIt jarfile="${catalina-tribes.jar}"
       filesDir="${tomcat.classes}"
       filesId="files.catalina-tribes" />
 
+    <!-- Catalina Main JAR File -->
+    <jarIt jarfile="${catalina.jar}"
+      filesDir="${tomcat.classes}"
+      filesId="files.catalina" />
+
     <!-- Catalina Cluster/HA JAR File -->
     <jarIt jarfile="${catalina-ha.jar}"
       filesDir="${tomcat.classes}"
       filesId="files.catalina-ha" />
+
+    <!-- Server-Side Includes (SSI) -->
+    <jarIt jarfile="${catalina-ssi.jar}"
+      filesDir="${tomcat.classes}"
+      filesId="files.catalina-ssi" />
 
     <!-- Catalina Ant Tasks JAR File -->
     <jarIt jarfile="${catalina-ant.jar}"
@@ -829,41 +864,17 @@
       filesDir="${tomcat.classes}"
       filesId="files.catalina-storeconfig" />
 
-    <!-- Tomcat API JAR File -->
-    <jarIt jarfile="${tomcat-api.jar}"
-      filesDir="${tomcat.classes}"
-      filesId="files.tomcat-api" />
-
-    <!-- Tomcat Util JAR File -->
-    <jarIt jarfile="${tomcat-util.jar}"
-      filesDir="${tomcat.classes}"
-      filesId="files.tomcat-util" />
-
-    <!-- Tomcat Util Scan JAR File -->
-    <jarIt jarfile="${tomcat-util-scan.jar}"
-      filesDir="${tomcat.classes}"
-      filesId="files.tomcat-util-scan" />
-
-    <!-- Protocol handlers - Coyote -->
-    <jarIt jarfile="${tomcat-coyote.jar}"
-      filesDir="${tomcat.classes}"
-      filesId="files.tomcat-coyote" />
-
-    <jarIt jarfile="${tomcat-jni.jar}"
-      filesDir="${tomcat.classes}"
-      filesId="files.tomcat-jni" />
-
-    <!-- Jasper Implementation JAR File -->
-    <jarIt jarfile="${jasper.jar}"
-      filesDir="${tomcat.classes}"
-      filesId="files.jasper"
-      meta-inf="${tomcat.manifests}/jasper.jar"/>
-
     <!-- Jasper EL Implementation JAR File -->
     <jarIt jarfile="${jasper-el.jar}"
       filesDir="${tomcat.classes}"
       filesId="files.jasper-el"
       meta-inf="${tomcat.manifests}/jasper-el.jar"/>
+
+    <!-- Jasper Implementation JAR File -->
+    <jarIt jarfile="${jasper.jar}"
+      filesDir="${tomcat.classes}"
+      filesId="files.jasper"
+      meta-inf="${tomcat.manifests}/jasper.jar" />
 
     <!-- Re-packaged Apache Commons DBCP 2-->
     <jarIt jarfile="${tomcat-dbcp.jar}"
@@ -1326,13 +1337,13 @@
            filesId="files.tomcat-embed-core"
            notice="${tomcat.manifests}/servlet-api.jar.notice"
            license="${tomcat.manifests}/servlet-api.jar.license"/>
+    <jarIt jarfile="${tomcat-embed-el.jar}"
+           filesDir="${tomcat.classes}"
+           filesId="files.tomcat-embed-el"/>
     <jarIt jarfile="${tomcat-embed-jasper.jar}"
            filesDir="${tomcat.classes}"
            filesId="files.tomcat-embed-jasper"
            meta-inf="${tomcat.manifests}/jasper.jar"/>
-    <jarIt jarfile="${tomcat-embed-el.jar}"
-           filesDir="${tomcat.classes}"
-           filesId="files.tomcat-embed-el"/>
     <jarIt jarfile="${tomcat-embed-websocket.jar}"
            filesDir="${tomcat.classes}"
            filesId="files.tomcat-embed-websocket"
@@ -1351,12 +1362,12 @@
            filesId="files.tomcat-embed-core"
             notice="${tomcat.manifests}/servlet-api.jar.notice"
             license="${tomcat.manifests}/servlet-api.jar.license"/>
-    <jarIt jarfile="${tomcat-embed-jasper-sources.jar}"
-           filesDir="java"
-           filesId="files.tomcat-embed-jasper"/>
     <jarIt jarfile="${tomcat-embed-el-sources.jar}"
            filesDir="java"
            filesId="files.tomcat-embed-el"/>
+    <jarIt jarfile="${tomcat-embed-jasper-sources.jar}"
+           filesDir="java"
+           filesId="files.tomcat-embed-jasper"/>
     <jarIt jarfile="${tomcat-embed-websocket-sources.jar}"
            filesDir="java"
            filesId="files.tomcat-embed-websocket"/>
@@ -2607,7 +2618,13 @@ skip.installer property in build.properties" />
       notice="${tomcat.manifests}/servlet-api.jar.notice"
       license="${tomcat.manifests}/servlet-api.jar.license" />
 
-    <!-- JSP 2.3 Implementation JAR File -->
+    <!-- JSP EL Implementation JAR File -->
+    <jarIt jarfile="${el-api-src.jar}"
+      filesDir="java"
+      filesId="files.el-api"
+      manifest="${tomcat.manifests}/el-api.jar.manifest" />
+
+    <!-- JSP Implementation JAR File -->
     <jarIt jarfile="${jsp-api-src.jar}"
       filesDir="java"
       filesId="files.jsp-api"
@@ -2615,24 +2632,13 @@ skip.installer property in build.properties" />
       notice="${tomcat.manifests}/jsp-api.jar.notice"
       license="${tomcat.manifests}/jsp-api.jar.license" />
 
-    <!-- JSP EL 3.0 Implementation JAR File -->
-    <jarIt jarfile="${el-api-src.jar}"
-      filesDir="java"
-      filesId="files.el-api"
-      manifest="${tomcat.manifests}/el-api.jar.manifest" />
-
-    <!-- WebSocket 1.1 API JAR File -->
+    <!-- WebSocket API JAR File -->
     <jarIt jarfile="${websocket-api-src.jar}"
       filesDir="java"
       filesId="files.websocket-api"
       manifest="${tomcat.manifests}/websocket-api.jar.manifest" />
 
-    <!-- WebSocket 1.1 implementation JAR File -->
-    <jarIt jarfile="${tomcat-websocket-src.jar}"
-      filesDir="java"
-      filesId="files.tomcat-websocket" />
-
-    <!-- JASPIC 1.1 API JAR File -->
+    <!-- JASPIC API JAR File -->
     <jarIt jarfile="${jaspic-api-src.jar}"
       filesDir="java"
       filesId="files.jaspic-api"
@@ -2640,31 +2646,66 @@ skip.installer property in build.properties" />
       notice="${tomcat.manifests}/jaspic-api.jar.notice"
       license="${tomcat.manifests}/jaspic-api.jar.license" />
 
+    <!-- Tomcat-juli JAR File -->
+    <jarIt jarfile="${tomcat-juli-src.jar}"
+      filesDir="java"
+      filesId="files.tomcat-juli" />
+
     <!-- Bootstrap JAR File -->
     <jarIt jarfile="${bootstrap-src.jar}"
       filesDir="java"
       filesId="files.bootstrap"
       manifest="${tomcat.manifests}/bootstrap.jar.manifest" />
 
-    <!-- Tomcat-juli JAR File -->
-    <jarIt jarfile="${tomcat-juli-src.jar}"
+    <!-- Tomcat Util JAR File -->
+    <jarIt jarfile="${tomcat-util-src.jar}"
       filesDir="java"
-      filesId="files.tomcat-juli" />
+      filesId="files.tomcat-util" />
 
-    <!-- Catalina Main JAR File -->
-    <jarIt jarfile="${catalina-src.jar}"
+    <!-- Tomcat API JAR File -->
+    <jarIt jarfile="${tomcat-api-src.jar}"
       filesDir="java"
-      filesId="files.catalina" />
+      filesId="files.tomcat-api" />
+
+    <!-- Tomcat Util Scan JAR File -->
+    <jarIt jarfile="${tomcat-util-scan-src.jar}"
+      filesDir="java"
+      filesId="files.tomcat-util-scan" />
+
+    <!-- JNI -->
+    <jarIt jarfile="${tomcat-jni-src.jar}"
+      filesDir="java"
+      filesId="files.tomcat-jni" />
+
+    <!-- Protocol handlers - Coyote -->
+    <jarIt jarfile="${tomcat-coyote-src.jar}"
+      filesDir="java"
+      filesId="files.tomcat-coyote" />
+
+    <!-- WebSocket implementation JAR File -->
+    <jarIt jarfile="${tomcat-websocket-src.jar}"
+      filesDir="java"
+      filesId="files.tomcat-websocket" />
 
     <!-- Catalina GroupCom/Tribes JAR File -->
     <jarIt jarfile="${catalina-tribes-src.jar}"
       filesDir="java"
       filesId="files.catalina-tribes" />
 
+    <!-- Catalina Main JAR File -->
+    <jarIt jarfile="${catalina-src.jar}"
+      filesDir="java"
+      filesId="files.catalina" />
+
     <!-- Catalina Cluster/HA JAR File -->
     <jarIt jarfile="${catalina-ha-src.jar}"
       filesDir="java"
       filesId="files.catalina-ha" />
+
+    <!-- Catalina SSI JAR File -->
+    <jarIt jarfile="${catalina-ssi-src.jar}"
+      filesDir="java"
+      filesId="files.catalina-ssi" />
 
     <!-- Catalina Ant Tasks JAR File -->
     <jarIt jarfile="${catalina-ant-src.jar}"
@@ -2676,42 +2717,15 @@ skip.installer property in build.properties" />
       filesDir="java"
       filesId="files.catalina-storeconfig" />
 
-    <!-- Tomcat API JAR File -->
-    <jarIt jarfile="${tomcat-api-src.jar}"
+    <!-- Jasper EL Implementation JAR File -->
+    <jarIt jarfile="${jasper-el-src.jar}"
       filesDir="java"
-      filesId="files.tomcat-api" />
-
-    <!-- Tomcat Util JAR File -->
-    <jarIt jarfile="${tomcat-util-src.jar}"
-      filesDir="java"
-      filesId="files.tomcat-util" />
-
-    <!-- Tomcat Util Scan JAR File -->
-    <jarIt jarfile="${tomcat-util-scan-src.jar}"
-      filesDir="java"
-      filesId="files.tomcat-util-scan" />
-
-    <!-- Protocol handlers - Coyote -->
-    <jarIt jarfile="${tomcat-coyote-src.jar}"
-      filesDir="java"
-      filesId="files.tomcat-coyote"
-      notice="${tomcat.manifests}/tomcat-coyote.jar.notice"
-      license="${tomcat.manifests}/tomcat-coyote.license" />
-
-    <!-- JNI -->
-    <jarIt jarfile="${tomcat-jni-src.jar}"
-      filesDir="java"
-      filesId="files.tomcat-jni" />
+      filesId="files.jasper-el" />
 
     <!-- Jasper Implementation JAR File -->
     <jarIt jarfile="${jasper-src.jar}"
       filesDir="java"
       filesId="files.jasper" />
-
-    <!-- Jasper EL Implementation JAR File -->
-    <jarIt jarfile="${jasper-el-src.jar}"
-      filesDir="java"
-      filesId="files.jasper-el" />
 
     <!-- Repackaged DBCP 2 -->
     <jarIt jarfile="${tomcat-dbcp-src.jar}"

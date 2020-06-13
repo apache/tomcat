@@ -110,6 +110,10 @@
         they are packaged into separate jars. Pull request provided by Raymond
         Augé. (markt)
       </fix>
+      <fix>
+        <bug>64522</bug>: Package jars in effective dependency order. Pull
+        request provided by Raymond Augé. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
