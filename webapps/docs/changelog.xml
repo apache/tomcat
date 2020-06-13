@@ -99,6 +99,11 @@
         to address packaging/dependency concerns for JPMS and OSGi. Pull request
         provided by Raymond Augé. (markt)
       </fix>
+      <fix>
+        <bug>64521</bug>: Avoid moving i18n translations into classes dir since
+        they are packaged into separate jars. Pull request provided by Raymond
+        Augé. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
