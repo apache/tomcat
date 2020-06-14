@@ -12,9 +12,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+-include: build-defaults.bnd
+
 Bundle-Name: tomcat-jsp-api
 Bundle-SymbolicName: org.apache.tomcat-jsp-api
-Bundle-Version: ${version_cleanup;${version}}
 Export-Package: \
     jakarta.servlet.jsp,\
     jakarta.servlet.jsp.el,\
