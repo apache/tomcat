@@ -12,9 +12,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+-include: build-defaults.bnd
+
 Bundle-Name: tomcat-util-scan
 Bundle-SymbolicName: org.apache.tomcat-util-scan
-Bundle-Version: ${version_cleanup;${version}}
 Export-Package: \
     org.apache.tomcat.util.descriptor,\
     org.apache.tomcat.util.descriptor.tagplugin,\
