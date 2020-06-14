@@ -13,8 +13,4 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
--include: build-defaults.bnd
-
-Bundle-Name: tomcat-jni
-Bundle-SymbolicName: org.apache.tomcat-jni
-Export-Package: org.apache.tomcat.jni
+Bundle-Version: ${version_cleanup;${version}}
