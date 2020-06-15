@@ -65,6 +65,10 @@
         cache implementation that could lead to
         <code>NullPointerException</code>s during class loading. (markt)
       </fix>
+      <add>
+        Add <code>application/wasm</code> to the media types recognised by
+        Tomcat. Based on a PR by Thiago Henrique Hüpner. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
