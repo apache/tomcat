@@ -66,6 +66,10 @@
         <bug>64470</bug>: The default value of the solidus handling should
         reflect the associated system property. (remm)
       </fix>
+      <add>
+        Add <code>application/wasm</code> to the media types recognised by
+        Tomcat. Based on a PR by Thiago Henrique Hüpner. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
