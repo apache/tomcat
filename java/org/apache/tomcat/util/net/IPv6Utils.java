@@ -109,7 +109,7 @@ public class IPv6Utils {
         int length = ipv6AddressLength;
         int change = 0;
 
-        if (colonsPos >= 0 && colonsPos < ipv6AddressLength - 2) {
+        if (colonsPos >= 0 && colonsPos < ipv6AddressLength - 1) {
             int colonCounter = 0;
             for (int i = 0; i < ipv6AddressLength; i++) {
                 if (ipv6Address.charAt(i) == ':') {
