@@ -83,6 +83,11 @@
         comma as a separater between cookies when using the RFC 6265 cookie
         processor. Based on a patch by W J Carpenter. (markt)
       </fix>
+      <fix>
+        Fix the utility code that converted IPv6 addresses to a canonical form
+        to correctly handle input addresses that ended with a pair of colons.
+        Based on a patch by syarramsetty-skyhook. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
