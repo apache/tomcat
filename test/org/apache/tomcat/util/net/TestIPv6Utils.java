@@ -111,6 +111,9 @@ public class TestIPv6Utils {
         Assert.assertEquals("2001:0:0:1::1", IPv6Utils.canonize("2001:0:0:1:0:0:0:1"));
         Assert.assertEquals("2001:db8::1:0:0:1", IPv6Utils.canonize("2001:db8:0:0:1:0:0:1"));
 
+        // Already ends with "::"
+        Assert.assertEquals("2001:db8::", IPv6Utils.canonize("2001:db8::"));
+
         // IPv4 inside IPv6
         Assert.assertEquals("::ffff:192.0.2.1", IPv6Utils.canonize("::ffff:192.0.2.1"));
         Assert.assertEquals("::ffff:192.0.2.1", IPv6Utils.canonize("0:0:0:0:0:ffff:192.0.2.1"));
