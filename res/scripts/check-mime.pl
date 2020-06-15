@@ -95,7 +95,6 @@ my %TOMCAT_ONLY = qw(
     shtml text/x-server-parsed-html
     ulw audio/basic
     z application/x-compress
-    Z application/x-compress
 );
 
 # Mime types, that are defined differently
