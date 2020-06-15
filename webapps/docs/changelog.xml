@@ -65,6 +65,10 @@
         cache implementation that could lead to
         <code>NullPointerException</code>s during class loading. (markt)
       </fix>
+      <add>
+        Add <code>application/wasm</code> to the media types recognised by
+        Tomcat. Based on a PR by Thiago Henrique Hüpner. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
@@ -79,6 +83,19 @@
         comma as a separater between cookies when using the RFC 6265 cookie
         processor. Based on a patch by W J Carpenter. (markt)
       </fix>
+      <fix>
+        Fix the utility code that converted IPv6 addresses to a canonical form
+        to correctly handle input addresses that ended with a pair of colons.
+        Based on a patch by syarramsetty-skyhook. (markt)
+      </fix>
+    </changelog>
+  </subsection>
+  <subsection name="Jasper">
+    <changelog>
+      <update>
+        Update the JSP document validation to permit <code>3.0</code> as a valid
+        version attribute for the <code>&lt;jsp-root&gt;</code> element. (markt)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Web Applications">
@@ -103,6 +120,9 @@
         <bug>64515</bug>: Bnd files don't need to be filtered (save some work).
         Pull request provided by Raymond Augé. (markt)
       </fix>
+      <update>
+        Update the OWB module to Apache OpenWebBeans 2.0.17. (remm)
+      </update>
       <fix>
         <bug>64514</bug>: Fixes some missing class dependency issus in bootstrap
         to address packaging/dependency concerns for JPMS and OSGi. Pull request
