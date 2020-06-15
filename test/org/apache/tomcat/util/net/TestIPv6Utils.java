@@ -23,7 +23,7 @@ import org.junit.Test;
 /**
  * Mostly examples from RFC 5952
  */
-public class IPv6UtilsTest {
+public class TestIPv6Utils {
 
     @Test
     public void testMayBeIPv6Address() {
