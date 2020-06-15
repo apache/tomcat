@@ -103,6 +103,9 @@
         <bug>64515</bug>: Bnd files don't need to be filtered (save some work).
         Pull request provided by Raymond Augé. (markt)
       </fix>
+      <update>
+        Update the OWB module to Apache OpenWebBeans 2.0.17. (remm)
+      </update>
     </changelog>
   </subsection>
 </section>

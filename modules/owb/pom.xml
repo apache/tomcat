@@ -29,14 +29,14 @@
     <name>Apache Tomcat CDI 2 support</name>
     <description>Apache Tomcat CDI 2 support using Apache OpenWebBeans</description>
     <!-- This is the Apache OpenWebBeans version -->
-    <version>2.0.16</version>
+    <version>2.0.17</version>
     <packaging>jar</packaging>
 
     <properties>
         <geronimo-atinject.version>1.0</geronimo-atinject.version>
         <geronimo-interceptor.version>1.0</geronimo-interceptor.version>
         <geronimo-jcdi.version>1.0.1</geronimo-jcdi.version>
-        <tomcat.version>10.0.0-M3</tomcat.version>
+        <tomcat.version>10.0.0-M6</tomcat.version>
     </properties>
 
     <dependencies>
@@ -80,7 +80,6 @@
         </dependency>
     </dependencies>
 
-
     <build>
         <plugins>
             <plugin>
@@ -95,8 +94,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
-                <version>3.2.1</version>
-                <!--<version>3.2.2</version>-->
+                <version>3.2.4</version>
                 <executions>
                     <execution>
                         <phase>package</phase>
@@ -106,23 +104,23 @@
                         <configuration>
                             <createDependencyReducedPom>false</createDependencyReducedPom>
                             <transformers>
-                                <transformer implementation="org.apache.openwebbeans.maven.shade.OpenWebBeansPropertiesTransformer" />
-                                <!-- With Shade 3.2.2 <transformer implementation="org.apache.maven.plugins.shade.resource.properties.OpenWebBeansPropertiesTransformer"/>-->
-                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                    <mainClass>${mainClass}</mainClass>
-                                </transformer>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ApacheLicenseResourceTransformer"/>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ApacheNoticeResourceTransformer"/>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.properties.OpenWebBeansPropertiesTransformer"/>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer" />
                             </transformers>
+                            <filters>
+                                <filter>
+                                    <artifact>*:*</artifact>
+                                    <excludes>
+                                        <exclude>META-INF/DEPENDENCIES</exclude>
+                                        <exclude>META-INF/MANIFEST.MF</exclude>
+                                    </excludes>
+                                </filter>
+                            </filters>
                         </configuration>
                     </execution>
                 </executions>
-                <!-- Remove after Shade 3.2.2 -->
-                <dependencies>
-                    <dependency>
-                        <groupId>org.apache.openwebbeans</groupId>
-                        <artifactId>openwebbeans-maven</artifactId>
-                        <version>${project.version}</version>
-                    </dependency>
-                </dependencies>
             </plugin>
         </plugins>
     </build>
