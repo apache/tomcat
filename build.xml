@@ -231,6 +231,7 @@
   <path id="tomcat.test.classpath">
     <pathelement location="${test.basedir}/webapps/examples/WEB-INF/classes"/>
     <pathelement location="${test.classes}"/>
+    <pathelement location="${tomcat.build}/i18n"/>
     <pathelement location="${junit.jar}"/>
     <pathelement location="${hamcrest.jar}"/>
     <pathelement location="${easymock.jar}"/>
