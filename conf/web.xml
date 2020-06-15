@@ -4253,6 +4253,10 @@
         <mime-type>application/x-doom</mime-type>
     </mime-mapping>
     <mime-mapping>
+        <extension>wasm</extension>
+        <mime-type>application/wasm</mime-type>
+    </mime-mapping>
+    <mime-mapping>
         <extension>wav</extension>
         <mime-type>audio/x-wav</mime-type>
     </mime-mapping>
