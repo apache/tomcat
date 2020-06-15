@@ -81,6 +81,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Jasper">
+    <changelog>
+      <update>
+        Update the JSP document validation to permit <code>3.0</code> as a valid
+        version attribute for the <code>&lt;jsp-root&gt;</code> element. (markt)
+      </update>
+    </changelog>
+  </subsection>
   <subsection name="Web Applications">
     <changelog>
       <update>
