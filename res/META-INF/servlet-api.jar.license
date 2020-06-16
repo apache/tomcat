@@ -570,6 +570,7 @@ For the following Jakarta EE Schemas:
 - jsp_3_0.xsd
 - web-app_5_0.xsd
 - web-commonn_5_0.xsd
+- web-fragment_5_0.xsd
 
 Eclipse Public License - v 2.0
 

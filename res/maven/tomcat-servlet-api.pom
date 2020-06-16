@@ -68,6 +68,7 @@
         jsp_3_0.xsd
         web-app_5_0.xsd
         web-commonn_5_0.xsd
+        web-fragment_5_0.xsd
         to which the EPLv2 applies.
       </comments>
     </license>
