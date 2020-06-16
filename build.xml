@@ -849,11 +849,6 @@
       filesDir="${tomcat.classes}"
       filesId="files.catalina-ha" />
 
-    <!-- Server-Side Includes (SSI) -->
-    <jarIt jarfile="${catalina-ssi.jar}"
-      filesDir="${tomcat.classes}"
-      filesId="files.catalina-ssi" />
-
     <!-- Catalina Ant Tasks JAR File -->
     <jarIt jarfile="${catalina-ant.jar}"
       filesDir="${tomcat.classes}"
@@ -2701,11 +2696,6 @@ skip.installer property in build.properties" />
     <jarIt jarfile="${catalina-ha-src.jar}"
       filesDir="java"
       filesId="files.catalina-ha" />
-
-    <!-- Catalina SSI JAR File -->
-    <jarIt jarfile="${catalina-ssi-src.jar}"
-      filesDir="java"
-      filesId="files.catalina-ssi" />
 
     <!-- Catalina Ant Tasks JAR File -->
     <jarIt jarfile="${catalina-ant-src.jar}"
