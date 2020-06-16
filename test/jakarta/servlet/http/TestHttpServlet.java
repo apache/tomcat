@@ -28,7 +28,10 @@ import jakarta.servlet.ServletException;
 import org.junit.Assert;
 import org.junit.Test;
 
+import org.apache.catalina.Context;
 import org.apache.catalina.core.StandardContext;
+import org.apache.catalina.startup.SimpleHttpClient;
+import org.apache.catalina.startup.TesterServlet;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.buf.ByteChunk;
@@ -188,6 +191,105 @@ public class TestHttpServlet extends TomcatBaseTest {
 
         Assert.assertEquals(HttpServletResponse.SC_OK, rc);
         Assert.assertEquals(expectedAllow, resHeaders.get("Allow").get(0));
+    }
+
+
+    @Test
+    public void testUnimplementedMethodHttp09() throws Exception {
+        doTestUnimplementedMethod("0.9");
+    }
+
+
+    @Test
+    public void testUnimplementedMethodHttp10() throws Exception {
+        doTestUnimplementedMethod("1.0");
+    }
+
+
+    @Test
+    public void testUnimplementedMethodHttp11() throws Exception {
+        doTestUnimplementedMethod("1.1");
+    }
+
+
+    /*
+     * See org.aoache.coyote.http2.TestHttpServlet for the HTTP/2 version of
+     * this test. It was placed in that package because it needed access to
+     * package private classes.
+     */
+
+
+    private void doTestUnimplementedMethod(String httpVersion) {
+        StringBuilder request = new StringBuilder("PUT /test");
+        boolean isHttp09 = "0.9".equals(httpVersion);
+        boolean isHttp10 = "1.0".equals(httpVersion);
+
+        if (!isHttp09) {
+            request.append(" HTTP/");
+            request.append(httpVersion);
+        }
+        request.append(SimpleHttpClient.CRLF);
+
+        request.append("Host: localhost:8080");
+        request.append(SimpleHttpClient.CRLF);
+
+        request.append("Connection: close");
+        request.append(SimpleHttpClient.CRLF);
+
+        request.append(SimpleHttpClient.CRLF);
+
+        Client client = new Client(request.toString(), "0.9".equals(httpVersion));
+
+        client.doRequest();
+
+        if (isHttp09) {
+            Assert.assertTrue( client.getResponseBody(), client.getResponseBody().contains(" 400 "));
+        } else if (isHttp10) {
+            Assert.assertTrue(client.getResponseLine(), client.isResponse400());
+        } else {
+            Assert.assertTrue(client.getResponseLine(), client.isResponse405());
+        }
+    }
+
+
+    private class Client extends SimpleHttpClient {
+
+        public Client(String request, boolean isHttp09) {
+            setRequest(new String[] {request});
+            setUseHttp09(isHttp09);
+        }
+
+        private Exception doRequest() {
+
+            Tomcat tomcat = getTomcatInstance();
+
+            Context root = tomcat.addContext("", TEMP_DIR);
+            Tomcat.addServlet(root, "TesterServlet", new TesterServlet());
+            root.addServletMappingDecoded("/test", "TesterServlet");
+
+            try {
+                tomcat.start();
+                setPort(tomcat.getConnector().getLocalPort());
+                setRequestPause(20);
+
+                // Open connection
+                connect();
+
+                processRequest(); // blocks until response has been read
+
+                // Close the connection
+                disconnect();
+            } catch (Exception e) {
+                e.printStackTrace();
+                return e;
+            }
+            return null;
+        }
+
+        @Override
+        public boolean isResponseBodyOK() {
+            return false;
+        }
     }
 
 

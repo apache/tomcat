@@ -186,7 +186,6 @@ public class TestHttp11InputBufferCRLF extends TomcatBaseTest {
                 // Open connection
                 connect();
 
-                setRequest(request);
                 processRequest(); // blocks until response has been read
 
                 // Close the connection

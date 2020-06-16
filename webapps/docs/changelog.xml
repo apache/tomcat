@@ -69,6 +69,12 @@
         Add <code>application/wasm</code> to the media types recognised by
         Tomcat. Based on a PR by Thiago Henrique Hüpner. (markt)
       </add>
+      <fix>
+        Fix a bug in <code>HttpServlet</code> so that a <code>405</code>
+        response is returned for an HTTP/2 request if the mapped servlet does
+        implement the requested method rather than the more general
+        <code>400</code> response. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
