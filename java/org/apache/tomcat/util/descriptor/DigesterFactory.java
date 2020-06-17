@@ -128,6 +128,7 @@ public class DigesterFactory {
         // from JakartaEE 9
         add(systemIds, XmlIdentifiers.WEB_50_XSD, locationFor("web-app_5_0.xsd"));
         add(systemIds, XmlIdentifiers.WEB_FRAGMENT_50_XSD, locationFor("web-fragment_5_0.xsd"));
+        add(systemIds, XmlIdentifiers.TLD_30_XSD, locationFor("web-jsptaglibrary_3_0.xsd"));
         addSelf(systemIds, "web-common_5_0.xsd");
         addSelf(systemIds, "jakartaee_9.xsd");
         addSelf(systemIds, "jsp_3_0.xsd");

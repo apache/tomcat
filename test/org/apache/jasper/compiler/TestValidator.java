@@ -241,6 +241,7 @@ public class TestValidator extends TomcatBaseTest {
         Assert.assertTrue(result.indexOf("<p>04-hello world</p>") > 0);
         Assert.assertTrue(result.indexOf("<p>#{'05-hello world'}</p>") > 0);
         Assert.assertTrue(result.indexOf("<p>06-hello world</p>") > 0);
+        Assert.assertTrue(result.indexOf("<p>07-hello world</p>") > 0);
     }
 
     public static class Echo extends TagSupport {

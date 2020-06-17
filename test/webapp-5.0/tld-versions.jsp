@@ -19,6 +19,7 @@
 <%@ taglib prefix="tags12" uri="http://tomcat.apache.org/tags12" %>
 <%@ taglib prefix="tags20" uri="http://tomcat.apache.org/tags20" %>
 <%@ taglib prefix="tags21" uri="http://tomcat.apache.org/tags21" %>
+<%@ taglib prefix="tags30" uri="http://tomcat.apache.org/tags30" %>
 <tags11:Echo echo="${'00-hello world'}"/>
 <tags11:Echo echo="#{'01-hello world'}"/>
 <tags12:Echo echo="${'02-hello world'}"/>
@@ -26,4 +27,5 @@
 <tags20:Echo echo="${'04-hello world'}"/>
 <tags20:Echo echo="#{'05-hello world'}"/>
 <tags21:Echo echo="${'06-hello world'}"/>
+<tags30:Echo echo="${'07-hello world'}"/>
 </body></html>

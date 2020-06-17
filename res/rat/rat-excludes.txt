@@ -138,6 +138,7 @@ java/jakarta/servlet/resources/web-fragment_3_0.xsd
 java/jakarta/servlet/resources/web-fragment_3_1.xsd
 java/jakarta/servlet/resources/web-fragment_4_0.xsd
 java/jakarta/servlet/resources/web-fragment_5_0.xsd
+java/jakarta/servlet/resources/web-jsptaglibrary_3_0.xsd
 output/classes/jakarta/servlet/resources/javaee_5.xsd
 output/classes/jakarta/servlet/resources/javaee_6.xsd
 output/classes/jakarta/servlet/resources/javaee_7.xsd
@@ -165,6 +166,7 @@ output/classes/jakarta/servlet/resources/web-fragment_3_0.xsd
 output/classes/jakarta/servlet/resources/web-fragment_3_1.xsd
 output/classes/jakarta/servlet/resources/web-fragment_4_0.xsd
 output/classes/jakarta/servlet/resources/web-fragment_5_0.xsd
+output/classes/jakarta/servlet/resources/web-jsptaglibrary_3_0.xsd
 output/dist/src/java/jakarta/servlet/resources/javaee_5.xsd
 output/dist/src/java/jakarta/servlet/resources/javaee_6.xsd
 output/dist/src/java/jakarta/servlet/resources/javaee_7.xsd
@@ -193,6 +195,7 @@ output/dist/src/java/jakarta/servlet/resources/web-fragment_3_0.xsd
 output/dist/src/java/jakarta/servlet/resources/web-fragment_3_1.xsd
 output/dist/src/java/jakarta/servlet/resources/web-fragment_4_0.xsd
 output/dist/src/java/jakarta/servlet/resources/web-fragment_5_0.xsd
+output/dist/src/java/jakarta/servlet/resources/web-jsptaglibrary_3_0.xsd
 
 output/dist/src/res/checkstyle/header-al2.txt
 res/checkstyle/header-al2.txt

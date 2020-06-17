@@ -82,6 +82,7 @@ public final class XmlIdentifiers {
     public static final String JAKARTAEE_9_NS = "https://jakarta.ee/xml/ns/jakartaee";
     public static final String WEB_50_XSD = JAKARTAEE_9_NS + "/web-app_5_0.xsd";
     public static final String WEB_FRAGMENT_50_XSD = JAKARTAEE_9_NS + "/web-fragment_5_0.xsd";
+    public static final String TLD_30_XSD = JAKARTAEE_9_NS + "/web-jsptaglibrary_3_0.xsd";
     public static final String WEBSERVICES_20_XSD = JAKARTAEE_9_NS + "/jakartaee_web_services_2_0.xsd";
 
     private XmlIdentifiers() {
