@@ -38,8 +38,8 @@ public class TestCookie {
         List<Object[]> parameterSets = new ArrayList<>();
 
         String[] SEPS = new String[] { ",", ";" };
-        String[] PATHS = new String[] { ";$Path=/foo", ""};
-        String[] DOMAINS = new String[] { ";$Domain=bar.com", ""};
+        String[] PATHS = new String[] { ";$Path=/foo", " ; $Path = /foo ", ""};
+        String[] DOMAINS = new String[] { ";$Domain=bar.com",  " ; $Domain = bar.com ", ""};
 
         for (String sep1 : SEPS) {
             for (String path1 : PATHS) {

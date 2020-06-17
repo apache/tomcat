@@ -91,6 +91,11 @@
         to correctly handle input addresses that ended with a pair of colons.
         Based on a patch by syarramsetty-skyhook. (markt)
       </fix>
+      <fix>
+        Correctly parse RFC 2109 version 1 cookies that have additional linear
+        white space around cookie attrubute names and values when using the RFC
+        6265 cookie processor. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">

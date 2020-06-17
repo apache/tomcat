@@ -287,6 +287,7 @@ public class Cookie {
             }
 
             if (parseAttributes) {
+                skipLWS(bb);
                 skipResult = skipBytes(bb, PATH_BYTES);
                 if (skipResult == SkipResult.FOUND) {
                     skipLWS(bb);
@@ -295,6 +296,7 @@ public class Cookie {
                         skipInvalidCookie(bb);
                         continue;
                     }
+                    skipLWS(bb);
                     path = readCookieValueRfc2109(bb, true);
                     if (path == null) {
                         skipInvalidCookie(bb);
@@ -319,6 +321,7 @@ public class Cookie {
             }
 
             if (parseAttributes) {
+                skipLWS(bb);
                 skipResult = skipBytes(bb, DOMAIN_BYTES);
                 if (skipResult == SkipResult.FOUND) {
                     skipLWS(bb);
@@ -327,11 +330,13 @@ public class Cookie {
                         skipInvalidCookie(bb);
                         continue;
                     }
+                    skipLWS(bb);
                     domain = readCookieValueRfc2109(bb, false);
                     if (domain == null) {
                         skipInvalidCookie(bb);
                         continue;
                     }
+                    skipLWS(bb);
 
                     skipResult = skipByte(bb, COMMA_BYTE);
                     if (skipResult == SkipResult.FOUND) {
