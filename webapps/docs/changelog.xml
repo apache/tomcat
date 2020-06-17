@@ -152,6 +152,10 @@
         Store common build details in a shared build-defaults.bnd. Pull
         request provided by Raymond Augé. (markt)
       </fix>
+      <fix>
+        <bug>64532</bug>: Update to bnd 5.1.1. Pull request provided by Raymond
+        Augé. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
