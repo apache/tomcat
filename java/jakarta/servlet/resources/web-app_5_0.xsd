@@ -265,7 +265,7 @@
             of the web application. An empty value for this element must cause
             the web application to be deployed at the root for the container.
             Otherwise, the default context path must start with
-            a “/“ character but not end with a “/“ character.
+            a "/" character but not end with a "/" character.
             Servlet containers may provide vendor specific configuration
             options that allows specifying a value that overrides the value
             specified here.
