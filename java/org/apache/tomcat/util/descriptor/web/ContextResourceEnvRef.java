@@ -29,6 +29,10 @@ public class ContextResourceEnvRef extends ResourceBase {
 
     private static final long serialVersionUID = 1L;
 
+    public ContextResourceEnvRef() {
+        initialHashCode = hashCode();
+    }
+
     // ------------------------------------------------------------- Properties
 
     /**

@@ -21,6 +21,7 @@ package org.apache.catalina.startup;
 import org.apache.catalina.Context;
 import org.apache.catalina.deploy.NamingResourcesImpl;
 import org.apache.tomcat.util.IntrospectionUtils;
+import org.apache.tomcat.util.descriptor.web.ResourceBase;
 import org.apache.tomcat.util.digester.Rule;
 
 
@@ -104,6 +105,12 @@ public class SetNextNamingRule extends Rule {
         IntrospectionUtils.callMethod1(namingResources, methodName,
                 child, paramType, digester.getClassLoader());
 
+        StringBuilder code = digester.getGeneratedCode();
+        if (code != null) {
+            code.append(digester.toVariableName(namingResources)).append(".").append(methodName).append("(");
+            code.append(digester.toVariableName(child, ((ResourceBase) child).getInitialHashCode())).append(");");
+            code.append(System.lineSeparator());
+        }
     }
 
 

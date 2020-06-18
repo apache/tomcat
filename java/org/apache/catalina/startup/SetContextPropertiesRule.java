@@ -18,58 +18,28 @@
 
 package org.apache.catalina.startup;
 
-import org.apache.tomcat.util.IntrospectionUtils;
-import org.apache.tomcat.util.digester.Rule;
-import org.xml.sax.Attributes;
+import org.apache.tomcat.util.digester.SetPropertiesRule;
 
 /**
  * Rule that uses the introspection utils to set properties of a context
  * (everything except "path").
  *
  * @author Remy Maucherat
+ * @deprecated This will be removed in Tomcat 10
  */
-public class SetContextPropertiesRule extends Rule {
+public class SetContextPropertiesRule extends SetPropertiesRule {
 
 
     // ----------------------------------------------------------- Constructors
 
+    public SetContextPropertiesRule() {
+        super(new String[]{"path", "docBase"});
+    }
 
     // ----------------------------------------------------- Instance Variables
 
 
     // --------------------------------------------------------- Public Methods
-
-
-    /**
-     * Handle the beginning of an XML element.
-     *
-     * @param attributes The attributes of this element
-     *
-     * @exception Exception if a processing error occurs
-     */
-    @Override
-    public void begin(String namespace, String nameX, Attributes attributes)
-        throws Exception {
-
-        for (int i = 0; i < attributes.getLength(); i++) {
-            String name = attributes.getLocalName(i);
-            if ("".equals(name)) {
-                name = attributes.getQName(i);
-            }
-            if ("path".equals(name) || "docBase".equals(name)) {
-                continue;
-            }
-            String value = attributes.getValue(i);
-            if (!digester.isFakeAttribute(digester.peek(), name)
-                    && !IntrospectionUtils.setProperty(digester.peek(), name, value)
-                    && digester.getRulesValidation()) {
-                digester.getLogger().warn("[SetContextPropertiesRule]{" + digester.getMatch() +
-                        "} Setting property '" + name + "' to '" +
-                        value + "' did not find a matching property.");
-            }
-        }
-
-    }
 
 
 }

@@ -29,6 +29,10 @@ public class MessageDestinationRef extends ResourceBase {
 
     private static final long serialVersionUID = 1L;
 
+    public MessageDestinationRef() {
+        initialHashCode = hashCode();
+    }
+
     // ------------------------------------------------------------- Properties
 
 

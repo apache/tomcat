@@ -383,6 +383,20 @@ public class CallMethodRule extends Rule {
         Object result = IntrospectionUtils.callMethodN(target, methodName,
                 paramValues, paramTypes);
         processMethodCallResult(result);
+
+        StringBuilder code = digester.getGeneratedCode();
+        if (code != null) {
+            code.append(digester.toVariableName(target)).append(".").append(methodName);
+            code.append("(");
+            for (int i = 0; i < paramValues.length; i++) {
+                if (i > 0) {
+                    code.append(",");
+                }
+                code.append(digester.toVariableName(paramValues[i]));
+            }
+            code.append(");");
+            code.append(System.lineSeparator());
+        }
     }
 
 

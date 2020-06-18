@@ -96,6 +96,16 @@ public class ResourceBase implements Serializable, Injectable {
 
 
     /**
+     * Store the initial hash code of the object, as the override
+     * can mess some operations.
+     */
+    protected int initialHashCode = 0;
+
+    public int getInitialHashCode() {
+        return initialHashCode;
+    }
+
+    /**
      * Holder for our configured properties.
      */
     private final Map<String, Object> properties = new HashMap<>();
