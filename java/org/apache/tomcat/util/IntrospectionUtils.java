@@ -45,12 +45,17 @@ public final class IntrospectionUtils {
      * @return <code>true</code> if operation was successful
      */
     public static boolean setProperty(Object o, String name, String value) {
-        return setProperty(o,name,value,true);
+        return setProperty(o, name, value, true, null);
+    }
+
+    public static boolean setProperty(Object o, String name, String value,
+            boolean invokeSetProperty) {
+        return setProperty(o, name, value, invokeSetProperty, null);
     }
 
     @SuppressWarnings("null") // setPropertyMethodVoid is not null when used
     public static boolean setProperty(Object o, String name, String value,
-            boolean invokeSetProperty) {
+            boolean invokeSetProperty, StringBuilder actualMethod) {
         if (log.isDebugEnabled())
             log.debug("IntrospectionUtils: setProperty(" +
                     o.getClass() + " " + name + "=" + value + ")");
@@ -67,8 +72,10 @@ public final class IntrospectionUtils {
                 Class<?> paramT[] = item.getParameterTypes();
                 if (setter.equals(item.getName()) && paramT.length == 1
                         && "java.lang.String".equals(paramT[0].getName())) {
-
                     item.invoke(o, new Object[]{value});
+                    if (actualMethod != null) {
+                        actualMethod.append(item.getName()).append("(\"").append(value).append("\")");
+                    }
                     return true;
                 }
             }
@@ -91,6 +98,9 @@ public final class IntrospectionUtils {
                         } catch (NumberFormatException ex) {
                             ok = false;
                         }
+                        if (actualMethod != null) {
+                            actualMethod.append(method.getName()).append("(Integer.valueOf(\"").append(value).append("\"))");
+                        }
                         // Try a setFoo ( long )
                     } else if ("java.lang.Long".equals(paramType.getName())
                             || "long".equals(paramType.getName())) {
@@ -99,12 +109,16 @@ public final class IntrospectionUtils {
                         } catch (NumberFormatException ex) {
                             ok = false;
                         }
-
+                        if (actualMethod != null) {
+                            actualMethod.append(method.getName()).append("(Long.valueOf(\"").append(value).append("\"))");
+                        }
                         // Try a setFoo ( boolean )
                     } else if ("java.lang.Boolean".equals(paramType.getName())
                             || "boolean".equals(paramType.getName())) {
                         params[0] = Boolean.valueOf(value);
-
+                        if (actualMethod != null) {
+                            actualMethod.append(method.getName()).append("(Boolean.valueOf(\"").append(value).append("\"))");
+                        }
                         // Try a setFoo ( InetAddress )
                     } else if ("java.net.InetAddress".equals(paramType
                             .getName())) {
@@ -115,7 +129,9 @@ public final class IntrospectionUtils {
                                 log.debug("IntrospectionUtils: Unable to resolve host name:" + value);
                             ok = false;
                         }
-
+                        if (actualMethod != null) {
+                            actualMethod.append(method.getName()).append("(InetAddress.getByName(\"").append(value).append("\"))");
+                        }
                         // Unknown type
                     } else {
                         if (log.isDebugEnabled())
@@ -143,6 +159,9 @@ public final class IntrospectionUtils {
             // Ok, no setXXX found, try a setProperty("name", "value")
             if (invokeSetProperty && (setPropertyMethodBool != null ||
                     setPropertyMethodVoid != null)) {
+                if (actualMethod != null) {
+                    actualMethod.append("setProperty(\"").append(name).append("\", \"").append(value).append("\")");
+                }
                 Object params[] = new Object[2];
                 params[0] = name;
                 params[1] = value;

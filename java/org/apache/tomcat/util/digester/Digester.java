@@ -340,6 +340,10 @@ public class Digester extends DefaultHandler2 {
      */
     protected Log saxLog = LogFactory.getLog("org.apache.tomcat.util.digester.Digester.sax");
 
+    /**
+     * Generated code.
+     */
+    protected StringBuilder code = null;
 
     public Digester() {
         propertySourcesSet = true;
@@ -373,6 +377,22 @@ public class Digester extends DefaultHandler2 {
         }
     }
 
+
+    public void startGeneratingCode() {
+        code = new StringBuilder();
+    }
+
+    public StringBuilder getGeneratedCode() {
+        return code;
+    }
+
+    public String toVariableName(Object object) {
+        return toVariableName(object, object.hashCode());
+    }
+
+    public String toVariableName(Object object, int hashCode) {
+        return "tc_" + object.getClass().getSimpleName() + "_" + String.valueOf(Math.abs(hashCode));
+    }
 
     // ------------------------------------------------------------- Properties
 
@@ -1662,6 +1682,13 @@ public class Digester extends DefaultHandler2 {
     public void addSetProperties(String pattern) {
 
         addRule(pattern, new SetPropertiesRule());
+
+    }
+
+
+    public void addSetProperties(String pattern, String[] excludes) {
+
+        addRule(pattern, new SetPropertiesRule(excludes));
 
     }
 

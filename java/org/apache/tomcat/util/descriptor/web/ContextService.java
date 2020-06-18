@@ -33,6 +33,10 @@ public class ContextService extends ResourceBase {
 
     private static final long serialVersionUID = 1L;
 
+    public ContextService() {
+        initialHashCode = hashCode();
+    }
+
     // ------------------------------------------------------------- Properties
 
 

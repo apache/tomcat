@@ -104,6 +104,12 @@ public class ObjectCreateRule extends Rule {
         Class<?> clazz = digester.getClassLoader().loadClass(realClassName);
         Object instance = clazz.getConstructor().newInstance();
         digester.push(instance);
+
+        StringBuilder code = digester.getGeneratedCode();
+        if (code != null) {
+            code.append(realClassName).append(" ").append(digester.toVariableName(instance)).append(" = new ");
+            code.append(realClassName).append("();").append(System.lineSeparator());
+        }
     }
 
 
@@ -143,6 +149,10 @@ public class ObjectCreateRule extends Rule {
                     "} Pop " + top.getClass().getName());
         }
 
+        StringBuilder code = digester.getGeneratedCode();
+        if (code != null) {
+            code.append(System.lineSeparator());
+        }
     }
 
 

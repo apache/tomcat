@@ -145,6 +145,12 @@ public class SetNextRule extends Rule {
         IntrospectionUtils.callMethod1(parent, methodName,
                 child, paramType, digester.getClassLoader());
 
+        StringBuilder code = digester.getGeneratedCode();
+        if (code != null) {
+            code.append(digester.toVariableName(parent)).append(".");
+            code.append(methodName).append("(").append(digester.toVariableName(child)).append(");");
+            code.append(System.lineSeparator());
+        }
     }
 
 

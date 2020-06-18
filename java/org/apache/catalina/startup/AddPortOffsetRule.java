@@ -32,5 +32,12 @@ public class AddPortOffsetRule extends Rule {
 
         int portOffset = server.getPortOffset();
         conn.setPortOffset(portOffset);
+
+        StringBuilder code = digester.getGeneratedCode();
+        if (code != null) {
+            code.append(digester.toVariableName(conn)).append(".setPortOffset(");
+            code.append(digester.toVariableName(server)).append(".getPortOffset());");
+            code.append(System.lineSeparator());
+        }
     }
 }
