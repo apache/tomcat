@@ -81,6 +81,7 @@ script:
 
 after_failure:
     - tail -n 5000 ant-test.log
+    - tail -n 5000 test-failures.log
     - ls -laR $HOME/tomcat-build-libs
 
 notifications:
