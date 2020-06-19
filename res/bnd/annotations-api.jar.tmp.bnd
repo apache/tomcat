@@ -18,6 +18,18 @@
 Bundle-Name: tomcat-annotations-api
 Bundle-SymbolicName: org.apache.tomcat-annotations-api
 Export-Package: \
-    jakarta.annotation,\
-    jakarta.annotation.security,\
-    jakarta.annotation.sql
+    jakarta.annotation.*;version=${annotation.spec.version}
+
+Provide-Capability: \
+    osgi.contract;\
+        osgi.contract=JavaAnnotation;\
+        version:Version=${annotation.spec.version};\
+        uses:='${packages;NAMED;jakarta.annotation.*}'
+
+-namesection: jakarta/annotation*/;\
+    Specification-Title=Jakarta Annotations;\
+    Specification-Version=${annotation.spec.version};\
+    Specification-Vendor=Eclipse Foundation;\
+    Implementation-Title=jakarta.annotation;\
+    Implementation-Version=${annotation.spec.version}.${annotation.revision};\
+    Implementation-Vendor=Apache Software Foundation
