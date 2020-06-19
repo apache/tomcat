@@ -19,10 +19,7 @@ Automatic-Module-Name: org.apache.tomcat.embed.jasper
 Bundle-Name: tomcat-embed-jasper
 Bundle-SymbolicName: org.apache.tomcat-embed-jasper
 Export-Package: \
-    javax.servlet.jsp,\
-    javax.servlet.jsp.el,\
-    javax.servlet.jsp.resources,\
-    javax.servlet.jsp.tagext,\
+    javax.servlet.jsp.*;version=2.3,\
     org.apache.jasper,\
     org.apache.jasper.compiler,\
     org.apache.jasper.compiler.tagplugin,\
@@ -38,3 +35,17 @@ Export-Package: \
     org.apache.jasper.resources
 
 -includeresource.meta-inf: /META-INF/=../META-INF/jasper.jar/
+
+Provide-Capability: \
+    osgi.contract;\
+        osgi.contract=JavaJSP;\
+        version:List<Version>="2.3,2.2,2.1,2";\
+        uses:='${packages;NAMED;javax.servlet.jsp.*}'
+
+-namesection: javax/servlet/jsp*/;\
+    Specification-Title='Java API for JavaServer Pages';\
+    Specification-Version=2.3;\
+    Specification-Vendor='Sun Microsystems, Inc.';\
+    Implementation-Title=javax.servlet.jsp;\
+    Implementation-Version=2.3.${jsp.revision};\
+    Implementation-Vendor='Apache Software Foundation'

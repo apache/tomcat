@@ -18,8 +18,22 @@
 Bundle-Name: tomcat-servlet-api
 Bundle-SymbolicName: org.apache.tomcat-servlet-api
 Export-Package: \
-    javax.servlet,\
-    javax.servlet.annotation,\
-    javax.servlet.descriptor,\
-    javax.servlet.http,\
-    javax.servlet.resources
+    !javax.servlet.jsp.*,\
+    javax.servlet.*;version=4.0
+
+Provide-Capability: \
+    osgi.contract;\
+        osgi.contract=JavaServlet;\
+        version:List<Version>="4.0,3.1,3,2.5";\
+        uses:='${packages;NAMED;javax.servlet.*;NAMED;!javax.servlet.jsp.*}'
+
+-includeresource.notice2: META-INF/NOTICE;literal="${replace;${cat;../META-INF/servlet-api.jar.notice};@YEAR@;${year}}\n"
+-includeresource.license2: {META-INF/LICENSE=../META-INF/servlet-api.jar.license}
+
+-namesection: javax/servlet*/;\
+    Specification-Title='Java API for Servlets';\
+    Specification-Version=4.0;\
+    Specification-Vendor='Sun Microsystems, Inc.';\
+    Implementation-Title=javax.servlet;\
+    Implementation-Version=4.0.${servlet.revision};\
+    Implementation-Vendor='Apache Software Foundation'

@@ -19,13 +19,27 @@ Automatic-Module-Name: org.apache.tomcat.embed.jasper.el
 Bundle-Name: tomcat-embed-jasper-el
 Bundle-SymbolicName: org.apache.tomcat-embed-jasper-el
 Export-Package: \
-    javax.el,\
+    javax.el;version=3.0,\
     org.apache.el,\
     org.apache.el.lang,\
     org.apache.el.parser
 
 -includepackage: \
-	org.apache.el.stream,\
-	org.apache.el.util
+    org.apache.el.stream,\
+    org.apache.el.util
 
 -includeresource.meta-inf: /META-INF/=../META-INF/jasper-el.jar/
+
+Provide-Capability: \
+    osgi.contract;\
+        osgi.contract=JavaEL;\
+        version:List<Version>="3.0,2.2,2.1";\
+        uses:='${packages;NAMED;javax.el.*}'
+
+-namesection: javax/el*/;\
+    Specification-Title='Expression Language';\
+    Specification-Version=3.0;\
+    Specification-Vendor='Sun Microsystems, Inc.';\
+    Implementation-Title=javax.el;\
+    Implementation-Version=3.0.${el.revision};\
+    Implementation-Vendor='Apache Software Foundation'

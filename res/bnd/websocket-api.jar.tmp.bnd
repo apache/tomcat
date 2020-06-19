@@ -18,5 +18,18 @@
 Bundle-Name: tomcat-websocket-api
 Bundle-SymbolicName: org.apache.tomcat-websocket-api
 Export-Package: \
-    javax.websocket,\
-    javax.websocket.server
+    javax.websocket.*;version=1.1
+
+Provide-Capability: \
+    osgi.contract;\
+        osgi.contract=JavaWebSockets;\
+        version:List<Version>="1.1,1";\
+        uses:='${packages;NAMED;javax.websocket.*}'
+
+-namesection: javax/websocket*/;\
+    Specification-Title=WebSocket;\
+    Specification-Version=1.1;\
+    Specification-Vendor='Oracle, Inc.';\
+    Implementation-Title=javax.websocket;\
+    Implementation-Version=1.1.${websocket.revision};\
+    Implementation-Vendor='Apache Software Foundation'
