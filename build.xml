@@ -3358,9 +3358,20 @@ Read the Building page on the Apache Tomcat documentation site for details on ho
 
   <target name="add-osgi" if="${addOSGi}" >
     <echo message="add-osgi ${jarfile} ${addOSGi}"></echo>
-    <bndwrap output="${jarfile}.tmp" definitions="${tomcat.bnd}" >
-      <fileset file="${jarfile}"  />
-    </bndwrap>
+    <local name="filename"/>
+    <basename property="filename" file="${jarfile}"/>
+    <bnd
+      basedir="${basedir}"
+      output="${jarfile}.tmp"
+    >
+      <classpath>
+        <pathelement location="${jarfile}"/>
+        <pathelement location="${bnd.jar}"/>
+      </classpath>
+      <bndfiles>
+        <pathelement location="${tomcat.bnd}/${filename}.tmp.bnd"/>
+      </bndfiles>
+    </bnd>
     <delete file="${jarfile}" />
     <move file="${jarfile}.tmp" tofile="${jarfile}" />
   </target>

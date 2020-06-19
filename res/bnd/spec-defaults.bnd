@@ -13,10 +13,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
--include: build-defaults.bnd, spec-defaults.bnd
-
-Bundle-Name: tomcat-websocket-api
-Bundle-SymbolicName: org.apache.tomcat-websocket-api
-Export-Package: \
-    javax.websocket,\
-    javax.websocket.server
+Specification-Title:
+Specification-Version:
+Specification-Vendor:
+Implementation-Title:
+Implementation-Version:
+Implementation-Vendor:
