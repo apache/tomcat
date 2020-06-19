@@ -18,6 +18,18 @@
 Bundle-Name: tomcat-annotations-api
 Bundle-SymbolicName: org.apache.tomcat-annotations-api
 Export-Package: \
-    javax.annotation,\
-    javax.annotation.security,\
-    javax.annotation.sql
+    javax.annotation.*;version=1.3
+
+Provide-Capability: \
+    osgi.contract;\
+        osgi.contract=JavaAnnotation;\
+        version:List<Version>="1.3,1.2,1.1,1";\
+        uses:='${packages;NAMED;javax.annotation.*}'
+
+-namesection: javax/annotation*/;\
+    Implementation-Title=javax.annotation;\
+    Implementation-Vendor='Apache Software Foundation';\
+    Implementation-Version=1.3.${annotation.revision};\
+    Specification-Title='Common Annotations';\
+    Specification-Vendor='Oracle Corporation';\
+    Specification-Version=1.3

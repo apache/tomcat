@@ -17,4 +17,18 @@
 
 Bundle-Name: tomcat-el-api
 Bundle-SymbolicName: org.apache.tomcat-el-api
-Export-Package: javax.el
+Export-Package: javax.el;version=3.0
+
+Provide-Capability: \
+    osgi.contract;\
+        osgi.contract=JavaEL;\
+        version:List<Version>="3.0,2.2,2.1";\
+        uses:='${packages;NAMED;javax.el.*}'
+
+-namesection: javax/el*/;\
+    Specification-Title='Expression Language';\
+    Specification-Version=3.0;\
+    Specification-Vendor='Sun Microsystems, Inc.';\
+    Implementation-Title=javax.el;\
+    Implementation-Version=3.0.${el.revision};\
+    Implementation-Vendor='Apache Software Foundation'
