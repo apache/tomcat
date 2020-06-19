@@ -46,3 +46,6 @@ Export-Package: \
     org.apache.catalina.webresources.war,\
     org.apache.catalina.manager.util,\
     org.apache.catalina
+
+-includepackage: \
+    org.apache.naming.factory.webservices

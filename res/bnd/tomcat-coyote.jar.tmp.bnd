@@ -36,3 +36,10 @@ Export-Package: \
     org.apache.tomcat.util.net,\
     org.apache.tomcat.util.net.openssl,\
     org.apache.tomcat.util.net.openssl.ciphers
+
+-includepackage: \
+    org.apache.tomcat.util.bcel,\
+    org.apache.tomcat.util.http.fileupload.impl,\
+    org.apache.tomcat.util.http.fileupload.util.mime,\
+    org.apache.tomcat.util.modeler.modules,\
+    org.apache.tomcat.util.net.jsse
