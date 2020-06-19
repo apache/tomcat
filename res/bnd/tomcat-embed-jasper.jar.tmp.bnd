@@ -33,3 +33,8 @@ Export-Package: \
     org.apache.jasper.tagplugins.jstl,\
     org.apache.jasper.tagplugins.jstl.core,\
     org.apache.jasper.util
+
+-includepackage: \
+    org.apache.jasper.resources
+
+-includeresource.meta-inf: /META-INF/=../META-INF/jasper.jar/

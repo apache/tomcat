@@ -27,3 +27,7 @@ Export-Package: \
     org.apache.tomcat.util.res,\
     org.apache.tomcat.util.security,\
     org.apache.tomcat.util.threads
+
+-includepackage: \
+	org.apache.tomcat.util.json,\
+	org.apache.tomcat.util.threads.res
