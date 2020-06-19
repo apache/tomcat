@@ -1394,14 +1394,16 @@
            addOSGi="true"
            addGraal="true"
            graalPrefix="org.apache.tomcat.embed/tomcat-embed-core"
-           graalFiles="res/graal/tomcat-embed-core/native-image"/>
+           graalFiles="res/graal/tomcat-embed-core/native-image"
+           libs="embed/*.jar"/>
     <jarIt jarfile="${tomcat-embed-el.jar}"
            filesDir="${tomcat.classes}"
            filesId="files.tomcat-embed-el"
            addOSGi="true"
            addGraal="true"
            graalPrefix="org.apache.tomcat.embed/tomcat-embed-el"
-           graalFiles="res/graal/tomcat-embed-el/native-image"/>
+           graalFiles="res/graal/tomcat-embed-el/native-image"
+           libs="embed/*.jar"/>
     <jarIt jarfile="${tomcat-embed-jasper.jar}"
            filesDir="${tomcat.classes}"
            filesId="files.tomcat-embed-jasper"
@@ -1409,7 +1411,8 @@
            addOSGi="true"
            addGraal="true"
            graalPrefix="org.apache.tomcat.embed/tomcat-embed-jasper"
-           graalFiles="res/graal/tomcat-embed-jasper/native-image"/>
+           graalFiles="res/graal/tomcat-embed-jasper/native-image"
+           libs="embed/*.jar"/>
     <jarIt jarfile="${tomcat-embed-websocket.jar}"
            filesDir="${tomcat.classes}"
            filesId="files.tomcat-embed-websocket"
@@ -1417,7 +1420,8 @@
            addOSGi="true"
            addGraal="true"
            graalPrefix="org.apache.tomcat.embed/tomcat-embed-websocket"
-           graalFiles="res/graal/tomcat-embed-websocket/native-image"/>
+           graalFiles="res/graal/tomcat-embed-websocket/native-image"
+           libs="embed/*.jar"/>
   </target>
 
   <target name="embed-sources"
@@ -3348,6 +3352,8 @@ Read the Building page on the Apache Tomcat documentation site for details on ho
                default="" />
     <attribute name="graalFiles" description="Graal resource/reflection file location"
                default="" />
+    <attribute name="libs" description="libraries to use for bnd classpath analysis relative to ${tomcat.output}"
+               default="build/lib/*.jar,build/bin/tomcat-juli.jar" />
     <sequential>
       <jar jarfile="@{jarfile}" manifest="@{manifest}">
         <fileset dir="@{filesDir}">
@@ -3363,6 +3369,7 @@ Read the Building page on the Apache Tomcat documentation site for details on ho
       <antcall target="add-osgi" >
         <param name="jarfile" value="@{jarfile}" />
         <param name="addOSGi" value="@{addOSGi}" />
+        <param name="libs" value="@{libs}" />
       </antcall>
       <antcall target="add-graal">
         <param name="jarfile" value="@{jarfile}" />
@@ -3382,8 +3389,8 @@ Read the Building page on the Apache Tomcat documentation site for details on ho
       output="${jarfile}.tmp"
     >
       <classpath>
-        <pathelement location="${jarfile}"/>
         <pathelement location="${bnd.jar}"/>
+        <fileset dir="${tomcat.output}" includes="${libs}" />
       </classpath>
       <bndfiles>
         <pathelement location="${tomcat.bnd}/${filename}.tmp.bnd"/>
