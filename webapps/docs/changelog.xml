@@ -160,6 +160,11 @@
         <bug>64532</bug>: Update to bnd 5.1.1. Pull request provided by Raymond
         Augé. (markt)
       </fix>
+      <fix>
+        <bug>64540</bug>: Switch from bndwrap task to bnd task, begin generating
+        a better manifest and make sure the resulting jar contents are correct.
+        Pull request provided by Raymond Augé. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
