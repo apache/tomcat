@@ -33,3 +33,11 @@ Provide-Capability: \
     Implementation-Title=jakarta.security.auth.message;\
     Implementation-Version=${jaspic.spec.version}.${jaspic.revision};\
     Implementation-Vendor=Apache Software Foundation
+
+-jpms-module-info: \
+    jakarta.security.enterprise;\
+        access=32;\
+        version=${jaspic.spec.version}
+-jpms-module-info-options: \
+    jakarta.security.enterprise;\
+        substitute=jaspic-api

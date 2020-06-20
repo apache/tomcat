@@ -15,7 +15,6 @@
 
 -include: build-defaults.bnd
 
-Automatic-Module-Name: org.apache.tomcat.embed.core
 Bundle-Name: tomcat-embed-core
 Bundle-SymbolicName: org.apache.tomcat-embed-core
 Export-Package: \
@@ -126,3 +125,21 @@ Provide-Capability: \
         Implementation-Title=jakarta.servlet;\
         Implementation-Version=${servlet.spec.version}.${servlet.revision};\
         Implementation-Vendor=Apache Software Foundation
+
+-jpms-module-info: \
+    ${module.name};\
+        access=32;\
+        version=${Bundle-Version};\
+        modules='\
+            jakarta.ejb-api,\
+            jakarta.mail,\
+            jakarta.persistence-api,\
+            jakarta.xml.rpc-api,\
+            java.xml.ws'
+-jpms-module-info-options: \
+    ${module.name};substitute=tomcat-embed-core,\
+    jakarta.ejb-api;static=true,\
+    jakarta.mail;static=true,\
+    jakarta.persistence-api;static=true,\
+    jakarta.xml.rpc-api;static=true,\
+    java.xml.ws;static=true

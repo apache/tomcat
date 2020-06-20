@@ -37,3 +37,11 @@ Provide-Capability: \
     Implementation-Title=jakarta.servlet;\
     Implementation-Version=${servlet.spec.version}.${servlet.revision};\
     Implementation-Vendor=Apache Software Foundation
+
+-jpms-module-info: \
+    jakarta.servlet;\
+        access=32;\
+        version=${servlet.spec.version}
+-jpms-module-info-options: \
+    jakarta.servlet;\
+        substitute=servlet-api

@@ -257,6 +257,9 @@
         Improve the quality and expand the coverage of the French translations
         provided with Apache Tomcat. (remm)
       </add>
+      <fix>
+        <bug>64548</bug>: Generate JPMS metadata. (rotty3000)
+      </fix>
     </changelog>
   </subsection>
 </section>

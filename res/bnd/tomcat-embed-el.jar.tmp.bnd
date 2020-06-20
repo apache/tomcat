@@ -15,7 +15,6 @@
 
 -include: build-defaults.bnd
 
-Automatic-Module-Name: org.apache.tomcat.embed.jasper.el
 Bundle-Name: tomcat-embed-jasper-el
 Bundle-SymbolicName: org.apache.tomcat-embed-jasper-el
 Export-Package: \
@@ -43,3 +42,11 @@ Provide-Capability: \
     Implementation-Title=jakarta.annotation;\
     Implementation-Version=${el.spec.version}.${el.revision};\
     Implementation-Vendor=Apache Software Foundation
+
+-jpms-module-info: \
+    org.apache.tomcat.embed.el;\
+        access=32;\
+        version=${Bundle-Version}
+-jpms-module-info-options: \
+    org.apache.tomcat.embed.el;\
+        substitute=tomcat-embed-el

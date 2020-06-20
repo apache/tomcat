@@ -19,3 +19,11 @@ Bundle-Name: tomcat-ssi
 Bundle-SymbolicName: org.apache.tomcat-ssi
 Export-Package: \
     org.apache.catalina.ssi
+
+-jpms-module-info: \
+    ${module.name};\
+        access=32;\
+        version=${Bundle-Version}
+-jpms-module-info-options: \
+    ${module.name};\
+        substitute=catalina-ssi

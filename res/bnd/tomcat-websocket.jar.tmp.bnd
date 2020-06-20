@@ -25,3 +25,11 @@ Export-Package: \
     org.apache.tomcat.websocket.pojo
 
 -includeresource.meta-inf: /META-INF/=../META-INF/tomcat-websocket.jar/
+
+-jpms-module-info: \
+    ${module.name};\
+        access=32;\
+        version=${Bundle-Version}
+-jpms-module-info-options: \
+    ${module.name};\
+        substitute=${Bundle-Name}

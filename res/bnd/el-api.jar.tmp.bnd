@@ -32,3 +32,11 @@ Provide-Capability: \
     Implementation-Title=jakarta.el;\
     Implementation-Version=${el.spec.version}.${el.revision};\
     Implementation-Vendor=Apache Software Foundation
+
+-jpms-module-info: \
+    jakarta.el.api;\
+        access=32;\
+        version=${el.spec.version}
+-jpms-module-info-options: \
+    jakarta.el.api;\
+        substitute=el-api

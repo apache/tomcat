@@ -25,3 +25,11 @@ Export-Package: \
     org.apache.catalina.ha.deploy,\
     org.apache.catalina.ha.session,\
     org.apache.catalina.ha.tcp
+
+-jpms-module-info: \
+    ${module.name};\
+        access=32;\
+        version=${Bundle-Version}
+-jpms-module-info-options: \
+	${module.name};\
+		substitute=catalina-ha

@@ -49,3 +49,21 @@ Export-Package: \
 
 -includepackage: \
     org.apache.naming.factory.webservices
+
+-jpms-module-info: \
+    ${module.name};\
+        access=32;\
+        version=${Bundle-Version};\
+        modules='\
+            jakarta.ejb-api,\
+            jakarta.mail,\
+            jakarta.persistence-api,\
+            jakarta.xml.rpc-api,\
+            java.xml.ws'
+-jpms-module-info-options: \
+    ${module.name};substitute=catalina,\
+    jakarta.ejb-api;static=true,\
+    jakarta.mail;static=true,\
+    jakarta.persistence-api;static=true,\
+    jakarta.xml.rpc-api;static=true,\
+    java.xml.ws;static=true

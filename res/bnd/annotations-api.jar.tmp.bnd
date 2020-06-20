@@ -33,3 +33,11 @@ Provide-Capability: \
     Implementation-Title=jakarta.annotation;\
     Implementation-Version=${annotation.spec.version}.${annotation.revision};\
     Implementation-Vendor=Apache Software Foundation
+
+-jpms-module-info: \
+    jakarta.annotation;\
+        access=32;\
+        version=${annotation.spec.version}
+-jpms-module-info-options: \
+	jakarta.annotation;\
+		substitute=annotations-api

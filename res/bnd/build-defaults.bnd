@@ -29,3 +29,5 @@ X-Compile-Target-JDK: ${compile.target}
 -includeresource.license: {META-INF/LICENSE=../META-INF/default.license}
 
 -noclassforname: true
+
+module.name: org.apache.${replace;${Bundle-Name};-;.}
