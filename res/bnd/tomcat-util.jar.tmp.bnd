@@ -31,3 +31,11 @@ Export-Package: \
 -includepackage: \
     org.apache.tomcat.util.json,\
     org.apache.tomcat.util.threads.res
+
+-jpms-module-info: \
+    ${module.name};\
+        access=32;\
+        version=${Bundle-Version}
+-jpms-module-info-options: \
+    ${module.name};\
+        substitute=${Bundle-Name}

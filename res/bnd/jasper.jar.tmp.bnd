@@ -33,3 +33,12 @@ Export-Package: \
     org.apache.jasper.resources
 
 -includeresource.meta-inf: /META-INF/=../META-INF/jasper.jar/
+
+-jpms-module-info: \
+    ${module.name};\
+        access=32;\
+        version=${Bundle-Version};\
+        modules='ecj'
+-jpms-module-info-options: \
+    ${module.name};\
+        substitute=jasper

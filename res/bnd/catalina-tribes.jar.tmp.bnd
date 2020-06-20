@@ -32,3 +32,11 @@ Export-Package: \
 
 -includepackage: \
     org.apache.catalina.tribes.membership.cloud
+
+-jpms-module-info: \
+    ${module.name};\
+        access=32;\
+        version=${Bundle-Version}
+-jpms-module-info-options: \
+	${module.name};\
+		substitute=catalina-tribes

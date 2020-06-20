@@ -33,3 +33,11 @@ Provide-Capability: \
     Implementation-Title=javax.websocket;\
     Implementation-Version=1.1.${websocket.revision};\
     Implementation-Vendor='Apache Software Foundation'
+
+-jpms-module-info: \
+    jakarta.websocket.api;\
+        access=32;\
+        version=${websocket.spec.version}
+-jpms-module-info-options: \
+    jakarta.websocket.api;\
+        substitute=websocket-api
