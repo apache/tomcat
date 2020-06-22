@@ -30,10 +30,6 @@ public class ContextResource extends ResourceBase {
 
     private static final long serialVersionUID = 1L;
 
-    public ContextResource() {
-        initialHashCode = hashCode();
-    }
-
     // ------------------------------------------------------------- Properties
 
 

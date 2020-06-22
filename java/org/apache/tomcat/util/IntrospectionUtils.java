@@ -74,7 +74,7 @@ public final class IntrospectionUtils {
                         && "java.lang.String".equals(paramT[0].getName())) {
                     item.invoke(o, new Object[]{value});
                     if (actualMethod != null) {
-                        actualMethod.append(item.getName()).append("(\"").append(value).append("\")");
+                        actualMethod.append(item.getName()).append("(\"").append(escape(value)).append("\")");
                     }
                     return true;
                 }
@@ -160,7 +160,7 @@ public final class IntrospectionUtils {
             if (invokeSetProperty && (setPropertyMethodBool != null ||
                     setPropertyMethodVoid != null)) {
                 if (actualMethod != null) {
-                    actualMethod.append("setProperty(\"").append(name).append("\", \"").append(value).append("\")");
+                    actualMethod.append("setProperty(\"").append(name).append("\", \"").append(escape(value)).append("\")");
                 }
                 Object params[] = new Object[2];
                 params[0] = name;
@@ -192,6 +192,33 @@ public final class IntrospectionUtils {
             log.warn(sm.getString("introspectionUtils.setPropertyError", name, value, o.getClass()), e);
         }
         return false;
+    }
+
+    /**
+     * @param s
+     *            the input string
+     * @return escaped string, per Java rule
+     */
+    public static String escape(String s) {
+
+        if (s == null)
+            return "";
+
+        StringBuilder b = new StringBuilder();
+        for (int i = 0; i < s.length(); i++) {
+            char c = s.charAt(i);
+            if (c == '"')
+                b.append('\\').append('"');
+            else if (c == '\\')
+                b.append('\\').append('\\');
+            else if (c == '\n')
+                b.append('\\').append('n');
+            else if (c == '\r')
+                b.append('\\').append('r');
+            else
+                b.append(c);
+        }
+        return b.toString();
     }
 
     public static Object getProperty(Object o, String name) {

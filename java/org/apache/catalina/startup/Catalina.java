@@ -135,9 +135,15 @@ public class Catalina {
 
 
     /**
-     * Generate Tomcat embedded code from server.xml.
+     * Generate Tomcat embedded code from configuration files.
      */
     protected boolean generateCode = false;
+
+
+    /**
+     * Use generated code as a replacement for configuration files.
+     */
+    protected boolean useGeneratedCode = false;
 
 
     // ----------------------------------------------------------- Constructors
@@ -167,6 +173,26 @@ public class Catalina {
 
     public boolean getUseShutdownHook() {
         return useShutdownHook;
+    }
+
+
+    public boolean getGenerateCode() {
+        return this.generateCode;
+    }
+
+
+    public void setGenerateCode(boolean generateCode) {
+        this.generateCode = generateCode;
+    }
+
+
+    public boolean getUseGeneratedCode() {
+        return this.useGeneratedCode;
+    }
+
+
+    public void setUseGeneratedCode(boolean useGeneratedCode) {
+        this.useGeneratedCode = useGeneratedCode;
     }
 
 
@@ -247,6 +273,8 @@ public class Catalina {
                 isConfig = true;
             } else if (arg.equals("-generateCode")) {
                 generateCode = true;
+            } else if (arg.equals("-useGeneratedCode")) {
+                useGeneratedCode = true;
             } else if (arg.equals("-nonaming")) {
                 setUseNaming(false);
             } else if (arg.equals("-help")) {
@@ -558,50 +586,49 @@ public class Catalina {
         ConfigFileLoader.setSource(new CatalinaBaseConfigurationSource(Bootstrap.getCatalinaBaseFile(), getConfigFile()));
         File file = configFile();
 
-        try (ConfigurationSource.Resource resource = ConfigFileLoader.getSource().getServerXml()) {
-            String serverXmlId = String.valueOf(resource.getLastModified());
-            String serverXmlClassName = "catalina.ServerXml_" + serverXmlId;
-            ServerXml serverXml = null;
+        ServerXml serverXml = null;
+        if (useGeneratedCode) {
+            String xmlClassName = "catalina.ServerXml";
             try {
-                serverXml = (ServerXml) Catalina.class.getClassLoader().loadClass(serverXmlClassName).newInstance();
-            } catch (ClassNotFoundException e) {
+                serverXml = (ServerXml) Catalina.class.getClassLoader().loadClass(xmlClassName).newInstance();
+            } catch (Exception e) {
                 // Ignore, no generated code found
             }
-            if (serverXml != null) {
-                serverXml.load(this);
-            } else {
+        }
+
+        if (serverXml != null) {
+            serverXml.load(this);
+        } else {
+            try (ConfigurationSource.Resource resource = ConfigFileLoader.getSource().getServerXml()) {
                 // Create and execute our Digester
                 Digester digester = createStartDigester();
-
                 InputStream inputStream = resource.getInputStream();
                 InputSource inputSource = new InputSource(resource.getURI().toURL().toString());
                 inputSource.setByteStream(inputStream);
                 digester.push(this);
                 if (generateCode) {
                     digester.startGeneratingCode();
-                    generateClassHeader(digester, String.valueOf(resource.getLastModified()));
+                    generateClassHeader(digester);
                 }
                 digester.parse(inputSource);
                 if (generateCode) {
                     generateClassFooter(digester);
                     File generatedSourceFolder = new File(new File(Bootstrap.getCatalinaHomeFile(), "work"), "catalina");
                     if (generatedSourceFolder.isDirectory() || generatedSourceFolder.mkdirs()) {
-                        File generatedSourceFile = new File(generatedSourceFolder,
-                                "ServerXml_" + serverXmlId + ".java");
-                        if (!generatedSourceFile.exists()) {
-                            try (FileWriter writer = new FileWriter(generatedSourceFile)) {
-                                writer.write(digester.getGeneratedCode().toString());
-                            }
+                        File generatedSourceFile = new File(generatedSourceFolder, "ServerXml.java");
+                        try (FileWriter writer = new FileWriter(generatedSourceFile)) {
+                            writer.write(digester.getGeneratedCode().toString());
                         }
                     }
+                    digester.endGeneratingCode();
                 }
+            } catch (Exception e) {
+                log.warn(sm.getString("catalina.configFail", file.getAbsolutePath()), e);
+                if (file.exists() && !file.canRead()) {
+                    log.warn(sm.getString("catalina.incorrectPermissions"));
+                }
+                return;
             }
-        } catch (Exception e) {
-            log.warn(sm.getString("catalina.configFail", file.getAbsolutePath()), e);
-            if (file.exists() && !file.canRead()) {
-                log.warn(sm.getString("catalina.incorrectPermissions"));
-            }
-            return;
         }
 
         getServer().setCatalina(this);
@@ -672,9 +699,8 @@ public class Catalina {
             return;
         }
 
-        long t2 = System.nanoTime();
-        if(log.isInfoEnabled()) {
-            log.info(sm.getString("catalina.startup", Long.valueOf((t2 - t1) / 1000000)));
+        if (log.isInfoEnabled()) {
+            log.info(sm.getString("catalina.startup", TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - t1)));
         }
 
         // Register shutdown hook
@@ -819,10 +845,10 @@ public class Catalina {
     }
 
 
-    protected void generateClassHeader(Digester digester, String time) {
+    protected void generateClassHeader(Digester digester) {
         StringBuilder code = digester.getGeneratedCode();
         code.append("package catalina;").append(System.lineSeparator());
-        code.append("public class ServerXml_").append(time).append(" implements ");
+        code.append("public class ServerXml implements ");
         code.append(ServerXml.class.getName().replace('$', '.')).append(" {").append(System.lineSeparator());
         code.append("public void load(").append(Catalina.class.getName());
         code.append(" ").append(digester.toVariableName(this)).append(") {").append(System.lineSeparator());

@@ -394,16 +394,36 @@ public class Digester extends DefaultHandler2 {
         code = new StringBuilder();
     }
 
+    public void endGeneratingCode() {
+        code = null;
+        known.clear();
+    }
+
     public StringBuilder getGeneratedCode() {
         return code;
     }
 
-    public String toVariableName(Object object) {
-        return toVariableName(object, object.hashCode());
+    protected ArrayList<Object> known = new ArrayList<>();
+    public void setKnown(Object object) {
+        known.add(object);
     }
-
-    public String toVariableName(Object object, int hashCode) {
-        return "tc_" + object.getClass().getSimpleName() + "_" + String.valueOf(Math.abs(hashCode));
+    public String toVariableName(Object object) {
+        boolean found = false;
+        int pos = 0;
+        if (known.size() > 0) {
+            for (int i = known.size() - 1; i >= 0; i--) {
+                if (known.get(i) == object) {
+                    pos = i;
+                    found = true;
+                    break;
+                }
+            }
+        }
+        if (!found) {
+            pos = known.size();
+            known.add(object);
+        }
+        return "tc_" + object.getClass().getSimpleName() + "_" + String.valueOf(pos);
     }
 
     // ------------------------------------------------------------- Properties
