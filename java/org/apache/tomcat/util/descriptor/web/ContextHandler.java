@@ -34,10 +34,6 @@ public class ContextHandler extends ResourceBase {
 
     private static final long serialVersionUID = 1L;
 
-    public ContextHandler() {
-        initialHashCode = hashCode();
-    }
-
     // ------------------------------------------------------------- Properties
 
 

@@ -21,7 +21,6 @@ package org.apache.catalina.startup;
 import org.apache.catalina.Context;
 import org.apache.catalina.deploy.NamingResourcesImpl;
 import org.apache.tomcat.util.IntrospectionUtils;
-import org.apache.tomcat.util.descriptor.web.ResourceBase;
 import org.apache.tomcat.util.digester.Rule;
 
 
@@ -93,10 +92,12 @@ public class SetNextNamingRule extends Rule {
         // Identify the objects to be used
         Object child = digester.peek(0);
         Object parent = digester.peek(1);
+        boolean context = false;
 
         NamingResourcesImpl namingResources = null;
         if (parent instanceof Context) {
             namingResources = ((Context) parent).getNamingResources();
+            context = true;
         } else {
             namingResources = (NamingResourcesImpl) parent;
         }
@@ -107,8 +108,13 @@ public class SetNextNamingRule extends Rule {
 
         StringBuilder code = digester.getGeneratedCode();
         if (code != null) {
-            code.append(digester.toVariableName(namingResources)).append(".").append(methodName).append("(");
-            code.append(digester.toVariableName(child, ((ResourceBase) child).getInitialHashCode())).append(");");
+            if (context) {
+                code.append(digester.toVariableName(parent)).append(".getNamingResources()");
+            } else {
+                code.append(digester.toVariableName(namingResources));
+            }
+            code.append(".").append(methodName).append("(");
+            code.append(digester.toVariableName(child)).append(");");
             code.append(System.lineSeparator());
         }
     }

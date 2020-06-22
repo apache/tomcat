@@ -30,10 +30,6 @@ public class ContextLocalEjb extends ResourceBase {
 
     private static final long serialVersionUID = 1L;
 
-    public ContextLocalEjb() {
-        initialHashCode = hashCode();
-    }
-
     // ------------------------------------------------------------- Properties
 
     /**

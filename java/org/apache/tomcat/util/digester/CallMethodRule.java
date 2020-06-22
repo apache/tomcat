@@ -392,7 +392,11 @@ public class CallMethodRule extends Rule {
                 if (i > 0) {
                     code.append(",");
                 }
-                code.append(digester.toVariableName(paramValues[i]));
+                if (bodyText != null) {
+                    code.append("\"").append(bodyText).append("\"");
+                } else {
+                    code.append(digester.toVariableName(paramValues[i]));
+                }
             }
             code.append(");");
             code.append(System.lineSeparator());
