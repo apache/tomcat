@@ -463,6 +463,17 @@ public class ContextConfig implements LifecycleListener {
     }
 
 
+    protected File getGeneratedCodeLocation() {
+        Catalina catalina = Container.getService(context).getServer().getCatalina();
+        if (catalina != null) {
+            return catalina.getGeneratedCodeLocation();
+        } else {
+            // Cannot happen
+            return null;
+        }
+    }
+
+
     protected static String getContextXmlPackageName(Container container) {
         StringBuffer result = new StringBuffer();
         Container host = null;
@@ -492,14 +503,12 @@ public class ContextConfig implements LifecycleListener {
     }
 
 
-    protected static File getContextXmlJavaSource(String contextXmlPackageName, String contextXmlSimpleClassName) {
-        File generatedSourceFolder = new File(Bootstrap.getCatalinaHomeFile(), "work");
-        if (generatedSourceFolder.isDirectory() || generatedSourceFolder.mkdirs()) {
-            String path = contextXmlPackageName.replace('.', File.separatorChar);
-            File packageFolder = new File(generatedSourceFolder, path);
-            if (packageFolder.isDirectory() || packageFolder.mkdirs()) {
-                return new File(packageFolder, contextXmlSimpleClassName + ".java");
-            }
+    protected File getContextXmlJavaSource(String contextXmlPackageName, String contextXmlSimpleClassName) {
+        File generatedSourceFolder = getGeneratedCodeLocation();
+        String path = contextXmlPackageName.replace('.', File.separatorChar);
+        File packageFolder = new File(generatedSourceFolder, path);
+        if (packageFolder.isDirectory() || packageFolder.mkdirs()) {
+            return new File(packageFolder, contextXmlSimpleClassName + ".java");
         }
         return null;
     }
@@ -579,7 +588,7 @@ public class ContextConfig implements LifecycleListener {
             if (contextXml != null) {
                 contextXml.load(context);
                 contextXml = null;
-            } else {
+            } else if (!useGeneratedCode) {
                 try (ConfigurationSource.Resource contextXmlResource =
                         ConfigFileLoader.getSource().getResource(defaultContextXml)) {
                     if (generateCode) {
@@ -618,7 +627,7 @@ public class ContextConfig implements LifecycleListener {
             if (contextXml != null) {
                 contextXml.load(context);
                 contextXml = null;
-            } else {
+            } else if (!useGeneratedCode) {
                 String hostContextFile = Container.getConfigPath(context, Constants.HostContextXml);
                 try (ConfigurationSource.Resource contextXmlResource =
                         ConfigFileLoader.getSource().getResource(hostContextFile)) {
@@ -660,7 +669,7 @@ public class ContextConfig implements LifecycleListener {
             if (contextXml != null) {
                 contextXml.load(context);
                 contextXml = null;
-            } else {
+            } else if (!useGeneratedCode) {
                 if (generateCode) {
                     contextXmlJavaSource = getContextXmlJavaSource(contextXmlPackageName, contextXmlSimpleClassName);
                     digester.startGeneratingCode();
@@ -922,9 +931,11 @@ public class ContextConfig implements LifecycleListener {
     protected synchronized void init() {
         // Called from StandardContext.init()
 
-        // FIXME: Try to avoid creation of the parser if not needed due to code generation
-        Digester contextDigester = createContextDigester();
-        contextDigester.getParser();
+        Digester contextDigester = null;
+        if (!getUseGeneratedCode()) {
+            contextDigester = createContextDigester();
+            contextDigester.getParser();
+        }
 
         if (log.isDebugEnabled()) {
             log.debug(sm.getString("contextConfig.init"));

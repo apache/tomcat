@@ -18,7 +18,6 @@ package org.apache.catalina.startup;
 
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
@@ -148,6 +147,18 @@ public class Catalina {
 
 
     /**
+     * Location of generated sources.
+     */
+    protected File generatedCodeLocation = null;
+
+
+    /**
+     * Value of the argument.
+     */
+    protected String generatedCodeLocationParameter = null;
+
+
+    /**
      * Use generated code as a replacement for configuration files.
      */
     protected boolean useGeneratedCode = false;
@@ -200,6 +211,16 @@ public class Catalina {
 
     public void setUseGeneratedCode(boolean useGeneratedCode) {
         this.useGeneratedCode = useGeneratedCode;
+    }
+
+
+    public File getGeneratedCodeLocation() {
+        return this.generatedCodeLocation;
+    }
+
+
+    public void setGeneratedCodeLocation(File generatedCodeLocation) {
+        this.generatedCodeLocation = generatedCodeLocation;
     }
 
 
@@ -284,6 +305,7 @@ public class Catalina {
     protected boolean arguments(String args[]) {
 
         boolean isConfig = false;
+        boolean isGenerateCode = false;
 
         if (args.length < 1) {
             usage();
@@ -297,20 +319,29 @@ public class Catalina {
             } else if (arg.equals("-config")) {
                 isConfig = true;
             } else if (arg.equals("-generateCode")) {
-                generateCode = true;
+                setGenerateCode(true);
+                isGenerateCode = true;
             } else if (arg.equals("-useGeneratedCode")) {
-                useGeneratedCode = true;
+                setUseGeneratedCode(true);
+                isGenerateCode = false;
             } else if (arg.equals("-nonaming")) {
                 setUseNaming(false);
+                isGenerateCode = false;
             } else if (arg.equals("-help")) {
                 usage();
                 return false;
             } else if (arg.equals("start")) {
+                isGenerateCode = false;
                 // NOOP
             } else if (arg.equals("configtest")) {
+                isGenerateCode = false;
                 // NOOP
             } else if (arg.equals("stop")) {
+                isGenerateCode = false;
                 // NOOP
+            } else if (isGenerateCode) {
+                generatedCodeLocationParameter = arg;
+                isGenerateCode = false;
             } else {
                 usage();
                 return false;
@@ -527,6 +558,72 @@ public class Catalina {
     }
 
 
+    protected void parseServerXml(boolean start) {
+        // Set configuration source
+        ConfigFileLoader.setSource(new CatalinaBaseConfigurationSource(Bootstrap.getCatalinaBaseFile(), getConfigFile()));
+        File file = configFile();
+
+        // Init source location
+        File serverXmlLocation = null;
+        if (generateCode) {
+            if (generatedCodeLocationParameter != null) {
+                generatedCodeLocation = new File(generatedCodeLocationParameter);
+                if (!generatedCodeLocation.isAbsolute()) {
+                    generatedCodeLocation = new File(Bootstrap.getCatalinaHomeFile(), generatedCodeLocationParameter);
+                }
+            } else {
+                generatedCodeLocation = new File(Bootstrap.getCatalinaHomeFile(), "work");
+            }
+            serverXmlLocation = new File(generatedCodeLocation, "catalina");
+            if (!serverXmlLocation.isDirectory() && !serverXmlLocation.mkdirs()) {
+                log.warn(sm.getString("catalina.generatedCodeLocationError", generatedCodeLocation.getAbsolutePath()));
+                // Disable code generation
+                generateCode = false;
+            }
+        }
+
+        ServerXml serverXml = null;
+        if (useGeneratedCode) {
+            String xmlClassName = start ? "catalina.ServerXml" : "catalina.ServerXmlStop";
+            try {
+                serverXml = (ServerXml) Catalina.class.getClassLoader().loadClass(xmlClassName).newInstance();
+            } catch (Exception e) {
+                // Ignore, no generated code found
+            }
+        }
+
+        if (serverXml != null) {
+            serverXml.load(this);
+        } else {
+            try (ConfigurationSource.Resource resource = ConfigFileLoader.getSource().getServerXml()) {
+                // Create and execute our Digester
+                Digester digester = start ? createStartDigester() : createStopDigester();
+                InputStream inputStream = resource.getInputStream();
+                InputSource inputSource = new InputSource(resource.getURI().toURL().toString());
+                inputSource.setByteStream(inputStream);
+                digester.push(this);
+                if (generateCode) {
+                    digester.startGeneratingCode();
+                    generateClassHeader(digester, start);
+                }
+                digester.parse(inputSource);
+                if (generateCode) {
+                    generateClassFooter(digester);
+                    try (FileWriter writer = new FileWriter(new File(serverXmlLocation,
+                            start ? "ServerXml.java" : "ServerXmlStop.java"))) {
+                        writer.write(digester.getGeneratedCode().toString());
+                    }
+                    digester.endGeneratingCode();
+                }
+            } catch (Exception e) {
+                log.warn(sm.getString("catalina.configFail", file.getAbsolutePath()), e);
+                if (file.exists() && !file.canRead()) {
+                    log.warn(sm.getString("catalina.incorrectPermissions"));
+                }
+            }
+        }
+    }
+
     public void stopServer() {
         stopServer(null);
     }
@@ -539,17 +636,9 @@ public class Catalina {
 
         Server s = getServer();
         if (s == null) {
-            // Create and execute our Digester
-            Digester digester = createStopDigester();
-            File file = configFile();
-            try (FileInputStream fis = new FileInputStream(file)) {
-                InputSource is =
-                    new InputSource(file.toURI().toURL().toString());
-                is.setByteStream(fis);
-                digester.push(this);
-                digester.parse(is);
-            } catch (Exception e) {
-                log.error(sm.getString("catalina.stopError"), e);
+            parseServerXml(false);
+            if (getServer() == null) {
+                log.error(sm.getString("catalina.stopError"));
                 System.exit(1);
             }
         } else {
@@ -605,53 +694,11 @@ public class Catalina {
         // Before digester - it may be needed
         initNaming();
 
-        // Set configuration source
-        ConfigFileLoader.setSource(new CatalinaBaseConfigurationSource(Bootstrap.getCatalinaBaseFile(), getConfigFile()));
-        File file = configFile();
-
-        ServerXml serverXml = null;
-        if (useGeneratedCode) {
-            String xmlClassName = "catalina.ServerXml";
-            try {
-                serverXml = (ServerXml) Catalina.class.getClassLoader().loadClass(xmlClassName).newInstance();
-            } catch (Exception e) {
-                // Ignore, no generated code found
-            }
-        }
-
-        if (serverXml != null) {
-            serverXml.load(this);
-        } else {
-            try (ConfigurationSource.Resource resource = ConfigFileLoader.getSource().getServerXml()) {
-                // Create and execute our Digester
-                Digester digester = createStartDigester();
-                InputStream inputStream = resource.getInputStream();
-                InputSource inputSource = new InputSource(resource.getURI().toURL().toString());
-                inputSource.setByteStream(inputStream);
-                digester.push(this);
-                if (generateCode) {
-                    digester.startGeneratingCode();
-                    generateClassHeader(digester);
-                }
-                digester.parse(inputSource);
-                if (generateCode) {
-                    generateClassFooter(digester);
-                    File generatedSourceFolder = new File(new File(Bootstrap.getCatalinaHomeFile(), "work"), "catalina");
-                    if (generatedSourceFolder.isDirectory() || generatedSourceFolder.mkdirs()) {
-                        File generatedSourceFile = new File(generatedSourceFolder, "ServerXml.java");
-                        try (FileWriter writer = new FileWriter(generatedSourceFile)) {
-                            writer.write(digester.getGeneratedCode().toString());
-                        }
-                    }
-                    digester.endGeneratingCode();
-                }
-            } catch (Exception e) {
-                log.warn(sm.getString("catalina.configFail", file.getAbsolutePath()), e);
-                if (file.exists() && !file.canRead()) {
-                    log.warn(sm.getString("catalina.incorrectPermissions"));
-                }
-                return;
-            }
+        // Parse main server.xml
+        parseServerXml(true);
+        Server s = getServer();
+        if (s == null) {
+            return;
         }
 
         getServer().setCatalina(this);
@@ -860,10 +907,14 @@ public class Catalina {
     }
 
 
-    protected void generateClassHeader(Digester digester) {
+    protected void generateClassHeader(Digester digester, boolean start) {
         StringBuilder code = digester.getGeneratedCode();
         code.append("package catalina;").append(System.lineSeparator());
-        code.append("public class ServerXml implements ");
+        code.append("public class ServerXml");
+        if (!start) {
+            code.append("Stop");
+        }
+        code.append(" implements ");
         code.append(ServerXml.class.getName().replace('$', '.')).append(" {").append(System.lineSeparator());
         code.append("public void load(").append(Catalina.class.getName());
         code.append(" ").append(digester.toVariableName(this)).append(") {").append(System.lineSeparator());
