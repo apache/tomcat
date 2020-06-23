@@ -135,13 +135,6 @@ public class Catalina {
 
 
     /**
-     * Rethrow exceptions on init failure.
-     */
-    protected boolean throwOnInitFailure =
-            Boolean.getBoolean("org.apache.catalina.startup.EXIT_ON_INIT_FAILURE");
-
-
-    /**
      * Generate Tomcat embedded code from server.xml.
      */
     protected boolean generateCode = false;
