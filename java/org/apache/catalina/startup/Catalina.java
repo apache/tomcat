@@ -697,7 +697,7 @@ public class Catalina {
         }
 
         if(log.isInfoEnabled()) {
-            log.info(sm.getString("catalina.init", TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - t1)));
+            log.info(sm.getString("catalina.init", Long.toString(TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - t1))));
         }
     }
 
@@ -747,7 +747,7 @@ public class Catalina {
         }
 
         if (log.isInfoEnabled()) {
-            log.info(sm.getString("catalina.startup", TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - t1)));
+            log.info(sm.getString("catalina.startup", Long.toString(TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - t1))));
         }
 
         // Register shutdown hook

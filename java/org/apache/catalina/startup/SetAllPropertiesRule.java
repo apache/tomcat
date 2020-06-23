@@ -26,6 +26,7 @@ import org.apache.tomcat.util.digester.SetPropertiesRule;
  * @author Remy Maucherat
  * @deprecated This will be removed in Tomcat 10
  */
+@Deprecated
 public class SetAllPropertiesRule extends SetPropertiesRule {
 
 
