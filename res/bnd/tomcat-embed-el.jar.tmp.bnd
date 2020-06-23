@@ -25,8 +25,8 @@ Export-Package: \
     org.apache.el.parser
 
 -includepackage: \
-	org.apache.el.stream,\
-	org.apache.el.util
+    org.apache.el.stream,\
+    org.apache.el.util
 
 -includeresource.meta-inf: /META-INF/=../META-INF/jasper-el.jar/
 
