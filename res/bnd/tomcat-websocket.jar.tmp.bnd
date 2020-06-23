@@ -22,6 +22,6 @@ Export-Package: \
     org.apache.tomcat.websocket.server
 
 -includepackage: \
-	org.apache.tomcat.websocket.pojo
+    org.apache.tomcat.websocket.pojo
 
 -includeresource.meta-inf: /META-INF/=../META-INF/tomcat-websocket.jar/
