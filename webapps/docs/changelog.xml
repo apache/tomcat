@@ -74,11 +74,11 @@
         response is returned for an HTTP/2 request if the mapped servlet does
         implement the requested method rather than the more general
         <code>400</code> response. (markt)
+      </fix>
       <add>
         Add generated classes using Tomcat embedded as an optional replacement
         for the Catalina configuration files. (remm)
       </add>
-      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
