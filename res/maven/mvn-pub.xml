@@ -50,8 +50,11 @@
       </filterset>
     </copy>
 
-    <resolver:install file="${file}">
+    <resolver:install>
+      <artifact file="${file}" />
       <pom file="${pom}.tmp"/>
+      <artifact file="${file}.asc" type="jar.asc" if:set="gpg.passphrase"/>
+      <artifact file="${pom}.asc" type="pom.asc" if:set="gpg.passphrase"/>
     </resolver:install>
 
     <delete file="${pom}.tmp"/>
