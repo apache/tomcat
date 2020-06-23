@@ -123,9 +123,6 @@ public class SetPropertiesRule extends Rule {
             }
         }
 
-        if (code != null) {
-            code.append(System.lineSeparator());
-        }
     }
 
 
