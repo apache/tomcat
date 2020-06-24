@@ -72,6 +72,10 @@
         and the encoded solidus was preceeded by other %nn encoded characters.
         Based on a pull request by willmeck. (markt)
       </fix>
+      <fix>
+        Implement a partial fix for <bug>63362</bug> that adds collection of
+        request statistics for HTTP/2 requests. (markt)
+      </fix>
     </changelog>
   </subseciton>
 </section>

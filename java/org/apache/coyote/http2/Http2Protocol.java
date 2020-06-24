@@ -27,11 +27,14 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
 
+import javax.management.ObjectName;
+
 import org.apache.coyote.Adapter;
 import org.apache.coyote.CompressionConfig;
 import org.apache.coyote.ContinueResponseTiming;
 import org.apache.coyote.Processor;
 import org.apache.coyote.Request;
+import org.apache.coyote.RequestGroupInfo;
 import org.apache.coyote.Response;
 import org.apache.coyote.UpgradeProtocol;
 import org.apache.coyote.UpgradeToken;
@@ -39,6 +42,7 @@ import org.apache.coyote.http11.AbstractHttp11Protocol;
 import org.apache.coyote.http11.upgrade.InternalHttpUpgradeHandler;
 import org.apache.coyote.http11.upgrade.UpgradeProcessorInternal;
 import org.apache.tomcat.util.buf.StringUtils;
+import org.apache.tomcat.util.modeler.Registry;
 import org.apache.tomcat.util.net.SocketWrapperBase;
 
 public class Http2Protocol implements UpgradeProtocol {
@@ -94,6 +98,9 @@ public class Http2Protocol implements UpgradeProtocol {
     private final CompressionConfig compressionConfig = new CompressionConfig();
     // Reference to HTTP/1.1 protocol that this instance is configured under
     private AbstractHttp11Protocol<?> http11Protocol = null;
+
+    private RequestGroupInfo global = new RequestGroupInfo();
+    private ObjectName rgOname = null;
 
     @Override
     public String getHttpUpgradeName(boolean isSSLEnabled) {
@@ -423,7 +430,40 @@ public class Http2Protocol implements UpgradeProtocol {
     public AbstractHttp11Protocol<?> getHttp11Protocol() {
         return this.http11Protocol;
     }
+
+
     public void setHttp11Protocol(AbstractHttp11Protocol<?> http11Protocol) {
         this.http11Protocol = http11Protocol;
+    }
+
+
+    public RequestGroupInfo getGlobal() {
+        return global;
+    }
+
+
+    public void init() throws Exception {
+        ObjectName parentRgOname = http11Protocol.getGlobalRequestProcessorMBeanName();
+        if (parentRgOname != null) {
+            StringBuilder name = new StringBuilder(parentRgOname.getCanonicalName());
+            name.append(",Upgrade=");
+            // Neither of these names need quoting
+            if (http11Protocol.isSSLEnabled()) {
+                name.append(ALPN_NAME);
+            } else {
+                name.append(HTTP_UPGRADE_NAME);
+            }
+            ObjectName rgOname = new ObjectName(name.toString());
+            this.rgOname = rgOname;
+            Registry.getRegistry(null, null).registerComponent(global, rgOname, null);
+        }
+    }
+
+
+    public void destroy() throws Exception {
+        ObjectName rgOname = this.rgOname;
+        if (rgOname != null) {
+            Registry.getRegistry(null, null).unregisterComponent(rgOname);
+        }
     }
 }
