@@ -1350,6 +1350,7 @@ public class Tomcat {
             } else if (args[i].equals("--catalina")) {
                 // This was already processed before
                 // Skip the rest of the arguments as they are for Catalina
+                break;
             } else {
                 throw new IllegalArgumentException(sm.getString("tomcat.invalidCommandLine", args[i]));
             }
