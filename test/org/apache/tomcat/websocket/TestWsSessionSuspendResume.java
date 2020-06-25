@@ -29,8 +29,6 @@ import javax.websocket.ContainerProvider;
 import javax.websocket.Endpoint;
 import javax.websocket.EndpointConfig;
 import javax.websocket.MessageHandler;
-import javax.websocket.SendHandler;
-import javax.websocket.SendResult;
 import javax.websocket.Session;
 import javax.websocket.WebSocketContainer;
 import javax.websocket.server.ServerEndpointConfig;
@@ -76,7 +74,7 @@ public class TestWsSessionSuspendResume extends WebSocketBaseTest {
             }
         });
         for (int i = 0; i < 8; i++) {
-            wsSession.getAsyncRemote().sendText("echo");
+            wsSession.getBasicRemote().sendText("echo");
         }
 
         boolean latchResult = latch.await(30, TimeUnit.SECONDS);
@@ -144,15 +142,13 @@ public class TestWsSessionSuspendResume extends WebSocketBaseTest {
         void addMessage(String message) {
             if (messages.size() == count) {
                 ((WsSession) session).suspend();
-                session.getAsyncRemote().sendText(messages.toString(), new SendHandler() {
-
-                    @Override
-                    public void onResult(SendResult result) {
-                        ((WsSession) session).resume();
-                        Assert.assertTrue(result.isOK());
-                    }
-                });
-                messages.clear();
+                try {
+                    session.getBasicRemote().sendText(messages.toString());
+                    messages.clear();
+                    ((WsSession) session).resume();
+                } catch (IOException e) {
+                    Assert.fail();
+                }
             } else {
                 messages.add(message);
             }
