@@ -86,6 +86,9 @@ class StreamProcessor extends AbstractProcessor {
                                         stream.getIdAsInt());
                             }
                             stream.close(se);
+                        } else {
+                            // stream.close() will call recycle so only need it here
+                            stream.recycle();
                         }
                     }
                 } catch (Exception e) {

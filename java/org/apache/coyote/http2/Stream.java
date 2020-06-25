@@ -681,6 +681,19 @@ public class Stream extends AbstractStream implements HeaderEmitter {
         if (inputBuffer != null) {
             inputBuffer.receiveReset();
         }
+        recycle();
+    }
+
+
+    /*
+     * This method is called recycle for consistency with the rest of the Tomcat
+     * code base. Currently, it only sets references to null for the purposes of
+     * reducing memory footprint. It does not fully recycle the Stream ready for
+     * re-use since Stream objects are not re-used.
+     */
+    final void recycle() {
+        // Currently a NO-OP. This will change shortly to address the TODO for
+        // nulling out references.
     }
 
 
