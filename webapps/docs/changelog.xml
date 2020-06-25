@@ -104,6 +104,9 @@
         Once an HTTP/2 stream has been closed, ensure that the code that cleans
         up references that are no longer required is called. (markt)
       </fix>
+      <fix>
+        Reduce the memory footprint of closed HTTP/2 streams. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
