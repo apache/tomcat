@@ -74,13 +74,15 @@ public class Stream extends AbstractStream implements HeaderEmitter {
     // State machine would be too much overhead
     private int headerState = HEADER_STATE_START;
     private StreamException headerException = null;
-    // TODO: null these when finished to reduce memory used by closed stream
-    private final Request coyoteRequest;
-    private StringBuilder cookieHeader = null;
-    private final Response coyoteResponse = new Response();
-    private final StreamInputBuffer inputBuffer;
-    private final StreamOutputBuffer streamOutputBuffer = new StreamOutputBuffer();
-    private final Http2OutputBuffer http2OutputBuffer =
+
+    // These will be set to null once the Stream closes to reduce the memory
+    // footprint.
+    private volatile Request coyoteRequest;
+    private volatile StringBuilder cookieHeader = null;
+    private volatile Response coyoteResponse = new Response();
+    private volatile StreamInputBuffer inputBuffer;
+    private volatile StreamOutputBuffer streamOutputBuffer = new StreamOutputBuffer();
+    private volatile Http2OutputBuffer http2OutputBuffer =
             new Http2OutputBuffer(coyoteResponse, streamOutputBuffer);
 
 
@@ -689,11 +691,16 @@ public class Stream extends AbstractStream implements HeaderEmitter {
      * This method is called recycle for consistency with the rest of the Tomcat
      * code base. Currently, it only sets references to null for the purposes of
      * reducing memory footprint. It does not fully recycle the Stream ready for
-     * re-use since Stream objects are not re-used.
+     * re-use since Stream objects are not re-used. This is useful because
+     * Stream instances are retained for a period after the Stream closes.
      */
     final void recycle() {
-        // Currently a NO-OP. This will change shortly to address the TODO for
-        // nulling out references.
+        coyoteRequest = null;
+        cookieHeader = null;
+        coyoteResponse = null;
+        inputBuffer = null;
+        streamOutputBuffer = null;
+        http2OutputBuffer = null;
     }
 
 
