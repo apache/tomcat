@@ -15,13 +15,13 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 -->
-<project name="Webapp packaging for GraalVM" default="package" basedir=".">
+<project name="Webapp JSP precompilation and packaging for Maven shade plugin" default="package" basedir=".">
 
   <property name="webapp.name" value="examples" />
 
   <typedef name="jasper" classname="org.apache.jasper.JspC">
     <classpath>
-      <fileset file="${basedir}/target/tomcat-maven-1.0.jar" />
+      <fileset file="${basedir}/target/tomcat-stuffed-1.0.jar" />
       <fileset dir="${basedir}/webapps/${webapp.name}/WEB-INF/lib" includes="*.jar" erroronmissingdir="false" />
     </classpath>
   </typedef>

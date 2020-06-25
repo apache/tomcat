@@ -22,14 +22,15 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.apache.tomcat</groupId>
-    <artifactId>tomcat-maven</artifactId>
+    <artifactId>tomcat-stuffed</artifactId>
     <version>1.0</version>
     <packaging>jar</packaging>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <mainClass>org.apache.catalina.startup.Tomcat</mainClass>
-        <tomcat.version>10.0.0-M3</tomcat.version>
+        <tomcat.version>10.0.0-M7</tomcat.version>
+        <!-- <tomcat.version>9.0.37</tomcat.version> -->
     </properties>
 
     <dependencies>
@@ -85,7 +86,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
-                <version>3.2.1</version>
+                <version>3.2.4</version>
                 <executions>
                     <execution>
                         <phase>package</phase>
@@ -95,11 +96,21 @@
                         <configuration>
                             <createDependencyReducedPom>false</createDependencyReducedPom>
                             <transformers>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ApacheLicenseResourceTransformer"/>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ApacheNoticeResourceTransformer"/>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
                                     <resource>META-INF/services/jakarta.servlet.ServletContainerInitializer</resource>
                                 </transformer>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                                     <mainClass>${mainClass}</mainClass>
+                                </transformer>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.DontIncludeResourceTransformer">
+                                    <resources>
+                                        <resource>.RSA</resource>
+                                        <resource>.SF</resource>
+                                        <resource>META-INF/MANIFEST.MF</resource>
+                                        <resource>META-INF/web-fragment.xml</resource>
+                                    </resources>
                                 </transformer>
                             </transformers>
                         </configuration>

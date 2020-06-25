@@ -19,7 +19,7 @@
 
 -->
 
-# Apache Tomcat distribution for Apache Maven
+# Apache Tomcat distribution for container platforms
 
 ## Configuration
 
@@ -37,7 +37,7 @@ mvn clean; mvn package
 ### Docker build
 
 ```
-docker build -t apache/tomcat-maven:1.0 -f ./Dockerfile .
+docker build -t apache/tomcat-stuffed:1.0 -f ./Dockerfile .
 ```
 Docker build arguments include `namepsace` (default is `tomcat`) and `port` which should match the Tomcat port in `server.xml` (default is `8080`). Other ports that need to be exposed can be added in the `Dockerfile` as needed. Webapps should be added to the `webapps` folder where they will be auto deployed by the host if using the defaults. Otherwise, the `Dockerfile` command line can be edited like below to include the necesary resources and command line arguments to run a single or multiple hardcoded web applications.
 
@@ -56,13 +56,13 @@ The default JULI configuration uses `catalina.base`, so specifying the system pr
 ### Command line example with a single root webapp
 
 ```
-java -Dcatalina.base=. -Djava.util.logging.manager=org.apache.juli.ClassLoaderLogManager -Djava.util.logging.config.file=conf/logging.properties -jar target/tomcat-maven-1.0.jar --war myrootwebapp
+java -Dcatalina.base=. -Djava.util.logging.manager=org.apache.juli.ClassLoaderLogManager -Djava.util.logging.config.file=conf/logging.properties -jar target/tomcat-stuffed-1.0.jar --war myrootwebapp
 ```
 
 ### Command line example with three webapps
 
 ```
-java -Dcatalina.base=. -Djava.util.logging.manager=org.apache.juli.ClassLoaderLogManager -Djava.util.logging.config.file=conf/logging.properties -jar target/tomcat-maven-1.0.jar --war myrootwebapp --path /path1 --war mywebapp1 --path /path2 --war mywebapp2
+java -Dcatalina.base=. -Djava.util.logging.manager=org.apache.juli.ClassLoaderLogManager -Djava.util.logging.config.file=conf/logging.properties -jar target/tomcat-stuffed-1.0.jar --war myrootwebapp --path /path1 --war mywebapp1 --path /path2 --war mywebapp2
 ```
 
 ## Cloud
