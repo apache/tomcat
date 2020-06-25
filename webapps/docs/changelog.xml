@@ -100,6 +100,10 @@
         white space around cookie attrubute names and values when using the RFC
         6265 cookie processor. (markt)
       </fix>
+      <fix>
+        Once an HTTP/2 stream has been closed, ensure that the code that cleans
+        up references that are no longer required is called. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
