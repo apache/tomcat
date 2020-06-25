@@ -97,7 +97,11 @@ class StreamProcessor extends AbstractProcessor {
                     ConnectionException ce = new ConnectionException(msg, Http2Error.INTERNAL_ERROR);
                     ce.initCause(e);
                     stream.close(ce);
+                    state = SocketState.CLOSED;
                 } finally {
+                    if (state == SocketState.CLOSED) {
+                        recycle();
+                    }
                     ContainerThreadMarker.clear();
                 }
             }
