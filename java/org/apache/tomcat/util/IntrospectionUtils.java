@@ -34,6 +34,7 @@ public final class IntrospectionUtils {
 
     private static final Log log = LogFactory.getLog(IntrospectionUtils.class);
     private static final StringManager sm = StringManager.getManager(IntrospectionUtils.class);
+    private static int iterationCount = 0;
 
     /**
      * Find a method with the right name If found, call the method ( if param is
@@ -340,7 +341,13 @@ public final class IntrospectionUtils {
             return value;
         if (log.isDebugEnabled())
             log.debug("IntrospectionUtils.replaceProperties iter on: " + newval);
-        return replaceProperties(newval, staticProp, dynamicProp, classLoader);
+        iterationCount++;
+        if (iterationCount <20)
+            newval = replaceProperties(newval, staticProp, dynamicProp, classLoader);
+        else
+            log.warn("System property failed to update and remains [" + newval + "]");
+        iterationCount--;
+        return newval;
     }
 
     private static String getProperty(String name, Hashtable<Object, Object> staticProp,
