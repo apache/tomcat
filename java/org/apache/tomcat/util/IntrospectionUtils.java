@@ -332,7 +332,15 @@ public final class IntrospectionUtils {
         }
         if (prev < value.length())
             sb.append(value.substring(prev));
-        return sb.toString();
+        String newval = sb.toString();
+        if (newval.indexOf('$') < 0) {
+            return newval;
+        }
+        if (newval.equals(value))
+            return value;
+        if (log.isDebugEnabled())
+            log.debug("IntrospectionUtils.replaceProperties iter on: " + newval);
+        return replaceProperties(newval, staticProp, dynamicProp, classLoader);
     }
 
     private static String getProperty(String name, Hashtable<Object, Object> staticProp,
