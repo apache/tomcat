@@ -165,7 +165,19 @@ public abstract class SocketWrapperBase<E> {
      */
     @Deprecated
     public void setUpgraded(boolean upgraded) { this.upgraded = upgraded; }
+    /**
+     * @return {@code true} if the connection uses TLS
+     *
+     * @deprecated Unused. Will be removed in Tomcat 10.
+     */
+    @Deprecated
     public boolean isSecure() { return secure; }
+    /**
+     * @param secure {@code true} if the connection uses TLS
+     *
+     * @deprecated Unused. Will be removed in Tomcat 10.
+     */
+    @Deprecated
     public void setSecure(boolean secure) { this.secure = secure; }
     public String getNegotiatedProtocol() { return negotiatedProtocol; }
     public void setNegotiatedProtocol(String negotiatedProtocol) {

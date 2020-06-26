@@ -742,7 +742,6 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
             ka.setReadTimeout(getSocketProperties().getSoTimeout());
             ka.setWriteTimeout(getSocketProperties().getSoTimeout());
             ka.setKeepAliveLeft(NioEndpoint.this.getMaxKeepAliveRequests());
-            ka.setSecure(isSSLEnabled());
             ka.setReadTimeout(getConnectionTimeout());
             ka.setWriteTimeout(getConnectionTimeout());
             PollerEvent r = eventCache.pop();

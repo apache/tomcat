@@ -321,7 +321,6 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
             socketWrapper.setReadTimeout(getSocketProperties().getSoTimeout());
             socketWrapper.setWriteTimeout(getSocketProperties().getSoTimeout());
             socketWrapper.setKeepAliveLeft(Nio2Endpoint.this.getMaxKeepAliveRequests());
-            socketWrapper.setSecure(isSSLEnabled());
             socketWrapper.setReadTimeout(getConnectionTimeout());
             socketWrapper.setWriteTimeout(getConnectionTimeout());
             // Continue processing on another thread
