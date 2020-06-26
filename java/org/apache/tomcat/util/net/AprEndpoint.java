@@ -680,7 +680,6 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
             AprSocketWrapper wrapper = new AprSocketWrapper(socket, this);
             connections.put(socket, wrapper);
             wrapper.setKeepAliveLeft(getMaxKeepAliveRequests());
-            wrapper.setSecure(isSSLEnabled());
             wrapper.setReadTimeout(getConnectionTimeout());
             wrapper.setWriteTimeout(getConnectionTimeout());
             getExecutor().execute(new SocketWithOptionsProcessor(wrapper));
