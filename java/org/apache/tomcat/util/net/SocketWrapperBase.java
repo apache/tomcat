@@ -52,8 +52,6 @@ public abstract class SocketWrapperBase<E> {
     private volatile long writeTimeout = -1;
 
     private volatile int keepAliveLeft = 100;
-    private volatile boolean upgraded = false;
-    private boolean secure = false;
     private String negotiatedProtocol = null;
 
     /*
@@ -171,34 +169,6 @@ public abstract class SocketWrapperBase<E> {
         }
     }
 
-    /**
-     * @return {@code true} if the connection has been upgraded.
-     *
-     * @deprecated Unused. Will be removed in Tomcat 10.
-     */
-    @Deprecated
-    public boolean isUpgraded() { return upgraded; }
-    /**
-     * @param upgraded {@code true} if the connection has been upgraded.
-     *
-     * @deprecated Unused. Will be removed in Tomcat 10.
-     */
-    @Deprecated
-    public void setUpgraded(boolean upgraded) { this.upgraded = upgraded; }
-    /**
-     * @return {@code true} if the connection uses TLS
-     *
-     * @deprecated Unused. Will be removed in Tomcat 10.
-     */
-    @Deprecated
-    public boolean isSecure() { return secure; }
-    /**
-     * @param secure {@code true} if the connection uses TLS
-     *
-     * @deprecated Unused. Will be removed in Tomcat 10.
-     */
-    @Deprecated
-    public void setSecure(boolean secure) { this.secure = secure; }
     public String getNegotiatedProtocol() { return negotiatedProtocol; }
     public void setNegotiatedProtocol(String negotiatedProtocol) {
         this.negotiatedProtocol = negotiatedProtocol;
