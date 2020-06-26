@@ -285,8 +285,17 @@ public final class IntrospectionUtils {
     public static String replaceProperties(String value,
             Hashtable<Object,Object> staticProp, PropertySource dynamicProp[],
             ClassLoader classLoader) {
+            return replaceProperties(value, staticProp, dynamicProp, classLoader, 0);
+    }
 
-        if (value.indexOf('$') < 0) {
+    private static String replaceProperties(String value,
+            Hashtable<Object,Object> staticProp, PropertySource dynamicProp[],
+            ClassLoader classLoader, int iterationCount) {
+        if (value.indexOf("${") < 0) {
+            return value;
+        }
+        if (iterationCount >=20) {
+            log.warn("System property failed to update and remains [" + value + "]");
             return value;
         }
         StringBuilder sb = new StringBuilder();
@@ -332,7 +341,15 @@ public final class IntrospectionUtils {
         }
         if (prev < value.length())
             sb.append(value.substring(prev));
-        return sb.toString();
+        String newval = sb.toString();
+        if (newval.indexOf("${") < 0) {
+            return newval;
+        }
+        if (newval.equals(value))
+            return value;
+        if (log.isDebugEnabled())
+            log.debug("IntrospectionUtils.replaceProperties iter on: " + newval);
+        return replaceProperties(newval, staticProp, dynamicProp, classLoader, iterationCount+1);
     }
 
     private static String getProperty(String name, Hashtable<Object, Object> staticProp,

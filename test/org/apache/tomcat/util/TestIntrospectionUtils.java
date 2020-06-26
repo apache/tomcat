@@ -143,5 +143,17 @@ public class TestIntrospectionUtils {
 
         Assert.assertEquals("abc${normal}xyz", IntrospectionUtils.replaceProperties(
                 "abc${normal}xyz", properties, null, null));
+
+        properties.setProperty("my.ajp.port", "8009");
+        properties.setProperty("tomcat.ajp.port", "${my.ajp.port}");
+        Assert.assertEquals("8009", IntrospectionUtils.replaceProperties(
+                "${tomcat.ajp.port}", properties, null, null));
+
+    }
+    @Test
+    public void testReplacePropertiesRecursively() {
+        Properties properties = new Properties();
+        properties.setProperty("replaceMe", "something ${replaceMe}");
+        IntrospectionUtils.replaceProperties("${replaceMe}", properties, null, null);
     }
 }
