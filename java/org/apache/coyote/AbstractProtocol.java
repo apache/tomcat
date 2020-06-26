@@ -853,8 +853,6 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
                                         processor, wrapper));
                             }
                             wrapper.unRead(leftOverInput);
-                            // Mark the connection as upgraded
-                            wrapper.setUpgraded(true);
                             // Associate with the processor with the connection
                             connections.put(socket, processor);
                             // Initialise the upgrade handler (which may trigger
