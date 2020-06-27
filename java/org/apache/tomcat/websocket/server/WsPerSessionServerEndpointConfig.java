@@ -20,10 +20,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import javax.websocket.Decoder;
-import javax.websocket.Encoder;
-import javax.websocket.Extension;
-import javax.websocket.server.ServerEndpointConfig;
+import jakarta.websocket.Decoder;
+import jakarta.websocket.Encoder;
+import jakarta.websocket.Extension;
+import jakarta.websocket.server.ServerEndpointConfig;
 
 /**
  * Wraps the provided {@link ServerEndpointConfig} and provides a per session

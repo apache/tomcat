@@ -15,6 +15,9 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 -->
+<!DOCTYPE mbeans-descriptors PUBLIC
+   "-//Apache Software Foundation//DTD Model MBeans Configuration File"
+   "http://jakarta.apache.org/commons/dtds/mbeans-descriptors.dtd">
 <mbeans-descriptors>
 
   <mbean description="Reports " domain="tomcat.jdbc" group="jdbc-pool" name="SlowQueryReportJmx"
@@ -23,7 +26,6 @@
     <attribute description="The name of the connection pool this Jmx bean is representing" name="poolName" type="java.lang.String" writeable="false"/>
     <attribute description="List of all registered connections pools" name="poolNames" type="[java.lang.String;" writeable="false"/>
     <attribute description="All the recorded query stats. " name="slowQueriesCD" type="[javax.management.openmbean.CompositeData;" writeable="false"/>
-    <operation description="Clears all the query stats" impact="ACTION" name="resetStats" returnType="void"/>
 
     <notification description="Notification sent out by the slow query report when a query exceeds the threshold" name="slow-query">
       <notification-type>Slow query</notification-type>
@@ -32,5 +34,7 @@
     <notification description="Notification sent out by the slow query report when a query fails execution" name="failed-query">
       <notification-type>Failed query execution</notification-type>
     </notification>
+
+    <operation description="Clears all the query stats" impact="ACTION" name="resetStats" returnType="void"/>
   </mbean>
 </mbeans-descriptors>

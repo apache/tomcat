@@ -31,15 +31,15 @@ import java.nio.charset.StandardCharsets;
 import java.util.concurrent.TimeUnit;
 
 import javax.net.SocketFactory;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpUpgradeHandler;
-import javax.servlet.http.WebConnection;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpUpgradeHandler;
+import jakarta.servlet.http.WebConnection;
 
 import org.junit.Assert;
-import org.junit.Assume;
 import org.junit.Test;
 
 import static org.apache.catalina.startup.SimpleHttpClient.CRLF;
@@ -59,10 +59,6 @@ public class TestUpgradeInternalHandler extends TomcatBaseTest {
 
     @Test
     public void testUpgradeInternal() throws Exception {
-        Assume.assumeTrue(
-                "Only supported on NIO 2",
-                getTomcatInstance().getConnector().getProtocolHandlerClassName().contains("Nio2"));
-
         UpgradeConnection uc = doUpgrade(EchoAsync.class);
         PrintWriter pw = new PrintWriter(uc.getWriter());
         BufferedReader reader = uc.getReader();
@@ -87,6 +83,7 @@ public class TestUpgradeInternalHandler extends TomcatBaseTest {
             Class<? extends HttpUpgradeHandler> upgradeHandlerClass) throws Exception {
         // Setup Tomcat instance
         Tomcat tomcat = getTomcatInstance();
+        Assert.assertTrue(tomcat.getConnector().setProperty("useAsyncIO", "true"));
 
         // No file system docBase required
         Context ctx = tomcat.addContext("", null);
@@ -226,6 +223,17 @@ public class TestUpgradeInternalHandler extends TomcatBaseTest {
                 }
             }, buffer);
             System.out.println("CompletionState: " + state);
+            // Test zero length write used by websockets
+            wrapper.write(BlockingMode.BLOCK, 10, TimeUnit.SECONDS, null, SocketWrapperBase.COMPLETE_WRITE_WITH_COMPLETION, new CompletionHandler<Long, Void>() {
+                @Override
+                public void completed(Long result, Void attachment) {
+                    System.out.println("Write: " + result.longValue());
+                }
+                @Override
+                public void failed(Throwable exc, Void attachment) {
+                    exc.printStackTrace();
+                }
+            }, buffer);
         }
 
         @Override
@@ -251,9 +259,15 @@ public class TestUpgradeInternalHandler extends TomcatBaseTest {
             case DISCONNECT:
             case ERROR:
             case TIMEOUT:
+            case CONNECT_FAIL:
                 return SocketState.CLOSED;
             }
             return SocketState.UPGRADED;
+        }
+
+        @Override
+        public void timeoutAsync(long now) {
+            // NO-OP
         }
 
         @Override

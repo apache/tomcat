@@ -16,9 +16,9 @@
  */
 package org.apache.jasper.compiler;
 
-import javax.servlet.ServletContext;
-import javax.servlet.jsp.tagext.TagFileInfo;
-import javax.servlet.jsp.tagext.TagInfo;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.jsp.tagext.TagFileInfo;
+import jakarta.servlet.jsp.tagext.TagInfo;
 
 import org.junit.Assert;
 import org.junit.Test;

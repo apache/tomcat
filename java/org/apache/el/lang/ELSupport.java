@@ -27,8 +27,8 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
-import javax.el.ELContext;
-import javax.el.ELException;
+import jakarta.el.ELContext;
+import jakarta.el.ELException;
 
 import org.apache.el.util.MessageFactory;
 

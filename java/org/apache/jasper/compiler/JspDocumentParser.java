@@ -22,11 +22,12 @@ import java.io.IOException;
 import java.security.AccessController;
 import java.util.Collection;
 
-import javax.servlet.jsp.tagext.TagFileInfo;
-import javax.servlet.jsp.tagext.TagInfo;
-import javax.servlet.jsp.tagext.TagLibraryInfo;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
+
+import jakarta.servlet.jsp.tagext.TagFileInfo;
+import jakarta.servlet.jsp.tagext.TagInfo;
+import jakarta.servlet.jsp.tagext.TagLibraryInfo;
 
 import org.apache.jasper.Constants;
 import org.apache.jasper.JasperException;
@@ -167,7 +168,8 @@ class JspDocumentParser
         try {
 
             // Create dummy root and initialize it with given page encodings
-            Node.Root dummyRoot = new Node.Root(null, parent, true);
+            Node.Root dummyRoot = new Node.Root(null, parent, true,
+                    pc.getJspCompilationContext().getOptions().getTempVariableNamePrefix());
             dummyRoot.setPageEncoding(pageEnc);
             dummyRoot.setJspConfigPageEncoding(jspConfigPageEnc);
             dummyRoot.setIsEncodingSpecifiedInProlog(

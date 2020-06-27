@@ -19,13 +19,13 @@ package org.apache.tomcat.websocket;
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import javax.websocket.OnClose;
-import javax.websocket.OnError;
-import javax.websocket.OnMessage;
-import javax.websocket.OnOpen;
-import javax.websocket.RemoteEndpoint.Basic;
-import javax.websocket.Session;
-import javax.websocket.server.ServerEndpoint;
+import jakarta.websocket.OnClose;
+import jakarta.websocket.OnError;
+import jakarta.websocket.OnMessage;
+import jakarta.websocket.OnOpen;
+import jakarta.websocket.RemoteEndpoint.Basic;
+import jakarta.websocket.Session;
+import jakarta.websocket.server.ServerEndpoint;
 
 import org.apache.tomcat.websocket.server.TesterEndpointConfig;
 

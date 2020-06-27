@@ -19,15 +19,14 @@ package org.apache.catalina.connector;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -38,6 +37,7 @@ import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.unittest.TesterContext;
 import org.apache.tomcat.unittest.TesterRequest;
 import org.apache.tomcat.util.buf.ByteChunk;
+import org.apache.tomcat.util.collections.CaseInsensitiveKeyMap;
 
 /**
  * Test case for {@link Request}.
@@ -57,7 +57,7 @@ public class TestResponse extends TomcatBaseTest {
 
         tomcat.start();
 
-        Map<String,List<String>> headers = new HashMap<>();
+        Map<String,List<String>> headers = new CaseInsensitiveKeyMap<>();
         getUrl("http://localhost:" + getPort() + "/", new ByteChunk(), headers);
 
         // Check for headers without a name

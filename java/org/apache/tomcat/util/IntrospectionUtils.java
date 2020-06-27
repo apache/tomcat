@@ -14,7 +14,6 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package org.apache.tomcat.util;
 
 import java.lang.reflect.InvocationTargetException;
@@ -26,6 +25,7 @@ import java.util.Hashtable;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.res.StringManager;
+import org.apache.tomcat.util.security.PermissionCheck;
 
 /**
  * Utils for introspection and reflection
@@ -45,12 +45,17 @@ public final class IntrospectionUtils {
      * @return <code>true</code> if operation was successful
      */
     public static boolean setProperty(Object o, String name, String value) {
-        return setProperty(o,name,value,true);
+        return setProperty(o, name, value, true, null);
+    }
+
+    public static boolean setProperty(Object o, String name, String value,
+            boolean invokeSetProperty) {
+        return setProperty(o, name, value, invokeSetProperty, null);
     }
 
     @SuppressWarnings("null") // setPropertyMethodVoid is not null when used
     public static boolean setProperty(Object o, String name, String value,
-            boolean invokeSetProperty) {
+            boolean invokeSetProperty, StringBuilder actualMethod) {
         if (log.isDebugEnabled())
             log.debug("IntrospectionUtils: setProperty(" +
                     o.getClass() + " " + name + "=" + value + ")");
@@ -63,24 +68,26 @@ public final class IntrospectionUtils {
             Method setPropertyMethodBool = null;
 
             // First, the ideal case - a setFoo( String ) method
-            for (int i = 0; i < methods.length; i++) {
-                Class<?> paramT[] = methods[i].getParameterTypes();
-                if (setter.equals(methods[i].getName()) && paramT.length == 1
+            for (Method item : methods) {
+                Class<?> paramT[] = item.getParameterTypes();
+                if (setter.equals(item.getName()) && paramT.length == 1
                         && "java.lang.String".equals(paramT[0].getName())) {
-
-                    methods[i].invoke(o, new Object[] { value });
+                    item.invoke(o, new Object[]{value});
+                    if (actualMethod != null) {
+                        actualMethod.append(item.getName()).append("(\"").append(escape(value)).append("\")");
+                    }
                     return true;
                 }
             }
 
             // Try a setFoo ( int ) or ( boolean )
-            for (int i = 0; i < methods.length; i++) {
+            for (Method method : methods) {
                 boolean ok = true;
-                if (setter.equals(methods[i].getName())
-                        && methods[i].getParameterTypes().length == 1) {
+                if (setter.equals(method.getName())
+                        && method.getParameterTypes().length == 1) {
 
                     // match - find the type and invoke it
-                    Class<?> paramType = methods[i].getParameterTypes()[0];
+                    Class<?> paramType = method.getParameterTypes()[0];
                     Object params[] = new Object[1];
 
                     // Try a setFoo ( int )
@@ -91,20 +98,27 @@ public final class IntrospectionUtils {
                         } catch (NumberFormatException ex) {
                             ok = false;
                         }
-                    // Try a setFoo ( long )
-                    }else if ("java.lang.Long".equals(paramType.getName())
-                                || "long".equals(paramType.getName())) {
-                            try {
-                                params[0] = Long.valueOf(value);
-                            } catch (NumberFormatException ex) {
-                                ok = false;
-                            }
-
+                        if (actualMethod != null) {
+                            actualMethod.append(method.getName()).append("(Integer.valueOf(\"").append(value).append("\"))");
+                        }
+                        // Try a setFoo ( long )
+                    } else if ("java.lang.Long".equals(paramType.getName())
+                            || "long".equals(paramType.getName())) {
+                        try {
+                            params[0] = Long.valueOf(value);
+                        } catch (NumberFormatException ex) {
+                            ok = false;
+                        }
+                        if (actualMethod != null) {
+                            actualMethod.append(method.getName()).append("(Long.valueOf(\"").append(value).append("\"))");
+                        }
                         // Try a setFoo ( boolean )
                     } else if ("java.lang.Boolean".equals(paramType.getName())
                             || "boolean".equals(paramType.getName())) {
                         params[0] = Boolean.valueOf(value);
-
+                        if (actualMethod != null) {
+                            actualMethod.append(method.getName()).append("(Boolean.valueOf(\"").append(value).append("\"))");
+                        }
                         // Try a setFoo ( InetAddress )
                     } else if ("java.net.InetAddress".equals(paramType
                             .getName())) {
@@ -115,7 +129,9 @@ public final class IntrospectionUtils {
                                 log.debug("IntrospectionUtils: Unable to resolve host name:" + value);
                             ok = false;
                         }
-
+                        if (actualMethod != null) {
+                            actualMethod.append(method.getName()).append("(InetAddress.getByName(\"").append(value).append("\"))");
+                        }
                         // Unknown type
                     } else {
                         if (log.isDebugEnabled())
@@ -124,17 +140,17 @@ public final class IntrospectionUtils {
                     }
 
                     if (ok) {
-                        methods[i].invoke(o, params);
+                        method.invoke(o, params);
                         return true;
                     }
                 }
 
                 // save "setProperty" for later
-                if ("setProperty".equals(methods[i].getName())) {
-                    if (methods[i].getReturnType()==Boolean.TYPE){
-                        setPropertyMethodBool = methods[i];
-                    }else {
-                        setPropertyMethodVoid = methods[i];
+                if ("setProperty".equals(method.getName())) {
+                    if (method.getReturnType() == Boolean.TYPE) {
+                        setPropertyMethodBool = method;
+                    } else {
+                        setPropertyMethodVoid = method;
                     }
 
                 }
@@ -143,6 +159,9 @@ public final class IntrospectionUtils {
             // Ok, no setXXX found, try a setProperty("name", "value")
             if (invokeSetProperty && (setPropertyMethodBool != null ||
                     setPropertyMethodVoid != null)) {
+                if (actualMethod != null) {
+                    actualMethod.append("setProperty(\"").append(name).append("\", \"").append(escape(value)).append("\")");
+                }
                 Object params[] = new Object[2];
                 params[0] = name;
                 params[1] = value;
@@ -175,6 +194,33 @@ public final class IntrospectionUtils {
         return false;
     }
 
+    /**
+     * @param s
+     *            the input string
+     * @return escaped string, per Java rule
+     */
+    public static String escape(String s) {
+
+        if (s == null)
+            return "";
+
+        StringBuilder b = new StringBuilder();
+        for (int i = 0; i < s.length(); i++) {
+            char c = s.charAt(i);
+            if (c == '"')
+                b.append('\\').append('"');
+            else if (c == '\\')
+                b.append('\\').append('\\');
+            else if (c == '\n')
+                b.append('\\').append('n');
+            else if (c == '\r')
+                b.append('\\').append('r');
+            else
+                b.append(c);
+        }
+        return b.toString();
+    }
+
     public static Object getProperty(Object o, String name) {
         String getter = "get" + capitalize(name);
         String isGetter = "is" + capitalize(name);
@@ -184,17 +230,17 @@ public final class IntrospectionUtils {
             Method getPropertyMethod = null;
 
             // First, the ideal case - a getFoo() method
-            for (int i = 0; i < methods.length; i++) {
-                Class<?> paramT[] = methods[i].getParameterTypes();
-                if (getter.equals(methods[i].getName()) && paramT.length == 0) {
-                    return methods[i].invoke(o, (Object[]) null);
+            for (Method method : methods) {
+                Class<?> paramT[] = method.getParameterTypes();
+                if (getter.equals(method.getName()) && paramT.length == 0) {
+                    return method.invoke(o, (Object[]) null);
                 }
-                if (isGetter.equals(methods[i].getName()) && paramT.length == 0) {
-                    return methods[i].invoke(o, (Object[]) null);
+                if (isGetter.equals(method.getName()) && paramT.length == 0) {
+                    return method.invoke(o, (Object[]) null);
                 }
 
-                if ("getProperty".equals(methods[i].getName())) {
-                    getPropertyMethod = methods[i];
+                if ("getProperty".equals(method.getName())) {
+                    getPropertyMethod = method;
                 }
             }
 
@@ -219,14 +265,27 @@ public final class IntrospectionUtils {
     }
 
     /**
-     * Replace ${NAME} with the property value.
+     * Replaces ${NAME} in the value with the value of the property 'NAME'.
+     * Replaces ${NAME:DEFAULT} with the value of the property 'NAME:DEFAULT',
+     * if the property 'NAME:DEFAULT' is not set,
+     * the expression is replaced with the value of the property 'NAME',
+     * if the property 'NAME' is not set,
+     * the expression is replaced with 'DEFAULT'.
+     * If the property is not set and there is no default the value will be
+     * returned unmodified.
+     *
      * @param value The value
      * @param staticProp Replacement properties
      * @param dynamicProp Replacement properties
+     * @param classLoader Class loader associated with the code requesting the
+     *                    property
+     *
      * @return the replacement value
      */
     public static String replaceProperties(String value,
-            Hashtable<Object,Object> staticProp, PropertySource dynamicProp[]) {
+            Hashtable<Object,Object> staticProp, PropertySource dynamicProp[],
+            ClassLoader classLoader) {
+
         if (value.indexOf('$') < 0) {
             return value;
         }
@@ -252,21 +311,21 @@ public final class IntrospectionUtils {
                     continue;
                 }
                 String n = value.substring(pos + 2, endName);
-                String v = null;
-                if (staticProp != null) {
-                    v = (String) staticProp.get(n);
-                }
-                if (v == null && dynamicProp != null) {
-                    for (int i = 0; i < dynamicProp.length; i++) {
-                        v = dynamicProp[i].getProperty(n);
-                        if (v != null) {
-                            break;
+                String v = getProperty(n, staticProp, dynamicProp, classLoader);
+                if (v == null) {
+                    // {name:default}
+                    int col = n.indexOf(":-");
+                    if (col != -1) {
+                        String dV = n.substring(col + 2);
+                        n = n.substring(0, col);
+                        v = getProperty(n, staticProp, dynamicProp, classLoader);
+                        if (v == null) {
+                            v = dV;
                         }
+                    } else {
+                        v = "${" + n + "}";
                     }
                 }
-                if (v == null)
-                    v = "${" + n + "}";
-
                 sb.append(v);
                 prev = endName + 1;
             }
@@ -274,6 +333,27 @@ public final class IntrospectionUtils {
         if (prev < value.length())
             sb.append(value.substring(prev));
         return sb.toString();
+    }
+
+    private static String getProperty(String name, Hashtable<Object, Object> staticProp,
+            PropertySource[] dynamicProp, ClassLoader classLoader) {
+        String v = null;
+        if (staticProp != null) {
+            v = (String) staticProp.get(name);
+        }
+        if (v == null && dynamicProp != null) {
+            for (PropertySource propertySource : dynamicProp) {
+                if (propertySource instanceof SecurePropertySource) {
+                    v = ((SecurePropertySource) propertySource).getProperty(name, classLoader);
+                } else {
+                    v = propertySource.getProperty(name);
+                }
+                if (v != null) {
+                    break;
+                }
+            }
+        }
+        return v;
     }
 
     /**
@@ -311,11 +391,11 @@ public final class IntrospectionUtils {
     public static Method findMethod(Class<?> c, String name,
             Class<?> params[]) {
         Method methods[] = findMethods(c);
-        for (int i = 0; i < methods.length; i++) {
-            if (methods[i].getName().equals(name)) {
-                Class<?> methodParams[] = methods[i].getParameterTypes();
+        for (Method method : methods) {
+            if (method.getName().equals(name)) {
+                Class<?> methodParams[] = method.getParameterTypes();
                 if (params == null && methodParams.length == 0) {
-                    return methods[i];
+                    return method;
                 }
                 if (params.length != methodParams.length) {
                     continue;
@@ -328,7 +408,7 @@ public final class IntrospectionUtils {
                     }
                 }
                 if (found) {
-                    return methods[i];
+                    return method;
                 }
             }
         }
@@ -433,13 +513,70 @@ public final class IntrospectionUtils {
         return result;
     }
 
+
+    /**
+     * Checks to see if the specified class is an instance of or assignable from
+     * the specified type. The class <code>clazz</code>, all its superclasses,
+     * interfaces and those superinterfaces are tested for a match against
+     * the type name <code>type</code>.
+     *
+     * This is similar to <code>instanceof</code> or {@link Class#isAssignableFrom}
+     * except that the target type will not be resolved into a Class
+     * object, which provides some security and memory benefits.
+     *
+     * @param clazz The class to test for a match.
+     * @param type The name of the type that <code>clazz</code> must be.
+     *
+     * @return <code>true</code> if the <code>clazz</code> tested is an
+     *         instance of the specified <code>type</code>,
+     *         <code>false</code> otherwise.
+     */
+    public static boolean isInstance(Class<?> clazz, String type) {
+        if (type.equals(clazz.getName())) {
+            return true;
+        }
+
+        Class<?>[] ifaces = clazz.getInterfaces();
+        for (Class<?> iface : ifaces) {
+            if (isInstance(iface, type)) {
+                return true;
+            }
+        }
+
+        Class<?> superClazz = clazz.getSuperclass();
+        if (superClazz == null) {
+            return false;
+        } else {
+            return isInstance(superClazz, type);
+        }
+    }
+
+
     // -------------------- Get property --------------------
     // This provides a layer of abstraction
 
     public static interface PropertySource {
-
         public String getProperty(String key);
-
     }
 
+
+    public static interface SecurePropertySource extends PropertySource {
+
+        /**
+         * Obtain a property value, checking that code associated with the
+         * provided class loader has permission to access the property. If the
+         * {@code classLoader} is {@code null} or if {@code classLoader} does
+         * not implement {@link PermissionCheck} then the property value will be
+         * looked up <b>without</b> a call to
+         * {@link PermissionCheck#check(java.security.Permission)}
+         *
+         * @param key           The key of the requested property
+         * @param classLoader   The class loader associated with the code that
+         *                      trigger the property lookup
+         * @return The property value or {@code null} if it could not be found
+         *         or if {@link PermissionCheck#check(java.security.Permission)}
+         *         fails
+         */
+        public String getProperty(String key, ClassLoader classLoader);
+    }
 }

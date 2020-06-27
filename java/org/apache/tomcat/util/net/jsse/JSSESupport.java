@@ -21,6 +21,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -87,6 +88,14 @@ public class JSSESupport implements SSLSupport, SSLSessionManager {
     }
 
     @Override
+    public X509Certificate[] getLocalCertificateChain() {
+        if (session == null) {
+            return null;
+        }
+        return convertCertificates(session.getLocalCertificates());
+    }
+
+    @Override
     public java.security.cert.X509Certificate[] getPeerCertificateChain() throws IOException {
         // Look up the current SSLSession
         if (session == null)
@@ -99,6 +108,12 @@ public class JSSESupport implements SSLSupport, SSLSessionManager {
             log.debug(sm.getString("jsseSupport.clientCertError"), t);
             return null;
         }
+
+        return convertCertificates(certs);
+    }
+
+
+    private static java.security.cert.X509Certificate[] convertCertificates(Certificate[] certs) {
         if( certs==null ) return null;
 
         java.security.cert.X509Certificate [] x509Certs =
@@ -157,10 +172,10 @@ public class JSSESupport implements SSLSupport, SSLSessionManager {
         if ( ssl_session == null)
             return null;
         StringBuilder buf=new StringBuilder();
-        for(int x=0; x<ssl_session.length; x++) {
-            String digit=Integer.toHexString(ssl_session[x]);
-            if (digit.length()<2) buf.append('0');
-            if (digit.length()>2) digit=digit.substring(digit.length()-2);
+        for (byte b : ssl_session) {
+            String digit = Integer.toHexString(b);
+            if (digit.length() < 2) buf.append('0');
+            if (digit.length() > 2) digit = digit.substring(digit.length() - 2);
             buf.append(digit);
         }
         return buf.toString();

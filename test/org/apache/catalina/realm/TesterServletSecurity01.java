@@ -16,9 +16,9 @@
 */
 package org.apache.catalina.realm;
 
-import javax.servlet.annotation.HttpConstraint;
-import javax.servlet.annotation.HttpMethodConstraint;
-import javax.servlet.annotation.ServletSecurity;
+import jakarta.servlet.annotation.HttpConstraint;
+import jakarta.servlet.annotation.HttpMethodConstraint;
+import jakarta.servlet.annotation.ServletSecurity;
 
 import org.apache.tomcat.util.descriptor.web.SecurityConstraint;
 

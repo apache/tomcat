@@ -25,7 +25,8 @@ import java.util.List;
 import java.util.Locale;
 
 import javax.security.auth.Subject;
-import javax.servlet.http.HttpSession;
+
+import jakarta.servlet.http.HttpSession;
 
 import org.apache.catalina.Session;
 import org.apache.tomcat.util.ExceptionUtils;
@@ -49,8 +50,8 @@ public class SessionUtils {
      */
     // org.apache.struts.Globals.LOCALE_KEY
     private static final String STRUTS_LOCALE_KEY = "org.apache.struts.action.LOCALE";//$NON-NLS-1$
-    // javax.servlet.jsp.jstl.core.Config.FMT_LOCALE
-    private static final String JSTL_LOCALE_KEY   = "javax.servlet.jsp.jstl.fmt.locale";//$NON-NLS-1$
+    // jakarta.servlet.jsp.jstl.core.Config.FMT_LOCALE
+    private static final String JSTL_LOCALE_KEY   = "jakarta.servlet.jsp.jstl.fmt.locale";//$NON-NLS-1$
     // org.springframework.web.servlet.i18n.SessionLocaleResolver.LOCALE_SESSION_ATTRIBUTE_NAME
     private static final String SPRING_LOCALE_KEY = "org.springframework.web.servlet.i18n.SessionLocaleResolver.LOCALE";//$NON-NLS-1$
     /**
@@ -85,18 +86,18 @@ public class SessionUtils {
             Locale locale = null;
 
             // First search "known locations"
-            for (int i = 0; i < LOCALE_TEST_ATTRIBUTES.length; ++i) {
-                Object obj = in_session.getAttribute(LOCALE_TEST_ATTRIBUTES[i]);
+            for (String localeTestAttribute : LOCALE_TEST_ATTRIBUTES) {
+                Object obj = in_session.getAttribute(localeTestAttribute);
                 if (obj instanceof Locale) {
                     locale = (Locale) obj;
                     break;
                 }
-                obj = in_session.getAttribute(LOCALE_TEST_ATTRIBUTES[i].toLowerCase(Locale.ENGLISH));
+                obj = in_session.getAttribute(localeTestAttribute.toLowerCase(Locale.ENGLISH));
                 if (obj instanceof Locale) {
                     locale = (Locale) obj;
                     break;
                 }
-                obj = in_session.getAttribute(LOCALE_TEST_ATTRIBUTES[i].toUpperCase(Locale.ENGLISH));
+                obj = in_session.getAttribute(localeTestAttribute.toUpperCase(Locale.ENGLISH));
                 if (obj instanceof Locale) {
                     locale = (Locale) obj;
                     break;
@@ -180,18 +181,18 @@ public class SessionUtils {
         try {
             Object user = null;
             // First search "known locations"
-            for (int i = 0; i < USER_TEST_ATTRIBUTES.length; ++i) {
-                Object obj = httpSession.getAttribute(USER_TEST_ATTRIBUTES[i]);
+            for (String userTestAttribute : USER_TEST_ATTRIBUTES) {
+                Object obj = httpSession.getAttribute(userTestAttribute);
                 if (null != obj) {
                     user = obj;
                     break;
                 }
-                obj = httpSession.getAttribute(USER_TEST_ATTRIBUTES[i].toLowerCase(Locale.ENGLISH));
+                obj = httpSession.getAttribute(userTestAttribute.toLowerCase(Locale.ENGLISH));
                 if (null != obj) {
                     user = obj;
                     break;
                 }
-                obj = httpSession.getAttribute(USER_TEST_ATTRIBUTES[i].toUpperCase(Locale.ENGLISH));
+                obj = httpSession.getAttribute(userTestAttribute.toUpperCase(Locale.ENGLISH));
                 if (null != obj) {
                     user = obj;
                     break;

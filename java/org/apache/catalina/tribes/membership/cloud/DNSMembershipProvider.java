@@ -30,11 +30,65 @@ import org.apache.catalina.tribes.membership.MemberImpl;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
+/**
+ * A {@link org.apache.catalina.tribes.MembershipProvider} that uses DNS to retrieve the members of a cluster.<br>
+ *
+ * <p>
+ * <strong>Configuration example for Kubernetes</strong>
+ * </p>
+ *
+ * {@code server.xml }
+ *
+ * <pre>
+ * {@code
+ * <Server ...
+ *
+ *   <Service ...
+ *
+ *     <Engine ...
+ *
+ *       <Host ...
+ *
+ *         <Cluster className="org.apache.catalina.ha.tcp.SimpleTcpCluster">
+ *           <Channel className="org.apache.catalina.tribes.group.GroupChannel">
+ *             <Membership className="org.apache.catalina.tribes.membership.cloud.CloudMembershipService"
+ *                 membershipProviderClassName="org.apache.catalina.tribes.membership.cloud.DNSMembershipProvider"/>
+ *           </Channel>
+ *         </Cluster>
+ *         ...
+ *  }
+ *  </pre>
+ *
+ * {@code dns-membership-service.yml }
+ *
+ * <pre>
+ * {@code
+ * apiVersion: v1
+ * kind: Service
+ * metadata:
+ *   annotations:
+ *     service.alpha.kubernetes.io/tolerate-unready-endpoints: "true"
+ *     description: "The service for tomcat cluster membership."
+ *   name: my-tomcat-app-membership
+ * spec:
+ *   clusterIP: None
+ *   ports:
+ *   - name: membership
+ *     port: 8888
+ *   selector:
+ *     app: my-tomcat-app
+ * }
+ * </pre>
+ *
+ * Environment variable configuration<br>
+ *
+ * {@code DNS_MEMBERSHIP_SERVICE_NAME=my-tomcat-app-membership }
+ */
+
 public class DNSMembershipProvider extends CloudMembershipProvider {
     private static final Log log = LogFactory.getLog(DNSMembershipProvider.class);
 
-    private static final String CUSTOM_ENV_PREFIX = "OPENSHIFT_KUBE_PING_";
-    private String namespace;
+    private String dnsServiceName;
 
     @Override
     public void start(int level) throws Exception {
@@ -45,15 +99,15 @@ public class DNSMembershipProvider extends CloudMembershipProvider {
         super.start(level);
 
         // Set up Kubernetes API parameters
-        namespace = getEnv("KUBERNETES_NAMESPACE", CUSTOM_ENV_PREFIX + "NAMESPACE");
-        if (namespace == null || namespace.length() == 0) {
-            throw new IllegalArgumentException(sm.getString("kubernetesMembershipProvider.noNamespace"));
+        dnsServiceName = getEnv("DNS_MEMBERSHIP_SERVICE_NAME");
+        if (dnsServiceName == null) {
+            dnsServiceName = getNamespace();
         }
 
         if (log.isDebugEnabled()) {
-            log.debug(String.format("Namespace [%s] set; clustering enabled", namespace));
+            log.debug(String.format("Namespace [%s] set; clustering enabled", dnsServiceName));
         }
-        namespace = URLEncoder.encode(namespace, "UTF-8");
+        dnsServiceName = URLEncoder.encode(dnsServiceName, "UTF-8");
 
         // Fetch initial members
         heartbeat();
@@ -70,9 +124,9 @@ public class DNSMembershipProvider extends CloudMembershipProvider {
 
         InetAddress[] inetAddresses = null;
         try {
-            inetAddresses = InetAddress.getAllByName(namespace);
+            inetAddresses = InetAddress.getAllByName(dnsServiceName);
         } catch (UnknownHostException exception) {
-            log.warn(sm.getString("dnsMembershipProvider.dnsError", namespace), exception);
+            log.warn(sm.getString("dnsMembershipProvider.dnsError", dnsServiceName), exception);
         }
 
         if (inetAddresses != null) {

@@ -50,10 +50,12 @@ import org.apache.tomcat.dbcp.pool2.PooledObjectState;
  * {@link #borrowObject borrowObject} methods. Each time a new key value is
  * provided to one of these methods, a sub-new pool is created under the given
  * key to be managed by the containing <code>GenericKeyedObjectPool.</code>
+ * </p>
  * <p>
  * Note that the current implementation uses a ConcurrentHashMap which uses
  * equals() to compare keys.
  * This means that distinct instance keys must be distinguishable using equals.
+ * </p>
  * <p>
  * Optionally, one may configure the pool to examine and possibly evict objects
  * as they sit idle in the pool and to ensure that a minimum number of idle
@@ -62,12 +64,15 @@ import org.apache.tomcat.dbcp.pool2.PooledObjectState;
  * configuring this optional feature. Eviction runs contend with client threads
  * for access to objects in the pool, so if they run too frequently performance
  * issues may result.
+ * </p>
  * <p>
  * Implementation note: To prevent possible deadlocks, care has been taken to
  * ensure that no call to a factory method will occur within a synchronization
  * block. See POOL-125 and DBCP-44 for more information.
+ * </p>
  * <p>
  * This class is intended to be thread-safe.
+ * </p>
  *
  * @see GenericObjectPool
  *
@@ -382,7 +387,7 @@ public class GenericKeyedObjectPool<K, T> extends BaseGenericObjectPool<T>
                             throw nsee;
                         }
                     }
-                    if (p != null && (getTestOnBorrow() || create && getTestOnCreate())) {
+                    if (p != null && getTestOnBorrow()) {
                         boolean validate = false;
                         Throwable validationThrowable = null;
                         try {
@@ -446,6 +451,11 @@ public class GenericKeyedObjectPool<K, T> extends BaseGenericObjectPool<T>
     public void returnObject(final K key, final T obj) {
 
         final ObjectDeque<T> objectDeque = poolMap.get(key);
+
+        if (objectDeque == null) {
+            throw new IllegalStateException(
+                    "No keyed pool found under the given key.");
+        }
 
         final PooledObject<T> p = objectDeque.getAllObjects().get(new IdentityWrapper<>(obj));
 
@@ -520,8 +530,8 @@ public class GenericKeyedObjectPool<K, T> extends BaseGenericObjectPool<T>
 
     /**
      * Whether there is at least one thread waiting on this deque, add an pool object.
-     * @param key
-     * @param idleObjects
+     * @param key pool key.
+     * @param idleObjects list of idle pool objects.
      */
     private void whenWaitersAddObject(final K key, final LinkedBlockingDeque<PooledObject<T>> idleObjects) {
         if (idleObjects.hasTakeWaiters()) {
@@ -589,10 +599,9 @@ public class GenericKeyedObjectPool<K, T> extends BaseGenericObjectPool<T>
      */
     @Override
     public void clear() {
-        final Iterator<K> iter = poolMap.keySet().iterator();
 
-        while (iter.hasNext()) {
-            clear(iter.next());
+        for (K k : poolMap.keySet()) {
+            clear(k);
         }
     }
 
@@ -689,7 +698,7 @@ public class GenericKeyedObjectPool<K, T> extends BaseGenericObjectPool<T>
 
             // Stop the evictor before the pool is closed since evict() calls
             // assertOpen()
-            stopEvitor();
+            stopEvictor();
 
             closed = true;
             // This clear removes any idle objects
@@ -698,9 +707,8 @@ public class GenericKeyedObjectPool<K, T> extends BaseGenericObjectPool<T>
             jmxUnregister();
 
             // Release any threads that were waiting for an object
-            final Iterator<ObjectDeque<T>> iter = poolMap.values().iterator();
-            while (iter.hasNext()) {
-                iter.next().getIdleObjects().interuptTakeWaiters();
+            for (ObjectDeque<T> tObjectDeque : poolMap.values()) {
+                tObjectDeque.getIdleObjects().interuptTakeWaiters();
             }
             // This clear cleans up the keys now any waiting threads have been
             // interrupted
@@ -863,11 +871,11 @@ public class GenericKeyedObjectPool<K, T> extends BaseGenericObjectPool<T>
                 if(evictionIterator == null || !evictionIterator.hasNext()) {
                     if (evictionKeyIterator == null ||
                             !evictionKeyIterator.hasNext()) {
-                        final List<K> keyCopy = new ArrayList<>();
+                        final List<K> keyCopy;
                         final Lock readLock = keyLock.readLock();
                         readLock.lock();
                         try {
-                            keyCopy.addAll(poolKeyList);
+                            keyCopy = new ArrayList<>(poolKeyList);
                         } finally {
                             readLock.unlock();
                         }
@@ -1040,6 +1048,11 @@ public class GenericKeyedObjectPool<K, T> extends BaseGenericObjectPool<T>
         PooledObject<T> p = null;
         try {
             p = factory.makeObject(key);
+            if (getTestOnCreate() && !factory.validateObject(key, p)) {
+                numTotal.decrementAndGet();
+                objectDeque.getCreateCount().decrementAndGet();
+                return null;
+            }
         } catch (final Exception e) {
             numTotal.decrementAndGet();
             objectDeque.getCreateCount().decrementAndGet();
@@ -1072,8 +1085,16 @@ public class GenericKeyedObjectPool<K, T> extends BaseGenericObjectPool<T>
         final ObjectDeque<T> objectDeque = register(key);
 
         try {
-            final boolean isIdle = objectDeque.getIdleObjects().remove(toDestroy);
-
+            boolean isIdle;
+            synchronized(toDestroy) {
+                // Check idle state directly
+                isIdle = toDestroy.getState().equals(PooledObjectState.IDLE);
+                // If idle, not under eviction test, or always is true, remove instance,
+                // updating isIdle if instance is found in idle objects
+                if (isIdle || always) {
+                    isIdle = objectDeque.getIdleObjects().remove(toDestroy);
+                }
+            }
             if (isIdle || always) {
                 objectDeque.getAllObjects().remove(new IdentityWrapper<>(toDestroy.getObject()));
                 toDestroy.invalidate();
@@ -1145,26 +1166,27 @@ public class GenericKeyedObjectPool<K, T> extends BaseGenericObjectPool<T>
      * @param k The key to de-register
      */
     private void deregister(final K k) {
-        ObjectDeque<T> objectDeque;
-
-        objectDeque = poolMap.get(k);
-        final long numInterested = objectDeque.getNumInterested().decrementAndGet();
-        if (numInterested == 0 && objectDeque.getCreateCount().get() == 0) {
-            // Potential to remove key
-            final Lock writeLock = keyLock.writeLock();
-            writeLock.lock();
-            try {
-                if (objectDeque.getCreateCount().get() == 0 &&
-                        objectDeque.getNumInterested().get() == 0) {
+        Lock lock = keyLock.readLock();
+        try {
+            lock.lock();
+            final ObjectDeque<T> objectDeque = poolMap.get(k);
+            final long numInterested = objectDeque.getNumInterested().decrementAndGet();
+            if (numInterested == 0 && objectDeque.getCreateCount().get() == 0) {
+                // Potential to remove key
+                // Upgrade to write lock
+                lock.unlock();
+                lock = keyLock.writeLock();
+                lock.lock();
+                if (objectDeque.getCreateCount().get() == 0 && objectDeque.getNumInterested().get() == 0) {
                     // NOTE: Keys must always be removed from both poolMap and
                     //       poolKeyList at the same time while protected by
                     //       keyLock.writeLock()
                     poolMap.remove(k);
                     poolKeyList.remove(k);
                 }
-            } finally {
-                writeLock.unlock();
             }
+        } finally {
+            lock.unlock();
         }
     }
 
@@ -1335,16 +1357,14 @@ public class GenericKeyedObjectPool<K, T> extends BaseGenericObjectPool<T>
     public Map<String,Integer> getNumActivePerKey() {
         final HashMap<String,Integer> result = new HashMap<>();
 
-        final Iterator<Entry<K,ObjectDeque<T>>> iter = poolMap.entrySet().iterator();
-        while (iter.hasNext()) {
-            final Entry<K,ObjectDeque<T>> entry = iter.next();
+        for (Entry<K, ObjectDeque<T>> entry : poolMap.entrySet()) {
             if (entry != null) {
                 final K key = entry.getKey();
                 final ObjectDeque<T> objectDequeue = entry.getValue();
                 if (key != null && objectDequeue != null) {
                     result.put(key.toString(), Integer.valueOf(
                             objectDequeue.getAllObjects().size() -
-                            objectDequeue.getIdleObjects().size()));
+                                    objectDequeue.getIdleObjects().size()));
                 }
             }
         }
@@ -1364,11 +1384,10 @@ public class GenericKeyedObjectPool<K, T> extends BaseGenericObjectPool<T>
         int result = 0;
 
         if (getBlockWhenExhausted()) {
-            final Iterator<ObjectDeque<T>> iter = poolMap.values().iterator();
 
-            while (iter.hasNext()) {
+            for (ObjectDeque<T> tObjectDeque : poolMap.values()) {
                 // Assume no overflow
-                result += iter.next().getIdleObjects().getTakeQueueLength();
+                result += tObjectDeque.getIdleObjects().getTakeQueueLength();
             }
         }
 

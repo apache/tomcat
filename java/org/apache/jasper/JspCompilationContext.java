@@ -27,8 +27,8 @@ import java.net.URLConnection;
 import java.util.Set;
 import java.util.jar.JarEntry;
 
-import javax.servlet.ServletContext;
-import javax.servlet.jsp.tagext.TagInfo;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.jsp.tagext.TagInfo;
 
 import org.apache.jasper.compiler.Compiler;
 import org.apache.jasper.compiler.JspRuntimeContext;
@@ -82,7 +82,9 @@ public class JspCompilationContext {
 
     private volatile boolean removed = false;
 
-    private URLClassLoader jspLoader;
+    // volatile so changes are visible when multiple threads request a JSP file
+    // that has been modified
+    private volatile URLClassLoader jspLoader;
     private URL baseUrl;
     private Class<?> servletClass;
 
@@ -128,7 +130,7 @@ public class JspCompilationContext {
         this.baseURI = baseURI;
 
         this.rctxt = rctxt;
-        this.basePackageName = Constants.JSP_PACKAGE_NAME;
+        this.basePackageName = options.getGeneratedJspPackageName();
 
         this.tagInfo = tagInfo;
         this.tagJar = tagJar;
@@ -176,10 +178,8 @@ public class JspCompilationContext {
 
     public ClassLoader getJspLoader() {
         if( jspLoader == null ) {
-            jspLoader = new JasperLoader
-                    (new URL[] {baseUrl},
-                            getClassLoader(),
-                            rctxt.getPermissionCollection());
+            jspLoader = new JasperLoader(new URL[] {baseUrl}, getClassLoader(),
+                    basePackageName, rctxt.getPermissionCollection());
         }
         return jspLoader;
     }
@@ -454,11 +454,11 @@ public class JspCompilationContext {
         if (isTagFile()) {
             String className = tagInfo.getTagClassName();
             int lastIndex = className.lastIndexOf('.');
-            String pkgName = "";
+            String packageName = "";
             if (lastIndex != -1) {
-                pkgName = className.substring(0, lastIndex);
+                packageName = className.substring(0, lastIndex);
             }
-            return pkgName;
+            return packageName;
         } else {
             String dPackageName = getDerivedPackageName();
             if (dPackageName.length() == 0) {
@@ -767,4 +767,3 @@ public class JspCompilationContext {
         return result.toString();
     }
 }
-

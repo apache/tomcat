@@ -18,10 +18,10 @@ package org.apache.catalina.connector;
 
 import java.io.IOException;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -58,9 +58,9 @@ public class TestKeepAliveCount extends TomcatBaseTest {
             Context root = tomcat.addContext("", TEMP_DIR);
             Tomcat.addServlet(root, "Simple", new SimpleServlet());
             root.addServletMappingDecoded("/test", "Simple");
-            tomcat.getConnector().setProperty("maxKeepAliveRequests", "5");
-            tomcat.getConnector().setProperty("soTimeout", "20000");
-            tomcat.getConnector().setProperty("keepAliveTimeout", "50000");
+            Assert.assertTrue(tomcat.getConnector().setProperty("maxKeepAliveRequests", "5"));
+            Assert.assertTrue(tomcat.getConnector().setProperty("connectionTimeout", "20000"));
+            Assert.assertTrue(tomcat.getConnector().setProperty("keepAliveTimeout", "50000"));
             init = true;
         }
 

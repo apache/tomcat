@@ -64,9 +64,9 @@ public final class Library {
         if (!loaded) {
             String path = System.getProperty("java.library.path");
             String [] paths = path.split(File.pathSeparator);
-            for (int i = 0; i < NAMES.length; i++) {
+            for (String value : NAMES) {
                 try {
-                    System.loadLibrary(NAMES[i]);
+                    System.loadLibrary(value);
                     loaded = true;
                 } catch (ThreadDeath t) {
                     throw t;
@@ -75,9 +75,9 @@ public final class Library {
                     // the JNI code identical between Tomcat 6/7/8/9
                     throw t;
                 } catch (Throwable t) {
-                    String name = System.mapLibraryName(NAMES[i]);
-                    for (int j = 0; j < paths.length; j++) {
-                        java.io.File fd = new java.io.File(paths[j] , name);
+                    String name = System.mapLibraryName(value);
+                    for (String s : paths) {
+                        File fd = new File(s, name);
                         if (fd.exists()) {
                             // File exists but failed to load
                             throw t;
@@ -249,7 +249,7 @@ public final class Library {
                                                aprVersionString() + ")");
             }
             if (!APR_HAS_THREADS) {
-                throw new UnsatisfiedLinkError("Missing APR_HAS_THREADS");
+                throw new UnsatisfiedLinkError("Missing threading support from APR");
             }
         }
         return initialize();

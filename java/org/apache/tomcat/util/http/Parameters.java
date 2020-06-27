@@ -146,7 +146,7 @@ public final class Parameters {
         if (values == null) {
             return null;
         }
-        return values.toArray(new String[values.size()]);
+        return values.toArray(new String[0]);
     }
 
     public Enumeration<String> getParameterNames() {

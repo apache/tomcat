@@ -16,22 +16,29 @@
  */
 package org.apache.coyote.http2;
 
+import java.io.File;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.List;
 
-import javax.servlet.AsyncContext;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.AsyncContext;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.junit.Assert;
 import org.junit.Test;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.Wrapper;
+import org.apache.catalina.connector.Connector;
 import org.apache.catalina.startup.Tomcat;
+import org.apache.tomcat.util.compat.JrePlatform;
+import org.apache.tomcat.util.http.FastHttpDateFormat;
 
 public class TestStreamProcessor extends Http2TestBase {
 
@@ -111,6 +118,57 @@ public class TestStreamProcessor extends Http2TestBase {
     }
 
 
+    @Test
+    public void testPrepareHeaders() throws Exception {
+        enableHttp2();
+
+        Tomcat tomcat = getTomcatInstance();
+
+        File appDir = new File("test/webapp");
+        Context ctxt = tomcat.addWebapp(null, "", appDir.getAbsolutePath());
+
+        Tomcat.addServlet(ctxt, "simple", new SimpleServlet());
+        ctxt.addServletMappingDecoded("/simple", "simple");
+
+        tomcat.start();
+
+        openClientConnection();
+        doHttpUpgrade();
+        sendClientPreface();
+        validateHttp2InitialResponse();
+
+        byte[] frameHeader = new byte[9];
+        ByteBuffer headersPayload = ByteBuffer.allocate(128);
+
+        List<Header> headers = new ArrayList<>(3);
+        headers.add(new Header(":method", "GET"));
+        headers.add(new Header(":scheme", "http"));
+        headers.add(new Header(":path", "/index.html"));
+        headers.add(new Header(":authority", "localhost:" + getPort()));
+        headers.add(new Header("if-modified-since", FastHttpDateFormat.getCurrentDate()));
+
+        buildGetRequest(frameHeader, headersPayload, null, headers, 3);
+
+        writeFrame(frameHeader, headersPayload);
+
+        parser.readFrame(true);
+
+        StringBuilder expected = new StringBuilder();
+        expected.append("3-HeadersStart\n");
+        expected.append("3-Header-[:status]-[304]\n");
+        // Different line-endings -> different files size -> different weak eTag
+        if (JrePlatform.IS_WINDOWS) {
+            expected.append("3-Header-[etag]-[W/\"957-1447269522000\"]\n");
+        } else {
+            expected.append("3-Header-[etag]-[W/\"934-1447269522000\"]\n");
+        }
+        expected.append("3-Header-[date]-[Wed, 11 Nov 2015 19:18:42 GMT]\n");
+        expected.append("3-HeadersEnd\n");
+
+        Assert.assertEquals(expected.toString(), output.getTrace());
+    }
+
+
     private static final class AsyncComplete extends HttpServlet {
 
         private static final long serialVersionUID = 1L;
@@ -165,6 +223,85 @@ public class TestStreamProcessor extends Http2TestBase {
                     }
                 }
             });
+        }
+    }
+
+
+    @Test
+    public void testCompression() throws Exception {
+        enableHttp2();
+
+        Tomcat tomcat = getTomcatInstance();
+
+        Context ctxt = tomcat.addContext("", null);
+        Tomcat.addServlet(ctxt, "simple", new SimpleServlet());
+        ctxt.addServletMappingDecoded("/simple", "simple");
+        Tomcat.addServlet(ctxt, "compression", new CompressionServlet());
+        ctxt.addServletMappingDecoded("/compression", "compression");
+
+        // Enable compression
+        Connector connector = tomcat.getConnector();
+        Assert.assertTrue(connector.setProperty("compression", "on"));
+
+        tomcat.start();
+
+        enableHttp2();
+        openClientConnection();
+        doHttpUpgrade();
+        sendClientPreface();
+        validateHttp2InitialResponse();
+
+
+        byte[] frameHeader = new byte[9];
+        ByteBuffer headersPayload = ByteBuffer.allocate(128);
+
+        List<Header> headers = new ArrayList<>(3);
+        headers.add(new Header(":method", "GET"));
+        headers.add(new Header(":scheme", "http"));
+        headers.add(new Header(":path", "/compression"));
+        headers.add(new Header(":authority", "localhost:" + getPort()));
+        headers.add(new Header("accept-encoding", "gzip"));
+
+        buildGetRequest(frameHeader, headersPayload, null, headers, 3);
+
+        writeFrame(frameHeader, headersPayload);
+
+        readSimpleGetResponse();
+
+        Assert.assertEquals(
+                "3-HeadersStart\n" +
+                "3-Header-[:status]-[200]\n" +
+                "3-Header-[vary]-[accept-encoding]\n" +
+                "3-Header-[content-encoding]-[gzip]\n" +
+                "3-Header-[content-type]-[text/plain;charset=UTF-8]\n" +
+                "3-Header-[date]-[Wed, 11 Nov 2015 19:18:42 GMT]\n" +
+                "3-HeadersEnd\n" +
+                "3-Body-97\n" +
+                "3-EndOfStream\n", output.getTrace());
+    }
+
+
+    private static class CompressionServlet extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+                throws ServletException, IOException {
+            // Generate content type that is compressible
+            resp.setContentType("text/plain");
+            resp.setCharacterEncoding("UTF-8");
+
+            // Make ir large enough to trigger compression
+            int count = 64 * 1024;
+
+            // One bytes per entry
+            resp.setContentLengthLong(count);
+
+            OutputStream os = resp.getOutputStream();
+            for (int i = 0; i < count; i++) {
+                os.write('X');
+            }
         }
     }
 }

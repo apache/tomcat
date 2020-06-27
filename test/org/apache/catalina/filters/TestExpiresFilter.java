@@ -18,18 +18,19 @@
 package org.apache.catalina.filters;
 
 import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.URL;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.StringTokenizer;
 import java.util.TimeZone;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -41,8 +42,11 @@ import org.apache.catalina.filters.ExpiresFilter.ExpiresConfiguration;
 import org.apache.catalina.filters.ExpiresFilter.StartingPoint;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.tomcat.util.buf.ByteChunk;
+import org.apache.tomcat.util.collections.CaseInsensitiveKeyMap;
 import org.apache.tomcat.util.descriptor.web.FilterDef;
 import org.apache.tomcat.util.descriptor.web.FilterMap;
+import org.apache.tomcat.util.http.FastHttpDateFormat;
 
 public class TestExpiresFilter extends TomcatBaseTest {
     public static final String TEMP_DIR = System.getProperty("java.io.tmpdir");
@@ -366,12 +370,13 @@ public class TestExpiresFilter extends TomcatBaseTest {
 
     protected void validate(HttpServlet servlet, Integer expectedMaxAgeInSeconds)
             throws Exception {
-        validate(servlet, expectedMaxAgeInSeconds, HttpURLConnection.HTTP_OK);
+        validate(servlet, expectedMaxAgeInSeconds, HttpServletResponse.SC_OK);
     }
 
     protected void validate(HttpServlet servlet,
             Integer expectedMaxAgeInSeconds, int expectedResponseStatusCode)
             throws Exception {
+
         // SETUP
 
         Tomcat tomcat = getTomcatInstance();
@@ -408,16 +413,15 @@ public class TestExpiresFilter extends TomcatBaseTest {
             long timeBeforeInMillis = System.currentTimeMillis();
 
             // TEST
-            HttpURLConnection httpURLConnection = (HttpURLConnection) new URL(
-                    "http://localhost:" + tomcat.getConnector().getLocalPort() +
-                            "/test").openConnection();
+            ByteChunk bc = new ByteChunk();
+            Map<String,List<String>> responseHeaders = new HashMap<>();
+            int rc = getUrl("http://localhost:" + getPort() + "/test", bc, responseHeaders);
 
             // VALIDATE
-            Assert.assertEquals(expectedResponseStatusCode,
-                    httpURLConnection.getResponseCode());
+            Assert.assertEquals(expectedResponseStatusCode, rc);
 
             StringBuilder msg = new StringBuilder();
-            for (Entry<String, List<String>> field : httpURLConnection.getHeaderFields().entrySet()) {
+            for (Entry<String, List<String>> field : responseHeaders.entrySet()) {
                 for (String value : field.getValue()) {
                     msg.append((field.getKey() == null ? "" : field.getKey() +
                             ": ") +
@@ -428,7 +432,8 @@ public class TestExpiresFilter extends TomcatBaseTest {
 
             Integer actualMaxAgeInSeconds;
 
-            String cacheControlHeader = httpURLConnection.getHeaderField("Cache-Control");
+            String cacheControlHeader = getSingleHeader("Cache-Control", responseHeaders);
+
             if (cacheControlHeader == null) {
                 actualMaxAgeInSeconds = null;
             } else {
@@ -459,13 +464,15 @@ public class TestExpiresFilter extends TomcatBaseTest {
 
             Assert.assertNotNull(actualMaxAgeInSeconds);
 
+            String contentType = getSingleHeader("Content-Type", responseHeaders);
+
             int deltaInSeconds = Math.abs(actualMaxAgeInSeconds.intValue() -
                     expectedMaxAgeInSeconds.intValue());
             Assert.assertTrue("actualMaxAgeInSeconds: " +
                     actualMaxAgeInSeconds + ", expectedMaxAgeInSeconds: " +
                     expectedMaxAgeInSeconds + ", request time: " +
                     timeBeforeInMillis + " for content type " +
-                    httpURLConnection.getContentType(), deltaInSeconds < 3);
+                    contentType, deltaInSeconds < 3);
 
         } finally {
             tomcat.stop();
@@ -479,5 +486,86 @@ public class TestExpiresFilter extends TomcatBaseTest {
         String expected = "500, 503";
 
         Assert.assertEquals(expected, actual);
+    }
+
+
+    /*
+     * Tests Expires filter with:
+     * - per content type expires
+     * - no default
+     * - Default servlet returning 304s (without content-type)
+     */
+    @Test
+    public void testBug63909() throws Exception {
+
+        Tomcat tomcat = getTomcatInstanceTestWebapp(false, false);
+        Context ctxt = (Context) tomcat.getHost().findChild("/test");
+
+        FilterDef filterDef = new FilterDef();
+        filterDef.addInitParameter("ExpiresByType text/xml;charset=utf-8", "access plus 3 minutes");
+        filterDef.addInitParameter("ExpiresByType text/xml", "access plus 5 minutes");
+        filterDef.addInitParameter("ExpiresByType text", "access plus 7 minutes");
+        filterDef.addInitParameter("ExpiresExcludedResponseStatusCodes", "");
+
+        filterDef.setFilterClass(ExpiresFilter.class.getName());
+        filterDef.setFilterName(ExpiresFilter.class.getName());
+
+        ctxt.addFilterDef(filterDef);
+
+        FilterMap filterMap = new FilterMap();
+        filterMap.setFilterName(ExpiresFilter.class.getName());
+        filterMap.addURLPatternDecoded("*");
+        ctxt.addFilterMap(filterMap);
+
+        tomcat.start();
+
+        ByteChunk bc = new ByteChunk();
+        Map<String,List<String>> requestHeaders = new CaseInsensitiveKeyMap<>();
+        List<String> ifModifiedSinceValues = new ArrayList<>();
+        ifModifiedSinceValues.add(FastHttpDateFormat.getCurrentDate());
+        requestHeaders.put("If-Modified-Since", ifModifiedSinceValues);
+        Map<String,List<String>> responseHeaders = new CaseInsensitiveKeyMap<>();
+
+        int rc = getUrl("http://localhost:" + getPort() + "/test/bug6nnnn/bug69303.txt", bc, requestHeaders, responseHeaders);
+
+        Assert.assertEquals(HttpServletResponse.SC_NOT_MODIFIED, rc);
+
+        StringBuilder msg = new StringBuilder();
+        for (Entry<String, List<String>> field : responseHeaders.entrySet()) {
+            for (String value : field.getValue()) {
+                msg.append((field.getKey() == null ? "" : field.getKey() +
+                        ": ") +
+                        value + "\n");
+            }
+        }
+        System.out.println(msg);
+
+        Integer actualMaxAgeInSeconds;
+
+        String cacheControlHeader = getSingleHeader("Cache-Control", responseHeaders);
+
+        if (cacheControlHeader == null) {
+            actualMaxAgeInSeconds = null;
+        } else {
+            actualMaxAgeInSeconds = null;
+            StringTokenizer cacheControlTokenizer = new StringTokenizer(
+                    cacheControlHeader, ",");
+            while (cacheControlTokenizer.hasMoreTokens() &&
+                    actualMaxAgeInSeconds == null) {
+                String cacheDirective = cacheControlTokenizer.nextToken();
+                StringTokenizer cacheDirectiveTokenizer = new StringTokenizer(
+                        cacheDirective, "=");
+                if (cacheDirectiveTokenizer.countTokens() == 2) {
+                    String key = cacheDirectiveTokenizer.nextToken().trim();
+                    String value = cacheDirectiveTokenizer.nextToken().trim();
+                    if (key.equalsIgnoreCase("max-age")) {
+                        actualMaxAgeInSeconds = Integer.valueOf(value);
+                    }
+                }
+            }
+        }
+
+        Assert.assertNotNull(actualMaxAgeInSeconds);
+        Assert.assertTrue(Math.abs(actualMaxAgeInSeconds.intValue() - 420) < 3);
     }
 }

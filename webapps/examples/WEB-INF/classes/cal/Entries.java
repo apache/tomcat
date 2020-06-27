@@ -18,7 +18,7 @@ package cal;
 
 import java.util.Hashtable;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 public class Entries {
 

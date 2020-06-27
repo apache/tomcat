@@ -22,6 +22,7 @@ package org.apache.tomcat.dbcp.pool2.impl;
  * its own specific configuration attributes.
  * <p>
  * This class is immutable and thread-safe.
+ * </p>
  *
  * @since 2.0
  */

@@ -19,13 +19,13 @@ package org.apache.catalina.filters;
 import java.io.IOException;
 import java.nio.charset.Charset;
 
-import javax.servlet.FilterChain;
-import javax.servlet.FilterConfig;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpServletResponseWrapper;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.FilterConfig;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponseWrapper;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -106,17 +106,17 @@ public class AddDefaultCharsetFilter extends FilterBase {
         }
 
         @Override
-        public void setContentType(String ct) {
+        public void setContentType(String contentType) {
 
-            if (ct != null && ct.startsWith("text/")) {
-                if (!ct.contains("charset=")) {
-                    super.setContentType(ct + ";charset=" + encoding);
+            if (contentType != null && contentType.startsWith("text/")) {
+                if (!contentType.contains("charset=")) {
+                    super.setContentType(contentType + ";charset=" + encoding);
                 } else {
-                    super.setContentType(ct);
+                    super.setContentType(contentType);
                     encoding = getCharacterEncoding();
                 }
             } else {
-                super.setContentType(ct);
+                super.setContentType(contentType);
             }
 
         }

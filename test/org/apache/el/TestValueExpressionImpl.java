@@ -23,10 +23,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.el.ELContext;
-import javax.el.ExpressionFactory;
-import javax.el.ValueExpression;
-import javax.el.ValueReference;
+import jakarta.el.ELContext;
+import jakarta.el.ExpressionFactory;
+import jakarta.el.ValueExpression;
+import jakarta.el.ValueReference;
 
 import org.junit.Assert;
 import org.junit.Test;

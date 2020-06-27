@@ -524,6 +524,11 @@ public class ConnectionPool {
             log.warn("maxIdle is smaller than minIdle, setting maxIdle to: "+properties.getMinIdle());
             properties.setMaxIdle(properties.getMinIdle());
         }
+        if (properties.getMaxAge()>0 && properties.isPoolSweeperEnabled() &&
+                properties.getTimeBetweenEvictionRunsMillis()>properties.getMaxAge()) {
+            log.warn("timeBetweenEvictionRunsMillis is larger than maxAge, setting timeBetweenEvictionRunsMillis to: " + properties.getMaxAge());
+            properties.setTimeBetweenEvictionRunsMillis((int)properties.getMaxAge());
+        }
     }
 
     public void initializePoolCleaner(PoolConfiguration properties) {
@@ -824,10 +829,9 @@ public class ConnectionPool {
             try {
                 con.reconnect();
                 reconnectedCount.incrementAndGet();
-                int validationMode = getPoolProperties().isTestOnConnect() || getPoolProperties().getInitSQL()!=null ?
-                    PooledConnection.VALIDATE_INIT :
-                    PooledConnection.VALIDATE_BORROW;
-
+                int validationMode = isInitNewConnections() ?
+                        PooledConnection.VALIDATE_INIT:
+                        PooledConnection.VALIDATE_BORROW;
                 if (con.validate(validationMode)) {
                     //set the timestamp
                     con.setTimestamp(now);
@@ -861,6 +865,18 @@ public class ConnectionPool {
             }
         }
     }
+
+    /**
+     * Returns whether new connections should be initialized by invoking
+     * {@link PooledConnection#validate(int)} with {@link PooledConnection#VALIDATE_INIT}.
+     *
+     * @return true if pool is either configured to test connections on connect or a non-NULL init
+     * SQL has been configured
+     */
+    private boolean isInitNewConnections() {
+        return getPoolProperties().isTestOnConnect() || getPoolProperties().getInitSQL()!=null;
+    }
+
     /**
      * Terminate the current transaction for the given connection.
      * @param con The connection
@@ -898,8 +914,32 @@ public class ConnectionPool {
         if (isClosed()) return true;
         if (!con.validate(action)) return true;
         if (!terminateTransaction(con)) return true;
-        if (con.isMaxAgeExpired()) return true;
-        else return false;
+        return false;
+    }
+
+    /**
+     * Checks whether this connection has {@link PooledConnection#isMaxAgeExpired() expired} and tries to reconnect if it has.
+     * @param con PooledConnection
+     * @return true if the connection was either not expired or expired but reconnecting succeeded,
+     * false if reconnecting failed (either because a new connection could not be established or
+     * validating the newly created connection failed)
+     * @see PooledConnection#isMaxAgeExpired()
+     */
+    protected boolean reconnectIfExpired(PooledConnection con) {
+        if (con.isMaxAgeExpired()) {
+            try {
+                if (log.isDebugEnabled()) log.debug( "Connection ["+this+"] expired because of maxAge, trying to reconnect" );
+                con.reconnect();
+                reconnectedCount.incrementAndGet();
+                if ( isInitNewConnections() && !con.validate( PooledConnection.VALIDATE_INIT)) {
+                    return false;
+                }
+            } catch(Exception e) {
+                log.error("Failed to re-connect connection ["+this+"] that expired because of maxAge",e);
+                return false;
+            }
+        }
+        return true;
     }
 
     /**
@@ -933,7 +973,7 @@ public class ConnectionPool {
                 }
                 if (busy.remove(con)) {
 
-                    if (!shouldClose(con,PooledConnection.VALIDATE_RETURN)) {
+                    if (!shouldClose(con,PooledConnection.VALIDATE_RETURN) && reconnectIfExpired(con)) {
                         con.clearWarnings();
                         con.setStackTrace(null);
                         con.setTimestamp(System.currentTimeMillis());
@@ -1071,6 +1111,15 @@ public class ConnectionPool {
      * Forces a validation of all idle connections if {@link PoolProperties#testWhileIdle} is set.
      */
     public void testAllIdle() {
+        testAllIdle(false);
+    }
+
+    /**
+     * Forces a validation of all idle connections if {@link PoolProperties#testWhileIdle} is set.
+     * @param checkMaxAgeOnly whether to only check {@link PooledConnection#isMaxAgeExpired()} but
+     *                        not invoke {@link PooledConnection#validate(int)}
+     */
+    public void testAllIdle(boolean checkMaxAgeOnly) {
         try {
             if (idle.isEmpty()) return;
             Iterator<PooledConnection> unlocked = idle.iterator();
@@ -1081,7 +1130,14 @@ public class ConnectionPool {
                     //the con been taken out, we can't clean it up
                     if (busy.contains(con))
                         continue;
-                    if (!con.validate(PooledConnection.VALIDATE_IDLE)) {
+
+                    boolean release;
+                    if (checkMaxAgeOnly) {
+                        release = !reconnectIfExpired(con);
+                    } else {
+                        release = !reconnectIfExpired(con) || !con.validate(PooledConnection.VALIDATE_IDLE);
+                    }
+                    if (release) {
                         idle.remove(con);
                         release(con);
                     }
@@ -1469,8 +1525,11 @@ public class ConnectionPool {
                     if (pool.getPoolProperties().getMinIdle() < pool.idle
                             .size())
                         pool.checkIdle();
-                    if (pool.getPoolProperties().isTestWhileIdle())
-                        pool.testAllIdle();
+                    if (pool.getPoolProperties().isTestWhileIdle()) {
+                        pool.testAllIdle(false);
+                    } else if (pool.getPoolProperties().getMaxAge() > 0) {
+                        pool.testAllIdle(true);
+                    }
                 } catch (Exception x) {
                     log.error("", x);
                 }

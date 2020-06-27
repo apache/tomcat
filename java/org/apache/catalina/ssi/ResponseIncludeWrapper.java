@@ -22,14 +22,14 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.util.Locale;
 
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpServletResponseWrapper;
+import jakarta.servlet.ServletOutputStream;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponseWrapper;
 
 import org.apache.tomcat.util.http.FastHttpDateFormat;
 
 /**
- * A HttpServletResponseWrapper, used from
+ * An HttpServletResponseWrapper, used from
  * <code>SSIServletExternalResolver</code>
  *
  * @author Bip Thelin
@@ -81,7 +81,7 @@ public class ResponseIncludeWrapper extends HttpServletResponseWrapper {
 
 
     /**
-     * Return a printwriter, throws and exception if a OutputStream already
+     * Return a printwriter, throws and exception if an OutputStream already
      * been returned.
      *
      * @return a PrintWriter object
@@ -104,10 +104,10 @@ public class ResponseIncludeWrapper extends HttpServletResponseWrapper {
 
 
     /**
-     * Return a OutputStream, throws and exception if a printwriter already
+     * Return an OutputStream, throws and exception if a printwriter already
      * been returned.
      *
-     * @return a OutputStream object
+     * @return an OutputStream object
      * @exception java.io.IOException
      *                if the printwriter already been called
      */

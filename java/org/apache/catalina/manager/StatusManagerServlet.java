@@ -34,10 +34,11 @@ import javax.management.Notification;
 import javax.management.NotificationListener;
 import javax.management.ObjectInstance;
 import javax.management.ObjectName;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.apache.catalina.util.ServerInfo;
 import org.apache.tomcat.util.modeler.Registry;
@@ -119,15 +120,10 @@ public class StatusManagerServlet
             onStr = "*:type=ThreadPool,*";
             objectName = new ObjectName(onStr);
             set = mBeanServer.queryMBeans(objectName, null);
-            onStr = "*:type=ThreadPool,*,subType=SocketProperties";
-            objectName = new ObjectName(onStr);
-            Set<ObjectInstance> set2 = mBeanServer.queryMBeans(objectName, null);
             iterator = set.iterator();
             while (iterator.hasNext()) {
                 ObjectInstance oi = iterator.next();
-                if (!set2.contains(oi)) {
-                    threadPools.addElement(oi.getObjectName());
-                }
+                threadPools.addElement(oi.getObjectName());
             }
 
             // Query Global Request Processors

@@ -36,6 +36,7 @@ public class StandardJarScanFilter implements JarScanFilter {
     private static final String defaultScan;
     private static final Set<String> defaultSkipSet = new HashSet<>();
     private static final Set<String> defaultScanSet = new HashSet<>();
+    private static final boolean defaultSkipAll;
 
     static {
         // Initialize defaults. There are no setter methods for them.
@@ -43,6 +44,7 @@ public class StandardJarScanFilter implements JarScanFilter {
         populateSetFromAttribute(defaultSkip, defaultSkipSet);
         defaultScan = System.getProperty(Constants.SCAN_JARS_PROPERTY);
         populateSetFromAttribute(defaultScan, defaultScanSet);
+        defaultSkipAll = (defaultSkipSet.contains("*") || defaultSkipSet.contains("*.jar")) && defaultScanSet.isEmpty();
     }
 
     private String tldSkip;
@@ -129,6 +131,12 @@ public class StandardJarScanFilter implements JarScanFilter {
         } finally {
             writeLock.unlock();
         }
+    }
+
+
+    @Override
+    public boolean isSkipAll() {
+        return defaultSkipAll;
     }
 
 

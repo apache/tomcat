@@ -257,7 +257,7 @@ public class CallMethodRule extends Rule {
             throws Exception {
 
         if (paramCount == 0) {
-            this.bodyText = bodyText.trim();
+            this.bodyText = bodyText.trim().intern();
         }
 
     }
@@ -383,6 +383,24 @@ public class CallMethodRule extends Rule {
         Object result = IntrospectionUtils.callMethodN(target, methodName,
                 paramValues, paramTypes);
         processMethodCallResult(result);
+
+        StringBuilder code = digester.getGeneratedCode();
+        if (code != null) {
+            code.append(digester.toVariableName(target)).append(".").append(methodName);
+            code.append("(");
+            for (int i = 0; i < paramValues.length; i++) {
+                if (i > 0) {
+                    code.append(",");
+                }
+                if (bodyText != null) {
+                    code.append("\"").append(bodyText).append("\"");
+                } else {
+                    code.append(digester.toVariableName(paramValues[i]));
+                }
+            }
+            code.append(");");
+            code.append(System.lineSeparator());
+        }
     }
 
 

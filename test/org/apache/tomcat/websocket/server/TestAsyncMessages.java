@@ -20,11 +20,11 @@ import java.net.URI;
 import java.nio.ByteBuffer;
 import java.util.concurrent.CountDownLatch;
 
-import javax.websocket.ClientEndpointConfig;
-import javax.websocket.ContainerProvider;
-import javax.websocket.MessageHandler;
-import javax.websocket.Session;
-import javax.websocket.WebSocketContainer;
+import jakarta.websocket.ClientEndpointConfig;
+import jakarta.websocket.ContainerProvider;
+import jakarta.websocket.MessageHandler;
+import jakarta.websocket.Session;
+import jakarta.websocket.WebSocketContainer;
 
 import org.junit.Assert;
 import org.junit.Ignore;

@@ -147,21 +147,44 @@ public class TestHttp2Section_5_1 extends Http2TestBase {
 
     @Test
     public void testImplicitClose() throws Exception {
+        doTestImplicitClose(5);
+    }
+
+
+    // https://bz.apache.org/bugzilla/show_bug.cgi?id=64467
+    @Test
+    public void testImplicitCloseLargeId() throws Exception {
+        doTestImplicitClose(Integer.MAX_VALUE - 8);
+    }
+
+
+    private void doTestImplicitClose(int lastStreamId) throws Exception {
+
+        long startFirst = System.nanoTime();
         http2Connect();
+        long durationFirst = System.nanoTime() - startFirst;
 
         sendPriority(3, 0, 16);
-        sendPriority(5, 0, 16);
+        sendPriority(lastStreamId, 0, 16);
 
-        sendSimpleGetRequest(5);
+        long startSecond = System.nanoTime();
+        sendSimpleGetRequest(lastStreamId);
         readSimpleGetResponse();
-        Assert.assertEquals(getSimpleResponseTrace(5), output.getTrace());
+        long durationSecond = System.nanoTime() - startSecond;
+
+        Assert.assertEquals(getSimpleResponseTrace(lastStreamId), output.getTrace());
         output.clearTrace();
+
+        // Allow second request to take up to 5 times first request or up to 1 second - whichever is the larger - mainly
+        // to allow for CI systems under load that can exhibit significant timing variation.
+        Assert.assertTrue("First request took [" + durationFirst/1000000 + "ms], second request took [" +
+                durationSecond/1000000 + "ms]", durationSecond < 1000000000 || durationSecond < durationFirst * 3);
 
         // Should trigger an error since stream 3 should have been implicitly
         // closed.
         sendSimpleGetRequest(3);
 
-        handleGoAwayResponse(5);
+        handleGoAwayResponse(lastStreamId);
     }
 
 

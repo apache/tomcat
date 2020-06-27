@@ -21,8 +21,8 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.CompletionHandler;
 
-import javax.websocket.CloseReason;
-import javax.websocket.CloseReason.CloseCodes;
+import jakarta.websocket.CloseReason;
+import jakarta.websocket.CloseReason.CloseCodes;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;

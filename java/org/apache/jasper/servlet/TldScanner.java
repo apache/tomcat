@@ -32,9 +32,9 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
-import javax.servlet.ServletContext;
-import javax.servlet.descriptor.JspConfigDescriptor;
-import javax.servlet.descriptor.TaglibDescriptor;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.descriptor.JspConfigDescriptor;
+import jakarta.servlet.descriptor.TaglibDescriptor;
 
 import org.apache.jasper.compiler.JarScannerFactory;
 import org.apache.jasper.compiler.Localizer;
@@ -272,10 +272,6 @@ public class TldScanner {
     }
 
     protected void parseTld(TldResourcePath path) throws IOException, SAXException {
-        if (tldResourcePathTaglibXmlMap.containsKey(path)) {
-            // TLD has already been parsed as a result of processing web.xml
-            return;
-        }
         TaglibXml tld = tldParser.parse(path);
         String uri = tld.getUri();
         if (uri != null) {
@@ -283,6 +279,12 @@ public class TldScanner {
                 uriTldResourcePathMap.put(uri, path);
             }
         }
+
+        if (tldResourcePathTaglibXmlMap.containsKey(path)) {
+            // TLD has already been parsed as a result of processing web.xml
+            return;
+        }
+
         tldResourcePathTaglibXmlMap.put(path, tld);
         if (tld.getListeners() != null) {
             listeners.addAll(tld.getListeners());

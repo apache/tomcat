@@ -26,11 +26,11 @@ import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-import javax.websocket.ClientEndpointConfig.Builder;
-import javax.websocket.ContainerProvider;
-import javax.websocket.Endpoint;
-import javax.websocket.Session;
-import javax.websocket.WebSocketContainer;
+import jakarta.websocket.ClientEndpointConfig.Builder;
+import jakarta.websocket.ContainerProvider;
+import jakarta.websocket.Endpoint;
+import jakarta.websocket.Session;
+import jakarta.websocket.WebSocketContainer;
 
 import org.junit.Assert;
 import org.junit.Test;

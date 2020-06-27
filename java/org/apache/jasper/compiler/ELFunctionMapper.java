@@ -26,7 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.servlet.jsp.tagext.FunctionInfo;
+import jakarta.servlet.jsp.tagext.FunctionInfo;
 
 import org.apache.jasper.Constants;
 import org.apache.jasper.JasperException;
@@ -239,8 +239,7 @@ public class ELFunctionMapper {
                         int iArray = params[k].indexOf('[');
                         if (iArray < 0) {
                             ds.append(params[k] + ".class");
-                        }
-                        else {
+                        } else {
                             String baseType = params[k].substring(0, iArray);
                             ds.append("java.lang.reflect.Array.newInstance(");
                             ds.append(baseType);
@@ -296,7 +295,7 @@ public class ELFunctionMapper {
         }
 
         /*
-         * @return An unique name for a function mapper.
+         * @return A unique name for a function mapper.
          */
         private String getMapName() {
             return "_jspx_fnmap_" + currFunc++;

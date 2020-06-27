@@ -19,8 +19,8 @@ package org.apache.jasper.runtime;
 import java.math.RoundingMode;
 import java.util.Collections;
 
-import javax.servlet.DispatcherType;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.DispatcherType;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -58,9 +58,9 @@ public class TestJspContextWrapper extends TomcatBaseTest {
         String result = out.toString();
 
         Assert.assertTrue(result, result.contains("00-" + DispatcherType.ASYNC));
-        // No obvious status fields for javax.servlet.http
+        // No obvious status fields for jakarta.servlet.http
         // Could hack something with HttpUtils...
-        // No obvious status fields for javax.servlet.jsp
+        // No obvious status fields for jakarta.servlet.jsp
         // Wild card (package) import
         Assert.assertTrue(result, result.contains("01-" + RoundingMode.HALF_UP));
         // Class import

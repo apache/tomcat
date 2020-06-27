@@ -1,5 +1,4 @@
-/**
- *
+/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -7,13 +6,13 @@
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package org.apache.tomcat.dbcp.dbcp2;
 
@@ -50,7 +49,7 @@ import javax.sql.CommonDataSource;
 public class Jdbc41Bridge {
 
     /**
-     * Delegates to {@link Connection#abort(Executor)} without throwing a {@link AbstractMethodError}.
+     * Delegates to {@link Connection#abort(Executor)} without throwing an {@link AbstractMethodError}.
      * <p>
      * If the JDBC driver does not implement {@link Connection#abort(Executor)}, then call {@link Connection#close()}.
      * </p>
@@ -95,7 +94,7 @@ public class Jdbc41Bridge {
     }
 
     /**
-     * Delegates to {@link Connection#getNetworkTimeout()} without throwing a {@link AbstractMethodError}.
+     * Delegates to {@link Connection#getNetworkTimeout()} without throwing an {@link AbstractMethodError}.
      * <p>
      * If the JDBC driver does not implement {@link Connection#getNetworkTimeout()}, then return 0.
      * </p>
@@ -116,7 +115,7 @@ public class Jdbc41Bridge {
     }
 
     /**
-     * Delegates to {@link ResultSet#getObject(int, Class)} without throwing a {@link AbstractMethodError}.
+     * Delegates to {@link ResultSet#getObject(int, Class)} without throwing an {@link AbstractMethodError}.
      * <p>
      * If the JDBC driver does not implement {@link ResultSet#getObject(int, Class)}, then return 0.
      * </p>
@@ -216,7 +215,7 @@ public class Jdbc41Bridge {
     }
 
     /**
-     * Delegates to {@link ResultSet#getObject(String, Class)} without throwing a {@link AbstractMethodError}.
+     * Delegates to {@link ResultSet#getObject(String, Class)} without throwing an {@link AbstractMethodError}.
      *
      * @param <T>
      *            See {@link ResultSet#getObject(String, Class)}
@@ -305,7 +304,7 @@ public class Jdbc41Bridge {
                 return (T) resultSet.getURL(columnLabel);
             }
             throw new SQLFeatureNotSupportedException(
-                    String.format("resultSet=%s, columnLabel=%,d, type=%s", resultSet, columnLabel, type));
+                    String.format("resultSet=%s, columnLabel=%s, type=%s", resultSet, columnLabel, type));
         }
     }
 
@@ -344,7 +343,7 @@ public class Jdbc41Bridge {
     }
 
     /**
-     * Delegates to {@link Connection#getSchema()} without throwing a {@link AbstractMethodError}.
+     * Delegates to {@link Connection#getSchema()} without throwing an {@link AbstractMethodError}.
      * <p>
      * If the JDBC driver does not implement {@link Connection#getSchema()}, then return null.
      * </p>
@@ -366,7 +365,7 @@ public class Jdbc41Bridge {
     }
 
     /**
-     * Delegates to {@link Connection#setNetworkTimeout(Executor, int)} without throwing a {@link AbstractMethodError}.
+     * Delegates to {@link Connection#setNetworkTimeout(Executor, int)} without throwing an {@link AbstractMethodError}.
      * <p>
      * If the JDBC driver does not implement {@link Connection#setNetworkTimeout(Executor, int)}, then do nothing.
      * </p>
@@ -391,7 +390,7 @@ public class Jdbc41Bridge {
     }
 
     /**
-     * Delegates to {@link Connection#setSchema(String)} without throwing a {@link AbstractMethodError}.
+     * Delegates to {@link Connection#setSchema(String)} without throwing an {@link AbstractMethodError}.
      * <p>
      * If the JDBC driver does not implement {@link Connection#setSchema(String)}, then do nothing.
      * </p>
@@ -413,10 +412,10 @@ public class Jdbc41Bridge {
     }
 
     /**
-     * Delegates to {@link Statement#closeOnCompletion()} without throwing a {@link AbstractMethodError}.
+     * Delegates to {@link Statement#closeOnCompletion()} without throwing an {@link AbstractMethodError}.
      * <p>
      * If the JDBC driver does not implement {@link Statement#closeOnCompletion()}, then just check that the connection
-     * is closed to then throw a SQLException.
+     * is closed to then throw an SQLException.
      * </p>
      *
      * @param statement
@@ -436,10 +435,10 @@ public class Jdbc41Bridge {
     }
 
     /**
-     * Delegates to {@link Statement#isCloseOnCompletion()} without throwing a {@link AbstractMethodError}.
+     * Delegates to {@link Statement#isCloseOnCompletion()} without throwing an {@link AbstractMethodError}.
      * <p>
      * If the JDBC driver does not implement {@link Statement#isCloseOnCompletion()}, then just check that the
-     * connection is closed to then throw a SQLException.
+     * connection is closed to then throw an SQLException.
      * </p>
      *
      * @param statement
@@ -461,7 +460,7 @@ public class Jdbc41Bridge {
     }
 
     /**
-     * Delegates to {@link CommonDataSource#getParentLogger()} without throwing a {@link AbstractMethodError}.
+     * Delegates to {@link CommonDataSource#getParentLogger()} without throwing an {@link AbstractMethodError}.
      * <p>
      * If the JDBC driver does not implement {@link CommonDataSource#getParentLogger()}, then return null.
      * </p>

@@ -16,7 +16,7 @@
  */
 package org.apache.jasper.tagplugins.jstl.core;
 
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.junit.Assert;
 import org.junit.Test;

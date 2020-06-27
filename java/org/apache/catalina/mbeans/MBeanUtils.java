@@ -92,9 +92,9 @@ public class MBeanUtils {
 
         // Deal with exceptions to the standard rule
         String className = component.getClass().getName();
-        for (int i = 0; i < exceptions.length; i++) {
-            if (className.equals(exceptions[i][0])) {
-                return exceptions[i][1];
+        for (String[] exception : exceptions) {
+            if (className.equals(exception[0])) {
+                return exception[1];
             }
         }
 

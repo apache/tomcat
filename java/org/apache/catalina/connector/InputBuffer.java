@@ -29,7 +29,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import javax.servlet.ReadListener;
+import jakarta.servlet.ReadListener;
 
 import org.apache.catalina.security.SecurityUtil;
 import org.apache.coyote.ActionCode;

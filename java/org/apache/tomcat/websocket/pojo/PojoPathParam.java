@@ -16,17 +16,17 @@
  */
 package org.apache.tomcat.websocket.pojo;
 
-import javax.websocket.DeploymentException;
+import jakarta.websocket.DeploymentException;
 
 import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.websocket.Util;
 
 /**
  * Stores the parameter type and name for a parameter that needs to be passed to
- * an onXxx method of {@link javax.websocket.Endpoint}. The name is only present
+ * an onXxx method of {@link jakarta.websocket.Endpoint}. The name is only present
  * for parameters annotated with
- * {@link javax.websocket.server.PathParam}. For the
- * {@link javax.websocket.Session} and {@link java.lang.Throwable} parameters,
+ * {@link jakarta.websocket.server.PathParam}. For the
+ * {@link jakarta.websocket.Session} and {@link java.lang.Throwable} parameters,
  * {@link #getName()} will always return <code>null</code>.
  */
 public class PojoPathParam {

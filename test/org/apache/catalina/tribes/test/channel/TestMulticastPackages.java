@@ -130,8 +130,12 @@ public class TestMulticastPackages {
                 }
             };
         }
-        for (int x=0; x<threads.length; x++ ) { threads[x].start();}
-        for (int x=0; x<threads.length; x++ ) { threads[x].join();}
+        for (Thread thread : threads) {
+            thread.start();
+        }
+        for (Thread thread : threads) {
+            thread.join();
+        }
         //sleep for 50 sec, let the other messages in
         long start = System.currentTimeMillis();
         while ( (System.currentTimeMillis()-start)<25000 && msgCount*threadCount!=listener1.count.get()) Thread.sleep(500);

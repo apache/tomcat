@@ -29,20 +29,20 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
-import javax.servlet.ServletContextEvent;
-import javax.websocket.ClientEndpointConfig;
-import javax.websocket.ContainerProvider;
-import javax.websocket.DeploymentException;
-import javax.websocket.Endpoint;
-import javax.websocket.EndpointConfig;
-import javax.websocket.Extension;
-import javax.websocket.MessageHandler;
-import javax.websocket.OnMessage;
-import javax.websocket.Session;
-import javax.websocket.WebSocketContainer;
-import javax.websocket.server.ServerContainer;
-import javax.websocket.server.ServerEndpoint;
-import javax.websocket.server.ServerEndpointConfig;
+import jakarta.servlet.ServletContextEvent;
+import jakarta.websocket.ClientEndpointConfig;
+import jakarta.websocket.ContainerProvider;
+import jakarta.websocket.DeploymentException;
+import jakarta.websocket.Endpoint;
+import jakarta.websocket.EndpointConfig;
+import jakarta.websocket.Extension;
+import jakarta.websocket.MessageHandler;
+import jakarta.websocket.OnMessage;
+import jakarta.websocket.Session;
+import jakarta.websocket.WebSocketContainer;
+import jakarta.websocket.server.ServerContainer;
+import jakarta.websocket.server.ServerEndpoint;
+import jakarta.websocket.server.ServerEndpointConfig;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -119,7 +119,7 @@ public class TestWsWebSocketContainer extends WebSocketBaseTest {
     }
 
 
-    @Test(expected=javax.websocket.DeploymentException.class)
+    @Test(expected=jakarta.websocket.DeploymentException.class)
     public void testConnectToServerEndpointInvalidScheme() throws Exception {
         Tomcat tomcat = getTomcatInstance();
         // No file system docBase required
@@ -137,7 +137,7 @@ public class TestWsWebSocketContainer extends WebSocketBaseTest {
     }
 
 
-    @Test(expected=javax.websocket.DeploymentException.class)
+    @Test(expected=jakarta.websocket.DeploymentException.class)
     public void testConnectToServerEndpointNoHost() throws Exception {
         Tomcat tomcat = getTomcatInstance();
         // No file system docBase required

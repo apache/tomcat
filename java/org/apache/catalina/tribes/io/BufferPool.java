@@ -17,68 +17,75 @@
 package org.apache.catalina.tribes.io;
 
 
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.atomic.AtomicInteger;
+
 import org.apache.catalina.tribes.util.StringManager;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
-/**
- *
- *
- * @version 1.0
- */
 public class BufferPool {
     private static final Log log = LogFactory.getLog(BufferPool.class);
 
-    public static final int DEFAULT_POOL_SIZE = 100*1024*1024; //100MB
+    public static final int DEFAULT_POOL_SIZE =
+            Integer.getInteger("org.apache.catalina.tribes.io.BufferPool.DEFAULT_POOL_SIZE", 100*1024*1024).intValue(); //100MB
 
     protected static final StringManager sm = StringManager.getManager(BufferPool.class);
 
-
-
     protected static volatile BufferPool instance = null;
-    protected final BufferPoolAPI pool;
-
-    private BufferPool(BufferPoolAPI pool) {
-        this.pool = pool;
-    }
-
-    public XByteBuffer getBuffer(int minSize, boolean discard) {
-        if ( pool != null ) return pool.getBuffer(minSize, discard);
-        else return new XByteBuffer(minSize,discard);
-    }
-
-    public void returnBuffer(XByteBuffer buffer) {
-        if ( pool != null ) pool.returnBuffer(buffer);
-    }
-
-    public void clear() {
-        if ( pool != null ) pool.clear();
-    }
-
 
     public static BufferPool getBufferPool() {
         if (instance == null) {
             synchronized (BufferPool.class) {
                 if (instance == null) {
-                   BufferPoolAPI pool = new BufferPool15Impl();
-                   pool.setMaxSize(DEFAULT_POOL_SIZE);
-                   log.info(sm.getString("bufferPool.created",
-                           Integer.toString(DEFAULT_POOL_SIZE), pool.getClass().getName()));
-                   instance = new BufferPool(pool);
+                    BufferPool pool = new BufferPool();
+                    pool.setMaxSize(DEFAULT_POOL_SIZE);
+                    log.info(sm.getString("bufferPool.created",
+                            Integer.toString(DEFAULT_POOL_SIZE),
+                            pool.getClass().getName()));
+                    instance = pool;
                 }
             }
         }
         return instance;
     }
 
-
-    public static interface BufferPoolAPI {
-        public void setMaxSize(int bytes);
-
-        public XByteBuffer getBuffer(int minSize, boolean discard);
-
-        public void returnBuffer(XByteBuffer buffer);
-
-        public void clear();
+    private BufferPool() {
     }
+
+    public XByteBuffer getBuffer(int minSize, boolean discard) {
+        XByteBuffer buffer = queue.poll();
+        if ( buffer != null ) size.addAndGet(-buffer.getCapacity());
+        if ( buffer == null ) buffer = new XByteBuffer(minSize,discard);
+        else if ( buffer.getCapacity() <= minSize ) buffer.expand(minSize);
+        buffer.setDiscard(discard);
+        buffer.reset();
+        return buffer;
+    }
+
+    public void returnBuffer(XByteBuffer buffer) {
+        if ( (size.get() + buffer.getCapacity()) <= maxSize ) {
+            size.addAndGet(buffer.getCapacity());
+            queue.offer(buffer);
+        }
+    }
+
+    public void clear() {
+        queue.clear();
+        size.set(0);
+    }
+
+    protected int maxSize;
+    protected final AtomicInteger size = new AtomicInteger(0);
+    protected final ConcurrentLinkedQueue<XByteBuffer> queue =
+            new ConcurrentLinkedQueue<>();
+
+    public void setMaxSize(int bytes) {
+        this.maxSize = bytes;
+    }
+
+    public int getMaxSize() {
+        return maxSize;
+    }
+
 }

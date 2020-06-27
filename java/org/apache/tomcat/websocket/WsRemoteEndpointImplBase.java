@@ -33,15 +33,15 @@ import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import javax.websocket.CloseReason;
-import javax.websocket.CloseReason.CloseCodes;
-import javax.websocket.DeploymentException;
-import javax.websocket.EncodeException;
-import javax.websocket.Encoder;
-import javax.websocket.EndpointConfig;
-import javax.websocket.RemoteEndpoint;
-import javax.websocket.SendHandler;
-import javax.websocket.SendResult;
+import jakarta.websocket.CloseReason;
+import jakarta.websocket.CloseReason.CloseCodes;
+import jakarta.websocket.DeploymentException;
+import jakarta.websocket.EncodeException;
+import jakarta.websocket.Encoder;
+import jakarta.websocket.EndpointConfig;
+import jakarta.websocket.RemoteEndpoint;
+import jakarta.websocket.SendHandler;
+import jakarta.websocket.SendResult;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -338,7 +338,12 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
                 intermediateMessageHandler,
                 new EndMessageHandler(this, handler), -1));
 
-        messageParts = transformation.sendMessagePart(messageParts);
+        try {
+            messageParts = transformation.sendMessagePart(messageParts);
+        } catch (IOException ioe) {
+            handler.onResult(new SendResult(ioe));
+            return;
+        }
 
         // Some extensions/transformations may buffer messages so it is possible
         // that no message parts will be returned. If this is the case the
@@ -836,7 +841,7 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
         private final ByteBuffer outputBuffer;
         private final boolean flushRequired;
         private final WsRemoteEndpointImplBase endpoint;
-        private int maskIndex = 0;
+        private volatile int maskIndex = 0;
 
         public OutputBufferSendHandler(SendHandler completion,
                 long blockingWriteTimeoutExpiry,
@@ -1253,7 +1258,7 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
 
     private static class BlockingSendHandler implements SendHandler {
 
-        private SendResult sendResult = null;
+        private volatile SendResult sendResult = null;
 
         @Override
         public void onResult(SendResult result) {

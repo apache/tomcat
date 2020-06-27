@@ -508,7 +508,7 @@ public class MyBean2 {
     (including the name of the SMTP host to be used for message sending).</p>
 
     <p>Tomcat includes a standard resource factory that will create
-    <code>javax.mail.Session</code> session instances for you, already
+    <code>jakarta.mail.Session</code> session instances for you, already
     configured to connect to an SMTP server.
     In this way, the application is totally insulated from changes in the
     email server configuration environment - it simply asks for, and receives,
@@ -527,7 +527,7 @@ public class MyBean2 {
     might look like this:</p>
 <source><![CDATA[<resource-ref>
   <description>
-    Resource reference to a factory for javax.mail.Session
+    Resource reference to a factory for jakarta.mail.Session
     instances that may be used for sending electronic mail
     messages, preconfigured to connect to the appropriate
     SMTP server.
@@ -536,7 +536,7 @@ public class MyBean2 {
     mail/Session
   </res-ref-name>
   <res-type>
-    javax.mail.Session
+    jakarta.mail.Session
   </res-type>
   <res-auth>
     Container
@@ -580,7 +580,7 @@ Transport.send(message);]]></source>
 <source><![CDATA[<Context ...>
   ...
   <Resource name="mail/Session" auth="Container"
-            type="javax.mail.Session"
+            type="jakarta.mail.Session"
             mail.smtp.host="localhost"/>
   ...
 </Context>]]></source>
@@ -592,7 +592,7 @@ Transport.send(message);]]></source>
 
     <p>Additional resource attributes and values will be converted to properties
     and values and passed to
-    <code>javax.mail.Session.getInstance(java.util.Properties)</code> as part of
+    <code>jakarta.mail.Session.getInstance(java.util.Properties)</code> as part of
     the <code>java.util.Properties</code> collection. In addition to the
     properties defined in Annex A of the JavaMail specification, individual
     providers may also support additional properties.
@@ -601,7 +601,7 @@ Transport.send(message);]]></source>
     <p>If the resource is configured with a <code>password</code> attribute and
     either a <code>mail.smtp.user</code> or <code>mail.user</code> attribute
     then Tomcat&apos;s resource factory will configure and add a
-    <code>javax.mail.Authenticator</code> to the mail session.</p>
+    <code>jakarta.mail.Authenticator</code> to the mail session.</p>
 
     <h5>4.  Install the JavaMail libraries</h5>
 

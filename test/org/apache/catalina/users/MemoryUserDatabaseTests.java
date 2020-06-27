@@ -19,12 +19,9 @@ package org.apache.catalina.users;
 
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileWriter;
-import java.io.IOException;
-import java.net.URI;
 import java.security.Principal;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
 
@@ -34,8 +31,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import org.apache.catalina.User;
-import org.apache.tomcat.util.file.ConfigFileLoader;
-import org.apache.tomcat.util.file.ConfigurationSource;
 
 public class MemoryUserDatabaseTests {
     private static File TEST_FILE = new File(System.getProperty("java.io.tmpdir"), "tomcat-users.xml");
@@ -58,37 +53,8 @@ public class MemoryUserDatabaseTests {
                     + "</tomcat-users>");
         }
 
-        // MemoryUserDatabase requires the use of ConfigFileLoader/ConfigurationSource
-        ConfigFileLoader.setSource(new ConfigurationSource() {
-            protected final File userDir = new File(System.getProperty("java.io.tmpdir"));
-            protected final URI userDirUri = userDir.toURI();
-            @Override
-            public Resource getResource(String name) throws IOException {
-                File f = new File(name);
-                if (!f.isAbsolute()) {
-                    f = new File(userDir, name);
-                }
-                if (f.isFile()) {
-                    return new Resource(new FileInputStream(f), f.toURI());
-                } else {
-                    throw new FileNotFoundException(name);
-                }
-            }
-            @Override
-            public URI getURI(String name) {
-                File f = new File(name);
-                if (!f.isAbsolute()) {
-                    f = new File(userDir, name);
-                }
-                if (f.isFile()) {
-                    return f.toURI();
-                }
-                return userDirUri.resolve(name);
-            }
-        });
-
         db = new MemoryUserDatabase();
-        db.setPathname(TEST_FILE.getAbsolutePath());
+        db.setPathname(TEST_FILE.toURI().toURL().toString());
         db.open();
     }
 
@@ -210,11 +176,8 @@ public class MemoryUserDatabaseTests {
         assertPrincipalNames(new String[] { "testgroup", "othergroup"}, user.getGroups());
     }
 
-    private void assertPrincipalNames(String[] expectedNames, Iterator<? extends Principal> i)
-    {
-        HashSet<String> names = new HashSet<>(expectedNames.length);
-        for(String name : expectedNames)
-            names.add(name);
+    private void assertPrincipalNames(String[] expectedNames, Iterator<? extends Principal> i) {
+        HashSet<String> names = new HashSet<>(Arrays.asList(expectedNames));
 
         int j=0;
         while(i.hasNext()) {

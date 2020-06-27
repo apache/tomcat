@@ -28,7 +28,7 @@ public class TestUDecoder {
         // %n rather than %nn should throw an IAE according to the Javadoc
         Exception exception = null;
         try {
-            UDecoder.URLDecode("%5xxxxx");
+            UDecoder.URLDecode("%5xxxxx", StandardCharsets.UTF_8);
         } catch (Exception e) {
             exception = e;
         }
@@ -37,7 +37,7 @@ public class TestUDecoder {
         // Edge case trying to trigger ArrayIndexOutOfBoundsException
         exception = null;
         try {
-            UDecoder.URLDecode("%5");
+            UDecoder.URLDecode("%5", StandardCharsets.UTF_8);
         } catch (Exception e) {
             exception = e;
         }

@@ -315,8 +315,7 @@ public class HPackHuffman {
         HuffmanCode[] currentCode = new HuffmanCode[256];
         currentCode[0] = new HuffmanCode(0, 0);
 
-        final Set<HuffmanCode> allCodes = new HashSet<>();
-        allCodes.addAll(Arrays.asList(HUFFMAN_CODES));
+        final Set<HuffmanCode> allCodes = new HashSet<>(Arrays.asList(HUFFMAN_CODES));
 
         while (!allCodes.isEmpty()) {
             int length = currentCode[pos].length;
@@ -404,6 +403,11 @@ public class HPackHuffman {
                     if ((val & HIGH_TERMINAL_BIT) == 0) {
                         treePos = (val >> 16) & LOW_MASK;
                     } else {
+                        if (eosBitCount != 0) {
+                            // This must be the EOS symbol which MUST be treated
+                            // as an error
+                            throw new HpackException(sm.getString("hpackhuffman.stringLiteralEOS"));
+                        }
                         target.append((char) ((val >> 16) & LOW_MASK));
                         treePos = 0;
                         eosBits = true;

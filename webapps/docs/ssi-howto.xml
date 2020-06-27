@@ -146,27 +146,63 @@ false.</li>
 <p>The directives are:</p>
 <ul>
 <li>
-<strong>config</strong> - <code>&lt;!--#config timefmt=&quot;%B %Y&quot; --&gt;</code>
-Used to set the format of dates and other items processed by SSI
+<strong>config</strong> - <code>&lt;!--#config errmsg=&quot;Error occured&quot; sizefmt=&quot;abbrev&quot;
+timefmt=&quot;%B %Y&quot; --&gt;</code>
+Used to set SSI error message, the format of dates and file sizes processed by SSI.<br/>
+All are optional but at least one must be used. The available options are as follows:
+<br/>
+<strong>errmsg</strong> - error message used for SSI errors<br/>
+<strong>sizefmt</strong> - format used for sizes in the <strong>fsize</strong> directive<br/>
+<strong>timefmt</strong> - format used for timestamps in the <strong>flastmod</strong> directive<br/>
 </li>
 <li>
-<strong>echo</strong> -   <code>&lt;!--#echo var=&quot;VARIABLE_NAME&quot; --&gt;</code>
+<strong>echo</strong> -   <code>&lt;!--#echo var=&quot;VARIABLE_NAME&quot; encoding=&quot;entity&quot; --&gt;</code>
 will be replaced by the value of the variable.
+<br/>
+The optional <strong>encoding</strong> parameter specifies the type of encoding to use.
+Valid values are <strong>entity</strong> (default), <strong>url</strong> or <strong>none</strong>.
+NOTE: Using an encoding other than <strong>entity</strong> can lead to security issues.
 </li>
 <li>
-<strong>exec</strong> -  Used to run commands on the host system.
+<strong>exec</strong> - <code>&lt;!--#exec cmd=&quot;file-name&quot; --&gt;</code>
+Used to run commands on the host system.
+</li>
+<li>
+<strong>exec</strong> - <code>&lt;!--#exec cgi=&quot;file-name&quot; --&gt;</code>
+This acts the same as the <strong>include virtual</strong> directive, and doesn't actually execute any commands.
+</li>
+<li>
+<strong>include</strong> -  <code>&lt;!--#include file=&quot;file-name&quot; --&gt;</code>
+inserts the contents. The path is interpreted relative to the document where this directive
+is being used, and IS NOT a &quot;virtual&quot; path relative to either the context root or the server root.
 </li>
 <li>
 <strong>include</strong> -  <code>&lt;!--#include virtual=&quot;file-name&quot; --&gt;</code>
-inserts the contents
+inserts the contents. The path is interpreted as a &quot;virtual&quot; path which is
+relative to either the context root or the server root (depending on the <strong>isVirtualWebappRelative</strong>
+parameter).
 </li>
 <li>
 <strong>flastmod</strong> - <code>&lt;!--#flastmod file=&quot;filename.shtml&quot; --&gt;</code>
-Returns the time that a file was lost modified.
+Returns the time that a file was last modified. The path is interpreted relative to the document where this directive
+is being used, and IS NOT a &quot;virtual&quot; path relative to either the context root or the server root.
+</li>
+<li>
+<strong>flastmod</strong> - <code>&lt;!--#flastmod virtual=&quot;filename.shtml&quot; --&gt;</code>
+Returns the time that a file was last modified. The path is interpreted as a &quot;virtual&quot; path which is
+relative to either the context root or the server root (depending on the <strong>isVirtualWebappRelative</strong>
+parameter).
 </li>
 <li>
 <strong>fsize</strong> - <code>&lt;!--#fsize file=&quot;filename.shtml&quot; --&gt;</code>
-Returns the size of a file.
+Returns the size of a file. The path is interpreted relative to the document where this directive
+is being used, and IS NOT a &quot;virtual&quot; path relative to either the context root or the server root.
+</li>
+<li>
+<strong>fsize</strong> - <code>&lt;!--#fsize virtual=&quot;filename.shtml&quot; --&gt;</code>
+Returns the size of a file. The path is interpreted as a &quot;virtual&quot; path which is
+relative to either the context root or the server root (depending on the <strong>isVirtualWebappRelative</strong>
+parameter).
 </li>
 <li>
 <strong>printenv</strong> - <code>&lt;!--#printenv --&gt;</code>
@@ -195,6 +231,12 @@ Apache Introduction to SSI</a> for more information on using SSI directives.</p>
 </section>
 
 <section name="Variables">
+<p>
+SSI variables are implemented via request attributes on the <b>jakarta.servlet.ServletRequest</b> object
+and are not limited to the SSI servlet. Variables starting with the names
+"java.", "javax.", "sun" or "org.apache.catalina.ssi.SSIMediator." are reserved
+and cannot be used.
+</p>
 <p>The SSI servlet currently implements the following variables:
 </p>
 <table class="defaultTable">

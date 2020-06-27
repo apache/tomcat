@@ -29,19 +29,20 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.junit.Assert;
 import org.junit.Test;
 
 import org.apache.catalina.AccessLog;
 import org.apache.catalina.Context;
+import org.apache.catalina.Globals;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.connector.Connector;
 import org.apache.catalina.connector.Request;
@@ -96,6 +97,7 @@ public class TestRemoteIpFilter extends TomcatBaseTest {
             writer.println("request.remoteHost=" + request.getRemoteHost());
             writer.println("request.secure=" + request.isSecure());
             writer.println("request.scheme=" + request.getScheme());
+            writer.println("request.serverName=" + request.getServerName());
             writer.println("request.serverPort=" + request.getServerPort());
 
             writer.println();
@@ -548,6 +550,85 @@ public class TestRemoteIpFilter extends TomcatBaseTest {
     }
 
     @Test
+    public void testInvokeXforwardedHost() throws Exception {
+        // PREPARE
+        FilterDef filterDef = new FilterDef();
+        filterDef.addInitParameter("hostHeader", "x-forwarded-host");
+        filterDef.addInitParameter("portHeader", "x-forwarded-port");
+        filterDef.addInitParameter("protocolHeader", "x-forwarded-proto");
+
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        // client ip
+        request.setRemoteAddr("192.168.0.10");
+        request.setRemoteHost("192.168.0.10");
+        // protocol
+        request.setSecure(false);
+        request.setServerPort(8080);
+        request.setScheme("http");
+        // host and port
+        request.getCoyoteRequest().serverName().setString("10.0.0.1");
+        request.setHeader("x-forwarded-host", "example.com");
+        request.setHeader("x-forwarded-port", "8443");
+        request.setHeader("x-forwarded-proto", "https");
+
+        // TEST
+        HttpServletRequest actualRequest = testRemoteIpFilter(filterDef, request).getRequest();
+
+        // VERIFY
+        // protocol
+        String actualServerName = actualRequest.getServerName();
+        Assert.assertEquals("postInvoke serverName", "example.com", actualServerName);
+
+        String actualScheme = actualRequest.getScheme();
+        Assert.assertEquals("postInvoke scheme", "https", actualScheme);
+
+        int actualServerPort = actualRequest.getServerPort();
+        Assert.assertEquals("postInvoke serverPort", 8443, actualServerPort);
+
+        boolean actualSecure = actualRequest.isSecure();
+        Assert.assertTrue("postInvoke secure", actualSecure);
+    }
+
+    @Test
+    public void testInvokeXforwardedHostAndPort() throws Exception {
+        // PREPARE
+        FilterDef filterDef = new FilterDef();
+        filterDef.addInitParameter("hostHeader", "x-forwarded-host");
+        filterDef.addInitParameter("portHeader", "x-forwarded-port");
+        filterDef.addInitParameter("protocolHeader", "x-forwarded-proto");
+
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        // client ip
+        request.setRemoteAddr("192.168.0.10");
+        request.setRemoteHost("192.168.0.10");
+        // protocol
+        request.setSecure(false);
+        request.setServerPort(8080);
+        request.setScheme("http");
+        // host and port
+        request.getCoyoteRequest().serverName().setString("10.0.0.1");
+        request.setHeader("x-forwarded-host", "example.com:8443");
+        request.setHeader("x-forwarded-proto", "https");
+
+        // TEST
+        HttpServletRequest actualRequest = testRemoteIpFilter(filterDef, request).getRequest();
+
+        // VERIFY
+        // protocol
+        String actualServerName = actualRequest.getServerName();
+        Assert.assertEquals("postInvoke serverName", "example.com", actualServerName);
+
+        String actualScheme = actualRequest.getScheme();
+        Assert.assertEquals("postInvoke scheme", "https", actualScheme);
+
+        int actualServerPort = actualRequest.getServerPort();
+        Assert.assertEquals("postInvoke serverPort", 443, actualServerPort);
+
+        boolean actualSecure = actualRequest.isSecure();
+        Assert.assertTrue("postInvoke secure", actualSecure);
+    }
+
+    @Test
     public void testListToCommaDelimitedString() {
         String[] actual = RemoteIpFilter.commaDelimitedListToStringArray("element1, element2, element3");
         String[] expected = new String[] { "element1", "element2", "element3" };
@@ -622,6 +703,28 @@ public class TestRemoteIpFilter extends TomcatBaseTest {
         Assert.assertEquals("org.apache.catalina.AccessLog.RemoteHost",
                 "140.211.11.130",
                 actualRequest.getAttribute(AccessLog.REMOTE_HOST_ATTRIBUTE));
+    }
+
+    @Test
+    public void testRequestForwarded() throws Exception {
+        // PREPARE
+        FilterDef filterDef = new FilterDef();
+        filterDef.addInitParameter("protocolHeader", "x-forwarded-proto");
+        filterDef.addInitParameter("remoteIpHeader", "x-my-forwarded-for");
+        filterDef.addInitParameter("httpServerPort", "8080");
+
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        request.setRemoteAddr("192.168.0.10");
+        request.setHeader("x-my-forwarded-for", "140.211.11.130");
+        request.setHeader("x-forwarded-proto", "http");
+
+        // TEST
+        HttpServletRequest actualRequest = testRemoteIpFilter(filterDef, request).getRequest();
+
+        // VERIFY
+        Assert.assertEquals("org.apache.tomcat.request.forwarded",
+                Boolean.TRUE,
+                actualRequest.getAttribute(Globals.REQUEST_FORWARDED_ATTRIBUTE));
     }
 
     /*

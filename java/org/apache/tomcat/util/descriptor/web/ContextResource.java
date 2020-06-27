@@ -85,13 +85,19 @@ public class ContextResource extends ResourceBase {
      * collection.
      */
     private String closeMethod = null;
+    private boolean closeMethodConfigured = false;
 
     public String getCloseMethod() {
         return closeMethod;
     }
 
     public void setCloseMethod(String closeMethod) {
+        closeMethodConfigured = true;
         this.closeMethod = closeMethod;
+    }
+
+    public boolean getCloseMethodConfigured() {
+        return closeMethodConfigured;
     }
 
 

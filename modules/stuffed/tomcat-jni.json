@@ -1,0 +1,7 @@
+[
+{ "name":"org.apache.tomcat.jni.Error" },
+{ "name":"org.apache.tomcat.jni.FileInfo" },
+{ "name":"org.apache.tomcat.jni.Sockaddr" },
+{ "name":"org.apache.tomcat.jni.SSL", "methods":[{"name":"newSSL","parameterTypes":["long","boolean"]}] },
+{ "name":"java.lang.String", "methods":[{"name":"<init>","parameterTypes":["byte[]"]},{"name":"getBytes","parameterTypes":[]}] }
+]

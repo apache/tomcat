@@ -23,11 +23,12 @@ import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
 
-import javax.servlet.WriteListener;
+import jakarta.servlet.WriteListener;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -122,7 +123,7 @@ public final class Response {
 
     // General informations
     private long contentWritten = 0;
-    private long commitTime = -1;
+    private long commitTimeNanos = -1;
 
     /**
      * Holds request error exception.
@@ -258,7 +259,7 @@ public final class Response {
 
     public void setCommitted(boolean v) {
         if (v && !this.committed) {
-            this.commitTime = System.currentTimeMillis();
+            this.commitTimeNanos = System.nanoTime();
         }
         this.committed = v;
     }
@@ -269,7 +270,16 @@ public final class Response {
      * @return the time the response was committed
      */
     public long getCommitTime() {
-        return commitTime;
+        return System.currentTimeMillis() - TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - commitTimeNanos);
+    }
+
+    /**
+     * Return the time the response was committed (based on System.nanoTime).
+     *
+     * @return the time the response was committed
+     */
+    public long getCommitTimeNanos() {
+        return commitTimeNanos;
     }
 
     // -----------------Error State --------------------
@@ -503,6 +513,9 @@ public final class Response {
     }
 
 
+    /**
+     * @return The name of the current encoding
+     */
     public String getCharacterEncoding() {
         return characterEncoding;
     }
@@ -541,7 +554,14 @@ public final class Response {
 
         String charsetValue = m.getCharset();
 
-        if (charsetValue != null) {
+        if (charsetValue == null) {
+            // No charset and we know value is valid as parser was successful
+            // Pass-through user provided value in case user-agent is buggy and
+            // requires specific format
+            this.contentType = type;
+        } else {
+            // There is a charset so have to rebuild content-type without it
+            this.contentType = m.toStringNoCharset();
             charsetValue = charsetValue.trim();
             if (charsetValue.length() > 0) {
                 try {
@@ -561,8 +581,7 @@ public final class Response {
 
         String ret = contentType;
 
-        if (ret != null
-            && charset != null) {
+        if (ret != null && charset != null) {
             ret = ret + ";charset=" + characterEncoding;
         }
 
@@ -613,7 +632,7 @@ public final class Response {
         status = 200;
         message = null;
         committed = false;
-        commitTime = -1;
+        commitTimeNanos = -1;
         errorException = null;
         errorState.set(0);
         headers.clear();

@@ -65,18 +65,18 @@ public class NamingResourcesMBean extends BaseModelMBean {
     public String[] getEnvironments() {
         ContextEnvironment[] envs = ((NamingResourcesImpl)this.resource).findEnvironments();
         List<String> results = new ArrayList<>();
-        for (int i = 0; i < envs.length; i++) {
+        for (ContextEnvironment env : envs) {
             try {
-                ObjectName oname = MBeanUtils.createObjectName(managed.getDomain(), envs[i]);
+                ObjectName oname = MBeanUtils.createObjectName(managed.getDomain(), env);
                 results.add(oname.toString());
             } catch (MalformedObjectNameException e) {
                 IllegalArgumentException iae = new IllegalArgumentException(
-                        sm.getString("namingResourcesMBean.createObjectNameError.environment", envs[i]));
+                        sm.getString("namingResourcesMBean.createObjectNameError.environment", env));
                 iae.initCause(e);
                 throw iae;
             }
         }
-        return results.toArray(new String[results.size()]);
+        return results.toArray(new String[0]);
     }
 
 
@@ -88,18 +88,18 @@ public class NamingResourcesMBean extends BaseModelMBean {
     public String[] getResources() {
         ContextResource[] resources = ((NamingResourcesImpl)this.resource).findResources();
         List<String> results = new ArrayList<>();
-        for (int i = 0; i < resources.length; i++) {
+        for (ContextResource contextResource : resources) {
             try {
-                ObjectName oname = MBeanUtils.createObjectName(managed.getDomain(), resources[i]);
+                ObjectName oname = MBeanUtils.createObjectName(managed.getDomain(), contextResource);
                 results.add(oname.toString());
             } catch (MalformedObjectNameException e) {
                 IllegalArgumentException iae = new IllegalArgumentException(
-                        sm.getString("namingResourcesMBean.createObjectNameError.resource", resources[i]));
+                        sm.getString("namingResourcesMBean.createObjectNameError.resource", contextResource));
                 iae.initCause(e);
                 throw iae;
             }
         }
-        return results.toArray(new String[results.size()]);
+        return results.toArray(new String[0]);
     }
 
 
@@ -112,19 +112,19 @@ public class NamingResourcesMBean extends BaseModelMBean {
         ContextResourceLink[] resourceLinks =
                 ((NamingResourcesImpl)this.resource).findResourceLinks();
         List<String> results = new ArrayList<>();
-        for (int i = 0; i < resourceLinks.length; i++) {
+        for (ContextResourceLink resourceLink : resourceLinks) {
             try {
                 ObjectName oname =
-                        MBeanUtils.createObjectName(managed.getDomain(), resourceLinks[i]);
+                        MBeanUtils.createObjectName(managed.getDomain(), resourceLink);
                 results.add(oname.toString());
             } catch (MalformedObjectNameException e) {
                 IllegalArgumentException iae = new IllegalArgumentException(
-                        sm.getString("namingResourcesMBean.createObjectNameError.resourceLink", resourceLinks[i]));
+                        sm.getString("namingResourcesMBean.createObjectNameError.resourceLink", resourceLink));
                 iae.initCause(e);
                 throw iae;
             }
         }
-        return results.toArray(new String[results.size()]);
+        return results.toArray(new String[0]);
     }
 
 

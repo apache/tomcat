@@ -27,12 +27,13 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.security.auth.Subject;
-import javax.servlet.Filter;
-import javax.servlet.Servlet;
-import javax.servlet.ServletException;
-import javax.servlet.UnavailableException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
+
+import jakarta.servlet.Filter;
+import jakarta.servlet.Servlet;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.UnavailableException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 
 import org.apache.catalina.Globals;
 import org.apache.juli.logging.Log;

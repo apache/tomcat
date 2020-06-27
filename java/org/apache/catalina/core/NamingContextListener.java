@@ -37,8 +37,6 @@ import javax.naming.NamingException;
 import javax.naming.Reference;
 import javax.naming.StringRefAddr;
 
-import org.apache.catalina.ContainerEvent;
-import org.apache.catalina.ContainerListener;
 import org.apache.catalina.Context;
 import org.apache.catalina.Engine;
 import org.apache.catalina.Host;
@@ -60,6 +58,7 @@ import org.apache.naming.ResourceLinkRef;
 import org.apache.naming.ResourceRef;
 import org.apache.naming.ServiceRef;
 import org.apache.naming.TransactionRef;
+import org.apache.naming.factory.Constants;
 import org.apache.naming.factory.ResourceLinkFactory;
 import org.apache.tomcat.util.descriptor.web.ContextEjb;
 import org.apache.tomcat.util.descriptor.web.ContextEnvironment;
@@ -82,8 +81,7 @@ import org.apache.tomcat.util.res.StringManager;
  *
  * @author Remy Maucherat
  */
-public class NamingContextListener
-        implements LifecycleListener, ContainerListener, PropertyChangeListener {
+public class NamingContextListener implements LifecycleListener, PropertyChangeListener {
 
     private static final Log log = LogFactory.getLog(NamingContextListener.class);
 
@@ -338,24 +336,6 @@ public class NamingContextListener
 
         }
 
-    }
-
-
-    // ---------------------------------------------- ContainerListener Methods
-
-    /**
-     * NO-OP.
-     *
-     * @param event ContainerEvent that has occurred
-     *
-     * @deprecated The {@link ContainerListener} interface and implementing
-     *             methods will be removed from this class for Tomcat 10
-     *             onwards.
-     */
-    @Deprecated
-    @Override
-    public void containerEvent(ContainerEvent event) {
-        // NO-OP
     }
 
 
@@ -1010,16 +990,21 @@ public class NamingContextListener
         if (("javax.sql.DataSource".equals(ref.getClassName())  ||
             "javax.sql.XADataSource".equals(ref.getClassName())) &&
                 resource.getSingleton()) {
+            Object actualResource = null;
             try {
                 ObjectName on = createObjectName(resource);
-                Object actualResource = envCtx.lookup(resource.getName());
+                actualResource = envCtx.lookup(resource.getName());
                 Registry.getRegistry(null, null).registerComponent(actualResource, on, null);
                 objectNames.put(resource.getName(), on);
             } catch (Exception e) {
                 log.warn(sm.getString("naming.jmxRegistrationFailed", e));
             }
+            // Bug 63210. DBCP2 DataSources require an explicit close. This goes
+            // further and cleans up and AutoCloseable DataSource by default.
+            if (actualResource instanceof AutoCloseable && !resource.getCloseMethodConfigured()) {
+                resource.setCloseMethod("close");
+            }
         }
-
     }
 
 
@@ -1096,7 +1081,11 @@ public class NamingContextListener
     private javax.naming.Context getGlobalNamingContext() {
         if (container instanceof Context) {
             Engine e = (Engine) ((Context) container).getParent().getParent();
-            return e.getService().getServer().getGlobalNamingContext();
+            Server s = e.getService().getServer();
+            // When the Service is an embedded Service, there is no Server
+            if (s != null) {
+                return s.getGlobalNamingContext();
+            }
         }
         return null;
     }

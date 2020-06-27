@@ -15,6 +15,9 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 -->
+<!DOCTYPE mbeans-descriptors PUBLIC
+   "-//Apache Software Foundation//DTD Model MBeans Configuration File"
+   "http://jakarta.apache.org/commons/dtds/mbeans-descriptors.dtd">
 <mbeans-descriptors>
 
   <mbean name="ContextConfig"
@@ -39,7 +42,7 @@
   </mbean>
 
   <mbean name="EngineConfig"
-         description="Startup event listener for a Engine that configures the properties of that Engine, and the associated defined contexts"
+         description="Startup event listener for an Engine that configures the properties of that Engine, and the associated defined contexts"
          domain="Catalina"
          group="Listener"
          type="org.apache.catalina.startup.EngineConfig">

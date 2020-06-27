@@ -91,4 +91,20 @@ public interface UpgradeProtocol {
      *         <code>false</code>
      */
     public boolean accept(Request request);
+
+
+    /**
+     * Configure the HTTP/1.1 protocol that this UpgradeProcotol is nested
+     * under. Connections passed to this UpgradeProtocol via HTTP upgrade will
+     * have been initially handled by this HTTP/1.1 protocol implementation.
+     * <p>
+     * The default implementation is a NO-OP.
+     *
+     * @param protocol The HTTP/1.1 protocol implementation that will initially
+     *                 handle any connections passed to this UpgradeProtocol via
+     *                 the HTTP upgrade mechanism
+     */
+    public default void setHttp11Protocol(AbstractProtocol<?> protocol) {
+        // NO-OP
+    }
 }

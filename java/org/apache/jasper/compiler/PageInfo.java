@@ -25,11 +25,12 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
 
-import javax.el.ExpressionFactory;
-import javax.servlet.jsp.tagext.TagLibraryInfo;
+import jakarta.el.ExpressionFactory;
+import jakarta.servlet.jsp.tagext.TagLibraryInfo;
 
 import org.apache.jasper.Constants;
 import org.apache.jasper.JasperException;
+import org.apache.jasper.JspCompilationContext;
 
 /**
  * A repository for various info about the translation unit under compilation.
@@ -51,7 +52,7 @@ class PageInfo {
     private final String jspFile;
     private static final String defaultLanguage = "java";
     private String language;
-    private final String defaultExtends = Constants.JSP_SERVLET_BASE;
+    private final String defaultExtends;
     private String xtends;
     private String contentType = null;
     private String session;
@@ -101,16 +102,16 @@ class PageInfo {
 
     private final boolean isTagFile;
 
-    PageInfo(BeanRepository beanRepository, String jspFile, boolean isTagFile) {
-        this.isTagFile = isTagFile;
-        this.jspFile = jspFile;
+    PageInfo(BeanRepository beanRepository, JspCompilationContext ctxt) {
+        isTagFile = ctxt.isTagFile();
+        jspFile = ctxt.getJspFile();
+        defaultExtends = ctxt.getOptions().getJspServletBase();
         this.beanRepository = beanRepository;
         this.varInfoNames = new HashSet<>();
         this.taglibsMap = new HashMap<>();
         this.jspPrefixMapper = new HashMap<>();
         this.xmlPrefixMapper = new HashMap<>();
         this.nonCustomTagPrefixMap = new HashMap<>();
-        this.imports = new Vector<>();
         this.dependants = new HashMap<>();
         this.includePrelude = new Vector<>();
         this.includeCoda = new Vector<>();
@@ -118,7 +119,7 @@ class PageInfo {
         this.prefixes = new HashSet<>();
 
         // Enter standard imports
-        imports.addAll(Constants.STANDARD_IMPORTS);
+        this.imports = new Vector<>(Constants.STANDARD_IMPORTS);
     }
 
     public boolean isTagFile() {

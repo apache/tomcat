@@ -69,6 +69,12 @@ public class MemoryRealm  extends RealmBase {
     private final Map<String,GenericPrincipal> principals = new HashMap<>();
 
 
+    /**
+     * The set of credentials for this Realm, keyed by user name.
+     */
+    private final Map<String, String> credentials = new HashMap<>();
+
+
     // ------------------------------------------------------------- Properties
 
     /**
@@ -118,8 +124,12 @@ public class MemoryRealm  extends RealmBase {
         }
 
         GenericPrincipal principal = principals.get(username);
+        String password = null;
+        if (principal != null) {
+            password = this.credentials.get(username);
+        }
 
-        if(principal == null || principal.getPassword() == null) {
+        if (principal == null || password == null) {
             // User was not found in the database or the password was null
             // Waste a bit of time as not to reveal that the user does not exist.
             getCredentialHandler().mutate(credentials);
@@ -129,7 +139,7 @@ public class MemoryRealm  extends RealmBase {
             return null;
         }
 
-        boolean validated = getCredentialHandler().matches(credentials, principal.getPassword());
+        boolean validated = getCredentialHandler().matches(credentials, password);
 
         if (validated) {
             if (log.isDebugEnabled())
@@ -168,9 +178,9 @@ public class MemoryRealm  extends RealmBase {
         }
 
         // Construct and cache the Principal for this user
-        GenericPrincipal principal =
-            new GenericPrincipal(username, password, list);
+        GenericPrincipal principal = new GenericPrincipal(username, list);
         principals.put(username, principal);
+        credentials.put(username, password);
 
     }
 
@@ -204,14 +214,7 @@ public class MemoryRealm  extends RealmBase {
      */
     @Override
     protected String getPassword(String username) {
-
-        GenericPrincipal principal = principals.get(username);
-        if (principal != null) {
-            return principal.getPassword();
-        } else {
-            return null;
-        }
-
+        return credentials.get(username);
     }
 
 

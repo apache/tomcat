@@ -216,8 +216,7 @@ public class TestSSOnonLoginAndDigestAuthenticator extends TomcatBaseTest {
         if (expectedReject) {
             Assert.assertEquals(expectedRC, rc);
             Assert.assertTrue(bc.getLength() > 0);
-        }
-        else {
+        } else {
             Assert.assertEquals(200, rc);
             Assert.assertEquals("OK", bc.toString());
             saveCookies(respHeaders);
@@ -249,8 +248,7 @@ public class TestSSOnonLoginAndDigestAuthenticator extends TomcatBaseTest {
         if (expectedReject1) {
             Assert.assertEquals(expectedRC1, rc);
             Assert.assertTrue(bc.getLength() > 0);
-        }
-        else {
+        } else {
             Assert.assertEquals(200, rc);
             Assert.assertEquals("OK", bc.toString());
             saveCookies(respHeaders1);

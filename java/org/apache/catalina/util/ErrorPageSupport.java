@@ -99,6 +99,6 @@ public class ErrorPageSupport {
         Set<ErrorPage> errorPages = new HashSet<>();
         errorPages.addAll(exceptionPages.values());
         errorPages.addAll(statusPages.values());
-        return errorPages.toArray(new ErrorPage[errorPages.size()]);
+        return errorPages.toArray(new ErrorPage[0]);
     }
 }

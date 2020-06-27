@@ -102,12 +102,14 @@ public class UserDatabaseRealm extends RealmBase {
         }
         if (principal instanceof GenericPrincipal) {
             GenericPrincipal gp = (GenericPrincipal) principal;
-            if (gp.getUserPrincipal() instanceof User) {
-                principal = gp.getUserPrincipal();
+            if (gp.getUserPrincipal() instanceof UserDatabasePrincipal) {
+                principal = database.findUser(gp.getName());
             }
         }
         if (!(principal instanceof User)) {
             // Play nice with SSO and mixed Realms
+            // No need to pass the wrapper here because role mapping has been
+            // performed already a few lines above
             return super.hasRole(null, principal, role);
         }
         if ("*".equals(role)) {
@@ -183,7 +185,8 @@ public class UserDatabaseRealm extends RealmBase {
                 roles.add(role.getName());
             }
         }
-        return new GenericPrincipal(username, user.getPassword(), roles, user);
+        return new GenericPrincipal(username, roles,
+                new UserDatabasePrincipal(username));
     }
 
 
@@ -233,5 +236,16 @@ public class UserDatabaseRealm extends RealmBase {
 
         // Release reference to our user database
         database = null;
+    }
+
+    private class UserDatabasePrincipal implements Principal {
+        private final String name;
+        private UserDatabasePrincipal(String name) {
+            this.name = name;
+        }
+        @Override
+        public String getName() {
+            return name;
+        }
     }
 }

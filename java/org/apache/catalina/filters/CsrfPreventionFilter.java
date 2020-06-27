@@ -23,14 +23,18 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpServletResponseWrapper;
-import javax.servlet.http.HttpSession;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.FilterConfig;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponseWrapper;
+import jakarta.servlet.http.HttpSession;
+
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 
 /**
  * Provides basic CSRF protection for a web application. The filter assumes
@@ -43,10 +47,13 @@ import javax.servlet.http.HttpSession;
  * </ul>
  */
 public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
+    private final Log log = LogFactory.getLog(CsrfPreventionFilter.class);
 
     private final Set<String> entryPoints = new HashSet<>();
 
     private int nonceCacheSize = 5;
+
+    private String nonceRequestParameterName = Constants.CSRF_NONCE_REQUEST_PARAM;
 
     /**
      * Entry points are URLs that will not be tested for the presence of a valid
@@ -78,6 +85,27 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
         this.nonceCacheSize = nonceCacheSize;
     }
 
+    /**
+     * Sets the request parameter name to use for CSRF nonces.
+     *
+     * @param parameterName The request parameter name to use
+     *        for CSRF nonces.
+     */
+    public void setNonceRequestParameterName(String parameterName) {
+        this.nonceRequestParameterName = parameterName;
+    }
+
+    @Override
+    public void init(FilterConfig filterConfig) throws ServletException {
+        // Set the parameters
+        super.init(filterConfig);
+
+        // Put the expected request parameter name into the application scope
+        filterConfig.getServletContext().setAttribute(
+                Constants.CSRF_NONCE_REQUEST_PARAM_NAME_KEY,
+                nonceRequestParameterName);
+    }
+
     @Override
     public void doFilter(ServletRequest request, ServletResponse response,
             FilterChain chain) throws IOException, ServletException {
@@ -94,6 +122,10 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
 
             if (Constants.METHOD_GET.equals(req.getMethod())
                     && entryPoints.contains(getRequestedPath(req))) {
+                if(log.isTraceEnabled()) {
+                    log.trace("Skipping CSRF nonce-check for GET request to entry point " + getRequestedPath(req));
+                }
+
                 skipNonceCheck = true;
             }
 
@@ -106,18 +138,56 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
 
             if (!skipNonceCheck) {
                 String previousNonce =
-                    req.getParameter(Constants.CSRF_NONCE_REQUEST_PARAM);
+                    req.getParameter(nonceRequestParameterName);
 
-                if (nonceCache == null || previousNonce == null ||
-                        !nonceCache.contains(previousNonce)) {
+                if(previousNonce == null) {
+                    if(log.isDebugEnabled()) {
+                        log.debug("Rejecting request for " + getRequestedPath(req)
+                                  + ", session "
+                                  + (null == session ? "(none)" : session.getId())
+                                  + " with no CSRF nonce found in request");
+                    }
+
                     res.sendError(getDenyStatus());
                     return;
+                } else if(nonceCache == null) {
+                    if(log.isDebugEnabled()) {
+                        log.debug("Rejecting request for " + getRequestedPath(req)
+                                  + ", session "
+                                  + (null == session ? "(none)" : session.getId())
+                                  + " due to empty / missing nonce cache");
+                    }
+
+                    res.sendError(getDenyStatus());
+                    return;
+                } else if(!nonceCache.contains(previousNonce)) {
+                    if(log.isDebugEnabled()) {
+                        log.debug("Rejecting request for " + getRequestedPath(req)
+                                  + ", session "
+                                  + (null == session ? "(none)" : session.getId())
+                                  + " due to invalid nonce " + previousNonce);
+                    }
+
+                    res.sendError(getDenyStatus());
+                    return;
+                }
+                if(log.isTraceEnabled()) {
+                    log.trace("Allowing request to " + getRequestedPath(req)
+                               + " with valid CSRF nonce " + previousNonce);
                 }
             }
 
             if (nonceCache == null) {
+                if(log.isDebugEnabled()) {
+                    log.debug("Creating new CSRF nonce cache with size=" + nonceCacheSize + " for session " + (null == session ? "(will create)" : session.getId()));
+                }
+
                 nonceCache = new LruCache<>(nonceCacheSize);
                 if (session == null) {
+                    if(log.isDebugEnabled()) {
+                         log.debug("Creating new session to store CSRF nonce cache");
+                    }
+
                     session = req.getSession(true);
                 }
                 session.setAttribute(
@@ -128,7 +198,12 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
 
             nonceCache.add(newNonce);
 
-            wResponse = new CsrfResponseWrapper(res, newNonce);
+            // Take this request's nonce and put it into the request
+            // attributes so pages can make direct use of it, rather than
+            // requiring the use of response.encodeURL.
+            request.setAttribute(Constants.CSRF_NONCE_REQUEST_ATTR_NAME, newNonce);
+
+            wResponse = new CsrfResponseWrapper(res, nonceRequestParameterName, newNonce);
         } else {
             wResponse = response;
         }
@@ -140,10 +215,12 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
     protected static class CsrfResponseWrapper
             extends HttpServletResponseWrapper {
 
+        private final String nonceRequestParameterName;
         private final String nonce;
 
-        public CsrfResponseWrapper(HttpServletResponse response, String nonce) {
+        public CsrfResponseWrapper(HttpServletResponse response, String nonceRequestParameterName, String nonce) {
             super(response);
+            this.nonceRequestParameterName = nonceRequestParameterName;
             this.nonce = nonce;
         }
 
@@ -198,7 +275,7 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
             } else {
                 sb.append('?');
             }
-            sb.append(Constants.CSRF_NONCE_REQUEST_PARAM);
+            sb.append(nonceRequestParameterName);
             sb.append('=');
             sb.append(nonce);
             sb.append(anchor);

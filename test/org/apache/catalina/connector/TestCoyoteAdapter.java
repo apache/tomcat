@@ -22,11 +22,11 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
 
-import javax.servlet.AsyncContext;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.AsyncContext;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -333,7 +333,7 @@ public class TestCoyoteAdapter extends TomcatBaseTest {
         byte[] b = input.getBytes(StandardCharsets.UTF_8);
         mb.setBytes(b, 0, b.length);
 
-        boolean result = CoyoteAdapter.normalize(mb);
+        boolean result = CoyoteAdapter.normalize(mb, false);
         mb.toString();
 
         if (expected == null) {

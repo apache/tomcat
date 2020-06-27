@@ -35,9 +35,9 @@
 <section name="Introduction">
 
   <p>The <strong>CookieProcessor</strong> element represents the component that
-  parses received cookie headers into <code>javax.servlet.http.Cookie</code>
+  parses received cookie headers into <code>jakarta.servlet.http.Cookie</code>
   objects accessible through <code>HttpServletRequest.getCookies()</code> and
-  converts <code>javax.servlet.http.Cookie</code> objects added to the response
+  converts <code>jakarta.servlet.http.Cookie</code> objects added to the response
   through <code>HttpServletResponse.addCookie()</code> to the HTTP headers
   returned to the client.</p>
 
@@ -94,8 +94,28 @@
       <li>The cookie header is always preserved.</li>
     </ul>
 
-    <p>No additional attributes are supported by the <strong>RFC 6265 Cookie
-    Processor</strong>.</p>
+    <p>The <strong>RFC 6265 Cookie Processor</strong> supports the following
+    additional attributes.</p>
+
+    <attributes>
+
+      <attribute name="sameSiteCookies" required="false">
+        <p>Enables setting same-site cookie attribute.</p>
+
+        <p>If value is <code>unset</code> then the same-site cookie attribute
+        won't be set. This is the default value.</p>
+
+        <p>If value is <code>none</code> then the same-site cookie attribute
+        will be set and the cookie will always be sent in cross-site requests.</p>
+
+        <p>If value is <code>lax</code> then the browser only sends the cookie
+        in same-site requests and cross-site top level GET requests.</p>
+
+        <p>If value is <code>strict</code> then the browser prevents sending the
+        cookie in any cross-site request.</p>
+      </attribute>
+
+    </attributes>
 
   </subsection>
 
@@ -152,6 +172,22 @@
         is set to <code>true</code>, the default of this setting will be
         <code>true</code>, else the default value will be <code>false</code>.
         </p>
+      </attribute>
+
+      <attribute name="sameSiteCookies" required="false">
+        <p>Enables setting same-site cookie attribute.</p>
+
+        <p>If value is <code>unset</code> then the same-site cookie attribute
+        won't be set. This is the default value.</p>
+
+        <p>If value is <code>none</code> then the same-site cookie attribute
+        will be set and the cookie will always be sent in cross-site requests.</p>
+
+        <p>If value is <code>lax</code> then the browser only sends the cookie
+        in same-site requests and cross-site top level GET requests.</p>
+
+        <p>If value is <code>strict</code> then the browser prevents sending the
+        cookie in any cross-site request.</p>
       </attribute>
 
     </attributes>

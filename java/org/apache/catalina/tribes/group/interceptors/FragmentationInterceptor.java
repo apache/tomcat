@@ -134,8 +134,8 @@ public class FragmentationInterceptor extends ChannelInterceptorBase implements 
             remaining -= length;
 
         }
-        for ( int i=0; i<messages.length; i++ ) {
-            super.sendMessage(destination,messages[i],payload);
+        for (ChannelMessage message : messages) {
+            super.sendMessage(destination, message, payload);
         }
     }
 
@@ -144,9 +144,9 @@ public class FragmentationInterceptor extends ChannelInterceptorBase implements 
         try {
             Set<FragKey> set = fragpieces.keySet();
             Object[] keys = set.toArray();
-            for ( int i=0; i<keys.length; i++ ) {
-                FragKey key = (FragKey)keys[i];
-                if ( key != null && key.expired(getExpire()) )
+            for (Object o : keys) {
+                FragKey key = (FragKey) o;
+                if (key != null && key.expired(getExpire()))
                     removeFragCollection(key);
             }
         }catch ( Exception x ) {
@@ -208,11 +208,13 @@ public class FragmentationInterceptor extends ChannelInterceptorBase implements 
         public ChannelMessage assemble() {
             if ( !complete() ) throw new IllegalStateException(sm.getString("fragmentationInterceptor.fragments.missing"));
             int buffersize = 0;
-            for (int i=0; i<frags.length; i++ ) buffersize += frags[i].getLength();
+            for (XByteBuffer frag : frags) {
+                buffersize += frag.getLength();
+            }
             XByteBuffer buf = new XByteBuffer(buffersize,false);
             msg.setMessage(buf);
-            for ( int i=0; i<frags.length; i++ ) {
-                msg.getMessage().append(frags[i].getBytesDirect(),0,frags[i].getLength());
+            for (XByteBuffer frag : frags) {
+                msg.getMessage().append(frag.getBytesDirect(), 0, frag.getLength());
             }
             return msg;
         }

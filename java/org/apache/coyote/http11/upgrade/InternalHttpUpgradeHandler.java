@@ -16,7 +16,7 @@
  */
 package org.apache.coyote.http11.upgrade;
 
-import javax.servlet.http.HttpUpgradeHandler;
+import jakarta.servlet.http.HttpUpgradeHandler;
 
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.net.SSLSupport;
@@ -32,9 +32,15 @@ public interface InternalHttpUpgradeHandler extends HttpUpgradeHandler {
 
     SocketState upgradeDispatch(SocketEvent status);
 
+    void timeoutAsync(long now);
+
     void setSocketWrapper(SocketWrapperBase<?> wrapper);
 
     void setSslSupport(SSLSupport sslSupport);
 
     void pause();
+
+    default boolean hasAsyncIO() {
+        return false;
+    }
 }

@@ -32,11 +32,9 @@ public final class ConstantUtf8 extends Constant {
 
     private final String bytes;
 
-
     static ConstantUtf8 getInstance(final DataInput input) throws IOException {
         return new ConstantUtf8(input.readUTF());
     }
-
 
     /**
      * @param bytes Data
@@ -48,7 +46,6 @@ public final class ConstantUtf8 extends Constant {
         }
         this.bytes = bytes;
     }
-
 
     /**
      * @return Data converted to string.

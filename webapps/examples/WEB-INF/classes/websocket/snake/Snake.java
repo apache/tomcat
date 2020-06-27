@@ -21,9 +21,9 @@ import java.util.ArrayDeque;
 import java.util.Collection;
 import java.util.Deque;
 
-import javax.websocket.CloseReason;
-import javax.websocket.CloseReason.CloseCodes;
-import javax.websocket.Session;
+import jakarta.websocket.CloseReason;
+import jakarta.websocket.CloseReason.CloseCodes;
+import jakarta.websocket.Session;
 
 public class Snake {
 

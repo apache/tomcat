@@ -32,12 +32,12 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import javax.servlet.DispatcherType;
-import javax.servlet.ServletContext;
-import javax.servlet.SessionTrackingMode;
-import javax.servlet.descriptor.JspConfigDescriptor;
-import javax.servlet.descriptor.JspPropertyGroupDescriptor;
-import javax.servlet.descriptor.TaglibDescriptor;
+import jakarta.servlet.DispatcherType;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.SessionTrackingMode;
+import jakarta.servlet.descriptor.JspConfigDescriptor;
+import jakarta.servlet.descriptor.JspPropertyGroupDescriptor;
+import jakarta.servlet.descriptor.TaglibDescriptor;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -182,6 +182,10 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
                 majorVersion = 4;
                 minorVersion = 0;
                 break;
+            case "5.0":
+                majorVersion = 5;
+                minorVersion = 0;
+                break;
             default:
                 log.warn(sm.getString("webXml.version.unknown", version));
         }
@@ -233,8 +237,7 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
     }
 
     // Derived major and minor version attributes
-    // Default to 4.0 until we know otherwise
-    private int majorVersion = 4;
+    private int majorVersion = 5;
     private int minorVersion = 0;
     public int getMajorVersion() { return majorVersion; }
     public int getMinorVersion() { return minorVersion; }
@@ -296,6 +299,7 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
     private final Set<FilterMap> filterMaps = new LinkedHashSet<>();
     private final Set<String> filterMappingNames = new HashSet<>();
     public void addFilterMapping(FilterMap filterMap) {
+        filterMap.setCharset(getCharset());
         filterMaps.add(filterMap);
         filterMappingNames.add(filterMap.getFilterName());
     }
@@ -397,6 +401,7 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
     // error-page
     private final Map<String,ErrorPage> errorPages = new HashMap<>();
     public void addErrorPage(ErrorPage errorPage) {
+        errorPage.setCharset(getCharset());
         errorPages.put(errorPage.getName(), errorPage);
     }
     public Map<String,ErrorPage> getErrorPages() { return errorPages; }
@@ -440,6 +445,7 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
     // Digester will check there is only one of these
     private LoginConfig loginConfig = null;
     public void setLoginConfig(LoginConfig loginConfig) {
+        loginConfig.setCharset(getCharset());
         this.loginConfig = loginConfig;
     }
     public LoginConfig getLoginConfig() { return loginConfig; }

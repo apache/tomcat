@@ -86,8 +86,7 @@ public class ChannelException extends Exception {
             buf.append("; No faulty members identified.");
         } else {
             buf.append("; Faulty members:");
-            for ( int i=0; i<faultyMembers.size(); i++ ) {
-                FaultyMember mbr = faultyMembers.get(i);
+            for (FaultyMember mbr : faultyMembers) {
                 buf.append(mbr.getMember().getName());
                 buf.append("; ");
             }
@@ -135,7 +134,7 @@ public class ChannelException extends Exception {
      */
     public FaultyMember[] getFaultyMembers() {
         if ( this.faultyMembers==null ) return EMPTY_LIST;
-        return faultyMembers.toArray(new FaultyMember[faultyMembers.size()]);
+        return faultyMembers.toArray(new FaultyMember[0]);
     }
 
     /**

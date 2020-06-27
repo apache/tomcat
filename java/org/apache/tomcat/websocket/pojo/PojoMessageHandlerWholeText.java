@@ -22,12 +22,12 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.websocket.DecodeException;
-import javax.websocket.Decoder;
-import javax.websocket.Decoder.Text;
-import javax.websocket.Decoder.TextStream;
-import javax.websocket.EndpointConfig;
-import javax.websocket.Session;
+import jakarta.websocket.DecodeException;
+import jakarta.websocket.Decoder;
+import jakarta.websocket.Decoder.Text;
+import jakarta.websocket.Decoder.TextStream;
+import jakarta.websocket.EndpointConfig;
+import jakarta.websocket.Session;
 
 import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.websocket.Util;

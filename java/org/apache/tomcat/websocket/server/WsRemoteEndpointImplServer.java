@@ -21,12 +21,11 @@ import java.io.IOException;
 import java.net.SocketTimeoutException;
 import java.nio.ByteBuffer;
 import java.nio.channels.CompletionHandler;
-import java.nio.channels.InterruptedByTimeoutException;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.TimeUnit;
 
-import javax.websocket.SendHandler;
-import javax.websocket.SendResult;
+import jakarta.websocket.SendHandler;
+import jakarta.websocket.SendResult;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -37,7 +36,7 @@ import org.apache.tomcat.websocket.Transformation;
 import org.apache.tomcat.websocket.WsRemoteEndpointImplBase;
 
 /**
- * This is the server side {@link javax.websocket.RemoteEndpoint} implementation
+ * This is the server side {@link jakarta.websocket.RemoteEndpoint} implementation
  * - i.e. what the server uses to send data to the client.
  */
 public class WsRemoteEndpointImplServer extends WsRemoteEndpointImplBase {
@@ -52,7 +51,6 @@ public class WsRemoteEndpointImplServer extends WsRemoteEndpointImplBase {
     private volatile ByteBuffer[] buffers = null;
 
     private volatile long timeoutExpiry = -1;
-    private volatile boolean close;
 
     public WsRemoteEndpointImplServer(SocketWrapperBase<?> socketWrapper,
             WsServerContainer serverContainer) {
@@ -65,6 +63,7 @@ public class WsRemoteEndpointImplServer extends WsRemoteEndpointImplBase {
     protected final boolean isMasked() {
         return false;
     }
+
 
     @Override
     protected void doWrite(SendHandler handler, long blockingWriteTimeoutExpiry,
@@ -81,12 +80,12 @@ public class WsRemoteEndpointImplServer extends WsRemoteEndpointImplBase {
                 }
             } else {
                 this.handler = handler;
+                timeout = getSendTimeout();
                 if (timeout > 0) {
                     // Register with timeout thread
                     timeoutExpiry = timeout + System.currentTimeMillis();
                     wsWriteTimeout.register(this);
                 }
-                timeout = getSendTimeout();
             }
             socketWrapper.write(block ? BlockingMode.BLOCK : BlockingMode.SEMI_BLOCK, timeout,
                     TimeUnit.MILLISECONDS, null, SocketWrapperBase.COMPLETE_WRITE_WITH_COMPLETION,
@@ -103,16 +102,10 @@ public class WsRemoteEndpointImplServer extends WsRemoteEndpointImplBase {
                             } else {
                                 wsWriteTimeout.unregister(WsRemoteEndpointImplServer.this);
                                 clearHandler(null, true);
-                                if (close) {
-                                    close();
-                                }
                             }
                         }
                         @Override
                         public void failed(Throwable exc, Void attachment) {
-                            if (exc instanceof InterruptedByTimeoutException) {
-                                exc = new SocketTimeoutException();
-                            }
                             if (block) {
                                 SendResult sr = new SendResult(exc);
                                 handler.onResult(sr);
@@ -188,9 +181,6 @@ public class WsRemoteEndpointImplServer extends WsRemoteEndpointImplBase {
                     if (complete) {
                         wsWriteTimeout.unregister(this);
                         clearHandler(null, useDispatch);
-                        if (close) {
-                            close();
-                        }
                     }
                     break;
                 }
@@ -224,7 +214,7 @@ public class WsRemoteEndpointImplServer extends WsRemoteEndpointImplBase {
         }
         try {
             socketWrapper.close();
-        } catch (IOException e) {
+        } catch (Exception e) {
             if (log.isInfoEnabled()) {
                 log.info(sm.getString("wsRemoteEndpointServer.closeFailed"), e);
             }
@@ -267,7 +257,7 @@ public class WsRemoteEndpointImplServer extends WsRemoteEndpointImplBase {
      * @param useDispatch   Should {@link SendHandler#onResult(SendResult)} be
      *                      called from a new thread, keeping in mind the
      *                      requirements of
-     *                      {@link javax.websocket.RemoteEndpoint.Async}
+     *                      {@link jakarta.websocket.RemoteEndpoint.Async}
      */
     private void clearHandler(Throwable t, boolean useDispatch) {
         // Setting the result marks this (partial) message as

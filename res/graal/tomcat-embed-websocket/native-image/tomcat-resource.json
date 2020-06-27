@@ -1,0 +1,13 @@
+{
+  "bundles":[
+    {"name":"org.apache.tomcat.websocket.LocalStrings"},
+    {"name":"org.apache.tomcat.websocket.pojo.LocalStrings"},
+    {"name":"org.apache.tomcat.websocket.server.LocalStrings"}
+  ],
+  "resources":[
+    {"pattern":".*/mbeans-descriptors.xml$"},
+    {"pattern":".*/*.properties$"},
+    {"pattern":".*/*.dtd$"},
+    {"pattern":".*/*.xsd$"}
+  ]
+}

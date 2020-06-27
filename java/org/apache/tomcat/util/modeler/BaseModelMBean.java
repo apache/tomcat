@@ -21,7 +21,6 @@ package org.apache.tomcat.util.modeler;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Iterator;
 
 import javax.management.Attribute;
 import javax.management.AttributeChangeNotification;
@@ -217,9 +216,9 @@ public class BaseModelMBean implements DynamicMBean, MBeanRegistration,
 
         // Prepare our response, eating all exceptions
         AttributeList response = new AttributeList();
-        for (int i = 0; i < names.length; i++) {
+        for (String name : names) {
             try {
-                response.add(new Attribute(names[i],getAttribute(names[i])));
+                response.add(new Attribute(name, getAttribute(name)));
             } catch (Exception e) {
                 // Not having a particular attribute in the response
                 // is the indication of a getter problem
@@ -461,9 +460,8 @@ public class BaseModelMBean implements DynamicMBean, MBeanRegistration,
         // Prepare and return our response, eating all exceptions
         String names[] = new String[attributes.size()];
         int n = 0;
-        Iterator<?> items = attributes.iterator();
-        while (items.hasNext()) {
-            Attribute item = (Attribute) items.next();
+        for (Object attribute : attributes) {
+            Attribute item = (Attribute) attribute;
             names[n++] = item.getName();
             try {
                 setAttribute(item);

@@ -24,29 +24,26 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-/**
+/*
  * Tests for server-side sockets.
+ *
+ * While System.nanotime() is available and may have a resolution of ~100ns on
+ * some platforms, those same platforms do not use as precise a timer for socket
+ * timeouts. Therefore, a much larger error margin (100ms) is used.
+ *
+ * It is known that this larger error margin is required for Windows 10. It may
+ * be worth revisiting the choice of error margin once that platform is no
+ * longer supported.
  */
 public class TestSocketServer extends AbstractJniTest {
 
     private static final String HOST = "localhost";
-    private static final long ERROR_MARGIN;
+    // 100ms == 100,000,000ns
+    private static final long ERROR_MARGIN = 100000000;
 
     private int port = 0;
     private long serverSocket = 0;
     private long clientSocket = 0;
-
-    // Determine the resolution of System.nanoTime() so an appropriate error
-    // margin can be used in tests that use nanoTime()
-    static {
-        long start = System.nanoTime();
-        long end = System.nanoTime();
-        while (end == start) {
-            end = System.nanoTime();
-        }
-        ERROR_MARGIN = 2 * (end - start);
-    }
-
 
     @Before
     public void init() throws Exception {

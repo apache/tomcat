@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -27,25 +28,25 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import javax.servlet.ServletContextEvent;
-import javax.websocket.ClientEndpoint;
-import javax.websocket.ContainerProvider;
-import javax.websocket.DecodeException;
-import javax.websocket.Decoder;
-import javax.websocket.DeploymentException;
-import javax.websocket.EncodeException;
-import javax.websocket.Encoder;
-import javax.websocket.Endpoint;
-import javax.websocket.EndpointConfig;
-import javax.websocket.Extension;
-import javax.websocket.MessageHandler;
-import javax.websocket.OnError;
-import javax.websocket.OnMessage;
-import javax.websocket.Session;
-import javax.websocket.WebSocketContainer;
-import javax.websocket.server.ServerContainer;
-import javax.websocket.server.ServerEndpoint;
-import javax.websocket.server.ServerEndpointConfig;
+import jakarta.servlet.ServletContextEvent;
+import jakarta.websocket.ClientEndpoint;
+import jakarta.websocket.ContainerProvider;
+import jakarta.websocket.DecodeException;
+import jakarta.websocket.Decoder;
+import jakarta.websocket.DeploymentException;
+import jakarta.websocket.EncodeException;
+import jakarta.websocket.Encoder;
+import jakarta.websocket.Endpoint;
+import jakarta.websocket.EndpointConfig;
+import jakarta.websocket.Extension;
+import jakarta.websocket.MessageHandler;
+import jakarta.websocket.OnError;
+import jakarta.websocket.OnMessage;
+import jakarta.websocket.Session;
+import jakarta.websocket.WebSocketContainer;
+import jakarta.websocket.server.ServerContainer;
+import jakarta.websocket.server.ServerEndpoint;
+import jakarta.websocket.server.ServerEndpointConfig;
 
 import org.junit.Assert;
 import org.junit.Ignore;
@@ -332,8 +333,7 @@ public class TestEncodingDecoding extends TomcatBaseTest {
     }
 
 
-    @ClientEndpoint(decoders={ListStringDecoder.class},
-            encoders={ListStringEncoder.class})
+    @ClientEndpoint(decoders=ListStringDecoder.class, encoders=ListStringEncoder.class)
     public static class GenericsClient {
         private Queue<Object> received = new ConcurrentLinkedQueue<>();
 
@@ -376,8 +376,8 @@ public class TestEncodingDecoding extends TomcatBaseTest {
 
 
     @ServerEndpoint(value=PATH_GENERICS_EP,
-            decoders={ListStringDecoder.class},
-            encoders={ListStringEncoder.class},
+            decoders=ListStringDecoder.class,
+            encoders=ListStringEncoder.class,
             configurator=SingletonConfigurator.class)
     public static class GenericsServer {
 
@@ -686,9 +686,7 @@ public class TestEncodingDecoding extends TomcatBaseTest {
             List<String> lst = new ArrayList<>(1);
             str = str.substring(1,str.length()-1);
             String[] strings = str.split(",");
-            for (String t : strings){
-                lst.add(t);
-            }
+            lst.addAll(Arrays.asList(strings));
             return lst;
         }
 

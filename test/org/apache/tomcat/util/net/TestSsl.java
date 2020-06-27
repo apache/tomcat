@@ -16,18 +16,28 @@
  */
 package org.apache.tomcat.util.net;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.Reader;
+import java.util.Arrays;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.atomic.AtomicInteger;
 
+import javax.net.SocketFactory;
 import javax.net.ssl.HandshakeCompletedEvent;
 import javax.net.ssl.HandshakeCompletedListener;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.junit.Assert;
 import org.junit.Assume;
@@ -67,6 +77,82 @@ public class TestSsl extends TomcatBaseTest {
         Assert.assertTrue(res.toString().indexOf("<a href=\"../helloworld.html\">") > 0);
         Assert.assertTrue("Checking no client issuer has been requested",
                 TesterSupport.getLastClientAuthRequestedIssuerCount() == 0);
+    }
+
+    private static final int POST_DATA_SIZE = 16 * 1024 * 1024;
+
+    @Test
+    public void testPost() throws Exception {
+        SocketFactory socketFactory = TesterSupport.configureClientSsl();
+
+        Tomcat tomcat = getTomcatInstance();
+        TesterSupport.initSsl(tomcat);
+        // Increase timeout as default (3s) can be too low for some CI systems
+        Assert.assertTrue(tomcat.getConnector().setProperty("connectionTimeout", "20000"));
+
+        Context ctxt = tomcat.addContext("", null);
+        Tomcat.addServlet(ctxt, "post", new SimplePostServlet());
+        ctxt.addServletMappingDecoded("/post", "post");
+        tomcat.start();
+        int iterations = 8;
+        CountDownLatch latch = new CountDownLatch(iterations);
+        AtomicInteger errorCount = new AtomicInteger(0);
+        for (int i = 0; i < iterations; i++) {
+            new Thread() {
+                @Override
+                public void run() {
+                    try {
+                        SSLSocket socket = (SSLSocket) socketFactory.createSocket("localhost",
+                                getPort());
+
+                        OutputStream os = socket.getOutputStream();
+
+                        byte[] bytes = new byte[POST_DATA_SIZE]; // 16MB
+                        Arrays.fill(bytes, (byte) 1);
+
+                        os.write("POST /post HTTP/1.1\r\n".getBytes());
+                        os.write("Host: localhost\r\n".getBytes());
+                        os.write(("Content-Length: " + Integer.valueOf(bytes.length) + "\r\n\r\n").getBytes());
+                        // Write in 128KB blocks
+                        for (int i = 0; i < bytes.length / (128 * 1024); i++) {
+                            os.write(bytes, 0, 1024 * 128);
+                            Thread.sleep(10);
+                        }
+                        os.flush();
+
+                        InputStream is = socket.getInputStream();
+
+                        // Skip to the end of the headers
+                        byte[] endOfHeaders = "\r\n\r\n".getBytes();
+                        int found = 0;
+                        while (found != endOfHeaders.length) {
+                            if (is.read() == endOfHeaders[found]) {
+                                found++;
+                            } else {
+                                found = 0;
+                            }
+                        }
+
+                        for (int i = 0; i < bytes.length; i++) {
+                            int read = is.read();
+                            if (bytes[i] != read) {
+                                System.err.println("Byte in position [" + i + "] had value [" + read +
+                                        "] rather than [" + Byte.toString(bytes[i]) + "]");
+                                errorCount.incrementAndGet();
+                                break;
+                            }
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        errorCount.incrementAndGet();
+                    } finally {
+                        latch.countDown();
+                    }
+                }
+            }.start();
+        }
+        latch.await();
+        Assert.assertEquals(0, errorCount.get());
     }
 
     @Test
@@ -136,28 +222,17 @@ public class TestSsl extends TomcatBaseTest {
 
         socket.startHandshake();
 
-        // One request should be sufficient
-        int requestCount = 0;
-        int listenerComplete = 0;
-        try {
-            while (requestCount < 10) {
-                requestCount++;
-                doRequest(os, r);
-                Assert.assertTrue("Checking no client issuer has been requested",
-                        TesterSupport.getLastClientAuthRequestedIssuerCount() == 0);
-                if (listener.isComplete() && listenerComplete == 0) {
-                    listenerComplete = requestCount;
-                }
-            }
-        } catch (AssertionError | IOException e) {
-            String message = "Failed on request number " + requestCount
-                    + " after startHandshake(). " + e.getMessage();
-            log.error(message, e);
-            Assert.fail(message);
+        doRequest(os, r);
+        // Handshake complete appears to be called asynchronously
+        int wait = 0;
+        while (wait < 5000 && !listener.isComplete()) {
+            wait += 50;
+            Thread.sleep(50);
         }
-
+        Assert.assertTrue("Checking no client issuer has been requested",
+                TesterSupport.getLastClientAuthRequestedIssuerCount() == 0);
         Assert.assertTrue(listener.isComplete());
-        System.out.println("Renegotiation completed after " + listenerComplete + " requests");
+        System.out.println("Renegotiation completed after " + wait + " ms");
     }
 
     private void doRequest(OutputStream os, Reader r) throws IOException {
@@ -205,5 +280,30 @@ public class TestSsl extends TomcatBaseTest {
         public boolean isComplete() {
             return complete;
         }
+    }
+
+    public class SimplePostServlet extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+            ByteArrayOutputStream baos = new ByteArrayOutputStream(POST_DATA_SIZE);
+            byte[] in = new byte[1500];
+            InputStream input = req.getInputStream();
+            while (true) {
+                int n = input.read(in);
+                if (n > 0) {
+                    baos.write(in, 0, n);
+                } else {
+                    break;
+                }
+            }
+            byte[] out = baos.toByteArray();
+            // Set the content-length to avoid having to parse chunked
+            resp.setContentLength(out.length);
+            resp.getOutputStream().write(out);
+        }
+
     }
 }

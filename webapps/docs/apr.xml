@@ -146,13 +146,15 @@
       documentation.</p>
 
       <p>An example SSL Connector declaration is:</p>
-      <source><![CDATA[<Connector port="443" maxHttpHeaderSize="8192"
-                 maxThreads="150"
-                 enableLookups="false" disableUploadTimeout="true"
-                 acceptCount="100" scheme="https" secure="true"
-                 SSLEnabled="true"
-                 SSLCertificateFile="${catalina.base}/conf/localhost.crt"
-                 SSLCertificateKeyFile="${catalina.base}/conf/localhost.key" />]]></source>
+      <source><![CDATA[    <Connector port="443"
+               protocol="org.apache.coyote.http11.Http11AprProtocol"
+               SSLEnabled="true" scheme="https" secure="true"
+               socket.directBuffer="true" socket.directSslBuffer="true">
+        <SSLHostConfig protocols="TLSv1.3">
+            <Certificate certificateKeystoreFile="conf/localhost-rsa.jks"
+                         type="RSA" />
+        </SSLHostConfig>
+    </Connector>]]></source>
 
 
     </subsection>

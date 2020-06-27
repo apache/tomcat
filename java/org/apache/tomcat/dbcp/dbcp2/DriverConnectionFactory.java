@@ -29,7 +29,9 @@ import java.util.Properties;
 public class DriverConnectionFactory implements ConnectionFactory {
 
     private final String connectionString;
+
     private final Driver driver;
+
     private final Properties properties;
 
     /**

@@ -18,7 +18,7 @@
 # Java -> Compiler -> Errors/Warnings
 =======================================
 
-The following settings are for Oxygen (Eclipse 4.7)
+The following settings are for Eclipse 4.15
 W = Warning
 I = Ignore
 E = Error
@@ -42,6 +42,8 @@ Potential programming problems
 
    - Incomplete 'switch' cases on enum    - W
      [ ] Signal even if 'default' case exists
+   - Unlikely argument type for...        - W
+     [ ] Perfprm strict...
    - 'switch' is missing 'default' case   - I
    - Potential resource leak              - I
 
@@ -55,8 +57,12 @@ Name shadowing and conflicts
 Deprecated and restricted API
  - Deprecated API                       - W
    ([ ] on all additional check boxes)
+ - Deprecated API marked for removal    - W
  - Forbidden references                 - E
  - Discouraged reference                - W
+
+Modules
+ - All                                  - W
 
 Unnecessary code
  - All                                  - W

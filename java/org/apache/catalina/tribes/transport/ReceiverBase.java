@@ -220,10 +220,10 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
 
     /**
      * Same as bind() except it does it for the UDP port
-     * @param socket The socket to bind
-     * @param portstart     Starting port for bind attempts
-     * @param retries       Number of times to attempt to bind (port incremented
-     *                      between attempts)
+     * @param socket    The socket to bind
+     * @param portstart Starting port for bind attempts
+     * @param retries   Number of times to attempt to bind (port incremented
+     *                  between attempts)
      * @return int The retry count
      * @throws IOException Socket bind error
      */

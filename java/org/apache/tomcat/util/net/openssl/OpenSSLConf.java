@@ -48,8 +48,8 @@ public class OpenSSLConf implements Serializable {
         String name;
         String value;
         int rc;
-        for (int i = 0; i < commands.size(); i++) {
-            cmd = commands.get(i);
+        for (OpenSSLConfCmd command : commands) {
+            cmd = command;
             name = cmd.getName();
             value = cmd.getValue();
             if (name == null) {
@@ -88,8 +88,8 @@ public class OpenSSLConf implements Serializable {
         String name;
         String value;
         int rc;
-        for (int i = 0; i < commands.size(); i++) {
-            cmd = commands.get(i);
+        for (OpenSSLConfCmd command : commands) {
+            cmd = command;
             name = cmd.getName();
             value = cmd.getValue();
             if (name == null) {

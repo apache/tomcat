@@ -41,7 +41,7 @@ public final class Streams {
      * Default buffer size for use in
      * {@link #copy(InputStream, OutputStream, boolean)}.
      */
-    private static final int DEFAULT_BUFFER_SIZE = 8192;
+    public static final int DEFAULT_BUFFER_SIZE = 8192;
 
     /**
      * Copies the contents of the given {@link InputStream}

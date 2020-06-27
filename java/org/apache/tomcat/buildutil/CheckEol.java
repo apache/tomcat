@@ -33,16 +33,20 @@ import org.apache.tools.ant.types.FileSet;
 
 /**
  * Ant task that checks that all the files in the given fileset have end-of-line
- * delimiters that are appropriate for the current OS.
+ * delimiters that are appropriate.
  *
  * <p>
- * The goal is to check whether we have problems with svn:eol-style property
- * when files are committed on one OS and then checked on another one.
+ * The goal is to check whether we have problems with Subversion's svn:eol-style
+ * property or Git's autocrlf setting when files are committed on one OS and then
+ * checked on another one.
  */
 public class CheckEol extends Task {
 
     /** The files to be checked */
     private final List<FileSet> filesets = new LinkedList<>();
+
+    /** The line ending mode (either LF, CRLF, or null for OS specific) */
+    private Mode mode;
 
     /**
      * Sets the files to be checked
@@ -54,6 +58,29 @@ public class CheckEol extends Task {
     }
 
     /**
+     * Sets the line ending mode.
+     *
+     * @param mode The line ending mode (either LF or CRLF)
+     */
+    public void setMode( String mode ) {
+        this.mode = Mode.valueOf( mode.toUpperCase() );
+    }
+
+    private Mode getMode() {
+        if ( mode != null ) {
+            return mode;
+        } else {
+            if ("\n".equals(System.lineSeparator())) {
+                return Mode.LF;
+            } else if ("\r\n".equals(System.lineSeparator())) {
+                return Mode.CRLF;
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * Perform the check
      *
      * @throws BuildException if an error occurs during execution of
@@ -62,14 +89,9 @@ public class CheckEol extends Task {
     @Override
     public void execute() throws BuildException {
 
-        Mode mode = null;
-        if ("\n".equals(System.lineSeparator())) {
-            mode = Mode.LF;
-        } else if ("\r\n".equals(System.lineSeparator())) {
-            mode = Mode.CRLF;
-        } else {
-            log("Line ends check skipped, because OS line ends setting is neither LF nor CRLF.",
-                    Project.MSG_VERBOSE);
+        Mode mode = getMode();
+        if ( mode == null ) {
+            log("Line ends check skipped, because OS line ends setting is neither LF nor CRLF.", Project.MSG_VERBOSE);
             return;
         }
 
@@ -84,8 +106,8 @@ public class CheckEol extends Task {
             String[] files = ds.getIncludedFiles();
             if (files.length > 0) {
                 log("Checking line ends in " + files.length + " file(s)");
-                for (int i = 0; i < files.length; i++) {
-                    File file = new File(basedir, files[i]);
+                for (String filename : files) {
+                    File file = new File(basedir, filename);
                     log("Checking file '" + file + "' for correct line ends",
                             Project.MSG_DEBUG);
                     try {

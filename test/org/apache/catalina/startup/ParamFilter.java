@@ -19,14 +19,14 @@ package org.apache.catalina.startup;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-import javax.servlet.DispatcherType;
-import javax.servlet.FilterChain;
-import javax.servlet.GenericFilter;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.annotation.WebFilter;
-import javax.servlet.annotation.WebInitParam;
+import jakarta.servlet.DispatcherType;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.GenericFilter;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
+import jakarta.servlet.annotation.WebFilter;
+import jakarta.servlet.annotation.WebInitParam;
 
 /**
  * Test Mock to check Filter Annotations

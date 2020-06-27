@@ -65,16 +65,16 @@ testdb.validationQuery=SELECT 1
 #testdb.validationQuery=VALUES 1
 
 # JUnit Unit Test Suite
-junit.version=4.11
+junit.version=4.13
 junit.home=${base.path}/junit-${junit.version}
 junit.jar=${junit.home}/junit-${junit.version}.jar
 junit.loc=https://repo.maven.apache.org/maven2/junit/junit/${junit.version}/junit-${junit.version}.jar
 
 # Hamcrest Library, used by JUnit
-hamcrest.version=1.3
+hamcrest.version=2.2
 hamcrest.home=${base.path}/hamcrest-${hamcrest.version}
-hamcrest.jar=${hamcrest.home}/hamcrest-core-${hamcrest.version}.jar
-hamcrest.loc=https://repo.maven.apache.org/maven2/org/hamcrest/hamcrest-core/${hamcrest.version}/hamcrest-core-${hamcrest.version}.jar
+hamcrest.jar=${hamcrest.home}/hamcrest-${hamcrest.version}.jar
+hamcrest.loc=https://repo.maven.apache.org/maven2/org/hamcrest/hamcrest/${hamcrest.version}/hamcrest-${hamcrest.version}.jar
 
 mysql.home=${base.path}/mysql-connector-java-5.1.12
 mysql.jar=${mysql.home}/mysql-connector-java-5.1.12-bin.jar

@@ -25,8 +25,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.servlet.ServletContext;
-import javax.servlet.SessionTrackingMode;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.SessionTrackingMode;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.connector.Request;

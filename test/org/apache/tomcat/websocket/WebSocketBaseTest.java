@@ -19,9 +19,30 @@ package org.apache.tomcat.websocket;
 import org.junit.After;
 import org.junit.Assert;
 
+import org.apache.catalina.Context;
+import org.apache.catalina.LifecycleException;
+import org.apache.catalina.servlets.DefaultServlet;
+import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.tomcat.websocket.server.WsContextListener;
 
 public abstract class WebSocketBaseTest extends TomcatBaseTest {
+
+    protected Tomcat startServer(
+            final Class<? extends WsContextListener> configClass)
+            throws LifecycleException {
+
+        Tomcat tomcat = getTomcatInstance();
+        // No file system docBase required
+        Context ctx = tomcat.addContext("", null);
+        ctx.addApplicationListener(configClass.getName());
+        Tomcat.addServlet(ctx, "default", new DefaultServlet());
+        ctx.addServletMappingDecoded("/", "default");
+
+        tomcat.start();
+        return tomcat;
+    }
+
 
     @After
     public void checkBackgroundProcessHasStopped() throws Exception {

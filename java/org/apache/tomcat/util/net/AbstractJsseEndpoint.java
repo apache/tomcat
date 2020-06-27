@@ -29,8 +29,6 @@ import javax.net.ssl.SSLEngine;
 import javax.net.ssl.SSLParameters;
 
 import org.apache.tomcat.util.compat.JreCompat;
-import org.apache.tomcat.util.net.SSLHostConfig.Type;
-import org.apache.tomcat.util.net.openssl.OpenSSLImplementation;
 import org.apache.tomcat.util.net.openssl.ciphers.Cipher;
 
 public abstract class AbstractJsseEndpoint<S,U> extends AbstractEndpoint<S,U> {
@@ -65,22 +63,11 @@ public abstract class AbstractJsseEndpoint<S,U> extends AbstractEndpoint<S,U> {
     }
 
 
-    @Override
-    protected Type getSslConfigType() {
-        if (OpenSSLImplementation.class.getName().equals(sslImplementationName)) {
-            return SSLHostConfig.Type.EITHER;
-        } else {
-            return SSLHostConfig.Type.JSSE;
-        }
-    }
-
-
     protected void initialiseSsl() throws Exception {
         if (isSSLEnabled()) {
             sslImplementation = SSLImplementation.getInstance(getSslImplementationName());
 
             for (SSLHostConfig sslHostConfig : sslHostConfigs.values()) {
-                sslHostConfig.setConfigType(getSslConfigType());
                 createSSLContext(sslHostConfig);
             }
 
@@ -130,41 +117,40 @@ public abstract class AbstractJsseEndpoint<S,U> extends AbstractEndpoint<S,U> {
         }
 
         SSLEngine engine = sslContext.createSSLEngine();
-        switch (sslHostConfig.getCertificateVerification()) {
-        case NONE:
-            engine.setNeedClientAuth(false);
-            engine.setWantClientAuth(false);
-            break;
-        case OPTIONAL:
-        case OPTIONAL_NO_CA:
-            engine.setWantClientAuth(true);
-            break;
-        case REQUIRED:
-            engine.setNeedClientAuth(true);
-            break;
-        }
         engine.setUseClientMode(false);
         engine.setEnabledCipherSuites(sslHostConfig.getEnabledCiphers());
         engine.setEnabledProtocols(sslHostConfig.getEnabledProtocols());
 
         SSLParameters sslParameters = engine.getSSLParameters();
         sslParameters.setUseCipherSuitesOrder(sslHostConfig.getHonorCipherOrder());
-        if (JreCompat.isJre9Available() && clientRequestedApplicationProtocols != null
+        if (JreCompat.isAlpnSupported() && clientRequestedApplicationProtocols != null
                 && clientRequestedApplicationProtocols.size() > 0
                 && negotiableProtocols.size() > 0) {
             // Only try to negotiate if both client and server have at least
             // one protocol in common
             // Note: Tomcat does not explicitly negotiate http/1.1
             // TODO: Is this correct? Should it change?
-            List<String> commonProtocols = new ArrayList<>();
-            commonProtocols.addAll(negotiableProtocols);
+            List<String> commonProtocols = new ArrayList<>(negotiableProtocols);
             commonProtocols.retainAll(clientRequestedApplicationProtocols);
             if (commonProtocols.size() > 0) {
-                String[] commonProtocolsArray = commonProtocols.toArray(new String[commonProtocols.size()]);
+                String[] commonProtocolsArray = commonProtocols.toArray(new String[0]);
                 JreCompat.getInstance().setApplicationProtocols(sslParameters, commonProtocolsArray);
             }
         }
-        // In case the getter returns a defensive copy
+        switch (sslHostConfig.getCertificateVerification()) {
+        case NONE:
+            sslParameters.setNeedClientAuth(false);
+            sslParameters.setWantClientAuth(false);
+            break;
+        case OPTIONAL:
+        case OPTIONAL_NO_CA:
+            sslParameters.setWantClientAuth(true);
+            break;
+        case REQUIRED:
+            sslParameters.setNeedClientAuth(true);
+            break;
+        }
+        // The getter (at least in OpenJDK and derivatives) returns a defensive copy
         engine.setSSLParameters(sslParameters);
 
         return engine;
@@ -204,7 +190,6 @@ public abstract class AbstractJsseEndpoint<S,U> extends AbstractEndpoint<S,U> {
     }
 
 
-
     @Override
     public boolean isAlpnSupported() {
         // ALPN requires TLS so if TLS is not enabled, ALPN cannot be supported
@@ -228,7 +213,7 @@ public abstract class AbstractJsseEndpoint<S,U> extends AbstractEndpoint<S,U> {
     @Override
     public void unbind() throws Exception {
         for (SSLHostConfig sslHostConfig : sslHostConfigs.values()) {
-            for (SSLHostConfigCertificate certificate : sslHostConfig.getCertificates(true)) {
+            for (SSLHostConfigCertificate certificate : sslHostConfig.getCertificates()) {
                 certificate.setSslContext(null);
             }
         }

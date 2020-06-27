@@ -16,10 +16,10 @@
  */
 package org.apache.tomcat.websocket.server;
 
-import javax.servlet.ServletContextEvent;
-import javax.websocket.DeploymentException;
-import javax.websocket.server.ServerContainer;
-import javax.websocket.server.ServerEndpointConfig;
+import jakarta.servlet.ServletContextEvent;
+import jakarta.websocket.DeploymentException;
+import jakarta.websocket.server.ServerContainer;
+import jakarta.websocket.server.ServerEndpointConfig;
 
 public abstract class TesterEndpointConfig extends WsContextListener {
 

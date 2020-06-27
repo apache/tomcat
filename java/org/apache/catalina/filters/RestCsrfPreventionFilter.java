@@ -24,13 +24,14 @@ import java.util.Set;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.FilterConfig;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 /**
  * Provides basic CSRF protection for REST APIs. The filter assumes that the
@@ -87,6 +88,17 @@ public class RestCsrfPreventionFilter extends CsrfPreventionFilterBase {
     private Set<String> pathsAcceptingParams = new HashSet<>();
 
     private String pathsDelimiter = ",";
+
+    @Override
+    public void init(FilterConfig filterConfig) throws ServletException {
+        // Set the parameters
+        super.init(filterConfig);
+
+        // Put the expected request header name into the application scope
+        filterConfig.getServletContext().setAttribute(
+                Constants.CSRF_REST_NONCE_HEADER_NAME_KEY,
+                Constants.CSRF_REST_NONCE_HEADER_NAME);
+    }
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)

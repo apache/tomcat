@@ -20,7 +20,7 @@ package org.apache.el.parser;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.el.ELException;
+import jakarta.el.ELException;
 
 import org.apache.el.lang.EvaluationContext;
 

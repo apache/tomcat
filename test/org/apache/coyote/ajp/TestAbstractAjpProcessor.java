@@ -26,20 +26,33 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
 import org.apache.catalina.Context;
+import org.apache.catalina.connector.Connector;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 
 public class TestAbstractAjpProcessor extends TomcatBaseTest {
+
+    @Before
+    @Override
+    public void setUp() throws Exception {
+        super.setUp();
+
+        Connector c = getTomcatInstance().getConnector();
+        c.setProperty("secretRequired", "false");
+        c.setProperty("allowedRequestAttributesPattern", "MYATTRIBUTE.*");
+    }
+
 
     @Override
     protected String getProtocol() {
@@ -76,7 +89,7 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
         Map<String, String> params = desc.getParams();
 
         Tomcat tomcat = getTomcatInstance();
-        tomcat.getConnector().setProperty("packetSize", Integer.toString(ajpPacketSize));
+        Assert.assertTrue(tomcat.getConnector().setProperty("packetSize", Integer.toString(ajpPacketSize)));
 
         // No file system docBase required
         Context ctx = tomcat.addContext("", null);
@@ -193,13 +206,13 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
                 case "REQUEST-REMOTE-USER":
                     /* request.getRemoteUser() will not trust the AJP
                      * info if tomcatAuthentication is set. */
-                    tomcat.getConnector().setProperty("tomcatAuthentication", "false");
+                    Assert.assertTrue(tomcat.getConnector().setProperty("tomcatAuthentication", "false"));
                     forwardMessage.addAttribute(0x03, value);
                     break;
                 case "REQUEST-AUTH-TYPE":
                     /* request.getAuthType() will not trust the AJP
                      * info if tomcatAuthentication is set. */
-                    tomcat.getConnector().setProperty("tomcatAuthentication", "false");
+                    Assert.assertTrue(tomcat.getConnector().setProperty("tomcatAuthentication", "false"));
                     forwardMessage.addAttribute(0x04, value);
                     break;
                 case "REQUEST-QUERY-STRING":
@@ -490,7 +503,7 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
     @Test
     public void testSecret() throws Exception {
         Tomcat tomcat = getTomcatInstance();
-        tomcat.getConnector().setProperty("requiredSecret", "RIGHTSECRET");
+        Assert.assertTrue(tomcat.getConnector().setProperty("requiredSecret", "RIGHTSECRET"));
         tomcat.start();
 
         // No file system docBase required
@@ -550,7 +563,7 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
     @Test
     public void testKeepAlive() throws Exception {
         Tomcat tomcat = getTomcatInstance();
-        tomcat.getConnector().setProperty("connectionTimeout", "-1");
+        Assert.assertTrue(tomcat.getConnector().setProperty("connectionTimeout", "-1"));
         tomcat.start();
 
         // No file system docBase required
@@ -771,7 +784,7 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
         int ajpPacketSize = 16000;
 
         Tomcat tomcat = getTomcatInstance();
-        tomcat.getConnector().setProperty("packetSize", Integer.toString(ajpPacketSize));
+        Assert.assertTrue(tomcat.getConnector().setProperty("packetSize", Integer.toString(ajpPacketSize)));
 
         // No file system docBase required
         Context ctx = tomcat.addContext("", null);

@@ -27,7 +27,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
 
-import javax.servlet.http.HttpUpgradeHandler;
+import jakarta.servlet.http.HttpUpgradeHandler;
 
 import org.apache.coyote.AbstractProtocol;
 import org.apache.coyote.CompressionConfig;
@@ -95,6 +95,15 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
     // ------------------------------------------------ HTTP specific properties
     // ------------------------------------------ managed in the ProtocolHandler
 
+    private boolean useKeepAliveResponseHeader = true;
+    public boolean getUseKeepAliveResponseHeader() {
+        return useKeepAliveResponseHeader;
+    }
+    public void setUseKeepAliveResponseHeader(boolean useKeepAliveResponseHeader) {
+        this.useKeepAliveResponseHeader = useKeepAliveResponseHeader;
+    }
+
+
     private String relaxedPathChars = null;
     public String getRelaxedPathChars() {
         return relaxedPathChars;
@@ -136,27 +145,27 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
     }
 
 
-    private boolean rejectIllegalHeaderName = true;
+    private boolean rejectIllegalHeader = true;
     /**
-     * If an HTTP request is received that contains an illegal header name (i.e.
-     * the header name is not a token) will the request be rejected (with a 400
-     * response) or will the illegal header be ignored.
+     * If an HTTP request is received that contains an illegal header name or
+     * value (e.g. the header name is not a token) will the request be rejected
+     * (with a 400 response) or will the illegal header be ignored?
      *
      * @return {@code true} if the request will be rejected or {@code false} if
      *         the header will be ignored
      */
-    public boolean getRejectIllegalHeaderName() { return rejectIllegalHeaderName; }
+    public boolean getRejectIllegalHeader() { return rejectIllegalHeader; }
     /**
-     * If an HTTP request is received that contains an illegal header name (i.e.
-     * the header name is not a token) should the request be rejected (with a
-     * 400 response) or should the illegal header be ignored.
+     * If an HTTP request is received that contains an illegal header name or
+     * value (e.g. the header name is not a token) should the request be
+     * rejected (with a 400 response) or should the illegal header be ignored?
      *
-     * @param rejectIllegalHeaderName   {@code true} to reject requests with
-     *                                  illegal header names, {@code false} to
-     *                                  ignore the header
+     * @param rejectIllegalHeader   {@code true} to reject requests with illegal
+     *                              header names or values, {@code false} to
+     *                              ignore the header
      */
-    public void setRejectIllegalHeaderName(boolean rejectIllegalHeaderName) {
-        this.rejectIllegalHeaderName = rejectIllegalHeaderName;
+    public void setRejectIllegalHeader(boolean rejectIllegalHeader) {
+        this.rejectIllegalHeader = rejectIllegalHeader;
     }
 
 
@@ -387,8 +396,7 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
     public void setAllowedTrailerHeaders(String commaSeparatedHeaders) {
         // Jump through some hoops so we don't end up with an empty set while
         // doing updates.
-        Set<String> toRemove = new HashSet<>();
-        toRemove.addAll(allowedTrailerHeaders);
+        Set<String> toRemove = new HashSet<>(allowedTrailerHeaders);
         if (commaSeparatedHeaders != null) {
             String[] headers = commaSeparatedHeaders.split(",");
             for (String header : headers) {
@@ -405,11 +413,13 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
     protected Set<String> getAllowedTrailerHeadersInternal() {
         return allowedTrailerHeaders;
     }
+    public boolean isTrailerHeaderAllowed(String headerName) {
+        return allowedTrailerHeaders.contains(headerName);
+    }
     public String getAllowedTrailerHeaders() {
-        // Chances of a size change between these lines are small enough that a
-        // sync is unnecessary.
-        List<String> copy = new ArrayList<>(allowedTrailerHeaders.size());
-        copy.addAll(allowedTrailerHeaders);
+        // Chances of a change during execution of this line are small enough
+        // that a sync is unnecessary.
+        List<String> copy = new ArrayList<>(allowedTrailerHeaders);
         return StringUtils.join(copy);
     }
     public void addAllowedTrailerHeader(String header) {
@@ -479,6 +489,8 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
                 }
             }
         }
+
+        upgradeProtocol.setHttp11Protocol(this);
     }
     @Override
     public UpgradeProtocol getNegotiatedProtocol(String negotiatedName) {
@@ -531,9 +543,6 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
     }
     public void setDefaultSSLHostConfigName(String defaultSSLHostConfigName) {
         getEndpoint().setDefaultSSLHostConfigName(defaultSSLHostConfigName);
-        if (defaultSSLHostConfig != null) {
-            defaultSSLHostConfig.setHostName(defaultSSLHostConfigName);
-        }
     }
 
 
@@ -556,380 +565,6 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
 
     public void reloadSslHostConfig(String hostName) {
         getEndpoint().reloadSslHostConfig(hostName);
-    }
-
-
-    // ----------------------------------------------- HTTPS specific properties
-    // -------------------------------------------- Handled via an SSLHostConfig
-
-    private SSLHostConfig defaultSSLHostConfig = null;
-    private void registerDefaultSSLHostConfig() {
-        if (defaultSSLHostConfig == null) {
-            for (SSLHostConfig sslHostConfig : findSslHostConfigs()) {
-                if (getDefaultSSLHostConfigName().equals(sslHostConfig.getHostName())) {
-                    defaultSSLHostConfig = sslHostConfig;
-                    break;
-                }
-            }
-            if (defaultSSLHostConfig == null) {
-                defaultSSLHostConfig = new SSLHostConfig();
-                defaultSSLHostConfig.setHostName(getDefaultSSLHostConfigName());
-                getEndpoint().addSslHostConfig(defaultSSLHostConfig);
-            }
-        }
-    }
-
-
-    // TODO: All of these SSL getters and setters can be removed once it is no
-    // longer necessary to support the old configuration attributes (Tomcat 10?)
-
-    public String getSslEnabledProtocols() {
-        registerDefaultSSLHostConfig();
-        return StringUtils.join(defaultSSLHostConfig.getEnabledProtocols());
-    }
-    public void setSslEnabledProtocols(String enabledProtocols) {
-        registerDefaultSSLHostConfig();
-        defaultSSLHostConfig.setProtocols(enabledProtocols);
-    }
-    public String getSSLProtocol() {
-        registerDefaultSSLHostConfig();
-        return StringUtils.join(defaultSSLHostConfig.getEnabledProtocols());
-    }
-    public void setSSLProtocol(String sslProtocol) {
-        registerDefaultSSLHostConfig();
-        defaultSSLHostConfig.setProtocols(sslProtocol);
-    }
-
-
-    public String getKeystoreFile() {
-        registerDefaultSSLHostConfig();
-        return defaultSSLHostConfig.getCertificateKeystoreFile();
-    }
-    public void setKeystoreFile(String keystoreFile) {
-        registerDefaultSSLHostConfig();
-        defaultSSLHostConfig.setCertificateKeystoreFile(keystoreFile);
-    }
-    public String getSSLCertificateChainFile() {
-        registerDefaultSSLHostConfig();
-        return defaultSSLHostConfig.getCertificateChainFile();
-    }
-    public void setSSLCertificateChainFile(String certificateChainFile) {
-        registerDefaultSSLHostConfig();
-        defaultSSLHostConfig.setCertificateChainFile(certificateChainFile);
-    }
-    public String getSSLCertificateFile() {
-        registerDefaultSSLHostConfig();
-        return defaultSSLHostConfig.getCertificateFile();
-    }
-    public void setSSLCertificateFile(String certificateFile) {
-        registerDefaultSSLHostConfig();
-        defaultSSLHostConfig.setCertificateFile(certificateFile);
-    }
-    public String getSSLCertificateKeyFile() {
-        registerDefaultSSLHostConfig();
-        return defaultSSLHostConfig.getCertificateKeyFile();
-    }
-    public void setSSLCertificateKeyFile(String certificateKeyFile) {
-        registerDefaultSSLHostConfig();
-        defaultSSLHostConfig.setCertificateKeyFile(certificateKeyFile);
-    }
-
-
-    public String getAlgorithm() {
-        registerDefaultSSLHostConfig();
-        return defaultSSLHostConfig.getKeyManagerAlgorithm();
-    }
-    public void setAlgorithm(String keyManagerAlgorithm) {
-        registerDefaultSSLHostConfig();
-        defaultSSLHostConfig.setKeyManagerAlgorithm(keyManagerAlgorithm);
-    }
-
-
-    public String getClientAuth() {
-        registerDefaultSSLHostConfig();
-        return defaultSSLHostConfig.getCertificateVerificationAsString();
-    }
-    public void setClientAuth(String certificateVerification) {
-        registerDefaultSSLHostConfig();
-        defaultSSLHostConfig.setCertificateVerification(certificateVerification);
-    }
-
-
-    public String getSSLVerifyClient() {
-        registerDefaultSSLHostConfig();
-        return defaultSSLHostConfig.getCertificateVerificationAsString();
-    }
-    public void setSSLVerifyClient(String certificateVerification) {
-        registerDefaultSSLHostConfig();
-        defaultSSLHostConfig.setCertificateVerification(certificateVerification);
-    }
-
-
-    public int getTrustMaxCertLength(){
-        registerDefaultSSLHostConfig();
-        return defaultSSLHostConfig.getCertificateVerificationDepth();
-    }
-    public void setTrustMaxCertLength(int certificateVerificationDepth){
-        registerDefaultSSLHostConfig();
-        defaultSSLHostConfig.setCertificateVerificationDepth(certificateVerificationDepth);
-    }
-    public int getSSLVerifyDepth() {
-        registerDefaultSSLHostConfig();
-        return defaultSSLHostConfig.getCertificateVerificationDepth();
-    }
-    public void setSSLVerifyDepth(int certificateVerificationDepth) {
-        registerDefaultSSLHostConfig();
-        defaultSSLHostConfig.setCertificateVerificationDepth(certificateVerificationDepth);
-    }
-
-
-    public boolean getUseServerCipherSuitesOrder() {
-        registerDefaultSSLHostConfig();
-        return defaultSSLHostConfig.getHonorCipherOrder();
-    }
-    public void setUseServerCipherSuitesOrder(boolean honorCipherOrder) {
-        registerDefaultSSLHostConfig();
-        defaultSSLHostConfig.setHonorCipherOrder(honorCipherOrder);
-    }
-    public boolean getSSLHonorCipherOrder() {
-        registerDefaultSSLHostConfig();
-        return defaultSSLHostConfig.getHonorCipherOrder();
-    }
-    public void setSSLHonorCipherOrder(boolean honorCipherOrder) {
-        registerDefaultSSLHostConfig();
-        defaultSSLHostConfig.setHonorCipherOrder(honorCipherOrder);
-    }
-
-
-    public String getCiphers() {
-        registerDefaultSSLHostConfig();
-        return defaultSSLHostConfig.getCiphers();
-    }
-    public void setCiphers(String ciphers) {
-        registerDefaultSSLHostConfig();
-        defaultSSLHostConfig.setCiphers(ciphers);
-    }
-    public String getSSLCipherSuite() {
-        registerDefaultSSLHostConfig();
-        return defaultSSLHostConfig.getCiphers();
-    }
-    public void setSSLCipherSuite(String ciphers) {
-        registerDefaultSSLHostConfig();
-        defaultSSLHostConfig.setCiphers(ciphers);
-    }
-
-
-    public String getKeystorePass() {
-        registerDefaultSSLHostConfig();
-        return defaultSSLHostConfig.getCertificateKeystorePassword();
-    }
-    public void setKeystorePass(String certificateKeystorePassword) {
-        registerDefaultSSLHostConfig();
-        defaultSSLHostConfig.setCertificateKeystorePassword(certificateKeystorePassword);
-    }
-
-
-    public String getKeyPass() {
-        registerDefaultSSLHostConfig();
-        return defaultSSLHostConfig.getCertificateKeyPassword();
-    }
-    public void setKeyPass(String certificateKeyPassword) {
-        registerDefaultSSLHostConfig();
-        defaultSSLHostConfig.setCertificateKeyPassword(certificateKeyPassword);
-    }
-    public String getSSLPassword() {
-        registerDefaultSSLHostConfig();
-        return defaultSSLHostConfig.getCertificateKeyPassword();
-    }
-    public void setSSLPassword(String certificateKeyPassword) {
-        registerDefaultSSLHostConfig();
-        defaultSSLHostConfig.setCertificateKeyPassword(certificateKeyPassword);
-    }
-
-
-    public String getCrlFile(){
-        registerDefaultSSLHostConfig();
-        return defaultSSLHostConfig.getCertificateRevocationListFile();
-    }
-    public void setCrlFile(String certificateRevocationListFile){
-        registerDefaultSSLHostConfig();
-        defaultSSLHostConfig.setCertificateRevocationListFile(certificateRevocationListFile);
-    }
-    public String getSSLCARevocationFile() {
-        registerDefaultSSLHostConfig();
-        return defaultSSLHostConfig.getCertificateRevocationListFile();
-    }
-    public void setSSLCARevocationFile(String certificateRevocationListFile) {
-        registerDefaultSSLHostConfig();
-        defaultSSLHostConfig.setCertificateRevocationListFile(certificateRevocationListFile);
-    }
-    public String getSSLCARevocationPath() {
-        registerDefaultSSLHostConfig();
-        return defaultSSLHostConfig.getCertificateRevocationListPath();
-    }
-    public void setSSLCARevocationPath(String certificateRevocationListPath) {
-        registerDefaultSSLHostConfig();
-        defaultSSLHostConfig.setCertificateRevocationListPath(certificateRevocationListPath);
-    }
-
-
-    public String getKeystoreType() {
-        registerDefaultSSLHostConfig();
-        return defaultSSLHostConfig.getCertificateKeystoreType();
-    }
-    public void setKeystoreType(String certificateKeystoreType) {
-        registerDefaultSSLHostConfig();
-        defaultSSLHostConfig.setCertificateKeystoreType(certificateKeystoreType);
-    }
-
-
-    public String getKeystoreProvider() {
-        registerDefaultSSLHostConfig();
-        return defaultSSLHostConfig.getCertificateKeystoreProvider();
-    }
-    public void setKeystoreProvider(String certificateKeystoreProvider) {
-        registerDefaultSSLHostConfig();
-        defaultSSLHostConfig.setCertificateKeystoreProvider(certificateKeystoreProvider);
-    }
-
-
-    public String getKeyAlias() {
-        registerDefaultSSLHostConfig();
-        return defaultSSLHostConfig.getCertificateKeyAlias();
-    }
-    public void setKeyAlias(String certificateKeyAlias) {
-        registerDefaultSSLHostConfig();
-        defaultSSLHostConfig.setCertificateKeyAlias(certificateKeyAlias);
-    }
-
-
-    public String getTruststoreAlgorithm(){
-        registerDefaultSSLHostConfig();
-        return defaultSSLHostConfig.getTruststoreAlgorithm();
-    }
-    public void setTruststoreAlgorithm(String truststoreAlgorithm){
-        registerDefaultSSLHostConfig();
-        defaultSSLHostConfig.setTruststoreAlgorithm(truststoreAlgorithm);
-    }
-
-
-    public String getTruststoreFile(){
-        registerDefaultSSLHostConfig();
-        return defaultSSLHostConfig.getTruststoreFile();
-    }
-    public void setTruststoreFile(String truststoreFile){
-        registerDefaultSSLHostConfig();
-        defaultSSLHostConfig.setTruststoreFile(truststoreFile);
-    }
-
-
-    public String getTruststorePass(){
-        registerDefaultSSLHostConfig();
-        return defaultSSLHostConfig.getTruststorePassword();
-    }
-    public void setTruststorePass(String truststorePassword){
-        registerDefaultSSLHostConfig();
-        defaultSSLHostConfig.setTruststorePassword(truststorePassword);
-    }
-
-
-    public String getTruststoreType(){
-        registerDefaultSSLHostConfig();
-        return defaultSSLHostConfig.getTruststoreType();
-    }
-    public void setTruststoreType(String truststoreType){
-        registerDefaultSSLHostConfig();
-        defaultSSLHostConfig.setTruststoreType(truststoreType);
-    }
-
-
-    public String getTruststoreProvider(){
-        registerDefaultSSLHostConfig();
-        return defaultSSLHostConfig.getTruststoreProvider();
-    }
-    public void setTruststoreProvider(String truststoreProvider){
-        registerDefaultSSLHostConfig();
-        defaultSSLHostConfig.setTruststoreProvider(truststoreProvider);
-    }
-
-
-    public String getSslProtocol() {
-        registerDefaultSSLHostConfig();
-        return defaultSSLHostConfig.getSslProtocol();
-    }
-    public void setSslProtocol(String sslProtocol) {
-        registerDefaultSSLHostConfig();
-        defaultSSLHostConfig.setSslProtocol(sslProtocol);
-    }
-
-
-    public int getSessionCacheSize(){
-        registerDefaultSSLHostConfig();
-        return defaultSSLHostConfig.getSessionCacheSize();
-    }
-    public void setSessionCacheSize(int sessionCacheSize){
-        registerDefaultSSLHostConfig();
-        defaultSSLHostConfig.setSessionCacheSize(sessionCacheSize);
-    }
-
-
-    public int getSessionTimeout(){
-        registerDefaultSSLHostConfig();
-        return defaultSSLHostConfig.getSessionTimeout();
-    }
-    public void setSessionTimeout(int sessionTimeout){
-        registerDefaultSSLHostConfig();
-        defaultSSLHostConfig.setSessionTimeout(sessionTimeout);
-    }
-
-
-    public String getSSLCACertificatePath() {
-        registerDefaultSSLHostConfig();
-        return defaultSSLHostConfig.getCaCertificatePath();
-    }
-    public void setSSLCACertificatePath(String caCertificatePath) {
-        registerDefaultSSLHostConfig();
-        defaultSSLHostConfig.setCaCertificatePath(caCertificatePath);
-    }
-
-
-    public String getSSLCACertificateFile() {
-        registerDefaultSSLHostConfig();
-        return defaultSSLHostConfig.getCaCertificateFile();
-    }
-    public void setSSLCACertificateFile(String caCertificateFile) {
-        registerDefaultSSLHostConfig();
-        defaultSSLHostConfig.setCaCertificateFile(caCertificateFile);
-    }
-
-
-    public boolean getSSLDisableCompression() {
-        registerDefaultSSLHostConfig();
-        return defaultSSLHostConfig.getDisableCompression();
-    }
-    public void setSSLDisableCompression(boolean disableCompression) {
-        registerDefaultSSLHostConfig();
-        defaultSSLHostConfig.setDisableCompression(disableCompression);
-    }
-
-
-    public boolean getSSLDisableSessionTickets() {
-        registerDefaultSSLHostConfig();
-        return defaultSSLHostConfig.getDisableSessionTickets();
-    }
-    public void setSSLDisableSessionTickets(boolean disableSessionTickets) {
-        registerDefaultSSLHostConfig();
-        defaultSSLHostConfig.setDisableSessionTickets(disableSessionTickets);
-    }
-
-
-    public String getTrustManagerClassName() {
-        registerDefaultSSLHostConfig();
-        return defaultSSLHostConfig.getTrustManagerClassName();
-    }
-    public void setTrustManagerClassName(String trustManagerClassName) {
-        registerDefaultSSLHostConfig();
-        defaultSSLHostConfig.setTrustManagerClassName(trustManagerClassName);
     }
 
 

@@ -26,6 +26,7 @@ import java.util.Collection;
 
 import javax.crypto.Cipher;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.hamcrest.core.IsNot;
 
@@ -371,7 +372,7 @@ public class TestEncryptInterceptor {
 
         byte[] cipherText2 = ((ValueCaptureInterceptor)src.getNext()).getValue();
 
-        Assert.assertThat("Two identical cleartexts encrypt to the same ciphertext",
+        MatcherAssert.assertThat("Two identical cleartexts encrypt to the same ciphertext",
                 cipherText1, IsNot.not(IsEqual.equalTo(cipherText2)));
     }
 

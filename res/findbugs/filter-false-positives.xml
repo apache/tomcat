@@ -18,7 +18,7 @@
   <!--  Considered to be false positives -->
   <Match>
     <!-- Only base null is handled by this resolver -->
-    <Class name="javax.el.BeanNameELResolver"/>
+    <Class name="jakarta.el.BeanNameELResolver"/>
     <Or>
       <Method name="getType" />
       <Method name="getValue" />
@@ -29,7 +29,7 @@
   </Match>
   <Match>
     <!-- Only base null is handled by this resolver -->
-    <Class name="javax.servlet.jsp.el.ImplicitObjectELResolver"/>
+    <Class name="jakarta.servlet.jsp.el.ImplicitObjectELResolver"/>
     <Or>
       <Method name="getType" />
       <Method name="getValue" />
@@ -39,13 +39,13 @@
     <Bug code="NP" />
   </Match>
   <Match>
-    <Class name="javax.servlet.jsp.el.ImplicitObjectELResolver$ScopeMap$ScopeEntry"/>
+    <Class name="jakarta.servlet.jsp.el.ImplicitObjectELResolver$ScopeMap$ScopeEntry"/>
     <Method name="equals"/>
     <Bug code="Eq" />
   </Match>
   <Match>
     <!-- Only base null is handled by this resolver -->
-    <Class name="javax.servlet.jsp.el.ScopedAttributeELResolver"/>
+    <Class name="jakarta.servlet.jsp.el.ScopedAttributeELResolver"/>
     <Or>
       <Method name="getType" />
       <Method name="getValue" />
@@ -56,7 +56,7 @@
   </Match>
   <Match>
     <!--  Cannot do anything about this. API is fixed by the specification. -->
-    <Class name="javax.servlet.jsp.tagext.TagData"/>
+    <Class name="jakarta.servlet.jsp.tagext.TagData"/>
     <Bug code="CN" />
   </Match>
   <Match>
@@ -351,6 +351,8 @@
     </Or>
     <Or>
       <Method name="credentials" />
+      <Method name="getPassword" />
+      <Method name="getRoles" />
       <Method name="roles" />
     </Or>
     <Bug pattern="SQL_PREPARED_STATEMENT_GENERATED_FROM_NONCONSTANT_STRING" />
@@ -810,7 +812,10 @@
     <!-- Notify is correct. Condition changed outside of this method. -->
     <Class name="org.apache.coyote.http2.Http2UpgradeHandler" />
     <Method name="incrementWindowSize" />
-    <Bug pattern="NN_NAKED_NOTIFY" />
+    <Or>
+      <Bug pattern="NN_NAKED_NOTIFY" />
+      <Bug pattern="NO_NOTIFY_NOT_NOTIFYALL" />
+    </Or>
   </Match>
   <Match>
     <!-- Return value is intentionally ignored. -->
@@ -822,10 +827,25 @@
     <!-- Notify is correct. Condition changed outside of this method. -->
     <Class name="org.apache.coyote.http2.Stream" />
     <Or>
+      <Method name="cancelAllocationRequests" />
       <Method name="incrementWindowSize" />
-      <Method name="receiveReset" />
     </Or>
-    <Bug pattern="NN_NAKED_NOTIFY" />
+    <Or>
+      <Bug pattern="NN_NAKED_NOTIFY" />
+      <Bug pattern="NO_NOTIFY_NOT_NOTIFYALL" />
+    </Or>
+  </Match>
+  <Match>
+    <!-- Monitor is used for a single condition. -->
+    <Class name="org.apache.coyote.http2.WindowAllocationManager" />
+    <Method name="notify" />
+    <Bug pattern="NO_NOTIFY_NOT_NOTIFYALL" />
+  </Match>
+  <Match>
+    <!-- Monitor is used for a single condition. -->
+    <Class name="org.apache.coyote.http2.WindowAllocationManager" />
+    <Method name="waitFor" />
+    <Bug pattern="WA_NOT_IN_LOOP" />
   </Match>
   <Match>
     <!-- Returning null is required by the EL specification -->
@@ -959,6 +979,13 @@
     <Class name="org.apache.juli.FileHandler"/>
     <Method name="openWriter"/>
     <Bug code="Dm" />
+  </Match>
+  <Match>
+    <!-- As per the comment, FileSystems.getDefault() does have a
+         side-effect. -->
+    <Class name="org.apache.juli.logging.LogFactory"/>
+    <Method name="&lt;init&gt;"/>
+    <Bug pattern="RV_RETURN_VALUE_IGNORED_NO_SIDE_EFFECT" />
   </Match>
   <Match>
     <!-- Reference.equals() implementation correctly handles sub-classes -->
@@ -1190,6 +1217,15 @@
     <Bug code="ST" />
   </Match>
   <Match>
+    <!-- Array is only ever updated as a whole, not element by element -->
+    <Class name="org.apache.tomcat.util.buf.StringCache"/>
+    <Or>
+      <Field name="bcCache"/>
+      <Field name="ccCache"/>
+    </Or>
+    <Bug pattern="VO_VOLATILE_REFERENCE_TO_ARRAY"/>
+  </Match>
+  <Match>
     <!-- mb.toString() can be null because
     o.a.t.util.buf.MessageBytes.toString() can return NULL -->
     <Class name="org.apache.tomcat.util.buf.UDecoder"/>
@@ -1365,6 +1401,13 @@
     <Bug code="ML" />
   </Match>
   <Match>
+    <!-- Sync is on closed to ensure that actions taken because the socket  -->
+    <!-- open remain valid until the action is completed.                   -->
+    <Class name="org.apache.tomcat.util.net.AprEndpoint$AprSocketWrapper"/>
+    <Field name="closed"/>
+    <Bug pattern="JLM_JSR166_UTILCONCURRENT_MONITORENTER"/>
+  </Match>
+  <Match>
     <!-- Return value is ignored at this point but logic further up call     -->
     <!-- stack will ensure that a SocketTimeoutException is thrown           -->
     <Class name="org.apache.tomcat.util.net.NioEndpoint$NioSocketWrapper"/>
@@ -1379,6 +1422,18 @@
     </Or>
     <Method name="run"/>
     <Bug code="ML"/>
+  </Match>
+  <Match>
+    <!-- Single condition so no need for wait to be in loop -->
+    <Class name="org.apache.tomcat.util.net.NioEndpoint$NioSocketWrapper"/>
+    <Method name="fillReadBuffer"/>
+    <Bug pattern="WA_NOT_IN_LOOP" />
+  </Match>
+  <Match>
+    <!-- Single condition so notify() is OK -->
+    <Class name="org.apache.tomcat.util.net.NioEndpoint$Poller"/>
+    <Method name="processKey"/>
+    <Bug pattern="NO_NOTIFY_NOT_NOTIFYALL" />
   </Match>
   <Match>
     <!-- Single condition so no need for wait to be in loop -->
@@ -1414,6 +1469,21 @@
     <Class name="org.apache.tomcat.util.net.SecureNio2Channel" />
     <Method name="processSNI"/>
     <Bug code="SF" />
+  </Match>
+  <Match>
+  <!-- Single condition so fine -->
+    <Class name="org.apache.tomcat.util.net.SocketWrapperBase" />
+    <Method name="vectoredOperation"/>
+    <Bug pattern="WA_NOT_IN_LOOP" />
+  </Match>
+  <Match>
+  <!-- Single condition so notify is fine -->
+    <Class name="org.apache.tomcat.util.net.SocketWrapperBase$VectoredIOCompletionHandler" />
+    <Or>
+      <Method name="completed"/>
+      <Method name="failed"/>
+    </Or>
+    <Bug pattern="NO_NOTIFY_NOT_NOTIFYALL" />
   </Match>
   <Match>
     <!-- Stream will be closed -->
@@ -1515,22 +1585,31 @@
   <!-- Test code -->
   <Match>
     <!-- Code is deliberately unused -->
-    <Class name="javax.el.TestImportHandler" />
+    <Class name="jakarta.el.TestImportHandler" />
     <Method name="testImportPackage01_57574"/>
     <Bug pattern="UC_USELESS_OBJECT"/>
   </Match>
   <Match>
     <!-- Code is deliberately unused -->
     <Or>
-      <Class name="javax.servlet.http.TestCookie" />
-      <Class name="javax.servlet.http.TestCookieStrict" />
+      <Class name="jakarta.servlet.http.TestCookie" />
+      <Class name="jakarta.servlet.http.TestCookieStrict" />
     </Or>
     <Bug pattern="DLS_DEAD_LOCAL_STORE"/>
   </Match>
   <Match>
+    <!-- Name is consistent in context -->
+     <Class name="jakarta.servlet.http.TestHttpServletResponseSendError$ErrorServletStaticException" />
+    <Bug pattern="NM_CLASS_NOT_EXCEPTION"/>
+  </Match>
+  <Match>
     <!-- Code is intentionally unused -->
     <Class name="org.apache.catalina.authenticator.TestBasicAuthParser"/>
-    <Method name="testAuthMethodBadMethod"/>
+    <Or>
+      <Method name="testAuthMethodBadMethod"/>
+      <Method name="testBadBase64Char"/>
+      <Method name="testBadBase64InlineEquals"/>
+    </Or>
     <Bug pattern="DLS_DEAD_LOCAL_STORE"/>
   </Match>
   <Match>
@@ -1538,6 +1617,12 @@
     <Class name="org.apache.catalina.connector.TestCoyoteAdapter$AsyncServlet"/>
     <Field name="t"/>
     <Bug pattern="MSF_MUTABLE_SERVLET_FIELD"/>
+  </Match>
+  <Match>
+    <!-- Container handles close -->
+    <Class name="org.apache.catalina.connector.TestOutputBuffer$WritingServlet"/>
+    <Method name="doGet"/>
+    <Bug pattern="OS_OPEN_STREAM"/>
   </Match>
   <Match>
     <!-- ByteChunk.toString() can return null -->
@@ -1582,9 +1667,21 @@
   </Match>
   <Match>
     <!-- Deliberate hack for the purposes of the test -->
+    <Class name="org.apache.catalina.core.TestAsyncContextImpl$AsyncIoEndServlet"/>
+    <Field name="asyncIoEndWriteListener"/>
+    <Bug pattern="MSF_MUTABLE_SERVLET_FIELD"/>
+  </Match>
+  <Match>
+    <!-- Deliberate hack for the purposes of the test -->
     <Class name="org.apache.catalina.core.TestAsyncContextImpl$AsyncISEServlet"/>
     <Field name="asyncContext"/>
     <Bug pattern="MSF_MUTABLE_SERVLET_FIELD"/>
+  </Match>
+  <Match>
+    <!-- Deliberate use of run() for the purposes of the test -->
+    <Class name="org.apache.catalina.core.TestAsyncContextStateChanges$AsyncServlet"/>
+    <Method name="doGet"/>
+    <Bug pattern="RU_INVOKE_RUN"/>
   </Match>
   <Match>
     <!-- Hard-coded absolute path is intentional -->
@@ -1611,6 +1708,24 @@
     <Bug pattern="MSF_MUTABLE_SERVLET_FIELD"/>
   </Match>
   <Match>
+    <!-- Return value of latch is intentionally ignored -->
+    <Class name="org.apache.catalina.nonblocking.TestNonBlockingAPI"/>
+    <Method name="testDelayedNBWrite"/>
+    <Bug pattern="RV_RETURN_VALUE_IGNORED"/>
+  </Match>
+  <Match>
+    <!-- Deliberate hack for the purposes of the test -->
+    <Class name="org.apache.catalina.nonblocking.TestNonBlockingAPI$NBReadServlet"/>
+    <Filed name="listener"/>
+    <Bug pattern="MSF_MUTABLE_SERVLET_FIELD"/>
+  </Match>
+  <Match>
+    <!-- Return value of read is intentionally ignored -->
+    <Class name="org.apache.catalina.nonblocking.TestNonBlockingAPI$NBReadWithDispatchServlet$1"/>
+    <Method name="onDataAvailable"/>
+    <Bug pattern="RR_NOT_CHECKED"/>
+  </Match>
+  <Match>
     <!-- Deliberate hack for the purposes of the test -->
     <Class name="org.apache.catalina.startup.TesterServletWithAnnotations"/>
     <Or>
@@ -1626,18 +1741,6 @@
     <Class name="org.apache.catalina.startup.TesterServletWithLifeCycleMethods"/>
     <Field name="result"/>
     <Bug pattern="MSF_MUTABLE_SERVLET_FIELD"/>
-  </Match>
-  <Match>
-    <!-- Return value of latch is intentionally ignored -->
-    <Class name="org.apache.catalina.nonblocking.TestNonBlockingAPI"/>
-    <Method name="testDelayedNBWrite"/>
-    <Bug pattern="RV_RETURN_VALUE_IGNORED"/>
-  </Match>
-  <Match>
-    <!-- Return value of read is intentionally ignored -->
-    <Class name="org.apache.catalina.nonblocking.TestNonBlockingAPI$NBReadWithDispatchServlet$1"/>
-    <Method name="onDataAvailable"/>
-    <Bug pattern="RR_NOT_CHECKED"/>
   </Match>
   <Match>
     <Or>
@@ -1656,6 +1759,12 @@
     <Class name="org.apache.catalina.startup.TestTomcat$CustomContextConfig"/>
     <Field name="used"/>
     <Bug pattern="ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD"/>
+  </Match>
+  <Match>
+    <!-- Test code - array is safe -->
+    <Class name="org.apache.catalina.startup.TomcatBaseTest"/>
+    <Field name="booleans"/>
+    <Bug pattern="MS_MUTABLE_ARRAY"/>
   </Match>
   <Match>
     <Class name="org.apache.catalina.tribes.demos.EchoRpcTest" />
@@ -1747,16 +1856,16 @@
     <Bug code="DE" />
   </Match>
   <Match>
-    <!-- Deliberate hack for the purposes of the test -->
-    <Class name="org.apache.catalina.valves.TestStuckThreadDetectionValve$StickingServlet"/>
-    <Field name="wasInterrupted"/>
-    <Bug pattern="MSF_MUTABLE_SERVLET_FIELD"/>
-  </Match>
-  <Match>
     <!-- Concrete Map type not affected -->
     <Class name="org.apache.catalina.util.TestParameterMap" />
     <Method name="testEntrySetImmutabilityAfterLocked" />
     <Bug pattern="DMI_ENTRY_SETS_MAY_REUSE_ENTRY_OBJECTS" />
+  </Match>
+  <Match>
+    <!-- Deliberate hack for the purposes of the test -->
+    <Class name="org.apache.catalina.valves.TestStuckThreadDetectionValve$StickingServlet"/>
+    <Field name="wasInterrupted"/>
+    <Bug pattern="MSF_MUTABLE_SERVLET_FIELD"/>
   </Match>
   <Match>
     <!-- Code is deliberately unused -->
@@ -1801,6 +1910,12 @@
     <Class name="org.apache.coyote.http11.TestHttp11Processor"/>
     <Field name="bug55772IsSecondRequest"/>
     <Bug pattern="ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD"/>
+  </Match>
+  <Match>
+    <!-- Latch isn't essential so no need to check return -->
+    <Class name="org.apache.coyote.http2.TestAsyncTimeout"/>
+    <Method name="testTimeout"/>
+    <Bug pattern="RV_RETURN_VALUE_IGNORED"/>
   </Match>
   <Match>
     <!-- Result is negated to compare result when order is reversed -->

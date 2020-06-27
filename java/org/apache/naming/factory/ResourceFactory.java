@@ -30,7 +30,7 @@ import org.apache.naming.StringManager;
  */
 public class ResourceFactory extends FactoryBase {
 
-    private static final StringManager sm = StringManager.getManager(ResourceLinkFactory.class);
+    private static final StringManager sm = StringManager.getManager(ResourceFactory.class);
 
     @Override
     protected boolean isReferenceTypeSupported(Object obj) {
@@ -54,9 +54,9 @@ public class ResourceFactory extends FactoryBase {
                 ex.initCause(e);
                 throw ex;
             }
-        } else if (ref.getClassName().equals("javax.mail.Session")) {
+        } else if (ref.getClassName().equals("jakarta.mail.Session")) {
             String javaxMailSessionFactoryClassName =
-                System.getProperty("javax.mail.Session.Factory",
+                System.getProperty("jakarta.mail.Session.Factory",
                         "org.apache.naming.factory.MailSessionFactory");
             try {
                 factory = (ObjectFactory) Class.forName(

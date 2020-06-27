@@ -38,13 +38,14 @@ import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 import javax.naming.Binding;
 import javax.naming.NamingEnumeration;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import javax.servlet.ServletInputStream;
-import javax.servlet.UnavailableException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletInputStream;
+import jakarta.servlet.UnavailableException;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.apache.catalina.Container;
 import org.apache.catalina.ContainerServlet;
@@ -66,6 +67,7 @@ import org.apache.coyote.ProtocolHandler;
 import org.apache.coyote.http11.AbstractHttp11Protocol;
 import org.apache.tomcat.util.Diagnostics;
 import org.apache.tomcat.util.ExceptionUtils;
+import org.apache.tomcat.util.IntrospectionUtils;
 import org.apache.tomcat.util.modeler.Registry;
 import org.apache.tomcat.util.net.SSLContext;
 import org.apache.tomcat.util.net.SSLHostConfig;
@@ -709,11 +711,14 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
                 return;
             }
             try {
-                mBeanServer.invoke(storeConfigOname, "store",
+                Boolean result = (Boolean) mBeanServer.invoke(storeConfigOname, "store",
                         new Object[] {context},
-                        new String [] { "java.lang.String"});
-                writer.println(smClient.getString("managerServlet.savedContext",
-                        path));
+                        new String [] { "org.apache.catalina.Context"});
+                if (result.booleanValue()) {
+                    writer.println(smClient.getString("managerServlet.savedContext", path));
+                } else {
+                    writer.println(smClient.getString("managerServlet.savedContextFail", path));
+                }
             } catch (Exception e) {
                 log(sm.getString("managerServlet.error.storeContextConfig", path), e);
                 writer.println(smClient.getString("managerServlet.exception",
@@ -1064,11 +1069,11 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
         writer.println(smClient.getString("managerServlet.listed",
                                     host.getName()));
         Container[] contexts = host.findChildren();
-        for (int i = 0; i < contexts.length; i++) {
-            Context context = (Context) contexts[i];
-            if (context != null ) {
+        for (Container container : contexts) {
+            Context context = (Context) container;
+            if (context != null) {
                 String displayPath = context.getPath();
-                if( displayPath.equals("") )
+                if (displayPath.equals(""))
                     displayPath = "/";
                 if (context.getState().isAvailable()) {
                     writer.println(smClient.getString("managerServlet.listitem",
@@ -1163,20 +1168,7 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
             writer.println(smClient.getString("managerServlet.resourcesAll"));
         }
 
-        Class<?> clazz = null;
-        try {
-            if (type != null) {
-                clazz = Class.forName(type);
-            }
-        } catch (Throwable t) {
-            ExceptionUtils.handleThrowable(t);
-            log(sm.getString("managerServlet.error.resources", type), t);
-            writer.println(smClient.getString("managerServlet.exception",
-                    t.toString()));
-            return;
-        }
-
-        printResources(writer, "", global, type, clazz, smClient);
+        printResources(writer, "", global, type, smClient);
 
     }
 
@@ -1188,27 +1180,23 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
      * @param namingContext The naming context for lookups
      * @param type Fully qualified class name of the resource type of interest,
      *  or <code>null</code> to list resources of all types
-     * @param clazz The resource class or <code>null</code> to list
-     *  resources of all types
      * @param smClient i18n support for current client's locale
      */
     protected void printResources(PrintWriter writer, String prefix,
                                   javax.naming.Context namingContext,
-                                  String type, Class<?> clazz,
+                                  String type,
                                   StringManager smClient) {
-
         try {
             NamingEnumeration<Binding> items = namingContext.listBindings("");
             while (items.hasMore()) {
                 Binding item = items.next();
-                if (item.getObject() instanceof javax.naming.Context) {
-                    printResources
-                        (writer, prefix + item.getName() + "/",
-                         (javax.naming.Context) item.getObject(), type, clazz,
-                         smClient);
+                Object obj = item.getObject();
+                if (obj instanceof javax.naming.Context) {
+                    printResources(writer, prefix + item.getName() + "/",
+                            (javax.naming.Context) obj, type, smClient);
                 } else {
-                    if ((clazz != null) &&
-                        (!(clazz.isInstance(item.getObject())))) {
+                    if (type != null && (obj == null ||
+                            !IntrospectionUtils.isInstance(obj.getClass(), type))) {
                         continue;
                     }
                     writer.print(prefix + item.getName());
@@ -1224,7 +1212,6 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
             writer.println(smClient.getString("managerServlet.exception",
                     t.toString()));
         }
-
     }
 
 
@@ -1309,13 +1296,13 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
             int[] timeout = new int[maxCount + 1];
             int notimeout = 0;
             int expired = 0;
-            for (int i = 0; i < sessions.length; i++) {
-                int time = (int) (sessions[i].getIdleTimeInternal() / 1000L);
-                if (idle >= 0 && time >= idle*60) {
-                    sessions[i].expire();
+            for (Session session : sessions) {
+                int time = (int) (session.getIdleTimeInternal() / 1000L);
+                if (idle >= 0 && time >= idle * 60) {
+                    session.expire();
                     expired++;
                 }
-                time=time/60/histoInterval;
+                time = time / 60 / histoInterval;
                 if (time < 0)
                     notimeout++;
                 else if (time >= maxCount)

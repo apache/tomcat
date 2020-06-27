@@ -142,9 +142,9 @@ public class TestMediaType {
         StringReader sr = new StringReader(sb.toString());
         MediaType m = MediaType.parseMediaType(sr);
 
-        Assert.assertEquals("foo/bar; charset=UTF-8; a=b", m.toString());
+        Assert.assertEquals("foo/bar;charset=UTF-8;a=b", m.toString());
         Assert.assertEquals(CHARSET, m.getCharset());
-        Assert.assertEquals("foo/bar; a=b", m.toStringNoCharset());
+        Assert.assertEquals("foo/bar;a=b", m.toStringNoCharset());
     }
 
 
@@ -184,8 +184,8 @@ public class TestMediaType {
         Assert.assertEquals("\"application/smil;charset=UTF-8\"",
                 m.getParameterValue("Type"));
 
-        String expected = "multipart/related; boundary=1_4F50BD36_CDF8C28; " +
-                "start=\"<31671603.smil>\"; " +
+        String expected = "multipart/related;boundary=1_4F50BD36_CDF8C28;" +
+                "start=\"<31671603.smil>\";" +
                 "type=\"application/smil;charset=UTF-8\"";
         Assert.assertEquals(expected, m.toString());
         Assert.assertEquals(expected, m.toStringNoCharset());
@@ -211,7 +211,7 @@ public class TestMediaType {
         Assert.assertEquals("UTF-8", m.getCharset());
 
         // Note: Invalid input is filtered out
-        Assert.assertEquals("text/html; charset=UTF-8", m.toString());
+        Assert.assertEquals("text/html;charset=UTF-8", m.toString());
         Assert.assertEquals("UTF-8", m.getCharset());
     }
 
@@ -231,7 +231,7 @@ public class TestMediaType {
         Assert.assertEquals("UTF-8", m.getParameterValue("charset"));
         Assert.assertEquals("UTF-8", m.getCharset());
 
-        Assert.assertEquals("text/html; charset=UTF-8", m.toString());
+        Assert.assertEquals("text/html;charset=UTF-8", m.toString());
     }
 
 
@@ -260,9 +260,9 @@ public class TestMediaType {
         Assert.assertEquals(SUBTYPE.trim(), m.getSubtype());
 
         // Check the parameters
-        for (int i = 0; i <  parameters.length; i++) {
-            Assert.assertEquals(parameters[i].getValue().trim(),
-                    m.getParameterValue(parameters[i].getName().trim()));
+        for (Parameter parameter : parameters) {
+            Assert.assertEquals(parameter.getValue().trim(),
+                    m.getParameterValue(parameter.getName().trim()));
         }
     }
 

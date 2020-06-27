@@ -98,7 +98,7 @@ public class ContextRuleSet implements RuleSet {
                     "org.apache.catalina.core.StandardContext", "className");
             digester.addSetProperties(prefix + "Context");
         } else {
-            digester.addRule(prefix + "Context", new SetContextPropertiesRule());
+            digester.addSetProperties(prefix + "Context", new String[]{"path", "docBase"});
         }
 
         if (create) {

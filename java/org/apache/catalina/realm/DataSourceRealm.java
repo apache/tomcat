@@ -334,7 +334,7 @@ public class DataSourceRealm extends RealmBase {
         ArrayList<String> list = getRoles(dbConnection, username);
 
         // Create and return a suitable Principal for this user
-        return new GenericPrincipal(username, credentials, list);
+        return new GenericPrincipal(username, list);
     }
 
 
@@ -415,29 +415,31 @@ public class DataSourceRealm extends RealmBase {
         }
     }
 
+
     /**
      * Return the password associated with the given principal's user name.
+     *
      * @param dbConnection The database connection to be used
      * @param username Username for which password should be retrieved
+     *
      * @return the password for the specified user
      */
-    protected String getPassword(Connection dbConnection,
-                                 String username) {
+    protected String getPassword(Connection dbConnection, String username) {
 
         String dbCredentials = null;
 
-        try (PreparedStatement stmt = credentials(dbConnection, username);
-                ResultSet rs = stmt.executeQuery()) {
-            if (rs.next()) {
-                dbCredentials = rs.getString(1);
+        try (PreparedStatement stmt = dbConnection.prepareStatement(preparedCredentials)) {
+            stmt.setString(1, username);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    dbCredentials = rs.getString(1);
+                }
+
+                return (dbCredentials != null) ? dbCredentials.trim() : null;
             }
-
-            return (dbCredentials != null) ? dbCredentials.trim() : null;
-
         } catch (SQLException e) {
-            containerLog.error(
-                    sm.getString("dataSourceRealm.getPassword.exception",
-                                 username), e);
+            containerLog.error(sm.getString("dataSourceRealm.getPassword.exception", username), e);
         }
 
         return null;
@@ -453,11 +455,10 @@ public class DataSourceRealm extends RealmBase {
     protected Principal getPrincipal(String username) {
         Connection dbConnection = open();
         if (dbConnection == null) {
-            return new GenericPrincipal(username, null, null);
+            return new GenericPrincipal(username, null);
         }
         try {
             return new GenericPrincipal(username,
-                    getPassword(dbConnection, username),
                     getRoles(dbConnection, username));
         } finally {
             close(dbConnection);
@@ -487,14 +488,16 @@ public class DataSourceRealm extends RealmBase {
         }
     }
 
+
     /**
-     * Return the roles associated with the given user name
+     * Return the roles associated with the given user name.
+     *
      * @param dbConnection The database connection to be used
      * @param username User name for which roles should be retrieved
+     *
      * @return an array list of the role names
      */
-    protected ArrayList<String> getRoles(Connection dbConnection,
-                                     String username) {
+    protected ArrayList<String> getRoles(Connection dbConnection, String username) {
 
         if (allRolesMode != AllRolesMode.STRICT_MODE && !isRoleStoreDefined()) {
             // Using an authentication only configuration and no role store has
@@ -504,64 +507,25 @@ public class DataSourceRealm extends RealmBase {
 
         ArrayList<String> list = null;
 
-        try (PreparedStatement stmt = roles(dbConnection, username);
-                ResultSet rs = stmt.executeQuery()) {
-            list = new ArrayList<>();
+        try (PreparedStatement stmt = dbConnection.prepareStatement(preparedRoles)) {
+            stmt.setString(1, username);
 
-            while (rs.next()) {
-                String role = rs.getString(1);
-                if (role != null) {
-                    list.add(role.trim());
+            try (ResultSet rs = stmt.executeQuery()) {
+                list = new ArrayList<>();
+
+                while (rs.next()) {
+                    String role = rs.getString(1);
+                    if (role != null) {
+                        list.add(role.trim());
+                    }
                 }
+                return list;
             }
-            return list;
         } catch(SQLException e) {
-            containerLog.error(
-                sm.getString("dataSourceRealm.getRoles.exception", username), e);
+            containerLog.error(sm.getString("dataSourceRealm.getRoles.exception", username), e);
         }
 
         return null;
-    }
-
-    /**
-     * Return a PreparedStatement configured to perform the SELECT required
-     * to retrieve user credentials for the specified username.
-     *
-     * @param dbConnection The database connection to be used
-     * @param username User name for which credentials should be retrieved
-     * @return the prepared statement
-     * @exception SQLException if a database error occurs
-     */
-    private PreparedStatement credentials(Connection dbConnection,
-                                            String username)
-        throws SQLException {
-
-        PreparedStatement credentials =
-            dbConnection.prepareStatement(preparedCredentials);
-
-        credentials.setString(1, username);
-        return credentials;
-
-    }
-
-    /**
-     * Return a PreparedStatement configured to perform the SELECT required
-     * to retrieve user roles for the specified username.
-     *
-     * @param dbConnection The database connection to be used
-     * @param username User name for which roles should be retrieved
-     * @return the prepared statement
-     * @exception SQLException if a database error occurs
-     */
-    private PreparedStatement roles(Connection dbConnection, String username)
-        throws SQLException {
-
-        PreparedStatement roles =
-            dbConnection.prepareStatement(preparedRoles);
-
-        roles.setString(1, username);
-        return roles;
-
     }
 
 

@@ -277,7 +277,7 @@
                     this.y2 = y2;
 
                     function ellipse(ctx, x, y, w, h) {
-                        /* Drawing a ellipse cannot be done directly in a
+                        /* Drawing an ellipse cannot be done directly in a
                          * CanvasRenderingContext2D - we need to use drawArc()
                          * in conjunction with scaling the context so that we
                          * get the needed proportion.
@@ -326,7 +326,7 @@
                                     ctx.strokeRect(x1, y1, x2 - x1, y2 - y1);
                                 }
                             } else if (type == 4) {
-                                // Draw a ellipse.
+                                // Draw an ellipse.
                                 ellipse(ctx, x1, y1, x2 - x1, y2 - y1);
                                 ctx.closePath();
                                 ctx.stroke();

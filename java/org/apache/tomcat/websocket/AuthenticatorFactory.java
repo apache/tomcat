@@ -16,7 +16,6 @@
  */
 package org.apache.tomcat.websocket;
 
-import java.util.Iterator;
 import java.util.ServiceLoader;
 
 /**
@@ -54,10 +53,8 @@ public class AuthenticatorFactory {
 
     private static Authenticator loadAuthenticators(String authScheme) {
         ServiceLoader<Authenticator> serviceLoader = ServiceLoader.load(Authenticator.class);
-        Iterator<Authenticator> auths = serviceLoader.iterator();
 
-        while (auths.hasNext()) {
-            Authenticator auth = auths.next();
+        for (Authenticator auth : serviceLoader) {
             if (auth.getSchemeName().equalsIgnoreCase(authScheme))
                 return auth;
         }

@@ -20,8 +20,8 @@ import java.beans.PropertyEditorManager;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
-import javax.el.ELException;
-import javax.el.ELManager;
+import jakarta.el.ELException;
+import jakarta.el.ELManager;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -264,15 +264,15 @@ public class TestELSupport {
         Assert.assertEquals(value, ELSupport.coerceToNumber(null, value, value.getClass()));
     }
 
-    private static enum TestEnumA {
+    private enum TestEnumA {
         VALA1,
         VALA2
     }
-    private static enum TestEnumB {
+    private enum TestEnumB {
         VALB1,
         VALB2
     }
-    private static enum TestEnumC {
+    private enum TestEnumC {
         VALA1,
         VALA2,
         VALB1,

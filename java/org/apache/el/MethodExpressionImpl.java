@@ -22,14 +22,14 @@ import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 
-import javax.el.ELContext;
-import javax.el.ELException;
-import javax.el.FunctionMapper;
-import javax.el.MethodExpression;
-import javax.el.MethodInfo;
-import javax.el.MethodNotFoundException;
-import javax.el.PropertyNotFoundException;
-import javax.el.VariableMapper;
+import jakarta.el.ELContext;
+import jakarta.el.ELException;
+import jakarta.el.FunctionMapper;
+import jakarta.el.MethodExpression;
+import jakarta.el.MethodInfo;
+import jakarta.el.MethodNotFoundException;
+import jakarta.el.PropertyNotFoundException;
+import jakarta.el.VariableMapper;
 
 import org.apache.el.lang.EvaluationContext;
 import org.apache.el.lang.ExpressionBuilder;
@@ -41,7 +41,7 @@ import org.apache.el.util.ReflectionUtil;
  * An <code>Expression</code> that refers to a method on an object.
  *
  * <p>
- * The {@link javax.el.ExpressionFactory#createMethodExpression} method
+ * The {@link jakarta.el.ExpressionFactory#createMethodExpression} method
  * can be used to parse an expression string and return a concrete instance
  * of <code>MethodExpression</code> that encapsulates the parsed expression.
  * The {@link FunctionMapper} is used at parse time, not evaluation time,
@@ -49,11 +49,11 @@ import org.apache.el.util.ReflectionUtil;
  * However, the {@link ELContext} is needed at evaluation time.</p>
  *
  * <p>The {@link #getMethodInfo} and {@link #invoke} methods will evaluate the
- * expression each time they are called. The {@link javax.el.ELResolver} in the
+ * expression each time they are called. The {@link jakarta.el.ELResolver} in the
  * <code>ELContext</code> is used to resolve the top-level variables and to
  * determine the behavior of the <code>.</code> and <code>[]</code>
  * operators. For any of the two methods, the
- * {@link javax.el.ELResolver#getValue} method is used to resolve all properties
+ * {@link jakarta.el.ELResolver#getValue} method is used to resolve all properties
  * up to but excluding the last one. This provides the <code>base</code> object
  * on which the method appears. If the <code>base</code> object is null, a
  * <code>NullPointerException</code> must be thrown. At the last resolution,
@@ -64,12 +64,12 @@ import org.apache.el.util.ReflectionUtil;
  * <code>MethodExpression</code>).</p>
  *
  * <p>See the notes about comparison, serialization and immutability in
- * the {@link javax.el.Expression} javadocs.
+ * the {@link jakarta.el.Expression} javadocs.
  *
- * @see javax.el.ELResolver
- * @see javax.el.Expression
- * @see javax.el.ExpressionFactory
- * @see javax.el.MethodExpression
+ * @see jakarta.el.ELResolver
+ * @see jakarta.el.Expression
+ * @see jakarta.el.ExpressionFactory
+ * @see jakarta.el.MethodExpression
  *
  * @author Jacob Hookom [jacob@hookom.net]
  */
@@ -156,7 +156,7 @@ public final class MethodExpressionImpl extends MethodExpression implements
      *
      * @return The original expression String.
      *
-     * @see javax.el.Expression#getExpressionString()
+     * @see jakarta.el.Expression#getExpressionString()
      */
     @Override
     public String getExpressionString() {
@@ -183,7 +183,7 @@ public final class MethodExpressionImpl extends MethodExpression implements
      *             if an exception was thrown while performing property or
      *             variable resolution. The thrown exception must be included as
      *             the cause property of this exception, if available.
-     * @see javax.el.MethodExpression#getMethodInfo(javax.el.ELContext)
+     * @see jakarta.el.MethodExpression#getMethodInfo(jakarta.el.ELContext)
      */
     @Override
     public MethodInfo getMethodInfo(ELContext context)
@@ -254,7 +254,7 @@ public final class MethodExpressionImpl extends MethodExpression implements
      *             exception thrown is an <code>InvocationTargetException</code>,
      *             extract its <code>cause</code> and pass it to the
      *             <code>ELException</code> constructor.
-     * @see javax.el.MethodExpression#invoke(javax.el.ELContext,
+     * @see jakarta.el.MethodExpression#invoke(jakarta.el.ELContext,
      *      java.lang.Object[])
      */
     @Override

@@ -19,7 +19,7 @@ package org.apache.tomcat.util.http;
 
 import java.nio.charset.StandardCharsets;
 
-import javax.servlet.http.Cookie;
+import jakarta.servlet.http.Cookie;
 
 import org.junit.Assert;
 import org.junit.Test;

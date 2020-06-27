@@ -21,14 +21,14 @@ import java.security.Principal;
 import java.security.PrivilegedActionException;
 import java.util.Set;
 
-import javax.servlet.Filter;
-import javax.servlet.FilterChain;
-import javax.servlet.Servlet;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.Filter;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.Servlet;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.apache.catalina.Globals;
 import org.apache.catalina.security.SecurityUtil;
@@ -36,7 +36,7 @@ import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
- * Implementation of <code>javax.servlet.FilterChain</code> used to manage
+ * Implementation of <code>jakarta.servlet.FilterChain</code> used to manage
  * the execution of a set of filters for a particular request.  When the
  * set of defined filters has all been executed, the next call to
  * <code>doFilter()</code> will execute the servlet's <code>service()</code>
@@ -47,18 +47,9 @@ import org.apache.tomcat.util.res.StringManager;
 public final class ApplicationFilterChain implements FilterChain {
 
     // Used to enforce requirements of SRV.8.2 / SRV.14.2.5.1
-    private static final ThreadLocal<ServletRequest> lastServicedRequest;
-    private static final ThreadLocal<ServletResponse> lastServicedResponse;
+    private static final ThreadLocal<ServletRequest> lastServicedRequest = new ThreadLocal<>();
+    private static final ThreadLocal<ServletResponse> lastServicedResponse = new ThreadLocal<>();
 
-    static {
-        if (ApplicationDispatcher.WRAP_SAME_OBJECT) {
-            lastServicedRequest = new ThreadLocal<>();
-            lastServicedResponse = new ThreadLocal<>();
-        } else {
-            lastServicedRequest = null;
-            lastServicedResponse = null;
-        }
-    }
 
     // -------------------------------------------------------------- Constants
 
@@ -97,6 +88,11 @@ public final class ApplicationFilterChain implements FilterChain {
      * Does the associated servlet instance support async processing?
      */
     private boolean servletSupportsAsync = false;
+
+    /**
+     * Check the proper Servlet objects have been used.
+     */
+    private boolean dispatcherWrapsSameObject = false;
 
     /**
      * The string manager for our package.
@@ -204,7 +200,7 @@ public final class ApplicationFilterChain implements FilterChain {
 
         // We fell off the end of the chain -- call the servlet instance
         try {
-            if (ApplicationDispatcher.WRAP_SAME_OBJECT) {
+            if (dispatcherWrapsSameObject) {
                 lastServicedRequest.set(request);
                 lastServicedResponse.set(response);
             }
@@ -237,7 +233,7 @@ public final class ApplicationFilterChain implements FilterChain {
             ExceptionUtils.handleThrowable(e);
             throw new ServletException(sm.getString("filterChain.servlet"), e);
         } finally {
-            if (ApplicationDispatcher.WRAP_SAME_OBJECT) {
+            if (dispatcherWrapsSameObject) {
                 lastServicedRequest.set(null);
                 lastServicedResponse.set(null);
             }
@@ -303,6 +299,7 @@ public final class ApplicationFilterChain implements FilterChain {
         pos = 0;
         servlet = null;
         servletSupportsAsync = false;
+        dispatcherWrapsSameObject = false;
     }
 
 
@@ -326,6 +323,11 @@ public final class ApplicationFilterChain implements FilterChain {
 
     void setServletSupportsAsync(boolean servletSupportsAsync) {
         this.servletSupportsAsync = servletSupportsAsync;
+    }
+
+
+    void setDispatcherWrapsSameObject(boolean dispatcherWrapsSameObject) {
+        this.dispatcherWrapsSameObject = dispatcherWrapsSameObject;
     }
 
 

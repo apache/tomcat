@@ -21,6 +21,7 @@ import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -98,13 +99,11 @@ class JSSESSLContext implements SSLContext {
                 if (tm instanceof X509TrustManager) {
                     X509Certificate[] accepted = ((X509TrustManager) tm).getAcceptedIssuers();
                     if (accepted != null) {
-                        for (X509Certificate c : accepted) {
-                            certs.add(c);
-                        }
+                        certs.addAll(Arrays.asList(accepted));
                     }
                 }
             }
         }
-        return certs.toArray(new X509Certificate[certs.size()]);
+        return certs.toArray(new X509Certificate[0]);
     }
 }

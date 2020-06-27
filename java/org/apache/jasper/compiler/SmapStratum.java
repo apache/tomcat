@@ -62,7 +62,7 @@ public class SmapStratum {
          * Sets lineFileID.  Should be called only when different from
          * that of prior LineInfo object (in any given context) or 0
          * if the current LineInfo has no (logical) predecessor.
-         * <tt>LineInfo</tt> will print this file number no matter what.
+         * <code>LineInfo</code> will print this file number no matter what.
          *
          * @param lineFileID The new line file ID
          */
@@ -222,19 +222,19 @@ public class SmapStratum {
      * later.)
      *
      * @param inputStartLine starting line in the source file
-     *        (SMAP <tt>InputStartLine</tt>)
+     *        (SMAP <code>InputStartLine</code>)
      * @param inputFileName the filepath (or name) from which the input comes
-     *        (yields SMAP <tt>LineFileID</tt>)  Use unqualified names
+     *        (yields SMAP <code>LineFileID</code>)  Use unqualified names
      *        carefully, and only when they uniquely identify a file.
      * @param inputLineCount the number of lines in the input to map
-     *        (SMAP <tt>LineFileCount</tt>)
+     *        (SMAP <code>LineFileCount</code>)
      * @param outputStartLine starting line in the output file
-     *        (SMAP <tt>OutputStartLine</tt>)
+     *        (SMAP <code>OutputStartLine</code>)
      * @param outputLineIncrement number of output lines to map to each
-     *        input line (SMAP <tt>OutputLineIncrement</tt>).  <i>Given the
+     *        input line (SMAP <code>OutputLineIncrement</code>).  <i>Given the
      *        fact that the name starts with "output", I continuously have
      *        the subconscious urge to call this field
-     *        <tt>OutputLineExcrement</tt>.</i>
+     *        <code>OutputLineExcrement</code>.</i>
      */
     public void addLineData(
         int inputStartLine,

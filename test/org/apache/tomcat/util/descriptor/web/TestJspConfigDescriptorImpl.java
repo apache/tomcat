@@ -20,9 +20,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import javax.servlet.descriptor.JspConfigDescriptor;
-import javax.servlet.descriptor.JspPropertyGroupDescriptor;
-import javax.servlet.descriptor.TaglibDescriptor;
+import jakarta.servlet.descriptor.JspConfigDescriptor;
+import jakarta.servlet.descriptor.JspPropertyGroupDescriptor;
+import jakarta.servlet.descriptor.TaglibDescriptor;
 
 import org.junit.Assert;
 import org.junit.Test;

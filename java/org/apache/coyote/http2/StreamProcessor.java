@@ -71,13 +71,14 @@ class StreamProcessor extends AbstractProcessor {
                 try {
                     state = process(socketWrapper, event);
 
-                    if (state == SocketState.CLOSED) {
+                    if (state == SocketState.LONG) {
+                        handler.getProtocol().getHttp11Protocol().addWaitingProcessor(this);
+                    } else if (state == SocketState.CLOSED) {
+                        handler.getProtocol().getHttp11Protocol().removeWaitingProcessor(this);
                         if (!getErrorState().isConnectionIoAllowed()) {
                             ConnectionException ce = new ConnectionException(sm.getString(
                                     "streamProcessor.error.connection", stream.getConnectionId(),
                                     stream.getIdentifier()), Http2Error.INTERNAL_ERROR);
-                            // TODO - Temporary debug code
-                            log.info(ce.getMessage(), ce);
                             stream.close(ce);
                         } else if (!getErrorState().isIoAllowed()) {
                             StreamException se = stream.getResetException();
@@ -88,19 +89,25 @@ class StreamProcessor extends AbstractProcessor {
                                         stream.getIdAsInt());
                             }
                             stream.close(se);
+                        } else {
+                            // stream.close() will call recycle so only need it here
+                            stream.recycle();
                         }
                     }
                 } catch (Exception e) {
                     String msg = sm.getString("streamProcessor.error.connection",
                             stream.getConnectionId(), stream.getIdentifier());
-                    // TODO - Temporary debug code
-                    //if (log.isDebugEnabled()) {
-                        log.info(msg, e);
-                    //}
+                    if (log.isDebugEnabled()) {
+                        log.debug(msg, e);
+                    }
                     ConnectionException ce = new ConnectionException(msg, Http2Error.INTERNAL_ERROR);
                     ce.initCause(e);
                     stream.close(ce);
+                    state = SocketState.CLOSED;
                 } finally {
+                    if (state == SocketState.CLOSED) {
+                        recycle();
+                    }
                     ContainerThreadMarker.clear();
                 }
             }
@@ -147,8 +154,19 @@ class StreamProcessor extends AbstractProcessor {
         // Add the pseudo header for status
         headers.addValue(":status").setString(Integer.toString(statusCode));
 
+
+        // Compression can't be used with sendfile
+        // Need to check for compression (and set headers appropriately) before
+        // adding headers below
+        if (noSendfile && protocol != null &&
+                protocol.useCompression(coyoteRequest, coyoteResponse)) {
+            // Enable compression. Headers will have been set. Need to configure
+            // output filter at this point.
+            stream.addOutputFilter(new GzipOutputFilter());
+        }
+
         // Check to see if a response body is present
-        if (!(statusCode < 200 || statusCode == 205 || statusCode == 304)) {
+        if (!(statusCode < 200 || statusCode == 204 || statusCode == 205 || statusCode == 304)) {
             String contentType = coyoteResponse.getContentType();
             if (contentType != null) {
                 headers.setValue("content-type").setString(contentType);
@@ -157,27 +175,26 @@ class StreamProcessor extends AbstractProcessor {
             if (contentLanguage != null) {
                 headers.setValue("content-language").setString(contentLanguage);
             }
-        }
-
-        // Add a content-length header if a content length has been set unless
-        // the application has already added one
-        long contentLength = coyoteResponse.getContentLengthLong();
-        if (contentLength != -1 && headers.getValue("content-length") == null) {
-            headers.addValue("content-length").setLong(contentLength);
+            // Add a content-length header if a content length has been set unless
+            // the application has already added one
+            long contentLength = coyoteResponse.getContentLengthLong();
+            if (contentLength != -1 && headers.getValue("content-length") == null) {
+                headers.addValue("content-length").setLong(contentLength);
+            }
+        } else {
+            if (statusCode == 205) {
+                // RFC 7231 requires the server to explicitly signal an empty
+                // response in this case
+                coyoteResponse.setContentLength(0);
+            } else {
+                coyoteResponse.setContentLength(-1);
+            }
         }
 
         // Add date header unless it is an informational response or the
         // application has already set one
         if (statusCode >= 200 && headers.getValue("date") == null) {
             headers.addValue("date").setString(FastHttpDateFormat.getCurrentDate());
-        }
-
-        // Compression can't be used with sendfile
-        if (noSendfile && protocol != null &&
-                protocol.useCompression(coyoteRequest, coyoteResponse)) {
-            // Enable compression. Headers will have been set. Need to configure
-            // output filter at this point.
-            stream.addOutputFilter(new GzipOutputFilter());
         }
     }
 
@@ -332,6 +349,18 @@ class StreamProcessor extends AbstractProcessor {
 
 
     @Override
+    protected Object getConnectionID() {
+        return stream.getConnectionId();
+    }
+
+
+    @Override
+    protected Object getStreamID() {
+        return stream.getIdentifier().toString();
+    }
+
+
+    @Override
     public final void recycle() {
         // StreamProcessor instances are not re-used.
         // Clear fields that can be cleared to aid GC and trigger NPEs if this
@@ -362,6 +391,13 @@ class StreamProcessor extends AbstractProcessor {
             }
             response.setStatus(500);
             setErrorState(ErrorState.CLOSE_NOW, e);
+        }
+
+        if (!isAsync()) {
+            // If this is an async request then the request ends when it has
+            // been completed. The AsyncContext is responsible for calling
+            // endRequest() in that case.
+            endRequest();
         }
 
         if (sendfileState == SendfileState.PENDING) {
@@ -405,7 +441,31 @@ class StreamProcessor extends AbstractProcessor {
 
 
     @Override
-    protected final SocketState dispatchEndRequest() {
+    protected final SocketState dispatchEndRequest() throws IOException {
+        endRequest();
         return SocketState.CLOSED;
+    }
+
+
+    private void endRequest() throws IOException {
+        if (!stream.isInputFinished() && getErrorState().isIoAllowed()) {
+            if (handler.hasAsyncIO() && !stream.isContentLengthInconsistent()) {
+                // Need an additional checks for asyncIO as the end of stream
+                // might have been set on the header frame but not processed
+                // yet. Checking for this here so the extra processing only
+                // occurs on the potential error condition rather than on every
+                // request.
+                return;
+            }
+            // The request has been processed but the request body has not been
+            // fully read. This typically occurs when Tomcat rejects an upload
+            // of some form (e.g. PUT or POST). Need to tell the client not to
+            // send any more data but only if a reset has not already been
+            // triggered.
+            StreamException se = new StreamException(
+                    sm.getString("streamProcessor.cancel", stream.getConnectionId(),
+                            stream.getIdentifier()), Http2Error.CANCEL, stream.getIdAsInt());
+            handler.sendStreamReset(se);
+        }
     }
 }

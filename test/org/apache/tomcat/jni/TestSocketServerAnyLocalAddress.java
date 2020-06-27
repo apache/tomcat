@@ -43,8 +43,13 @@ public class TestSocketServerAnyLocalAddress extends AbstractJniTest {
     @Before
     public void init() throws Exception {
         long serverPool = Pool.create(0);
-        long inetAddress = Address.info(null, Socket.APR_UNSPEC,
-                                        0, 0, serverPool);
+        int family;
+        if (Boolean.getBoolean("java.net.preferIPv4Stack")) {
+            family = Socket.APR_INET;
+        } else {
+            family = Socket.APR_UNSPEC;
+        }
+        long inetAddress = Address.info(null, family, 0, 0, serverPool);
         serverSocket = Socket.create(Address.getInfo(inetAddress).family, Socket.SOCK_STREAM,
                                    Socket.APR_PROTO_TCP, serverPool);
         if (OS.IS_UNIX) {
@@ -124,6 +129,7 @@ public class TestSocketServerAnyLocalAddress extends AbstractJniTest {
 
             try {
                 InetSocketAddress connectAddress = getConnectAddress(serverSocket);
+                System.out.println("Client attempting to connect to [" + connectAddress + "]");
                 java.net.Socket sock = new java.net.Socket();
                 sock.connect(connectAddress, TIMEOUT_MICROSECONDS);
                 sock.setSoTimeout(TIMEOUT_MICROSECONDS);
@@ -146,6 +152,9 @@ public class TestSocketServerAnyLocalAddress extends AbstractJniTest {
                 sock.close();
             } catch (Exception e) {
                 e.printStackTrace();
+                // Prevent the test from hanging on Socket.accept(serverSocket)
+                // if the client fails
+                Socket.shutdown(serverSocket, Socket.APR_SHUTDOWN_READWRITE);
             }
         }
 
@@ -162,6 +171,7 @@ public class TestSocketServerAnyLocalAddress extends AbstractJniTest {
             } else {
                 localAddress = new InetSocketAddress("0.0.0.0", addr.port);
             }
+            System.out.println("Server is listening at [" + localAddress + "]");
 
             // Need a local address of the same type (IPv4 or IPV6) as the
             // configured bind address since the connector may be configured

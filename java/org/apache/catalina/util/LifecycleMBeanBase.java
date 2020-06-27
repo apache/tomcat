@@ -17,8 +17,6 @@
 
 package org.apache.catalina.util;
 
-import javax.management.InstanceNotFoundException;
-import javax.management.MBeanRegistrationException;
 import javax.management.MBeanServer;
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
@@ -43,7 +41,6 @@ public abstract class LifecycleMBeanBase extends LifecycleBase
     /* Cache components of the MBean registration. */
     private String domain = null;
     private ObjectName oname = null;
-    protected MBeanServer mserver = null;
 
     /**
      * Sub-classes wishing to perform additional initialization should override
@@ -52,12 +49,9 @@ public abstract class LifecycleMBeanBase extends LifecycleBase
      */
     @Override
     protected void initInternal() throws LifecycleException {
-
         // If oname is not null then registration has already happened via
         // preRegister().
         if (oname == null) {
-            mserver = Registry.getRegistry(null, null).getMBeanServer();
-
             oname = register(this, getObjectNameKeyProperties());
         }
     }
@@ -157,7 +151,6 @@ public abstract class LifecycleMBeanBase extends LifecycleBase
 
         try {
             on = new ObjectName(name.toString());
-
             Registry.getRegistry(null, null).registerComponent(obj, on, null);
         } catch (MalformedObjectNameException e) {
             log.warn(sm.getString("lifecycleMBeanBase.registerFail", obj, name),
@@ -187,17 +180,7 @@ public abstract class LifecycleMBeanBase extends LifecycleBase
         StringBuilder name = new StringBuilder(getDomain());
         name.append(':');
         name.append(objectNameKeyProperties);
-
-        ObjectName on = null;
-
-        try {
-            on = new ObjectName(name.toString());
-            Registry.getRegistry(null, null).unregisterComponent(on);
-        } catch (MalformedObjectNameException e) {
-            log.warn(sm.getString("lifecycleMBeanBase.unregisterFail", name), e);
-        } catch (Exception e) {
-            log.warn(sm.getString("lifecycleMBeanBase.unregisterFail", name), e);
-        }
+        Registry.getRegistry(null, null).unregisterComponent(name.toString());
     }
 
 
@@ -211,26 +194,7 @@ public abstract class LifecycleMBeanBase extends LifecycleBase
      * @param on    The name of the component to unregister
      */
     protected final void unregister(ObjectName on) {
-
-        // If null ObjectName, just return without complaint
-        if (on == null) {
-            return;
-        }
-
-        // If the MBeanServer is null, log a warning & return
-        if (mserver == null) {
-            log.warn(sm.getString("lifecycleMBeanBase.unregisterNoServer", on));
-            return;
-        }
-
-        try {
-            mserver.unregisterMBean(on);
-        } catch (MBeanRegistrationException e) {
-            log.warn(sm.getString("lifecycleMBeanBase.unregisterFail", on), e);
-        } catch (InstanceNotFoundException e) {
-            log.warn(sm.getString("lifecycleMBeanBase.unregisterFail", on), e);
-        }
-
+        Registry.getRegistry(null, null).unregisterComponent(on);
     }
 
 
@@ -269,9 +233,8 @@ public abstract class LifecycleMBeanBase extends LifecycleBase
     public final ObjectName preRegister(MBeanServer server, ObjectName name)
             throws Exception {
 
-        this.mserver = server;
         this.oname = name;
-        this.domain = name.getDomain();
+        this.domain = name.getDomain().intern();
 
         return oname;
     }

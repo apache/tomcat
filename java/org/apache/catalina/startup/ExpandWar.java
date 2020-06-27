@@ -68,7 +68,7 @@ public class ExpandWar {
      * @exception IOException if an input/output error was encountered
      *  during expansion
      *
-     * @return The absolute path to the expanded directory foe the given WAR
+     * @return The absolute path to the expanded directory for the given WAR
      */
     public static String expand(Host host, URL war, String pathname)
         throws IOException {
@@ -354,8 +354,8 @@ public class ExpandWar {
         if (files == null) {
             files = new String[0];
         }
-        for (int i = 0; i < files.length; i++) {
-            File file = new File(dir, files[i]);
+        for (String s : files) {
+            File file = new File(dir, s);
             if (file.isDirectory()) {
                 deleteDir(file, logFailure);
             } else {

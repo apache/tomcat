@@ -60,9 +60,9 @@
  *   Iterator i = fileItems.iterator();
  *   String comment = ((FileItem)i.next()).getString();
  *   FileItem fi = (FileItem)i.next();
- *   // filename on the client
+ *   // file name on the client
  *   String fileName = fi.getName();
- *   // save comment and filename to database
+ *   // save comment and file name to database
  *   ...
  *   // write the file
  *   fi.write(new File("/www/uploads/", fileName));

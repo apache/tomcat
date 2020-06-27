@@ -29,16 +29,17 @@ import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 
 import javax.net.SocketFactory;
-import javax.servlet.ReadListener;
-import javax.servlet.ServletException;
-import javax.servlet.ServletInputStream;
-import javax.servlet.ServletOutputStream;
-import javax.servlet.WriteListener;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpUpgradeHandler;
-import javax.servlet.http.WebConnection;
+
+import jakarta.servlet.ReadListener;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletInputStream;
+import jakarta.servlet.ServletOutputStream;
+import jakarta.servlet.WriteListener;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpUpgradeHandler;
+import jakarta.servlet.http.WebConnection;
 
 import org.junit.Assert;
 import org.junit.Test;

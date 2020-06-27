@@ -22,7 +22,6 @@
 The Digester package provides for rules-based processing of arbitrary
 XML documents.
 <br><br>
-<a name="doc.Description"></a>
 <div>
 <a href="#doc.Intro">[Introduction]</a>
 <a href="#doc.Properties">[Configuration Properties]</a>
@@ -41,8 +40,7 @@ XML documents.
 <a href="#doc.Limits">[Known Limitations]</a>
 </div>
 
-<a name="doc.Intro"></a>
-<h3>Introduction</h3>
+<h2 id="doc.Intro">Introduction</h2>
 
 <p>In many application environments that deal with XML-formatted data, it is
 useful to be able to process an XML document in an "event driven" manner,
@@ -84,8 +82,7 @@ the developer to focus on the processing to be performed.</p>
 <p>For example code, see <a href="#doc.Usage"> the usage
 examples</a>, and <a href="#doc.FAQ.Examples"> the FAQ </a>. </p>
 
-<a name="doc.Properties"></a>
-<h3>Digester Configuration Properties</h3>
+<h2 id="doc.Properties">Digester Configuration Properties</h2>
 
 <p>A <code>org.apache.commons.digester.Digester</code> instance contains several
 configuration properties that can be used to customize its operation.  These
@@ -192,8 +189,7 @@ or <code>java.lang.ClassLoader.getResourceAsStream()</code>.  The actual DTD
 resource is loaded through the same class loader that loads all of the Struts
 classes -- typically from the <code>struts.jar</code> file.</p>
 
-<a name="doc.Stack"></a>
-<h3>The Object Stack</h3>
+<h2 id="doc.Stack">The Object Stack</h2>
 
 <p>One very common use of <code>org.apache.commons.digester.Digester</code>
 technology is to dynamically construct a tree of Java objects, whose internal
@@ -254,8 +250,7 @@ features of the Digester functionality:</p>
     the parse finishes as well.</li>
 </ul>
 
-<a name="doc.Patterns"></a>
-<h3>Element Matching Patterns</h3>
+<h2 id="doc.Patterns">Element Matching Patterns</h2>
 
 <p>A primary feature of the <code>org.apache.commons.digester.Digester</code>
 parser is that the Digester automatically navigates the element hierarchy of
@@ -314,8 +309,7 @@ order that the <code>Rules</code> where initially registered with the
 <code>Digester</code>, whilst <code>end</code> method calls are execute in
 reverse order. In other words - the order is first in, last out.</p>
 
-<a name="doc.Rules"></a>
-<h3>Processing Rules</h3>
+<h2 id="doc.Rules">Processing Rules</h2>
 
 <p>The <a href="#doc.Patterns">previous section</a> documented how you identify
 <strong>when</strong> you wish to have certain actions take place.  The purpose
@@ -426,8 +420,7 @@ class.  For example, the following code sequence:</p>
                         "com.mycompany.mypackage.MyChildClass");
 </pre>
 
-<a name="doc.Logging"></a>
-<h3>Logging</h3>
+<h2 id="doc.Logging">Logging</h2>
 
 <p>Logging is a vital tool for debugging Digester rulesets. Digester can log
 copious amounts of debugging information. So, you need to know how logging
@@ -445,11 +438,10 @@ works before you start using Digester seriously.</p>
     volume.</li>
 </ul>
 
-<a name="doc.Usage"></a>
-<h3>Usage Examples</h3>
+<h2 id="doc.Usage">Usage Examples</h2>
 
 
-<h4>Creating a Simple Object Tree</h4>
+<h3>Creating a Simple Object Tree</h3>
 
 <p>Let's assume that you have two simple JavaBeans, <code>Foo</code> and
 <code>Bar</code>, with the following method signatures:</p>
@@ -529,7 +521,7 @@ have had its properties set, and all of its child <code>Bar</code> objects
 created for you.</p>
 
 
-<h4>Processing A Struts Configuration File</h4>
+<h3>Processing A Struts Configuration File</h3>
 
 <p>As stated earlier, the primary reason that the
 <code>Digester</code> package was created is because the
@@ -623,7 +615,7 @@ now represented as collections of objects cached within the Struts controller
 servlet, as well as being exposed as servlet context attributes.</p>
 
 
-<h4>Parsing Body Text In XML Files</h4>
+<h3>Parsing Body Text In XML Files</h3>
 
 <p>The Digester module also allows you to process the nested body text in an
 XML file, not just the elements and attributes that are encountered.  The
@@ -707,8 +699,7 @@ brevity in this example):</p>
 </ul>
 
 
-<a name="doc.Namespace"></a>
-<h3>Namespace Aware Parsing</h3>
+<h2 id="doc.Namespace">Namespace Aware Parsing</h2>
 
 <p>For digesting XML documents that do not use XML namespaces, the default
 behavior of <code>Digester</code>, as described above, is generally sufficient.
@@ -777,7 +768,7 @@ any restrictions on what other content is present in the document.</p>
 Rule Sets</a> if you wish to reuse a particular set of rules, associated
 with a particular namespace, in more than one application context.</p>
 
-<h4>Using Namespace Prefixes In Pattern Matching</h4>
+<h3>Using Namespace Prefixes In Pattern Matching</h3>
 
 <p>Using rules with namespaces is very useful when you have orthogonal rulesets.
 One ruleset applies to a namespace and is independent of other rulesets applying
@@ -795,15 +786,14 @@ prefixes.</p>
 'foo:bar'</code> will match a top level element named <code>'bar'</code> in the
 namespace with (local) prefix <code>'foo'</code>.</p>
 
-<h4>Limitations of Digester Namespace support</h4>
+<h3>Limitations of Digester Namespace support</h3>
 <p>Digester does not provide general "xpath-compliant" matching;
 only the namespace attached to the <i>last</i> element in the match path
 is involved in the matching process. Namespaces attached to parent
 elements are ignored for matching purposes.</p>
 
 
-<a name="doc.Pluggable"></a>
-<h3>Pluggable Rules Processing</h3>
+<h2 id="doc.Pluggable">Pluggable Rules Processing</h2>
 
 <p>By default, <code>Digester</code> selects the rules that match a particular
 pattern of nested elements as described under
@@ -829,7 +819,7 @@ that:</p>
     creator can use any prefix that they like).</li>
 </ul>
 
-<h4>ExtendedBaseRules</h4>
+<h3>ExtendedBaseRules</h3>
 <p><a href="ExtendedBaseRules.html">ExtendedBaseRules</a>,
 adds some additional expression syntax for pattern matching
 to the default mechanism, but it also executes more slowly.  See the
@@ -844,7 +834,7 @@ following as part of your Digester initialization:</p>
   ...
 </pre>
 
-<h4>RegexRules</h4>
+<h3>RegexRules</h3>
 <p><a href="RegexRules.html">RegexRules</a> is an advanced <code>Rules</code>
 implementation which does not build on the default pattern matching rules.
 It uses a pluggable <a href="RegexMatcher.html">RegexMatcher</a> implementation to test
@@ -862,7 +852,7 @@ Example usage:
   digester.setRules(new RegexRules(new SimpleRegexMatcher()));
   ...
 </pre>
-<h4>RegexMatchers</h4>
+<h3>RegexMatchers</h3>
 <p>
 <code>Digester</code> ships only with one <code>RegexMatcher</code>
 implementation: <a href='SimpleRegexMatcher.html'>SimpleRegexMatcher</a>.
@@ -892,8 +882,7 @@ regex (to allow the dependencies required by <code>Digester</code>
 to be kept to a minimum).
 </p>
 
-<a name="doc.RuleSets"></a>
-<h3>Encapsulated Rule Sets</h3>
+<h2 id="doc.RuleSets">Encapsulated Rule Sets</h2>
 
 <p>All of the examples above have described a scenario where the rules to be
 processed are registered with a <code>Digester</code> instance immediately
@@ -959,8 +948,8 @@ public class MyRuleSet extends RuleSetBase {
     the same set of nested elements at different nesting levels within an
     XML document.</li>
 </ul>
-<a name="doc.NamedStacks"></a>
-<h3>Using Named Stacks For Inter-Rule Communication</h3>
+
+<h2 id="doc.NamedStacks">Using Named Stacks For Inter-Rule Communication</h2>
 <p>
 <code>Digester</code> is based on <code>Rule</code> instances working together
 to process xml. For anything other than the most trivial processing,
@@ -1001,10 +990,10 @@ are reserved for future use by the <code>Digester</code> component. It is also r
 that users choose stack names perfixed by the name of their own domain to avoid conflicts
 with other <code>Rule</code> implementations.
 </p>
-<a name="doc.RegisteringDTDs"></a>
-<h3>Registering DTDs</h3>
 
-<h4>Brief (But Still Too Long) Introduction To System and Public Identifiers</h4>
+<h2 id="doc.RegisteringDTDs">Registering DTDs</h2>
+
+<h3>Brief (But Still Too Long) Introduction To System and Public Identifiers</h3>
 <p>A definition for an external entity comes in one of two forms:
 </p>
 <ol>
@@ -1019,9 +1008,9 @@ The <code><em>public-identifier</em></code> is an additional free identifier whi
 </p>
 <p>
 In practice, the weakness with a <code><em>system-identifier</em></code> is that most parsers
-will attempt to interpret this URI as an URL, try to download the resource directly
+will attempt to interpret this URI as a URL, try to download the resource directly
 from the URL and stop the parsing if this download fails. So, this means that
-almost always the URI will have to be an URL from which the declaration
+almost always the URI will have to be a URL from which the declaration
 can be downloaded.
 </p>
 <p>
@@ -1056,7 +1045,7 @@ Only when no local copy exists is it necessary to download the document
 from the internet URL. This naming scheme is recommended when using <code>Digester</code>.
 </p>
 
-<h4>External Entity Resolution Using Digester</h4>
+<h3>External Entity Resolution Using Digester</h3>
 <p>
 SAX factors out the resolution of external entities into an <code>EntityResolver</code>.
 <code>Digester</code> supports the use of custom <code>EntityResolver</code>
@@ -1075,9 +1064,8 @@ whenever an external entity with public id
 <p><strong>Note:</strong> This is a simple (but useful) implementation.
 Greater sophistication requires a custom <code>EntityResolver</code>.</p>
 
-<a name="doc.troubleshooting"></a>
-<h3>Troubleshooting</h3>
-<h4>Debugging Exceptions</h4>
+<h2 id="doc.troubleshooting">Troubleshooting</h2>
+<h3>Debugging Exceptions</h3>
 <p>
 <code>Digester</code> is based on <a href='http://www.saxproject.org'>SAX</a>.
 Digestion throws two kinds of <code>Exception</code>:
@@ -1092,7 +1080,7 @@ that developers know all about. The second is thrown by SAX parsers when the pro
 of the XML cannot be completed. So, to diagnose the cause a certain familiarity with
 the way that SAX error handling works is very useful.
 </p>
-<h4>Diagnosing SAX Exceptions</h4>
+<h3>Diagnosing SAX Exceptions</h3>
 <p>
 This is a short, potted guide to SAX error handling strategies. It's not intended as a
 proper guide to error handling in SAX.
@@ -1115,8 +1103,8 @@ throw by <code>Digester</code> each of these will be wrapped into a
 <code>SAXException</code> and rethrown. So, catch these and examine the wrapped
 exception to diagnose what went wrong.
 </p>
-<a name="doc.FAQ"></a>
-<h3>Frequently Asked Questions</h3>
+
+<h2 id="doc.FAQ">Frequently Asked Questions</h2>
 <ul>
 <li><strong>Why do I get warnings when using a JAXP 1.1 parser?</strong>
 If you're using a JAXP 1.1 parser, you might see the following warning (in your log):
@@ -1159,8 +1147,7 @@ Digester logs but the processing will continue. To change this behaviour, call
 <code>digester.setErrorHandler</code> with a more suitable implementation.
 </p>
 
-<li><strong>Where Can I Find Example Code?</strong>
-<a name="doc.FAQ.Examples"></a>
+<li id="doc.FAQ.Examples"><strong>Where Can I Find Example Code?</strong>
 <p>Digester ships with a sample application: a mapping for the <em>Rich Site
 Summary</em> format used by many newsfeeds. Download the source distribution
 to see how it works.</p>
@@ -1181,9 +1168,9 @@ commons dev mailing list</a>
 </p>
 </li>
 </ul>
-<a name="doc.Limits"></a>
-<h3>Known Limitations</h3>
-<h4>Accessing Public Methods In A Default Access Superclass</h4>
+
+<h2 id="doc.Limits">Known Limitations</h2>
+<h3>Accessing Public Methods In A Default Access Superclass</h3>
 <p>There is an issue when invoking public methods contained in a default access superclass.
 Reflection locates these methods fine and correctly assigns them as public.
 However, an <code>IllegalAccessException</code> is thrown if the method is invoked.</p>

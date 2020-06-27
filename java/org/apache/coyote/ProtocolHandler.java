@@ -16,6 +16,7 @@
  */
 package org.apache.coyote;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ScheduledExecutorService;
 
@@ -179,5 +180,46 @@ public interface ProtocolHandler {
      * @return the protocols
      */
     public UpgradeProtocol[] findUpgradeProtocols();
+
+
+    /**
+     * Some protocols, like AJP, have a packet length that
+     * shouldn't be exceeded, and this can be used to adjust the buffering
+     * used by the application layer.
+     * @return the desired buffer size, or -1 if not relevant
+     */
+    public default int getDesiredBufferSize() {
+        return -1;
+    }
+
+
+    /**
+     * Create a new ProtocolHandler for the given protocol.
+     * @param protocol the protocol
+     * @return the newly instantiated protocol handler
+     * @throws ClassNotFoundException Specified protocol was not found
+     * @throws InstantiationException Specified protocol could not be instantiated
+     * @throws IllegalAccessException Exception occurred
+     * @throws IllegalArgumentException Exception occurred
+     * @throws InvocationTargetException Exception occurred
+     * @throws NoSuchMethodException Exception occurred
+     * @throws SecurityException Exception occurred
+     */
+    public static ProtocolHandler create(String protocol)
+            throws ClassNotFoundException, InstantiationException, IllegalAccessException,
+            IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException {
+        if (protocol == null || "HTTP/1.1".equals(protocol)
+                || org.apache.coyote.http11.Http11NioProtocol.class.getName().equals(protocol)) {
+            return new org.apache.coyote.http11.Http11NioProtocol();
+        } else if ("AJP/1.3".equals(protocol)
+                || org.apache.coyote.ajp.AjpNioProtocol.class.getName().equals(protocol)) {
+            return new org.apache.coyote.ajp.AjpNioProtocol();
+        } else {
+            // Instantiate protocol handler
+            Class<?> clazz = Class.forName(protocol);
+            return (ProtocolHandler) clazz.getConstructor().newInstance();
+        }
+    }
+
 
 }

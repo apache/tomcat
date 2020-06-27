@@ -21,10 +21,10 @@ import java.io.IOException;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -205,8 +205,8 @@ public class TestOutputBuffer extends TomcatBaseTest{
             resp.setContentType("text/plain");
             Writer w = resp.getWriter();
 
-            for (int i = 0; i < chars.length; i++) {
-                w.write(chars[i]);
+            for (char aChar : chars) {
+                w.write(aChar);
             }
         }
     }

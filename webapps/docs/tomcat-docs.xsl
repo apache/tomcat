@@ -37,22 +37,22 @@
   <xsl:param    name="apache-logo"         select="'/images/asf-logo.svg'"/>
   <xsl:param    name="subdir"              select="''"/>
   <xsl:param    name="relative-path"       select="'.'"/>
-  <xsl:param    name="version"             select="'9.0.x'"/>
-  <xsl:param    name="majorversion"        select="'9'"/>
-  <xsl:param    name="majorminorversion"   select="'9.0'"/>
+  <xsl:param    name="version"             select="'10.0.x'"/>
+  <xsl:param    name="majorversion"        select="'10'"/>
+  <xsl:param    name="majorminorversion"   select="'10.0'"/>
+  <xsl:param    name="minjavaversion"      select="'8'"/>
   <xsl:param    name="build-date"          select="'MMM d yyyy'"/>
   <xsl:param    name="build-date-iso-8601" select="'yyyy-MM-dd'"/>
   <xsl:param    name="year"                select="'yyyy'"/>
   <xsl:param    name="buglink"             select="'https://bz.apache.org/bugzilla/show_bug.cgi?id='"/>
   <xsl:param    name="revlink"             select="'https://svn.apache.org/viewvc?view=rev&amp;rev='"/>
-  <xsl:param    name="doclink"             select="'https://tomcat.apache.org/tomcat-9.0-doc'"/>
-  <xsl:param    name="sylink"              select="'https://tomcat.apache.org/security-9.html'"/>
-  <xsl:param    name="dllink"              select="'https://tomcat.apache.org/download-90.cgi'"/>
+  <xsl:param    name="doclink"             select="'https://tomcat.apache.org/tomcat-10.0-doc'"/>
+  <xsl:param    name="sylink"              select="'https://tomcat.apache.org/security-10.html'"/>
+  <xsl:param    name="dllink"              select="'https://tomcat.apache.org/download-10.cgi'"/>
   <xsl:param    name="sitedir"             select="''"/>
   <xsl:param    name="filename"            select="'-'"/>
 
   <!-- Defined variables (non-overrideable) -->
-  <xsl:variable name="commentslink"><xsl:value-of select="$relative-path"/>/comments.html</xsl:variable>
   <xsl:variable name="project-xml-filename"><xsl:value-of select="$subdir"/>project.xml</xsl:variable>
   <xsl:variable name="project"
               select="document($project-xml-filename)/project"/>
@@ -88,53 +88,6 @@
     -->
     <meta name="author" content="{$name}"/>
   </xsl:for-each>
-
-  <!-- Script for ASF Comments System. -->
-  <!--
-    Use data-* attributes for retrieval of XSLT-generated data
-    in JavaScript.
-    Use this approach rather than directly inserting text
-    in a JS string literal as that would cause
-    problems when the string contains special characters
-    like ", ', \n etc.
-  -->
-  <xsl:variable name="comments-identifier">
-    <xsl:value-of select="$sitedir"/><xsl:value-of select="$subdir"/><xsl:value-of select="substring($filename,1,string-length($filename)-4)"/>
-  </xsl:variable>
-  <xsl:if test="not(properties/no-comments)">
-  <script type="application/javascript"
-      data-comments-identifier="{$comments-identifier}"><![CDATA[
-    "use strict"; // Enable strict mode
-
-    (function() {
-      var thisScript = document.currentScript;
-      if (!thisScript) { // Workaround for IE <= 11
-        var scripts = document.getElementsByTagName("script");
-        thisScript = scripts[scripts.length - 1];
-      }
-      document.addEventListener("DOMContentLoaded", (function() {
-        var commentsDiv = document.getElementById("comments_thread");
-        var commentsShortname = "tomcat";
-        var commentsIdentifier = "https://tomcat.apache.org/" +
-          thisScript.getAttribute("data-comments-identifier") + ".html";
-
-        (function(w, d) {
-          if (w.location.hostname.toLowerCase() == "tomcat.apache.org") {
-            var s = d.createElement("script");
-            s.type = "application/javascript";
-            s.async = true;
-            s.src = "https://comments.apache.org/show_comments.lua?site=" +
-              encodeURIComponent(commentsShortname) +
-              "&page=" + encodeURIComponent(commentsIdentifier);
-            d.head.appendChild(s);
-          } else {
-            commentsDiv.appendChild(d.createTextNode("Comments are disabled for this page at the moment."));
-          }
-        })(window, document);
-      }), false);
-    })();
-  ]]></script>
-  </xsl:if>
   </head>
 
   <body>
@@ -183,34 +136,8 @@
       <div id="mainRight">
         <div id="content">
           <!-- Main Part -->
-            <h2><xsl:value-of select="properties/title"/></h2>
-            <xsl:apply-templates select="body/section"/>
-
-            <!-- Comments Section -->
-            <xsl:if test="not(properties/no-comments)">
-              <div class="noprint">
-                <h3 id="comments_section">
-                  Comments
-                </h3>
-
-                <div class="text">
-                  <p class="notice">
-                    <strong>Notice:</strong> This comments section collects your suggestions
-                    on improving documentation for Apache Tomcat.<br/><br/>
-                    If you have trouble and need help, read
-                    <a href="https://tomcat.apache.org/findhelp.html">Find Help</a> page
-                    and ask your question on the tomcat-users
-                    <a href="https://tomcat.apache.org/lists.html">mailing list</a>.
-                    Do not ask such questions here. This is not a Q&amp;A section.<br/><br/>
-                    The Apache Comments System is explained <a href="{$commentslink}">here</a>.
-                    Comments may be removed by our moderators if they are either
-                    implemented or considered invalid/off-topic.
-                  </p>
-                  <div id="comments_thread"/>
-                </div>
-              </div>
-            </xsl:if>
-
+          <h2><xsl:value-of select="properties/title"/></h2>
+          <xsl:apply-templates select="body/section"/>
         </div>
       </div>
     </div>
@@ -502,6 +429,9 @@
   </xsl:template>
   <xsl:template match="version-major">
     <xsl:value-of select="$majorversion"/>
+  </xsl:template>
+  <xsl:template match="min-java-version">
+    <xsl:value-of select="$minjavaversion"/>
   </xsl:template>
 
   <!-- Process everything else by just passing it through -->

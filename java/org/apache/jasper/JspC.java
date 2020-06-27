@@ -45,8 +45,8 @@ import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import javax.servlet.jsp.JspFactory;
-import javax.servlet.jsp.tagext.TagLibraryInfo;
+import jakarta.servlet.jsp.JspFactory;
+import jakarta.servlet.jsp.tagext.TagLibraryInfo;
 
 import org.apache.jasper.compiler.Compiler;
 import org.apache.jasper.compiler.JspConfig;
@@ -1036,18 +1036,6 @@ public class JspC extends Task implements Options {
     }
 
     /**
-     * File where we generate a web.xml fragment with the class definitions.
-     * @param s New value
-     * @deprecated Will be removed in Tomcat 10.
-     *             Use {@link #setWebXmlInclude(String)}
-     */
-    @Deprecated
-    public void setWebXmlFragment( String s ) {
-        webxmlFile=resolveFile(s).getAbsolutePath();
-        webxmlLevel=INC_WEBXML;
-    }
-
-    /**
      * File where we generate configuration with the class definitions to be
      * included in a web.xml file.
      * @param s New value
@@ -1393,18 +1381,6 @@ public class JspC extends Task implements Options {
         }
     }
 
-    /**
-     * Locate all jsp files in the webapp. Used if no explicit
-     * jsps are specified.
-     * @param base Base path
-     *
-     * @deprecated This will be removed in Tomcat 10. Use {@link #scanFiles()}
-     */
-    @Deprecated
-    public void scanFiles(File base) {
-        scanFiles();
-    }
-
 
     /**
      * Locate all jsp files in the webapp. Used if no explicit jsps are
@@ -1746,23 +1722,22 @@ public class JspC extends Task implements Options {
                 // therefore we have permission to freak out
                 throw new RuntimeException(ioe.toString());
             }
-            File lib = new File(webappBase, "/WEB-INF/lib");
-            if (lib.exists() && lib.isDirectory()) {
-                String[] libs = lib.list();
+            File webinfLib = new File(webappBase, "/WEB-INF/lib");
+            if (webinfLib.exists() && webinfLib.isDirectory()) {
+                String[] libs = webinfLib.list();
                 if (libs != null) {
-                    for (int i = 0; i < libs.length; i++) {
-                        if( libs[i].length() <5 ) continue;
-                        String ext=libs[i].substring( libs[i].length() - 4 );
-                        if (! ".jar".equalsIgnoreCase(ext)) {
+                    for (String lib : libs) {
+                        if (lib.length() < 5) continue;
+                        String ext = lib.substring(lib.length() - 4);
+                        if (!".jar".equalsIgnoreCase(ext)) {
                             if (".tld".equalsIgnoreCase(ext)) {
                                 log.warn(Localizer.getMessage("jspc.warning.tldInWebInfLib"));
                             }
                             continue;
                         }
                         try {
-                            File libFile = new File(lib, libs[i]);
-                            classPath = classPath + File.pathSeparator
-                                + libFile.getAbsolutePath();
+                            File libFile = new File(webinfLib, lib);
+                            classPath = classPath + File.pathSeparator + libFile.getAbsolutePath();
                             urls.add(libFile.getAbsoluteFile().toURI().toURL());
                         } catch (IOException ioe) {
                             // failing a toCanonicalPath on a file that

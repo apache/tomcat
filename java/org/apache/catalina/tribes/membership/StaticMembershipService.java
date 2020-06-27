@@ -43,7 +43,7 @@ public class StaticMembershipService extends MembershipServiceBase
     private StaticMembershipProvider provider;
 
     /**
-     * the ObjectName of this McastService.
+     * the ObjectName of this MembershipService.
      */
     private ObjectName oname = null;
 

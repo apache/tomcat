@@ -276,11 +276,11 @@ public abstract class AbstractReplicatedMap<K,V>
                                                   msg, RpcChannel.ALL_REPLY,
                                                   (channelSendOptions),
                                                   (int) accessTimeout);
-                for (int i = 0; i < resp.length; i++) {
-                    MapMessage mapMsg = (MapMessage)resp[i].getMessage();
+                for (Response response : resp) {
+                    MapMessage mapMsg = (MapMessage) response.getMessage();
                     try {
                         mapMsg.deserialize(getExternalLoaders());
-                        Member member = resp[i].getSource();
+                        Member member = response.getSource();
                         State state = (State) mapMsg.getValue();
                         if (state.isAvailable()) {
                             memberAlive(member);
@@ -289,7 +289,7 @@ public abstract class AbstractReplicatedMap<K,V>
                                 if (log.isInfoEnabled())
                                     log.info(sm.getString("abstractReplicatedMap.ping.stateTransferredMember",
                                             member));
-                                if (mapMembers.containsKey(member) ) {
+                                if (mapMembers.containsKey(member)) {
                                     mapMembers.put(member, Long.valueOf(System.currentTimeMillis()));
                                 }
                             }
@@ -313,7 +313,7 @@ public abstract class AbstractReplicatedMap<K,V>
         }
         //update our map of members, expire some if we didn't receive a ping back
         synchronized (mapMembers) {
-            Member[] members = mapMembers.keySet().toArray(new Member[mapMembers.size()]);
+            Member[] members = mapMembers.keySet().toArray(new Member[0]);
             long now = System.currentTimeMillis();
             for (Member member : members) {
                 long access = mapMembers.get(member).longValue();
@@ -353,9 +353,9 @@ public abstract class AbstractReplicatedMap<K,V>
             Response[] resp = rpcChannel.send(members, msg,
                     RpcChannel.FIRST_REPLY, (channelSendOptions), rpcTimeout);
             if (resp.length > 0) {
-                for (int i = 0; i < resp.length; i++) {
-                    mapMemberAdded(resp[i].getSource());
-                    messageReceived(resp[i].getMessage(), resp[i].getSource());
+                for (Response response : resp) {
+                    mapMemberAdded(response.getSource());
+                    messageReceived(response.getMessage(), response.getSource());
                 }
             } else {
                 log.warn(sm.getString("abstractReplicatedMap.broadcast.noReplies"));
@@ -428,7 +428,7 @@ public abstract class AbstractReplicatedMap<K,V>
         synchronized (mapMembers) {
             @SuppressWarnings("unchecked") // mapMembers has the correct type
             HashMap<Member, Long> list = (HashMap<Member, Long>)mapMembers.clone();
-            for (int i=0; i<exclude.length;i++) list.remove(exclude[i]);
+            for (Member member : exclude) list.remove(member);
             return getMapMembers(list);
         }
     }
@@ -530,8 +530,8 @@ public abstract class AbstractReplicatedMap<K,V>
                         msg = (MapMessage) resp[0].getMessage();
                         msg.deserialize(getExternalLoaders());
                         ArrayList<?> list = (ArrayList<?>) msg.getValue();
-                        for (int i = 0; i < list.size(); i++) {
-                            messageReceived( (Serializable) list.get(i), resp[0].getSource());
+                        for (Object o : list) {
+                            messageReceived((Serializable) o, resp[0].getSource());
                         } //for
                     }
                     stateTransferred = true;
@@ -824,20 +824,26 @@ public abstract class AbstractReplicatedMap<K,V>
     public boolean inSet(Member m, Member[] set) {
         if ( set == null ) return false;
         boolean result = false;
-        for (int i=0; i<set.length && (!result); i++ )
-            if ( m.equals(set[i]) ) result = true;
+        for (Member member : set)
+            if (m.equals(member)) {
+                result = true;
+                break;
+            }
         return result;
     }
 
     public Member[] excludeFromSet(Member[] mbrs, Member[] set) {
         List<Member> result = new ArrayList<>();
-        for (int i=0; i<set.length; i++ ) {
+        for (Member member : set) {
             boolean include = true;
-            for (int j=0; j<mbrs.length && include; j++ )
-                if ( mbrs[j].equals(set[i]) ) include = false;
-            if ( include ) result.add(set[i]);
+            for (Member mbr : mbrs)
+                if (mbr.equals(member)) {
+                    include = false;
+                    break;
+                }
+            if (include) result.add(member);
         }
-        return result.toArray(new Member[result.size()]);
+        return result.toArray(new Member[0]);
     }
 
     @Override
@@ -1113,11 +1119,10 @@ public abstract class AbstractReplicatedMap<K,V>
      */
     @Override
     public void putAll(Map<? extends K, ? extends V> m) {
-        Iterator<?> i = m.entrySet().iterator();
-        while ( i.hasNext() ) {
+        for (Entry<? extends K, ? extends V> value : m.entrySet()) {
             @SuppressWarnings("unchecked")
-            Map.Entry<K,V> entry = (Map.Entry<K,V>) i.next();
-            put(entry.getKey(),entry.getValue());
+            Entry<K, V> entry = (Entry<K, V>) value;
+            put(entry.getKey(), entry.getValue());
         }
     }
 

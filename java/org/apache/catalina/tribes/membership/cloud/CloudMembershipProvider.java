@@ -42,6 +42,8 @@ public abstract class CloudMembershipProvider extends MembershipProviderBase imp
     private static final Log log = LogFactory.getLog(CloudMembershipProvider.class);
     protected static final StringManager sm = StringManager.getManager(CloudMembershipProvider.class);
 
+    protected static final String CUSTOM_ENV_PREFIX = "OPENSHIFT_KUBE_PING_";
+
     protected String url;
     protected StreamProvider streamProvider;
     protected int connectionTimeout;
@@ -65,32 +67,46 @@ public abstract class CloudMembershipProvider extends MembershipProviderBase imp
         }
     }
 
-    // Get value of environment variable named keys[0]
-    // If keys[0] isn't found, try keys[1], keys[2], ...
-    // If nothing is found, return null
+    /**
+     * Get value of environment variable.
+     * @param keys the environment variables
+     * @return the env variables values, or null if not found
+     */
     protected static String getEnv(String... keys) {
         String val = null;
-
         for (String key : keys) {
             val = AccessController.doPrivileged((PrivilegedAction<String>) () -> System.getenv(key));
             if (val != null)
                 break;
         }
-
         return val;
+    }
+
+    /**
+     * Get the Kubernetes namespace, or "tomcat" if the Kubernetes environment variable
+     * cannot be found (with a warning log about the missing namespace).
+     * @return the namespace
+     */
+    protected String getNamespace() {
+        String namespace = getEnv(CUSTOM_ENV_PREFIX + "NAMESPACE", "KUBERNETES_NAMESPACE");
+        if (namespace == null || namespace.length() == 0) {
+            log.warn(sm.getString("kubernetesMembershipProvider.noNamespace"));
+            namespace = "tomcat";
+        }
+        return namespace;
     }
 
     @Override
     public void init(Properties properties) throws IOException {
         startTime = Instant.now();
 
-        connectionTimeout = Integer.parseInt(properties.getProperty("connectionTimeout", "1000"));
-        readTimeout = Integer.parseInt(properties.getProperty("readTimeout", "1000"));
+        CloudMembershipService service = (CloudMembershipService) this.service;
+        connectionTimeout = service.getConnectTimeout();
+        readTimeout = service.getReadTimeout();
+        expirationTime = service.getExpirationTime();
 
         localIp = InetAddress.getLocalHost().getHostAddress();
         port = Integer.parseInt(properties.getProperty("tcpListenPort"));
-
-        expirationTime = Long.parseLong(properties.getProperty("expirationTime", "5000"));
     }
 
     @Override

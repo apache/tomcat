@@ -119,7 +119,7 @@
   <subsection name="Additional features">
     <p>The Tomcat connection pool offers a few additional features over what most other pools let you do:</p>
     <ul>
-      <li><code>initSQL</code> - the ability to run a SQL statement exactly once, when the connection is created</li>
+      <li><code>initSQL</code> - the ability to run an SQL statement exactly once, when the connection is created</li>
       <li><code>validationInterval</code> - in addition to running validations on connections, avoid running them too frequently.</li>
       <li><code>jdbcInterceptors</code> - flexible and pluggable interceptors to create any customizations around the pool,
           the query execution and the result set handling. More on this in the advanced section.</li>
@@ -335,7 +335,7 @@
     <attribute name="timeBetweenEvictionRunsMillis" required="false">
       <p>(int) The number of milliseconds to sleep between runs of the idle connection validation/cleaner thread.
          This value should not be set under 1 second. It dictates how often we check for idle, abandoned connections, and how often
-         we validate idle connections.
+         we validate idle connections. This value will be overridden by <code>maxAge</code> if the latter is non-zero and lower.
          The default value is <code>5000</code> (5 seconds). <br/>
       </p>
     </attribute>
@@ -463,17 +463,22 @@
     </attribute>
 
     <attribute name="maxAge" required="false">
-      <p>(long) Time in milliseconds to keep this connection. This attribute
-         works both when returning connection and when borrowing connection.
+      <p>(long) Time in milliseconds to keep a connection before recreating it.
          When a connection is borrowed from the pool, the pool will check to see
          if the <code>now - time-when-connected > maxAge</code> has been reached
          , and if so, it reconnects before borrow it. When a connection is
          returned to the pool, the pool will check to see if the
          <code>now - time-when-connected > maxAge</code> has been reached, and
-         if so, it closes the connection rather than returning it to the pool.
+         if so, it tries to reconnect.
+         When a connection is idle and <code>timeBetweenEvictionRunsMillis</code> is
+         greater than zero, the pool will periodically check to see if the
+         <code>now - time-when-connected > maxAge</code> has been reached, and
+         if so, it tries to reconnect.
+         Setting <code>maxAge</code> to a value lower than <code>timeBetweenEvictionRunsMillis</code>
+         will override it (so idle connection validation/cleaning will run more frequently).
          The default value is <code>0</code>, which implies that connections
          will be left open and no age check will be done upon borrowing from the
-         pool and returning the connection to the pool.</p>
+         pool, returning the connection to the pool or when checking idle connections.</p>
     </attribute>
 
     <attribute name="useEquals" required="false">

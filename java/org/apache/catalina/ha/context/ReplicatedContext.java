@@ -23,7 +23,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import javax.servlet.ServletContext;
+import jakarta.servlet.ServletContext;
 
 import org.apache.catalina.Globals;
 import org.apache.catalina.LifecycleException;
@@ -186,8 +186,7 @@ public class ReplicatedContext extends StandardContext implements MapOwner {
         @SuppressWarnings("unchecked")
         @Override
         public Enumeration<String> getAttributeNames() {
-            Set<String> names = new HashSet<>();
-            names.addAll(attributes.keySet());
+            Set<String> names = new HashSet<>(attributes.keySet());
 
             return new MultiEnumeration<>(new Enumeration[] {
                     super.getAttributeNames(),
@@ -196,21 +195,25 @@ public class ReplicatedContext extends StandardContext implements MapOwner {
     }
 
     protected static class MultiEnumeration<T> implements Enumeration<T> {
-        private final Enumeration<T>[] e;
-        public MultiEnumeration(Enumeration<T>[] lists) {
-            e = lists;
+        private final Enumeration<T>[] enumerations;
+        public MultiEnumeration(Enumeration<T>[] enumerations) {
+            this.enumerations = enumerations;
         }
         @Override
         public boolean hasMoreElements() {
-            for ( int i=0; i<e.length; i++ ) {
-                if ( e[i].hasMoreElements() ) return true;
+            for (Enumeration<T> enumeration : enumerations) {
+                if (enumeration.hasMoreElements()) {
+                    return true;
+                }
             }
             return false;
         }
         @Override
         public T nextElement() {
-            for ( int i=0; i<e.length; i++ ) {
-                if ( e[i].hasMoreElements() ) return e[i].nextElement();
+            for (Enumeration<T> enumeration : enumerations) {
+                if (enumeration.hasMoreElements()) {
+                    return enumeration.nextElement();
+                }
             }
             return null;
 
@@ -221,6 +224,4 @@ public class ReplicatedContext extends StandardContext implements MapOwner {
     public void objectMadePrimary(Object key, Object value) {
         //noop
     }
-
-
 }

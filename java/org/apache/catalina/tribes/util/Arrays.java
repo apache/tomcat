@@ -109,7 +109,7 @@ public class Arrays {
 
     public static int add(int[] data) {
         int result = 0;
-        for (int i=0;i<data.length; i++ ) result += data[i];
+        for (int datum : data) result += datum;
         return result;
     }
 
@@ -141,7 +141,7 @@ public class Arrays {
         AbsoluteOrder.absoluteOrder(m1);
         AbsoluteOrder.absoluteOrder(m2);
         ArrayList<Member> list = new ArrayList<>(java.util.Arrays.asList(m1));
-        for (int i=0; i<m2.length; i++) if ( !list.contains(m2[i]) ) list.add(m2[i]);
+        for (Member member : m2) if (!list.contains(member)) list.add(member);
         Member[] result = new Member[list.size()];
         list.toArray(result);
         AbsoluteOrder.absoluteOrder(result);
@@ -149,17 +149,17 @@ public class Arrays {
     }
 
     public static void fill(Membership mbrship, Member[] m) {
-        for (int i=0; i<m.length; i++ ) mbrship.addMember(m[i]);
+        for (Member member : m) mbrship.addMember(member);
     }
 
     public static Member[] diff(Membership complete, Membership local, Member ignore) {
         List<Member> result = new ArrayList<>();
         Member[] comp = complete.getMembers();
-        for ( int i=0; i<comp.length; i++ ) {
-            if ( ignore!=null && ignore.equals(comp[i]) ) continue;
-            if ( local.getMember(comp[i]) == null ) result.add(comp[i]);
+        for (Member member : comp) {
+            if (ignore != null && ignore.equals(member)) continue;
+            if (local.getMember(member) == null) result.add(member);
         }
-        return result.toArray(new Member[result.size()]);
+        return result.toArray(new Member[0]);
     }
 
     public static Member[] remove(Member[] all, Member remove) {
@@ -169,8 +169,8 @@ public class Arrays {
     public static Member[] extract(Member[] all, Member[] remove) {
         List<Member> alist = java.util.Arrays.asList(all);
         ArrayList<Member> list = new ArrayList<>(alist);
-        for (int i=0; i<remove.length; i++ ) list.remove(remove[i]);
-        return list.toArray(new Member[list.size()]);
+        for (Member member : remove) list.remove(member);
+        return list.toArray(new Member[0]);
     }
 
     public static int indexOf(Member member, Member[] members) {
@@ -192,8 +192,7 @@ public class Arrays {
             return 0;
 
         int result = 1;
-        for (int i=0; i<a.length; i++) {
-            byte element = a[i];
+        for (byte element : a) {
             result = 31 * result + element;
         }
         return result;

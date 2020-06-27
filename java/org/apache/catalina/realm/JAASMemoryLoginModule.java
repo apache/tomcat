@@ -32,7 +32,8 @@ import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.security.auth.login.FailedLoginException;
 import javax.security.auth.login.LoginException;
 import javax.security.auth.spi.LoginModule;
-import javax.servlet.http.HttpServletRequest;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.apache.catalina.CredentialHandler;
 import org.apache.juli.logging.Log;
@@ -195,8 +196,8 @@ public class JAASMemoryLoginModule extends MemoryRealm implements LoginModule {
             // JAASRealm
             if (principal instanceof GenericPrincipal) {
                 String roles[] = ((GenericPrincipal) principal).getRoles();
-                for (int i = 0; i < roles.length; i++) {
-                    subject.getPrincipals().add(new GenericPrincipal(roles[i], null, null));
+                for (String role : roles) {
+                    subject.getPrincipals().add(new GenericPrincipal(role));
                 }
 
             }
@@ -381,14 +382,14 @@ public class JAASMemoryLoginModule extends MemoryRealm implements LoginModule {
         if (!file.isAbsolute()) {
             String catalinaBase = getCatalinaBase();
             if (catalinaBase == null) {
-                log.warn(sm.getString("jaasMemoryLoginModule.noCatalinaBase", pathname));
+                log.error(sm.getString("jaasMemoryLoginModule.noCatalinaBase", pathname));
                 return;
             } else {
                 file = new File(catalinaBase, pathname);
             }
         }
         if (!file.canRead()) {
-            log.warn(sm.getString("jaasMemoryLoginModule.noConfig", file.getAbsolutePath()));
+            log.error(sm.getString("jaasMemoryLoginModule.noConfig", file.getAbsolutePath()));
             return;
         }
 
@@ -400,7 +401,7 @@ public class JAASMemoryLoginModule extends MemoryRealm implements LoginModule {
             digester.push(this);
             digester.parse(file);
         } catch (Exception e) {
-            log.warn(sm.getString("jaasMemoryLoginModule.parseError", file.getAbsolutePath()), e);
+            log.error(sm.getString("jaasMemoryLoginModule.parseError", file.getAbsolutePath()), e);
         } finally {
             digester.reset();
         }

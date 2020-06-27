@@ -35,18 +35,19 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.net.SocketFactory;
-import javax.servlet.AsyncContext;
-import javax.servlet.AsyncEvent;
-import javax.servlet.AsyncListener;
-import javax.servlet.DispatcherType;
-import javax.servlet.ReadListener;
-import javax.servlet.ServletException;
-import javax.servlet.ServletInputStream;
-import javax.servlet.ServletOutputStream;
-import javax.servlet.WriteListener;
-import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+
+import jakarta.servlet.AsyncContext;
+import jakarta.servlet.AsyncEvent;
+import jakarta.servlet.AsyncListener;
+import jakarta.servlet.DispatcherType;
+import jakarta.servlet.ReadListener;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletInputStream;
+import jakarta.servlet.ServletOutputStream;
+import jakarta.servlet.WriteListener;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.junit.Assert;
 import org.junit.Ignore;
@@ -157,7 +158,10 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         String servletName = NBWriteServlet.class.getName();
         Tomcat.addServlet(ctx, servletName, servlet);
         ctx.addServletMappingDecoded("/", servletName);
-        tomcat.getConnector().setProperty("socket.txBufSize", "1024");
+        // Note: Low values of socket.txBufSize can trigger very poor
+        //       performance. Set it just low enough to ensure that the
+        //       non-blocking write servlet will see isReady() == false
+        Assert.assertTrue(tomcat.getConnector().setProperty("socket.txBufSize", "1048576"));
         tomcat.start();
 
         SocketFactory factory = SocketFactory.getDefault();
@@ -192,11 +196,15 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         int readSinceLastPause = 0;
         while (read != -1) {
             read = is.read(buffer);
+            if (readSinceLastPause == 0) {
+                log.info("Reading data");
+            }
             if (read > 0) {
                 result.append(buffer, 0, read);
             }
             readSinceLastPause += read;
             if (readSinceLastPause > WRITE_SIZE / 16) {
+                log.info("Read " + readSinceLastPause + " bytes, pause 500ms");
                 readSinceLastPause = 0;
                 Thread.sleep(500);
             }
@@ -319,7 +327,10 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         String servletName = NBWriteServlet.class.getName();
         Tomcat.addServlet(ctx, servletName, servlet);
         ctx.addServletMappingDecoded("/", servletName);
-        tomcat.getConnector().setProperty("socket.txBufSize", "1024");
+        // Note: Low values of socket.txBufSize can trigger very poor
+        //       performance. Set it just low enough to ensure that the
+        //       non-blocking write servlet will see isReady() == false
+        Assert.assertTrue(tomcat.getConnector().setProperty("socket.txBufSize", "1048576"));
         tomcat.start();
 
         SocketFactory factory = SocketFactory.getDefault();
@@ -678,16 +689,12 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
                 public void run() {
                     try {
                         ServletInputStream in = ctx.getRequest().getInputStream();
-                        String s = "";
                         byte[] b = new byte[1024];
                         int read = in.read(b);
                         if (read == -1) {
                             return;
                         }
-                        s += new String(b, 0, read);
-                        synchronized (body) {
-                            body.append(s);
-                        }
+                        body.append(new String(b, 0, read));
                         boolean isReady = ignoreIsReady || in.isReady();
                         if (isReady) {
                             isReadyCount.incrementAndGet();

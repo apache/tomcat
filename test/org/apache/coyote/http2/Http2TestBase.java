@@ -32,10 +32,11 @@ import java.util.Map;
 import java.util.Random;
 
 import javax.net.SocketFactory;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.junit.Assert;
 import org.junit.Assume;
@@ -46,23 +47,33 @@ import org.apache.catalina.connector.Connector;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.catalina.util.IOTools;
+import org.apache.coyote.http11.Http11NioProtocol;
 import org.apache.coyote.http2.HpackDecoder.HeaderEmitter;
 import org.apache.coyote.http2.Http2Parser.Input;
 import org.apache.coyote.http2.Http2Parser.Output;
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.apache.tomcat.util.compat.JrePlatform;
+import org.apache.tomcat.util.http.FastHttpDateFormat;
 import org.apache.tomcat.util.http.MimeHeaders;
+import org.apache.tomcat.util.net.TesterSupport;
 
 /**
  * Tests for compliance with the <a href="https://tools.ietf.org/html/rfc7540">
  * HTTP/2 specification</a>.
  */
+@org.junit.runner.RunWith(org.junit.runners.Parameterized.class)
 public abstract class Http2TestBase extends TomcatBaseTest {
+
+    @org.junit.runners.Parameterized.Parameters
+    public static Object[][] data() {
+        return new Object[Integer.getInteger("tomcat.test.http2.loopCount", 1).intValue()][0];
+    }
 
     // Nothing special about this date apart from it being the date I ran the
     // test that demonstrated that most HTTP/2 tests were failing because the
     // response now included a date header
     protected static final String DEFAULT_DATE = "Wed, 11 Nov 2015 19:18:42 GMT";
+    protected static final long DEFAULT_TIME = FastHttpDateFormat.parseDate(DEFAULT_DATE);
 
     private static final String HEADER_IGNORED = "x-ignore";
 
@@ -73,18 +84,22 @@ public abstract class Http2TestBase extends TomcatBaseTest {
 
     static {
         byte[] empty = new byte[0];
-        EMPTY_HTTP2_SETTINGS_HEADER = "HTTP2-Settings: " + Base64.encodeBase64String(empty) + "\r\n";
+        EMPTY_HTTP2_SETTINGS_HEADER = "HTTP2-Settings: " + Base64.encodeBase64URLSafeString(empty) + "\r\n";
     }
 
     protected static final String TRAILER_HEADER_NAME = "x-trailertest";
     protected static final String TRAILER_HEADER_VALUE = "test";
 
+    // Client
     private Socket s;
     protected HpackEncoder hpackEncoder;
     protected Input input;
     protected TestOutput output;
     protected Http2Parser parser;
     protected OutputStream os;
+
+    // Server
+    protected Http2Protocol http2Protocol;
 
     private long pingAckDelayMillis = 0;
 
@@ -98,9 +113,13 @@ public abstract class Http2TestBase extends TomcatBaseTest {
      * that the first response is correctly received.
      */
     protected void http2Connect() throws Exception {
-        enableHttp2();
+        http2Connect(false);
+    }
+
+    protected void http2Connect(boolean tls) throws Exception {
+        enableHttp2(tls);
         configureAndStartWebApplication();
-        openClientConnection();
+        openClientConnection(tls);
         doHttpUpgrade();
         sendClientPreface();
         validateHttp2InitialResponse();
@@ -533,18 +552,38 @@ public abstract class Http2TestBase extends TomcatBaseTest {
     }
 
     protected void enableHttp2(long maxConcurrentStreams) {
-        Connector connector = getTomcatInstance().getConnector();
-        Http2Protocol http2Protocol = new Http2Protocol();
-        // Short timeouts for now. May need to increase these for CI systems.
-        http2Protocol.setReadTimeout(2000);
-        http2Protocol.setWriteTimeout(2000);
-        http2Protocol.setKeepAliveTimeout(5000);
-        http2Protocol.setStreamReadTimeout(1000);
-        http2Protocol.setStreamWriteTimeout(1000);
-        http2Protocol.setMaxConcurrentStreams(maxConcurrentStreams);
-        connector.addUpgradeProtocol(http2Protocol);
+        enableHttp2(maxConcurrentStreams, false);
     }
 
+    protected void enableHttp2(boolean tls) {
+        enableHttp2(200, tls);
+    }
+
+    protected void enableHttp2(long maxConcurrentStreams, boolean tls) {
+        Tomcat tomcat = getTomcatInstance();
+        Connector connector = tomcat.getConnector();
+        http2Protocol = new UpgradableHttp2Protocol();
+        // Short timeouts for now. May need to increase these for CI systems.
+        http2Protocol.setReadTimeout(6000);
+        http2Protocol.setWriteTimeout(6000);
+        http2Protocol.setKeepAliveTimeout(15000);
+        http2Protocol.setStreamReadTimeout(3000);
+        http2Protocol.setStreamWriteTimeout(3000);
+        http2Protocol.setMaxConcurrentStreams(maxConcurrentStreams);
+        http2Protocol.setHttp11Protocol(new Http11NioProtocol());
+        connector.addUpgradeProtocol(http2Protocol);
+        if (tls) {
+            // Enable TLS
+            TesterSupport.initSsl(tomcat);
+        }
+    }
+
+    private class UpgradableHttp2Protocol extends Http2Protocol {
+        @Override
+        public String getHttpUpgradeName(boolean isSSLEnabled) {
+            return "h2c";
+        }
+    }
 
     protected void configureAndStartWebApplication() throws LifecycleException {
         Tomcat tomcat = getTomcatInstance();
@@ -566,8 +605,13 @@ public abstract class Http2TestBase extends TomcatBaseTest {
 
 
     protected void openClientConnection() throws IOException {
+        openClientConnection(false);
+    }
+
+    protected void openClientConnection(boolean tls) throws IOException {
+        SocketFactory socketFactory = tls ? TesterSupport.configureClientSsl() : SocketFactory.getDefault();
         // Open a connection
-        s = SocketFactory.getDefault().createSocket("localhost", getPort());
+        s = socketFactory.createSocket("localhost", getPort());
         s.setSoTimeout(30000);
 
         os = s.getOutputStream();
@@ -959,7 +1003,7 @@ public abstract class Http2TestBase extends TomcatBaseTest {
 
 
         @Override
-        public ByteBuffer startRequestBodyFrame(int streamId, int payloadSize) {
+        public ByteBuffer startRequestBodyFrame(int streamId, int payloadSize, boolean endOfStream) {
             lastStreamId = Integer.toString(streamId);
             bytesRead += payloadSize;
             if (traceBody) {
@@ -1012,9 +1056,15 @@ public abstract class Http2TestBase extends TomcatBaseTest {
 
         @Override
         public void emitHeader(String name, String value) {
-            // Date headers will always change so use a hard-coded default
             if ("date".equals(name)) {
+                // Date headers will always change so use a hard-coded default
                 value = DEFAULT_DATE;
+            } else if ("etag".equals(name) && value.startsWith("W/\"")) {
+                // etag headers will vary depending on when the source was
+                // checked out, unpacked, copied etc so use the same default as
+                // for date headers
+                int startOfTime = value.indexOf('-');
+                value = value.substring(0, startOfTime + 1) + DEFAULT_TIME + "\"";
             }
             // Some header values vary so ignore them
             if (HEADER_IGNORED.equals(name)) {
@@ -1034,6 +1084,12 @@ public abstract class Http2TestBase extends TomcatBaseTest {
         @Override
         public void setHeaderException(StreamException streamException) {
             // NO-OP: Accept anything the server sends for the unit tests
+        }
+
+
+        @Override
+        public void headersContinue(int payloadSize, boolean endOfHeaders) {
+            // NO-OP: Logging occurs per header
         }
 
 

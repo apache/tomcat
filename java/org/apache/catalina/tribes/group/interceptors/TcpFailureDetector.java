@@ -19,6 +19,7 @@ package org.apache.catalina.tribes.group.interceptors;
 import java.net.ConnectException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.net.NoRouteToHostException;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.util.Arrays;
@@ -92,10 +93,10 @@ public class TcpFailureDetector extends ChannelInterceptorBase implements TcpFai
             super.sendMessage(destination, msg, payload);
         }catch ( ChannelException cx ) {
             FaultyMember[] mbrs = cx.getFaultyMembers();
-            for ( int i=0; i<mbrs.length; i++ ) {
-                if ( mbrs[i].getCause()!=null &&
-                     (!(mbrs[i].getCause() instanceof RemoteProcessException)) ) {//RemoteProcessException's are ok
-                    this.memberDisappeared(mbrs[i].getMember());
+            for (FaultyMember mbr : mbrs) {
+                if (mbr.getCause() != null &&
+                        (!(mbr.getCause() instanceof RemoteProcessException))) {//RemoteProcessException's are ok
+                    this.memberDisappeared(mbr.getMember());
                 }//end if
             }//for
             throw cx;
@@ -134,7 +135,9 @@ public class TcpFailureDetector extends ChannelInterceptorBase implements TcpFai
                     addSuspects.remove(member);
                     notify = true;
                 } else {
-                    addSuspects.put(member, Long.valueOf(System.currentTimeMillis()));
+                    if (member instanceof StaticMember) {
+                        addSuspects.put(member, Long.valueOf(System.currentTimeMillis()));
+                    }
                 }
             }
         }
@@ -274,9 +277,8 @@ public class TcpFailureDetector extends ChannelInterceptorBase implements TcpFai
 
         //check suspect members if they are still alive,
         //if not, simply issue the memberDisappeared message
-        Member[] keys = removeSuspects.keySet().toArray(new Member[removeSuspects.size()]);
-        for (int i = 0; i < keys.length; i++) {
-            Member m = keys[i];
+        Member[] keys = removeSuspects.keySet().toArray(new Member[0]);
+        for (Member m : keys) {
             if (membership.getMember(m) != null && (!memberAlive(m))) {
                 membership.removeMember(m);
                 if (m instanceof StaticMember) {
@@ -284,7 +286,7 @@ public class TcpFailureDetector extends ChannelInterceptorBase implements TcpFai
                 }
                 super.memberDisappeared(m);
                 removeSuspects.remove(m);
-                if(log.isInfoEnabled())
+                if (log.isInfoEnabled())
                     log.info(sm.getString("tcpFailureDetector.suspectMember.dead", m));
             } else {
                 if (removeSuspectsTimeout > 0) {
@@ -299,14 +301,13 @@ public class TcpFailureDetector extends ChannelInterceptorBase implements TcpFai
 
         //check add suspects members if they are alive now,
         //if they are, simply issue the memberAdded message
-        keys = addSuspects.keySet().toArray(new Member[addSuspects.size()]);
-        for (int i = 0; i < keys.length; i++) {
-            Member m = keys[i];
-            if ( membership.getMember(m) == null && (memberAlive(m))) {
+        keys = addSuspects.keySet().toArray(new Member[0]);
+        for (Member m : keys) {
+            if (membership.getMember(m) == null && (memberAlive(m))) {
                 membership.memberAlive(m);
                 super.memberAdded(m);
                 addSuspects.remove(m);
-                if(log.isInfoEnabled())
+                if (log.isInfoEnabled())
                     log.info(sm.getString("tcpFailureDetector.suspectMember.alive", m));
             } //end if
         }
@@ -352,9 +353,7 @@ public class TcpFailureDetector extends ChannelInterceptorBase implements TcpFai
                 }
             }//end if
             return true;
-        } catch (SocketTimeoutException sx) {
-            //do nothing, we couldn't connect
-        } catch (ConnectException cx) {
+        } catch (SocketTimeoutException | ConnectException | NoRouteToHostException noop) {
             //do nothing, we couldn't connect
         } catch (Exception x) {
             log.error(sm.getString("tcpFailureDetector.failureDetection.failed", mbr),x);

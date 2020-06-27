@@ -501,7 +501,7 @@ public interface PoolConfiguration {
      * The SQL query that will be used to validate connections from this
      * pool before returning them to the caller or pool.
      * If specified, this query does not have to return any data,
-     * it just can't throw a SQLException.
+     * it just can't throw an SQLException.
      * The default value is null.
      * Example values are SELECT 1(mysql),
      * select 1 from dual(oracle),
@@ -514,7 +514,7 @@ public interface PoolConfiguration {
      * The SQL query that will be used to validate connections from this
      * pool before returning them to the caller or pool.
      * If specified, this query does not have to return any data,
-     * it just can't throw a SQLException.
+     * it just can't throw an SQLException.
      * The default value is null.
      * Example values are SELECT 1(mysql),
      * select 1 from dual(oracle),
@@ -699,12 +699,13 @@ public interface PoolConfiguration {
     public void setUseEquals(boolean useEquals);
 
     /**
-     * Time in milliseconds to keep this connection alive even when used.
-     * When a connection is returned to the pool, the pool will check to see if the
-     * ((now - time-when-connected) &gt; maxAge) has been reached, and if so,
-     * it closes the connection rather than returning it to the pool.
+     * Time in milliseconds to keep this connection before reconnecting.
+     * When a connection is idle, returned to the pool or borrowed from the pool, the pool will
+     * check to see if the ((now - time-when-connected) &gt; maxAge) has been reached, and if so,
+     * it reconnects. Note that the age of idle connections will only be checked if
+     * {@link #getTimeBetweenEvictionRunsMillis()} returns a value greater than 0.
      * The default value is 0, which implies that connections will be left open and no
-     * age check will be done upon returning the connection to the pool.
+     * age checks will be done.
      * This is a useful setting for database sessions that leak memory as it ensures that the session
      * will have a finite life span.
      * @return the time in milliseconds a connection will be open for when used
@@ -712,12 +713,13 @@ public interface PoolConfiguration {
     public long getMaxAge();
 
     /**
-     * Time in milliseconds to keep this connection alive even when used.
-     * When a connection is returned to the pool, the pool will check to see if the
-     * ((now - time-when-connected) &gt; maxAge) has been reached, and if so,
-     * it closes the connection rather than returning it to the pool.
+     * Time in milliseconds to keep this connection before reconnecting.
+     * When a connection is idle, returned to the pool or borrowed from the pool, the pool will
+     * check to see if the ((now - time-when-connected) &gt; maxAge) has been reached, and if so,
+     * it reconnects. Note that the age of idle connections will only be checked if
+     * {@link #getTimeBetweenEvictionRunsMillis()} returns a value greater than 0.
      * The default value is 0, which implies that connections will be left open and no
-     * age check will be done upon returning the connection to the pool.
+     * age checks will be done.
      * This is a useful setting for database sessions that leak memory as it ensures that the session
      * will have a finite life span.
      * @param maxAge the time in milliseconds a connection will be open for when used
@@ -908,5 +910,4 @@ public interface PoolConfiguration {
      * @return <code>true</code> if the statements are wrapped
      */
     public boolean getUseStatementFacade();
-
 }

@@ -26,6 +26,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import jakarta.servlet.http.WebConnection;
+
 import org.apache.coyote.Adapter;
 import org.apache.coyote.ProtocolException;
 import org.apache.coyote.Request;
@@ -37,12 +39,16 @@ import org.apache.tomcat.util.net.SocketWrapperBase.BlockingMode;
 public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
 
     private static final ByteBuffer[] BYTEBUFFER_ARRAY = new ByteBuffer[0];
+    // Ensures headers are generated and then written for one thread at a time.
+    // Because of the compression used, headers need to be written to the
+    // network in the same order they are generated.
+    private final Object headerWriteLock = new Object();
     private Throwable error = null;
     private IOException applicationIOE = null;
 
     public Http2AsyncUpgradeHandler(Http2Protocol protocol, Adapter adapter,
             Request coyoteRequest) {
-        super (protocol, adapter, coyoteRequest);
+        super(protocol, adapter, coyoteRequest);
     }
 
     private CompletionHandler<Long, Void> errorCompletion = new CompletionHandler<Long, Void>() {
@@ -78,17 +84,31 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
         return new AsyncPingManager();
     }
 
+
     @Override
-    boolean hasAsyncIO() {
+    public boolean hasAsyncIO() {
         return true;
     }
 
+
+    @Override
+    protected void processConnection(WebConnection webConnection,
+            Stream stream) {
+        // The end of the processing will instead be an async callback
+    }
+
+    void processConnectionCallback(WebConnection webConnection,
+            Stream stream) {
+        super.processConnection(webConnection, stream);
+    }
+
+
     @Override
     protected void writeSettings() {
-        // Send the initial settings frame
         socketWrapper.write(BlockingMode.SEMI_BLOCK, protocol.getWriteTimeout(),
                 TimeUnit.MILLISECONDS, null, SocketWrapperBase.COMPLETE_WRITE, errorCompletion,
-                ByteBuffer.wrap(localSettings.getSettingsFrameForPending()));
+                ByteBuffer.wrap(localSettings.getSettingsFrameForPending()),
+                ByteBuffer.wrap(createWindowUpdateForSettings()));
         if (error != null) {
             String msg = sm.getString("upgradeHandler.sendPrefaceFail", connectionId);
             if (log.isDebugEnabled()) {
@@ -103,7 +123,7 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
     void sendStreamReset(StreamException se) throws IOException {
         if (log.isDebugEnabled()) {
             log.debug(sm.getString("upgradeHandler.rst.debug", connectionId,
-                    Integer.toString(se.getStreamId()), se.getError()));
+                    Integer.toString(se.getStreamId()), se.getError(), se.getMessage()));
         }
         // Write a RST frame
         byte[] rstFrame = new byte[13];
@@ -153,8 +173,7 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
     @Override
     void writeHeaders(Stream stream, int pushedStreamId, MimeHeaders mimeHeaders,
             boolean endOfStream, int payloadSize) throws IOException {
-        // This ensures the Stream processing thread has control of the socket.
-        synchronized (socketWrapper) {
+        synchronized (headerWriteLock) {
             AsyncHeaderFrameBuffers headerFrameBuffers = (AsyncHeaderFrameBuffers)
                     doWriteHeaders(stream, pushedStreamId, mimeHeaders, endOfStream, payloadSize);
             if (headerFrameBuffers != null) {
@@ -191,7 +210,7 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
             header[4] = FLAG_END_OF_STREAM;
             stream.sentEndOfStream();
             if (!stream.isActive()) {
-                activeRemoteStreamCount.decrementAndGet();
+                setConnectionTimeoutForStreamCount(activeRemoteStreamCount.decrementAndGet());
             }
         }
         if (writeable) {
@@ -264,13 +283,6 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
     }
 
     @Override
-    protected void processWrites() throws IOException {
-        if (socketWrapper.isWritePending()) {
-            socketWrapper.registerWriteInterest();
-        }
-    }
-
-    @Override
     protected SendfileState processSendfile(SendfileData sendfile) {
         if (sendfile != null) {
             try {
@@ -297,7 +309,7 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
                 header[4] = FLAG_END_OF_STREAM;
                 sendfile.stream.sentEndOfStream();
                 if (!sendfile.stream.isActive()) {
-                    activeRemoteStreamCount.decrementAndGet();
+                    setConnectionTimeoutForStreamCount(activeRemoteStreamCount.decrementAndGet());
                 }
             }
             if (writeable) {
@@ -358,7 +370,7 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
                 header[4] = FLAG_END_OF_STREAM;
                 sendfile.stream.sentEndOfStream();
                 if (!sendfile.stream.isActive()) {
-                    activeRemoteStreamCount.decrementAndGet();
+                    setConnectionTimeoutForStreamCount(activeRemoteStreamCount.decrementAndGet());
                 }
             }
             if (writeable) {

@@ -238,8 +238,8 @@ public class Membership implements Cloneable {
             if (list != null) {
                 Member[] result = new Member[list.size()];
                 list.toArray(result);
-                for (int j=0; j<result.length; j++) {
-                    removeMember(result[j]);
+                for (Member member : result) {
+                    removeMember(member);
                 }
                 return result;
             } else {
@@ -262,9 +262,9 @@ public class Membership implements Cloneable {
     public Member getMember(Member mbr) {
         Member[] members = this.members;
         if (members.length > 0) {
-            for (int i = 0; i < members.length; i++) {
-                if (members[i].equals(mbr)) {
-                    return members[i];
+            for (Member member : members) {
+                if (member.equals(mbr)) {
+                    return member;
                 }
             }
         }

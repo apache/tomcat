@@ -35,11 +35,11 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-import javax.servlet.http.Part;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.http.Part;
 
 import org.apache.catalina.Container;
 import org.apache.catalina.Context;
@@ -62,7 +62,7 @@ import org.apache.tomcat.util.security.Escape;
 * relaxed during testing.
 * <p>
 * The difference between the <code>ManagerServlet</code> and this
-* Servlet is that this Servlet prints out a HTML interface which
+* Servlet is that this Servlet prints out an HTML interface which
 * makes it easier to administrate.
 * <p>
 * However if you use a software that parses the output of
@@ -328,7 +328,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
     }
 
     /**
-     * Render a HTML list of the currently active Contexts in our virtual host,
+     * Render an HTML list of the currently active Contexts in our virtual host,
      * and memory and server status information.
      *
      * @param request The request
@@ -790,15 +790,15 @@ public final class HTMLManagerServlet extends ManagerServlet {
 
 
     /**
-     * @see javax.servlet.Servlet#getServletInfo()
+     * @see jakarta.servlet.Servlet#getServletInfo()
      */
     @Override
     public String getServletInfo() {
-        return "HTMLManagerServlet, Copyright (c) 1999-2019, The Apache Software Foundation";
+        return "HTMLManagerServlet, Copyright (c) 1999-2020, The Apache Software Foundation";
     }
 
     /**
-     * @see javax.servlet.GenericServlet#init()
+     * @see jakarta.servlet.GenericServlet#init()
      */
     @Override
     public void init() throws ServletException {
@@ -896,8 +896,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
                     Escape.htmlElementContent(cn.getDisplayName())));
         }
         Manager manager = ctxt.getManager();
-        List<Session> sessions = new ArrayList<>();
-        sessions.addAll(Arrays.asList(manager.findSessions()));
+        List<Session> sessions = new ArrayList<>(Arrays.asList(manager.findSessions()));
         if (manager instanceof DistributedManager && showProxySessions) {
             // Add dummy proxy sessions
             Set<String> sessionIds =
@@ -1016,10 +1015,9 @@ public final class HTMLManagerServlet extends ManagerServlet {
             return 0;
         }
         int nbAffectedSessions = 0;
-        for (int i = 0; i < sessionIds.length; ++i) {
-            String sessionId = sessionIds[i];
+        for (String sessionId : sessionIds) {
             HttpSession session =
-                getSessionForNameAndId(cn, sessionId, smClient).getSession();
+                    getSessionForNameAndId(cn, sessionId, smClient).getSession();
             if (null == session) {
                 // Shouldn't happen, but let's play nice...
                 if (debug >= 1) {

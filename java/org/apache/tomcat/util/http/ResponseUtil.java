@@ -25,9 +25,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
 
-import org.apache.tomcat.util.http.parser.Vary;
+import org.apache.tomcat.util.http.parser.TokenList;
 
 public class ResponseUtil {
 
@@ -81,7 +81,7 @@ public class ResponseUtil {
         for (String varyHeader : varyHeaders) {
             StringReader input = new StringReader(varyHeader);
             try {
-                Vary.parseVary(input, fieldNames);
+                TokenList.parseTokenList(input, fieldNames);
             } catch (IOException ioe) {
                 // Should never happen
             }

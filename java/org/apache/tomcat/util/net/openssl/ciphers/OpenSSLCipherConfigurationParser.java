@@ -40,8 +40,7 @@ import org.apache.tomcat.util.res.StringManager;
 public class OpenSSLCipherConfigurationParser {
 
     private static final Log log = LogFactory.getLog(OpenSSLCipherConfigurationParser.class);
-    private static final StringManager sm =
-            StringManager.getManager("org.apache.tomcat.util.net.jsse.res");
+    private static final StringManager sm = StringManager.getManager(OpenSSLCipherConfigurationParser.class);
 
     private static boolean initialized = false;
 
@@ -732,7 +731,7 @@ public class OpenSSLCipherConfigurationParser {
                 if (aliases.containsKey(alias)) {
                     removedCiphers.addAll(aliases.get(alias));
                 } else {
-                    log.warn(sm.getString("jsse.openssl.unknownElement", alias));
+                    log.warn(sm.getString("opensslCipherConfigurationParser.unknownElement", alias));
                 }
             } else if (element.startsWith(TO_END)) {
                 String alias = element.substring(1);
@@ -767,7 +766,7 @@ public class OpenSSLCipherConfigurationParser {
             result.addAll(cipher.getJsseNames());
         }
         if (log.isDebugEnabled()) {
-            log.debug(sm.getString("jsse.openssl.effectiveCiphers", displayResult(ciphers, true, ",")));
+            log.debug(sm.getString("opensslCipherConfigurationParser.effectiveCiphers", displayResult(ciphers, true, ",")));
         }
         return result;
     }

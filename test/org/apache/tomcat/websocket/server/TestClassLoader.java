@@ -20,13 +20,13 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import javax.websocket.ClientEndpoint;
-import javax.websocket.ContainerProvider;
-import javax.websocket.OnMessage;
-import javax.websocket.OnOpen;
-import javax.websocket.Session;
-import javax.websocket.WebSocketContainer;
-import javax.websocket.server.ServerEndpoint;
+import jakarta.websocket.ClientEndpoint;
+import jakarta.websocket.ContainerProvider;
+import jakarta.websocket.OnMessage;
+import jakarta.websocket.OnOpen;
+import jakarta.websocket.Session;
+import jakarta.websocket.WebSocketContainer;
+import jakarta.websocket.server.ServerEndpoint;
 
 import org.junit.Assert;
 import org.junit.Test;

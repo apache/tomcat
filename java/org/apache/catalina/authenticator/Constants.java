@@ -14,12 +14,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.catalina.authenticator;
 
-
 public class Constants {
+
     // Authentication methods for login configuration
     // Servlet spec schemes are defined in HttpServletRequest
     // Vendor specific schemes
@@ -33,17 +31,12 @@ public class Constants {
     // SPNEGO authentication constants
     public static final String KRB5_CONF_PROPERTY = "java.security.krb5.conf";
     public static final String DEFAULT_KRB5_CONF = "conf/krb5.ini";
-    public static final String JAAS_CONF_PROPERTY =
-            "java.security.auth.login.config";
+    public static final String JAAS_CONF_PROPERTY = "java.security.auth.login.config";
     public static final String DEFAULT_JAAS_CONF = "conf/jaas.conf";
-    public static final String DEFAULT_LOGIN_MODULE_NAME =
-        "com.sun.security.jgss.krb5.accept";
+    public static final String DEFAULT_LOGIN_MODULE_NAME = "com.sun.security.jgss.krb5.accept";
 
     // Cookie name for single sign on support
-    public static final String SINGLE_SIGN_ON_COOKIE =
-        System.getProperty(
-                "org.apache.catalina.authenticator.Constants.SSO_SESSION_COOKIE_NAME",
-                "JSESSIONIDSSO");
+    public static final String SINGLE_SIGN_ON_COOKIE = "JSESSIONIDSSO";
 
 
     // --------------------------------------------------------- Request Notes
@@ -52,15 +45,17 @@ public class Constants {
      * The notes key to track the single-sign-on identity with which this
      * request is associated.
      */
-    public static final String REQ_SSOID_NOTE =
-            "org.apache.catalina.request.SSOID";
+    public static final String REQ_SSOID_NOTE = "org.apache.catalina.request.SSOID";
 
-
-    public static final String REQ_JASPIC_SUBJECT_NOTE =
-            "org.apache.catalina.authenticator.jaspic.SUBJECT";
+    public static final String REQ_JASPIC_SUBJECT_NOTE = "org.apache.catalina.authenticator.jaspic.SUBJECT";
 
 
     // ---------------------------------------------------------- Session Notes
+
+    /**
+     * The session id used as a CSRF marker when redirecting a user's request.
+     */
+    public static final String SESSION_ID_NOTE = "org.apache.catalina.authenticator.SESSION_ID";
 
 
     /**
@@ -70,19 +65,15 @@ public class Constants {
      * <code>Realm.authenticate()</code>, under the following keys:
      */
 
-
     /**
      * The notes key for the password used to authenticate this user.
      */
-    public static final String SESS_PASSWORD_NOTE =
-      "org.apache.catalina.session.PASSWORD";
-
+    public static final String SESS_PASSWORD_NOTE = "org.apache.catalina.session.PASSWORD";
 
     /**
      * The notes key for the username used to authenticate this user.
      */
-    public static final String SESS_USERNAME_NOTE =
-      "org.apache.catalina.session.USERNAME";
+    public static final String SESS_USERNAME_NOTE = "org.apache.catalina.session.USERNAME";
 
 
     /**
@@ -90,20 +81,9 @@ public class Constants {
      * cache required information prior to the completion of authentication.
      */
 
-
-    /**
-     * The previously authenticated principal (if caching is disabled).
-     */
-    public static final String FORM_PRINCIPAL_NOTE =
-        "org.apache.catalina.authenticator.PRINCIPAL";
-
-
     /**
      * The original request information, to which the user will be
      * redirected if authentication succeeds.
      */
-    public static final String FORM_REQUEST_NOTE =
-        "org.apache.catalina.authenticator.REQUEST";
-
-
+    public static final String FORM_REQUEST_NOTE = "org.apache.catalina.authenticator.REQUEST";
 }

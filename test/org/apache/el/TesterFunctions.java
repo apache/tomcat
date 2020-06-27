@@ -19,7 +19,7 @@ package org.apache.el;
 
 import java.lang.reflect.Method;
 
-import javax.el.FunctionMapper;
+import jakarta.el.FunctionMapper;
 
 public class TesterFunctions {
     public static String trim(String input) {

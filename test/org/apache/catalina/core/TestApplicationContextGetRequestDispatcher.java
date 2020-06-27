@@ -21,12 +21,12 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Collection;
 
-import javax.servlet.AsyncContext;
-import javax.servlet.RequestDispatcher;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.AsyncContext;
+import jakarta.servlet.RequestDispatcher;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -375,7 +375,7 @@ public class TestApplicationContextGetRequestDispatcher extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("/test", null);
+        Context ctx = tomcat.addContext("/test\u6771\u4eac", null);
         ctx.setDispatchersUseEncodedPaths(useEncodedDispatchPaths);
 
         // Add a default servlet to return 404 for not found resources
@@ -400,7 +400,7 @@ public class TestApplicationContextGetRequestDispatcher extends TomcatBaseTest {
 
         StringBuilder url = new StringBuilder("http://localhost:");
         url.append(getPort());
-        url.append("/test");
+        url.append("/test%E6%9D%B1%E4%BA%AC");
         url.append(startPath);
         if (startQueryString != null) {
             url.append('?');
@@ -467,7 +467,12 @@ public class TestApplicationContextGetRequestDispatcher extends TomcatBaseTest {
                 throws ServletException, IOException {
             resp.setContentType("text/plain");
             resp.setCharacterEncoding("UTF-8");
-            resp.getWriter().print(OK);
+            String contextPath = req.getContextPath();
+            if ("/test%E6%9D%B1%E4%BA%AC".equals(contextPath)) {
+                resp.getWriter().print(OK);
+            } else {
+                resp.getWriter().print("FAIL - ContextPath");
+            }
             String qs = req.getQueryString();
             if (qs != null) {
                 resp.getWriter().print(qs);

@@ -24,21 +24,24 @@ import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
 
-import javax.servlet.ServletContainerInitializer;
-import javax.servlet.ServletContext;
+import jakarta.servlet.ServletContainerInitializer;
+import jakarta.servlet.ServletContext;
 
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 import org.apache.catalina.Context;
+import org.apache.catalina.LifecycleException;
+import org.apache.catalina.WebResourceRoot;
+import org.apache.catalina.webresources.StandardRoot;
 import org.apache.tomcat.unittest.TesterContext;
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
 
 public class TestWebappServiceLoader {
     private static final String CONFIG_FILE =
-            "META-INF/services/javax.servlet.ServletContainerInitializer";
+            "META-INF/services/jakarta.servlet.ServletContainerInitializer";
     private IMocksControl control;
     private ClassLoader cl;
     private ClassLoader parent;
@@ -62,6 +65,8 @@ public class TestWebappServiceLoader {
     @Test
     public void testNoInitializersFound() throws IOException {
         loader = new WebappServiceLoader<>(context);
+        EasyMock.expect(cl.getResources(CONFIG_FILE))
+                .andReturn(Collections.<URL>emptyEnumeration());
         EasyMock.expect(servletContext.getAttribute(ServletContext.ORDERED_LIBS))
                 .andReturn(null);
         EasyMock.expect(cl.getResources(CONFIG_FILE))
@@ -78,11 +83,13 @@ public class TestWebappServiceLoader {
         loader = EasyMock.createMockBuilder(WebappServiceLoader.class)
                 .addMockedMethod("parseConfigFile", LinkedHashSet.class, URL.class)
                 .withConstructor(context).createMock(control);
+        EasyMock.expect(cl.getResources(CONFIG_FILE))
+                .andReturn(Collections.enumeration(Collections.singleton(url)));
+        loader.parseConfigFile(EasyMock.isA(LinkedHashSet.class), EasyMock.same(url));
         EasyMock.expect(servletContext.getAttribute(ServletContext.ORDERED_LIBS))
                 .andReturn(null);
         EasyMock.expect(cl.getResources(CONFIG_FILE))
                 .andReturn(Collections.enumeration(Collections.singleton(url)));
-        loader.parseConfigFile(EasyMock.isA(LinkedHashSet.class), EasyMock.same(url));
         control.replay();
         Assert.assertTrue(loader.load(ServletContainerInitializer.class).isEmpty());
         control.verify();
@@ -99,16 +106,18 @@ public class TestWebappServiceLoader {
                 .addMockedMethod("parseConfigFile", LinkedHashSet.class, URL.class)
                 .withConstructor(context).createMock(control);
         List<String> jars = Arrays.asList("jar1.jar", "dir/");
+        EasyMock.expect(parent.getResources(CONFIG_FILE))
+                .andReturn(Collections.<URL>emptyEnumeration());
         EasyMock.expect(servletContext.getAttribute(ServletContext.ORDERED_LIBS))
                 .andReturn(jars);
+        EasyMock.expect(servletContext.getResource("/WEB-INF/classes/" + CONFIG_FILE))
+                .andReturn(null);
         EasyMock.expect(servletContext.getResource("/WEB-INF/lib/jar1.jar"))
                 .andReturn(url1);
         loader.parseConfigFile(EasyMock.isA(LinkedHashSet.class), EasyMock.eq(sci1));
         EasyMock.expect(servletContext.getResource("/WEB-INF/lib/dir/"))
                 .andReturn(url2);
         loader.parseConfigFile(EasyMock.isA(LinkedHashSet.class), EasyMock.eq(sci2));
-        EasyMock.expect(parent.getResources(CONFIG_FILE))
-                .andReturn(Collections.<URL>emptyEnumeration());
 
         control.replay();
         Assert.assertTrue(loader.load(ServletContainerInitializer.class).isEmpty());
@@ -181,10 +190,19 @@ public class TestWebappServiceLoader {
     private static class ExtendedTesterContext extends TesterContext {
         private final ServletContext servletContext;
         private final ClassLoader parent;
+        private final WebResourceRoot resources;
 
         public ExtendedTesterContext(ServletContext servletContext, ClassLoader parent) {
             this.servletContext = servletContext;
             this.parent = parent;
+            // Empty resources - any non-null returns will be mocked on the
+            // ServletContext
+            this.resources = new StandardRoot(this);
+            try {
+                this.resources.start();
+            } catch (LifecycleException e) {
+                throw new IllegalStateException(e);
+            }
         }
 
         @Override
@@ -202,5 +220,9 @@ public class TestWebappServiceLoader {
             return parent;
         }
 
+        @Override
+        public WebResourceRoot getResources() {
+            return resources;
+        }
     }
 }

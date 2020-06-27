@@ -17,33 +17,91 @@ rem limitations under the License.
 rem ---------------------------------------------------------------------------
 rem NT Service Install/Uninstall script
 rem
-rem Options
-rem install                Install the service using Tomcat@VERSION_MAJOR@ as service name.
-rem                        Service is installed using default settings.
-rem remove                 Remove the service from the System.
+rem Usage: service.bat install/remove [service_name [--rename]] [--user username]
 rem
-rem name        (optional) If the second argument is present it is considered
-rem                        to be new service name
+rem Options
+rem install                 Install the service using default settings.
+rem remove                  Remove the service from the system.
+rem
+rem service_name (optional) The name to use for the service. If not specified,
+rem                         Tomcat@VERSION_MAJOR@ is used as the service name.
+rem
+rem --rename     (optional) Rename tomcat@VERSION_MAJOR@.exe and tomcat@VERSION_MAJOR@w.exe to match
+rem                         the non-default service name.
+rem
+rem username     (optional) The name of the OS user to use to install/remove
+rem                         the service (not the name of the OS user the
+rem                         service will run as). If not specified, the current
+rem                         user is used.
 rem ---------------------------------------------------------------------------
 
 setlocal
 
 set "SELF=%~dp0%service.bat"
-rem Guess CATALINA_HOME if not defined
+
+set DEFAULT_SERVICE_NAME=Tomcat@VERSION_MAJOR@
+set SERVICE_NAME=%DEFAULT_SERVICE_NAME%
+
 set "CURRENT_DIR=%cd%"
+
+rem Parse the arguments
+if "x%1x" == "xx" goto displayUsage
+set SERVICE_CMD=%1
+shift
+if "x%1x" == "xx" goto checkEnv
+:checkUser
+if "x%1x" == "x/userx" goto runAsUser
+if "x%1x" == "x--userx" goto runAsUser
+set SERVICE_NAME=%1
+shift
+if "x%1x" == "xx" goto checkEnv
+if "x%1x" == "x--renamex" (
+    set RENAME=%1
+    shift
+)
+if "x%1x" == "xx" goto checkEnv
+goto checkUser
+:runAsUser
+shift
+if "x%1x" == "xx" goto displayUsage
+set SERVICE_USER=%1
+shift
+runas /env /savecred /user:%SERVICE_USER% "%COMSPEC% /K \"%SELF%\" %SERVICE_CMD% %SERVICE_NAME%"
+goto end
+
+rem Check the environment
+:checkEnv
+
+rem Guess CATALINA_HOME if not defined
 if not "%CATALINA_HOME%" == "" goto gotHome
 set "CATALINA_HOME=%cd%"
-if exist "%CATALINA_HOME%\bin\tomcat@VERSION_MAJOR@.exe" goto okHome
+if exist "%CATALINA_HOME%\bin\%DEFAULT_SERVICE_NAME%.exe" goto okHome
+if exist "%CATALINA_HOME%\bin\%SERVICE_NAME%.exe" goto okHome
 rem CD to the upper dir
 cd ..
 set "CATALINA_HOME=%cd%"
 :gotHome
-if exist "%CATALINA_HOME%\bin\tomcat@VERSION_MAJOR@.exe" goto okHome
-echo The tomcat@VERSION_MAJOR@.exe was not found...
-echo The CATALINA_HOME environment variable is not defined correctly.
-echo This environment variable is needed to run this program
+if exist "%CATALINA_HOME%\bin\%DEFAULT_SERVICE_NAME%.exe" (
+    set "EXECUTABLE=%CATALINA_HOME%\bin\%DEFAULT_SERVICE_NAME%.exe"
+    goto okHome
+)
+if exist "%CATALINA_HOME%\bin\%SERVICE_NAME%.exe" (
+    set "EXECUTABLE=%CATALINA_HOME%\bin\%SERVICE_NAME%.exe"
+    goto okHome
+)
+if "%DEFAULT_SERVICE_NAME%"== "%SERVICE_NAME%" (
+    echo The file %DEFAULT_SERVICE_NAME%.exe was not found...
+) else (
+    echo Neither the %DEFAULT_SERVICE_NAME%.exe file nor the %SERVICE_NAME%.exe file was found...
+)
+echo Either the CATALINA_HOME environment variable is not defined correctly or
+echo the incorrect service name has been used.
+echo Both the CATALINA_HOME environment variable and the correct service name
+echo are required to run this program.
 goto end
 :okHome
+cd "%CURRENT_DIR%"
+
 rem Make sure prerequisite environment variables are set
 if not "%JAVA_HOME%" == "" goto gotJdkHome
 if not "%JRE_HOME%" == "" goto gotJreHome
@@ -75,12 +133,6 @@ if not "%CATALINA_BASE%" == "" goto gotBase
 set "CATALINA_BASE=%CATALINA_HOME%"
 :gotBase
 
-set "EXECUTABLE=%CATALINA_HOME%\bin\tomcat@VERSION_MAJOR@.exe"
-
-rem Set default Service name
-set SERVICE_NAME=Tomcat@VERSION_MAJOR@
-set DISPLAYNAME=Apache Tomcat @VERSION_MAJOR_MINOR@ %SERVICE_NAME%
-
 rem Java 9 no longer supports the java.endorsed.dirs
 rem system property. Only try to use it if
 rem JAVA_ENDORSED_DIRS was explicitly set
@@ -94,33 +146,14 @@ if not exist "%CATALINA_HOME%\endorsed" goto doneEndorsed
 set ENDORSED_PROP=java.endorsed.dirs
 :doneEndorsed
 
-if "x%1x" == "xx" goto displayUsage
-set SERVICE_CMD=%1
-shift
-if "x%1x" == "xx" goto checkServiceCmd
-:checkUser
-if "x%1x" == "x/userx" goto runAsUser
-if "x%1x" == "x--userx" goto runAsUser
-set SERVICE_NAME=%1
-set DISPLAYNAME=Apache Tomcat @VERSION_MAJOR_MINOR@ %1
-shift
-if "x%1x" == "xx" goto checkServiceCmd
-goto checkUser
-:runAsUser
-shift
-if "x%1x" == "xx" goto displayUsage
-set SERVICE_USER=%1
-shift
-runas /env /savecred /user:%SERVICE_USER% "%COMSPEC% /K \"%SELF%\" %SERVICE_CMD% %SERVICE_NAME%"
-goto end
-:checkServiceCmd
+rem Process the requested command
 if /i %SERVICE_CMD% == install goto doInstall
 if /i %SERVICE_CMD% == remove goto doRemove
 if /i %SERVICE_CMD% == uninstall goto doRemove
 echo Unknown parameter "%SERVICE_CMD%"
 :displayUsage
 echo.
-echo Usage: service.bat install/remove [service_name] [/user username]
+echo Usage: service.bat install/remove [service_name [--rename]] [--user username]
 goto end
 
 :doRemove
@@ -135,6 +168,10 @@ echo Failed removing '%SERVICE_NAME%' service
 goto end
 :removed
 echo The service '%SERVICE_NAME%' has been removed
+if exist "%CATALINA_HOME%\bin\%SERVICE_NAME%.exe" (
+    rename "%SERVICE_NAME%.exe" "%DEFAULT_SERVICE_NAME%.exe"
+    rename "%SERVICE_NAME%w.exe" "%DEFAULT_SERVICE_NAME%w.exe"
+)
 goto end
 
 :doInstall
@@ -163,9 +200,17 @@ if "%SERVICE_STARTUP_MODE%" == "" set SERVICE_STARTUP_MODE=manual
 if "%JvmMs%" == "" set JvmMs=128
 if "%JvmMx%" == "" set JvmMx=256
 
+if exist "%CATALINA_HOME%\bin\%DEFAULT_SERVICE_NAME%.exe" (
+    if "x%RENAME%x" == "x--renamex" (
+        rename "%DEFAULT_SERVICE_NAME%.exe" "%SERVICE_NAME%.exe"
+        rename "%DEFAULT_SERVICE_NAME%w.exe" "%SERVICE_NAME%w.exe"
+        set "EXECUTABLE=%CATALINA_HOME%\bin\%SERVICE_NAME%.exe"
+    )
+)
+
 "%EXECUTABLE%" //IS//%SERVICE_NAME% ^
     --Description "Apache Tomcat @VERSION@ Server - https://tomcat.apache.org/" ^
-    --DisplayName "%DISPLAYNAME%" ^
+    --DisplayName "Apache Tomcat @VERSION_MAJOR_MINOR@ %SERVICE_NAME%" ^
     --Install "%EXECUTABLE%" ^
     --LogPath "%CATALINA_BASE%\logs" ^
     --StdOutput auto ^
@@ -192,4 +237,3 @@ goto end
 echo The service '%SERVICE_NAME%' has been installed.
 
 :end
-cd "%CURRENT_DIR%"

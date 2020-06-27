@@ -17,22 +17,28 @@
 
 package org.apache.jasper.el;
 
+import java.beans.FeatureDescriptor;
+import java.lang.reflect.Method;
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import javax.el.ArrayELResolver;
-import javax.el.BeanELResolver;
-import javax.el.CompositeELResolver;
-import javax.el.ELContext;
-import javax.el.ELException;
-import javax.el.ELResolver;
-import javax.el.ListELResolver;
-import javax.el.MapELResolver;
-import javax.el.PropertyNotFoundException;
-import javax.el.ResourceBundleELResolver;
-import javax.el.StaticFieldELResolver;
-import javax.servlet.jsp.el.ImplicitObjectELResolver;
-import javax.servlet.jsp.el.ScopedAttributeELResolver;
+import jakarta.el.ArrayELResolver;
+import jakarta.el.BeanELResolver;
+import jakarta.el.CompositeELResolver;
+import jakarta.el.ELContext;
+import jakarta.el.ELException;
+import jakarta.el.ELResolver;
+import jakarta.el.ListELResolver;
+import jakarta.el.MapELResolver;
+import jakarta.el.PropertyNotFoundException;
+import jakarta.el.ResourceBundleELResolver;
+import jakarta.el.StaticFieldELResolver;
+import jakarta.servlet.jsp.el.ImplicitObjectELResolver;
+import jakarta.servlet.jsp.el.ScopedAttributeELResolver;
+
+import org.apache.jasper.runtime.ExceptionUtils;
+import org.apache.jasper.runtime.JspRuntimeLibrary;
 
 /**
  * Jasper-specific CompositeELResolver that optimizes certain functions to avoid
@@ -61,6 +67,9 @@ public class JasperELResolver extends CompositeELResolver {
         add(new ResourceBundleELResolver());
         add(new ListELResolver());
         add(new ArrayELResolver());
+        if (JspRuntimeLibrary.GRAAL) {
+            add(new GraalBeanELResolver());
+        }
         add(new BeanELResolver());
         add(new ScopedAttributeELResolver());
     }
@@ -103,6 +112,9 @@ public class JasperELResolver extends CompositeELResolver {
             // skip stream, static and collection-based resolvers (map,
             // resource, list, array) and bean
             start = index + 7;
+            if (JspRuntimeLibrary.GRAAL) {
+                start++;
+            }
         } else {
             // skip implicit resolver only
             start = 1;
@@ -170,6 +182,104 @@ public class JasperELResolver extends CompositeELResolver {
             return ((Enum<?>) obj).name();
         } else {
             return obj.toString();
+        }
+    }
+
+    /**
+     * Extend ELResolver for Graal to avoid bean info use if possible,
+     * as BeanELResolver needs manual reflection configuration.
+     */
+    private static class GraalBeanELResolver extends ELResolver {
+
+        @Override
+        public Object getValue(ELContext context, Object base,
+                Object property) {
+            Object value = null;
+            Method method = getReadMethod(base.getClass(), property.toString());
+            if (method != null) {
+                context.setPropertyResolved(base, property);
+                try {
+                    value = method.invoke(base, (Object[]) null);
+                } catch (Exception ex) {
+                    Throwable thr = ExceptionUtils.unwrapInvocationTargetException(ex);
+                    ExceptionUtils.handleThrowable(thr);
+                }
+            }
+            return value;
+        }
+
+        @Override
+        public void setValue(ELContext context, Object base, Object property,
+                Object value) {
+            Method method = getWriteMethod(base.getClass(), property.toString());
+            if (method != null) {
+                context.setPropertyResolved(base, property);
+                try {
+                    method.invoke(base, value);
+                } catch (Exception ex) {
+                    Throwable thr = ExceptionUtils.unwrapInvocationTargetException(ex);
+                    ExceptionUtils.handleThrowable(thr);
+                }
+            }
+        }
+
+        @Override
+        public boolean isReadOnly(ELContext context, Object base,
+                Object property) {
+            Class<?> beanClass = base.getClass();
+            String prop = property.toString();
+            return (getReadMethod(beanClass, prop) != null)
+                    && (getWriteMethod(beanClass, prop) != null);
+        }
+
+        public static Method getReadMethod(Class<?> beanClass, String prop) {
+            Method result = null;
+            String setter = "get" + capitalize(prop);
+            Method methods[] = beanClass.getMethods();
+            for (Method method : methods) {
+                if (setter.equals(method.getName())) {
+                    return method;
+                }
+            }
+            return result;
+        }
+
+        public static Method getWriteMethod(Class<?> beanClass, String prop) {
+            Method result = null;
+            String setter = "set" + capitalize(prop);
+            Method methods[] = beanClass.getMethods();
+            for (Method method : methods) {
+                if (setter.equals(method.getName())) {
+                    return method;
+                }
+            }
+            return result;
+        }
+
+        public static String capitalize(String name) {
+            if (name == null || name.length() == 0) {
+                return name;
+            }
+            char chars[] = name.toCharArray();
+            chars[0] = Character.toUpperCase(chars[0]);
+            return new String(chars);
+        }
+
+        @Override
+        public Class<?> getType(ELContext context, Object base,
+                Object property) {
+            return null;
+        }
+
+        @Override
+        public Iterator<FeatureDescriptor> getFeatureDescriptors(
+                ELContext context, Object base) {
+            return null;
+        }
+
+        @Override
+        public Class<?> getCommonPropertyType(ELContext context, Object base) {
+            return null;
         }
     }
 }

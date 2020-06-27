@@ -21,9 +21,9 @@ import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 
-import javax.el.ELContext;
-import javax.el.PropertyNotWritableException;
-import javax.el.ValueExpression;
+import jakarta.el.ELContext;
+import jakarta.el.PropertyNotWritableException;
+import jakarta.el.ValueExpression;
 
 import org.apache.el.util.MessageFactory;
 import org.apache.el.util.ReflectionUtil;

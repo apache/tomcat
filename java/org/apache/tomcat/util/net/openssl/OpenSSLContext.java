@@ -49,6 +49,7 @@ import org.apache.tomcat.jni.SSLContext;
 import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.Constants;
 import org.apache.tomcat.util.net.SSLHostConfig;
+import org.apache.tomcat.util.net.SSLHostConfig.CertificateVerification;
 import org.apache.tomcat.util.net.SSLHostConfigCertificate;
 import org.apache.tomcat.util.net.SSLHostConfigCertificate.Type;
 import org.apache.tomcat.util.res.StringManager;
@@ -299,8 +300,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
             }
 
             if (negotiableProtocols != null && negotiableProtocols.size() > 0) {
-                List<String> protocols = new ArrayList<>();
-                protocols.addAll(negotiableProtocols);
+                List<String> protocols = new ArrayList<>(negotiableProtocols);
                 protocols.add("http/1.1");
                 String[] protocolsArray = protocols.toArray(new String[0]);
                 SSLContext.setAlpnProtos(ctx, protocolsArray, SSL.SSL_SELECTOR_FAILURE_NO_ADVERTISE);
@@ -353,7 +353,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                     enabled.add(Constants.SSL_PROTO_SSLv3);
                 }
                 sslHostConfig.setEnabledProtocols(
-                        enabled.toArray(new String[enabled.size()]));
+                        enabled.toArray(new String[0]));
                 // Reconfigure the enabled ciphers
                 sslHostConfig.setEnabledCiphers(SSLContext.getCiphers(ctx));
             }
@@ -489,7 +489,9 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
     @Override
     public SSLEngine createSSLEngine() {
         return new OpenSSLEngine(ctx, defaultProtocol, false, sessionContext,
-                (negotiableProtocols != null && negotiableProtocols.size() > 0), initialized);
+                (negotiableProtocols != null && negotiableProtocols.size() > 0), initialized,
+                sslHostConfig.getCertificateVerificationDepth(),
+                sslHostConfig.getCertificateVerification() == CertificateVerification.OPTIONAL_NO_CA);
     }
 
     @Override

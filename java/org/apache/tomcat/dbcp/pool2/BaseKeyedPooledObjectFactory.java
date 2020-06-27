@@ -21,7 +21,9 @@ package org.apache.tomcat.dbcp.pool2;
  * <p>
  * All operations defined here are essentially no-op's.
  * </p>
+ * <p>
  * This class is immutable, and therefore thread-safe.
+ * </p>
  *
  * @see KeyedPooledObjectFactory
  *

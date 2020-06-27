@@ -19,12 +19,12 @@ package org.apache.catalina.startup;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
-import javax.annotation.Resource;
-import javax.annotation.Resources;
-import javax.annotation.security.DeclareRoles;
-import javax.annotation.security.RunAs;
-import javax.servlet.ServletSecurityElement;
-import javax.servlet.annotation.ServletSecurity;
+import jakarta.annotation.Resource;
+import jakarta.annotation.Resources;
+import jakarta.annotation.security.DeclareRoles;
+import jakarta.annotation.security.RunAs;
+import jakarta.servlet.ServletSecurityElement;
+import jakarta.servlet.annotation.ServletSecurity;
 
 import org.apache.catalina.Container;
 import org.apache.catalina.Context;
@@ -359,7 +359,7 @@ public class WebAnnotationSet {
                 type.equals("javax.jms.ConnectionFactory") ||
                 type.equals("javax.jms.QueueConnectionFactory") ||
                 type.equals("javax.jms.TopicConnectionFactory") ||
-                type.equals("javax.mail.Session") ||
+                type.equals("jakarta.mail.Session") ||
                 type.equals("java.net.URL") ||
                 type.equals("javax.resource.cci.ConnectionFactory") ||
                 type.equals("org.omg.CORBA_2_3.ORB") ||
@@ -402,7 +402,7 @@ public class WebAnnotationSet {
             /*
              * General case. Also used for:
              * - javax.resource.cci.InteractionSpec
-             * - javax.transaction.UserTransaction
+             * - jakarta.transaction.UserTransaction
              */
 
             // resource-env-ref

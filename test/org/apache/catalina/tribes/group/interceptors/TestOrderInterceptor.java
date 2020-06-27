@@ -90,8 +90,8 @@ public class TestOrderInterceptor {
             channels[0].send(dest,Integer.valueOf(value.getAndAdd(1)),0);
         }
         Thread.sleep(5000);
-        for ( int i=0; i<test.length; i++ ) {
-            Assert.assertFalse(test[i].fail);
+        for (TestListener testListener : test) {
+            Assert.assertFalse(testListener.fail);
         }
     }
 
@@ -118,19 +118,19 @@ public class TestOrderInterceptor {
         for (int i=0;i<threads.length;i++) {
             threads[i] = new Thread(run);
         }
-        for (int i=0;i<threads.length;i++) {
-            threads[i].start();
+        for (Thread thread : threads) {
+            thread.start();
         }
-        for (int i=0;i<threads.length;i++) {
-            threads[i].join();
+        for (Thread thread : threads) {
+            thread.join();
         }
         if (!exceptionQueue.isEmpty()) {
             Assert.fail("Exception while sending in threads: "
                     + exceptionQueue.remove().toString());
         }
         Thread.sleep(5000);
-        for ( int i=0; i<test.length; i++ ) {
-            Assert.assertFalse(test[i].fail);
+        for (TestListener testListener : test) {
+            Assert.assertFalse(testListener.fail);
         }
     }
 

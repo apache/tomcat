@@ -84,7 +84,8 @@ public class TestTldScanner extends TomcatBaseTest {
 
 
         // Check content type
-        Assert.assertTrue(headers.get("Content-Type").get(0).startsWith("text/html"));
+        String contentType = getSingleHeader("Content-Type", headers);
+        Assert.assertTrue(contentType.startsWith("text/html"));
     }
 
 
@@ -106,9 +107,9 @@ public class TestTldScanner extends TomcatBaseTest {
 
         File webappDir = new File("webapps/examples");
         Assert.assertFalse(callback.scanFoundNoTLDs());
-        scan(callback, webappDir, "WEB-INF/lib/taglibs-standard-spec-1.2.5.jar");
+        scan(callback, webappDir, "WEB-INF/lib/taglibs-standard-spec-1.2.5-migrated-0.0.1.jar");
         Assert.assertTrue(callback.scanFoundNoTLDs());
-        scan(callback, webappDir, "WEB-INF/lib/taglibs-standard-impl-1.2.5.jar");
+        scan(callback, webappDir, "WEB-INF/lib/taglibs-standard-impl-1.2.5-migrated-0.0.1.jar");
         Assert.assertTrue(callback.scanFoundNoTLDs());
     }
 

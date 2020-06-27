@@ -15,6 +15,9 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 -->
+<!DOCTYPE mbeans-descriptors PUBLIC
+   "-//Apache Software Foundation//DTD Model MBeans Configuration File"
+   "http://jakarta.apache.org/commons/dtds/mbeans-descriptors.dtd">
 <mbeans-descriptors>
 
   <mbean         name="StandardManager"
@@ -64,6 +67,10 @@
     <attribute   name="pathname"
           description="Path name of the disk file in which active sessions"
                  type="java.lang.String"/>
+
+    <attribute   name="persistAuthentication"
+          description="Indicates whether sessions shall persist authentication information when being persisted (e.g. across application restarts)."
+                 type="boolean"/>
 
     <attribute   name="processExpiresFrequency"
           description="The frequency of the manager checks (expiration and passivation)"
@@ -255,6 +262,10 @@
           description="The descriptive name of this Manager implementation (for logging)"
                  type="java.lang.String"
             writeable="false"/>
+
+    <attribute   name="persistAuthentication"
+          description="Indicates whether sessions shall persist authentication information when being backed up to the store (e.g. across application restarts)."
+                 type="boolean"/>
 
     <attribute   name="processExpiresFrequency"
           description="The frequency of the manager checks (expiration and passivation)"

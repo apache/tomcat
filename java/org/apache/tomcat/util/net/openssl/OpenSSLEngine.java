@@ -133,8 +133,8 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
     private static final long EMPTY_ADDR = Buffer.address(ByteBuffer.allocate(0));
 
     // OpenSSL state
-    private long ssl;
-    private long networkBIO;
+    private final long ssl;
+    private final long networkBIO;
 
     private enum Accepted { NOT, IMPLICIT, EXPLICIT }
     private Accepted accepted = Accepted.NOT;
@@ -165,6 +165,8 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
     private final OpenSSLSessionContext sessionContext;
     private final boolean alpn;
     private final boolean initialized;
+    private final int certificateVerificationDepth;
+    private final boolean certificateVerificationOptionalNoCA;
 
     private String selectedProtocol = null;
 
@@ -181,44 +183,29 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
      * {@link SSLEngine} belongs to.
      * @param alpn {@code true} if alpn should be used, {@code false}
      * otherwise
-     */
-    OpenSSLEngine(long sslCtx, String fallbackApplicationProtocol,
-            boolean clientMode, OpenSSLSessionContext sessionContext,
-            boolean alpn) {
-        this(sslCtx, fallbackApplicationProtocol, clientMode, sessionContext,
-             alpn, false);
-    }
-
-    /**
-     * Creates a new instance
-     *
-     * @param sslCtx an OpenSSL {@code SSL_CTX} object
-     * @param fallbackApplicationProtocol the fallback application protocol
-     * @param clientMode {@code true} if this is used for clients, {@code false}
-     * otherwise
-     * @param sessionContext the {@link OpenSSLSessionContext} this
-     * {@link SSLEngine} belongs to.
-     * @param alpn {@code true} if alpn should be used, {@code false}
-     * otherwise
      * @param initialized {@code true} if this instance gets its protocol,
      * cipher and client verification from the {@code SSL_CTX} {@code sslCtx}
+     * @param certificateVerificationDepth Certificate verification depth
+     * @param certificateVerificationOptionalNoCA Skip CA verification in
+     *   optional mode
      */
     OpenSSLEngine(long sslCtx, String fallbackApplicationProtocol,
             boolean clientMode, OpenSSLSessionContext sessionContext, boolean alpn,
-            boolean initialized) {
+            boolean initialized, int certificateVerificationDepth,
+            boolean certificateVerificationOptionalNoCA) {
         if (sslCtx == 0) {
             throw new IllegalArgumentException(sm.getString("engine.noSSLContext"));
         }
         session = new OpenSSLSession();
-        destroyed = true;
         ssl = SSL.newSSL(sslCtx, !clientMode);
         networkBIO = SSL.makeNetworkBIO(ssl);
-        destroyed = false;
         this.fallbackApplicationProtocol = fallbackApplicationProtocol;
         this.clientMode = clientMode;
         this.sessionContext = sessionContext;
         this.alpn = alpn;
         this.initialized = initialized;
+        this.certificateVerificationDepth = certificateVerificationDepth;
+        this.certificateVerificationOptionalNoCA = certificateVerificationOptionalNoCA;
     }
 
     @Override
@@ -232,10 +219,12 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
     public synchronized void shutdown() {
         if (!destroyed) {
             destroyed = true;
-            SSL.freeBIO(networkBIO);
-            SSL.freeSSL(ssl);
-            ssl = networkBIO = 0;
-
+            if (networkBIO != 0) {
+                SSL.freeBIO(networkBIO);
+            }
+            if (ssl != 0) {
+                SSL.freeSSL(ssl);
+            }
             // internal errors can cause shutdown without marking the engine closed
             isInboundDone = isOutboundDone = engineClosed = true;
         }
@@ -573,7 +562,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         int bytesProduced = 0;
         int idx = offset;
         // Do we have enough room in dsts to write decrypted data?
-        if (capacity < pendingApp) {
+        if (capacity == 0) {
             return new SSLEngineResult(SSLEngineResult.Status.BUFFER_OVERFLOW, getHandshakeStatus(), written, 0);
         }
 
@@ -714,7 +703,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
     @Override
     public String[] getSupportedCipherSuites() {
         Set<String> availableCipherSuites = AVAILABLE_CIPHER_SUITES;
-        return availableCipherSuites.toArray(new String[availableCipherSuites.size()]);
+        return availableCipherSuites.toArray(new String[0]);
     }
 
     @Override
@@ -779,7 +768,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
 
     @Override
     public String[] getSupportedProtocols() {
-        return IMPLEMENTED_PROTOCOLS_SET.toArray(new String[IMPLEMENTED_PROTOCOLS_SET.size()]);
+        return IMPLEMENTED_PROTOCOLS_SET.toArray(new String[0]);
     }
 
     @Override
@@ -1111,13 +1100,15 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
             }
             switch (mode) {
                 case NONE:
-                    SSL.setVerify(ssl, SSL.SSL_CVERIFY_NONE, VERIFY_DEPTH);
+                    SSL.setVerify(ssl, SSL.SSL_CVERIFY_NONE, certificateVerificationDepth);
                     break;
                 case REQUIRE:
-                    SSL.setVerify(ssl, SSL.SSL_CVERIFY_REQUIRE, VERIFY_DEPTH);
+                    SSL.setVerify(ssl, SSL.SSL_CVERIFY_REQUIRE, certificateVerificationDepth);
                     break;
                 case OPTIONAL:
-                    SSL.setVerify(ssl, SSL.SSL_CVERIFY_OPTIONAL, VERIFY_DEPTH);
+                    SSL.setVerify(ssl,
+                            certificateVerificationOptionalNoCA ? SSL.SSL_CVERIFY_OPTIONAL_NO_CA : SSL.SSL_CVERIFY_OPTIONAL,
+                            certificateVerificationDepth);
                     break;
             }
             clientAuth = mode;
@@ -1126,14 +1117,15 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
 
     @Override
     public void setEnableSessionCreation(boolean b) {
-        if (b) {
-            throw new UnsupportedOperationException();
+        if (!b) {
+            String msg = sm.getString("engine.noRestrictSessionCreation");
+            throw new UnsupportedOperationException(msg);
         }
     }
 
     @Override
     public boolean getEnableSessionCreation() {
-        return false;
+        return true;
     }
 
     @Override
@@ -1245,7 +1237,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
             if (values == null || values.isEmpty()) {
                 return new String[0];
             }
-            return values.keySet().toArray(new String[values.size()]);
+            return values.keySet().toArray(new String[0]);
         }
 
         private void notifyUnbound(Object value, String name) {

@@ -19,12 +19,12 @@ package websocket.drawboard;
 import java.io.IOException;
 import java.util.LinkedList;
 
-import javax.websocket.CloseReason;
-import javax.websocket.CloseReason.CloseCodes;
-import javax.websocket.RemoteEndpoint.Async;
-import javax.websocket.SendHandler;
-import javax.websocket.SendResult;
-import javax.websocket.Session;
+import jakarta.websocket.CloseReason;
+import jakarta.websocket.CloseReason.CloseCodes;
+import jakarta.websocket.RemoteEndpoint.Async;
+import jakarta.websocket.SendHandler;
+import jakarta.websocket.SendResult;
+import jakarta.websocket.Session;
 
 import websocket.drawboard.wsmessages.AbstractWebsocketMessage;
 import websocket.drawboard.wsmessages.BinaryWebsocketMessage;

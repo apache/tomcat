@@ -20,7 +20,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.List;
 
-import javax.websocket.Extension;
+import jakarta.websocket.Extension;
 
 /**
  * The internal representation of the transformation that a WebSocket extension
@@ -101,8 +101,11 @@ public interface Transformation {
      * @return  The list of messages after this any any subsequent
      *          transformations have been applied. The size of the returned list
      *          may be bigger or smaller than the size of the input list
+     *
+     * @throws IOException If an error occurs during the transformation of the
+     *                     message parts
      */
-    List<MessagePart> sendMessagePart(List<MessagePart> messageParts);
+    List<MessagePart> sendMessagePart(List<MessagePart> messageParts) throws IOException;
 
     /**
      * Clean-up any resources that were used by the transformation.

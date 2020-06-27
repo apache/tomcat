@@ -215,8 +215,28 @@ public interface Manager {
      * session ID.
      *
      * @param session   The session to change the session ID for
+     *
+     * @return  The new session ID
      */
-    public void changeSessionId(Session session);
+    public default String rotateSessionId(Session session) {
+        String newSessionId = null;
+        // Assume there new Id is a duplicate until we prove it isn't. The
+        // chances of a duplicate are extremely low but the current ManagerBase
+        // code protects against duplicates so this default method does too.
+        boolean duplicate = true;
+        do {
+            newSessionId = getSessionIdGenerator().generateSessionId();
+            try {
+                if (findSession(newSessionId) == null) {
+                    duplicate = false;
+                }
+            } catch (IOException ioe) {
+                // Swallow. An IOE means the ID was known so continue looping
+            }
+        } while (duplicate);
+        changeSessionId(session, newSessionId);
+        return newSessionId;
+    }
 
 
     /**
@@ -356,10 +376,10 @@ public interface Manager {
     /**
      * When an attribute that is already present in the session is added again
      * under the same name and the attribute implements {@link
-     * javax.servlet.http.HttpSessionBindingListener}, should
-     * {@link javax.servlet.http.HttpSessionBindingListener#valueUnbound(javax.servlet.http.HttpSessionBindingEvent)}
+     * jakarta.servlet.http.HttpSessionBindingListener}, should
+     * {@link jakarta.servlet.http.HttpSessionBindingListener#valueUnbound(jakarta.servlet.http.HttpSessionBindingEvent)}
      * be called followed by
-     * {@link javax.servlet.http.HttpSessionBindingListener#valueBound(javax.servlet.http.HttpSessionBindingEvent)}?
+     * {@link jakarta.servlet.http.HttpSessionBindingListener#valueBound(jakarta.servlet.http.HttpSessionBindingEvent)}?
      * <p>
      * The default value is {@code false}.
      *
@@ -373,12 +393,12 @@ public interface Manager {
 
     /**
      * Configure if
-     * {@link javax.servlet.http.HttpSessionBindingListener#valueUnbound(javax.servlet.http.HttpSessionBindingEvent)}
+     * {@link jakarta.servlet.http.HttpSessionBindingListener#valueUnbound(jakarta.servlet.http.HttpSessionBindingEvent)}
      * be called followed by
-     * {@link javax.servlet.http.HttpSessionBindingListener#valueBound(javax.servlet.http.HttpSessionBindingEvent)}
+     * {@link jakarta.servlet.http.HttpSessionBindingListener#valueBound(jakarta.servlet.http.HttpSessionBindingEvent)}
      * when an attribute that is already present in the session is added again
      * under the same name and the attribute implements {@link
-     * javax.servlet.http.HttpSessionBindingListener}.
+     * jakarta.servlet.http.HttpSessionBindingListener}.
      *
      * @param notifyBindingListenerOnUnchangedValue {@code true} the listener
      *                                              will be called, {@code
@@ -391,9 +411,9 @@ public interface Manager {
     /**
      * When an attribute that is already present in the session is added again
      * under the same name and a {@link
-     * javax.servlet.http.HttpSessionAttributeListener} is configured for the
+     * jakarta.servlet.http.HttpSessionAttributeListener} is configured for the
      * session should
-     * {@link javax.servlet.http.HttpSessionAttributeListener#attributeReplaced(javax.servlet.http.HttpSessionBindingEvent)}
+     * {@link jakarta.servlet.http.HttpSessionAttributeListener#attributeReplaced(jakarta.servlet.http.HttpSessionBindingEvent)}
      * be called?
      * <p>
      * The default value is {@code true}.
@@ -408,10 +428,10 @@ public interface Manager {
 
     /**
      * Configure if
-     * {@link javax.servlet.http.HttpSessionAttributeListener#attributeReplaced(javax.servlet.http.HttpSessionBindingEvent)}
+     * {@link jakarta.servlet.http.HttpSessionAttributeListener#attributeReplaced(jakarta.servlet.http.HttpSessionBindingEvent)}
      * when an attribute that is already present in the session is added again
      * under the same name and a {@link
-     * javax.servlet.http.HttpSessionAttributeListener} is configured for the
+     * jakarta.servlet.http.HttpSessionAttributeListener} is configured for the
      * session.
      *
      * @param notifyAttributeListenerOnUnchangedValue {@code true} the listener
@@ -420,4 +440,55 @@ public interface Manager {
      */
     public void setNotifyAttributeListenerOnUnchangedValue(
             boolean notifyAttributeListenerOnUnchangedValue);
+
+
+    /**
+     * If this is <code>true</code>, Tomcat will track the number of active
+     * requests for each session. When determining if a session is valid, any
+     * session with at least one active request will always be considered valid.
+     * If <code>org.apache.catalina.STRICT_SERVLET_COMPLIANCE</code> is set to
+     * <code>true</code>, the default of this setting will be <code>true</code>,
+     * else the default value will be <code>false</code>.
+     * @return the flag value
+     */
+    public default boolean getSessionActivityCheck() {
+        return Globals.STRICT_SERVLET_COMPLIANCE;
+    }
+
+
+    /**
+     * Configure if Tomcat will track the number of active requests for each
+     * session. When determining if a session is valid, any session with at
+     * least one active request will always be considered valid.
+     * @param sessionActivityCheck the new flag value
+     */
+    public void setSessionActivityCheck(boolean sessionActivityCheck);
+
+
+    /**
+     * If this is <code>true</code>, the last accessed time for sessions will
+     * be calculated from the beginning of the previous request. If
+     * <code>false</code>, the last accessed time for sessions will be calculated
+     * from the end of the previous request. This also affects how the idle time
+     * is calculated.
+     * If <code>org.apache.catalina.STRICT_SERVLET_COMPLIANCE</code> is set to
+     * <code>true</code>, the default of this setting will be <code>true</code>,
+     * else the default value will be <code>false</code>.
+     * @return the flag value
+     */
+    public default boolean getSessionLastAccessAtStart() {
+        return Globals.STRICT_SERVLET_COMPLIANCE;
+    }
+
+
+    /**
+     * Configure if the last accessed time for sessions will
+     * be calculated from the beginning of the previous request. If
+     * <code>false</code>, the last accessed time for sessions will be calculated
+     * from the end of the previous request. This also affects how the idle time
+     * is calculated.
+     * @param sessionLastAccessAtStart the new flag value
+     */
+    public void setSessionLastAccessAtStart(boolean sessionLastAccessAtStart);
+
 }

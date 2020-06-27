@@ -14,10 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.catalina.core;
-
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,7 +37,6 @@ import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.res.StringManager;
 
-
 /**
  * Standard implementation of a processing <b>Pipeline</b> that will invoke
  * a series of Valves that have been configured to be called in order.  This
@@ -53,7 +49,6 @@ import org.apache.tomcat.util.res.StringManager;
  *
  * @author Craig R. McClanahan
  */
-
 public class StandardPipeline extends LifecycleBase implements Pipeline {
 
     private static final Log log = LogFactory.getLog(StandardPipeline.class);

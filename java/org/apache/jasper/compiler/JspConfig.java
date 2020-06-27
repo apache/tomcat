@@ -21,9 +21,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Vector;
 
-import javax.servlet.ServletContext;
-import javax.servlet.descriptor.JspConfigDescriptor;
-import javax.servlet.descriptor.JspPropertyGroupDescriptor;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.descriptor.JspConfigDescriptor;
+import jakarta.servlet.descriptor.JspPropertyGroupDescriptor;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -377,7 +377,7 @@ public class JspConfig {
     }
 
     /**
-     * To find out if an uri matches an url pattern in jsp config.  If so,
+     * To find out if a uri matches a url pattern in jsp config.  If so,
      * then the uri is a JSP page.  This is used primarily for jspc.
      * @param uri The path to check
      * @return <code>true</code> if the path denotes a JSP page

@@ -37,13 +37,13 @@ abstract class ConnectionSettingsBase<T extends Throwable> {
     static final long UNLIMITED = ((long)1 << 32); // Use the maximum possible
     static final int MAX_HEADER_TABLE_SIZE = 1 << 16;
 
-    // Defaults
+    // Defaults (defined by the specification)
     static final int DEFAULT_HEADER_TABLE_SIZE = Hpack.DEFAULT_TABLE_SIZE;
     static final boolean DEFAULT_ENABLE_PUSH = true;
     static final long DEFAULT_MAX_CONCURRENT_STREAMS = UNLIMITED;
     static final int DEFAULT_INITIAL_WINDOW_SIZE = (1 << 16) - 1;
     static final int DEFAULT_MAX_FRAME_SIZE = MIN_MAX_FRAME_SIZE;
-    static final long DEFAULT_MAX_HEADER_LIST_SIZE = UNLIMITED;
+    static final long DEFAULT_MAX_HEADER_LIST_SIZE = 1 << 15;
 
     Map<Setting, Long> current = new EnumMap<>(Setting.class);
     Map<Setting, Long> pending = new EnumMap<>(Setting.class);
@@ -64,7 +64,7 @@ abstract class ConnectionSettingsBase<T extends Throwable> {
     final void set(Setting setting, long value) throws T {
         if (log.isDebugEnabled()) {
             log.debug(sm.getString("connectionSettings.debug",
-                    connectionId, setting, Long.toString(value)));
+                    connectionId, getEndpointName(), setting, Long.toString(value)));
         }
 
         switch(setting) {
@@ -215,4 +215,6 @@ abstract class ConnectionSettingsBase<T extends Throwable> {
 
 
     abstract void throwException(String msg, Http2Error error) throws T;
+
+    abstract String getEndpointName();
 }

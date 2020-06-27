@@ -71,29 +71,29 @@ class DefaultErrorHandler implements ErrorHandler {
         Object[] args = null;
         StringBuilder buf = new StringBuilder();
 
-        for (int i=0; i < details.length; i++) {
-            if (details[i].getJspBeginLineNumber() >= 0) {
-                args = new Object[] {
-                        Integer.valueOf(details[i].getJspBeginLineNumber()),
-                        details[i].getJspFileName() };
+        for (JavacErrorDetail detail : details) {
+            if (detail.getJspBeginLineNumber() >= 0) {
+                args = new Object[]{
+                        Integer.valueOf(detail.getJspBeginLineNumber()),
+                        detail.getJspFileName()};
                 buf.append(System.lineSeparator());
                 buf.append(System.lineSeparator());
                 buf.append(Localizer.getMessage("jsp.error.single.line.number",
                         args));
                 buf.append(System.lineSeparator());
-                buf.append(details[i].getErrorMessage());
+                buf.append(detail.getErrorMessage());
                 buf.append(System.lineSeparator());
-                buf.append(details[i].getJspExtract());
+                buf.append(detail.getJspExtract());
             } else {
-                args = new Object[] {
-                        Integer.valueOf(details[i].getJavaLineNumber()),
-                        details[i].getJavaFileName() };
+                args = new Object[]{
+                        Integer.valueOf(detail.getJavaLineNumber()),
+                        detail.getJavaFileName()};
                 buf.append(System.lineSeparator());
                 buf.append(System.lineSeparator());
                 buf.append(Localizer.getMessage("jsp.error.java.line.number",
                         args));
                 buf.append(System.lineSeparator());
-                buf.append(details[i].getErrorMessage());
+                buf.append(detail.getErrorMessage());
             }
         }
         buf.append(System.lineSeparator());

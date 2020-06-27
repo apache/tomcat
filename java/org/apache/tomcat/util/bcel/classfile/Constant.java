@@ -41,11 +41,9 @@ public abstract class Constant {
      */
     protected final byte tag;
 
-
     Constant(final byte tag) {
         this.tag = tag;
     }
-
 
     /**
      * @return Tag of constant, i.e., its type. No setTag() method to avoid
@@ -54,7 +52,6 @@ public abstract class Constant {
     public final byte getTag() {
         return tag;
     }
-
 
     /**
      * Read one constant from the given input, the type depends on a tag byte.

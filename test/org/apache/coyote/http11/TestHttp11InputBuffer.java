@@ -21,10 +21,10 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Enumeration;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -37,6 +37,10 @@ import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 
 public class TestHttp11InputBuffer extends TomcatBaseTest {
+
+    private static final String CR = "\r";
+    private static final String LF = "\n";
+    private  static final String CRLF = CR + LF;
 
     /**
      * Test case for https://bz.apache.org/bugzilla/show_bug.cgi?id=48839
@@ -163,13 +167,13 @@ public class TestHttp11InputBuffer extends TomcatBaseTest {
 
 
     @Test
-    public void testBug51557Separators() throws Exception {
+    public void testBug51557SeparatorsInName() throws Exception {
         char httpSeparators[] = new char[] {
                 '\t', ' ', '\"', '(', ')', ',', '/', ':', ';', '<',
                 '=', '>', '?', '@', '[', '\\', ']', '{', '}' };
 
         for (char s : httpSeparators) {
-            doTestBug51557Char(s);
+            doTestBug51557CharInName(s);
             tearDown();
             setUp();
         }
@@ -177,13 +181,38 @@ public class TestHttp11InputBuffer extends TomcatBaseTest {
 
 
     @Test
-    public void testBug51557Ctl() throws Exception {
+    public void testBug51557CtlInName() throws Exception {
         for (int i = 0; i < 31; i++) {
-            doTestBug51557Char((char) i);
+            doTestBug51557CharInName((char) i);
             tearDown();
             setUp();
         }
-        doTestBug51557Char((char) 127);
+        doTestBug51557CharInName((char) 127);
+    }
+
+
+    @Test
+    public void testBug51557CtlInValue() throws Exception {
+        for (int i = 0; i < 31; i++) {
+            if (i == '\t') {
+                // TAB is allowed
+                continue;
+            }
+            doTestBug51557InvalidCharInValue((char) i);
+            tearDown();
+            setUp();
+        }
+        doTestBug51557InvalidCharInValue((char) 127);
+    }
+
+
+    @Test
+    public void testBug51557ObsTextInValue() throws Exception {
+        for (int i = 128; i < 255; i++) {
+            doTestBug51557ValidCharInValue((char) i);
+            tearDown();
+            setUp();
+        }
     }
 
 
@@ -226,7 +255,7 @@ public class TestHttp11InputBuffer extends TomcatBaseTest {
     }
 
 
-    private void doTestBug51557Char(char s) {
+    private void doTestBug51557CharInName(char s) {
         Bug51557Client client =
             new Bug51557Client("X-Bug" + s + "51557", "invalid");
 
@@ -236,6 +265,29 @@ public class TestHttp11InputBuffer extends TomcatBaseTest {
         Assert.assertTrue(client.isResponseBodyOK());
     }
 
+
+    private void doTestBug51557InvalidCharInValue(char s) {
+        Bug51557Client client =
+            new Bug51557Client("X-Bug51557-Invalid", "invalid" + s + "invalid");
+
+        client.doRequest();
+        Assert.assertTrue("Testing [" + (int) s + "]", client.isResponse200());
+        Assert.assertEquals("Testing [" + (int) s + "]", "abcd", client.getResponseBody());
+        Assert.assertTrue(client.isResponseBodyOK());
+    }
+
+
+    private void doTestBug51557ValidCharInValue(char s) {
+        Bug51557Client client =
+            new Bug51557Client("X-Bug51557-Valid", "valid" + s + "valid");
+
+        client.doRequest();
+        Assert.assertTrue("Testing [" + (int) s + "]", client.isResponse200());
+        Assert.assertEquals("Testing [" + (int) s + "]", "valid" + s + "validabcd", client.getResponseBody());
+        Assert.assertTrue(client.isResponseBodyOK());
+    }
+
+
     /**
      * Bug 51557 test client.
      */
@@ -243,12 +295,12 @@ public class TestHttp11InputBuffer extends TomcatBaseTest {
 
         private final String headerName;
         private final String headerLine;
-        private final boolean rejectIllegalHeaderName;
+        private final boolean rejectIllegalHeader;
 
         public Bug51557Client(String headerName) {
             this.headerName = headerName;
             this.headerLine = headerName;
-            this.rejectIllegalHeaderName = false;
+            this.rejectIllegalHeader = false;
         }
 
         public Bug51557Client(String headerName, String headerValue) {
@@ -256,10 +308,10 @@ public class TestHttp11InputBuffer extends TomcatBaseTest {
         }
 
         public Bug51557Client(String headerName, String headerValue,
-                boolean rejectIllegalHeaderName) {
+                boolean rejectIllegalHeader) {
             this.headerName = headerName;
             this.headerLine = headerName + ": " + headerValue;
-            this.rejectIllegalHeaderName = rejectIllegalHeaderName;
+            this.rejectIllegalHeader = rejectIllegalHeader;
         }
 
         private Exception doRequest() {
@@ -273,8 +325,8 @@ public class TestHttp11InputBuffer extends TomcatBaseTest {
 
             try {
                 Connector connector = tomcat.getConnector();
-                connector.setProperty("rejectIllegalHeaderName",
-                        Boolean.toString(rejectIllegalHeaderName));
+                Assert.assertTrue(connector.setProperty(
+                        "rejectIllegalHeader", Boolean.toString(rejectIllegalHeader)));
                 tomcat.start();
                 setPort(connector.getLocalPort());
 
@@ -548,7 +600,7 @@ public class TestHttp11InputBuffer extends TomcatBaseTest {
 
             try {
                 Connector connector = tomcat.getConnector();
-                connector.setProperty("rejectIllegalHeaderName", "false");
+                Assert.assertTrue(connector.setProperty("rejectIllegalHeader", "false"));
                 tomcat.start();
                 setPort(connector.getLocalPort());
 
@@ -588,7 +640,83 @@ public class TestHttp11InputBuffer extends TomcatBaseTest {
     @Test
     public void testInvalidMethod() {
 
-        InvalidMethodClient client = new InvalidMethodClient();
+        String[] request = new String[1];
+        request[0] =
+            "GET" + (char) 0 + " /test HTTP/1.1" + CRLF +
+            "Host: localhost:8080" + CRLF +
+            "Connection: close" + CRLF +
+            CRLF;
+
+        InvalidClient client = new InvalidClient(request);
+
+        client.doRequest();
+        Assert.assertTrue(client.getResponseLine(), client.isResponse400());
+        Assert.assertTrue(client.isResponseBodyOK());
+    }
+
+
+    @Test
+    public void testInvalidHttp09() {
+
+        String[] request = new String[1];
+        request[0] = "GET /test" + CR + " " + LF;
+
+        InvalidClient client = new InvalidClient(request);
+
+        client.doRequest();
+        Assert.assertTrue(client.getResponseLine(), client.isResponse400());
+        Assert.assertTrue(client.isResponseBodyOK());
+    }
+
+
+    @Test
+    public void testInvalidEndOfRequestLine01() {
+
+        String[] request = new String[1];
+        request[0] =
+                "GET /test HTTP/1.1" + CR +
+                "Host: localhost:8080" + CRLF +
+                "Connection: close" + CRLF +
+                CRLF;
+
+        InvalidClient client = new InvalidClient(request);
+
+        client.doRequest();
+        Assert.assertTrue(client.getResponseLine(), client.isResponse400());
+        Assert.assertTrue(client.isResponseBodyOK());
+    }
+
+
+    @Test
+    public void testInvalidEndOfRequestLine02() {
+
+        String[] request = new String[1];
+        request[0] =
+                "GET /test HTTP/1.1" + LF +
+                "Host: localhost:8080" + CRLF +
+                "Connection: close" + CRLF +
+                CRLF;
+
+        InvalidClient client = new InvalidClient(request);
+
+        client.doRequest();
+        Assert.assertTrue(client.getResponseLine(), client.isResponse400());
+        Assert.assertTrue(client.isResponseBodyOK());
+    }
+
+
+    @Test
+    public void testInvalidHeader01() {
+
+        String[] request = new String[1];
+        request[0] =
+                "GET /test HTTP/1.1" + CRLF +
+                "Host: localhost:8080" + CRLF +
+                CR + "X-Header: xxx" + CRLF +
+                "Connection: close" + CRLF +
+                CRLF;
+
+        InvalidClient client = new InvalidClient(request);
 
         client.doRequest();
         Assert.assertTrue(client.getResponseLine(), client.isResponse400());
@@ -597,9 +725,15 @@ public class TestHttp11InputBuffer extends TomcatBaseTest {
 
 
     /**
-     * Bug 48839 test client.
+     * Invalid request test client.
      */
-    private class InvalidMethodClient extends SimpleHttpClient {
+    private class InvalidClient extends SimpleHttpClient {
+
+        private final String[] request;
+
+        public InvalidClient(String[] request) {
+            this.request = request;
+        }
 
         private Exception doRequest() {
 
@@ -613,14 +747,6 @@ public class TestHttp11InputBuffer extends TomcatBaseTest {
 
                 // Open connection
                 connect();
-
-                String[] request = new String[1];
-                request[0] =
-                    "GET" + (char) 0 + " /test HTTP/1.1" + CRLF +
-                    "Host: localhost:8080" + CRLF +
-                    "Connection: close" + CRLF +
-                    CRLF;
-
                 setRequest(request);
                 processRequest(); // blocks until response has been read
 

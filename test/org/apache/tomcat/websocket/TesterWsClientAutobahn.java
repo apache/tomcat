@@ -23,16 +23,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
-import javax.websocket.ClientEndpoint;
-import javax.websocket.ClientEndpointConfig;
-import javax.websocket.ContainerProvider;
-import javax.websocket.Endpoint;
-import javax.websocket.Extension;
-import javax.websocket.OnClose;
-import javax.websocket.OnError;
-import javax.websocket.OnMessage;
-import javax.websocket.Session;
-import javax.websocket.WebSocketContainer;
+import jakarta.websocket.ClientEndpoint;
+import jakarta.websocket.ClientEndpointConfig;
+import jakarta.websocket.ContainerProvider;
+import jakarta.websocket.Endpoint;
+import jakarta.websocket.Extension;
+import jakarta.websocket.OnClose;
+import jakarta.websocket.OnError;
+import jakarta.websocket.OnMessage;
+import jakarta.websocket.Session;
+import jakarta.websocket.WebSocketContainer;
 
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.websocket.pojo.PojoEndpointClient;

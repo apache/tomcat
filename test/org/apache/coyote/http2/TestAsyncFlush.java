@@ -19,12 +19,12 @@ package org.apache.coyote.http2;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
-import javax.servlet.AsyncContext;
-import javax.servlet.ServletOutputStream;
-import javax.servlet.WriteListener;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.AsyncContext;
+import jakarta.servlet.ServletOutputStream;
+import jakarta.servlet.WriteListener;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -41,7 +41,7 @@ import org.apache.catalina.startup.Tomcat;
  *       non-blocking I/O is explicitly called out as illegal in the Servlet
  *       specification but also goes on to say the behaviour if such a call is
  *       made is undefined. Which means it is OK if the call works as expected
- *       (a non-blcoking flush is triggered) :).
+ *       (a non-blocking flush is triggered) :).
  *       If any of these tests fail, that should not block a release since -
  *       while the specification allows this to work - it doesn't require that
  *       it does work.

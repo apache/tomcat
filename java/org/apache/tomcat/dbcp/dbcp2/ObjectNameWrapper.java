@@ -18,6 +18,7 @@
 package org.apache.tomcat.dbcp.dbcp2;
 
 import java.lang.management.ManagementFactory;
+import java.util.Objects;
 
 import javax.management.MBeanServer;
 import javax.management.MalformedObjectNameException;
@@ -74,6 +75,14 @@ class ObjectNameWrapper {
         } catch (LinkageError | Exception e) {
             log.warn("Failed to complete JMX registration for " + objectName, e);
         }
+    }
+
+    /**
+     * @since 2.7.0
+     */
+    @Override
+    public String toString() {
+        return Objects.toString(objectName);
     }
 
     public void unregisterMBean() {

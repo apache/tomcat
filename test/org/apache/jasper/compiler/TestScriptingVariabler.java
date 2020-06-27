@@ -19,10 +19,10 @@ package org.apache.jasper.compiler;
 
 import java.io.IOException;
 
-import javax.servlet.jsp.tagext.TagData;
-import javax.servlet.jsp.tagext.TagExtraInfo;
-import javax.servlet.jsp.tagext.TagSupport;
-import javax.servlet.jsp.tagext.VariableInfo;
+import jakarta.servlet.jsp.tagext.TagData;
+import jakarta.servlet.jsp.tagext.TagExtraInfo;
+import jakarta.servlet.jsp.tagext.TagSupport;
+import jakarta.servlet.jsp.tagext.VariableInfo;
 
 import org.junit.Assert;
 import org.junit.Test;

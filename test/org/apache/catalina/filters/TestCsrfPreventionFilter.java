@@ -22,7 +22,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -37,7 +37,7 @@ public class TestCsrfPreventionFilter extends TomcatBaseTest {
 
     private final HttpServletResponse wrapper =
         new CsrfPreventionFilter.CsrfResponseWrapper(
-                new NonEncodingResponse(), "TESTNONCE");
+                new NonEncodingResponse(), Constants.CSRF_NONCE_SESSION_ATTR_NAME, "TESTNONCE");
 
     @Test
     public void testAddNonceNoQueryNoAnchor() throws Exception {

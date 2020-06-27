@@ -70,7 +70,7 @@ public class JSONParser {
      * Parses a JSON object into a Java {@code Map}.
      */
     public java.util.LinkedHashMap<String, Object> parseObject() throws ParseException {
-        java.util.LinkedHashMap<String, Object> toReturn = object(); 
+        java.util.LinkedHashMap<String, Object> toReturn = object();
         if (!ensureEOF()) {
             throw new IllegalStateException(sm.getString("parser.expectedEOF"));
         }
@@ -80,8 +80,8 @@ public class JSONParser {
     /**
      * Parses a JSON array into a Java {@code List}.
      */
-    public java.util.ArrayList<Object> parseArray() throws ParseException {   
-        java.util.ArrayList<Object> toReturn = list(); 
+    public java.util.ArrayList<Object> parseArray() throws ParseException {
+        java.util.ArrayList<Object> toReturn = list();
         if (!ensureEOF()) {
             throw new IllegalStateException(sm.getString("parser.expectedEOF"));
         }
@@ -91,8 +91,8 @@ public class JSONParser {
     /**
      * Parses any JSON-parseable object, returning the value.
      */
-    public Object parse() throws ParseException { 
-        Object toReturn = anything(); 
+    public Object parse() throws ParseException {
+        Object toReturn = anything();
         if (!ensureEOF()) {
             throw new IllegalStateException(sm.getString("parser.expectedEOF"));
         }
@@ -280,7 +280,7 @@ java.util.ArrayList<Object> list() : {
         )*
     ]
     <BRACKET_CLOSE>
-    { 
+    {
         list.trimToSize();
         return list;
     }
@@ -319,7 +319,7 @@ Boolean booleanValue(): {
 
 Number number(): {
     Token t;
-}{ 
+}{
     (
         t = <NUMBER_DECIMAL>
         {

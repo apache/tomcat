@@ -29,9 +29,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.apache.catalina.Container;
 import org.apache.catalina.Context;
@@ -52,6 +52,20 @@ import org.apache.tomcat.util.file.ConfigFileLoader;
 import org.apache.tomcat.util.file.ConfigurationSource;
 import org.apache.tomcat.util.http.RequestUtil;
 
+/**
+ * Note: Extra caution should be used when adding a Rewrite Rule. When
+ * specifying a regex to match for in a Rewrite Rule, certain regex could allow
+ * an attacker to DoS your server, as Java's regex parsing is vulnerable to
+ * "catastrophic backtracking" (also known as "Regular expression Denial of
+ * Service", or ReDoS). There are some open source tools to help detect
+ * vulnerable regex, though in general it is a hard problem. A good defence is
+ * to use a regex debugger on your desired regex, and read more on the subject
+ * of catastrophic backtracking.
+ *
+ * @see <a href=
+ *      "https://www.owasp.org/index.php/Regular_expression_Denial_of_Service_-_ReDoS">OWASP
+ *      ReDoS</a>
+ */
 public class RewriteValve extends ValveBase {
 
     /**
@@ -122,7 +136,6 @@ public class RewriteValve extends ValveBase {
     protected synchronized void startInternal() throws LifecycleException {
 
         super.startInternal();
-        context = (getContainer() instanceof Context);
 
         InputStream is = null;
 
@@ -141,7 +154,7 @@ public class RewriteValve extends ValveBase {
         } else {
             String resourceName = Container.getConfigPath(getContainer(), resourcePath);
             try {
-                ConfigurationSource.Resource resource = ConfigFileLoader.getSource().getConfResource(resourceName);
+                ConfigurationSource.Resource resource = ConfigFileLoader.getSource().getResource(resourceName);
                 is = resource.getInputStream();
             } catch (IOException e) {
                 if (containerLog.isDebugEnabled()) {
@@ -187,11 +200,11 @@ public class RewriteValve extends ValveBase {
         if (mapsConfiguration.size() > 0) {
             buffer.append("\r\n");
         }
-        for (int i = 0; i < rules.length; i++) {
-            for (int j = 0; j < rules[i].getConditions().length; j++) {
-                buffer.append(rules[i].getConditions()[j].toString()).append("\r\n");
+        for (RewriteRule rule : rules) {
+            for (int j = 0; j < rule.getConditions().length; j++) {
+                buffer.append(rule.getConditions()[j].toString()).append("\r\n");
             }
-            buffer.append(rules[i].toString()).append("\r\n").append("\r\n");
+            buffer.append(rule.toString()).append("\r\n").append("\r\n");
         }
         return buffer.toString();
     }
@@ -217,16 +230,16 @@ public class RewriteValve extends ValveBase {
                             conditions.get(i).setOrnext(true);
                         }
                     }
-                    for (int i = 0; i < conditions.size(); i++) {
+                    for (RewriteCond condition : conditions) {
                         if (containerLog.isDebugEnabled()) {
-                            RewriteCond cond = conditions.get(i);
+                            RewriteCond cond = condition;
                             containerLog.debug("Add condition " + cond.getCondPattern()
                                     + " test " + cond.getTestString() + " to rule with pattern "
                                     + rule.getPatternString() + " and substitution "
                                     + rule.getSubstitutionString() + (cond.isOrnext() ? " [OR]" : "")
                                     + (cond.isNocase() ? " [NC]" : ""));
                         }
-                        rule.addCondition(conditions.get(i));
+                        rule.addCondition(condition);
                     }
                     conditions.clear();
                     rules.add(rule);
@@ -250,8 +263,8 @@ public class RewriteValve extends ValveBase {
         this.rules = rules.toArray(new RewriteRule[0]);
 
         // Finish parsing the rules
-        for (int i = 0; i < this.rules.length; i++) {
-            this.rules[i].parse(maps);
+        for (RewriteRule rule : this.rules) {
+            rule.parse(maps);
         }
     }
 
@@ -559,7 +572,7 @@ public class RewriteValve extends ValveBase {
      * @return The condition, rule or map resulting from parsing the line
      */
     public static Object parse(String line) {
-        StringTokenizer tokenizer = new StringTokenizer(line);
+        QuotedStringTokenizer tokenizer = new QuotedStringTokenizer(line);
         if (tokenizer.hasMoreTokens()) {
             String token = tokenizer.nextToken();
             if (token.equals("RewriteCond")) {
@@ -604,25 +617,38 @@ public class RewriteValve extends ValveBase {
                 return rule;
             } else if (token.equals("RewriteMap")) {
                 // RewriteMap name rewriteMapClassName whateverOptionalParameterInWhateverFormat
+                // FIXME: Possibly implement more special maps from https://httpd.apache.org/docs/2.4/rewrite/rewritemap.html
                 if (tokenizer.countTokens() < 2) {
                     throw new IllegalArgumentException(sm.getString("rewriteValve.invalidLine", line));
                 }
                 String name = tokenizer.nextToken();
                 String rewriteMapClassName = tokenizer.nextToken();
                 RewriteMap map = null;
-                try {
-                    map = (RewriteMap) (Class.forName(
-                            rewriteMapClassName).getConstructor().newInstance());
-                } catch (Exception e) {
-                    throw new IllegalArgumentException(sm.getString("rewriteValve.invalidMapClassName", line));
+                if (rewriteMapClassName.startsWith("int:")) {
+                    map = InternalRewriteMap.toMap(rewriteMapClassName.substring("int:".length()));
+                } else if (rewriteMapClassName.startsWith("prg:")) {
+                    rewriteMapClassName = rewriteMapClassName.substring("prg:".length());
+                }
+                if (map == null) {
+                    try {
+                        map = (RewriteMap) (Class.forName(
+                                rewriteMapClassName).getConstructor().newInstance());
+                    } catch (Exception e) {
+                        throw new IllegalArgumentException(sm.getString("rewriteValve.invalidMapClassName", line));
+                    }
                 }
                 if (tokenizer.hasMoreTokens()) {
-                    map.setParameters(tokenizer.nextToken());
+                    if (tokenizer.countTokens() == 1) {
+                        map.setParameters(tokenizer.nextToken());
+                    } else {
+                        List<String> params = new ArrayList<>();
+                        while (tokenizer.hasMoreTokens()) {
+                            params.add(tokenizer.nextToken());
+                        }
+                        map.setParameters(params.toArray(new String[0]));
+                    }
                 }
-                Object[] result = new Object[2];
-                result[0] = name;
-                result[1] = map;
-                return result;
+                return new Object[] { name, map };
             } else if (token.startsWith("#")) {
                 // it's a comment, ignore it
             } else {

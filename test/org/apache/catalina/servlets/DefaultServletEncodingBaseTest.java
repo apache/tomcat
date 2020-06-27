@@ -26,11 +26,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.RequestDispatcher;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.RequestDispatcher;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -57,8 +57,8 @@ import org.apache.tomcat.util.http.parser.MediaType;
 @RunWith(Parameterized.class)
 public abstract class DefaultServletEncodingBaseTest extends TomcatBaseTest {
 
-    @Parameterized.Parameters(name = "{index}: contextEnc[{0}], fileEnc[{1}], target[{4}]," +
-            " useInclude[{5}], outputEnc[{6}], callSetCharacterEnc[{8}], useWriter[{7}]")
+    @Parameterized.Parameters(name = "{index}: contextEnc[{0}], fileEnc[{1}], target[{2}]," +
+            " useInclude[{3}], outputEnc[{4}], callSetCharacterEnc[{5}], useWriter[{6}]")
     public static Collection<Object[]> parameters() {
 
         String[] encodings = new String[] {
@@ -66,8 +66,6 @@ public abstract class DefaultServletEncodingBaseTest extends TomcatBaseTest {
 
         String[] targetFiles = new String[] {
                 "cp1252", "ibm850", "iso-8859-1", "utf-8-bom", "utf-8" };
-
-        Boolean[] booleans = new Boolean[] { Boolean.FALSE, Boolean.TRUE };
 
         List<Object[]> parameterSets = new ArrayList<>();
 
@@ -202,9 +200,9 @@ public abstract class DefaultServletEncodingBaseTest extends TomcatBaseTest {
         int rc = getUrl(target, res, headers);
 
         Assert.assertEquals(HttpServletResponse.SC_OK, rc);
-        List<String> values = headers.get("Content-Type");
-        if (values != null && values.size() == 1) {
-            MediaType mediaType = MediaType.parseMediaType(new StringReader(values.get(0)));
+        String contentType = getSingleHeader("Content-Type", headers);
+        if (contentType != null) {
+            MediaType mediaType = MediaType.parseMediaType(new StringReader(contentType));
             String charset = mediaType.getCharset();
             if (charset == null) {
                 res.setCharset(B2CConverter.getCharset(outputEncoding));

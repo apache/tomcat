@@ -66,7 +66,7 @@
       </li>
       <li>
         Use the logging API provided by the Java Servlets specification,
-        <code>javax.servlet.ServletContext.log(...)</code>
+        <code>jakarta.servlet.ServletContext.log(...)</code>
       </li>
     </ul>
 
@@ -115,7 +115,7 @@
     <subsection name="Servlets logging API">
 
     <p>
-      The calls to <code>javax.servlet.ServletContext.log(...)</code> to write
+      The calls to <code>jakarta.servlet.ServletContext.log(...)</code> to write
       log messages are handled by internal Tomcat logging. Such messages are
       logged to the category named
     </p>
@@ -171,7 +171,7 @@
       <code>true</code>, the calls to <code>System.out/err</code> during request
       processing will be intercepted, and their output will be fed to the
       logging subsystem using the
-      <code>javax.servlet.ServletContext.log(...)</code> calls.<br />
+      <code>jakarta.servlet.ServletContext.log(...)</code> calls.<br />
       <strong>Note</strong>, that the <code>swallowOutput</code>  feature is
       actually a trick, and it has its limitations.
       It works only with direct calls to <code>System.out/err</code>,
@@ -289,7 +289,7 @@ java.util.logging.ConsoleHandler.level=ALL</source>
       boolean value.</li>
       <li>The root logger can define its set of handlers using the
       <code>.handlers</code> property.</li>
-      <li> By default the log files will be kept on the file system
+      <li> By default the log files will be kept on the file system for
       <code>90</code> days. This may be changed per handler using the
       <code>handlerName.maxDays</code> property. If the specified value for the
       property is <code>&le;0</code> then the log files will be kept on the
@@ -398,8 +398,8 @@ java.util.logging.ConsoleHandler.formatter = java.util.logging.OneLineFormatter]
           <a href="api/org/apache/juli/package-summary.html"><code>org.apache.juli</code></a>
           package.
         </li>
-        <li>Oracle Java 6 Javadoc for the
-          <a href="http://docs.oracle.com/javase/6/docs/api/java/util/logging/package-summary.html"><code>java.util.logging</code></a>
+        <li>Oracle Java 8 Javadoc for the
+          <a href="https://docs.oracle.com/javase/8/docs/api/java/util/logging/package-summary.html"><code>java.util.logging</code></a>
           package.
         </li>
       </ul>

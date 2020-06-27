@@ -26,8 +26,9 @@ import javax.security.auth.Subject;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
-import javax.security.auth.message.callback.CallerPrincipalCallback;
-import javax.security.auth.message.callback.GroupPrincipalCallback;
+
+import jakarta.security.auth.message.callback.CallerPrincipalCallback;
+import jakarta.security.auth.message.callback.GroupPrincipalCallback;
 
 import org.apache.catalina.realm.GenericPrincipal;
 import org.apache.juli.logging.Log;
@@ -116,6 +117,6 @@ public class CallbackHandlerImpl implements CallbackHandler {
             roles = Arrays.asList(groups);
         }
 
-        return new GenericPrincipal(name, null, roles, principal);
+        return new GenericPrincipal(name, roles, principal);
     }
 }

@@ -1,0 +1,171 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<!--
+
+    Licensed to the Apache Software Foundation (ASF) under one or more
+    contributor license agreements. See the NOTICE file distributed with
+    this work for additional information regarding copyright ownership.
+    The ASF licenses this file to You under the Apache License, Version
+    2.0 (the "License"); you may not use this file except in compliance
+    with the License. You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0 Unless required by
+    applicable law or agreed to in writing, software distributed under the
+    License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+    CONDITIONS OF ANY KIND, either express or implied. See the License for
+    the specific language governing permissions and limitations under the
+    License.
+-->
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>org.apache</groupId>
+        <artifactId>apache</artifactId>
+        <version>21</version>
+    </parent>
+
+    <groupId>org.apache.tomcat</groupId>
+    <artifactId>tomcat-cxf</artifactId>
+    <name>Apache CXF for Apache Tomcat CDI</name>
+    <description>Apache CXF packaged for Apache Tomcat CDI</description>
+    <!-- This is the Apache CXF version -->
+    <version>3.3.6</version>
+    <packaging>jar</packaging>
+
+    <properties>
+        <geronimo-jcdi.version>1.0.1</geronimo-jcdi.version>
+        <javax.json-api.version>1.1.4</javax.json-api.version>
+        <javax.json.bind-api.version>1.0</javax.json.bind-api.version>
+        <johnzon.version>1.2.4</johnzon.version>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.apache.geronimo.specs</groupId>
+            <artifactId>geronimo-jcdi_2.0_spec</artifactId>
+            <version>${geronimo-jcdi.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>javax.json</groupId>
+            <artifactId>javax.json-api</artifactId>
+            <version>${javax.json-api.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>javax.json.bind</groupId>
+            <artifactId>javax.json.bind-api</artifactId>
+            <version>${javax.json.bind-api.version}</version>
+        </dependency>
+        <!-- Apache CXF -->
+        <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-integration-cdi</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-rs-client</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-frontend-jaxrs</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-rs-extension-providers</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-rs-json-basic</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <!-- Apache Johnzon -->
+        <dependency>
+            <groupId>org.apache.johnzon</groupId>
+            <artifactId>johnzon-jsonb</artifactId>
+            <version>${johnzon.version}</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <!-- Build any extra classes for your custom Tomcat components if needed -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.8.1</version>
+                <configuration>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.2.1</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <createDependencyReducedPom>false</createDependencyReducedPom>
+                            <transformers>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
+                                    <resource>META-INF/cxf/bus-extensions.txt</resource>
+                                </transformer>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                    <mainClass>${mainClass}</mainClass>
+                                </transformer>
+                            </transformers>
+				            <artifactSet>
+                                <excludes>
+                                    <!-- Already present in Tomcat or in the CDI bundle -->
+                                    <exclude>jakarta.annotation:jakarta.annotation-api</exclude>
+									<exclude>jakarta.el:*</exclude>
+                                    <exclude>javax.annotation:javax.annotation-api</exclude>
+                                    <exclude>javax.el:*</exclude>
+									<exclude>javax.enterprise:cdi-api</exclude>
+									<exclude>javax.inject:*</exclude>
+									<exclude>javax.interceptor:*</exclude>
+									<!-- Exclude other unneeded dependencies -->
+									<exclude>org.apache.ant:*</exclude>
+									<exclude>org.codehaus.woodstox:*</exclude>
+									<exclude>org.glassfish.jaxb:*</exclude>
+									<exclude>org.jvnet.staxex:*</exclude>
+									<exclude>com.fasterxml.woodstox:*</exclude>
+									<exclude>com.sun.istack:*</exclude>
+									<exclude>com.sun.xml.*:*</exclude>
+								</excludes>
+                            </artifactSet>
+					        <filters>
+                                <filter>
+						            <artifact>*:*</artifact>
+						            <excludes>
+										<exclude>META-INF/*.SF</exclude>
+										<exclude>META-INF/*.DSA</exclude>
+										<exclude>META-INF/*.RSA</exclude>
+										<exclude>META-INF/LICENSE.txt</exclude>
+										<exclude>META-INF/LICENSE</exclude>
+										<exclude>META-INF/NOTICE.txt</exclude>
+										<exclude>META-INF/NOTICE</exclude>
+										<!-- Unneeded configuration files -->
+										<exclude>META-INF/cxf/cxf.*</exclude>
+										<exclude>META-INF/cxf/cxf-servlet.*</exclude>
+										<exclude>META-INF/cxf/org.apache.cxf.bus.factory</exclude>
+										<exclude>META-INF/services/org.apache.cxf.bus.factory</exclude>
+										<exclude>META-INF/spring.*</exclude>
+						            </excludes>
+                                </filter>
+					        </filters>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>

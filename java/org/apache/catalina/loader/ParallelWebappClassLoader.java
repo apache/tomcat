@@ -19,15 +19,17 @@ package org.apache.catalina.loader;
 import org.apache.catalina.LifecycleException;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.compat.JreCompat;
 
 public class ParallelWebappClassLoader extends WebappClassLoaderBase {
 
     private static final Log log = LogFactory.getLog(ParallelWebappClassLoader.class);
 
     static {
-        boolean result = ClassLoader.registerAsParallelCapable();
-        if (!result) {
-            log.warn(sm.getString("webappClassLoaderParallel.registrationFailed"));
+        if (!JreCompat.isGraalAvailable()) {
+            if (!ClassLoader.registerAsParallelCapable()) {
+                log.warn(sm.getString("webappClassLoaderParallel.registrationFailed"));
+            }
         }
     }
 

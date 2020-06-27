@@ -17,7 +17,7 @@
 
 package org.apache.coyote;
 
-import javax.servlet.http.HttpUpgradeHandler;
+import jakarta.servlet.http.HttpUpgradeHandler;
 
 import org.apache.tomcat.ContextBind;
 import org.apache.tomcat.InstanceManager;

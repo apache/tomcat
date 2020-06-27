@@ -38,6 +38,7 @@ import java.util.concurrent.TimeUnit;
 
 import javax.management.InstanceNotFoundException;
 import javax.management.MBeanException;
+import javax.management.MBeanServer;
 import javax.management.ObjectName;
 
 import org.apache.catalina.Context;
@@ -56,6 +57,7 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.buf.StringCache;
+import org.apache.tomcat.util.modeler.Registry;
 import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.util.threads.TaskThreadFactory;
 
@@ -695,9 +697,9 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
             return null;
         }
         synchronized (servicesLock) {
-            for (int i = 0; i < services.length; i++) {
-                if (name.equals(services[i].getName())) {
-                    return services[i];
+            for (Service service : services) {
+                if (name.equals(service.getName())) {
+                    return service;
                 }
             }
         }
@@ -710,9 +712,7 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
      */
     @Override
     public Service[] findServices() {
-
         return services;
-
     }
 
     /**
@@ -849,8 +849,9 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
         try {
             // Note: Hard-coded domain used since this object is per Server/JVM
             ObjectName sname = new ObjectName("Catalina:type=StoreConfig");
-            if (mserver.isRegistered(sname)) {
-                mserver.invoke(sname, "storeConfig", null, null);
+            MBeanServer server = Registry.getRegistry(null, null).getMBeanServer();
+            if (server.isRegistered(sname)) {
+                server.invoke(sname, "storeConfig", null, null);
             } else {
                 log.error(sm.getString("standardServer.storeConfig.notAvailable", sname));
             }
@@ -878,8 +879,9 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
         try {
             // Note: Hard-coded domain used since this object is per Server/JVM
             ObjectName sname = new ObjectName("Catalina:type=StoreConfig");
-            if (mserver.isRegistered(sname)) {
-                mserver.invoke(sname, "store",
+            MBeanServer server = Registry.getRegistry(null, null).getMBeanServer();
+            if (server.isRegistered(sname)) {
+                server.invoke(sname, "store",
                     new Object[] {context},
                     new String [] { "java.lang.String"});
             } else {
@@ -924,8 +926,8 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
 
         // Start our defined Services
         synchronized (servicesLock) {
-            for (int i = 0; i < services.length; i++) {
-                services[i].start();
+            for (Service service : services) {
+                service.start();
             }
         }
 
@@ -986,8 +988,8 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
         fireLifecycleEvent(CONFIGURE_STOP_EVENT, null);
 
         // Stop our defined Services
-        for (int i = 0; i < services.length; i++) {
-            services[i].stop();
+        for (Service service : services) {
+            service.stop();
         }
 
         globalNamingResources.stop();
@@ -1051,16 +1053,16 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
             }
         }
         // Initialize our defined Services
-        for (int i = 0; i < services.length; i++) {
-            services[i].init();
+        for (Service service : services) {
+            service.init();
         }
     }
 
     @Override
     protected void destroyInternal() throws LifecycleException {
         // Destroy our defined Services
-        for (int i = 0; i < services.length; i++) {
-            services[i].destroy();
+        for (Service service : services) {
+            service.destroy();
         }
 
         globalNamingResources.destroy();
@@ -1141,5 +1143,4 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
     public ScheduledExecutorService getUtilityExecutor() {
         return utilityExecutorWrapper;
     }
-
 }

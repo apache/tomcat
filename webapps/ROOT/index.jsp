@@ -71,9 +71,6 @@ request.setAttribute("tomcatExamplesUrl", "/examples/");
                         <a class="container shadow" href="/host-manager/html"><span>Host Manager</span></a>
                     </div>
                 </div>
-                <!--
-                <br class="separator" />
-                -->
                 <br class="separator" />
             </div>
             <div id="middle" class="curved container">
@@ -131,7 +128,7 @@ request.setAttribute("tomcatExamplesUrl", "/examples/");
                         <ul>
                             <li><a href="https://tomcat.apache.org/bugreport.html">Tomcat @VERSION_MAJOR_MINOR@ Bug Database</a></li>
                             <li><a href="${tomcatDocUrl}api/index.html">Tomcat @VERSION_MAJOR_MINOR@ JavaDocs</a></li>
-                            <li><a href="https://svn.apache.org/repos/asf/tomcat/tc@VERSION_MAJOR_MINOR@.x/">Tomcat @VERSION_MAJOR_MINOR@ SVN Repository</a></li>
+                            <li><a href="https://github.com/apache/tomcat/tree/@GIT_BRANCH@">Tomcat @VERSION_MAJOR_MINOR@ Git Repository at GitHub</a></li>
                         </ul>
                     </div>
                 </div>
@@ -186,7 +183,7 @@ request.setAttribute("tomcatExamplesUrl", "/examples/");
                         <h4>Get Involved</h4>
                         <ul>
                             <li><a href="${tomcatUrl}getinvolved.html">Overview</a></li>
-                            <li><a href="${tomcatUrl}svn.html">SVN Repositories</a></li>
+                            <li><a href="${tomcatUrl}source.html">Source Repositories</a></li>
                             <li><a href="${tomcatUrl}lists.html">Mailing Lists</a></li>
                             <li><a href="https://wiki.apache.org/tomcat/FrontPage">Wiki</a></li>
                         </ul>

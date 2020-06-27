@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ Licensed to the Apache Software Foundation (ASF) under one or more
+  contributor license agreements.  See the NOTICE file distributed with
+  this work for additional information regarding copyright ownership.
+  The ASF licenses this file to You under the Apache License, Version 2.0
+  (the "License"); you may not use this file except in compliance with
+  the License.  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+<!DOCTYPE import-control PUBLIC
+    "-//Puppy Crawl//DTD Import Control 1.1//EN"
+    "http://www.puppycrawl.com/dtds/import_control_1_1.dtd">
+
+<import-control pkg="jakarta">
+  <allow pkg="java"/>
+  <subpackage name="annotation">
+    <allow pkg="jakarta.annotation"/>
+  </subpackage>
+  <subpackage name="ejb">
+    <allow pkg="jakarta.ejb"/>
+  </subpackage>
+  <subpackage name="el">
+    <allow pkg="jakarta.el"/>
+  </subpackage>
+  <subpackage name="mail">
+    <allow pkg="jakarta.mail"/>
+  </subpackage>
+  <subpackage name="persistence">
+    <allow pkg="jakarta.persistence"/>
+  </subpackage>
+  <subpackage name="security">
+    <subpackage name="auth">
+      <subpackage name="message">
+        <allow pkg="javax.crypto" />
+        <allow class="javax.security.auth.Subject"/>
+        <allow pkg="javax.security.auth.callback"/>
+        <allow pkg="javax.security.auth.login"/>
+        <allow pkg="javax.security.auth.x500"/>
+        <disallow pkg="jakarta.security.auth.message.callback" local-only="true"/>
+        <disallow pkg="jakarta.security.auth.message.config" local-only="true"/>
+        <disallow pkg="jakarta.security.auth.message.module" local-only="true"/>
+        <subpackage name="config">
+        <allow class="javax.security.auth.AuthPermission"/>
+          <allow pkg="jakarta.security.auth.message"/>
+        </subpackage>
+        <subpackage name="module">
+          <allow pkg="jakarta.security.auth.message"/>
+        </subpackage>
+      </subpackage>
+    </subpackage>
+  </subpackage>
+  <subpackage name="servlet">
+    <allow pkg="jakarta.servlet"/>
+    <disallow pkg="jakarta.servlet.jsp" local-only="true"/>
+    <subpackage name="jsp">
+      <allow pkg="jakarta.el"/>
+      <allow pkg="jakarta.servlet.jsp"/>
+    </subpackage>
+  </subpackage>
+  <subpackage name="transaction">
+    <allow pkg="jakarta.transaction"/>
+    <allow pkg="javax.transaction.xa"/>
+  </subpackage>
+  <subpackage name="websocket">
+    <allow pkg="jakarta.websocket"/>
+  </subpackage>
+</import-control>

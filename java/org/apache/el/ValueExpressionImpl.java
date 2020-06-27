@@ -22,14 +22,14 @@ import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 
-import javax.el.ELContext;
-import javax.el.ELException;
-import javax.el.FunctionMapper;
-import javax.el.PropertyNotFoundException;
-import javax.el.PropertyNotWritableException;
-import javax.el.ValueExpression;
-import javax.el.ValueReference;
-import javax.el.VariableMapper;
+import jakarta.el.ELContext;
+import jakarta.el.ELException;
+import jakarta.el.FunctionMapper;
+import jakarta.el.PropertyNotFoundException;
+import jakarta.el.PropertyNotWritableException;
+import jakarta.el.ValueExpression;
+import jakarta.el.ValueReference;
+import jakarta.el.VariableMapper;
 
 import org.apache.el.lang.EvaluationContext;
 import org.apache.el.lang.ExpressionBuilder;
@@ -54,7 +54,7 @@ import org.apache.el.util.ReflectionUtil;
  * </p>
  *
  * <p>
- * The {@link javax.el.ExpressionFactory#createValueExpression} method
+ * The {@link jakarta.el.ExpressionFactory#createValueExpression} method
  * can be used to parse an expression string and return a concrete instance
  * of <code>ValueExpression</code> that encapsulates the parsed expression.
  * The {@link FunctionMapper} is used at parse time, not evaluation time,
@@ -63,25 +63,25 @@ import org.apache.el.util.ReflectionUtil;
  *
  * <p>The {@link #getValue}, {@link #setValue}, {@link #isReadOnly} and
  * {@link #getType} methods will evaluate the expression each time they are
- * called. The {@link javax.el.ELResolver} in the <code>ELContext</code> is used
+ * called. The {@link jakarta.el.ELResolver} in the <code>ELContext</code> is used
  * to resolve the top-level variables and to determine the behavior of the
  * <code>.</code> and <code>[]</code> operators. For any of the four methods,
- * the {@link javax.el.ELResolver#getValue} method is used to resolve all
+ * the {@link jakarta.el.ELResolver#getValue} method is used to resolve all
  * properties up to but excluding the last one. This provides the
  * <code>base</code> object. At the last resolution, the
  * <code>ValueExpression</code> will call the corresponding
- * {@link javax.el.ELResolver#getValue}, {@link javax.el.ELResolver#setValue},
- * {@link javax.el.ELResolver#isReadOnly} or {@link javax.el.ELResolver#getType}
+ * {@link jakarta.el.ELResolver#getValue}, {@link jakarta.el.ELResolver#setValue},
+ * {@link jakarta.el.ELResolver#isReadOnly} or {@link jakarta.el.ELResolver#getType}
  * method, depending on which was called on the <code>ValueExpression</code>.
  * </p>
  *
  * <p>See the notes about comparison, serialization and immutability in
- * the {@link javax.el.Expression} javadocs.
+ * the {@link jakarta.el.Expression} javadocs.
  *
- * @see javax.el.ELResolver
- * @see javax.el.Expression
- * @see javax.el.ExpressionFactory
- * @see javax.el.ValueExpression
+ * @see jakarta.el.ELResolver
+ * @see jakarta.el.Expression
+ * @see jakarta.el.ExpressionFactory
+ * @see jakarta.el.ValueExpression
  *
  * @author Jacob Hookom [jacob@hookom.net]
  */
@@ -131,7 +131,7 @@ public final class ValueExpressionImpl extends ValueExpression implements
     /*
      * (non-Javadoc)
      *
-     * @see javax.el.ValueExpression#getExpectedType()
+     * @see jakarta.el.ValueExpression#getExpectedType()
      */
     @Override
     public Class<?> getExpectedType() {
@@ -146,7 +146,7 @@ public final class ValueExpressionImpl extends ValueExpression implements
      *         <code>ExpressionFactory.createValueExpression</code> method
      *         that created this <code>ValueExpression</code>.
      *
-     * @see javax.el.Expression#getExpressionString()
+     * @see jakarta.el.Expression#getExpressionString()
      */
     @Override
     public String getExpressionString() {
@@ -163,7 +163,7 @@ public final class ValueExpressionImpl extends ValueExpression implements
     /*
      * (non-Javadoc)
      *
-     * @see javax.el.ValueExpression#getType(javax.el.ELContext)
+     * @see jakarta.el.ValueExpression#getType(jakarta.el.ELContext)
      */
     @Override
     public Class<?> getType(ELContext context) throws PropertyNotFoundException,
@@ -179,7 +179,7 @@ public final class ValueExpressionImpl extends ValueExpression implements
     /*
      * (non-Javadoc)
      *
-     * @see javax.el.ValueExpression#getValue(javax.el.ELContext)
+     * @see jakarta.el.ValueExpression#getValue(jakarta.el.ELContext)
      */
     @Override
     public Object getValue(ELContext context) throws PropertyNotFoundException,
@@ -208,7 +208,7 @@ public final class ValueExpressionImpl extends ValueExpression implements
     /*
      * (non-Javadoc)
      *
-     * @see javax.el.ValueExpression#isLiteralText()
+     * @see jakarta.el.ValueExpression#isLiteralText()
      */
     @Override
     public boolean isLiteralText() {
@@ -222,7 +222,7 @@ public final class ValueExpressionImpl extends ValueExpression implements
     /*
      * (non-Javadoc)
      *
-     * @see javax.el.ValueExpression#isReadOnly(javax.el.ELContext)
+     * @see jakarta.el.ValueExpression#isReadOnly(jakarta.el.ELContext)
      */
     @Override
     public boolean isReadOnly(ELContext context)
@@ -250,7 +250,7 @@ public final class ValueExpressionImpl extends ValueExpression implements
     /*
      * (non-Javadoc)
      *
-     * @see javax.el.ValueExpression#setValue(javax.el.ELContext,
+     * @see jakarta.el.ValueExpression#setValue(jakarta.el.ELContext,
      *      java.lang.Object)
      */
     @Override

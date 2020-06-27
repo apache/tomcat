@@ -610,10 +610,10 @@ public class AccessLogValve extends AbstractAccessLogValve {
 
         // Log this message
         try {
+            message.write(System.lineSeparator());
             synchronized(this) {
                 if (writer != null) {
                     message.writeTo(writer);
-                    writer.println("");
                     if (!buffered) {
                         writer.flush();
                     }

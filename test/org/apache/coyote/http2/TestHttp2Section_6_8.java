@@ -19,8 +19,6 @@ package org.apache.coyote.http2;
 import org.junit.Assert;
 import org.junit.Test;
 
-import org.apache.catalina.connector.Connector;
-
 /**
  * Unit tests for Section 6.8 of
  * <a href="https://tools.ietf.org/html/rfc7540">RFC 7540</a>.
@@ -32,30 +30,19 @@ public class TestHttp2Section_6_8 extends Http2TestBase {
 
     private static final boolean RELAX_TIMING = Boolean.getBoolean("tomcat.test.relaxTiming");
 
-    private static final long PNG_ACK_DELAY_MS = 2000;
+    private static final long PING_ACK_DELAY_MS = 2000;
     // On slow systems (Gump) may need to be higher
     private static final long TIMING_MARGIN_MS = RELAX_TIMING ? 1000 : 200;
 
     @Test
     public void testGoawayIgnoreNewStreams() throws Exception {
-        setPingAckDelayMillis(PNG_ACK_DELAY_MS);
+        setPingAckDelayMillis(PING_ACK_DELAY_MS);
 
-        // HTTP2 upgrade - need longer timeouts for this test
-        Connector connector = getTomcatInstance().getConnector();
-        Http2Protocol http2Protocol = new Http2Protocol();
-        // Short timeouts for now. May need to increase these for CI systems.
-        http2Protocol.setReadTimeout(5000);
-        http2Protocol.setKeepAliveTimeout(10000);
-        http2Protocol.setWriteTimeout(5000);
+        http2Connect();
+
         http2Protocol.setMaxConcurrentStreams(200);
-        connector.addUpgradeProtocol(http2Protocol);
-        configureAndStartWebApplication();
-        openClientConnection();
-        doHttpUpgrade();
-        sendClientPreface();
-        validateHttp2InitialResponse();
 
-        Thread.sleep(PNG_ACK_DELAY_MS + TIMING_MARGIN_MS);
+        Thread.sleep(PING_ACK_DELAY_MS + TIMING_MARGIN_MS);
 
         getTomcatInstance().getConnector().pause();
 
@@ -67,7 +54,7 @@ public class TestHttp2Section_6_8 extends Http2TestBase {
         // Should be processed
         sendSimpleGetRequest(3);
 
-        Thread.sleep(PNG_ACK_DELAY_MS + TIMING_MARGIN_MS);
+        Thread.sleep(PING_ACK_DELAY_MS + TIMING_MARGIN_MS);
 
         // Should be ignored
         sendSimpleGetRequest(5);

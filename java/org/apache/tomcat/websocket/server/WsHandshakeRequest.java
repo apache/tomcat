@@ -27,8 +27,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.websocket.server.HandshakeRequest;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.websocket.server.HandshakeRequest;
 
 import org.apache.tomcat.util.collections.CaseInsensitiveKeyMap;
 import org.apache.tomcat.util.res.StringManager;
@@ -69,9 +69,7 @@ public class WsHandshakeRequest implements HandshakeRequest {
                             Arrays.asList(entry.getValue())));
         }
         for (Entry<String,String> entry : pathParams.entrySet()) {
-            newParameters.put(entry.getKey(),
-                    Collections.unmodifiableList(
-                            Collections.singletonList(entry.getValue())));
+            newParameters.put(entry.getKey(), Collections.singletonList(entry.getValue()));
         }
         parameterMap = Collections.unmodifiableMap(newParameters);
 

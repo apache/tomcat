@@ -137,7 +137,9 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
     private static final String CLASS_FILE_SUFFIX = ".class";
 
     static {
-        ClassLoader.registerAsParallelCapable();
+        if (!JreCompat.isGraalAvailable()) {
+            ClassLoader.registerAsParallelCapable();
+        }
         JVM_THREAD_GROUP_NAMES.add(JVM_THREAD_GROUP_SYSTEM);
         JVM_THREAD_GROUP_NAMES.add("RMI Runtime");
     }
@@ -192,8 +194,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
     /**
      * The string manager for this package.
      */
-    protected static final StringManager sm =
-        StringManager.getManager(Constants.Package);
+    protected static final StringManager sm = StringManager.getManager(WebappClassLoaderBase.class);
 
 
     // ----------------------------------------------------------- Constructors
@@ -325,7 +326,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
 
     /**
      * The bootstrap class loader used to load the JavaSE classes. In some
-     * implementations this class loader is always <code>null</null> and in
+     * implementations this class loader is always <code>null</code> and in
      * those cases {@link ClassLoader#getParent()} will be called recursively on
      * the system class loader and the last non-null result used.
      */
@@ -1215,7 +1216,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
     @Override
     public Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
 
-        synchronized (getClassLoadingLock(name)) {
+        synchronized (JreCompat.isGraalAvailable() ? this : getClassLoadingLock(name)) {
             if (log.isDebugEnabled())
                 log.debug("loadClass(" + name + ", " + resolve + ")");
             Class<?> clazz = null;
@@ -1234,7 +1235,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
             }
 
             // (0.1) Check our previously loaded class cache
-            clazz = findLoadedClass(name);
+            clazz = JreCompat.isGraalAvailable() ? null : findLoadedClass(name);
             if (clazz != null) {
                 if (log.isDebugEnabled())
                     log.debug("  Returning class from cache");
@@ -1444,7 +1445,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
         ArrayList<URL> result = new ArrayList<>();
         result.addAll(localRepositories);
         result.addAll(Arrays.asList(super.getURLs()));
-        return result.toArray(new URL[result.size()]);
+        return result.toArray(new URL[0]);
     }
 
 
@@ -1612,19 +1613,21 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
             }
         }
 
-        // De-register any remaining JDBC drivers
-        clearReferencesJdbc();
+        if (!JreCompat.isGraalAvailable()) {
+            // De-register any remaining JDBC drivers
+            clearReferencesJdbc();
+        }
 
         // Stop any threads the web application started
         clearReferencesThreads();
 
         // Clear any references retained in the serialization caches
-        if (clearReferencesObjectStreamClassCaches) {
+        if (clearReferencesObjectStreamClassCaches && !JreCompat.isGraalAvailable()) {
             clearReferencesObjectStreamClassCaches();
         }
 
         // Check for leaks triggered by ThreadLocals loaded by this class loader
-        if (clearReferencesThreadLocals) {
+        if (clearReferencesThreadLocals && !JreCompat.isGraalAvailable()) {
             checkThreadLocalsForLeaks();
         }
 
@@ -1709,7 +1712,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
     @SuppressWarnings("deprecation") // thread.stop()
     private void clearReferencesThreads() {
         Thread[] threads = getThreads();
-        List<Thread> executorThreadsToStop = new ArrayList<>();
+        List<Thread> threadsToStop = new ArrayList<>();
 
         // Iterate over the set of threads
         for (Thread thread : threads) {
@@ -1805,29 +1808,29 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
                                 thread.getName(), getContextName()), e);
                     }
 
-                    if (usingExecutor) {
-                        // Executor may take a short time to stop all the
-                        // threads. Make a note of threads that should be
-                        // stopped and check them at the end of the method.
-                        executorThreadsToStop.add(thread);
-                    } else {
-                        // This method is deprecated and for good reason. This
-                        // is very risky code but is the only option at this
-                        // point. A *very* good reason for apps to do this
-                        // clean-up themselves.
-                        thread.stop();
+                    // Stopping an executor automatically interrupts the
+                    // associated threads. For non-executor threads, interrupt
+                    // them here.
+                    if (!usingExecutor && !thread.isInterrupted()) {
+                        thread.interrupt();
                     }
+
+                    // Threads are expected to take a short time to stop after
+                    // being interrupted. Make a note of all threads that are
+                    // expected to stop to enable them to be checked at the end
+                    // of this method.
+                    threadsToStop.add(thread);
                 }
             }
         }
 
-        // If thread stopping is enabled, executor threads should have been
-        // stopped above when the executor was shut down but that depends on the
-        // thread correctly handling the interrupt. Give all the executor
-        // threads a few seconds shutdown and if they are still running
-        // Give threads up to 2 seconds to shutdown
+        // If thread stopping is enabled, threads should have been stopped above
+        // when the executor was shut down or the thread was interrupted but
+        // that depends on the thread correctly handling the interrupt. Check
+        // each thread and if any are still running give all threads up to a
+        // total of 2 seconds to shutdown.
         int count = 0;
-        for (Thread t : executorThreadsToStop) {
+        for (Thread t : threadsToStop) {
             while (t.isAlive() && count < 100) {
                 try {
                     Thread.sleep(20);
@@ -1950,20 +1953,20 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
             Method expungeStaleEntriesMethod = tlmClass.getDeclaredMethod("expungeStaleEntries");
             expungeStaleEntriesMethod.setAccessible(true);
 
-            for (int i = 0; i < threads.length; i++) {
+            for (Thread thread : threads) {
                 Object threadLocalMap;
-                if (threads[i] != null) {
+                if (thread != null) {
 
                     // Clear the first map
-                    threadLocalMap = threadLocalsField.get(threads[i]);
-                    if (null != threadLocalMap){
+                    threadLocalMap = threadLocalsField.get(thread);
+                    if (null != threadLocalMap) {
                         expungeStaleEntriesMethod.invoke(threadLocalMap);
                         checkThreadLocalMapForLeaks(threadLocalMap, tableField);
                     }
 
                     // Clear the second map
-                    threadLocalMap =inheritableThreadLocalsField.get(threads[i]);
-                    if (null != threadLocalMap){
+                    threadLocalMap = inheritableThreadLocalsField.get(thread);
+                    if (null != threadLocalMap) {
                         expungeStaleEntriesMethod.invoke(threadLocalMap);
                         checkThreadLocalMapForLeaks(threadLocalMap, tableField);
                     }
@@ -1996,8 +1999,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
         if (map != null) {
             Object[] table = (Object[]) internalTableField.get(map);
             if (table != null) {
-                for (int j =0; j < table.length; j++) {
-                    Object obj = table[j];
+                for (Object obj : table) {
                     if (obj != null) {
                         boolean keyLoadedByWebapp = false;
                         boolean valueLoadedByWebapp = false;
@@ -2038,7 +2040,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
                                             "webappClassLoader.checkThreadLocalsForLeaks.badValue",
                                             args[3]), e);
                                     args[4] = sm.getString(
-                                    "webappClassLoader.checkThreadLocalsForLeaks.unknown");
+                                            "webappClassLoader.checkThreadLocalsForLeaks.unknown");
                                 }
                             }
                             if (valueLoadedByWebapp) {
@@ -2323,7 +2325,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
         if (clazz != null)
             return clazz;
 
-        synchronized (getClassLoadingLock(name)) {
+        synchronized (JreCompat.isGraalAvailable() ? this : getClassLoadingLock(name)) {
             clazz = entry.loadedClass;
             if (clazz != null)
                 return clazz;
@@ -2530,7 +2532,36 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
             return false;
 
         char ch;
-        if (name.startsWith("javax")) {
+        if (name.startsWith("jakarta")) {
+            /* 7 == length("jakarta") */
+            if (name.length() == 7) {
+                return false;
+            }
+            ch = name.charAt(7);
+            if (isClassName && ch == '.') {
+                /* 8 == length("jakarta.") */
+                if (name.startsWith("servlet.jsp.jstl.", 8)) {
+                    return false;
+                }
+                if (name.startsWith("el.", 8) ||
+                    name.startsWith("servlet.", 8) ||
+                    name.startsWith("websocket.", 8) ||
+                    name.startsWith("security.auth.message.", 8)) {
+                    return true;
+                }
+            } else if (!isClassName && ch == '/') {
+                /* 8 == length("jakarta/") */
+                if (name.startsWith("servlet/jsp/jstl/", 8)) {
+                    return false;
+                }
+                if (name.startsWith("el/", 8) ||
+                    name.startsWith("servlet/", 8) ||
+                    name.startsWith("websocket/", 8) ||
+                    name.startsWith("security/auth/message/", 8)) {
+                    return true;
+                }
+            }
+        } else if (name.startsWith("javax")) {
             /* 5 == length("javax") */
             if (name.length() == 5) {
                 return false;
@@ -2538,24 +2569,12 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
             ch = name.charAt(5);
             if (isClassName && ch == '.') {
                 /* 6 == length("javax.") */
-                if (name.startsWith("servlet.jsp.jstl.", 6)) {
-                    return false;
-                }
-                if (name.startsWith("el.", 6) ||
-                    name.startsWith("servlet.", 6) ||
-                    name.startsWith("websocket.", 6) ||
-                    name.startsWith("security.auth.message.", 6)) {
+                if (name.startsWith("websocket.", 6)) {
                     return true;
                 }
             } else if (!isClassName && ch == '/') {
                 /* 6 == length("javax/") */
-                if (name.startsWith("servlet/jsp/jstl/", 6)) {
-                    return false;
-                }
-                if (name.startsWith("el/", 6) ||
-                    name.startsWith("servlet/", 6) ||
-                    name.startsWith("websocket/", 6) ||
-                    name.startsWith("security/auth/message/", 6)) {
+                if (name.startsWith("websocket/", 6)) {
                     return true;
                 }
             }

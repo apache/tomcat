@@ -23,8 +23,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicReference;
 
-import javax.websocket.SendHandler;
-import javax.websocket.SendResult;
+import jakarta.websocket.SendHandler;
+import jakarta.websocket.SendResult;
 
 import org.apache.tomcat.util.res.StringManager;
 

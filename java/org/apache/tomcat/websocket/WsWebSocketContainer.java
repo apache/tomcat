@@ -54,16 +54,17 @@ import javax.net.ssl.SSLEngine;
 import javax.net.ssl.SSLException;
 import javax.net.ssl.SSLParameters;
 import javax.net.ssl.TrustManagerFactory;
-import javax.websocket.ClientEndpoint;
-import javax.websocket.ClientEndpointConfig;
-import javax.websocket.CloseReason;
-import javax.websocket.CloseReason.CloseCodes;
-import javax.websocket.DeploymentException;
-import javax.websocket.Endpoint;
-import javax.websocket.Extension;
-import javax.websocket.HandshakeResponse;
-import javax.websocket.Session;
-import javax.websocket.WebSocketContainer;
+
+import jakarta.websocket.ClientEndpoint;
+import jakarta.websocket.ClientEndpointConfig;
+import jakarta.websocket.CloseReason;
+import jakarta.websocket.CloseReason.CloseCodes;
+import jakarta.websocket.DeploymentException;
+import jakarta.websocket.Endpoint;
+import jakarta.websocket.Extension;
+import jakarta.websocket.HandshakeResponse;
+import jakarta.websocket.Session;
+import jakarta.websocket.WebSocketContainer;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -72,6 +73,7 @@ import org.apache.tomcat.util.buf.StringUtils;
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.apache.tomcat.util.collections.CaseInsensitiveKeyMap;
 import org.apache.tomcat.util.res.StringManager;
+import org.apache.tomcat.util.security.KeyStoreUtil;
 import org.apache.tomcat.websocket.pojo.PojoEndpointClient;
 
 public class WsWebSocketContainer implements WebSocketContainer, BackgroundProcess {
@@ -264,7 +266,7 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
         }
 
         // Create the initial HTTP request to open the WebSocket connection
-        Map<String, List<String>> reqHeaders = createRequestHeaders(host, port,
+        Map<String, List<String>> reqHeaders = createRequestHeaders(host, port, secure,
                 clientEndpointConfiguration);
         clientEndpointConfiguration.getConfigurator().beforeRequest(reqHeaders);
         if (Constants.DEFAULT_ORIGIN_HEADER_VALUE != null
@@ -430,9 +432,7 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
 
                     return connectToServerRecursive(endpoint, clientEndpointConfiguration, path, redirectSet);
 
-                }
-
-                else {
+                } else {
                     throw new DeploymentException(sm.getString("wsWebSocketContainer.invalidStatus",
                             Integer.toString(httpResponse.status)));
                 }
@@ -483,8 +483,7 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
             success = true;
         } catch (ExecutionException | InterruptedException | SSLException |
                 EOFException | TimeoutException | URISyntaxException | AuthenticationException e) {
-            throw new DeploymentException(
-                    sm.getString("wsWebSocketContainer.httpRequestFailed"), e);
+            throw new DeploymentException(sm.getString("wsWebSocketContainer.httpRequestFailed", path), e);
         } finally {
             if (!success) {
                 channel.close();
@@ -630,7 +629,7 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
     }
 
     private static Map<String, List<String>> createRequestHeaders(String host, int port,
-            ClientEndpointConfig clientEndpointConfiguration) {
+            boolean secure, ClientEndpointConfig clientEndpointConfiguration) {
 
         Map<String, List<String>> headers = new HashMap<>();
         List<Extension> extensions = clientEndpointConfiguration.getExtensions();
@@ -645,7 +644,8 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
 
         // Host header
         List<String> hostValues = new ArrayList<>(1);
-        if (port == -1) {
+        if (port == 80 && !secure || port == 443 && secure) {
+            // Default ports. Do not include port in host header
             hostValues.add(host);
         } else {
             hostValues.add(host + ':' + port);
@@ -912,7 +912,7 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
                     File keyStoreFile = new File(sslTrustStoreValue);
                     KeyStore ks = KeyStore.getInstance("JKS");
                     try (InputStream is = new FileInputStream(keyStoreFile)) {
-                        ks.load(is, sslTrustStorePwdValue.toCharArray());
+                        KeyStoreUtil.load(ks, is, sslTrustStorePwdValue.toCharArray());
                     }
 
                     TrustManagerFactory tmf = TrustManagerFactory.getInstance(

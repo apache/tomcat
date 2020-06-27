@@ -90,6 +90,26 @@
         the default value of <code>false</code> will be used.</p>
       </attribute>
 
+      <attribute name="sessionActivityCheck" required="false">
+        <p>If this is <code>true</code>, Tomcat will track the number of active
+        requests for each session. When determining if a session is valid, any
+        session with at least one active request will always be considered valid.</p>
+        <p>If <code>org.apache.catalina.STRICT_SERVLET_COMPLIANCE</code> is set to
+        <code>true</code>, the default of this setting will be <code>true</code>,
+        else the default value will be <code>false</code>.</p>
+      </attribute>
+
+      <attribute name="sessionLastAccessAtStart" required="false">
+        <p>If this is <code>true</code>, the last accessed time for sessions will
+        be calculated from the beginning of the previous request. If
+        <code>false</code>, the last accessed time for sessions will be calculated
+        from the end of the previous request. This also affects how the idle time
+        is calculated.</p>
+        <p>If <code>org.apache.catalina.STRICT_SERVLET_COMPLIANCE</code> is set to
+        <code>true</code>, the default of this setting will be <code>true</code>,
+        else the default value will be <code>false</code>.</p>
+      </attribute>
+
     </attributes>
 
   </subsection>
@@ -116,10 +136,27 @@
         <p>Absolute or relative (to the work directory for this Context)
         pathname of the file in which session state will be preserved
         across application restarts, if possible.  The default is
-        "SESSIONS.ser".<br />See
+        null.<br />See
         <a href="#Persistence_Across_Restarts">Persistence Across Restarts</a>
         for more information. This persistence may be
-        disabled by setting this attribute to an empty string.</p>
+        enabled by setting this attribute to a non empty string.</p>
+      </attribute>
+
+      <attribute name="persistAuthentication" required="false">
+        <p>Should authentication information be included when session state is
+        preserved across application restarts? If <code>true</code>, the session's
+        authentication is preserved so that the session remains authenticated
+        after the application has been restarted. If not specified, the default
+        value of <code>false</code> will be used.<br />See
+        <a href="#Persistence_Across_Restarts">Persistence Across Restarts</a>
+        for more information.</p>
+
+        <p>Please note that the session's <code>Principal</code> class as well
+        as its descendant classes are all subject to the
+        <strong>sessionAttributeValueClassNameFilter</strong>. If such a filter
+        is specified or a <code>SecurityManager</code> is enabled, the names of
+        the <code>Principal</code> class and descendant classes must match that
+        filter pattern in order to be restored.</p>
       </attribute>
 
       <attribute name="processExpiresFrequency" required="false">
@@ -178,7 +215,7 @@
         must fully match the pattern. If not specified, the default value of
         <code>null</code> will be used unless a <code>SecurityManager</code> is
         enabled in which case the default will be
-        <code>java\\.lang\\.(?:Boolean|Integer|Long|Number|String)</code>.</p>
+        <code>java\\.lang\\.(?:Boolean|Integer|Long|Number|String)|org\\.apache\\.catalina\\.realm\\.GenericPrincipal\\$SerializablePrincipal|\\[Ljava.lang.String;</code>.</p>
       </attribute>
 
       <attribute name="warnOnSessionAttributeFilterFailure" required="false">
@@ -249,6 +286,21 @@
         By default, this value is set to <code>-1</code>.</p>
       </attribute>
 
+      <attribute name="persistAuthentication" required="false">
+        <p>Should authentication information be included when sessions are
+        swapped out to persistent storage? If <code>true</code>, the session's
+        authentication is preserved so that the session remains authenticated
+        after being reloaded (swapped in) from persistent storage. If not
+        specified, the default value of <code>false</code> will be used.</p>
+
+        <p>Please note that the session's <code>Principal</code> class as well
+        as its descendant classes are all subject to the
+        <strong>sessionAttributeValueClassNameFilter</strong>. If such a filter
+        is specified or a <code>SecurityManager</code> is enabled, the names of
+        the <code>Principal</code> class and descendant classes must match that
+        filter pattern in order to be restored.</p>
+      </attribute>
+
       <attribute name="processExpiresFrequency" required="false">
         <p>It is the same as described above for the
         <code>org.apache.catalina.session.StandardManager</code> class.
@@ -301,7 +353,7 @@
         must fully match the pattern. If not specified, the default value of
         <code>null</code> will be used unless a <code>SecurityManager</code> is
         enabled in which case the default will be
-        <code>java\\.lang\\.(?:Boolean|Integer|Long|Number|String)</code>.</p>
+        <code>java\\.lang\\.(?:Boolean|Integer|Long|Number|String)|org\\.apache\\.catalina\\.realm\\.GenericPrincipal\\$SerializablePrincipal|\\[Ljava.lang.String;</code>.</p>
       </attribute>
 
       <attribute name="warnOnSessionAttributeFilterFailure" required="false">
@@ -546,6 +598,15 @@
     including the <code>&lt;distributable&gt;</code> element in your web
     application deployment descriptor (<code>/WEB-INF/web.xml</code>).</p>
 
+    <p>Note that, if <strong>persistAuthentication</strong> is also set to
+    <code>true</code>, the <code>Principal</code> class present in the session
+    MUST also implement the <code>java.io.Serializable</code> interface in order
+    to make authentication persistence work properly. The actual type of that
+    <code>Principal</code> class is determined by the <a href="realm.html">
+    Realm</a> implementation used with the application. Tomcat's standard
+    <code>Principal</code> class instantiated by most of the Realms (except
+    <code>JAASRealm</code>) implements <code>java.io.Serializable</code>.</p>
+
     <p>The persistence across restarts provided by the
     <strong>StandardManager</strong> is a simpler implementation than that
     provided by the <strong>PersistentManager</strong>. If robust, production
@@ -555,15 +616,16 @@
 
   </subsection>
 
-  <subsection name="Disable Session Persistence">
+  <subsection name="Enable Session Persistence">
 
     <p>As documented above, every web application by default has
-    standard manager implementation configured, and it performs session
-    persistence across restarts. To disable this persistence feature, create
+    standard manager implementation configured, which can perform session
+    persistence across restarts. To enable this persistence feature, create
     a <a href="context.html">Context</a> configuration file for your web
-    application and add the following element there:</p>
+    application and add the following element there (in this example,
+    it will save sessions to files named <code>SESSIONS.ser</code>):</p>
 
-    <source><![CDATA[<Manager pathname="" />]]></source>
+    <source><![CDATA[<Manager pathname="SESSIONS.ser" />]]></source>
   </subsection>
 
 </section>

@@ -21,7 +21,9 @@ import java.io.PrintWriter;
 import java.util.Set;
 
 import javax.management.Attribute;
+import javax.management.InstanceNotFoundException;
 import javax.management.MBeanException;
+import javax.management.MBeanInfo;
 import javax.management.MBeanOperationInfo;
 import javax.management.MBeanParameterInfo;
 import javax.management.MBeanServer;
@@ -29,12 +31,14 @@ import javax.management.ObjectName;
 import javax.management.OperationsException;
 import javax.management.ReflectionException;
 import javax.management.openmbean.CompositeData;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.apache.catalina.mbeans.MBeanDumper;
+import org.apache.catalina.tribes.util.StringManager;
 import org.apache.tomcat.util.modeler.Registry;
 
 /**
@@ -50,6 +54,8 @@ public class JMXProxyServlet extends HttpServlet {
     // Constant for "no parameters" when invoking a JMX operation
     // without any parameters.
     private static final String[] NO_PARAMETERS = new String[0];
+
+    private static final StringManager sm = StringManager.getManager(JMXProxyServlet.class);
 
     // ----------------------------------------------------- Instance Variables
     /**
@@ -257,10 +263,27 @@ public class JMXProxyServlet extends HttpServlet {
      *            call the requested operation.
      * @return The value returned by the requested operation.
      */
+    @SuppressWarnings("null") // parameters can't be null if signature.length > 0
     private Object invokeOperationInternal(String onameStr, String operation, String[] parameters)
             throws OperationsException, MBeanException, ReflectionException {
         ObjectName oname = new ObjectName(onameStr);
-        MBeanOperationInfo methodInfo = registry.getMethodInfo(oname, operation);
+        int paramCount = null == parameters ? 0 : parameters.length;
+        MBeanOperationInfo methodInfo = registry.getMethodInfo(oname, operation, paramCount);
+        if(null == methodInfo) {
+            // getMethodInfo returns null for both "object not found" and "operation not found"
+            MBeanInfo info = null;
+            try {
+                info = registry.getMBeanServer().getMBeanInfo(oname);
+            } catch (InstanceNotFoundException infe) {
+                throw infe;
+            } catch (Exception e) {
+                throw new IllegalArgumentException(sm.getString("jmxProxyServlet.noBeanFound", onameStr), e);
+            }
+            throw new IllegalArgumentException(
+                    sm.getString("jmxProxyServlet.noOperationOnBean",
+                            operation, Integer.valueOf(paramCount), onameStr, info.getClassName()));
+        }
+
         MBeanParameterInfo[] signature = methodInfo.getSignature();
         String[] signatureTypes = new String[signature.length];
         Object[] values = new Object[signature.length];

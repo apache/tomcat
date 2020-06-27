@@ -31,7 +31,7 @@ import java.util.Set;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
 
-import javax.servlet.ServletContext;
+import jakarta.servlet.ServletContext;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -171,6 +171,10 @@ public class StandardJarScanner implements JarScanner {
             log.trace(sm.getString("jarScan.webinflibStart"));
         }
 
+        if (jarScanFilter.isSkipAll()) {
+            return;
+        }
+
         Set<URL> processedURLs = new HashSet<>();
 
         // Scan WEB-INF/lib
@@ -282,6 +286,11 @@ public class StandardJarScanner implements JarScanner {
 
     protected void processURLs(JarScanType scanType, JarScannerCallback callback,
             Set<URL> processedURLs, boolean isWebapp, Deque<URL> classPathUrlsToProcess) {
+
+        if (jarScanFilter.isSkipAll()) {
+            return;
+        }
+
         while (!classPathUrlsToProcess.isEmpty()) {
             URL url = classPathUrlsToProcess.pop();
 

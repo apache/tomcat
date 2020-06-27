@@ -38,8 +38,7 @@ import org.apache.tomcat.util.net.SocketProperties;
  * Store the Connector attributes. Connector has really special design. A
  * Connector is only a startup Wrapper for a ProtocolHandler. This meant that
  * ProtocolHandler get all there attributes from the Connector attribute map.
- * Strange is that some attributes change there name and the attribute
- * sslProtocol need a special handling
+ * Strange is that some attributes change their name.
  */
 public class ConnectorStoreAppender extends StoreAppender {
 
@@ -47,13 +46,7 @@ public class ConnectorStoreAppender extends StoreAppender {
     protected static final Set<String> internalExecutorAttributes = new HashSet<>();
     static {
         replacements.put("timeout", "connectionUploadTimeout");
-        replacements.put("clientauth", "clientAuth");
-        replacements.put("keystore", "keystoreFile");
         replacements.put("randomfile", "randomFile");
-        replacements.put("keypass", "keystorePass");
-        replacements.put("keytype", "keystoreType");
-        replacements.put("protocol", "sslProtocol");
-        replacements.put("protocols", "sslProtocols");
 
         internalExecutorAttributes.add("maxThreads");
         internalExecutorAttributes.add("minSpareThreads");
@@ -66,7 +59,7 @@ public class ConnectorStoreAppender extends StoreAppender {
             throws Exception {
 
         // Render a className attribute if requested
-        if (include && desc != null && !desc.isStandard()) {
+        if (include && !desc.isStandard()) {
             writer.print(" className=\"");
             writer.print(bean.getClass().getName());
             writer.print("\"");

@@ -21,8 +21,8 @@ import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.servlet.ServletSecurityElement;
-import javax.servlet.annotation.ServletSecurity;
+import jakarta.servlet.ServletSecurityElement;
+import jakarta.servlet.annotation.ServletSecurity;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -625,7 +625,7 @@ public class TestRealmBase {
         // Set up an authenticated user
         // Configure the users in the Realm
         if (userRoles != null) {
-            GenericPrincipal gp = new GenericPrincipal(USER1, PWD, userRoles);
+            GenericPrincipal gp = new GenericPrincipal(USER1, userRoles);
             request.setUserPrincipal(gp);
         }
 
@@ -639,7 +639,7 @@ public class TestRealmBase {
 
     /*
      * This test case covers the special case in section 13.4.1 of the Servlet
-     * 3.1 specification for {@link javax.servlet.annotation.HttpConstraint}.
+     * 3.1 specification for {@link jakarta.servlet.annotation.HttpConstraint}.
      */
     @Test
     public void testHttpConstraint() throws IOException {
@@ -676,14 +676,14 @@ public class TestRealmBase {
         // Create the principals
         List<String> userRoles1 = new ArrayList<>();
         userRoles1.add(ROLE1);
-        GenericPrincipal gp1 = new GenericPrincipal(USER1, PWD, userRoles1);
+        GenericPrincipal gp1 = new GenericPrincipal(USER1, userRoles1);
 
         List<String> userRoles2 = new ArrayList<>();
         userRoles2.add(ROLE2);
-        GenericPrincipal gp2 = new GenericPrincipal(USER2, PWD, userRoles2);
+        GenericPrincipal gp2 = new GenericPrincipal(USER2, userRoles2);
 
         List<String> userRoles99 = new ArrayList<>();
-        GenericPrincipal gp99 = new GenericPrincipal(USER99, PWD, userRoles99);
+        GenericPrincipal gp99 = new GenericPrincipal(USER99, userRoles99);
 
         // Add the constraints to the context
         for (SecurityConstraint constraint : constraints) {

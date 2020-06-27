@@ -56,7 +56,7 @@ public class ClusterSessionListener extends ClusterListener {
         if (myobj instanceof SessionMessage) {
             SessionMessage msg = (SessionMessage) myobj;
             String ctxname = msg.getContextName();
-            //check if the message is a EVT_GET_ALL_SESSIONS,
+            //check if the message is an EVT_GET_ALL_SESSIONS,
             //if so, wait until we are fully started up
             Map<String,ClusterManager> managers = cluster.getManagers() ;
             if (ctxname == null) {
@@ -88,7 +88,6 @@ public class ClusterSessionListener extends ClusterListener {
                         cluster.send(replymsg, msg.getAddress());
                     }
                 }
-
             }
         }
     }

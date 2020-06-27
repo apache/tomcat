@@ -47,26 +47,45 @@
     to monitor it locally, using the same user that Tomcat runs with.</p>
 
     <p>The Oracle website includes the list of options and how to configure
-    JMX Remote on Java 6:
-        <a href="http://docs.oracle.com/javase/6/docs/technotes/guides/management/agent.html">
+    JMX Remote on Java 8:
+        <a href="https://docs.oracle.com/javase/8/docs/technotes/guides/management/agent.html">
         http://docs.oracle.com/javase/6/docs/technotes/guides/management/agent.html</a>.
     </p>
-    <p>The following is a quick configuration guide for Java 6:</p>
+    <p>The following is a quick configuration guide for Java 8:</p>
     <p>Add the following parameters to <code>setenv.bat</code> script of your
     Tomcat (see <a href="RUNNING.txt">RUNNING.txt</a> for details).<br/>
     <em>Note:</em> This syntax is for Microsoft Windows. The command has
     to be on the same line. It is wrapped to be more readable. If Tomcat is
     running as a Windows service, use its configuration dialog to set
     java options for the service.
-    For un*xes remove <code>"set "</code> from beginning of the line.
+    For Linux, MacOS, etc, remove <code>"set "</code> from beginning of the
+    line.
     </p>
-<source><![CDATA[set CATALINA_OPTS=-Dcom.sun.management.jmxremote
-  -Dcom.sun.management.jmxremote.port=%my.jmx.port%
+<source><![CDATA[set CATALINA_OPTS=-Dcom.sun.management.jmxremote.port=%my.jmx.port%
+  -Dcom.sun.management.jmxremote.rmi.port=%my.rmi.port%
   -Dcom.sun.management.jmxremote.ssl=false
   -Dcom.sun.management.jmxremote.authenticate=false]]></source>
+<p>If you don't set <code>com.sun.management.jmxremote.rmi.port</code> then the
+JSR 160 JMX-Adaptor will select a port at random which will may it difficult to
+configure a firewall to allow access.</p>
 
+<p>If you require TLS:</p>
     <ol>
-    <li>If you require authorization, add and change this:
+    <li>change and add this:
+<source><![CDATA[  -Dcom.sun.management.jmxremote.ssl=true
+  -Dcom.sun.management.jmxremote.registry.ssl=true
+]]></source></li>
+    <li>to configure the protocols and/or cipher suites use:
+<source><![CDATA[  -Dcom.sun.management.jmxremote.ssl.enabled.protocols=%my.jmx.ssl.protocols%
+  -Dcom.sun.management.jmxremote.ssl.enabled.cipher.suites=%my.jmx.cipher.suites%
+]]></source></li>
+    <li>to client certificate authentication use:
+<source><![CDATA[  -Dcom.sun.management.jmxremote.ssl.need.client.auth=%my.jmx.ssl.clientauth%]]></source></li>
+    </ol>
+<p>If you require authorization (it is strongly recommended that TLS is always
+used with authentication):</p>
+    <ol>
+    <li>change and add this:
 <source><![CDATA[  -Dcom.sun.management.jmxremote.authenticate=true
   -Dcom.sun.management.jmxremote.password.file=../conf/jmxremote.password
   -Dcom.sun.management.jmxremote.access.file=../conf/jmxremote.access]]></source>
@@ -81,17 +100,23 @@ controlRole tomcat]]></source>
     <b>Tip</b>: The password file should be read-only and only accessible by the
     operating system user Tomcat is running as.
     </li>
+    <li>Alterantively, you can configure a JAAS login module with:
+<source><![CDATA[  -Dcom.sun.management.jmxremote.login.config=%login.module.name%]]></source></li>
     </ol>
-    <p><strong>Note:</strong> The JSR 160 JMX-Adaptor opens a second data channel
-    on a random port. That is a problem when you have a local firewall installed.
-    To fix it, configure a <code>JmxRemoteLifecycleListener</code>, as described
-    in <a href="config/listeners.html">listeners</a> documentation.
-    </p>
+
+<p>If you need to specify a host name to be used in the RMI stubs sent to the
+client (e.g. because the public host name that must be used to connect is not
+the same as the local host name) then you can set:</p>
+<source><![CDATA[set CATALINA_OPTS=-Djava.rmi.server.hostname]]></source>
+
+<p>If you need to specify a specific interface for the JMX service to bind to
+then you can set:</p>
+<source><![CDATA[set CATALINA_OPTS=-Dcom.sun.management.jmxremote.host]]></source>
 
   </section>
 
   <section name="Manage Tomcat with JMX remote Ant Tasks">
-   <p>To simplify JMX usage with Ant 1.6.x, a set of tasks is provided that may
+   <p>To simplify JMX usage with Ant, a set of tasks is provided that may
    be used with antlib.</p>
    <p><b>antlib</b>: Copy your catalina-ant.jar from $CATALINA_HOME/lib to $ANT_HOME/lib.</p>
    <p>The following example shows the JMX Accessor usage:<br/>

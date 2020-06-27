@@ -20,11 +20,12 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import javax.websocket.ClientEndpointConfig.Builder;
-import javax.websocket.ContainerProvider;
-import javax.websocket.DeploymentException;
-import javax.websocket.WebSocketContainer;
+import jakarta.websocket.ClientEndpointConfig.Builder;
+import jakarta.websocket.ContainerProvider;
+import jakarta.websocket.DeploymentException;
+import jakarta.websocket.WebSocketContainer;
 
+import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -50,7 +51,7 @@ public class TestConnectionLimit extends TomcatBaseTest {
         Tomcat.addServlet(ctx, "default", new DefaultServlet());
         ctx.addServletMappingDecoded("/", "default");
 
-        tomcat.getConnector().setAttribute("maxConnections", "-1");
+        Assert.assertTrue(tomcat.getConnector().setProperty("maxConnections", "-1"));
 
         tomcat.start();
 

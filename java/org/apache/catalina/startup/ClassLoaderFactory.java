@@ -85,35 +85,38 @@ public final class ClassLoaderFactory {
 
         // Add unpacked directories
         if (unpacked != null) {
-            for (int i = 0; i < unpacked.length; i++)  {
-                File file = unpacked[i];
-                if (!file.canRead())
+            for (File file : unpacked) {
+                if (!file.canRead()) {
                     continue;
+                }
                 file = new File(file.getCanonicalPath() + File.separator);
                 URL url = file.toURI().toURL();
-                if (log.isDebugEnabled())
+                if (log.isDebugEnabled()) {
                     log.debug("  Including directory " + url);
+                }
                 set.add(url);
             }
         }
 
         // Add packed directory JAR files
         if (packed != null) {
-            for (int i = 0; i < packed.length; i++) {
-                File directory = packed[i];
-                if (!directory.isDirectory() || !directory.canRead())
+            for (File directory : packed) {
+                if (!directory.isDirectory() || !directory.canRead()) {
                     continue;
+                }
                 String filenames[] = directory.list();
                 if (filenames == null) {
                     continue;
                 }
-                for (int j = 0; j < filenames.length; j++) {
-                    String filename = filenames[j].toLowerCase(Locale.ENGLISH);
-                    if (!filename.endsWith(".jar"))
+                for (String s : filenames) {
+                    String filename = s.toLowerCase(Locale.ENGLISH);
+                    if (!filename.endsWith(".jar")) {
                         continue;
-                    File file = new File(directory, filenames[j]);
-                    if (log.isDebugEnabled())
+                    }
+                    File file = new File(directory, s);
+                    if (log.isDebugEnabled()) {
                         log.debug("  Including jar file " + file.getAbsolutePath());
+                    }
                     URL url = file.toURI().toURL();
                     set.add(url);
                 }
@@ -121,15 +124,16 @@ public final class ClassLoaderFactory {
         }
 
         // Construct the class loader itself
-        final URL[] array = set.toArray(new URL[set.size()]);
+        final URL[] array = set.toArray(new URL[0]);
         return AccessController.doPrivileged(
                 new PrivilegedAction<URLClassLoader>() {
                     @Override
                     public URLClassLoader run() {
-                        if (parent == null)
+                        if (parent == null) {
                             return new URLClassLoader(array);
-                        else
+                        } else {
                             return new URLClassLoader(array, parent);
+                        }
                     }
                 });
     }
@@ -198,18 +202,18 @@ public final class ClassLoaderFactory {
                     if (filenames == null) {
                         continue;
                     }
-                    for (int j = 0; j < filenames.length; j++) {
-                        String filename = filenames[j].toLowerCase(Locale.ENGLISH);
+                    for (String s : filenames) {
+                        String filename = s.toLowerCase(Locale.ENGLISH);
                         if (!filename.endsWith(".jar"))
                             continue;
-                        File file = new File(directory, filenames[j]);
+                        File file = new File(directory, s);
                         file = file.getCanonicalFile();
                         if (!validateFile(file, RepositoryType.JAR)) {
                             continue;
                         }
                         if (log.isDebugEnabled())
                             log.debug("    Including glob jar file "
-                                + file.getAbsolutePath());
+                                    + file.getAbsolutePath());
                         URL url = buildClassLoaderUrl(file);
                         set.add(url);
                     }
@@ -218,7 +222,7 @@ public final class ClassLoaderFactory {
         }
 
         // Construct the class loader itself
-        final URL[] array = set.toArray(new URL[set.size()]);
+        final URL[] array = set.toArray(new URL[0]);
         if (log.isDebugEnabled())
             for (int i = 0; i < array.length; i++) {
                 log.debug("  location " + i + " is " + array[i]);

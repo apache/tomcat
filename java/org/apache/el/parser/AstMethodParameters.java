@@ -33,7 +33,7 @@ public final class AstMethodParameters extends SimpleNode {
         for (int i = 0; i < this.jjtGetNumChildren(); i++) {
             params.add(this.jjtGetChild(i).getValue(ctx));
         }
-        return params.toArray(new Object[params.size()]);
+        return params.toArray(new Object[0]);
     }
 
     @Override

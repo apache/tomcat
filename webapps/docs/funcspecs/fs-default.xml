@@ -138,7 +138,7 @@
 
     <p>For all HTTP request methods, the resource path is determined from
     the path information provided to this request, either as request attribute
-    <code>javax.servlet.include.path_info</code> (for a request dispatcher
+    <code>jakarta.servlet.include.path_info</code> (for a request dispatcher
     access to a static resource) or by calling
     <code>request.getPathInfo()</code> directly.</p>
 

@@ -32,6 +32,7 @@ import org.apache.tomcat.dbcp.pool2.PooledObjectFactory;
  * {@link org.apache.tomcat.dbcp.pool2.ObjectPool}.
  * <p>
  * This class is intended to be thread-safe.
+ * </p>
  *
  * @param <T>
  *            Type of element pooled in this pool.
@@ -185,6 +186,8 @@ public class SoftReferenceObjectPool<T> extends BaseObjectPool<T> {
      *
      * @param obj
      *            instance to return to the pool
+     * @throws IllegalArgumentException
+     *            if obj is not currently part of this pool
      */
     @Override
     public synchronized void returnObject(final T obj) throws Exception {
@@ -328,10 +331,9 @@ public class SoftReferenceObjectPool<T> extends BaseObjectPool<T> {
     @Override
     public synchronized void clear() {
         if (null != factory) {
-            final Iterator<PooledSoftReference<T>> iter = idleReferences.iterator();
-            while (iter.hasNext()) {
+            for (PooledSoftReference<T> idleReference : idleReferences) {
                 try {
-                    final PooledSoftReference<T> ref = iter.next();
+                    final PooledSoftReference<T> ref = idleReference;
                     if (null != ref.getObject()) {
                         factory.destroyObject(ref);
                     }
@@ -388,9 +390,7 @@ public class SoftReferenceObjectPool<T> extends BaseObjectPool<T> {
      * @return PooledSoftReference wrapping a soft reference to obj
      */
     private PooledSoftReference<T> findReference(final T obj) {
-        final Iterator<PooledSoftReference<T>> iterator = allReferences.iterator();
-        while (iterator.hasNext()) {
-            final PooledSoftReference<T> reference = iterator.next();
+        for (PooledSoftReference<T> reference : allReferences) {
             if (reference.getObject() != null && reference.getObject().equals(obj)) {
                 return reference;
             }

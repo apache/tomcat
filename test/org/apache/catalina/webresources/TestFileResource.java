@@ -18,7 +18,7 @@ package org.apache.catalina.webresources;
 
 import java.io.File;
 
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.junit.Assert;
 import org.junit.Test;

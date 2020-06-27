@@ -21,10 +21,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -101,7 +101,7 @@ public class TestChunkedInputFilter extends TomcatBaseTest {
         Context ctx = tomcat.addContext("", null);
 
         // Configure allowed trailer headers
-        tomcat.getConnector().setProperty("allowedTrailerHeaders", "x-trailer1,x-trailer2");
+        Assert.assertTrue(tomcat.getConnector().setProperty("allowedTrailerHeaders", "x-trailer1,x-trailer2"));
 
         EchoHeaderServlet servlet = new EchoHeaderServlet(expectPass);
         Tomcat.addServlet(ctx, "servlet", servlet);
@@ -170,7 +170,7 @@ public class TestChunkedInputFilter extends TomcatBaseTest {
         ctx.addServletMappingDecoded("/", "servlet");
 
         // Limit the size of the trailing header
-        tomcat.getConnector().setProperty("maxTrailerSize", "10");
+        Assert.assertTrue(tomcat.getConnector().setProperty("maxTrailerSize", "10"));
         tomcat.start();
 
         String[] request = new String[]{
@@ -223,8 +223,8 @@ public class TestChunkedInputFilter extends TomcatBaseTest {
         // Setup Tomcat instance
         Tomcat tomcat = getTomcatInstance();
 
-        tomcat.getConnector().setProperty(
-                "maxExtensionSize", Integer.toString(EXT_SIZE_LIMIT));
+        Assert.assertTrue(tomcat.getConnector().setProperty(
+                "maxExtensionSize", Integer.toString(EXT_SIZE_LIMIT)));
 
         // No file system docBase required
         Context ctx = tomcat.addContext("", null);
@@ -392,14 +392,19 @@ public class TestChunkedInputFilter extends TomcatBaseTest {
         request += SimpleHttpClient.CRLF + chunks + "0" + SimpleHttpClient.CRLF
                 + SimpleHttpClient.CRLF;
 
-        TrailerClient client = new TrailerClient(tomcat.getConnector()
-                .getLocalPort());
+        TrailerClient client = new TrailerClient(tomcat.getConnector().getLocalPort());
+        // Need to use the content length here as variations in Connector and
+        // JVM+OS behaviour mean that in some circumstances the client may see
+        // an IOException rather than the response body when the server closes
+        // the connection.
+        client.setUseContentLength(true);
         client.setRequest(new String[] { request });
 
         Exception processException = null;
         client.connect();
         try {
             client.processRequest();
+            client.disconnect();
         } catch (Exception e) {
             // Socket was probably closed before client had a chance to read
             // response

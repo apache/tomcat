@@ -196,37 +196,43 @@ public class NioReplicationTask extends AbstractRxTask {
 
         registerForRead(key,reader);//register to read new data, before we send it off to avoid dead locks
 
-        for ( int i=0; i<msgs.length; i++ ) {
+        for (ChannelMessage msg : msgs) {
             /**
              * Use send ack here if you want to ack the request to the remote
              * server before completing the request
              * This is considered an asynchronous request
              */
-            if (ChannelData.sendAckAsync(msgs[i].getOptions())) sendAck(key,(WritableByteChannel)channel,Constants.ACK_COMMAND,saddr);
+            if (ChannelData.sendAckAsync(msg.getOptions())) {
+                sendAck(key, (WritableByteChannel) channel, Constants.ACK_COMMAND, saddr);
+            }
             try {
-                if ( Logs.MESSAGES.isTraceEnabled() ) {
+                if (Logs.MESSAGES.isTraceEnabled()) {
                     try {
-                        Logs.MESSAGES.trace("NioReplicationThread - Received msg:" + new UniqueId(msgs[i].getUniqueId()) + " at " + new java.sql.Timestamp(System.currentTimeMillis()));
-                    }catch ( Throwable t ) {}
+                        Logs.MESSAGES.trace("NioReplicationThread - Received msg:" + new UniqueId(msg.getUniqueId()) + " at " + new java.sql.Timestamp(System.currentTimeMillis()));
+                    } catch (Throwable t) {
+                    }
                 }
                 //process the message
-                getCallback().messageDataReceived(msgs[i]);
+                getCallback().messageDataReceived(msg);
                 /**
                  * Use send ack here if you want the request to complete on this
                  * server before sending the ack to the remote server
                  * This is considered a synchronized request
                  */
-                if (ChannelData.sendAckSync(msgs[i].getOptions())) sendAck(key,(WritableByteChannel)channel,Constants.ACK_COMMAND,saddr);
-            }catch ( RemoteProcessException e ) {
-                if ( log.isDebugEnabled() ) log.error(sm.getString("nioReplicationTask.process.clusterMsg.failed"),e);
-                if (ChannelData.sendAckSync(msgs[i].getOptions())) sendAck(key,(WritableByteChannel)channel,Constants.FAIL_ACK_COMMAND,saddr);
-            }catch ( Exception e ) {
-                log.error(sm.getString("nioReplicationTask.process.clusterMsg.failed"),e);
-                if (ChannelData.sendAckSync(msgs[i].getOptions())) sendAck(key,(WritableByteChannel)channel,Constants.FAIL_ACK_COMMAND,saddr);
+                if (ChannelData.sendAckSync(msg.getOptions()))
+                    sendAck(key, (WritableByteChannel) channel, Constants.ACK_COMMAND, saddr);
+            } catch (RemoteProcessException e) {
+                if (log.isDebugEnabled()) log.error(sm.getString("nioReplicationTask.process.clusterMsg.failed"), e);
+                if (ChannelData.sendAckSync(msg.getOptions()))
+                    sendAck(key, (WritableByteChannel) channel, Constants.FAIL_ACK_COMMAND, saddr);
+            } catch (Exception e) {
+                log.error(sm.getString("nioReplicationTask.process.clusterMsg.failed"), e);
+                if (ChannelData.sendAckSync(msg.getOptions()))
+                    sendAck(key, (WritableByteChannel) channel, Constants.FAIL_ACK_COMMAND, saddr);
             }
-            if ( getUseBufferPool() ) {
-                BufferPool.getBufferPool().returnBuffer(msgs[i].getMessage());
-                msgs[i].setMessage(null);
+            if (getUseBufferPool()) {
+                BufferPool.getBufferPool().returnBuffer(msg.getMessage());
+                msg.setMessage(null);
             }
         }
 

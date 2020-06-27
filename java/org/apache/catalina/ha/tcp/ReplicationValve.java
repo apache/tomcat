@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
-import javax.servlet.ServletException;
+import jakarta.servlet.ServletException;
 
 import org.apache.catalina.Cluster;
 import org.apache.catalina.Context;
@@ -543,11 +543,11 @@ public class ReplicationValve
     protected void sendInvalidSessions(ClusterManager manager) {
         String[] invalidIds=manager.getInvalidatedSessions();
         if ( invalidIds.length > 0 ) {
-            for ( int i=0;i<invalidIds.length; i++ ) {
+            for (String invalidId : invalidIds) {
                 try {
-                    send(manager,invalidIds[i]);
-                } catch ( Exception x ) {
-                    log.error(sm.getString("ReplicationValve.send.invalid.failure",invalidIds[i]),x);
+                    send(manager, invalidId);
+                } catch (Exception x) {
+                    log.error(sm.getString("ReplicationValve.send.invalid.failure", invalidId), x);
                 }
             }
         }

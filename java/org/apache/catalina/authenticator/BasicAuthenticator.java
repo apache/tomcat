@@ -14,18 +14,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.catalina.authenticator;
-
 
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.security.Principal;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.apache.catalina.connector.Request;
 import org.apache.juli.logging.Log;
@@ -33,8 +30,6 @@ import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.MessageBytes;
 import org.apache.tomcat.util.codec.binary.Base64;
-
-
 
 /**
  * An <b>Authenticator</b> and <b>Valve</b> implementation of HTTP BASIC
@@ -164,24 +159,6 @@ public class BasicAuthenticator extends AuthenticatorBase {
          * as per RFC 2617 section 2, and the Base64 encoded credentials
          * as per RFC 2045 section 6.8.
          *
-         * @param input   The header value to parse in-place
-         * @param charset The character set to use to convert the bytes to a
-         *                string
-         *
-         * @throws IllegalArgumentException If the header does not conform
-         *                                  to RFC 2617
-         * @deprecated Unused. Will be removed in Tomcat 10. Use 3-arg constructor
-         */
-        @Deprecated
-        public BasicCredentials(ByteChunk input, Charset charset) throws IllegalArgumentException {
-            this(input, charset, true);
-        }
-
-        /**
-         * Parse the HTTP Authorization header for BASIC authentication
-         * as per RFC 2617 section 2, and the Base64 encoded credentials
-         * as per RFC 2045 section 6.8.
-         *
          * @param input           The header value to parse in-place
          * @param charset         The character set to use to convert the bytes
          *                        to a string
@@ -232,8 +209,7 @@ public class BasicAuthenticator extends AuthenticatorBase {
                 // step past the auth method name
                 base64blobOffset = initialOffset + METHOD.length();
                 base64blobLength = authorization.getLength() - METHOD.length();
-            }
-            else {
+            } else {
                 // is this possible, or permitted?
                 throw new IllegalArgumentException(
                         "Authorization header method is not \"Basic\"");
@@ -276,8 +252,7 @@ public class BasicAuthenticator extends AuthenticatorBase {
             if (colon < 0) {
                 username = new String(decoded, charset);
                 // password will remain null!
-            }
-            else {
+            } else {
                 username = new String(decoded, 0, colon, charset);
                 password = new String(decoded, colon + 1, decoded.length - colon - 1, charset);
                 // tolerate surplus white space around credentials

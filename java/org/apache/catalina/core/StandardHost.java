@@ -41,6 +41,7 @@ import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleListener;
 import org.apache.catalina.Valve;
 import org.apache.catalina.loader.WebappClassLoaderBase;
+import org.apache.catalina.util.ContextName;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.ExceptionUtils;
@@ -663,8 +664,8 @@ public class StandardHost extends ContainerBase implements Host {
 
         synchronized (aliasesLock) {
             // Skip duplicate aliases
-            for (int i = 0; i < aliases.length; i++) {
-                if (aliases[i].equals(alias))
+            for (String s : aliases) {
+                if (s.equals(alias))
                     return;
             }
             // Add this alias to the list
@@ -687,11 +688,20 @@ public class StandardHost extends ContainerBase implements Host {
     @Override
     public void addChild(Container child) {
 
-        child.addLifecycleListener(new MemoryLeakTrackingListener());
-
         if (!(child instanceof Context))
             throw new IllegalArgumentException
                 (sm.getString("standardHost.notContext"));
+
+        child.addLifecycleListener(new MemoryLeakTrackingListener());
+
+        // Avoid NPE for case where Context is defined in server.xml with only a
+        // docBase
+        Context context = (Context) child;
+        if (context.getPath() == null) {
+            ContextName cn = new ContextName(context.getDocBase(), true);
+            context.setPath(cn.getPath());
+        }
+
         super.addChild(child);
 
     }
@@ -739,7 +749,7 @@ public class StandardHost extends ContainerBase implements Host {
             }
         }
 
-        return result.toArray(new String[result.size()]);
+        return result.toArray(new String[0]);
     }
 
     /**
@@ -834,25 +844,24 @@ public class StandardHost extends ContainerBase implements Host {
 
     // -------------------- JMX  --------------------
     /**
-      * @return the MBean Names of the Valves associated with this Host
-      *
-      * @exception Exception if an MBean cannot be created or registered
-      */
-     public String[] getValveNames() throws Exception {
-         Valve [] valves = this.getPipeline().getValves();
-         String [] mbeanNames = new String[valves.length];
-         for (int i = 0; i < valves.length; i++) {
-             if (valves[i] instanceof JmxEnabled) {
-                 ObjectName oname = ((JmxEnabled) valves[i]).getObjectName();
-                 if (oname != null) {
-                     mbeanNames[i] = oname.toString();
-                 }
-             }
-         }
+     * @return the MBean Names of the Valves associated with this Host
+     *
+     * @exception Exception if an MBean cannot be created or registered
+     */
+    public String[] getValveNames() throws Exception {
+        Valve [] valves = this.getPipeline().getValves();
+        String [] mbeanNames = new String[valves.length];
+        for (int i = 0; i < valves.length; i++) {
+            if (valves[i] instanceof JmxEnabled) {
+                ObjectName oname = ((JmxEnabled) valves[i]).getObjectName();
+                if (oname != null) {
+                    mbeanNames[i] = oname.toString();
+                }
+            }
+        }
 
-         return mbeanNames;
-
-     }
+        return mbeanNames;
+    }
 
     public String[] getAliases() {
         synchronized (aliasesLock) {

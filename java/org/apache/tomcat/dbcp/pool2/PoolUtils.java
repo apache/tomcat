@@ -19,7 +19,6 @@ package org.apache.tomcat.dbcp.pool2;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Timer;
@@ -35,6 +34,13 @@ import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
  * @since 2.0
  */
 public final class PoolUtils {
+
+    private static final String MSG_FACTOR_NEGATIVE = "factor must be positive.";
+    private static final String MSG_MIN_IDLE = "minIdle must be non-negative.";
+    static final String MSG_NULL_KEY = "key must not be null.";
+    private static final String MSG_NULL_KEYED_POOL = "keyedPool must not be null.";
+    static final String MSG_NULL_KEYS = "keys must not be null.";
+    private static final String MSG_NULL_POOL = "pool must not be null.";
 
     /**
      * Timer used to periodically check pools idle object count. Because a
@@ -101,10 +107,10 @@ public final class PoolUtils {
             final int minIdle, final long period)
             throws IllegalArgumentException {
         if (pool == null) {
-            throw new IllegalArgumentException("keyedPool must not be null.");
+            throw new IllegalArgumentException(MSG_NULL_KEYED_POOL);
         }
         if (minIdle < 0) {
-            throw new IllegalArgumentException("minIdle must be non-negative.");
+            throw new IllegalArgumentException(MSG_MIN_IDLE);
         }
         final TimerTask task = new ObjectPoolMinIdleTimerTask<>(pool, minIdle);
         getMinIdleTimer().schedule(task, 0L, period);
@@ -142,13 +148,13 @@ public final class PoolUtils {
             final int minIdle, final long period)
             throws IllegalArgumentException {
         if (keyedPool == null) {
-            throw new IllegalArgumentException("keyedPool must not be null.");
+            throw new IllegalArgumentException(MSG_NULL_KEYED_POOL);
         }
         if (key == null) {
-            throw new IllegalArgumentException("key must not be null.");
+            throw new IllegalArgumentException(MSG_NULL_KEY);
         }
         if (minIdle < 0) {
-            throw new IllegalArgumentException("minIdle must be non-negative.");
+            throw new IllegalArgumentException(MSG_MIN_IDLE);
         }
         final TimerTask task = new KeyedObjectPoolMinIdleTimerTask<>(
                 keyedPool, key, minIdle);
@@ -188,12 +194,10 @@ public final class PoolUtils {
             final int minIdle, final long period)
             throws IllegalArgumentException {
         if (keys == null) {
-            throw new IllegalArgumentException("keys must not be null.");
+            throw new IllegalArgumentException(MSG_NULL_KEYS);
         }
         final Map<K, TimerTask> tasks = new HashMap<>(keys.size());
-        final Iterator<K> iter = keys.iterator();
-        while (iter.hasNext()) {
-            final K key = iter.next();
+        for (K key : keys) {
             final TimerTask task = checkMinIdle(keyedPool, key, minIdle, period);
             tasks.put(key, task);
         }
@@ -213,15 +217,15 @@ public final class PoolUtils {
      *             when {@link ObjectPool#addObject()} fails.
      * @throws IllegalArgumentException
      *             when <code>pool</code> is <code>null</code>.
+     * @deprecated Use {@link ObjectPool#addObjects(int)}.
      */
+    @Deprecated
     public static <T> void prefill(final ObjectPool<T> pool, final int count)
             throws Exception, IllegalArgumentException {
         if (pool == null) {
-            throw new IllegalArgumentException("pool must not be null.");
+            throw new IllegalArgumentException(MSG_NULL_POOL);
         }
-        for (int i = 0; i < count; i++) {
-            pool.addObject();
-        }
+        pool.addObjects(count);
     }
 
     /**
@@ -241,19 +245,16 @@ public final class PoolUtils {
      * @throws IllegalArgumentException
      *             when <code>keyedPool</code> or <code>key</code> is
      *             <code>null</code>.
+     * @deprecated Use {@link KeyedObjectPool#addObjects(Object, int)}.
      */
+    @Deprecated
     public static <K, V> void prefill(final KeyedObjectPool<K, V> keyedPool,
             final K key, final int count) throws Exception,
             IllegalArgumentException {
         if (keyedPool == null) {
-            throw new IllegalArgumentException("keyedPool must not be null.");
+            throw new IllegalArgumentException(MSG_NULL_KEYED_POOL);
         }
-        if (key == null) {
-            throw new IllegalArgumentException("key must not be null.");
-        }
-        for (int i = 0; i < count; i++) {
-            keyedPool.addObject(key);
-        }
+        keyedPool.addObjects(key, count);
     }
 
     /**
@@ -276,17 +277,16 @@ public final class PoolUtils {
      *             when <code>keyedPool</code>, <code>keys</code>, or any value
      *             in <code>keys</code> is <code>null</code>.
      * @see #prefill(KeyedObjectPool, Object, int)
+     * @deprecated Use {@link KeyedObjectPool#addObjects(Collection, int)}.
      */
+    @Deprecated
     public static <K, V> void prefill(final KeyedObjectPool<K, V> keyedPool,
             final Collection<K> keys, final int count) throws Exception,
             IllegalArgumentException {
         if (keys == null) {
-            throw new IllegalArgumentException("keys must not be null.");
+            throw new IllegalArgumentException(MSG_NULL_KEYS);
         }
-        final Iterator<K> iter = keys.iterator();
-        while (iter.hasNext()) {
-            prefill(keyedPool, iter.next(), count);
-        }
+        keyedPool.addObjects(keys, count);
     }
 
     /**
@@ -308,7 +308,7 @@ public final class PoolUtils {
      */
     public static <T> ObjectPool<T> synchronizedPool(final ObjectPool<T> pool) {
         if (pool == null) {
-            throw new IllegalArgumentException("pool must not be null.");
+            throw new IllegalArgumentException(MSG_NULL_POOL);
         }
         /*
          * assert !(pool instanceof GenericObjectPool) :
@@ -436,10 +436,10 @@ public final class PoolUtils {
     public static <T> ObjectPool<T> erodingPool(final ObjectPool<T> pool,
             final float factor) {
         if (pool == null) {
-            throw new IllegalArgumentException("pool must not be null.");
+            throw new IllegalArgumentException(MSG_NULL_POOL);
         }
         if (factor <= 0f) {
-            throw new IllegalArgumentException("factor must be positive.");
+            throw new IllegalArgumentException(MSG_FACTOR_NEGATIVE);
         }
         return new ErodingObjectPool<>(pool, factor);
     }
@@ -538,10 +538,10 @@ public final class PoolUtils {
             final KeyedObjectPool<K, V> keyedPool, final float factor,
             final boolean perKey) {
         if (keyedPool == null) {
-            throw new IllegalArgumentException("keyedPool must not be null.");
+            throw new IllegalArgumentException(MSG_NULL_KEYED_POOL);
         }
         if (factor <= 0f) {
-            throw new IllegalArgumentException("factor must be positive.");
+            throw new IllegalArgumentException(MSG_FACTOR_NEGATIVE);
         }
         if (perKey) {
             return new ErodingPerKeyKeyedObjectPool<>(keyedPool, factor);
@@ -587,7 +587,7 @@ public final class PoolUtils {
         ObjectPoolMinIdleTimerTask(final ObjectPool<T> pool, final int minIdle)
                 throws IllegalArgumentException {
             if (pool == null) {
-                throw new IllegalArgumentException("pool must not be null.");
+                throw new IllegalArgumentException(MSG_NULL_POOL);
             }
             this.pool = pool;
             this.minIdle = minIdle;
@@ -665,7 +665,7 @@ public final class PoolUtils {
                 final K key, final int minIdle) throws IllegalArgumentException {
             if (keyedPool == null) {
                 throw new IllegalArgumentException(
-                        "keyedPool must not be null.");
+                        MSG_NULL_KEYED_POOL);
             }
             this.keyedPool = keyedPool;
             this.key = key;
@@ -747,7 +747,7 @@ public final class PoolUtils {
         SynchronizedObjectPool(final ObjectPool<T> pool)
                 throws IllegalArgumentException {
             if (pool == null) {
-                throw new IllegalArgumentException("pool must not be null.");
+                throw new IllegalArgumentException(MSG_NULL_POOL);
             }
             this.pool = pool;
         }
@@ -924,7 +924,7 @@ public final class PoolUtils {
                 throws IllegalArgumentException {
             if (keyedPool == null) {
                 throw new IllegalArgumentException(
-                        "keyedPool must not be null.");
+                        MSG_NULL_KEYED_POOL);
             }
             this.keyedPool = keyedPool;
         }
@@ -1605,7 +1605,7 @@ public final class PoolUtils {
                 final ErodingFactor erodingFactor) {
             if (keyedPool == null) {
                 throw new IllegalArgumentException(
-                        "keyedPool must not be null.");
+                        MSG_NULL_KEYED_POOL);
             }
             this.keyedPool = keyedPool;
             this.erodingFactor = erodingFactor;

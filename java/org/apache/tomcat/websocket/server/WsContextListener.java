@@ -16,9 +16,9 @@
  */
 package org.apache.tomcat.websocket.server;
 
-import javax.servlet.ServletContext;
-import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletContextListener;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.ServletContextEvent;
+import jakarta.servlet.ServletContextListener;
 
 /**
  * In normal usage, this {@link ServletContextListener} does not need to be

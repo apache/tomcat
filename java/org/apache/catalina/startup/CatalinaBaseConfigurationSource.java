@@ -24,6 +24,7 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.file.InvalidPathException;
 
 import org.apache.tomcat.util.file.ConfigurationSource;
 import org.apache.tomcat.util.res.StringManager;
@@ -84,22 +85,35 @@ public class CatalinaBaseConfigurationSource implements ConfigurationSource {
             f = new File(catalinaBaseFile, name);
         }
         if (f.isFile()) {
-            return new Resource(new FileInputStream(f), f.toURI());
+            FileInputStream fis = new FileInputStream(f);
+            return new Resource(fis, f.toURI());
         }
 
         // Try classloader
-        InputStream stream = getClass().getClassLoader().getResourceAsStream(name);
-        if (stream != null) {
-            try {
+        InputStream stream = null;
+        try {
+            stream = getClass().getClassLoader().getResourceAsStream(name);
+            if (stream != null) {
                 return new Resource(stream, getClass().getClassLoader().getResource(name).toURI());
-            } catch (URISyntaxException e) {
-                stream.close();
-                throw new IOException(sm.getString("catalinaConfigurationSource.cannotObtainURL", name), e);
             }
+        } catch (InvalidPathException e) {
+            // Ignore. Some valid file URIs can trigger this.
+            // Stream should be null here but check to be on the safe side.
+            if (stream != null) {
+                stream.close();
+            }
+        } catch (URISyntaxException e) {
+            stream.close();
+            throw new IOException(sm.getString("catalinaConfigurationSource.cannotObtainURL", name), e);
         }
 
         // Then try URI.
-        URI uri = getURI(name);
+        URI uri = null;
+        try {
+            uri = getURI(name);
+        } catch (IllegalArgumentException e) {
+            throw new IOException(sm.getString("catalinaConfigurationSource.cannotObtainURL", name), e);
+        }
 
         // Obtain the input stream we need
         try {

@@ -88,7 +88,7 @@ public class TestJNDIRealm {
 
         // THEN
         Assert.assertTrue(principal instanceof GenericPrincipal);
-        Assert.assertEquals(PASSWORD, ((GenericPrincipal)principal).getPassword());
+        Assert.assertEquals(USER, principal.getName());
     }
 
     @Test
@@ -106,7 +106,7 @@ public class TestJNDIRealm {
 
         // THEN
         Assert.assertTrue(principal instanceof GenericPrincipal);
-        Assert.assertEquals(ha1(), ((GenericPrincipal)principal).getPassword());
+        Assert.assertEquals(USER, principal.getName());
     }
 
 
@@ -117,9 +117,12 @@ public class TestJNDIRealm {
         realm.setContainer(context);
         realm.setUserSearch("");
 
-        Field field = JNDIRealm.class.getDeclaredField("context");
+        // Usually everything is created in create() but that's not the case here
+        Field field = JNDIRealm.class.getDeclaredField("singleConnection");
         field.setAccessible(true);
-        field.set(realm, mockDirContext(mockSearchResults(password)));
+        Field field2 = JNDIRealm.JNDIConnection.class.getDeclaredField("context");
+        field2.setAccessible(true);
+        field2.set(field.get(realm), mockDirContext(mockSearchResults(password)));
 
         realm.start();
 

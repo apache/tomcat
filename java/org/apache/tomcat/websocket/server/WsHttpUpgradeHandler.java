@@ -20,14 +20,14 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.http.HttpSession;
-import javax.servlet.http.WebConnection;
-import javax.websocket.CloseReason;
-import javax.websocket.CloseReason.CloseCodes;
-import javax.websocket.DeploymentException;
-import javax.websocket.Endpoint;
-import javax.websocket.Extension;
-import javax.websocket.server.ServerEndpointConfig;
+import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.http.WebConnection;
+import jakarta.websocket.CloseReason;
+import jakarta.websocket.CloseReason.CloseCodes;
+import jakarta.websocket.DeploymentException;
+import jakarta.websocket.Endpoint;
+import jakarta.websocket.Extension;
+import jakarta.websocket.server.ServerEndpointConfig;
 
 import org.apache.coyote.http11.upgrade.InternalHttpUpgradeHandler;
 import org.apache.juli.logging.Log;
@@ -178,6 +178,7 @@ public class WsHttpUpgradeHandler implements InternalHttpUpgradeHandler {
                 //$FALL-THROUGH$
             case DISCONNECT:
             case TIMEOUT:
+            case CONNECT_FAIL:
                 return SocketState.CLOSED;
 
         }
@@ -186,6 +187,12 @@ public class WsHttpUpgradeHandler implements InternalHttpUpgradeHandler {
         } else {
             return SocketState.CLOSED;
         }
+    }
+
+
+    @Override
+    public void timeoutAsync(long now) {
+        // NO-OP
     }
 
 

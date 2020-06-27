@@ -94,8 +94,8 @@ my %TOMCAT_ONLY = qw(
     qtif image/x-quicktime
     shtml text/x-server-parsed-html
     ulw audio/basic
+    wasm application/wasm
     z application/x-compress
-    Z application/x-compress
 );
 
 # Mime types, that are defined differently

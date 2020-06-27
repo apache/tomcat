@@ -102,7 +102,22 @@ the web application root directory + File.separator + this prefix.
 By default there is no value, which results in the web application root
 directory being used as the search path. The recommended value is
 <code>WEB-INF/cgi</code></li>
-<li><strong>enableCmdLineArguments</strong> - Are command line parameters
+<li><strong>cmdLineArgumentsDecoded</strong> - If command line argumemnts
+are enabled (via <strong>enableCmdLineArguments</strong>) and Tomcat is running
+on Windows then each individual decoded command line argument must match this
+pattern else the request will be rejected. This is to protect against known
+issues passing command line arguments from Java to Windows. These issues can
+lead to remote code execution. For more information on these issues see
+<a href="https://codewhitesec.blogspot.com/2016/02/java-and-command-line-injections-in-windows.html">Markus
+Wulftange&apos;s blog</a> and this archived
+<a href="https://web.archive.org/web/20161228144344/https://blogs.msdn.microsoft.com/twistylittlepassagesallalike/2011/04/23/everyone-quotes-command-line-arguments-the-wrong-way/">blog
+by Daniel Colascione</a>.</li>
+<li><strong>cmdLineArgumentsEncoded</strong> - If command line argumemnts
+are enabled (via <strong>enableCmdLineArguments</strong>) individual encoded
+command line argument must match this pattern else the request will be rejected.
+The default matches the allowed values defined by RFC3875 and is
+<code>[a-zA-Z0-9\Q%;/?:@&amp;,$-_.!~*'()\E]+</code></li>
+<li><strong>enableCmdLineArguments</strong> - Are command line arguments
 generated from the query string as per section 4.4 of 3875 RFC? The default is
 <code>false</code>.</li>
 <li><strong>environment-variable-</strong> - An environment to be set for the

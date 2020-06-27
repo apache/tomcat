@@ -53,24 +53,24 @@ public final class IntrospectionUtils {
             Method setPropertyMethodBool = null;
 
             // First, the ideal case - a setFoo( String ) method
-            for (int i = 0; i < methods.length; i++) {
-                Class<?> paramT[] = methods[i].getParameterTypes();
-                if (setter.equals(methods[i].getName()) && paramT.length == 1
+            for (Method item : methods) {
+                Class<?> paramT[] = item.getParameterTypes();
+                if (setter.equals(item.getName()) && paramT.length == 1
                         && "java.lang.String".equals(paramT[0].getName())) {
 
-                    methods[i].invoke(o, new Object[] { value });
+                    item.invoke(o, new Object[]{value});
                     return true;
                 }
             }
 
             // Try a setFoo ( int ) or ( boolean )
-            for (int i = 0; i < methods.length; i++) {
+            for (Method method : methods) {
                 boolean ok = true;
-                if (setter.equals(methods[i].getName())
-                        && methods[i].getParameterTypes().length == 1) {
+                if (setter.equals(method.getName())
+                        && method.getParameterTypes().length == 1) {
 
                     // match - find the type and invoke it
-                    Class<?> paramType = methods[i].getParameterTypes()[0];
+                    Class<?> paramType = method.getParameterTypes()[0];
                     Object params[] = new Object[1];
 
                     // Try a setFoo ( int )
@@ -81,22 +81,25 @@ public final class IntrospectionUtils {
                         } catch (NumberFormatException ex) {
                             ok = false;
                         }
-                    // Try a setFoo ( long )
-                    }else if ("java.lang.Long".equals(paramType.getName())
-                                || "long".equals(paramType.getName())) {
-                            try {
-                                params[0] = Long.valueOf(value);
-                            } catch (NumberFormatException ex) {
-                                ok = false;
-                            }
+                        // Try a setFoo ( long )
+                    }
+                    else if ("java.lang.Long".equals(paramType.getName())
+                            || "long".equals(paramType.getName())) {
+                        try {
+                            params[0] = Long.valueOf(value);
+                        } catch (NumberFormatException ex) {
+                            ok = false;
+                        }
 
                         // Try a setFoo ( boolean )
-                    } else if ("java.lang.Boolean".equals(paramType.getName())
+                    }
+                    else if ("java.lang.Boolean".equals(paramType.getName())
                             || "boolean".equals(paramType.getName())) {
                         params[0] = Boolean.valueOf(value);
 
                         // Try a setFoo ( InetAddress )
-                    } else if ("java.net.InetAddress".equals(paramType
+                    }
+                    else if ("java.net.InetAddress".equals(paramType
                             .getName())) {
                         try {
                             params[0] = InetAddress.getByName(value);
@@ -114,17 +117,17 @@ public final class IntrospectionUtils {
                     }
 
                     if (ok) {
-                        methods[i].invoke(o, params);
+                        method.invoke(o, params);
                         return true;
                     }
                 }
 
                 // save "setProperty" for later
-                if ("setProperty".equals(methods[i].getName())) {
-                    if (methods[i].getReturnType()==Boolean.TYPE){
-                        setPropertyMethodBool = methods[i];
-                    }else {
-                        setPropertyMethodVoid = methods[i];
+                if ("setProperty".equals(method.getName())) {
+                    if (method.getReturnType() == Boolean.TYPE) {
+                        setPropertyMethodBool = method;
+                    } else {
+                        setPropertyMethodVoid = method;
                     }
 
                 }

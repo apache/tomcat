@@ -78,7 +78,7 @@
 <section name="Configuring Manager Application Access">
   <p><em>The description below uses <code>$CATALINA_HOME</code> to refer the
     base Tomcat directory. It is the directory in which you installed
-    Tomcat, for example <code>C:/tomcat9</code>, or
+    Tomcat, for example <code>C:\tomcat9</code>, or
     <code>/usr/share/tomcat9</code>.</em></p>
 
   <p>

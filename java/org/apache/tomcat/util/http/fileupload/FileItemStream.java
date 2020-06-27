@@ -73,12 +73,12 @@ public interface FileItemStream extends FileItemHeadersSupport {
     String getContentType();
 
     /**
-     * Returns the original filename in the client's filesystem, as provided by
+     * Returns the original file name in the client's file system, as provided by
      * the browser (or other client software). In most cases, this will be the
      * base file name, without path information. However, some clients, such as
      * the Opera browser, do include path information.
      *
-     * @return The original filename in the client's filesystem.
+     * @return The original file name in the client's file system.
      */
     String getName();
 
