@@ -1678,7 +1678,7 @@
            />
         <batchtest todir="${test.reports}" unless="test.entry">
           <!-- Include all by default -->
-          <fileset dir="test" includes="${test.name}">
+          <fileset dir="test" includes="${test.name}" excludes="${test.exclude}">
             <!-- Exclude helper classes -->
             <exclude name="**/Tester*.java" />
             <!-- Exclude the tests known to fail -->
@@ -1689,8 +1689,6 @@
             <exclude name="**/*Performance.java" if="${test.excludePerformance}" />
             <!-- Exclude tests that Gump can't compile -->
             <exclude name="org/apache/tomcat/buildutil/**" />
-            <!-- Exclude a configurable list of tests -->
-            <exclude name="${test.exclude}" />
           </fileset>
         </batchtest>
       </junit>
