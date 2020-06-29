@@ -105,6 +105,10 @@
         Include the target URL in the log message when a WebSocket connection
         fails. (markt)
       </add>
+      <fix>
+        <bug>64563</bug>: Add additional validation of payload length for
+        WebSocket messages. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
