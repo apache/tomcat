@@ -72,6 +72,11 @@
         implement the requested method rather than the more general
         <code>400</code> response. (markt)
       </fix>
+      <fix>
+        <bug>64541</bug>: Refactor the DTD used to validate
+        <code>mbeans-descriptors.xml</code> files to avoid issues when XML
+        entity expansion is limited or disabled. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
