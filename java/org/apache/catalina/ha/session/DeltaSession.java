@@ -325,7 +325,12 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
     @Override
     public void setId(String id, boolean notify) {
         super.setId(id, notify);
-        resetDeltaRequest();
+        lockInternal();
+        try {
+            deltaRequest.setSessionId(getIdInternal());
+        } finally{
+            unlockInternal();
+        }
     }
 
 
@@ -337,8 +342,7 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
      */
     @Override
     public void setId(String id) {
-        super.setId(id, true);
-        resetDeltaRequest();
+        setId(id, true);
     }
 
 
