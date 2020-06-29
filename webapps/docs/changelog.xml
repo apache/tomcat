@@ -79,6 +79,11 @@
         Add generated classes using Tomcat embedded as an optional replacement
         for the Catalina configuration files. (remm)
       </add>
+      <fix>
+        <bug>64541</bug>: Refactor the DTD used to validate
+        <code>mbeans-descriptors.xml</code> files to avoid issues when XML
+        entity expansion is limited or disabled. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
