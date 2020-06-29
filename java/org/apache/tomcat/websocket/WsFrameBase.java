@@ -679,7 +679,7 @@ public abstract class WsFrameBase {
         int shift = 0;
         long result = 0;
         for (int i = start + len - 1; i >= start; i--) {
-            result = result + ((b[i] & 0xFF) << shift);
+            result = result + ((b[i] & 0xFFL) << shift);
             shift += 8;
         }
         return result;
