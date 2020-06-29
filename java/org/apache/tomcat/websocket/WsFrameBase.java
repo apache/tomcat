@@ -261,6 +261,13 @@ public abstract class WsFrameBase {
         } else if (payloadLength == 127) {
             payloadLength = byteArrayToLong(inputBuffer.array(),
                     inputBuffer.arrayOffset() + inputBuffer.position(), 8);
+            // The most significant bit of those 8 bytes is required to be zero
+            // (see RFC 6455, section 5.2). If the most significant bit is set,
+            // the resulting payload length will be negative so test for that.
+            if (payloadLength < 0) {
+                throw new WsIOException(
+                        new CloseReason(CloseCodes.PROTOCOL_ERROR, sm.getString("wsFrame.payloadMsbInvalid")));
+            }
             inputBuffer.position(inputBuffer.position() + 8);
         }
         if (Util.isControl(opCode)) {
