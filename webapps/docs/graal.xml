@@ -64,9 +64,9 @@
 cd $JAVA_HOME/bin
 ./gu install native-image</source>
    Mandrel already includes the Native Image tool ready to use, so this
-   step can be skipped. Only JAVA_HOME must be set to the mandrelJDK folder,
-   such as:
-   <source>export JAVA_HOME=/absolute...path...to/mandrel-javaXX-platform-x.x.x.x</source>
+   step can be skipped. Only JAVA_HOME must be set to the folder which
+   contains the bin folder with the JVM binaries, such as:
+   <source>export JAVA_HOME=/absolute...path...to/mandrel-javaXX-platform-x.x.x.x/mandrelJDK</source>
   </p>
 
   <p>
