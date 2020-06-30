@@ -141,6 +141,10 @@
         they are packaged into separate jars. Pull request provided by Raymond
         Augé. (markt)
       </fix>
+      <add>
+        Improve the quality and expand the coverage of the French translations
+        provided with Apache Tomcat. (remm)
+      </add>
     </changelog>
   </subsection>
 </section>
