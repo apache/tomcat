@@ -194,6 +194,10 @@
         <bug>64544</bug>: Add built libs to the bnd classpath for introspection.
         Pull request provided by Raymond Augé. (markt)
       </fix>
+      <add>
+        Improve the quality and expand the coverage of the French translations
+        provided with Apache Tomcat. (remm)
+      </add>
     </changelog>
   </subsection>
 </section>
