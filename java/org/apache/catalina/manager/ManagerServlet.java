@@ -56,6 +56,7 @@ import org.apache.catalina.util.ServerInfo;
 import org.apache.tomcat.util.Diagnostics;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.IntrospectionUtils;
+import org.apache.tomcat.util.buf.StringUtils;
 import org.apache.tomcat.util.modeler.Registry;
 import org.apache.tomcat.util.res.StringManager;
 
@@ -967,19 +968,21 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
                 String displayPath = context.getPath();
                 if (displayPath.equals(""))
                     displayPath = "/";
+                List<String> parts = null;
                 if (context.getState().isAvailable()) {
-                    writer.println(smClient.getString("managerServlet.listitem",
+                    parts = Arrays.asList(
                             displayPath,
                             "running",
                             "" + context.getManager().findSessions().length,
-                            context.getDocBase()));
+                            context.getDocBase());
                 } else {
-                    writer.println(smClient.getString("managerServlet.listitem",
+                    parts = Arrays.asList(
                             displayPath,
                             "stopped",
                             "0",
-                            context.getDocBase()));
+                            context.getDocBase());
                 }
+                writer.println(StringUtils.join(parts, ':'));
             }
         }
     }
