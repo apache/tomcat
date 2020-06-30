@@ -33,7 +33,7 @@ public class Conversions {
         int shift = 0;
         long result = 0;
         for (int i = input.length - 1; i >= 0; i--) {
-            result = result + ((input[i] & 0xFF) << shift);
+            result = result + ((input[i] & 0xFFL) << shift);
             shift += 8;
         }
 

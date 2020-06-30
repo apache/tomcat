@@ -28,10 +28,14 @@ public class TestConversions {
         Assert.assertEquals(0L, Conversions.byteArrayToLong(new byte[] { 0 }));
         Assert.assertEquals(1L, Conversions.byteArrayToLong(new byte[] { 1 }));
         Assert.assertEquals(0xFF, Conversions.byteArrayToLong(new byte[] { -1 }));
-        Assert.assertEquals(0xFFFF,
-                Conversions.byteArrayToLong(new byte[] { -1, -1 }));
-        Assert.assertEquals(0xFFFFFF,
-                Conversions.byteArrayToLong(new byte[] { -1, -1, -1 }));
+        Assert.assertEquals(0xFFFF, Conversions.byteArrayToLong(new byte[] { -1, -1 }));
+        Assert.assertEquals(0xFFFFFF, Conversions.byteArrayToLong(new byte[] { -1, -1, -1 }));
+        Assert.assertEquals(0xFFFFFFFFL, Conversions.byteArrayToLong(new byte[] { -1, -1, -1, -1 }));
+        Assert.assertEquals(0xFFFFFFFFFFL, Conversions.byteArrayToLong(new byte[] { -1, -1, -1, -1, -1 }));
+        Assert.assertEquals(0xFFFFFFFFFFFFL, Conversions.byteArrayToLong(new byte[] { -1, -1, -1, -1, -1, -1 }));
+        Assert.assertEquals(0xFFFFFFFFFFFFFFL, Conversions.byteArrayToLong(new byte[] { -1, -1, -1, -1, -1, -1, -1 }));
+        Assert.assertEquals(0x7FFFFFFFFFFFFFFFL, Conversions.byteArrayToLong(new byte[] {127, -1, -1, -1, -1, -1, -1, -1 }));
+        Assert.assertEquals(-1, Conversions.byteArrayToLong(new byte[] { -1, -1, -1, -1, -1, -1, -1, -1 }));
     }
 
 }
