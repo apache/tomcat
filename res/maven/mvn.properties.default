@@ -39,7 +39,7 @@ maven.asf.release.repo.url=https://repository.apache.org/service/local/staging/d
 maven.asf.release.repo.repositoryId=apache.releases.https
 
 # Release version info
-maven.asf.release.deploy.version=10.0.0-M7
+maven.asf.release.deploy.version=10.0.0-M8
 
 #Where do we load the libraries from
 tomcat.lib.path=../../output/build/lib
