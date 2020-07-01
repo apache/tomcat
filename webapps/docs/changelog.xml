@@ -97,7 +97,7 @@
       </add>
       <fix>
         <bug>64509</bug>: Correctly parse RFC 2109 version 1 cookies that use a
-        comma as a separater between cookies when using the RFC 6265 cookie
+        comma as a separator between cookies when using the RFC 6265 cookie
         processor. Based on a patch by W J Carpenter. (markt)
       </fix>
       <fix>
@@ -107,7 +107,7 @@
       </fix>
       <fix>
         Correctly parse RFC 2109 version 1 cookies that have additional linear
-        white space around cookie attrubute names and values when using the RFC
+        white space around cookie attribute names and values when using the RFC
         6265 cookie processor. (markt)
       </fix>
       <fix>
@@ -178,7 +178,7 @@
         Update the OWB module to Apache OpenWebBeans 2.0.17. (remm)
       </update>
       <fix>
-        <bug>64514</bug>: Fixes some missing class dependency issus in bootstrap
+        <bug>64514</bug>: Fixes some missing class dependency issues in bootstrap
         to address packaging/dependency concerns for JPMS and OSGi. Pull request
         provided by Raymond Augé. (markt)
       </fix>
@@ -264,7 +264,7 @@
         contains an unexpected request attribute. (markt)
       </add>
       <fix>
-        <bug>64485</bug>: Fix possible resource leak geting last modified from
+        <bug>64485</bug>: Fix possible resource leak getting last modified from
         <code>ConfigurationSource.Resource</code>. (remm)
       </fix>
     </changelog>
