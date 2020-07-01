@@ -523,8 +523,7 @@ public class HostManagerServlet
             Host host = (Host) container;
             String name = host.getName();
             String[] aliases = host.findAliases();
-            writer.println(smClient.getString("hostManagerServlet.listitem",
-                    name, StringUtils.join(aliases)));
+            writer.println(String.format("[%s]:[%s]", name, StringUtils.join(aliases)));
         }
     }
 
