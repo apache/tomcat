@@ -1090,7 +1090,7 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
                                 "0",
                                 context.getDocBase());
                 }
-                writer.println(parts, ':');
+                writer.println(StringUtils.join(parts, ':'));
             }
         }
     }
