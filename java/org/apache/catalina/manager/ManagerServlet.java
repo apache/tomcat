@@ -1076,13 +1076,13 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
                 if (displayPath.equals(""))
                     displayPath = "/";
                 if (context.getState().isAvailable()) {
-                    writer.println(smClient.getString("managerServlet.listitem",
+                    writer.println(String.join(":",
                             displayPath,
                             "running",
                             "" + context.getManager().findSessions().length,
                             context.getDocBase()));
                 } else {
-                    writer.println(smClient.getString("managerServlet.listitem",
+                    writer.println(String.join(":",
                             displayPath,
                             "stopped",
                             "0",
