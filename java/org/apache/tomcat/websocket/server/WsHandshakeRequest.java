@@ -156,6 +156,8 @@ public class WsHandshakeRequest implements HandshakeRequest {
             uri.append("ws");
         } else if ("https".equals(scheme)) {
             uri.append("wss");
+        } else if ("wss".equals(scheme) || "ws".equals(scheme)) {
+            uri.append(scheme);
         } else {
             // Should never happen
             throw new IllegalArgumentException(
@@ -166,6 +168,8 @@ public class WsHandshakeRequest implements HandshakeRequest {
         uri.append(req.getServerName());
 
         if ((scheme.equals("http") && (port != 80))
+            || (scheme.equals("ws") && (port != 80))
+            || (scheme.equals("wss") && (port != 443))
             || (scheme.equals("https") && (port != 443))) {
             uri.append(':');
             uri.append(port);
