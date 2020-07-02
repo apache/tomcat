@@ -27,7 +27,7 @@
     <classpathentry kind="var" path="TOMCAT_LIBS_BASE/ecj-4.15/ecj-4.15.jar"/>
     <classpathentry kind="var" path="TOMCAT_LIBS_BASE/easymock-4.2/easymock-4.2.jar"/>
     <classpathentry kind="var" path="TOMCAT_LIBS_BASE/hamcrest-2.2/hamcrest-2.2.jar"/>
-    <classpathentry kind="var" path="TOMCAT_LIBS_BASE/cglib-3.3.0/cglib-nodep-2.2.2.jar"/>
+    <classpathentry kind="var" path="TOMCAT_LIBS_BASE/cglib-3.3.0/cglib-nodep-3.3.0.jar"/>
     <classpathentry kind="var" path="TOMCAT_LIBS_BASE/objenesis-3.1/objenesis-3.1.jar"/>
     <classpathentry kind="output" path=".settings/output"/>
 </classpath>
