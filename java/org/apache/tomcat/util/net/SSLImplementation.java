@@ -68,5 +68,4 @@ public abstract class SSLImplementation {
 
     public abstract SSLUtil getSSLUtil(SSLHostConfigCertificate certificate);
 
-    public abstract boolean isAlpnSupported();
 }
