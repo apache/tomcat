@@ -193,7 +193,7 @@ public class RewriteValve extends ValveBase {
     }
 
     public String getConfiguration() {
-        StringBuffer buffer = new StringBuffer();
+        StringBuilder buffer = new StringBuilder();
         for (String mapConfiguration : mapsConfiguration) {
             buffer.append(mapConfiguration).append("\r\n");
         }
@@ -373,8 +373,8 @@ public class RewriteValve extends ValveBase {
                         urlStringDecoded = urlStringDecoded.substring(0, index);
                     }
 
-                    StringBuffer urlStringEncoded =
-                            new StringBuffer(URLEncoder.DEFAULT.encode(urlStringDecoded, uriCharset));
+                    StringBuilder urlStringEncoded =
+                            new StringBuilder(URLEncoder.DEFAULT.encode(urlStringDecoded, uriCharset));
                     if (!qsd && originalQueryStringEncoded != null
                             && originalQueryStringEncoded.length() > 0) {
                         if (rewrittenQueryStringDecoded == null) {

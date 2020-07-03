@@ -712,7 +712,7 @@ public class MemoryUserDatabase implements UserDatabase {
         sb.append(this.roles.size());
         sb.append(",userCount=");
         sb.append(this.users.size());
-        sb.append("]");
+        sb.append(']');
         return sb.toString();
     }
 }

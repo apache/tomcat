@@ -86,7 +86,7 @@ public class MessageDestinationRef extends ResourceBase {
             sb.append(", description=");
             sb.append(getDescription());
         }
-        sb.append("]");
+        sb.append(']');
         return sb.toString();
     }
 

@@ -218,10 +218,10 @@ public class MBeanDumper {
             CompositeData composite = CompositeData.class.cast(value);
             Set<String> keys = composite.getCompositeType().keySet();
             for (String key : keys) {
-                sb.append(sep).append(key).append("=").append(composite.get(key));
+                sb.append(sep).append(key).append('=').append(composite.get(key));
                 sep = ", ";
             }
-            sb.append("}");
+            sb.append('}');
             valueString = sb.toString();
         } else {
             valueString = value.toString();

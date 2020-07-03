@@ -107,7 +107,7 @@ public class SetPropertiesRule extends Rule {
                     }
                 } else {
                     if (code != null) {
-                        code.append(variableName).append(".").append(actualMethod).append(";");
+                        code.append(variableName).append(".").append(actualMethod).append(';');
                         code.append(System.lineSeparator());
                     }
                 }
@@ -132,7 +132,7 @@ public class SetPropertiesRule extends Rule {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder("SetPropertiesRule[");
-        sb.append("]");
+        sb.append(']');
         return sb.toString();
     }
 }

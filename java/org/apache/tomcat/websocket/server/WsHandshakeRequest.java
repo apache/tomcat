@@ -144,7 +144,7 @@ public class WsHandshakeRequest implements HandshakeRequest {
      */
     private static URI buildRequestUri(HttpServletRequest req) {
 
-        StringBuffer uri = new StringBuffer();
+        StringBuilder uri = new StringBuilder();
         String scheme = req.getScheme();
         int port = req.getServerPort();
         if (port < 0) {
@@ -174,7 +174,7 @@ public class WsHandshakeRequest implements HandshakeRequest {
         uri.append(req.getRequestURI());
 
         if (req.getQueryString() != null) {
-            uri.append("?");
+            uri.append('?');
             uri.append(req.getQueryString());
         }
 

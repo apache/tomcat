@@ -562,7 +562,7 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
         StringBuilder sb = new StringBuilder();
         sb.append("DeltaSession[");
         sb.append(id);
-        sb.append("]");
+        sb.append(']');
         return sb.toString();
     }
 

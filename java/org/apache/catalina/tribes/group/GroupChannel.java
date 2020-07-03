@@ -435,13 +435,13 @@ public class GroupChannel extends ChannelInterceptorBase
                 while ( next != null ) {
                     int nflag = next.getOptionFlag();
                     if (nflag!=0 && (((flag & nflag) == flag ) || ((flag & nflag) == nflag)) ) {
-                        conflicts.append("[");
+                        conflicts.append('[');
                         conflicts.append(first.getClass().getName());
-                        conflicts.append(":");
+                        conflicts.append(':');
                         conflicts.append(flag);
                         conflicts.append(" == ");
                         conflicts.append(next.getClass().getName());
-                        conflicts.append(":");
+                        conflicts.append(':');
                         conflicts.append(nflag);
                         conflicts.append("] ");
                     }//end if

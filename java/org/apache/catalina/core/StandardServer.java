@@ -828,7 +828,7 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
     public String toString() {
         StringBuilder sb = new StringBuilder("StandardServer[");
         sb.append(getPort());
-        sb.append("]");
+        sb.append(']');
         return sb.toString();
     }
 

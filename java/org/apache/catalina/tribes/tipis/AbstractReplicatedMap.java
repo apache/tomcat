@@ -1427,7 +1427,7 @@ public abstract class AbstractReplicatedMap<K,V>
             buf.append(key);
             buf.append("; value=");
             buf.append(value);
-            buf.append("]");
+            buf.append(']');
             return buf.toString();
         }
 
