@@ -508,7 +508,7 @@ HTTP/1.1 200 OK
   <subsection name="Basic configuration sample">
     <p>
     Basic configuration to add '<code>Expires</code>' and '<code>Cache-Control: max-age=</code>'
-    headers to images, css and javascript.
+    headers to images, CSS and JavaScript.
     </p>
 
     <source><![CDATA[<filter>
