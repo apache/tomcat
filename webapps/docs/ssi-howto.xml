@@ -61,7 +61,7 @@ is mapped to the URL pattern "*.shtml".</p>
 is mapped to the URL pattern "*.shtml", though it can be mapped to "*" as
 it will selectively enable/disable SSI processing based on mime types.  The
 contentType init param allows you to apply SSI processing to JSP pages,
-javascript, or any other content you wish.</p>
+JavaScript, or any other content you wish.</p>
 <p>By default SSI support is disabled in Tomcat.</p>
 </section>
 

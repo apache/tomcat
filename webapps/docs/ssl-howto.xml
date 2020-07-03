@@ -155,7 +155,7 @@ scenarios, they are not suitable for any form of production use.</p>
 
 <p>When securing a website with SSL it's important to make sure that all assets
 that the site uses are served over SSL, so that an attacker can&apos;t bypass
-the security by injecting malicious content in a javascript file or similar. To
+the security by injecting malicious content in a JavaScript file or similar. To
 further enhance the security of your website, you should evaluate to use the
 HSTS header. It allows you to communicate to the browser that your site should
 always be accessed over https.</p>
