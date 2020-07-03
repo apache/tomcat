@@ -81,7 +81,7 @@ import org.apache.juli.logging.LogFactory;
  * </p>
  * <h2>Filter Configuration</h2><h3>Basic configuration to add
  * '{@code Expires}' and '{@code Cache-Control: max-age=}'
- * headers to images, css and javascript</h3>
+ * headers to images, CSS and JavaScript</h3>
  *
  * <pre>
  * {@code
