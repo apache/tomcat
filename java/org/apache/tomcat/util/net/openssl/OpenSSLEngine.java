@@ -46,6 +46,7 @@ import org.apache.tomcat.jni.SSL;
 import org.apache.tomcat.jni.SSLContext;
 import org.apache.tomcat.util.buf.ByteBufferUtils;
 import org.apache.tomcat.util.net.Constants;
+import org.apache.tomcat.util.net.SSLUtil;
 import org.apache.tomcat.util.net.openssl.ciphers.OpenSSLCipherConfigurationParser;
 import org.apache.tomcat.util.res.StringManager;
 
@@ -54,7 +55,7 @@ import org.apache.tomcat.util.res.StringManager;
  * <a href="https://www.openssl.org/docs/crypto/BIO_s_bio.html#EXAMPLE">OpenSSL
  * BIO abstractions</a>.
  */
-public final class OpenSSLEngine extends SSLEngine {
+public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolInfo {
 
     private static final Log logger = LogFactory.getLog(OpenSSLEngine.class);
     private static final StringManager sm = StringManager.getManager(OpenSSLEngine.class);
@@ -208,7 +209,7 @@ public final class OpenSSLEngine extends SSLEngine {
     }
 
     @Override
-    public String getApplicationProtocol() {
+    public String getNegotiatedProtocol() {
         return selectedProtocol;
     }
 

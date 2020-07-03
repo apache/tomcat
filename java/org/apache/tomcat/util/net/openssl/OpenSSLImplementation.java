@@ -36,4 +36,9 @@ public class OpenSSLImplementation extends SSLImplementation {
         return new OpenSSLUtil(certificate);
     }
 
+    @Override
+    public boolean isAlpnSupported() {
+        // OpenSSL supported ALPN
+        return true;
+    }
 }
