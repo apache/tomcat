@@ -89,9 +89,9 @@ public class MultiThrowable extends Throwable {
         sb.append(size());
         sb.append(" wrapped Throwables: ");
         for (Throwable t : throwables) {
-            sb.append("[");
+            sb.append('[');
             sb.append(t.getMessage());
-            sb.append("]");
+            sb.append(']');
         }
 
         return sb.toString();

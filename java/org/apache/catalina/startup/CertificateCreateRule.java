@@ -45,10 +45,10 @@ public class CertificateCreateRule extends Rule {
 
         StringBuilder code = digester.getGeneratedCode();
         if (code != null) {
-            code.append(SSLHostConfigCertificate.class.getName()).append(" ").append(digester.toVariableName(certificate));
+            code.append(SSLHostConfigCertificate.class.getName()).append(' ').append(digester.toVariableName(certificate));
             code.append(" = new ").append(SSLHostConfigCertificate.class.getName());
-            code.append("(").append(digester.toVariableName(sslHostConfig));
-            code.append(", ").append(Type.class.getName().replace('$', '.')).append(".").append(type).append(");");
+            code.append('(').append(digester.toVariableName(sslHostConfig));
+            code.append(", ").append(Type.class.getName().replace('$', '.')).append('.').append(type).append(");");
             code.append(System.lineSeparator());
         }
     }

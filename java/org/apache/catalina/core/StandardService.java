@@ -325,7 +325,7 @@ public class StandardService extends LifecycleMBeanBase implements Service {
     public String toString() {
         StringBuilder sb = new StringBuilder("StandardService[");
         sb.append(getName());
-        sb.append("]");
+        sb.append(']');
         return sb.toString();
     }
 

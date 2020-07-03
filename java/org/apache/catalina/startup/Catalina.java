@@ -902,14 +902,14 @@ public class Catalina {
         code.append(" implements ");
         code.append(ServerXml.class.getName().replace('$', '.')).append(" {").append(System.lineSeparator());
         code.append("public void load(").append(Catalina.class.getName());
-        code.append(" ").append(digester.toVariableName(this)).append(") {").append(System.lineSeparator());
+        code.append(' ').append(digester.toVariableName(this)).append(") {").append(System.lineSeparator());
     }
 
 
     protected void generateClassFooter(Digester digester) {
         StringBuilder code = digester.getGeneratedCode();
-        code.append("}").append(System.lineSeparator());
-        code.append("}").append(System.lineSeparator());
+        code.append('}').append(System.lineSeparator());
+        code.append('}').append(System.lineSeparator());
     }
 
 

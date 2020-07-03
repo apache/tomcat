@@ -108,7 +108,7 @@ public class ObjectCreateRule extends Rule {
         StringBuilder code = digester.getGeneratedCode();
         if (code != null) {
             code.append(System.lineSeparator());
-            code.append(realClassName).append(" ").append(digester.toVariableName(instance)).append(" = new ");
+            code.append(realClassName).append(' ').append(digester.toVariableName(instance)).append(" = new ");
             code.append(realClassName).append("();").append(System.lineSeparator());
         }
     }
@@ -167,7 +167,7 @@ public class ObjectCreateRule extends Rule {
         sb.append(className);
         sb.append(", attributeName=");
         sb.append(attributeName);
-        sb.append("]");
+        sb.append(']');
         return sb.toString();
     }
 

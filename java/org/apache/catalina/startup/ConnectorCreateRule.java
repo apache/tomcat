@@ -77,7 +77,7 @@ public class ConnectorCreateRule extends Rule {
         StringBuilder code = digester.getGeneratedCode();
         if (code != null) {
             code.append(System.lineSeparator());
-            code.append(Connector.class.getName()).append(" ").append(digester.toVariableName(con));
+            code.append(Connector.class.getName()).append(' ').append(digester.toVariableName(con));
             code.append(" = new ").append(Connector.class.getName());
             code.append("(new ").append(con.getProtocolHandlerClassName()).append("());");
             code.append(System.lineSeparator());

@@ -321,11 +321,11 @@ public class SSIServletExternalResolver implements SSIExternalResolver {
                 retVal = req.getProtocol();
             } else if (nameParts[1].equals("SOFTWARE")) {
                 StringBuilder rv = new StringBuilder(context.getServerInfo());
-                rv.append(" ");
+                rv.append(' ');
                 rv.append(System.getProperty("java.vm.name"));
-                rv.append("/");
+                rv.append('/');
                 rv.append(System.getProperty("java.vm.version"));
-                rv.append(" ");
+                rv.append(' ');
                 rv.append(System.getProperty("os.name"));
                 retVal = rv.toString();
             }

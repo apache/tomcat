@@ -144,7 +144,7 @@ public class ExpressionParseTree {
                         nodeStack.add(0, currStringNode);
                     } else {
                         // Add to the existing
-                        currStringNode.value.append(" ");
+                        currStringNode.value.append(' ');
                         currStringNode.value.append(et.getTokenValue());
                     }
                     break;

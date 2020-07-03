@@ -200,14 +200,14 @@ public class StoreFileMover {
         String ts = (new Timestamp(System.currentTimeMillis())).toString();
         //        yyyy-mm-dd hh:mm:ss
         //        0123456789012345678
-        StringBuffer sb = new StringBuffer(".");
-        sb.append(ts.substring(0, 10));
+        StringBuilder sb = new StringBuilder(".");
+        sb.append(ts, 0, 10);
         sb.append('.');
-        sb.append(ts.substring(11, 13));
+        sb.append(ts, 11, 13);
         sb.append('-');
-        sb.append(ts.substring(14, 16));
+        sb.append(ts, 14, 16);
         sb.append('-');
-        sb.append(ts.substring(17, 19));
+        sb.append(ts, 17, 19);
         return sb.toString();
     }
 

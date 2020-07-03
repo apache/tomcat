@@ -71,7 +71,7 @@ public class Arrays {
                 }
             }
         }
-        buf.append("}");
+        buf.append('}');
         return buf.toString();
     }
 
@@ -87,7 +87,7 @@ public class Arrays {
                 buf.append(", ").append(data[i]);
             }
         }
-        buf.append("}");
+        buf.append('}');
         return buf.toString();
     }
 
@@ -103,7 +103,7 @@ public class Arrays {
                 buf.append(", ").append(data[i].getName());
             }
         }
-        buf.append("}");
+        buf.append('}');
         return buf.toString();
     }
 

@@ -269,7 +269,7 @@ public final class LegacyCookieProcessor extends CookieProcessorBase {
 
         // Just use the name supplied in the Cookie
         buf.append(cookie.getName());
-        buf.append("=");
+        buf.append('=');
 
         // Value
         maybeQuote(buf, value, version);

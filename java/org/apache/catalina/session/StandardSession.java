@@ -1016,7 +1016,7 @@ public class StandardSession implements HttpSession, Session, Serializable {
         StringBuilder sb = new StringBuilder();
         sb.append("StandardSession[");
         sb.append(id);
-        sb.append("]");
+        sb.append(']');
         return sb.toString();
     }
 

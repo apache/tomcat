@@ -3090,7 +3090,7 @@ class Generator {
                         sb.append(".getValue(");
                         sb.append(getJspContextVar());
                         sb.append(".getELContext()");
-                        sb.append(")");
+                        sb.append(')');
                     }
                     attrValue = sb.toString();
                 } else if (attr.isDeferredMethodInput()

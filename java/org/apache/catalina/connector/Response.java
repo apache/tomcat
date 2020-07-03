@@ -1814,10 +1814,10 @@ public class Response implements HttpServletResponse {
         }
         StringBuilder sb = new StringBuilder(path);
         if( sb.length() > 0 ) { // jsessionid can't be first.
-            sb.append(";");
+            sb.append(';');
             sb.append(SessionConfig.getSessionUriParamName(
                     request.getContext()));
-            sb.append("=");
+            sb.append('=');
             sb.append(sessionId);
         }
         sb.append(anchor);
