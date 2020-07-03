@@ -45,14 +45,6 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 10.0.0-M8 (markt)" rtext="in development">
-  <subsection name="Coyote">
-    <changelog>
-      <fix>
-        Remove ALPN abstraction to simplify code. Tomcat now requires
-        Java 8 251 or 252 for TLS support. (remm)
-      </fix>
-    </changelog>
-  </subsection>
 </section>
 <section name="Tomcat 10.0.0-M7 (markt)" rtext="release in progress">
   <subsection name="Catalina">
