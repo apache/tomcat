@@ -962,9 +962,9 @@ public class Tomcat {
         loggerName.append("].[");
         // Context name
         if (contextName == null || contextName.equals("")) {
-            loggerName.append("/");
+            loggerName.append('/');
         } else if (contextName.startsWith("##")) {
-            loggerName.append("/");
+            loggerName.append('/');
             loggerName.append(contextName);
         }
         loggerName.append(']');

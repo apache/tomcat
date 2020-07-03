@@ -314,7 +314,7 @@ public class Substitution {
     }
 
     private String evaluateSubstitution(SubstitutionElement[] elements, Matcher rule, Matcher cond, Resolver resolver) {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         for (SubstitutionElement element : elements) {
             buf.append(element.evaluate(rule, cond, resolver));
         }

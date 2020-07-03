@@ -390,7 +390,7 @@ public class SecurityCollection extends XmlEncodingBase implements Serializable 
             sb.append(", ");
             sb.append(description);
         }
-        sb.append("]");
+        sb.append(']');
         return sb.toString();
     }
 

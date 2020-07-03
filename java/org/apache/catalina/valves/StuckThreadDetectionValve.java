@@ -195,7 +195,7 @@ public class StuckThreadDetectionValve extends ValveBase {
         Long key = Long.valueOf(Thread.currentThread().getId());
         StringBuffer requestUrl = request.getRequestURL();
         if(request.getQueryString()!=null) {
-            requestUrl.append("?");
+            requestUrl.append('?');
             requestUrl.append(request.getQueryString());
         }
         MonitoredThread monitoredThread = new MonitoredThread(Thread.currentThread(),

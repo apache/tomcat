@@ -1107,7 +1107,7 @@ public abstract class ManagerBase extends LifecycleMBeanBase implements Manager 
     public String listSessionIds() {
         StringBuilder sb = new StringBuilder();
         for (String s : sessions.keySet()) {
-            sb.append(s).append(" ");
+            sb.append(s).append(' ');
         }
         return sb.toString();
     }

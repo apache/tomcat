@@ -64,7 +64,7 @@ public class CoyotePrincipal implements Principal, Serializable {
     public String toString() {
         StringBuilder sb = new StringBuilder("CoyotePrincipal[");
         sb.append(this.name);
-        sb.append("]");
+        sb.append(']');
         return sb.toString();
     }
 

@@ -150,7 +150,7 @@ public class ObjectCreateRule extends Rule {
         sb.append(className);
         sb.append(", attributeName=");
         sb.append(attributeName);
-        sb.append("]");
+        sb.append(']');
         return sb.toString();
     }
 

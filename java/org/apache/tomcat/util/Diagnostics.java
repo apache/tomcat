@@ -426,7 +426,7 @@ public class Diagnostics {
         sb.append(CRLF);
 
         sb.append(requestedSm.getString("diagnostics.threadDumpTitle"));
-        sb.append(" ");
+        sb.append(' ');
         sb.append(runtimeMXBean.getVmName());
         sb.append(" (");
         sb.append(runtimeMXBean.getVmVersion());

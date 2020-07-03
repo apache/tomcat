@@ -76,7 +76,7 @@ public class ContextResourceLink extends ResourceBase {
             sb.append(", global=");
             sb.append(getGlobal());
         }
-        sb.append("]");
+        sb.append(']');
         return sb.toString();
     }
 

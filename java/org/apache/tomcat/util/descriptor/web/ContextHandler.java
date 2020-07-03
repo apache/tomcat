@@ -146,7 +146,7 @@ public class ContextHandler extends ResourceBase {
             sb.append(", init-param=");
             sb.append(this.listProperties());
         }
-        sb.append("]");
+        sb.append(']');
         return sb.toString();
     }
 

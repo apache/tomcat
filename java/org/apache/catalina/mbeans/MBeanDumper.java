@@ -187,5 +187,4 @@ public class MBeanDumper {
         }
         sb.append( value.substring(pos,end));
     }
-
 }

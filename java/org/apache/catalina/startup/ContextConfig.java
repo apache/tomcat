@@ -439,7 +439,6 @@ public class ContextConfig implements LifecycleListener {
         return digester;
     }
 
-
     /**
      * Process the default configuration file, if it exists.
      * @param digester The digester that will be used for XML parsing

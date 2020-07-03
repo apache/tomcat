@@ -116,7 +116,7 @@ public class SingleSignOnSessionKey implements Serializable {
         sb.append(contextName);
         sb.append("], SessionID: [");
         sb.append(sessionId);
-        sb.append("]");
+        sb.append(']');
         return sb.toString();
     }
 }

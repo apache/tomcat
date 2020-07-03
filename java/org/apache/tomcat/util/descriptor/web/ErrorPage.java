@@ -148,7 +148,7 @@ public class ErrorPage extends XmlEncodingBase implements Serializable {
         }
         sb.append(", location=");
         sb.append(location);
-        sb.append("]");
+        sb.append(']');
         return sb.toString();
     }
 

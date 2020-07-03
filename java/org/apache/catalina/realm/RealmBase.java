@@ -1043,17 +1043,17 @@ public abstract class RealmBase extends LifecycleMBeanBase implements org.apache
         file.append(protocol).append("://").append(host);
         // Host with port
         if(redirectPort != 443) {
-            file.append(":").append(redirectPort);
+            file.append(':').append(redirectPort);
         }
         // URI
         file.append(request.getRequestURI());
         String requestedSessionId = request.getRequestedSessionId();
         if ((requestedSessionId != null) &&
             request.isRequestedSessionIdFromURL()) {
-            file.append(";");
+            file.append(';');
             file.append(SessionConfig.getSessionUriParamName(
                     request.getContext()));
-            file.append("=");
+            file.append('=');
             file.append(requestedSessionId);
         }
         String queryString = request.getQueryString();

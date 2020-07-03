@@ -392,7 +392,7 @@ public class CallMethodRule extends Rule {
             sb.append(targetOffset);
             sb.append(",stackdepth=");
             sb.append(digester.getCount());
-            sb.append(")");
+            sb.append(')');
             throw new org.xml.sax.SAXException(sb.toString());
         }
 
@@ -402,26 +402,26 @@ public class CallMethodRule extends Rule {
             sb.append(digester.match);
             sb.append("} Call ");
             sb.append(target.getClass().getName());
-            sb.append(".");
+            sb.append('.');
             sb.append(methodName);
-            sb.append("(");
+            sb.append('(');
             for (int i = 0; i < paramValues.length; i++) {
                 if (i > 0) {
-                    sb.append(",");
+                    sb.append(',');
                 }
                 if (paramValues[i] == null) {
                     sb.append("null");
                 } else {
                     sb.append(paramValues[i].toString());
                 }
-                sb.append("/");
+                sb.append('/');
                 if (paramTypes[i] == null) {
                     sb.append("null");
                 } else {
                     sb.append(paramTypes[i].getName());
                 }
             }
-            sb.append(")");
+            sb.append(')');
             digester.log.debug(sb.toString());
         }
         Object result = IntrospectionUtils.callMethodN(target, methodName,
@@ -469,10 +469,8 @@ public class CallMethodRule extends Rule {
                 sb.append(paramTypes[i].getName());
             }
         }
-        sb.append("}");
-        sb.append("]");
+        sb.append('}');
+        sb.append(']');
         return sb.toString();
     }
-
-
 }

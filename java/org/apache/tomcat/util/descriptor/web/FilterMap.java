@@ -214,7 +214,7 @@ public class FilterMap extends XmlEncodingBase implements Serializable {
             sb.append(", urlPattern=");
             sb.append(urlPattern);
         }
-        sb.append("]");
+        sb.append(']');
         return sb.toString();
     }
 

@@ -197,7 +197,7 @@ public class FilterDef implements Serializable {
         sb.append(this.filterName);
         sb.append(", filterClass=");
         sb.append(this.filterClass);
-        sb.append("]");
+        sb.append(']');
         return sb.toString();
     }
 

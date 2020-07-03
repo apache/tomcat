@@ -158,7 +158,7 @@ public class SetNextRule extends Rule {
         sb.append(methodName);
         sb.append(", paramType=");
         sb.append(paramType);
-        sb.append("]");
+        sb.append(']');
         return sb.toString();
     }
 

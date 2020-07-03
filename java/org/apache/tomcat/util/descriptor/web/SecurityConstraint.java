@@ -475,7 +475,7 @@ public class SecurityConstraint extends XmlEncodingBase implements Serializable 
                 sb.append(", ");
             sb.append(collections[i].getName());
         }
-        sb.append("]");
+        sb.append(']');
         return sb.toString();
     }
 

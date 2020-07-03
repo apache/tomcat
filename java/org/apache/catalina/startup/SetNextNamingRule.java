@@ -103,7 +103,6 @@ public class SetNextNamingRule extends Rule {
         // Call the specified method
         IntrospectionUtils.callMethod1(namingResources, methodName,
                 child, paramType, digester.getClassLoader());
-
     }
 
 
@@ -117,7 +116,7 @@ public class SetNextNamingRule extends Rule {
         sb.append(methodName);
         sb.append(", paramType=");
         sb.append(paramType);
-        sb.append("]");
+        sb.append(']');
         return sb.toString();
     }
 

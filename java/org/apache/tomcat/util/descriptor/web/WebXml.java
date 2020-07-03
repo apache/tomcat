@@ -721,7 +721,7 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Encodi
             sb.append("\"http://www.w3.org/2001/XMLSchema-instance\"\n");
             sb.append("         xsi:schemaLocation=\"");
             sb.append(javaeeNamespace);
-            sb.append(" ");
+            sb.append(' ');
             sb.append(webXmlSchemaLocation);
             sb.append("\"\n");
             sb.append("         version=\"");

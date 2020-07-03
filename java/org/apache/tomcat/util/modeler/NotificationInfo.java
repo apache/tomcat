@@ -150,7 +150,7 @@ public class NotificationInfo extends FeatureInfo {
         } finally {
             readLock.unlock();
         }
-        sb.append("]");
+        sb.append(']');
         return sb.toString();
     }
 }

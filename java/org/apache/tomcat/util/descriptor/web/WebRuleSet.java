@@ -1021,7 +1021,7 @@ final class CallMethodMultiRule extends CallMethodRule {
             sb.append(targetOffset);
             sb.append(",stackdepth=");
             sb.append(digester.getCount());
-            sb.append(")");
+            sb.append(')');
             throw new org.xml.sax.SAXException(sb.toString());
         }
 

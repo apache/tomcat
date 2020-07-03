@@ -339,7 +339,7 @@ public class ExtendedAccessLogValve extends AccessLogValve {
                         if (first) {
                             first = false;
                         } else {
-                            buffer.append(",");
+                            buffer.append(',');
                         }
                         buffer.append(iter.next());
                     }
@@ -347,7 +347,7 @@ public class ExtendedAccessLogValve extends AccessLogValve {
                 }
                 return ;
             }
-            buf.append("-");
+            buf.append('-');
         }
     }
 

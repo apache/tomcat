@@ -419,7 +419,7 @@ public class ManagedBean implements java.io.Serializable {
         }
         sb.append(", type=");
         sb.append(type);
-        sb.append("]");
+        sb.append(']');
         return sb.toString();
 
     }

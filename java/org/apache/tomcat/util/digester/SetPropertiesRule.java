@@ -87,7 +87,7 @@ public class SetPropertiesRule extends Rule {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder("SetPropertiesRule[");
-        sb.append("]");
+        sb.append(']');
         return sb.toString();
     }
 }

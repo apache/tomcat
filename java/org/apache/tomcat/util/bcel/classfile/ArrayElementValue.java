@@ -36,15 +36,15 @@ public class ArrayElementValue extends ElementValue
     public String stringifyValue()
     {
         final StringBuilder sb = new StringBuilder();
-        sb.append("[");
+        sb.append('[');
         for (int i = 0; i < evalues.length; i++)
         {
             sb.append(evalues[i].stringifyValue());
             if ((i + 1) < evalues.length) {
-                sb.append(",");
+                sb.append(',');
             }
         }
-        sb.append("]");
+        sb.append(']');
         return sb.toString();
     }
 
