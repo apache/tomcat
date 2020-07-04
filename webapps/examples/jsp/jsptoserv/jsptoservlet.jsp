@@ -15,9 +15,15 @@
   limitations under the License.
 --%>
 <html>
-<body bgcolor="white">
+<head>
+  <style>
+    body {background-color: white;}
+  </style>
+</head>
+<body>
 
 <!-- Forward to a servlet -->
 <jsp:forward page="/servletToJsp" />
 
+</body>
 </html>

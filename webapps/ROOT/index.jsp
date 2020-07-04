@@ -25,11 +25,10 @@ request.setAttribute("tomcatExamplesUrl", "/examples/");
 <!DOCTYPE html>
 <html lang="en">
     <head>
-        <meta charset="UTF-8" />
+        <meta charset="UTF-8">
         <title><%=request.getServletContext().getServerInfo() %></title>
-        <link href="favicon.ico" rel="icon" type="image/x-icon" />
-        <link href="favicon.ico" rel="shortcut icon" type="image/x-icon" />
-        <link href="tomcat.css" rel="stylesheet" type="text/css" />
+        <link href="favicon.ico" rel="shortcut icon" type="image/x-icon">
+        <link href="tomcat.css" rel="stylesheet" type="text/css">
     </head>
 
     <body>
@@ -42,7 +41,7 @@ request.setAttribute("tomcatExamplesUrl", "/examples/");
                 <span id="nav-wiki"><a href="https://wiki.apache.org/tomcat/FrontPage">Wiki</a></span>
                 <span id="nav-lists"><a href="${tomcatUrl}lists.html">Mailing Lists</a></span>
                 <span id="nav-help"><a href="${tomcatUrl}findhelp.html">Find Help</a></span>
-                <br class="separator" />
+                <br class="separator">
             </div>
             <div id="asf-box">
                 <h1>${pageContext.servletContext.serverInfo}</h1>
@@ -52,7 +51,7 @@ request.setAttribute("tomcatExamplesUrl", "/examples/");
                     <h2>If you're seeing this, you've successfully installed Tomcat. Congratulations!</h2>
                 </div>
                 <div id="notice">
-                    <img src="tomcat.png" alt="[tomcat logo]" />
+                    <img src="tomcat.png" alt="[tomcat logo]">
                     <div id="tasks">
                         <h3>Recommended Reading:</h3>
                         <h4><a href="${tomcatDocUrl}security-howto.html">Security Considerations How-To</a></h4>
@@ -71,7 +70,7 @@ request.setAttribute("tomcatExamplesUrl", "/examples/");
                         <a class="container shadow" href="/host-manager/html"><span>Host Manager</span></a>
                     </div>
                 </div>
-                <br class="separator" />
+                <br class="separator">
             </div>
             <div id="middle" class="curved container">
                 <h3>Developer Quick Start</h3>
@@ -98,7 +97,7 @@ request.setAttribute("tomcatExamplesUrl", "/examples/");
                         <p><a href="https://wiki.apache.org/tomcat/TomcatVersions">Tomcat Versions</a></p>
                     </div>
                 </div>
-                <br class="separator" />
+                <br class="separator">
             </div>
             <div id="lower">
                 <div id="low-manage" class="">
@@ -109,7 +108,7 @@ request.setAttribute("tomcatExamplesUrl", "/examples/");
                         <pre>$CATALINA_HOME/conf/tomcat-users.xml</pre>
                         <p>In Tomcat @VERSION_MAJOR_MINOR@ access to the manager application is split between
                            different users. &nbsp; <a href="${tomcatDocUrl}manager-howto.html">Read more...</a></p>
-                        <br />
+                        <br>
                         <h4><a href="${tomcatDocUrl}RELEASE-NOTES.txt">Release Notes</a></h4>
                         <h4><a href="${tomcatDocUrl}changelog.html">Changelog</a></h4>
                         <h4><a href="${tomcatUrl}migration.html">Migration Guide</a></h4>
@@ -138,22 +137,22 @@ request.setAttribute("tomcatExamplesUrl", "/examples/");
                         <h4><a href="${tomcatUrl}faq/">FAQ</a> and <a href="${tomcatUrl}lists.html">Mailing Lists</a></h4>
                         <p>The following mailing lists are available:</p>
                         <ul>
-                            <li id="list-announce"><strong><a href="${tomcatUrl}lists.html#tomcat-announce">tomcat-announce</a><br />
+                            <li id="list-announce"><strong><a href="${tomcatUrl}lists.html#tomcat-announce">tomcat-announce</a><br>
                                 Important announcements, releases, security vulnerability notifications. (Low volume).</strong>
                             </li>
-                            <li><a href="${tomcatUrl}lists.html#tomcat-users">tomcat-users</a><br />
+                            <li><a href="${tomcatUrl}lists.html#tomcat-users">tomcat-users</a><br>
                                 User support and discussion
                             </li>
-                            <li><a href="${tomcatUrl}lists.html#taglibs-user">taglibs-user</a><br />
+                            <li><a href="${tomcatUrl}lists.html#taglibs-user">taglibs-user</a><br>
                                 User support and discussion for <a href="${tomcatUrl}taglibs/">Apache Taglibs</a>
                             </li>
-                            <li><a href="${tomcatUrl}lists.html#tomcat-dev">tomcat-dev</a><br />
+                            <li><a href="${tomcatUrl}lists.html#tomcat-dev">tomcat-dev</a><br>
                                 Development mailing list, including commit messages
                             </li>
                         </ul>
                     </div>
                 </div>
-                <br class="separator" />
+                <br class="separator">
             </div>
             <div id="footer" class="curved container">
                 <div class="col20">
@@ -211,7 +210,7 @@ request.setAttribute("tomcatExamplesUrl", "/examples/");
                         </ul>
                     </div>
                 </div>
-                <br class="separator" />
+                <br class="separator">
             </div>
             <p class="copyright">Copyright &copy;1999-${year} Apache Software Foundation.  All Rights Reserved</p>
         </div>

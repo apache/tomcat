@@ -14,13 +14,18 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 --%>
-<html>
-<body bgcolor="white">
-
-<h1>
-I have been invoked by
-<% out.print (request.getAttribute("servletName").toString()); %>
-Servlet.
-</h1>
-
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <style>
+      body {background-color: white;}
+    </style>
+  </head>
+  <body>
+    <h1>
+    I have been invoked by
+    <% out.print (request.getAttribute("servletName").toString()); %>
+    Servlet.
+    </h1>
+  </body>
 </html>

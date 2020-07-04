@@ -22,11 +22,14 @@
     return;
   }
 %>
-<html>
+<html lang="en">
 <head>
-<title>Protected Page for Examples</title>
+  <title>Protected Page for Examples</title>
+  <style>
+    body {background-color: white;}
+  </style>
 </head>
-<body bgcolor="white">
+<body>
 
 You are logged in as remote user
 <b><%= util.HTMLFilter.filter(request.getRemoteUser()) %></b>
@@ -69,7 +72,7 @@ To check whether your user name has been granted a particular role,
 enter it here:
 <form method="GET" action='<%= response.encodeURL("index.jsp") %>'>
 <input type="text" name="role" value="<%= util.HTMLFilter.filter(role) %>">
-<input type="submit" >
+<input type="submit">
 </form>
 <br><br>
 
@@ -77,7 +80,7 @@ To add some data to the authenticated session, enter it here:
 <form method="GET" action='<%= response.encodeURL("index.jsp") %>'>
 <input type="text" name="dataName">
 <input type="text" name="dataValue">
-<input type="submit" >
+<input type="submit">
 </form>
 <br><br>
 

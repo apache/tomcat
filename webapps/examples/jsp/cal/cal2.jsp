@@ -15,31 +15,31 @@
   limitations under the License.
 --%>
 <%@page contentType="text/html; charset=UTF-8" %>
-<HTML>
-<HEAD><TITLE>
-    Calendar: A JSP APPLICATION
-</TITLE></HEAD>
+<html lang="en">
+  <head>
+    <title>Calendar: A JSP APPLICATION</title>
+    <style>
+      body {background-color: white;}
+    </style>
+  </head>
+  <body>
+  <jsp:useBean id="table" scope="session" class="cal.TableBean" />
 
-
-<BODY BGCOLOR="white">
-<jsp:useBean id="table" scope="session" class="cal.TableBean" />
-
-<%
+  <%
     String time = request.getParameter ("time");
-%>
+  %>
 
-<FONT SIZE=5> Please add the following event:
-<BR> <h3> Date <%= table.getDate() %>
-<BR> Time <%= util.HTMLFilter.filter(time) %> </h3>
-</FONT>
-<FORM METHOD=POST ACTION=cal1.jsp>
-<BR>
-<BR> <INPUT NAME="date" TYPE=HIDDEN VALUE="current">
-<BR> <INPUT NAME="time" TYPE=HIDDEN VALUE="<%= util.HTMLFilter.filter(time) %>">
-<BR> <h2> Description of the event <INPUT NAME="description" TYPE=TEXT SIZE=20> </h2>
-<BR> <INPUT TYPE=SUBMIT VALUE="submit">
-</FORM>
-
-</BODY>
-</HTML>
+    <font size="5">Please add the following event:
+      <br>
+      <h3>Date <%= table.getDate() %><br>Time <%= util.HTMLFilter.filter(time) %></h3>
+    </font>
+    <form method="POST" action="cal1.jsp">
+      <br>
+      <br> <input name="date" type="hidden" value="current">
+      <br> <input name="time" type="hidden" value="<%= util.HTMLFilter.filter(time) %>">
+      <br> <h2> Description of the event <input name="description" type="text" size="20"> </h2>
+      <br> <input type="submit" value="submit">
+    </form>
+  </body>
+</html>
 

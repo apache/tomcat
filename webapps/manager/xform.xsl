@@ -34,7 +34,7 @@
         </style>
       </head>
       <body>
-        <div style='font-size:20px;'>Tomcat Status</div>
+        <div style="font-size:20px;">Tomcat Status</div>
 
         <xsl:apply-templates select="jvm"/>
         <xsl:apply-templates select="connector"/>
@@ -44,9 +44,9 @@
 
   <xsl:template match="jvm">
    <xsl:apply-templates select="memory"/>
-   <b>Memory Pools</b><br />
+   <b>Memory Pools</b><br/>
    <xsl:apply-templates select="memorypool"/>
-   <hr />
+   <hr/>
   </xsl:template>
 
   <xsl:template match="memory">
@@ -58,7 +58,7 @@
           <td><b>max:</b> <xsl:value-of select="@max"/></td>
         </tr>
     </table>
-    <hr />
+    <hr/>
   </xsl:template>
 
   <xsl:template match="memorypool">
@@ -75,7 +75,7 @@
   </xsl:template>
 
   <xsl:template match="connector">
-     <b>Connector -- </b> <xsl:value-of select="@name"/><br />
+     <b>Connector -- </b> <xsl:value-of select="@name"/><br/>
 
       <xsl:apply-templates select="threadInfo"/>
       <xsl:apply-templates select="requestInfo"/>
@@ -91,7 +91,7 @@
           <td><b>currentThreadsBusy:</b> <xsl:value-of select="@currentThreadsBusy"/></td>
         </tr>
     </table>
-    <hr />
+    <hr/>
   </xsl:template>
 
   <xsl:template match="requestInfo">
@@ -106,7 +106,7 @@
           <td><b>bytesSent:</b> <xsl:value-of select="@bytesSent"/></td>
         </tr>
     </table>
-    <hr />
+    <hr/>
   </xsl:template>
 
   <xsl:template match="workers">
@@ -122,7 +122,7 @@
         </tr>
         <xsl:apply-templates select="worker"/>
     </table>
-    <hr />
+    <hr/>
   </xsl:template>
 
   <xsl:template match="worker">

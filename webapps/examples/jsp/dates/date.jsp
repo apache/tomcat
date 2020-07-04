@@ -19,9 +19,9 @@
 <%@ page session="false"%>
 
 <body bgcolor="white">
-<jsp:useBean id='clock' scope='page' class='dates.JspCalendar' type="dates.JspCalendar" />
+<jsp:useBean id="clock" scope="page" class="dates.JspCalendar" type="dates.JspCalendar"/>
 
-<font size=4>
+<font size="4">
 <ul>
 <li>    Day of month: is  <jsp:getProperty name="clock" property="dayOfMonth"/>
 <li>    Year: is  <jsp:getProperty name="clock" property="year"/>

@@ -24,10 +24,15 @@
 <jsp:useBean id="numguess" class="num.NumberGuessBean" scope="session"/>
 <jsp:setProperty name="numguess" property="*"/>
 
-<html>
-<head><title>Number Guess</title></head>
-<body bgcolor="white">
-<font size=4>
+<html lang="en">
+<head>
+  <title>Number Guess</title>
+  <style>
+    body {background-color: white}
+  </style>
+</head>
+<body>
+<font size="4">
 
 <% if (numguess.getSuccess()) { %>
 
@@ -44,9 +49,9 @@
 
   I'm thinking of a number between 1 and 100.<p>
 
-  <form method=get>
-  What's your guess? <input type=text name=guess>
-  <input type=submit value="Submit">
+  <form method="GET">
+  What's your guess? <input type="text" name="guess">
+  <input type="submit" value="Submit">
   </form>
 
 <% } else { %>
@@ -57,9 +62,9 @@
 
   I'm thinking of a number between 1 and 100.<p>
 
-  <form method=get>
-  What's your guess? <input type=text name=guess>
-  <input type=submit value="Submit">
+  <form method="GET">
+  What's your guess? <input type="text" name="guess">
+  <input type="submit" value="Submit">
   </form>
 
 <% } %>

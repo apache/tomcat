@@ -20,16 +20,14 @@
   </head>
   <body>
     <h1>Tag Plugin Examples - &lt;c:choose></h1>
-
-    <hr/>
-    <br/>
+    <hr>
+    <br>
     <a href="notes.html">Plugin Introductory Notes</a>
-    <br/>
+    <br>
     <a href="howto.html">Brief Instructions for Writing Plugins</a>
-    <br/> <br/>
-    <hr/>
-
-    <br/>
+    <br><br>
+    <hr>
+    <br>
 
     <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 
@@ -37,16 +35,16 @@
       # ${index}:
       <c:choose>
         <c:when test="${index == 1}">
-          One!<br/>
+          One!<br>
         </c:when>
         <c:when test="${index == 4}">
-          Four!<br/>
+          Four!<br>
         </c:when>
         <c:when test="${index == 3}">
-          Three!<br/>
+          Three!<br>
         </c:when>
         <c:otherwise>
-          Huh?<br/>
+          Huh?<br>
         </c:otherwise>
       </c:choose>
     </c:forEach>

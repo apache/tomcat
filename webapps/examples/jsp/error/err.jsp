@@ -14,14 +14,18 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 --%>
-<html>
-<body bgcolor="lightblue">
-
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <style>
+    body {background-color: lightblue;}
+  </style>
+</head>
+<body>
     <%@ page errorPage="errorpge.jsp" %>
     <jsp:useBean id="foo" scope="request" class="error.Smart" />
     <%
         String name = null;
-
         if (request.getParameter("name") == null) {
     %>
     <%@ include file="error.html" %>
@@ -33,7 +37,7 @@
           if (name.equalsIgnoreCase("acura")) {
     %>
 
-    <H1> Yes!!! <a href="http://www.acura.com">Acura</a> is my favorite car.
+    <h1>Yes!!! <a href="http://www.acura.com">Acura</a> is my favorite car.</h1>
 
     <%
           }

@@ -1,4 +1,4 @@
-<HTML>
+<html>
 <!--
  Licensed to the Apache Software Foundation (ASF) under one or more
   contributor license agreements.  See the NOTICE file distributed with
@@ -15,24 +15,24 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 -->
+<head>
+    <style>
+        body {background-color: white;}
+    </style>
+</head>
+<body>
+    <form method="POST" action="checkresult.jsp">
+    <br>
+    <font size="5" color="red">
+    Check all Favorite fruits: <br>
 
-<BODY bgcolor="white">
+    <input type="checkbox" name="fruit" value="apples"> Apples <br>
+    <input type="checkbox" name="fruit" value="grapes"> Grapes <br>
+    <input type="checkbox" name="fruit" value="oranges"> Oranges <br>
+    <input type="checkbox" name="fruit" value="melons"> Melons <br>
 
-
-<FORM TYPE=POST ACTION=checkresult.jsp>
-<BR>
-<font size=5 color="red">
-Check all Favorite fruits: <br>
-
-<input TYPE=checkbox name=fruit VALUE=apples> Apples <BR>
-<input TYPE=checkbox name=fruit VALUE=grapes> Grapes <BR>
-<input TYPE=checkbox name=fruit VALUE=oranges> Oranges <BR>
-<input TYPE=checkbox name=fruit VALUE=melons> Melons <BR>
-
-
-<br> <INPUT TYPE=submit name=submit Value="Submit">
-
-</font>
-</FORM>
-</BODY>
-</HTML>
+    <br> <input type="submit" name="submit" value="Submit">
+    </font>
+    </form>
+</body>
+</html>
