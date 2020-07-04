@@ -20,14 +20,12 @@
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
   version="3.0">
 
-
   <!-- Output method -->
   <xsl:output method="html"
               html-version="5.0"
               encoding="UTF-8"
               indent="no"
               doctype-system="about:legacy-compat"/>
-
 
   <!-- Defined parameters (overrideable) -->
   <xsl:param    name="home-name"           select="'The Tomcat Project'"/>
@@ -55,13 +53,13 @@
   <!-- Defined variables (non-overrideable) -->
   <xsl:variable name="project-xml-filename"><xsl:value-of select="$subdir"/>project.xml</xsl:variable>
   <xsl:variable name="project"
-              select="document($project-xml-filename)/project"/>
+                select="document($project-xml-filename)/project"/>
 
   <!-- Process an entire document into an HTML page -->
   <xsl:template match="document">
 <html lang="en">
 <head>
-  <!-- Note: XLST seems to always output a
+  <!-- Note: XSLT seems to always output a
        <META http-equiv="Content-Type" content="text/html; charset=UTF-8">
        when method="html",
        therefore we can't use
@@ -88,40 +86,42 @@
     -->
     <meta name="author" content="{$name}"/>
   </xsl:for-each>
-  </head>
+</head>
 
-  <body>
+<body>
   <div id="wrapper">
   <!-- Header -->
-  <header><div id="header">
-    <div>
+  <header>
+    <div id="header">
       <div>
-        <xsl:if test="$project/logo">
-          <xsl:variable name="src">
-            <xsl:value-of select="$relative-path"/><xsl:value-of select="$home-logo"/>
-          </xsl:variable>
-          <div class="logo noPrint">
-            <a href="{$project/@href}"><img alt="Tomcat Home" src="{$src}"/></a>
-          </div>
-        </xsl:if>
+        <div>
+          <xsl:if test="$project/logo">
+            <xsl:variable name="src">
+              <xsl:value-of select="$relative-path"/><xsl:value-of select="$home-logo"/>
+            </xsl:variable>
+            <div class="logo noPrint">
+              <a href="{$project/@href}"><img alt="Tomcat Home" src="{$src}"/></a>
+            </div>
+          </xsl:if>
 
-        <div style="height: 1px;"/>
-        <xsl:variable name="src">
-          <xsl:value-of select="$relative-path"/><xsl:value-of select="$apache-logo"/>
-        </xsl:variable>
-        <div class="asfLogo noPrint">
-          <a href="https://www.apache.org/" target="_blank"><img src="{$src}" alt="The Apache Software Foundation" style="width: 266px; height: 83px;"/></a>
+          <div style="height: 1px;"/>
+          <xsl:variable name="src">
+            <xsl:value-of select="$relative-path"/><xsl:value-of select="$apache-logo"/>
+          </xsl:variable>
+          <div class="asfLogo noPrint">
+            <a href="https://www.apache.org/" target="_blank"><img src="{$src}" alt="The Apache Software Foundation" style="width: 266px; height: 83px;"/></a>
+          </div>
+          <h1><xsl:value-of select="$project/title"/></h1>
+          <div class="versionInfo">
+            Version <xsl:value-of select="$version"/>,
+            <time datetime="{$build-date-iso-8601}"><xsl:value-of select="$build-date"/></time>
+          </div>
+          <div style="height: 1px;"/>
+          <div style="clear: left;"/>
         </div>
-        <h1><xsl:value-of select="$project/title"/></h1>
-        <div class="versionInfo">
-          Version <xsl:value-of select="$version"/>,
-          <time datetime="{$build-date-iso-8601}"><xsl:value-of select="$build-date"/></time>
-        </div>
-        <div style="height: 1px;"/>
-        <div style="clear: left;"/>
       </div>
     </div>
-  </div></header>
+  </header>
 
   <div id="middle">
     <div>
@@ -144,27 +144,25 @@
   </div>
 
   <!-- Footer -->
-  <footer><div id="footer">
+  <footer>
+    <div id="footer">
     Copyright © 1999-<xsl:value-of select="$year"/>, The Apache Software Foundation
-  </div></footer>
-</div>
+    </div>
+  </footer>
+  </div>
 </body>
 </html>
-
-
   </xsl:template>
-
 
   <!-- Process a menu for the navigation bar -->
   <xsl:template match="menu">
-  <div>
-    <h2><xsl:value-of select="@name"/></h2>
-    <ul>
-      <xsl:apply-templates select="item"/>
-    </ul>
-  </div>
+    <div>
+      <h2><xsl:value-of select="@name"/></h2>
+      <ul>
+        <xsl:apply-templates select="item"/>
+      </ul>
+    </div>
   </xsl:template>
-
 
   <!-- Process a menu item for the navigation bar -->
   <xsl:template match="item">
@@ -173,7 +171,6 @@
     </xsl:variable>
     <li><a href="{$href}"><xsl:value-of select="@name"/></a></li>
   </xsl:template>
-
 
   <!-- Process a documentation section -->
   <xsl:template match="section">
@@ -191,7 +188,6 @@
       <xsl:value-of select="translate($name2, ' #', '__')"/>
     </xsl:variable>
 
-
     <!-- Section heading -->
     <h3 id="{$name}">
       <xsl:if test="@rtext">
@@ -206,9 +202,7 @@
     <div class="text">
       <xsl:apply-templates/>
     </div>
-
   </xsl:template>
-
 
   <!-- Process a documentation subsection -->
   <xsl:template match="subsection">
@@ -219,8 +213,7 @@
         </xsl:when>
         <xsl:otherwise>
           <xsl:if test="
-              count(//*[self::section or self::subsection][@name=current()/@name]) &gt; 1
-              ">
+              count(//*[self::section or self::subsection][@name=current()/@name]) &gt; 1">
             <xsl:value-of select="concat(parent::*[self::section or self::subsection]/@name, '/')"/>
           </xsl:if>
           <xsl:value-of select="@name"/>
@@ -243,9 +236,7 @@
         <xsl:apply-templates/>
       </div>
     </div>
-
   </xsl:template>
-
 
   <!-- Generate table of contents -->
   <xsl:template match="toc">
@@ -260,8 +251,7 @@
         </xsl:when>
         <xsl:otherwise>
           <xsl:if test="local-name()='subsection' and
-              count(//*[self::section or self::subsection][@name=current()/@name]) &gt; 1
-              ">
+              count(//*[self::section or self::subsection][@name=current()/@name]) &gt; 1">
             <xsl:value-of select="concat(parent::*[self::section or self::subsection]/@name, '/')"/>
           </xsl:if>
           <xsl:value-of select="@name"/>
@@ -278,17 +268,16 @@
     </li>
   </xsl:template>
 
-
   <!-- Process a source code example -->
   <xsl:template match="source">
-  <div class="codeBox">
-    <pre>
-      <xsl:if test="@wrapped='true'">
-        <xsl:attribute name="class">wrap</xsl:attribute>
-      </xsl:if>
-      <code><xsl:apply-templates/></code>
-    </pre>
-  </div>
+    <div class="codeBox">
+      <pre>
+        <xsl:if test="@wrapped='true'">
+          <xsl:attribute name="class">wrap</xsl:attribute>
+        </xsl:if>
+        <code><xsl:apply-templates/></code>
+      </pre>
+    </div>
   </xsl:template>
 
   <!-- Process an attributes list with nested attribute elements -->
@@ -354,73 +343,73 @@
   <xsl:template match="changelog/add">
     <xsl:variable name="src"><xsl:value-of select="$relative-path"/>/images/add.gif</xsl:variable>
     <li>
-    <img alt="Add: " class="icon" src="{$src}"/><xsl:apply-templates/>
-  </li>
+      <img alt="Add: " class="icon" src="{$src}"/><xsl:apply-templates/>
+    </li>
   </xsl:template>
 
   <xsl:template match="changelog/update">
     <xsl:variable name="src"><xsl:value-of select="$relative-path"/>/images/update.gif</xsl:variable>
     <li>
-    <img alt="Update: " class="icon" src="{$src}"/><xsl:apply-templates/>
-  </li>
+      <img alt="Update: " class="icon" src="{$src}"/><xsl:apply-templates/>
+    </li>
   </xsl:template>
 
   <xsl:template match="changelog/design">
     <xsl:variable name="src"><xsl:value-of select="$relative-path"/>/images/design.gif</xsl:variable>
     <li>
-    <img alt="Design: " class="icon" src="{$src}"/><xsl:apply-templates/>
-  </li>
+      <img alt="Design: " class="icon" src="{$src}"/><xsl:apply-templates/>
+    </li>
   </xsl:template>
 
   <xsl:template match="changelog/docs">
     <xsl:variable name="src"><xsl:value-of select="$relative-path"/>/images/docs.gif</xsl:variable>
     <li>
-    <img alt="Docs: " class="icon" src="{$src}"/><xsl:apply-templates/>
-  </li>
+      <img alt="Docs: " class="icon" src="{$src}"/><xsl:apply-templates/>
+    </li>
   </xsl:template>
 
   <xsl:template match="changelog/fix">
     <xsl:variable name="src"><xsl:value-of select="$relative-path"/>/images/fix.gif</xsl:variable>
     <li>
-    <img alt="Fix: " class="icon" src="{$src}"/><xsl:apply-templates/>
-  </li>
+      <img alt="Fix: " class="icon" src="{$src}"/><xsl:apply-templates/>
+    </li>
   </xsl:template>
 
   <xsl:template match="changelog/scode">
     <xsl:variable name="src"><xsl:value-of select="$relative-path"/>/images/code.gif</xsl:variable>
     <li>
-    <img alt="Code: " class="icon" src="{$src}"/><xsl:apply-templates/>
-  </li>
+      <img alt="Code: " class="icon" src="{$src}"/><xsl:apply-templates/>
+    </li>
   </xsl:template>
 
   <!-- Link to a bug report -->
   <xsl:template match="bug">
-      <xsl:variable name="link"><xsl:value-of select="$buglink"/><xsl:value-of select="text()"/></xsl:variable>
-      <a href="{$link}"><xsl:apply-templates/></a>
+    <xsl:variable name="link"><xsl:value-of select="$buglink"/><xsl:value-of select="text()"/></xsl:variable>
+    <a href="{$link}"><xsl:apply-templates/></a>
   </xsl:template>
 
   <!-- Link to a SVN revision report -->
   <xsl:template match="rev">
-      <xsl:variable name="link"><xsl:value-of select="$revlink"/><xsl:value-of select="text()"/></xsl:variable>
-      <a href="{$link}">r<xsl:apply-templates/></a>
+    <xsl:variable name="link"><xsl:value-of select="$revlink"/><xsl:value-of select="text()"/></xsl:variable>
+    <a href="{$link}">r<xsl:apply-templates/></a>
   </xsl:template>
 
   <!-- Link to online docs -->
   <xsl:template match="doc">
-      <xsl:variable name="link"><xsl:value-of select="$doclink"/><xsl:value-of select="@path"/></xsl:variable>
-      <a href="{$link}"><xsl:apply-templates/></a>
+    <xsl:variable name="link"><xsl:value-of select="$doclink"/><xsl:value-of select="@path"/></xsl:variable>
+    <a href="{$link}"><xsl:apply-templates/></a>
   </xsl:template>
 
   <!-- Link to security page -->
   <xsl:template match="security">
-      <xsl:variable name="link"><xsl:value-of select="$sylink"/></xsl:variable>
-      <a href="{$link}"><xsl:apply-templates/></a>
+    <xsl:variable name="link"><xsl:value-of select="$sylink"/></xsl:variable>
+    <a href="{$link}"><xsl:apply-templates/></a>
   </xsl:template>
 
   <!-- Link to download page -->
   <xsl:template match="download">
-      <xsl:variable name="link"><xsl:value-of select="$dllink"/></xsl:variable>
-      <a href="{$link}"><xsl:apply-templates/></a>
+    <xsl:variable name="link"><xsl:value-of select="$dllink"/></xsl:variable>
+    <a href="{$link}"><xsl:apply-templates/></a>
   </xsl:template>
 
   <!-- Version numbers -->
