@@ -1087,7 +1087,7 @@ public class AjpProcessor extends AbstractProcessor {
         if (empty) {
             return 0;
         } else {
-            return bodyBytes.getByteChunk().getLength();
+            return request.getInputBuffer().available();
         }
     }
 
@@ -1308,6 +1308,11 @@ public class AjpProcessor extends AbstractProcessor {
             handler.setByteBuffer(ByteBuffer.wrap(bc.getBuffer(), bc.getStart(), bc.getLength()));
             empty = true;
             return handler.getByteBuffer().remaining();
+        }
+
+        @Override
+        public int available() {
+            return bodyBytes.getByteChunk().getLength();
         }
     }
 

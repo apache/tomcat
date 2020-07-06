@@ -51,6 +51,11 @@
         Remove deprecated <code>CookieProcessor.generateHeader</code> method.
         (remm)
       </fix>
+      <fix>
+        Refactor the implementation of
+        <code>ServletInputStream.available()</code> to provide a more accurate
+        return value, particularly when end of stream has been reached. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="WebSocket">
