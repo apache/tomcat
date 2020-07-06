@@ -1229,7 +1229,8 @@ public class Stream extends AbstractStream implements HeaderEmitter {
         }
 
 
-        synchronized int available() {
+        @Override
+        public final synchronized int available() {
             if (inBuffer == null) {
                 return 0;
             }
