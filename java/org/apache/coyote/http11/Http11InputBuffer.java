@@ -242,12 +242,11 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
 
     @Override
     public int doRead(ApplicationBufferHandler handler) throws IOException {
-
-        if (lastActiveFilter == -1)
+        if (lastActiveFilter == -1) {
             return inputStreamInputBuffer.doRead(handler);
-        else
+        } else {
             return activeFilters[lastActiveFilter].doRead(handler);
-
+        }
     }
 
 
@@ -648,17 +647,25 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
     }
 
 
+    @Override
+    public int available() {
+        return available(false);
+    }
+
+
     /**
      * Available bytes in the buffers (note that due to encoding, this may not
      * correspond).
      */
     int available(boolean read) {
-        int available = byteBuffer.remaining();
-        if ((available == 0) && (lastActiveFilter >= 0)) {
-            for (int i = 0; (available == 0) && (i <= lastActiveFilter); i++) {
-                available = activeFilters[i].available();
-            }
+        int available;
+
+        if (lastActiveFilter == -1) {
+            available = inputStreamInputBuffer.available();
+        } else {
+            available = activeFilters[lastActiveFilter].available();
         }
+
         if (available > 0 || !read) {
             return available;
         }
@@ -1139,6 +1146,11 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
             byteBuffer.position(byteBuffer.limit());
 
             return length;
+        }
+
+        @Override
+        public int available() {
+            return byteBuffer.remaining();
         }
     }
 

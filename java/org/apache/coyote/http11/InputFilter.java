@@ -76,14 +76,6 @@ public interface InputFilter extends InputBuffer {
 
 
     /**
-     * Amount of bytes still available in a buffer.
-     *
-     * @return The number of bytes in the buffer
-     */
-    public int available();
-
-
-    /**
      * Has the request body been read fully?
      *
      * @return {@code true} if the request body has been fully read, otherwise
