@@ -867,14 +867,11 @@ public class InternalNioInputBuffer extends AbstractInputBuffer<NioChannel> {
 
     // ------------------------------------- InputStreamInputBuffer Inner Class
 
-
     /**
      * This class is an input buffer which will read its data from an input
      * stream.
      */
-    protected class SocketInputBuffer
-        implements InputBuffer {
-
+    protected class SocketInputBuffer implements InputBuffer {
 
         /**
          * Read bytes into the specified chunk.
@@ -893,6 +890,15 @@ public class InternalNioInputBuffer extends AbstractInputBuffer<NioChannel> {
             pos = lastValid;
 
             return (length);
+        }
+
+        @Override
+        public int available() {
+            if (lastValid > pos) {
+                return lastValid - pos;
+            } else {
+                return 0;
+            }
         }
     }
 }

@@ -75,14 +75,5 @@ public interface InputFilter extends InputBuffer {
      * to consume extra bytes. The result of this method can't be negative (if
      * an error happens, an IOException should be thrown instead).
      */
-    public long end()
-        throws IOException;
-
-
-    /**
-     * Amount of bytes still available in a buffer.
-     */
-    public int available();
-
-
+    public long end() throws IOException;
 }

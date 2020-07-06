@@ -265,7 +265,13 @@ public class ChunkedInputFilter implements InputFilter {
      */
     @Override
     public int available() {
-        return lastValid - pos;
+        int available = lastValid - pos;
+        if (available == 0) {
+            // No data buffered here. Try the next filter in the chain.
+            return buffer.available();
+        } else {
+            return available;
+        }
     }
 
 

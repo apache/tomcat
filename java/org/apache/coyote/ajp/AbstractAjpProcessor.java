@@ -1218,20 +1218,17 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
 
     // ------------------------------------- InputStreamInputBuffer Inner Class
 
-
     /**
      * This class is an input buffer which will read its data from an input
      * stream.
      */
     protected class SocketInputBuffer implements InputBuffer {
 
-
         /**
          * Read bytes into the specified chunk.
          */
         @Override
-        public int doRead(ByteChunk chunk, Request req)
-        throws IOException {
+        public int doRead(ByteChunk chunk, Request req) throws IOException {
 
             if (endOfStream) {
                 return -1;
@@ -1250,9 +1247,16 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
             chunk.setBytes(bc.getBuffer(), bc.getStart(), bc.getLength());
             empty = true;
             return chunk.getLength();
-
         }
 
+        @Override
+        public int available() {
+            if (empty) {
+                return 0;
+            } else {
+                return bodyBytes.getByteChunk().getLength();
+            }
+        }
     }
 
 

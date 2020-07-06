@@ -137,7 +137,12 @@ public class BufferedInputFilter implements InputFilter {
 
     @Override
     public int available() {
-        return buffered.getLength();
+        int available = buffered.getLength();
+        if (available == 0) {
+            // No data buffered here. Try the next filter in the chain.
+            return buffer.available();
+        } else {
+            return available;
+        }
     }
-
 }

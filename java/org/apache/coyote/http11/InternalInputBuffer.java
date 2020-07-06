@@ -595,14 +595,11 @@ public class InternalInputBuffer extends AbstractInputBuffer<Socket> {
 
     // ------------------------------------- InputStreamInputBuffer Inner Class
 
-
     /**
      * This class is an input buffer which will read its data from an input
      * stream.
      */
-    protected class InputStreamInputBuffer
-        implements InputBuffer {
-
+    protected class InputStreamInputBuffer implements InputBuffer {
 
         /**
          * Read bytes into the specified chunk.
@@ -621,6 +618,15 @@ public class InternalInputBuffer extends AbstractInputBuffer<Socket> {
             pos = lastValid;
 
             return (length);
+        }
+
+        @Override
+        public int available() {
+            if (lastValid > pos) {
+                return lastValid - pos;
+            } else {
+                return 0;
+            }
         }
     }
 }
