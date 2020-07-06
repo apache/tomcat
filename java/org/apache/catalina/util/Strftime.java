@@ -184,7 +184,7 @@ public class Strftime {
                 } else {
                     if ( !inside && c != ' ' ) {
                         //We start a literal, which we need to quote
-                        buf.append("'");
+                        buf.append('\'');
                         inside = true;
                     }
 

@@ -1611,7 +1611,7 @@ public class DefaultServlet extends HttpServlet {
         sb.append("<listing ");
         sb.append(" contextPath='");
         sb.append(contextPath);
-        sb.append("'");
+        sb.append('\'');
         sb.append(" directory='");
         sb.append(resource.getName());
         sb.append("' ");
@@ -1645,25 +1645,25 @@ public class DefaultServlet extends HttpServlet {
             sb.append("<entry");
             sb.append(" type='")
               .append(childResource.isDirectory()?"dir":"file")
-              .append("'");
+              .append('\'');
             sb.append(" urlPath='")
               .append(rewrittenContextPath)
               .append(rewriteUrl(directoryWebappPath + entry))
               .append(childResource.isDirectory()?"/":"")
-              .append("'");
+              .append('\'');
             if (childResource.isFile()) {
                 sb.append(" size='")
                   .append(renderSize(childResource.getContentLength()))
-                  .append("'");
+                  .append('\'');
             }
             sb.append(" date='")
               .append(childResource.getLastModifiedHttp())
-              .append("'");
+              .append('\'');
 
-            sb.append(">");
+            sb.append('>');
             sb.append(Escape.htmlElementContent(entry));
             if (childResource.isDirectory())
-                sb.append("/");
+                sb.append('/');
             sb.append("</entry>");
         }
         sb.append("</entries>");
@@ -1781,7 +1781,7 @@ public class DefaultServlet extends HttpServlet {
                 parent = "/";
             sb.append(rewriteUrl(parent));
             if (!parent.endsWith("/"))
-                sb.append("/");
+                sb.append('/');
             sb.append("\">");
             sb.append("<b>");
             sb.append(sm.getString("directory.parent", parent));
@@ -1863,11 +1863,11 @@ public class DefaultServlet extends HttpServlet {
             sb.append(rewrittenContextPath);
             sb.append(rewriteUrl(childResource.getWebappPath()));
             if (childResource.isDirectory())
-                sb.append("/");
+                sb.append('/');
             sb.append("\"><tt>");
             sb.append(Escape.htmlElementContent(filename));
             if (childResource.isDirectory())
-                sb.append("/");
+                sb.append('/');
             sb.append("</tt></a></td>\r\n");
 
             sb.append("<td align=\"right\"><tt>");

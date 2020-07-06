@@ -372,7 +372,7 @@ public class StaticMembershipProvider extends MembershipProviderBase implements 
             buf.append(getTypeDesc());
             buf.append("; member=");
             buf.append(member);
-            buf.append("]");
+            buf.append(']');
             return buf.toString();
         }
 

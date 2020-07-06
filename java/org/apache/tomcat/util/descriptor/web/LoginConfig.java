@@ -155,7 +155,7 @@ public class LoginConfig extends XmlEncodingBase implements Serializable {
             sb.append(", errorPage=");
             sb.append(errorPage);
         }
-        sb.append("]");
+        sb.append(']');
         return sb.toString();
     }
 

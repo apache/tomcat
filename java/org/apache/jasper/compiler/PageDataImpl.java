@@ -324,15 +324,15 @@ class PageDataImpl extends PageData implements TagConstants {
         @Override
     public void visit(Node.ELExpression n) throws JasperException {
             if (!n.getRoot().isXmlSyntax()) {
-                buf.append("<").append(JSP_TEXT_ACTION);
-                buf.append(" ");
+                buf.append('<').append(JSP_TEXT_ACTION);
+                buf.append(' ');
                 buf.append(jspIdPrefix);
                 buf.append(":id=\"");
                 buf.append(jspId++).append("\">");
             }
             buf.append("${");
             buf.append(Escape.xml(n.getText()));
-            buf.append("}");
+            buf.append('}');
             if (!n.getRoot().isXmlSyntax()) {
                 buf.append(JSP_TEXT_ACTION_END);
             }
@@ -464,7 +464,7 @@ class PageDataImpl extends PageData implements TagConstants {
             Node.Nodes body = n.getBody();
             String text = n.getText();
 
-            buf.append("<").append(n.getQName());
+            buf.append('<').append(n.getQName());
             buf.append("\n");
 
             printAttributes(n, addDefaultNS);
@@ -523,7 +523,7 @@ class PageDataImpl extends PageData implements TagConstants {
                 return;
             }
 
-            buf.append("<").append(n.getQName());
+            buf.append('<').append(n.getQName());
             buf.append("\n");
 
             // append jsp:id
@@ -557,7 +557,7 @@ class PageDataImpl extends PageData implements TagConstants {
                         first = false;
                         buf.append("  import=\"");
                     } else {
-                        buf.append(",");
+                        buf.append(',');
                     }
                     buf.append(JspUtil.getExprInXml(i));
                 }
@@ -576,7 +576,7 @@ class PageDataImpl extends PageData implements TagConstants {
          * ServletResponse.setContentType(), is derived from the pageInfo.
          */
         private void appendPageDirective() {
-            buf.append("<").append(JSP_PAGE_DIRECTIVE_ACTION);
+            buf.append('<').append(JSP_PAGE_DIRECTIVE_ACTION);
             buf.append("\n");
 
             // append jsp:id
@@ -622,7 +622,7 @@ class PageDataImpl extends PageData implements TagConstants {
          * attribute whose value is hard-coded to UTF-8.
          */
         private void appendTagDirective() {
-            buf.append("<").append(JSP_TAG_DIRECTIVE_ACTION);
+            buf.append('<').append(JSP_TAG_DIRECTIVE_ACTION);
             buf.append("\n");
 
             // append jsp:id
@@ -634,7 +634,7 @@ class PageDataImpl extends PageData implements TagConstants {
 
         private void appendText(String text, boolean createJspTextElement) {
             if (createJspTextElement) {
-                buf.append("<").append(JSP_TEXT_ACTION);
+                buf.append('<').append(JSP_TEXT_ACTION);
                 buf.append("\n");
 
                 // append jsp:id

@@ -113,7 +113,7 @@ public class SetNextNamingRule extends Rule {
             } else {
                 code.append(digester.toVariableName(namingResources));
             }
-            code.append(".").append(methodName).append("(");
+            code.append(".").append(methodName).append('(');
             code.append(digester.toVariableName(child)).append(");");
             code.append(System.lineSeparator());
         }
@@ -130,7 +130,7 @@ public class SetNextNamingRule extends Rule {
         sb.append(methodName);
         sb.append(", paramType=");
         sb.append(paramType);
-        sb.append("]");
+        sb.append(']');
         return sb.toString();
     }
 

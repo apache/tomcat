@@ -475,7 +475,7 @@ public class ContextConfig implements LifecycleListener {
 
 
     protected static String getContextXmlPackageName(Container container) {
-        StringBuffer result = new StringBuffer();
+        StringBuilder result = new StringBuilder();
         Container host = null;
         Container engine = null;
         while (container != null) {
@@ -516,26 +516,26 @@ public class ContextConfig implements LifecycleListener {
 
     protected void generateClassHeader(Digester digester, String packageName, String resourceName) {
         StringBuilder code = digester.getGeneratedCode();
-        code.append("package ").append(packageName).append(";").append(System.lineSeparator());
+        code.append("package ").append(packageName).append(';').append(System.lineSeparator());
         code.append("public class ").append(resourceName).append(" implements ");
         code.append(ContextXml.class.getName().replace('$', '.'));
         code.append(" {").append(System.lineSeparator());
         code.append("public void load(");
         code.append(Context.class.getName());
         String contextArgument = digester.toVariableName(context);
-        code.append(" ").append(contextArgument).append(") {").append(System.lineSeparator());
+        code.append(' ').append(contextArgument).append(") {").append(System.lineSeparator());
         // Create a new variable with the concrete type
         digester.setKnown(context);
-        code.append(context.getClass().getName()).append(" ").append(digester.toVariableName(context));
+        code.append(context.getClass().getName()).append(' ').append(digester.toVariableName(context));
         code.append(" = (").append(context.getClass().getName()).append(") ").append(contextArgument);
-        code.append(";").append(System.lineSeparator());
+        code.append(';').append(System.lineSeparator());
     }
 
 
     protected void generateClassFooter(Digester digester) {
         StringBuilder code = digester.getGeneratedCode();
-        code.append("}").append(System.lineSeparator());
-        code.append("}").append(System.lineSeparator());
+        code.append('}').append(System.lineSeparator());
+        code.append('}').append(System.lineSeparator());
     }
 
 
