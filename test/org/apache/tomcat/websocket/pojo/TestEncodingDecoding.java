@@ -22,10 +22,10 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import javax.servlet.ServletContextEvent;
@@ -40,6 +40,7 @@ import javax.websocket.Endpoint;
 import javax.websocket.EndpointConfig;
 import javax.websocket.Extension;
 import javax.websocket.MessageHandler;
+import javax.websocket.OnError;
 import javax.websocket.OnMessage;
 import javax.websocket.Session;
 import javax.websocket.WebSocketContainer;
@@ -61,9 +62,15 @@ import org.apache.tomcat.websocket.server.WsContextListener;
 public class TestEncodingDecoding extends TomcatBaseTest {
 
     private static final String MESSAGE_ONE = "message-one";
+    private static final String MESSAGE_TWO = "message-two";
     private static final String PATH_PROGRAMMATIC_EP = "/echoProgrammaticEP";
     private static final String PATH_ANNOTATED_EP = "/echoAnnotatedEP";
     private static final String PATH_GENERICS_EP = "/echoGenericsEP";
+    private static final String PATH_MESSAGES_EP = "/echoMessagesEP";
+    private static final String PATH_BATCHED_EP = "/echoBatchedEP";
+
+    private static final int WAIT_LOOPS = 50;
+    private static final int WAIT_DELAY = 100;
 
 
     @Test
@@ -89,13 +96,13 @@ public class TestEncodingDecoding extends TomcatBaseTest {
         session.getBasicRemote().sendObject(msg1);
         // Should not take very long
         int i = 0;
-        while (i < 20) {
+        while (i < WAIT_LOOPS) {
             if (MsgStringMessageHandler.received.size() > 0 &&
                     client.received.size() > 0) {
                 break;
             }
-            Thread.sleep(100);
             i++;
+            Thread.sleep(WAIT_DELAY);
         }
 
         // Check messages were received
@@ -140,11 +147,12 @@ public class TestEncodingDecoding extends TomcatBaseTest {
 
         // Should not take very long
         int i = 0;
-        while (i < 20) {
+        while (i < WAIT_LOOPS) {
             if (server.received.size() > 0 && client.received.size() > 0) {
                 break;
             }
-            Thread.sleep(100);
+            i++;
+            Thread.sleep(WAIT_DELAY);
         }
 
         // Check messages were received
@@ -200,11 +208,12 @@ public class TestEncodingDecoding extends TomcatBaseTest {
 
         // Should not take very long
         int i = 0;
-        while (i < 20) {
+        while (i < WAIT_LOOPS) {
             if (server.received.size() > 0 && client.received.size() > 0) {
                 break;
             }
-            Thread.sleep(100);
+            i++;
+            Thread.sleep(WAIT_DELAY);
         }
 
         // Check messages were received
@@ -218,14 +227,108 @@ public class TestEncodingDecoding extends TomcatBaseTest {
     }
 
 
+    @Test
+    public void testMessagesEndPoints() throws Exception {
+        // Set up utility classes
+        MessagesServer server = new MessagesServer();
+        SingletonConfigurator.setInstance(server);
+        ServerConfigListener.setPojoClazz(MessagesServer.class);
+
+        Tomcat tomcat = getTomcatInstance();
+        // No file system docBase required
+        Context ctx = tomcat.addContext("", null);
+        ctx.addApplicationListener(ServerConfigListener.class.getName());
+        Tomcat.addServlet(ctx, "default", new DefaultServlet());
+        ctx.addServletMapping("/", "default");
+
+        WebSocketContainer wsContainer =
+                ContainerProvider.getWebSocketContainer();
+
+        tomcat.start();
+
+        StringClient client = new StringClient();
+        URI uri = new URI("ws://localhost:" + getPort() + PATH_MESSAGES_EP);
+        Session session = wsContainer.connectToServer(client, uri);
+
+        session.getBasicRemote().sendText(MESSAGE_ONE);
+
+        // Should not take very long
+        int i = 0;
+        while (i < WAIT_LOOPS) {
+            if (server.received.size() > 0 && client.received.size() > 0) {
+                break;
+            }
+            i++;
+            Thread.sleep(WAIT_DELAY);
+        }
+
+        // Check messages were received
+        Assert.assertEquals(1, server.received.size());
+        Assert.assertEquals(2, client.received.size());
+
+        // Check correct messages were received
+        Assert.assertEquals(MESSAGE_ONE, server.received.peek());
+        session.close();
+
+        Assert.assertNull(server.t);
+    }
+
+
+    @Test
+    public void testBatchedEndPoints() throws Exception {
+        // Set up utility classes
+        BatchedServer server = new BatchedServer();
+        SingletonConfigurator.setInstance(server);
+        ServerConfigListener.setPojoClazz(BatchedServer.class);
+
+        Tomcat tomcat = getTomcatInstance();
+        // No file system docBase required
+        Context ctx = tomcat.addContext("", null);
+        ctx.addApplicationListener(ServerConfigListener.class.getName());
+        Tomcat.addServlet(ctx, "default", new DefaultServlet());
+        ctx.addServletMapping("/", "default");
+
+        WebSocketContainer wsContainer =
+                ContainerProvider.getWebSocketContainer();
+
+        tomcat.start();
+
+        StringClient client = new StringClient();
+        URI uri = new URI("ws://localhost:" + getPort() + PATH_BATCHED_EP);
+        Session session = wsContainer.connectToServer(client, uri);
+
+        session.getBasicRemote().sendText(MESSAGE_ONE);
+
+        // Should not take very long
+        int i = 0;
+        while (i++ < WAIT_LOOPS) {
+            if (server.received.size() > 0 && client.received.size() > 1) {
+                break;
+            }
+            i++;
+            Thread.sleep(WAIT_DELAY);
+        }
+
+        // Check messages were received
+        Assert.assertEquals(1, server.received.size());
+        Assert.assertEquals(2, client.received.size());
+
+        // Check correct messages were received
+        Assert.assertEquals(MESSAGE_ONE, server.received.peek());
+        session.close();
+
+        Assert.assertNull(server.t);
+    }
+
+
     private int testEvent(String name, int count) throws InterruptedException {
         int i = count;
-        while (i < 50) {
+        while (i < WAIT_LOOPS * 3) {
             if (Server.isLifeCycleEventCalled(name)) {
                 break;
             }
             i++;
-            Thread.sleep(100);
+            Thread.sleep(WAIT_DELAY);
         }
         Assert.assertTrue(Server.isLifeCycleEventCalled(name));
         return i;
@@ -234,7 +337,7 @@ public class TestEncodingDecoding extends TomcatBaseTest {
 
     @ClientEndpoint(decoders=ListStringDecoder.class, encoders=ListStringEncoder.class)
     public static class GenericsClient {
-        private Queue<Object> received = new ConcurrentLinkedQueue<Object>();
+        private final Queue<Object> received = new ConcurrentLinkedQueue<Object>();
 
         @OnMessage
         public void rx(List<String> in) {
@@ -247,7 +350,7 @@ public class TestEncodingDecoding extends TomcatBaseTest {
             encoders={MsgStringEncoder.class, MsgByteEncoder.class})
     public static class Client {
 
-        private Queue<Object> received = new ConcurrentLinkedQueue<Object>();
+        private final Queue<Object> received = new ConcurrentLinkedQueue<Object>();
 
         @OnMessage
         public void rx(MsgString in) {
@@ -261,14 +364,26 @@ public class TestEncodingDecoding extends TomcatBaseTest {
     }
 
 
+    @ClientEndpoint
+    public static class StringClient {
+
+        private final Queue<Object> received = new ConcurrentLinkedQueue<>();
+
+        @OnMessage
+        public void rx(String in) {
+            received.add(in);
+        }
+
+    }
+
+
     @ServerEndpoint(value=PATH_GENERICS_EP,
             decoders=ListStringDecoder.class,
             encoders=ListStringEncoder.class,
             configurator=SingletonConfigurator.class)
     public static class GenericsServer {
 
-        private Queue<Object> received = new ConcurrentLinkedQueue<Object>();
-
+        private final Queue<Object> received = new ConcurrentLinkedQueue<Object>();
 
         @OnMessage
         public List<String> rx(List<String> in) {
@@ -279,14 +394,60 @@ public class TestEncodingDecoding extends TomcatBaseTest {
     }
 
 
+    @ServerEndpoint(value=PATH_MESSAGES_EP,
+            configurator=SingletonConfigurator.class)
+    public static class MessagesServer {
+
+        private final Queue<String> received = new ConcurrentLinkedQueue<>();
+        private volatile Throwable t = null;
+
+        @OnMessage
+        public String onMessage(String message, Session session) throws Exception {
+            received.add(message);
+            session.getAsyncRemote().sendText(MESSAGE_ONE).get();
+            return message;
+        }
+
+        @OnError
+        public void onError(@SuppressWarnings("unused") Session session, Throwable t) {
+            t.printStackTrace();
+            this.t = t;
+        }
+    }
+
+
+    @ServerEndpoint(value=PATH_BATCHED_EP,
+            configurator=SingletonConfigurator.class)
+    public static class BatchedServer {
+
+        private final Queue<String> received = new ConcurrentLinkedQueue<>();
+        private volatile Throwable t = null;
+
+        @OnMessage
+        public String onMessage(String message, Session session) throws IOException {
+            received.add(message);
+            session.getAsyncRemote().setBatchingAllowed(true);
+            session.getAsyncRemote().sendText(MESSAGE_ONE);
+            session.getAsyncRemote().setBatchingAllowed(false);
+            return MESSAGE_TWO;
+        }
+
+        @OnError
+        public void onError(@SuppressWarnings("unused") Session session, Throwable t) {
+            t.printStackTrace();
+            this.t = t;
+        }
+    }
+
+
     @ServerEndpoint(value=PATH_ANNOTATED_EP,
             decoders={MsgStringDecoder.class, MsgByteDecoder.class},
             encoders={MsgStringEncoder.class, MsgByteEncoder.class},
             configurator=SingletonConfigurator.class)
     public static class Server {
 
-        private Queue<Object> received = new ConcurrentLinkedQueue<Object>();
-        static HashMap<String, Boolean> lifeCyclesCalled = new HashMap<String, Boolean>(8);
+        private final Queue<Object> received = new ConcurrentLinkedQueue<Object>();
+        static final ConcurrentHashMap<String, Boolean> lifeCyclesCalled = new ConcurrentHashMap<String, Boolean>(8);
 
         @OnMessage
         public MsgString rx(MsgString in) {
@@ -374,7 +535,7 @@ public class TestEncodingDecoding extends TomcatBaseTest {
 
 
     public static class MsgString {
-        private String data;
+        private volatile String data;
         public String getData() { return data; }
         public void setData(String data) { this.data = data; }
     }
@@ -426,7 +587,7 @@ public class TestEncodingDecoding extends TomcatBaseTest {
 
 
     public static class MsgByte {
-        private byte[] data;
+        private volatile byte[] data;
         public byte[] getData() { return data; }
         public void setData(byte[] data) { this.data = data; }
     }
