@@ -45,10 +45,20 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 10.0.0-M8 (markt)" rtext="in development">
+  <subsection name="WebSocket">
+    <changelog>
+      <fix>
+        Requests received via proxies may be marked as using the <code>ws</code>
+        or <code>wss</code> protocol rather than <code>http</code> or
+        <code>https</code>. Ensure that such requests are not rejected. PR
+        provided by Ronny Perinke. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Web applications">
     <changelog>
       <fix>
-        Remove the localization of the text output of the Manager application 
+        Remove the localization of the text output of the Manager application
         list of contexts and the Host Manager application list of hosts so that
         the output is more consistent. PR provided by Holomark. (markt)
       </fix>
