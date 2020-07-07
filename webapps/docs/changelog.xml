@@ -70,7 +70,7 @@
     </changelog>
   </subsection>
 </section>
-<section name="Tomcat 7.0.105 (violetagg)" rtext="release in progress">
+<section name="Tomcat 7.0.105 (violetagg)" rtext="released 2020-07-07">
   <subsection name="Catalina">
     <changelog>
       <fix>
