@@ -60,6 +60,15 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 7.0.106 (violetagg)" rtext="in development">
+  <subsection name="Web applications">
+    <changelog>
+      <fix>
+        Remove the localization of the text output of the Manager application 
+        list of contexts and the Host Manager application list of hosts so that
+        the output is more consistent. PR provided by Holomark. (markt)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 7.0.105 (violetagg)" rtext="release in progress">
   <subsection name="Catalina">
