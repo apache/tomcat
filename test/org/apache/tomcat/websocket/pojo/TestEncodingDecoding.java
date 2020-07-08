@@ -254,7 +254,7 @@ public class TestEncodingDecoding extends TomcatBaseTest {
         // Should not take very long
         int i = 0;
         while (i < WAIT_LOOPS) {
-            if (server.received.size() > 0 && client.received.size() > 0) {
+            if (server.received.size() > 0 && client.received.size() > 1) {
                 break;
             }
             i++;
