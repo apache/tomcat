@@ -801,9 +801,17 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
             response.clear();
             // Blocking read
             Future<Integer> read = channel.read(response);
-            Integer bytesRead = read.get(timeout, TimeUnit.MILLISECONDS);
+            Integer bytesRead;
+            try {
+                bytesRead = read.get(timeout, TimeUnit.MILLISECONDS);
+            } catch (TimeoutException e) {
+                TimeoutException te = new TimeoutException(
+                        sm.getString("wsWebSocketContainer.responseFail", Integer.toString(status), headers));
+                te.initCause(e);
+                throw te;
+            }
             if (bytesRead.intValue() == -1) {
-                throw new EOFException();
+                throw new EOFException(sm.getString("wsWebSocketContainer.responseFail", Integer.toString(status), headers));
             }
             response.flip();
             while (response.hasRemaining() && !readHeaders) {
