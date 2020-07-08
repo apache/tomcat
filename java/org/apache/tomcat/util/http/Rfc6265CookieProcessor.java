@@ -100,12 +100,6 @@ public class Rfc6265CookieProcessor extends CookieProcessorBase {
 
 
     @Override
-    public String generateHeader(jakarta.servlet.http.Cookie cookie) {
-        return generateHeader(cookie, null);
-    }
-
-
-    @Override
     public String generateHeader(jakarta.servlet.http.Cookie cookie, HttpServletRequest request) {
 
         // Can't use StringBuilder due to DateFormat

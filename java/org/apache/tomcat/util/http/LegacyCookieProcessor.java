@@ -234,12 +234,6 @@ public final class LegacyCookieProcessor extends CookieProcessorBase {
 
 
     @Override
-    public String generateHeader(Cookie cookie) {
-        return generateHeader(cookie, null);
-    }
-
-
-    @Override
     public String generateHeader(Cookie cookie, HttpServletRequest request) {
 
         /*
