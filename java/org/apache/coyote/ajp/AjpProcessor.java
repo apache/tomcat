@@ -1458,7 +1458,11 @@ public class AjpProcessor extends AbstractProcessor {
 
         @Override
         public int available() {
-            return bodyBytes.getByteChunk().getLength();
+            if (empty) {
+                return 0;
+            } else {
+                return bodyBytes.getByteChunk().getLength();
+            }
         }
     }
 
