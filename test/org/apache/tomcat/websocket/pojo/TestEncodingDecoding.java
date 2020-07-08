@@ -367,7 +367,7 @@ public class TestEncodingDecoding extends TomcatBaseTest {
     @ClientEndpoint
     public static class StringClient {
 
-        private final Queue<Object> received = new ConcurrentLinkedQueue<>();
+        private final Queue<Object> received = new ConcurrentLinkedQueue<Object>();
 
         @OnMessage
         public void rx(String in) {
@@ -398,7 +398,7 @@ public class TestEncodingDecoding extends TomcatBaseTest {
             configurator=SingletonConfigurator.class)
     public static class MessagesServer {
 
-        private final Queue<String> received = new ConcurrentLinkedQueue<>();
+        private final Queue<String> received = new ConcurrentLinkedQueue<String>();
         private volatile Throwable t = null;
 
         @OnMessage
@@ -420,7 +420,7 @@ public class TestEncodingDecoding extends TomcatBaseTest {
             configurator=SingletonConfigurator.class)
     public static class BatchedServer {
 
-        private final Queue<String> received = new ConcurrentLinkedQueue<>();
+        private final Queue<String> received = new ConcurrentLinkedQueue<String>();
         private volatile Throwable t = null;
 
         @OnMessage
