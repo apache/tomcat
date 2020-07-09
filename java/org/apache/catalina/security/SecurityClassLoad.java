@@ -125,6 +125,7 @@ public final class SecurityClassLoad {
 
     private static final void loadConnectorPackage(ClassLoader loader) throws Exception {
         final String basePackage = "org.apache.catalina.connector.";
+        loader.loadClass(basePackage + "CoyoteOutputStream");
         loader.loadClass(basePackage + "RequestFacade$GetAttributePrivilegedAction");
         loader.loadClass(basePackage + "RequestFacade$GetParameterMapPrivilegedAction");
         loader.loadClass(basePackage + "RequestFacade$GetRequestDispatcherPrivilegedAction");

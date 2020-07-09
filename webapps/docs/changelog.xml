@@ -45,6 +45,15 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 8.5.58 (markt)" rtext="in development">
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        <bug>64582</bug>: Pre-load the <code>CoyoteOutputStream</code> class to
+        prevent a potential exception when running under a security manager.
+        Patch provided by Johnathan Gilday. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Coyote">
     <changelog>
       <fix>
