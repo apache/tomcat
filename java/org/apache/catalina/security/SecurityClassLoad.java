@@ -149,6 +149,7 @@ public final class SecurityClassLoad {
         loader.loadClass(basePackage + "CoyoteInputStream$PrivilegedRead");
         loader.loadClass(basePackage + "CoyoteInputStream$PrivilegedReadArray");
         loader.loadClass(basePackage + "CoyoteInputStream$PrivilegedReadBuffer");
+        loader.loadClass(basePackage + "CoyoteOutputStream");
         loader.loadClass(basePackage + "InputBuffer$PrivilegedCreateConverter");
         loader.loadClass(basePackage + "Response$PrivilegedDoIsEncodable");
         loader.loadClass(basePackage + "Response$PrivilegedGenerateCookieString");
