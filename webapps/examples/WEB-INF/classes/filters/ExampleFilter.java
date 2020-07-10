@@ -127,11 +127,9 @@ public final class ExampleFilter implements Filter {
     public String toString() {
 
         if (filterConfig == null)
-            return ("TimingFilter()");
-        StringBuilder sb = new StringBuilder("TimingFilter(");
-        sb.append(filterConfig);
-        sb.append(")");
-        return sb.toString();
+            return ("ExampleFilter()");
+
+        return "ExampleFilter(" + filterConfig + ")";
     }
 }
 
