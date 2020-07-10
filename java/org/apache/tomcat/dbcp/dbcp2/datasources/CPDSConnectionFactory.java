@@ -420,7 +420,7 @@ class CPDSConnectionFactory
         builder.append(validatingSet);
         builder.append(", pcMap=");
         builder.append(pcMap);
-        builder.append("]");
+        builder.append(']');
         return builder.toString();
     }
 }
