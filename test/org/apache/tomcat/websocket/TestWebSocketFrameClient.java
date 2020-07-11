@@ -23,6 +23,8 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
+import java.util.logging.LogManager;
 
 import jakarta.websocket.ClientEndpointConfig;
 import jakarta.websocket.ClientEndpointConfig.Configurator;
@@ -115,10 +117,17 @@ public class TestWebSocketFrameClient extends WebSocketBaseTest {
 
         tomcat.start();
 
-        echoTester("",null);
-        echoTester("/",null);
-        echoTester("/foo",null);
-        echoTester("/foo/",null);
+        LogManager.getLogManager().getLogger("org.apache.coyote").setLevel(Level.ALL);
+        LogManager.getLogManager().getLogger("org.apache.tomcat.util.net").setLevel(Level.ALL);
+        try {
+            echoTester("",null);
+            echoTester("/",null);
+            echoTester("/foo",null);
+            echoTester("/foo/",null);
+        } finally {
+            LogManager.getLogManager().getLogger("org.apache.coyote").setLevel(Level.ALL);
+            LogManager.getLogManager().getLogger("org.apache.tomcat.util.net").setLevel(Level.INFO);
+        }
     }
 
     public void echoTester(String path, ClientEndpointConfig clientEndpointConfig)
