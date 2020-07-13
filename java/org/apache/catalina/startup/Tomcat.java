@@ -1011,6 +1011,7 @@ public class Tomcat {
      * @return newly created {@link Context}
      */
     private Context createContext(Host host, String url) {
+        String defaultContextClass = StandardContext.class.getName();
         String contextClass = StandardContext.class.getName();
         if (host == null) {
             host = this.getHost();
@@ -1019,8 +1020,13 @@ public class Tomcat {
             contextClass = ((StandardHost) host).getContextClass();
         }
         try {
-            return (Context) Class.forName(contextClass).getConstructor()
+            if (defaultContextClass.equals(contextClass)) {
+                return new StandardContext();
+            } else {
+                return (Context) Class.forName(contextClass).getConstructor()
                     .newInstance();
+            }
+
         } catch (ReflectiveOperationException  | IllegalArgumentException | SecurityException e) {
             throw new IllegalArgumentException(sm.getString("tomcat.noContextClass", contextClass, host, url), e);
         }

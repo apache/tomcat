@@ -29,7 +29,7 @@ import org.apache.catalina.Globals;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleState;
 import org.apache.catalina.Service;
-import org.apache.catalina.core.AprLifecycleListener;
+import org.apache.catalina.core.AprStatus;
 import org.apache.catalina.util.LifecycleMBeanBase;
 import org.apache.coyote.AbstractProtocol;
 import org.apache.coyote.Adapter;
@@ -80,8 +80,8 @@ public class Connector extends LifecycleMBeanBase  {
 
 
     public Connector(String protocol) {
-        boolean apr = AprLifecycleListener.isAprAvailable() &&
-                AprLifecycleListener.getUseAprConnector();
+        boolean apr = AprStatus.isAprAvailable() &&
+            AprStatus.getUseAprConnector();
         ProtocolHandler p = null;
         try {
             p = ProtocolHandler.create(protocol, apr);
@@ -625,7 +625,7 @@ public class Connector extends LifecycleMBeanBase  {
      * @return the Coyote protocol handler in use.
      */
     public String getProtocol() {
-        boolean apr = AprLifecycleListener.getUseAprConnector();
+        boolean apr = AprStatus.getUseAprConnector();
         if ((!apr && org.apache.coyote.http11.Http11NioProtocol.class.getName().equals(protocolHandlerClassName))
                 || (apr && org.apache.coyote.http11.Http11AprProtocol.class.getName().equals(protocolHandlerClassName))) {
             return "HTTP/1.1";
@@ -1016,15 +1016,15 @@ public class Connector extends LifecycleMBeanBase  {
             setParseBodyMethods(getParseBodyMethods());
         }
 
-        if (protocolHandler.isAprRequired() && !AprLifecycleListener.isInstanceCreated()) {
+        if (protocolHandler.isAprRequired() && !AprStatus.isInstanceCreated()) {
             throw new LifecycleException(sm.getString("coyoteConnector.protocolHandlerNoAprListener",
                     getProtocolHandlerClassName()));
         }
-        if (protocolHandler.isAprRequired() && !AprLifecycleListener.isAprAvailable()) {
+        if (protocolHandler.isAprRequired() && !AprStatus.isAprAvailable()) {
             throw new LifecycleException(sm.getString("coyoteConnector.protocolHandlerNoAprLibrary",
                     getProtocolHandlerClassName()));
         }
-        if (AprLifecycleListener.isAprAvailable() && AprLifecycleListener.getUseOpenSSL() &&
+        if (AprStatus.isAprAvailable() && AprStatus.getUseOpenSSL() &&
                 protocolHandler instanceof AbstractHttp11JsseProtocol) {
             AbstractHttp11JsseProtocol<?> jsseProtocolHandler =
                     (AbstractHttp11JsseProtocol<?>) protocolHandler;

@@ -42,6 +42,7 @@ import org.apache.catalina.LifecycleListener;
 import org.apache.catalina.Valve;
 import org.apache.catalina.loader.WebappClassLoaderBase;
 import org.apache.catalina.util.ContextName;
+import org.apache.catalina.valves.ErrorReportValve;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.ExceptionUtils;
@@ -827,7 +828,8 @@ public class StandardHost extends ContainerBase implements Host {
                     }
                 }
                 if(!found) {
-                    Valve valve =
+                    Valve valve = ErrorReportValve.class.getName().equals(errorValve) ?
+                        new ErrorReportValve() :
                         (Valve) Class.forName(errorValve).getConstructor().newInstance();
                     getPipeline().addValve(valve);
                 }

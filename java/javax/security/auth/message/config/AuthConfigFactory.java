@@ -72,8 +72,12 @@ public abstract class AuthConfigFactory {
                             // this class. Note that the Thread context class loader
                             // should not be used since that would trigger a memory leak
                             // in container environments.
-                            Class<?> clazz = Class.forName(className);
-                            return (AuthConfigFactory) clazz.getConstructor().newInstance();
+                            if (className.equals("org.apache.catalina.authenticator.jaspic.AuthConfigFactoryImpl")) {
+                                return new org.apache.catalina.authenticator.jaspic.AuthConfigFactoryImpl();
+                            } else {
+                                Class<?> clazz = Class.forName(className);
+                                return (AuthConfigFactory) clazz.getConstructor().newInstance();
+                            }
                         }
                     });
                 } catch (PrivilegedActionException e) {
