@@ -52,6 +52,11 @@
         prevent a potential exception when running under a security manager.
         Patch provided by Johnathan Gilday. (markt)
       </fix>
+      <fix>
+        <bug>64593</bug>: If a request is not matched to a Context, delay
+        issuing the 404 response to give the rewrite valve, if configured, an
+        opportunity to rewrite the request. (remm/markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

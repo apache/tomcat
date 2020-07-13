@@ -692,11 +692,11 @@ public class CoyoteAdapter implements Adapter {
             // because no ROOT context has been deployed or the URI was invalid
             // so no context could be mapped.
             if (request.getContext() == null) {
-                // Don't overwrite an existing error
-                if (!response.isError()) {
-                    response.sendError(404);
-                }
                 // Allow processing to continue.
+                // If present, the rewrite Valve may rewrite this to a valid
+                // request.
+                // The StandardEngineValve will handle the case of a missing
+                // Host and the StandardHostValve the case of a missing Context.
                 // If present, the error reporting valve will provide a response
                 // body.
                 return true;
