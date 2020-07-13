@@ -186,11 +186,11 @@ public class Stockticker implements Runnable {
         public String toString() {
             StringBuilder buf = new StringBuilder("STOCK#");
             buf.append(getSymbol());
-            buf.append("#");
+            buf.append('#');
             buf.append(getValueAsString());
-            buf.append("#");
+            buf.append('#');
             buf.append(getLastChangeAsString());
-            buf.append("#");
+            buf.append('#');
             buf.append(String.valueOf(getCnt()));
             return buf.toString();
 

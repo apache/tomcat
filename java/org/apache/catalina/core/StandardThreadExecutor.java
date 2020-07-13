@@ -338,8 +338,6 @@ public class StandardThreadExecutor extends LifecycleMBeanBase
 
     @Override
     protected String getObjectNameKeyProperties() {
-        StringBuilder name = new StringBuilder("type=Executor,name=");
-        name.append(getName());
-        return name.toString();
+        return "type=Executor,name=" + getName();
     }
 }
