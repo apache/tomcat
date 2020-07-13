@@ -398,6 +398,10 @@ public class WebappLoader extends LifecycleMBeanBase implements Loader{
     private WebappClassLoaderBase createClassLoader()
         throws Exception {
 
+        if (ParallelWebappClassLoader.class.getName().equals(loaderClass)) {
+            return new ParallelWebappClassLoader(context.getParentClassLoader());
+        }
+
         Class<?> clazz = Class.forName(loaderClass);
         WebappClassLoaderBase classLoader = null;
 
