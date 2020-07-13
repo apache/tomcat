@@ -24,5 +24,5 @@ Export-Package: org.apache.catalina.storeconfig
         access=32;\
         version=${Bundle-Version}
 -jpms-module-info-options: \
-	${module.name};\
-		substitute=catalina-storeconfig
+    ${module.name};\
+        substitute=catalina-storeconfig
