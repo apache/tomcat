@@ -39,5 +39,5 @@ Provide-Capability: \
         access=32;\
         version=${annotation.spec.version}
 -jpms-module-info-options: \
-	jakarta.annotation;\
-		substitute=annotations-api
+    jakarta.annotation;\
+        substitute=annotations-api
