@@ -76,6 +76,10 @@
         <code>https</code>. Ensure that such requests are not rejected. PR
         provided by Ronny Perinke. (markt)
       </fix>
+      <fix>
+        Fix a potential issue where the write lock for a WebSocket connection
+        may not be released if an exception occurs during the write. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
