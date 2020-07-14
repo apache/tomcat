@@ -131,15 +131,15 @@ Provide-Capability: \
         access=32;\
         version=${Bundle-Version};\
         modules='\
-            jakarta.ejb-api,\
-            jakarta.mail,\
-            jakarta.persistence-api,\
-            jakarta.xml.rpc-api,\
-            java.xml.ws'
+            java.persistence,\
+            javax.ejb.api,\
+            javax.mail.api,\
+            javax.xml.rpc.api,\
+            javax.xml.ws'
 -jpms-module-info-options: \
     ${module.name};substitute=tomcat-embed-core,\
-    jakarta.ejb-api;static=true,\
-    jakarta.mail;static=true,\
-    jakarta.persistence-api;static=true,\
-    jakarta.xml.rpc-api;static=true,\
-    java.xml.ws;static=true
+    java.persistence;static=true,\
+    javax.ejb.api;static=true,\
+    javax.mail.api;static=true,\
+    javax.xml.rpc.api;static=true,\
+    javax.xml.ws;static=true
