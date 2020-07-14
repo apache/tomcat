@@ -45,6 +45,7 @@ import jakarta.websocket.SendResult;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.buf.Utf8Encoder;
 import org.apache.tomcat.util.res.StringManager;
 
@@ -306,7 +307,15 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
         }
 
         for (MessagePart mp : messageParts) {
-            writeMessagePart(mp);
+            try {
+                writeMessagePart(mp);
+            } catch (Throwable t) {
+                ExceptionUtils.handleThrowable(t);
+                messagePartInProgress.release();
+                wsSession.doClose(new CloseReason(CloseCodes.GOING_AWAY, t.getMessage()),
+                        new CloseReason(CloseCodes.CLOSED_ABNORMALLY, t.getMessage()));
+                throw t;
+            }
             if (!bsh.getSendResult().isOK()) {
                 messagePartInProgress.release();
                 Throwable t = bsh.getSendResult().getException();
