@@ -35,9 +35,9 @@ Provide-Capability: \
     Implementation-Vendor=Apache Software Foundation
 
 -jpms-module-info: \
-    jakarta.servlet.jsp;\
+    jakarta.servlet.jsp.api;\
         access=32;\
         version=${jsp.spec.version}
 -jpms-module-info-options: \
-    jakarta.servlet.jsp;\
+    jakarta.servlet.jsp.api;\
         substitute=jsp-api

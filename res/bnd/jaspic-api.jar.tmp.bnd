@@ -35,9 +35,9 @@ Provide-Capability: \
     Implementation-Vendor=Apache Software Foundation
 
 -jpms-module-info: \
-    jakarta.security.enterprise;\
+    jakarta.security.enterprise.api;\
         access=32;\
         version=${jaspic.spec.version}
 -jpms-module-info-options: \
-    jakarta.security.enterprise;\
+    jakarta.security.enterprise.api;\
         substitute=jaspic-api
