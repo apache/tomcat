@@ -152,6 +152,12 @@ public class Catalina {
 
 
     /**
+     * Top package name for generated source.
+     */
+    protected String generatedCodePackage = "catalinaembedded";
+
+
+    /**
      * Use generated code as a replacement for configuration files.
      */
     protected boolean useGeneratedCode = false;
@@ -214,6 +220,16 @@ public class Catalina {
 
     public void setGeneratedCodeLocation(File generatedCodeLocation) {
         this.generatedCodeLocation = generatedCodeLocation;
+    }
+
+
+    public String getGeneratedCodePackage() {
+        return this.generatedCodePackage;
+    }
+
+
+    public void setGeneratedCodePackage(String generatedCodePackage) {
+        this.generatedCodePackage = generatedCodePackage;
     }
 
 
@@ -549,7 +565,7 @@ public class Catalina {
             } else {
                 generatedCodeLocation = new File(Bootstrap.getCatalinaHomeFile(), "work");
             }
-            serverXmlLocation = new File(generatedCodeLocation, "catalina");
+            serverXmlLocation = new File(generatedCodeLocation, generatedCodePackage);
             if (!serverXmlLocation.isDirectory() && !serverXmlLocation.mkdirs()) {
                 log.warn(sm.getString("catalina.generatedCodeLocationError", generatedCodeLocation.getAbsolutePath()));
                 // Disable code generation
@@ -559,7 +575,7 @@ public class Catalina {
 
         ServerXml serverXml = null;
         if (useGeneratedCode) {
-            String xmlClassName = start ? "catalina.ServerXml" : "catalina.ServerXmlStop";
+            String xmlClassName = start ? generatedCodePackage + ".ServerXml" : generatedCodePackage + ".ServerXmlStop";
             try {
                 serverXml = (ServerXml) Catalina.class.getClassLoader().loadClass(xmlClassName).newInstance();
             } catch (Exception e) {
@@ -894,7 +910,7 @@ public class Catalina {
 
     protected void generateClassHeader(Digester digester, boolean start) {
         StringBuilder code = digester.getGeneratedCode();
-        code.append("package catalina;").append(System.lineSeparator());
+        code.append("package ").append(generatedCodePackage).append(";").append(System.lineSeparator());
         code.append("public class ServerXml");
         if (!start) {
             code.append("Stop");
