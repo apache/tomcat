@@ -57,6 +57,11 @@
         issuing the 404 response to give the rewrite valve, if configured, an
         opportunity to rewrite the request. (remm/markt)
       </fix>
+      <fix>
+        Change top package name for generated emebedded classes to avoid
+        conflict with default host name on case insensitive filesystems.
+        (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

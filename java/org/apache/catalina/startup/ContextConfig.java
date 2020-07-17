@@ -474,7 +474,17 @@ public class ContextConfig implements LifecycleListener {
     }
 
 
-    protected static String getContextXmlPackageName(Container container) {
+    protected String getGeneratedCodePackage() {
+        Catalina catalina = Container.getService(context).getServer().getCatalina();
+        if (catalina != null) {
+            return catalina.getGeneratedCodePackage();
+        } else {
+            return "generatedCodePackage";
+        }
+    }
+
+
+    protected static String getContextXmlPackageName(String generatedCodePackge, Container container) {
         StringBuilder result = new StringBuilder();
         Container host = null;
         Container engine = null;
@@ -486,7 +496,7 @@ public class ContextConfig implements LifecycleListener {
             }
             container = container.getParent();
         }
-        result.append("catalina");
+        result.append(generatedCodePackge);
         if (engine != null) {
             result.append('.');
         }
@@ -574,7 +584,7 @@ public class ContextConfig implements LifecycleListener {
         if (!context.getOverride()) {
 
             if (useGeneratedCode || generateCode) {
-                contextXmlPackageName = "catalina";
+                contextXmlPackageName = getGeneratedCodePackage();
                 contextXmlSimpleClassName = "ContextXmlDefault";
                 contextXmlClassName = contextXmlPackageName + "." + contextXmlSimpleClassName;
             }
@@ -613,7 +623,7 @@ public class ContextConfig implements LifecycleListener {
             }
 
             if (useGeneratedCode || generateCode) {
-                contextXmlPackageName = getContextXmlPackageName(context);
+                contextXmlPackageName = getContextXmlPackageName(getGeneratedCodePackage(), context);
                 contextXmlSimpleClassName = "ContextXmlDefault";
                 contextXmlClassName = contextXmlPackageName + "." + contextXmlSimpleClassName;
             }
@@ -655,7 +665,7 @@ public class ContextConfig implements LifecycleListener {
 
         if (context.getConfigFile() != null) {
             if (useGeneratedCode || generateCode) {
-                contextXmlPackageName = getContextXmlPackageName(context);
+                contextXmlPackageName = getContextXmlPackageName(getGeneratedCodePackage(), context);
                 contextXmlSimpleClassName = "ContextXml_" + context.getName().replace('/', '_').replace("-", "__");
                 contextXmlClassName = contextXmlPackageName + "." + contextXmlSimpleClassName;
             }
