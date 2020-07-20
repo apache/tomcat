@@ -32,7 +32,7 @@ public abstract class AbstractResource implements WebResource {
     private final String webAppPath;
 
     private String mimeType = null;
-    private volatile String weakETag;
+    private volatile String etag;
 
 
     protected AbstractResource(WebResourceRoot root, String webAppPath) {
@@ -61,19 +61,19 @@ public abstract class AbstractResource implements WebResource {
 
     @Override
     public final String getETag() {
-        if (weakETag == null) {
+        if (etag == null) {
             synchronized (this) {
-                if (weakETag == null) {
+                if (etag == null) {
                     long contentLength = getContentLength();
                     long lastModified = getLastModified();
                     if ((contentLength >= 0) || (lastModified >= 0)) {
-                        weakETag = "W/\"" + contentLength + "-" +
-                                   lastModified + "\"";
+                        etag = '\"' + contentLength + '-' +
+                                   lastModified + '\"';
                     }
                 }
             }
         }
-        return weakETag;
+        return etag;
     }
 
     @Override
