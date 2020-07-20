@@ -37,7 +37,7 @@
 { "name":"org.apache.catalina.Wrapper" },
 { "name":"org.apache.catalina.authenticator.jaspic.AuthConfigFactoryImpl", "methods" : [{"name": "<init>","parameterTypes":[]}] },
 { "name":"org.apache.catalina.core.StandardContext", "methods" : [{"name": "<init>","parameterTypes":[]}] },
-{ "name":"org.apache.catalina.loader.ParallelWebappClassLoader", "allPublicMethods":true, "methods":[{"name":"<init>","parameterTypes":["java.lang.ClassLoader"] }]},
+{ "name":"org.apache.catalina.loader.ParallelWebappClassLoader", "allDeclaredConstructors" : true, "allPublicConstructors" : true, "allDeclaredMethods" : true, "allPublicMethods" : true},
 { "name":"org.apache.catalina.servlets.DefaultServlet", "allDeclaredFields":true, "allDeclaredMethods":true },
 { "name":"org.apache.catalina.valves.ErrorReportValve", "methods" : [{"name": "<init>","parameterTypes":[]}] },
 { "name":"org.apache.coyote.http11.Http11NioProtocol", "methods" : [{"name": "<init>","parameterTypes":[]}] },
