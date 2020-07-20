@@ -390,10 +390,12 @@ public class CallMethodRule extends Rule {
             code.append('(');
             for (int i = 0; i < paramValues.length; i++) {
                 if (i > 0) {
-                    code.append(',');
+                    code.append(", ");
                 }
                 if (bodyText != null) {
                     code.append("\"").append(bodyText).append("\"");
+                } else if (paramValues[i] instanceof String) {
+                    code.append("\"").append(paramValues[i].toString()).append("\"");
                 } else {
                     code.append(digester.toVariableName(paramValues[i]));
                 }

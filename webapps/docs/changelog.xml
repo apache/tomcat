@@ -62,6 +62,9 @@
         conflict with default host name on case insensitive filesystems.
         (remm)
       </fix>
+      <fix>
+        Add missing code generation for remaining digester rules. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
