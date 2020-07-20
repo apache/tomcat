@@ -65,10 +65,10 @@ public abstract class AbstractResource implements WebResource {
             synchronized (this) {
                 if (etag == null) {
                     long contentLength = getContentLength();
-                    long lastModified = getLastModified();
+                    long lastModified = getLastModified() / 1000; // msec to sec
                     if ((contentLength >= 0) || (lastModified >= 0)) {
-                        etag = '\"' + contentLength + '-' +
-                                   lastModified + '\"';
+                        etag = '\"' + Long.toHexString(lastModified) + '-' +
+                                Long.toHexString(contentLength) + '\"';
                     }
                 }
             }
