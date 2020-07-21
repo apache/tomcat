@@ -507,6 +507,12 @@ public class WebappLoader extends LifecycleMBeanBase
     private WebappClassLoaderBase createClassLoader()
         throws Exception {
 
+        if (parentClassLoader == null) {
+            parentClassLoader = context.getParentClassLoader();
+        } else {
+            context.setParentClassLoader(parentClassLoader);
+        }
+
         if (ParallelWebappClassLoader.class.getName().equals(loaderClass)) {
             return new ParallelWebappClassLoader(parentClassLoader);
         }
@@ -514,11 +520,6 @@ public class WebappLoader extends LifecycleMBeanBase
         Class<?> clazz = Class.forName(loaderClass);
         WebappClassLoaderBase classLoader = null;
 
-        if (parentClassLoader == null) {
-            parentClassLoader = context.getParentClassLoader();
-        } else {
-            context.setParentClassLoader(parentClassLoader);
-        }
         Class<?>[] argTypes = { ClassLoader.class };
         Object[] args = { parentClassLoader };
         Constructor<?> constr = clazz.getConstructor(argTypes);
