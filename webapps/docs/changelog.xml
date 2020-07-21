@@ -65,6 +65,10 @@
       <fix>
         Add missing code generation for remaining digester rules. (remm)
       </fix>
+      <update>
+        Add a dedicated loader for generated code to avoid dynamic class
+        loading. (remm)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Coyote">
