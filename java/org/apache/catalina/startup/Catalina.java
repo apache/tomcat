@@ -554,8 +554,30 @@ public class Catalina {
         ConfigFileLoader.setSource(new CatalinaBaseConfigurationSource(Bootstrap.getCatalinaBaseFile(), getConfigFile()));
         File file = configFile();
 
+        if (useGeneratedCode && !Digester.isGeneratedCodeLoaderSet()) {
+            // Load loader
+            String loaderClassName = generatedCodePackage + ".DigesterGeneratedCodeLoader";
+            try {
+                Digester.GeneratedCodeLoader loader =
+                        (Digester.GeneratedCodeLoader) Catalina.class.getClassLoader().loadClass(loaderClassName).newInstance();
+                Digester.setGeneratedCodeLoader(loader);
+            } catch (Exception e) {
+                if (log.isDebugEnabled()) {
+                    log.info(sm.getString("catalina.noLoader", loaderClassName), e);
+                } else {
+                    log.info(sm.getString("catalina.noLoader", loaderClassName));
+                }
+                // No loader so don't use generated code
+                useGeneratedCode = false;
+            }
+        }
+
         // Init source location
         File serverXmlLocation = null;
+        String xmlClassName = null;
+        if (generateCode || useGeneratedCode) {
+            xmlClassName = start ? generatedCodePackage + ".ServerXml" : generatedCodePackage + ".ServerXmlStop";
+        }
         if (generateCode) {
             if (generatedCodeLocationParameter != null) {
                 generatedCodeLocation = new File(generatedCodeLocationParameter);
@@ -575,12 +597,7 @@ public class Catalina {
 
         ServerXml serverXml = null;
         if (useGeneratedCode) {
-            String xmlClassName = start ? generatedCodePackage + ".ServerXml" : generatedCodePackage + ".ServerXmlStop";
-            try {
-                serverXml = (ServerXml) Catalina.class.getClassLoader().loadClass(xmlClassName).newInstance();
-            } catch (Exception e) {
-                // Ignore, no generated code found
-            }
+            serverXml = (ServerXml) Digester.loadGeneratedClass(xmlClassName);
         }
 
         if (serverXml != null) {
@@ -605,6 +622,7 @@ public class Catalina {
                         writer.write(digester.getGeneratedCode().toString());
                     }
                     digester.endGeneratingCode();
+                    Digester.addGeneratedClass(xmlClassName);
                 }
             } catch (Exception e) {
                 log.warn(sm.getString("catalina.configFail", file.getAbsolutePath()), e);
@@ -766,6 +784,11 @@ public class Catalina {
             log.info(sm.getString("catalina.startup", Long.toString(TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - t1))));
         }
 
+        if (generateCode) {
+            // Generate loader which will load all generated classes
+            generateLoader();
+        }
+
         // Register shutdown hook
         if (useShutdownHook) {
             if (shutdownHook == null) {
@@ -905,6 +928,30 @@ public class Catalina {
         SecurityConfig securityConfig = SecurityConfig.newInstance();
         securityConfig.setPackageDefinition();
         securityConfig.setPackageAccess();
+    }
+
+
+    protected void generateLoader() {
+        String loaderClassName = "DigesterGeneratedCodeLoader";
+        StringBuilder code = new StringBuilder();
+        code.append("package ").append(generatedCodePackage).append(";").append(System.lineSeparator());
+        code.append("public class ").append(loaderClassName);
+        code.append(" implements org.apache.tomcat.util.digester.Digester.GeneratedCodeLoader {").append(System.lineSeparator());
+        code.append("public Object loadGeneratedCode(String className) {").append(System.lineSeparator());
+        code.append("switch (className) {").append(System.lineSeparator());
+        for (String generatedClassName : Digester.getGeneratedClasses()) {
+            code.append("case \"").append(generatedClassName).append("\" : return new ").append(generatedClassName);
+            code.append("();").append(System.lineSeparator());
+        }
+        code.append("default: return null; }").append(System.lineSeparator());
+        code.append("}}").append(System.lineSeparator());
+        File loaderLocation = new File(generatedCodeLocation, generatedCodePackage);
+        try (FileWriter writer = new FileWriter(new File(loaderLocation, loaderClassName + ".java"))) {
+            writer.write(code.toString());
+        } catch (IOException e) {
+            // Should not happen
+            log.debug("Error writing code loader", e);
+        }
     }
 
 

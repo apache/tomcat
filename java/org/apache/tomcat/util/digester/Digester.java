@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EmptyStackException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -136,6 +137,39 @@ public class Digester extends DefaultHandler2 {
             Digester.propertySources = propertySources;
             propertySourcesSet = true;
         }
+    }
+
+    private static final HashSet<String> generatedClasses = new HashSet<>();
+
+    public static void addGeneratedClass(String className) {
+        generatedClasses.add(className);
+    }
+
+    public static String[] getGeneratedClasses() {
+        return generatedClasses.toArray(new String[0]);
+    }
+
+    public interface GeneratedCodeLoader {
+        Object loadGeneratedCode(String className);
+    }
+
+    private static GeneratedCodeLoader generatedCodeLoader;
+
+    public static boolean isGeneratedCodeLoaderSet() {
+        return (Digester.generatedCodeLoader != null);
+    }
+
+    public static void setGeneratedCodeLoader(GeneratedCodeLoader generatedCodeLoader) {
+        if (Digester.generatedCodeLoader == null) {
+            Digester.generatedCodeLoader = generatedCodeLoader;
+        }
+    }
+
+    public static Object loadGeneratedClass(String className) {
+        if (generatedCodeLoader != null) {
+            return generatedCodeLoader.loadGeneratedCode(className);
+        }
+        return null;
     }
 
     // --------------------------------------------------- Instance Variables

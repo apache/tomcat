@@ -589,11 +589,7 @@ public class ContextConfig implements LifecycleListener {
                 contextXmlClassName = contextXmlPackageName + "." + contextXmlSimpleClassName;
             }
             if (useGeneratedCode) {
-                try {
-                    contextXml = (ContextXml) Catalina.class.getClassLoader().loadClass(contextXmlClassName).newInstance();
-                } catch (Exception e) {
-                    // Ignore, no generated code found
-                }
+                contextXml = (ContextXml) Digester.loadGeneratedClass(contextXmlClassName);
             }
             if (contextXml != null) {
                 contextXml.load(context);
@@ -614,6 +610,7 @@ public class ContextConfig implements LifecycleListener {
                             writer.write(digester.getGeneratedCode().toString());
                         }
                         digester.endGeneratingCode();
+                        Digester.addGeneratedClass(contextXmlClassName);
                     }
                 } catch (MalformedURLException e) {
                     log.error(sm.getString("contextConfig.badUrl", defaultContextXml), e);
@@ -628,11 +625,7 @@ public class ContextConfig implements LifecycleListener {
                 contextXmlClassName = contextXmlPackageName + "." + contextXmlSimpleClassName;
             }
             if (useGeneratedCode) {
-                try {
-                    contextXml = (ContextXml) Catalina.class.getClassLoader().loadClass(contextXmlClassName).newInstance();
-                } catch (Exception e) {
-                    // Ignore, no generated code found
-                }
+                contextXml = (ContextXml) Digester.loadGeneratedClass(contextXmlClassName);
             }
             if (contextXml != null) {
                 contextXml.load(context);
@@ -654,6 +647,7 @@ public class ContextConfig implements LifecycleListener {
                             writer.write(digester.getGeneratedCode().toString());
                         }
                         digester.endGeneratingCode();
+                        Digester.addGeneratedClass(contextXmlClassName);
                     }
                 } catch (MalformedURLException e) {
                     log.error(sm.getString("contextConfig.badUrl", hostContextFile), e);
@@ -670,11 +664,7 @@ public class ContextConfig implements LifecycleListener {
                 contextXmlClassName = contextXmlPackageName + "." + contextXmlSimpleClassName;
             }
             if (useGeneratedCode) {
-                try {
-                    contextXml = (ContextXml) Catalina.class.getClassLoader().loadClass(contextXmlClassName).newInstance();
-                } catch (Exception e) {
-                    // Ignore, no generated code found
-                }
+                contextXml = (ContextXml) Digester.loadGeneratedClass(contextXmlClassName);
             }
             if (contextXml != null) {
                 contextXml.load(context);
@@ -694,6 +684,7 @@ public class ContextConfig implements LifecycleListener {
                         // Ignore
                     }
                     digester.endGeneratingCode();
+                    Digester.addGeneratedClass(contextXmlClassName);
                 }
             }
         }
