@@ -119,6 +119,11 @@
         <code>org.apache.tomcat.util.net.jsse</code> in the list of exported
         packages. (markt)
       </fix>
+      <fix>
+        Remove the local copy of <code>javax.transaction.xa</code> package which
+        is only used during compilation. The package is provided by the JRE from
+        Java 1.4 onwards so the local copy should be unnecessary. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
