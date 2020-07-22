@@ -42,6 +42,7 @@
     <allow pkg="jakarta.ejb"/>
     <allow pkg="jakarta.persistence"/>
     <allow pkg="jakarta.servlet"/>
+    <allow pkg="jakarta.xml.ws"/>
     <allow pkg="org.apache.catalina"/>
     <disallow pkg="org.apache.catalina.ha"/>
     <disallow pkg="org.apache.catalina.tribes"/>

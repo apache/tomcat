@@ -624,12 +624,6 @@
         <include name="**/*.java"/>
       </fileset>
     </checkstyle>
-    <!-- javax package checks -->
-    <checkstyle config="res/checkstyle/javax-checkstyle.xml">
-      <fileset dir="java/javax" >
-        <include name="**/*.java"/>
-      </fileset>
-    </checkstyle>
     <!-- org package checks -->
     <checkstyle config="res/checkstyle/org-checkstyle.xml">
       <fileset dir="java/org" >
@@ -1502,7 +1496,6 @@
       <classpath refid="tomcat.test.classpath" />
       <include name="org/apache/**" />
       <include name="jakarta/**" />
-      <include name="javax/**" />
       <include name="util/**" />
       <!-- Exclude these by default as Gump can't run them because the -->
       <!-- classes on which they depend are not in any output JAR.     -->

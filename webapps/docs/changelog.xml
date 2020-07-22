@@ -120,9 +120,14 @@
         packages. (markt)
       </fix>
       <fix>
-        Remove the local copy of <code>javax.transaction.xa</code> package which
-        is only used during compilation. The package is provided by the JRE from
-        Java 1.4 onwards so the local copy should be unnecessary. (markt)
+        Remove the local copy of the <code>javax.transaction.xa</code> package
+        which is only used during compilation. The package is provided by the
+        JRE from Java 1.4 onwards so the local copy should be unnecessary.
+        (markt)
+      </fix>
+      <fix>
+        Rename the local copy of the <code>javax.xml.ws</code> package to
+        <code>jakarta.xml.ws</code>. (markt)
       </fix>
     </changelog>
   </subsection>
