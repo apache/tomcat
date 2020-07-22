@@ -20,7 +20,20 @@ import java.io.IOException;
 
 class GraalCompat extends Jre9Compat {
 
-    private static final boolean GRAAL = System.getProperty("org.graalvm.nativeimage.imagecode") != null;
+    private static final boolean GRAAL;
+
+    static {
+        boolean result = false;
+        try {
+            Class<?> nativeImageClazz = Class.forName("org.graalvm.nativeimage.ImageInfo");
+            result = Boolean.TRUE.equals(nativeImageClazz.getMethod("inImageCode").invoke(null));
+        } catch (ClassNotFoundException e) {
+            // Must be Graal
+        } catch (ReflectiveOperationException | IllegalArgumentException e) {
+            // Should never happen
+        }
+        GRAAL = result;
+    }
 
     static boolean isSupported() {
         // This property does not exist for a native image
