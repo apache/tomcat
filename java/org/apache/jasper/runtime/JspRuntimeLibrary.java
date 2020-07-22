@@ -56,7 +56,21 @@ import org.apache.tomcat.InstanceManager;
  */
 public class JspRuntimeLibrary {
 
-    public static final boolean GRAAL = System.getProperty("org.graalvm.nativeimage.imagecode") != null;
+    public static final boolean GRAAL;
+
+    static {
+        boolean result = false;
+        try {
+            Class<?> nativeImageClazz = Class.forName("org.graalvm.nativeimage.ImageInfo");
+            result = nativeImageClazz.getMethod("inImageCode").invoke(null) != null;
+            // Note: This will also be true for the Graal substrate VM
+        } catch (ClassNotFoundException e) {
+            // Must be Graal
+        } catch (ReflectiveOperationException | IllegalArgumentException e) {
+            // Should never happen
+        }
+        GRAAL = result;
+    }
 
     /**
      * Returns the value of the jakarta.servlet.error.exception request
