@@ -804,7 +804,7 @@ public class NamingContext implements Context {
         } catch (ReflectiveOperationException | IllegalArgumentException e) {
             // Should never happen
         }
-        GRAAL = result;
+        GRAAL = result || System.getProperty("org.graalvm.nativeimage.imagecode") != null;
     }
 
     /**
