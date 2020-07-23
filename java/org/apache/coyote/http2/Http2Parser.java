@@ -737,7 +737,7 @@ class Http2Parser {
         HeaderEmitter headersStart(int streamId, boolean headersEndStream)
                 throws Http2Exception, IOException;
         void headersContinue(int payloadSize, boolean endOfHeaders);
-        void headersEnd(int streamId) throws ConnectionException;
+        void headersEnd(int streamId) throws Http2Exception;
 
         // Priority frames (also headers)
         void reprioritise(int streamId, int parentStreamId, boolean exclusive, int weight)

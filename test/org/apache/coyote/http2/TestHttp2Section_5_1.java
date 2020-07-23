@@ -222,11 +222,11 @@ public class TestHttp2Section_5_1 extends Http2TestBase {
         // Expecting
         // 1 * headers
         // 56k-1 of body (7 * ~8k)
-        // 1 * error (could be in any order)
-        for (int i = 0; i < 8; i++) {
+        // 1 * error
+        // for a total of 9 frames (could be in any order)
+        for (int i = 0; i < 9; i++) {
             parser.readFrame(true);
         }
-        parser.readFrame(true);
 
         Assert.assertTrue(output.getTrace(),
                 output.getTrace().contains("5-RST-[" +
@@ -238,14 +238,20 @@ public class TestHttp2Section_5_1 extends Http2TestBase {
 
         // Release the remaining body
         sendWindowUpdate(0, (1 << 31) - 2);
-        // Allow for the 8k still in the stream window
+        // Allow for the ~8k still in the stream window
         sendWindowUpdate(3, (1 << 31) - 8193);
 
-        // 192k of body (24 * 8k)
-        // 1 * error (could be in any order)
-        for (int i = 0; i < 24; i++) {
+        // Read until the end of stream 3
+        while (!output.getTrace().contains("3-EndOfStream")) {
             parser.readFrame(true);
         }
+        output.clearTrace();
+
+        // Confirm another request can be sent once concurrency falls back below limit
+        sendSimpleGetRequest(7);
+        parser.readFrame(true);
+        parser.readFrame(true);
+        Assert.assertEquals(getSimpleResponseTrace(7), output.getTrace());
     }
 
 
