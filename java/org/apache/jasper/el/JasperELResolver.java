@@ -199,6 +199,7 @@ public class JasperELResolver extends CompositeELResolver {
             if (method != null) {
                 context.setPropertyResolved(base, property);
                 try {
+                    method.setAccessible(true);
                     value = method.invoke(base, (Object[]) null);
                 } catch (Exception ex) {
                     Throwable thr = ExceptionUtils.unwrapInvocationTargetException(ex);
@@ -211,6 +212,9 @@ public class JasperELResolver extends CompositeELResolver {
         @Override
         public void setValue(ELContext context, Object base, Object property,
                 Object value) {
+            if (base == null) {
+                return;
+            }
             Method method = getWriteMethod(base.getClass(), property.toString());
             if (method != null) {
                 context.setPropertyResolved(base, property);
