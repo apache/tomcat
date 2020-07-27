@@ -347,6 +347,11 @@
          file="${tomcat.embed.path}/tomcat-embed-core.jar"
          pom="tomcat-embed-core.pom"
          src="${tomcat.embed.src.path}/tomcat-embed-core-src.jar"/>
+     <doMavenInstall artifactId="tomcat-embed-programmatic"
+         groupId="org.apache.tomcat.experimental"
+         file="${tomcat.embed.path}/tomcat-embed-programmatic.jar"
+         pom="tomcat-embed-programmatic.pom"
+         src="${tomcat.embed.src.path}/tomcat-embed-programmatic-src.jar"/>
      <doMavenInstall artifactId="tomcat-embed-jasper"
          groupId="org.apache.tomcat.embed"
          file="${tomcat.embed.path}/tomcat-embed-jasper.jar"
@@ -455,6 +460,11 @@
         file="${tomcat.embed.path}/tomcat-embed-core.jar"
         pom="tomcat-embed-core.pom"
         src="${tomcat.embed.src.path}/tomcat-embed-core-src.jar"/>
+    <doMavenDeploy artifactId="tomcat-embed-programmatic"
+                   groupId="org.apache.tomcat.experimental"
+                   file="${tomcat.embed.path}/tomcat-embed-programmatic.jar"
+                   pom="tomcat-embed-programmatic.pom"
+                   src="${tomcat.embed.src.path}/tomcat-embed-programmatic-src.jar"/>
     <doMavenDeploy artifactId="tomcat-embed-jasper"
         groupId="org.apache.tomcat.embed"
         file="${tomcat.embed.path}/tomcat-embed-jasper.jar"

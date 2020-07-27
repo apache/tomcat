@@ -157,11 +157,13 @@
 
   <!-- Embedded JARs & source JARs -->
   <property name="tomcat-embed-core.jar" value="${tomcat.embed}/tomcat-embed-core.jar"/>
+  <property name="tomcat-embed-programmatic.jar" value="${tomcat.embed}/tomcat-embed-programmatic.jar"/>
   <property name="tomcat-embed-jasper.jar" value="${tomcat.embed}/tomcat-embed-jasper.jar"/>
   <property name="tomcat-embed-el.jar" value="${tomcat.embed}/tomcat-embed-el.jar"/>
   <property name="tomcat-embed-websocket.jar" value="${tomcat.embed}/tomcat-embed-websocket.jar"/>
 
   <property name="tomcat-embed-core-sources.jar" value="${tomcat.embed.sources}/tomcat-embed-core-src.jar"/>
+  <property name="tomcat-embed-programmatic-sources.jar" value="${tomcat.embed.sources}/tomcat-embed-programmatic-src.jar"/>
   <property name="tomcat-embed-jasper-sources.jar" value="${tomcat.embed.sources}/tomcat-embed-jasper-src.jar"/>
   <property name="tomcat-embed-el-sources.jar" value="${tomcat.embed.sources}/tomcat-embed-el-src.jar"/>
   <property name="tomcat-embed-websocket-sources.jar" value="${tomcat.embed.sources}/tomcat-embed-websocket-src.jar"/>
@@ -429,6 +431,268 @@
     <exclude name="org/apache/catalina/tribes/**" />
     <exclude name="org/apache/catalina/storeconfig/**" />
     <exclude name="org/apache/catalina/ssi/**" />
+  </patternset>
+
+  <patternset id="files.tomcat-embed-programmatic">
+    <patternset refid="files.jaspic-api" />
+    <patternset refid="files.tomcat-juli" />
+
+    <!-- Servlet -->
+    <include name="jakarta/servlet/**" />
+    <include name="jakarta/servlet/annotation/**" />
+    <include name="jakarta/servlet/http/**" />
+    <exclude name="jakarta/servlet/descriptor/**" />
+    <exclude name="jakarta/servlet/jsp/**"/>
+    <exclude name="jakarta/servlet/resources/**" />
+
+    <!-- AprLifecycleListener is configured by default -->
+    <include name="**/AprLifecycleListener.*"/>
+    <include name="**/AprStatus.*"/>
+
+    <!-- Remove dynamic mbean descriptors -->
+    <exclude name="**/mbeans-descriptors.xml"/>
+    <exclude name="**/mbeans-descriptors.dtd"/>
+    <!-- No JMX Support - But we can't remove the classes -->
+    <include name="org/apache/tomcat/util/modeler/LocalStrings.properties" />
+    <include name="org/apache/tomcat/util/modeler/AttributeInfo*" />
+    <include name="org/apache/tomcat/util/modeler/BaseModelMBean*" />
+    <include name="org/apache/tomcat/util/modeler/FeatureInfo*" />
+    <include name="org/apache/tomcat/util/modeler/ManagedBean*" />
+    <include name="org/apache/tomcat/util/modeler/NoDescriptorRegistry*" />
+    <include name="org/apache/tomcat/util/modeler/NotificationInfo*" />
+    <include name="org/apache/tomcat/util/modeler/Registry*" />
+    <include name="org/apache/tomcat/util/modeler/RegistryMBean*" />
+    <include name="org/apache/tomcat/util/modeler/Util*" />
+    <include name="org/apache/tomcat/util/modeler/modules/ModelerSource*" />
+
+    <!-- Apache Tomcat Core Code -->
+    <include name="org/apache/catalina/*"/>
+    <include name="org/apache/catalina/authenticator/**"/>
+    <include name="org/apache/catalina/connector/**"/>
+    <include name="org/apache/catalina/core/**"/>
+    <include name="org/apache/catalina/deploy/**"/>
+    <include name="org/apache/catalina/filters/**"/>
+    <include name="org/apache/catalina/loader/**"/>
+    <include name="org/apache/catalina/mapper/**"/>
+    <include name="org/apache/catalina/mbeans/**"/>
+    <include name="org/apache/catalina/realm/**"/>
+    <include name="org/apache/catalina/security/**"/>
+    <include name="org/apache/catalina/session/**"/>
+    <include name="org/apache/catalina/startup/**"/>
+    <include name="org/apache/catalina/util/**"/>
+    <include name="org/apache/catalina/valves/*"/>
+    <include name="org/apache/catalina/webresources/**"/>
+    <include name="org/apache/coyote/**" />
+    <include name="org/apache/naming/**" />
+    <include name="org/apache/tomcat/*" />
+    <include name="org/apache/tomcat/util/*" />
+    <include name="org/apache/tomcat/util/bcel/**" />
+    <include name="org/apache/tomcat/util/buf/**" />
+    <include name="org/apache/tomcat/util/codec/**" />
+    <include name="org/apache/tomcat/util/collections/**" />
+    <include name="org/apache/tomcat/util/compat/**" />
+    <include name="org/apache/tomcat/util/descriptor/**" />
+    <include name="org/apache/tomcat/util/file/**" />
+    <include name="org/apache/tomcat/util/http/**" />
+    <include name="org/apache/tomcat/util/json/**" />
+    <include name="org/apache/tomcat/util/log/**" />
+    <include name="org/apache/tomcat/util/net/**" />
+    <include name="org/apache/tomcat/util/res/**" />
+    <include name="org/apache/tomcat/util/security/**" />
+    <include name="org/apache/tomcat/util/threads/**" />
+
+    <!-- Some of the core code depends on the jar scanner -->
+    <include name="org/apache/tomcat/util/scan/StandardJarScan*" />
+    <include name="org/apache/tomcat/util/scan/LocalStrings.properties" />
+
+    <!-- Minimize JNI to what doesn't throw an error -->
+    <include name="org/apache/tomcat/jni/Library.class" />
+    <include name="org/apache/tomcat/jni/LibraryNotFoundError*" />
+    <exclude name="org/apache/tomcat/jni" />
+
+    <!-- Remove connectors that are not default -->
+    <exclude name="**/AbstractAjpProtocol.class"/>
+    <exclude name="**/Ajp*.class"/>
+    <exclude name="**/AjpApr*.class"/>
+    <exclude name="**/Http11Apr*.class"/>
+    <exclude name="**/Http11Nio2*.class"/>
+    <exclude name="**/JniLifecycleListener.class"/>
+    <exclude name="org/apache/tomcat/**/*Nio2*.class"/>
+    <exclude name="org/apache/tomcat/**/Apr*.class"/>
+
+    <!-- Minimize bundles to the default set -->
+    <exclude name="org/apache/**/LocalStrings_*.properties"/>
+
+    <!-- Remove digester support -->
+    <exclude name="org/apache/catalina/**/*Rule.class" />
+    <exclude name="org/apache/catalina/**/*RuleSet*.class" />
+    <exclude name="org/apache/tomcat/**/*RuleSet*.class" />
+
+    <!-- Remove various Apache Tomcat modules not used by default in an embedded setting -->
+    <exclude name="org/apache/catalina/ant/**" />
+    <exclude name="org/apache/catalina/ha/**" />
+    <exclude name="org/apache/catalina/manager/**" />
+    <exclude name="org/apache/catalina/ssi/**" />
+    <exclude name="org/apache/catalina/storeconfig/**" />
+    <exclude name="org/apache/catalina/tribes/**" />
+    <exclude name="org/apache/catalina/valves/rewrite/**" />
+    <exclude name="org/apache/tomcat/buildutil" />
+    <exclude name="org/apache/tomcat/dbcp" />
+
+    <!-- Remove authenticator classes -->
+    <exclude name="org/apache/catalina/authenticator/BasicAuthenticator*" />
+    <exclude name="org/apache/catalina/authenticator/DigestAuthenticator*" />
+    <exclude name="org/apache/catalina/authenticator/FormAuthenticator*" />
+    <exclude name="org/apache/catalina/authenticator/SingleSignOnE*" />
+    <exclude name="org/apache/catalina/authenticator/SingleSignOnL*" />
+    <exclude name="org/apache/catalina/authenticator/SingleSignOnS*" />
+    <exclude name="org/apache/catalina/authenticator/Spnego*" />
+    <exclude name="org/apache/catalina/authenticator/SSLAuthenticator*" />
+    <exclude name="org/apache/catalina/authenticator/jaspcic/Simple*" />
+
+    <!-- Remove optional filter classes -->
+    <exclude name="org/apache/catalina/filters/**" />
+
+    <!-- Remove Realm classes -->
+    <exclude name="org/apache/catalina/realm/AuthenticatedUserRealm.class" />
+    <exclude name="org/apache/catalina/realm/CombinedRealm.class" />
+    <exclude name="org/apache/catalina/realm/DataSourceRealm.class" />
+    <exclude name="org/apache/catalina/realm/JAASCallbackHandler.class" />
+    <exclude name="org/apache/catalina/realm/JAASMemoryLoginModule.class" />
+    <exclude name="org/apache/catalina/realm/JAASRealm.class" />
+    <exclude name="org/apache/catalina/realm/JDBCRealm.class" />
+    <exclude name="org/apache/catalina/realm/JNDIRealm$User.class" />
+    <exclude name="org/apache/catalina/realm/JNDIRealm.class" />
+    <exclude name="org/apache/catalina/realm/LockOutRealm*" />
+    <exclude name="org/apache/catalina/realm/MemoryRealm.class" />
+    <exclude name="org/apache/catalina/realm/NestedCredentialHandler.class" />
+    <exclude name="org/apache/catalina/realm/UserDatabaseRealm.class" />
+
+    <!-- Remove optional servlets -->
+    <exclude name="org/apache/catalina/servlets/**" />
+
+    <!-- Remove all but the standard session management -->
+    <exclude name="org/apache/catalina/session/JDBC*" />
+    <exclude name="org/apache/catalina/session/File*" />
+    <exclude name="org/apache/catalina/session/Persistent*" />
+    <exclude name="org/apache/catalina/session/StoreBase*" />
+
+    <!-- Remove users -->
+    <exclude name="org/apache/catalina/users/**" />
+
+    <!-- Remove optional valves -->
+    <exclude name="org/apache/catalina/valves/Crawler*" />
+    <exclude name="org/apache/catalina/valves/ExtendedAccessLogValve*" />
+    <exclude name="org/apache/catalina/valves/ExtendedAccessLogValve*" />
+    <exclude name="org/apache/catalina/valves/HealthCheckValve*" />
+    <exclude name="org/apache/catalina/valves/JDBCAccessLogValve*" />
+    <exclude name="org/apache/catalina/valves/LoadBalancerDrainingValve*" />
+    <exclude name="org/apache/catalina/valves/PersistentValve*" />
+
+    <!-- Remove web resources classes, default is the EmptyResourceSet -->
+    <exclude name="org/apache/catalina/webresources/AbstractArchiveResource*" />
+    <exclude name="org/apache/catalina/webresources/AbstractSingleArchiveResource*" />
+    <exclude name="org/apache/catalina/webresources/ExtractingRoot*" />
+    <exclude name="org/apache/catalina/webresources/FileResource*" />
+    <exclude name="org/apache/catalina/webresources/JarResource*" />
+    <exclude name="org/apache/catalina/webresources/JarWarResource*" />
+    <exclude name="org/apache/catalina/webresources/TomcatJarInputStream*" />
+    <exclude name="org/apache/catalina/webresources/TrackedInputStream*" />
+    <exclude name="org/apache/catalina/webresources/VirtualResource*" />
+    <exclude name="org/apache/catalina/webresources/WarResource*" />
+    <exclude name="org/apache/catalina/webresources/WarResource*" />
+    <exclude name="org/apache/catalina/webresources/war/WarURLConnection*" />
+
+    <!-- Remove most JNDI stuff -->
+    <exclude name="org/apache/naming/EjbRef*" />
+    <exclude name="org/apache/naming/factory/BeanFactory*" />
+    <exclude name="org/apache/naming/factory/DataSourceLinkFactory*" />
+    <exclude name="org/apache/naming/factory/EjbFactory*" />
+    <exclude name="org/apache/naming/factory/LookupFactory*" />
+    <exclude name="org/apache/naming/factory/MailSessionFactory*" />
+    <exclude name="org/apache/naming/factory/OpenEjbFactory*" />
+    <exclude name="org/apache/naming/factory/ResourceEnvFactory*" />
+    <exclude name="org/apache/naming/factory/ResourceFactory*" />
+    <exclude name="org/apache/naming/factory/ResourceLinkFactory*" />
+    <exclude name="org/apache/naming/factory/SendMailFactory*" />
+    <exclude name="org/apache/naming/factory/TransactionFactory*" />
+    <exclude name="org/apache/naming/factory/webservices/*" />
+    <exclude name="org/apache/naming/LookupRef*" />
+    <exclude name="org/apache/naming/NameParserImpl*" />
+    <exclude name="org/apache/naming/NamingContextBindingsEnumeration*" />
+    <exclude name="org/apache/naming/NamingContext*" />
+    <exclude name="org/apache/naming/NamingContextEnumeration*" />
+    <exclude name="org/apache/naming/NamingEntry*" />
+    <exclude name="org/apache/naming/ResourceEnvRef*" />
+    <exclude name="org/apache/naming/ResourceLinkRef*" />
+    <exclude name="org/apache/naming/ResourceRef*" />
+    <exclude name="org/apache/naming/SelectorContext*" />
+    <exclude name="org/apache/naming/ServiceRef*" />
+    <exclude name="org/apache/naming/TransactionRef*" />
+
+    <!-- remove BCEL support -->
+    <exclude name="org/apache/tomcat/util/bcel/**" />
+
+    <!-- remove web descriptor elements -->
+    <exclude name="org/apache/tomcat/util/descriptor/DigesterFactory*" />
+    <exclude name="org/apache/tomcat/util/descriptor/InputSourceUtil*" />
+    <exclude name="org/apache/tomcat/util/descriptor/LocalResolver*" />
+    <exclude name="org/apache/tomcat/util/descriptor/web/AbsoluteOrderingRule*" />
+    <exclude name="org/apache/tomcat/util/descriptor/web/CallMethodMultiRule*" />
+    <exclude name="org/apache/tomcat/util/descriptor/web/CallParamMultiRule*" />
+    <exclude name="org/apache/tomcat/util/descriptor/web/ContextHandler*" />
+    <exclude name="org/apache/tomcat/util/descriptor/web/ContextResourceLink*" />
+    <exclude name="org/apache/tomcat/util/descriptor/web/ContextTransaction*" />
+    <exclude name="org/apache/tomcat/util/descriptor/web/FragmentJarScannerCallback*" />
+    <exclude name="org/apache/tomcat/util/descriptor/web/IgnoreAnnotationsRule*" />
+    <exclude name="org/apache/tomcat/util/descriptor/web/InjectionTarget*" />
+    <exclude name="org/apache/tomcat/util/descriptor/web/JspConfigDescriptorImpl*" />
+    <exclude name="org/apache/tomcat/util/descriptor/web/JspPropertyGroup*" />
+    <exclude name="org/apache/tomcat/util/descriptor/web/JspPropertyGroupDescriptorImpl*" />
+    <exclude name="org/apache/tomcat/util/descriptor/web/LifecycleCallbackRule*" />
+    <exclude name="org/apache/tomcat/util/descriptor/web/MappedNameRule*" />
+    <exclude name="org/apache/tomcat/util/descriptor/web/MultipartDef*" />
+    <exclude name="org/apache/tomcat/util/descriptor/web/NameRule*" />
+    <exclude name="org/apache/tomcat/util/descriptor/web/RelativeOrderingRule*" />
+    <exclude name="org/apache/tomcat/util/descriptor/web/SecurityCollection*" />
+    <exclude name="org/apache/tomcat/util/descriptor/web/SecurityRoleRef*" />
+    <exclude name="org/apache/tomcat/util/descriptor/web/ServiceQnameRule*" />
+    <exclude name="org/apache/tomcat/util/descriptor/web/ServletDef*" />
+    <exclude name="org/apache/tomcat/util/descriptor/web/ServletDefCreateRule*" />
+    <exclude name="org/apache/tomcat/util/descriptor/web/SessionConfig*" />
+    <exclude name="org/apache/tomcat/util/descriptor/web/SetAuthConstraintRule*" />
+    <exclude name="org/apache/tomcat/util/descriptor/web/SetDenyUncoveredHttpMethodsRule*" />
+    <exclude name="org/apache/tomcat/util/descriptor/web/SetDistributableRule*" />
+    <exclude name="org/apache/tomcat/util/descriptor/web/SetJspConfig*" />
+    <exclude name="org/apache/tomcat/util/descriptor/web/SetLoginConfig*" />
+    <exclude name="org/apache/tomcat/util/descriptor/web/SetOverrideRule*" />
+    <exclude name="org/apache/tomcat/util/descriptor/web/SetPublicIdRule*" />
+    <exclude name="org/apache/tomcat/util/descriptor/web/SetSessionConfig*" />
+    <exclude name="org/apache/tomcat/util/descriptor/web/SoapHeaderRule*" />
+    <exclude name="org/apache/tomcat/util/descriptor/web/TaglibDescriptorImpl*" />
+    <exclude name="org/apache/tomcat/util/descriptor/web/TaglibLocationRule*" />
+    <exclude name="org/apache/tomcat/util/descriptor/web/VersionRule*" />
+    <exclude name="org/apache/tomcat/util/descriptor/web/WebXml*" />
+    <exclude name="org/apache/tomcat/util/descriptor/web/WebXmlParser*" />
+    <exclude name="org/apache/tomcat/util/descriptor/XmlErrorHandler*" />
+    <exclude name="org/apache/tomcat/util/descriptor/XmlIdentifiers*" />
+
+    <!-- remove taglibrary support -->
+    <exclude name="org/apache/tomcat/util/descriptor/tagplugin/**"/>
+    <exclude name="org/apache/tomcat/util/descriptor/tld/**"/>
+
+    <!-- Remove Digester Support -->
+    <exclude name="org/apache/tomcat/util/digester/**"/>
+
+    <!-- TODO - For now, remove SSL until we have an example -->
+    <exclude name="org/apache/tomcat/util/net/jsse/**"/>
+    <exclude name="org/apache/tomcat/util/net/openssl/**"/>
+
+    <!-- Remove without-reflection code generator -->
+    <exclude name="org/apache/tomcat/util/xreflection/**" />
+
+    <!-- Remove DefaultServlet -->
+    <exclude name="org/apache/catalina/servlets/DefaultServlet*.*" />
   </patternset>
 
   <patternset id="files.catalina-tribes">
@@ -1445,9 +1709,86 @@
 
   </target>
 
+  <target name="embed-programmatic-jar" description="Create non reflection embedded jar"
+          depends="embed-jars,embed-sources">
+
+    <!-- temporary directory to store the generated code -->
+    <tempfile property="xreflect.directory" destDir="${java.io.tmpdir}" prefix="apache-tomcat-xreflect-"/>
+    <echo>Generating Reflection Less Introspection to: ${xreflect.directory}</echo>
+    <mkdir dir="${xreflect.directory}"/>
+    <copy todir="${xreflect.directory}/sources">
+      <fileset dir="java"/>
+      <fileset dir="res/graal/java"/>
+    </copy>
+    <copy todir="${xreflect.directory}/classes">
+      <fileset dir="${tomcat.classes}"/>
+    </copy>
+
+    <!-- Compile the sources needed to generate XReflectionIntrospectionUtils -->
+    <javac includes="org/apache/tomcat/util/xreflection/*.java"
+           srcdir="${xreflect.directory}/sources"
+           destdir="${xreflect.directory}/classes"
+           debug="${compile.debug}"
+           deprecation="${compile.deprecation}"
+           source="${compile.source}"
+           target="${compile.target}"
+           encoding="ISO-8859-1"
+           includeAntRuntime="true" >
+      <compilerarg value="-XDignore.symbol.file"/>
+      <classpath refid="compile.classpath" />
+    </javac>
+
+    <!-- Generate the reflection less XReflectionIntrospectionUtils .java file -->
+    <java classname="org.apache.tomcat.util.xreflection.ObjectReflectionPropertyInspector"
+          classpath="${xreflect.directory}/classes">
+      <arg value="${xreflect.directory}/sources"/>
+    </java>
+
+    <!-- Compile the generated XReflectionIntrospectionUtils.java class -->
+    <delete file="${xreflect.directory}/classes/org/apache/tomcat/util/XReflectionIntrospectionUtils.class"/>
+    <javac includes="org/apache/tomcat/util/XReflectionIntrospectionUtils.java"
+           srcdir="${xreflect.directory}/sources"
+           destdir="${xreflect.directory}/classes"
+           debug="${compile.debug}"
+           deprecation="${compile.deprecation}"
+           source="${compile.source}"
+           target="${compile.target}"
+           encoding="ISO-8859-1"
+           includeAntRuntime="true" >
+      <compilerarg value="-XDignore.symbol.file"/>
+      <classpath refid="compile.classpath" />
+    </javac>
+
+    <!-- Create the binary JAR file -->
+    <jarIt jarfile="${tomcat-embed-programmatic.jar}"
+           filesDir="${xreflect.directory}/classes"
+           filesId="files.tomcat-embed-programmatic"
+           notice="${tomcat.manifests}/servlet-api.jar.notice"
+           license="${tomcat.manifests}/servlet-api.jar.license"
+           addOSGi="false"
+           addGraal="true"
+           graalPrefix="org.apache.tomcat.embed/tomcat-embed-programmatic"
+           graalFiles="res/graal/tomcat-embed-programmatic/native-image"
+           libs="embed/*.jar"/>
+
+    <!-- Create the source JAR file -->
+    <jarIt jarfile="${tomcat-embed-programmatic-sources.jar}"
+           filesDir="${xreflect.directory}/sources"
+           filesId="files.tomcat-embed-programmatic"
+           notice="${tomcat.manifests}/servlet-api.jar.notice"
+           license="${tomcat.manifests}/servlet-api.jar.license"/>
+
+    <!-- Leave generated code in an easy place for review -->
+    <copy todir="${java.io.tmpdir}"
+          file="${xreflect.directory}/sources/org/apache/tomcat/util/XReflectionIntrospectionUtils.java"
+          overwrite="true"/>
+    <!-- Delete our temporary compilation directory -->
+    <delete dir="${xreflect.directory}"/>
+  </target>
+
   <target name="embed"
           description="Creates the experimental embedded release"
-          depends="embed-jars,embed-sources" >
+          depends="embed-jars,embed-sources,embed-programmatic-jar" >
 
     <fixcrlf srcdir="${tomcat.embed}" eol="crlf"
         encoding="ISO-8859-1" fixlast="false" >
