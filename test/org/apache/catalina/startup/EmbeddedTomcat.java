@@ -35,7 +35,6 @@ import org.apache.catalina.connector.Connector;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.scan.StandardJarScanFilter;
 import org.apache.tomcat.util.scan.StandardJarScanner;
-import org.apache.tomcat.websocket.server.WsContextListener;
 
 @Ignore
 public class EmbeddedTomcat {
@@ -67,7 +66,7 @@ public class EmbeddedTomcat {
         CounterServlet counterServlet = new CounterServlet();
         Tomcat.addServlet(ctx, "counterServlet", counterServlet);
         ctx.addServletMappingDecoded("/", "counterServlet");
-        ctx.addApplicationListener(WsContextListener.class.getName());
+        //ctx.addApplicationListener(new WsContextListener());
 
         tomcat.start();
         Thread.sleep(60*1000);
@@ -88,6 +87,7 @@ public class EmbeddedTomcat {
         @Override
         protected void service(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
+            req.getSession(true);
             resp.setContentType("text/plain");
             resp.getWriter().print("OK: " + req.getRequestURL() + "[" + callCount.incrementAndGet()+ "]");
         }
