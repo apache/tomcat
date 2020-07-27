@@ -39,8 +39,9 @@ public class Constants {
             "<head>\n" +
             "<style>\n" +
             org.apache.catalina.util.TomcatCSS.TOMCAT_CSS + "\n" +
-            "  #manager-container {\n" +
-            "    width: 960px;\n" +
+            "  #manager-wrapper {\n" +
+            "    min-width: 720px;\n" +
+            "    max-width: 1000px;\n" +
             "    margin: 20px auto;\n" +
             "  }\n" +
             "  table {\n" +
@@ -61,6 +62,9 @@ public class Constants {
             "  td.page-title font{\n" +
             "    font-size:52px;\n" +
             "  }\n" + 
+            "  #manager-section{\n" +
+            "    margin-bottom:20px;\n" +
+            "  }\n" +             
             "  td.title {\n" +
             "    color: #fff;\n" + 
             "    text-align: left;\n" +
@@ -121,6 +125,77 @@ public class Constants {
             "  form.inline {\n" +
             "    display: inline;\n" +
             "  }\n" +
+            "  .highlight .even{\n" +
+            "    background:#fff;\n" +
+            "  }\n" +
+            "  .highlight .even:hover{\n" +
+            "    background:#feedb3;\n" +
+            "  }\n" +
+            "  .highlight .odd {\n" +
+            "    background: #efefef;\n" +
+            "  }\n" +
+            "  .highlight .odd {\n" +
+            "    background: #f2e0a4;\n" +
+            "  }\n" +
+            "  .action,\n" + 
+            "  input[type=\"button\"].action,\n" + 
+            "  input[type=\"reset\"].action,\n" + 
+            "  input[type=\"submit\"].action {\n" + 
+            "    font-size: 13px;\n" + 
+            "    padding: 13px 21px !important;\n" +
+            "    border-radius: 3px;\n" +
+            "    -moz-border-radius: 3px;\n" +
+            "    -webkit-border-radius: 3px;\n" +
+            "    -webkit-box-shadow: 0px 1px 3px 0px rgba(0,0,0,0.12);\n" + 
+            "    -moz-box-shadow: 0px 1px 3px 0px rgba(0,0,0,0.12);\n" + 
+            "    box-shadow: 0px 1px 3px 0px rgba(0,0,0,0.12);\n" + 
+            "    -webkit-appearance: none;\n" + 
+            "    -moz-appearance:none;\n" + 
+            "    text-transform:uppercase;\n" + 
+            "    cursor:hand;\n" + 
+            "    cursor:pointer;\n" + 
+            "  }\n" +
+            "  .sky, \n" + 
+            "  input[type=\"button\"].action.sky,\n" + 
+            "  input[type=\"reset\"].action.sky,\n" + 
+            "  input[type=\"submit\"].action.sky,\n" + 
+            "  input[type=\"button\"].action.sky{\n"+ 
+            "    color: #000;\n" +
+            "    background: #e2e2e2;\n" + 
+            "    border: solid 1px #d2d1d1;\n" +
+            "  }\n" + 
+            "  .stop, \n" + 
+            "  input[type=\"button\"].action.stop,\n" + 
+            "  input[type=\"reset\"].action.stop,\n" + 
+            "  input[type=\"submit\"].action.stop,\n" + 
+            "  input[type=\"button\"].action.stop{\n"+ 
+            "    color: #fff;\n" +
+            "    background: #ff4343;\n" + 
+            "    border: solid 1px #ff3131;\n" +
+            "  }\n" + 
+            "  .start, \n" + 
+            "  input[type=\"button\"].action.start,\n" + 
+            "  input[type=\"reset\"].action.start,\n" + 
+            "  input[type=\"submit\"].action.start,\n" + 
+            "  input[type=\"button\"].action.start{\n"+ 
+            "      color: #fff;\n" +
+            "      background: #4E657B;\n" + 
+            "      border: solid 1px #4E657B;\n" +
+            "  }\n" + 
+            "  input[type=\"text\"],\n" + 
+            "  input[type=\"text\"]:hover,\n" + 
+            "  input[type=\"text\"]:focus{\n" + 
+            "    color:#221;\n" + 
+            "    font-size:19px;\n" + 
+            "    background:#f8f8f8;\n" + 
+            "    line-height:1.0em;\n" + 
+            "    padding:12px 12px;\n" + 
+            "    border:solid 1px #ccc;\n" + 
+            "    border-style:solid;\n" + 
+            "    -webkit-border-radius: 3px;\n" + 
+            "    -moz-border-radius: 3px;\n" + 
+            "    border-radius: 3px;\n" + 
+            "  }\n" + 
             "</style>\n";
 
         BODY_HEADER_SECTION =
@@ -129,7 +204,7 @@ public class Constants {
             "\n" +
             "<body bgcolor=\"#FFFFFF\">\n" +
             "\n" +
-            "<div id=\"manager-container\">\n" + 
+            "<div id=\"manager-wrapper\">\n" + 
             "<table cellspacing=\"4\" border=\"0\">\n" +
             " <tr>\n" +
             "  <td colspan=\"2\">\n" +
@@ -139,7 +214,7 @@ public class Constants {
             "   </a>\n" +
             "   <a href=\"https://www.apache.org/\" " + REL_EXTERNAL + ">\n" +
             "    <img border=\"0\" alt=\"The Apache Software Foundation\" align=\"right\"\n" +
-            "         src=\"{0}/images/asf-logo.svg\" style=\"width: 266px; height: 83px;\">\n" +
+            "         src=\"{0}/images/asf-logo.svg\" style=\"width: 139px;\">\n" +
             "   </a>\n" +
             "  </td>\n" +
             " </tr>\n" +
@@ -166,7 +241,7 @@ public class Constants {
             "\n";
 
         MANAGER_SECTION =
-            "<table border=\"0\" cellspacing=\"0\" cellpadding=\"3\">\n" +
+            "<table border=\"0\" cellspacing=\"0\" cellpadding=\"3\" id=\"manager-section\">\n" +
             "<tr>\n" +
             " <td colspan=\"4\" class=\"title\">{0}</td>\n" +
             "</tr>\n" +

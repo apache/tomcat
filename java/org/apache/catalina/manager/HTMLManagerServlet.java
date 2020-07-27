@@ -426,9 +426,9 @@ public final class HTMLManagerServlet extends ManagerServlet {
                 // Bugzilla 34818, alternating row colors
                 isHighlighted = !isHighlighted;
                 if(isHighlighted) {
-                    highlightColor = "#EFEFEF";
+                    highlightColor = "#f8f8f8";
                 } else {
-                    highlightColor = "#FFFFFF";
+                    highlightColor = "#fff";
                 }
 
                 String contextPath = ctxt.getPath();
@@ -1154,7 +1154,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
     // (maximum of 10).
 
     private static final String APPS_HEADER_SECTION =
-        "<table border=\"1\" cellspacing=\"0\" cellpadding=\"3\">\n" +
+        "<table border=\"0\" cellspacing=\"0\" cellpadding=\"3\">\n" +
         "<tr>\n" +
         " <td colspan=\"6\" class=\"title\">{0}</td>\n" +
         "</tr>\n" +
@@ -1169,7 +1169,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
 
     private static final String APPS_ROW_DETAILS_SECTION =
         "<tr>\n" +
-        " <td class=\"row-left\" bgcolor=\"{6}\" rowspan=\"2\"><small>{0}</small></td>\n" +
+        " <td class=\"row-left\"  bgcolor=\"{6}\" rowspan=\"2\"><small>{0}</small></td>\n" +
         " <td class=\"row-left\" bgcolor=\"{6}\" rowspan=\"2\"><small>{1}</small></td>\n" +
         " <td class=\"row-left\" bgcolor=\"{6}\" rowspan=\"2\"><small>{2}</small></td>\n" +
         " <td class=\"row-center\" bgcolor=\"{6}\" rowspan=\"2\"><small>{3}</small></td>\n" +
@@ -1199,20 +1199,20 @@ public final class HTMLManagerServlet extends ManagerServlet {
         " <td class=\"row-left\" bgcolor=\"{13}\">\n" +
         "  &nbsp;<small>{1}</small>&nbsp;\n" +
         "  <form class=\"inline\" method=\"POST\" action=\"{2}\">" +
-        "  <small><input type=\"submit\" value=\"{3}\"></small>" +
+        "  <small><input type=\"submit\" value=\"{3}\" class=\"action stop\"></small>" +
         "  </form>\n" +
         "  <form class=\"inline\" method=\"POST\" action=\"{4}\">" +
-        "  <small><input type=\"submit\" value=\"{5}\"></small>" +
+        "  <small><input type=\"submit\" value=\"{5}\" class=\"action sky\"></small>" +
         "  </form>\n" +
         "  <form class=\"inline\" method=\"POST\" action=\"{6}\">" +
-        "  &nbsp;&nbsp;<small><input type=\"submit\" value=\"{7}\"></small>" +
+        "  &nbsp;&nbsp;<small><input type=\"submit\" value=\"{7}\" class=\"action sky\"></small>" +
         "  </form>\n" +
         " </td>\n" +
         " </tr><tr>\n" +
         " <td class=\"row-left\" bgcolor=\"{13}\">\n" +
         "  <form method=\"POST\" action=\"{8}\">\n" +
         "  <small>\n" +
-        "  &nbsp;<input type=\"submit\" value=\"{9}\">&nbsp;{10}&nbsp;<input type=\"text\" name=\"idle\" size=\"5\" value=\"{11}\">&nbsp;{12}&nbsp;\n" +
+        "  &nbsp;<input type=\"submit\" value=\"{9}\" class=\"action sky\">&nbsp;{10}&nbsp;<input type=\"text\" name=\"idle\" size=\"5\" value=\"{11}\">&nbsp;{12}&nbsp;\n" +
         "  </small>\n" +
         "  </form>\n" +
         " </td>\n" +
@@ -1221,12 +1221,12 @@ public final class HTMLManagerServlet extends ManagerServlet {
     private static final String STOPPED_DEPLOYED_APPS_ROW_BUTTON_SECTION =
         " <td class=\"row-left\" bgcolor=\"{13}\" rowspan=\"2\">\n" +
         "  <form class=\"inline\" method=\"POST\" action=\"{0}\">" +
-        "  <small><input type=\"submit\" value=\"{1}\"></small>" +
+        "  <small><input type=\"submit\" value=\"{1}\" class=\"action start\"></small>" +
         "  </form>\n" +
         "  &nbsp;<small>{3}</small>&nbsp;\n" +
         "  &nbsp;<small>{5}</small>&nbsp;\n" +
         "  <form class=\"inline\" method=\"POST\" action=\"{6}\">" +
-        "  <small><input type=\"submit\" value=\"{7}\"></small>" +
+        "  <small><input type=\"submit\" value=\"{7}\" class=\"action sky\"></small>" +
         "  </form>\n" +
         " </td>\n" +
         "</tr>\n<tr></tr>\n";
@@ -1266,7 +1266,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
     private static final String DEPLOY_SECTION =
         "</table>\n" +
         "<br>\n" +
-        "<table border=\"1\" cellspacing=\"0\" cellpadding=\"3\">\n" +
+        "<table border=\"0\" cellspacing=\"0\" cellpadding=\"3\">\n" +
         "<tr>\n" +
         " <td colspan=\"2\" class=\"title\">{0}</td>\n" +
         "</tr>\n" +
@@ -1282,7 +1282,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
         "  <small>{3}</small>\n" +
         " </td>\n" +
         " <td class=\"row-left\">\n" +
-        "  <input type=\"text\" name=\"deployPath\" size=\"20\">\n" +
+        "  <input type=\"text\" name=\"deployPath\" size=\"20\" placeholder=\"app\">\n" +
         " </td>\n" +
         "</tr>\n" +
         "<tr>\n" +
@@ -1290,7 +1290,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
         "  <small>{4}</small>\n" +
         " </td>\n" +
         " <td class=\"row-left\">\n" +
-        "  <input type=\"text\" name=\"deployVersion\" size=\"20\">\n" +
+        "  <input type=\"text\" name=\"deployVersion\" size=\"20\" placeholder=\"v0.1\">\n" +
         " </td>\n" +
         "</tr>\n" +
         "<tr>\n" +
@@ -1298,7 +1298,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
         "  <small>{5}</small>\n" +
         " </td>\n" +
         " <td class=\"row-left\">\n" +
-        "  <input type=\"text\" name=\"deployConfig\" size=\"20\">\n" +
+        "  <input type=\"text\" name=\"deployConfig\" size=\"20\" placeholder=\"/location/deploy.xml\">\n" +
         " </td>\n" +
         "</tr>\n" +
         "<tr>\n" +
@@ -1306,7 +1306,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
         "  <small>{6}</small>\n" +
         " </td>\n" +
         " <td class=\"row-left\">\n" +
-        "  <input type=\"text\" name=\"deployWar\" size=\"40\">\n" +
+        "  <input type=\"text\" name=\"deployWar\" size=\"40\" placeholder=\"/location/app.war\">\n" +
         " </td>\n" +
         "</tr>\n" +
         "<tr>\n" +
@@ -1314,7 +1314,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
         "  &nbsp;\n" +
         " </td>\n" +
         " <td class=\"row-left\">\n" +
-        "  <input type=\"submit\" value=\"{7}\">\n" +
+        "  <input type=\"submit\" value=\"{7}\" class=\"action start large\">\n" +
         " </td>\n" +
         "</tr>\n" +
         "</table>\n" +
@@ -1356,7 +1356,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
         "\n";
 
     private static final String CONFIG_SECTION =
-        "<table border=\"1\" cellspacing=\"0\" cellpadding=\"3\">\n" +
+        "<table border=\"0\" cellspacing=\"0\" cellpadding=\"3\">\n" +
         "<tr>\n" +
         " <td colspan=\"2\" class=\"title\">{0}</td>\n" +
         "</tr>\n" +
@@ -1393,7 +1393,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
         "<br>";
 
     private static final String DIAGNOSTICS_SECTION =
-        "<table border=\"1\" cellspacing=\"0\" cellpadding=\"3\">\n" +
+        "<table border=\"0\" cellspacing=\"0\" cellpadding=\"3\">\n" +
         "<tr>\n" +
         " <td colspan=\"2\" class=\"title\">{0}</td>\n" +
         "</tr>\n" +
