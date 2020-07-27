@@ -39,38 +39,50 @@ public class Constants {
             "<head>\n" +
             "<style>\n" +
             org.apache.catalina.util.TomcatCSS.TOMCAT_CSS + "\n" +
+            "  #manager-container {\n" +
+            "    width: 960px;\n" +
+            "    margin: 20px auto;\n" +
+            "  }\n" +
             "  table {\n" +
             "    width: 100%;\n" +
             "  }\n" +
             "  td.page-title {\n" +
+            "    font-size:52px; \n" +
             "    text-align: center;\n" +
             "    vertical-align: top;\n" +
             "    font-family:sans-serif,Tahoma,Arial;\n" +
             "    font-weight: bold;\n" +
             "    background: white;\n" +
+            "    text-align: left;\n" +
+            "    padding-top:20px\n" +
             "    color: black;\n" +
+            "    padding-top: 24px;\n" +
             "  }\n" +
+            "  td.page-title font{\n" +
+            "    font-size:52px;\n" +
+            "  }\n" + 
             "  td.title {\n" +
+            "    color: #fff;\n" + 
             "    text-align: left;\n" +
             "    vertical-align: top;\n" +
             "    font-family:sans-serif,Tahoma,Arial;\n" +
-            "    font-style:italic;\n" +
+            "    font-size:23px;\n" +
             "    font-weight: bold;\n" +
-            "    background: #D2A41C;\n" +
+            "    background: #BEAC72;\n" +
             "  }\n" +
             "  td.header-left {\n" +
             "    text-align: left;\n" +
             "    vertical-align: top;\n" +
             "    font-family:sans-serif,Tahoma,Arial;\n" +
             "    font-weight: bold;\n" +
-            "    background: #FFDC75;\n" +
+            "    background: #FEEDB3;\n" +
             "  }\n" +
             "  td.header-center {\n" +
             "    text-align: center;\n" +
             "    vertical-align: top;\n" +
             "    font-family:sans-serif,Tahoma,Arial;\n" +
             "    font-weight: bold;\n" +
-            "    background: #FFDC75;\n" +
+            "    background: #FEEDB3;\n" +
             "  }\n" +
             "  td.row-left {\n" +
             "    text-align: left;\n" +
@@ -117,6 +129,7 @@ public class Constants {
             "\n" +
             "<body bgcolor=\"#FFFFFF\">\n" +
             "\n" +
+            "<div id=\"manager-container\">\n" + 
             "<table cellspacing=\"4\" border=\"0\">\n" +
             " <tr>\n" +
             "  <td colspan=\"2\">\n" +
@@ -131,7 +144,6 @@ public class Constants {
             "  </td>\n" +
             " </tr>\n" +
             "</table>\n" +
-            "<hr size=\"1\" noshade=\"noshade\">\n" +
             "<table cellspacing=\"4\" border=\"0\">\n" +
             " <tr>\n" +
             "  <td class=\"page-title\" bordercolor=\"#000000\" " +
@@ -140,11 +152,10 @@ public class Constants {
             "  </td>\n" +
             " </tr>\n" +
             "</table>\n" +
-            "<br>\n" +
             "\n";
 
         MESSAGE_SECTION =
-            "<table border=\"1\" cellspacing=\"0\" cellpadding=\"3\">\n" +
+            "<table border=\"0\" cellspacing=\"0\" cellpadding=\"3\">\n" +
             " <tr>\n" +
             "  <td class=\"row-left\" width=\"10%\">" +
             "<small><strong>{0}</strong></small>&nbsp;</td>\n" +
@@ -155,7 +166,7 @@ public class Constants {
             "\n";
 
         MANAGER_SECTION =
-            "<table border=\"1\" cellspacing=\"0\" cellpadding=\"3\">\n" +
+            "<table border=\"0\" cellspacing=\"0\" cellpadding=\"3\">\n" +
             "<tr>\n" +
             " <td colspan=\"4\" class=\"title\">{0}</td>\n" +
             "</tr>\n" +
@@ -170,7 +181,7 @@ public class Constants {
             "\n";
 
         SERVER_HEADER_SECTION =
-            "<table border=\"1\" cellspacing=\"0\" cellpadding=\"3\">\n" +
+            "<table border=\"0\" cellspacing=\"0\" cellpadding=\"3\">\n" +
             "<tr>\n" +
             " <td colspan=\"8\" class=\"title\">{0}</td>\n" +
             "</tr>\n" +
@@ -201,10 +212,11 @@ public class Constants {
             "\n";
 
         HTML_TAIL_SECTION =
-            "<hr size=\"1\" noshade=\"noshade\">\n" +
+            "<hr size=\"0\" noshade=\"noshade\">\n" +
             "<center><font size=\"-1\" color=\"#525D76\">\n" +
             " <em>Copyright &copy; 1999-2020, Apache Software Foundation</em>" +
             "</font></center>\n" +
+            "</div>\n" + 
             "\n" +
             "</body>\n" +
             "</html>";

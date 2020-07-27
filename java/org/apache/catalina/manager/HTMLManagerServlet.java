@@ -426,7 +426,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
                 // Bugzilla 34818, alternating row colors
                 isHighlighted = !isHighlighted;
                 if(isHighlighted) {
-                    highlightColor = "#C3F3C3";
+                    highlightColor = "#EFEFEF";
                 } else {
                     highlightColor = "#FFFFFF";
                 }

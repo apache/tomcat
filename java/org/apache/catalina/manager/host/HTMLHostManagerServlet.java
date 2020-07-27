@@ -472,7 +472,7 @@ public final class HTMLHostManagerServlet extends HostManagerServlet {
     // (maximum of 10).
 
     private static final String HOSTS_HEADER_SECTION =
-        "<table border=\"1\" cellspacing=\"0\" cellpadding=\"3\">\n" +
+        "<table border=\"0\" cellspacing=\"0\" cellpadding=\"3\">\n" +
         "<tr>\n" +
         " <td colspan=\"5\" class=\"title\">{0}</td>\n" +
         "</tr>\n" +
@@ -509,7 +509,7 @@ public final class HTMLHostManagerServlet extends HostManagerServlet {
     private static final String ADD_SECTION_START =
         "</table>\n" +
         "<br>\n" +
-        "<table border=\"1\" cellspacing=\"0\" cellpadding=\"3\">\n" +
+        "<table border=\"0\" cellspacing=\"0\" cellpadding=\"3\">\n" +
         "<tr>\n" +
         " <td colspan=\"2\" class=\"title\">{0}</td>\n" +
         "</tr>\n" +
@@ -573,7 +573,7 @@ public final class HTMLHostManagerServlet extends HostManagerServlet {
         "\n";
 
         private static final String PERSIST_SECTION =
-                "<table border=\"1\" cellspacing=\"0\" cellpadding=\"3\">\n" +
+                "<table border=\"0\" cellspacing=\"0\" cellpadding=\"3\">\n" +
                 "<tr>\n" +
                 " <td class=\"title\">{0}</td>\n" +
                 "</tr>\n" +
