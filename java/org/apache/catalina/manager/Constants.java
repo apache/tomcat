@@ -48,6 +48,7 @@ public class Constants {
             "  }\n" +
             "  table {\n" +
             "    width: 100%;\n" +
+            "    margin: 10px auto 0px auto;\n" +
             "  }\n" +
             "  td.page-title {\n" +
             "    font-size:52px; \n" +
@@ -66,7 +67,15 @@ public class Constants {
             "  }\n" + 
             "  #manager-section{\n" +
             "    margin-bottom:20px;\n" +
-            "  }\n" +             
+            "  }\n" +   
+            "  #server-section{\n" +
+            "    margin-top:20px;\n" +
+            "    margin-bottom:170px;\n" +
+            "  }\n" +  
+            "  #copyright{\n" +
+            "    display:block;\n" +
+            "    margin-bottom:30px;\n" +
+            "  }\n" +               
             "  td.title {\n" +
             "    color: #fff;\n" + 
             "    text-align: left;\n" +
@@ -235,7 +244,7 @@ public class Constants {
             "<table border=\"0\" cellspacing=\"0\" cellpadding=\"3\">\n" +
             " <tr>\n" +
             "  <td class=\"row-left\" width=\"10%\">" +
-            "<small><strong>{0}</strong></small>&nbsp;</td>\n" +
+            "   <strong>{0}</strong>&nbsp;</td>\n" +
             "  <td class=\"row-left\"><pre>{1}</pre></td>\n" +
             " </tr>\n" +
             "</table>\n" +
@@ -258,7 +267,7 @@ public class Constants {
             "\n";
 
         SERVER_HEADER_SECTION =
-            "<table border=\"0\" cellspacing=\"0\" cellpadding=\"3\">\n" +
+            "<table border=\"0\" cellspacing=\"0\" cellpadding=\"3\" id=\"server-section\">\n" +
             "<tr>\n" +
             " <td colspan=\"8\" class=\"title\">{0}</td>\n" +
             "</tr>\n" +
@@ -290,7 +299,7 @@ public class Constants {
 
         HTML_TAIL_SECTION =
             "<center><font size=\"-1\" color=\"#525D76\">\n" +
-            " <span class=\"copright\">Copyright &copy; 1999-2020, Apache Software Foundation</span>" +
+            " <span id=\"copyright\">Copyright &copy; 1999-2020, Apache Software Foundation</span>" +
             "</font></center>\n" +
             "</div>\n" + 
             "\n" +

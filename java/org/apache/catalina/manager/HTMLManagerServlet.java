@@ -1178,18 +1178,18 @@ public final class HTMLManagerServlet extends ManagerServlet {
 
     private static final String MANAGER_APP_ROW_BUTTON_SECTION =
         " <td class=\"row-left\" bgcolor=\"{13}\">\n" +
-        "  <small>\n" +
+        "  \n" +
         "  &nbsp;{1}&nbsp;\n" +
         "  &nbsp;{3}&nbsp;\n" +
         "  &nbsp;{5}&nbsp;\n" +
         "  &nbsp;{7}&nbsp;\n" +
-        "  </small>\n" +
+        "  \n" +
         " </td>\n" +
         "</tr><tr>\n" +
         " <td class=\"row-left\" bgcolor=\"{13}\">\n" +
         "  <form method=\"POST\" action=\"{8}\">\n" +
         "  <small>\n" +
-        "  &nbsp;<input type=\"submit\" value=\"{9}\">&nbsp;{10}&nbsp;<input type=\"text\" name=\"idle\" size=\"5\" value=\"{11}\">&nbsp;{12}&nbsp;\n" +
+        "  &nbsp;<input type=\"submit\" value=\"{9}\" class=\"action sky small\">&nbsp;{10}&nbsp;<input type=\"text\" name=\"idle\" size=\"5\" value=\"{11}\">&nbsp;{12}&nbsp;\n" +
         "  </small>\n" +
         "  </form>\n" +
         " </td>\n" +
@@ -1271,7 +1271,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
         " <td colspan=\"2\" class=\"title\">{0}</td>\n" +
         "</tr>\n" +
         "<tr>\n" +
-        " <td colspan=\"2\" class=\"header-left\"><small>{1}</small></td>\n" +
+        " <td colspan=\"2\" class=\"header-left\">{1}</td>\n" +
         "</tr>\n" +
         "<tr>\n" +
         " <td colspan=\"2\">\n" +
@@ -1279,7 +1279,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
         "<table cellspacing=\"0\" cellpadding=\"3\">\n" +
         "<tr>\n" +
         " <td class=\"row-right\">\n" +
-        "  <small>{3}</small>\n" +
+        "  {3}\n" +
         " </td>\n" +
         " <td class=\"row-left\">\n" +
         "  <input type=\"text\" name=\"deployPath\" size=\"20\" placeholder=\"app\">\n" +
@@ -1287,7 +1287,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
         "</tr>\n" +
         "<tr>\n" +
         " <td class=\"row-right\">\n" +
-        "  <small>{4}</small>\n" +
+        "  {4}\n" +
         " </td>\n" +
         " <td class=\"row-left\">\n" +
         "  <input type=\"text\" name=\"deployVersion\" size=\"20\" placeholder=\"v0.1\">\n" +
@@ -1295,7 +1295,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
         "</tr>\n" +
         "<tr>\n" +
         " <td class=\"row-right\">\n" +
-        "  <small>{5}</small>\n" +
+        "  {5}\n" +
         " </td>\n" +
         " <td class=\"row-left\">\n" +
         "  <input type=\"text\" name=\"deployConfig\" size=\"20\" placeholder=\"/location/deploy.xml\">\n" +
@@ -1303,7 +1303,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
         "</tr>\n" +
         "<tr>\n" +
         " <td class=\"row-right\">\n" +
-        "  <small>{6}</small>\n" +
+        "  {6}\n" +
         " </td>\n" +
         " <td class=\"row-left\">\n" +
         "  <input type=\"text\" name=\"deployWar\" size=\"40\" placeholder=\"/location/app.war\">\n" +
@@ -1314,7 +1314,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
         "  &nbsp;\n" +
         " </td>\n" +
         " <td class=\"row-left\">\n" +
-        "  <input type=\"submit\" value=\"{7}\" class=\"action start large\">\n" +
+        "  <input type=\"submit\" value=\"{7}\" class=\"action start small\">\n" +
         " </td>\n" +
         "</tr>\n" +
         "</table>\n" +
@@ -1324,7 +1324,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
 
     private static final String UPLOAD_SECTION =
         "<tr>\n" +
-        " <td colspan=\"2\" class=\"header-left\"><small>{0}</small></td>\n" +
+        " <td colspan=\"2\" class=\"header-left\">{0}</td>\n" +
         "</tr>\n" +
         "<tr>\n" +
         " <td colspan=\"2\">\n" +
@@ -1333,7 +1333,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
         "<table cellspacing=\"0\" cellpadding=\"3\">\n" +
         "<tr>\n" +
         " <td class=\"row-right\">\n" +
-        "  <small>{2}</small>\n" +
+        "  {2}\n" +
         " </td>\n" +
         " <td class=\"row-left\">\n" +
         "  <input type=\"file\" name=\"deployWar\" size=\"40\">\n" +
@@ -1344,7 +1344,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
         "  &nbsp;\n" +
         " </td>\n" +
         " <td class=\"row-left\">\n" +
-        "  <input type=\"submit\" value=\"{3}\" class=\"action start small\">\n" +
+        "  <input type=\"submit\" value=\"{3}\" class=\"action start\">\n" +
         " </td>\n" +
         "</tr>\n" +
         "</table>\n" +
@@ -1369,7 +1369,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
         "<table cellspacing=\"0\" cellpadding=\"3\">\n" +
         "<tr>\n" +
         " <td class=\"row-right\">\n" +
-        "  <small>{3}</small>\n" +
+        "  {3}\n" +
         " </td>\n" +
         " <td class=\"row-left\">\n" +
         "  <input type=\"text\" name=\"tlsHostName\" size=\"20\">\n" +
@@ -1408,7 +1408,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
         "  </form>\n" +
         " </td>\n" +
         " <td class=\"row-left\">\n" +
-        "  <small>{3}</small>\n" +
+        "  {3}\n" +
         " </td>\n" +
         "</tr>\n" +
 
@@ -1423,7 +1423,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
         "  </form>\n" +
         " </td>\n" +
         " <td class=\"row-left\">\n" +
-        "  <small>{8}</small>\n" +
+        "  {8}\n" +
         " </td>\n" +
         "</tr>\n" +
 
@@ -1434,7 +1434,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
         "  </form>\n" +
         " </td>\n" +
         " <td class=\"row-left\">\n" +
-        "  <small>{11}</small>\n" +
+        "  {11}\n" +
         " </td>\n" +
         "</tr>\n" +
 
@@ -1445,7 +1445,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
         "  </form>\n" +
         " </td>\n" +
         " <td class=\"row-left\">\n" +
-        "  <small>{14}</small>\n" +
+        "  {14}\n" +
         " </td>\n" +
         "</tr>\n" +
 
