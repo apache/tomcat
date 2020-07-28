@@ -18,6 +18,7 @@ body {
     margin: 10px 20px;
     text-align: center;
     font-family: Arial, sans-serif;
+    background:#dfd3ae;
 }
 
 h1, h2, h3, h4, h5, h6, p, ul, ol {
@@ -93,6 +94,8 @@ a img {
     text-align: left;
     min-width: 720px;
     max-width: 1000px;
+    padding: 20px 30px;
+    background:#fff;
 }
 .curved {
     border-radius: 10px;
@@ -135,9 +138,7 @@ a img {
     margin: 0;
 }
 
-#upper {
-    background: #fff url(bg-upper.png) repeat-x top left;
-}
+#upper {}
 
 #congrats {
     text-align: center;
@@ -319,7 +320,6 @@ a img {
     padding: 0;
     margin: 20px 0;
     color: #999;
-    background-color: #eee;
 }
 #footer h4 {
     margin: 0 0 10px;

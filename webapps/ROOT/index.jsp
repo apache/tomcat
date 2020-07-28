@@ -29,7 +29,7 @@ request.setAttribute("tomcatExamplesUrl", "/examples/");
         <title><%=request.getServletContext().getServerInfo() %></title>
         <link href="favicon.ico" rel="icon" type="image/x-icon" />
         <link href="favicon.ico" rel="shortcut icon" type="image/x-icon" />
-        <link href="tomcat.css" rel="stylesheet" type="text/css" />
+        <link href="tomcat.css?v=<%=System.currentTimeMillis()%>" rel="stylesheet" type="text/css" />
     </head>
 
     <body>

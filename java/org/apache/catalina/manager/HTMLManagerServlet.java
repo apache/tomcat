@@ -412,8 +412,8 @@ public final class HTMLManagerServlet extends ManagerServlet {
         String appsUndeploy =
             smClient.getString("htmlManagerServlet.appsUndeploy");
         String appsExpire = smClient.getString("htmlManagerServlet.appsExpire");
-        String noVersion = "<i>" +
-            smClient.getString("htmlManagerServlet.noVersion") + "</i>";
+        String noVersion = "<span class=\"highlight\">" +
+            smClient.getString("htmlManagerServlet.noVersion") + "</span>";
 
         boolean isHighlighted = true;
         boolean isDeployed = true;
@@ -458,7 +458,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
                 args[0] = // External link
                         "<a href=\""
                         + URLEncoder.DEFAULT.encode(contextPath + "/", StandardCharsets.UTF_8)
-                        + "\" " + Constants.REL_EXTERNAL + ">"
+                        + "\" " + Constants.REL_EXTERNAL + " class=\"href-dotted\">"
                         + Escape.htmlElementContent(displayPath) + "</a>";
                 if ("".equals(ctxt.getWebappVersion())) {
                     args[1] = noVersion;
@@ -1159,22 +1159,22 @@ public final class HTMLManagerServlet extends ManagerServlet {
         " <td colspan=\"6\" class=\"title\">{0}</td>\n" +
         "</tr>\n" +
         "<tr>\n" +
-        " <td class=\"header-left\"><small>{1}</small></td>\n" +
-        " <td class=\"header-left\"><small>{2}</small></td>\n" +
-        " <td class=\"header-center\"><small>{3}</small></td>\n" +
-        " <td class=\"header-center\"><small>{4}</small></td>\n" +
-        " <td class=\"header-left\"><small>{5}</small></td>\n" +
-        " <td class=\"header-left\"><small>{6}</small></td>\n" +
+        " <td class=\"header-left\">{1}</td>\n" +
+        " <td class=\"header-left\">{2}</td>\n" +
+        " <td class=\"header-center\">{3}</td>\n" +
+        " <td class=\"header-center\">{4}</td>\n" +
+        " <td class=\"header-left\">{5}</td>\n" +
+        " <td class=\"header-left\">{6}</td>\n" +
         "</tr>\n";
 
     private static final String APPS_ROW_DETAILS_SECTION =
         "<tr>\n" +
-        " <td class=\"row-left\"  bgcolor=\"{6}\" rowspan=\"2\"><small>{0}</small></td>\n" +
-        " <td class=\"row-left\" bgcolor=\"{6}\" rowspan=\"2\"><small>{1}</small></td>\n" +
-        " <td class=\"row-left\" bgcolor=\"{6}\" rowspan=\"2\"><small>{2}</small></td>\n" +
-        " <td class=\"row-center\" bgcolor=\"{6}\" rowspan=\"2\"><small>{3}</small></td>\n" +
-        " <td class=\"row-center\" bgcolor=\"{6}\" rowspan=\"2\">" +
-        "<small><a href=\"{4}\">{5}</a></small></td>\n";
+        " <td class=\"row-left base-td\"  bgcolor=\"{6}\" rowspan=\"2\">{0}</td>\n" +
+        " <td class=\"row-left base-td\" bgcolor=\"{6}\" rowspan=\"2\">{1}</td>\n" +
+        " <td class=\"row-left base-td\" bgcolor=\"{6}\" rowspan=\"2\">{2}</td>\n" +
+        " <td class=\"row-center base-td\" bgcolor=\"{6}\" rowspan=\"2\">{3}</td>\n" +
+        " <td class=\"row-center base-td\" bgcolor=\"{6}\" rowspan=\"2\">" +
+        "<a href=\"{4}\" class=\"href-dotted\">{5}</a></td>\n";
 
     private static final String MANAGER_APP_ROW_BUTTON_SECTION =
         " <td class=\"row-left\" bgcolor=\"{13}\">\n" +
@@ -1196,23 +1196,23 @@ public final class HTMLManagerServlet extends ManagerServlet {
         "</tr>\n";
 
     private static final String STARTED_DEPLOYED_APPS_ROW_BUTTON_SECTION =
-        " <td class=\"row-left\" bgcolor=\"{13}\">\n" +
+        " <td class=\"row-left base-td\" bgcolor=\"{13}\">\n" +
         "  &nbsp;<small>{1}</small>&nbsp;\n" +
         "  <form class=\"inline\" method=\"POST\" action=\"{2}\">" +
-        "  <small><input type=\"submit\" value=\"{3}\" class=\"action stop\"></small>" +
+        "  <small><input type=\"submit\" value=\"{3}\" class=\"action stop small\"></small>" +
         "  </form>\n" +
         "  <form class=\"inline\" method=\"POST\" action=\"{4}\">" +
-        "  <small><input type=\"submit\" value=\"{5}\" class=\"action sky\"></small>" +
+        "  <small><input type=\"submit\" value=\"{5}\" class=\"action sky small\"></small>" +
         "  </form>\n" +
         "  <form class=\"inline\" method=\"POST\" action=\"{6}\">" +
-        "  &nbsp;&nbsp;<small><input type=\"submit\" value=\"{7}\" class=\"action sky\"></small>" +
+        "  &nbsp;&nbsp;<small><input type=\"submit\" value=\"{7}\" class=\"action sky small\"></small>" +
         "  </form>\n" +
         " </td>\n" +
         " </tr><tr>\n" +
-        " <td class=\"row-left\" bgcolor=\"{13}\">\n" +
+        " <td class=\"row-left base-td\" bgcolor=\"{13}\">\n" +
         "  <form method=\"POST\" action=\"{8}\">\n" +
         "  <small>\n" +
-        "  &nbsp;<input type=\"submit\" value=\"{9}\" class=\"action sky\">&nbsp;{10}&nbsp;<input type=\"text\" name=\"idle\" size=\"5\" value=\"{11}\">&nbsp;{12}&nbsp;\n" +
+        "  &nbsp;<input type=\"submit\" value=\"{9}\" class=\"action sky small\">&nbsp;{10}&nbsp;<input type=\"text\" name=\"idle\" size=\"5\" value=\"{11}\">&nbsp;{12}&nbsp;\n" +
         "  </small>\n" +
         "  </form>\n" +
         " </td>\n" +
@@ -1221,12 +1221,12 @@ public final class HTMLManagerServlet extends ManagerServlet {
     private static final String STOPPED_DEPLOYED_APPS_ROW_BUTTON_SECTION =
         " <td class=\"row-left\" bgcolor=\"{13}\" rowspan=\"2\">\n" +
         "  <form class=\"inline\" method=\"POST\" action=\"{0}\">" +
-        "  <small><input type=\"submit\" value=\"{1}\" class=\"action start\"></small>" +
+        "  <small><input type=\"submit\" value=\"{1}\" class=\"action start small\"></small>" +
         "  </form>\n" +
         "  &nbsp;<small>{3}</small>&nbsp;\n" +
         "  &nbsp;<small>{5}</small>&nbsp;\n" +
         "  <form class=\"inline\" method=\"POST\" action=\"{6}\">" +
-        "  <small><input type=\"submit\" value=\"{7}\" class=\"action sky\"></small>" +
+        "  <small><input type=\"submit\" value=\"{7}\" class=\"action sky small\"></small>" +
         "  </form>\n" +
         " </td>\n" +
         "</tr>\n<tr></tr>\n";
@@ -1235,10 +1235,10 @@ public final class HTMLManagerServlet extends ManagerServlet {
         " <td class=\"row-left\" bgcolor=\"{13}\">\n" +
         "  &nbsp;<small>{1}</small>&nbsp;\n" +
         "  <form class=\"inline\" method=\"POST\" action=\"{2}\">" +
-        "  <small><input type=\"submit\" value=\"{3}\"></small>" +
+        "  <small><input type=\"submit\" value=\"{3}\" class=\"action stop small\"></small>" +
         "  </form>\n" +
         "  <form class=\"inline\" method=\"POST\" action=\"{4}\">" +
-        "  <small><input type=\"submit\" value=\"{5}\"></small>" +
+        "  <small><input type=\"submit\" value=\"{5}\" class=\"action sky small\"></small>" +
         "  </form>\n" +
         "  &nbsp;<small>{7}</small>&nbsp;\n" +
         " </td>\n" +
@@ -1246,7 +1246,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
         " <td class=\"row-left\" bgcolor=\"{13}\">\n" +
         "  <form method=\"POST\" action=\"{8}\">\n" +
         "  <small>\n" +
-        "  &nbsp;<input type=\"submit\" value=\"{9}\">&nbsp;{10}&nbsp;<input type=\"text\" name=\"idle\" size=\"5\" value=\"{11}\">&nbsp;{12}&nbsp;\n" +
+        "  &nbsp;<input type=\"submit\" value=\"{9}\" class=\"action sky small\">&nbsp;{10}&nbsp;<input type=\"text\" name=\"idle\" size=\"5\" value=\"{11}\">&nbsp;{12}&nbsp;\n" +
         "  </small>\n" +
         "  </form>\n" +
         " </td>\n" +
@@ -1255,7 +1255,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
     private static final String STOPPED_NONDEPLOYED_APPS_ROW_BUTTON_SECTION =
         " <td class=\"row-left\" bgcolor=\"{13}\" rowspan=\"2\">\n" +
         "  <form class=\"inline\" method=\"POST\" action=\"{0}\">" +
-        "  <small><input type=\"submit\" value=\"{1}\"></small>" +
+        "  <small><input type=\"submit\" value=\"{1}\" class=\"action sky small\"></small>" +
         "  </form>\n" +
         "  &nbsp;<small>{3}</small>&nbsp;\n" +
         "  &nbsp;<small>{5}</small>&nbsp;\n" +
@@ -1344,7 +1344,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
         "  &nbsp;\n" +
         " </td>\n" +
         " <td class=\"row-left\">\n" +
-        "  <input type=\"submit\" value=\"{3}\">\n" +
+        "  <input type=\"submit\" value=\"{3}\" class=\"action start small\">\n" +
         " </td>\n" +
         "</tr>\n" +
         "</table>\n" +
@@ -1360,9 +1360,8 @@ public final class HTMLManagerServlet extends ManagerServlet {
         "<tr>\n" +
         " <td colspan=\"2\" class=\"title\">{0}</td>\n" +
         "</tr>\n" +
-
         "<tr>\n" +
-        " <td colspan=\"2\" class=\"header-left\"><small>{1}</small></td>\n" +
+        " <td colspan=\"2\" class=\"header-left\">{1}</td>\n" +
         "</tr>\n" +
         "<tr>\n" +
         " <td colspan=\"2\">\n" +
@@ -1381,7 +1380,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
         "  &nbsp;\n" +
         " </td>\n" +
         " <td class=\"row-left\">\n" +
-        "  <input type=\"submit\" value=\"{4}\">\n" +
+        "  <input type=\"submit\" value=\"{4}\" class=\"action sky small\">\n" +
         " </td>\n" +
         "</tr>\n" +
         "</table>\n" +
@@ -1399,13 +1398,13 @@ public final class HTMLManagerServlet extends ManagerServlet {
         "</tr>\n" +
 
         "<tr>\n" +
-        " <td colspan=\"2\" class=\"header-left\"><small>{1}</small></td>\n" +
+        " <td colspan=\"2\" class=\"header-left\">{1}</td>\n" +
         "</tr>\n" +
 
         "<tr>\n" +
         " <td class=\"row-left\">\n" +
         "  <form method=\"post\" action=\"{2}\">\n" +
-        "   <input type=\"submit\" value=\"{4}\">\n" +
+        "   <input type=\"submit\" value=\"{4}\" class=\"action start small\">\n" +
         "  </form>\n" +
         " </td>\n" +
         " <td class=\"row-left\">\n" +
@@ -1414,13 +1413,13 @@ public final class HTMLManagerServlet extends ManagerServlet {
         "</tr>\n" +
 
         "<tr>\n" +
-        " <td colspan=\"2\" class=\"header-left\"><small>{5}</small></td>\n" +
+        " <td colspan=\"2\" class=\"header-left\">{5}</td>\n" +
         "</tr>\n" +
 
         "<tr>\n" +
         " <td class=\"row-left\">\n" +
         "  <form method=\"post\" action=\"{6}\">\n" +
-        "   <input type=\"submit\" value=\"{7}\">\n" +
+        "   <input type=\"submit\" value=\"{7}\" class=\"action sky small\">\n" +
         "  </form>\n" +
         " </td>\n" +
         " <td class=\"row-left\">\n" +
@@ -1431,7 +1430,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
         "<tr>\n" +
         " <td class=\"row-left\">\n" +
         "  <form method=\"post\" action=\"{9}\">\n" +
-        "   <input type=\"submit\" value=\"{10}\">\n" +
+        "   <input type=\"submit\" value=\"{10}\" class=\"action sky small\">\n" +
         "  </form>\n" +
         " </td>\n" +
         " <td class=\"row-left\">\n" +
@@ -1442,7 +1441,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
         "<tr>\n" +
         " <td class=\"row-left\">\n" +
         "  <form method=\"post\" action=\"{12}\">\n" +
-        "   <input type=\"submit\" value=\"{13}\">\n" +
+        "   <input type=\"submit\" value=\"{13}\" class=\"action sky small\">\n" +
         "  </form>\n" +
         " </td>\n" +
         " <td class=\"row-left\">\n" +
