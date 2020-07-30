@@ -48,20 +48,19 @@ public class TestDefaultServletIfMatchRequests extends TomcatBaseTest {
         String weakETag = "W/" + strongETag;
 
         List<Object[]> parameterSets = Arrays.asList(
-            new Object[] { null, Integer.valueOf(200) },
             new Object[] { "*", Integer.valueOf(200) },
             new Object[] { weakETag, Integer.valueOf(200) },
             new Object[] { strongETag, Integer.valueOf(200) },
-            new Object[] { weakETag + ",123456789", Integer.valueOf(200) },
-            new Object[] { strongETag + ",123456789", Integer.valueOf(200) },
-            new Object[] { weakETag + " ,123456789", Integer.valueOf(200) },
-            new Object[] { strongETag + " ,123456789", Integer.valueOf(200) },
-            new Object[] { "123456789," + weakETag, Integer.valueOf(200) },
-            new Object[] { "123456789," + strongETag, Integer.valueOf(200) },
-            new Object[] { "123456789, " + weakETag, Integer.valueOf(200) },
-            new Object[] { "123456789, " + strongETag, Integer.valueOf(200) },
-            new Object[] { "123456789", Integer.valueOf(412) },
-            new Object[] { "W/123456789", Integer.valueOf(412) },
+            new Object[] { weakETag + ",\"anotherETag\"", Integer.valueOf(200) },
+            new Object[] { strongETag + ",\"anotherETag\"", Integer.valueOf(200) },
+            new Object[] { weakETag + " ,\"anotherETag\"", Integer.valueOf(200) },
+            new Object[] { strongETag + " ,\"anotherETag\"", Integer.valueOf(200) },
+            new Object[] { "\"anotherETag\"," + weakETag, Integer.valueOf(200) },
+            new Object[] { "\"anotherETag\"," + strongETag, Integer.valueOf(200) },
+            new Object[] { "\"anotherETag\", " + weakETag, Integer.valueOf(200) },
+            new Object[] { "\"anotherETag\", " + strongETag, Integer.valueOf(200) },
+            new Object[] { "\"anotherETag\"", Integer.valueOf(412) },
+            new Object[] { "W/\"anotherETag\"", Integer.valueOf(412) },
             new Object[] { "W/", Integer.valueOf(412) }
         );
 
@@ -94,12 +93,10 @@ public class TestDefaultServletIfMatchRequests extends TomcatBaseTest {
         Map<String,List<String>> responseHeaders = new HashMap<>();
 
         Map<String,List<String>> requestHeaders = null;
-        if (ifMatchHeader != null) {
-            requestHeaders = new HashMap<>();
-            List<String> values = new ArrayList<>(1);
-            values.add(ifMatchHeader);
-            requestHeaders.put("If-Match", values);
-        }
+        requestHeaders = new HashMap<>();
+        List<String> values = new ArrayList<>(1);
+        values.add(ifMatchHeader);
+        requestHeaders.put("If-Match", values);
 
         int rc = getUrl(path, responseBody, requestHeaders, responseHeaders);
 
