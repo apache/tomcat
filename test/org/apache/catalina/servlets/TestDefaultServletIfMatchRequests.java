@@ -48,30 +48,30 @@ public class TestDefaultServletIfMatchRequests extends TomcatBaseTest {
         String weakETag = "W/" + strongETag;
 
         List<Object[]> parameterSets = Arrays.asList(
-            new Object[] { "*", Integer.valueOf(200) },
-            new Object[] { weakETag, Integer.valueOf(200) },
-            new Object[] { strongETag, Integer.valueOf(200) },
-            new Object[] { weakETag + ",\"anotherETag\"", Integer.valueOf(200) },
-            new Object[] { strongETag + ",\"anotherETag\"", Integer.valueOf(200) },
-            new Object[] { weakETag + " ,\"anotherETag\"", Integer.valueOf(200) },
-            new Object[] { strongETag + " ,\"anotherETag\"", Integer.valueOf(200) },
-            new Object[] { "\"anotherETag\"," + weakETag, Integer.valueOf(200) },
-            new Object[] { "\"anotherETag\"," + strongETag, Integer.valueOf(200) },
-            new Object[] { "\"anotherETag\", " + weakETag, Integer.valueOf(200) },
-            new Object[] { "\"anotherETag\", " + strongETag, Integer.valueOf(200) },
-            new Object[] { "\"anotherETag\"", Integer.valueOf(412) },
-            new Object[] { "W/\"anotherETag\"", Integer.valueOf(412) },
-            new Object[] { "W/", Integer.valueOf(412) }
+            new Object[] { "*", Boolean.TRUE },
+            new Object[] { weakETag, Boolean.TRUE },
+            new Object[] { strongETag, Boolean.TRUE },
+            new Object[] { weakETag + ",\"anotherETag\"", Boolean.TRUE },
+            new Object[] { strongETag + ",\"anotherETag\"", Boolean.TRUE },
+            new Object[] { weakETag + " ,\"anotherETag\"", Boolean.TRUE },
+            new Object[] { strongETag + " ,\"anotherETag\"", Boolean.TRUE },
+            new Object[] { "\"anotherETag\"," + weakETag, Boolean.TRUE },
+            new Object[] { "\"anotherETag\"," + strongETag, Boolean.TRUE },
+            new Object[] { "\"anotherETag\", " + weakETag, Boolean.TRUE },
+            new Object[] { "\"anotherETag\", " + strongETag, Boolean.TRUE },
+            new Object[] { "\"anotherETag\"", Boolean.FALSE },
+            new Object[] { "W/\"anotherETag\"", Boolean.FALSE },
+            new Object[] { "W/", Boolean.FALSE }
         );
 
         return parameterSets;
     }
 
     @Parameter(0)
-    public String ifMatchHeader;
+    public String matchHeader;
 
     @Parameter(1)
-    public int responseCodeExpected;
+    public boolean ifMatchCondition;
 
 
     @Test
@@ -87,10 +87,10 @@ public class TestDefaultServletIfMatchRequests extends TomcatBaseTest {
 
         tomcat.start();
 
-        int rc = performRequest("If-Match", ifMatchHeader);
+        int rc = performRequest("If-Match", matchHeader);
 
         // Check the result
-        Assert.assertEquals(responseCodeExpected, rc);
+        Assert.assertEquals(ifMatchCondition ? 200 : 412, rc);
     }
 
     private int performRequest(String headerName, String matchHeader) throws IOException {
