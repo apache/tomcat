@@ -17,10 +17,10 @@
 package org.apache.catalina.servlets;
 
 import java.io.File;
-import java.util.ArrayList;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -87,20 +87,21 @@ public class TestDefaultServletIfMatchRequests extends TomcatBaseTest {
 
         tomcat.start();
 
-        // Set up parameters
-        String path = "http://localhost:" + getPort() + "/index.html";
-        ByteChunk responseBody = new ByteChunk();
-        Map<String,List<String>> responseHeaders = new HashMap<>();
-
-        Map<String,List<String>> requestHeaders = null;
-        requestHeaders = new HashMap<>();
-        List<String> values = new ArrayList<>(1);
-        values.add(ifMatchHeader);
-        requestHeaders.put("If-Match", values);
-
-        int rc = getUrl(path, responseBody, requestHeaders, responseHeaders);
+        int rc = performRequest("If-Match", ifMatchHeader);
 
         // Check the result
         Assert.assertEquals(responseCodeExpected, rc);
+    }
+
+    private int performRequest(String headerName, String matchHeader) throws IOException {
+        // Set up parameters
+        String path = "http://localhost:" + getPort() + "/index.html";
+        ByteChunk responseBody = new ByteChunk();
+
+        List<String> values = Collections.singletonList(matchHeader);
+        Map<String,List<String>> requestHeaders = Collections.singletonMap(headerName, values);
+
+        int rc = getUrl(path, responseBody, requestHeaders, null);
+        return rc;
     }
 }
