@@ -2161,37 +2161,17 @@ public class DefaultServlet extends HttpServlet {
             HttpServletResponse response, WebResource resource)
             throws IOException {
 
-        String eTag = resource.getETag();
-        // Default servlet uses weak matching so we strip any leading "W/" and
-        // then compare using equals
-        if (eTag.startsWith("W/")) {
-            eTag = eTag.substring(2);
-        }
         String headerValue = request.getHeader("If-Match");
         if (headerValue != null) {
-            if (headerValue.indexOf('*') == -1) {
+            String eTag = resource.getETag();
+            boolean conditionSatisfied = matchByEtagStrong(headerValue, eTag);
 
-                StringTokenizer commaTokenizer = new StringTokenizer(headerValue, ",");
-                boolean conditionSatisfied = false;
-
-                while (!conditionSatisfied && commaTokenizer.hasMoreTokens()) {
-                    String currentToken = commaTokenizer.nextToken();
-                    currentToken = currentToken.trim();
-                    if (currentToken.startsWith("W/")) {
-                        currentToken = currentToken.substring(2);
-                    }
-                    if (currentToken.equals(eTag))
-                        conditionSatisfied = true;
-                }
-
-                // If none of the given ETags match, 412 Precondition failed is
-                // sent back
-                if (!conditionSatisfied) {
-                    response.sendError
+            // If none of the given ETags match, 412 Precondition failed is
+            // sent back
+            if (!conditionSatisfied) {
+                response.sendError
                         (HttpServletResponse.SC_PRECONDITION_FAILED);
-                    return false;
-                }
-
+                return false;
             }
         }
         return true;
@@ -2249,27 +2229,10 @@ public class DefaultServlet extends HttpServlet {
             HttpServletResponse response, WebResource resource)
             throws IOException {
 
-        String eTag = resource.getETag();
         String headerValue = request.getHeader("If-None-Match");
         if (headerValue != null) {
-
-            boolean conditionSatisfied = false;
-
-            if (!headerValue.equals("*")) {
-
-                StringTokenizer commaTokenizer =
-                    new StringTokenizer(headerValue, ",");
-
-                while (!conditionSatisfied && commaTokenizer.hasMoreTokens()) {
-                    String currentToken = commaTokenizer.nextToken();
-                    if (currentToken.trim().equals(eTag))
-                        conditionSatisfied = true;
-                }
-
-            } else {
-                conditionSatisfied = true;
-            }
-
+            String eTag = resource.getETag();
+            boolean conditionSatisfied = matchByEtagWeak(headerValue, eTag);
             if (conditionSatisfied) {
 
                 // For GET and HEAD, we should respond with
@@ -2609,6 +2572,44 @@ public class DefaultServlet extends HttpServlet {
             this.resource = resource;
             this.format = format;
         }
+    }
+
+    /**
+     * RFC 7232 requires weak comparison for If-None-Match
+     */
+    private boolean matchByEtagWeak(String headerValue, String eTag) {
+        // Match W/"1" and W/"1"
+        if (headerValue.contains(eTag)) {
+            return true;
+        }
+        // Match W/"1" and "1"
+        String resourceEtag = weakEtagToStrong(eTag);
+        if (headerValue.contains(resourceEtag)) {
+            return true;
+        }
+        // asterisk checked last as rarely used
+        return headerValue.equals("*");
+    }
+
+    /**
+     * RFC 7232 requires strong comparison for If-Match
+     */
+    private boolean matchByEtagStrong(String headerValue, String eTag) {
+        // BZ 64265: Default servlet uses weak matching so we strip any leading "W/" and
+        // then compare using equals
+        String resourceEtag = weakEtagToStrong(eTag);
+        StringTokenizer commaTokenizer = new StringTokenizer(headerValue, ",");
+        while (commaTokenizer.hasMoreTokens()) {
+            String currentToken = commaTokenizer.nextToken();
+            if (currentToken.trim().equals(resourceEtag))
+                return true;
+        }
+        // asterisk checked last as rarely used
+        return headerValue.equals("*");
+    }
+
+    private String weakEtagToStrong(String eTag) {
+        return eTag.startsWith("W/") ? eTag.substring(2) : eTag;
     }
 
     /**
