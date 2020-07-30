@@ -1133,6 +1133,62 @@ public class TestRemoteIpValve {
                 request.getAttribute(Globals.REQUEST_FORWARDED_ATTRIBUTE));
     }
 
+    @Test
+    public void testRequestForwardedForWithPortNumber() throws Exception {
+
+        // PREPARE
+        RemoteIpValve remoteIpValve = new RemoteIpValve();
+        RemoteAddrAndHostTrackerValve remoteAddrAndHostTrackerValve = new RemoteAddrAndHostTrackerValve();
+        remoteIpValve.setNext(remoteAddrAndHostTrackerValve);
+
+        Request request = new MockRequest();
+        request.setCoyoteRequest(new org.apache.coyote.Request());
+        // client ip
+        request.setRemoteAddr("192.168.0.10");
+        request.setRemoteHost("192.168.0.10");
+        request.getCoyoteRequest().getMimeHeaders().addValue("x-forwarded-for").setString("140.211.11.130:1234");
+        // protocol
+        request.setServerPort(8080);
+        request.getCoyoteRequest().scheme().setString("http");
+
+        // TEST
+        remoteIpValve.invoke(request, null);
+
+        // VERIFY
+
+        Assert.assertEquals("140.211.11.130:1234", remoteAddrAndHostTrackerValve.getRemoteAddr());
+   }
+
+    @Test
+    public void testRequestForwardedForWithProxyPortNumber() throws Exception {
+
+        // PREPARE
+        RemoteIpValve remoteIpValve = new RemoteIpValve();
+        //remoteIpValve.setRemoteIpHeader("x-forwarded-for");
+        //remoteIpValve.setProtocolHeader("x-forwarded-proto");
+        RemoteAddrAndHostTrackerValve remoteAddrAndHostTrackerValve = new RemoteAddrAndHostTrackerValve();
+        remoteIpValve.setNext(remoteAddrAndHostTrackerValve);
+
+        Request request = new MockRequest();
+        request.setCoyoteRequest(new org.apache.coyote.Request());
+        // client ip
+        request.setRemoteAddr("192.168.0.10");
+        request.setRemoteHost("192.168.0.10");
+        // Trust c.d
+        remoteIpValve.setTrustedProxies("foo\\.bar:123");
+        request.getCoyoteRequest().getMimeHeaders().addValue("x-forwarded-for").setString("140.211.11.130:1234, foo.bar:123");
+        // protocol
+        request.setServerPort(8080);
+        request.getCoyoteRequest().scheme().setString("http");
+
+        // TEST
+        remoteIpValve.invoke(request, null);
+
+        // VERIFY
+
+        Assert.assertEquals("140.211.11.130:1234", remoteAddrAndHostTrackerValve.getRemoteAddr());
+   }
+
     private void assertArrayEquals(String[] expected, String[] actual) {
         if (expected == null) {
             Assert.assertNull(actual);
