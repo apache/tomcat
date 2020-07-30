@@ -18,6 +18,7 @@ package org.apache.catalina.servlets;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -46,23 +47,23 @@ public class TestDefaultServletIfMatchRequests extends TomcatBaseTest {
         String strongETag =  "\"" + index.length() + "-" + index.lastModified() + "\"";
         String weakETag = "W/" + strongETag;
 
-        List<Object[]> parameterSets = new ArrayList<>();
-
-        parameterSets.add(new Object[] { null, Integer.valueOf(200) });
-        parameterSets.add(new Object[] { "*", Integer.valueOf(200) });
-        parameterSets.add(new Object[] { weakETag, Integer.valueOf(200) });
-        parameterSets.add(new Object[] { strongETag, Integer.valueOf(200) });
-        parameterSets.add(new Object[] { weakETag + ",123456789", Integer.valueOf(200) });
-        parameterSets.add(new Object[] { strongETag + ",123456789", Integer.valueOf(200) });
-        parameterSets.add(new Object[] { weakETag + " ,123456789", Integer.valueOf(200) });
-        parameterSets.add(new Object[] { strongETag + " ,123456789", Integer.valueOf(200) });
-        parameterSets.add(new Object[] { "123456789," + weakETag, Integer.valueOf(200) });
-        parameterSets.add(new Object[] { "123456789," + strongETag, Integer.valueOf(200) });
-        parameterSets.add(new Object[] { "123456789, " + weakETag, Integer.valueOf(200) });
-        parameterSets.add(new Object[] { "123456789, " + strongETag, Integer.valueOf(200) });
-        parameterSets.add(new Object[] { "123456789", Integer.valueOf(412) });
-        parameterSets.add(new Object[] { "W/123456789", Integer.valueOf(412) });
-        parameterSets.add(new Object[] { "W/", Integer.valueOf(412) });
+        List<Object[]> parameterSets = Arrays.asList(
+            new Object[] { null, Integer.valueOf(200) },
+            new Object[] { "*", Integer.valueOf(200) },
+            new Object[] { weakETag, Integer.valueOf(200) },
+            new Object[] { strongETag, Integer.valueOf(200) },
+            new Object[] { weakETag + ",123456789", Integer.valueOf(200) },
+            new Object[] { strongETag + ",123456789", Integer.valueOf(200) },
+            new Object[] { weakETag + " ,123456789", Integer.valueOf(200) },
+            new Object[] { strongETag + " ,123456789", Integer.valueOf(200) },
+            new Object[] { "123456789," + weakETag, Integer.valueOf(200) },
+            new Object[] { "123456789," + strongETag, Integer.valueOf(200) },
+            new Object[] { "123456789, " + weakETag, Integer.valueOf(200) },
+            new Object[] { "123456789, " + strongETag, Integer.valueOf(200) },
+            new Object[] { "123456789", Integer.valueOf(412) },
+            new Object[] { "W/123456789", Integer.valueOf(412) },
+            new Object[] { "W/", Integer.valueOf(412) }
+        );
 
         return parameterSets;
     }
