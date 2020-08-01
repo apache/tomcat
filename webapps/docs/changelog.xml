@@ -137,6 +137,10 @@
         is only used during compilation. The package is provided by the JRE from
         Java 1.4 onwards so the local copy should be unnecessary. (markt)
       </fix>
+      <add>
+        Improve the quality of the Japanese translations provided with Apache
+        Tomcat. Includes contributions from Yuki Shira. (markt)
+      </add>
     </changelog>
   </subsection>
 </section>
