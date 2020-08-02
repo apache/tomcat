@@ -173,7 +173,7 @@ to web applications, these features are disabled by default.
 
 To enable and configure CGI support, please see the cgi-howto.html page.
 
-To enable and configue SSI support, please see the ssi-howto.html page.
+To enable and configure SSI support, please see the ssi-howto.html page.
 
 
 ======================
