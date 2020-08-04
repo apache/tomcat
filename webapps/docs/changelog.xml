@@ -103,6 +103,7 @@
         <bug>62723</bug>: Clarify the effects of some options for cluster
         <code>channelSendOptions</code>. Patch provided by Mitch Claborn.
         (schultz)
+      </fix>
     </changelog>
   </subsection>
 </section>
