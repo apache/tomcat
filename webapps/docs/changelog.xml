@@ -99,6 +99,10 @@
         Clean-up / standardize the XSL files used to generate the documentation.
         PR provided by John Bampton. (markt)
       </fix>
+      <fix>
+        <bug>62723</bug>: Clarify the effects of some options for cluster
+        <code>channelSendOptions</code>. Patch provided by Mitch Claborn.
+        (schultz)
     </changelog>
   </subsection>
 </section>
