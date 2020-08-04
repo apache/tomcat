@@ -56,6 +56,9 @@ import org.apache.jasper.compiler.Node.NamedAttribute;
 import org.apache.jasper.runtime.JspRuntimeLibrary;
 import org.xml.sax.Attributes;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 /**
  * Generate Java source from Nodes
  *
@@ -80,6 +83,12 @@ import org.xml.sax.Attributes;
 class Generator {
 
     private static final Class<?>[] OBJECT_CLASS = { Object.class };
+
+    //Flag to enable or disable the excess white space trimming.
+    private static final boolean JSP_WHITE_SPACE_TRIMMING = Boolean.getBoolean("tomcat.JSPWhiteSpaceTrimming");
+
+    private static final Pattern PRE_TAG_PATTERN = Pattern.compile(".*(<pre>|</pre>).*");
+    private static final Pattern BLANK_LINE_PATTERN = Pattern.compile("(\\s*(\\n|\\r)+\\s*)");
 
     private static final String VAR_EXPRESSIONFACTORY =
         System.getProperty("org.apache.jasper.compiler.Generator.VAR_EXPRESSIONFACTORY", "_el_expressionfactory");
@@ -2108,6 +2117,18 @@ class Generator {
         public void visit(Node.TemplateText n) throws JasperException {
 
             String text = n.getText();
+            // If the flag is active, attempt to minimize the frequency of
+            // regex operations.
+            if (JSP_WHITE_SPACE_TRIMMING && text.contains("\n")) {
+                // Ensure there are no <pre> or </pre> tags embedded in this
+                // text - if there are, we want to NOT modify the whitespace.
+                Matcher preMatcher = PRE_TAG_PATTERN.matcher(text);
+                if (!preMatcher.matches()) {
+                    Matcher matcher = BLANK_LINE_PATTERN.matcher(text);
+                    String revisedText = matcher.replaceAll("\n");
+                    text = revisedText;
+                }
+            }
 
             int textSize = text.length();
             if (textSize == 0) {
