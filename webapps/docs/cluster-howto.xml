@@ -218,6 +218,8 @@ should be completed:</p>
     Synchronous vs. asynchronous is configured using the <code>channelSendOptions</code>
     flag and is an integer value. The default value for the <code>SimpleTcpCluster/DeltaManager</code> combo is
     8, which is asynchronous.
+    See the <a href="config/cluster.html#SimpleTcpCluster_Attributes">configuration reference</a>
+    for more discussion on the various <code>channelSendOptions</code> values.
 </p>
 <p>
     For convenience, <code>channelSendOptions</code> can be set by name(s) rather than integer,
