@@ -37,6 +37,7 @@ import javax.websocket.DeploymentException;
 import javax.websocket.Endpoint;
 import javax.websocket.EndpointConfig;
 import javax.websocket.Extension;
+import javax.websocket.IdleStateEventType;
 import javax.websocket.MessageHandler;
 import javax.websocket.MessageHandler.Partial;
 import javax.websocket.MessageHandler.Whole;
@@ -98,6 +99,8 @@ public class WsSession implements Session {
     private volatile int maxTextMessageBufferSize = Constants.DEFAULT_BUFFER_SIZE;
     private volatile long maxIdleTimeout = 0;
     private volatile long lastActive = System.currentTimeMillis();
+    private volatile long lastActiveRead = System.currentTimeMillis();
+    private volatile boolean closeOnIdle = false;
     private Map<FutureToSendHandler, FutureToSendHandler> futures = new ConcurrentHashMap<>();
 
     /**
@@ -385,6 +388,17 @@ public class WsSession implements Session {
         this.maxIdleTimeout = timeout;
     }
 
+    @Override
+    public boolean getCloseOnIdleTimeout() {
+    	checkState();
+    	return this.closeOnIdle;
+    }
+
+    @Override
+    public void setCloseOnIdleTimeout(boolean closeOnIdleTimeout) {
+    	checkState();
+    	this.closeOnIdle = closeOnIdleTimeout;
+    }
 
     @Override
     public void setMaxBinaryMessageBufferSize(int max) {
@@ -575,8 +589,6 @@ public class WsSession implements Session {
         }
     }
 
-
-
     private void fireEndpointOnError(Throwable throwable) {
 
         // Fire the onError event
@@ -591,6 +603,10 @@ public class WsSession implements Session {
     }
 
 
+    private void fireEndpointOnIdle(IdleStateEventType idleStateEventType) {
+    	localEndpoint.onIdleSession(this, idleStateEventType);
+    }
+    
     private void sendCloseMessage(CloseReason closeReason) {
         // 125 is maximum size for the payload of a control message
         ByteBuffer msg = ByteBuffer.allocate(125);
@@ -809,20 +825,36 @@ public class WsSession implements Session {
         lastActive = System.currentTimeMillis();
     }
 
+    protected void updateLastActiveRead() {
+    	lastActiveRead = System.currentTimeMillis();
+    }
 
     protected void checkExpiration() {
         long timeout = maxIdleTimeout;
         if (timeout < 1) {
             return;
         }
+        long currentTime = System.currentTimeMillis();
+        boolean isWriteTimeout =  currentTime - lastActive > timeout;
+        boolean isReadTimeout = currentTime - lastActiveRead > timeout;
 
-        if (System.currentTimeMillis() - lastActive > timeout) {
-            String msg = sm.getString("wsSession.timeout", getId());
-            if (log.isDebugEnabled()) {
-                log.debug(msg);
-            }
-            doClose(new CloseReason(CloseCodes.GOING_AWAY, msg),
-                    new CloseReason(CloseCodes.CLOSED_ABNORMALLY, msg));
+        if (isWriteTimeout || isReadTimeout) {
+        	if(closeOnIdle) {
+                String msg = sm.getString("wsSession.timeout", getId());
+                if (log.isDebugEnabled()) {
+                    log.debug(msg);
+                }
+                doClose(new CloseReason(CloseCodes.GOING_AWAY, msg),
+                        new CloseReason(CloseCodes.CLOSED_ABNORMALLY, msg));
+        	} else {
+        		String msg = sm.getString("wsSession.timeout", getId());
+                if (log.isDebugEnabled()) {
+                    log.debug(msg);
+                }
+                IdleStateEventType idleType = isWriteTimeout ? IdleStateEventType.IDLE_WRITE_EVENT : 
+                	IdleStateEventType.IDLE_READ_EVENT;
+                fireEndpointOnIdle(idleType);
+        	}
         }
     }
 

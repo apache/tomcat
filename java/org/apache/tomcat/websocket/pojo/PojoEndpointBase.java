@@ -24,6 +24,7 @@ import java.util.Set;
 import javax.websocket.CloseReason;
 import javax.websocket.Endpoint;
 import javax.websocket.EndpointConfig;
+import javax.websocket.IdleStateEventType;
 import javax.websocket.MessageHandler;
 import javax.websocket.Session;
 
@@ -137,6 +138,21 @@ public abstract class PojoEndpointBase extends Endpoint {
                         pojo.getClass().getName()), t);
             }
         }
+    }
+
+    @Override
+    public void onIdleSession(Session session, IdleStateEventType idleStateEventType) {
+            
+    	try {
+            methodMapping.getOnIdleSession().invoke(
+                    pojo,
+                    methodMapping.getOnIdleSessionArgs(pathParameters, session,
+                    		idleStateEventType));
+        } catch (Throwable t) {
+            ExceptionUtils.handleThrowable(t);
+            log.error(sm.getString("pojoEndpointBase.onIdleSessionFail",
+                    pojo.getClass().getName()), t);
+            }
     }
 
     protected Object getPojo() { return pojo; }

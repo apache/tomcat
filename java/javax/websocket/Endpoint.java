@@ -46,4 +46,13 @@ public abstract class Endpoint {
     public void onError(Session session, Throwable throwable) {
         // NO-OP by default
     }
+
+    /**
+     * Event that is triggered when a session is idle for more than maxIdleTime.
+     * @param session
+     * @param idleStateEventType
+     */
+    public void onIdleSession(Session session, IdleStateEventType idleStateEventType) {
+    	//NO-PO by default
+    }
 }

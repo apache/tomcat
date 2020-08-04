@@ -78,6 +78,19 @@ public interface Session extends Closeable {
     void setMaxIdleTimeout(long timeout);
 
     /**
+     * Get the flag to decide whether the session will be closed if idle Time is passed
+     * @return true if the session is to be closed on expire
+     *         false if the session will remain open and an IdleSession event is thrown instead
+     */
+    boolean getCloseOnIdleTimeout();
+
+    /**
+     * Get the flag to decide whether the session will be closed if idle Time is passed
+     * @param clsoeOnIdleTimeout- true for closing the session on idle timeout
+     *                            false for keeping the session open and throwing IdleSession event instead.
+     */
+    void setCloseOnIdleTimeout(boolean clsoeOnIdleTimeout);
+    /**
      * Set the current maximum buffer size for binary messages.
      * @param max The new maximum buffer size in bytes
      */

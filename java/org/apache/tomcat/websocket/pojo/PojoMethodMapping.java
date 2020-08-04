@@ -35,9 +35,11 @@ import javax.websocket.DecodeException;
 import javax.websocket.Decoder;
 import javax.websocket.DeploymentException;
 import javax.websocket.EndpointConfig;
+import javax.websocket.IdleStateEventType;
 import javax.websocket.MessageHandler;
 import javax.websocket.OnClose;
 import javax.websocket.OnError;
+import javax.websocket.OnIdleSession;
 import javax.websocket.OnMessage;
 import javax.websocket.OnOpen;
 import javax.websocket.PongMessage;
@@ -63,9 +65,11 @@ public class PojoMethodMapping {
     private final Method onOpen;
     private final Method onClose;
     private final Method onError;
+    private final Method onIdleSession;
     private final PojoPathParam[] onOpenParams;
     private final PojoPathParam[] onCloseParams;
     private final PojoPathParam[] onErrorParams;
+    private final PojoPathParam[] onIdleSessionParams;
     private final List<MessageHandlerInfo> onMessage = new ArrayList<>();
     private final String wsPath;
 
@@ -80,6 +84,7 @@ public class PojoMethodMapping {
         Method open = null;
         Method close = null;
         Method error = null;
+        Method idleSession = null;
         Method[] clazzPojoMethods = null;
         Class<?> currentClazz = clazzPojo;
         while (!currentClazz.equals(Object.class)) {
@@ -132,6 +137,19 @@ public class PojoMethodMapping {
                             throw new DeploymentException(sm.getString(
                                     "pojoMethodMapping.duplicateAnnotation",
                                     OnError.class, currentClazz));
+                        }
+                    }
+                } else if (method.getAnnotation(OnIdleSession.class) != null) {
+                    checkPublic(method);
+                    if (idleSession == null) {
+                        idleSession = method;
+                    } else {
+                        if (currentClazz == clazzPojo ||
+                                !isMethodOverride(idleSession, method)) {
+                            // Duplicate annotation
+                            throw new DeploymentException(sm.getString(
+                                    "pojoMethodMapping.duplicateAnnotation",
+                                    OnIdleSession.class, currentClazz));
                         }
                     }
                 } else if (method.getAnnotation(OnMessage.class) != null) {
@@ -189,9 +207,11 @@ public class PojoMethodMapping {
         this.onOpen = open;
         this.onClose = close;
         this.onError = error;
+        this.onIdleSession = idleSession;
         onOpenParams = getPathParams(onOpen, MethodType.ON_OPEN);
         onCloseParams = getPathParams(onClose, MethodType.ON_CLOSE);
         onErrorParams = getPathParams(onError, MethodType.ON_ERROR);
+        onIdleSessionParams = getPathParams(onIdleSession, MethodType.ON_IDLE_SESSION);
     }
 
 
@@ -235,7 +255,7 @@ public class PojoMethodMapping {
     public Object[] getOnOpenArgs(Map<String,String> pathParameters,
             Session session, EndpointConfig config) throws DecodeException {
         return buildArgs(onOpenParams, pathParameters, session, config, null,
-                null);
+                null, null);
     }
 
 
@@ -247,21 +267,29 @@ public class PojoMethodMapping {
     public Object[] getOnCloseArgs(Map<String,String> pathParameters,
             Session session, CloseReason closeReason) throws DecodeException {
         return buildArgs(onCloseParams, pathParameters, session, null, null,
-                closeReason);
+                closeReason, null);
     }
 
 
     public Method getOnError() {
         return onError;
     }
-
-
+    
     public Object[] getOnErrorArgs(Map<String,String> pathParameters,
             Session session, Throwable throwable) throws DecodeException {
         return buildArgs(onErrorParams, pathParameters, session, null,
-                throwable, null);
+                throwable, null, null);
     }
 
+    public Method getOnIdleSession() {
+    	return onIdleSession;
+    }
+
+    public Object[] getOnIdleSessionArgs(Map<String,String> pathParameters,
+            Session session, IdleStateEventType idleStateEventType) throws DecodeException {
+        return buildArgs(onIdleSessionParams, pathParameters, session, null,
+                null, null, idleStateEventType);
+    }
 
     public boolean hasMessageHandlers() {
         return !onMessage.isEmpty();
@@ -303,6 +331,9 @@ public class PojoMethodMapping {
             } else if (methodType == MethodType.ON_CLOSE &&
                     type.equals(CloseReason.class)) {
                 result[i] = new PojoPathParam(type, null);
+            } else if (methodType == MethodType.ON_IDLE_SESSION &&
+                    type.equals(IdleStateEventType.class)) {
+                result[i] = new PojoPathParam(type, null);
             } else {
                 Annotation[] paramAnnotations = paramsAnnotations[i];
                 for (Annotation paramAnnotation : paramAnnotations) {
@@ -332,7 +363,8 @@ public class PojoMethodMapping {
 
     private static Object[] buildArgs(PojoPathParam[] pathParams,
             Map<String,String> pathParameters, Session session,
-            EndpointConfig config, Throwable throwable, CloseReason closeReason)
+            EndpointConfig config, Throwable throwable, CloseReason closeReason,
+            IdleStateEventType IdleStateEventType)
             throws DecodeException {
         Object[] result = new Object[pathParams.length];
         for (int i = 0; i < pathParams.length; i++) {
@@ -345,7 +377,9 @@ public class PojoMethodMapping {
                 result[i] = throwable;
             } else if (type.equals(CloseReason.class)) {
                 result[i] = closeReason;
-            } else {
+            } else if(type.equals(IdleStateEventType.class)) {
+            	result[i] = IdleStateEventType;
+            }else {
                 String name = pathParams[i].getName();
                 String value = pathParameters.get(name);
                 try {
@@ -720,6 +754,7 @@ public class PojoMethodMapping {
     private enum MethodType {
         ON_OPEN,
         ON_CLOSE,
-        ON_ERROR
+        ON_ERROR,
+        ON_IDLE_SESSION
     }
 }
