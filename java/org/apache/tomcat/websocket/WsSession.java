@@ -100,7 +100,7 @@ public class WsSession implements Session {
     private volatile long maxIdleTimeout = 0;
     private volatile long lastActive = System.currentTimeMillis();
     private volatile long lastActiveRead = System.currentTimeMillis();
-    private volatile boolean closeOnIdle = false;
+    private volatile boolean closeOnIdle = true;
     private Map<FutureToSendHandler, FutureToSendHandler> futures = new ConcurrentHashMap<>();
 
     /**
