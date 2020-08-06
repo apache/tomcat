@@ -27,6 +27,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import org.apache.catalina.connector.Connector;
 import org.apache.catalina.startup.ExpectationClient;
+import org.apache.coyote.ContinueHandlingResponsePolicy;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -190,12 +191,7 @@ public class TestStandardContextValve extends TomcatBaseTest {
         // the default policy is IMMEDIATELY
         // This test verifies that we get proper 100 Continue responses
         // when the continueHandlingResponsePolicy property is not set
-        final Tomcat tomcat = getTomcatInstance();
-
-        final Connector connector = tomcat.getConnector();
-        connector.setProperty("continueHandlingResponsePolicy", "IMMEDIATELY");
-
-        test100Continue();
+        test100Continue(ContinueHandlingResponsePolicy.IMMEDIATELY);
     }
 
     @Test
@@ -205,7 +201,7 @@ public class TestStandardContextValve extends TomcatBaseTest {
         final Connector connector = tomcat.getConnector();
         connector.setProperty("continueHandlingResponsePolicy", "IMMEDIATELY");
 
-        test100Continue();
+        test100Continue(ContinueHandlingResponsePolicy.IMMEDIATELY);
     }
 
     @Test
@@ -213,23 +209,24 @@ public class TestStandardContextValve extends TomcatBaseTest {
         final Tomcat tomcat = getTomcatInstance();
 
         final Connector connector = tomcat.getConnector();
-        connector.setProperty("continueHandlingResponsePolicy", "ON_REQUEST_CONTENT_READ");
+        connector.setProperty("continueHandlingResponsePolicy", ContinueHandlingResponsePolicy.ON_REQUEST_BODY_READ.toString());
 
-        test100Continue();
+        test100Continue(ContinueHandlingResponsePolicy.ON_REQUEST_BODY_READ);
     }
 
-    public void test100Continue() throws Exception {
-        Tomcat tomcat = getTomcatInstance();
+    public void test100Continue(ContinueHandlingResponsePolicy expectedPolicy) throws Exception {
+        final Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        final Context ctx = tomcat.addContext("", null);
 
-        Tomcat.addServlet(ctx, "echo", new EchoBodyServlet());
+        // configure the servlet to wait 1 second before reading the request body
+        Tomcat.addServlet(ctx, "echo", new DelayingEchoBodyServlet(1000));
         ctx.addServletMappingDecoded("/echo", "echo");
 
         tomcat.start();
 
-        ExpectationClient client = new ExpectationClient();
+        final ExpectationClient client = new ExpectationClient();
 
         client.setPort(tomcat.getConnector().getLocalPort());
         // Expected content doesn't end with a CR-LF so if it isn't chunked make
@@ -239,11 +236,70 @@ public class TestStandardContextValve extends TomcatBaseTest {
 
         client.connect();
 
+        // time how long it takes to send the request headers and get the
+        // 100 continue response
+        final long startTime = System.currentTimeMillis();
         client.doRequestHeaders();
+        final long endTime = System.currentTimeMillis();
+
+        final long duration = endTime - startTime;
+
+        if(expectedPolicy == ContinueHandlingResponsePolicy.IMMEDIATELY) {
+            // the 100 response should be received immediately while
+            // the servlet will wait 1 second before responding. 500 ms
+            // should be enough  time to allow for any slowness that may
+            // occur but still differentiate from the 1 second or more
+            // expected delay by the ON_REQUEST_BODY_READ policy.
+            Assert.assertTrue(duration < 500);
+        } else if (expectedPolicy == ContinueHandlingResponsePolicy.ON_REQUEST_BODY_READ){
+            // Since the servlet will wait 1 second before responding, if
+            // the response takes more than a second, it implies that the
+            // ON_REQUEST_BODY_READ policy was executed.
+            Assert.assertTrue(duration >= 1000);
+        } else {
+            Assert.fail("won't happen");
+        }
         Assert.assertTrue(client.isResponse100());
 
         client.doRequestBody();
         Assert.assertTrue(client.isResponse200());
         Assert.assertTrue(client.isResponseBodyOK());
+    }
+
+    /**
+     * Servlet that waits before it echos the request body back as the
+     * response body
+     */
+    public static class DelayingEchoBodyServlet extends EchoBodyServlet {
+
+        private final int delay;
+
+        public DelayingEchoBodyServlet(int delay) {
+            this.delay = delay;
+        }
+
+        private void delay() {
+            try {
+                Thread.sleep(delay);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+                throws ServletException, IOException {
+
+            delay();
+            super.doGet(req, resp);
+        }
+
+        @Override
+        protected void doPost(HttpServletRequest req, HttpServletResponse resp)
+                throws ServletException, IOException {
+
+            delay();
+            super.doPost(req, resp);
+        }
     }
 }
