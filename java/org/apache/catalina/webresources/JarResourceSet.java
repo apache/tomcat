@@ -16,11 +16,15 @@
  */
 package org.apache.catalina.webresources;
 
+import java.net.URL;
+import java.util.List;
 import java.util.jar.JarEntry;
 import java.util.jar.Manifest;
 
 import org.apache.catalina.WebResource;
 import org.apache.catalina.WebResourceRoot;
+import org.apache.catalina.WebResourceSet;
+import org.apache.tomcat.util.scan.JarIndex;
 
 /**
  * Represents a {@link org.apache.catalina.WebResourceSet} based on a JAR file.
@@ -57,6 +61,36 @@ public class JarResourceSet extends AbstractSingleArchiveResourceSet {
     public JarResourceSet(WebResourceRoot root, String webAppMount, String base,
             String internalPath) throws IllegalArgumentException {
         super(root, webAppMount, base, internalPath);
+    }
+
+    @Override
+    public WebResource getResource(String path, List<List<WebResourceSet>> allResources) {
+        JarIndex jarIndex = getJarIndex();
+        if(jarIndex==null){
+            return getResource(path);
+        }
+        String webAppMount = getWebAppMount();
+        if (path.startsWith(getWebAppMount())) {
+            String pathInJar = getInternalPath() + path.substring(
+                    webAppMount.length());
+            if (pathInJar.length() > 0 && pathInJar.charAt(0) == '/') {
+                pathInJar = pathInJar.substring(1);
+            }
+            List<String> jarFiles = jarIndex.get(pathInJar);
+            if(jarFiles!=null){
+                for(String jarFile:jarFiles){
+                    for(List<WebResourceSet> list:allResources){
+                        for(WebResourceSet wrs:list){
+                            URL baseUrl = wrs.getBaseUrl();
+                            if(baseUrl.toString().endsWith(jarFile)){
+                                return wrs.getResource(path);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return getResource(path);
     }
 
 

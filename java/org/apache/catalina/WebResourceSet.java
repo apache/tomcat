@@ -18,6 +18,7 @@ package org.apache.catalina;
 
 import java.io.InputStream;
 import java.net.URL;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -35,6 +36,10 @@ public interface WebResourceSet extends Lifecycle {
      * @return  The object that represents the resource at the given path
      */
     WebResource getResource(String path);
+
+    default WebResource getResource(String path, List<List<WebResourceSet>> allResources){
+        return getResource(path);
+    }
 
     /**
      * Obtain the list of the names of all of the files and directories located

@@ -18,17 +18,20 @@ package org.apache.catalina.webresources;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+import java.util.zip.ZipEntry;
 
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.WebResourceRoot;
 import org.apache.tomcat.util.buf.UriUtil;
 import org.apache.tomcat.util.compat.JreCompat;
+import org.apache.tomcat.util.scan.JarIndex;
 
 /**
  * Base class for a {@link org.apache.catalina.WebResourceSet} based on a
@@ -37,6 +40,8 @@ import org.apache.tomcat.util.compat.JreCompat;
 public abstract class AbstractSingleArchiveResourceSet extends AbstractArchiveResourceSet {
 
     private volatile Boolean multiRelease;
+
+    private JarIndex jarIndex;
 
     /**
      * A no argument constructor is required for this to work with the digester.
@@ -139,6 +144,12 @@ public abstract class AbstractSingleArchiveResourceSet extends AbstractArchiveRe
 
         try (JarFile jarFile = JreCompat.getInstance().jarFileNewInstance(getBase())) {
             setManifest(jarFile.getManifest());
+            ZipEntry ze = jarFile.getEntry("META-INF/INDEX.LIST");
+            if(ze!=null){
+                try(InputStream is = jarFile.getInputStream(ze)){
+                    jarIndex = new JarIndex(is);
+                }
+            }
         } catch (IOException ioe) {
             throw new IllegalArgumentException(ioe);
         }
@@ -148,5 +159,9 @@ public abstract class AbstractSingleArchiveResourceSet extends AbstractArchiveRe
         } catch (MalformedURLException e) {
             throw new IllegalArgumentException(e);
         }
+    }
+
+    protected JarIndex getJarIndex() {
+        return jarIndex;
     }
 }
