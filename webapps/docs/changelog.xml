@@ -124,6 +124,12 @@
         return value, particularly when end of stream has been reached. (markt)
       </fix>
       <fix>
+        <bug>64614</bug>: Improve compatibility with FIPS keystores. When a FIPS
+        keystore is configured and the keystore contains multiple keys, the
+        alias attribute will be ignored and the key used will be implementation
+        dependent. (jfclere)
+      </fix>
+      <fix>
         <bug>64621</bug>: Improve handling HTTP/2 stream reset frames received
         from clients. (markt)
       </fix>
