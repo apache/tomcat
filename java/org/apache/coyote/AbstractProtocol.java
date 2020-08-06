@@ -274,7 +274,6 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
     }
 
 
-    //todo(malay) move to AbstractProtocol
     public ContinueHandlingResponsePolicy getContinueHandlingResponsePolicy() {
         return continueHandlingResponsePolicy;
     }

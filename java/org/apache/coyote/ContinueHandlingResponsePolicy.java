@@ -17,11 +17,13 @@
 package org.apache.coyote;
 
 /**
- * Enum defining policies on responding to '100-continue' expectations.
+ * Enum defining policies on responding requests that contain a '100-continue'
+ * expectations.
  */
 public enum ContinueHandlingResponsePolicy {
     /**
-     * Tomcat will automatically and always send the 100 intermediate response
+     * Tomcat will automatically send the 100 intermediate response before
+     * sending the request to the servlet
      *
      * This is the default behavior
      */
@@ -29,9 +31,14 @@ public enum ContinueHandlingResponsePolicy {
 
     /**
      * Send the 100 intermediate response only when the servlet attempts to
-     * read the request's body. This allows the servlet to process the
-     * request headers and possibly respond before asking for the request
-     * body
+     * read the request's body by either:
+     * - calling read on the InputStream returned by
+     *   HttpServletRequest.getInputStream
+     * - calling read on the BufferedReader returned by
+     *   HttpServletRequest.getReader
+     *
+     * This allows the servlet to process the request headers and possibly
+     * respond before reading the request body
      */
     ON_REQUEST_BODY_READ
 }

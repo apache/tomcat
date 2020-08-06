@@ -722,9 +722,9 @@ public final class Request {
     /**
      * set whether to acknowledge the request when the request body is
      * first read from
-     * @param acknowledgeOnFirstRead the value to set
+     * @param acknowledgeOnRequestBodyRead the value to set
      */
-    public void setAcknowledgeOnRequestBodyRead(boolean acknowledgeOnFirstRead) {
-        this.acknowledgeOnRequestBodyRead = acknowledgeOnFirstRead;
+    public void setAcknowledgeOnRequestBodyRead(boolean acknowledgeOnRequestBodyRead) {
+        this.acknowledgeOnRequestBodyRead = acknowledgeOnRequestBodyRead;
     }
 }
