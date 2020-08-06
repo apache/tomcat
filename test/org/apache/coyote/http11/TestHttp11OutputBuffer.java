@@ -16,11 +16,11 @@
  */
 package org.apache.coyote.http11;
 
+import org.apache.catalina.startup.ExpectationClient;
 import org.junit.Assert;
 import org.junit.Test;
 
 import org.apache.catalina.Context;
-import org.apache.catalina.startup.SimpleHttpClient;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 
@@ -56,34 +56,4 @@ public class TestHttp11OutputBuffer extends TomcatBaseTest {
         Assert.assertTrue(client.isResponseBodyOK());
     }
 
-    private static class ExpectationClient extends SimpleHttpClient {
-
-        private static final String BODY = "foo=bar";
-
-        public void doRequestHeaders() throws Exception {
-            StringBuilder requestHeaders = new StringBuilder();
-            requestHeaders.append("POST /echo HTTP/1.1").append(CRLF);
-            requestHeaders.append("Host: localhost").append(CRLF);
-            requestHeaders.append("Expect: 100-continue").append(CRLF);
-            requestHeaders.append("Content-Type: application/x-www-form-urlencoded").append(CRLF);
-            String len = Integer.toString(BODY.length());
-            requestHeaders.append("Content-length: ").append(len).append(CRLF);
-            requestHeaders.append(CRLF);
-
-            setRequest(new String[] {requestHeaders.toString()});
-
-            processRequest(false);
-        }
-
-        public void doRequestBody() throws Exception {
-            setRequest(new String[] { BODY });
-
-            processRequest(true);
-        }
-
-        @Override
-        public boolean isResponseBodyOK() {
-            return BODY.equals(getResponseBody());
-        }
-    }
 }

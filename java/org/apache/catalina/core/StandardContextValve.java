@@ -26,6 +26,7 @@ import org.apache.catalina.Wrapper;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
 import org.apache.catalina.valves.ValveBase;
+import org.apache.coyote.ContinueHandlingResponsePolicy;
 import org.apache.tomcat.util.buf.MessageBytes;
 import org.apache.tomcat.util.res.StringManager;
 
@@ -81,7 +82,17 @@ final class StandardContextValve extends ValveBase {
 
         // Acknowledge the request
         try {
-            response.sendAcknowledgement();
+            // Acknowledge based on the policy
+            final ContinueHandlingResponsePolicy continueHandlingResponsePolicy = (ContinueHandlingResponsePolicy) request.getConnector().getProperty("continueHandlingResponsePolicy");
+
+            if (continueHandlingResponsePolicy == ContinueHandlingResponsePolicy.IMMEDIATELY) {
+                // acknowledge immediately
+                response.sendAcknowledgement();
+                request.setAcknowledgeOnRequestBodyRead(false);
+            } else if (continueHandlingResponsePolicy == ContinueHandlingResponsePolicy.ON_REQUEST_BODY_READ) {
+                // configure the request to acknowledge when the request body is first consumed
+                request.setAcknowledgeOnRequestBodyRead(true);
+            }
         } catch (IOException ioe) {
             container.getLogger().error(sm.getString(
                     "standardContextValve.acknowledgeException"), ioe);

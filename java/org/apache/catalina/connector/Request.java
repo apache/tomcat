@@ -3522,4 +3522,13 @@ public class Request implements HttpServletRequest {
                     }
                 });
     }
+
+    /**
+     * set whether to acknowledge the request when the request body is
+     * first read from
+     * @param acknowledgeOnFirstRead the value to set
+     */
+    public void setAcknowledgeOnRequestBodyRead(boolean acknowledgeOnFirstRead) {
+        coyoteRequest.setAcknowledgeOnRequestBodyRead(acknowledgeOnFirstRead);
+    }
 }

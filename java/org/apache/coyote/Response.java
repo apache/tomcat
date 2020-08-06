@@ -779,4 +779,16 @@ public final class Response {
             listener.onWritePossible();
         }
     }
+
+    /**
+     * Send an acknowledgement of a request.
+     */
+    public void sendAcknowledgement() {
+        if (isCommitted()) {
+            return;
+        }
+
+        action(ActionCode.ACK, null);
+
+    }
 }

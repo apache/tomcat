@@ -25,6 +25,8 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+import org.apache.catalina.connector.Connector;
+import org.apache.catalina.startup.ExpectationClient;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -181,5 +183,67 @@ public class TestStandardContextValve extends TomcatBaseTest {
             sb.append("Destroy");
         }
 
+    }
+
+    @Test
+    public void test100ContinueDefaultPolicy() throws Exception {
+        // the default policy is IMMEDIATELY
+        // This test verifies that we get proper 100 Continue responses
+        // when the continueHandlingResponsePolicy property is not set
+        final Tomcat tomcat = getTomcatInstance();
+
+        final Connector connector = tomcat.getConnector();
+        connector.setProperty("continueHandlingResponsePolicy", "IMMEDIATELY");
+
+        test100Continue();
+    }
+
+    @Test
+    public void test100ContinueSentImmediately() throws Exception {
+        final Tomcat tomcat = getTomcatInstance();
+
+        final Connector connector = tomcat.getConnector();
+        connector.setProperty("continueHandlingResponsePolicy", "IMMEDIATELY");
+
+        test100Continue();
+    }
+
+    @Test
+    public void test100ContinueSentOnRequestContentRead() throws Exception {
+        final Tomcat tomcat = getTomcatInstance();
+
+        final Connector connector = tomcat.getConnector();
+        connector.setProperty("continueHandlingResponsePolicy", "ON_REQUEST_CONTENT_READ");
+
+        test100Continue();
+    }
+
+    public void test100Continue() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        // No file system docBase required
+        Context ctx = tomcat.addContext("", null);
+
+        Tomcat.addServlet(ctx, "echo", new EchoBodyServlet());
+        ctx.addServletMappingDecoded("/echo", "echo");
+
+        tomcat.start();
+
+        ExpectationClient client = new ExpectationClient();
+
+        client.setPort(tomcat.getConnector().getLocalPort());
+        // Expected content doesn't end with a CR-LF so if it isn't chunked make
+        // sure the content length is used as reading it line-by-line will fail
+        // since there is no "line".
+        client.setUseContentLength(true);
+
+        client.connect();
+
+        client.doRequestHeaders();
+        Assert.assertTrue(client.isResponse100());
+
+        client.doRequestBody();
+        Assert.assertTrue(client.isResponse200());
+        Assert.assertTrue(client.isResponseBodyOK());
     }
 }

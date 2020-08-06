@@ -102,6 +102,11 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
     private ScheduledFuture<?> timeoutFuture = null;
     private ScheduledFuture<?> monitorFuture;
 
+    /**
+     * The policy for how to process requests with "Expect: 100-continue" header
+     */
+    private ContinueHandlingResponsePolicy continueHandlingResponsePolicy = ContinueHandlingResponsePolicy.IMMEDIATELY;
+
     public AbstractProtocol(AbstractEndpoint<S,?> endpoint) {
         this.endpoint = endpoint;
         setConnectionLinger(Constants.DEFAULT_CONNECTION_LINGER);
@@ -260,6 +265,18 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
     public int getConnectionLinger() { return endpoint.getConnectionLinger(); }
     public void setConnectionLinger(int connectionLinger) {
         endpoint.setConnectionLinger(connectionLinger);
+    }
+
+    // ------------------------------------------------ HTTP specific properties
+    // ----------------------------------------- queried by StandardContextValve
+    public void setContinueHandlingResponsePolicy(String value) {
+        continueHandlingResponsePolicy = Enum.valueOf(ContinueHandlingResponsePolicy.class, value);
+    }
+
+
+    //todo(malay) move to AbstractProtocol
+    public ContinueHandlingResponsePolicy getContinueHandlingResponsePolicy() {
+        return continueHandlingResponsePolicy;
     }
 
 

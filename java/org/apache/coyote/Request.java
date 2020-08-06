@@ -69,6 +69,10 @@ public final class Request {
     // Expected maximum typical number of cookies per request.
     private static final int INITIAL_COOKIE_SIZE = 4;
 
+    // whether to acknowledge the request when the request body is first
+    // read from.
+    private boolean acknowledgeOnRequestBodyRead = false;
+
     // ----------------------------------------------------------- Constructors
 
     public Request() {
@@ -549,7 +553,12 @@ public final class Request {
      * @throws IOException If an I/O error occurs during the copy
      */
     public int doRead(ApplicationBufferHandler handler) throws IOException {
+        if (bytesRead == 0 && acknowledgeOnRequestBodyRead) {
+            response.sendAcknowledgement();
+        }
+
         int n = inputBuffer.doRead(handler);
+
         if (n > 0) {
             bytesRead+=n;
         }
@@ -708,5 +717,14 @@ public final class Request {
         }
 
         return encoding.trim();
+    }
+
+    /**
+     * set whether to acknowledge the request when the request body is
+     * first read from
+     * @param acknowledgeOnFirstRead the value to set
+     */
+    public void setAcknowledgeOnRequestBodyRead(boolean acknowledgeOnFirstRead) {
+        this.acknowledgeOnRequestBodyRead = acknowledgeOnFirstRead;
     }
 }
