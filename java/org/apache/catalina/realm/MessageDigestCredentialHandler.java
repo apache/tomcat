@@ -36,7 +36,7 @@ import org.apache.tomcat.util.security.ConcurrentMessageDigest;
  * <li><b>{MD5}encodedCredential</b> - a Base64 encoded MD5 digest of the password</li>
  * <li><b>{SHA}encodedCredential</b> - a Base64 encoded SHA1 digest of the password</li>
  * <li><b>{SSHA}encodedCredential</b> - 20 character SHA1 digest Base64 encoded followed by salt</li>
- * <li><b>{SSHA2}encodedCredential</b> - 20 character salt followed by the salted digest Base64 encoded</li>
+ * <li><b>{SSHAv2}encodedCredential</b> - 20 character salt followed by the salted digest Base64 encoded</li>
  * <li><b>salt$iterationCount$encodedCredential</b> - a hex encoded salt, iteration code and a hex encoded
  *        credential, each separated by $</li>
  * </ul>
