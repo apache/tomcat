@@ -32,16 +32,13 @@ import org.apache.tomcat.util.security.ConcurrentMessageDigest;
 /**
  * This credential handler supports the following forms of stored passwords:
  * <ul>
- * <li><b>encodedCredential</b> - a hex encoded digest of the password digested
- *     using the configured digest</li>
- * <li><b>{MD5}encodedCredential</b> - a Base64 encoded MD5 digest of the
- *     password</li>
- * <li><b>{SHA}encodedCredential</b> - a Base64 encoded SHA1 digest of the
- *     password</li>
- * <li><b>{SSHA}encodedCredential</b> - 20 character salt followed by the salted
- *     SHA1 digest Base64 encoded</li>
- * <li><b>salt$iterationCount$encodedCredential</b> - a hex encoded salt,
- *     iteration code and a hex encoded credential, each separated by $</li>
+ * <li><b>encodedCredential</b> - a hex encoded digest of the password digested using the configured digest</li>
+ * <li><b>{MD5}encodedCredential</b> - a Base64 encoded MD5 digest of the password</li>
+ * <li><b>{SHA}encodedCredential</b> - a Base64 encoded SHA1 digest of the password</li>
+ * <li><b>{SSHA}encodedCredential</b> - 20 character SHA1 digest Base64 encoded followed by salt</li>
+ * <li><b>{SSHA2}encodedCredential</b> - 20 character salt followed by the salted digest Base64 encoded</li>
+ * <li><b>salt$iterationCount$encodedCredential</b> - a hex encoded salt, iteration code and a hex encoded
+ *        credential, each separated by $</li>
  * </ul>
  *
  * <p>
@@ -116,9 +113,7 @@ public class MessageDigestCredentialHandler extends DigestCredentialHandlerBase 
                 return userDigest.equals(serverDigest);
 
             } else if (storedCredentials.startsWith("{SSHA}")) {
-                // Server is storing digested passwords with a prefix indicating
-                // the digest type and the salt used when creating that digest
-
+                // "{SSHA}<digest:20><salt:20>"
                 String serverDigestPlusSalt = storedCredentials.substring(6);
 
                 // Need to convert the salt to bytes to apply it to the user's
@@ -141,8 +136,25 @@ public class MessageDigestCredentialHandler extends DigestCredentialHandlerBase 
                         serverSaltBytes);
 
                 return Arrays.equals(userDigestBytes, serverDigestBytes);
+        } else if (storedCredentials.startsWith("{SSHAv2}")) {
+                String serverSaltPlusDigest = storedCredentials.substring(8);
 
-            } else if (storedCredentials.indexOf('$') > -1) {
+                // Need to convert the salt to bytes to apply it to the user's digested password.
+                byte[] serverSaltPlusDigestBytes = Base64.decodeBase64(serverSaltPlusDigest);
+                final int saltLength = 20;
+                byte[] serverSaltBytes = new byte[saltLength];
+                System.arraycopy(serverSaltPlusDigestBytes, 0, serverSaltBytes, 0, saltLength);
+                final int digestLength = serverSaltPlusDigestBytes.length - saltLength;
+                byte[] serverDigestBytes = new byte[digestLength];
+                System.arraycopy(serverSaltPlusDigestBytes, saltLength, serverDigestBytes, 0, digestLength);
+
+                // Generate the digested form of the user provided password using the salt
+                byte[] userDigestBytes = ConcurrentMessageDigest.digest(getAlgorithm(),
+                        inputCredentials.getBytes(StandardCharsets.ISO_8859_1),
+                        serverSaltBytes);
+
+                return Arrays.equals(userDigestBytes, serverDigestBytes);
+        } else if (storedCredentials.indexOf('$') > -1) {
                 return matchesSaltIterationsEncoded(inputCredentials, storedCredentials);
 
             } else {
