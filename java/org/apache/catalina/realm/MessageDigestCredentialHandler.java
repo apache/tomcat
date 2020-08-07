@@ -121,18 +121,16 @@ public class MessageDigestCredentialHandler extends DigestCredentialHandlerBase 
 
                 String serverDigestPlusSalt = storedCredentials.substring(6);
 
-                // Need to convert the salt to bytes to apply it to the user's
-                // digested password.
-                byte[] serverDigestPlusSaltBytes =
-                        Base64.decodeBase64(serverDigestPlusSalt);
-                final int saltPos = 20;
-                byte[] serverDigestBytes = new byte[saltPos];
-                System.arraycopy(serverDigestPlusSaltBytes, 0,
-                        serverDigestBytes, 0, saltPos);
-                final int saltLength = serverDigestPlusSaltBytes.length - saltPos;
+                String serverSaltPlusDigest = storedCredentials.substring(6);
+
+                // Need to convert the salt to bytes to apply it to the user's digested password.
+                byte[] serverSaltPlusDigestBytes = Base64.decodeBase64(serverSaltPlusDigest);
+                final int saltLength = 20;
                 byte[] serverSaltBytes = new byte[saltLength];
-                System.arraycopy(serverDigestPlusSaltBytes, saltPos,
-                        serverSaltBytes, 0, saltLength);
+                System.arraycopy(serverSaltPlusDigestBytes, 0, serverSaltBytes, 0, saltLength);
+                final int digestLength = serverSaltPlusDigestBytes.length - saltLength;
+                byte[] serverDigestBytes = new byte[digestLength];
+                System.arraycopy(serverSaltPlusDigestBytes, saltLength, serverDigestBytes, 0, digestLength);
 
                 // Generate the digested form of the user provided password
                 // using the salt
