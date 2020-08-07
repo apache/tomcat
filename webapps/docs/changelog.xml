@@ -48,10 +48,10 @@
   <subsection name="Catalina">
     <changelog>
       <fix>
-        Fix in MessageDigestCredentialHandler.
+        Fix javadoc in MessageDigestCredentialHandler.
         For {SSHA} the documentation says that the format is like "{SSHA}&lt;salt:20&gt;&lt;digest&gt;"
-        but the code parses it it wrongly. The code only works with SHA-1 because then the salt and the
-        digest have the same length. And the code parsed it like "{SSHA}&lt;digest:20&gt;&lt;salt:20&gt;"
+        but the code parses it it differently. SSHA is more or less a standard and should be
+        like "{SSHA}&lt;digest:20&gt;&lt;salt:20&gt;". This is the way the code handles it.
         Patch provided by Milo van der Zee (MilovdZee).
       </fix>
       <fix>
