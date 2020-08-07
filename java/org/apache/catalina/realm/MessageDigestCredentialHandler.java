@@ -35,8 +35,8 @@ import org.apache.tomcat.util.security.ConcurrentMessageDigest;
  * <li><b>encodedCredential</b> - a hex encoded digest of the password digested using the configured digest</li>
  * <li><b>{MD5}encodedCredential</b> - a Base64 encoded MD5 digest of the password</li>
  * <li><b>{SHA}encodedCredential</b> - a Base64 encoded SHA1 digest of the password</li>
- * <li><b>{SSHA}encodedCredential</b> - 20 character SHA1 digest Base64 encoded followed by salt</li>
- * <li><b>{SSHAv2}encodedCredential</b> - 20 character salt followed by the salted digest Base64 encoded</li>
+ * <li><b>{SSHA}encodedCredential</b> - 20 byte SHA1 digest Base64 encoded followed by variable length salt.
+ *         <pre>{SSHA}&lt;sha-1 digest:20&gt;&lt;salt:n&gt;</pre></li>
  * <li><b>salt$iterationCount$encodedCredential</b> - a hex encoded salt, iteration code and a hex encoded
  *        credential, each separated by $</li>
  * </ul>
@@ -69,8 +69,7 @@ public class MessageDigestCredentialHandler extends DigestCredentialHandlerBase 
             try {
                 this.encoding = B2CConverter.getCharset(encodingName);
             } catch (UnsupportedEncodingException e) {
-                log.error(sm.getString("mdCredentialHandler.unknownEncoding",
-                        encodingName, encoding.name()));
+                log.error(sm.getString("mdCredentialHandler.unknownEncoding", encodingName, encoding.name()));
             }
         }
     }
@@ -91,7 +90,6 @@ public class MessageDigestCredentialHandler extends DigestCredentialHandlerBase 
 
     @Override
     public boolean matches(String inputCredentials, String storedCredentials) {
-
         if (inputCredentials == null || storedCredentials == null) {
             return false;
         }
@@ -103,50 +101,27 @@ public class MessageDigestCredentialHandler extends DigestCredentialHandlerBase 
             // Some directories and databases prefix the password with the hash
             // type. The string is in a format compatible with Base64.encode not
             // the normal hex encoding of the digest
-            if (storedCredentials.startsWith("{MD5}") ||
-                    storedCredentials.startsWith("{SHA}")) {
-                // Server is storing digested passwords with a prefix indicating
-                // the digest type
-                String serverDigest = storedCredentials.substring(5);
-                String userDigest = Base64.encodeBase64String(ConcurrentMessageDigest.digest(
-                        getAlgorithm(), inputCredentials.getBytes(StandardCharsets.ISO_8859_1)));
-                return userDigest.equals(serverDigest);
-
+            if (storedCredentials.startsWith("{MD5}") || storedCredentials.startsWith("{SHA}")) {
+                // Server is storing digested passwords with a prefix indicating the digest type
+                String base64ServerDigest = storedCredentials.substring(5);
+                byte[] userDigest = ConcurrentMessageDigest.digest(getAlgorithm(), inputCredentials.getBytes(StandardCharsets.ISO_8859_1));
+                String base64UserDigest = Base64.encodeBase64String(userDigest);
+                return base64UserDigest.equals(base64ServerDigest);
             } else if (storedCredentials.startsWith("{SSHA}")) {
-                // "{SSHA}<digest:20><salt:20>"
-                String serverDigestPlusSalt = storedCredentials.substring(6);
-
-                // Need to convert the salt to bytes to apply it to the user's
-                // digested password.
-                byte[] serverDigestPlusSaltBytes =
-                        Base64.decodeBase64(serverDigestPlusSalt);
-                final int saltPos = 20;
-                byte[] serverDigestBytes = new byte[saltPos];
-                System.arraycopy(serverDigestPlusSaltBytes, 0,
-                        serverDigestBytes, 0, saltPos);
-                final int saltLength = serverDigestPlusSaltBytes.length - saltPos;
-                byte[] serverSaltBytes = new byte[saltLength];
-                System.arraycopy(serverDigestPlusSaltBytes, saltPos,
-                        serverSaltBytes, 0, saltLength);
-
-                // Generate the digested form of the user provided password
-                // using the salt
-                byte[] userDigestBytes = ConcurrentMessageDigest.digest(getAlgorithm(),
-                        inputCredentials.getBytes(StandardCharsets.ISO_8859_1),
-                        serverSaltBytes);
-
-                return Arrays.equals(userDigestBytes, serverDigestBytes);
-        } else if (storedCredentials.startsWith("{SSHAv2}")) {
-                String serverSaltPlusDigest = storedCredentials.substring(8);
-
+                // "{SSHA}<sha-1 digest:20><salt:n>"
                 // Need to convert the salt to bytes to apply it to the user's digested password.
-                byte[] serverSaltPlusDigestBytes = Base64.decodeBase64(serverSaltPlusDigest);
-                final int saltLength = 20;
-                byte[] serverSaltBytes = new byte[saltLength];
-                System.arraycopy(serverSaltPlusDigestBytes, 0, serverSaltBytes, 0, saltLength);
-                final int digestLength = serverSaltPlusDigestBytes.length - saltLength;
+                String serverDigestPlusSalt = storedCredentials.substring(6);
+                byte[] serverDigestPlusSaltBytes = Base64.decodeBase64(serverDigestPlusSalt);
+
+                // extract the first 20 bytes containing the SHA-1 digest
+                final int digestLength = 20;
                 byte[] serverDigestBytes = new byte[digestLength];
-                System.arraycopy(serverSaltPlusDigestBytes, saltLength, serverDigestBytes, 0, digestLength);
+                System.arraycopy(serverDigestPlusSaltBytes, 0, serverDigestBytes, 0, digestLength);
+
+                // the remaining bytes are the salt
+                final int saltLength = serverDigestPlusSaltBytes.length - digestLength;
+                byte[] serverSaltBytes = new byte[saltLength];
+                System.arraycopy(serverDigestPlusSaltBytes, digestLength, serverSaltBytes, 0, saltLength);
 
                 // Generate the digested form of the user provided password using the salt
                 byte[] userDigestBytes = ConcurrentMessageDigest.digest(getAlgorithm(),
@@ -154,9 +129,8 @@ public class MessageDigestCredentialHandler extends DigestCredentialHandlerBase 
                         serverSaltBytes);
 
                 return Arrays.equals(userDigestBytes, serverDigestBytes);
-        } else if (storedCredentials.indexOf('$') > -1) {
+            } else if (storedCredentials.indexOf('$') > -1) {
                 return matchesSaltIterationsEncoded(inputCredentials, storedCredentials);
-
             } else {
                 // Hex hashes should be compared case-insensitively
                 String userDigest = mutate(inputCredentials, null, 1);
@@ -178,11 +152,9 @@ public class MessageDigestCredentialHandler extends DigestCredentialHandlerBase 
         } else {
             byte[] userDigest;
             if (salt == null) {
-                userDigest = ConcurrentMessageDigest.digest(algorithm, iterations,
-                        inputCredentials.getBytes(encoding));
+                userDigest = ConcurrentMessageDigest.digest(algorithm, iterations, inputCredentials.getBytes(encoding));
             } else {
-                userDigest = ConcurrentMessageDigest.digest(algorithm, iterations,
-                        salt, inputCredentials.getBytes(encoding));
+                userDigest = ConcurrentMessageDigest.digest(algorithm, iterations, salt, inputCredentials.getBytes(encoding));
             }
             return HexUtils.toHexString(userDigest);
         }
