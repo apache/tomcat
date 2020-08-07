@@ -48,7 +48,7 @@
   <subsection name="Catalina">
     <changelog>
       <fix>
-        Fix javadoc in MessageDigestCredentialHandler.
+        Fix javadoc in MessageDigestCredentialHandler and code rearrange.
         For {SSHA} the documentation says that the format is like "{SSHA}&lt;salt:20&gt;&lt;digest&gt;"
         but the code parses it it differently. SSHA is more or less a standard and should be
         like "{SSHA}&lt;digest:20&gt;&lt;salt:20&gt;". This is the way the code handles it.
