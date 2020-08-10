@@ -1,4 +1,4 @@
-package javax.websocket;
+package org.apache.tomcat.websocket;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

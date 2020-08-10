@@ -37,7 +37,6 @@ import javax.websocket.DeploymentException;
 import javax.websocket.Endpoint;
 import javax.websocket.EndpointConfig;
 import javax.websocket.Extension;
-import javax.websocket.IdleStateEventType;
 import javax.websocket.MessageHandler;
 import javax.websocket.MessageHandler.Partial;
 import javax.websocket.MessageHandler.Whole;
@@ -98,8 +97,8 @@ public class WsSession implements Session {
     private volatile int maxBinaryMessageBufferSize = Constants.DEFAULT_BUFFER_SIZE;
     private volatile int maxTextMessageBufferSize = Constants.DEFAULT_BUFFER_SIZE;
     private volatile long maxIdleTimeout = 0;
-    private volatile long lastActive = System.currentTimeMillis();
-    private volatile long lastActiveRead = System.currentTimeMillis();
+    private volatile long lastWriteTime = System.currentTimeMillis();
+    private volatile long lastReadTime = System.currentTimeMillis();
     private volatile boolean closeOnIdle = true;
     private Map<FutureToSendHandler, FutureToSendHandler> futures = new ConcurrentHashMap<>();
 
@@ -821,12 +820,12 @@ public class WsSession implements Session {
     }
 
 
-    protected void updateLastActive() {
-        lastActive = System.currentTimeMillis();
+    protected void updateLastWriteTime() {
+        lastWriteTime = System.currentTimeMillis();
     }
 
-    protected void updateLastActiveRead() {
-    	lastActiveRead = System.currentTimeMillis();
+    protected void updateLastReadTime() {
+    	lastReadTime = System.currentTimeMillis();
     }
 
     protected void checkExpiration() {
@@ -835,26 +834,28 @@ public class WsSession implements Session {
             return;
         }
         long currentTime = System.currentTimeMillis();
-        boolean isWriteTimeout =  currentTime - lastActive > timeout;
-        boolean isReadTimeout = currentTime - lastActiveRead > timeout;
+        boolean isWriteTimeout =  currentTime - lastWriteTime > timeout;
+        boolean isReadTimeout = currentTime - lastReadTime > timeout;
 
         if (isWriteTimeout || isReadTimeout) {
-        	if(closeOnIdle) {
+            if (closeOnIdle) {
+                if (isWriteTimeout && isReadTimeout) {
+                    String msg = sm.getString("wsSession.timeout", getId());
+                    if (log.isDebugEnabled()) {
+                        log.debug(msg);
+                    }
+                    doClose(new CloseReason(CloseCodes.GOING_AWAY, msg), 
+                        new CloseReason(CloseCodes.CLOSED_ABNORMALLY, msg));
+                }
+            } else {
                 String msg = sm.getString("wsSession.timeout", getId());
                 if (log.isDebugEnabled()) {
                     log.debug(msg);
                 }
-                doClose(new CloseReason(CloseCodes.GOING_AWAY, msg),
-                        new CloseReason(CloseCodes.CLOSED_ABNORMALLY, msg));
-        	} else {
-        		String msg = sm.getString("wsSession.timeout", getId());
-                if (log.isDebugEnabled()) {
-                    log.debug(msg);
-                }
-                IdleStateEventType idleType = isWriteTimeout ? IdleStateEventType.IDLE_WRITE_EVENT : 
-                	IdleStateEventType.IDLE_READ_EVENT;
+                IdleStateEventType idleType = isWriteTimeout ? IdleStateEventType.IDLE_WRITE_EVENT :
+                    IdleStateEventType.IDLE_READ_EVENT;
                 fireEndpointOnIdle(idleType);
-        	}
+            }
         }
     }
 

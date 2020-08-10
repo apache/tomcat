@@ -24,7 +24,6 @@ import java.util.Set;
 import javax.websocket.CloseReason;
 import javax.websocket.Endpoint;
 import javax.websocket.EndpointConfig;
-import javax.websocket.IdleStateEventType;
 import javax.websocket.MessageHandler;
 import javax.websocket.Session;
 
@@ -32,6 +31,7 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.res.StringManager;
+import org.apache.tomcat.websocket.IdleStateEventType;
 
 /**
  * Base implementation (client and server have different concrete

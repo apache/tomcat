@@ -16,6 +16,8 @@
  */
 package javax.websocket;
 
+import org.apache.tomcat.websocket.IdleStateEventType;
+
 public abstract class Endpoint {
 
     /**
@@ -53,6 +55,6 @@ public abstract class Endpoint {
      * @param idleStateEventType
      */
     public void onIdleSession(Session session, IdleStateEventType idleStateEventType) {
-    	//NO-PO by default
+    	//NO-OP by default
     }
 }

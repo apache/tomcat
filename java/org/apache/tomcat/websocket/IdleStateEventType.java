@@ -1,4 +1,4 @@
-package javax.websocket;
+package org.apache.tomcat.websocket;
 
 public enum IdleStateEventType {
 

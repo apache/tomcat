@@ -35,11 +35,9 @@ import javax.websocket.DecodeException;
 import javax.websocket.Decoder;
 import javax.websocket.DeploymentException;
 import javax.websocket.EndpointConfig;
-import javax.websocket.IdleStateEventType;
 import javax.websocket.MessageHandler;
 import javax.websocket.OnClose;
 import javax.websocket.OnError;
-import javax.websocket.OnIdleSession;
 import javax.websocket.OnMessage;
 import javax.websocket.OnOpen;
 import javax.websocket.PongMessage;
@@ -48,6 +46,8 @@ import javax.websocket.server.PathParam;
 
 import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.websocket.DecoderEntry;
+import org.apache.tomcat.websocket.IdleStateEventType;
+import org.apache.tomcat.websocket.OnIdleSession;
 import org.apache.tomcat.websocket.Util;
 import org.apache.tomcat.websocket.Util.DecoderMatch;
 

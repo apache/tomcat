@@ -113,7 +113,7 @@ public abstract class WsFrameBase {
 
     protected void processInputBuffer() throws IOException {
         while (!isSuspended()) {
-            wsSession.updateLastActiveRead();
+            wsSession.updateLastReadTime();
             if (state == State.NEW_FRAME) {
                 if (!processInitialHeader()) {
                     break;
