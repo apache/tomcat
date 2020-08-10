@@ -63,6 +63,11 @@
         issuing the 404 response to give the rewrite valve, if configured, an
         opportunity to rewrite the request. (remm/markt)
       </fix>
+      <add>
+        Refactor the Default servlet to provide a single method that can be
+        overridden (<code>generateETag()</code>) should a custom entity tag
+        format be required. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
