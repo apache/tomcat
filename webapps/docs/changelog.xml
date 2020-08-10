@@ -67,6 +67,11 @@
         prevent a potential exception when running under a security manager.
         Patch provided by Johnathan Gilday. (markt)
       </fix>
+      <add>
+        Refactor the Default servlet to provide a single method that can be
+        overridden (<code>generateETag()</code>) should a custom entity tag
+        format be required. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">

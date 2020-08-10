@@ -902,7 +902,7 @@ public class DefaultServlet extends HttpServlet {
                 ranges = parseRange(request, response, cacheEntry.attributes);
 
                 // ETag header
-                response.setHeader("ETag", cacheEntry.attributes.getETag());
+                response.setHeader("ETag", generateETag(cacheEntry.attributes));
 
                 // Last-Modified header
                 response.setHeader("Last-Modified",
@@ -1181,7 +1181,7 @@ public class DefaultServlet extends HttpServlet {
                 // Ignore
             }
 
-            String eTag = resourceAttributes.getETag();
+            String eTag = generateETag(resourceAttributes);
             long lastModified = resourceAttributes.getLastModified();
 
             if (headerValueTime == (-1L)) {
@@ -1910,7 +1910,7 @@ public class DefaultServlet extends HttpServlet {
             HttpServletResponse response, ResourceAttributes resourceAttributes)
             throws IOException {
 
-        String eTag = resourceAttributes.getETag();
+        String eTag = generateETag(resourceAttributes);
         // Default servlet uses weak matching so we strip any leading "W/" and
         // then compare using equals
         if (eTag.startsWith("W/")) {
@@ -1971,7 +1971,7 @@ public class DefaultServlet extends HttpServlet {
                     // The entity has not been modified since the date
                     // specified by the client. This is not an error case.
                     response.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
-                    response.setHeader("ETag", resourceAttributes.getETag());
+                    response.setHeader("ETag", generateETag(resourceAttributes));
 
                     return false;
                 }
@@ -1998,7 +1998,7 @@ public class DefaultServlet extends HttpServlet {
             HttpServletResponse response, ResourceAttributes resourceAttributes)
             throws IOException {
 
-        String eTag = resourceAttributes.getETag();
+        String eTag = generateETag(resourceAttributes);
         String headerValue = request.getHeader("If-None-Match");
         if (headerValue != null) {
 
@@ -2068,6 +2068,23 @@ public class DefaultServlet extends HttpServlet {
             return true;
         }
         return true;
+    }
+
+
+    /**
+     * Provides the entity tag (the ETag header) for the given resource
+     * attributes. Intended to be over-ridden by custom DefaultServlet
+     * implementations that wish to use an alternative format for the entity
+     * tag.
+     *
+     * @param resourceAttributes  The resource attributes for which an entity
+     *                            tag is required.
+     *
+     * @return The result of calling {@link ResourceAttributes#getETag()} on the given
+     *         resource
+     */
+    protected String generateETag(ResourceAttributes resourceAttributes) {
+        return resourceAttributes.getETag();
     }
 
 

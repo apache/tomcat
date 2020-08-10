@@ -2128,7 +2128,7 @@ public class WebdavServlet extends DefaultServlet {
         generatePropFindResponse(generatedXML, rewrittenUrl, path, type, propertiesVector,
                 cacheEntry.context == null, false, cacheEntry.attributes.getCreation(), cacheEntry.attributes.getLastModified(),
                 cacheEntry.attributes.getContentLength(), getServletContext().getMimeType(cacheEntry.name),
-                cacheEntry.attributes.getETag());
+                generateETag(cacheEntry.attributes));
     }
 
 
