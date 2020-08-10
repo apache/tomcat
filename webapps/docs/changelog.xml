@@ -69,6 +69,11 @@
         Add a dedicated loader for generated code to avoid dynamic class
         loading. (remm)
       </update>
+      <add>
+        Refactor the Default servlet to provide a single method that can be
+        overridden (<code>generateETag()</code>) should a custom entity tag
+        format be required. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">

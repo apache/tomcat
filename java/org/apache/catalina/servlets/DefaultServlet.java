@@ -905,7 +905,7 @@ public class DefaultServlet extends HttpServlet {
         String eTag = null;
         String lastModifiedHttp = null;
         if (resource.isFile() && !isError) {
-            eTag = resource.getETag();
+            eTag = generateETag(resource);
             lastModifiedHttp = resource.getLastModifiedHttp();
         }
 
@@ -1473,7 +1473,7 @@ public class DefaultServlet extends HttpServlet {
                 // Ignore
             }
 
-            String eTag = resource.getETag();
+            String eTag = generateETag(resource);
             long lastModified = resource.getLastModified();
 
             if (headerValueTime == (-1L)) {
@@ -2228,7 +2228,7 @@ public class DefaultServlet extends HttpServlet {
             HttpServletResponse response, WebResource resource)
             throws IOException {
 
-        String eTag = resource.getETag();
+        String eTag = generateETag(resource);
         // Default servlet uses weak matching so we strip any leading "W/" and
         // then compare using equals
         if (eTag.startsWith("W/")) {
@@ -2289,7 +2289,7 @@ public class DefaultServlet extends HttpServlet {
                     // The entity has not been modified since the date
                     // specified by the client. This is not an error case.
                     response.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
-                    response.setHeader("ETag", resource.getETag());
+                    response.setHeader("ETag", generateETag(resource));
 
                     return false;
                 }
@@ -2316,7 +2316,7 @@ public class DefaultServlet extends HttpServlet {
             HttpServletResponse response, WebResource resource)
             throws IOException {
 
-        String eTag = resource.getETag();
+        String eTag = generateETag(resource);
         String headerValue = request.getHeader("If-None-Match");
         if (headerValue != null) {
 
@@ -2386,6 +2386,21 @@ public class DefaultServlet extends HttpServlet {
             return true;
         }
         return true;
+    }
+
+
+    /**
+     * Provides the entity tag (the ETag header) for the given resource.
+     * Intended to be over-ridden by custom DefaultServlet implementations that
+     * wish to use an alternative format for the entity tag.
+     *
+     * @param resource  The resource for which an entity tag is required.
+     *
+     * @return The result of calling {@link WebResource#getETag()} on the given
+     *         resource
+     */
+    protected String generateETag(WebResource resource) {
+        return resource.getETag();
     }
 
 

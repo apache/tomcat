@@ -1993,7 +1993,7 @@ public class WebdavServlet extends DefaultServlet {
         generatePropFindResponse(generatedXML, rewrittenUrl, path, type, propertiesVector,
                 resource.isFile(), false, resource.getCreation(), resource.getLastModified(),
                 resource.getContentLength(), getServletContext().getMimeType(resource.getName()),
-                resource.getETag());
+                generateETag(resource));
     }
 
 
