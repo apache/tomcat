@@ -146,6 +146,10 @@
         Rename the local copy of the <code>javax.xml.ws</code> package to
         <code>jakarta.xml.ws</code>. (markt)
       </fix>
+      <add>
+        Improve the quality of the Japanese translations provided with Apache
+        Tomcat. Includes contributions from Yuki Shira. (markt)
+      </add>
     </changelog>
   </subsection>
 </section>
