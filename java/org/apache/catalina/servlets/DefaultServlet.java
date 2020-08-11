@@ -2175,27 +2175,33 @@ public class DefaultServlet extends HttpServlet {
             HttpServletResponse response, WebResource resource)
             throws IOException {
 
-        String eTag = generateETag(resource);
-        // Default servlet uses weak matching so we strip any leading "W/" and
-        // then compare using equals
-        if (eTag.startsWith("W/")) {
-            eTag = eTag.substring(2);
-        }
         String headerValue = request.getHeader("If-Match");
-        if (headerValue != null && !headerValue.equals("*")) {
+        if (headerValue != null) {
+            String eTag = generateETag(resource);
+            boolean conditionSatisfied = false;
 
-            Set<String> eTags = EntityTag.parseEntityTag(new StringReader(headerValue), useWeakComparisonWithIfMatch);
-            if (eTags == null) {
-                if (debug > 10) {
-                    log("DefaultServlet.checkIfMatch:  Invalid header value [" + headerValue + "]");
+            if (!headerValue.equals("*")) {
+                // Default servlet uses weak matching so we strip any leading "W/" and
+                // then compare using equals
+                if (eTag.startsWith("W/")) {
+                    eTag = eTag.substring(2);
                 }
-                response.sendError(HttpServletResponse.SC_BAD_REQUEST);
-                return false;
+                Set<String> eTags = EntityTag.parseEntityTag(new StringReader(headerValue), useWeakComparisonWithIfMatch);
+                if (eTags == null) {
+                    if (debug > 10) {
+                        log("DefaultServlet.checkIfMatch:  Invalid header value [" + headerValue + "]");
+                    }
+                    response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+                    return false;
+                }
+                conditionSatisfied = eTags.contains(eTag);
+            } else {
+                conditionSatisfied = true;
             }
 
             // If none of the given ETags match, 412 Precondition failed is
             // sent back
-            if (!eTags.contains(eTag)) {
+            if (!conditionSatisfied) {
                 response.sendError(HttpServletResponse.SC_PRECONDITION_FAILED);
                 return false;
             }
@@ -2255,18 +2261,17 @@ public class DefaultServlet extends HttpServlet {
             HttpServletResponse response, WebResource resource)
             throws IOException {
 
-        String eTag = generateETag(resource);
-        // If-None-Match uses weak comparison so strip the weak indicator if
-        // present
-        if (eTag.startsWith("W/")) {
-            eTag = eTag.substring(2);
-        }
         String headerValue = request.getHeader("If-None-Match");
         if (headerValue != null) {
-
+            String eTag = generateETag(resource);
             boolean conditionSatisfied = false;
 
             if (!headerValue.equals("*")) {
+                // If-None-Match uses weak comparison so strip the weak indicator if
+                // present
+                if (eTag.startsWith("W/")) {
+                    eTag = eTag.substring(2);
+                }
                 Set<String> eTags = EntityTag.parseEntityTag(new StringReader(headerValue), true);
                 if (eTags == null) {
                     if (debug > 10) {
