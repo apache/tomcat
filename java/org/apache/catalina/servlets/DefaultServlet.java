@@ -2181,11 +2181,10 @@ public class DefaultServlet extends HttpServlet {
             boolean conditionSatisfied = false;
 
             if (!headerValue.equals("*")) {
-                // Default servlet uses weak matching so we strip any leading "W/" and
-                // then compare using equals
-                if (eTag.startsWith("W/")) {
-                    eTag = eTag.substring(2);
-                }
+                // BZ 64265: By default Tomcat generates weak etag for resource.
+                // But If-Match uses weak matching that expects a strong resource etag.
+                // So we strip any leading "W/" and then compare using equals
+                String resourceEtag = weakEtagToStrong(eTag);
                 Set<String> eTags = EntityTag.parseEntityTag(new StringReader(headerValue), useWeakComparisonWithIfMatch);
                 if (eTags == null) {
                     if (debug > 10) {
@@ -2194,7 +2193,7 @@ public class DefaultServlet extends HttpServlet {
                     response.sendError(HttpServletResponse.SC_BAD_REQUEST);
                     return false;
                 }
-                conditionSatisfied = eTags.contains(eTag);
+                conditionSatisfied = eTags.contains(resourceEtag);
             } else {
                 conditionSatisfied = true;
             }
@@ -2269,9 +2268,7 @@ public class DefaultServlet extends HttpServlet {
             if (!headerValue.equals("*")) {
                 // If-None-Match uses weak comparison so strip the weak indicator if
                 // present
-                if (eTag.startsWith("W/")) {
-                    eTag = eTag.substring(2);
-                }
+                String resourceEtag = weakEtagToStrong(eTag);
                 Set<String> eTags = EntityTag.parseEntityTag(new StringReader(headerValue), true);
                 if (eTags == null) {
                     if (debug > 10) {
@@ -2280,7 +2277,7 @@ public class DefaultServlet extends HttpServlet {
                     response.sendError(HttpServletResponse.SC_BAD_REQUEST);
                     return false;
                 }
-                conditionSatisfied = eTags.contains(eTag);
+                conditionSatisfied = eTags.contains(resourceEtag);
             } else {
                 conditionSatisfied = true;
             }
@@ -2668,6 +2665,10 @@ public class DefaultServlet extends HttpServlet {
             throw new SAXException(sm.getString("defaultServlet.blockExternalEntity2",
                     name, publicId, baseURI, systemId));
         }
+    }
+
+    private String weakEtagToStrong(String eTag) {
+        return eTag.startsWith("W/") ? eTag.substring(2) : eTag;
     }
 
     /**

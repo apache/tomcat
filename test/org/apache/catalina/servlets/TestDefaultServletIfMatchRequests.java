@@ -45,6 +45,8 @@ public class TestDefaultServletIfMatchRequests extends TomcatBaseTest {
     private static final Integer RC_412 = Integer.valueOf(412);
 
     private static final String[] CONCAT = new String[] { ",", " ,", ", ", " , " };
+    private static String resourceETagStrong;
+    private static String resourceETagWeak;
 
     @Parameterized.Parameters(name = "{index} resource-strong [{0}], matchHeader [{1}]")
     public static Collection<Object[]> parameters() {
@@ -52,8 +54,8 @@ public class TestDefaultServletIfMatchRequests extends TomcatBaseTest {
         // Get the length of the file used for this test
         // It varies by platform due to line-endings
         File index = new File("test/webapp/index.html");
-        String resourceETagStrong =  "\"" + index.length() + "-" + index.lastModified() + "\"";
-        String resourceETagWeak = "W/" + resourceETagStrong;
+        resourceETagStrong = "\"" + index.length() + "-" + index.lastModified() + "\"";
+        resourceETagWeak = "W/" + resourceETagStrong;
 
         String otherETagStrong = "\"123456789\"";
         String otherETagWeak = "\"123456789\"";
@@ -138,17 +140,17 @@ public class TestDefaultServletIfMatchRequests extends TomcatBaseTest {
 
     @Test
     public void testIfMatch() throws Exception {
-        doMatchTest("If-Match", ifMatchResponseCode);
+        doMatchTest("If-Match", ifMatchResponseCode, false);
     }
 
 
     @Test
     public void testIfNoneMatch() throws Exception {
-        doMatchTest("If-None-Match", ifNoneMatchResponseCode);
+        doMatchTest("If-None-Match", ifNoneMatchResponseCode, true);
     }
 
 
-    private void doMatchTest(String headerName, int responseCodeExpected) throws Exception {
+    private void doMatchTest(String headerName, int responseCodeExpected, boolean responseHasEtag) throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
         File appDir = new File("test/webapp");
@@ -178,6 +180,13 @@ public class TestDefaultServletIfMatchRequests extends TomcatBaseTest {
 
         // Check the result
         Assert.assertEquals(responseCodeExpected, rc);
+
+        // If-None-Match should have a real resource ETag in successful response
+        if (responseHasEtag && (rc == RC_200 || rc == RC_304)) {
+            System.out.println(responseHeaders);
+            String responseEtag = responseHeaders.get("ETag").get(0);
+            Assert.assertEquals(resourceHasStrongETag ? resourceETagStrong : resourceETagWeak, responseEtag);
+        }
     }
 
 
