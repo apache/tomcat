@@ -81,7 +81,7 @@ directory listings are disabled and debugging is turned off.
   <property name="debug">
         Debugging level. It is not very useful unless you are a tomcat
         developer. As
-        of this writing, useful values are 0, 1, 11, 1000. [0]
+        of this writing, useful values are 0, 1, 11. [0]
   </property>
   <property name="listings">
         If no welcome file is present, can a directory listing be
@@ -185,6 +185,12 @@ directory listings are disabled and debugging is turned off.
   </property>
   <property name="sortDirectoriesFirst">
         Should the server list all directories before all files. [false]
+  </property>
+  <property name="useWeakComparisonWithIfMatch">
+        When comparing entity tags for If-Match headers should a weak comparison
+        be used rather than the strong comparison required by RFC 7232? A weak
+        comparison is used by default since the default resources implementation
+        generates weak entity tags. [true]
   </property>
 </properties>
 </section>
