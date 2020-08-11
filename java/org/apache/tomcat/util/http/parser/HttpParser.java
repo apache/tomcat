@@ -519,7 +519,7 @@ public class HttpParser {
     // Skip any LWS and position to read the next character. The next character
     // is returned as being able to 'peek()' it allows a small optimisation in
     // some cases.
-    private static int skipLws(Reader input) throws IOException {
+    static int skipLws(Reader input) throws IOException {
 
         input.mark(1);
         int c = input.read();
@@ -588,7 +588,7 @@ public class HttpParser {
      *         quoted string was found or null if the end of data was reached
      *         before the quoted string was terminated
      */
-    private static String readQuotedString(Reader input, boolean returnQuoted) throws IOException {
+    static String readQuotedString(Reader input, boolean returnQuoted) throws IOException {
 
         skipLws(input);
         int c = input.read();

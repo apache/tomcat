@@ -72,6 +72,13 @@
         overridden (<code>generateETag()</code>) should a custom entity tag
         format be required. (markt)
       </add>
+      <fix>
+        Improve the validation of entity tags provided with conditional
+        requests. Requests with headers that contain invalid entity tags will be
+        rejected with a 400 response code. Improve the matching algorithm used
+        to compare entity tags in conditional requests with the entity tag for
+        the requested resource. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
