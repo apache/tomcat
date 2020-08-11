@@ -24,14 +24,16 @@ import java.util.Set;
 public class EntityTag {
 
     /**
+     * Parse the given input as (per RFC 7232) 1#entity-tag.
      *
-     * @param input
-     * @param includeWeak
+     * @param input         The input to parse
+     * @param includeWeak   Should weak tags be included in the set of returned
+     *                          values?
      *
      * @return The set of parsed entity tags or {@code null} if the header is
      *         invalid
      *
-     * @throws IOException
+     * @throws IOException If an I/O occurs during the parsing
      */
     public static Set<String> parseEntityTag(StringReader input, boolean includeWeak) throws IOException {
 
