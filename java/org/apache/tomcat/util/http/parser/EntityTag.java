@@ -37,7 +37,7 @@ public class EntityTag {
      */
     public static Set<String> parseEntityTag(StringReader input, boolean includeWeak) throws IOException {
 
-        HashSet<String> result = new HashSet<>();
+        HashSet<String> result = new HashSet<String>();
 
         while (true) {
             boolean strong = false;
