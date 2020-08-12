@@ -45,6 +45,8 @@ public class TestDefaultServletIfMatchRequests extends TomcatBaseTest {
     private static final Integer RC_412 = Integer.valueOf(412);
 
     private static final String[] CONCAT = new String[] { ",", " ,", ", ", " , " };
+    private static String resourceETagStrong;
+    private static String resourceETagWeak;
 
     @Parameterized.Parameters(name = "{index} resource-strong [{0}], matchHeader [{1}]")
     public static Collection<Object[]> parameters() {
@@ -52,8 +54,8 @@ public class TestDefaultServletIfMatchRequests extends TomcatBaseTest {
         // Get the length of the file used for this test
         // It varies by platform due to line-endings
         File index = new File("test/webapp/index.html");
-        String resourceETagStrong =  "\"" + index.length() + "-" + index.lastModified() + "\"";
-        String resourceETagWeak = "W/" + resourceETagStrong;
+        resourceETagStrong = "\"" + index.length() + "-" + index.lastModified() + "\"";
+        resourceETagWeak = "W/" + resourceETagStrong;
 
         String otherETagStrong = "\"123456789\"";
         String otherETagWeak = "\"123456789\"";
@@ -88,36 +90,36 @@ public class TestDefaultServletIfMatchRequests extends TomcatBaseTest {
             parameterSets.add(new Object[] { resourceWithStrongETag, otherETagWeak, RC_412, RC_200 });
 
             // match header includes weak tag
-            // Results depend on whether strong or weak comparison is used
-            Integer rcWeak;
-            if (resourceWithStrongETag.booleanValue()) {
-                rcWeak = RC_412;
-            } else {
-                rcWeak = RC_200;
-            }
-            parameterSets.add(new Object[] { resourceWithStrongETag, resourceETagWeak, rcWeak, RC_304 });
+            parameterSets.add(new Object[] { resourceWithStrongETag, resourceETagWeak, RC_412, RC_304 });
             for (String concat : CONCAT) {
                 parameterSets.add(new Object[] { resourceWithStrongETag, resourceETagWeak + concat + otherETagWeak,
-                        rcWeak, RC_304 });
+                        RC_412, RC_304 });
                 parameterSets.add(new Object[] { resourceWithStrongETag, resourceETagWeak + concat + otherETagStrong,
-                        rcWeak, RC_304 });
+                        RC_412, RC_304 });
                 parameterSets.add(new Object[] { resourceWithStrongETag, otherETagWeak + concat + resourceETagWeak,
-                        rcWeak, RC_304 });
+                        RC_412, RC_304 });
                 parameterSets.add(new Object[] { resourceWithStrongETag, otherETagStrong + concat + resourceETagWeak,
-                        rcWeak, RC_304 });
+                        RC_412, RC_304 });
             }
 
-            // match header includes strong tag
-            parameterSets.add(new Object[] { resourceWithStrongETag, resourceETagStrong, RC_200, RC_304 });
+            // match header includes strong entity tag
+            // If-Match result depends on whether the resource has a strong entity tag
+            Integer rcIfMatch;
+            if (resourceWithStrongETag.booleanValue()) {
+                rcIfMatch = RC_200;
+            } else {
+                rcIfMatch = RC_412;
+            }
+            parameterSets.add(new Object[] { resourceWithStrongETag, resourceETagStrong, rcIfMatch, RC_304 });
             for (String concat : CONCAT) {
                 parameterSets.add(new Object[] { resourceWithStrongETag, resourceETagStrong + concat + otherETagWeak,
-                        RC_200, RC_304 });
+                        rcIfMatch, RC_304 });
                 parameterSets.add(new Object[] { resourceWithStrongETag, resourceETagStrong + concat + otherETagStrong,
-                        RC_200, RC_304 });
+                        rcIfMatch, RC_304 });
                 parameterSets.add(new Object[] { resourceWithStrongETag, otherETagWeak + concat + resourceETagStrong,
-                        RC_200, RC_304 });
+                        rcIfMatch, RC_304 });
                 parameterSets.add(new Object[] { resourceWithStrongETag, otherETagStrong + concat + resourceETagStrong,
-                        RC_200, RC_304 });
+                        rcIfMatch, RC_304 });
             }
         }
 
@@ -138,17 +140,17 @@ public class TestDefaultServletIfMatchRequests extends TomcatBaseTest {
 
     @Test
     public void testIfMatch() throws Exception {
-        doMatchTest("If-Match", ifMatchResponseCode);
+        doMatchTest("If-Match", ifMatchResponseCode, false);
     }
 
 
     @Test
     public void testIfNoneMatch() throws Exception {
-        doMatchTest("If-None-Match", ifNoneMatchResponseCode);
+        doMatchTest("If-None-Match", ifNoneMatchResponseCode, true);
     }
 
 
-    private void doMatchTest(String headerName, int responseCodeExpected) throws Exception {
+    private void doMatchTest(String headerName, int responseCodeExpected, boolean responseHasEtag) throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
         File appDir = new File("test/webapp");
@@ -178,16 +180,19 @@ public class TestDefaultServletIfMatchRequests extends TomcatBaseTest {
 
         // Check the result
         Assert.assertEquals(responseCodeExpected, rc);
+
+        // If-None-Match should have a real resource ETag in successful response
+        if (responseHasEtag && (rc == 200 || rc == 304)) {
+            System.out.println(responseHeaders);
+            String responseEtag = responseHeaders.get("ETag").get(0);
+            Assert.assertEquals(resourceHasStrongETag ? resourceETagStrong : resourceETagWeak, responseEtag);
+        }
     }
 
 
     public static class DefaultWithStrongETag extends DefaultServlet {
 
         private static final long serialVersionUID = 1L;
-
-        public DefaultWithStrongETag() {
-            useWeakComparisonWithIfMatch = false;
-        }
 
         @Override
         protected String generateETag(WebResource resource) {
