@@ -22,18 +22,25 @@ import java.io.StringReader;
 public class EntityTag {
 
     /**
-     * Compare the given input as (per RFC 7232) 1#entity-tag.
+     * Parse the given input as (per RFC 7232) 1#entity-tag.
+     * Compare it resource ETag as described in RFC 7232 sec. 2.3.2.
      *
-     * @param input         The input to parse
-     * @param includeWeak   Should weak tags be included in the set of returned
-     *                          values?
+     * @param input        The input to parse
+     * @param compareWeak  Use weak comparison e.g. match "etag" with W/"etag"
      *
-     * @param comparisonETag Resource's ETag
+     * @param resourceETag Resource's ETag
      * @return true if etag matched or {@code null} if the header is invalid
      *
      * @throws IOException If an I/O occurs during the parsing
      */
-    public static Boolean compareEntityTag(StringReader input, boolean includeWeak, String comparisonETag) throws IOException {
+    public static Boolean compareEntityTag(StringReader input, boolean compareWeak, String resourceETag) throws IOException {
+        // The resourceETag may be weak so to do weak comparison remove /W before comparison
+        String comparisonETag;
+        if (compareWeak && resourceETag.startsWith("W/")) {
+            comparisonETag = resourceETag.substring(2);
+        } else {
+            comparisonETag = resourceETag;
+        }
 
         Boolean result = Boolean.FALSE;
 
@@ -61,7 +68,7 @@ public class EntityTag {
                 return null;
             }
 
-            if (strong || includeWeak) {
+            if (strong || compareWeak) {
                 if (comparisonETag.equals(value)) {
                     result = Boolean.TRUE;
                 }

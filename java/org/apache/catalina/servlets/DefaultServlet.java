@@ -2261,15 +2261,7 @@ public class DefaultServlet extends HttpServlet {
                     conditionSatisfied = false;
                 } else {
                     // RFC 7232 requires weak comparison for If-None-Match headers
-                    // This is done by removing any weak markers before comparison
-                    String comparisonETag;
-                    if (resourceETag.startsWith("W/")) {
-                        comparisonETag = resourceETag.substring(2);
-                    } else {
-                        comparisonETag = resourceETag;
-                    }
-
-                    Boolean matched = EntityTag.compareEntityTag(new StringReader(headerValue), true, comparisonETag);
+                    Boolean matched = EntityTag.compareEntityTag(new StringReader(headerValue), true, resourceETag);
                     if (matched == null) {
                         if (debug > 10) {
                             log("DefaultServlet.checkIfNoneMatch:  Invalid header value [" + headerValue + "]");
