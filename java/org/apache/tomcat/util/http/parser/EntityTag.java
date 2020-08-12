@@ -18,13 +18,11 @@ package org.apache.tomcat.util.http.parser;
 
 import java.io.IOException;
 import java.io.StringReader;
-import java.util.HashSet;
-import java.util.Set;
 
 public class EntityTag {
 
     /**
-     * Parse the given input as (per RFC 7232) 1#entity-tag.
+     * Compare the given input as (per RFC 7232) 1#entity-tag.
      *
      * @param input         The input to parse
      * @param includeWeak   Should weak tags be included in the set of returned
@@ -35,9 +33,9 @@ public class EntityTag {
      *
      * @throws IOException If an I/O occurs during the parsing
      */
-    public static Boolean parseEntityTag(StringReader input, boolean includeWeak, String comparisonETag) throws IOException {
+    public static Boolean compareEntityTag(StringReader input, boolean includeWeak, String comparisonETag) throws IOException {
 
-        HashSet<String> result = new HashSet<>();
+        Boolean result = Boolean.FALSE;
 
         while (true) {
             boolean strong = false;
@@ -64,14 +62,16 @@ public class EntityTag {
             }
 
             if (strong || includeWeak) {
-                result.add(value);
+                if (comparisonETag.equals(value)) {
+                    result = Boolean.TRUE;
+                }
             }
 
             HttpParser.skipLws(input);
 
             switch (HttpParser.skipConstant(input, ",")) {
                 case EOF:
-                    return result.contains(comparisonETag);
+                    return result;
                 case NOT_FOUND:
                     // Not EOF and not "," so must be invalid
                     return null;
