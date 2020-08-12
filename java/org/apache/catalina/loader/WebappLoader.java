@@ -189,6 +189,17 @@ public class WebappLoader extends LifecycleMBeanBase implements Loader{
         this.loaderClass = loaderClass;
     }
 
+    /**
+     * Set the ClassLoader instance, without relying on reflection
+     * This method will also invoke {@link #setLoaderClass(String)} with
+     * {@code loaderInstance.getClass().getName()} as an argument
+     *
+     * @param loaderInstance The new ClassLoader instance to use
+     */
+    public void setLoaderInstance(WebappClassLoaderBase loaderInstance) {
+        this.classLoader = loaderInstance;
+        this.loaderClass = loaderInstance.getClass().getName();
+    }
 
     // --------------------------------------------------------- Public Methods
 
@@ -397,6 +408,10 @@ public class WebappLoader extends LifecycleMBeanBase implements Loader{
      */
     private WebappClassLoaderBase createClassLoader()
         throws Exception {
+
+        if (classLoader != null) {
+            return classLoader;
+        }
 
         if (ParallelWebappClassLoader.class.getName().equals(loaderClass)) {
             return new ParallelWebappClassLoader(context.getParentClassLoader());
