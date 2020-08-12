@@ -548,6 +548,11 @@ public class Stream extends AbstractStream implements HeaderEmitter {
 
 
     ByteBuffer getInputByteBuffer() {
+        // Avoid NPE if Stream has been closed on Stream specific thread
+        StreamInputBuffer inputBuffer = this.inputBuffer;
+        if (inputBuffer == null) {
+            return null;
+        }
         return inputBuffer.getInBuffer();
     }
 
@@ -576,6 +581,11 @@ public class Stream extends AbstractStream implements HeaderEmitter {
 
     final void receivedData(int payloadSize) throws ConnectionException {
         contentLengthReceived += payloadSize;
+        Request coyoteRequest = this.coyoteRequest;
+        // Avoid NPE if Stream has been closed on Stream specific thread
+        if (coyoteRequest == null) {
+            return;
+        }
         long contentLengthHeader = coyoteRequest.getContentLengthLong();
         if (contentLengthHeader > -1 && contentLengthReceived > contentLengthHeader) {
             throw new ConnectionException(sm.getString("stream.header.contentLength",
