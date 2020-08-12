@@ -67,7 +67,7 @@ if "x%1x" == "xx" goto displayUsage
 set SERVICE_USER=%1
 shift
 runas /env /savecred /user:%SERVICE_USER% "%COMSPEC% /K \"%SELF%\" %SERVICE_CMD% %SERVICE_NAME%"
-goto end
+exit /b 0
 
 rem Check the environment
 :checkEnv
@@ -98,7 +98,7 @@ echo Either the CATALINA_HOME environment variable is not defined correctly or
 echo the incorrect service name has been used.
 echo Both the CATALINA_HOME environment variable and the correct service name
 echo are required to run this program.
-goto end
+exit /b 1
 :okHome
 cd "%CURRENT_DIR%"
 
@@ -127,7 +127,7 @@ goto okJavaHome
 echo The JAVA_HOME environment variable is not defined correctly
 echo This environment variable is needed to run this program
 echo NB: JAVA_HOME should point to a JDK not a JRE
-goto end
+exit /b 1
 :okJavaHome
 if not "%CATALINA_BASE%" == "" goto gotBase
 set "CATALINA_BASE=%CATALINA_HOME%"
@@ -154,7 +154,7 @@ echo Unknown parameter "%SERVICE_CMD%"
 :displayUsage
 echo.
 echo Usage: service.bat install/remove [service_name [--rename]] [--user username]
-goto end
+exit /b 1
 
 :doRemove
 rem Remove the service
@@ -165,14 +165,14 @@ echo Using CATALINA_BASE:    "%CATALINA_BASE%"
     --LogPath "%CATALINA_BASE%\logs"
 if not errorlevel 1 goto removed
 echo Failed removing '%SERVICE_NAME%' service
-goto end
+exit /b 1
 :removed
 echo The service '%SERVICE_NAME%' has been removed
 if exist "%CATALINA_HOME%\bin\%SERVICE_NAME%.exe" (
     rename "%SERVICE_NAME%.exe" "%DEFAULT_SERVICE_NAME%.exe"
     rename "%SERVICE_NAME%w.exe" "%DEFAULT_SERVICE_NAME%w.exe"
 )
-goto end
+exit /b 0
 
 :doInstall
 rem Install the service
@@ -232,8 +232,7 @@ if exist "%CATALINA_HOME%\bin\%DEFAULT_SERVICE_NAME%.exe" (
     --JvmMx "%JvmMx%"
 if not errorlevel 1 goto installed
 echo Failed installing '%SERVICE_NAME%' service
-goto end
+exit /b 1
 :installed
 echo The service '%SERVICE_NAME%' has been installed.
-
-:end
+exit /b 0
