@@ -198,7 +198,7 @@ public class WebappLoader extends LifecycleMBeanBase implements Loader{
      */
     public void setLoaderInstance(WebappClassLoaderBase loaderInstance) {
         this.classLoader = loaderInstance;
-        this.loaderClass = loaderInstance.getClass().getName();
+        setLoaderClass(loaderInstance.getClass().getName());
     }
 
     // --------------------------------------------------------- Public Methods
