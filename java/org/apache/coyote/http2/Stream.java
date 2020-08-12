@@ -472,8 +472,12 @@ class Stream extends AbstractStream implements HeaderEmitter {
             }
 
             if (headerState == HEADER_STATE_TRAILER) {
-                // HTTP/2 headers are already always lower case
-                coyoteRequest.getTrailerFields().put(name, value);
+                // Avoid NPE if Stream has been closed on Stream specific thread
+                Request coyoteRequest = this.coyoteRequest;
+                if (coyoteRequest != null) {
+                    // HTTP/2 headers are already always lower case
+                    coyoteRequest.getTrailerFields().put(name, value);
+                }
             } else {
                 coyoteRequest.getMimeHeaders().addValue(name).setString(value);
             }
@@ -585,6 +589,11 @@ class Stream extends AbstractStream implements HeaderEmitter {
 
 
     final ByteBuffer getInputByteBuffer() {
+        // Avoid NPE if Stream has been closed on Stream specific thread
+        StreamInputBuffer inputBuffer = this.inputBuffer;
+        if (inputBuffer == null) {
+            return null;
+        }
         return inputBuffer.getInBuffer();
     }
 
@@ -615,6 +624,11 @@ class Stream extends AbstractStream implements HeaderEmitter {
 
     final void receivedData(int payloadSize) throws ConnectionException {
         contentLengthReceived += payloadSize;
+        Request coyoteRequest = this.coyoteRequest;
+        // Avoid NPE if Stream has been closed on Stream specific thread
+        if (coyoteRequest == null) {
+            return;
+        }
         long contentLengthHeader = coyoteRequest.getContentLengthLong();
         if (contentLengthHeader > -1 && contentLengthReceived > contentLengthHeader) {
             throw new ConnectionException(sm.getString("stream.header.contentLength",
