@@ -2169,21 +2169,24 @@ public class DefaultServlet extends HttpServlet {
         String headerValue = request.getHeader("If-Match");
         if (headerValue != null) {
 
-            boolean conditionSatisfied = false;
+            boolean conditionSatisfied;
 
             if (!headerValue.equals("*")) {
                 String resourceETag = generateETag(resource);
-
-                // RFC 7232 requires strong comparison for If-Match headers
-                Boolean matched = EntityTag.compareEntityTag(new StringReader(headerValue), false, resourceETag);
-                if (matched == null) {
-                    if (debug > 10) {
-                        log("DefaultServlet.checkIfMatch:  Invalid header value [" + headerValue + "]");
+                if (resourceETag == null) {
+                    conditionSatisfied = false;
+                } else {
+                    // RFC 7232 requires strong comparison for If-Match headers
+                    Boolean matched = EntityTag.compareEntityTag(new StringReader(headerValue), false, resourceETag);
+                    if (matched == null) {
+                        if (debug > 10) {
+                            log("DefaultServlet.checkIfMatch:  Invalid header value [" + headerValue + "]");
+                        }
+                        response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+                        return false;
                     }
-                    response.sendError(HttpServletResponse.SC_BAD_REQUEST);
-                    return false;
+                    conditionSatisfied = matched.booleanValue();
                 }
-                conditionSatisfied = matched.booleanValue();
             } else {
                 conditionSatisfied = true;
             }
@@ -2250,29 +2253,32 @@ public class DefaultServlet extends HttpServlet {
         String headerValue = request.getHeader("If-None-Match");
         if (headerValue != null) {
 
-            boolean conditionSatisfied = false;
+            boolean conditionSatisfied;
 
             String resourceETag = generateETag(resource);
             if (!headerValue.equals("*")) {
-
-                // RFC 7232 requires weak comparison for If-None-Match headers
-                // This is done by removing any weak markers before comparison
-                String comparisonETag;
-                if (resourceETag.startsWith("W/")) {
-                    comparisonETag = resourceETag.substring(2);
+                if (resourceETag == null) {
+                    conditionSatisfied = false;
                 } else {
-                    comparisonETag = resourceETag;
-                }
-
-                Boolean matched = EntityTag.compareEntityTag(new StringReader(headerValue), true, comparisonETag);
-                if (matched == null) {
-                    if (debug > 10) {
-                        log("DefaultServlet.checkIfNoneMatch:  Invalid header value [" + headerValue + "]");
+                    // RFC 7232 requires weak comparison for If-None-Match headers
+                    // This is done by removing any weak markers before comparison
+                    String comparisonETag;
+                    if (resourceETag.startsWith("W/")) {
+                        comparisonETag = resourceETag.substring(2);
+                    } else {
+                        comparisonETag = resourceETag;
                     }
-                    response.sendError(HttpServletResponse.SC_BAD_REQUEST);
-                    return false;
+
+                    Boolean matched = EntityTag.compareEntityTag(new StringReader(headerValue), true, comparisonETag);
+                    if (matched == null) {
+                        if (debug > 10) {
+                            log("DefaultServlet.checkIfNoneMatch:  Invalid header value [" + headerValue + "]");
+                        }
+                        response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+                        return false;
+                    }
+                    conditionSatisfied = matched.booleanValue();
                 }
-                conditionSatisfied = matched.booleanValue();
             } else {
                 conditionSatisfied = true;
             }
