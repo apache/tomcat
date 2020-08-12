@@ -2176,15 +2176,15 @@ public class DefaultServlet extends HttpServlet {
                 String resourceETag = generateETag(resource);
 
                 // RFC 7232 requires strong comparison for If-Match headers
-                Set<String> headerETags = EntityTag.parseEntityTag(new StringReader(headerValue), false);
-                if (headerETags == null) {
+                Boolean matched = EntityTag.parseEntityTag(new StringReader(headerValue), false, resourceETag);
+                if (matched == null) {
                     if (debug > 10) {
                         log("DefaultServlet.checkIfMatch:  Invalid header value [" + headerValue + "]");
                     }
                     response.sendError(HttpServletResponse.SC_BAD_REQUEST);
                     return false;
                 }
-                conditionSatisfied = headerETags.contains(resourceETag);
+                conditionSatisfied = matched.booleanValue();
             } else {
                 conditionSatisfied = true;
             }
@@ -2265,15 +2265,15 @@ public class DefaultServlet extends HttpServlet {
                     comparisonETag = resourceETag;
                 }
 
-                Set<String> headerETags = EntityTag.parseEntityTag(new StringReader(headerValue), true);
-                if (headerETags == null) {
+                Boolean matched = EntityTag.parseEntityTag(new StringReader(headerValue), true, comparisonETag);
+                if (matched == null) {
                     if (debug > 10) {
                         log("DefaultServlet.checkIfNoneMatch:  Invalid header value [" + headerValue + "]");
                     }
                     response.sendError(HttpServletResponse.SC_BAD_REQUEST);
                     return false;
                 }
-                conditionSatisfied = headerETags.contains(comparisonETag);
+                conditionSatisfied = matched.booleanValue();
             } else {
                 conditionSatisfied = true;
             }

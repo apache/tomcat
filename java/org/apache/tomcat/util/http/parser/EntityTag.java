@@ -30,12 +30,12 @@ public class EntityTag {
      * @param includeWeak   Should weak tags be included in the set of returned
      *                          values?
      *
-     * @return The set of parsed entity tags or {@code null} if the header is
-     *         invalid
+     * @param comparisonETag Resource's ETag
+     * @return true if etag matched or {@code null} if the header is invalid
      *
      * @throws IOException If an I/O occurs during the parsing
      */
-    public static Set<String> parseEntityTag(StringReader input, boolean includeWeak) throws IOException {
+    public static Boolean parseEntityTag(StringReader input, boolean includeWeak, String comparisonETag) throws IOException {
 
         HashSet<String> result = new HashSet<>();
 
@@ -71,7 +71,7 @@ public class EntityTag {
 
             switch (HttpParser.skipConstant(input, ",")) {
                 case EOF:
-                    return result;
+                    return result.contains(comparisonETag);
                 case NOT_FOUND:
                     // Not EOF and not "," so must be invalid
                     return null;
