@@ -206,12 +206,6 @@ Tomcat.</p>
         partial PUT? Note that RFC 7233 clarified that Range headers are only
         valid for GET requests. [true]
   </property>
-  <property name="useWeakComparisonWithIfMatch">
-        When comparing entity tags for If-Match headers should a weak comparison
-        be used rather than the strong comparison required by RFC 7232? A weak
-        comparison is used by default since the default resources implementation
-        generates weak entity tags. [true]
-  </property>
 </properties>
 </section>
 
