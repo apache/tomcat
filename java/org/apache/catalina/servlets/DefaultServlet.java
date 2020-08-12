@@ -267,8 +267,6 @@ public class DefaultServlet extends HttpServlet {
      */
     protected boolean showServerInfo = true;
 
-    protected boolean useWeakComparisonWithIfMatch = true;
-
 
     // --------------------------------------------------------- Public Methods
 
@@ -318,11 +316,6 @@ public class DefaultServlet extends HttpServlet {
 
         if (getServletConfig().getInitParameter("useAcceptRanges") != null) {
             useAcceptRanges = Boolean.parseBoolean(getServletConfig().getInitParameter("useAcceptRanges"));
-        }
-
-        if (getServletConfig().getInitParameter("useWeakComparisonWithIfMatch") != null) {
-            useWeakComparisonWithIfMatch = Boolean.parseBoolean(
-                    getServletConfig().getInitParameter("useWeakComparisonWithIfMatch"));
         }
 
         // Sanity check on the specified buffer sizes
@@ -1918,31 +1911,32 @@ public class DefaultServlet extends HttpServlet {
      *  request processing is stopped
      * @throws IOException an IO error occurred
      */
-    protected boolean checkIfMatch(HttpServletRequest request,
-            HttpServletResponse response, ResourceAttributes resourceAttributes)
-            throws IOException {
+    protected boolean checkIfMatch(HttpServletRequest request, HttpServletResponse response,
+            ResourceAttributes resourceAttributes) throws IOException {
 
-        String eTag = generateETag(resourceAttributes);
-        // Default servlet uses weak matching so we strip any leading "W/" and
-        // then compare using equals
-        if (eTag.startsWith("W/")) {
-            eTag = eTag.substring(2);
-        }
         String headerValue = request.getHeader("If-Match");
-        if (headerValue != null && !headerValue.equals("*")) {
+        if (headerValue != null) {
 
-            Set<String> eTags = EntityTag.parseEntityTag(new StringReader(headerValue), useWeakComparisonWithIfMatch);
-            if (eTags == null) {
-                if (debug > 10) {
-                    log("DefaultServlet.checkIfMatch:  Invalid header value [" + headerValue + "]");
+            boolean conditionSatisfied = false;
+
+            if (!headerValue.equals("*")) {
+                String resourceETag = generateETag(resourceAttributes);
+
+                // RFC 7232 requires strong comparison for If-Match headers
+                Set<String> headerETags = EntityTag.parseEntityTag(new StringReader(headerValue), false);
+                if (headerETags == null) {
+                    if (debug > 10) {
+                        log("DefaultServlet.checkIfMatch:  Invalid header value [" + headerValue + "]");
+                    }
+                    response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+                    return false;
                 }
-                response.sendError(HttpServletResponse.SC_BAD_REQUEST);
-                return false;
+                conditionSatisfied = headerETags.contains(resourceETag);
+            } else {
+                conditionSatisfied = true;
             }
 
-            // If none of the given ETags match, 412 Precondition failed is
-            // sent back
-            if (!eTags.contains(eTag)) {
+            if (!conditionSatisfied) {
                 response.sendError(HttpServletResponse.SC_PRECONDITION_FAILED);
                 return false;
             }
@@ -1998,31 +1992,35 @@ public class DefaultServlet extends HttpServlet {
      *  request processing is stopped
      * @throws IOException an IO error occurred
      */
-    protected boolean checkIfNoneMatch(HttpServletRequest request,
-            HttpServletResponse response, ResourceAttributes resourceAttributes)
-            throws IOException {
+    protected boolean checkIfNoneMatch(HttpServletRequest request, HttpServletResponse response,
+            ResourceAttributes resourceAttributes) throws IOException {
 
-        String eTag = generateETag(resourceAttributes);
-        // If-None-Match uses weak comparison so strip the weak indicator if
-        // present
-        if (eTag.startsWith("W/")) {
-            eTag = eTag.substring(2);
-        }
         String headerValue = request.getHeader("If-None-Match");
         if (headerValue != null) {
 
             boolean conditionSatisfied = false;
 
+            String resourceETag = generateETag(resourceAttributes);
             if (!headerValue.equals("*")) {
-                Set<String> eTags = EntityTag.parseEntityTag(new StringReader(headerValue), true);
-                if (eTags == null) {
+
+                // RFC 7232 requires weak comparison for If-None-Match headers
+                // This is done by removing any weak markers before comparison
+                String comparisonETag;
+                if (resourceETag.startsWith("W/")) {
+                    comparisonETag = resourceETag.substring(2);
+                } else {
+                    comparisonETag = resourceETag;
+                }
+
+                Set<String> headerETags = EntityTag.parseEntityTag(new StringReader(headerValue), true);
+                if (headerETags == null) {
                     if (debug > 10) {
                         log("DefaultServlet.checkIfNoneMatch:  Invalid header value [" + headerValue + "]");
                     }
                     response.sendError(HttpServletResponse.SC_BAD_REQUEST);
                     return false;
                 }
-                conditionSatisfied = eTags.contains(eTag);
+                conditionSatisfied = headerETags.contains(comparisonETag);
             } else {
                 conditionSatisfied = true;
             }
@@ -2034,7 +2032,7 @@ public class DefaultServlet extends HttpServlet {
                 // back.
                 if ("GET".equals(request.getMethod()) || "HEAD".equals(request.getMethod())) {
                     response.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
-                    response.setHeader("ETag", eTag);
+                    response.setHeader("ETag", resourceETag);
                 } else {
                     response.sendError(HttpServletResponse.SC_PRECONDITION_FAILED);
                 }
@@ -2078,12 +2076,18 @@ public class DefaultServlet extends HttpServlet {
 
 
     /**
+<<<<<<< HEAD
      * Provides the entity tag (the ETag header) for the given resource
      * attributes. Intended to be over-ridden by custom DefaultServlet
      * implementations that wish to use an alternative format for the entity
      * tag. Such custom implementations that generate strong entity tags may
      * also want to change the default value of
      * {@link #useWeakComparisonWithIfMatch}.
+=======
+     * Provides the entity tag (the ETag header) for the given resource.
+     * Intended to be over-ridden by custom DefaultServlet implementations that
+     * wish to use an alternative format for the entity tag.
+>>>>>>> bc379af8e3... Further ETag fixes
      *
      * @param resourceAttributes  The resource attributes for which an entity
      *                            tag is required.

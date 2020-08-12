@@ -77,7 +77,8 @@
         requests. Requests with headers that contain invalid entity tags will be
         rejected with a 400 response code. Improve the matching algorithm used
         to compare entity tags in conditional requests with the entity tag for
-        the requested resource. (markt)
+        the requested resource. Based on a pull request by Sergey Ponomarev.
+        (markt)
       </fix>
     </changelog>
   </subsection>

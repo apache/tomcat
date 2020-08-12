@@ -160,12 +160,6 @@ directory listings are disabled and debugging is turned off.
         Should server information be presented in the response sent to clients
         when directory listing is enabled. [true]
   </property>
-  <property name="useWeakComparisonWithIfMatch">
-        When comparing entity tags for If-Match headers should a weak comparison
-        be used rather than the strong comparison required by RFC 7232? A weak
-        comparison is used by default since the default resources implementation
-        generates weak entity tags. [true]
-  </property>
 </properties>
 </section>
 
