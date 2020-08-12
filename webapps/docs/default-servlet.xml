@@ -186,12 +186,6 @@ directory listings are disabled and debugging is turned off.
   <property name="sortDirectoriesFirst">
         Should the server list all directories before all files. [false]
   </property>
-  <property name="useWeakComparisonWithIfMatch">
-        When comparing entity tags for If-Match headers should a weak comparison
-        be used rather than the strong comparison required by RFC 7232? A weak
-        comparison is used by default since the default resources implementation
-        generates weak entity tags. [true]
-  </property>
 </properties>
 </section>
 
