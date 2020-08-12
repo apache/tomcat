@@ -52,6 +52,7 @@
 
     <resolver:install>
       <artifact file="${file}" />
+      <artifact file="${src}" classifier="sources"/>
       <pom file="${pom}.tmp"/>
       <artifact file="${file}.asc" type="jar.asc" if:set="gpg.passphrase"/>
       <artifact file="${pom}.asc" type="pom.asc" if:set="gpg.passphrase"/>
