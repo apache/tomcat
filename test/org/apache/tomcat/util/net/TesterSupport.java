@@ -200,7 +200,12 @@ public final class TesterSupport {
     protected static void configureClientSsl(String protocol) {
         try {
             System.setProperty("https.protocols", protocol);
-            SSLContext sc = SSLContext.getInstance(Constants.SSL_PROTO_TLS);
+            SSLContext sc;
+            if (TesterSupport.TLSV13_AVAILABLE) {
+                 sc = SSLContext.getInstance("TLSv1.3");
+            } else {
+                sc = SSLContext.getInstance(Constants.SSL_PROTO_TLS);
+            }
             sc.init(TesterSupport.getUser1KeyManagers(),
                     TesterSupport.getTrustManagers(),
                     null);
