@@ -2178,29 +2178,19 @@ public class DefaultServlet extends HttpServlet {
         String headerValue = request.getHeader("If-Match");
         if (headerValue != null) {
             String eTag = generateETag(resource);
-            boolean conditionSatisfied = false;
-
-            if (!headerValue.equals("*")) {
-                // BZ 64265: By default Tomcat generates weak etag for resource.
-                // But If-Match uses weak matching that expects a strong resource etag.
-                // So we strip any leading "W/" and then compare using equals
-                String resourceEtag = weakEtagToStrong(eTag);
-                Set<String> eTags = EntityTag.parseEntityTag(new StringReader(headerValue), useWeakComparisonWithIfMatch);
-                if (eTags == null) {
-                    if (debug > 10) {
-                        log("DefaultServlet.checkIfMatch:  Invalid header value [" + headerValue + "]");
-                    }
-                    response.sendError(HttpServletResponse.SC_BAD_REQUEST);
-                    return false;
+            // BZ 64265: By default Tomcat generates weak etag for resource.
+            // But If-Match uses strong matching that expects a strong resource etag.
+            // So we strip any leading "W/" and then compare using equals
+            String resourceEtag = weakEtagToStrong(eTag);
+            Boolean conditionSatisfied = matchEtag(headerValue, resourceEtag, useWeakComparisonWithIfMatch);
+            if (conditionSatisfied == null) {
+                if (debug > 10) {
+                    log("DefaultServlet.checkIfMatch:  Invalid header value [" + headerValue + "]");
                 }
-                conditionSatisfied = eTags.contains(resourceEtag);
-            } else {
-                conditionSatisfied = true;
-            }
-
-            // If none of the given ETags match, 412 Precondition failed is
-            // sent back
-            if (!conditionSatisfied) {
+                response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+                return false;
+            } else if (!conditionSatisfied.booleanValue()) {
+                // If none of the given ETags match, 412 Precondition failed is sent back
                 response.sendError(HttpServletResponse.SC_PRECONDITION_FAILED);
                 return false;
             }
@@ -2263,26 +2253,16 @@ public class DefaultServlet extends HttpServlet {
         String headerValue = request.getHeader("If-None-Match");
         if (headerValue != null) {
             String eTag = generateETag(resource);
-            boolean conditionSatisfied = false;
-
-            if (!headerValue.equals("*")) {
-                // If-None-Match uses weak comparison so strip the weak indicator if
-                // present
-                String resourceEtag = weakEtagToStrong(eTag);
-                Set<String> eTags = EntityTag.parseEntityTag(new StringReader(headerValue), true);
-                if (eTags == null) {
-                    if (debug > 10) {
-                        log("DefaultServlet.checkIfNoneMatch:  Invalid header value [" + headerValue + "]");
-                    }
-                    response.sendError(HttpServletResponse.SC_BAD_REQUEST);
-                    return false;
+            // If-None-Match uses weak comparison so strip the weak indicator if present
+            String resourceEtag = weakEtagToStrong(eTag);
+            Boolean conditionSatisfied = matchEtag(headerValue, resourceEtag, true);
+            if (conditionSatisfied == null) {
+                if (debug > 10) {
+                    log("DefaultServlet.checkIfNoneMatch:  Invalid header value [" + headerValue + "]");
                 }
-                conditionSatisfied = eTags.contains(resourceEtag);
-            } else {
-                conditionSatisfied = true;
-            }
-
-            if (conditionSatisfied) {
+                response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+                return false;
+            } else if (conditionSatisfied.booleanValue()) {
                 // For GET and HEAD, we should respond with
                 // 304 Not Modified.
                 // For every other method, 412 Precondition Failed is sent
@@ -2665,6 +2645,22 @@ public class DefaultServlet extends HttpServlet {
             throw new SAXException(sm.getString("defaultServlet.blockExternalEntity2",
                     name, publicId, baseURI, systemId));
         }
+    }
+
+    private Boolean matchEtag(String headerValue, String resourceEtag, boolean useWeakComparison) throws IOException {
+        Boolean conditionSatisfied;
+
+        if (!headerValue.equals("*")) {
+            Set<String> eTags = EntityTag.parseEntityTag(new StringReader(headerValue), useWeakComparison);
+            if (eTags == null) {
+                conditionSatisfied = null;
+            } else {
+                conditionSatisfied = Boolean.valueOf(eTags.contains(resourceEtag));
+            }
+        } else {
+            conditionSatisfied = Boolean.TRUE;
+        }
+        return conditionSatisfied;
     }
 
     private String weakEtagToStrong(String eTag) {
