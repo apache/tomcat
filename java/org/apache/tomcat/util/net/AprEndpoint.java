@@ -491,7 +491,7 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
             for (SocketWrapperBase<Long> socketWrapper : connections.values()) {
                 socketWrapper.close();
             }
-            if (acceptor.getState() != AcceptorState.ENDED) {
+            if (acceptor.getState() != AcceptorState.ENDED && !getBindOnInit()) {
                 log.warn(sm.getString("endpoint.warn.unlockAcceptorFailed", acceptor.getThreadName()));
                 // If the Acceptor is still running force
                 // the hard socket close.
