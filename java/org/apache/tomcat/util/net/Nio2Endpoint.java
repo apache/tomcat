@@ -192,7 +192,7 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
         }
         if (running) {
             running = false;
-            acceptor.state = AcceptorState.ENDED;
+            acceptor.stop();
             // Use the executor to avoid binding the main thread if something bad
             // occurs and unbind will also wait for a bit for it to complete
             getExecutor().execute(new Runnable() {
@@ -405,6 +405,11 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
             } else {
                 state = AcceptorState.PAUSED;
             }
+        }
+
+        @Override
+        public void stop() {
+            acceptor.state = AcceptorState.ENDED;
         }
 
         @Override

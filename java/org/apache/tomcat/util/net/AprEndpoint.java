@@ -486,24 +486,13 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
         }
         if (running) {
             running = false;
+            acceptor.stop();
             poller.stop();
             for (SocketWrapperBase<Long> socketWrapper : connections.values()) {
                 socketWrapper.close();
             }
-            long waitLeft = 10000;
-            while (waitLeft > 0 &&
-                    acceptor.getState() != AcceptorState.ENDED &&
-                    serverSock != 0) {
-                try {
-                    Thread.sleep(50);
-                } catch (InterruptedException e) {
-                    // Ignore
-                }
-                waitLeft -= 50;
-            }
-            if (waitLeft == 0) {
-                log.warn(sm.getString("endpoint.warn.unlockAcceptorFailed",
-                        acceptor.getThreadName()));
+            if (acceptor.getState() != AcceptorState.ENDED) {
+                log.warn(sm.getString("endpoint.warn.unlockAcceptorFailed", acceptor.getThreadName()));
                 // If the Acceptor is still running force
                 // the hard socket close.
                 if (serverSock != 0) {
