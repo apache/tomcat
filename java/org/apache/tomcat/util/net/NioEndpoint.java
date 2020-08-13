@@ -292,6 +292,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
         }
         if (running) {
             running = false;
+            acceptor.stop();
             if (poller != null) {
                 poller.destroy();
                 poller = null;
