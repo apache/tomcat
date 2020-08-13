@@ -415,21 +415,21 @@ public class TestHttp2Limits extends Http2TestBase {
 
 
     @Test
-    public void doTestPostWithTrailerHeadersDefaultLimit() throws Exception{
+    public void testPostWithTrailerHeadersDefaultLimit() throws Exception{
         doTestPostWithTrailerHeaders(Constants.DEFAULT_MAX_TRAILER_COUNT,
                 Constants.DEFAULT_MAX_TRAILER_SIZE, FailureMode.NONE);
     }
 
 
     @Test
-    public void doTestPostWithTrailerHeadersCount0() throws Exception{
+    public void testPostWithTrailerHeadersCount0() throws Exception{
         doTestPostWithTrailerHeaders(0, Constants.DEFAULT_MAX_TRAILER_SIZE,
                 FailureMode.STREAM_RESET);
     }
 
 
     @Test
-    public void doTestPostWithTrailerHeadersSize0() throws Exception{
+    public void testPostWithTrailerHeadersSize0() throws Exception{
         doTestPostWithTrailerHeaders(Constants.DEFAULT_MAX_TRAILER_COUNT, 0,
                 FailureMode.CONNECTION_RESET);
     }
