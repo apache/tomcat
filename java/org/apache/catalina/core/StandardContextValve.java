@@ -83,7 +83,8 @@ final class StandardContextValve extends ValveBase {
         // Acknowledge the request
         try {
             // Acknowledge based on the policy
-            final ContinueHandlingResponsePolicy continueHandlingResponsePolicy = (ContinueHandlingResponsePolicy) request.getConnector().getProperty("continueHandlingResponsePolicy");
+            final ContinueHandlingResponsePolicy continueHandlingResponsePolicy =
+                (ContinueHandlingResponsePolicy) request.getConnector().getProperty("continueHandlingResponsePolicy");
 
             if (continueHandlingResponsePolicy == ContinueHandlingResponsePolicy.IMMEDIATELY) {
                 // acknowledge immediately

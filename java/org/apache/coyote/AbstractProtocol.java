@@ -19,6 +19,7 @@ package org.apache.coyote;
 import java.net.InetAddress;
 import java.nio.ByteBuffer;
 import java.util.Collections;
+import java.util.Locale;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
@@ -270,7 +271,8 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
     // ------------------------------------------------ HTTP specific properties
     // ----------------------------------------- queried by StandardContextValve
     public void setContinueHandlingResponsePolicy(String value) {
-        continueHandlingResponsePolicy = Enum.valueOf(ContinueHandlingResponsePolicy.class, value);
+        final String normalizedValue = value.trim().toUpperCase(Locale.ENGLISH);
+        continueHandlingResponsePolicy = Enum.valueOf(ContinueHandlingResponsePolicy.class, normalizedValue);
     }
 
 

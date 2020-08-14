@@ -1197,6 +1197,10 @@ public class Response implements HttpServletResponse {
     public void sendAcknowledgement()
         throws IOException {
 
+        if (isCommitted()) {
+            return;
+        }
+
         // Ignore any call from an included servlet
         if (included) {
             return;
