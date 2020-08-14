@@ -585,20 +585,6 @@
     <exclude name="org/apache/catalina/valves/LoadBalancerDrainingValve*" />
     <exclude name="org/apache/catalina/valves/PersistentValve*" />
 
-    <!-- Remove web resources classes, default is the EmptyResourceSet -->
-    <exclude name="org/apache/catalina/webresources/AbstractArchiveResource*" />
-    <exclude name="org/apache/catalina/webresources/AbstractSingleArchiveResource*" />
-    <exclude name="org/apache/catalina/webresources/ExtractingRoot*" />
-    <exclude name="org/apache/catalina/webresources/FileResource*" />
-    <exclude name="org/apache/catalina/webresources/JarResource*" />
-    <exclude name="org/apache/catalina/webresources/JarWarResource*" />
-    <exclude name="org/apache/catalina/webresources/TomcatJarInputStream*" />
-    <exclude name="org/apache/catalina/webresources/TrackedInputStream*" />
-    <exclude name="org/apache/catalina/webresources/VirtualResource*" />
-    <exclude name="org/apache/catalina/webresources/WarResource*" />
-    <exclude name="org/apache/catalina/webresources/WarResource*" />
-    <exclude name="org/apache/catalina/webresources/war/WarURLConnection*" />
-
     <!-- Remove most JNDI stuff -->
     <exclude name="org/apache/naming/EjbRef*" />
     <exclude name="org/apache/naming/factory/BeanFactory*" />
