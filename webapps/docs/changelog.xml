@@ -93,6 +93,13 @@
         the <code>docBase</code> attribute of a <code>Context</code>. Note that
         such a configuration should be used with caution. (markt)
       </fix>
+      <update>
+        <bug>57661</bug>: For requests containing the
+        <code>Expect: 100-continue</code> header, add optional support to delay
+        sending an intermediate 100 status response until the servlet reads the
+        request body, allowing the servlet the opportunity to respond without
+        asking for the request body. (malaysf)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Coyote">
