@@ -564,8 +564,7 @@ List of Attributes<br/>
 
   <tr>
     <td>operation</td>
-    <td>Existing MBean operation (see Tomcat
-        <a href="funcspecs/fs-admin-opers.html">funcspecs/fs-admin-opers.html</a>).
+    <td>Existing MBean operation
     </td>
     <td></td>
   </tr>

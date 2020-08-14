@@ -108,6 +108,10 @@
         list of contexts and the Host Manager application list of hosts so that
         the output is more consistent. PR provided by Holomark. (markt)
       </fix>
+      <fix>
+        Remove the out of date functional specification secton from the
+        documentation web application. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
