@@ -121,6 +121,10 @@
         <code>channelSendOptions</code>. Patch provided by Mitch Claborn.
         (schultz)
       </fix>
+      <fix>
+        Remove the out of date functional specification secton from the
+        documentation web application. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">

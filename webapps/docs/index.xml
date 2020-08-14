@@ -218,9 +218,6 @@ the development of the <em>Apache Tomcat</em> project.</p>
 <li><a href="developers.html"><strong>Developers</strong></a> - List of active
     Apache Tomcat contributors.
     </li>
-<li><a href="funcspecs/index.html"><strong>Functional Specifications</strong></a>
-    - Requirements specifications for features of the <em>Catalina</em> servlet
-    container portion of Apache Tomcat.</li>
 <li><a href="api/index.html"><strong>Javadocs</strong></a>
     - Javadoc API documentation for Apache Tomcat's internals.</li>
 <li><a href="architecture/index.html"><strong>Apache Tomcat Architecture</strong></a>
