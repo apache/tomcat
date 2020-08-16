@@ -75,7 +75,9 @@ public class StatusTransformer {
     public static void writeHeader(PrintWriter writer, Object[] args, int mode) {
         if (mode == 0){
             // HTML Header Section
-            writer.print(Constants.HTML_HEADER_SECTION);
+            writer.print(MessageFormat.format(
+                Constants.HTML_HEADER_SECTION, args
+            ));
         } else if (mode == 1){
             writer.write(Constants.XML_DECLARATION);
             writer.print(MessageFormat.format
