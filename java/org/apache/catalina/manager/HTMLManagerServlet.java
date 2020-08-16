@@ -342,14 +342,17 @@ public final class HTMLManagerServlet extends ManagerServlet {
                 host.getName() + "'");
 
         PrintWriter writer = response.getWriter();
-
-        // HTML Header Section
-        writer.print(Constants.HTML_HEADER_SECTION);
-
-        // Body Header Section
+        
         Object[] args = new Object[2];
         args[0] = request.getContextPath();
         args[1] = smClient.getString("htmlManagerServlet.title");
+
+        // HTML Header Section
+        writer.print(MessageFormat.format(
+            Constants.HTML_HEADER_SECTION, args
+        ));
+
+        // Body Header Section
         writer.print(MessageFormat.format
                      (Constants.BODY_HEADER_SECTION, args));
 
