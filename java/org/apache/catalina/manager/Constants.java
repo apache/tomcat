@@ -37,79 +37,7 @@ public class Constants {
         HTML_HEADER_SECTION =
             "<html>\n" +
             "<head>\n" +
-            "<style>\n" +
-            org.apache.catalina.util.TomcatCSS.TOMCAT_CSS + "\n" +
-            "  table {\n" +
-            "    width: 100%;\n" +
-            "  }\n" +
-            "  td.page-title {\n" +
-            "    text-align: center;\n" +
-            "    vertical-align: top;\n" +
-            "    font-family:sans-serif,Tahoma,Arial;\n" +
-            "    font-weight: bold;\n" +
-            "    background: white;\n" +
-            "    color: black;\n" +
-            "  }\n" +
-            "  td.title {\n" +
-            "    text-align: left;\n" +
-            "    vertical-align: top;\n" +
-            "    font-family:sans-serif,Tahoma,Arial;\n" +
-            "    font-style:italic;\n" +
-            "    font-weight: bold;\n" +
-            "    background: #D2A41C;\n" +
-            "  }\n" +
-            "  td.header-left {\n" +
-            "    text-align: left;\n" +
-            "    vertical-align: top;\n" +
-            "    font-family:sans-serif,Tahoma,Arial;\n" +
-            "    font-weight: bold;\n" +
-            "    background: #FFDC75;\n" +
-            "  }\n" +
-            "  td.header-center {\n" +
-            "    text-align: center;\n" +
-            "    vertical-align: top;\n" +
-            "    font-family:sans-serif,Tahoma,Arial;\n" +
-            "    font-weight: bold;\n" +
-            "    background: #FFDC75;\n" +
-            "  }\n" +
-            "  td.row-left {\n" +
-            "    text-align: left;\n" +
-            "    vertical-align: middle;\n" +
-            "    font-family:sans-serif,Tahoma,Arial;\n" +
-            "    color: black;\n" +
-            "  }\n" +
-            "  td.row-center {\n" +
-            "    text-align: center;\n" +
-            "    vertical-align: middle;\n" +
-            "    font-family:sans-serif,Tahoma,Arial;\n" +
-            "    color: black;\n" +
-            "  }\n" +
-            "  td.row-right {\n" +
-            "    text-align: right;\n" +
-            "    vertical-align: middle;\n" +
-            "    font-family:sans-serif,Tahoma,Arial;\n" +
-            "    color: black;\n" +
-            "  }\n" +
-            "  TH {\n" +
-            "    text-align: center;\n" +
-            "    vertical-align: top;\n" +
-            "    font-family:sans-serif,Tahoma,Arial;\n" +
-            "    font-weight: bold;\n" +
-            "    background: #FFDC75;\n" +
-            "  }\n" +
-            "  TD {\n" +
-            "    text-align: center;\n" +
-            "    vertical-align: middle;\n" +
-            "    font-family:sans-serif,Tahoma,Arial;\n" +
-            "    color: black;\n" +
-            "  }\n" +
-            "  form {\n" +
-            "    margin: 1;\n" +
-            "  }\n" +
-            "  form.inline {\n" +
-            "    display: inline;\n" +
-            "  }\n" +
-            "</style>\n";
+            "<link rel=\"stylesheet\" href=\"{0}/css/manager.css\">\n";
 
         BODY_HEADER_SECTION =
             "<title>{0}</title>\n" +
@@ -121,8 +49,8 @@ public class Constants {
             " <tr>\n" +
             "  <td colspan=\"2\">\n" +
             "   <a href=\"https://tomcat.apache.org/\" " + REL_EXTERNAL + ">\n" +
-            "    <img border=\"0\" alt=\"The Tomcat Servlet/JSP Container\"\n" +
-            "         align=\"left\" src=\"{0}/images/tomcat.gif\">\n" +
+            "    <img class='tomcat-logo' alt=\"The Tomcat Servlet/JSP Container\"\n" +
+            "         src=\"{0}/images/tomcat.svg\">\n" +
             "   </a>\n" +
             "   <a href=\"https://www.apache.org/\" " + REL_EXTERNAL + ">\n" +
             "    <img border=\"0\" alt=\"The Apache Software Foundation\" align=\"right\"\n" +
@@ -218,4 +146,3 @@ public class Constants {
     public static final String XML_STYLE =
         "<?xml-stylesheet type=\"text/xsl\" href=\"{0}/xform.xsl\" ?>\n";
 }
-
