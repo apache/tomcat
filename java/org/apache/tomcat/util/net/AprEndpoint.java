@@ -711,6 +711,11 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
      */
     protected boolean processSocket(long socket, SocketEvent event) {
         SocketWrapperBase<Long> socketWrapper = connections.get(Long.valueOf(socket));
+        if (socketWrapper == null) {
+            // Socket probably closed from another thread. Triggering another
+            // close in case won't cause an issue.
+            return false;
+        }
         if (event == SocketEvent.OPEN_READ && socketWrapper.readOperation != null) {
             return socketWrapper.readOperation.process();
         } else if (event == SocketEvent.OPEN_WRITE && socketWrapper.writeOperation != null) {
