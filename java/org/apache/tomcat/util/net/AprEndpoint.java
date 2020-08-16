@@ -740,6 +740,11 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
      */
     protected boolean processSocket(long socket, SocketEvent event) {
         SocketWrapperBase<Long> socketWrapper = connections.get(Long.valueOf(socket));
+        if (socketWrapper == null) {
+            // Socket probably closed from another thread. Triggering another
+            // close in case won't cause an issue.
+            return false;
+        }
         return processSocket(socketWrapper, event, true);
     }
 

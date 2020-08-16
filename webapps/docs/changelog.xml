@@ -89,6 +89,11 @@
         Avoid several potential NPEs introduced in the changes in the previous
         release to reduce the memory footprint of closed HTTP/2 streams. (markt)
       </fix>
+      <fix>
+        <bug>64660</bug>: Avoid a potential NPE in the AprEndpoint if a socket
+        is closed in one thread at the same time as the poller is processing an
+        event for that socket in another. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="WebSocket">
