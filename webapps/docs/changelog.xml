@@ -86,8 +86,8 @@
         return value, particularly when end of stream has been reached. (markt)
       </fix>
       <fix>
-        Avoid several potential NPEs introduced in the changes in the previous
-        release to reduce the memory footprint of closed HTTP/2 streams. (markt)
+        <bug>64621</bug>: Improve handling HTTP/2 stream reset frames received
+        from clients. (markt)
       </fix>
       <fix>
         <bug>64660</bug>: Avoid a potential NPE in the AprEndpoint if a socket
@@ -95,8 +95,9 @@
         event for that socket in another. (markt)
       </fix>
       <fix>
-        <bug>64621</bug>: Improve handling HTTP/2 stream reset frames received
-        from clients. (markt)
+        <bug>64671</bug>: Avoid several potential NPEs introduced in the changes
+        in the previous release to reduce the memory footprint of closed HTTP/2
+        streams. (markt)
       </fix>
     </changelog>
   </subsection>
