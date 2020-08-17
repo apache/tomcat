@@ -20,6 +20,8 @@ package org.apache.jasper.compiler;
 import org.junit.Assert;
 import org.junit.Test;
 
+import org.apache.catalina.core.StandardContext;
+import org.apache.catalina.core.StandardWrapper;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.buf.ByteChunk;
 
@@ -34,10 +36,15 @@ public class TestParserNoStrictWhitespace extends TomcatBaseTest {
     public void testBug49297NoSpaceNotStrict() throws Exception {
         getTomcatInstanceTestWebapp(false, true);
 
+        // Github / Travis / s390x debug code
+        StandardContext ctxt = (StandardContext) getTomcatInstance().getHost().findChild("/test");
+        StandardWrapper w = (StandardWrapper) ctxt.findChild("bug49297NoSpace");
+        System.out.println("JSP strict whitespace: [" +  w.getInitParameter("strictWhitespace") + "]");
+        // debug code end
+
         ByteChunk res = new ByteChunk();
         int sc = getUrl("http://localhost:" + getPort() +
                 "/test/bug49nnn/bug49297NoSpace.jsp", res, null);
-
 
         Assert.assertEquals(200, sc);
         assertEcho(res.toString(), "Hello World");
