@@ -94,6 +94,10 @@
         is closed in one thread at the same time as the poller is processing an
         event for that socket in another. (markt)
       </fix>
+      <fix>
+        <bug>64621</bug>: Improve handling HTTP/2 stream reset frames received
+        from clients. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="WebSocket">

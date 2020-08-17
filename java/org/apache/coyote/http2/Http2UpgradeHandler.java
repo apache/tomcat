@@ -895,17 +895,28 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
                                 tracker = backLogStreams.get(stream);
                             }
                             if (tracker != null && tracker.getUnusedAllocation() == 0) {
-                                if (log.isDebugEnabled()) {
-                                    log.debug(sm.getString("upgradeHandler.noAllocation",
-                                            connectionId, stream.getIdentifier()));
+                                String msg;
+                                Http2Error error;
+                                if (stream.isActive()) {
+                                    if (log.isDebugEnabled()) {
+                                        log.debug(sm.getString("upgradeHandler.noAllocation",
+                                                connectionId, stream.getIdentifier()));
+                                    }
+                                    // No allocation
+                                    // Close the connection. Do this first since
+                                    // closing the stream will raise an exception.
+                                    close();
+                                    msg = sm.getString("stream.writeTimeout");
+                                    error = Http2Error.ENHANCE_YOUR_CALM;
+                                } else {
+                                    msg = sm.getString("stream.clientAbort");
+                                    error = Http2Error.CANCEL;
                                 }
-                                // No allocation
-                                // Close the connection. Do this first since
-                                // closing the stream will raise an exception
-                                close();
-                                // Close the stream (in app code so need to
-                                // signal to app stream is closing)
-                                stream.doWriteTimeout();
+                                // Close the stream
+                                // This thread is in application code so need
+                                // to signal to the application that the
+                                // stream is closing
+                                stream.doStreamAbort(msg, error);
                             }
                         } catch (InterruptedException e) {
                             throw new IOException(sm.getString(
@@ -1661,8 +1672,12 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
     @Override
     public void reset(int streamId, long errorCode) throws Http2Exception  {
         Stream stream = getStream(streamId, true);
+        boolean active = stream.isActive();
         stream.checkState(FrameType.RST);
         stream.receiveReset(errorCode);
+        if (active) {
+            activeRemoteStreamCount.decrementAndGet();
+        }
     }
 
 

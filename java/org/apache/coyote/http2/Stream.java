@@ -272,7 +272,7 @@ public class Stream extends AbstractStream implements HeaderEmitter {
                     allocationManager.waitForStream(writeTimeout);
                     windowSize = getWindowSize();
                     if (windowSize == 0) {
-                        doWriteTimeout();
+                        doStreamAbort(sm.getString("stream.writeTimeout"), Http2Error.ENHANCE_YOUR_CALM);
                     }
                 } catch (InterruptedException e) {
                     // Possible shutdown / rst or similar. Use an IOException to
@@ -296,10 +296,8 @@ public class Stream extends AbstractStream implements HeaderEmitter {
     }
 
 
-    void doWriteTimeout() throws CloseNowException {
-        String msg = sm.getString("stream.writeTimeout");
-        StreamException se = new StreamException(
-                msg, Http2Error.ENHANCE_YOUR_CALM, getIdAsInt());
+    void doStreamAbort(String msg, Http2Error error) throws CloseNowException {
+        StreamException se = new StreamException(msg, error, getIdAsInt());
         // Prevent the application making further writes
         streamOutputBuffer.closed = true;
         // Prevent Tomcat's error handling trying to write
