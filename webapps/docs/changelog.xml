@@ -131,8 +131,8 @@
         documentation web application. (markt)
       </fix>
       <fix>
-        Extracted CSS styles from the Manager we application for better code 
-        maintenance and replaced the GIF logo with SVG. (isapir) 
+        Extracted CSS styles from the Manager we application for better code
+        maintenance and replaced the GIF logo with SVG. (isapir)
       </fix>
     </changelog>
   </subsection>
