@@ -342,7 +342,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
                 host.getName() + "'");
 
         PrintWriter writer = response.getWriter();
-        
+
         Object[] args = new Object[2];
         args[0] = request.getContextPath();
         args[1] = smClient.getString("htmlManagerServlet.title");
