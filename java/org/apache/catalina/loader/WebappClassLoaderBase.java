@@ -77,6 +77,10 @@ import org.apache.tomcat.util.IntrospectionUtils;
 import org.apache.tomcat.util.compat.JreCompat;
 import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.util.security.PermissionCheck;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
+import java.io.ByteArrayInputStream;
+
 
 /**
  * Specialized web application class loader.
@@ -126,6 +130,10 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
 
     private static final Log log = LogFactory.getLog(WebappClassLoaderBase.class);
 
+    private final boolean FAST_STARTUP = Boolean.getBoolean("tomcat.fastServerStartup");
+
+    private static final String JAR_URL_PREFIX = "jar:file:";
+    private static final int JAR_URL_PREFIX_LENGTH = JAR_URL_PREFIX.length();
     /**
      * List of ThreadGroup names to ignore when scanning for web application
      * started threads that need to be shut down.
@@ -1115,6 +1123,12 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
         checkStateForResourceLoading(name);
 
         InputStream stream = null;
+        stream = checkForCacheStream(name);
+        if (stream != null) {
+            if (log.isDebugEnabled())
+                log.debug("  --> Returning stream from cache");
+            return stream;
+        }
 
         boolean delegateFirst = delegate || filter(name, false);
 
@@ -1932,6 +1946,48 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
                     "webappClassLoader.stopTimerThreadFail",
                     thread.getName(), getContextName()), t);
         }
+    }
+
+    /**
+     * Finds the resource with the given name if it has previously been
+     * loaded and cached by this class loader, and return an input stream
+     * to the resource data.  If this resource has not been cached, return
+     * <code>null</code>.
+     *
+     * @param name Name of the resource to return
+     */
+    protected InputStream checkForCacheStream(String name) {
+
+        String path = binaryNameToPath(name, true);
+
+        ResourceEntry entry = resourceEntries.get(path);
+        if (entry != null) {
+            WebResource resource = resources.getClassLoaderResource(path);
+            if (resource.getContent() != null)
+                return new ByteArrayInputStream(resource.getContent());
+            else {
+                try {
+                    String sourceURL = resource.getURL().toString();
+                    // Example: "jar:file:/XXXXX/_env/YYYYY/lib/ABCD.jar/MyClass.class"
+                    if (FAST_STARTUP && sourceURL.startsWith(JAR_URL_PREFIX)) {
+                        // Use or create the cached copy of the JarFile
+                        JarFile jar = entry.getSourceJar();
+                        if (jar == null) {
+                            jar = new JarFile(sourceURL.substring(JAR_URL_PREFIX_LENGTH, sourceURL.indexOf('!')));
+                            entry.setSourceJar(jar);
+                        }
+                        JarEntry jarEntry = jar.getJarEntry(name);
+                        if (jarEntry != null) {
+                            return jar.getInputStream(jarEntry);
+                        }
+                    }
+                    return resource.getURL().openStream();
+                } catch (IOException ioe) {
+                    // Ignore: We can simply ignore the exception if there was an error reading the cache stream.
+                }
+            }
+        }
+        return null;
     }
 
     private void checkThreadLocalsForLeaks() {

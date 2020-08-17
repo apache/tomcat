@@ -36,11 +36,12 @@ public abstract class AbstractArchiveResourceSet extends AbstractResourceSet {
 
     private URL baseUrl;
     private String baseUrlString;
-
+    private final boolean FAST_STARTUP = Boolean.getBoolean("tomcat.fastServerStartup");
     private JarFile archive = null;
     protected Map<String,JarEntry> archiveEntries = null;
     protected final Object archiveLock = new Object();
     private long archiveUseCount = 0;
+    private JarContents jarContents;
 
 
     protected final void setBaseUrl(URL baseUrl) {
@@ -210,6 +211,32 @@ public abstract class AbstractArchiveResourceSet extends AbstractResourceSet {
         checkPath(path);
         String webAppMount = getWebAppMount();
         WebResourceRoot root = getRoot();
+
+        if (FAST_STARTUP) {
+            /*
+             * This initializes (when necessary) and checks the jarContents, which
+             * is a highly efficient index of the files stored in the jar. If
+             * jarContents reports that this resource definitely does not contain
+             * the path, we can end this method and move on to the next jar.
+             *
+             * Note: the initialization is thread-safe because multiple simultaneous
+             * threads will create a complete and valid copy, then set the shared
+             * pointer. This guarantees the shared pointer will always go to a valid
+             * object. The cost of multiple copies is small since only one of them
+             * will be long-lived.
+             */
+            if (jarContents == null) {
+                try {
+                    JarFile jar = openJarFile();
+                    jarContents = new JarContents(jar);
+                } catch (IOException ioe) {
+                    throw new RuntimeException("Unable to parse contents of JAR", ioe);
+                }
+            }
+            if (!jarContents.mightContainResource(path, webAppMount)) {
+                return new EmptyResource(root, path);
+            }
+        }
 
         /*
          * Implementation notes

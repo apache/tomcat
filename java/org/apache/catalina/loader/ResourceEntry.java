@@ -16,12 +16,20 @@
  */
 package org.apache.catalina.loader;
 
+import java.util.Map;
+import java.util.WeakHashMap;
+import java.util.jar.JarFile;
 /**
  * Resource entry.
  *
  * @author Remy Maucherat
  */
 public class ResourceEntry {
+
+    /** Weak references here allow the key-value pair to be garbage collected if the key-value pair is no longer
+     *  referenced outside the Hashmap. In that case the setSourceFile will set the JarFile in the WeakHashmap again whenever the JarFile is referenced.
+    */
+    private static final Map<String, JarFile> JAR_FILE_CACHE = new WeakHashMap<>();
 
     /**
      * The "last modified" time of the origin file at the time this resource
@@ -34,5 +42,35 @@ public class ResourceEntry {
      * Loaded class.
      */
     public volatile Class<?> loadedClass = null;
+
+    /**
+     * Single, reusable jar file for this resource. Avoids duplication.
+     */
+    private JarFile sourceJar;
+
+    /**
+     * Deduplicates the jar file, then stores for reuse.
+     *
+     * @param sourceJar
+     */
+    public void setSourceJar(JarFile sourceJar) {
+        String jarName = sourceJar.getName();
+
+        JarFile uniqueJarFile;
+        synchronized (JAR_FILE_CACHE) {
+            uniqueJarFile = JAR_FILE_CACHE.get(jarName);
+            if (uniqueJarFile == null) {
+                uniqueJarFile = sourceJar;
+                JAR_FILE_CACHE.put(jarName, uniqueJarFile);
+            }
+        }
+
+        this.sourceJar = uniqueJarFile;
+    }
+
+    // Call the setSourceFile if it returns null. Example in WebappClassLoaderBase
+    public JarFile getSourceJar() {
+        return sourceJar;
+    }
 }
 

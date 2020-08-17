@@ -111,6 +111,10 @@ import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.util.scan.JarFactory;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXParseException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.Callable;
 
 /**
  * Startup event listener for a <b>Context</b> that configures the properties
@@ -121,7 +125,11 @@ import org.xml.sax.SAXParseException;
 public class ContextConfig implements LifecycleListener {
 
     private static final Log log = LogFactory.getLog(ContextConfig.class);
+    private static final int DEFAULT_CLASS_CACHE_SIZE = 16384;
+    private static final float DEFAULT_LOAD_FACTOR = .75f;
+    private static final int DEFAULT_CONCURRENCY_LEVEL = Runtime.getRuntime().availableProcessors();
 
+    private final boolean FAST_STARTUP = Boolean.getBoolean("tomcat.fastServerStartup");
 
     /**
      * The string resources for this package.
@@ -1374,7 +1382,7 @@ public class ContextConfig implements LifecycleListener {
     protected void processClasses(WebXml webXml, Set<WebXml> orderedFragments) {
         // Step 4. Process /WEB-INF/classes for annotations and
         // @HandlesTypes matches
-        Map<String, JavaClassCacheEntry> javaClassCache = new HashMap<>();
+        Map<String, JavaClassCacheEntry> javaClassCache = new ConcurrentHashMap<>(DEFAULT_CLASS_CACHE_SIZE, DEFAULT_LOAD_FACTOR, DEFAULT_CONCURRENCY_LEVEL);
 
         if (ok) {
             WebResource[] webResources =
@@ -2137,25 +2145,95 @@ public class ContextConfig implements LifecycleListener {
 
     protected void processAnnotations(Set<WebXml> fragments,
             boolean handlesTypesOnly, Map<String,JavaClassCacheEntry> javaClassCache) {
-        for(WebXml fragment : fragments) {
-            // Only need to scan for @HandlesTypes matches if any of the
-            // following are true:
-            // - it has already been determined only @HandlesTypes is required
-            //   (e.g. main web.xml has metadata-complete="true"
-            // - this fragment is for a container JAR (Servlet 3.1 section 8.1)
-            // - this fragment has metadata-complete="true"
-            boolean htOnly = handlesTypesOnly || !fragment.getWebappJar() ||
-                    fragment.isMetadataComplete();
 
-            WebXml annotations = new WebXml();
-            // no impact on distributable
-            annotations.setDistributable(true);
-            URL url = fragment.getURL();
-            processAnnotationsUrl(url, annotations, htOnly, javaClassCache);
-            Set<WebXml> set = new HashSet<>();
-            set.add(annotations);
-            // Merge annotations into fragment - fragment takes priority
-            fragment.merge(set);
+        if (FAST_STARTUP) {
+            processAnnotationsInParallel(fragments, handlesTypesOnly, javaClassCache);
+            return;
+        }
+
+        for(WebXml fragment : fragments) {
+            scanWebXmlFragment(handlesTypesOnly, fragment, javaClassCache);
+        }
+    }
+
+    private void scanWebXmlFragment(boolean handlesTypesOnly, WebXml fragment, Map<String,JavaClassCacheEntry> javaClassCache) {
+        // Only need to scan for @HandlesTypes matches if any of the
+        // following are true:
+        // - it has already been determined only @HandlesTypes is required
+        //   (e.g. main web.xml has metadata-complete="true"
+        // - this fragment is for a container JAR (Servlet 3.1 section 8.1)
+        // - this fragment has metadata-complete="true"
+        boolean htOnly = handlesTypesOnly || !fragment.getWebappJar() ||
+                fragment.isMetadataComplete();
+
+        WebXml annotations = new WebXml();
+        // no impact on distributable
+        annotations.setDistributable(true);
+        URL url = fragment.getURL();
+        processAnnotationsUrl(url, annotations, htOnly, javaClassCache);
+        Set<WebXml> set = new HashSet<>();
+        set.add(annotations);
+        // Merge annotations into fragment - fragment takes priority
+        fragment.merge(set);
+    }
+
+    /**
+     * Executable task to scan a segment for annotations. Each task does the
+     * same work as the for loop inside processAnnotations();
+     *
+     * @author Engebretson, John
+     * @author Kamnani, Jatin
+     */
+    private class AnnotationScanTask implements Callable<Void> {
+        private final WebXml fragment;
+        private final boolean handlesTypesOnly;
+        private Map<String,JavaClassCacheEntry> javaClassCache;
+
+        private AnnotationScanTask(WebXml fragment, boolean handlesTypesOnly, Map<String,JavaClassCacheEntry> javaClassCache) {
+            this.fragment = fragment;
+            this.handlesTypesOnly= handlesTypesOnly;
+            this.javaClassCache = javaClassCache;
+        }
+
+        @Override
+        public Void call() {
+            scanWebXmlFragment(handlesTypesOnly, fragment, javaClassCache);
+
+            return null;
+        }
+
+    }
+
+    /**
+     * Parallelized version of processAnnotationsInParallel(). Constructs tasks,
+     * submits them as they're created, then waits for completion.
+     *
+     * @param fragments
+     *            Set of parallelizable scans
+     * @param handlesTypesOnly
+     *            Important parameter for the underlying scan
+     */
+    protected void processAnnotationsInParallel(Set<WebXml> fragments, boolean handlesTypesOnly, Map<String,JavaClassCacheEntry> javaClassCache) {
+
+        ExecutorService pool = null;
+        try {
+            pool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+            List<Future<Void>> futures = new ArrayList<>(fragments.size());
+            for (WebXml fragment : fragments) {
+                Callable<Void> task = new AnnotationScanTask(fragment, handlesTypesOnly, javaClassCache);
+                futures.add(pool.submit(task));
+            }
+            try {
+                for (Future<?> future : futures) {
+                    future.get();
+                }
+            } catch (Exception e) {
+                throw new RuntimeException("Parallel execution failed", e);
+            }
+        } finally {
+            if (pool != null) {
+                pool.shutdownNow();
+            }
         }
     }
 
