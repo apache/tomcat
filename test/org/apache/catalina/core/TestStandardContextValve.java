@@ -17,6 +17,7 @@
 package org.apache.catalina.core;
 
 import java.io.IOException;
+import java.util.Locale;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequestEvent;
@@ -199,7 +200,7 @@ public class TestStandardContextValve extends TomcatBaseTest {
         final Tomcat tomcat = getTomcatInstance();
 
         final Connector connector = tomcat.getConnector();
-        connector.setProperty("continueHandlingResponsePolicy", "IMMEDIATELY");
+        connector.setProperty("continueHandlingResponsePolicy", "immediately");
 
         test100Continue(ContinueHandlingResponsePolicy.IMMEDIATELY);
     }
@@ -209,7 +210,9 @@ public class TestStandardContextValve extends TomcatBaseTest {
         final Tomcat tomcat = getTomcatInstance();
 
         final Connector connector = tomcat.getConnector();
-        connector.setProperty("continueHandlingResponsePolicy", ContinueHandlingResponsePolicy.ON_REQUEST_BODY_READ.toString());
+        final String policyString = ContinueHandlingResponsePolicy.ON_REQUEST_BODY_READ.toString()
+                .toLowerCase(Locale.ENGLISH);
+        connector.setProperty("continueHandlingResponsePolicy", policyString);
 
         test100Continue(ContinueHandlingResponsePolicy.ON_REQUEST_BODY_READ);
     }
