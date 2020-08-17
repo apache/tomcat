@@ -74,6 +74,10 @@
         <param-value>false</param-value>
       </init-param>
   </servlet>
+  <servlet-mapping>
+    <servlet-name>bug49297NoSpace</servlet-name>
+    <url-pattern>/bug49nnn/bug49297NoSpace.jsp</url-pattern>
+  </servlet-mapping>
   <servlet>
     <servlet-name>Bug49922Forward</servlet-name>
     <servlet-class>
