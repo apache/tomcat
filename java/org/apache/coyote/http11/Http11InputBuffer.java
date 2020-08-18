@@ -768,6 +768,14 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
      */
     private boolean fill(boolean block) throws IOException {
 
+        if (log.isDebugEnabled()) {
+            log.debug("parsingHeader: [" + parsingHeader +
+                    "], parsingRequestLine: [" + parsingRequestLine +
+                    "], parsingRequestLinePhase: [" + parsingRequestLinePhase +
+                    "], parsingRequestLineStart: [" + parsingRequestLineStart +
+                    "], byteBuffer.position() [" + byteBuffer.position() + "]");
+        }
+
         if (parsingHeader) {
             if (byteBuffer.limit() >= headerBufferSize) {
                 if (parsingRequestLine) {
