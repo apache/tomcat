@@ -1097,6 +1097,8 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
         File war = null;
         File dir = null;
 
+        long testStartTime = System.currentTimeMillis();
+
         if (startXml && !startExternalWar && !startExternalDir) {
             xml = createXmlInConfigBaseForAppbase();
         }
@@ -1130,40 +1132,36 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
                 if (xml == null) {
                     Assert.fail();
                 } else {
-                    xml.setLastModified(System.currentTimeMillis() -
-                            10 * HostConfig.FILE_MODIFICATION_RESOLUTION_MS);
+                    Assert.assertTrue("Failed to set last modified for [" + xml + "]. " +
+                            "This is expected (due to a JVM bug) with Java 6 on Windows.", xml.setLastModified(
+                            testStartTime - 10 * HostConfig.FILE_MODIFICATION_RESOLUTION_MS));
                 }
                 break;
             case EXT:
                 if (ext == null) {
                     Assert.fail();
                 } else {
-                    if (!ext.setLastModified(System.currentTimeMillis() -
-                            10 * HostConfig.FILE_MODIFICATION_RESOLUTION_MS)){
-                        Assert.fail("Failed to set last modified time for " +
-                                "external WAR file. This is expected (due to " +
-                                "a JVM bug) with Java 6 on Windows.");
-                    }
+                    Assert.assertTrue("Failed to set last modified for [" + ext + "]. " +
+                            "This is expected (due to a JVM bug) with Java 6 on Windows.", ext.setLastModified(
+                            testStartTime - 10 * HostConfig.FILE_MODIFICATION_RESOLUTION_MS));
                 }
                 break;
             case WAR:
                 if (war == null) {
                     Assert.fail();
                 } else {
-                    if (!war.setLastModified(System.currentTimeMillis() -
-                            10 * HostConfig.FILE_MODIFICATION_RESOLUTION_MS)) {
-                        Assert.fail("Failed to set last modified time for WAR " +
-                                "file. This is expected (due to a JVM bug) " +
-                                "with Java 6 on Windows.");
-                    }
+                    Assert.assertTrue("Failed to set last modified for [" + war + "]. " +
+                            "This is expected (due to a JVM bug) with Java 6 on Windows.", war.setLastModified(
+                            testStartTime - 10 * HostConfig.FILE_MODIFICATION_RESOLUTION_MS));
                 }
                 break;
             case DIR:
                 if (dir == null) {
                     Assert.fail();
                 } else {
-                    dir.setLastModified(System.currentTimeMillis() -
-                            10 * HostConfig.FILE_MODIFICATION_RESOLUTION_MS);
+                    Assert.assertTrue("Failed to set last modified for [" + dir + "]. " +
+                            "This is expected (due to a JVM bug) with Java 6 on Windows.", dir.setLastModified(
+                            testStartTime - 10 * HostConfig.FILE_MODIFICATION_RESOLUTION_MS));
                 }
                 break;
             default:
