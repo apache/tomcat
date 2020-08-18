@@ -379,8 +379,7 @@ public class TestHttp2Section_5_1 extends Http2TestBase {
         parser.readFrame(true);
 
         Assert.assertTrue(output.getTrace(),
-                output.getTrace().contains("5-RST-[" +
-                        Http2Error.REFUSED_STREAM.getCode() + "]"));
+                output.getTrace().contains("5-RST-[" + Http2Error.REFUSED_STREAM.getCode() + "]"));
         output.clearTrace();
 
         // Connection window is zero.
@@ -391,5 +390,6 @@ public class TestHttp2Section_5_1 extends Http2TestBase {
         sendWindowUpdate(3, (1 << 31) - 1);
 
         parser.readFrame(true);
+        Assert.assertEquals("3-RST-[" + Http2Error.FLOW_CONTROL_ERROR.getCode() + "]\n", output.getTrace());
     }
 }

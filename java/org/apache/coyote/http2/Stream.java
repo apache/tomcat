@@ -677,6 +677,7 @@ public class Stream extends AbstractStream implements HeaderEmitter {
                             se.getError()));
                 }
                 state.sendReset();
+                cancelAllocationRequests();
                 handler.sendStreamReset(se);
             } catch (IOException ioe) {
                 ConnectionException ce = new ConnectionException(
