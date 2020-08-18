@@ -36,7 +36,6 @@ import java.util.concurrent.atomic.AtomicReference;
 import javax.servlet.http.WebConnection;
 
 import org.apache.coyote.Adapter;
-import org.apache.coyote.CloseNowException;
 import org.apache.coyote.ProtocolException;
 import org.apache.coyote.Request;
 import org.apache.coyote.http11.upgrade.InternalHttpUpgradeHandler;
@@ -839,9 +838,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
             do {
                 synchronized (this) {
                     if (!stream.canWrite()) {
-                        throw new CloseNowException(
-                                sm.getString("upgradeHandler.stream.notWritable",
-                                        stream.getConnectionId(), stream.getIdentifier()));
+                        stream.doStreamCancel(sm.getString("upgradeHandler.stream.notWritable"), Http2Error.STREAM_CLOSED);
                     }
                     long windowSize = getWindowSize();
                     if (windowSize < 1 || backLogSize > 0) {
@@ -913,7 +910,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
                                     error = Http2Error.ENHANCE_YOUR_CALM;
                                 } else {
                                     msg = sm.getString("stream.clientCancel");
-                                    error = Http2Error.CANCEL;
+                                    error = Http2Error.STREAM_CLOSED;
                                 }
                                 // Close the stream
                                 // This thread is in application code so need
