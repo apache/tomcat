@@ -912,14 +912,14 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
                                     msg = sm.getString("stream.writeTimeout");
                                     error = Http2Error.ENHANCE_YOUR_CALM;
                                 } else {
-                                    msg = sm.getString("stream.clientAbort");
+                                    msg = sm.getString("stream.clientCancel");
                                     error = Http2Error.CANCEL;
                                 }
                                 // Close the stream
                                 // This thread is in application code so need
                                 // to signal to the application that the
                                 // stream is closing
-                                stream.doStreamAbort(msg, error);
+                                stream.doStreamCancel(msg, error);
                             }
                         } catch (InterruptedException e) {
                             throw new IOException(sm.getString(

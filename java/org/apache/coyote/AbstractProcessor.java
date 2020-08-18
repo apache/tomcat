@@ -433,7 +433,7 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
             break;
         }
         case DISABLE_SWALLOW_INPUT: {
-            // Aborted upload or similar.
+            // Cancelled upload or similar.
             // No point reading the remainder of the request.
             disableSwallowRequest();
             // This is an error state. Make sure it is marked as such.
