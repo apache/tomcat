@@ -17,6 +17,7 @@
 package org.apache.coyote.http2;
 
 import org.apache.coyote.ActionCode;
+import org.apache.coyote.Response;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.res.StringManager;
@@ -184,24 +185,27 @@ class WindowAllocationManager {
                 // to stream.notify(). Additional notify() calls may trigger
                 // unexpected timeouts.
                 waitingFor = NONE;
-                if (stream.getCoyoteResponse().getWriteListener() == null) {
-                    // Blocking, so use notify to release StreamOutputBuffer
-                    if (log.isDebugEnabled()) {
-                        log.debug(sm.getString("windowAllocationManager.notified",
-                                stream.getConnectionId(), stream.getIdentifier()));
+                Response response = stream.getCoyoteResponse();
+                if (response != null) {
+                    if (response.getWriteListener() == null) {
+                        // Blocking, so use notify to release StreamOutputBuffer
+                        if (log.isDebugEnabled()) {
+                            log.debug(sm.getString("windowAllocationManager.notified",
+                                    stream.getConnectionId(), stream.getIdentifier()));
+                        }
+                        stream.notify();
+                    } else {
+                        // Non-blocking so dispatch
+                        if (log.isDebugEnabled()) {
+                            log.debug(sm.getString("windowAllocationManager.dispatched",
+                                    stream.getConnectionId(), stream.getIdentifier()));
+                        }
+                        response.action(ActionCode.DISPATCH_WRITE, null);
+                        // Need to explicitly execute dispatches on the StreamProcessor
+                        // as this thread is being processed by an UpgradeProcessor
+                        // which won't see this dispatch
+                        response.action(ActionCode.DISPATCH_EXECUTE, null);
                     }
-                    stream.notify();
-                } else {
-                    // Non-blocking so dispatch
-                    if (log.isDebugEnabled()) {
-                        log.debug(sm.getString("windowAllocationManager.dispatched",
-                                stream.getConnectionId(), stream.getIdentifier()));
-                    }
-                    stream.getCoyoteResponse().action(ActionCode.DISPATCH_WRITE, null);
-                    // Need to explicitly execute dispatches on the StreamProcessor
-                    // as this thread is being processed by an UpgradeProcessor
-                    // which won't see this dispatch
-                    stream.getCoyoteResponse().action(ActionCode.DISPATCH_EXECUTE, null);
                 }
             }
         }
