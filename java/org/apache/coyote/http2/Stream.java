@@ -272,7 +272,7 @@ public class Stream extends AbstractStream implements HeaderEmitter {
                     allocationManager.waitForStream(writeTimeout);
                     windowSize = getWindowSize();
                     if (windowSize == 0) {
-                        doStreamAbort(sm.getString("stream.writeTimeout"), Http2Error.ENHANCE_YOUR_CALM);
+                        doStreamCancel(sm.getString("stream.writeTimeout"), Http2Error.ENHANCE_YOUR_CALM);
                     }
                 } catch (InterruptedException e) {
                     // Possible shutdown / rst or similar. Use an IOException to
@@ -296,7 +296,7 @@ public class Stream extends AbstractStream implements HeaderEmitter {
     }
 
 
-    void doStreamAbort(String msg, Http2Error error) throws CloseNowException {
+    void doStreamCancel(String msg, Http2Error error) throws CloseNowException {
         StreamException se = new StreamException(msg, error, getIdAsInt());
         // Prevent the application making further writes
         streamOutputBuffer.closed = true;
