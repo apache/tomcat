@@ -125,7 +125,7 @@ public class TestWebSocketFrameClient extends WebSocketBaseTest {
             echoTester("/foo",null);
             echoTester("/foo/",null);
         } finally {
-            LogManager.getLogManager().getLogger("org.apache.coyote").setLevel(Level.ALL);
+            LogManager.getLogManager().getLogger("org.apache.coyote").setLevel(Level.INFO);
             LogManager.getLogManager().getLogger("org.apache.tomcat.util.net").setLevel(Level.INFO);
         }
     }
