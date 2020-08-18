@@ -316,7 +316,7 @@ public class TestHttp2Section_5_1 extends Http2TestBase {
             // Client reset triggers a write error which in turn triggers a server
             // reset
             parser.readFrame(true);
-            Assert.assertEquals("3-RST-[8]\n", output.getTrace());
+            Assert.assertEquals("3-RST-[5]\n", output.getTrace());
             output.clearTrace();
 
             // Open up the connection window.
