@@ -322,8 +322,9 @@ public class TestVirtualContext extends TomcatBaseTest {
         //       VM running the buildbot instance. Increasing this to 10s should
         //       avoid these failures.
         //       With the additional of Travis CI, failures continued to
-        //       observed with a 10s timeout. It was therefore increased to 20s.
-        int sc = getUrl("http://localhost:" + getPort() + pageUrl, res, 20000,
+        //       observed with a 10s timeout. It was therefore increased to 20s
+        //       and then 30s.
+        int sc = getUrl("http://localhost:" + getPort() + pageUrl, res, 30000,
                 null, null);
 
         Assert.assertEquals(expectedStatus, sc);
