@@ -76,6 +76,12 @@
         the requested resource. Based on a pull request by Sergey Ponomarev.
         (markt)
       </fix>
+      <fix>
+        Correct the description of the storage format for salted hashes in the
+        Javadoc for <code>MessageDigestCredentialHandler</code> and refactor the
+        associated code for clarity.
+        Based on a patch provided by Milo van der Zee. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
