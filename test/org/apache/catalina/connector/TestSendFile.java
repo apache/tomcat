@@ -22,12 +22,12 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -187,18 +187,18 @@ public class TestSendFile extends TomcatBaseTest {
                 + "=true", bc, null);
 
         CountDownLatch latch = new CountDownLatch(2);
-        List<Throwable> exceptions = new ArrayList<Throwable>();
+        List<Throwable> throwables = new CopyOnWriteArrayList<Throwable>();
         new Thread(
-                new RequestExecutor("http://localhost:" + getPort() + "/test/", latch, exceptions))
+                new RequestExecutor("http://localhost:" + getPort() + "/test/", latch, throwables))
                         .start();
         new Thread(
-                new RequestExecutor("http://localhost:" + getPort() + "/test/", latch, exceptions))
+                new RequestExecutor("http://localhost:" + getPort() + "/test/", latch, throwables))
                         .start();
 
         latch.await(3000, TimeUnit.MILLISECONDS);
 
-        if (exceptions.size() > 0) {
-            Assert.fail();
+        if (throwables.size() > 0) {
+            Assert.fail("[" + throwables.size() + "] throwables observed");
         }
     }
 
