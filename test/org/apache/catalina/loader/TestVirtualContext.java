@@ -22,6 +22,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.logging.Level;
+import java.util.logging.LogManager;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -55,194 +57,203 @@ public class TestVirtualContext extends TomcatBaseTest {
 
     @Test
     public void testVirtualClassLoader() throws Exception {
-        Tomcat tomcat = getTomcatInstance();
 
-        File appDir = new File("test/webapp-virtual-webapp/src/main/webapp");
-        // app dir is relative to server home
-        StandardContext ctx = (StandardContext) tomcat.addWebapp(null, "/test",
-            appDir.getAbsolutePath());
+        // debug logging for intermittent CI failures
+        LogManager.getLogManager().getLogger("org.apache.coyote").setLevel(Level.ALL);
+        LogManager.getLogManager().getLogger("org.apache.tomcat.util.net").setLevel(Level.ALL);
+        try {
+            Tomcat tomcat = getTomcatInstance();
 
-        ctx.setResources(new StandardRoot(ctx));
-        File f1 = new File("test/webapp-virtual-webapp/target/classes");
-        File f2 = new File("test/webapp-virtual-library/target/WEB-INF");
-        File f3 = new File(
-                "test/webapp-virtual-webapp/src/main/webapp/WEB-INF/classes");
-        File f4 = new File(
-                "test/webapp-virtual-webapp/src/main/webapp2/WEB-INF/classes");
-        File f5 = new File("test/webapp-virtual-webapp/src/main/misc");
-        File f6 = new File("test/webapp-virtual-webapp/src/main/webapp2");
-        ctx.getResources().createWebResourceSet(
-                WebResourceRoot.ResourceSetType.POST, "/WEB-INF/classes",
-                f1.getAbsolutePath(), null, "/");
-        ctx.getResources().createWebResourceSet(
-                WebResourceRoot.ResourceSetType.POST, "/WEB-INF",
-                f2.getAbsolutePath(), null, "/");
-        ctx.getResources().createWebResourceSet(
-                WebResourceRoot.ResourceSetType.POST, "/WEB-INF/classes",
-                f3.getAbsolutePath(), null, "/");
-        ctx.getResources().createWebResourceSet(
-                WebResourceRoot.ResourceSetType.POST, "/WEB-INF/classes",
-                f4.getAbsolutePath(), null, "/");
-        ctx.getResources().createWebResourceSet(
-                WebResourceRoot.ResourceSetType.POST, "/other",
-                f5.getAbsolutePath(), null, "/");
-        ctx.getResources().createWebResourceSet(
-                WebResourceRoot.ResourceSetType.POST, "/",
-                f6.getAbsolutePath(), null, "/");
+            File appDir = new File("test/webapp-virtual-webapp/src/main/webapp");
+            // app dir is relative to server home
+            StandardContext ctx = (StandardContext) tomcat.addWebapp(null, "/test",
+                appDir.getAbsolutePath());
 
-        StandardJarScanner jarScanner = new StandardJarScanner();
-        jarScanner.setScanAllDirectories(true);
-        ctx.setJarScanner(jarScanner);
-        ctx.setAddWebinfClassesResources(true);
+            ctx.setResources(new StandardRoot(ctx));
+            File f1 = new File("test/webapp-virtual-webapp/target/classes");
+            File f2 = new File("test/webapp-virtual-library/target/WEB-INF");
+            File f3 = new File(
+                    "test/webapp-virtual-webapp/src/main/webapp/WEB-INF/classes");
+            File f4 = new File(
+                    "test/webapp-virtual-webapp/src/main/webapp2/WEB-INF/classes");
+            File f5 = new File("test/webapp-virtual-webapp/src/main/misc");
+            File f6 = new File("test/webapp-virtual-webapp/src/main/webapp2");
+            ctx.getResources().createWebResourceSet(
+                    WebResourceRoot.ResourceSetType.POST, "/WEB-INF/classes",
+                    f1.getAbsolutePath(), null, "/");
+            ctx.getResources().createWebResourceSet(
+                    WebResourceRoot.ResourceSetType.POST, "/WEB-INF",
+                    f2.getAbsolutePath(), null, "/");
+            ctx.getResources().createWebResourceSet(
+                    WebResourceRoot.ResourceSetType.POST, "/WEB-INF/classes",
+                    f3.getAbsolutePath(), null, "/");
+            ctx.getResources().createWebResourceSet(
+                    WebResourceRoot.ResourceSetType.POST, "/WEB-INF/classes",
+                    f4.getAbsolutePath(), null, "/");
+            ctx.getResources().createWebResourceSet(
+                    WebResourceRoot.ResourceSetType.POST, "/other",
+                    f5.getAbsolutePath(), null, "/");
+            ctx.getResources().createWebResourceSet(
+                    WebResourceRoot.ResourceSetType.POST, "/",
+                    f6.getAbsolutePath(), null, "/");
 
-        tomcat.start();
+            StandardJarScanner jarScanner = new StandardJarScanner();
+            jarScanner.setScanAllDirectories(true);
+            ctx.setJarScanner(jarScanner);
+            ctx.setAddWebinfClassesResources(true);
 
-        assertPageContains("/test/classpathGetResourceAsStream.jsp?path=nonexistent",
-            "resourceAInWebInfClasses=true", 404);
+            tomcat.start();
 
-        assertPageContains(
-            "/test/classpathGetResourceAsStream.jsp?path=rsrc/resourceA.properties",
-            "resourceAInWebInfClasses=true");
-        assertPageContains(
-            "/test/classpathGetResourceUrlThenGetStream.jsp?path=rsrc/resourceA.properties",
-            "resourceAInWebInfClasses=true");
+            assertPageContains("/test/classpathGetResourceAsStream.jsp?path=nonexistent",
+                "resourceAInWebInfClasses=true", 404);
 
-        assertPageContains(
-            "/test/classpathGetResourceAsStream.jsp?path=rsrc/resourceB.properties",
-            "resourceBInTargetClasses=true");
-        assertPageContains(
-            "/test/classpathGetResourceUrlThenGetStream.jsp?path=rsrc/resourceB.properties",
-            "resourceBInTargetClasses=true");
+            assertPageContains(
+                "/test/classpathGetResourceAsStream.jsp?path=rsrc/resourceA.properties",
+                "resourceAInWebInfClasses=true");
+            assertPageContains(
+                "/test/classpathGetResourceUrlThenGetStream.jsp?path=rsrc/resourceA.properties",
+                "resourceAInWebInfClasses=true");
 
-        assertPageContains(
-            "/test/classpathGetResourceAsStream.jsp?path=rsrc/resourceC.properties",
-            "resourceCInDependentLibraryTargetClasses=true");
-        assertPageContains(
-            "/test/classpathGetResourceUrlThenGetStream.jsp?path=rsrc/resourceC.properties",
-            "resourceCInDependentLibraryTargetClasses=true");
+            assertPageContains(
+                "/test/classpathGetResourceAsStream.jsp?path=rsrc/resourceB.properties",
+                "resourceBInTargetClasses=true");
+            assertPageContains(
+                "/test/classpathGetResourceUrlThenGetStream.jsp?path=rsrc/resourceB.properties",
+                "resourceBInTargetClasses=true");
 
-        assertPageContains(
-            "/test/classpathGetResourceAsStream.jsp?path=rsrc/resourceD.properties",
-            "resourceDInPackagedJarInWebInfLib=true");
-        assertPageContains(
-            "/test/classpathGetResourceUrlThenGetStream.jsp?path=rsrc/resourceD.properties",
-            "resourceDInPackagedJarInWebInfLib=true");
+            assertPageContains(
+                "/test/classpathGetResourceAsStream.jsp?path=rsrc/resourceC.properties",
+                "resourceCInDependentLibraryTargetClasses=true");
+            assertPageContains(
+                "/test/classpathGetResourceUrlThenGetStream.jsp?path=rsrc/resourceC.properties",
+                "resourceCInDependentLibraryTargetClasses=true");
 
-        assertPageContains(
-            "/test/classpathGetResourceAsStream.jsp?path=rsrc/resourceG.properties",
-            "resourceGInWebInfClasses=true");
-        assertPageContains(
-            "/test/classpathGetResourceUrlThenGetStream.jsp?path=rsrc/resourceG.properties",
-            "resourceGInWebInfClasses=true");
+            assertPageContains(
+                "/test/classpathGetResourceAsStream.jsp?path=rsrc/resourceD.properties",
+                "resourceDInPackagedJarInWebInfLib=true");
+            assertPageContains(
+                "/test/classpathGetResourceUrlThenGetStream.jsp?path=rsrc/resourceD.properties",
+                "resourceDInPackagedJarInWebInfLib=true");
 
-        // test listing all possible paths for a classpath resource
-        String allUrls =
-            getUrl(
-                "http://localhost:" + getPort() +
-                    "/test/classpathGetResources.jsp?path=rsrc/").toString();
-        Assert.assertTrue(
-            allUrls,
-            allUrls.indexOf("/test/webapp-virtual-webapp/src/main/webapp/WEB-INF/classes/rsrc") > 0);
-        Assert.assertTrue(
-            allUrls,
-            allUrls.indexOf("/test/webapp-virtual-webapp/src/main/webapp2/WEB-INF/classes/rsrc") > 0);
-        Assert.assertTrue(
-            allUrls,
-            allUrls.indexOf("/test/webapp-virtual-webapp/src/main/webapp/WEB-INF/lib/rsrc.jar!/rsrc") > 0);
-        Assert.assertTrue(
-            allUrls,
-            allUrls.indexOf("/test/webapp-virtual-webapp/target/classes/rsrc") > 0);
-        Assert.assertTrue(
-            allUrls,
-            allUrls.indexOf("/test/webapp-virtual-library/target/WEB-INF/classes/rsrc") > 0);
+            assertPageContains(
+                "/test/classpathGetResourceAsStream.jsp?path=rsrc/resourceG.properties",
+                "resourceGInWebInfClasses=true");
+            assertPageContains(
+                "/test/classpathGetResourceUrlThenGetStream.jsp?path=rsrc/resourceG.properties",
+                "resourceGInWebInfClasses=true");
 
-        // check that there's no duplicate in the URLs
-        String[] allUrlsArray = allUrls.split("\\s+");
-        Assert.assertEquals(new HashSet<>(Arrays.asList(allUrlsArray)).size(),
-            allUrlsArray.length);
+            // test listing all possible paths for a classpath resource
+            String allUrls =
+                getUrl(
+                    "http://localhost:" + getPort() +
+                        "/test/classpathGetResources.jsp?path=rsrc/").toString();
+            Assert.assertTrue(
+                allUrls,
+                allUrls.indexOf("/test/webapp-virtual-webapp/src/main/webapp/WEB-INF/classes/rsrc") > 0);
+            Assert.assertTrue(
+                allUrls,
+                allUrls.indexOf("/test/webapp-virtual-webapp/src/main/webapp2/WEB-INF/classes/rsrc") > 0);
+            Assert.assertTrue(
+                allUrls,
+                allUrls.indexOf("/test/webapp-virtual-webapp/src/main/webapp/WEB-INF/lib/rsrc.jar!/rsrc") > 0);
+            Assert.assertTrue(
+                allUrls,
+                allUrls.indexOf("/test/webapp-virtual-webapp/target/classes/rsrc") > 0);
+            Assert.assertTrue(
+                allUrls,
+                allUrls.indexOf("/test/webapp-virtual-library/target/WEB-INF/classes/rsrc") > 0);
 
-        String allRsrsc2ClasspathUrls =
-            getUrl(
-                "http://localhost:" + getPort() +
-                    "/test/classpathGetResources.jsp?path=rsrc2/").toString();
-        Assert.assertTrue(
-            allRsrsc2ClasspathUrls,
-            allRsrsc2ClasspathUrls.indexOf("/test/webapp-virtual-webapp/src/main/webapp2/WEB-INF/classes/rsrc2") > 0);
+            // check that there's no duplicate in the URLs
+            String[] allUrlsArray = allUrls.split("\\s+");
+            Assert.assertEquals(new HashSet<>(Arrays.asList(allUrlsArray)).size(),
+                allUrlsArray.length);
 
-        // tests context.getRealPath
+            String allRsrsc2ClasspathUrls =
+                getUrl(
+                    "http://localhost:" + getPort() +
+                        "/test/classpathGetResources.jsp?path=rsrc2/").toString();
+            Assert.assertTrue(
+                allRsrsc2ClasspathUrls,
+                allRsrsc2ClasspathUrls.indexOf("/test/webapp-virtual-webapp/src/main/webapp2/WEB-INF/classes/rsrc2") > 0);
 
-        // the following fails because getRealPath always return a non-null path
-        // even if there's no such resource
-        // assertPageContains("/test/contextGetRealPath.jsp?path=nonexistent",
-        // "resourceAInWebInfClasses=true", 404);
+            // tests context.getRealPath
 
-        // Real paths depend on the OS and this test has to work on all
-        // platforms so use File to convert the path to a platform specific form
-        File f = new File(
-            "test/webapp-virtual-webapp/src/main/webapp/rsrc/resourceF.properties");
-        assertPageContains(
-            "/test/contextGetRealPath.jsp?path=/rsrc/resourceF.properties",
-            f.getPath());
+            // the following fails because getRealPath always return a non-null path
+            // even if there's no such resource
+            // assertPageContains("/test/contextGetRealPath.jsp?path=nonexistent",
+            // "resourceAInWebInfClasses=true", 404);
 
-        // tests context.getResource then the content
+            // Real paths depend on the OS and this test has to work on all
+            // platforms so use File to convert the path to a platform specific form
+            File f = new File(
+                "test/webapp-virtual-webapp/src/main/webapp/rsrc/resourceF.properties");
+            assertPageContains(
+                "/test/contextGetRealPath.jsp?path=/rsrc/resourceF.properties",
+                f.getPath());
 
-        assertPageContains("/test/contextGetResource.jsp?path=/nonexistent",
-            "resourceAInWebInfClasses=true", 404);
-        assertPageContains(
-            "/test/contextGetResource.jsp?path=/WEB-INF/classes/rsrc/resourceA.properties",
-            "resourceAInWebInfClasses=true");
-        assertPageContains(
-            "/test/contextGetResource.jsp?path=/WEB-INF/classes/rsrc/resourceG.properties",
-            "resourceGInWebInfClasses=true");
-        assertPageContains(
-            "/test/contextGetResource.jsp?path=/rsrc/resourceE.properties",
-            "resourceEInDependentLibraryTargetClasses=true");
-        assertPageContains(
-            "/test/contextGetResource.jsp?path=/other/resourceI.properties",
-            "resourceIInWebapp=true");
-        assertPageContains(
-            "/test/contextGetResource.jsp?path=/rsrc2/resourceJ.properties",
-            "resourceJInWebapp=true");
+            // tests context.getResource then the content
 
-        String allRsrcPaths =
-            getUrl(
-                "http://localhost:" + getPort() +
-                    "/test/contextGetResourcePaths.jsp?path=/rsrc/").toString();
-        Assert.assertTrue(
-            allRsrcPaths,
-            allRsrcPaths.indexOf("/rsrc/resourceF.properties") > 0);
-        Assert.assertTrue(
-            allRsrcPaths,
-            allRsrcPaths.indexOf("/rsrc/resourceE.properties") > 0);
-        Assert.assertTrue(
-            allRsrcPaths,
-            allRsrcPaths.indexOf("/rsrc/resourceH.properties") > 0);
+            assertPageContains("/test/contextGetResource.jsp?path=/nonexistent",
+                "resourceAInWebInfClasses=true", 404);
+            assertPageContains(
+                "/test/contextGetResource.jsp?path=/WEB-INF/classes/rsrc/resourceA.properties",
+                "resourceAInWebInfClasses=true");
+            assertPageContains(
+                "/test/contextGetResource.jsp?path=/WEB-INF/classes/rsrc/resourceG.properties",
+                "resourceGInWebInfClasses=true");
+            assertPageContains(
+                "/test/contextGetResource.jsp?path=/rsrc/resourceE.properties",
+                "resourceEInDependentLibraryTargetClasses=true");
+            assertPageContains(
+                "/test/contextGetResource.jsp?path=/other/resourceI.properties",
+                "resourceIInWebapp=true");
+            assertPageContains(
+                "/test/contextGetResource.jsp?path=/rsrc2/resourceJ.properties",
+                "resourceJInWebapp=true");
 
-        // check that there's no duplicate in the URLs
-        String[] allRsrcPathsArray = allRsrcPaths.split("\\s+");
-        Assert.assertEquals(new HashSet<>(Arrays.asList(allRsrcPathsArray)).size(),
-            allRsrcPathsArray.length);
+            String allRsrcPaths =
+                getUrl(
+                    "http://localhost:" + getPort() +
+                        "/test/contextGetResourcePaths.jsp?path=/rsrc/").toString();
+            Assert.assertTrue(
+                allRsrcPaths,
+                allRsrcPaths.indexOf("/rsrc/resourceF.properties") > 0);
+            Assert.assertTrue(
+                allRsrcPaths,
+                allRsrcPaths.indexOf("/rsrc/resourceE.properties") > 0);
+            Assert.assertTrue(
+                allRsrcPaths,
+                allRsrcPaths.indexOf("/rsrc/resourceH.properties") > 0);
 
-        String allRsrc2Paths =
-            getUrl(
-                "http://localhost:" + getPort() +
-                    "/test/contextGetResourcePaths.jsp?path=/rsrc2/").toString();
-        Assert.assertTrue(
-            allRsrc2Paths,
-            allRsrc2Paths.indexOf("/rsrc2/resourceJ.properties") > 0);
+            // check that there's no duplicate in the URLs
+            String[] allRsrcPathsArray = allRsrcPaths.split("\\s+");
+            Assert.assertEquals(new HashSet<>(Arrays.asList(allRsrcPathsArray)).size(),
+                allRsrcPathsArray.length);
 
-        assertPageContains(
-            "/test/testTlds.jsp",
-            "worldA");
-        assertPageContains(
-            "/test/testTlds.jsp",
-            "worldB");
-        assertPageContains(
-            "/test/testTlds.jsp",
-            "worldC");
-        assertPageContains(
-            "/test/testTlds.jsp",
-            "worldD");
+            String allRsrc2Paths =
+                getUrl(
+                    "http://localhost:" + getPort() +
+                        "/test/contextGetResourcePaths.jsp?path=/rsrc2/").toString();
+            Assert.assertTrue(
+                allRsrc2Paths,
+                allRsrc2Paths.indexOf("/rsrc2/resourceJ.properties") > 0);
+
+            assertPageContains(
+                "/test/testTlds.jsp",
+                "worldA");
+            assertPageContains(
+                "/test/testTlds.jsp",
+                "worldB");
+            assertPageContains(
+                "/test/testTlds.jsp",
+                "worldC");
+            assertPageContains(
+                "/test/testTlds.jsp",
+                "worldD");
+        } finally {
+            LogManager.getLogManager().getLogger("org.apache.coyote").setLevel(Level.INFO);
+            LogManager.getLogManager().getLogger("org.apache.tomcat.util.net").setLevel(Level.INFO);
+        }
     }
 
     @Test
