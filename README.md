@@ -2,8 +2,8 @@
 
 ### What Is It?
 
-The Apache Tomcat® software is an open source implementation of the Java
-Servlet, JavaServer Pages, Java Expression Language and Java WebSocket
+The Apache Tomcat® software is an open-source implementation of the Java
+Servlet, JavaServer Pages, Java Expression Language, and Java WebSocket
 technologies. The Java Servlet, JavaServer Pages, Java Expression Language and
 Java WebSocket specifications are developed under the
 [Java Community Process](https://jcp.org/en/introduction/overview).
@@ -22,7 +22,7 @@ these users and their stories are listed on the
 [PoweredBy wiki page](https://wiki.apache.org/tomcat/PoweredBy).
 
 Apache Tomcat, Tomcat, Apache, the Apache feather, and the Apache Tomcat
-project logo are trademarks of the Apache Software Foundation.
+project logos are trademarks of the Apache Software Foundation.
 
 ### Get It
 
@@ -65,7 +65,7 @@ Freenode).
 resources page [here](https://tomcat.apache.org/findhelp.html).
 
 * If you want to be informed about new code releases, bug fixes,
-security fixes, general news and information about Apache Tomcat, please
+security fixes, general news, and information about Apache Tomcat, please
 subscribe to the
 [tomcat-announce](https://tomcat.apache.org/lists.html#tomcat-announce) email
 list.
