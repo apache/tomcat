@@ -1698,15 +1698,15 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
          */
         @Override
         public String toString() {
-            StringBuffer buf = new StringBuffer();
+            StringBuilder buf = new StringBuilder();
             buf.append("Poller");
             long[] res = new long[pollerSize * 2];
             int count = Poll.pollset(aprPoller, res);
             buf.append(" [ ");
             for (int j = 0; j < count; j++) {
-                buf.append(desc[2*j+1]).append(" ");
+                buf.append(desc[2*j+1]).append(' ');
             }
-            buf.append("]");
+            buf.append(']');
             return buf.toString();
         }
 
@@ -1810,33 +1810,32 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
                             timeouts.remove(info.socket);
                             AprSocketWrapper wrapper = connections.get(
                                     Long.valueOf(info.socket));
-                            if (wrapper == null) {
-                                continue;
-                            }
-                            if (info.read() || info.write()) {
-                                boolean comet = wrapper.isComet();
-                                if (comet || wrapper.pollerFlags != 0) {
-                                    removeFromPoller(info.socket);
-                                }
-                                wrapper.pollerFlags = wrapper.pollerFlags |
-                                        (info.read() ? Poll.APR_POLLIN : 0) |
-                                        (info.write() ? Poll.APR_POLLOUT : 0);
-                                if (!addToPoller(info.socket, wrapper.pollerFlags)) {
-                                    // Can't do anything: close the socket right
-                                    // away
-                                    if (!comet || !processSocket(info.socket, SocketStatus.ERROR)) {
-                                        closeSocket(info.socket);
+                            if (wrapper != null) {
+                                if (info.read() || info.write()) {
+                                    boolean comet = wrapper.isComet();
+                                    if (comet || wrapper.pollerFlags != 0) {
+                                        removeFromPoller(info.socket);
+                                    }
+                                    wrapper.pollerFlags = wrapper.pollerFlags |
+                                            (info.read() ? Poll.APR_POLLIN : 0) |
+                                            (info.write() ? Poll.APR_POLLOUT : 0);
+                                    if (!addToPoller(info.socket, wrapper.pollerFlags)) {
+                                        // Can't do anything: close the socket right
+                                        // away
+                                        if (!comet || !processSocket(info.socket, SocketStatus.ERROR)) {
+                                            closeSocket(info.socket);
+                                        }
+                                    } else {
+                                        timeouts.add(info.socket,
+                                                System.currentTimeMillis() +
+                                                        info.timeout);
                                     }
                                 } else {
-                                    timeouts.add(info.socket,
-                                            System.currentTimeMillis() +
-                                                    info.timeout);
+                                    // Should never happen.
+                                    closeSocket(info.socket);
+                                    getLog().warn(sm.getString(
+                                            "endpoint.apr.pollAddInvalid", info));
                                 }
-                            } else {
-                                // Should never happen.
-                                closeSocket(info.socket);
-                                getLog().warn(sm.getString(
-                                        "endpoint.apr.pollAddInvalid", info));
                             }
                             info = localAddList.get();
                         }
