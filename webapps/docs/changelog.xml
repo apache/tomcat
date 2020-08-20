@@ -89,6 +89,10 @@
         <code>ServletInputStream.available()</code> to provide a more accurate
         return value, particularly when end of stream has been reached. (markt)
       </fix>
+      <fix>
+        Fix a rare potential race condition when chekcing for timeouts with the
+        APR connector. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="WebSocket">
