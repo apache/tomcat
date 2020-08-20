@@ -31,6 +31,7 @@ import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.catalina.valves.ValveBase;
 import org.apache.tomcat.util.buf.ByteChunk;
+import org.apache.tomcat.util.net.SSLHostConfig;
 import org.apache.tomcat.util.net.TesterSupport;
 
 public class TestResolverSSL extends TomcatBaseTest {
@@ -40,6 +41,10 @@ public class TestResolverSSL extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
         Container root = tomcat.getHost().findChild("");
         root.getPipeline().addValve(new ResolverTestValve());
+
+        // Enable session caching so the SSL Session is available when using APR
+        SSLHostConfig sslHostConfig = tomcat.getConnector().findSslHostConfigs()[0];
+        sslHostConfig.setSessionCacheSize(20 * 1024);
 
         tomcat.start();
         ByteChunk res = getUrl("https://localhost:" + getPort() + "/protected");
