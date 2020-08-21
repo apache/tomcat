@@ -94,17 +94,25 @@ public class TestCancelledUpload extends Http2TestBase {
             return;
         }
 
-        // Not window update, not reset, must be the response
-        parser.readFrame(true);
+        // Not window update, not reset, must be the headers
         Assert.assertEquals("3-HeadersStart\n" +
                 "3-Header-[:status]-[403]\n" +
                 "3-Header-[content-length]-[0]\n" +
                 "3-Header-[date]-[Wed, 11 Nov 2015 19:18:42 GMT]\n" +
-                "3-HeadersEnd\n" +
-                "3-Body-0\n" +
-                "3-EndOfStream\n",
+                "3-HeadersEnd\n",
                 output.getTrace());
         output.clearTrace();
+
+        parser.readFrame(true);
+        // Check for reset and exit if found
+        if (output.getTrace().startsWith("3-RST-[3]\n")) {
+            return;
+        }
+
+        // Not reset, must be request body
+        Assert.assertEquals("3-Body-0\n" +
+                "3-EndOfStream\n",
+                output.getTrace());
 
         // There must be a reset. There may be some WindowSize frames
         parser.readFrame(true);
