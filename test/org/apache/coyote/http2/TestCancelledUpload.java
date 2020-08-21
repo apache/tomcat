@@ -63,29 +63,66 @@ public class TestCancelledUpload extends Http2TestBase {
         // Trailers
         writeFrame(trailerFrameHeader, trailerPayload);
 
-        // The actual response depends on timing issues. Particularly how much
-        // data is transferred in StreamInputBuffer inBuffer to outBuffer on the
-        // first read.
-        while (output.getTrace().length() == 0) {
-            try {
-                parser.readFrame(true);
-                if ("3-RST-[3]\n".equals(output.getTrace())) {
-                    output.clearTrace();
-                }
-            } catch (IOException ioe) {
-                // Might not be any further frames after the reset
-                break;
-            }
+        // The Server will process the request on a separate thread to the
+        // incoming frames.
+        // The request processing thread will:
+        // - read up to 128 bytes of request body
+        //   (and issue a window update for bytes read)
+        // - write a 403 response with no response body
+        // The connection processing thread will:
+        // - read the request body until the flow control window is exhausted
+        // - reset the stream if further DATA frames are received
+        parser.readFrame(true);
+
+        // If reset is first frame received end test here
+        if (output.getTrace().startsWith("3-RST-[3]\\n")) {
+            return;
         }
 
-        if (output.getTrace().startsWith("0-WindowSize-[")) {
+        // Validate any WindowSize frames (always arrive in pairs)
+        while (output.getTrace().startsWith("0-WindowSize-[")) {
             String trace = output.getTrace();
             int size = Integer.parseInt(trace.substring(14, trace.length() - 2));
             output.clearTrace();
-            // Window updates always come in pairs
+            parser.readFrame(true);
+            Assert.assertEquals("3-WindowSize-[" + size + "]\n", output.getTrace());
+            output.clearTrace();
+            parser.readFrame(true);
+        }
+
+        // Check for reset and exit if found
+        if (output.getTrace().startsWith("3-RST-[3]\n")) {
+            return;
+        }
+
+        // Not window update, not reset, must be the response
+        parser.readFrame(true);
+        Assert.assertEquals("3-HeadersStart\n" +
+                "3-Header-[:status]-[403]\n" +
+                "3-Header-[content-length]-[0]\n" +
+                "3-Header-[date]-[Wed, 11 Nov 2015 19:18:42 GMT]\n" +
+                "3-HeadersEnd\n" +
+                "3-Body-0\n" +
+                "3-EndOfStream\n",
+                output.getTrace());
+        output.clearTrace();
+
+        // There must be a reset. There may be some WindowSize frames
+        parser.readFrame(true);
+
+        // Validate any WindowSize frames (always arrive in pairs)
+        while (output.getTrace().startsWith("0-WindowSize-[")) {
+            String trace = output.getTrace();
+            int size = Integer.parseInt(trace.substring(14, trace.length() - 2));
+            output.clearTrace();
             parser.readFrame(true);
             Assert.assertEquals("3-WindowSize-[" + size + "]\n", output.getTrace());
         }
+
+        // This should be the reset
+        Assert.assertEquals("3-RST-[3]\n", output.getTrace());
+
+        // If there are any more frames after this, ignore them
     }
 
 
