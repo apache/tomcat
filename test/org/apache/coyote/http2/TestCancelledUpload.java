@@ -31,10 +31,10 @@ import org.apache.catalina.Context;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.startup.Tomcat;
 
-public class TestAbortedUpload extends Http2TestBase {
+public class TestCancelledUpload extends Http2TestBase {
 
     @Test
-    public void testAbortedRequest() throws Exception {
+    public void testCancelledRequest() throws Exception {
         http2Connect();
 
         http2Protocol.setAllowedTrailerHeaders(TRAILER_HEADER_NAME);
@@ -94,14 +94,14 @@ public class TestAbortedUpload extends Http2TestBase {
 
         // Retain '/simple' url-pattern since it enables code re-use
         Context ctxt = tomcat.addContext("", null);
-        Tomcat.addServlet(ctxt, "abort", new AbortServlet());
-        ctxt.addServletMappingDecoded("/simple", "abort");
+        Tomcat.addServlet(ctxt, "cancel", new CancelServlet());
+        ctxt.addServletMappingDecoded("/simple", "cancel");
 
         tomcat.start();
     }
 
 
-    private static class AbortServlet extends SimpleServlet {
+    private static class CancelServlet extends SimpleServlet {
 
         private static final long serialVersionUID = 1L;
 
