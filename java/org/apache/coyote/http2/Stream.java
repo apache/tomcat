@@ -651,9 +651,14 @@ class Stream extends AbstractStream implements HeaderEmitter {
 
 
     final boolean isContentLengthInconsistent() {
-        long contentLengthHeader = coyoteRequest.getContentLengthLong();
-        if (contentLengthHeader > -1 && contentLengthReceived != contentLengthHeader) {
-            return true;
+        Request coyoteRequest = this.coyoteRequest;
+        // May be null when processing trailer headers after stream has been
+        // closed.
+        if (coyoteRequest != null) {
+            long contentLengthHeader = coyoteRequest.getContentLengthLong();
+            if (contentLengthHeader > -1 && contentLengthReceived != contentLengthHeader) {
+                return true;
+            }
         }
         return false;
     }
