@@ -342,6 +342,7 @@ if [ $have_tty -eq 1 ]; then
     echo "Using JRE_HOME:        $JRE_HOME"
   fi
   echo "Using CLASSPATH:       $CLASSPATH"
+  echo "Using CATALINA_OPTS:   $CATALINA_OPTS"
   if [ ! -z "$CATALINA_PID" ]; then
     echo "Using CATALINA_PID:    $CATALINA_PID"
   fi
