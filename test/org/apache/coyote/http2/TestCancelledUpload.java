@@ -75,7 +75,7 @@ public class TestCancelledUpload extends Http2TestBase {
         parser.readFrame(true);
 
         // If reset is first frame received end test here
-        if (output.getTrace().startsWith("3-RST-[3]\\n")) {
+        if (output.getTrace().startsWith("3-RST-[3]\n")) {
             return;
         }
 
@@ -114,6 +114,7 @@ public class TestCancelledUpload extends Http2TestBase {
         Assert.assertEquals("3-Body-0\n" +
                 "3-EndOfStream\n",
                 output.getTrace());
+        output.clearTrace();
 
         // There must be a reset. There may be some WindowSize frames
         parser.readFrame(true);
