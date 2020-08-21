@@ -752,6 +752,9 @@ class Stream extends AbstractStream implements HeaderEmitter {
      * Stream instances are retained for a period after the Stream closes.
      */
     final void recycle() {
+        if (log.isDebugEnabled()) {
+            log.debug(sm.getString("stream.recycle", getConnectionId(), getIdentifier()));
+        }
         coyoteRequest = null;
         cookieHeader = null;
         coyoteResponse = null;
