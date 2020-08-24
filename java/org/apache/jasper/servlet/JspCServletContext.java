@@ -14,9 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.jasper.servlet;
-
 
 import java.io.File;
 import java.io.InputStream;
@@ -73,8 +71,7 @@ public class JspCServletContext implements ServletContext {
     /**
      * Servlet context initialization parameters.
      */
-    private final ConcurrentMap<String,String> myParameters =
-            new ConcurrentHashMap<String,String>();
+    private final ConcurrentMap<String,String> myParameters = new ConcurrentHashMap<String,String>();
 
 
     /**
@@ -102,6 +99,8 @@ public class JspCServletContext implements ServletContext {
      *
      * @param aLogWriter PrintWriter which is used for <code>log()</code> calls
      * @param aResourceBaseURL Resource base URL
+     * @param classLoader   Class loader for this {@link ServletContext}
+     * @throws JasperException Never thrown
      */
     public JspCServletContext(PrintWriter aLogWriter, URL aResourceBaseURL, ClassLoader classLoader)
             throws JasperException {
@@ -124,9 +123,7 @@ public class JspCServletContext implements ServletContext {
      */
     @Override
     public Object getAttribute(String name) {
-
-        return (myAttributes.get(name));
-
+        return myAttributes.get(name);
     }
 
 
@@ -135,9 +132,7 @@ public class JspCServletContext implements ServletContext {
      */
     @Override
     public Enumeration<String> getAttributeNames() {
-
-        return (myAttributes.keys());
-
+        return myAttributes.keys();
     }
 
 
@@ -148,9 +143,7 @@ public class JspCServletContext implements ServletContext {
      */
     @Override
     public ServletContext getContext(String uripath) {
-
-        return (null);
-
+        return null;
     }
 
 
@@ -159,9 +152,7 @@ public class JspCServletContext implements ServletContext {
      */
     @Override
     public String getContextPath() {
-
-        return (null);
-
+        return null;
     }
 
 
@@ -191,9 +182,7 @@ public class JspCServletContext implements ServletContext {
      */
     @Override
     public int getMajorVersion() {
-
-        return (3);
-
+        return 3;
     }
 
 
@@ -204,9 +193,7 @@ public class JspCServletContext implements ServletContext {
      */
     @Override
     public String getMimeType(String file) {
-
-        return (null);
-
+        return null;
     }
 
 
@@ -215,9 +202,7 @@ public class JspCServletContext implements ServletContext {
      */
     @Override
     public int getMinorVersion() {
-
-        return (0);
-
+        return 0;
     }
 
 
@@ -228,9 +213,7 @@ public class JspCServletContext implements ServletContext {
      */
     @Override
     public RequestDispatcher getNamedDispatcher(String name) {
-
-        return (null);
-
+        return null;
     }
 
 
@@ -242,7 +225,6 @@ public class JspCServletContext implements ServletContext {
      */
     @Override
     public String getRealPath(String path) {
-
         if (!myResourceBaseURL.getProtocol().equals("file"))
             return null;
         if (!path.startsWith("/"))
@@ -264,9 +246,7 @@ public class JspCServletContext implements ServletContext {
      */
     @Override
     public RequestDispatcher getRequestDispatcher(String path) {
-
-        return (null);
-
+        return null;
     }
 
 
@@ -282,9 +262,10 @@ public class JspCServletContext implements ServletContext {
     @Override
     public URL getResource(String path) throws MalformedURLException {
 
-        if (!path.startsWith("/"))
-            throw new MalformedURLException("Path '" + path +
-                                            "' does not start with '/'");
+        if (!path.startsWith("/")) {
+            throw new MalformedURLException("Path '" + path + "' does not start with '/'");
+        }
+
         URL url = new URL(myResourceBaseURL, path.substring(1));
         InputStream is = null;
         try {
@@ -302,7 +283,6 @@ public class JspCServletContext implements ServletContext {
             }
         }
         return url;
-
     }
 
 
@@ -314,14 +294,12 @@ public class JspCServletContext implements ServletContext {
      */
     @Override
     public InputStream getResourceAsStream(String path) {
-
         try {
-            return (getResource(path).openStream());
+            return getResource(path).openStream();
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
-            return (null);
+            return null;
         }
-
     }
 
 
@@ -335,8 +313,9 @@ public class JspCServletContext implements ServletContext {
     public Set<String> getResourcePaths(String path) {
 
         Set<String> thePaths = new HashSet<String>();
-        if (!path.endsWith("/"))
+        if (!path.endsWith("/")) {
             path += "/";
+        }
         String basePath = getRealPath(path);
         if (basePath != null) {
             File theBaseDir = new File(basePath);
@@ -363,9 +342,7 @@ public class JspCServletContext implements ServletContext {
      */
     @Override
     public String getServerInfo() {
-
-        return ("JspCServletContext/1.0");
-
+        return "JspCServletContext/1.0";
     }
 
 
@@ -379,9 +356,7 @@ public class JspCServletContext implements ServletContext {
     @Override
     @Deprecated
     public Servlet getServlet(String name) throws ServletException {
-
-        return (null);
-
+        return null;
     }
 
 
@@ -390,9 +365,7 @@ public class JspCServletContext implements ServletContext {
      */
     @Override
     public String getServletContextName() {
-
-        return (getServerInfo());
-
+        return getServerInfo();
     }
 
 
@@ -404,9 +377,7 @@ public class JspCServletContext implements ServletContext {
     @Override
     @Deprecated
     public Enumeration<String> getServletNames() {
-
-        return (new Vector<String>().elements());
-
+        return new Vector<String>().elements();
     }
 
 
@@ -418,9 +389,7 @@ public class JspCServletContext implements ServletContext {
     @Override
     @Deprecated
     public Enumeration<Servlet> getServlets() {
-
-        return (new Vector<Servlet>().elements());
-
+        return new Vector<Servlet>().elements();
     }
 
 
@@ -431,9 +400,7 @@ public class JspCServletContext implements ServletContext {
      */
     @Override
     public void log(String message) {
-
         myLogWriter.println(message);
-
     }
 
 
@@ -448,9 +415,7 @@ public class JspCServletContext implements ServletContext {
     @Override
     @Deprecated
     public void log(Exception exception, String message) {
-
         log(message, exception);
-
     }
 
 
@@ -462,10 +427,8 @@ public class JspCServletContext implements ServletContext {
      */
     @Override
     public void log(String message, Throwable exception) {
-
         myLogWriter.println(message);
         exception.printStackTrace(myLogWriter);
-
     }
 
 
@@ -476,9 +439,7 @@ public class JspCServletContext implements ServletContext {
      */
     @Override
     public void removeAttribute(String name) {
-
         myAttributes.remove(name);
-
     }
 
 
@@ -490,9 +451,7 @@ public class JspCServletContext implements ServletContext {
      */
     @Override
     public void setAttribute(String name, Object value) {
-
         myAttributes.put(name, value);
-
     }
 
 
