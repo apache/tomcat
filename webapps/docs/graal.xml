@@ -128,6 +128,7 @@ mvn package</source>
     Run the GraalVM substrate VM using the trace agent:
     <source>$JAVA_HOME/bin/java\
         -agentlib:native-image-agent=config-output-dir=$TOMCAT_STUFFED/target/\
+        -Dorg.graalvm.nativeimage.imagecode=agent\
         -Dcatalina.base=. -Djava.util.logging.config.file=conf/logging.properties\
         -jar target/tomcat-stuffed-1.0.jar --catalina -useGeneratedCode</source>
   </p>
