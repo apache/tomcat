@@ -69,10 +69,6 @@ public final class Request {
     // Expected maximum typical number of cookies per request.
     private static final int INITIAL_COOKIE_SIZE = 4;
 
-    // whether to acknowledge the request when the request body is first
-    // read from.
-    private ContinueHandlingResponsePolicy continueHandlingResponsePolicy = null;
-
     // ----------------------------------------------------------- Constructors
 
     public Request() {
@@ -166,6 +162,10 @@ public final class Request {
     private boolean sendfile = true;
 
     volatile ReadListener listener;
+
+    // whether to acknowledge the request when the request body is first
+    // read from.
+    private ContinueHandlingResponsePolicy continueHandlingResponsePolicy = null;
 
     public ReadListener getReadListener() {
         return listener;
