@@ -88,6 +88,11 @@
         associated code for clarity.
         Based on a patch provided by Milo van der Zee. (markt)
       </fix>
+      <fix>
+        Correct the path vaidation to allow the use of the file system root for
+        the <code>docBase</code> attribute of a <code>Context</code>. Note that
+        such a configuration should be used with caution. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
