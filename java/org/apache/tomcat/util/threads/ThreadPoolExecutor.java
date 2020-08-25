@@ -197,7 +197,7 @@ public class ThreadPoolExecutor extends java.util.concurrent.ThreadPoolExecutor 
             // checks that queue.remainingCapacity()==0. I did not understand
             // why, but to get the intended effect of waking up idle threads, I
             // temporarily fake this condition.
-            taskQueue.setForcedRemainingCapacity(Integer.valueOf(0));
+            taskQueue.setForcedRemainingCapacity(0);
         }
 
         // setCorePoolSize(0) wakes idle threads
@@ -209,7 +209,7 @@ public class ThreadPoolExecutor extends java.util.concurrent.ThreadPoolExecutor 
 
         if (taskQueue != null) {
             // ok, restore the state of the queue and pool
-            taskQueue.setForcedRemainingCapacity(null);
+            taskQueue.resetForcedRemainingCapacity();
         }
         this.setCorePoolSize(savedCorePoolSize);
     }
