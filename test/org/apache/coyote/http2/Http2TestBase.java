@@ -593,8 +593,6 @@ public abstract class Http2TestBase extends TomcatBaseTest {
         ctxt.addServletMappingDecoded("/empty", "empty");
         Tomcat.addServlet(ctxt, "simple", new SimpleServlet());
         ctxt.addServletMappingDecoded("/simple", "simple");
-        Tomcat.addServlet(ctxt, "simpleDelayed", new SimpleDelayedReadServlet());
-        ctxt.addServletMappingDecoded("/simpleDelayed", "simpleDelayed");
         Tomcat.addServlet(ctxt, "large", new LargeServlet());
         ctxt.addServletMappingDecoded("/large", "large");
         Tomcat.addServlet(ctxt, "cookie", new CookieServlet());
@@ -1265,20 +1263,6 @@ public abstract class Http2TestBase extends TomcatBaseTest {
         }
     }
 
-
-    private static class SimpleDelayedReadServlet extends SimpleServlet {
-        @Override
-        protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-            try {
-                // delay processing for one second before reading the request body
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                throw new RuntimeException("unexpected InterruptedException", e);
-            }
-
-            super.doPost(req, resp);
-        }
-    }
 
     private static class LargeServlet extends HttpServlet {
 

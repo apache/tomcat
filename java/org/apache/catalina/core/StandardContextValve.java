@@ -80,27 +80,11 @@ final class StandardContextValve extends ValveBase {
             return;
         }
 
-        // Acknowledge the request
-        try {
-            // Acknowledge based on the policy
-            final ContinueHandlingResponsePolicy continueHandlingResponsePolicy =
-                (ContinueHandlingResponsePolicy) request.getConnector().getProperty("continueHandlingResponsePolicy");
+        // Acknowledge based on the policy
+        final ContinueHandlingResponsePolicy continueHandlingResponsePolicy =
+            (ContinueHandlingResponsePolicy) request.getConnector().getProperty("continueHandlingResponsePolicy");
 
-            if (continueHandlingResponsePolicy == ContinueHandlingResponsePolicy.IMMEDIATELY) {
-                // acknowledge immediately
-                response.sendAcknowledgement();
-                request.setAcknowledgeOnRequestBodyRead(false);
-            } else if (continueHandlingResponsePolicy == ContinueHandlingResponsePolicy.ON_REQUEST_BODY_READ) {
-                // configure the request to acknowledge when the request body is first consumed
-                request.setAcknowledgeOnRequestBodyRead(true);
-            }
-        } catch (IOException ioe) {
-            container.getLogger().error(sm.getString(
-                    "standardContextValve.acknowledgeException"), ioe);
-            request.setAttribute(RequestDispatcher.ERROR_EXCEPTION, ioe);
-            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            return;
-        }
+        request.setContinueHandlingResponsePolicy(continueHandlingResponsePolicy);
 
         if (request.isAsyncSupported()) {
             request.setAsyncSupported(wrapper.getPipeline().isAsyncSupported());

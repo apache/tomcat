@@ -87,6 +87,7 @@ import org.apache.catalina.util.RequestUtil;
 import org.apache.catalina.util.TLSUtil;
 import org.apache.catalina.util.URLEncoder;
 import org.apache.coyote.ActionCode;
+import org.apache.coyote.ContinueHandlingResponsePolicy;
 import org.apache.coyote.UpgradeToken;
 import org.apache.coyote.http11.upgrade.InternalHttpUpgradeHandler;
 import org.apache.juli.logging.Log;
@@ -3524,11 +3525,14 @@ public class Request implements HttpServletRequest {
     }
 
     /**
-     * set whether to acknowledge the request when the request body is
-     * first read from
-     * @param acknowledgeOnRequestBodyRead the value to set
+     * Sets the continue handling policy
+     *
+     * if set to IMMEDIATELY, will also call sendAcknowledgement on the
+     * response
+     *
+     * @param continueHandlingResponsePolicy policy to set for this request
      */
-    public void setAcknowledgeOnRequestBodyRead(boolean acknowledgeOnRequestBodyRead) {
-        coyoteRequest.setAcknowledgeOnRequestBodyRead(acknowledgeOnRequestBodyRead);
+    public void setContinueHandlingResponsePolicy(ContinueHandlingResponsePolicy continueHandlingResponsePolicy) {
+        coyoteRequest.setContinueHandlingResponsePolicy(continueHandlingResponsePolicy);
     }
 }

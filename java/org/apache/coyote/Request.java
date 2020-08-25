@@ -71,7 +71,7 @@ public final class Request {
 
     // whether to acknowledge the request when the request body is first
     // read from.
-    private boolean acknowledgeOnRequestBodyRead = false;
+    private ContinueHandlingResponsePolicy continueHandlingResponsePolicy = null;
 
     // ----------------------------------------------------------- Constructors
 
@@ -553,7 +553,7 @@ public final class Request {
      * @throws IOException If an I/O error occurs during the copy
      */
     public int doRead(ApplicationBufferHandler handler) throws IOException {
-        if (bytesRead == 0 && acknowledgeOnRequestBodyRead) {
+        if (bytesRead == 0 && continueHandlingResponsePolicy == ContinueHandlingResponsePolicy.ON_REQUEST_BODY_READ) {
             response.sendAcknowledgement();
         }
 
@@ -719,12 +719,20 @@ public final class Request {
         return encoding.trim();
     }
 
+
     /**
-     * set whether to acknowledge the request when the request body is
-     * first read from
-     * @param acknowledgeOnRequestBodyRead the value to set
+     * Sets the continue handling policy
+     *
+     * if set to IMMEDIATELY, will also call sendAcknowledgement on the
+     * response
+     *
+     * @param continueHandlingResponsePolicy policy to set for this request
      */
-    public void setAcknowledgeOnRequestBodyRead(boolean acknowledgeOnRequestBodyRead) {
-        this.acknowledgeOnRequestBodyRead = acknowledgeOnRequestBodyRead;
+    public void setContinueHandlingResponsePolicy(ContinueHandlingResponsePolicy continueHandlingResponsePolicy) {
+        this.continueHandlingResponsePolicy = continueHandlingResponsePolicy;
+
+        if (continueHandlingResponsePolicy == ContinueHandlingResponsePolicy.IMMEDIATELY) {
+            response.sendAcknowledgement();
+        }
     }
 }

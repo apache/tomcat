@@ -101,21 +101,21 @@ public class TestHttp2Section_8_1 extends Http2TestBase {
 
     @Test
     public void testSendAckWithDefaultPolicy() throws Exception {
-        testSendAckWithPolicy(ContinueHandlingResponsePolicy.IMMEDIATELY);
+        testSendAck();
     }
 
 
     @Test
     public void testSendAckWithImmediatelyPolicy() throws Exception {
         setContinueHandlingResponsePolicy(ContinueHandlingResponsePolicy.IMMEDIATELY);
-        testSendAckWithPolicy(ContinueHandlingResponsePolicy.IMMEDIATELY);
+        testSendAck();
     }
 
 
     @Test
     public void testSendAckWithOnRequestBodyReadPolicy() throws Exception {
         setContinueHandlingResponsePolicy(ContinueHandlingResponsePolicy.ON_REQUEST_BODY_READ);
-        testSendAckWithPolicy(ContinueHandlingResponsePolicy.ON_REQUEST_BODY_READ);
+        testSendAck();
     }
 
 
@@ -127,7 +127,13 @@ public class TestHttp2Section_8_1 extends Http2TestBase {
     }
 
 
-    public void testSendAckWithPolicy(ContinueHandlingResponsePolicy expectedPolicyBehavior) throws Exception {
+    public void testSendAck() throws Exception {
+        // makes a request that expects a 100 Continue response and verifies
+        // that the 100 Continue response is received. This does not check
+        // that the correct ContinueHandlingResponsePolicy was followed, just
+        // that a 100 Continue response is received. The unit tests for
+        // Request verify that the various policies are implemented.
+
         http2Connect();
 
         byte[] headersFrameHeader = new byte[9];
@@ -136,32 +142,14 @@ public class TestHttp2Section_8_1 extends Http2TestBase {
         ByteBuffer dataPayload = ByteBuffer.allocate(256);
 
         buildPostRequest(headersFrameHeader, headersPayload, true,
-                null, -1, "/simpleDelayed",
+                null, -1, "/simple",
                 dataFrameHeader, dataPayload, null,
                 null, null, 3);
 
         // Write the headers
         writeFrame(headersFrameHeader, headersPayload);
 
-        // time how long it takes to receive the 100 continue response
-        final long startTime = System.currentTimeMillis();
         parser.readFrame(true);
-        final long endTime = System.currentTimeMillis();
-        final long duration = endTime - startTime;
-
-        if (expectedPolicyBehavior == ContinueHandlingResponsePolicy.IMMEDIATELY) {
-            // the 100 response should be received immediately while
-            // the servlet will wait 1 second before responding. 500 ms
-            // should be enough  time to allow for any slowness that may
-            // occur but still differentiate from the 1 second or more
-            // expected delay by the ON_REQUEST_BODY_READ policy.
-            Assert.assertTrue(duration < 500);
-        } else if (expectedPolicyBehavior == ContinueHandlingResponsePolicy.ON_REQUEST_BODY_READ) {
-            // Since the servlet will wait 1 second before responding, if
-            // the response takes more than a second, it implies that the
-            // ON_REQUEST_BODY_READ policy was executed.
-            Assert.assertTrue(duration > 1000);
-        }
 
         Assert.assertEquals("3-HeadersStart\n" +
                 "3-Header-[:status]-[100]\n" +
