@@ -1159,8 +1159,7 @@ public class CoyoteAdapter implements Adapter {
                 } else {
                     return false;
                 }
-            }
-            if (b[pos] == (byte) 0) {
+            } else if (b[pos] == (byte) 0) {
                 return false;
             }
         }
