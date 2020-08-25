@@ -1151,6 +1151,12 @@ public class CoyoteAdapter implements Adapter {
         int pos = 0;
         int index = 0;
 
+
+        // The URL must start with '/' (or '\' that will be replaced soon)
+        if (b[start] != (byte) '/' && b[start] != (byte) '\\') {
+            return false;
+        }
+
         // Replace '\' with '/'
         // Check for null byte
         for (pos = start; pos < end; pos++) {
@@ -1164,11 +1170,6 @@ public class CoyoteAdapter implements Adapter {
             if (b[pos] == (byte) 0) {
                 return false;
             }
-        }
-
-        // The URL must start with '/'
-        if (b[start] != (byte) '/') {
-            return false;
         }
 
         // Replace "//" with "/"
