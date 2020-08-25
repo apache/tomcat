@@ -42,10 +42,10 @@ public final class ClassParser {
     private static final int MAGIC = 0xCAFEBABE;
 
     private final DataInput dataInputStream;
-    private String class_name, superclass_name;
-    private int access_flags; // Access rights of parsed class
-    private String[] interface_names; // Names of implemented interfaces
-    private ConstantPool constant_pool; // collection of constants
+    private String class_name, superclassName;
+    private int accessFlags; // Access rights of parsed class
+    private String[] interfaceNames; // Names of implemented interfaces
+    private ConstantPool constantPool; // collection of constants
     private Annotations runtimeVisibleAnnotations; // "RuntimeVisibleAnnotations" attribute defined in the class
     private static final int BUFSIZE = 8192;
 
@@ -94,8 +94,8 @@ public final class ClassParser {
         readAttributes();
 
         // Return the information we have gathered in a new object
-        return new JavaClass(class_name, superclass_name,
-                access_flags, constant_pool, interface_names,
+        return new JavaClass(class_name, superclassName,
+                accessFlags, constantPool, interfaceNames,
                 runtimeVisibleAnnotations);
     }
 
@@ -114,7 +114,7 @@ public final class ClassParser {
             int length;
             // Get class name from constant pool via `name_index' indirection
             name_index = dataInputStream.readUnsignedShort();
-            c = (ConstantUtf8) constant_pool.getConstant(name_index,
+            c = (ConstantUtf8) constantPool.getConstant(name_index,
                     Const.CONSTANT_Utf8);
             name = c.getBytes();
             // Length of data in bytes
@@ -125,7 +125,7 @@ public final class ClassParser {
                     throw new ClassFormatException(
                             "RuntimeVisibleAnnotations attribute is not allowed more than once in a class file");
                 }
-                runtimeVisibleAnnotations = new Annotations(dataInputStream, constant_pool);
+                runtimeVisibleAnnotations = new Annotations(dataInputStream, constantPool);
             } else {
                 // All other attributes are skipped
                 Utility.skipFully(dataInputStream, length);
@@ -140,27 +140,27 @@ public final class ClassParser {
      * @throws  ClassFormatException
      */
     private void readClassInfo() throws IOException, ClassFormatException {
-        access_flags = dataInputStream.readUnsignedShort();
+        accessFlags = dataInputStream.readUnsignedShort();
         /* Interfaces are implicitly abstract, the flag should be set
          * according to the JVM specification.
          */
-        if ((access_flags & Const.ACC_INTERFACE) != 0) {
-            access_flags |= Const.ACC_ABSTRACT;
+        if ((accessFlags & Const.ACC_INTERFACE) != 0) {
+            accessFlags |= Const.ACC_ABSTRACT;
         }
-        if (((access_flags & Const.ACC_ABSTRACT) != 0)
-                && ((access_flags & Const.ACC_FINAL) != 0)) {
+        if (((accessFlags & Const.ACC_ABSTRACT) != 0)
+                && ((accessFlags & Const.ACC_FINAL) != 0)) {
             throw new ClassFormatException("Class can't be both final and abstract");
         }
 
         int class_name_index = dataInputStream.readUnsignedShort();
-        class_name = Utility.getClassName(constant_pool, class_name_index);
+        class_name = Utility.getClassName(constantPool, class_name_index);
 
         int superclass_name_index = dataInputStream.readUnsignedShort();
         if (superclass_name_index > 0) {
             // May be zero -> class is java.lang.Object
-            superclass_name = Utility.getClassName(constant_pool, superclass_name_index);
+            superclassName = Utility.getClassName(constantPool, superclass_name_index);
         } else {
-            superclass_name = "java.lang.Object";
+            superclassName = "java.lang.Object";
         }
     }
 
@@ -171,7 +171,7 @@ public final class ClassParser {
      * @throws  ClassFormatException
      */
     private void readConstantPool() throws IOException, ClassFormatException {
-        constant_pool = new ConstantPool(dataInputStream);
+        constantPool = new ConstantPool(dataInputStream);
     }
 
 
@@ -210,13 +210,13 @@ public final class ClassParser {
     private void readInterfaces() throws IOException, ClassFormatException {
         final int interfaces_count = dataInputStream.readUnsignedShort();
         if (interfaces_count > 0) {
-            interface_names = new String[interfaces_count];
+            interfaceNames = new String[interfaces_count];
             for (int i = 0; i < interfaces_count; i++) {
                 int index = dataInputStream.readUnsignedShort();
-                interface_names[i] = Utility.getClassName(constant_pool, index);
+                interfaceNames[i] = Utility.getClassName(constantPool, index);
             }
         } else {
-            interface_names = INTERFACES_EMPTY_ARRAY;
+            interfaceNames = INTERFACES_EMPTY_ARRAY;
         }
     }
 

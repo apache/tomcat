@@ -20,44 +20,44 @@ package org.apache.tomcat.util.bcel.classfile;
 /**
  * Represents a Java class, i.e., the data structures, constant pool,
  * fields, methods and commands contained in a Java .class file.
- * See <a href="http://docs.oracle.com/javase/specs/">JVM specification</a> for details.
+ * See <a href="https://docs.oracle.com/javase/specs/">JVM specification</a> for details.
  * The intent of this class is to represent a parsed or otherwise existing
  * class file.  Those interested in programatically generating classes
  * should see the <a href="../generic/ClassGen.html">ClassGen</a> class.
  */
 public class JavaClass {
 
-    private final int access_flags;
-    private final String class_name;
-    private final String superclass_name;
-    private final String[] interface_names;
+    private final int accessFlags;
+    private final String className;
+    private final String superclassName;
+    private final String[] interfaceNames;
     private final Annotations runtimeVisibleAnnotations; // "RuntimeVisibleAnnotations" attribute defined in the class
 
     /**
      * Constructor gets all contents as arguments.
      *
-     * @param class_name Name of this class.
-     * @param superclass_name Name of this class's superclass.
-     * @param access_flags Access rights defined by bit flags
+     * @param className Name of this class.
+     * @param superclassName Name of this class's superclass.
+     * @param accessFlags Access rights defined by bit flags
      * @param constant_pool Array of constants
-     * @param interface_names Implemented interfaces
+     * @param interfaceNames Implemented interfaces
      * @param runtimeVisibleAnnotations "RuntimeVisibleAnnotations" attribute defined on the Class, or null
      */
-    JavaClass(final String class_name, final String superclass_name,
-            final int access_flags, final ConstantPool constant_pool, final String[] interface_names,
+    JavaClass(final String className, final String superclassName,
+            final int accessFlags, final ConstantPool constant_pool, final String[] interfaceNames,
             final Annotations runtimeVisibleAnnotations) {
-        this.access_flags = access_flags;
+        this.accessFlags = accessFlags;
         this.runtimeVisibleAnnotations = runtimeVisibleAnnotations;
-        this.class_name = class_name;
-        this.superclass_name = superclass_name;
-        this.interface_names = interface_names;
+        this.className = className;
+        this.superclassName = superclassName;
+        this.interfaceNames = interfaceNames;
     }
 
     /**
      * @return Access flags of the object aka. "modifiers".
      */
     public final int getAccessFlags() {
-        return access_flags;
+        return accessFlags;
     }
 
     /**
@@ -77,7 +77,7 @@ public class JavaClass {
      * @return Class name.
      */
     public String getClassName() {
-        return class_name;
+        return className;
     }
 
 
@@ -85,7 +85,7 @@ public class JavaClass {
      * @return Names of implemented interfaces.
      */
     public String[] getInterfaceNames() {
-        return interface_names;
+        return interfaceNames;
     }
 
 
@@ -97,6 +97,6 @@ public class JavaClass {
      * @return Superclass name.
      */
     public String getSuperclassName() {
-        return superclass_name;
+        return superclassName;
     }
 }
