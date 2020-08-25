@@ -35,8 +35,8 @@ public class TaskQueue extends LinkedBlockingQueue<Runnable> {
     private transient volatile ThreadPoolExecutor parent = null;
 
     // No need to be volatile. This is written and read in a single thread
-    // (when stopping a context and firing the  listeners)
-    private Integer forcedRemainingCapacity = null;
+    // (when stopping a context and firing the listeners)
+    private int forcedRemainingCapacity = -1;
 
     public TaskQueue() {
         super();
@@ -105,18 +105,22 @@ public class TaskQueue extends LinkedBlockingQueue<Runnable> {
 
     @Override
     public int remainingCapacity() {
-        if (forcedRemainingCapacity != null) {
+        if (forcedRemainingCapacity > DEFAULT_FORCED_REMAINING_CAPACITY) {
             // ThreadPoolExecutor.setCorePoolSize checks that
             // remainingCapacity==0 to allow to interrupt idle threads
             // I don't see why, but this hack allows to conform to this
             // "requirement"
-            return forcedRemainingCapacity.intValue();
+            return forcedRemainingCapacity;
         }
         return super.remainingCapacity();
     }
 
-    public void setForcedRemainingCapacity(Integer forcedRemainingCapacity) {
+    public void setForcedRemainingCapacity(int forcedRemainingCapacity) {
         this.forcedRemainingCapacity = forcedRemainingCapacity;
+    }
+
+    void resetForcedRemainingCapacity() {
+        this.forcedRemainingCapacity = DEFAULT_FORCED_REMAINING_CAPACITY;
     }
 
 }
