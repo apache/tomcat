@@ -34,7 +34,7 @@ import org.apache.tomcat.util.bcel.Const;
  */
 public class ConstantPool {
 
-    private final Constant[] constant_pool;
+    private final Constant[] constantPool;
 
     /**
      * Reads constants from given input stream.
@@ -45,12 +45,12 @@ public class ConstantPool {
      */
     ConstantPool(final DataInput input) throws IOException, ClassFormatException {
         final int constant_pool_count = input.readUnsignedShort();
-        constant_pool = new Constant[constant_pool_count];
-        /* constant_pool[0] is unused by the compiler and may be used freely
+        constantPool = new Constant[constant_pool_count];
+        /* constantPool[0] is unused by the compiler and may be used freely
          * by the implementation.
          */
         for (int i = 1; i < constant_pool_count; i++) {
-            constant_pool[i] = Constant.readConstant(input);
+            constantPool[i] = Constant.readConstant(input);
             /* Quote from the JVM specification:
              * "All eight byte constants take up two spots in the constant pool.
              * If this is the n'th byte in the constant pool, then the next item
@@ -58,8 +58,8 @@ public class ConstantPool {
              *
              * Thus we have to increment the index counter.
              */
-            if (constant_pool[i] != null) {
-                byte tag = constant_pool[i].getTag();
+            if (constantPool[i] != null) {
+                byte tag = constantPool[i].getTag();
                 if ((tag == Const.CONSTANT_Double) || (tag == Const.CONSTANT_Long)) {
                     i++;
                 }
@@ -75,11 +75,11 @@ public class ConstantPool {
      * @see    Constant
      */
     public Constant getConstant( final int index ) {
-        if (index >= constant_pool.length || index < 0) {
+        if (index >= constantPool.length || index < 0) {
             throw new ClassFormatException("Invalid constant pool reference: " + index
-                    + ". Constant pool size is: " + constant_pool.length);
+                    + ". Constant pool size is: " + constantPool.length);
         }
-        return constant_pool[index];
+        return constantPool[index];
     }
 
     /**
