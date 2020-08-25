@@ -212,6 +212,14 @@ public abstract class AbstractFileResourceSet extends AbstractResourceSet {
         } catch (IOException e) {
             throw new IllegalArgumentException(e);
         }
+
+        // Need to handle mapping of the file system root as a special case
+        if ("/".equals(this.absoluteBase)) {
+            this.absoluteBase = "";
+        }
+        if ("/".equals(this.canonicalBase)) {
+            this.canonicalBase = "";
+        }
     }
 
 
