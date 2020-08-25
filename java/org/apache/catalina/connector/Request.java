@@ -979,7 +979,8 @@ public class Request implements HttpServletRequest {
         if (attr != null) {
             return attr;
         }
-        if (isSSLAttribute(name) || name.equals(SSLSupport.PROTOCOL_VERSION_KEY)) {
+
+        if (!sslAttributesParsed && (isSSLAttribute(name) || name.equals(SSLSupport.PROTOCOL_VERSION_KEY))) {
             coyoteRequest.action(ActionCode.REQ_SSL_ATTRIBUTE, coyoteRequest);
             attr = coyoteRequest.getAttribute(Globals.CERTIFICATES_ATTR);
             if (attr != null) {
