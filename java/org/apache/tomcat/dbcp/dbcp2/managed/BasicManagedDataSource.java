@@ -175,7 +175,7 @@ public class BasicManagedDataSource extends BasicDataSource {
         if (xaDataSource == null) {
             final ConnectionFactory connectionFactory = super.createConnectionFactory();
             final XAConnectionFactory xaConnectionFactory = new LocalXAConnectionFactory(getTransactionManager(),
-                    connectionFactory);
+                    getTransactionSynchronizationRegistry(), connectionFactory);
             transactionRegistry = xaConnectionFactory.getTransactionRegistry();
             return xaConnectionFactory;
         }
@@ -238,6 +238,7 @@ public class BasicManagedDataSource extends BasicDataSource {
             connectionFactory.setDefaultSchema(getDefaultSchema());
             connectionFactory.setCacheState(getCacheState());
             connectionFactory.setPoolStatements(isPoolPreparedStatements());
+            connectionFactory.setClearStatementPoolOnReturn(isClearStatementPoolOnReturn());
             connectionFactory.setMaxOpenPreparedStatements(getMaxOpenPreparedStatements());
             connectionFactory.setMaxConnLifetimeMillis(getMaxConnLifetimeMillis());
             connectionFactory.setRollbackOnReturn(getRollbackOnReturn());
