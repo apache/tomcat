@@ -558,7 +558,6 @@ public final class Request {
         }
 
         int n = inputBuffer.doRead(handler);
-
         if (n > 0) {
             bytesRead+=n;
         }
