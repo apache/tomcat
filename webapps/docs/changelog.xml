@@ -206,6 +206,10 @@
         Update the internal fork of Apache Commons FileUpload to c25a4e3
         (2020-08-26, 2.0-SNAPSHOT). Code clean-up and RFC 2231 support. (markt)
       </add>
+      <add>
+        Update the internal fork of Apache Commons Pool to 2.8.1. Code clean-up
+        and improved abandoned pool handling. (markt)
+      </add>
     </changelog>
   </subsection>
 </section>
