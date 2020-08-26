@@ -17,7 +17,9 @@
 
 package org.apache.tomcat.dbcp.pool2.impl;
 
+import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.nio.charset.Charset;
 
 /**
  * Configuration settings for abandoned object removal.
@@ -39,7 +41,7 @@ public class AbandonedConfig {
      *
      * <p>If set to true, abandoned objects are removed by borrowObject if
      * there are fewer than 2 idle objects available in the pool and
-     * <code>getNumActive() &gt; getMaxTotal() - 3</code></p>
+     * {@code getNumActive() &gt; getMaxTotal() - 3}</p>
      *
      * @return true if abandoned objects are to be removed by borrowObject
      */
@@ -208,7 +210,7 @@ public class AbandonedConfig {
      * PrintWriter to use to log information on abandoned objects.
      * Use of default system encoding is deliberate.
      */
-    private PrintWriter logWriter = new PrintWriter(System.out);
+    private PrintWriter logWriter = new PrintWriter(new OutputStreamWriter(System.out, Charset.defaultCharset()));
 
     /**
      * Returns the log writer being used by this configuration to log
@@ -246,7 +248,7 @@ public class AbandonedConfig {
      * stack trace every time a method is called on a pooled object and retain
      * the most recent stack trace to aid debugging of abandoned objects?
      *
-     * @return <code>true</code> if usage tracking is enabled
+     * @return {@code true} if usage tracking is enabled
      */
     public boolean getUseUsageTracking() {
         return useUsageTracking;
@@ -260,7 +262,7 @@ public class AbandonedConfig {
      * object and retain the most recent stack trace to aid debugging of
      * abandoned objects.
      *
-     * @param   useUsageTracking    A value of <code>true</code> will enable
+     * @param   useUsageTracking    A value of {@code true} will enable
      *                              the recording of a stack trace on every use
      *                              of a pooled object
      */
