@@ -36,7 +36,7 @@ import org.apache.tomcat.util.http.fileupload.FileItemFactory;
  * <ul>
  *   <li>Size threshold is 10KB.</li>
  *   <li>Repository is the system default temp directory, as returned by
- *       <code>System.getProperty("java.io.tmpdir")</code>.</li>
+ *       {@code System.getProperty("java.io.tmpdir")}.</li>
  * </ul>
  * <p>
  * <b>NOTE</b>: Files are created in the system default temp directory with
@@ -47,7 +47,7 @@ import org.apache.tomcat.util.http.fileupload.FileItemFactory;
  * implementation in an environment with local, untrusted users,
  * {@link #setRepository(File)} MUST be used to configure a repository location
  * that is not publicly writable. In a Servlet container the location identified
- * by the ServletContext attribute <code>javax.servlet.context.tempdir</code>
+ * by the ServletContext attribute {@code java.servlet.context.tempdir}
  * may be used.
  * </p>
  *
@@ -169,8 +169,8 @@ public class DiskFileItemFactory implements FileItemFactory {
      *
      * @param fieldName   The name of the form field.
      * @param contentType The content type of the form field.
-     * @param isFormField <code>true</code> if this is a plain form field;
-     *                    <code>false</code> otherwise.
+     * @param isFormField {@code true} if this is a plain form field;
+     *                    {@code false} otherwise.
      * @param fileName    The name of the uploaded file, if any, as supplied
      *                    by the browser or other client.
      *

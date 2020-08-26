@@ -27,7 +27,6 @@ import java.util.Map;
 
 import org.apache.tomcat.util.http.fileupload.FileItemHeaders;
 
-
 /**
  * Default implementation of the {@link FileItemHeaders} interface.
  *
@@ -41,11 +40,10 @@ public class FileItemHeadersImpl implements FileItemHeaders, Serializable {
     private static final long serialVersionUID = -4455695752627032559L;
 
     /**
-     * Map of <code>String</code> keys to a <code>List</code> of
-     * <code>String</code> instances.
+     * Map of {@code String} keys to a {@code List} of
+     * {@code String} instances.
      */
-    private final Map<String,List<String>> headerNameToValueListMap =
-            new LinkedHashMap<String,List<String>>();
+    private final Map<String, List<String>> headerNameToValueListMap = new LinkedHashMap<String,List<String>>();
 
     /**
      * {@inheritDoc}

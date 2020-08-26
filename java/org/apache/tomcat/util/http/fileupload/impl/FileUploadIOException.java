@@ -39,7 +39,7 @@ public class FileUploadIOException extends IOException {
     private final FileUploadException cause;
 
     /**
-     * Creates a <code>FileUploadIOException</code> with the
+     * Creates a {@code FileUploadIOException} with the
      * given cause.
      *
      * @param pCause The exceptions cause, if any, or null.

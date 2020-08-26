@@ -136,6 +136,10 @@
         Update the internal fork of Apache Commons Codec to 53c93d0 (2020-08-18,
         1.15-SNAPSHOT). Code clean-up. (markt)
       </add>
+      <add>
+        Update the internal fork of Apache Commons FileUpload to c25a4e3
+        (2020-08-26, 2.0-SNAPSHOT). Code clean-up and RFC 2231 support. (markt)
+      </add>
     </changelog>
   </subsection>
 </section>

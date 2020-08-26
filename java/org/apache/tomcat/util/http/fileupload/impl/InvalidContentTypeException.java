@@ -30,7 +30,7 @@ public class InvalidContentTypeException
     private static final long serialVersionUID = -9073026332015646668L;
 
     /**
-     * Constructs a <code>InvalidContentTypeException</code> with no
+     * Constructs a {@code InvalidContentTypeException} with no
      * detail message.
      */
     public InvalidContentTypeException() {
@@ -38,7 +38,7 @@ public class InvalidContentTypeException
     }
 
     /**
-     * Constructs an <code>InvalidContentTypeException</code> with
+     * Constructs an {@code InvalidContentTypeException} with
      * the specified detail message.
      *
      * @param message The detail message.
@@ -48,7 +48,7 @@ public class InvalidContentTypeException
     }
 
     /**
-     * Constructs an <code>InvalidContentTypeException</code> with
+     * Constructs an {@code InvalidContentTypeException} with
      * the specified detail message and cause.
      *
      * @param msg The detail message.
