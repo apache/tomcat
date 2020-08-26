@@ -88,7 +88,7 @@ public class DiskFileItem
     private String fieldName;
 
     /**
-     * The content type passed by the browser, or <code>null</code> if
+     * The content type passed by the browser, or {@code null} if
      * not defined.
      */
     private final String contentType;
@@ -149,15 +149,15 @@ public class DiskFileItem
     // ----------------------------------------------------------- Constructors
 
     /**
-     * Constructs a new <code>DiskFileItem</code> instance.
+     * Constructs a new {@code DiskFileItem} instance.
      *
      * @param fieldName     The name of the form field.
      * @param contentType   The content type passed by the browser or
-     *                      <code>null</code> if not specified.
+     *                      {@code null} if not specified.
      * @param isFormField   Whether or not this item is a plain form field, as
      *                      opposed to a file upload.
      * @param fileName      The original file name in the user's file system, or
-     *                      <code>null</code> if not specified.
+     *                      {@code null} if not specified.
      * @param sizeThreshold The threshold, in bytes, below which items will be
      *                      retained in memory and above which they will be
      *                      stored as a file.
@@ -201,10 +201,10 @@ public class DiskFileItem
     }
 
     /**
-     * Returns the content type passed by the agent or <code>null</code> if
+     * Returns the content type passed by the agent or {@code null} if
      * not defined.
      *
-     * @return The content type passed by the agent or <code>null</code> if
+     * @return The content type passed by the agent or {@code null} if
      *         not defined.
      */
     @Override
@@ -213,10 +213,10 @@ public class DiskFileItem
     }
 
     /**
-     * Returns the content charset passed by the agent or <code>null</code> if
+     * Returns the content charset passed by the agent or {@code null} if
      * not defined.
      *
-     * @return The content charset passed by the agent or <code>null</code> if
+     * @return The content charset passed by the agent or {@code null} if
      *         not defined.
      */
     public String getCharSet() {
@@ -248,8 +248,8 @@ public class DiskFileItem
      * Provides a hint as to whether or not the file contents will be read
      * from memory.
      *
-     * @return <code>true</code> if the file contents will be read
-     *         from memory; <code>false</code> otherwise.
+     * @return {@code true} if the file contents will be read
+     *         from memory; {@code false} otherwise.
      */
     @Override
     public boolean isInMemory() {
@@ -365,7 +365,7 @@ public class DiskFileItem
      * method renames a temporary file, that file will no longer be available
      * to copy or rename again at a later time.
      *
-     * @param file The <code>File</code> into which the uploaded item should
+     * @param file The {@code File} into which the uploaded item should
      *             be stored.
      *
      * @throws Exception if an error occurs.
@@ -426,7 +426,7 @@ public class DiskFileItem
     /**
      * Deletes the underlying storage for a file item, including deleting any
      * associated temporary disk file. Although this storage will be deleted
-     * automatically when the <code>FileItem</code> instance is garbage
+     * automatically when the {@code FileItem} instance is garbage
      * collected, this method can be used to ensure that this is done at an
      * earlier time, thus preserving system resources.
      */
@@ -467,11 +467,11 @@ public class DiskFileItem
     }
 
     /**
-     * Determines whether or not a <code>FileItem</code> instance represents
+     * Determines whether or not a {@code FileItem} instance represents
      * a simple form field.
      *
-     * @return <code>true</code> if the instance represents a simple form
-     *         field; <code>false</code> if it represents an uploaded file.
+     * @return {@code true} if the instance represents a simple form
+     *         field; {@code false} if it represents an uploaded file.
      *
      * @see #setFormField(boolean)
      *
@@ -482,11 +482,11 @@ public class DiskFileItem
     }
 
     /**
-     * Specifies whether or not a <code>FileItem</code> instance represents
+     * Specifies whether or not a {@code FileItem} instance represents
      * a simple form field.
      *
-     * @param state <code>true</code> if the instance represents a simple form
-     *              field; <code>false</code> if it represents an uploaded file.
+     * @param state {@code true} if the instance represents a simple form
+     *              field; {@code false} if it represents an uploaded file.
      *
      * @see #isFormField()
      *
@@ -518,16 +518,16 @@ public class DiskFileItem
     // --------------------------------------------------------- Public methods
 
     /**
-     * Returns the {@link java.io.File} object for the <code>FileItem</code>'s
+     * Returns the {@link java.io.File} object for the {@code FileItem}'s
      * data's temporary location on the disk. Note that for
-     * <code>FileItem</code>s that have their data stored in memory,
-     * this method will return <code>null</code>. When handling large
+     * {@code FileItem}s that have their data stored in memory,
+     * this method will return {@code null}. When handling large
      * files, you can use {@link java.io.File#renameTo(java.io.File)} to
      * move the file to new location without copying the data, if the
      * source and destination locations reside within the same logical
      * volume.
      *
-     * @return The data file, or <code>null</code> if the data is stored in
+     * @return The data file, or {@code null} if the data is stored in
      *         memory.
      */
     public File getStoreLocation() {
@@ -561,7 +561,7 @@ public class DiskFileItem
     /**
      * Creates and returns a {@link java.io.File File} representing a uniquely
      * named temporary file in the configured repository path. The lifetime of
-     * the file is tied to the lifetime of the <code>FileItem</code> instance;
+     * the file is tied to the lifetime of the {@code FileItem} instance;
      * the file will be deleted when the instance is garbage collected.
      * <p>
      * <b>Note: Subclasses that override this method must ensure that they return the
