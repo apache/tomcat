@@ -62,7 +62,7 @@ public interface ObjectPool<T> extends Closeable {
     /**
      * Creates an object using the {@link PooledObjectFactory factory} or other
      * implementation dependent mechanism, passivate it, and then place it in
-     * the idle object pool. <code>addObject</code> is useful for "pre-loading"
+     * the idle object pool. {@code addObject} is useful for "pre-loading"
      * a pool with idle objects. (Optional operation).
      *
      * @throws Exception
@@ -76,7 +76,7 @@ public interface ObjectPool<T> extends Closeable {
             UnsupportedOperationException;
 
     /**
-     * Calls {@link ObjectPool#addObject()} <code>count</code>
+     * Calls {@link ObjectPool#addObject()} {@code count}
      * number of times.
      *
      * @param count
@@ -106,7 +106,7 @@ public interface ObjectPool<T> extends Closeable {
      * method as defined in an implementation or sub-interface.
      * </p>
      * <p>
-     * The behaviour of this method when the pool has been exhausted
+     * The behavior of this method when the pool has been exhausted
      * is not strictly specified (although it may be specified by
      * implementations).
      * </p>
@@ -169,7 +169,7 @@ public interface ObjectPool<T> extends Closeable {
     /**
      * Invalidates an object from the pool.
      * <p>
-     * By contract, <code>obj</code> <strong>must</strong> have been obtained
+     * By contract, {@code obj} <strong>must</strong> have been obtained
      * using {@link #borrowObject} or a related method as defined in an
      * implementation or sub-interface.
      * </p>
@@ -185,7 +185,7 @@ public interface ObjectPool<T> extends Closeable {
     void invalidateObject(T obj) throws Exception;
 
     /**
-     * Returns an instance to the pool. By contract, <code>obj</code>
+     * Returns an instance to the pool. By contract, {@code obj}
      * <strong>must</strong> have been obtained using {@link #borrowObject()} or
      * a related method as defined in an implementation or sub-interface.
      *
