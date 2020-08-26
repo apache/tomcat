@@ -170,7 +170,7 @@ public class MultipartStream {
     public static final byte DASH = 0x2D;
 
     /**
-     * The maximum length of <code>header-part</code> that will be
+     * The maximum length of {@code header-part} that will be
      * processed (10 kilobytes = 10240 bytes.).
      */
     public static final int HEADER_PART_SIZE_MAX = 10240;
@@ -181,25 +181,25 @@ public class MultipartStream {
     protected static final int DEFAULT_BUFSIZE = 4096;
 
     /**
-     * A byte sequence that marks the end of <code>header-part</code>
-     * (<code>CRLFCRLF</code>).
+     * A byte sequence that marks the end of {@code header-part}
+     * ({@code CRLFCRLF}).
      */
     protected static final byte[] HEADER_SEPARATOR = {CR, LF, CR, LF};
 
     /**
      * A byte sequence that that follows a delimiter that will be
-     * followed by an encapsulation (<code>CRLF</code>).
+     * followed by an encapsulation ({@code CRLF}).
      */
     protected static final byte[] FIELD_SEPARATOR = {CR, LF};
 
     /**
      * A byte sequence that that follows a delimiter of the last
-     * encapsulation in the stream (<code>--</code>).
+     * encapsulation in the stream ({@code --}).
      */
     protected static final byte[] STREAM_TERMINATOR = {DASH, DASH};
 
     /**
-     * A byte sequence that precedes a boundary (<code>CRLF--</code>).
+     * A byte sequence that precedes a boundary ({@code CRLF--}).
      */
     protected static final byte[] BOUNDARY_PREFIX = {CR, LF, DASH, DASH};
 
@@ -211,7 +211,7 @@ public class MultipartStream {
     private final InputStream input;
 
     /**
-     * The length of the boundary token plus the leading <code>CRLF--</code>.
+     * The length of the boundary token plus the leading {@code CRLF--}.
      */
     private int boundaryLength;
 
@@ -268,16 +268,16 @@ public class MultipartStream {
     // ----------------------------------------------------------- Constructors
 
     /**
-     * <p> Constructs a <code>MultipartStream</code> with a custom size buffer.
+     * <p> Constructs a {@code MultipartStream} with a custom size buffer.
      *
      * <p> Note that the buffer must be at least big enough to contain the
      * boundary string, plus 4 characters for CR/LF and double dash, plus at
      * least one byte of data.  Too small a buffer size setting will degrade
      * performance.
      *
-     * @param input    The <code>InputStream</code> to serve as a data source.
+     * @param input    The {@code InputStream} to serve as a data source.
      * @param boundary The token used for dividing the stream into
-     *                 <code>encapsulations</code>.
+     *                 {@code encapsulations}.
      * @param bufSize  The size of the buffer to be used, in bytes.
      * @param pNotifier The notifier, which is used for calling the
      *                  progress listener, if any.
@@ -322,11 +322,11 @@ public class MultipartStream {
     }
 
     /**
-     * <p> Constructs a <code>MultipartStream</code> with a default size buffer.
+     * <p> Constructs a {@code MultipartStream} with a default size buffer.
      *
-     * @param input    The <code>InputStream</code> to serve as a data source.
+     * @param input    The {@code InputStream} to serve as a data source.
      * @param boundary The token used for dividing the stream into
-     *                 <code>encapsulations</code>.
+     *                 {@code encapsulations}.
      * @param pNotifier An object for calling the progress listener, if any.
      *
      *
@@ -342,7 +342,7 @@ public class MultipartStream {
 
     /**
      * Retrieves the character encoding used when reading the headers of an
-     * individual part. When not specified, or <code>null</code>, the platform
+     * individual part. When not specified, or {@code null}, the platform
      * default encoding is used.
      *
      * @return The encoding used to read part headers.
@@ -353,7 +353,7 @@ public class MultipartStream {
 
     /**
      * Specifies the character encoding to be used when reading the headers of
-     * individual parts. When not specified, or <code>null</code>, the platform
+     * individual parts. When not specified, or {@code null}, the platform
      * default encoding is used.
      *
      * @param encoding The encoding used to read part headers.
@@ -363,7 +363,7 @@ public class MultipartStream {
     }
 
     /**
-     * Reads a byte from the <code>buffer</code>, and refills it as
+     * Reads a byte from the {@code buffer}, and refills it as
      * necessary.
      *
      * @return The next byte from the input stream.
@@ -388,11 +388,11 @@ public class MultipartStream {
     }
 
     /**
-     * Skips a <code>boundary</code> token, and checks whether more
-     * <code>encapsulations</code> are contained in the stream.
+     * Skips a {@code boundary} token, and checks whether more
+     * {@code encapsulations} are contained in the stream.
      *
-     * @return <code>true</code> if there are more encapsulations in
-     *         this stream; <code>false</code> otherwise.
+     * @return {@code true} if there are more encapsulations in
+     *         this stream; {@code false} otherwise.
      *
      * @throws FileUploadIOException if the bytes read from the stream exceeded the size limits
      * @throws MalformedStreamException if the stream ends unexpectedly or
@@ -440,7 +440,7 @@ public class MultipartStream {
      * <p>This method allows single pass processing of nested multipart
      * streams.
      *
-     * <p>The boundary token of the nested stream is <code>required</code>
+     * <p>The boundary token of the nested stream is {@code required}
      * to be of the same length as the boundary token in parent stream.
      *
      * <p>Restoring the parent stream boundary token after processing of a
@@ -449,7 +449,7 @@ public class MultipartStream {
      * @param boundary The boundary to be used for parsing of the nested
      *                 stream.
      *
-     * @throws IllegalBoundaryException if the <code>boundary</code>
+     * @throws IllegalBoundaryException if the {@code boundary}
      *                                  has a different length than the one
      *                                  being currently parsed.
      */
@@ -489,17 +489,17 @@ public class MultipartStream {
     }
 
     /**
-     * <p>Reads the <code>header-part</code> of the current
-     * <code>encapsulation</code>.
+     * <p>Reads the {@code header-part} of the current
+     * {@code encapsulation}.
      *
      * <p>Headers are returned verbatim to the input stream, including the
-     * trailing <code>CRLF</code> marker. Parsing is left to the
+     * trailing {@code CRLF} marker. Parsing is left to the
      * application.
      *
      * <p><strong>TODO</strong> allow limiting maximum header size to
      * protect against abuse.
      *
-     * @return The <code>header-part</code> of the current encapsulation.
+     * @return The {@code header-part} of the current encapsulation.
      *
      * @throws FileUploadIOException if the bytes read from the stream exceeded the size limits.
      * @throws MalformedStreamException if the stream ends unexpectedly.
@@ -549,16 +549,16 @@ public class MultipartStream {
     }
 
     /**
-     * <p>Reads <code>body-data</code> from the current
-     * <code>encapsulation</code> and writes its contents into the
-     * output <code>Stream</code>.
+     * <p>Reads {@code body-data} from the current
+     * {@code encapsulation} and writes its contents into the
+     * output {@code Stream}.
      *
      * <p>Arbitrary large amounts of data can be processed by this
      * method using a constant size buffer. (see {@link
      * #MultipartStream(InputStream,byte[],int,
      *   MultipartStream.ProgressNotifier) constructor}).
      *
-     * @param output The <code>Stream</code> to write data into. May
+     * @param output The {@code Stream} to write data into. May
      *               be null, in which case this method is equivalent
      *               to {@link #discardBodyData()}.
      *
@@ -581,8 +581,8 @@ public class MultipartStream {
     }
 
     /**
-     * <p> Reads <code>body-data</code> from the current
-     * <code>encapsulation</code> and discards it.
+     * <p> Reads {@code body-data} from the current
+     * {@code encapsulation} and discards it.
      *
      * <p>Use this method to skip encapsulations you don't need or don't
      * understand.
@@ -597,9 +597,9 @@ public class MultipartStream {
     }
 
     /**
-     * Finds the beginning of the first <code>encapsulation</code>.
+     * Finds the beginning of the first {@code encapsulation}.
      *
-     * @return <code>true</code> if an <code>encapsulation</code> was found in
+     * @return {@code true} if an {@code encapsulation} was found in
      *         the stream.
      *
      * @throws IOException if an i/o error occurs.
@@ -629,15 +629,15 @@ public class MultipartStream {
     }
 
     /**
-     * Compares <code>count</code> first bytes in the arrays
-     * <code>a</code> and <code>b</code>.
+     * Compares {@code count} first bytes in the arrays
+     * {@code a} and {@code b}.
      *
      * @param a     The first array to compare.
      * @param b     The second array to compare.
      * @param count How many bytes should be compared.
      *
-     * @return <code>true</code> if <code>count</code> first bytes in arrays
-     *         <code>a</code> and <code>b</code> are equal.
+     * @return {@code true} if {@code count} first bytes in arrays
+     *         {@code a} and {@code b} are equal.
      */
     public static boolean arrayequals(byte[] a,
             byte[] b,
@@ -651,14 +651,14 @@ public class MultipartStream {
     }
 
     /**
-     * Searches for a byte of specified value in the <code>buffer</code>,
-     * starting at the specified <code>position</code>.
+     * Searches for a byte of specified value in the {@code buffer},
+     * starting at the specified {@code position}.
      *
      * @param value The value to find.
      * @param pos   The starting position for searching.
      *
      * @return The position of byte found, counting from beginning of the
-     *         <code>buffer</code>, or <code>-1</code> if not found.
+     *         {@code buffer}, or {@code -1} if not found.
      */
     protected int findByte(byte value,
             int pos) {
@@ -672,11 +672,11 @@ public class MultipartStream {
     }
 
     /**
-     * Searches for the <code>boundary</code> in the <code>buffer</code>
-     * region delimited by <code>head</code> and <code>tail</code>.
+     * Searches for the {@code boundary} in the {@code buffer}
+     * region delimited by {@code head} and {@code tail}.
      *
      * @return The position of the boundary found, counting from the
-     *         beginning of the <code>buffer</code>, or <code>-1</code> if
+     *         beginning of the {@code buffer}, or {@code -1} if
      *         not found.
      */
     protected int findSeparator() {
@@ -709,7 +709,7 @@ public class MultipartStream {
         private static final long serialVersionUID = 6466926458059796677L;
 
         /**
-         * Constructs a <code>MalformedStreamException</code> with no
+         * Constructs a {@code MalformedStreamException} with no
          * detail message.
          */
         public MalformedStreamException() {
@@ -717,7 +717,7 @@ public class MultipartStream {
         }
 
         /**
-         * Constructs an <code>MalformedStreamException</code> with
+         * Constructs an {@code MalformedStreamException} with
          * the specified detail message.
          *
          * @param message The detail message.
@@ -739,7 +739,7 @@ public class MultipartStream {
         private static final long serialVersionUID = -161533165102632918L;
 
         /**
-         * Constructs an <code>IllegalBoundaryException</code> with no
+         * Constructs an {@code IllegalBoundaryException} with no
          * detail message.
          */
         public IllegalBoundaryException() {
@@ -747,7 +747,7 @@ public class MultipartStream {
         }
 
         /**
-         * Constructs an <code>IllegalBoundaryException</code> with
+         * Constructs an {@code IllegalBoundaryException} with
          * the specified detail message.
          *
          * @param message The detail message.
