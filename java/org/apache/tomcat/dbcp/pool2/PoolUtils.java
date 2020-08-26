@@ -99,9 +99,9 @@ public final class PoolUtils {
      * @return the {@link TimerTask} that will periodically check the pools idle
      *         object count.
      * @throws IllegalArgumentException
-     *             when <code>pool</code> is <code>null</code> or when
-     *             <code>minIdle</code> is negative or when <code>period</code>
-     *             isn't valid for {@link Timer#schedule(TimerTask, long, long)}
+     *             when {@code pool} is {@code null} or when {@code minIdle} is
+     *             negative or when {@code period} isn't valid for
+     *             {@link Timer#schedule(TimerTask, long, long)}
      */
     public static <T> TimerTask checkMinIdle(final ObjectPool<T> pool,
             final int minIdle, final long period)
@@ -138,10 +138,9 @@ public final class PoolUtils {
      * @return the {@link TimerTask} that will periodically check the pools idle
      *         object count.
      * @throws IllegalArgumentException
-     *             when <code>keyedPool</code>, <code>key</code> is
-     *             <code>null</code> or when <code>minIdle</code> is negative or
-     *             when <code>period</code> isn't valid for
-     *             {@link Timer#schedule(TimerTask, long, long)}.
+     *             when {@code keyedPool}, {@code key} is {@code null} or
+     *             when {@code minIdle} is negative or when {@code period} isn't
+     *             valid for {@link Timer#schedule(TimerTask, long, long)}.
      */
     public static <K, V> TimerTask checkMinIdle(
             final KeyedObjectPool<K, V> keyedPool, final K key,
@@ -164,8 +163,8 @@ public final class PoolUtils {
 
     /**
      * Periodically check the idle object count for each key in the
-     * <code>Collection</code> <code>keys</code> in the keyedPool. At most one
-     * idle object will be added per period.
+     * {@code Collection keys} in the keyedPool. At most one idle object will be
+     * added per period.
      *
      * @param keyedPool
      *            the keyedPool to check periodically.
@@ -182,11 +181,10 @@ public final class PoolUtils {
      * @return a {@link Map} of key and {@link TimerTask} pairs that will
      *         periodically check the pools idle object count.
      * @throws IllegalArgumentException
-     *             when <code>keyedPool</code>, <code>keys</code>, or any of the
-     *             values in the collection is <code>null</code> or when
-     *             <code>minIdle</code> is negative or when <code>period</code>
-     *             isn't valid for {@link Timer#schedule(TimerTask, long, long)}
-     *             .
+     *             when {@code keyedPool}, {@code keys}, or any of the values in
+     *             the collection is {@code null} or when {@code minIdle} is
+     *             negative or when {@code period} isn't valid for
+     *             {@link Timer#schedule(TimerTask, long, long)}.
      * @see #checkMinIdle(KeyedObjectPool, Object, int, long)
      */
     public static <K, V> Map<K, TimerTask> checkMinIdle(
@@ -205,8 +203,8 @@ public final class PoolUtils {
     }
 
     /**
-     * Calls {@link ObjectPool#addObject()} on <code>pool</code> <code>count</code>
-     * number of times.
+     * Calls {@link ObjectPool#addObject()} on {@code pool} {@code count} number
+     * of times.
      *
      * @param pool
      *            the pool to prefill.
@@ -216,7 +214,7 @@ public final class PoolUtils {
      * @throws Exception
      *             when {@link ObjectPool#addObject()} fails.
      * @throws IllegalArgumentException
-     *             when <code>pool</code> is <code>null</code>.
+     *             when {@code pool} is {@code null}.
      * @deprecated Use {@link ObjectPool#addObjects(int)}.
      */
     @Deprecated
@@ -229,22 +227,21 @@ public final class PoolUtils {
     }
 
     /**
-     * Calls {@link KeyedObjectPool#addObject(Object)} on <code>keyedPool</code> with
-     * <code>key</code> <code>count</code> number of times.
+     * Calls {@link KeyedObjectPool#addObject(Object)} on {@code keyedPool} with
+     * {@code key} {@code count} number of times.
      *
      * @param keyedPool
      *            the keyedPool to prefill.
      * @param key
      *            the key to add objects for.
      * @param count
-     *            the number of idle objects to add for <code>key</code>.
+     *            the number of idle objects to add for {@code key}.
      * @param <K> the type of the pool key
      * @param <V> the type of pool entries
      * @throws Exception
      *             when {@link KeyedObjectPool#addObject(Object)} fails.
      * @throws IllegalArgumentException
-     *             when <code>keyedPool</code> or <code>key</code> is
-     *             <code>null</code>.
+     *             when {@code keyedPool} or {@code key} is {@code null}.
      * @deprecated Use {@link KeyedObjectPool#addObjects(Object, int)}.
      */
     @Deprecated
@@ -258,24 +255,24 @@ public final class PoolUtils {
     }
 
     /**
-     * Calls {@link KeyedObjectPool#addObject(Object)} on <code>keyedPool</code> with each
-     * key in <code>keys</code> for <code>count</code> number of times. This has
+     * Calls {@link KeyedObjectPool#addObject(Object)} on {@code keyedPool} with
+     * each key in {@code keys} for {@code count} number of times. This has
      * the same effect as calling {@link #prefill(KeyedObjectPool, Object, int)}
-     * for each key in the <code>keys</code> collection.
+     * for each key in the {@code keys} collection.
      *
      * @param keyedPool
      *            the keyedPool to prefill.
      * @param keys
      *            {@link Collection} of keys to add objects for.
      * @param count
-     *            the number of idle objects to add for each <code>key</code>.
+     *            the number of idle objects to add for each {@code key}.
      * @param <K> the type of the pool key
      * @param <V> the type of pool entries
      * @throws Exception
      *             when {@link KeyedObjectPool#addObject(Object)} fails.
      * @throws IllegalArgumentException
-     *             when <code>keyedPool</code>, <code>keys</code>, or any value
-     *             in <code>keys</code> is <code>null</code>.
+     *             when {@code keyedPool}, {@code keys}, or any value in
+     *             {@code keys} is {@code null}.
      * @see #prefill(KeyedObjectPool, Object, int)
      * @deprecated Use {@link KeyedObjectPool#addObjects(Collection, int)}.
      */
@@ -304,6 +301,8 @@ public final class PoolUtils {
      * @param pool
      *            the ObjectPool to be "wrapped" in a synchronized ObjectPool.
      * @param <T> the type of objects in the pool
+     * @throws IllegalArgumentException
+     *             when {@code pool} is {@code null}.
      * @return a synchronized view of the specified ObjectPool.
      */
     public static <T> ObjectPool<T> synchronizedPool(final ObjectPool<T> pool) {
@@ -399,6 +398,8 @@ public final class PoolUtils {
      *            the ObjectPool to be decorated so it shrinks its idle count
      *            when possible.
      * @param <T> the type of objects in the pool
+     * @throws IllegalArgumentException
+     *             when {@code pool} is {@code null}.
      * @return a pool that adaptively decreases its size when idle objects are
      *         no longer needed.
      * @see #erodingPool(ObjectPool, float)
@@ -429,6 +430,9 @@ public final class PoolUtils {
      *            shrinks more aggressively. If 1 &lt; factor then the pool
      *            shrinks less aggressively.
      * @param <T> the type of objects in the pool
+     * @throws IllegalArgumentException
+     *             when {@code pool} is {@code null} or when {@code factor} is
+     *             not positive.
      * @return a pool that adaptively decreases its size when idle objects are
      *         no longer needed.
      * @see #erodingPool(ObjectPool)
@@ -456,6 +460,8 @@ public final class PoolUtils {
      *            count when possible.
      * @param <K> the type of the pool key
      * @param <V> the type of pool entries
+     * @throws IllegalArgumentException
+     *             when {@code keyedPool} is {@code null}.
      * @return a pool that adaptively decreases its size when idle objects are
      *         no longer needed.
      * @see #erodingPool(KeyedObjectPool, float)
@@ -489,6 +495,9 @@ public final class PoolUtils {
      *            shrinks less aggressively.
      * @param <K> the type of the pool key
      * @param <V> the type of pool entries
+     * @throws IllegalArgumentException
+     *             when {@code keyedPool} is {@code null} or when {@code factor}
+     *             is not positive.
      * @return a pool that adaptively decreases its size when idle objects are
      *         no longer needed.
      * @see #erodingPool(KeyedObjectPool, float, boolean)
@@ -529,6 +538,9 @@ public final class PoolUtils {
      *            when true, each key is treated independently.
      * @param <K> the type of the pool key
      * @param <V> the type of pool entries
+     * @throws IllegalArgumentException
+     *             when {@code keyedPool} is {@code null} or when {@code factor}
+     *             is not positive.
      * @return a pool that adaptively decreases its size when idle objects are
      *         no longer needed.
      * @see #erodingPool(KeyedObjectPool)
@@ -550,7 +562,7 @@ public final class PoolUtils {
     }
 
     /**
-     * Gets the <code>Timer</code> for checking keyedPool's idle count.
+     * Gets the {@code Timer} for checking keyedPool's idle count.
      *
      * @return the {@link Timer} for checking keyedPool's idle count.
      */

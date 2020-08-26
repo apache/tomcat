@@ -134,9 +134,9 @@ public interface PooledObject<T> extends Comparable<PooledObject<T>> {
      * Attempts to place the pooled object in the
      * {@link PooledObjectState#EVICTION} state.
      *
-     * @return <code>true</code> if the object was placed in the
+     * @return {@code true} if the object was placed in the
      *         {@link PooledObjectState#EVICTION} state otherwise
-     *         <code>false</code>
+     *         {@code false}
      */
     boolean startEvictionTest();
 

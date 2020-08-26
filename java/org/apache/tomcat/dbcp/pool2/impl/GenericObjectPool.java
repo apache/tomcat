@@ -36,7 +36,7 @@ import org.apache.tomcat.dbcp.pool2.UsageTracking;
  * A configurable {@link ObjectPool} implementation.
  * <p>
  * When coupled with the appropriate {@link PooledObjectFactory},
- * <code>GenericObjectPool</code> provides robust pooling functionality for
+ * {@code GenericObjectPool} provides robust pooling functionality for
  * arbitrary objects.
  * </p>
  * <p>
@@ -54,11 +54,11 @@ import org.apache.tomcat.dbcp.pool2.UsageTracking;
  * returned before the configured
  * {@link AbandonedConfig#getRemoveAbandonedTimeout() removeAbandonedTimeout}.
  * Abandoned object removal can be configured to happen when
- * <code>borrowObject</code> is invoked and the pool is close to starvation, or
+ * {@code borrowObject} is invoked and the pool is close to starvation, or
  * it can be executed by the idle object evictor, or both. If pooled objects
  * implement the {@link org.apache.tomcat.dbcp.pool2.TrackedUse} interface,
  * their last use will be queried
- * using the <code>getLastUsed</code> method on that interface; otherwise
+ * using the {@code getLastUsed} method on that interface; otherwise
  * abandonment is determined by how long an object has been checked out from
  * the pool.
  * </p>
@@ -81,7 +81,7 @@ public class GenericObjectPool<T> extends BaseGenericObjectPool<T>
         implements ObjectPool<T>, GenericObjectPoolMXBean, UsageTracking<T> {
 
     /**
-     * Creates a new <code>GenericObjectPool</code> using defaults from
+     * Creates a new {@code GenericObjectPool} using defaults from
      * {@link GenericObjectPoolConfig}.
      *
      * @param factory The object factory to be used to create object instances
@@ -92,7 +92,7 @@ public class GenericObjectPool<T> extends BaseGenericObjectPool<T>
     }
 
     /**
-     * Creates a new <code>GenericObjectPool</code> using a specific
+     * Creates a new {@code GenericObjectPool} using a specific
      * configuration.
      *
      * @param factory   The object factory to be used to create object instances
@@ -119,7 +119,7 @@ public class GenericObjectPool<T> extends BaseGenericObjectPool<T>
     }
 
     /**
-     * Creates a new <code>GenericObjectPool</code> that tracks and destroys
+     * Creates a new {@code GenericObjectPool} that tracks and destroys
      * objects that are checked out, but never returned to the pool.
      *
      * @param factory   The object factory to be used to create object instances
@@ -359,7 +359,7 @@ public class GenericObjectPool<T> extends BaseGenericObjectPool<T>
      * If there is one or more idle instance available in the pool, then an
      * idle instance will be selected based on the value of {@link #getLifo()},
      * activated and returned. If activation fails, or {@link #getTestOnBorrow()
-     * testOnBorrow} is set to <code>true</code> and validation fails, the
+     * testOnBorrow} is set to {@code true} and validation fails, the
      * instance is destroyed and the next available instance is examined. This
      * continues until either a valid instance is returned or there are no more
      * idle instances available.
@@ -368,20 +368,20 @@ public class GenericObjectPool<T> extends BaseGenericObjectPool<T>
      * If there are no idle instances available in the pool, behavior depends on
      * the {@link #getMaxTotal() maxTotal}, (if applicable)
      * {@link #getBlockWhenExhausted()} and the value passed in to the
-     * <code>borrowMaxWaitMillis</code> parameter. If the number of instances
-     * checked out from the pool is less than <code>maxTotal,</code> a new
+     * {@code borrowMaxWaitMillis} parameter. If the number of instances
+     * checked out from the pool is less than {@code maxTotal,} a new
      * instance is created, activated and (if applicable) validated and returned
-     * to the caller. If validation fails, a <code>NoSuchElementException</code>
+     * to the caller. If validation fails, a {@code NoSuchElementException}
      * is thrown.
      * </p>
      * <p>
      * If the pool is exhausted (no available idle instances and no capacity to
      * create new ones), this method will either block (if
      * {@link #getBlockWhenExhausted()} is true) or throw a
-     * <code>NoSuchElementException</code> (if
+     * {@code NoSuchElementException} (if
      * {@link #getBlockWhenExhausted()} is false). The length of time that this
      * method will block when {@link #getBlockWhenExhausted()} is true is
-     * determined by the value passed in to the <code>borrowMaxWaitMillis</code>
+     * determined by the value passed in to the {@code borrowMaxWaitMillis}
      * parameter.
      * </p>
      * <p>

@@ -206,9 +206,11 @@ public class DefaultPooledObject<T> implements PooledObject<T> {
 
     /**
      * Deallocates the object and sets it {@link PooledObjectState#IDLE IDLE}
-     * if it is currently {@link PooledObjectState#ALLOCATED ALLOCATED}.
+     * if it is currently {@link PooledObjectState#ALLOCATED ALLOCATED}
+     * or {@link PooledObjectState#RETURNING RETURNING}.
      *
      * @return {@code true} if the state was {@link PooledObjectState#ALLOCATED ALLOCATED}
+     *         or {@link PooledObjectState#RETURNING RETURNING}.
      */
     @Override
     public synchronized boolean deallocate() {
