@@ -210,6 +210,10 @@
         Update the internal fork of Apache Commons Pool to 2.8.1. Code clean-up
         and improved abandoned pool handling. (markt)
       </add>
+      <add>
+        Update the internal fork of Apache Commons DBCP to 6d232e5 (2020-08-11,
+        2.8.0-SNAPSHOT). Code clean-up various bug fixes. (markt)
+      </add>
     </changelog>
   </subsection>
 </section>
