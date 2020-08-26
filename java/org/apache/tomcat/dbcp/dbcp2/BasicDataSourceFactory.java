@@ -100,6 +100,7 @@ public class BasicDataSourceFactory implements ObjectFactory {
     private static final String PROP_LOG_ABANDONED = "logAbandoned";
     private static final String PROP_ABANDONED_USAGE_TRACKING = "abandonedUsageTracking";
     private static final String PROP_POOL_PREPARED_STATEMENTS = "poolPreparedStatements";
+    private static final String PROP_CLEAR_STATEMENT_POOL_ON_RETURN = "clearStatementPoolOnReturn";
     private static final String PROP_MAX_OPEN_PREPARED_STATEMENTS = "maxOpenPreparedStatements";
     private static final String PROP_CONNECTION_PROPERTIES = "connectionProperties";
     private static final String PROP_MAX_CONN_LIFETIME_MILLIS = "maxConnLifetimeMillis";
@@ -140,6 +141,7 @@ public class BasicDataSourceFactory implements ObjectFactory {
             PROP_URL, PROP_USER_NAME, PROP_VALIDATION_QUERY, PROP_VALIDATION_QUERY_TIMEOUT, PROP_CONNECTION_INIT_SQLS,
             PROP_ACCESS_TO_UNDERLYING_CONNECTION_ALLOWED, PROP_REMOVE_ABANDONED_ON_BORROW, PROP_REMOVE_ABANDONED_ON_MAINTENANCE,
             PROP_REMOVE_ABANDONED_TIMEOUT, PROP_LOG_ABANDONED, PROP_ABANDONED_USAGE_TRACKING, PROP_POOL_PREPARED_STATEMENTS,
+            PROP_CLEAR_STATEMENT_POOL_ON_RETURN,
             PROP_MAX_OPEN_PREPARED_STATEMENTS, PROP_CONNECTION_PROPERTIES, PROP_MAX_CONN_LIFETIME_MILLIS,
             PROP_LOG_EXPIRED_CONNECTIONS, PROP_ROLLBACK_ON_RETURN, PROP_ENABLE_AUTO_COMMIT_ON_RETURN,
             PROP_DEFAULT_QUERY_TIMEOUT, PROP_FAST_FAIL_VALIDATION, PROP_DISCONNECTION_SQL_CODES, PROP_JMX_NAME,
@@ -255,7 +257,7 @@ public class BasicDataSourceFactory implements ObjectFactory {
             final List<String> infoMessages) {
         final List<String> allPropsAsList = Arrays.asList(ALL_PROPERTIES);
         final String nameString = name != null ? "Name = " + name.toString() + " " : "";
-        if (NUPROP_WARNTEXT != null && !NUPROP_WARNTEXT.keySet().isEmpty()) {
+        if (NUPROP_WARNTEXT != null && !NUPROP_WARNTEXT.isEmpty()) {
             for (final String propertyName : NUPROP_WARNTEXT.keySet()) {
                 final RefAddr ra = ref.get(propertyName);
                 if (ra != null && !allPropsAsList.contains(ra.getType())) {
@@ -275,7 +277,7 @@ public class BasicDataSourceFactory implements ObjectFactory {
             final String propertyName = ra.getType();
             // If property name is not in the properties list, we haven't warned on it
             // and it is not in the "silent" list, tell user we are ignoring it.
-            if (!(allPropsAsList.contains(propertyName) || NUPROP_WARNTEXT.keySet().contains(propertyName)
+            if (!(allPropsAsList.contains(propertyName) || NUPROP_WARNTEXT.containsKey(propertyName)
                     || SILENT_PROPERTIES.contains(propertyName))) {
                 final String propertyValue = ra.getContent().toString();
                 final StringBuilder stringBuilder = new StringBuilder(nameString);
@@ -488,6 +490,11 @@ public class BasicDataSourceFactory implements ObjectFactory {
         value = properties.getProperty(PROP_POOL_PREPARED_STATEMENTS);
         if (value != null) {
             dataSource.setPoolPreparedStatements(Boolean.valueOf(value).booleanValue());
+        }
+
+        value = properties.getProperty(PROP_CLEAR_STATEMENT_POOL_ON_RETURN);
+        if (value != null) {
+            dataSource.setClearStatementPoolOnReturn(Boolean.valueOf(value).booleanValue());
         }
 
         value = properties.getProperty(PROP_MAX_OPEN_PREPARED_STATEMENTS);

@@ -16,6 +16,8 @@
  */
 package org.apache.tomcat.dbcp.dbcp2;
 
+import java.sql.SQLException;
+
 /**
  * Defines the methods that will be made available via JMX.
  *
@@ -128,6 +130,14 @@ public interface BasicDataSourceMXBean {
      * @return {@link BasicDataSource#isPoolPreparedStatements()}
      */
     boolean isPoolPreparedStatements();
+
+    /**
+     * See {@link BasicDataSource#isClearStatementPoolOnReturn()}
+     *
+     * @return {@link BasicDataSource#isClearStatementPoolOnReturn()}
+     * @since 2.8.0
+     */
+    boolean isClearStatementPoolOnReturn();
 
     /**
      * See {@link BasicDataSource#getMaxOpenPreparedStatements()}
@@ -313,4 +323,21 @@ public interface BasicDataSourceMXBean {
      * @since 2.1
      */
     String[] getDisconnectionSqlCodesAsArray();
+
+    /**
+     * See {@link BasicDataSource#start()}
+     *
+     * @throws SQLException if an error occurs initializing the datasource
+     *
+     * @since 2.8
+     */
+    void start() throws SQLException;
+
+    /**
+     * See {@link BasicDataSource#restart()}
+     * @throws SQLException if an error occurs initializing the datasource
+     *
+     * @since 2.8
+     */
+    void restart() throws SQLException;
 }
