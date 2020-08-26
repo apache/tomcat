@@ -38,7 +38,7 @@ public class FileSizeLimitExceededException
     private String fieldName;
 
     /**
-     * Constructs a <code>SizeExceededException</code> with
+     * Constructs a {@code SizeExceededException} with
      * the specified detail message, and actual and permitted sizes.
      *
      * @param message   The detail message.
