@@ -97,7 +97,11 @@ public class WsSession implements Session {
     private volatile int maxBinaryMessageBufferSize = Constants.DEFAULT_BUFFER_SIZE;
     private volatile int maxTextMessageBufferSize = Constants.DEFAULT_BUFFER_SIZE;
     private volatile long maxIdleTimeout = 0;
+    private volatile long maxIdleReadTimeout = 0;
+    private volatile long maxIdleWriteTimeout = 0;
     private volatile long lastActive = System.currentTimeMillis();
+    private volatile long lastReadTime = lastActive;
+    private volatile long lastWriteTime = lastActive;
     private Map<FutureToSendHandler, FutureToSendHandler> futures = new ConcurrentHashMap<>();
 
     /**
@@ -805,8 +809,13 @@ public class WsSession implements Session {
     }
 
 
-    protected void updateLastActive() {
+    protected void updateLastActive(boolean isWriteOperation) {
         lastActive = System.currentTimeMillis();
+        if (isWriteOperation) {
+            lastWriteTime = lastActive;
+        } else {
+            lastReadTime = lastActive;
+        }
     }
 
 
@@ -815,17 +824,85 @@ public class WsSession implements Session {
         if (timeout < 1) {
             return;
         }
-
-        if (System.currentTimeMillis() - lastActive > timeout) {
+        long currentTime = System.currentTimeMillis();
+        if (currentTime - lastActive > timeout) {
             String msg = sm.getString("wsSession.timeout", getId());
             if (log.isDebugEnabled()) {
                 log.debug(msg);
             }
             doClose(new CloseReason(CloseCodes.GOING_AWAY, msg),
                     new CloseReason(CloseCodes.CLOSED_ABNORMALLY, msg));
+        } else {
+            boolean closeConnection = false;
+            Long idleReadTimeout = getIdleReadTimeout();
+            boolean closeOnReadTimeout = getCloseOnReadIdleTimeout();
+            
+            closeConnection = idleReadTimeout != null && closeOnReadTimeout && 
+                            (currentTime - lastReadTime > idleReadTimeout);
+
+            if (closeConnection) {
+                String msg = sm.getString("wsSession.readIdleTimeout", getId());
+                if (log.isDebugEnabled()) {
+                    log.debug(msg);
+                }
+                doClose(new CloseReason(CloseCodes.GOING_AWAY, msg),
+                        new CloseReason(CloseCodes.CLOSED_ABNORMALLY, msg));
+            }
+
+            Long idleWriteTimeout = getIdleWriteTimeout();
+            boolean closeOnWriteTimeout = getCloseOnWriteIdleTimeout();
+            
+            closeConnection = idleWriteTimeout != null && closeOnWriteTimeout && 
+                            (currentTime - lastWriteTime > idleWriteTimeout);
+
+            if (closeConnection) {
+                String msg = sm.getString("wsSession.writeIdleTimeout", getId());
+                if (log.isDebugEnabled()) {
+                    log.debug(msg);
+                }
+                doClose(new CloseReason(CloseCodes.GOING_AWAY, msg),
+                        new CloseReason(CloseCodes.CLOSED_ABNORMALLY, msg));
+            }
         }
     }
 
+    private Long getIdleReadTimeout() {
+        Object readTimeout = this.getUserProperties().get(Constants.WS_READ_IDLE_TIMEOUT);
+        Long userReadTimeout = null;
+        if (readTimeout instanceof Long) {
+            userReadTimeout = (Long) readTimeout;
+        }
+        return userReadTimeout;
+    }
+
+    private boolean getCloseOnReadIdleTimeout() {
+        Object closeOnIdleRead = this.getUserProperties().get(Constants.WS_CLOSE_READ_IDLE_TIMEOUT);
+        if (closeOnIdleRead instanceof Boolean) {
+            if ((boolean) closeOnIdleRead) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private Long getIdleWriteTimeout() {
+        Object writeTimeout = this.getUserProperties().get(Constants.WS_WRITE_IDLE_TIMEOUT);
+        Long userWriteTimeout = null;
+        if (writeTimeout instanceof Long) {
+            userWriteTimeout = (Long) writeTimeout;
+        }
+        return userWriteTimeout;
+    }
+
+    private boolean getCloseOnWriteIdleTimeout() {
+        Object closeOnIdleRead = this.getUserProperties().get(Constants.WS_CLOSE_READ_IDLE_TIMEOUT);
+        if (closeOnIdleRead instanceof Boolean) {
+            if ((boolean) closeOnIdleRead) {
+                return true;
+            }
+        }
+        return false;
+    }
 
     private void checkState() {
         if (state == State.CLOSED) {

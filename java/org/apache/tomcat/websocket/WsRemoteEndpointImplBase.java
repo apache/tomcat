@@ -275,7 +275,7 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
 
     private void sendMessageBlock(byte opCode, ByteBuffer payload, boolean last,
             long timeoutExpiry) throws IOException {
-        wsSession.updateLastActive();
+        wsSession.updateLastActive(true);
 
         BlockingSendHandler bsh = new BlockingSendHandler();
 
@@ -340,7 +340,7 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
     void startMessage(byte opCode, ByteBuffer payload, boolean last,
             SendHandler handler) {
 
-        wsSession.updateLastActive();
+        wsSession.updateLastActive(true);
 
         List<MessagePart> messageParts = new ArrayList<>();
         messageParts.add(new MessagePart(last, 0, opCode, payload,
@@ -423,7 +423,7 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
             writeMessagePart(mpNext);
         }
 
-        wsSession.updateLastActive();
+        wsSession.updateLastActive(true);
 
         // Some handlers, such as the IntermediateMessageHandler, do not have a
         // nested handler so handler may be null.
