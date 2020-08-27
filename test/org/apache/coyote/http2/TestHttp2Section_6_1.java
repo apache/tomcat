@@ -16,6 +16,9 @@
  */
 package org.apache.coyote.http2;
 
+import java.util.logging.Level;
+import java.util.logging.LogManager;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -49,31 +52,37 @@ public class TestHttp2Section_6_1 extends Http2TestBase {
 
     @Test
     public void testDataFrameWithPadding() throws Exception {
-        http2Connect();
+        LogManager.getLogManager().getLogger("org.apache.coyote").setLevel(Level.ALL);
+        LogManager.getLogManager().getLogger("org.apache.tomcat.util.net").setLevel(Level.ALL);
+        try {
+            http2Connect();
 
-        byte[] padding = new byte[8];
+            byte[] padding = new byte[8];
 
-        sendSimplePostRequest(3, padding);
-        readSimplePostResponse(true);
+            sendSimplePostRequest(3, padding);
+            readSimplePostResponse(true);
 
+            // The window update for the padding could occur anywhere since it
+            // happens on a different thead to the response.
+            String trace = output.getTrace();
+            String paddingWindowUpdate = "0-WindowSize-[9]\n3-WindowSize-[9]\n";
 
-        // The window update for the padding could occur anywhere since it
-        // happens on a different thead to the response.
-        String trace = output.getTrace();
-        String paddingWindowUpdate = "0-WindowSize-[9]\n3-WindowSize-[9]\n";
+            Assert.assertTrue(trace, trace.contains(paddingWindowUpdate));
+            trace = trace.replace(paddingWindowUpdate, "");
 
-        Assert.assertTrue(trace, trace.contains(paddingWindowUpdate));
-        trace = trace.replace(paddingWindowUpdate, "");
-
-        Assert.assertEquals("0-WindowSize-[119]\n" +
-                "3-WindowSize-[119]\n" +
-                "3-HeadersStart\n" +
-                "3-Header-[:status]-[200]\n" +
-                "3-Header-[content-length]-[119]\n" +
-                "3-Header-[date]-[Wed, 11 Nov 2015 19:18:42 GMT]\n" +
-                "3-HeadersEnd\n" +
-                "3-Body-119\n" +
-                "3-EndOfStream\n", trace);
+            Assert.assertEquals("0-WindowSize-[119]\n" +
+                    "3-WindowSize-[119]\n" +
+                    "3-HeadersStart\n" +
+                    "3-Header-[:status]-[200]\n" +
+                    "3-Header-[content-length]-[119]\n" +
+                    "3-Header-[date]-[Wed, 11 Nov 2015 19:18:42 GMT]\n" +
+                    "3-HeadersEnd\n" +
+                    "3-Body-119\n" +
+                    "3-EndOfStream\n", trace);
+        } finally {
+            LogManager.getLogManager().getLogger("org.apache.coyote").setLevel(Level.INFO);
+            LogManager.getLogManager().getLogger("org.apache.tomcat.util.net").setLevel(Level.INFO);
+        }
     }
 
 
