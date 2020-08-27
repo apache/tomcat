@@ -432,7 +432,8 @@ public class TestHttp2Section_5_1 extends Http2TestBase {
         // Expecting
         // 1 * headers
         // 64k-1 of body (8 * ~8k)
-        // 1 * error (could be in any order)
+        // 1 * error
+        // Could be in any order
         for (int i = 0; i < 9; i++) {
             parser.readFrame(true);
         }
@@ -440,7 +441,6 @@ public class TestHttp2Section_5_1 extends Http2TestBase {
 
         Assert.assertTrue(output.getTrace(),
                 output.getTrace().contains("5-RST-[" + Http2Error.REFUSED_STREAM.getCode() + "]"));
-        output.clearTrace();
 
         // Connection window is 8k.
         // Stream window is zero.
