@@ -1685,25 +1685,10 @@
     <mkdir dir="${xreflect.directory}"/>
     <copy todir="${xreflect.directory}/sources">
       <fileset dir="java"/>
-      <fileset dir="res/graal/java"/>
     </copy>
     <copy todir="${xreflect.directory}/classes">
       <fileset dir="${tomcat.classes}"/>
     </copy>
-
-    <!-- Compile the sources needed to generate XReflectionIntrospectionUtils -->
-    <javac includes="org/apache/tomcat/util/xreflection/*.java"
-           srcdir="${xreflect.directory}/sources"
-           destdir="${xreflect.directory}/classes"
-           debug="${compile.debug}"
-           deprecation="${compile.deprecation}"
-           source="${compile.source}"
-           target="${compile.target}"
-           encoding="ISO-8859-1"
-           includeAntRuntime="true" >
-      <compilerarg value="-XDignore.symbol.file"/>
-      <classpath refid="compile.classpath" />
-    </javac>
 
     <!-- Generate the reflection less XReflectionIntrospectionUtils .java file -->
     <java classname="org.apache.tomcat.util.xreflection.ObjectReflectionPropertyInspector"
