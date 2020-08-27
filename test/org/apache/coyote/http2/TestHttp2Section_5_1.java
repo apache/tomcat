@@ -413,22 +413,28 @@ public class TestHttp2Section_5_1 extends Http2TestBase {
                 , output.getTrace());
         output.clearTrace();
 
-        sendLargeGetRequest(3);
-
-        sendSimpleGetRequest(5);
-
         // Default connection window size is 64k-1.
         // Initial request will have used 8k leaving 56k-1.
         // Stream window will be 64k-1.
 
         // Increase Connection window by 16k
+        // Do this before sending the requests to ensure the connection window
+        // is increased before request processing starts else stream 5 may
+        // consume the connection window before the update is processed which
+        // will result in at least one addition body frame and break the tests
+        // below.
         sendWindowUpdate(0, 16 * 1024);
+
+        sendLargeGetRequest(3);
+
+        sendSimpleGetRequest(5);
 
         // Expecting
         // 1 * headers
         // 64k-1 of body (8 * ~8k)
         // 1 * error
         // Could be in any order
+        //
         for (int i = 0; i < 9; i++) {
             parser.readFrame(true);
         }
