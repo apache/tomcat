@@ -489,7 +489,7 @@
     involved must be registered in your DNS server to resolve to the
     same computer that is running this instance of Catalina.</p>
 
-    <p>Aliases may also use the wildcard form (<code>*.domainname</code>), 
+    <p>Aliases may also use the wildcard form (<code>*.domainname</code>),
     unlike for the <strong>name</strong> attribute of a <strong>Host</strong>.
     </p>
   </subsection>
