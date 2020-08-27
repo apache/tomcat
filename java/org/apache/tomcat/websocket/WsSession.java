@@ -97,8 +97,6 @@ public class WsSession implements Session {
     private volatile int maxBinaryMessageBufferSize = Constants.DEFAULT_BUFFER_SIZE;
     private volatile int maxTextMessageBufferSize = Constants.DEFAULT_BUFFER_SIZE;
     private volatile long maxIdleTimeout = 0;
-    private volatile long maxIdleReadTimeout = 0;
-    private volatile long maxIdleWriteTimeout = 0;
     private volatile long lastActive = System.currentTimeMillis();
     private volatile long lastReadTime = lastActive;
     private volatile long lastWriteTime = lastActive;
@@ -835,10 +833,8 @@ public class WsSession implements Session {
         } else {
             boolean closeConnection = false;
             Long idleReadTimeout = getIdleReadTimeout();
-            boolean closeOnReadTimeout = getCloseOnReadIdleTimeout();
             
-            closeConnection = idleReadTimeout != null && closeOnReadTimeout && 
-                            (currentTime - lastReadTime > idleReadTimeout);
+            closeConnection = idleReadTimeout != null && (currentTime - lastReadTime > idleReadTimeout);
 
             if (closeConnection) {
                 String msg = sm.getString("wsSession.readIdleTimeout", getId());
@@ -850,10 +846,8 @@ public class WsSession implements Session {
             }
 
             Long idleWriteTimeout = getIdleWriteTimeout();
-            boolean closeOnWriteTimeout = getCloseOnWriteIdleTimeout();
             
-            closeConnection = idleWriteTimeout != null && closeOnWriteTimeout && 
-                            (currentTime - lastWriteTime > idleWriteTimeout);
+            closeConnection = idleWriteTimeout != null && (currentTime - lastWriteTime > idleWriteTimeout);
 
             if (closeConnection) {
                 String msg = sm.getString("wsSession.writeIdleTimeout", getId());
@@ -875,16 +869,6 @@ public class WsSession implements Session {
         return userReadTimeout;
     }
 
-    private boolean getCloseOnReadIdleTimeout() {
-        Object closeOnIdleRead = this.getUserProperties().get(Constants.WS_CLOSE_READ_IDLE_TIMEOUT);
-        if (closeOnIdleRead instanceof Boolean) {
-            if ((boolean) closeOnIdleRead) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     private Long getIdleWriteTimeout() {
         Object writeTimeout = this.getUserProperties().get(Constants.WS_WRITE_IDLE_TIMEOUT);
         Long userWriteTimeout = null;
@@ -892,16 +876,6 @@ public class WsSession implements Session {
             userWriteTimeout = (Long) writeTimeout;
         }
         return userWriteTimeout;
-    }
-
-    private boolean getCloseOnWriteIdleTimeout() {
-        Object closeOnIdleRead = this.getUserProperties().get(Constants.WS_CLOSE_READ_IDLE_TIMEOUT);
-        if (closeOnIdleRead instanceof Boolean) {
-            if ((boolean) closeOnIdleRead) {
-                return true;
-            }
-        }
-        return false;
     }
 
     private void checkState() {
