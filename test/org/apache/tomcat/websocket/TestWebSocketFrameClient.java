@@ -122,6 +122,7 @@ public class TestWebSocketFrameClient extends WebSocketBaseTest {
         try {
             echoTester("",null);
             echoTester("/",null);
+            // This will trigger a redirect so there will be 5 requests logged
             echoTester("/foo",null);
             echoTester("/foo/",null);
         } finally {
