@@ -822,7 +822,9 @@ public class WsSession implements Session {
         if (timeout < 1) {
             return;
         }
+
         long currentTime = System.currentTimeMillis();
+
         if (currentTime - lastActive > timeout) {
             String msg = sm.getString("wsSession.timeout", getId());
             if (log.isDebugEnabled()) {
