@@ -459,19 +459,35 @@ public abstract class Http2TestBase extends TomcatBaseTest {
 
 
     protected void readSimplePostResponse(boolean padding) throws Http2Exception, IOException {
-        if (padding) {
-            // Window updates for padding
-            parser.readFrame(true);
-            parser.readFrame(true);
-        }
+        /*
+         * If there is padding there will always be a window update for the
+         * connection and, depending on timing, there may be an update for the
+         * stream. The Window updates for padding (if present) may appear at any
+         * time. The comments in the code below are only indicative of what the
+         * frames are likely to contain. Actual frame order with padding may be
+         * different.
+         */
+
         // Connection window update after reading request body
         parser.readFrame(true);
         // Stream window update after reading request body
         parser.readFrame(true);
         // Headers
         parser.readFrame(true);
-        // Body
+        // Body (includes end of stream)
         parser.readFrame(true);
+
+        if (padding) {
+            // Connection window update for padding
+            parser.readFrame(true);
+
+            // If EndOfStream has not been received then the stream window
+            // update must have been received so a further frame needs to be
+            // read for EndOfStream.
+            if (!output.getTrace().contains("EndOfStream")) {
+                parser.readFrame(true);
+            }
+        }
     }
 
 
