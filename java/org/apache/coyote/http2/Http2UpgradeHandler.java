@@ -795,9 +795,6 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
      */
     void writeWindowUpdate(Stream stream, int increment, boolean applicationInitiated)
             throws IOException {
-        if (!stream.canWrite()) {
-            return;
-        }
         synchronized (socketWrapper) {
             // Build window update frame for stream 0
             byte[] frame = new byte[13];
@@ -805,17 +802,21 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
             frame[3] = FrameType.WINDOW_UPDATE.getIdByte();
             ByteUtil.set31Bits(frame, 9, increment);
             socketWrapper.write(true, frame, 0, frame.length);
-            // Change stream Id and re-use
-            ByteUtil.set31Bits(frame, 5, stream.getIdAsInt());
-            try {
-                socketWrapper.write(true, frame, 0, frame.length);
-                socketWrapper.flush(true);
-            } catch (IOException ioe) {
-                if (applicationInitiated) {
-                    handleAppInitiatedIOException(ioe);
-                } else {
-                    throw ioe;
+            if  (stream.canWrite()) {
+                // Change stream Id and re-use
+                ByteUtil.set31Bits(frame, 5, stream.getIdAsInt());
+                try {
+                    socketWrapper.write(true, frame, 0, frame.length);
+                    socketWrapper.flush(true);
+                } catch (IOException ioe) {
+                    if (applicationInitiated) {
+                        handleAppInitiatedIOException(ioe);
+                    } else {
+                        throw ioe;
+                    }
                 }
+            } else {
+                socketWrapper.flush(true);
             }
         }
     }
