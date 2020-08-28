@@ -122,14 +122,6 @@ public class Constants {
     public static final String WS_WRITE_IDLE_TIMEOUT =
             "org.apache.tomcat.websocket.WS_WRITE_IDLE_TIMEOUT";
 
-    // Configuration for idle write timeout on websocket channel
-    public static final String WS_CLOSE_READ_IDLE_TIMEOUT =
-            "org.apache.tomcat.websocket.WS_CLOSE_READ_IDLE_TIMEOUT";
-
-    // Configuration for idle write timeout on websocket channel
-    public static final String WS_CLOSE_WRITE_IDLE_TIMEOUT =
-            "org.apache.tomcat.websocket.WS_CLOSE_WRITE_IDLE_TIMEOUT";
-
     // Configuration for background processing checks intervals
     static final int DEFAULT_PROCESS_PERIOD = Integer.getInteger(
             "org.apache.tomcat.websocket.DEFAULT_PROCESS_PERIOD", 10)
