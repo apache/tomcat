@@ -207,7 +207,7 @@ class Http2Parser {
                 output.endRequestBodyFrame(streamId);
             }
         }
-        if (padLength > 0) {
+        if (Flags.hasPadding(flags)) {
             output.swallowedPadding(streamId, padLength);
         }
     }
