@@ -84,10 +84,10 @@ class Generator {
 
     private static final Class<?>[] OBJECT_CLASS = { Object.class };
 
-    //Flag to enable or disable the excess white space trimming.
-    private static final boolean JSP_WHITE_SPACE_TRIMMING = Boolean.getBoolean("tomcat.JSPWhiteSpaceTrimming");
+    //context param to enable or disable the excess white space trimming.
+    private static final String JSP_WHITE_SPACE_TRIMMING = "JSPWhiteSpaceTrimming";
 
-    private static final Pattern PRE_TAG_PATTERN = Pattern.compile(".*(<pre>|</pre>).*");
+    private static final Pattern PRE_TAG_PATTERN = Pattern.compile("(?s).*(<pre>|</pre>).*");
     private static final Pattern BLANK_LINE_PATTERN = Pattern.compile("(\\s*(\\n|\\r)+\\s*)");
 
     private static final String VAR_EXPRESSIONFACTORY =
@@ -2119,7 +2119,7 @@ class Generator {
             String text = n.getText();
             // If the flag is active, attempt to minimize the frequency of
             // regex operations.
-            if (JSP_WHITE_SPACE_TRIMMING && text.contains("\n")) {
+            if (Boolean.parseBoolean(ctxt.getServletContext().getInitParameter(JSP_WHITE_SPACE_TRIMMING)) && text.contains("\n")) {
                 // Ensure there are no <pre> or </pre> tags embedded in this
                 // text - if there are, we want to NOT modify the whitespace.
                 Matcher preMatcher = PRE_TAG_PATTERN.matcher(text);

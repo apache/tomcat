@@ -50,7 +50,7 @@ import org.apache.tomcat.util.scan.JarFactory;
  */
 public abstract class Compiler {
 
-    private static final boolean JSP_WHITE_SPACE_TRIMMING = Boolean.getBoolean("tomcat.JSPWhiteSpaceTrimming");
+    private static final String JSP_WHITE_SPACE_TRIMMING = "JSPWhiteSpaceTrimming";
 
     private final Log log = LogFactory.getLog(Compiler.class); // must not be static
 
@@ -318,7 +318,7 @@ public abstract class Compiler {
                     javaEncoding);
         }
 
-        if (JSP_WHITE_SPACE_TRIMMING) {
+        if (Boolean.parseBoolean(this.jsw.getServletContext().getInitParameter(JSP_WHITE_SPACE_TRIMMING))) {
             writer = new NewlineReductionServletWriter(new PrintWriter(osw));
         } else {
         writer = new ServletWriter(new PrintWriter(osw));
