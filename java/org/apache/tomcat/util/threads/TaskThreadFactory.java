@@ -18,17 +18,19 @@ package org.apache.tomcat.util.threads;
 
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;
+
 /**
- * Simple task thread factory to use to create threads for an executor implementation.
- * @author fhanik
- *
+ * Simple task thread factory to use to create threads for an executor
+ * implementation.
  */
 public class TaskThreadFactory implements ThreadFactory {
+
     private final ThreadGroup group;
     private final AtomicInteger threadNumber = new AtomicInteger(1);
     private final String namePrefix;
     private final boolean daemon;
     private final int threadPriority;
+
     public TaskThreadFactory(String namePrefix, boolean daemon, int priority) {
         SecurityManager s = System.getSecurityManager();
         group = (s != null) ? s.getThreadGroup() : Thread.currentThread().getThreadGroup();
@@ -44,5 +46,4 @@ public class TaskThreadFactory implements ThreadFactory {
         t.setPriority(threadPriority);
         return t;
     }
-
 }

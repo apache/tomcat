@@ -31,7 +31,6 @@ import org.apache.tomcat.util.res.StringManager;
  * {@link #getSubmittedCount()} method, to be used to properly handle the work queue.
  * If a RejectedExecutionHandler is not specified a default one will be configured
  * and that one will always throw a RejectedExecutionException
- * @author fhanik
  *
  */
 public class ThreadPoolExecutor extends java.util.concurrent.ThreadPoolExecutor {
@@ -156,6 +155,8 @@ public class ThreadPoolExecutor extends java.util.concurrent.ThreadPoolExecutor 
      * full after that.
      *
      * @param command the runnable task
+     * @param timeout A timeout for the completion of the task
+     * @param unit The timeout time unit
      * @throws RejectedExecutionException if this task cannot be
      * accepted for execution - the queue is full
      * @throws NullPointerException if command or unit is null
@@ -170,11 +171,10 @@ public class ThreadPoolExecutor extends java.util.concurrent.ThreadPoolExecutor 
                 try {
                     if (!queue.force(command, timeout, unit)) {
                         submittedCount.decrementAndGet();
-                        throw new RejectedExecutionException("Queue capacity is full.");
+                        throw new RejectedExecutionException(sm.getString("threadPoolExecutor.queueFull"));
                     }
                 } catch (InterruptedException x) {
                     submittedCount.decrementAndGet();
-                    Thread.interrupted();
                     throw new RejectedExecutionException(x);
                 }
             } else {
