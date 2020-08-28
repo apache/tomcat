@@ -25,8 +25,12 @@ import org.apache.catalina.tribes.Channel;
 import org.apache.catalina.tribes.Member;
 import org.apache.catalina.tribes.TesterUtil;
 import org.apache.catalina.tribes.group.GroupChannel;
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 
 public class TestNonBlockingCoordinator {
+
+    private static final Log log = LogFactory.getLog(TestNonBlockingCoordinator.class);
 
     private static final int CHANNEL_COUNT = 10;
 
@@ -35,7 +39,7 @@ public class TestNonBlockingCoordinator {
 
     @Before
     public void setUp() throws Exception {
-        System.out.println("Setup");
+        log.info("Setup");
         channels = new GroupChannel[CHANNEL_COUNT];
         coordinators = new NonBlockingCoordinator[CHANNEL_COUNT];
         Thread[] threads = new Thread[CHANNEL_COUNT];
@@ -70,8 +74,9 @@ public class TestNonBlockingCoordinator {
     @Test
     public void testCoord1() throws Exception {
         int expectedCount = channels[0].getMembers().length;
+        log.info("Expecting each channel to have [" + expectedCount + "] members");
         for (int i = 1; i < CHANNEL_COUNT; i++) {
-            Assert.assertEquals("Message count expected to be equal.", expectedCount,
+            Assert.assertEquals("Member count expected to be equal.", expectedCount,
                     channels[i].getMembers().length);
         }
         Member member = coordinators[0].getCoordinator();
@@ -84,10 +89,10 @@ public class TestNonBlockingCoordinator {
                 /* Ignore */
             }
         }
+        log.info("Coordinator[0] is:" + member);
         for (int i = 0; i < CHANNEL_COUNT; i++) {
-            Assert.assertEquals(member, coordinators[i].getCoordinator());
+            Assert.assertEquals("Local member" + channels[i].getLocalMember(false), member, coordinators[i].getCoordinator());
         }
-        System.out.println("Coordinator[1] is:" + member);
     }
 
     @Test
