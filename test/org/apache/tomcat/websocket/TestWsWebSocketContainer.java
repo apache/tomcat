@@ -779,6 +779,108 @@ public class TestWsWebSocketContainer extends WebSocketBaseTest {
         Assert.assertEquals(0, getOpenCount(setA));
     }
 
+    @Test
+    public void testSessionExpiryOnUserPropertyReadIdleTimeout() throws Exception {
+        final String readIdleTimeoutParameter = org.apache.tomcat.websocket.Constants.WS_READ_IDLE_TIMEOUT;
+
+        Tomcat tomcat = getTomcatInstance();
+        // No file system docBase required
+        Context ctx = tomcat.addContext("", null);
+        ctx.addApplicationListener(TesterEchoServer.Config.class.getName());
+        Tomcat.addServlet(ctx, "default", new DefaultServlet());
+        ctx.addServletMappingDecoded("/", "default");
+
+        tomcat.start();
+
+        // Need access to implementation methods for configuring unit tests
+        WsWebSocketContainer wsContainer = (WsWebSocketContainer)
+                ContainerProvider.getWebSocketContainer();
+
+        wsContainer.setDefaultMaxSessionIdleTimeout(5000);
+        wsContainer.setProcessPeriod(1);
+
+        EndpointA endpointA = new EndpointA();
+        Session s1a = connectToEchoServer(wsContainer, endpointA,
+                TesterEchoServer.Config.PATH_BASIC);
+        s1a.setMaxIdleTimeout(90000);
+
+        s1a.getUserProperties().put(readIdleTimeoutParameter, (long)5000);
+
+        // even though the maxIdleTimeout is 1.5 minutes but, the readIdleTimeout is 5s.
+        // Thus, session should get closed after 5 seconds as nothing is read on it and user has set the 
+        // max idle read timeout parameter.
+        Set<Session> setA = s1a.getOpenSessions();
+        int expected = 1;
+        while (expected > 0) {
+            Assert.assertEquals(expected, getOpenCount(setA));
+
+            int count = 0;
+            while (getOpenCount(setA) == expected && count < 50) {
+                count ++;
+                Thread.sleep(100);
+            }
+
+            expected--;
+        }
+        // to make sure the background thread to check expiration runs
+        Thread.sleep(2000);
+        Assert.assertEquals(0, getOpenCount(setA));
+    }
+
+    @Test
+    public void testSessionExpiryOnUserPropertyWriteIdleTimeout() throws Exception {
+        final String writeIdleTimeoutParameter = org.apache.tomcat.websocket.Constants.WS_WRITE_IDLE_TIMEOUT;
+
+        Tomcat tomcat = getTomcatInstance();
+        // No file system docBase required
+        Context ctx = tomcat.addContext("", null);
+        ctx.addApplicationListener(TesterEchoServer.Config.class.getName());
+        Tomcat.addServlet(ctx, "default", new DefaultServlet());
+        ctx.addServletMappingDecoded("/", "default");
+
+        tomcat.start();
+
+        // Need access to implementation methods for configuring unit tests
+        WsWebSocketContainer wsContainer = (WsWebSocketContainer)
+                ContainerProvider.getWebSocketContainer();
+
+        wsContainer.setDefaultMaxSessionIdleTimeout(5000);
+        wsContainer.setProcessPeriod(1);
+
+        EndpointA endpointA = new EndpointA();
+        Session s1a = connectToEchoServer(wsContainer, endpointA,
+                TesterEchoServer.Config.PATH_BASIC);
+        s1a.setMaxIdleTimeout(90000);
+
+        s1a.getUserProperties().put(writeIdleTimeoutParameter, (long)5000);
+
+        // write on session for 5 seconds to make sure the session is not idle on write
+        int timesWritten = 0;
+        while(5 > timesWritten++) {
+            s1a.getBasicRemote().sendText(MESSAGE_STRING_1);
+            Thread.sleep(1000);
+        }
+
+        // even though the maxIdleTimeout is 1.5 minutes but, the writeIdleTimeout is 5s.
+        // Thus, session should get closed after 5 seconds as nothing is being written on it and user has set the 
+        // max idle write timeout parameter.
+        Set<Session> setA = s1a.getOpenSessions();
+        int expected = 1;
+        while (expected > 0) {
+            Assert.assertEquals(expected, getOpenCount(setA));
+
+            int count = 0;
+            while (getOpenCount(setA) == expected && count < 50) {
+                count ++;
+                Thread.sleep(100);
+            }
+
+            expected--;
+        }
+        // to make sure the background thread to check expiration runs
+        Thread.sleep(2000);
+        Assert.assertEquals(0, getOpenCount(setA));
+    }
 
     private int getOpenCount(Set<Session> sessions) {
         int result = 0;
