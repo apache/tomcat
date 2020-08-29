@@ -813,13 +813,11 @@ public class TestWsWebSocketContainer extends WebSocketBaseTest {
         int expected = 1;
         while (expected > 0) {
             Assert.assertEquals(expected, getOpenCount(setA));
-
             int count = 0;
             while (getOpenCount(setA) == expected && count < 50) {
                 count ++;
                 Thread.sleep(100);
             }
-
             expected--;
         }
         // to make sure the background thread to check expiration runs
@@ -868,13 +866,11 @@ public class TestWsWebSocketContainer extends WebSocketBaseTest {
         int expected = 1;
         while (expected > 0) {
             Assert.assertEquals(expected, getOpenCount(setA));
-
             int count = 0;
             while (getOpenCount(setA) == expected && count < 50) {
                 count ++;
                 Thread.sleep(100);
             }
-
             expected--;
         }
         // to make sure the background thread to check expiration runs
