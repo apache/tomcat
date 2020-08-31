@@ -318,7 +318,7 @@ public abstract class Compiler {
                     javaEncoding);
         }
 
-        if (Boolean.parseBoolean(this.jsw.getServletContext().getInitParameter(JSP_WHITE_SPACE_TRIMMING))) {
+        if ((this.jsw!=null) && Boolean.parseBoolean(this.jsw.getServletContext().getInitParameter(JSP_WHITE_SPACE_TRIMMING))) {
             writer = new NewlineReductionServletWriter(new PrintWriter(osw));
         } else {
         writer = new ServletWriter(new PrintWriter(osw));

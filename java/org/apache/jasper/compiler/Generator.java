@@ -2119,7 +2119,7 @@ class Generator {
             String text = n.getText();
             // If the flag is active, attempt to minimize the frequency of
             // regex operations.
-            if (Boolean.parseBoolean(ctxt.getServletContext().getInitParameter(JSP_WHITE_SPACE_TRIMMING)) && text.contains("\n")) {
+            if ((ctxt!=null) && Boolean.parseBoolean(ctxt.getServletContext().getInitParameter(JSP_WHITE_SPACE_TRIMMING)) && text.contains("\n")) {
                 // Ensure there are no <pre> or </pre> tags embedded in this
                 // text - if there are, we want to NOT modify the whitespace.
                 Matcher preMatcher = PRE_TAG_PATTERN.matcher(text);
