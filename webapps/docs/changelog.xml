@@ -87,6 +87,10 @@
         the <code>docBase</code> attribute of a <code>Context</code>. Note that
         such a configuration should be used with caution. (markt)
       </fix>
+      <add>
+        Added filtering expression for requests that are not supposed to use
+        session in <code>PersistentValve</code>. (kfujino)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
