@@ -2200,6 +2200,43 @@
 
 </section>
 
+<section name="Persistent Valve">
+
+  <subsection name="Introduction">
+
+    <p>The <strong>PersistentValve</strong> that implements per-request session
+    persistence. It is intended to be used with non-sticky load-balancers.</p>
+
+  </subsection>
+
+  <subsection name="Attributes">
+
+    <p>The <strong>PersistentValve Valve</strong> supports the
+    following configuration attributes:</p>
+
+    <attributes>
+
+      <attribute name="className" required="true">
+        <p>Java class name of the implementation to use.  This MUST be set to
+        <strong>org.apache.catalina.valves.PersistentValve</strong>.</p>
+      </attribute>
+
+      <attribute name="filter" required="false">
+        <p>For known file extensions or urls, you can use this filter pattern to
+        notify the valve that no session required during this request. If the
+        request matches this filter pattern, the valve assumes there has been no
+        need to restore session. An example filter would look like <code>
+        filter=&quot;.*\.gif|.*\.js|.*\.jpeg|.*\.jpg|.*\.png|.*\.htm|.*\.html|
+        .*\.css|.*\.txt&quot;</code>. The filter is a regular expression using
+        <code>java.util.regex</code>.</p>
+      </attribute>
+
+    </attributes>
+
+  </subsection>
+
+</section>
+
 </body>
 
 
