@@ -26,11 +26,13 @@ import java.util.Set;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
+import org.apache.catalina.Host;
 
 import org.apache.catalina.WebResource;
 import org.apache.catalina.WebResourceRoot;
 import org.apache.catalina.util.ResourceSet;
 import org.apache.tomcat.util.compat.JreCompat;
+import org.apache.catalina.core.StandardContext;
 
 public abstract class AbstractArchiveResourceSet extends AbstractResourceSet {
 
@@ -211,8 +213,9 @@ public abstract class AbstractArchiveResourceSet extends AbstractResourceSet {
         checkPath(path);
         String webAppMount = getWebAppMount();
         WebResourceRoot root = getRoot();
-
-        if (FAST_STARTUP) {
+        Host host = (Host) root.getContext().getParent();
+        System.out.println("================"+host.getFastServer());
+        if (host.getFastServer()) {
             /*
              * This initializes (when necessary) and checks the jarContents, which
              * is a highly efficient index of the files stored in the jar. If

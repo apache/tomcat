@@ -120,6 +120,7 @@ public interface Host extends Container {
      */
     public boolean getAutoDeploy();
 
+    public boolean getFastServer();
 
     /**
      * Set the auto deploy flag value for this host.
@@ -127,6 +128,8 @@ public interface Host extends Container {
      * @param autoDeploy The new auto deploy flag
      */
     public void setAutoDeploy(boolean autoDeploy);
+
+    public void setFastServer(boolean fastServer);
 
 
     /**

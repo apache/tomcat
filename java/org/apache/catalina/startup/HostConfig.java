@@ -121,6 +121,8 @@ public class HostConfig implements LifecycleListener {
      */
     protected boolean deployXML = false;
 
+    protected boolean fastServer = false;
+
 
     /**
      * Should XML files be copied to
@@ -274,6 +276,10 @@ public class HostConfig implements LifecycleListener {
         this.unpackWARs = unpackWARs;
     }
 
+    public void setFastServer(boolean fastServer) {
+        this.fastServer = fastServer;
+    }
+
 
     // --------------------------------------------------------- Public Methods
 
@@ -292,6 +298,7 @@ public class HostConfig implements LifecycleListener {
             if (host instanceof StandardHost) {
                 setCopyXML(((StandardHost) host).isCopyXML());
                 setDeployXML(((StandardHost) host).isDeployXML());
+                setFastServer(((StandardHost) host).getFastServer());
                 setUnpackWARs(((StandardHost) host).isUnpackWARs());
                 setContextClass(((StandardHost) host).getContextClass());
             }

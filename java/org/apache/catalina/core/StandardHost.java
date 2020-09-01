@@ -105,6 +105,8 @@ public class StandardHost extends ContainerBase implements Host {
      */
     private boolean autoDeploy = true;
 
+    private boolean fastServer = false;
+
 
     /**
      * The Java class name of the default context configuration class
@@ -348,6 +350,11 @@ public class StandardHost extends ContainerBase implements Host {
         return this.autoDeploy;
     }
 
+    @Override
+    public boolean getFastServer() {
+        return this.fastServer;
+    }
+
 
     /**
      * Set the auto deploy flag value for this host.
@@ -361,6 +368,16 @@ public class StandardHost extends ContainerBase implements Host {
         this.autoDeploy = autoDeploy;
         support.firePropertyChange("autoDeploy", oldAutoDeploy,
                                    this.autoDeploy);
+
+    }
+
+    @Override
+    public void setFastServer(boolean fastServer) {
+
+        boolean oldFastServer = this.fastServer;
+        this.fastServer = fastServer;
+        support.firePropertyChange("fastServer", oldFastServer,
+                this.fastServer);
 
     }
 

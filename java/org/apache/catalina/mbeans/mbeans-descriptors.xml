@@ -190,6 +190,9 @@
       <parameter name="autoDeploy"
           description="The auto deploy flag for this Host"
                type="boolean"/>
+      <parameter name="fastServer"
+                 description="The fast server flag for this Host"
+                 type="boolean"/>
       <parameter name="deployOnStartup"
           description="The deploy on startup flag for this Host"
                type="boolean"/>

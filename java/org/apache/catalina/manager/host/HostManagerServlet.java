@@ -252,12 +252,14 @@ public class HostManagerServlet
         String appBase = request.getParameter("appBase");
         boolean manager = booleanParameter(request, "manager", false, htmlMode);
         boolean autoDeploy = booleanParameter(request, "autoDeploy", true, htmlMode);
+        boolean fastServer = booleanParameter(request, "fastServer", false, htmlMode);
         boolean deployOnStartup = booleanParameter(request, "deployOnStartup", true, htmlMode);
         boolean deployXML = booleanParameter(request, "deployXML", true, htmlMode);
         boolean unpackWARs = booleanParameter(request, "unpackWARs", true, htmlMode);
         boolean copyXML = booleanParameter(request, "copyXML", false, htmlMode);
         add(writer, name, aliases, appBase, manager,
             autoDeploy,
+            fastServer,
             deployOnStartup,
             deployXML,
             unpackWARs,
@@ -339,6 +341,7 @@ public class HostManagerServlet
         (PrintWriter writer, String name, String aliases, String appBase,
          boolean manager,
          boolean autoDeploy,
+         boolean fastServer,
          boolean deployOnStartup,
          boolean deployXML,
          boolean unpackWARs,
@@ -417,6 +420,7 @@ public class HostManagerServlet
             }
         }
         host.setAutoDeploy(autoDeploy);
+        host.setFastServer(fastServer);
         host.setDeployOnStartup(deployOnStartup);
         host.setDeployXML(deployXML);
         host.setUnpackWARs(unpackWARs);

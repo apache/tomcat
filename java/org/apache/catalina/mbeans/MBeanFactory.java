@@ -490,6 +490,7 @@ public class MBeanFactory {
     public String createStandardHost(String parent, String name,
                                      String appBase,
                                      boolean autoDeploy,
+                                     boolean fastServer,
                                      boolean deployOnStartup,
                                      boolean deployXML,
                                      boolean unpackWARs)
@@ -500,6 +501,7 @@ public class MBeanFactory {
         host.setName(name);
         host.setAppBase(appBase);
         host.setAutoDeploy(autoDeploy);
+        host.setFastServer(fastServer);
         host.setDeployOnStartup(deployOnStartup);
         host.setDeployXML(deployXML);
         host.setUnpackWARs(unpackWARs);
