@@ -100,7 +100,8 @@ public class WsSession implements Session {
     private volatile int maxTextMessageBufferSize =
             Constants.DEFAULT_BUFFER_SIZE;
     private volatile long maxIdleTimeout = 0;
-    private volatile long lastActive = System.currentTimeMillis();
+    private volatile long lastActiveRead = System.currentTimeMillis();
+    private volatile long lastActiveWrite = System.currentTimeMillis();
     private Map<FutureToSendHandler,FutureToSendHandler> futures =
             new ConcurrentHashMap<FutureToSendHandler,FutureToSendHandler>();
 
@@ -792,22 +793,59 @@ public class WsSession implements Session {
     }
 
 
-    protected void updateLastActive() {
-        lastActive = System.currentTimeMillis();
+    protected void updateLastActiveRead() {
+        lastActiveRead = System.currentTimeMillis();
+    }
+
+
+    protected void updateLastActiveWrite() {
+        lastActiveWrite = System.currentTimeMillis();
     }
 
 
     protected void checkExpiration() {
+        // Local copies to ensure consistent behaviour during method execution
         long timeout = maxIdleTimeout;
-        if (timeout < 1) {
-            return;
+        long timeoutRead = getMaxIdleTimeoutRead();
+        long timeoutWrite = getMaxIdleTimeoutWrite();
+
+        long currentTime = System.currentTimeMillis();
+        String key = null;
+
+        if (timeoutRead > 0 && (currentTime - lastActiveRead) > timeoutRead) {
+            key = "wsSession.timeoutRead";
+        } else if (timeoutWrite > 0 && (currentTime - lastActiveWrite) > timeoutRead) {
+            key = "wsSession.timeoutWrite";
+        } else if (timeout > 0 && (currentTime - lastActiveRead) > timeout &&
+                (currentTime - lastActiveWrite) > timeout) {
+            key = "wsSession.timeout";
         }
 
-        if (System.currentTimeMillis() - lastActive > timeout) {
-            String msg = sm.getString("wsSession.timeout");
-            doClose(new CloseReason(CloseCodes.GOING_AWAY, msg),
-                    new CloseReason(CloseCodes.CLOSED_ABNORMALLY, msg));
+        if (key != null) {
+            String msg = sm.getString(key, getId());
+            if (log.isDebugEnabled()) {
+                log.debug(msg);
+            }
+            doClose(new CloseReason(CloseCodes.GOING_AWAY, msg), new CloseReason(CloseCodes.CLOSED_ABNORMALLY, msg));
         }
+    }
+
+
+    private long getMaxIdleTimeoutRead() {
+        Object timeout = userProperties.get(Constants.READ_IDLE_TIMEOUT_MS);
+        if (timeout instanceof Long) {
+            return ((Long) timeout).longValue();
+        }
+        return 0;
+    }
+
+
+    private long getMaxIdleTimeoutWrite() {
+        Object timeout = userProperties.get(Constants.WRITE_IDLE_TIMEOUT_MS);
+        if (timeout instanceof Long) {
+            return ((Long) timeout).longValue();
+        }
+        return 0;
     }
 
 

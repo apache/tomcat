@@ -292,7 +292,7 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
     void startMessage(byte opCode, ByteBuffer payload, boolean last,
             SendHandler handler) {
 
-        wsSession.updateLastActive();
+        wsSession.updateLastActiveWrite();
 
         List<MessagePart> messageParts = new ArrayList<MessagePart>();
         messageParts.add(new MessagePart(last, 0, opCode, payload,
@@ -376,7 +376,7 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
             writeMessagePart(mpNext);
         }
 
-        wsSession.updateLastActive();
+        wsSession.updateLastActiveWrite();
 
         // Some handlers, such as the IntermediateMessageHandler, do not have a
         // nested handler so handler may be null.

@@ -86,6 +86,12 @@ public class Constants {
     static final String DEFAULT_ORIGIN_HEADER_VALUE =
             System.getProperty("org.apache.tomcat.websocket.DEFAULT_ORIGIN_HEADER_VALUE");
 
+    // Configuration for read idle timeout on WebSocket session
+    public static final String READ_IDLE_TIMEOUT_MS = "org.apache.tomcat.websocket.READ_IDLE_TIMEOUT_MS";
+
+    // Configuration for write idle timeout on WebSocket session
+    public static final String WRITE_IDLE_TIMEOUT_MS = "org.apache.tomcat.websocket.WRITE_IDLE_TIMEOUT_MS";
+
     // Configuration for background processing checks intervals
     static final int DEFAULT_PROCESS_PERIOD = Integer.getInteger(
             "org.apache.tomcat.websocket.DEFAULT_PROCESS_PERIOD", 10)
