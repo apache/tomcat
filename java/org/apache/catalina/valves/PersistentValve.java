@@ -215,8 +215,7 @@ public class PersistentValve extends ValveBase {
         if (session != null) {
             int maxInactiveInterval = session.getMaxInactiveInterval();
             if (maxInactiveInterval >= 0) {
-                int timeIdle = // Truncate, do not round up
-                    (int) ((timeNow - session.getThisAccessedTime()) / 1000L);
+                int timeIdle = (int) (session.getIdleTimeInternal() / 1000L);
                 if (timeIdle >= maxInactiveInterval) {
                     return true;
                 }
