@@ -20,6 +20,8 @@ import java.io.IOException;
 
 import jakarta.servlet.ServletException;
 
+import org.apache.catalina.Context;
+import org.apache.catalina.LifecycleException;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
 import org.apache.tomcat.util.buf.MessageBytes;
@@ -35,7 +37,13 @@ public class HealthCheckValve extends ValveBase {
             "  \"status\": \"UP\",\n" +
             "  \"checks\": []\n" +
             "}";
+
     private String path = "/health";
+
+    /**
+     * Will be set to true if the valve is associated with a context.
+     */
+    protected boolean context = false;
 
     public HealthCheckValve() {
         super(true);
@@ -50,10 +58,21 @@ public class HealthCheckValve extends ValveBase {
     }
 
     @Override
+    protected synchronized void startInternal() throws LifecycleException {
+        super.startInternal();
+        if (getContainer() instanceof Context) {
+            context = true;
+        } else {
+            context = false;
+        }
+    }
+
+    @Override
     public void invoke(Request request, Response response)
             throws IOException, ServletException {
-        MessageBytes requestPathMB = request.getRequestPathMB();
-        if (requestPathMB.equals(path)) {
+        MessageBytes urlMB =
+                context ? request.getRequestPathMB() : request.getDecodedRequestURIMB();
+        if (urlMB.equals(path)) {
             response.setContentType("application/json");
             response.getOutputStream().print(UP);
         } else {

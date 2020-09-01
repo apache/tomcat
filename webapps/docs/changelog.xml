@@ -101,6 +101,10 @@
         Use the correct method to calculate session idle time in
         <code>PersistentValve</code>. (kfujino)
       </fix>
+      <fix>
+        Fix path used by the health check valve when it is not associated with
+        a <code>Context</code>. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
