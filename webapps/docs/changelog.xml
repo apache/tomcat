@@ -97,6 +97,10 @@
         Added filtering expression for requests that are not supposed to use
         session in <code>PersistentValve</code>. (kfujino)
       </add>
+      <fix>
+        Use the correct method to calculate session idle time in
+        <code>PersistentValve</code>. (kfujino)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
