@@ -128,6 +128,18 @@ public interface Host extends Container {
      */
     public void setAutoDeploy(boolean autoDeploy);
 
+    /**
+     * @return the value of the fast class path scan flag.  If true, it enables
+     * this bloom filter approach while finding the resources.
+     */
+    public boolean getFastClasspathScanning();
+
+    /**
+     * Set the fast class path scan flag value for this host.
+     *
+     * @param fastClasspathScanning The new fast class path scan flag
+     */
+    public void setFastClasspathScanning(boolean fastClasspathScanning);
 
     /**
      * @return the Java class name of the context configuration class

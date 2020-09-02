@@ -105,6 +105,10 @@ public class StandardHost extends ContainerBase implements Host {
      */
     private boolean autoDeploy = true;
 
+    /**
+     * The fast classpath scan flag for this Host.
+     */
+    private boolean fastClasspathScanning = false;
 
     /**
      * The Java class name of the default context configuration class
@@ -348,6 +352,15 @@ public class StandardHost extends ContainerBase implements Host {
         return this.autoDeploy;
     }
 
+    /**
+     * @return the value of the fast classpath scan flag.  If true, it
+     * indicates that this host's resource lookup will use the
+     * Bloom Filter Approach.
+     */
+    @Override
+    public boolean getFastClasspathScanning() {
+        return this.fastClasspathScanning;
+    }
 
     /**
      * Set the auto deploy flag value for this host.
@@ -361,6 +374,21 @@ public class StandardHost extends ContainerBase implements Host {
         this.autoDeploy = autoDeploy;
         support.firePropertyChange("autoDeploy", oldAutoDeploy,
                                    this.autoDeploy);
+
+    }
+
+    /**
+     * Set the Fast Classpath Scanning flag value for this host.
+     *
+     * @param fastClasspathScanning The new fastClasspathScanning flag
+     */
+    @Override
+    public void setFastClasspathScanning(boolean fastClasspathScanning) {
+
+        boolean oldFastClasspathScanning = this.fastClasspathScanning;
+        this.fastClasspathScanning = fastClasspathScanning;
+        support.firePropertyChange("fastClasspathScanning", oldFastClasspathScanning,
+                this.fastClasspathScanning);
 
     }
 

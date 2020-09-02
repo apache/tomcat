@@ -479,7 +479,8 @@ public class MBeanFactory {
      * @param parent MBean Name of the associated parent component
      * @param name Unique name of this Host
      * @param appBase Application base directory name
-     * @param autoDeploy Should we auto deploy?
+     * @param autoDeploy Should we auto deploy?'
+     * @param fastClasspathScanning Should we use Fast class path scanning approach
      * @param deployOnStartup Deploy on server startup?
      * @param deployXML Should we deploy Context XML config files property?
      * @param unpackWARs Should we unpack WARs when auto deploying?
@@ -490,6 +491,7 @@ public class MBeanFactory {
     public String createStandardHost(String parent, String name,
                                      String appBase,
                                      boolean autoDeploy,
+                                     boolean fastClasspathScanning,
                                      boolean deployOnStartup,
                                      boolean deployXML,
                                      boolean unpackWARs)
@@ -500,6 +502,7 @@ public class MBeanFactory {
         host.setName(name);
         host.setAppBase(appBase);
         host.setAutoDeploy(autoDeploy);
+        host.setFastClasspathScanning(fastClasspathScanning);
         host.setDeployOnStartup(deployOnStartup);
         host.setDeployXML(deployXML);
         host.setUnpackWARs(unpackWARs);

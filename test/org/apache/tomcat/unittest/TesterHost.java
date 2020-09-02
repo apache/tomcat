@@ -301,6 +301,16 @@ public class TesterHost implements Host {
     }
 
     @Override
+    public boolean getFastClasspathScanning() {
+        return false;
+    }
+
+    @Override
+    public void setFastClasspathScanning(boolean fastClasspathScanning) {
+        // NO-OP
+    }
+
+    @Override
     public String getConfigClass() {
         return null;
     }

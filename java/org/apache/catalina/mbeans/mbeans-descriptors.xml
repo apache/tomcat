@@ -190,6 +190,9 @@
       <parameter name="autoDeploy"
           description="The auto deploy flag for this Host"
                type="boolean"/>
+      <parameter name="fastClasspathScanning"
+                 description="The fast class path scanning flag for this Host"
+                 type="boolean"/>
       <parameter name="deployOnStartup"
           description="The deploy on startup flag for this Host"
                type="boolean"/>

@@ -121,6 +121,11 @@ public class HostConfig implements LifecycleListener {
      */
     protected boolean deployXML = false;
 
+    /**
+     * Should we use Bloom Filter While looking up Resources in JAR Files?
+     */
+    protected boolean fastClasspathScanning = false;
+
 
     /**
      * Should XML files be copied to
@@ -274,6 +279,14 @@ public class HostConfig implements LifecycleListener {
         this.unpackWARs = unpackWARs;
     }
 
+    /**
+     * Set the FastClasspathScanning flag.
+     *
+     * @param fastClasspathScanning The new fast class path scanning flag
+     */
+    public void setFastClasspathScanning(boolean fastClasspathScanning) {
+        this.fastClasspathScanning = fastClasspathScanning;
+    }
 
     // --------------------------------------------------------- Public Methods
 
@@ -292,6 +305,7 @@ public class HostConfig implements LifecycleListener {
             if (host instanceof StandardHost) {
                 setCopyXML(((StandardHost) host).isCopyXML());
                 setDeployXML(((StandardHost) host).isDeployXML());
+                setFastClasspathScanning(((StandardHost) host).getFastClasspathScanning());
                 setUnpackWARs(((StandardHost) host).isUnpackWARs());
                 setContextClass(((StandardHost) host).getContextClass());
             }
