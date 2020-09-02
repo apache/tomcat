@@ -399,10 +399,6 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
 
             parsingRequestLineStart = byteBuffer.position();
             parsingRequestLinePhase = 2;
-            if (log.isDebugEnabled()) {
-                log.debug("Received ["
-                        + new String(byteBuffer.array(), byteBuffer.position(), byteBuffer.remaining(), StandardCharsets.ISO_8859_1) + "]");
-            }
         }
         if (parsingRequestLinePhase == 2) {
             //
@@ -769,7 +765,7 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
     private boolean fill(boolean block) throws IOException {
 
         if (log.isDebugEnabled()) {
-            log.debug("parsingHeader: [" + parsingHeader +
+            log.debug("Before fill(): [" + parsingHeader +
                     "], parsingRequestLine: [" + parsingRequestLine +
                     "], parsingRequestLinePhase: [" + parsingRequestLinePhase +
                     "], parsingRequestLineStart: [" + parsingRequestLineStart +
@@ -795,6 +791,12 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
         byteBuffer.limit(byteBuffer.capacity());
         int nRead = wrapper.read(block, byteBuffer);
         byteBuffer.limit(byteBuffer.position()).reset();
+
+        if (log.isDebugEnabled()) {
+            log.debug("Received ["
+                    + new String(byteBuffer.array(), byteBuffer.position(), byteBuffer.remaining(), StandardCharsets.ISO_8859_1) + "]");
+        }
+
         if (nRead > 0) {
             return true;
         } else if (nRead == -1) {
