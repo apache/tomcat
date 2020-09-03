@@ -100,6 +100,14 @@
       org.apache.catalina.core.TestStandardContext$Bug49922TargetServlet
     </servlet-class>
   </servlet>
+  <servlet>
+    <servlet-name>whiteSpaceTrim</servlet-name>
+    <jsp-file>/jsp/whiteSpaceTrim.jsp</jsp-file>
+    <init-param>
+      <param-name>jspWhiteSpaceTrimming</param-name>
+      <param-value>true</param-value>
+    </init-param>
+  </servlet>
   <servlet-mapping>
     <servlet-name>Bug49922Target</servlet-name>
     <url-pattern>/bug49922/target</url-pattern>

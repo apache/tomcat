@@ -37,6 +37,8 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.Vector;
@@ -80,6 +82,10 @@ import org.xml.sax.Attributes;
 class Generator {
 
     private static final Class<?>[] OBJECT_CLASS = { Object.class };
+
+    private static final Pattern PRE_TAG_PATTERN = Pattern.compile("(?s).*(<pre>|</pre>).*");
+
+    private static final Pattern BLANK_LINE_PATTERN = Pattern.compile("(\\s*(\\n|\\r)+\\s*)");
 
     private final ServletWriter out;
 
@@ -2095,6 +2101,20 @@ class Generator {
         public void visit(Node.TemplateText n) throws JasperException {
 
             String text = n.getText();
+            // If the flag is active, attempt to minimize the frequency of
+            // regex operations.
+            if ((ctxt!=null) &&
+                ctxt.getOptions().getJSPWhiteSpaceTrimFlag() &&
+                text.contains("\n")) {
+                // Ensure there are no <pre> or </pre> tags embedded in this
+                // text - if there are, we want to NOT modify the whitespace.
+                Matcher preMatcher = PRE_TAG_PATTERN.matcher(text);
+                if (!preMatcher.matches()) {
+                    Matcher matcher = BLANK_LINE_PATTERN.matcher(text);
+                    String revisedText = matcher.replaceAll("\n");
+                    text = revisedText;
+                }
+            }
 
             int textSize = text.length();
             if (textSize == 0) {

@@ -33,6 +33,7 @@ import org.junit.Test;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.buf.ByteChunk;
+import java.util.Scanner;
 
 public class TestGenerator extends TomcatBaseTest {
 
@@ -284,5 +285,22 @@ public class TestGenerator extends TomcatBaseTest {
         String result = res.toString();
         System.out.println(result);
         assertEcho(result, "ASYNC");
+    }
+
+    @Test
+    public void testJSPWhiteSpaceTrimming() throws Exception {
+        getTomcatInstanceTestWebapp(false, true);
+
+        ByteChunk res = getUrl("http://localhost:" + getPort() + "/test/jsp/whiteSpaceTrim.jsp");
+
+        String result = res.toString();
+        Scanner scanner = new Scanner(result);
+        while (scanner.hasNextLine()) {
+            String line = scanner.nextLine();
+            if(line.length()==0){
+                Assert.fail("JSP Optimisation does not allow the line to be just a new line character");
+            }
+        }
+        scanner.close();
     }
 }

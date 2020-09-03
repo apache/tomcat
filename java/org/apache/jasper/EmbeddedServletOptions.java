@@ -85,6 +85,11 @@ public final class EmbeddedServletOptions implements Options {
     private boolean classDebugInfo = true;
 
     /**
+     * Do we want to trim white spaces in the in JSP Files?
+     */
+    private boolean jspWhiteSpaceTrimming = false;
+
+    /**
      * Background compile thread check interval in seconds.
      */
     private int checkInterval = 0;
@@ -288,6 +293,14 @@ public final class EmbeddedServletOptions implements Options {
     @Override
     public boolean getClassDebugInfo() {
         return classDebugInfo;
+    }
+
+    /**
+     * Will the white space be trimmed from the JSP Files?
+     */
+    @Override
+    public boolean getJSPWhiteSpaceTrimFlag() {
+        return jspWhiteSpaceTrimming;
     }
 
     /**
@@ -631,6 +644,19 @@ public final class EmbeddedServletOptions implements Options {
             } else {
                 if (log.isWarnEnabled()) {
                     log.warn(Localizer.getMessage("jsp.warning.classDebugInfo"));
+                }
+            }
+        }
+
+        String jspWhiteSpaceTrim = config.getInitParameter("jspWhiteSpaceTrimming");
+        if (jspWhiteSpaceTrim != null) {
+            if (jspWhiteSpaceTrim.equalsIgnoreCase("true")) {
+                this.jspWhiteSpaceTrimming  = true;
+            } else if (jspWhiteSpaceTrim.equalsIgnoreCase("false")) {
+                this.jspWhiteSpaceTrimming  = false;
+            } else {
+                if (log.isWarnEnabled()) {
+                    log.warn(Localizer.getMessage("jsp.warning.jspWhiteSpaceTrimming"));
                 }
             }
         }

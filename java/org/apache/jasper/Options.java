@@ -48,6 +48,14 @@ public interface Options {
     public boolean getKeepGenerated();
 
     /**
+     * Returns the value of jspWhiteSpaceTrimming Flag - if set, it allows the removal of
+     * extra white spaces from the JSP files
+     * @return <code>true</code> if jspWhiteSpaceTrimming is set,
+     * <code>false</code> otherwise.
+     */
+    public boolean getJSPWhiteSpaceTrimFlag();
+
+    /**
      * @return <code>true</code> if tag handler pooling is enabled,
      *  <code>false</code> otherwise.
      */

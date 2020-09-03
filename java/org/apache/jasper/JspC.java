@@ -137,6 +137,7 @@ public class JspC extends Task implements Options {
     protected static final String SWITCH_POOLING = "-poolingEnabled";
     protected static final String SWITCH_ENCODING = "-javaEncoding";
     protected static final String SWITCH_SMAP = "-smap";
+    protected static final String JSP_WHITE_SPACE_TRIM = "-jspWhiteSpaceTrimming";
     protected static final String SWITCH_DUMP_SMAP = "-dumpsmap";
     protected static final String SWITCH_VALIDATE_TLD = "-validateTld";
     protected static final String SWITCH_VALIDATE_XML = "-validateXml";
@@ -195,6 +196,7 @@ public class JspC extends Task implements Options {
     protected boolean compile = false;
     protected boolean failFast = false;
     protected boolean smapSuppressed = true;
+    protected boolean jspWhiteSpaceTrimming = false;
     protected boolean smapDumped = false;
     protected boolean caching = true;
     protected final Map<String, TagLibraryInfo> cache = new HashMap<>();
@@ -410,6 +412,8 @@ public class JspC extends Task implements Options {
                 smapSuppressed = false;
             } else if (tok.equals(SWITCH_DUMP_SMAP)) {
                 smapDumped = true;
+            } else if (tok.equals(JSP_WHITE_SPACE_TRIM)) {
+                setJSPWhiteSpaceTrimming(true);
             } else if (tok.equals(SWITCH_VALIDATE_TLD)) {
                 setValidateTld(true);
             } else if (tok.equals(SWITCH_VALIDATE_XML)) {
@@ -581,6 +585,16 @@ public class JspC extends Task implements Options {
     public boolean getClassDebugInfo() {
         // compile with debug info
         return classDebugInfo;
+    }
+
+    /**
+     * It returns the value of jspWhiteSpaceTrimming Flag.
+     * @return boolean flag value
+     */
+    @Override
+    public boolean getJSPWhiteSpaceTrimFlag() {
+        // return boolean flag
+        return this.jspWhiteSpaceTrimming;
     }
 
     /**
@@ -939,6 +953,11 @@ public class JspC extends Task implements Options {
 
     public void setValidateTld( boolean b ) {
         this.validateTld = b;
+    }
+
+
+    public void setJSPWhiteSpaceTrimming( boolean b ) {
+        this.jspWhiteSpaceTrimming = b;
     }
 
     public boolean isValidateTld() {

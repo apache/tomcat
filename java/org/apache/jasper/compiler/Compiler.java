@@ -316,7 +316,13 @@ public abstract class Compiler {
                     javaEncoding);
         }
 
-        writer = new ServletWriter(new PrintWriter(osw));
+        if ((ctxt!=null) &&
+            ctxt.getOptions().getJSPWhiteSpaceTrimFlag()) {
+            writer = new NewlineReductionServletWriter(new PrintWriter(osw));
+        } else {
+            writer = new ServletWriter(new PrintWriter(osw));
+        }
+
         ctxt.setWriter(writer);
         return writer;
     }
