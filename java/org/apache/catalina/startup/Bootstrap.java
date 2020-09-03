@@ -433,7 +433,8 @@ public final class Bootstrap {
      * @param args Command line arguments to be processed
      */
     public static void main(String args[]) {
-
+        //start Kamon agent as soon as possible
+        kamon.Kamon.init();
         synchronized (daemonLock) {
             if (daemon == null) {
                 // Don't set daemon until init() has completed

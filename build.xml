@@ -219,6 +219,9 @@
   <path id="compile.classpath">
     <pathelement location="${jdt.jar}"/>
     <pathelement location="${saaj-api.jar}"/>
+     <fileset dir="/home/jimmy/tomcat-build-libs/">
+    <include name="**/*.jar" />
+  </fileset>
   </path>
 
   <path id="tomcat.classpath">
