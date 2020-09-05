@@ -24,6 +24,7 @@ import org.apache.coyote.AbstractProcessor;
 import org.apache.coyote.ActionCode;
 import org.apache.coyote.Adapter;
 import org.apache.coyote.ContainerThreadMarker;
+import org.apache.coyote.ContinueResponseTiming;
 import org.apache.coyote.ErrorState;
 import org.apache.coyote.Request;
 import org.apache.coyote.Response;
@@ -211,12 +212,17 @@ class StreamProcessor extends AbstractProcessor {
 
 
     @Override
-    protected final void ack() {
-        if (!response.isCommitted() && request.hasExpectation()) {
-            try {
-                stream.writeAck();
-            } catch (IOException ioe) {
-                setErrorState(ErrorState.CLOSE_CONNECTION_NOW, ioe);
+    protected final void ack(ContinueResponseTiming continueResponseTiming) {
+        // Only try and send the ACK for ALWAYS or if the timing of the request
+        // to send the ACK matches the current configuration.
+        if (continueResponseTiming == ContinueResponseTiming.ALWAYS ||
+                continueResponseTiming == handler.getProtocol().getContinueResponseTimingInternal()) {
+            if (!response.isCommitted() && request.hasExpectation()) {
+                try {
+                    stream.writeAck();
+                } catch (IOException ioe) {
+                    setErrorState(ErrorState.CLOSE_CONNECTION_NOW, ioe);
+                }
             }
         }
     }

@@ -37,6 +37,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.apache.coyote.AbstractProcessor;
 import org.apache.coyote.ActionCode;
 import org.apache.coyote.Adapter;
+import org.apache.coyote.ContinueResponseTiming;
 import org.apache.coyote.ErrorState;
 import org.apache.coyote.InputBuffer;
 import org.apache.coyote.OutputBuffer;
@@ -1064,7 +1065,7 @@ public class AjpProcessor extends AbstractProcessor {
 
 
     @Override
-    protected final void ack() {
+    protected final void ack(ContinueResponseTiming continueResponseTiming) {
         // NO-OP for AJP
     }
 

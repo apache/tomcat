@@ -30,6 +30,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.apache.coyote.AbstractProcessor;
 import org.apache.coyote.ActionCode;
 import org.apache.coyote.Adapter;
+import org.apache.coyote.ContinueResponseTiming;
 import org.apache.coyote.ErrorState;
 import org.apache.coyote.Request;
 import org.apache.coyote.RequestInfo;
@@ -1160,15 +1161,26 @@ public class Http11Processor extends AbstractProcessor {
 
     @Override
     protected final void ack() {
-        // Acknowledge request
-        // Send a 100 status back if it makes sense (response not committed
-        // yet, and client specified an expectation for 100-continue)
-        if (!response.isCommitted() && request.hasExpectation()) {
-            inputBuffer.setSwallowInput(true);
-            try {
-                outputBuffer.sendAck();
-            } catch (IOException e) {
-                setErrorState(ErrorState.CLOSE_CONNECTION_NOW, e);
+        ack(null);
+    }
+
+
+    @Override
+    protected final void ack(ContinueResponseTiming continueResponseTiming) {
+        // Only try and send the ACK for ALWAYS or if the timing of the request
+        // to send the ACK matches the current configuration.
+        if (continueResponseTiming == ContinueResponseTiming.ALWAYS ||
+                continueResponseTiming == protocol.getContinueResponseTimingInternal()) {
+            // Acknowledge request
+            // Send a 100 status back if it makes sense (response not committed
+            // yet, and client specified an expectation for 100-continue)
+            if (!response.isCommitted() && request.hasExpectation()) {
+                inputBuffer.setSwallowInput(true);
+                try {
+                    outputBuffer.sendAck();
+                } catch (IOException e) {
+                    setErrorState(ErrorState.CLOSE_CONNECTION_NOW, e);
+                }
             }
         }
     }

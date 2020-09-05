@@ -50,6 +50,7 @@ import org.apache.catalina.Session;
 import org.apache.catalina.security.SecurityUtil;
 import org.apache.catalina.util.SessionConfig;
 import org.apache.coyote.ActionCode;
+import org.apache.coyote.ContinueResponseTiming;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.buf.CharChunk;
@@ -1193,9 +1194,26 @@ public class Response implements HttpServletResponse {
      * Send an acknowledgement of a request.
      *
      * @exception IOException if an input/output error occurs
+     *
+     * @deprecated Unused. Will be removed in Tomcat 10.
+     *             Use {@link #sendAcknowledgement(ContinueResponseTiming)}.
      */
-    public void sendAcknowledgement()
-        throws IOException {
+    @Deprecated
+    public void sendAcknowledgement() throws IOException {
+        sendAcknowledgement(ContinueResponseTiming.ALWAYS);
+    }
+
+
+    /**
+     * Send an acknowledgement of a request.
+     *
+     * @param continueResponseTiming Indicates when the request for the ACK
+     *                               originated so it can be compared with the
+     *                               configured timing for ACK responses.
+     *
+     * @exception IOException if an input/output error occurs
+     */
+    public void sendAcknowledgement(ContinueResponseTiming continueResponseTiming) throws IOException {
 
         if (isCommitted()) {
             return;
@@ -1206,7 +1224,7 @@ public class Response implements HttpServletResponse {
             return;
         }
 
-        getCoyoteResponse().action(ActionCode.ACK, null);
+        getCoyoteResponse().action(ActionCode.ACK, continueResponseTiming);
     }
 
 

@@ -549,6 +549,10 @@ public final class Request {
      * @throws IOException If an I/O error occurs during the copy
      */
     public int doRead(ApplicationBufferHandler handler) throws IOException {
+        if (getBytesRead() == 0 && !response.isCommitted()) {
+            action(ActionCode.ACK, ContinueResponseTiming.ON_REQUEST_BODY_READ);
+        }
+
         int n = inputBuffer.doRead(handler);
         if (n > 0) {
             bytesRead+=n;

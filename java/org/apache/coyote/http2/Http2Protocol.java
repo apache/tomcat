@@ -21,6 +21,7 @@ import java.util.Enumeration;
 
 import org.apache.coyote.AbstractProtocol;
 import org.apache.coyote.Adapter;
+import org.apache.coyote.ContinueResponseTiming;
 import org.apache.coyote.Processor;
 import org.apache.coyote.Request;
 import org.apache.coyote.Response;
@@ -315,6 +316,11 @@ public class Http2Protocol implements UpgradeProtocol {
 
     public boolean useCompression(Request request, Response response) {
         return http11Protocol.useCompression(request, response);
+    }
+
+
+    public ContinueResponseTiming getContinueResponseTimingInternal() {
+        return http11Protocol.getContinueResponseTimingInternal();
     }
 
 

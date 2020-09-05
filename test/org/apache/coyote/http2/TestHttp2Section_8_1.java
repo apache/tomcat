@@ -23,6 +23,9 @@ import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
 
+import org.apache.catalina.connector.Connector;
+import org.apache.catalina.startup.Tomcat;
+import org.apache.coyote.ContinueResponseTiming;
 import org.apache.coyote.http11.AbstractHttp11Protocol;
 
 /**
@@ -97,7 +100,40 @@ public class TestHttp2Section_8_1 extends Http2TestBase {
 
 
     @Test
+    public void testSendAckWithDefaultPolicy() throws Exception {
+        testSendAck();
+    }
+
+
+    @Test
+    public void testSendAckWithImmediatelyPolicy() throws Exception {
+        setContinueHandlingResponsePolicy(ContinueResponseTiming.IMMEDIATELY);
+        testSendAck();
+    }
+
+
+    @Test
+    public void testSendAckWithOnRequestBodyReadPolicy() throws Exception {
+        setContinueHandlingResponsePolicy(ContinueResponseTiming.ON_REQUEST_BODY_READ);
+        testSendAck();
+    }
+
+
+    public void setContinueHandlingResponsePolicy(ContinueResponseTiming policy) throws Exception {
+        final Tomcat tomcat = getTomcatInstance();
+
+        final Connector connector = tomcat.getConnector();
+        connector.setProperty("continueHandlingResponsePolicy", policy.toString());
+    }
+
+
+    @Test
     public void testSendAck() throws Exception {
+        // makes a request that expects a 100 Continue response and verifies
+        // that the 100 Continue response is received. This does not check
+        // that the correct ContinueHandlingResponsePolicy was followed, just
+        // that a 100 Continue response is received. The unit tests for
+        // Request verify that the various policies are implemented.
         http2Connect();
 
         byte[] headersFrameHeader = new byte[9];
@@ -106,7 +142,9 @@ public class TestHttp2Section_8_1 extends Http2TestBase {
         ByteBuffer dataPayload = ByteBuffer.allocate(256);
 
         buildPostRequest(headersFrameHeader, headersPayload, true,
-                dataFrameHeader, dataPayload, null, 3);
+                null, -1, "/simple",
+                dataFrameHeader, dataPayload, null,
+                null, null, 3);
 
         // Write the headers
         writeFrame(headersFrameHeader, headersPayload);
