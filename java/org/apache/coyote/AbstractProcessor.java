@@ -724,7 +724,7 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
 
     /**
      * @deprecated Unused. This will be removed in Tomcat 10 onwards. Use
-     *             @{link {@link #ack(ContinueResponseTiming)}.
+     *             {@link #ack(ContinueResponseTiming)}.
      */
     @Deprecated
     protected void ack() {
