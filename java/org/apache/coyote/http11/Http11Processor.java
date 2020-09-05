@@ -1160,12 +1160,6 @@ public class Http11Processor extends AbstractProcessor {
 
 
     @Override
-    protected final void ack() {
-        ack(null);
-    }
-
-
-    @Override
     protected final void ack(ContinueResponseTiming continueResponseTiming) {
         // Only try and send the ACK for ALWAYS or if the timing of the request
         // to send the ACK matches the current configuration.

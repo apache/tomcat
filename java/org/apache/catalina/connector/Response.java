@@ -1193,20 +1193,6 @@ public class Response implements HttpServletResponse {
     /**
      * Send an acknowledgement of a request.
      *
-     * @exception IOException if an input/output error occurs
-     *
-     * @deprecated Unused. Will be removed in Tomcat 10.
-     *             Use {@link #sendAcknowledgement(ContinueResponseTiming)}.
-     */
-    @Deprecated
-    public void sendAcknowledgement() throws IOException {
-        sendAcknowledgement(ContinueResponseTiming.ALWAYS);
-    }
-
-
-    /**
-     * Send an acknowledgement of a request.
-     *
      * @param continueResponseTiming Indicates when the request for the ACK
      *                               originated so it can be compared with the
      *                               configured timing for ACK responses.
