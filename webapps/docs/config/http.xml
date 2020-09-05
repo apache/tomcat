@@ -85,6 +85,21 @@
       30000 (30 seconds).</p>
     </attribute>
 
+    <attribute name="continueResponseTiming" required="false">
+      <p>When to respond with a <code>100</code> intermediate response code to a
+      request containing an <code>Expect: 100-continue</code> header.
+      The following values may used:
+      <ul>
+      <li><code>immediately</code> - an intermediate 100 status response
+      will be returned as soon as practical</li>
+      <li><code>onRead</code> - an intermediate 100 status
+      response will be returned only when the Servlet reads the request body,
+      allowing the servlet to inspect the headers and possibly respond
+      before the user agent sends a possibly large request body.</li>
+      </ul>
+      </p>
+    </attribute>
+
     <attribute name="defaultSSLHostConfigName" required="false">
       <p>The name of the default <strong>SSLHostConfig</strong> that will be
       used for secure connections (if this connector is configured for secure

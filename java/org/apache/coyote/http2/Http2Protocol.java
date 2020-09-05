@@ -30,11 +30,13 @@ import java.util.regex.Pattern;
 import org.apache.coyote.AbstractProtocol;
 import org.apache.coyote.Adapter;
 import org.apache.coyote.CompressionConfig;
+import org.apache.coyote.ContinueResponseTiming;
 import org.apache.coyote.Processor;
 import org.apache.coyote.Request;
 import org.apache.coyote.Response;
 import org.apache.coyote.UpgradeProtocol;
 import org.apache.coyote.UpgradeToken;
+import org.apache.coyote.http11.AbstractHttp11Protocol;
 import org.apache.coyote.http11.upgrade.InternalHttpUpgradeHandler;
 import org.apache.coyote.http11.upgrade.UpgradeProcessorInternal;
 import org.apache.tomcat.util.buf.StringUtils;
@@ -420,6 +422,11 @@ public class Http2Protocol implements UpgradeProtocol {
 
     public boolean useCompression(Request request, Response response) {
         return compressionConfig.useCompression(request, response);
+    }
+
+
+    public ContinueResponseTiming getContinueResponseTimingInternal() {
+        return ((AbstractHttp11Protocol<?>) http11Protocol).getContinueResponseTimingInternal();
     }
 
 

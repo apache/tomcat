@@ -109,6 +109,13 @@
   </subsection>
   <subsection name="Coyote">
     <changelog>
+      <add>
+        <bug>57661</bug>: For requests containing the
+        <code>Expect: 100-continue</code> header, add optional support to delay
+        sending an intermediate 100 status response until the servlet reads the
+        request body, allowing the servlet the opportunity to respond without
+        asking for the request body. Based on a pull request by malaysf. (markt)
+      </add>
       <fix>
         Refactor the implementation of
         <code>ServletInputStream.available()</code> to provide a more accurate
