@@ -29,6 +29,7 @@ import java.util.regex.Pattern;
 
 import org.apache.coyote.Adapter;
 import org.apache.coyote.CompressionConfig;
+import org.apache.coyote.ContinueResponseTiming;
 import org.apache.coyote.Processor;
 import org.apache.coyote.Request;
 import org.apache.coyote.Response;
@@ -411,6 +412,11 @@ public class Http2Protocol implements UpgradeProtocol {
 
     public boolean useCompression(Request request, Response response) {
         return compressionConfig.useCompression(request, response);
+    }
+
+
+    public ContinueResponseTiming getContinueResponseTimingInternal() {
+        return http11Protocol.getContinueResponseTimingInternal();
     }
 
 

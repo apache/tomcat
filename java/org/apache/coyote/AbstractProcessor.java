@@ -395,7 +395,7 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
             break;
         }
         case ACK: {
-            ack();
+            ack((ContinueResponseTiming) param);
             break;
         }
         case CLIENT_FLUSH: {
@@ -715,7 +715,17 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
     protected abstract void finishResponse() throws IOException;
 
 
-    protected abstract void ack();
+    /**
+     * @deprecated Unused. This will be removed in Tomcat 10 onwards. Use
+     *             @{link {@link #ack(ContinueResponseTiming)}.
+     */
+    @Deprecated
+    protected void ack() {
+        ack(ContinueResponseTiming.ALWAYS);
+    }
+
+
+    protected abstract void ack(ContinueResponseTiming continueResponseTiming);
 
 
     protected abstract void flush() throws IOException;
