@@ -222,7 +222,7 @@ public class Stream extends AbstractStream implements HeaderEmitter {
 
     void receiveReset(long errorCode) {
         if (log.isDebugEnabled()) {
-            log.debug(sm.getString("stream.reset.debug", getConnectionId(), getIdentifier(),
+            log.debug(sm.getString("stream.reset.receive", getConnectionId(), getIdentifier(),
                     Long.toString(errorCode)));
         }
         // Set the new state first since read and write both check this
