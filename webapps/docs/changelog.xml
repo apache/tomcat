@@ -153,6 +153,10 @@
         adds a new feature to Procrun that outputs the commnd to (re-)configure
         the service with the current settings. (markt)
       </update>
+      <update>
+        Update the packaged version of the Tomcat Native Library to 1.2.25.
+        (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
