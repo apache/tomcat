@@ -924,16 +924,37 @@ public abstract class AuthenticatorBase extends ValveBase
                 if (requirePrincipal) {
                     return false;
                 }
-            } else if (cachedAuth == false ||
-                    !principal.getUserPrincipal().equals(request.getUserPrincipal())) {
+            } else if (cachedAuth == false || !principal.getUserPrincipal().equals(request.getUserPrincipal())) {
                 // Skip registration if authentication credentials were
                 // cached and the Principal did not change.
-                @SuppressWarnings("rawtypes")// JASPIC API uses raw types
+
+                // Check to see if any of the JASPIC properties were set
+                Boolean register = null;
+                String authType = "JASPIC";
+                @SuppressWarnings("rawtypes") // JASPIC API uses raw types
                 Map map = state.messageInfo.getMap();
-                if (map != null && map.containsKey("jakarta.servlet.http.registerSession")) {
-                    register(request, response, principal, "JASPIC", null, null, true, true);
+
+                String registerValue = (String) map.get("jakarta.servlet.http.registerSession");
+                if (registerValue != null) {
+                    register = Boolean.valueOf(registerValue);
+                }
+                String authTypeValue = (String) map.get("jakarta.servlet.http.authType");
+                if (authTypeValue != null) {
+                    authType = authTypeValue;
+                }
+
+                /*
+                 * Need to handle three cases.
+                 * See https://bz.apache.org/bugzilla/show_bug.cgi?id=64713
+                 * 1. registerSession TRUE    always use session, always cache
+                 * 2. registerSession NOT SET config for session, config for cache
+                 * 3. registerSession FALSE   config for session, never cache
+                 */
+                if (register != null) {
+                    register(request, response, principal, authType, null, null,
+                            alwaysUseSession || register.booleanValue(), register.booleanValue());
                 } else {
-                    register(request, response, principal, "JASPIC", null, null);
+                    register(request, response, principal, authType, null, null);
                 }
             }
             request.setNote(Constants.REQ_JASPIC_SUBJECT_NOTE, client);
