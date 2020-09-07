@@ -105,6 +105,18 @@
         Fix path used by the health check valve when it is not associated with
         a <code>Context</code>. (remm)
       </fix>
+      <fix>
+        <bug>64712</bug>: The JASPIC authenticator now checks the
+        <code>ServerAuthModule</code> for
+        <code>jakarta.servlet.http.authType</code> and, if present, uses the
+        value provided. Based on a patch by Robert Rodewald. (markt)
+      </fix>
+      <fix>
+        <bug>64713</bug>: The JASPIC authenticator now checks the value of
+        <code>jakarta.servlet.http.registerSession</code> set by the
+        <code>ServerAuthModule</code> when decideing whether or nor to register
+        the session. Based on a patch by Robert Rodewald. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
