@@ -264,6 +264,10 @@
         Update the internal fork of Apache Commons DBCP to 6d232e5 (2020-08-11,
         2.8.0-SNAPSHOT). Code clean-up various bug fixes. (markt)
       </add>
+      <update>
+        Update the packaged version of the Tomcat Native Library to 1.2.25.
+        (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
