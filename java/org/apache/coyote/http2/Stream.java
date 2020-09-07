@@ -476,8 +476,14 @@ public class Stream extends AbstractStream implements HeaderEmitter {
                         "stream.header.unknownPseudoHeader", getConnectionId(), getIdentifier(),
                         name), Http2Error.PROTOCOL_ERROR, getIdAsInt());
             }
-            // Assume other HTTP header
-            coyoteRequest.getMimeHeaders().addValue(name).setString(value);
+
+            // Avoid NPE if Stream has been closed on Stream specific thread
+            Request coyoteRequest = this.coyoteRequest;
+            if (coyoteRequest != null) {
+                // HTTP/2 headers are already always lower case
+                // In 8.5.x trailer headers are added to headers collection.
+                coyoteRequest.getMimeHeaders().addValue(name).setString(value);
+            }
         }
         }
     }
