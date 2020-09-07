@@ -78,12 +78,16 @@ public class TestCancelledUpload extends Http2TestBase {
             return;
         }
 
-        // Validate any WindowSize frames (always arrive in pairs)
+        // Validate any WindowSize frames. Usually arrive in pairs. Depending on
+        // timing, can see a reset rather than than stream update.
         while (output.getTrace().startsWith("0-WindowSize-[")) {
             String trace = output.getTrace();
             int size = Integer.parseInt(trace.substring(14, trace.length() - 2));
             output.clearTrace();
             parser.readFrame(true);
+            if (output.getTrace().startsWith("3-RST-[3]\n")) {
+                return;
+            }
             Assert.assertEquals("3-WindowSize-[" + size + "]\n", output.getTrace());
             output.clearTrace();
             parser.readFrame(true);
@@ -118,13 +122,19 @@ public class TestCancelledUpload extends Http2TestBase {
         // There must be a reset. There may be some WindowSize frames
         parser.readFrame(true);
 
-        // Validate any WindowSize frames (always arrive in pairs)
+        // Validate any WindowSize frames. Usually arrive in pairs. Depending on
+        // timing, can see a reset rather than than stream update.
         while (output.getTrace().startsWith("0-WindowSize-[")) {
             String trace = output.getTrace();
             int size = Integer.parseInt(trace.substring(14, trace.length() - 2));
             output.clearTrace();
             parser.readFrame(true);
+            if (output.getTrace().startsWith("3-RST-[3]\n")) {
+                return;
+            }
             Assert.assertEquals("3-WindowSize-[" + size + "]\n", output.getTrace());
+            output.clearTrace();
+            parser.readFrame(true);
         }
 
         // This should be the reset
