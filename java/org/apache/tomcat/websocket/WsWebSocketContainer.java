@@ -202,6 +202,10 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
             Set<URI> redirectSet)
             throws DeploymentException {
 
+        if (log.isDebugEnabled()) {
+            log.debug(sm.getString("wsWebSocketContainer.connect.entry", endpoint.getClass().getName(), path));
+        }
+
         boolean secure = false;
         ByteBuffer proxyConnect = null;
         URI proxyPath;
@@ -345,6 +349,10 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
             Future<Void> fHandshake = channel.handshake();
             fHandshake.get(timeout, TimeUnit.MILLISECONDS);
 
+            if (log.isDebugEnabled()) {
+                log.debug(sm.getString("wsWebSocketContainer.connect.write",
+                        Integer.valueOf(request.position()), Integer.valueOf(request.limit())));
+            }
             writeRequest(channel, request, timeout);
 
             HttpResponse httpResponse = processResponse(response, channel, timeout);
