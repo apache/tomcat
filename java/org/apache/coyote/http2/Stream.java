@@ -297,19 +297,14 @@ public class Stream extends AbstractStream implements HeaderEmitter {
 
 
     void doStreamCancel(String msg, Http2Error error) throws CloseNowException {
-        // Avoid NPEs on duplicate cancellations
-        StreamOutputBuffer streamOutputBuffer = this.streamOutputBuffer;
-        Response coyoteResponse = this.coyoteResponse;
         StreamException se = new StreamException(msg, error, getIdAsInt());
-        if (streamOutputBuffer != null && coyoteResponse != null) {
-            // Prevent the application making further writes
-            streamOutputBuffer.closed = true;
-            // Prevent Tomcat's error handling trying to write
-            coyoteResponse.setError();
-            coyoteResponse.setErrorReported();
-            // Trigger a reset once control returns to Tomcat
-            streamOutputBuffer.reset = se;
-        }
+        // Prevent the application making further writes
+        streamOutputBuffer.closed = true;
+        // Prevent Tomcat's error handling trying to write
+        coyoteResponse.setError();
+        coyoteResponse.setErrorReported();
+        // Trigger a reset once control returns to Tomcat
+        streamOutputBuffer.reset = se;
         throw new CloseNowException(msg, se);
     }
 
@@ -477,13 +472,7 @@ public class Stream extends AbstractStream implements HeaderEmitter {
                         name), Http2Error.PROTOCOL_ERROR, getIdAsInt());
             }
 
-            // Avoid NPE if Stream has been closed on Stream specific thread
-            Request coyoteRequest = this.coyoteRequest;
-            if (coyoteRequest != null) {
-                // HTTP/2 headers are already always lower case
-                // In 8.5.x trailer headers are added to headers collection.
-                coyoteRequest.getMimeHeaders().addValue(name).setString(value);
-            }
+            coyoteRequest.getMimeHeaders().addValue(name).setString(value);
         }
         }
     }
@@ -624,14 +613,9 @@ public class Stream extends AbstractStream implements HeaderEmitter {
 
 
     final boolean isContentLengthInconsistent() {
-        Request coyoteRequest = this.coyoteRequest;
-        // May be null when processing trailer headers after stream has been
-        // closed.
-        if (coyoteRequest != null) {
-            long contentLengthHeader = coyoteRequest.getContentLengthLong();
-            if (contentLengthHeader > -1 && contentLengthReceived != contentLengthHeader) {
-                return true;
-            }
+        long contentLengthHeader = coyoteRequest.getContentLengthLong();
+        if (contentLengthHeader > -1 && contentLengthReceived != contentLengthHeader) {
+            return true;
         }
         return false;
     }
@@ -737,12 +721,15 @@ public class Stream extends AbstractStream implements HeaderEmitter {
         if (log.isDebugEnabled()) {
             log.debug(sm.getString("stream.recycle", getConnectionId(), getIdentifier()));
         }
+        /*
+         * Temporarily disabled due to multiple regressions (NPEs)
         coyoteRequest = null;
         cookieHeader = null;
         coyoteResponse = null;
         inputBuffer = null;
         streamOutputBuffer = null;
         http2OutputBuffer = null;
+        */
     }
 
 

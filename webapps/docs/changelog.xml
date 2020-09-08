@@ -157,6 +157,11 @@
         streams to account for DATA frames containing zero-length padding.
         (markt)
       </fix>
+      <fix>
+        <bug>64710</bug>: Revert the changes to reduce the memory footprint of
+        closed HTTP/2 streams as they triggered multiple regressions in the form
+        of <code>NullPointerException</code>s. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="WebSocket">
