@@ -299,7 +299,7 @@ public abstract class SSLUtilBase implements SSLUtil {
         if (kmf.getProvider().getInfo().indexOf("FIPS") != -1) {
             // FIPS doesn't like ANY wrapping nor key manipulation.
             if (keyAlias != null) {
-                log.warn(sm.getString("sslUtilBase.alias_ignored", keyAlias));
+                log.warn(sm.getString("sslUtilBase.aliasIgnored", keyAlias));
             }
             kmf.init(ksUsed, keyPassArray);
             return kmf.getKeyManagers();
