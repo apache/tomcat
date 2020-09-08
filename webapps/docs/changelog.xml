@@ -187,6 +187,10 @@
         closed HTTP/2 streams as they triggered multiple regressions in the form
         of <code>NullPointerException</code>s. (markt)
       </fix>
+      <fix>
+        Ensure that the HTTP/2 overhead protection check is performed after
+        each HTTP/2 frame is processed. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="WebSocket">

@@ -39,6 +39,33 @@ public class TestHttp2Limits extends Http2TestBase {
 
     private static final StringManager sm = StringManager.getManager(TestHttp2Limits.class);
 
+
+    @Test
+    public void testSettingsOverheadLimits() throws Exception {
+        http2Connect(false);
+
+        for (int i = 0; i < 100; i++) {
+            sendSettings(0, false);
+            parser.readFrame(true);
+            String trace = output.getTrace();
+            if (trace.equals("0-Settings-Ack\n")) {
+                // Test continues
+                output.clearTrace();
+            } else if (trace.startsWith("0-Goaway-[1]-[11]-[Connection [")) {
+                // Test passed
+                return;
+            } else {
+                // Test failed
+                Assert.fail("Unexpected output: " + output.getTrace());
+            }
+            Thread.sleep(100);
+        }
+
+        // Test failed
+        Assert.fail("Connection not closed down");
+    }
+
+
     @Test
     public void testHeaderLimits1x128() throws Exception {
         // Well within limits
