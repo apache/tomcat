@@ -118,6 +118,7 @@ public class TestWebSocketFrameClient extends WebSocketBaseTest {
         tomcat.start();
 
         LogManager.getLogManager().getLogger("org.apache.coyote").setLevel(Level.ALL);
+        LogManager.getLogManager().getLogger("org.apache.tomcat.websocket").setLevel(Level.ALL);
         LogManager.getLogManager().getLogger("org.apache.tomcat.util.net").setLevel(Level.ALL);
         try {
             echoTester("",null);
@@ -127,6 +128,7 @@ public class TestWebSocketFrameClient extends WebSocketBaseTest {
             echoTester("/foo/",null);
         } finally {
             LogManager.getLogManager().getLogger("org.apache.coyote").setLevel(Level.INFO);
+            LogManager.getLogManager().getLogger("org.apache.tomcat.websocket.WsWebSocketContainer").setLevel(Level.INFO);
             LogManager.getLogManager().getLogger("org.apache.tomcat.util.net").setLevel(Level.INFO);
         }
     }
