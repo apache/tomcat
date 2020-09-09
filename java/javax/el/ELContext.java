@@ -36,7 +36,7 @@ public abstract class ELContext {
 
     private ImportHandler importHandler = null;
 
-    private List<EvaluationListener> listeners = new ArrayList<>();
+    private List<EvaluationListener> listeners;
 
     private Deque<Map<String,Object>> lambdaArguments = new LinkedList<>();
 
@@ -143,6 +143,10 @@ public abstract class ELContext {
      * @since EL 3.0
      */
     public void addEvaluationListener(EvaluationListener listener) {
+        if (listeners == null) {
+            listeners = new ArrayList<>();
+        }
+
         listeners.add(listener);
     }
 
@@ -154,7 +158,7 @@ public abstract class ELContext {
      * @since EL 3.0
      */
     public List<EvaluationListener> getEvaluationListeners() {
-        return listeners;
+        return listeners == null ? Collections.emptyList() : listeners;
     }
 
     /**
@@ -165,6 +169,10 @@ public abstract class ELContext {
      * @since EL 3.0
      */
     public void notifyBeforeEvaluation(String expression) {
+        if (listeners == null) {
+            return;
+        }
+
         for (EvaluationListener listener : listeners) {
             try {
                 listener.beforeEvaluation(this, expression);
@@ -183,6 +191,10 @@ public abstract class ELContext {
      * @since EL 3.0
      */
     public void notifyAfterEvaluation(String expression) {
+        if (listeners == null) {
+            return;
+        }
+        
         for (EvaluationListener listener : listeners) {
             try {
                 listener.afterEvaluation(this, expression);
@@ -202,6 +214,10 @@ public abstract class ELContext {
      * @since EL 3.0
      */
     public void notifyPropertyResolved(Object base, Object property) {
+        if (listeners == null) {
+            return;
+        }
+
         for (EvaluationListener listener : listeners) {
             try {
                 listener.propertyResolved(this, base, property);
