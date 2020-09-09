@@ -168,7 +168,7 @@
         client. (markt)
       </fix>
       <fix>
-        Improve handling of HTTP/2 stream level flow control errors and notidy
+        Improve handling of HTTP/2 stream level flow control errors and notify
         the stream immediately if it is waiting for an allocation when the flow
         control error occurs. (markt)
       </fix>
