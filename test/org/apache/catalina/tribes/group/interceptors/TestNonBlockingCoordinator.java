@@ -54,7 +54,6 @@ public class TestNonBlockingCoordinator {
                 public void run() {
                     try {
                         channels[j].start(Channel.DEFAULT);
-                        Thread.sleep(50);
                     } catch (Exception x) {
                         x.printStackTrace();
                     }
@@ -68,8 +67,27 @@ public class TestNonBlockingCoordinator {
         for (int i = 0; i < CHANNEL_COUNT; i++) {
             threads[i].join();
         }
-        Thread.sleep(1000);
+
+        // Allow up to 30s for cluster to form once all the nodes have been
+        // started
+        int count = 0;
+        Member member = null;
+        boolean electionComplete = false;
+        while (!electionComplete && count < 300) {
+            electionComplete = true;
+            member = coordinators[0].getCoordinator();
+            if (member == null) {
+                electionComplete = false;
+            } else {
+                for (int i = 0; i < CHANNEL_COUNT; i++) {
+                    electionComplete = electionComplete && (member.equals(coordinators[i].getCoordinator()));
+                }
+            }
+            Thread.sleep(100);
+            count++;
+        }
     }
+
 
     @Test
     public void testCoord1() throws Exception {
@@ -79,34 +97,30 @@ public class TestNonBlockingCoordinator {
             Assert.assertEquals("Member count expected to be equal.", expectedCount,
                     channels[i].getMembers().length);
         }
+
         Member member = coordinators[0].getCoordinator();
-        int cnt = 0;
-        while (member == null && (cnt++ < 100)) {
-            try {
-                Thread.sleep(100);
-                member = coordinators[0].getCoordinator();
-            } catch (Exception x) {
-                /* Ignore */
-            }
-        }
         log.info("Coordinator[0] is:" + member);
         for (int i = 0; i < CHANNEL_COUNT; i++) {
-            Assert.assertEquals("Local member" + channels[i].getLocalMember(false), member, coordinators[i].getCoordinator());
+            Assert.assertEquals("Local member " + channels[i].getLocalMember(false), member, coordinators[i].getCoordinator());
         }
     }
 
+
     @Test
     public void testCoord2() throws Exception {
+        // Stop current coordinator to trigger new election
         Member member = coordinators[1].getCoordinator();
         System.out.println("Coordinator[2a] is:" + member);
         int index = -1;
-        for ( int i=0; i<CHANNEL_COUNT; i++ ) {
-            if ( channels[i].getLocalMember(false).equals(member) ) {
+        for (int i = 0; i < CHANNEL_COUNT; i++) {
+            if (channels[i].getLocalMember(false).equals(member)) {
                 System.out.println("Shutting down:" + channels[i].getLocalMember(true).toString());
                 channels[i].stop(Channel.DEFAULT);
                 index = i;
+                break;
             }
         }
+
         int dead = index;
         Thread.sleep(1000);
         if (index == 0) {
@@ -114,6 +128,27 @@ public class TestNonBlockingCoordinator {
         } else {
             index = 0;
         }
+
+        // Allow up to 30s for election to complete
+        int count = 0;
+        member = null;
+        boolean electionComplete = false;
+        while (!electionComplete && count < 300) {
+            electionComplete = true;
+            member = coordinators[index].getCoordinator();
+            if (member == null) {
+                electionComplete = false;
+            } else {
+                for (int i = 0; i < CHANNEL_COUNT; i++) {
+                    if (i != dead) {
+                        electionComplete = electionComplete && (member.equals(coordinators[i].getCoordinator()));
+                    }
+                }
+            }
+            Thread.sleep(100);
+            count++;
+        }
+
         System.out.println("Member count:"+channels[index].getMembers().length);
         member = coordinators[index].getCoordinator();
         for (int i = 1; i < CHANNEL_COUNT; i++) {
