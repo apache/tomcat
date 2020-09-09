@@ -45,8 +45,8 @@ public class TestHttp2Limits extends Http2TestBase {
         http2Connect(false);
 
         for (int i = 0; i < 100; i++) {
-            sendSettings(0, false);
             try {
+                sendSettings(0, false);
                 parser.readFrame(true);
             } catch (IOException ioe) {
                 // Server closed connection before client has a chance to read
