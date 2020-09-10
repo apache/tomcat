@@ -129,7 +129,7 @@ public final class ValueExpressionLiteral extends ValueExpression implements
             ClassNotFoundException {
         this.value = in.readObject();
         String type = in.readUTF();
-        if (!"".equals(type)) {
+        if (!type.isEmpty()) {
             this.expectedType = ReflectionUtil.forName(type);
         }
     }

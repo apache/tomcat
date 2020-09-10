@@ -151,7 +151,7 @@ public class TcpSender
                 // read all the headers.
                 String header = connectionReaders[i].readLine();
                 int contentLength = 0;
-                while (!"".equals(header)) {
+                while (!header.isEmpty()) {
                     int colon = header.indexOf(':');
                     String headerName = header.substring(0, colon).trim();
                     String headerValue = header.substring(colon + 1).trim();

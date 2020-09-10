@@ -1077,7 +1077,7 @@ public final class CGIServlet extends HttpServlet {
              * SHOULD NOT be defined.
              *
              */
-            if (!("".equals(sPathInfoCGI))) {
+            if (!sPathInfoCGI.isEmpty()) {
                 sPathTranslatedCGI = context.getRealPath(sPathInfoCGI);
             }
             if (sPathTranslatedCGI == null || "".equals(sPathTranslatedCGI)) {
@@ -1386,9 +1386,9 @@ public final class CGIServlet extends HttpServlet {
          */
         protected String blanksToString(String couldBeBlank,
                                       String subForBlanks) {
-            return (("".equals(couldBeBlank) || couldBeBlank == null)
+            return (couldBeBlank == null || couldBeBlank.isEmpty())
                     ? subForBlanks
-                    : couldBeBlank);
+                    : couldBeBlank;
         }
 
 
@@ -1689,7 +1689,7 @@ public final class CGIServlet extends HttpServlet {
                     try {
                         //set headers
                         String line = null;
-                        while (((line = cgiHeaderReader.readLine()) != null) && !("".equals(line))) {
+                        while (((line = cgiHeaderReader.readLine()) != null) && !line.isEmpty()) {
                             if (log.isTraceEnabled()) {
                                 log.trace("addHeader(\"" + line + "\")");
                             }

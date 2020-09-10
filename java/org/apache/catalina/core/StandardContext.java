@@ -2093,7 +2093,7 @@ public class StandardContext extends ContainerBase
         if (path == null || path.equals("/")) {
             invalid = true;
             this.path = "";
-        } else if ("".equals(path) || path.startsWith("/")) {
+        } else if (path.isEmpty() || path.startsWith("/")) {
             this.path = path;
         } else {
             invalid = true;

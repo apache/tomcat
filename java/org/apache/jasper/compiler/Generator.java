@@ -562,7 +562,7 @@ class Generator {
      * preamble generation)
      */
     private void genPreamblePackage(String packageName) {
-        if (!"".equals(packageName) && packageName != null) {
+        if (packageName != null && !packageName.isEmpty()) {
             out.printil("package " + packageName + ";");
             out.println();
         }

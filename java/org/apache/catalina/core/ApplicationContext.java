@@ -1211,7 +1211,7 @@ public class ApplicationContext implements ServletContext {
         }
 
         for (String role : roleNames) {
-            if (role == null || "".equals(role)) {
+            if (role == null || role.isEmpty()) {
                 throw new IllegalArgumentException(
                         sm.getString("applicationContext.role.iae",
                                 getContextPath()));

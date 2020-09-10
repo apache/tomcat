@@ -443,10 +443,11 @@ public final class HTMLManagerServlet extends ManagerServlet {
                 StringBuilder tmp = new StringBuilder();
                 tmp.append("path=");
                 tmp.append(URLEncoder.DEFAULT.encode(displayPath, StandardCharsets.UTF_8));
-                if (ctxt.getWebappVersion().length() > 0) {
+                final String webappVersion = ctxt.getWebappVersion();
+                if (webappVersion != null && webappVersion.length() > 0) {
                     tmp.append("&version=");
                     tmp.append(URLEncoder.DEFAULT.encode(
-                            ctxt.getWebappVersion(), StandardCharsets.UTF_8));
+                            webappVersion, StandardCharsets.UTF_8));
                 }
                 String pathVersion = tmp.toString();
 
@@ -463,10 +464,10 @@ public final class HTMLManagerServlet extends ManagerServlet {
                         + URLEncoder.DEFAULT.encode(contextPath + "/", StandardCharsets.UTF_8)
                         + "\" " + Constants.REL_EXTERNAL + ">"
                         + Escape.htmlElementContent(displayPath) + "</a>";
-                if ("".equals(ctxt.getWebappVersion())) {
+                if (webappVersion == null || webappVersion.isEmpty()) {
                     args[1] = noVersion;
                 } else {
-                    args[1] = Escape.htmlElementContent(ctxt.getWebappVersion());
+                    args[1] = Escape.htmlElementContent(webappVersion);
                 }
                 if (ctxt.getDisplayName() == null) {
                     args[2] = "&nbsp;";

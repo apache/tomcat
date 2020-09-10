@@ -52,7 +52,7 @@ public class ReflectionUtil {
     }
 
     public static Class<?> forName(String name) throws ClassNotFoundException {
-        if (null == name || "".equals(name)) {
+        if (null == name || name.isEmpty()) {
             return null;
         }
         Class<?> c = forNamePrimitive(name);
