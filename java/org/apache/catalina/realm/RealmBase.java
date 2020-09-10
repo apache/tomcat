@@ -1606,7 +1606,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements org.apache
 
     private static X509UsernameRetriever createUsernameRetriever(String className)
         throws LifecycleException {
-        if(null == className || "".equals(className.trim()))
+        if(null == className || className.trim().isEmpty())
             return new X509SubjectDnRetriever();
 
         try {

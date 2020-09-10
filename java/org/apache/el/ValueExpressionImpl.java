@@ -240,7 +240,7 @@ public final class ValueExpressionImpl extends ValueExpression implements
             ClassNotFoundException {
         this.expr = in.readUTF();
         String type = in.readUTF();
-        if (!"".equals(type)) {
+        if (!type.isEmpty()) {
             this.expectedType = ReflectionUtil.forName(type);
         }
         this.fnMapper = (FunctionMapper) in.readObject();

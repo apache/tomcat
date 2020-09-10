@@ -179,7 +179,7 @@ public class StoreRegistry {
      */
     public void registerDescription(StoreDescription desc) {
         String key = desc.getId();
-        if (key == null || "".equals(key))
+        if (key == null || key.isEmpty())
             key = desc.getTagClass();
         descriptors.put(key, desc);
         if (log.isDebugEnabled())
