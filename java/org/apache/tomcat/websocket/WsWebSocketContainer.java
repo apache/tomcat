@@ -350,8 +350,14 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
             fHandshake.get(timeout, TimeUnit.MILLISECONDS);
 
             if (log.isDebugEnabled()) {
+                SocketAddress localAddress = null;
+                try {
+                    localAddress = channel.getLocalAddress();
+                } catch (IOException ioe) {
+                    // Ignore
+                }
                 log.debug(sm.getString("wsWebSocketContainer.connect.write",
-                        Integer.valueOf(request.position()), Integer.valueOf(request.limit())));
+                        Integer.valueOf(request.position()), Integer.valueOf(request.limit()), localAddress));
             }
             writeRequest(channel, request, timeout);
 
