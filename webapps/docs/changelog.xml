@@ -89,6 +89,11 @@
         database. (kfujino)
       </fix>
       <fix>
+        <bug>64735</bug>: Ensure that none of the methods on a
+        <code>ServletContext</code> instance always fail when running under a
+        SecurityManager. Pull request provided by Kyle Stiemann. (markt)
+      </fix>
+      <fix>
         <bug>64765</bug>: Ensure that the number of currently processing threads
         is tracked correctly when a web application is undeployed, long running
         requests are being processed and
