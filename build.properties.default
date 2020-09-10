@@ -27,7 +27,7 @@ version.major=9
 version.minor=0
 version.build=38
 version.patch=0
-version.suffix=-dev
+version.suffix=
 
 # ----- Source control flags -----
 git.branch=master
