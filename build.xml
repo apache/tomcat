@@ -80,6 +80,7 @@
   <property name="tomcat.dist"           value="${tomcat.output}/dist"/>
   <property name="tomcat.embed"          value="${tomcat.output}/embed"/>
   <property name="tomcat.embed.sources"  value="${tomcat.output}/embed-src-jars"/>
+  <property name="tomcat.i18n"           value="${tomcat.output}/i18n"/>
   <property name="tomcat.manifests"      value="${tomcat.output}/manifests"/>
   <property name="tomcat.release"        value="${tomcat.output}/release"/>
   <property name="tomcat.src.jars"       value="${tomcat.output}/src-jars"/>
@@ -237,7 +238,7 @@
   <path id="tomcat.test.classpath">
     <pathelement location="${test.basedir}/webapps/examples/WEB-INF/classes"/>
     <pathelement location="${test.classes}"/>
-    <pathelement location="${tomcat.build}/i18n"/>
+    <pathelement location="${tomcat.i18n}"/>
     <pathelement location="${junit.jar}"/>
     <pathelement location="${hamcrest.jar}"/>
     <pathelement location="${easymock.jar}"/>
@@ -791,7 +792,6 @@
     <mkdir dir="${tomcat.build}"/>
     <mkdir dir="${tomcat.build}/bin"/>
     <mkdir dir="${tomcat.build}/conf"/>
-    <mkdir dir="${tomcat.build}/i18n"/>
     <mkdir dir="${tomcat.build}/lib"/>
     <mkdir dir="${tomcat.build}/logs"/>
     <mkdir dir="${tomcat.build}/temp"/>
@@ -974,7 +974,7 @@
     after upgrading to Java 9+ as the minimum JRE and specifying the encoding
     when loading the ResourceBundles -->
     <native2ascii src="java" dest="${tomcat.classes}" includes="**/LocalStrings.properties,**/Messages*.properties" encoding="UTF-8"/>
-    <native2ascii src="java" dest="${tomcat.build}/i18n" includes="**/LocalStrings_*.properties" encoding="UTF-8"/>
+    <native2ascii src="java" dest="${tomcat.i18n}" includes="**/LocalStrings_*.properties" encoding="UTF-8"/>
 
   </target>
 
@@ -1162,7 +1162,7 @@
     <!-- i18n JARs -->
     <jar jarfile="${tomcat.build}/lib/tomcat-i18n-cs.jar"
       manifest="${tomcat.manifests}/default.manifest">
-      <fileset dir="${tomcat.build}/i18n">
+      <fileset dir="${tomcat.i18n}">
         <include name="**/LocalStrings_cs.properties" />
       </fileset>
       <zipfileset file="${tomcat.manifests}/default.notice"
@@ -1172,7 +1172,7 @@
     </jar>
     <jar jarfile="${tomcat.build}/lib/tomcat-i18n-de.jar"
       manifest="${tomcat.manifests}/default.manifest">
-      <fileset dir="${tomcat.build}/i18n">
+      <fileset dir="${tomcat.i18n}">
         <include name="**/LocalStrings_de.properties" />
       </fileset>
       <zipfileset file="${tomcat.manifests}/default.notice"
@@ -1182,7 +1182,7 @@
     </jar>
     <jar jarfile="${tomcat.build}/lib/tomcat-i18n-es.jar"
       manifest="${tomcat.manifests}/default.manifest">
-      <fileset dir="${tomcat.build}/i18n">
+      <fileset dir="${tomcat.i18n}">
         <include name="**/LocalStrings_es.properties" />
       </fileset>
       <zipfileset file="${tomcat.manifests}/default.notice"
@@ -1192,7 +1192,7 @@
     </jar>
     <jar jarfile="${tomcat.build}/lib/tomcat-i18n-fr.jar"
       manifest="${tomcat.manifests}/default.manifest">
-      <fileset dir="${tomcat.build}/i18n">
+      <fileset dir="${tomcat.i18n}">
         <include name="**/LocalStrings_fr.properties" />
       </fileset>
       <zipfileset file="${tomcat.manifests}/default.notice"
@@ -1202,7 +1202,7 @@
     </jar>
     <jar jarfile="${tomcat.build}/lib/tomcat-i18n-ja.jar"
       manifest="${tomcat.manifests}/default.manifest">
-      <fileset dir="${tomcat.build}/i18n">
+      <fileset dir="${tomcat.i18n}">
         <include name="**/LocalStrings_ja.properties" />
       </fileset>
       <zipfileset file="${tomcat.manifests}/default.notice"
@@ -1212,7 +1212,7 @@
     </jar>
     <jar jarfile="${tomcat.build}/lib/tomcat-i18n-ko.jar"
       manifest="${tomcat.manifests}/default.manifest">
-      <fileset dir="${tomcat.build}/i18n">
+      <fileset dir="${tomcat.i18n}">
         <include name="**/LocalStrings_ko.properties" />
       </fileset>
       <zipfileset file="${tomcat.manifests}/default.notice"
@@ -1222,7 +1222,7 @@
     </jar>
     <jar jarfile="${tomcat.build}/lib/tomcat-i18n-pt-BR.jar"
       manifest="${tomcat.manifests}/default.manifest">
-      <fileset dir="${tomcat.build}/i18n">
+      <fileset dir="${tomcat.i18n}">
         <include name="**/LocalStrings_pt_BR.properties" />
       </fileset>
       <zipfileset file="${tomcat.manifests}/default.notice"
@@ -1232,7 +1232,7 @@
     </jar>
     <jar jarfile="${tomcat.build}/lib/tomcat-i18n-ru.jar"
       manifest="${tomcat.manifests}/default.manifest">
-      <fileset dir="${tomcat.build}/i18n">
+      <fileset dir="${tomcat.i18n}">
         <include name="**/LocalStrings_ru.properties" />
       </fileset>
       <zipfileset file="${tomcat.manifests}/default.notice"
@@ -1242,7 +1242,7 @@
     </jar>
     <jar jarfile="${tomcat.build}/lib/tomcat-i18n-zh-CN.jar"
       manifest="${tomcat.manifests}/default.manifest">
-      <fileset dir="${tomcat.build}/i18n">
+      <fileset dir="${tomcat.i18n}">
         <include name="**/LocalStrings_zh_CN.properties" />
       </fileset>
       <zipfileset file="${tomcat.manifests}/default.notice"
