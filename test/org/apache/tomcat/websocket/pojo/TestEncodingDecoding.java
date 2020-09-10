@@ -69,7 +69,7 @@ public class TestEncodingDecoding extends TomcatBaseTest {
     private static final String PATH_MESSAGES_EP = "/echoMessagesEP";
     private static final String PATH_BATCHED_EP = "/echoBatchedEP";
 
-    private static final int WAIT_LOOPS = 50;
+    private static final int WAIT_LOOPS = 100;
     private static final int WAIT_DELAY = 100;
 
 
