@@ -117,6 +117,11 @@ public class ApplicationContextFacade implements ServletContext {
         classCache.put("getAttribute", clazz);
         classCache.put("log", clazz);
         classCache.put("setSessionTrackingModes", new Class[]{Set.class} );
+        classCache.put("addJspFile", new Class[]{String.class, String.class});
+        classCache.put("declareRoles", new Class[]{String[].class});
+        classCache.put("setSessionTimeout", new Class[]{int.class});
+        classCache.put("setRequestCharacterEncoding", new Class[]{String.class});
+        classCache.put("setResponseCharacterEncoding", new Class[]{String.class});
     }
 
 
