@@ -165,6 +165,9 @@ public class WsFrameClient extends WsFrameBase {
 
         @Override
         public void failed(Throwable exc, Void attachment) {
+            if (log.isDebugEnabled()) {
+                log.debug(sm.getString("wsFrame.readFailed"), exc);
+            }
             if (exc instanceof ReadBufferOverflowException) {
                 // response will be empty if this exception is thrown
                 response = ByteBuffer
