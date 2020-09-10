@@ -404,7 +404,7 @@ public class TestEncodingDecoding extends TomcatBaseTest {
         @OnMessage
         public String onMessage(String message, Session session) throws Exception {
             received.add(message);
-            session.getAsyncRemote().sendText(MESSAGE_ONE).get();
+            session.getBasicRemote().sendText(MESSAGE_ONE);
             return message;
         }
 
@@ -426,9 +426,9 @@ public class TestEncodingDecoding extends TomcatBaseTest {
         @OnMessage
         public String onMessage(String message, Session session) throws IOException {
             received.add(message);
-            session.getAsyncRemote().setBatchingAllowed(true);
-            session.getAsyncRemote().sendText(MESSAGE_ONE);
-            session.getAsyncRemote().setBatchingAllowed(false);
+            session.getBasicRemote().setBatchingAllowed(true);
+            session.getBasicRemote().sendText(MESSAGE_ONE);
+            session.getBasicRemote().setBatchingAllowed(false);
             return MESSAGE_TWO;
         }
 
