@@ -526,6 +526,13 @@ public class TestHttp2Limits extends Http2TestBase {
             // NIO2 can sometimes send window updates depending timing
             skipWindowSizeFrames();
 
+            // Async I/O can sometimes result in a stream closed reset before
+            // the enhance your calm reset
+            if ("3-RST-[5]\n".equals(output.getTrace())) {
+                output.clearTrace();
+                parser.readFrame(true);
+            }
+
             Assert.assertEquals("3-RST-[11]\n", output.getTrace());
             break;
         }
