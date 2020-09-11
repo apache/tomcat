@@ -96,7 +96,7 @@ public class HealthCheckValve extends ValveBase {
                 context ? request.getRequestPathMB() : request.getDecodedRequestURIMB();
         if (urlMB.equals(path)) {
             response.setContentType("application/json");
-            if (isAvailable(getContainer())) {
+            if (!checkContainersAvailable || (checkContainersAvailable && isAvailable(getContainer()))) {
                 response.getOutputStream().print(UP);
             } else {
                 response.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
