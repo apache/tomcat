@@ -37,4 +37,3 @@ This directory also contains resource directives, so that resource files normall
 also get compiled into the executable image.
 These are currently stored in a file called `tomcat-resource.json` in the `META-INF/native-image/groupId/artifactId`
 location.
-

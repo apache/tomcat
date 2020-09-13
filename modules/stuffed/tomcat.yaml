@@ -32,20 +32,20 @@ spec:
         run: tomcat
     spec:
       containers:
-      - name: tomcat
-        image: apache/tomcat-stuffed:1.0
-        ports:
-        - containerPort: 8080
-        - containerPort: 8778
-          name: jolokia
-        - containerPort: 9404
-          name: prometheus
-        readinessProbe:
-          httpGet:
-            path: /health
-            port: 8080
-          initialDelaySeconds: 3
-          periodSeconds: 3
-        resources: {}
+        - name: tomcat
+          image: apache/tomcat-stuffed:1.0
+          ports:
+            - containerPort: 8080
+            - containerPort: 8778
+              name: jolokia
+            - containerPort: 9404
+              name: prometheus
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 3
+            periodSeconds: 3
+          resources: {}
   strategy: {}
 status: {}
