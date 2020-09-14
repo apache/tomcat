@@ -901,7 +901,7 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
                             if (httpUpgradeHandler instanceof InternalHttpUpgradeHandler) {
                                 if (((InternalHttpUpgradeHandler) httpUpgradeHandler).hasAsyncIO()) {
                                     // The handler will initiate all further I/O
-                                    state = SocketState.LONG;
+                                    state = SocketState.UPGRADED;
                                 }
                             }
                         }
