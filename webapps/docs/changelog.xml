@@ -53,6 +53,17 @@
       </update>
     </changelog>
   </subsection>
+  <subsection name="Other">
+    <changelog>
+      <update>
+        Update to Commons Daemon 1.2.3. This adds support to jsvc for
+        <code>--enable-preview</code> and native memory tracking (Procrun
+        already supported these features), adds some addition debug logging and
+        adds a new feature to Procrun that outputs the commnd to (re-)configure
+        the service with the current settings. (markt)
+      </update>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 10.0.0-M8 (markt)" rtext="release in progress">
   <subsection name="Catalina">
