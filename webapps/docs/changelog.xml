@@ -146,6 +146,13 @@
         Update the internal fork of Apache Commons FileUpload to c25a4e3
         (2020-08-26, 2.0-SNAPSHOT). Code clean-up and RFC 2231 support. (markt)
       </add>
+      <update>
+        Update to Commons Daemon 1.2.3. This adds support to jsvc for
+        <code>--enable-preview</code> and native memory tracking (Procrun
+        already supported these features), adds some addition debug logging and
+        adds a new feature to Procrun that outputs the commnd to (re-)configure
+        the service with the current settings. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
