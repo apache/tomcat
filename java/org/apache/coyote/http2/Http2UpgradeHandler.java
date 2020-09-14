@@ -312,10 +312,15 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
         SocketState result = SocketState.CLOSED;
 
         try {
-            pingManager.sendPing(false);
-
             switch(status) {
             case OPEN_READ:
+                synchronized (socketWrapper) {
+                    if (!socketWrapper.canWrite()) {
+                        // Only send a ping if there is no other data waiting to be sent.
+                        // Ping manager will ensure they aren't sent too frequently.
+                        pingManager.sendPing(false);
+                    }
+                }
                 try {
                     // There is data to read so use the read timeout while
                     // reading frames ...
@@ -824,6 +829,10 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
         synchronized (socketWrapper) {
             if (socketWrapper.flush(false)) {
                 socketWrapper.registerWriteInterest();
+            } else {
+                // Only send a ping if there is no other data waiting to be sent.
+                // Ping manager will ensure they aren't sent too frequently.
+                pingManager.sendPing(false);
             }
         }
     }
