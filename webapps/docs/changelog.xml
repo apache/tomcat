@@ -55,6 +55,9 @@
         Fix race condition when saving and recycling session in
         <code>PersistentValve</code>. (kfujino)
       </fix>
+      <update>
+        Remove the JDBCRealm. (markt)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Coyote">
