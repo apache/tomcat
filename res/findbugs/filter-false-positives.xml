@@ -345,10 +345,7 @@
   </Match>
   <Match>
     <!-- SQL construction is safe since it is from trusted config -->
-    <Or>
-      <Class name="org.apache.catalina.realm.DataSourceRealm" />
-      <Class name="org.apache.catalina.realm.JDBCRealm" />
-    </Or>
+    <Class name="org.apache.catalina.realm.DataSourceRealm" />
     <Or>
       <Method name="credentials" />
       <Method name="getPassword" />
@@ -356,20 +353,6 @@
       <Method name="roles" />
     </Or>
     <Bug pattern="SQL_PREPARED_STATEMENT_GENERATED_FROM_NONCONSTANT_STRING" />
-  </Match>
-  <Match>
-    <Class name="org.apache.catalina.realm.JDBCRealm" />
-    <Field name="containerLog" />
-    <Bug code="IS" />
-  </Match>
-  <Match>
-    <!-- Sync is protecting preparedRoles, not these fields -->
-    <Class name="org.apache.catalina.realm.JDBCRealm" />
-    <Or>
-      <Field name="roleNameCol" />
-      <Field name="userRoleTable" />
-    </Or>
-    <Bug pattern="IS2_INCONSISTENT_SYNC " />
   </Match>
   <Match>
     <!-- roles will be initialized in addAttributeValues -->

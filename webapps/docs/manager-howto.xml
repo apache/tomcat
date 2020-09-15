@@ -181,7 +181,7 @@ Exactly how the usernames/passwords are configured depends on which
     add the <strong>manager-script</strong> role to the comma-delimited
     <code>roles</code> attribute for one or more existing users, and/or
     create new users with that assigned role.</li>
-<li><em>DataSourceRealm</em> or <em>JDBCRealm</em>
+<li><em>DataSourceRealm</em>
     &#8212; Your user and role information is stored in
     a database accessed via JDBC.  Add the <strong>manager-script</strong> role
     to one or more existing users, and/or create one or more new users

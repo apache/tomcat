@@ -323,38 +323,6 @@ public class MBeanFactory {
 
 
     /**
-     * Create a new JDBC Realm.
-     *
-     * @param parent MBean Name of the associated parent component
-     * @param driverName JDBC driver name
-     * @param connectionName the user name for the connection
-     * @param connectionPassword the password for the connection
-     * @param connectionURL the connection URL to the database
-     * @return the object name of the created realm
-     *
-     * @exception Exception if an MBean cannot be created or registered
-     *
-     * @deprecated This method will be removed in Tomcat 10. Use a
-     *             DataSourceRealm instead.
-     */
-    @Deprecated
-    public String createJDBCRealm(String parent, String driverName,
-        String connectionName, String connectionPassword, String connectionURL)
-        throws Exception {
-
-        // Create a new JDBCRealm instance
-        org.apache.catalina.realm.JDBCRealm realm = new org.apache.catalina.realm.JDBCRealm();
-        realm.setDriverName(driverName);
-        realm.setConnectionName(connectionName);
-        realm.setConnectionPassword(connectionPassword);
-        realm.setConnectionURL(connectionURL);
-
-        // Add the new instance to its parent component
-        return addRealmToParent(parent, realm);
-    }
-
-
-    /**
      * Create a new JNDI Realm.
      *
      * @param parent MBean Name of the associated parent component
