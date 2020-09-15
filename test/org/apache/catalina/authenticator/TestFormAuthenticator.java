@@ -52,8 +52,8 @@ import org.apache.catalina.startup.TomcatBaseTest;
  *    as a path parameter appended to ALL urls within its response. That is
  *    achievable with servlets, jsps, jstl (all of which which can ask for an
  *    encoded url to be inserted into the dynamic web page). It cannot work
- *    with static html.
- *    note: this test class uses the tomcat somaple jsps, which conform.
+ *    with static HTML.
+ *    note: this test class uses the Tomcat sample jsps, which conform.
  *
  * 3. Therefore, any webapp that MIGHT need to authenticate a client that
  *    does not accept cookies MUST generate EVERY protected resource url
@@ -498,7 +498,7 @@ public class TestFormAuthenticator extends TomcatBaseTest {
         }
 
         /*
-         * verify the server response html body is the page we expect,
+         * verify the server response HTML body is the page we expect,
          * based on the dialogue position within doTest.
          */
         @Override
@@ -507,7 +507,7 @@ public class TestFormAuthenticator extends TomcatBaseTest {
         }
 
         /*
-         * verify the server response html body is the page we expect,
+         * verify the server response HTML body is the page we expect,
          * based on the dialogue position given by the caller.
          */
         public boolean isResponseBodyOK(int testPhase) {
