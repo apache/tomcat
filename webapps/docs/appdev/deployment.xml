@@ -131,7 +131,7 @@ The location commonly used within a Tomcat installation for shared code is
 <strong>$CATALINA_HOME/lib</strong>. JAR files placed here are visible both to
 web applications and internal Tomcat code. This is a good place to put JDBC
 drivers that are required for both your application or internal Tomcat use
-(such as for a JDBCRealm).</p>
+(such as for a DataSourceRealm).</p>
 
 <p>Out of the box, a standard Tomcat installation includes a variety
 of pre-installed shared library files, including:</p>
