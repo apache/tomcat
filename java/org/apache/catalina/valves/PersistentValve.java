@@ -170,22 +170,21 @@ public class PersistentValve extends ValveBase {
                     if (manager instanceof StoreManager) {
                         Session session = manager.findSession(newsessionId);
                         Store store = ((StoreManager) manager).getStore();
-                        if (store != null && session != null && session.isValid() &&
-                                !isSessionStale(session, System.currentTimeMillis())) {
-                            store.save(session);
-                            ((StoreManager) manager).removeSuper(session);
-                            session.recycle();
-                        } else {
-                            if (container.getLogger().isDebugEnabled()) {
-                                container.getLogger().debug("newsessionId store: " +
-                                        store + " session: " + session +
-                                        " valid: " +
-                                        (session == null ? "N/A" : Boolean.toString(
-                                                session.isValid())) +
-                                        " stale: " + isSessionStale(session,
-                                                System.currentTimeMillis()));
-                            }
+                        synchronized (session) {
+                            if (store != null && session != null && session.isValid()
+                                    && !isSessionStale(session, System.currentTimeMillis())) {
+                                store.save(session);
+                                ((StoreManager) manager).removeSuper(session);
+                                session.recycle();
+                            } else {
+                                if (container.getLogger().isDebugEnabled()) {
+                                    container.getLogger()
+                                            .debug("newsessionId store: " + store + " session: " + session + " valid: "
+                                                    + (session == null ? "N/A" : Boolean.toString(session.isValid()))
+                                                    + " stale: " + isSessionStale(session, System.currentTimeMillis()));
+                                }
 
+                            }
                         }
                     } else {
                         if (container.getLogger().isDebugEnabled()) {

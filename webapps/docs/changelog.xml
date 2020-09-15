@@ -51,6 +51,10 @@
         The health check valve will now check the state of its associated
         containers to report availability. (remm)
       </update>
+      <fix>
+        Fix race condition when saving and recycling session in
+        <code>PersistentValve</code>. (kfujino)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
