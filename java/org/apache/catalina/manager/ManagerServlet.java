@@ -555,7 +555,7 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
                         smClient.getString("managerServlet.findleaksList"));
             }
             for (String result : results) {
-                if ("".equals(result)) {
+                if (result.isEmpty()) {
                     result = "/";
                 }
                 writer.println(result);

@@ -192,7 +192,7 @@ public abstract class SSLUtilBase implements SSLUtil {
                 // Some key store types (e.g. hardware) expect the InputStream
                 // to be null
                 if(!("PKCS11".equalsIgnoreCase(type) ||
-                        "".equalsIgnoreCase(path)) ||
+                        path.isEmpty()) ||
                         "NONE".equalsIgnoreCase(path)) {
                     istream = ConfigFileLoader.getSource().getResource(path).getInputStream();
                 }

@@ -445,7 +445,7 @@ public class JDBCStore extends StoreBase {
      * @param dataSourceName The JNDI name of the DataSource-factory
      */
     public void setDataSourceName(String dataSourceName) {
-        if (dataSourceName == null || "".equals(dataSourceName.trim())) {
+        if (dataSourceName == null || dataSourceName.trim().isEmpty()) {
             manager.getContext().getLogger().warn(
                     sm.getString(getStoreName() + ".missingDataSourceName"));
             return;

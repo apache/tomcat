@@ -85,7 +85,7 @@ public class SetPropertiesRule extends Rule {
 
         for (int i = 0; i < attributes.getLength(); i++) {
             String name = attributes.getLocalName(i);
-            if ("".equals(name)) {
+            if (name.isEmpty()) {
                 name = attributes.getQName(i);
             }
             String value = attributes.getValue(i);

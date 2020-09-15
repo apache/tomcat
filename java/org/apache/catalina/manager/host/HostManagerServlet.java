@@ -411,7 +411,7 @@ public class HostManagerServlet
         host.addLifecycleListener(new HostConfig());
 
         // Add host aliases
-        if ((aliases != null) && !("".equals(aliases))) {
+        if ((aliases != null) && !aliases.isEmpty()) {
             StringTokenizer tok = new StringTokenizer(aliases, ", ");
             while (tok.hasMoreTokens()) {
                 host.addAlias(tok.nextToken());

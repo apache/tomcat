@@ -25,7 +25,7 @@ import java.util.Locale;
 public final class ContextName {
     public static final String ROOT_NAME = "ROOT";
     private static final String VERSION_MARKER = "##";
-    private static final String FWD_SLASH_REPLACEMENT = "#";
+    private static final char FWD_SLASH_REPLACEMENT = '#';
 
     private final String baseName;
     private final String path;
@@ -54,10 +54,10 @@ public final class ContextName {
         }
 
         // Replace any remaining /
-        tmp1 = tmp1.replaceAll("/", FWD_SLASH_REPLACEMENT);
+        tmp1 = tmp1.replace('/', FWD_SLASH_REPLACEMENT);
 
         // Insert the ROOT name if required
-        if (tmp1.startsWith(VERSION_MARKER) || "".equals(tmp1)) {
+        if (tmp1.startsWith(VERSION_MARKER) || tmp1.isEmpty()) {
             tmp1 = ROOT_NAME + tmp1;
         }
 
@@ -84,7 +84,7 @@ public final class ContextName {
         if (ROOT_NAME.equals(tmp2)) {
             path = "";
         } else {
-            path = "/" + tmp2.replaceAll(FWD_SLASH_REPLACEMENT, "/");
+            path = "/" + tmp2.replace(FWD_SLASH_REPLACEMENT, '/');
         }
 
         if (versionIndex > -1) {
@@ -116,7 +116,7 @@ public final class ContextName {
         }
 
         // Name is path + version
-        if ("".equals(this.version)) {
+        if (this.version.isEmpty()) {
             name = this.path;
         } else {
             name = this.path + VERSION_MARKER + this.version;
@@ -124,13 +124,13 @@ public final class ContextName {
 
         // Base name is converted path + version
         StringBuilder tmp = new StringBuilder();
-        if ("".equals(this.path)) {
+        if (this.path.isEmpty()) {
             tmp.append(ROOT_NAME);
         } else {
-            tmp.append(this.path.substring(1).replaceAll("/",
+            tmp.append(this.path.substring(1).replace('/',
                     FWD_SLASH_REPLACEMENT));
         }
-        if (this.version.length() > 0) {
+        if (!this.version.isEmpty()) {
             tmp.append(VERSION_MARKER);
             tmp.append(this.version);
         }
@@ -161,7 +161,7 @@ public final class ContextName {
             tmp.append(path);
         }
 
-        if (!"".equals(version)) {
+        if (!version.isEmpty()) {
             tmp.append(VERSION_MARKER);
             tmp.append(version);
         }

@@ -734,7 +734,8 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
 
         // Request line
         result.put(GET_BYTES);
-        if (null == uri.getPath() || "".equals(uri.getPath())) {
+        final String path = uri.getPath();
+        if (null == path || path.isEmpty()) {
             result.put(ROOT_URI_BYTES);
         } else {
             result.put(uri.getRawPath().getBytes(StandardCharsets.ISO_8859_1));

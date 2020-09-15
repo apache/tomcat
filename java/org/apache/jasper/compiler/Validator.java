@@ -1681,7 +1681,7 @@ class Validator {
                     lastArg = true;
                 }
                 String arg = signature.substring(start, p).trim();
-                if (!"".equals(arg)) {
+                if (!arg.isEmpty()) {
                     params.add(arg);
                 }
                 if (lastArg) {
