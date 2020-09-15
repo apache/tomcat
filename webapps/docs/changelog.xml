@@ -90,7 +90,7 @@
         return value, particularly when end of stream has been reached. (markt)
       </fix>
       <fix>
-        Fix a rare potential race condition when chekcing for timeouts with the
+        Fix a rare potential race condition when checking for timeouts with the
         APR connector. (markt)
       </fix>
     </changelog>
@@ -119,7 +119,7 @@
         the output is more consistent. PR provided by Holomark. (markt)
       </fix>
       <fix>
-        Remove the out of date functional specification secton from the
+        Remove the out of date functional specification section from the
         documentation web application. (markt)
       </fix>
     </changelog>
@@ -150,7 +150,7 @@
         Update to Commons Daemon 1.2.3. This adds support to jsvc for
         <code>--enable-preview</code> and native memory tracking (Procrun
         already supported these features), adds some addition debug logging and
-        adds a new feature to Procrun that outputs the commnd to (re-)configure
+        adds a new feature to Procrun that outputs the command to (re-)configure
         the service with the current settings. (markt)
       </update>
       <update>
