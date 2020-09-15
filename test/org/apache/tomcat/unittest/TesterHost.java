@@ -291,6 +291,17 @@ public class TesterHost implements Host {
     }
 
     @Override
+    public boolean isParallelAnnotationScanning() {
+        return false;
+    }
+
+    @Override
+    public void setParallelAnnotationScanning(boolean parallelAnnotationScanning) {
+        // NO-OP
+    }
+
+
+    @Override
     public boolean getAutoDeploy() {
         return false;
     }

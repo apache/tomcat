@@ -131,6 +131,12 @@ public class HostConfig implements LifecycleListener {
 
 
     /**
+     * Should we use multi threading fpr annotation scanning
+     */
+    protected boolean parallelAnnotationScanning = false;
+
+
+    /**
      * Should we unpack WAR files when auto-deploying applications in the
      * <code>appBase</code> directory?
      */
@@ -275,6 +281,16 @@ public class HostConfig implements LifecycleListener {
     }
 
 
+    /**
+     * Set the parallel annotation scanning flag.
+     *
+     * @param parallelAnnotationScanning
+     */
+    public void setParallelAnnotationScanning(boolean parallelAnnotationScanning) {
+        this.parallelAnnotationScanning = parallelAnnotationScanning;
+    }
+
+
     // --------------------------------------------------------- Public Methods
 
 
@@ -292,6 +308,7 @@ public class HostConfig implements LifecycleListener {
             if (host instanceof StandardHost) {
                 setCopyXML(((StandardHost) host).isCopyXML());
                 setDeployXML(((StandardHost) host).isDeployXML());
+                setParallelAnnotationScanning(((StandardHost) host).isParallelAnnotationScanning());
                 setUnpackWARs(((StandardHost) host).isUnpackWARs());
                 setContextClass(((StandardHost) host).getContextClass());
             }

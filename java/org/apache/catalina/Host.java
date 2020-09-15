@@ -114,6 +114,21 @@ public interface Host extends Container {
 
 
     /**
+     * @return the value of the parallel annotation scanning flag.  If true,
+     * it enables multithreading while annotation scanning, with default
+     * thread as 1.
+     */
+    public boolean isParallelAnnotationScanning();
+
+    /**
+     * Set the parallel annotation scanning value for this host.
+     *
+     * @param parallelAnnotationScanning new parallel annotation scanning flag
+     */
+    public void setParallelAnnotationScanning(boolean parallelAnnotationScanning);
+
+
+    /**
      * @return the value of the auto deploy flag.  If true, it indicates that
      * this host's child webapps should be discovered and automatically
      * deployed dynamically.

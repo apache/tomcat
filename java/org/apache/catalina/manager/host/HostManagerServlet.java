@@ -94,6 +94,7 @@ public class HostManagerServlet
 
     private static final long serialVersionUID = 1L;
 
+
     // ----------------------------------------------------- Instance Variables
 
 
@@ -253,12 +254,14 @@ public class HostManagerServlet
         String appBase = request.getParameter("appBase");
         boolean manager = booleanParameter(request, "manager", false, htmlMode);
         boolean autoDeploy = booleanParameter(request, "autoDeploy", true, htmlMode);
+        boolean parallelAnnotationScanning = booleanParameter(request, "parallelAnnotationScanning", false, htmlMode);
         boolean deployOnStartup = booleanParameter(request, "deployOnStartup", true, htmlMode);
         boolean deployXML = booleanParameter(request, "deployXML", true, htmlMode);
         boolean unpackWARs = booleanParameter(request, "unpackWARs", true, htmlMode);
         boolean copyXML = booleanParameter(request, "copyXML", false, htmlMode);
         add(writer, name, aliases, appBase, manager,
             autoDeploy,
+            parallelAnnotationScanning,
             deployOnStartup,
             deployXML,
             unpackWARs,
@@ -330,6 +333,7 @@ public class HostManagerServlet
      * @param appBase application base for the host
      * @param manager should the manager webapp be deployed to the new host ?
      * @param autoDeploy Flag value
+     * @param parallelAnnotationScanning Flag value
      * @param deployOnStartup Flag value
      * @param deployXML Flag value
      * @param unpackWARs Flag value
@@ -340,6 +344,7 @@ public class HostManagerServlet
         (PrintWriter writer, String name, String aliases, String appBase,
          boolean manager,
          boolean autoDeploy,
+         boolean parallelAnnotationScanning,
          boolean deployOnStartup,
          boolean deployXML,
          boolean unpackWARs,
@@ -418,6 +423,7 @@ public class HostManagerServlet
             }
         }
         host.setAutoDeploy(autoDeploy);
+        host.setParallelAnnotationScanning(parallelAnnotationScanning);
         host.setDeployOnStartup(deployOnStartup);
         host.setDeployXML(deployXML);
         host.setUnpackWARs(unpackWARs);

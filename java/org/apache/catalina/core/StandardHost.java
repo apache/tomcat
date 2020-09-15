@@ -91,6 +91,13 @@ public class StandardHost extends ContainerBase implements Host {
     private volatile File appBaseFile = null;
 
     /**
+     * parallelAnnotationScanning for this Host.
+     * Allows Multithreading to be enabled for annotation scanning.
+     */
+    private boolean parallelAnnotationScanning = false;
+
+
+    /**
      * The XML root for this Host.
      */
     private String xmlBase = null;
@@ -366,12 +373,38 @@ public class StandardHost extends ContainerBase implements Host {
 
 
     /**
+     * Set the parallel annotation scanning flag.
+     *
+     * @param parallelAnnotationScanning
+     */
+    @Override
+    public void setParallelAnnotationScanning(boolean parallelAnnotationScanning) {
+
+        boolean oldParallelAnnotationScanning = this.parallelAnnotationScanning;
+        this.parallelAnnotationScanning = parallelAnnotationScanning;
+        support.firePropertyChange("parallelAnnotationScanning", parallelAnnotationScanning,
+                this.parallelAnnotationScanning);
+
+    }
+
+
+    /**
      * @return the Java class name of the context configuration class
      * for new web applications.
      */
     @Override
     public String getConfigClass() {
         return this.configClass;
+    }
+
+
+    /**
+     * @return the value of the parallel annotation scanning flag.
+     *  If true, it enables multithreading with one default thread.
+     */
+    @Override
+    public boolean isParallelAnnotationScanning() {
+        return this.parallelAnnotationScanning;
     }
 
 
