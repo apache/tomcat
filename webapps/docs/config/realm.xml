@@ -1050,6 +1050,9 @@
 
   <subsection name="JDBC Database Realm - org.apache.catalina.realm.JDBCRealm">
 
+    <p><strong>The JDBC Database Realm has been deprecated and will be removed
+    in Tomcat 10 onwards. Use the DataSourceRealm instead.</strong></p>
+
     <p>The <strong>JDBC Database Realm</strong> connects Tomcat to
     a relational database, accessed through an appropriate JDBC driver,
     to perform lookups of usernames, passwords, and their associated
