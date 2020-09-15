@@ -71,7 +71,7 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
     /**
      * State.
      */
-    private boolean parsingHeader;
+    private volatile boolean parsingHeader;
 
 
     /**
@@ -130,7 +130,7 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
      */
     private byte prevChr = 0;
     private byte chr = 0;
-    private boolean parsingRequestLine;
+    private volatile boolean parsingRequestLine;
     private int parsingRequestLinePhase = 0;
     private boolean parsingRequestLineEol = false;
     private int parsingRequestLineStart = 0;
@@ -266,18 +266,22 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
 
         byteBuffer.limit(0).position(0);
         lastActiveFilter = -1;
-        parsingHeader = true;
         swallowInput = true;
 
         chr = 0;
         prevChr = 0;
         headerParsePos = HeaderParsePosition.HEADER_START;
-        parsingRequestLine = true;
         parsingRequestLinePhase = 0;
         parsingRequestLineEol = false;
         parsingRequestLineStart = 0;
         parsingRequestLineQPos = -1;
         headerData.recycle();
+        // Recycled last because they are volatile
+        // All variables visible to this thread are guaranteed to be visible to
+        // any other thread once that thread reads the same volatile. The first
+        // action when parsing input data is to read one of these volatiles.
+        parsingRequestLine = true;
+        parsingHeader = true;
     }
 
 
