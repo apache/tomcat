@@ -92,126 +92,6 @@
   </subsection>
 
 
-  <subsection name="JDBC Database Realm - org.apache.catalina.realm.JDBCRealm">
-
-    <p>The <strong>JDBC Database Realm</strong> connects Tomcat to
-    a relational database, accessed through an appropriate JDBC driver,
-    to perform lookups of usernames, passwords, and their associated
-    roles.  Because the lookup is done each time that it is required,
-    changes to the database will be immediately reflected in the
-    information used to authenticate new logins.</p>
-
-    <p>A rich set of additional attributes lets you configure the required
-    connection to the underlying database, as well as the table and
-    column names used to retrieve the required information:</p>
-
-    <attributes>
-
-      <attribute name="allRolesMode" required="false">
-        <p>This attribute controls how the special role name <code>*</code> is
-        handled when processing authorization constraints in web.xml. By
-        default, the specification compliant value of <code>strict</code> is
-        used which means that the user must be assigned one of the roles defined
-        in web.xml. The alternative values are <code>authOnly</code> which means
-        that the user must be authenticated but no check is made for assigned
-        roles and <code>strictAuthOnly</code> which means that the user must be
-        authenticated and no check will be made for assigned roles unless roles
-        are defined in web.xml in which case the user must be assigned at least
-        one of those roles.</p>
-        <p>When this attribute has the value of <code>authOnly</code> or
-        <code>strictAuthOnly</code>, the <strong>roleNameCol</strong> and
-        <strong>userRoleTable</strong> attributes become optional. If those two
-        attributes are omitted, the user's roles will not be loaded by this
-        Realm.</p>
-      </attribute>
-
-      <attribute name="connectionName" required="true">
-        <p>The database username to use when establishing the JDBC
-        connection.</p>
-      </attribute>
-
-      <attribute name="connectionPassword" required="true">
-        <p>The database password to use when establishing the JDBC
-        connection.</p>
-      </attribute>
-
-      <attribute name="connectionURL" required="true">
-        <p>The connection URL to be passed to the JDBC driver when
-        establishing a database connection.</p>
-      </attribute>
-
-      <attribute name="driverName" required="true">
-        <p>Fully qualified Java class name of the JDBC driver to be
-        used to connect to the authentication database.</p>
-      </attribute>
-
-      <attribute name="roleNameCol" required="false">
-        <p>Name of the column, in the "user roles" table, which contains
-        a role name assigned to the corresponding user.</p>
-        <p>This attribute is <strong>required</strong> in majority of
-        configurations. See <strong>allRolesMode</strong> attribute for
-        a rare case when it can be omitted.</p>
-      </attribute>
-
-      <attribute name="stripRealmForGss" required="false">
-        <p>When processing users authenticated via the GSS-API, this attribute
-        controls if any &quot;@...&quot; is removed from the end of the user
-        name. If not specified, the default is <code>true</code>.</p>
-      </attribute>
-
-      <attribute name="transportGuaranteeRedirectStatus" required="false">
-        <p>The HTTP status code to use when the container needs to issue an HTTP
-           redirect to meet the requirements of a configured transport
-           guarantee. The provided status code is not validated. If not
-           specified, the default value of <code>302</code> is used.</p>
-      </attribute>
-
-      <attribute name="userCredCol" required="true">
-        <p>Name of the column, in the "users" table, which contains
-        the user's credentials (i.e. password).  If a
-        <code>CredentialHandler</code> is specified, this component
-        will assume that the passwords have been encoded with the
-        specified algorithm.  Otherwise, they will be assumed to be
-        in clear text.</p>
-      </attribute>
-
-      <attribute name="userNameCol" required="true">
-        <p>Name of the column, in the "users" and "user roles" table,
-        that contains the user's username.</p>
-      </attribute>
-
-      <attribute name="userRoleTable" required="false">
-        <p>Name of the "user roles" table, which must contain columns
-        named by the <code>userNameCol</code> and <code>roleNameCol</code>
-        attributes.</p>
-        <p>This attribute is <strong>required</strong> in majority of
-        configurations. See <strong>allRolesMode</strong> attribute for
-        a rare case when it can be omitted.</p>
-      </attribute>
-
-      <attribute name="userTable" required="true">
-        <p>Name of the "users" table, which must contain columns named
-        by the <code>userNameCol</code> and <code>userCredCol</code>
-        attributes.</p>
-      </attribute>
-
-      <attribute name="X509UsernameRetrieverClassName" required="false">
-        <p>When using X509 client certificates, this specifies the class name
-        that will be used to retrieve the user name from the certificate.
-        The class must implement the
-        <code>org.apache.catalina.realm.X509UsernameRetriever</code>
-        interface. The default is to use the certificate's SubjectDN
-        as the username.</p>
-      </attribute>
-    </attributes>
-
-    <p>See the <a href="../realm-howto.html">Container-Managed Security Guide</a> for more
-    information on setting up container managed security using the
-    JDBC Database Realm component.</p>
-
-  </subsection>
-
-
   <subsection name="DataSource Database Realm - org.apache.catalina.realm.DataSourceRealm">
 
     <p>The <strong>DataSource Database Realm</strong> connects Tomcat to
@@ -339,7 +219,6 @@
     that stores usernames, passwords, and their associated
     roles. Changes to the directory are immediately reflected in the
     information used to authenticate new logins.</p>
-
 
     <p>The directory realm supports a variety of approaches to using
     LDAP for authentication:</p>
@@ -1140,6 +1019,129 @@
       </attribute>
 
     </attributes>
+
+  </subsection>
+
+  <subsection name="JDBC Database Realm - org.apache.catalina.realm.JDBCRealm">
+
+    <p>The <strong>JDBC Database Realm</strong> connects Tomcat to
+    a relational database, accessed through an appropriate JDBC driver,
+    to perform lookups of usernames, passwords, and their associated
+    roles.  Because the lookup is done each time that it is required,
+    changes to the database will be immediately reflected in the
+    information used to authenticate new logins.</p>
+
+    <p>Note: The <strong>JDBC Database Realm</strong> uses a single connection
+    to the database with synchronisation to prevenbt concurrent usage. It is not
+    recommended for production usage. Use the DataSource Realm instaead.</p>
+
+    <p>A rich set of additional attributes lets you configure the required
+    connection to the underlying database, as well as the table and
+    column names used to retrieve the required information:</p>
+
+    <attributes>
+
+      <attribute name="allRolesMode" required="false">
+        <p>This attribute controls how the special role name <code>*</code> is
+        handled when processing authorization constraints in web.xml. By
+        default, the specification compliant value of <code>strict</code> is
+        used which means that the user must be assigned one of the roles defined
+        in web.xml. The alternative values are <code>authOnly</code> which means
+        that the user must be authenticated but no check is made for assigned
+        roles and <code>strictAuthOnly</code> which means that the user must be
+        authenticated and no check will be made for assigned roles unless roles
+        are defined in web.xml in which case the user must be assigned at least
+        one of those roles.</p>
+        <p>When this attribute has the value of <code>authOnly</code> or
+        <code>strictAuthOnly</code>, the <strong>roleNameCol</strong> and
+        <strong>userRoleTable</strong> attributes become optional. If those two
+        attributes are omitted, the user's roles will not be loaded by this
+        Realm.</p>
+      </attribute>
+
+      <attribute name="connectionName" required="true">
+        <p>The database username to use when establishing the JDBC
+        connection.</p>
+      </attribute>
+
+      <attribute name="connectionPassword" required="true">
+        <p>The database password to use when establishing the JDBC
+        connection.</p>
+      </attribute>
+
+      <attribute name="connectionURL" required="true">
+        <p>The connection URL to be passed to the JDBC driver when
+        establishing a database connection.</p>
+      </attribute>
+
+      <attribute name="driverName" required="true">
+        <p>Fully qualified Java class name of the JDBC driver to be
+        used to connect to the authentication database.</p>
+      </attribute>
+
+      <attribute name="roleNameCol" required="false">
+        <p>Name of the column, in the "user roles" table, which contains
+        a role name assigned to the corresponding user.</p>
+        <p>This attribute is <strong>required</strong> in majority of
+        configurations. See <strong>allRolesMode</strong> attribute for
+        a rare case when it can be omitted.</p>
+      </attribute>
+
+      <attribute name="stripRealmForGss" required="false">
+        <p>When processing users authenticated via the GSS-API, this attribute
+        controls if any &quot;@...&quot; is removed from the end of the user
+        name. If not specified, the default is <code>true</code>.</p>
+      </attribute>
+
+      <attribute name="transportGuaranteeRedirectStatus" required="false">
+        <p>The HTTP status code to use when the container needs to issue an HTTP
+           redirect to meet the requirements of a configured transport
+           guarantee. The provided status code is not validated. If not
+           specified, the default value of <code>302</code> is used.</p>
+      </attribute>
+
+      <attribute name="userCredCol" required="true">
+        <p>Name of the column, in the "users" table, which contains
+        the user's credentials (i.e. password).  If a
+        <code>CredentialHandler</code> is specified, this component
+        will assume that the passwords have been encoded with the
+        specified algorithm.  Otherwise, they will be assumed to be
+        in clear text.</p>
+      </attribute>
+
+      <attribute name="userNameCol" required="true">
+        <p>Name of the column, in the "users" and "user roles" table,
+        that contains the user's username.</p>
+      </attribute>
+
+      <attribute name="userRoleTable" required="false">
+        <p>Name of the "user roles" table, which must contain columns
+        named by the <code>userNameCol</code> and <code>roleNameCol</code>
+        attributes.</p>
+        <p>This attribute is <strong>required</strong> in majority of
+        configurations. See <strong>allRolesMode</strong> attribute for
+        a rare case when it can be omitted.</p>
+      </attribute>
+
+      <attribute name="userTable" required="true">
+        <p>Name of the "users" table, which must contain columns named
+        by the <code>userNameCol</code> and <code>userCredCol</code>
+        attributes.</p>
+      </attribute>
+
+      <attribute name="X509UsernameRetrieverClassName" required="false">
+        <p>When using X509 client certificates, this specifies the class name
+        that will be used to retrieve the user name from the certificate.
+        The class must implement the
+        <code>org.apache.catalina.realm.X509UsernameRetriever</code>
+        interface. The default is to use the certificate's SubjectDN
+        as the username.</p>
+      </attribute>
+    </attributes>
+
+    <p>See the <a href="../realm-howto.html">Container-Managed Security Guide</a> for more
+    information on setting up container managed security using the
+    JDBC Database Realm component.</p>
 
   </subsection>
 

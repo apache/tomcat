@@ -111,10 +111,9 @@ OK - Listed hosts
 localhost:</source>
   </p>
   <p>
-    Note that in case you retrieve your users using the
-    <code>DataSourceRealm</code>, <code>JDBCRealm</code>, or
-    <code>JNDIRealm</code> mechanism, add the appropriate role in the database
-    or the directory server respectively.
+    If you are using a different realm you will need to add the necessary role
+    to the appropriate user(s) using the standard user management tools for that
+    realm.
   </p>
 </section>
 <section name="List of Commands">
