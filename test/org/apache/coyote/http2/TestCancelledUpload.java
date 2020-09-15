@@ -75,7 +75,7 @@ public class TestCancelledUpload extends Http2TestBase {
         parser.readFrame(true);
 
         // If reset is first frame received end test here
-        if (output.getTrace().startsWith("3-RST-[3]\n")) {
+        if (checkReset()) {
             return;
         }
 
@@ -86,7 +86,7 @@ public class TestCancelledUpload extends Http2TestBase {
             int size = Integer.parseInt(trace.substring(14, trace.length() - 2));
             output.clearTrace();
             parser.readFrame(true);
-            if (output.getTrace().startsWith("3-RST-[3]\n")) {
+            if (checkReset()) {
                 return;
             }
             Assert.assertEquals("3-WindowSize-[" + size + "]\n", output.getTrace());
@@ -95,7 +95,7 @@ public class TestCancelledUpload extends Http2TestBase {
         }
 
         // Check for reset and exit if found
-        if (output.getTrace().startsWith("3-RST-[3]\n")) {
+        if (checkReset()) {
             return;
         }
 
@@ -110,7 +110,7 @@ public class TestCancelledUpload extends Http2TestBase {
 
         parser.readFrame(true);
         // Check for reset and exit if found
-        if (output.getTrace().startsWith("3-RST-[3]\n")) {
+        if (checkReset()) {
             return;
         }
 
@@ -130,7 +130,7 @@ public class TestCancelledUpload extends Http2TestBase {
             int size = Integer.parseInt(trace.substring(14, trace.length() - 2));
             output.clearTrace();
             parser.readFrame(true);
-            if (output.getTrace().startsWith("3-RST-[3]\n")) {
+            if (checkReset()) {
                 return;
             }
             Assert.assertEquals("3-WindowSize-[" + size + "]\n", output.getTrace());
@@ -139,9 +139,27 @@ public class TestCancelledUpload extends Http2TestBase {
         }
 
         // This should be the reset
+        checkReset();
         Assert.assertEquals("3-RST-[3]\n", output.getTrace());
 
         // If there are any more frames after this, ignore them
+    }
+
+
+    /*
+     * Depending on timing, several resets may be sent.
+     */
+    private boolean checkReset() throws IOException, Http2Exception {
+        while (true) {
+            if (output.getTrace().startsWith("3-RST-[3]\n")) {
+                return true;
+            } else if (output.getTrace().startsWith("3-RST-[")) {
+                output.clearTrace();
+                parser.readFrame(true);
+            } else {
+                return false;
+            }
+        }
     }
 
 
