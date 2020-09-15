@@ -1115,6 +1115,9 @@ functionality to a UserDatabase Realm.</p>
 
 <h5>Introduction</h5>
 
+<p><strong>The JDBC Database Realm has been deprecated and will be removed
+in Tomcat 10 onwards. Use the DataSourceRealm instead.</strong></p>
+
 <p><strong>JDBCRealm</strong> is an implementation of the Tomcat
 <code>Realm</code> interface that looks up users in a relational database
 accessed via a JDBC driver.  There is substantial configuration flexibility
