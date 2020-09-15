@@ -106,7 +106,7 @@
     </operation>
 
     <operation   name="createJDBCRealm"
-          description="Create a new JDBC Realm"
+          description="Create a new JDBC Realm (deprecated - will be removed in Tomcat 10)"
                impact="ACTION"
            returnType="java.lang.String">
       <parameter name="parent"
