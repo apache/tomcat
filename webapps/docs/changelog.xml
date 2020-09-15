@@ -53,6 +53,15 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Web applications">
+    <changelog>
+      <add>
+        Configure the Manager and Host Manager applications to set
+        <code>SameSite=strict</code> for all cookies, including session cookies,
+        created by the application. (markt)
+      </add>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <update>
