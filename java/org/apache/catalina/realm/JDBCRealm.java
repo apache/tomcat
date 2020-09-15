@@ -47,7 +47,11 @@ import org.apache.tomcat.util.ExceptionUtils;
 * @author Craig R. McClanahan
 * @author Carson McDonald
 * @author Ignacio Ortega
+*
+* @deprecated Will be removed in Tomcat 10 onwards. Use the DataSourceRealm
+*             instead.
 */
+@Deprecated
 public class JDBCRealm
     extends RealmBase {
 

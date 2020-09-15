@@ -39,7 +39,6 @@ import org.apache.catalina.core.StandardHost;
 import org.apache.catalina.core.StandardService;
 import org.apache.catalina.loader.WebappLoader;
 import org.apache.catalina.realm.DataSourceRealm;
-import org.apache.catalina.realm.JDBCRealm;
 import org.apache.catalina.realm.JNDIRealm;
 import org.apache.catalina.realm.MemoryRealm;
 import org.apache.catalina.realm.UserDatabaseRealm;
@@ -392,13 +391,17 @@ public class MBeanFactory {
      * @return the object name of the created realm
      *
      * @exception Exception if an MBean cannot be created or registered
+     *
+     * @deprecated This method will be removed in Tomcat 10. Use a
+     *             DataSourceRealm instead.
      */
+    @Deprecated
     public String createJDBCRealm(String parent, String driverName,
         String connectionName, String connectionPassword, String connectionURL)
         throws Exception {
 
         // Create a new JDBCRealm instance
-        JDBCRealm realm = new JDBCRealm();
+        org.apache.catalina.realm.JDBCRealm realm = new org.apache.catalina.realm.JDBCRealm();
         realm.setDriverName(driverName);
         realm.setConnectionName(connectionName);
         realm.setConnectionPassword(connectionPassword);

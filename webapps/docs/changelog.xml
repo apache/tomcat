@@ -80,6 +80,9 @@
         the requested resource. Based on a pull request by Sergey Ponomarev.
         (markt)
       </fix>
+      <update>
+        Deprecate the JDBCRealm. (markt)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Coyote">
