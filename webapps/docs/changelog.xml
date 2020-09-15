@@ -83,7 +83,7 @@
         Update to Commons Daemon 1.2.3. This adds support to jsvc for
         <code>--enable-preview</code> and native memory tracking (Procrun
         already supported these features), adds some addition debug logging and
-        adds a new feature to Procrun that outputs the commnd to (re-)configure
+        adds a new feature to Procrun that outputs the command to (re-)configure
         the service with the current settings. (markt)
       </update>
     </changelog>
@@ -103,7 +103,7 @@
         opportunity to rewrite the request. (remm/markt)
       </fix>
       <fix>
-        Change top package name for generated emebedded classes to avoid
+        Change top package name for generated embedded classes to avoid
         conflict with default host name on case insensitive filesystems.
         (remm)
       </fix>
@@ -134,7 +134,7 @@
         Based on a patch provided by Milo van der Zee. (markt)
       </fix>
       <fix>
-        Correct the path vaidation to allow the use of the file system root for
+        Correct the path validation to allow the use of the file system root for
         the <code>docBase</code> attribute of a <code>Context</code>. Note that
         such a configuration should be used with caution. (markt)
       </fix>
@@ -159,7 +159,7 @@
       <fix>
         <bug>64713</bug>: The JASPIC authenticator now checks the value of
         <code>jakarta.servlet.http.registerSession</code> set by the
-        <code>ServerAuthModule</code> when decideing whether or nor to register
+        <code>ServerAuthModule</code> when deciding whether or nor to register
         the session. Based on a patch by Robert Rodewald. (markt)
       </fix>
     </changelog>
@@ -275,7 +275,7 @@
         (schultz)
       </fix>
       <fix>
-        Remove the out of date functional specification secton from the
+        Remove the out of date functional specification section from the
         documentation web application. (markt)
       </fix>
       <fix>
