@@ -27,20 +27,26 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 
+import org.apache.catalina.Host;
 import org.apache.catalina.WebResource;
 import org.apache.catalina.WebResourceRoot;
 import org.apache.catalina.util.ResourceSet;
 import org.apache.tomcat.util.compat.JreCompat;
+import java.util.logging.Logger;
 
 public abstract class AbstractArchiveResourceSet extends AbstractResourceSet {
 
+    private final static Logger log = Logger.getLogger(AbstractArchiveResourceSet.class.getName());
     private URL baseUrl;
     private String baseUrlString;
-
     private JarFile archive = null;
     protected Map<String,JarEntry> archiveEntries = null;
     protected final Object archiveLock = new Object();
     private long archiveUseCount = 0;
+    private JarContents jarContents;
+    private JarFile jar;
+    private long prevJarOpenTime;
+    private final int jarRefreshTime = 60000;
 
 
     protected final void setBaseUrl(URL baseUrl) {
@@ -210,6 +216,50 @@ public abstract class AbstractArchiveResourceSet extends AbstractResourceSet {
         checkPath(path);
         String webAppMount = getWebAppMount();
         WebResourceRoot root = getRoot();
+
+
+        /*
+         * This initializes (when necessary) and checks the jarContents, which
+         * is a highly efficient index of the files stored in the jar. If
+         * jarContents reports that this resource definitely does not contain
+         * the path, we can end this method and move on to the next jar.
+         *
+         * Note: the initialization is thread-safe because multiple simultaneous
+         * threads will create a complete and valid copy, then set the shared
+         * pointer. This guarantees the shared pointer will always go to a
+         * valid object. The cost of multiple copies is small since only one of
+         * them will be long-lived.
+         */
+        try {
+            if ((root.getContext() != null) && (root.getContext().getParent()) != null &&
+                    (((Host) root.getContext().getParent()).getFastClasspathScanning())) {
+
+                if (jarContents == null ||
+                        ((System.currentTimeMillis() - prevJarOpenTime > jarRefreshTime))) {
+
+                    if (!openJarFile().equals(jar)) {
+                        try {
+                            jar = openJarFile();
+                            jarContents = new JarContents(jar);
+                            prevJarOpenTime = System.currentTimeMillis();
+                            closeJarFile();
+                        } catch (IOException ioe) {
+                            throw new RuntimeException("Unable to parse contents of JAR", ioe);
+                        } finally {
+                            closeJarFile();
+                        }
+                    } else {
+                        closeJarFile();
+                    }
+                }
+                if (!jarContents.mightContainResource(path, webAppMount)) {
+                    return new EmptyResource(root, path);
+                }
+            }
+        } catch (Exception e) {
+            log.info(sm.getString("abstractArchiveResourceSet.jarContentWarning") + e.getMessage());
+        }
+
 
         /*
          * Implementation notes

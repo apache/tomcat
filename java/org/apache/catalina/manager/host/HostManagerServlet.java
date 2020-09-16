@@ -253,12 +253,14 @@ public class HostManagerServlet
         String appBase = request.getParameter("appBase");
         boolean manager = booleanParameter(request, "manager", false, htmlMode);
         boolean autoDeploy = booleanParameter(request, "autoDeploy", true, htmlMode);
+        boolean fastClasspathScanning = booleanParameter(request, "fastClasspathScanning", false, htmlMode);
         boolean deployOnStartup = booleanParameter(request, "deployOnStartup", true, htmlMode);
         boolean deployXML = booleanParameter(request, "deployXML", true, htmlMode);
         boolean unpackWARs = booleanParameter(request, "unpackWARs", true, htmlMode);
         boolean copyXML = booleanParameter(request, "copyXML", false, htmlMode);
         add(writer, name, aliases, appBase, manager,
             autoDeploy,
+            fastClasspathScanning,
             deployOnStartup,
             deployXML,
             unpackWARs,
@@ -332,6 +334,7 @@ public class HostManagerServlet
      * @param autoDeploy Flag value
      * @param deployOnStartup Flag value
      * @param deployXML Flag value
+     * @param fastClasspathScanning Flag value
      * @param unpackWARs Flag value
      * @param copyXML Flag value
      * @param smClient StringManager for the client's locale
@@ -340,6 +343,7 @@ public class HostManagerServlet
         (PrintWriter writer, String name, String aliases, String appBase,
          boolean manager,
          boolean autoDeploy,
+         boolean fastClasspathScanning,
          boolean deployOnStartup,
          boolean deployXML,
          boolean unpackWARs,
@@ -418,6 +422,7 @@ public class HostManagerServlet
             }
         }
         host.setAutoDeploy(autoDeploy);
+        host.setFastClasspathScanning(fastClasspathScanning);
         host.setDeployOnStartup(deployOnStartup);
         host.setDeployXML(deployXML);
         host.setUnpackWARs(unpackWARs);

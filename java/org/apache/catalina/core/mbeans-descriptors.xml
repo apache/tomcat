@@ -1077,6 +1077,10 @@
                description="The auto deploy flag for this Host"
                type="boolean"/>
 
+    <attribute name="fastClasspathScanning"
+               description="The fast class path scanning flag for this Host"
+               type="boolean"/>
+
     <attribute name="backgroundProcessorDelay"
                description="The processor delay for this component."
                type="int"/>
