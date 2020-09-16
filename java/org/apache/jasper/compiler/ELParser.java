@@ -135,7 +135,7 @@ public class ELParser {
     }
 
     /**
-     * Parse for a function FunctionInvokation ::= (identifier ':')? identifier
+     * Parse for a function FunctionInvocation ::= (identifier ':')? identifier
      * '(' (Expression (,Expression)*)? ')' Note: currently we don't parse
      * arguments
      */

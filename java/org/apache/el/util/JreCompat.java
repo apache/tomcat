@@ -53,7 +53,7 @@ public class JreCompat {
      * @return {code true} if the AccessibleObject can be accessed otherwise
      *         {code false}
      */
-    public boolean canAcccess(Object base, AccessibleObject accessibleObject) {
+    public boolean canAccess(Object base, AccessibleObject accessibleObject) {
         // Java 8 doesn't support modules so default to true
         return true;
     }
