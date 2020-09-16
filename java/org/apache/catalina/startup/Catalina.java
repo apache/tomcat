@@ -810,7 +810,7 @@ public class Catalina {
     protected void initNaming() {
         // Setting additional variables
         if (!useNaming) {
-            log.info( "Catalina naming disabled");
+            log.info(sm.getString("catalina.noNaming"));
             System.setProperty("catalina.useNaming", "false");
         } else {
             System.setProperty("catalina.useNaming", "true");

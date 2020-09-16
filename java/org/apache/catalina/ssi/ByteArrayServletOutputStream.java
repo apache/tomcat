@@ -24,7 +24,7 @@ import javax.servlet.WriteListener;
 
 
 /**
- * Class that extends ServletOuputStream, used as a wrapper from within
+ * Class that extends ServletOutputStream, used as a wrapper from within
  * <code>SsiInclude</code>
  *
  * @author Bip Thelin

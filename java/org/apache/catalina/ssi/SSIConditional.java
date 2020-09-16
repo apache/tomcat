@@ -107,7 +107,7 @@ public class SSIConditional implements SSICommand {
 
 
     /**
-     * Retrieves the expression from the specified arguments and peforms the
+     * Retrieves the expression from the specified arguments and performs the
      * necessary evaluation steps.
      */
     private boolean evaluateArguments(String[] names, String[] values,
