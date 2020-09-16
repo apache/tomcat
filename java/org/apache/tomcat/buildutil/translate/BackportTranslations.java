@@ -41,17 +41,17 @@ public class BackportTranslations extends BackportBase {
 
     @Override
     protected void execute() throws IOException {
-        for (String langauge : targetTranslations.keySet()) {
+        for (String language : targetTranslations.keySet()) {
             // Skip source
-            if (langauge.length() == 0) {
+            if (language.length() == 0) {
                 continue;
             }
 
-            Properties sourceTranslated = sourceTranslations.get(langauge);
-            Properties targetTranslated = targetTranslations.get(langauge);
+            Properties sourceTranslated = sourceTranslations.get(language);
+            Properties targetTranslated = targetTranslations.get(language);
             if (targetTranslated == null) {
                 targetTranslated = new Properties();
-                targetTranslations.put(langauge, targetTranslated);
+                targetTranslations.put(language, targetTranslated);
             }
 
             for (Object key : targetEnglish.keySet()) {
@@ -70,7 +70,7 @@ public class BackportTranslations extends BackportBase {
                     iter.remove();
                 }
             }
-            Utils.export(langauge, targetTranslated, storageDir);
+            Utils.export(language, targetTranslated, storageDir);
         }
     }
 }
