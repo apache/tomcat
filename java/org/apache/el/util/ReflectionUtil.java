@@ -433,7 +433,7 @@ public class ReflectionUtil {
         // If base is non-null, method may be static or non-static
         if (m == null ||
                 (Modifier.isPublic(type.getModifiers()) &&
-                        (jreCompat.canAcccess(base, m) || base != null && jreCompat.canAcccess(null, m)))) {
+                        (jreCompat.canAccess(base, m) || base != null && jreCompat.canAccess(null, m)))) {
             return m;
         }
         Class<?>[] interfaces = type.getInterfaces();
