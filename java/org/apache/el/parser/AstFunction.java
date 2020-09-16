@@ -104,7 +104,7 @@ public final class AstFunction extends SimpleNode {
                 if (varMapper != null) {
                     obj = varMapper.resolveVariable(this.localName);
                     if (obj instanceof ValueExpression) {
-                        // See if this returns a LambdaEXpression
+                        // See if this returns a LambdaExpression
                         obj = ((ValueExpression) obj).getValue(ctx);
                     }
                 }
@@ -153,7 +153,7 @@ public final class AstFunction extends SimpleNode {
         // single set of method parameters
         if (this.jjtGetNumChildren() != 1) {
             throw new ELException(MessageFactory.get(
-                    "error.funciton.tooManyMethodParameterSets",
+                    "error.function.tooManyMethodParameterSets",
                     getOutputName()));
         }
 

@@ -60,7 +60,7 @@ import org.apache.tomcat.util.security.PrivilegedSetTccl;
  * DISPATCHING      - The dispatch is being processed.
  * MUST_ERROR       - ServletRequest.startAsync() has been called from
  *                    Servlet.service() but, before service() exited, an I/O
- *                    error occured on another thread. The container will
+ *                    error occurred on another thread. The container will
  *                    perform the necessary error handling when
  *                    Servlet.service() exits.
  * ERROR            - Something went wrong.
