@@ -195,7 +195,7 @@ public interface FileItem extends FileItemHeadersSupport {
      * be used for storing the contents of the file.
      *
      * @return An {@link java.io.OutputStream OutputStream} that can be used
-     *         for storing the contensts of the file.
+     *         for storing the contents of the file.
      *
      * @throws IOException if an error occurs.
      */
