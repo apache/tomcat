@@ -52,7 +52,7 @@ public interface FileItemIterator {
      * By default, this value will be copied from the {@link FileUploadBase#getSizeMax()
      * FileUploadBase} object, however, the user may replace the default value with a
      * request specific value by invoking {@link #setSizeMax(long)} on this object.
-     * @return The maximum size of the complete HTTP requqest. The value -1 indicates "unlimited".
+     * @return The maximum size of the complete HTTP request. The value -1 indicates "unlimited".
      */
     public long getSizeMax();
 
