@@ -57,7 +57,7 @@ public class TestRequest {
         request.setExpectation(true);
 
         // Configure the mock to verify that a network write is made.
-        configureMockForOneAckowledgementWrite(socketWrapper);
+        configureMockForOneAcknowledgementWrite(socketWrapper);
 
         protocol.setContinueResponseTiming(ContinueResponseTiming.IMMEDIATELY.toString());
         response.action(ActionCode.ACK, ContinueResponseTiming.IMMEDIATELY);
@@ -66,7 +66,7 @@ public class TestRequest {
         EasyMock.verify(socketWrapper);
 
         // Configure the mock to verify that no network write is made.
-        configureMockForNoAckowledgementWrite(socketWrapper);
+        configureMockForNoAcknowledgementWrite(socketWrapper);
 
         request.doRead(new DoNothingApplicationBufferHandler());
 
@@ -83,7 +83,7 @@ public class TestRequest {
         request.setExpectation(true);
 
         // Configure the mock to verify that no network write is made.
-        configureMockForNoAckowledgementWrite(socketWrapper);
+        configureMockForNoAcknowledgementWrite(socketWrapper);
 
         protocol.setContinueResponseTiming(ContinueResponseTiming.ON_REQUEST_BODY_READ.toString());
         response.action(ActionCode.ACK, ContinueResponseTiming.IMMEDIATELY);
@@ -92,7 +92,7 @@ public class TestRequest {
         EasyMock.verify(socketWrapper);
 
         // Configure the mock to verify that a network write is made.
-        configureMockForOneAckowledgementWrite(socketWrapper);
+        configureMockForOneAcknowledgementWrite(socketWrapper);
 
         request.doRead(new DoNothingApplicationBufferHandler());
 
@@ -108,7 +108,7 @@ public class TestRequest {
         request.setExpectation(false);
 
         // Configure the mock to verify that no network write is made.
-        configureMockForNoAckowledgementWrite(socketWrapper);
+        configureMockForNoAcknowledgementWrite(socketWrapper);
 
         protocol.setContinueResponseTiming(ContinueResponseTiming.ON_REQUEST_BODY_READ.toString());
         request.doRead(new DoNothingApplicationBufferHandler());
@@ -125,7 +125,7 @@ public class TestRequest {
         request.setExpectation(false);
 
         // Configure the mock to verify that no network write is made.
-        configureMockForNoAckowledgementWrite(socketWrapper);
+        configureMockForNoAcknowledgementWrite(socketWrapper);
 
         protocol.setContinueResponseTiming(ContinueResponseTiming.IMMEDIATELY.toString());
         response.action(ActionCode.ACK, ContinueResponseTiming.IMMEDIATELY);
@@ -153,7 +153,7 @@ public class TestRequest {
     }
 
 
-    private void configureMockForOneAckowledgementWrite(SocketWrapperBase<?> socketWrapper) throws IOException {
+    private void configureMockForOneAcknowledgementWrite(SocketWrapperBase<?> socketWrapper) throws IOException {
         EasyMock.reset(socketWrapper);
         socketWrapper.write(true, Constants.ACK_BYTES, 0, Constants.ACK_BYTES.length);
         EasyMock.expectLastCall().once();
@@ -161,7 +161,7 @@ public class TestRequest {
     }
 
 
-    private void configureMockForNoAckowledgementWrite(SocketWrapperBase<?> socketWrapper) {
+    private void configureMockForNoAcknowledgementWrite(SocketWrapperBase<?> socketWrapper) {
         EasyMock.reset(socketWrapper);
         EasyMock.replay(socketWrapper);
     }

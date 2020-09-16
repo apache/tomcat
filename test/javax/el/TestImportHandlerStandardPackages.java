@@ -112,7 +112,7 @@ public class TestImportHandlerStandardPackages {
                 Assert.assertNotNull(files);
                 for (String file : files) {
                     if (!file.endsWith(".class")) {
-                        // Skip non-class resoucres
+                        // Skip non-class resources
                         continue;
                     }
                     if (file.startsWith("Test")) {

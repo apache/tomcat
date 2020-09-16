@@ -77,7 +77,7 @@ public class TestMultipartConfig {
     }
 
     @Test
-    public void testPartialMultipartConfigMaxReqeustSize() throws Exception {
+    public void testPartialMultipartConfigMaxRequestSize() throws Exception {
         MultipartDef multipartDef = new MultipartDef();
         multipartDef.setMaxRequestSize("10240");
 
