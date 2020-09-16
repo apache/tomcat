@@ -58,7 +58,7 @@ public class TesterInjectionServlet extends HttpServlet {
         PrintWriter pw = resp.getWriter();
         pw.print(IntrospectionUtils.getProperty(this, injectionName));
 
-        // The property should tyake precedence over the field and this should
+        // The property should take precedence over the field and this should
         // be null
         if (getProperty2a() != null) {
             pw.println();

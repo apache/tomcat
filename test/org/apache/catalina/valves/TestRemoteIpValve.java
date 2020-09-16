@@ -726,7 +726,7 @@ public class TestRemoteIpValve {
         // PREPARE
         String incomingScheme = arrivesAsSecure ? "https" : "http";
         String expectedScheme = shouldBeSecure ? "https" : "http";
-        int incommingServerPort = arrivesAsSecure ? 8443 : 8080;
+        int incomingServerPort = arrivesAsSecure ? 8443 : 8080;
         int expectedServerPort = shouldBeSecure ? 443 : 80;
         RemoteIpValve remoteIpValve = new RemoteIpValve();
         remoteIpValve.setRemoteIpHeader("x-forwarded-for");
@@ -743,7 +743,7 @@ public class TestRemoteIpValve {
         // protocol
         request.getCoyoteRequest().getMimeHeaders().addValue("x-forwarded-proto").setString(incomingHeaderValue);
         request.setSecure(arrivesAsSecure);
-        request.setServerPort(incommingServerPort);
+        request.setServerPort(incomingServerPort);
         request.getCoyoteRequest().scheme().setString(incomingScheme);
 
         // TEST
@@ -785,7 +785,7 @@ public class TestRemoteIpValve {
                 Boolean.valueOf(arrivesAsSecure), Boolean.valueOf(actualPostInvokeSecure));
 
         int actualPostInvokeServerPort = request.getServerPort();
-        Assert.assertEquals("postInvoke serverPort", incommingServerPort, actualPostInvokeServerPort);
+        Assert.assertEquals("postInvoke serverPort", incomingServerPort, actualPostInvokeServerPort);
 
         String actualPostInvokeScheme = request.getScheme();
         Assert.assertEquals("postInvoke scheme", incomingScheme, actualPostInvokeScheme);

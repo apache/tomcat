@@ -213,7 +213,7 @@ public class TestHttpServlet extends TomcatBaseTest {
 
 
     /*
-     * See org.aoache.coyote.http2.TestHttpServlet for the HTTP/2 version of
+     * See org.apache.coyote.http2.TestHttpServlet for the HTTP/2 version of
      * this test. It was placed in that package because it needed access to
      * package private classes.
      */
