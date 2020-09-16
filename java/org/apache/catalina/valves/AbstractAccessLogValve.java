@@ -1027,7 +1027,7 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
          * formatting of SimpleDateFormat by our own handling
          */
         private static final String msecPattern = "{#}";
-        private static final String trippleMsecPattern =
+        private static final String tripleMsecPattern =
             msecPattern + msecPattern + msecPattern;
 
         /* Our format description string, null if CLF */
@@ -1146,17 +1146,17 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
                 String temp = localDateCache.get().getFormat(format, locale, timestamp);
                 if (usesMsecs) {
                     frac = timestamp % 1000;
-                    StringBuilder trippleMsec = new StringBuilder(4);
+                    StringBuilder tripleMsec = new StringBuilder(4);
                     if (frac < 100) {
                         if (frac < 10) {
-                            trippleMsec.append('0');
-                            trippleMsec.append('0');
+                            tripleMsec.append('0');
+                            tripleMsec.append('0');
                         } else {
-                            trippleMsec.append('0');
+                            tripleMsec.append('0');
                         }
                     }
-                    trippleMsec.append(frac);
-                    temp = temp.replace(trippleMsecPattern, trippleMsec);
+                    tripleMsec.append(frac);
+                    temp = temp.replace(tripleMsecPattern, tripleMsec);
                     temp = temp.replace(msecPattern, Long.toString(frac));
                 }
                 buf.append(temp);

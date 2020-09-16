@@ -324,7 +324,7 @@ public class StatusManagerServlet
                 args[5] = smClient.getString("htmlManagerServlet.connectorStateProcessingTime");
                 args[6] = smClient.getString("htmlManagerServlet.connectorStateRequestCount");
                 args[7] = smClient.getString("htmlManagerServlet.connectorStateErrorCount");
-                args[8] = smClient.getString("htmlManagerServlet.connectorStateBytesRecieved");
+                args[8] = smClient.getString("htmlManagerServlet.connectorStateBytesReceived");
                 args[9] = smClient.getString("htmlManagerServlet.connectorStateBytesSent");
                 args[10] = smClient.getString("htmlManagerServlet.connectorStateTableTitleStage");
                 args[11] = smClient.getString("htmlManagerServlet.connectorStateTableTitleTime");

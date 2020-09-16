@@ -46,7 +46,7 @@ import org.apache.juli.logging.LogFactory;
  * <p>Title: Auto merging leader election algorithm</p>
  *
  * <p>Description: Implementation of a simple coordinator algorithm that not only selects a coordinator,
- *    it also merges groups automatically when members are discovered that werent part of the
+ *    it also merges groups automatically when members are discovered that weren't part of the
  *    </p>
  * <p>This algorithm is non blocking meaning it allows for transactions while the coordination phase is going on
  * </p>
