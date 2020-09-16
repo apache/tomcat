@@ -99,7 +99,7 @@ public class JvmRouteBinderValve extends ValveBase implements ClusterValve {
      */
     protected long numberOfSessions = 0;
 
-    protected String sessionIdAttribute = "org.apache.catalina.ha.session.JvmRouteOrignalSessionID";
+    protected String sessionIdAttribute = "org.apache.catalina.ha.session.JvmRouteOriginalSessionID";
 
 
     /*--Logic---------------------------------------------------*/
