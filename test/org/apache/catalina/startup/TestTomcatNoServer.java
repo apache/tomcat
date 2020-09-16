@@ -71,7 +71,7 @@ public class TestTomcatNoServer {
                 System.out.println("Missing in embedded: [" + missingExtension +
                         "]-[" + webXmlMimeMappings.get(missingExtension) + "]");
             }
-            Assert.fail("Embedded is missing [" + missingInEmbedded.size() + "] entires compared to conf/web.xml");
+            Assert.fail("Embedded is missing [" + missingInEmbedded.size() + "] entries compared to conf/web.xml");
         }
 
         // Find entries present in embedded that are missing in conf/web.xml
@@ -82,7 +82,7 @@ public class TestTomcatNoServer {
                 System.out.println("Missing in embedded: [" + missingExtension +
                         "]-[" + ctx.findMimeMapping(missingExtension) + "]");
             }
-            Assert.fail("Embedded is missing [" + missingInWebXml.size() + "] entires compared to conf/web.xml");
+            Assert.fail("Embedded is missing [" + missingInWebXml.size() + "] entries compared to conf/web.xml");
         }
     }
 }
