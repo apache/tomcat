@@ -60,6 +60,14 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 7.0.107 (violetagg)" rtext="in development">
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        Correct numerous spellings throughout the code base. Based on a pull
+        request from John Bampton. (markt)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 7.0.106 (violetagg)" rtext="release in progress">
   <subsection name="Catalina">
