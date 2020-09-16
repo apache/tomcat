@@ -266,16 +266,6 @@ public class DeltaManager extends ClusterManagerBase{
 
     /**
      * @return Returns the counterNoStateTransferred.
-     * @deprecated Use {@link #getCounterNoStateTransferred()}. Will be removed
-     *             in Tomcat 10 onwards.
-     */
-    @Deprecated
-    public int getCounterNoStateTransfered() {
-        return getCounterNoStateTransferred();
-    }
-
-    /**
-     * @return Returns the counterNoStateTransferred.
      */
     public int getCounterNoStateTransferred() {
         return counterNoStateTransferred;
@@ -296,27 +286,6 @@ public class DeltaManager extends ClusterManagerBase{
      */
     public void setStateTransferTimeout(int timeoutAllSession) {
         this.stateTransferTimeout = timeoutAllSession;
-    }
-
-    /**
-     * @return <code>true</code> if the state transfer is complete.
-     * @deprecated Use {@link #getStateTransferred()}. Will be removed in Tomcat
-     *             10 onwards.
-     */
-    @Deprecated
-    public boolean getStateTransfered() {
-        return getStateTransferred();
-    }
-
-    /**
-     * Set that state transferred is complete
-     * @param stateTransferred Flag value
-     * @deprecated Use {@link #setStateTransferred(boolean)}. Will be removed in
-     *             Tomcat 10 onwards.
-     */
-    @Deprecated
-    public void setStateTransfered(boolean stateTransferred) {
-        setStateTransferred(stateTransferred);
     }
 
     /**
