@@ -1627,7 +1627,7 @@ public class Response implements HttpServletResponse {
                     if (SecurityUtil.isPackageProtectionEnabled() ){
                         try{
                             encodedURI = AccessController.doPrivileged(
-                                    new PrivilgedEncodeUrl(urlEncoder, relativePath, pos));
+                                    new PrivilegedEncodeUrl(urlEncoder, relativePath, pos));
                         } catch (PrivilegedActionException pae){
                             IllegalArgumentException iae =
                                 new IllegalArgumentException(location);
@@ -1854,13 +1854,13 @@ public class Response implements HttpServletResponse {
     }
 
 
-    private static class PrivilgedEncodeUrl implements PrivilegedExceptionAction<CharChunk> {
+    private static class PrivilegedEncodeUrl implements PrivilegedExceptionAction<CharChunk> {
 
         private final UEncoder urlEncoder;
         private final String relativePath;
         private final int end;
 
-        public PrivilgedEncodeUrl(UEncoder urlEncoder, String relativePath, int end) {
+        public PrivilegedEncodeUrl(UEncoder urlEncoder, String relativePath, int end) {
             this.urlEncoder = urlEncoder;
             this.relativePath = relativePath;
             this.end = end;

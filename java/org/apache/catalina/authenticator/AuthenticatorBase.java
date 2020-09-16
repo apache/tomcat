@@ -228,7 +228,7 @@ public abstract class AuthenticatorBase extends ValveBase
      * {@link RemoteIpFilter} mark a forwarded request with the
      * {@link Globals#REQUEST_FORWARDED_ATTRIBUTE} this authenticator can return the
      * values of {@link HttpServletRequest#getRemoteUser()} and
-     * {@link HttpServletRequest#getAuthType()} as reponse headers {@code remote-user}
+     * {@link HttpServletRequest#getAuthType()} as response headers {@code remote-user}
      * and {@code auth-type} to a reverse proxy. This is useful, e.g., for access log
      * consistency or other decisions to make.
      */
@@ -1239,7 +1239,7 @@ public abstract class AuthenticatorBase extends ValveBase
         }
 
         // Fix for Bug 10040
-        // Always associate a session with a new SSO reqistration.
+        // Always associate a session with a new SSO registration.
         // SSO entries are only removed from the SSO registry map when
         // associated sessions are destroyed; if a new SSO entry is created
         // above for this request and the user never revisits the context, the

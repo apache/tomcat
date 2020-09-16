@@ -484,7 +484,7 @@ public class ContextConfig implements LifecycleListener {
     }
 
 
-    protected static String getContextXmlPackageName(String generatedCodePackge, Container container) {
+    protected static String getContextXmlPackageName(String generatedCodePackage, Container container) {
         StringBuilder result = new StringBuilder();
         Container host = null;
         Container engine = null;
@@ -496,7 +496,7 @@ public class ContextConfig implements LifecycleListener {
             }
             container = container.getParent();
         }
-        result.append(generatedCodePackge);
+        result.append(generatedCodePackage);
         if (engine != null) {
             result.append('.');
         }

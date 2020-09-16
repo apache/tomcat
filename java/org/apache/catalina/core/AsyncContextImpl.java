@@ -581,7 +581,7 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
             try {
                 applicationDispatcher.dispatch(servletRequest, servletResponse);
             } catch (Exception e) {
-                throw new RuntimeException(sm.getString("asyncContextImpl.asyncDispachError"), e);
+                throw new RuntimeException(sm.getString("asyncContextImpl.asyncDispatchError"), e);
             }
         }
 
