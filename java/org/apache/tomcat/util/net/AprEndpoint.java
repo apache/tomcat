@@ -1758,7 +1758,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
          * will be handled asynchronously inside the kernel. As a result,
          * the poller will never be used.
          *
-         * @param data containing the reference to the data which should be snet
+         * @param data containing the reference to the data which should be sent
          * @return true if all the data has been sent right away, and false
          *              otherwise
          */
