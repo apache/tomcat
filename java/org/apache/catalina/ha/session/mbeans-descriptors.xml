@@ -81,7 +81,7 @@
       writeable="false"/>
     <attribute
       name="counterNoStateTransfered"
-      description="Count the failed session transfers noStateTransfered"
+      description="Count the failed session transfers noStateTransferred"
       type="int"
       writeable="false"/>
     <attribute
