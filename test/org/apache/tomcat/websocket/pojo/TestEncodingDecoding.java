@@ -78,7 +78,7 @@ public class TestEncodingDecoding extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
         // No file system docBase required
         Context ctx = tomcat.addContext("", null);
-        ctx.addApplicationListener(ProgramaticServerEndpointConfig.class.getName());
+        ctx.addApplicationListener(ProgrammaticServerEndpointConfig.class.getName());
         Tomcat.addServlet(ctx, "default", new DefaultServlet());
         ctx.addServletMappingDecoded("/", "default");
 
@@ -698,7 +698,7 @@ public class TestEncodingDecoding extends TomcatBaseTest {
     }
 
 
-    public static class ProgramaticServerEndpointConfig extends WsContextListener {
+    public static class ProgrammaticServerEndpointConfig extends WsContextListener {
 
         @Override
         public void contextInitialized(ServletContextEvent sce) {
@@ -761,7 +761,7 @@ public class TestEncodingDecoding extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
         // No file system docBase required
         Context ctx = tomcat.addContext("", null);
-        ctx.addApplicationListener(ProgramaticServerEndpointConfig.class.getName());
+        ctx.addApplicationListener(ProgrammaticServerEndpointConfig.class.getName());
         Tomcat.addServlet(ctx, "default", new DefaultServlet());
         ctx.addServletMappingDecoded("/", "default");
 
