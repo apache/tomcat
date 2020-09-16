@@ -669,7 +669,7 @@
         The taglib tag is the document root, it defines:
 
         description     a simple string describing the "use" of this taglib,
-                        should be user discernable
+                        should be user discernible
 
         display-name    the display-name element contains a
                         short name that is intended to be displayed
