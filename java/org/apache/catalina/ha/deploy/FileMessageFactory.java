@@ -193,8 +193,8 @@ public class FileMessageFactory {
      * If EOF is reached, the factory returns null, and closes itself, otherwise
      * the same message is returned as was passed in. This makes sure that not
      * more memory is ever used. To remember, neither the file message or the
-     * factory are thread safe. dont hand off the message to one thread and read
-     * the same with another.
+     * factory are thread safe. Don't hand off the message to one thread and
+     * read the same with another.
      *
      * @param f
      *            FileMessage - the message to be populated with file data

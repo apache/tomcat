@@ -128,7 +128,7 @@ public class HeartbeatListener implements LifecycleListener {
     public String getProxyList() { return proxyList; }
 
     /**
-     * Set the list of Proxies that send is requests, when not empty it toogles
+     * Set the list of Proxies that send is requests, when not empty it toggles
      * the multi to off. A SetHandler heartbeat must be existing in httpd.conf.
      *
      * @param proxyList the list of proxy, format "address:port,address:port".
