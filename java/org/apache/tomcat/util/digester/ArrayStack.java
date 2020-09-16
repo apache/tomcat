@@ -23,7 +23,7 @@ import java.util.EmptyStackException;
  * <p>Imported copy of the <code>ArrayStack</code> class from
  * Commons Collections, which was the only direct dependency from Digester.</p>
  *
- * <p><strong>WARNNG</strong> - This class is public solely to allow it to be
+ * <p><strong>WARNING</strong> - This class is public solely to allow it to be
  * used from subpackages of <code>org.apache.commons.digester</code>.
  * It should not be considered part of the public API of Commons Digester.
  * If you want to use such a class yourself, you should use the one from
