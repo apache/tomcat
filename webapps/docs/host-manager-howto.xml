@@ -68,7 +68,7 @@
   </ul>
   <p>
     Both ways enable you to add, remove, start, and stop virtual hosts. Changes
-    may be presisted by using the <code>persist</code> command. This document
+    may be persisted by using the <code>persist</code> command. This document
     focuses on the text interface. For further information about the graphical
     interface, see
     <a href="html-host-manager-howto.html">Host Manager App -- HTML Interface</a>.

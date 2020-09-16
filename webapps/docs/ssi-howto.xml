@@ -146,7 +146,7 @@ false.</li>
 <p>The directives are:</p>
 <ul>
 <li>
-<strong>config</strong> - <code>&lt;!--#config errmsg=&quot;Error occured&quot; sizefmt=&quot;abbrev&quot;
+<strong>config</strong> - <code>&lt;!--#config errmsg=&quot;Error occurred&quot; sizefmt=&quot;abbrev&quot;
 timefmt=&quot;%B %Y&quot; --&gt;</code>
 Used to set SSI error message, the format of dates and file sizes processed by SSI.<br/>
 All are optional but at least one must be used. The available options are as follows:

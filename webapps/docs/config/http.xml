@@ -579,7 +579,7 @@
     </attribute>
 
     <attribute name="noCompressionStrongETag" required="false">
-      <p>This flag configures whether resources with a stong ETag will be
+      <p>This flag configures whether resources with a strong ETag will be
       considered for compression. If <code>true</code>, resources with a strong
       ETag will not be compressed. The default value is <code>true</code>.</p>
       <p>This attribute is deprecated. It will be removed in Tomcat 10 onwards
@@ -934,7 +934,7 @@
       <attribute name="useInheritedChannel" required="false">
         <p>(bool)Defines if this connector should inherit an inetd/systemd network socket.
         Only one connector can inherit a network socket. This can option can be
-        used to automatcially start Tomcat once a connection request is made to
+        used to automatically start Tomcat once a connection request is made to
         the systemd super daemon's port.
         The default value is <code>false</code>. See the JavaDoc
         for the <code>java.nio.channels.spi.SelectorProvider</code> class for
@@ -1634,7 +1634,7 @@
     <p>In addition to the standard key store types (JKS and PKCS12), most Java
     runtimes support additional key store types such as Windows-ROOT,
     Windows-My, DKS as well as hardware security modules. Generally, to use
-    these additional keystore types with a TLS Conector in Tomcat:</p>
+    these additional keystore types with a TLS Connector in Tomcat:</p>
 
     <ul>
       <li>Set the certificateKeystoreType and/or truststoreType Connector
@@ -1658,7 +1658,7 @@
     <p>Variations in key store implementations, combined with the key store
     manipulation Tomcat does in the background to allow interoperability between
     JSSE and OpenSSL configuration styles, means that some keystores may need
-    slightly different configuration. Assitance is always available from the
+    slightly different configuration. Assistance is always available from the
     <a href="http://tomcat.apache.org/lists.html#tomcat-users">Apache Tomcat
     users mailing list</a>. We aim to document any key stores that vary from the
     above advice here. Currently there are none we are aware of.</p>

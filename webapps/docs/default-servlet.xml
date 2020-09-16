@@ -74,7 +74,7 @@ directory listings are disabled and debugging is turned off.
 
 <section anchor="change" name="What can I change?">
 <p>
-  The DefaultServlet allows the following initParamters:
+  The DefaultServlet allows the following initParameters:
 </p>
 
 <properties>
