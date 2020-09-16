@@ -2641,7 +2641,7 @@ public class WebdavServlet extends DefaultServlet {
 
         @Override
         public InputSource resolveEntity (String publicId, String systemId) {
-            context.log(sm.getString("webdavservlet.enternalEntityIgnored",
+            context.log(sm.getString("webdavservlet.externalEntityIgnored",
                     publicId, systemId));
             return new InputSource(
                     new StringReader("Ignored external entity"));
