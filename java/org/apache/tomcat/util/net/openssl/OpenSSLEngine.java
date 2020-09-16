@@ -437,7 +437,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
                 throw new SSLException(e);
             }
 
-            // If isOuboundDone is set, then the data from the network BIO
+            // If isOutboundDone is set, then the data from the network BIO
             // was the close_notify message -- we are not required to wait
             // for the receipt the peer's close_notify message -- shutdown.
             if (isOutboundDone) {

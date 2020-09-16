@@ -89,7 +89,7 @@ public class JSONParser {
     }
 
     /**
-     * Parses any JSON-parseable object, returning the value.
+     * Parses any JSON-parsable object, returning the value.
      */
     public Object parse() throws ParseException {
         Object toReturn = anything();
