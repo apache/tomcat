@@ -545,7 +545,7 @@ class Util {
         // If base is non-null, method may be static or non-static
         if (m == null ||
                 (Modifier.isPublic(type.getModifiers()) &&
-                        (jreCompat.canAcccess(base, m) || base != null && jreCompat.canAcccess(null, m)))) {
+                        (jreCompat.canAccess(base, m) || base != null && jreCompat.canAccess(null, m)))) {
             return m;
         }
         Class<?>[] interfaces = type.getInterfaces();
@@ -601,7 +601,7 @@ class Util {
         Constructor<?> constructor = wrapper.unWrap();
 
         JreCompat jreCompat = JreCompat.getInstance();
-        if (!Modifier.isPublic(clazz.getModifiers()) || !jreCompat.canAcccess(null, constructor)) {
+        if (!Modifier.isPublic(clazz.getModifiers()) || !jreCompat.canAccess(null, constructor)) {
             throw new MethodNotFoundException(message(
                     null, "util.method.notfound", clazz, methodName,
                     paramString(paramTypes)));

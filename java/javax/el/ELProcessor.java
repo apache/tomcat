@@ -117,7 +117,7 @@ public class ELProcessor {
             if (!Modifier.isStatic(method.getModifiers())) {
                 continue;
             }
-            if (!jreCompat.canAcccess(null, method)) {
+            if (!jreCompat.canAccess(null, method)) {
                 continue;
             }
             if (method.getName().equals(sig.getName())) {
@@ -192,7 +192,7 @@ public class ELProcessor {
 
         // Check for static, public method and module access for Java 9+
         JreCompat jreCompat = JreCompat.getInstance();
-        if (!Modifier.isStatic(modifiers) || !jreCompat.canAcccess(null, method)) {
+        if (!Modifier.isStatic(modifiers) || !jreCompat.canAccess(null, method)) {
             throw new NoSuchMethodException(Util.message(context,
                     "elProcessor.defineFunctionInvalidMethod", method.getName(),
                     method.getDeclaringClass().getName()));
