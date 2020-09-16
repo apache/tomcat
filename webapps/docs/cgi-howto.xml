@@ -102,7 +102,7 @@ the web application root directory + File.separator + this prefix.
 By default there is no value, which results in the web application root
 directory being used as the search path. The recommended value is
 <code>WEB-INF/cgi</code></li>
-<li><strong>cmdLineArgumentsDecoded</strong> - If command line argumemnts
+<li><strong>cmdLineArgumentsDecoded</strong> - If command line arguments
 are enabled (via <strong>enableCmdLineArguments</strong>) and Tomcat is running
 on Windows then each individual decoded command line argument must match this
 pattern else the request will be rejected. This is to protect against known
@@ -112,7 +112,7 @@ lead to remote code execution. For more information on these issues see
 Wulftange&apos;s blog</a> and this archived
 <a href="https://web.archive.org/web/20161228144344/https://blogs.msdn.microsoft.com/twistylittlepassagesallalike/2011/04/23/everyone-quotes-command-line-arguments-the-wrong-way/">blog
 by Daniel Colascione</a>.</li>
-<li><strong>cmdLineArgumentsEncoded</strong> - If command line argumemnts
+<li><strong>cmdLineArgumentsEncoded</strong> - If command line arguments
 are enabled (via <strong>enableCmdLineArguments</strong>) individual encoded
 command line argument must match this pattern else the request will be rejected.
 The default matches the allowed values defined by RFC3875 and is

@@ -73,7 +73,7 @@
    of milliseconds. Setting the property
    <code>org.apache.tomcat.websocket.WRITE_IDLE_TIMEOUT_MS</code> will trigger a
    session timeout if no WebSocket message is sent for the specified number of
-   milliseconds. These can be used separately or together, with or wihout
+   milliseconds. These can be used separately or together, with or without
    <code>Session.setMaxIdleTimeout(long)</code>. If the associated property is
    not specified, the read and/or write idle timeout will be applied.</p>
 

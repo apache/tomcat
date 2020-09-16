@@ -275,7 +275,7 @@
 
       <attribute name="allowMultipleLeadingForwardSlashInPath" required="false">
         <p>Tomcat normalises sequences of multiple <code>/</code> characters in
-        a URI to a single <code>/</code>. This is for consistencuy with the
+        a URI to a single <code>/</code>. This is for consistency with the
         behaviour of file systems as URIs are often translated to file system
         paths. As a result, the return value of
         <code>HttpServletRequest#getContextPath()</code> is expected to start

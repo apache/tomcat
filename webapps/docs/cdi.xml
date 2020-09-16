@@ -69,7 +69,7 @@ mvn clean && mvn package]]></source>
     The listener will produce a non fatal error if the CDI container loading
     fails.<br/>
     CDI support can also be enabled at the individual webapp level by adding
-    the following listner to the webapp <code>context.xml</code> file nested
+    the following listener to the webapp <code>context.xml</code> file nested
     inside the <code>Server</code> element:
     <source><![CDATA[<Listener className="org.apache.webbeans.web.tomcat.OpenWebBeansContextLifecycleListener" />]]></source>
   </p>
