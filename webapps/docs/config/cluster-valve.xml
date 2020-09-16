@@ -98,7 +98,7 @@
       </attribute>
       <attribute name="sessionIdAttribute" required="false">
         Old sessionid before failover is registered in request attributes with  this attribute.
-        Default attribute name is <code>org.apache.catalina.ha.session.JvmRouteOrignalSessionID</code>.
+        Default attribute name is <code>org.apache.catalina.ha.session.JvmRouteOriginalSessionID</code>.
       </attribute>
     </attributes>
   </subsection>
