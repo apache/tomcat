@@ -287,8 +287,18 @@ public class DeltaManager extends ClusterManagerBase{
 
     /**
      * @return Returns the counterNoStateTransferred.
+     * @deprecated Use {@link #getCounterNoStateTransferred()}. Will be removed
+     *             in Tomcat 10 onwards.
      */
+    @Deprecated
     public int getCounterNoStateTransfered() {
+        return getCounterNoStateTransferred();
+    }
+
+    /**
+     * @return Returns the counterNoStateTransferred.
+     */
+    public int getCounterNoStateTransferred() {
         return counterNoStateTransferred;
     }
 
@@ -311,8 +321,29 @@ public class DeltaManager extends ClusterManagerBase{
 
     /**
      * @return <code>true</code> if the state transfer is complete.
+     * @deprecated Use {@link #getStateTransferred()}. Will be removed in Tomcat
+     *             10 onwards.
      */
+    @Deprecated
     public boolean getStateTransfered() {
+        return getStateTransferred();
+    }
+
+    /**
+     * Set that state transferred is complete
+     * @param stateTransferred Flag value
+     * @deprecated Use {@link #setStateTransferred(boolean)}. Will be removed in
+     *             Tomcat 10 onwards.
+     */
+    @Deprecated
+    public void setStateTransfered(boolean stateTransferred) {
+        setStateTransferred(stateTransferred);
+    }
+
+    /**
+     * @return <code>true</code> if the state transfer is complete.
+     */
+    public boolean getStateTransferred() {
         return stateTransferred;
     }
 
@@ -320,7 +351,7 @@ public class DeltaManager extends ClusterManagerBase{
      * Set that state transferred is complete
      * @param stateTransferred Flag value
      */
-    public void setStateTransfered(boolean stateTransferred) {
+    public void setStateTransferred(boolean stateTransferred) {
         this.stateTransferred = stateTransferred;
     }
 
@@ -896,7 +927,7 @@ public class DeltaManager extends ClusterManagerBase{
                 }
                 reqNow = System.currentTimeMillis();
                 isTimeout = ((reqNow - reqStart) > (1000L * getStateTransferTimeout()));
-            } while ((!getStateTransfered()) && (!isTimeout) && (!isNoContextManagerReceived()));
+            } while ((!getStateTransferred()) && (!isTimeout) && (!isNoContextManagerReceived()));
         } else {
             if(getStateTransferTimeout() == -1) {
                 // wait that state is transferred
@@ -905,7 +936,7 @@ public class DeltaManager extends ClusterManagerBase{
                         Thread.sleep(100);
                     } catch (Exception sleep) {
                     }
-                } while ((!getStateTransfered())&& (!isNoContextManagerReceived()));
+                } while ((!getStateTransferred())&& (!isNoContextManagerReceived()));
                 reqNow = System.currentTimeMillis();
             }
         }
