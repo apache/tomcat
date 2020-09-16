@@ -55,7 +55,7 @@ public class BodyContentImpl extends BodyContent {
      * Constructor.
      * @param enclosingWriter The wrapped writer
      * @param limitBuffer <code>true</code> to discard large buffers
-     * @param tagBufferSize the buffer sise
+     * @param tagBufferSize the buffer size
      */
     public BodyContentImpl(JspWriter enclosingWriter, boolean limitBuffer, int tagBufferSize) {
         super(enclosingWriter);
