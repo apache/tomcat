@@ -385,7 +385,7 @@ public class JvmRouteBinderValve extends ValveBase implements ClusterValve {
         // change
         if (sessionIdAttribute != null && !"".equals(sessionIdAttribute)) {
             if (log.isDebugEnabled()) {
-                log.debug(sm.getString("jvmRoute.set.orignalsessionid",sessionIdAttribute,sessionId));
+                log.debug(sm.getString("jvmRoute.set.originalsessionid",sessionIdAttribute,sessionId));
             }
             request.setAttribute(sessionIdAttribute, sessionId);
         }

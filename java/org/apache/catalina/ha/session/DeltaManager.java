@@ -84,7 +84,7 @@ public class DeltaManager extends ClusterManagerBase{
     private boolean expireSessionsOnShutdown = false;
     private boolean notifySessionListenersOnReplication = true;
     private boolean notifyContainerListenersOnReplication  = true;
-    private volatile boolean stateTransfered = false ;
+    private volatile boolean stateTransferred = false ;
     private volatile boolean noContextManagerReceived = false ;
     private int stateTransferTimeout = 60;
     private boolean sendAllSessions = true;
@@ -120,7 +120,7 @@ public class DeltaManager extends ClusterManagerBase{
     private long counterSend_EVT_SESSION_EXPIRED = 0;
     private int counterSend_EVT_ALL_SESSION_TRANSFERCOMPLETE = 0 ;
     private long counterSend_EVT_CHANGE_SESSION_ID = 0;
-    private int counterNoStateTransfered = 0 ;
+    private int counterNoStateTransferred = 0 ;
 
 
     // ------------------------------------------------------------- Constructor
@@ -286,10 +286,10 @@ public class DeltaManager extends ClusterManagerBase{
     }
 
     /**
-     * @return Returns the counterNoStateTransfered.
+     * @return Returns the counterNoStateTransferred.
      */
     public int getCounterNoStateTransfered() {
-        return counterNoStateTransfered;
+        return counterNoStateTransferred;
     }
 
     public int getReceivedQueueSize() {
@@ -313,15 +313,15 @@ public class DeltaManager extends ClusterManagerBase{
      * @return <code>true</code> if the state transfer is complete.
      */
     public boolean getStateTransfered() {
-        return stateTransfered;
+        return stateTransferred;
     }
 
     /**
      * Set that state transferred is complete
-     * @param stateTransfered Flag value
+     * @param stateTransferred Flag value
      */
-    public void setStateTransfered(boolean stateTransfered) {
-        this.stateTransfered = stateTransfered;
+    public void setStateTransfered(boolean stateTransferred) {
+        this.stateTransferred = stateTransferred;
     }
 
     public boolean isNoContextManagerReceived() {
@@ -817,7 +817,7 @@ public class DeltaManager extends ClusterManagerBase{
             stateTransferCreateSendTime = beforeSendTime ;
             // request session state
             counterSend_EVT_GET_ALL_SESSIONS++;
-            stateTransfered = false ;
+            stateTransferred = false ;
             // FIXME This send call block the deploy thread, when sender waitForAck is enabled
             try {
                 synchronized(receivedMessageQueue) {
@@ -910,7 +910,7 @@ public class DeltaManager extends ClusterManagerBase{
             }
         }
         if (isTimeout) {
-            counterNoStateTransfered++ ;
+            counterNoStateTransferred++ ;
             log.error(sm.getString("deltaManager.noSessionState", getName(),
                     new Date(beforeSendTime), Long.valueOf(reqNow - beforeSendTime)));
         }else if (isNoContextManagerReceived()) {
@@ -1114,7 +1114,7 @@ public class DeltaManager extends ClusterManagerBase{
         }
         rejectedSessions = 0 ;
         sessionReplaceCounter = 0 ;
-        counterNoStateTransfered = 0 ;
+        counterNoStateTransferred = 0 ;
         setMaxActive(getActiveSessions());
         sessionCounter = getActiveSessions() ;
         counterReceive_EVT_ALL_SESSION_DATA = 0;
@@ -1276,7 +1276,7 @@ public class DeltaManager extends ClusterManagerBase{
                     getName(), sender.getHost(), Integer.valueOf(sender.getPort())));
         }
         stateTransferCreateSendTime = msg.getTimestamp() ;
-        stateTransfered = true ;
+        stateTransferred = true ;
     }
 
     /**
@@ -1435,7 +1435,7 @@ public class DeltaManager extends ClusterManagerBase{
                 "SESSION-STATE-TRANSFERRED" + getName());
         newmsg.setTimestamp(findSessionTimestamp);
         if (log.isDebugEnabled()) {
-            log.debug(sm.getString("deltaManager.createMessage.allSessionTransfered",getName()));
+            log.debug(sm.getString("deltaManager.createMessage.allSessionTransferred",getName()));
         }
         counterSend_EVT_ALL_SESSION_TRANSFERCOMPLETE++;
         cluster.send(newmsg, sender);
