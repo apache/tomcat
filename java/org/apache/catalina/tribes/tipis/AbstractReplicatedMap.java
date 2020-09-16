@@ -591,7 +591,7 @@ public abstract class AbstractReplicatedMap<K,V>
 
         //state transfer request
         if (mapmsg.getMsgType() == MapMessage.MSG_STATE || mapmsg.getMsgType() == MapMessage.MSG_STATE_COPY) {
-            synchronized (stateMutex) { //make sure we dont do two things at the same time
+            synchronized (stateMutex) { //make sure we don't do two things at the same time
                 ArrayList<MapMessage> list = new ArrayList<MapMessage>();
                 Iterator<Map.Entry<K,MapEntry<K,V>>> i = innerMap.entrySet().iterator();
                 while (i.hasNext()) {

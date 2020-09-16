@@ -104,7 +104,7 @@ public class NioReplicationTask extends AbstractRxTask {
             if ( e instanceof CancelledKeyException ) {
                 //do nothing
             } else if ( e instanceof IOException ) {
-                //dont spew out stack traces for IO exceptions unless debug is enabled.
+                //don't spew out stack traces for IO exceptions unless debug is enabled.
                 if (log.isDebugEnabled()) log.debug ("IOException in replication worker, unable to drain channel. Probable cause: Keep alive socket closed["+e.getMessage()+"].", e);
                 else log.warn ("IOException in replication worker, unable to drain channel. Probable cause: Keep alive socket closed["+e.getMessage()+"].");
             } else if ( log.isErrorEnabled() ) {
