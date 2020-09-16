@@ -466,7 +466,7 @@ public class BasicDataSource implements DataSource, BasicDataSourceMXBean, MBean
      *
      * @return A new connection factory.
      *
-     * @throws SQLException If the connection factort cannot be created
+     * @throws SQLException If the connection factory cannot be created
      */
     protected ConnectionFactory createConnectionFactory() throws SQLException {
         // Load the JDBC driver class
