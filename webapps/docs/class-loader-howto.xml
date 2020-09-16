@@ -263,7 +263,7 @@ for further information.</p>
 
 <p>A more complex class loader hierarchy may also be configured. See the diagram
 below. By default, the <strong>Server</strong> and <strong>Shared</strong>
-class loaders are not defined and the simplifed hierarchy shown above is used.
+class loaders are not defined and the simplified hierarchy shown above is used.
 This more complex hierarchy may be use by defining values for the
 <code>server.loader</code> and/or <code>shared.loader</code> properties in
 <code>conf/catalina.properties</code>.</p>

@@ -428,7 +428,7 @@ public interface RewriteMap {
     <p>The referenced implementation of such a class &ndash; in our example <code>rewriteMapClassName</code> &ndash;
     will be instantiated and initialized with the optional parameter &ndash; <code>optionalParameters</code> from above
     (be careful with whitespace) &ndash; by calling <code>setParameters(String)</code>. That instance
-    will then be registered under the name given as the first paramter of <code>RewriteMap</code> rule.</p>
+    will then be registered under the name given as the first parameter of <code>RewriteMap</code> rule.</p>
 
     <p>Note: Starting with Tomcat 9 you can use more than one parameter. These have to be separated by spaces. Parameters
     can be quoted with &quot;. This enables space characters inside parameters.</p>
