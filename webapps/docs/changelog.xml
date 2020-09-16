@@ -54,6 +54,10 @@
       <update>
         Deprecate the JDBCRealm. (markt)
       </update>
+      <fix>
+        Correct numerous spellings throughout the code base. Based on a pull
+        request from John Bampton. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
