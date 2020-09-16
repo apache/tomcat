@@ -56,7 +56,7 @@ public class RequestInfoExample extends HttpServlet {
         out.println("</head>");
         out.println("<body bgcolor=\"white\">");
 
-        // img stuff not req'd for source code html showing
+        // img stuff not req'd for source code HTML showing
         // all links relative!
 
         // XXX
