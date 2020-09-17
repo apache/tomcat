@@ -74,6 +74,14 @@
         When building, only rebuild JAR files if the contents has changed.
         (markt)
       </add>
+      <add>
+        Improvements to Chinese translations. Pull request provided by Yang
+        Yang. (markt)
+      </add>
+      <add>
+        Expand coverage of Russian translations. Pull request provided by
+        Nikolay Gribanov. (markt)
+      </add>
     </changelog>
   </subsection>
 </section>
