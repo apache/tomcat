@@ -99,6 +99,10 @@
         adds a new feature to Procrun that outputs the command to (re-)configure
         the service with the current settings. (markt)
       </update>
+      <add>
+        When building, only rebuild JAR files (including OSGi and JPMS metadata)
+        if the contents has changed. (markt)
+      </add>
     </changelog>
   </subsection>
 </section>

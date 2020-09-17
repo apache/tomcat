@@ -3638,28 +3638,41 @@ Read the Building page on the Apache Tomcat documentation site for details on ho
     <attribute name="libs" description="libraries to use for bnd classpath analysis relative to ${tomcat.output}"
                default="build/lib/*.jar,build/bin/tomcat-juli.jar" />
     <sequential>
-      <jar jarfile="@{jarfile}" manifest="@{manifest}">
-        <fileset dir="@{filesDir}">
+      <local name="jar.uptodate"/>
+      <uptodate property="jar.uptodate" targetfile="@{jarfile}" >
+        <srcfiles dir="@{filesDir}">
           <patternset refid="@{filesId}"/>
           <!-- Javadoc exclusions -->
           <exclude name="**/package.html" />
-        </fileset>
-        <zipfileset dir="@{meta-inf}" prefix="META-INF/"
-                    excludes=".gitignore" />
-        <zipfileset file="@{notice}" fullpath="META-INF/NOTICE" />
-        <zipfileset file="@{license}" fullpath="META-INF/LICENSE" />
-      </jar>
-      <antcall target="add-osgi" >
-        <param name="jarfile" value="@{jarfile}" />
-        <param name="addOSGi" value="@{addOSGi}" />
-        <param name="libs" value="@{libs}" />
-      </antcall>
-      <antcall target="add-graal">
-        <param name="jarfile" value="@{jarfile}" />
-        <param name="addGraal" value="@{addGraal}" />
-        <param name="graalFiles" value="@{graalFiles}" />
-        <param name="graalPrefix" value="@{graalPrefix}" />
-      </antcall>
+        </srcfiles>
+        <srcfiles dir="@{meta-inf}" excludes=".gitignore" />
+        <srcfiles file="@{notice}" />
+        <srcfiles file="@{license}" />
+      </uptodate>
+      <sequential unless:true="${jar.uptodate}">
+        <jar jarfile="@{jarfile}" manifest="@{manifest}" >
+          <fileset dir="@{filesDir}">
+            <patternset refid="@{filesId}"/>
+            <!-- Javadoc exclusions -->
+            <exclude name="**/package.html" />
+          </fileset>
+          <zipfileset dir="@{meta-inf}" prefix="META-INF/"
+                      excludes=".gitignore" />
+          <zipfileset file="@{notice}" fullpath="META-INF/NOTICE" />
+          <zipfileset file="@{license}" fullpath="META-INF/LICENSE" />
+        </jar>
+        <antcall target="add-osgi" >
+          <param name="jarfile" value="@{jarfile}" />
+          <param name="addOSGi" value="@{addOSGi}" />
+          <param name="libs" value="@{libs}" />
+        </antcall>
+        <antcall target="add-graal">
+          <param name="jarfile" value="@{jarfile}" />
+          <param name="addGraal" value="@{addGraal}" />
+          <param name="graalFiles" value="@{graalFiles}" />
+          <param name="graalPrefix" value="@{graalPrefix}" />
+        </antcall>
+      </sequential>
     </sequential>
   </macrodef>
 
