@@ -73,6 +73,12 @@
       <fix>
         Ensure HTTP/2 timeouts are processed for idle connections. (markt)
       </fix>
+      <fix>
+        <bug>64743</bug>: Correct a regression introduced in 9.0.37 that
+        caused a <code>Connection: close</code> header to be added to the
+        response if the Connector was configured with
+        <code>maxSwallowSize=-1</code>. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
