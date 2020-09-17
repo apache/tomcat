@@ -19,6 +19,7 @@
 package org.apache.catalina.util;
 
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
@@ -65,7 +66,7 @@ public class ServerInfo {
             info = props.getProperty("server.info");
             built = props.getProperty("server.built");
             number = props.getProperty("server.number");
-        } catch (Throwable t) {
+        } catch (IOException t) {
             ExceptionUtils.handleThrowable(t);
         }
         if (info == null || info.equals("Apache Tomcat/@VERSION@"))
