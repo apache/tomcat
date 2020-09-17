@@ -66,6 +66,12 @@
         Do not send an HTTP/2 PING frame to measure round-trip time when it is
         known that the HTTP/2 connection is not in a good state. (markt)
       </fix>
+      <fix>
+        <bug>64743</bug>: Correct a regression introduced in 8.5.57 that
+        caused a <code>Connection: close</code> header to be added to the
+        response if the Connector was configured with
+        <code>maxSwallowSize=-1</code>. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
