@@ -76,7 +76,6 @@ public class BasicDataSource implements DataSource, BasicDataSourceMXBean, MBean
             if (Utils.IS_SECURITY_ENABLED) {
                 final ClassLoader loader = BasicDataSource.class.getClassLoader();
                 final String dbcpPackageName = BasicDataSource.class.getPackage().getName();
-                loader.loadClass(dbcpPackageName + ".BasicDataSource$PaGetConnection");
                 loader.loadClass(dbcpPackageName + ".DelegatingCallableStatement");
                 loader.loadClass(dbcpPackageName + ".DelegatingDatabaseMetaData");
                 loader.loadClass(dbcpPackageName + ".DelegatingPreparedStatement");
