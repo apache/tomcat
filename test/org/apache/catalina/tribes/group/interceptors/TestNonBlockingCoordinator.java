@@ -47,7 +47,10 @@ public class TestNonBlockingCoordinator {
             channels[i] = new GroupChannel();
             coordinators[i] = new NonBlockingCoordinator();
             channels[i].addInterceptor(coordinators[i]);
-            channels[i].addInterceptor(new TcpFailureDetector());
+            TcpFailureDetector tcpFailureDetector = new TcpFailureDetector();
+            // Double default timeout - mainly for loaded CI systems
+            tcpFailureDetector.setReadTestTimeout(tcpFailureDetector.getReadTestTimeout() * 2);
+            channels[i].addInterceptor(tcpFailureDetector);
             final int j = i;
             threads[i] = new Thread() {
                 @Override
