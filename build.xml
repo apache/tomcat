@@ -3329,17 +3329,30 @@ Read the Building page on the Apache Tomcat documentation site for details on ho
     <attribute name="meta-inf" description="additional contents for META-INF"
                default="${tomcat.manifests}/default" />
     <sequential>
-      <jar jarfile="@{jarfile}" manifest="@{manifest}">
-        <fileset dir="@{filesDir}">
+      <local name="jar.uptodate"/>
+      <uptodate property="jar.uptodate" targetfile="@{jarfile}" >
+        <srcfiles dir="@{filesDir}">
           <patternset refid="@{filesId}"/>
           <!-- Javadoc exclusions -->
           <exclude name="**/package.html" />
-        </fileset>
-        <zipfileset dir="@{meta-inf}" prefix="META-INF/"
-                    excludes=".gitignore" />
-        <zipfileset file="@{notice}" fullpath="META-INF/NOTICE" />
-        <zipfileset file="@{license}" fullpath="META-INF/LICENSE" />
-      </jar>
+        </srcfiles>
+        <srcfiles dir="@{meta-inf}" excludes=".gitignore" />
+        <srcfiles file="@{notice}" />
+        <srcfiles file="@{license}" />
+      </uptodate>
+      <sequential unless:true="${jar.uptodate}">
+        <jar jarfile="@{jarfile}" manifest="@{manifest}" >
+          <fileset dir="@{filesDir}">
+            <patternset refid="@{filesId}"/>
+            <!-- Javadoc exclusions -->
+            <exclude name="**/package.html" />
+          </fileset>
+          <zipfileset dir="@{meta-inf}" prefix="META-INF/"
+                      excludes=".gitignore" />
+          <zipfileset file="@{notice}" fullpath="META-INF/NOTICE" />
+          <zipfileset file="@{license}" fullpath="META-INF/LICENSE" />
+        </jar>
+      </sequential>
     </sequential>
   </macrodef>
 

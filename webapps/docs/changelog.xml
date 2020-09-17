@@ -68,6 +68,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Other">
+    <changelog>
+      <add>
+        When building, only rebuild JAR files if the contents has changed.
+        (markt)
+      </add>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 7.0.106 (violetagg)" rtext="release in progress">
   <subsection name="Catalina">
