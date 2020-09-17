@@ -158,7 +158,11 @@ public abstract class ELContext {
      * @since EL 3.0
      */
     public List<EvaluationListener> getEvaluationListeners() {
-        return listeners == null ? Collections.emptyList() : listeners;
+        if (listeners == null) {
+            return Collections.emptyList();
+        } else {
+            return listeners;
+        }
     }
 
     /**
