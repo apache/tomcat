@@ -940,7 +940,7 @@
     </copy>
   </target>
 
-  <target name="compile" depends="download-compile,validate">
+  <target name="compile" depends="download-compile,validate,setup-bnd">
     <!-- Compile internal server components -->
     <javac srcdir="java" destdir="${tomcat.classes}"
            debug="${compile.debug}"
@@ -998,7 +998,7 @@
 
   </target>
 
-  <target name="package" depends="compile,build-manifests,setup-bnd" >
+  <target name="package" depends="compile,build-manifests" >
     <!--
     #### ORDER IS IMPORTANT ####
     Bnd will use the built jars to resolve import package versions and
