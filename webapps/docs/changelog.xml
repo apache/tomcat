@@ -62,6 +62,11 @@
         Correct numerous spellings throughout the code base. Based on a pull
         request from John Bampton. (markt)
       </fix>
+      <fix>
+        <bug>64715</bug>: Add PasswordValidationCallback to the Jakarta
+        Authentication implementation. Patch provided by Robert Rodewald.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
