@@ -67,6 +67,10 @@
         Authentication implementation. Patch provided by Robert Rodewald.
         (markt)
       </fix>
+      <update>
+        Allow using the utility executor for annotation scanning. Patch
+        provided by Jatin Kamnani. (remm)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Coyote">

@@ -208,6 +208,10 @@
                description="The name of this Context"
                type="java.lang.String"/>
 
+    <attribute name="parallelAnnotationScanning"
+               description="The parallel annotation scanning flag"
+               type="boolean"/>
+
     <attribute name="parentClassLoader"
                description="Parent class loader."
                type="java.lang.ClassLoader" />
