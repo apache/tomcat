@@ -71,6 +71,10 @@
         Allow using the utility executor for annotation scanning. Patch
         provided by Jatin Kamnani. (remm)
       </update>
+      <fix>
+        <bug>64751</bug>: Correct the JPMS module descriptor so the embedded
+        JARs may be used with JPMS. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

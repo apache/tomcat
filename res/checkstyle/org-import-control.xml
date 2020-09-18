@@ -37,6 +37,7 @@
   <allow pkg="org.w3c.dom"/>
   <allow pkg="org.xml.sax"/>
   <allow pkg="org.ietf.jgss"/>
+  <allow pkg="aQute.bnd.annotation.spi"/>
   <subpackage name="catalina">
     <allow pkg="jakarta.annotation"/>
     <allow pkg="jakarta.ejb"/>

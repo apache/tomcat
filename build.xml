@@ -225,6 +225,7 @@
 
   <!-- Classpaths -->
   <path id="compile.classpath">
+    <pathelement location="${bnd.jar}"/>
     <pathelement location="${jdt.jar}"/>
     <pathelement location="${saaj-api.jar}"/>
     <pathelement location="${jaxrpc-lib.jar}"/>
@@ -1596,7 +1597,7 @@
     </txt2html>
   </target>
   <target name="embed-jars" description="Create experimental embedded jars"
-    depends="build-manifests,setup-bnd,compile" >
+    depends="build-manifests,setup-bnd,compile,package" >
 
     <mkdir dir="${tomcat.embed}" />
 
