@@ -2205,6 +2205,7 @@ public class ContextConfig implements LifecycleListener {
      *
      * @param fragments        Set of parallelizable scans
      * @param handlesTypesOnly Important parameter for the underlying scan
+     * @param javaClassCache The class cache
      */
     protected void processAnnotationsInParallel(Set<WebXml> fragments, boolean handlesTypesOnly,
                                                 Map<String, JavaClassCacheEntry> javaClassCache) {
