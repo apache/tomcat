@@ -2211,24 +2211,18 @@ public class ContextConfig implements LifecycleListener {
                                                 Map<String, JavaClassCacheEntry> javaClassCache) {
         Server s = getServer();
         ExecutorService pool = null;
+        pool = s.getUtilityExecutor();
+        List<Future<?>> futures = new ArrayList<>(fragments.size());
+        for (WebXml fragment : fragments) {
+            Runnable task = new AnnotationScanTask(fragment, handlesTypesOnly, javaClassCache);
+            futures.add(pool.submit(task));
+        }
         try {
-            pool = s.getUtilityExecutor();
-            List<Future<?>> futures = new ArrayList<>(fragments.size());
-            for (WebXml fragment : fragments) {
-                Runnable task = new AnnotationScanTask(fragment, handlesTypesOnly, javaClassCache);
-                futures.add(pool.submit(task));
+            for (Future<?> future : futures) {
+                future.get();
             }
-            try {
-                for (Future<?> future : futures) {
-                    future.get();
-                }
-            } catch (Exception e) {
-                throw new RuntimeException(sm.getString("contextConfig.processAnnotationsInParallelFailure"), e);
-            }
-        } finally {
-            if (pool != null) {
-                pool.shutdownNow();
-            }
+        } catch (Exception e) {
+            throw new RuntimeException(sm.getString("contextConfig.processAnnotationsInParallelFailure"), e);
         }
     }
 
