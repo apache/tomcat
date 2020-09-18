@@ -745,11 +745,13 @@
     <include name="org/apache/tomcat/jni/**" />
     <include name="org/apache/jk/**" />
     <include name="org/apache/tomcat/util/**" />
+    <exclude name="org/apache/tomcat/util/descriptor/tld/**" />
   </patternset>
 
   <patternset id="files.tomcat-embed-jasper" >
     <patternset refid="files.jasper" />
     <patternset refid="files.jsp-api" />
+    <include name="org/apache/tomcat/util/descriptor/tld/**" />
   </patternset>
 
   <patternset id="files.tomcat-embed-el" >

@@ -75,6 +75,10 @@
         <bug>64751</bug>: Correct the JPMS module descriptor so the embedded
         JARs may be used with JPMS. (markt)
       </fix>
+      <fix>
+        When performing an incremental build, ensure bdn does not create
+        unwanted JPMS dependencies between embedded JARs. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

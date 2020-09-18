@@ -67,7 +67,6 @@ Export-Package: \
     org.apache.tomcat.util.compat,\
     org.apache.tomcat.util.descriptor,\
     org.apache.tomcat.util.descriptor.tagplugin,\
-    org.apache.tomcat.util.descriptor.tld,\
     org.apache.tomcat.util.descriptor.web,\
     org.apache.tomcat.util.digester,\
     org.apache.tomcat.util.file,\
