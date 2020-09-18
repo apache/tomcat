@@ -82,9 +82,9 @@ source distribution, do the following:
   JSR-356 (Java WebSocket 1.1) support.
 
 
-(2) Install Apache Ant version 1.8.2 or later on your computer
+(2) Install Apache Ant version 1.9.1 or later on your computer
 
- 1. If Apache Ant version 1.8.2 or later is already installed on your computer, skip to (3).
+ 1. If Apache Ant version 1.9.1 or later is already installed on your computer, skip to (3).
 
  2. Download a binary distribution of Ant from:
 

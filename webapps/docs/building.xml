@@ -66,10 +66,10 @@ The following is a quick step by step guide.
 
 </section>
 
-<section name="Install Apache Ant 1.8.2 or later">
+<section name="Install Apache Ant 1.9.1 or later">
 
 <p>
-Download a binary distribution of Ant 1.8.2 or later from
+Download a binary distribution of Ant 1.9.1 or later from
 <a href="https://ant.apache.org/bindownload.cgi">here</a>.
 </p>
 
@@ -260,7 +260,7 @@ Variables</em> to add two new <em>Classpath Variables</em>:
 <table class="defaultTable">
  <tr><td>TOMCAT_LIBS_BASE</td><td>The same location as the <code>base.path</code>
   setting in <code>build.properties</code>, where the binary dependencies have been downloaded</td></tr>
- <tr><td>ANT_HOME</td><td>the base path of Ant 1.8.2 or later</td></tr>
+ <tr><td>ANT_HOME</td><td>the base path of Ant 1.9.1 or later</td></tr>
 </table>
 
 <p>

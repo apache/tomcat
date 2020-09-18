@@ -82,6 +82,10 @@
         Expand coverage of Russian translations. Pull request provided by
         Nikolay Gribanov. (markt)
       </add>
+      <update>
+        Updated to Ant 1.9.1. The build now requires a minimum of Ant 1.9.1.
+        (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
