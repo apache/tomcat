@@ -828,6 +828,8 @@ public class StandardContext extends ContainerBase
     private boolean createUploadTargets = false;
 
 
+    private boolean parallelAnnotationScanning = false;
+
     // ----------------------------------------------------- Context Properties
 
     @Override
@@ -1401,6 +1403,23 @@ public class StandardContext extends ContainerBase
                                    oldAntiResourceLocking,
                                    this.antiResourceLocking);
 
+    }
+
+
+    @Override
+    public void setParallelAnnotationScanning(boolean parallelAnnotationScanning) {
+
+        boolean oldParallelAnnotationScanning = this.parallelAnnotationScanning;
+        this.parallelAnnotationScanning = parallelAnnotationScanning;
+        support.firePropertyChange("parallelAnnotationScanning", oldParallelAnnotationScanning,
+                this.parallelAnnotationScanning);
+
+    }
+
+
+    @Override
+    public boolean isParallelAnnotationScanning() {
+        return this.parallelAnnotationScanning;
     }
 
 

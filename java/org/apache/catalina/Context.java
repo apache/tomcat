@@ -761,6 +761,20 @@ public interface Context extends Container, ContextBind {
     public String getContainerSciFilter();
 
 
+    /**
+     * @return the value of the parallel annotation scanning flag.  If true,
+     * it will dispatch scanning to the utility executor.
+     */
+    public boolean isParallelAnnotationScanning();
+
+    /**
+     * Set the parallel annotation scanning value.
+     *
+     * @param parallelAnnotationScanning new parallel annotation scanning flag
+     */
+    public void setParallelAnnotationScanning(boolean parallelAnnotationScanning);
+
+
     // --------------------------------------------------------- Public Methods
 
     /**

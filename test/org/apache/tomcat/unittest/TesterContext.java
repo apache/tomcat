@@ -1288,4 +1288,10 @@ public class TesterContext implements Context {
     public void setCreateUploadTargets(boolean createUploadTargets) { /* NO-OP */}
     @Override
     public boolean getCreateUploadTargets() { return false; }
+
+    @Override
+    public boolean isParallelAnnotationScanning() { return false; }
+    @Override
+    public void setParallelAnnotationScanning(boolean parallelAnnotationScanning) {}
+
 }
