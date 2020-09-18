@@ -180,6 +180,11 @@ public class TestJaspicCallbackHandlerInAuthenticator {
         protected Principal getPrincipal(String username) {
             return new GenericPrincipal(username, null, null);
         }
+
+        @Override
+        protected String getName() {
+            return "Test Realm";
+        }
     }
 }
 
