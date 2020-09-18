@@ -28,7 +28,8 @@ Export-Package: \
     org.apache.jasper.servlet,\
     org.apache.jasper.tagplugins.jstl,\
     org.apache.jasper.tagplugins.jstl.core,\
-    org.apache.jasper.util
+    org.apache.jasper.util,\
+    org.apache.tomcat.util.descriptor.tld
 
 -includepackage: \
     org.apache.jasper.resources
