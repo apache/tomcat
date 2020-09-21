@@ -1570,6 +1570,10 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
 
     @Override
     public void reset(int streamId, long errorCode) throws Http2Exception  {
+        if (log.isDebugEnabled()) {
+            log.debug(sm.getString("upgradeHandler.reset.receive", getConnectionId(), Integer.toString(streamId),
+                    Long.toString(errorCode)));
+        }
         Stream stream = getStream(streamId, true);
         boolean active = stream.isActive();
         stream.checkState(FrameType.RST);
