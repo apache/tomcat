@@ -82,8 +82,8 @@ example:</p>
 <p>There are three ways to use the <strong>Manager</strong> web application.</p>
 <ul>
 <li>As an application with a user interface you use in your browser.
-Here is an example URL where you can replace <code>localhost</code> with
-your website host name:  <code>http://localhost:8080/manager/html</code> .</li>
+Here is an example URL where you can replace <code>127.0.0.1</code> with
+your website host name (must match the allow pattern in RemoteAddrValve above):  <code>http://127.0.0.1:8080/manager/html</code> .</li>
 <li>A minimal version using HTTP requests only which is suitable for use
 by scripts setup by system administrators.  Commands are given as part of the
 request URI, and responses are in the form of simple text that can be easily
