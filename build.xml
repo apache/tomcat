@@ -2318,7 +2318,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       <classpath>
         <path refid="compile.classpath"/>
         <path location="${ant.core.lib}"/>
-      	<path location="${osgi-annotations.jar}"/>
+        <path location="${osgi-annotations.jar}"/>
       </classpath>
       <link href="../annotationapi"/>
       <link href="../servletapi"/>
@@ -3055,7 +3055,7 @@ skip.installer property in build.properties" />
 
   <target name="download-compile"
           description="Download components necessary to compile"
-  	      depends="setup-bnd">
+          depends="setup-bnd">
 
     <!-- Download Commons Daemon -->
     <antcall target="downloadgz-2">
