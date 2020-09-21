@@ -68,7 +68,7 @@ class WindowAllocationManager {
     void waitForStream(long timeout) throws InterruptedException {
         if (log.isDebugEnabled()) {
             log.debug(sm.getString("windowAllocationManager.waitFor.stream",
-                    stream.getConnectionId(), stream.getIdentifier(), Long.toString(timeout)));
+                    stream.getConnectionId(), stream.getIdAsString(), Long.toString(timeout)));
         }
 
         waitFor(STREAM, timeout);
@@ -78,7 +78,7 @@ class WindowAllocationManager {
     void waitForConnection(long timeout) throws InterruptedException {
         if (log.isDebugEnabled()) {
             log.debug(sm.getString("windowAllocationManager.waitFor.connection",
-                    stream.getConnectionId(), stream.getIdentifier(), Long.toString(timeout)));
+                    stream.getConnectionId(), stream.getIdAsString(), Long.toString(timeout)));
         }
 
         waitFor(CONNECTION, timeout);
@@ -88,7 +88,7 @@ class WindowAllocationManager {
     void waitForStreamNonBlocking() {
         if (log.isDebugEnabled()) {
             log.debug(sm.getString("windowAllocationManager.waitForNonBlocking.stream",
-                    stream.getConnectionId(), stream.getIdentifier()));
+                    stream.getConnectionId(), stream.getIdAsString()));
         }
 
         waitForNonBlocking(STREAM);
@@ -98,7 +98,7 @@ class WindowAllocationManager {
     void waitForConnectionNonBlocking() {
         if (log.isDebugEnabled()) {
             log.debug(sm.getString("windowAllocationManager.waitForNonBlocking.connection",
-                    stream.getConnectionId(), stream.getIdentifier()));
+                    stream.getConnectionId(), stream.getIdAsString()));
         }
 
         waitForNonBlocking(CONNECTION);
@@ -141,7 +141,7 @@ class WindowAllocationManager {
         synchronized (stream) {
             if (waitingFor != NONE) {
                 throw new IllegalStateException(sm.getString("windowAllocationManager.waitFor.ise",
-                        stream.getConnectionId(), stream.getIdentifier()));
+                        stream.getConnectionId(), stream.getIdAsString()));
             }
 
             waitingFor = waitTarget;
@@ -164,7 +164,7 @@ class WindowAllocationManager {
                 // Non-blocking post-processing may attempt to flush
             } else {
                 throw new IllegalStateException(sm.getString("windowAllocationManager.waitFor.ise",
-                        stream.getConnectionId(), stream.getIdentifier()));
+                        stream.getConnectionId(), stream.getIdAsString()));
             }
 
         }
@@ -174,7 +174,7 @@ class WindowAllocationManager {
     private void notify(int notifyTarget) {
         if (log.isDebugEnabled()) {
             log.debug(sm.getString("windowAllocationManager.notify", stream.getConnectionId(),
-                    stream.getIdentifier(), Integer.toString(waitingFor), Integer.toString(notifyTarget)));
+                    stream.getIdAsString(), Integer.toString(waitingFor), Integer.toString(notifyTarget)));
         }
 
         synchronized (stream) {
@@ -191,14 +191,14 @@ class WindowAllocationManager {
                         // Blocking, so use notify to release StreamOutputBuffer
                         if (log.isDebugEnabled()) {
                             log.debug(sm.getString("windowAllocationManager.notified",
-                                    stream.getConnectionId(), stream.getIdentifier()));
+                                    stream.getConnectionId(), stream.getIdAsString()));
                         }
                         stream.notify();
                     } else {
                         // Non-blocking so dispatch
                         if (log.isDebugEnabled()) {
                             log.debug(sm.getString("windowAllocationManager.dispatched",
-                                    stream.getConnectionId(), stream.getIdentifier()));
+                                    stream.getConnectionId(), stream.getIdAsString()));
                         }
                         response.action(ActionCode.DISPATCH_WRITE, null);
                         // Need to explicitly execute dispatches on the StreamProcessor

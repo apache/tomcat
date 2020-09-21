@@ -33,6 +33,7 @@ abstract class AbstractStream {
     private static final StringManager sm = StringManager.getManager(AbstractStream.class);
 
     private final Integer identifier;
+    private final String idAsString;
 
     private volatile AbstractStream parentStream = null;
     private final Set<Stream> childStreams =
@@ -42,11 +43,17 @@ abstract class AbstractStream {
 
     public AbstractStream(Integer identifier) {
         this.identifier = identifier;
+        this.idAsString = identifier.toString();
     }
 
 
     public Integer getIdentifier() {
         return identifier;
+    }
+
+
+    final String getIdAsString() {
+        return idAsString;
     }
 
 
@@ -119,7 +126,7 @@ abstract class AbstractStream {
 
         if (log.isDebugEnabled()) {
             log.debug(sm.getString("abstractStream.windowSizeInc", getConnectionId(),
-                    getIdentifier(), Integer.toString(increment), Long.toString(windowSize)));
+                    getIdAsString(), Integer.toString(increment), Long.toString(windowSize)));
         }
 
         if (windowSize > ConnectionSettingsBase.MAX_WINDOW_SIZE) {
@@ -142,7 +149,7 @@ abstract class AbstractStream {
         windowSize -= decrement;
         if (log.isDebugEnabled()) {
             log.debug(sm.getString("abstractStream.windowSizeDec", getConnectionId(),
-                    getIdentifier(), Integer.toString(decrement), Long.toString(windowSize)));
+                    getIdAsString(), Integer.toString(decrement), Long.toString(windowSize)));
         }
     }
 

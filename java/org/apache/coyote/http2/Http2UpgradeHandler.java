@@ -661,10 +661,10 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
         if (log.isDebugEnabled()) {
             if (pushedStreamId == 0) {
                 log.debug(sm.getString("upgradeHandler.writeHeaders", connectionId,
-                        stream.getIdentifier()));
+                        stream.getIdAsString()));
             } else {
                 log.debug(sm.getString("upgradeHandler.writePushHeaders", connectionId,
-                        stream.getIdentifier(), Integer.valueOf(pushedStreamId),
+                        stream.getIdAsString(), Integer.valueOf(pushedStreamId),
                         Boolean.valueOf(endOfStream)));
             }
         }
@@ -740,7 +740,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
 
     void writeBody(Stream stream, ByteBuffer data, int len, boolean finished) throws IOException {
         if (log.isDebugEnabled()) {
-            log.debug(sm.getString("upgradeHandler.writeBody", connectionId, stream.getIdentifier(),
+            log.debug(sm.getString("upgradeHandler.writeBody", connectionId, stream.getIdAsString(),
                     Integer.toString(len)));
         }
 
@@ -908,7 +908,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
                                 if (stream.isActive()) {
                                     if (log.isDebugEnabled()) {
                                         log.debug(sm.getString("upgradeHandler.noAllocation",
-                                                connectionId, stream.getIdentifier()));
+                                                connectionId, stream.getIdAsString()));
                                     }
                                     // No allocation
                                     // Close the connection. Do this first since
@@ -929,7 +929,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
                         } catch (InterruptedException e) {
                             throw new IOException(sm.getString(
                                     "upgradeHandler.windowSizeReservationInterrupted", connectionId,
-                                    stream.getIdentifier(), Integer.toString(reservation)), e);
+                                    stream.getIdAsString(), Integer.toString(reservation)), e);
                         }
                     } else {
                         stream.waitForConnectionAllocationNonBlocking();
@@ -961,7 +961,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
             for (AbstractStream stream : streamsToNotify) {
                 if (log.isDebugEnabled()) {
                     log.debug(sm.getString("upgradeHandler.releaseBacklog",
-                            connectionId, stream.getIdentifier()));
+                            connectionId, stream.getIdAsString()));
                 }
                 // There is never any O/P on stream zero but it is included in
                 // the backlog as it simplifies the code. Skip it if it appears
@@ -1013,7 +1013,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
     private int allocate(AbstractStream stream, int allocation) {
         if (log.isDebugEnabled()) {
             log.debug(sm.getString("upgradeHandler.allocate.debug", getConnectionId(),
-                    stream.getIdentifier(), Integer.toString(allocation)));
+                    stream.getIdAsString(), Integer.toString(allocation)));
         }
         // Allocate to the specified stream
         BacklogTracker tracker = backLogStreams.get(stream);
@@ -1026,7 +1026,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
 
         if (log.isDebugEnabled()) {
             log.debug(sm.getString("upgradeHandler.allocate.left",
-                    getConnectionId(), stream.getIdentifier(), Integer.toString(leftToAllocate)));
+                    getConnectionId(), stream.getIdAsString(), Integer.toString(leftToAllocate)));
         }
 
         // Recipients are children of the current stream that are in the
@@ -1046,7 +1046,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
             for (AbstractStream recipient : recipients) {
                 if (log.isDebugEnabled()) {
                     log.debug(sm.getString("upgradeHandler.allocate.recipient",
-                            getConnectionId(), stream.getIdentifier(), recipient.getIdentifier(),
+                            getConnectionId(), stream.getIdAsString(), recipient.getIdAsString(),
                             Integer.toString(recipient.getWeight())));
                 }
                 totalWeight += recipient.getWeight();
@@ -1085,7 +1085,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
         Stream result = streams.get(key);
         if (result == null && unknownIsError) {
             // Stream has been closed and removed from the map
-            throw new ConnectionException(sm.getString("upgradeHandler.stream.closed", key),
+            throw new ConnectionException(sm.getString("upgradeHandler.stream.closed", key.toString()),
                     Http2Error.PROTOCOL_ERROR);
         }
         return result;
@@ -1711,7 +1711,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
                 } catch (Http2Exception h2e) {
                     stream.close(new StreamException(sm.getString(
                             "upgradeHandler.windowSizeTooBig", connectionId,
-                            stream.getIdentifier()),
+                            stream.getIdAsString()),
                             h2e.getError(), stream.getIdAsInt()));
                }
             }
@@ -1727,7 +1727,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
             if (!localSettings.ack()) {
                 // Ack was unexpected
                 log.warn(sm.getString(
-                        "upgradeHandler.unexpectedAck", connectionId, getIdentifier()));
+                        "upgradeHandler.unexpectedAck", connectionId, getIdAsString()));
             }
         } else {
             synchronized (socketWrapper) {
