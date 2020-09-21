@@ -95,6 +95,10 @@
         response if the Connector was configured with
         <code>maxSwallowSize=-1</code>. (markt)
       </fix>
+      <fix>
+        When logging HTTP/2 debug messages, use consistent formatting for stream
+        idnetifiers. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
