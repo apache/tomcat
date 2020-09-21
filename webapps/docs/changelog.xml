@@ -78,7 +78,7 @@
       </fix>
       <fix>
         When logging HTTP/2 debug messages, use consistent formatting for stream
-        idnetifiers. (markt)
+        identifiers. (markt)
       </fix>
     </changelog>
   </subsection>
