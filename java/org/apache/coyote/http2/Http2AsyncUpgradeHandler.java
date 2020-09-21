@@ -198,7 +198,7 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
     @Override
     void writeBody(Stream stream, ByteBuffer data, int len, boolean finished) throws IOException {
         if (log.isDebugEnabled()) {
-            log.debug(sm.getString("upgradeHandler.writeBody", connectionId, stream.getIdentifier(),
+            log.debug(sm.getString("upgradeHandler.writeBody", connectionId, stream.getIdAsString(),
                     Integer.toString(len)));
         }
         // Need to check this now since sending end of stream will change this.
@@ -258,7 +258,7 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
         if (ack) {
             if (!localSettings.ack()) {
                 // Ack was unexpected
-                log.warn(sm.getString("upgradeHandler.unexpectedAck", connectionId, getIdentifier()));
+                log.warn(sm.getString("upgradeHandler.unexpectedAck", connectionId, getIdAsString()));
             }
         } else {
             socketWrapper.write(BlockingMode.SEMI_BLOCK, protocol.getWriteTimeout(),

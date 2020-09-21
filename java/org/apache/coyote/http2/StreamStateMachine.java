@@ -92,7 +92,7 @@ class StreamStateMachine {
     public synchronized void sendReset() {
         if (state == State.IDLE) {
             throw new IllegalStateException(sm.getString("streamStateMachine.debug.change",
-                    stream.getConnectionId(), stream.getIdentifier(), state));
+                    stream.getConnectionId(), stream.getIdAsString(), state));
         }
         if (state.canReset()) {
             stateChange(state, State.CLOSED_RST_TX);
@@ -110,7 +110,7 @@ class StreamStateMachine {
             state = newState;
             if (log.isDebugEnabled()) {
                 log.debug(sm.getString("streamStateMachine.debug.change", stream.getConnectionId(),
-                        stream.getIdentifier(), oldState, newState));
+                        stream.getIdAsString(), oldState, newState));
             }
         }
     }
@@ -122,11 +122,11 @@ class StreamStateMachine {
         if (!isFrameTypePermitted(frameType)) {
             if (state.connectionErrorForInvalidFrame) {
                 throw new ConnectionException(sm.getString("streamStateMachine.invalidFrame",
-                        stream.getConnectionId(), stream.getIdentifier(), state, frameType),
+                        stream.getConnectionId(), stream.getIdAsString(), state, frameType),
                         state.errorCodeForInvalidFrame);
             } else {
                 throw new StreamException(sm.getString("streamStateMachine.invalidFrame",
-                        stream.getConnectionId(), stream.getIdentifier(), state, frameType),
+                        stream.getConnectionId(), stream.getIdAsString(), state, frameType),
                         state.errorCodeForInvalidFrame, stream.getIdAsInt());
             }
         }
