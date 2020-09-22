@@ -80,6 +80,11 @@
         When logging HTTP/2 debug messages, use consistent formatting for stream
         identifiers. (markt)
       </fix>
+      <fix>
+        Correct some double counting in the code that tracks the number of
+        in-flight asynchronous requests. The tracking enables Tomcat to shutdown
+        gracefully when asynchronous processing is in use. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
