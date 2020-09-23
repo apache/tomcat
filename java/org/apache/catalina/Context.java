@@ -1919,4 +1919,19 @@ public interface Context extends Container, ContextBind {
      *         otherwise {@code false}
      */
     public boolean getCreateUploadTargets();
+
+
+    /**
+     * @return <code>true</code> if the resources archive lookup will
+     * use a bloom filter.
+     */
+    public boolean getUseBloomFilterForArchives();
+
+    /**
+     * Set bloom filter flag value.
+     *
+     * @param useBloomFilterForArchives The new fast class path scan flag
+     */
+    public void setUseBloomFilterForArchives(boolean useBloomFilterForArchives);
+
 }

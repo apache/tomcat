@@ -78,6 +78,11 @@
         When performing an incremental build, ensure bdn does not create
         unwanted JPMS dependencies between embedded JARs. (markt)
       </fix>
+      <update>
+        Add a bloom filter to speed up archive lookup and improve deployment
+        speed of applications with a large number of JARs. Patch
+        provided by Jatin Kamnani. (remm)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Coyote">
