@@ -835,6 +835,8 @@ public class StandardContext extends ContainerBase
 
     private boolean parallelAnnotationScanning = false;
 
+    private boolean useBloomFilterForArchives = false;
+
     // ----------------------------------------------------- Context Properties
 
     @Override
@@ -1445,6 +1447,23 @@ public class StandardContext extends ContainerBase
         support.firePropertyChange("antiResourceLocking",
                                    oldAntiResourceLocking,
                                    this.antiResourceLocking);
+
+    }
+
+
+    @Override
+    public boolean getUseBloomFilterForArchives() {
+        return this.useBloomFilterForArchives;
+    }
+
+
+    @Override
+    public void setUseBloomFilterForArchives(boolean useBloomFilterForArchives) {
+
+        boolean oldUseBloomFilterForArchives = this.useBloomFilterForArchives;
+        this.useBloomFilterForArchives = useBloomFilterForArchives;
+        support.firePropertyChange("useBloomFilterForArchives", oldUseBloomFilterForArchives,
+                this.useBloomFilterForArchives);
 
     }
 
