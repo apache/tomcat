@@ -103,6 +103,11 @@
         <code>SameSite=strict</code> for all cookies, including session cookies,
         created by the application. (markt)
       </add>
+      <fix>
+        Update the Manager How-To in the documentation web application to
+        clarify when a user may wish to deploy additional instances of the
+        Maanger web application. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
