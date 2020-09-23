@@ -51,7 +51,7 @@ public final class JarContents {
     /**
      * Parses the passed-in jar and populates the bit array.
      *
-     * @param jar
+     * @param jar the JAR file
      */
     public JarContents(JarFile jar) {
         Enumeration<JarEntry> entries = jar.entries();
