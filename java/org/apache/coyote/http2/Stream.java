@@ -46,7 +46,7 @@ import org.apache.tomcat.util.net.ApplicationBufferHandler;
 import org.apache.tomcat.util.net.WriteBuffer;
 import org.apache.tomcat.util.res.StringManager;
 
-class Stream extends AbstractStream implements HeaderEmitter {
+class Stream extends AbstractNonZeroStream implements HeaderEmitter {
 
     private static final Log log = LogFactory.getLog(Stream.class);
     private static final StringManager sm = StringManager.getManager(Stream.class);
