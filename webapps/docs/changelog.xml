@@ -68,6 +68,15 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Web applications">
+    <changelog>
+      <fix>
+        Update the Manager How-To in the documentation web application to
+        clarify when a user may wish to deploy additional instances of the
+        Maanger web application. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <add>
