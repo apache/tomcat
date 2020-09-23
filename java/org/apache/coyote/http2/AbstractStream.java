@@ -25,7 +25,8 @@ import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
- * Used to managed prioritisation.
+ * Base class for all streams including the connection (referred to as Stream 0)
+ * and is used primarily when managing prioritization.
  */
 abstract class AbstractStream {
 
