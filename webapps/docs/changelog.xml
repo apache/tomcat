@@ -114,6 +114,11 @@
         in-flight asynchronous requests. The tracking enables Tomcat to shutdown
         gracefully when asynchronous processing is in use. (markt)
       </fix>
+      <fix>
+        Improve the error handling for the HTTP/2 connection preface when the
+        Connector is configured with <code>useAsycIO=&quot;true&quot;</code>.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
