@@ -612,7 +612,8 @@ public class Stream extends AbstractNonZeroStream implements HeaderEmitter {
     }
 
 
-    boolean isClosedFinal() {
+    @Override
+    final boolean isClosedFinal() {
         return state.isClosedFinal();
     }
 
