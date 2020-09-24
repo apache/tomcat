@@ -83,6 +83,11 @@
         speed of applications with a large number of JARs. Patch
         provided by Jatin Kamnani. (remm)
       </update>
+      <fix>
+        Throw <code>SQLException</code> instead of
+        <code>NullpointerException</code> when failing to connect to the
+        database. (kfujino)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
