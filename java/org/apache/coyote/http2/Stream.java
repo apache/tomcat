@@ -97,7 +97,7 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
         this.handler = handler;
         handler.addChild(this);
         setWindowSize(handler.getRemoteSettings().getInitialWindowSize());
-        state = new StreamStateMachine(this);
+        state = new StreamStateMachine(getConnectionId(), getIdAsString());
         if (coyoteRequest == null) {
             // HTTP/2 new request
             this.coyoteRequest = new Request();
