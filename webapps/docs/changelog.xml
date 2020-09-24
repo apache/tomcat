@@ -160,6 +160,9 @@
         Expand coverage of Russian translations. Pull request provided by
         Nikolay Gribanov. (markt)
       </add>
+      <update>
+        Update the OWB module to Apache OpenWebBeans 2.0.18. (remm)
+      </update>
     </changelog>
   </subsection>
 </section>
