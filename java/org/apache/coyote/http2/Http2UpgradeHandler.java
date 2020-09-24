@@ -662,7 +662,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
         if (log.isDebugEnabled()) {
             if (pushedStreamId == 0) {
                 log.debug(sm.getString("upgradeHandler.writeHeaders", connectionId,
-                        stream.getIdAsString()));
+                        stream.getIdAsString(), Boolean.valueOf(endOfStream)));
             } else {
                 log.debug(sm.getString("upgradeHandler.writePushHeaders", connectionId,
                         stream.getIdAsString(), Integer.valueOf(pushedStreamId),
@@ -1171,9 +1171,10 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
         // maximum number of concurrent streams.
         long max = localSettings.getMaxConcurrentStreams();
 
+        final int size = streams.size();
         if (log.isDebugEnabled()) {
             log.debug(sm.getString("upgradeHandler.pruneStart", connectionId,
-                    Long.toString(max), Integer.toString(streams.size())));
+                    Long.toString(max), Integer.toString(size)));
         }
 
         // Only need ~+10% for streams that are in the priority tree,
@@ -1187,7 +1188,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
             max = Integer.MAX_VALUE;
         }
 
-        int toClose = streams.size() - (int) max;
+        int toClose = size - (int) max;
         if (toClose < 1) {
             return;
         }
