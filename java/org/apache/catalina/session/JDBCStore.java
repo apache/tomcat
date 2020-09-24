@@ -935,6 +935,9 @@ public class JDBCStore extends StoreBase {
         if (connectionPassword != null)
             props.put("password", connectionPassword);
         dbConnection = driver.connect(connectionURL, props);
+        if (dbConnection == null) {
+            throw new SQLException(sm.getString(getStoreName() + ".connectError", connectionURL));
+        }
         dbConnection.setAutoCommit(true);
         return dbConnection;
 
