@@ -51,7 +51,7 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
         super(protocol, adapter, coyoteRequest);
     }
 
-    private CompletionHandler<Long, Void> errorCompletion = new CompletionHandler<Long, Void>() {
+    private final CompletionHandler<Long, Void> errorCompletion = new CompletionHandler<Long, Void>() {
         @Override
         public void completed(Long result, Void attachment) {
         }
@@ -60,7 +60,7 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
             error = t;
         }
     };
-    private CompletionHandler<Long, Void> applicationErrorCompletion = new CompletionHandler<Long, Void>() {
+    private final CompletionHandler<Long, Void> applicationErrorCompletion = new CompletionHandler<Long, Void>() {
         @Override
         public void completed(Long result, Void attachment) {
         }
@@ -199,7 +199,7 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
     void writeBody(Stream stream, ByteBuffer data, int len, boolean finished) throws IOException {
         if (log.isDebugEnabled()) {
             log.debug(sm.getString("upgradeHandler.writeBody", connectionId, stream.getIdAsString(),
-                    Integer.toString(len)));
+                    Integer.toString(len), Boolean.valueOf(finished)));
         }
         // Need to check this now since sending end of stream will change this.
         boolean writeable = stream.canWrite();
