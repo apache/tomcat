@@ -97,4 +97,5 @@ abstract class AbstractNonZeroStream extends AbstractStream {
         this.weight = weight;
     }
 
+    abstract boolean isClosedFinal();
 }
