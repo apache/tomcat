@@ -29,7 +29,7 @@
     <name>Apache CXF for Apache Tomcat CDI</name>
     <description>Apache CXF packaged for Apache Tomcat CDI</description>
     <!-- This is the Apache CXF version -->
-    <version>3.3.6</version>
+    <version>3.4.0</version>
     <packaging>jar</packaging>
 
     <properties>
@@ -127,11 +127,9 @@
                                     <!-- Already present in Tomcat or in the CDI bundle -->
                                     <exclude>jakarta.annotation:jakarta.annotation-api</exclude>
 									<exclude>jakarta.el:*</exclude>
-                                    <exclude>javax.annotation:javax.annotation-api</exclude>
-                                    <exclude>javax.el:*</exclude>
-									<exclude>javax.enterprise:cdi-api</exclude>
-									<exclude>javax.inject:*</exclude>
-									<exclude>javax.interceptor:*</exclude>
+									<exclude>jakarta.enterprise:jakarta.enterprise.cdi-api</exclude>
+									<exclude>jakarta.inject:*</exclude>
+									<exclude>jakarta.interceptor:*</exclude>
 									<!-- Exclude other unneeded dependencies -->
 									<exclude>org.apache.ant:*</exclude>
 									<exclude>org.codehaus.woodstox:*</exclude>
