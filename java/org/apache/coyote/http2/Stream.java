@@ -66,7 +66,6 @@ public class Stream extends AbstractNonZeroStream implements HeaderEmitter {
     private volatile long contentLengthReceived = 0;
 
     private final Http2UpgradeHandler handler;
-    private final StreamStateMachine state;
     private final WindowAllocationManager allocationManager = new WindowAllocationManager(this);
 
     // State machine would be too much overhead
@@ -90,11 +89,10 @@ public class Stream extends AbstractNonZeroStream implements HeaderEmitter {
 
 
     public Stream(Integer identifier, Http2UpgradeHandler handler, Request coyoteRequest) {
-        super(identifier);
+        super(handler.getConnectionId(), identifier);
         this.handler = handler;
         handler.addChild(this);
         setWindowSize(handler.getRemoteSettings().getInitialWindowSize());
-        state = new StreamStateMachine(getConnectionId(), getIdAsString());
         if (coyoteRequest == null) {
             // HTTP/2 new request
             this.coyoteRequest = new Request();
@@ -192,13 +190,7 @@ public class Stream extends AbstractNonZeroStream implements HeaderEmitter {
 
 
     @Override
-    final void checkState(FrameType frameType) throws Http2Exception {
-        state.checkFrameType(frameType);
-    }
-
-
-    @Override
-    protected synchronized void incrementWindowSize(int windowSizeIncrement) throws Http2Exception {
+    protected final synchronized void incrementWindowSize(int windowSizeIncrement) throws Http2Exception {
         // If this is zero then any thread that has been trying to write for
         // this stream will be waiting. Notify that thread it can continue. Use
         // notify all even though only one thread is waiting to be on the safe
@@ -613,13 +605,7 @@ public class Stream extends AbstractNonZeroStream implements HeaderEmitter {
     }
 
 
-    @Override
-    final boolean isClosedFinal() {
-        return state.isClosedFinal();
-    }
-
-
-    void closeIfIdle() {
+    final void closeIfIdle() {
         state.closeIfIdle();
     }
 

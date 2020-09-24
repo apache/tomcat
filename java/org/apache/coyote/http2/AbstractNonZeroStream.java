@@ -31,17 +31,22 @@ abstract class AbstractNonZeroStream extends AbstractStream {
     private static final Log log = LogFactory.getLog(AbstractNonZeroStream.class);
     private static final StringManager sm = StringManager.getManager(AbstractNonZeroStream.class);
 
+    protected final StreamStateMachine state;
+
     private volatile int weight;
 
 
-    AbstractNonZeroStream(Integer identifier) {
-        this(identifier, Constants.DEFAULT_WEIGHT);
+    AbstractNonZeroStream(String connectionId, Integer identifier) {
+        super(identifier);
+        this.weight = Constants.DEFAULT_WEIGHT;
+        this.state = new StreamStateMachine(connectionId, getIdAsString());
     }
 
 
-    AbstractNonZeroStream(Integer identifier, int weight) {
+    AbstractNonZeroStream(Integer identifier, int weight, StreamStateMachine state) {
         super(identifier);
         this.weight = weight;
+        this.state = state;
     }
 
 
@@ -97,7 +102,13 @@ abstract class AbstractNonZeroStream extends AbstractStream {
         this.weight = weight;
     }
 
-    abstract boolean isClosedFinal();
 
-    abstract void checkState(FrameType frameType) throws Http2Exception;
+    final boolean isClosedFinal() {
+        return state.isClosedFinal();
+    }
+
+
+    final void checkState(FrameType frameType) throws Http2Exception {
+        state.checkFrameType(frameType);
+    }
 }
