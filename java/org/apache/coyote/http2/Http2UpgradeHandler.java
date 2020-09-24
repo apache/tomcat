@@ -665,7 +665,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
         if (log.isDebugEnabled()) {
             if (pushedStreamId == 0) {
                 log.debug(sm.getString("upgradeHandler.writeHeaders", connectionId,
-                        stream.getIdAsString()));
+                        stream.getIdAsString(), Boolean.valueOf(endOfStream)));
             } else {
                 log.debug(sm.getString("upgradeHandler.writePushHeaders", connectionId,
                         stream.getIdAsString(), Integer.valueOf(pushedStreamId),
@@ -1160,9 +1160,10 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
         // maximum number of concurrent streams
         long max = localSettings.getMaxConcurrentStreams();
 
+        final int size = streams.size();
         if (log.isDebugEnabled()) {
             log.debug(sm.getString("upgradeHandler.pruneStart", connectionId,
-                    Long.toString(max), Integer.toString(streams.size())));
+                    Long.toString(max), Integer.toString(size)));
         }
 
         // Allow an additional 10% for closed streams that are used in the
@@ -1172,7 +1173,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
             max = Integer.MAX_VALUE;
         }
 
-        int toClose = streams.size() - (int) max;
+        int toClose = size - (int) max;
         if (toClose < 1) {
             return;
         }
@@ -1199,16 +1200,17 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
                 continue;
             }
 
+            final Integer streamIdentifier = entry.getKey();
             if (stream.isClosedFinal()) {
                 // This stream went from IDLE to CLOSED and is likely to have
                 // been created by the client as part of the priority tree.
-                candidatesStepThree.add(entry.getKey());
+                candidatesStepThree.add(streamIdentifier);
             } else if (stream.getChildStreams().size() == 0) {
                 // Closed, no children
-                candidatesStepOne.add(entry.getKey());
+                candidatesStepOne.add(streamIdentifier);
             } else {
                 // Closed, with children
-                candidatesStepTwo.add(entry.getKey());
+                candidatesStepTwo.add(streamIdentifier);
             }
         }
 
@@ -1268,9 +1270,9 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
         // Move the removed Stream's children to the removed Stream's
         // parent.
         Set<Stream> children = streamToRemove.getChildStreams();
-        if (streamToRemove.getChildStreams().size() == 1) {
+        if (children.size() == 1) {
             // Shortcut
-            streamToRemove.getChildStreams().iterator().next().rePrioritise(
+            children.iterator().next().rePrioritise(
                     streamToRemove.getParentStream(), streamToRemove.getWeight());
         } else {
             int totalWeight = 0;
@@ -1278,13 +1280,13 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
                 totalWeight += child.getWeight();
             }
             for (Stream child : children) {
-                streamToRemove.getChildStreams().iterator().next().rePrioritise(
+                children.iterator().next().rePrioritise(
                         streamToRemove.getParentStream(),
                         streamToRemove.getWeight() * child.getWeight() / totalWeight);
             }
         }
         streamToRemove.detachFromParent();
-        streamToRemove.getChildStreams().clear();
+        children.clear();
     }
 
 
