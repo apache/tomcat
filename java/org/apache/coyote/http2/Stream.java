@@ -22,7 +22,6 @@ import java.nio.charset.StandardCharsets;
 import java.security.AccessController;
 import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
-import java.util.Iterator;
 import java.util.Locale;
 
 import org.apache.coyote.ActionCode;
@@ -64,7 +63,6 @@ public class Stream extends AbstractNonZeroStream implements HeaderEmitter {
         ACK_HEADERS = response.getMimeHeaders();
     }
 
-    private volatile int weight = Constants.DEFAULT_WEIGHT;
     private volatile long contentLengthReceived = 0;
 
     private final Http2UpgradeHandler handler;
@@ -173,54 +171,7 @@ public class Stream extends AbstractNonZeroStream implements HeaderEmitter {
     }
 
 
-    void rePrioritise(AbstractStream parent, boolean exclusive, int weight) {
-        if (log.isDebugEnabled()) {
-            log.debug(sm.getString("stream.reprioritisation.debug",
-                    getConnectionId(), getIdAsString(), Boolean.toString(exclusive),
-                    parent.getIdAsString(), Integer.toString(weight)));
-        }
-
-        // Check if new parent is a descendant of this stream
-        if (isDescendant(parent)) {
-            parent.detachFromParent();
-            // Cast is always safe since any descendant of this stream must be
-            // an instance of Stream
-            getParentStream().addChild((Stream) parent);
-        }
-
-        if (exclusive) {
-            // Need to move children of the new parent to be children of this
-            // stream. Slightly convoluted to avoid concurrent modification.
-            Iterator<Stream> parentsChildren = parent.getChildStreams().iterator();
-            while (parentsChildren.hasNext()) {
-                Stream parentsChild = parentsChildren.next();
-                parentsChildren.remove();
-                this.addChild(parentsChild);
-            }
-        }
-        detachFromParent();
-        parent.addChild(this);
-        this.weight = weight;
-    }
-
-
-    /*
-     * Used when removing closed streams from the tree and we know there is no
-     * need to check for circular references.
-     */
-    final void rePrioritise(AbstractStream parent, int weight) {
-        if (log.isDebugEnabled()) {
-            log.debug(sm.getString("stream.reprioritisation.debug",
-                    getConnectionId(), getIdAsString(), Boolean.FALSE,
-                    parent.getIdAsString(), Integer.toString(weight)));
-        }
-
-        parent.addChild(this);
-        this.weight = weight;
-    }
-
-
-    void receiveReset(long errorCode) {
+    final void receiveReset(long errorCode) {
         if (log.isDebugEnabled()) {
             log.debug(sm.getString("stream.reset.receive", getConnectionId(), getIdAsString(),
                     Long.toString(errorCode)));
@@ -534,13 +485,7 @@ public class Stream extends AbstractNonZeroStream implements HeaderEmitter {
     }
 
 
-    @Override
-    protected int getWeight() {
-        return weight;
-    }
-
-
-    Request getCoyoteRequest() {
+    final Request getCoyoteRequest() {
         return coyoteRequest;
     }
 

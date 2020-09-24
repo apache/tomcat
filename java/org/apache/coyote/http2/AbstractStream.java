@@ -37,8 +37,8 @@ abstract class AbstractStream {
     private final String idAsString;
 
     private volatile AbstractStream parentStream = null;
-    private final Set<Stream> childStreams =
-            Collections.newSetFromMap(new ConcurrentHashMap<Stream,Boolean>());
+    private final Set<AbstractNonZeroStream> childStreams =
+            Collections.newSetFromMap(new ConcurrentHashMap<AbstractNonZeroStream,Boolean>());
     private long windowSize = ConnectionSettingsBase.DEFAULT_INITIAL_WINDOW_SIZE;
 
 
@@ -71,7 +71,7 @@ abstract class AbstractStream {
     }
 
 
-    final void addChild(Stream child) {
+    final void addChild(AbstractNonZeroStream child) {
         child.setParentStream(this);
         childStreams.add(child);
     }
@@ -98,7 +98,7 @@ abstract class AbstractStream {
     }
 
 
-    final Set<Stream> getChildStreams() {
+    final Set<AbstractNonZeroStream> getChildStreams() {
         return childStreams;
     }
 
