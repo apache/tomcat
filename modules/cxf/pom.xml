@@ -125,6 +125,7 @@
 				            <artifactSet>
                                 <excludes>
                                     <!-- Already present in Tomcat or in the CDI bundle -->
+                                    <exclude>jakarta.activation:*</exclude>
                                     <exclude>jakarta.annotation:jakarta.annotation-api</exclude>
 									<exclude>jakarta.el:*</exclude>
 									<exclude>jakarta.enterprise:jakarta.enterprise.cdi-api</exclude>
@@ -152,6 +153,7 @@
 										<exclude>META-INF/NOTICE.txt</exclude>
 										<exclude>META-INF/NOTICE</exclude>
 										<!-- Unneeded configuration files -->
+                                        <exclude>module-info.class</exclude>
 										<exclude>META-INF/cxf/cxf.*</exclude>
 										<exclude>META-INF/cxf/cxf-servlet.*</exclude>
 										<exclude>META-INF/cxf/org.apache.cxf.bus.factory</exclude>
