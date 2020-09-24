@@ -23,15 +23,23 @@ package org.apache.coyote.http2;
 class RecycledStream extends AbstractNonZeroStream {
 
     private final String connectionId;
+    private final boolean closedFinal;
 
     RecycledStream(Stream stream) {
         super(stream.getIdentifier(), stream.getWeight());
         connectionId = stream.getConnectionId();
+        closedFinal = stream.isClosedFinal();
     }
 
 
     @Override
     String getConnectionId() {
         return connectionId;
+    }
+
+
+    @Override
+    boolean isClosedFinal() {
+        return closedFinal;
     }
 }
