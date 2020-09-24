@@ -1269,17 +1269,17 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
         Stream streamToRemove = streams.remove(streamIdToRemove);
         // Move the removed Stream's children to the removed Stream's
         // parent.
-        Set<Stream> children = streamToRemove.getChildStreams();
+        Set<AbstractNonZeroStream> children = streamToRemove.getChildStreams();
         if (children.size() == 1) {
             // Shortcut
             children.iterator().next().rePrioritise(
                     streamToRemove.getParentStream(), streamToRemove.getWeight());
         } else {
             int totalWeight = 0;
-            for (Stream child : children) {
+            for (AbstractNonZeroStream child : children) {
                 totalWeight += child.getWeight();
             }
-            for (Stream child : children) {
+            for (AbstractNonZeroStream child : children) {
                 children.iterator().next().rePrioritise(
                         streamToRemove.getParentStream(),
                         streamToRemove.getWeight() * child.getWeight() / totalWeight);

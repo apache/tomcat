@@ -23,23 +23,15 @@ package org.apache.coyote.http2;
 class RecycledStream extends AbstractNonZeroStream {
 
     private final String connectionId;
-    private int weight;
 
     RecycledStream(Stream stream) {
-        super(stream.getIdentifier());
+        super(stream.getIdentifier(), stream.getWeight());
         connectionId = stream.getConnectionId();
-        weight = stream.getWeight();
     }
 
 
     @Override
     String getConnectionId() {
         return connectionId;
-    }
-
-
-    @Override
-    int getWeight() {
-        return weight;
     }
 }
