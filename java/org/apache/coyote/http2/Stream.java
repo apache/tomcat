@@ -69,7 +69,6 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
     private volatile long contentLengthReceived = 0;
 
     private final Http2UpgradeHandler handler;
-    private final StreamStateMachine state;
     private final WindowAllocationManager allocationManager = new WindowAllocationManager(this);
 
     // State machine would be too much overhead
@@ -93,11 +92,10 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
 
 
     Stream(Integer identifier, Http2UpgradeHandler handler, Request coyoteRequest) {
-        super(identifier);
+        super(handler.getConnectionId(), identifier);
         this.handler = handler;
         handler.addChild(this);
         setWindowSize(handler.getRemoteSettings().getInitialWindowSize());
-        state = new StreamStateMachine(getConnectionId(), getIdAsString());
         if (coyoteRequest == null) {
             // HTTP/2 new request
             this.coyoteRequest = new Request();
@@ -190,12 +188,6 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
 
     final void cancelAllocationRequests() {
         allocationManager.notifyAny();
-    }
-
-
-    @Override
-    final void checkState(FrameType frameType) throws Http2Exception {
-        state.checkFrameType(frameType);
     }
 
 
@@ -644,12 +636,6 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
 
     final boolean canWrite() {
         return state.canWrite();
-    }
-
-
-    @Override
-    final boolean isClosedFinal() {
-        return state.isClosedFinal();
     }
 
 
