@@ -23,30 +23,16 @@ package org.apache.coyote.http2;
 class RecycledStream extends AbstractNonZeroStream {
 
     private final String connectionId;
-    private final StreamStateMachine state;
 
     RecycledStream(String connectionId, Integer identifier, int weight, StreamStateMachine state) {
-        super(identifier, weight);
+        super(identifier, weight, state);
         this.connectionId = connectionId;
-        this.state = state;
     }
 
 
     @Override
     String getConnectionId() {
         return connectionId;
-    }
-
-
-    @Override
-    boolean isClosedFinal() {
-        return state.isClosedFinal();
-    }
-
-
-    @Override
-    final void checkState(FrameType frameType) throws Http2Exception {
-        state.checkFrameType(frameType);
     }
 
 
