@@ -193,6 +193,7 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
     }
 
 
+    @Override
     final void checkState(FrameType frameType) throws Http2Exception {
         state.checkFrameType(frameType);
     }
@@ -688,24 +689,17 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
 
     /*
      * This method is called recycle for consistency with the rest of the Tomcat
-     * code base. Currently, it only sets references to null for the purposes of
-     * reducing memory footprint. It does not fully recycle the Stream ready for
-     * re-use since Stream objects are not re-used. This is useful because
-     * Stream instances are retained for a period after the Stream closes.
+     * code base. Currently, it calls the handler to replace this stream with an
+     * implementation that uses less memory. It does not fully recycle the
+     * Stream ready for re-use since Stream objects are not re-used. This is
+     * useful because Stream instances are retained for a period after the
+     * Stream closes.
      */
     final void recycle() {
         if (log.isDebugEnabled()) {
             log.debug(sm.getString("stream.recycle", getConnectionId(), getIdAsString()));
         }
-        /*
-         * Temporarily disabled due to multiple regressions (NPEs)
-        coyoteRequest = null;
-        cookieHeader = null;
-        coyoteResponse = null;
-        inputBuffer = null;
-        streamOutputBuffer = null;
-        http2OutputBuffer = null;
-        */
+        handler.replaceStream(this, new RecycledStream(getConnectionId(), getIdentifier(), getWeight(), state));
     }
 
 

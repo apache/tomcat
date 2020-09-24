@@ -98,4 +98,6 @@ abstract class AbstractNonZeroStream extends AbstractStream {
     }
 
     abstract boolean isClosedFinal();
+
+    abstract void checkState(FrameType frameType) throws Http2Exception;
 }
