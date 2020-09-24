@@ -29,7 +29,7 @@
     <name>Apache CXF for Apache Tomcat CDI</name>
     <description>Apache CXF packaged for Apache Tomcat CDI</description>
     <!-- This is the Apache CXF version -->
-    <version>3.3.6</version>
+    <version>3.4.0</version>
     <packaging>jar</packaging>
 
     <properties>
@@ -125,11 +125,12 @@
 				            <artifactSet>
                                 <excludes>
                                     <!-- Already present in Tomcat or in the CDI bundle -->
-                                    <exclude>javax.annotation:javax.annotation-api</exclude>
-									<exclude>javax.el:*</exclude>
-									<exclude>javax.enterprise:cdi-api</exclude>
-									<exclude>javax.inject:*</exclude>
-									<exclude>javax.interceptor:*</exclude>
+                                    <exclude>jakarta.activation:*</exclude>
+                                    <exclude>jakarta.annotation:jakarta.annotation-api</exclude>
+                                    <exclude>jakarta.el:*</exclude>
+                                    <exclude>jakarta.enterprise:jakarta.enterprise.cdi-api</exclude>
+                                    <exclude>jakarta.inject:*</exclude>
+                                    <exclude>jakarta.interceptor:*</exclude>
 									<!-- Exclude other unneeded dependencies -->
 									<exclude>org.apache.ant:*</exclude>
 									<exclude>org.codehaus.woodstox:*</exclude>
@@ -152,6 +153,7 @@
 										<exclude>META-INF/NOTICE.txt</exclude>
 										<exclude>META-INF/NOTICE</exclude>
 										<!-- Unneeded configuration files -->
+                                        <exclude>module-info.class</exclude>
 										<exclude>META-INF/cxf/cxf.*</exclude>
 										<exclude>META-INF/cxf/cxf-servlet.*</exclude>
 										<exclude>META-INF/cxf/org.apache.cxf.bus.factory</exclude>
