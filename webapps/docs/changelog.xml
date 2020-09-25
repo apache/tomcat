@@ -127,6 +127,11 @@
         (markt)
       </fix>
       <fix>
+        Refactor the handling of closed HTTP/2 streams to reduce the heap usage
+        associated with used streams and to retain information for more streams
+        in the priority tree. (markt)
+      </fix>
+      <fix>
         Don't send the Keep-Alive response header if the connection has been
         explicitly closed. (markt)
       </fix>
