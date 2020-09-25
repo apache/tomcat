@@ -94,6 +94,8 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
 
     private static final HeaderSink HEADER_SINK = new HeaderSink();
 
+    private final Object priorityTreeLock = new Object();
+
     protected final String connectionId;
 
     protected final Http2Protocol protocol;
@@ -104,8 +106,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
     private volatile Http2Parser parser;
 
     // Simple state machine (sequence of states)
-    private AtomicReference<ConnectionState> connectionState =
-            new AtomicReference<>(ConnectionState.NEW);
+    private AtomicReference<ConnectionState> connectionState = new AtomicReference<>(ConnectionState.NEW);
     private volatile long pausedNanoTime = Long.MAX_VALUE;
 
     /**
@@ -1175,7 +1176,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
         newStreamsSinceLastPrune = 0;
 
         // RFC 7540, 5.3.4 endpoints should maintain state for at least the
-        // maximum number of concurrent streams
+        // maximum number of concurrent streams.
         long max = localSettings.getMaxConcurrentStreams();
 
         final int size = streams.size();
@@ -1184,9 +1185,13 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
                     Long.toString(max), Integer.toString(size)));
         }
 
-        // Allow an additional 10% for closed streams that are used in the
-        // priority tree
-        max = max + max / 10;
+        // Only need ~+10% for streams that are in the priority tree,
+        // Ideally need to retain information for a "significant" amount of time
+        // after sending END_STREAM (RFC 7540, page 20) so we detect potential
+        // connection error. 5x seems reasonable. The client will have had
+        // plenty of opportunity to process the END_STREAM if another 5x max
+        // concurrent streams have been processed.
+        max = max * 5;
         if (max > Integer.MAX_VALUE) {
             max = Integer.MAX_VALUE;
         }
@@ -1284,27 +1289,29 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
 
 
     private void removeStreamFromPriorityTree(Integer streamIdToRemove) {
-        AbstractNonZeroStream streamToRemove = streams.remove(streamIdToRemove);
-        // Move the removed Stream's children to the removed Stream's
-        // parent.
-        Set<AbstractNonZeroStream> children = streamToRemove.getChildStreams();
-        if (children.size() == 1) {
-            // Shortcut
-            children.iterator().next().rePrioritise(
-                    streamToRemove.getParentStream(), streamToRemove.getWeight());
-        } else {
-            int totalWeight = 0;
-            for (AbstractNonZeroStream child : children) {
-                totalWeight += child.getWeight();
-            }
-            for (AbstractNonZeroStream child : children) {
+        synchronized (priorityTreeLock) {
+            AbstractNonZeroStream streamToRemove = streams.remove(streamIdToRemove);
+            // Move the removed Stream's children to the removed Stream's
+            // parent.
+            Set<AbstractNonZeroStream> children = streamToRemove.getChildStreams();
+            if (children.size() == 1) {
+                // Shortcut
                 children.iterator().next().rePrioritise(
-                        streamToRemove.getParentStream(),
-                        streamToRemove.getWeight() * child.getWeight() / totalWeight);
+                        streamToRemove.getParentStream(), streamToRemove.getWeight());
+            } else {
+                int totalWeight = 0;
+                for (AbstractNonZeroStream child : children) {
+                    totalWeight += child.getWeight();
+                }
+                for (AbstractNonZeroStream child : children) {
+                    children.iterator().next().rePrioritise(
+                            streamToRemove.getParentStream(),
+                            streamToRemove.getWeight() * child.getWeight() / totalWeight);
+                }
             }
+            streamToRemove.detachFromParent();
+            children.clear();
         }
-        streamToRemove.detachFromParent();
-        children.clear();
     }
 
 
@@ -1544,7 +1551,9 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
         if (parentStream == null) {
             parentStream = this;
         }
-        abstractNonZeroStream.rePrioritise(parentStream, exclusive, weight);
+        synchronized (priorityTreeLock) {
+            abstractNonZeroStream.rePrioritise(parentStream, exclusive, weight);
+        }
     }
 
 
@@ -1740,7 +1749,10 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
 
 
     void replaceStream(AbstractNonZeroStream original, AbstractNonZeroStream replacement) {
-        streams.replace(original.getIdentifier(), replacement);
+        synchronized (priorityTreeLock) {
+            streams.replace(original.getIdentifier(), replacement);
+            original.replaceStream(replacement);
+        }
     }
 
 
