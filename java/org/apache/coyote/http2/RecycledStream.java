@@ -24,8 +24,8 @@ class RecycledStream extends AbstractNonZeroStream {
 
     private final String connectionId;
 
-    RecycledStream(String connectionId, Integer identifier, int weight, StreamStateMachine state) {
-        super(identifier, weight, state);
+    RecycledStream(String connectionId, Integer identifier, StreamStateMachine state) {
+        super(identifier, state);
         this.connectionId = connectionId;
     }
 

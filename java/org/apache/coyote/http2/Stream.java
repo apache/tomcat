@@ -655,7 +655,7 @@ public class Stream extends AbstractNonZeroStream implements HeaderEmitter {
         if (log.isDebugEnabled()) {
             log.debug(sm.getString("stream.recycle", getConnectionId(), getIdAsString()));
         }
-        handler.replaceStream(this, new RecycledStream(getConnectionId(), getIdentifier(), getWeight(), state));
+        handler.replaceStream(this, new RecycledStream(getConnectionId(), getIdentifier(), state));
     }
 
 

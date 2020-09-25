@@ -33,19 +33,17 @@ abstract class AbstractNonZeroStream extends AbstractStream {
 
     protected final StreamStateMachine state;
 
-    private volatile int weight;
+    private volatile int weight = Constants.DEFAULT_WEIGHT;
 
 
     AbstractNonZeroStream(String connectionId, Integer identifier) {
         super(identifier);
-        this.weight = Constants.DEFAULT_WEIGHT;
         this.state = new StreamStateMachine(connectionId, getIdAsString());
     }
 
 
-    AbstractNonZeroStream(Integer identifier, int weight, StreamStateMachine state) {
+    AbstractNonZeroStream(Integer identifier, StreamStateMachine state) {
         super(identifier);
-        this.weight = weight;
         this.state = state;
     }
 
@@ -56,6 +54,13 @@ abstract class AbstractNonZeroStream extends AbstractStream {
     }
 
 
+    /*
+     * General method used when reprioritising a stream and care needs to be
+     * taken not to create circular references.
+     *
+     * Changes to the priority tree need to be sychronized at the connection
+     * level. This is the caller's responsibility.
+     */
     final void rePrioritise(AbstractStream parent, boolean exclusive, int weight) {
         if (log.isDebugEnabled()) {
             log.debug(sm.getString("stream.reprioritisation.debug",
@@ -90,6 +95,9 @@ abstract class AbstractNonZeroStream extends AbstractStream {
     /*
      * Used when removing closed streams from the tree and we know there is no
      * need to check for circular references.
+     *
+     * Changes to the priority tree need to be sychronized at the connection
+     * level. This is the caller's responsibility.
      */
     final void rePrioritise(AbstractStream parent, int weight) {
         if (log.isDebugEnabled()) {
@@ -100,6 +108,27 @@ abstract class AbstractNonZeroStream extends AbstractStream {
 
         parent.addChild(this);
         this.weight = weight;
+    }
+
+
+    /*
+     * Used when "recycling" a stream and replacing a Stream instance with a
+     * RecycledStream instance.
+     *
+     * Replace this stream with the provided stream in the parent/child
+     * hierarchy.
+     *
+     * Changes to the priority tree need to be sychronized at the connection
+     * level. This is the caller's responsibility.
+     */
+    void replaceStream(AbstractNonZeroStream replacement) {
+        replacement.setParentStream(getParentStream());
+        detachFromParent();
+        for (AbstractNonZeroStream child : getChildStreams()) {
+            replacement.addChild(child);
+        }
+        getChildStreams().clear();
+        replacement.weight = weight;
     }
 
 
