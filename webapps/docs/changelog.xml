@@ -116,7 +116,7 @@
       </fix>
       <fix>
         Improve the error handling for the HTTP/2 connection preface when the
-        Connector is configured with <code>useAsycIO=&quot;true&quot;</code>.
+        Connector is configured with <code>useAsyncIO=&quot;true&quot;</code>.
         (markt)
       </fix>
     </changelog>
