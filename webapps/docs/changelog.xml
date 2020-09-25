@@ -120,6 +120,11 @@
         Connector is configured with <code>useAsyncIO=&quot;true&quot;</code>.
         (markt)
       </fix>
+      <fix>
+        Refactor the handling of closed HTTP/2 streams to reduce the heap usage
+        associated with used streams and to retain information for more streams
+        in the priority tree. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
