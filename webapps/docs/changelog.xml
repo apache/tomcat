@@ -119,6 +119,10 @@
         Connector is configured with <code>useAsyncIO=&quot;true&quot;</code>.
         (markt)
       </fix>
+      <fix>
+        Don't send the Keep-Alive response header if the connection has been
+        explicitly closed. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
