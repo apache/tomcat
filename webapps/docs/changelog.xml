@@ -125,6 +125,10 @@
         associated with used streams and to retain information for more streams
         in the priority tree. (markt)
       </fix>
+      <fix>
+        Don't send the Keep-Alive response header if the connection has been
+        explicitly closed. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">

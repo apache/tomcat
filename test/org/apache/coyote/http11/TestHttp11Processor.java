@@ -1513,36 +1513,66 @@ public class TestHttp11Processor extends TomcatBaseTest {
 
     @Test
     public void testKeepAliveHeader01() throws Exception {
-        doTestKeepAliveHeader(false, 3000, 10);
+        doTestKeepAliveHeader(false, 3000, 10, false);
     }
 
     @Test
     public void testKeepAliveHeader02() throws Exception {
-        doTestKeepAliveHeader(true, 5000, 1);
+        doTestKeepAliveHeader(true, 5000, 1, false);
     }
 
     @Test
     public void testKeepAliveHeader03() throws Exception {
-        doTestKeepAliveHeader(true, 5000, 10);
+        doTestKeepAliveHeader(true, 5000, 10, false);
     }
 
     @Test
     public void testKeepAliveHeader04() throws Exception {
-        doTestKeepAliveHeader(true, -1, 10);
+        doTestKeepAliveHeader(true, -1, 10, false);
     }
 
     @Test
     public void testKeepAliveHeader05() throws Exception {
-        doTestKeepAliveHeader(true, -1, 1);
+        doTestKeepAliveHeader(true, -1, 1, false);
     }
 
     @Test
     public void testKeepAliveHeader06() throws Exception {
-        doTestKeepAliveHeader(true, -1, -1);
+        doTestKeepAliveHeader(true, -1, -1, false);
+    }
+
+    @Test
+    public void testKeepAliveHeader07() throws Exception {
+        doTestKeepAliveHeader(false, 3000, 10, true);
+    }
+
+    @Test
+    public void testKeepAliveHeader08() throws Exception {
+        doTestKeepAliveHeader(true, 5000, 1, true);
+    }
+
+    @Test
+    public void testKeepAliveHeader09() throws Exception {
+        doTestKeepAliveHeader(true, 5000, 10, true);
+    }
+
+    @Test
+    public void testKeepAliveHeader10() throws Exception {
+        doTestKeepAliveHeader(true, -1, 10, true);
+    }
+
+    @Test
+    public void testKeepAliveHeader11() throws Exception {
+        doTestKeepAliveHeader(true, -1, 1, true);
+    }
+
+    @Test
+    public void testKeepAliveHeader12() throws Exception {
+        doTestKeepAliveHeader(true, -1, -1, true);
     }
 
     private void doTestKeepAliveHeader(boolean sendKeepAlive, int keepAliveTimeout,
-            int maxKeepAliveRequests) throws Exception {
+            int maxKeepAliveRequests, boolean explicitClose) throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
         tomcat.getConnector().setProperty("keepAliveTimeout", Integer.toString(keepAliveTimeout));
@@ -1552,7 +1582,7 @@ public class TestHttp11Processor extends TomcatBaseTest {
         Context ctx = tomcat.addContext("", null);
 
         // Add servlet
-        Tomcat.addServlet(ctx, "TesterServlet", new TesterServlet());
+        Tomcat.addServlet(ctx, "TesterServlet", new TesterServlet(explicitClose));
         ctx.addServletMappingDecoded("/foo", "TesterServlet");
 
         tomcat.start();
@@ -1586,7 +1616,10 @@ public class TestHttp11Processor extends TomcatBaseTest {
             }
         }
 
-        if (!sendKeepAlive || keepAliveTimeout < 0
+        if (explicitClose) {
+            Assert.assertEquals("close", connectionHeaderValue);
+            Assert.assertNull(keepAliveHeaderValue);
+        } else if (!sendKeepAlive || keepAliveTimeout < 0
             && (maxKeepAliveRequests < 0 || maxKeepAliveRequests > 1)) {
             Assert.assertNull(connectionHeaderValue);
             Assert.assertNull(keepAliveHeaderValue);
