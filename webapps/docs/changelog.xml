@@ -90,6 +90,10 @@
         in-flight asynchronous requests. The tracking enables Tomcat to shutdown
         gracefully when asynchronous processing is in use. (markt)
       </fix>
+      <fix>
+        Don't send the Keep-Alive response header if the connection has been
+        explicitly closed. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
