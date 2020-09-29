@@ -67,6 +67,13 @@
         <code>NullpointerException</code> when failing to connect to the
         database. (kfujino)
       </fix>
+      <fix>
+        <bug>64765</bug>: Ensure that the number of currently processing threads
+        is tracked correctly when a web application is undeployed, long running
+        requests are being processed and
+        <code>renewThreadsWhenStoppingContext</code> is enabled for the web
+        application. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
