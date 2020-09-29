@@ -123,10 +123,6 @@
         Don't send the Keep-Alive response header if the connection has been
         explicitly closed. (markt)
       </fix>
-      <fix>
-        Fix running service.bat when called from <code>$CATALINA_HOME</code>.
-        (markt)
-      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
@@ -179,6 +175,10 @@
       <update>
         Update the CXF module to Apache CXF 3.4.0. (remm)
       </update>
+      <fix>
+        Fix running service.bat when called from <code>$CATALINA_HOME</code>.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
