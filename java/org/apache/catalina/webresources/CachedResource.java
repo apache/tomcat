@@ -412,10 +412,15 @@ public class CachedResource implements WebResource {
     // Assume that the cache entry will always include the content unless the
     // resource content is larger than objectMaxSizeBytes. This isn't always the
     // case but it makes tracking the current cache size easier.
+    // The entry size should contain the webapp resource path and contents,
+    // because cached resources can contain very, very long error paths,
+    // which can cause the JVM to fail in garbage cleanup.
     long getSize() {
         long result = CACHE_ENTRY_SIZE;
-        if (getContentLength() <= objectMaxSizeBytes) {
-            result += getContentLength();
+        long webappPathLength = getWebappPath().getBytes().length;
+        long size = getContentLength() + webappPathLength;
+        if (size <= objectMaxSizeBytes) {
+            result += size;
         }
         return result;
     }
