@@ -92,7 +92,13 @@ public class ThreadPoolExecutor extends java.util.concurrent.ThreadPoolExecutor 
 
     @Override
     protected void afterExecute(Runnable r, Throwable t) {
-        submittedCount.decrementAndGet();
+        // Throwing StopPooledThreadException is likely to cause this method to
+        // be called more than once for a given task based on the typical
+        // implementations of the parent class. This test ensures that
+        // decrementAndGet() is only called once after each task execution.
+        if (!(t instanceof StopPooledThreadException)) {
+            submittedCount.decrementAndGet();
+        }
 
         if (t == null) {
             stopCurrentThreadIfNeeded();
