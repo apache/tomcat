@@ -586,6 +586,7 @@ public class TestHttp11Processor extends TomcatBaseTest {
 
         Client client = new Client(tomcat.getConnector().getLocalPort());
         client.setRequest(new String[] {request});
+        client.setUseContentLength(true);
 
         client.connect();
         client.processRequest();
